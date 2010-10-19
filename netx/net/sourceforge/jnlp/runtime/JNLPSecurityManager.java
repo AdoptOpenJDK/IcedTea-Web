@@ -1,0 +1,541 @@
+// Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+
+package net.sourceforge.jnlp.runtime;
+
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.lang.ref.WeakReference;
+import java.net.SocketPermission;
+import java.security.AllPermission;
+import java.security.AccessControlException;
+import java.security.AccessController;
+import java.security.Permission;
+import java.security.PrivilegedAction;
+import java.security.SecurityPermission;
+import java.util.PropertyPermission;
+
+import javax.swing.JWindow;
+
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.WeakList;
+import sun.awt.AWTSecurityManager;
+import sun.awt.AppContext;
+import sun.security.util.SecurityConstants;
+
+/**
+ * Security manager for JNLP environment.  This security manager
+ * cannot be replaced as it always denies attempts to replace the
+ * security manager or policy.<p>
+ *
+ * The JNLP security manager tracks windows created by an
+ * application, allowing those windows to be disposed when the
+ * application exits but the JVM does not.  If security is not
+ * enabled then the first application to call System.exit will
+ * halt the JVM.<p>
+ *
+ * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
+ * @version $Revision: 1.17 $
+ */
+class JNLPSecurityManager extends AWTSecurityManager {
+
+    // todo: some apps like JDiskReport can close the VM even when
+    // an exit class is set - fix!
+
+    // todo: create an event dispatch thread for each application,
+    // so that the context classloader doesn't have to be switched
+    // to the foreground application (the currently the approach
+    // since some apps need their classloader as event dispatch
+    // thread's context classloader).
+
+    // todo: use a custom Permission object to identify the current
+    // application in an AccessControlContext by setting a side
+    // effect in its implies method.  Use a custom
+    // AllPermissions-like permission to do this for apps granted
+    // all permissions (but investigate whether this will nuke
+    // the all-permission optimizations in the JRE).
+
+    // todo: does not exit app if close button pressed on JFrame
+    // with CLOSE_ON_EXIT (or whatever) set; if doesn't exit, use an
+    // WindowListener to catch WindowClosing event, then if exit is
+    // called immediately afterwards from AWT thread.
+
+    // todo: deny all permissions to applications that should have
+    // already been 'shut down' by closing their resources and
+    // interrupt the threads if operating in a shared-VM (exit class
+    // set).  Deny will probably will slow checks down a lot though.
+
+    // todo: weak remember last getProperty application and
+    // re-install properties if another application calls, or find
+    // another way for different apps to have different properties
+    // in java.lang.Sytem with the same names.
+
+    private static String R(String key) { return JNLPRuntime.getMessage(key); }
+
+    /** only class that can exit the JVM, if set */
+    private Object exitClass = null;
+
+    /** this exception prevents exiting the JVM */
+    private SecurityException closeAppEx = // making here prevents huge stack traces
+        new SecurityException(JNLPRuntime.getMessage("RShutdown"));
+
+    /** weak list of windows created */
+    private WeakList weakWindows = new WeakList();
+
+    /** weak list of applications corresponding to window list */
+    private WeakList weakApplications = new WeakList();
+
+    /** weak reference to most app who's windows was most recently activated */
+    private WeakReference activeApplication = null;
+
+    /** Sets whether or not exit is allowed (in the context of the plugin, this is always false) */
+    private boolean exitAllowed = true;
+
+    /**
+     * The AppContext of the main application (netx). We need to store this here
+     * so we can return this when no code from an external application is
+     * running on the thread
+     */
+    private AppContext mainAppContext;
+
+    /**
+     * Creates a JNLP SecurityManager.
+     */
+    JNLPSecurityManager() {
+        // this has the side-effect of creating the Swing shared Frame
+        // owner.  Since no application is running at this time, it is
+        // not added to any window list when checkTopLevelWindow is
+        // called for it (and not disposed).
+
+        if (!JNLPRuntime.isHeadless())
+            new JWindow().getOwner();
+
+        mainAppContext = AppContext.getAppContext();
+    }
+
+    /**
+     * Returns whether the exit class is present on the stack, or
+     * true if no exit class is set.
+     */
+    public boolean isExitClass() {
+        return isExitClass(getClassContext());
+    }
+
+    /**
+     * Returns whether the exit class is present on the stack, or
+     * true if no exit class is set.
+     */
+    private boolean isExitClass(Class stack[]) {
+        if (exitClass == null)
+            return true;
+
+        for (int i=0; i < stack.length; i++)
+            if (stack[i] == exitClass)
+                return true;
+
+        return false;
+    }
+
+    /**
+     * Set the exit class, which is the only class that can exit the
+     * JVM; if not set then any class can exit the JVM.
+     *
+     * @param exitClass the exit class
+     * @throws IllegalStateException if the exit class is already set
+     */
+    public void setExitClass(Class exitClass) throws IllegalStateException {
+        if (this.exitClass != null)
+            throw new IllegalStateException(R("RExitTaken"));
+
+        this.exitClass = exitClass;
+    }
+
+    /**
+     * Return the current Application, or null if none can be
+     * determined.
+     */
+    protected ApplicationInstance getApplication() {
+        return getApplication(getClassContext(), 0);
+    }
+
+    /**
+     * Return the application the opened the specified window (only
+     * call from event dispatch thread).
+     */
+    protected ApplicationInstance getApplication(Window window) {
+        for (int i = weakWindows.size(); i-->0;) {
+            Window w = (Window) weakWindows.get(i);
+            if (w == null) {
+                weakWindows.remove(i);
+                weakApplications.remove(i);
+            }
+
+            if (w == window)
+                return (ApplicationInstance) weakApplications.get(i);
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the current Application, or null.
+     */
+    protected ApplicationInstance getApplication(Class stack[], int maxDepth) {
+        if (maxDepth <= 0)
+                maxDepth = stack.length;
+
+        // this needs to be tightened up
+        for (int i=0; i < stack.length && i < maxDepth; i++) {
+                if (stack[i].getClassLoader() instanceof JNLPClassLoader) {
+                        JNLPClassLoader loader = (JNLPClassLoader) stack[i].getClassLoader();
+
+                        if (loader != null && loader.getApplication() != null) {
+                                return loader.getApplication();
+                        }
+                }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the application's thread group if the application can
+     * be determined; otherwise returns super.getThreadGroup()
+     */
+    public ThreadGroup getThreadGroup() {
+        ApplicationInstance app = getApplication();
+        if (app == null)
+            return super.getThreadGroup();
+
+        return app.getThreadGroup();
+    }
+
+    /**
+     * Throws a SecurityException if the permission is denied,
+     * otherwise return normally.  This method always denies
+     * permission to change the security manager or policy.
+     */
+    public void checkPermission(Permission perm) {
+        String name = perm.getName();
+
+        // Enable this manually -- it'll produce too much output for -verbose
+        // otherwise.
+        //      if (true)
+        //        System.out.println("Checking permission: " + perm.toString());
+
+        if (!JNLPRuntime.isWebstartApplication() &&
+              ("setPolicy".equals(name) || "setSecurityManager".equals(name)))
+            throw new SecurityException(R("RCantReplaceSM"));
+
+        try {
+            // deny all permissions to stopped applications
+                // The call to getApplication() below might not work if an
+                // application hasn't been fully initialized yet.
+//            if (JNLPRuntime.isDebug()) {
+//                if (!"getClassLoader".equals(name)) {
+//                    ApplicationInstance app = getApplication();
+//                    if (app != null && !app.isRunning())
+//                        throw new SecurityException(R("RDenyStopped"));
+//                }
+//            }
+
+                        try {
+                                super.checkPermission(perm);
+                        } catch (SecurityException se) {
+
+                                //This section is a special case for dealing with SocketPermissions.
+                                if (JNLPRuntime.isDebug())
+                                        System.err.println("Requesting permission: " + perm.toString());
+
+                                //Change this SocketPermission's action to connect and accept
+                                //(and resolve). This is to avoid asking for connect permission
+                                //on every address resolve.
+                                Permission tmpPerm = null;
+                                if (perm instanceof SocketPermission) {
+                                        tmpPerm = new SocketPermission(perm.getName(),
+                                                        SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION);
+
+                                        // before proceeding, check if we are trying to connect to same origin
+                                        ApplicationInstance app = getApplication();
+                                        JNLPFile file = app.getJNLPFile();
+
+                                        String srcHost =  file.getSourceLocation().getAuthority();
+                                        String destHost = name;
+
+                                        // host = abc.xyz.com or abc.xyz.com:<port>
+                                        if (destHost.indexOf(':') >= 0)
+                                                destHost = destHost.substring(0, destHost.indexOf(':'));
+
+                                        // host = abc.xyz.com
+                                        String[] hostComponents = destHost.split("\\.");
+
+                                        int length = hostComponents.length;
+                                        if (length >= 2) {
+
+                                                // address is in xxx.xxx.xxx format
+                                                destHost = hostComponents[length -2] + "." + hostComponents[length -1];
+
+                                                // host = xyz.com i.e. origin
+                                                boolean isDestHostName = false;
+
+                                                // make sure that it is not an ip address
+                                                try {
+                                                        Integer.parseInt(hostComponents[length -1]);
+                                                } catch (NumberFormatException e) {
+                                                        isDestHostName = true;
+                                                }
+
+                                                if (isDestHostName) {
+                                                        // okay, destination is hostname. Now figure out if it is a subset of origin
+                                                        if (srcHost.endsWith(destHost)) {
+                                                                addPermission(tmpPerm);
+                                                                return;
+                                                        }
+                                                }
+                                        }
+
+                                } else if (perm instanceof SecurityPermission) {
+
+                                    // JCE's initialization requires putProviderProperty permission
+                                    if (perm.equals(new SecurityPermission("putProviderProperty.SunJCE"))) {
+                                        if (inTrustedCallChain("com.sun.crypto.provider.SunJCE", "run")) {
+                                            return;
+                                        }
+                                    }
+
+                                } else if (perm instanceof RuntimePermission) {
+
+                                    // KeyGenerator's init method requires internal spec access
+                                    if (perm.equals(new SecurityPermission("accessClassInPackage.sun.security.internal.spec"))) {
+                                        if (inTrustedCallChain("javax.crypto.KeyGenerator", "init")) {
+                                            return;
+                                        }
+                                    }
+
+                                } else {
+                                    tmpPerm = perm;
+                                }
+
+                                if (tmpPerm != null) {
+                                    //askPermission will only prompt the user on SocketPermission
+                                    //meaning we're denying all other SecurityExceptions that may arise.
+                                    if (askPermission(tmpPerm)) {
+                                        addPermission(tmpPerm);
+                                        //return quietly.
+                                    } else {
+                                        throw se;
+                                    }
+                                }
+                        }
+        }
+        catch (SecurityException ex) {
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("Denying permission: "+perm);
+            }
+            throw ex;
+        }
+    }
+
+    /**
+     * Returns weather the given class and method are in the current stack,
+     * and whether or not everything upto then is trusted
+     *
+     * @param className The name of the class to look for in the stack
+     * @param methodName The name of the method for the given class to look for in the stack
+     * @return Weather or not class::method() are in the chain, and everything upto there is trusted
+     */
+    private boolean inTrustedCallChain(String className, String methodName) {
+
+        StackTraceElement[] stack =  Thread.currentThread().getStackTrace();
+
+        for (int i=0; i < stack.length; i++) {
+
+            // Everything up to the desired class/method must be trusted
+            if (!stack[i].getClass().getProtectionDomain().implies(new AllPermission())) {
+                return false;
+            }
+
+            if (stack[i].getClassName().equals(className) &&
+                stack[i].getMethodName().equals(methodName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Asks the user whether or not to grant permission.
+     * @param perm the permission to be granted
+     * @return true if the permission was granted, false otherwise.
+     */
+    private boolean askPermission(Permission perm)      {
+
+        ApplicationInstance app = getApplication();
+        if (app != null && !app.isSigned()) {
+                if (perm instanceof SocketPermission
+                                && ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.NETWORK, perm.getName())) {
+                        return true;
+                }
+        }
+
+        return false;
+    }
+
+    /**
+     * Adds a permission to the JNLPClassLoader.
+     * @param perm the permission to add to the JNLPClassLoader
+     */
+    private void addPermission(Permission perm) {
+        if (JNLPRuntime.getApplication().getClassLoader() instanceof JNLPClassLoader) {
+
+                JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
+                cl.addPermission(perm);
+                if (JNLPRuntime.isDebug()) {
+                        if (cl.getPermissions(null).implies(perm))
+                                System.err.println("Added permission: " + perm.toString());
+                        else
+                                System.err.println("Unable to add permission: " + perm.toString());
+                }
+        } else {
+                if (JNLPRuntime.isDebug())
+                        System.err.println("Unable to add permission: " + perm + ", classloader not JNLP.");
+        }
+    }
+
+    /**
+     * Checks whether the window can be displayed without an applet
+     * warning banner, and adds the window to the list of windows to
+     * be disposed when the calling application exits.
+     */
+    public boolean checkTopLevelWindow(Object window) {
+        ApplicationInstance app = getApplication();
+
+        // remember window -> application mapping for focus, close on exit
+        if (app != null && window instanceof Window) {
+            Window w = (Window) window;
+
+            if (JNLPRuntime.isDebug())
+                System.err.println("SM: app: "+app.getTitle()+" is adding a window: "+window);
+
+            weakWindows.add(window); // for mapping window -> app
+            weakApplications.add(app);
+
+            app.addWindow(w);
+        }
+
+        // change coffee cup to netx for default icon
+        if (window instanceof Window)
+            for (Window w = (Window)window; w != null; w = w.getOwner())
+                if (window instanceof Frame)
+                    ((Frame)window).setIconImage(JNLPRuntime.getWindowIcon());
+
+        // todo: set awt.appletWarning to custom message
+        // todo: logo on with glass pane on JFrame/JWindow?
+
+        return super.checkTopLevelWindow(window);
+    }
+
+    /**
+     * Checks whether the caller can exit the system.  This method
+     * identifies whether the caller is a real call to Runtime.exec
+     * and has special behavior when returning from this method
+     * would exit the JVM and an exit class is set: if the caller is
+     * not the exit class then the calling application will be
+     * stopped and its resources destroyed (when possible), and an
+     * exception will be thrown to prevent the JVM from shutting
+     * down.<p>
+     *
+     * Calls not from Runtime.exit or with no exit class set will
+     * behave normally, and the exit class can always exit the JVM.
+     */
+    public void checkExit(int status) {
+
+        // applets are not allowed to exit, but the plugin main class (primordial loader) is
+        Class stack[] = getClassContext();
+        if (!exitAllowed) {
+                for (int i=0; i < stack.length; i++)
+                        if (stack[i].getClassLoader() != null)
+                                throw new AccessControlException("Applets may not call System.exit()");
+        }
+
+        super.checkExit(status);
+
+        boolean realCall = (stack[1] == Runtime.class);
+
+        if (isExitClass(stack)) // either exitClass called or no exitClass set
+            return; // to Runtime.exit or fake call to see if app has permission
+
+        // not called from Runtime.exit()
+        if (!realCall) {
+            // apps that can't exit should think they can exit normally
+            super.checkExit(status);
+            return;
+        }
+
+        // but when they really call, stop only the app instead of the JVM
+        ApplicationInstance app = getApplication(stack, 0);
+        if (app == null) {
+            // should check caller to make sure it is JFrame.close or
+            // other known System.exit call
+            if (activeApplication != null)
+                app = (ApplicationInstance) activeApplication.get();
+
+            if (app == null)
+                throw new SecurityException(R("RExitNoApp"));
+        }
+
+        app.destroy();
+
+        throw closeAppEx;
+    }
+
+    protected void disableExit() {
+        exitAllowed = false;
+    }
+
+    /**
+     * This returns the appropriate {@link AppContext}. Hooks in AppContext
+     * check if the current {@link SecurityManager} is an instance of
+     * AWTSecurityManager and if so, call this method to give it a chance to
+     * return the appropriate appContext based on the application that is
+     * running.<p>
+     *
+     * This can be called from any thread (possibly a swing thread) to find out
+     * the AppContext for the thread (which may correspond to a particular
+     * applet).
+     */
+    @Override
+    public AppContext getAppContext() {
+        ApplicationInstance app = getApplication();
+        if (app == null) {
+            /*
+             * if we cannot find an application based on the code on the stack,
+             * then assume it is the main application
+             */
+            return mainAppContext;
+        } else {
+            return app.getAppContext();
+        }
+
+    }
+
+}

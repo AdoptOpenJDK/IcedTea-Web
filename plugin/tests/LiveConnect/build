@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# change to dir with tests
+cd `dirname $0`
+
+JAVAC=javac
+JAR=jar
+
+if [ ! -z $JAVA_HOME ]; then
+    JAVAC=$JAVA_HOME/bin/javac
+    JAVAC=$JAVA_HOME/bin/jar
+fi
+
+$JAVAC PluginTest.java DummyObject.java OverloadTestHelper*java
+$JAR cf PluginTest.jar PluginTest.class DummyObject.class OverloadTestHelper*class
+rm -f *class
+
+echo "Done. Now launch \"firefox file://`pwd`/index.html\""

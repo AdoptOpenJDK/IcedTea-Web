@@ -1,0 +1,91 @@
+<HTML>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<HEAD>
+
+    <style type="text/css">
+        table.results {
+            background-color: white;
+            border-collapse: collapse;
+            border-color: black black black black;
+            border-spacing: 0px;
+            border-style: outset outset outset outset;
+            border-width: 0px 0px 0px 0px;
+        }
+
+        table.results th {
+            background-color: white;
+            border-style: inset inset inset inset;
+            border-color: gray gray gray gray;
+            border-width: 1px 1px 1px 1px;
+            padding: 1px 1px 1px 1px;
+        }
+
+        table.results td {
+            background-color: white;
+            border-color: gray gray gray gray;
+            border-style: inset inset inset inset;
+            border-width: 1px 1px 1px 1px;
+            padding: 2px 2px 2px 2px;
+        }
+
+    </style>
+
+    <!-- Load all tests scripts -->
+    <script language="JavaScript" src="common.js"></script>
+    <script language="JavaScript" src="jsj_get_tests.js"></script>
+    <script language="JavaScript" src="jsj_set_tests.js"></script>
+    <script language="JavaScript" src="jsj_func_rettype_tests.js"></script>
+    <script language="JavaScript" src="jsj_func_parameters_tests.js"></script>
+    <script language="JavaScript" src="jsj_func_overload_tests.js"></script>
+    <script language="JavaScript" src="jsj_type_conversion_tests.js"></script>    
+    <script language="JavaScript" src="jjs_tests.js"></script>
+    <script language="JavaScript" src="jjs_get_tests.js"></script>
+    <script language="JavaScript" src="jjs_set_tests.js"></script>
+    <script language="JavaScript" src="jjs_func_rettype_tests.js"></script>
+    <script language="JavaScript" src="jjs_func_parameters_tests.js"></script>
+    <script language="JavaScript" src="jjs_eval_test.js"></script>
+
+</HEAD>
+
+<BODY>
+
+<!-- Test selection/launch input -->
+<form id="testForm">
+    <table STYLE="width:100%; float:static">
+        <tr>
+            <td>
+                <input type=checkbox name="jsjget"><tt>JS -> Java read tests</tt><BR>
+                <input type=checkbox name="jsjset"><tt>JS -> Java set tests</tt><BR>
+                <input type=checkbox name="jsjfp"><tt>JS -> Java function parameter conversion tests</tt><BR>
+                <input type=checkbox name="jsjfrt"><tt>JS -> Java function return type tests</tt><BR>
+                <input type=checkbox name="jsjfr"><tt>JS -> Java function resolution tests</tt><BR>
+            </td>
+            <td>
+                <input type=checkbox name="jsjtc"><tt>JS -> Java type conversion tests</tt><BR>
+                <input type=checkbox name="jjsget"><tt>Java -> JS read tests</tt><BR>
+                <input type=checkbox name="jjsset"><tt>Java -> JS set tests</tt><BR>
+                <input type=checkbox name="jjcparam"><tt>Java -> JS function parameter conversion tests</tt><BR>
+                <input type=checkbox name="jjcrt"><tt>Java -> JS function return type tests</tt><BR>
+                <input type=checkbox name="jjeval"><tt>Java -> JS eval test</tt><BR>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type=button id="run_selected" value="Run selected tests" onclick="doTest();">
+                <input type=button id= "run_all" value="Run all tests" onclick="testAll();">
+            </td>
+        </tr>
+    </table>
+</form>
+
+<!-- Results -->
+<DIV ID="RESULTS">
+    <DIV ID="totals" STYLE="width:100%; float:static"></DIV>
+    <DIV ID="results" STYLE="width:100%; float:static"></DIV>
+</DIV>
+
+<APPLET CODE="PluginTest.class" ARCHIVE="PluginTest.jar" NAME="PluginTest" WIDTH="0" HEIGHT=0 MAYSCRIPT></APPLET><BR>
+
+</BODY>
+</HTML>

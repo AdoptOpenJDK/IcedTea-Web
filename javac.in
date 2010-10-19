@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+use strict;
+use constant NO_DUP_ARGS => qw(-source -target -d -encoding);
+use constant STRIP_ARGS => qw(-Werror -implicit:none);
+
+my $ECJ_WARNINGS="-warn:-unused,-serial";
+my $JAVAC_WARNINGS="-Xlint:all,-serial";
+
+my @bcoption;
+push @bcoption, '-bootclasspath', glob '@abs_top_builddir@/bootstrap/jdk1.6.0/jre/lib/rt.jar'
+    unless grep {$_ eq '-bootclasspath'} @ARGV;
+my @ecj_parms = ($ECJ_WARNINGS, @bcoption);
+
+# Work around ecj's inability to handle duplicate command-line
+# options and unknown javac options.
+sub gen_ecj_opts
+{
+    my @new_args = @{$_[0]};
+
+    for my $opt (NO_DUP_ARGS) 
+    {
+	my @indices = reverse grep {$new_args[$_] eq $opt} 0..$#new_args;
+	if (@indices > 1) {
+	    shift @indices;    # keep last instance only
+	    splice @new_args, $_, 2 for @indices;
+	}
+    }
+
+    for my $opt (STRIP_ARGS) 
+    {
+	my @indices = reverse grep {$new_args[$_] eq $opt} 0..$#new_args;
+	splice @new_args, $_, 1 for @indices;
+    }
+
+    return @new_args;
+}
+
+if ( -e "@abs_top_builddir@/native-ecj" )
+{
+    my @ecj_args = gen_ecj_opts( \@ARGV );
+    exec '@abs_top_builddir@/native-ecj', @ecj_parms, @ecj_args ;
+}
+elsif ( -e "@JAVAC@" )
+{
+    if ("@USING_ECJ@" eq "yes")
+    {
+	my @ecj_args = gen_ecj_opts( \@ARGV );
+	exec '@JAVAC@', @ecj_parms, @ecj_args ;
+    }
+    else
+    {
+	exec '@JAVAC@', $JAVAC_WARNINGS, @ARGV ;
+    }
+}
+else
+{
+    my @ecj_args = gen_ecj_opts( \@ARGV );
+    my @CLASSPATH = ('@ECJ_JAR@');
+    push @CLASSPATH, split /:/, $ENV{"CLASSPATH"} if exists $ENV{"CLASSPATH"};
+    $ENV{"CLASSPATH"} = join ':', @CLASSPATH;
+    exec '@JAVA@', 'org.eclipse.jdt.internal.compiler.batch.Main', @ecj_parms, @ecj_args;
+}
