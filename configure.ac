@@ -1,5 +1,5 @@
 AC_INIT([icedtea-web],[1.0pre],[distro-pkg-dev@openjdk.java.net])
-AM_INIT_AUTOMAKE([1.9 tar-pax])
+AM_INIT_AUTOMAKE([1.9 tar-pax foreign])
 AC_CONFIG_FILES([Makefile])
 
 # Older automake doesn't generate these correctly

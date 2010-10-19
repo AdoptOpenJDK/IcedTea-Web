@@ -1,5 +1,16 @@
 2010-10-19  Andrew John Hughes  <ahughes@redhat.com>
 
+	* Makefile.am:
+	(PLUGIN_LAUNCHER_OBJECTS): Do prefixing once.
+	(NETX_LAUNCHER_OBJECTS): Likewise for NetX.
+	(pluginappletviewer): Use PLUGIN_LAUNCHER_OBJECTS.
+	(javaws): Use NETX_LAUNCHER_OBJECTS.
+	* configure.ac: Re-enable foreign (I want to use
+	GNU make!)
+	* README: Use gmake not make.
+
+2010-10-19  Andrew John Hughes  <ahughes@redhat.com>
+
 	* .hgignore,
 	* Makefile.am,
 	* acinclude.m4,

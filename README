@@ -48,8 +48,8 @@ IcedTea-Web is built using the standard:
 
 $ ./autogen.sh (if building from Mercurial rather than a tarball)
 $ ./configure
-$ make
-$ make install
+$ gmake
+$ gmake install
 
 incantation.  The build requirements are as follows:
 
