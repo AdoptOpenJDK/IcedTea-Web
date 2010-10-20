@@ -6,8 +6,14 @@ Deepak Bhole <dbhole@redhat.com>
 Thomas Fitzsimmons <fitzsim@redhat.com>
 Andrew John Hughes <gnu_andrew@member.fsf.org, ahughes@redhat.com>
 Matthias Klose <doko@ubuntu.com>
+Francis Kung <fkung@redhat.com>
 Omair Majid <omajid@redhat.com>
+Andrew Su <asu@redhat.com>
+Joshua Sumali <jsumali@redhat.com>
+Mark Wielaard <mark@klomp.org>
+Man Lung Wong <mwong@redhat.com>
 
 This project also includes code from the following projects:
 
 OpenJDK <http://openjdk.java.net/>
+Netx <http://jnlp.sourceforge.net/netx/>
