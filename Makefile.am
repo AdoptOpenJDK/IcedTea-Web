@@ -287,7 +287,7 @@ extra-source-files.txt:
 stamps/extra-class-files.stamp: extra-source-files.txt stamps/netx.stamp
 	mkdir -p extra-lib
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) -d extra-lib \
-          -sourcepath extra -cp netx.build \
+          -sourcepath $(abs_top_srcdir)/extra -cp netx.build \
           -bootclasspath $(RUNTIME) @extra-source-files.txt
 	cp -r $(NETX_EXTRA_DIR) extra-lib/net/sourceforge/jnlp/about
 	mkdir -p stamps

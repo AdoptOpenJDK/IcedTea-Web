@@ -1,3 +1,7 @@
+2010-10-20  Matthias Klose  <doko@ubuntu.com>
+
+	* Makefile.am (stamps/extra-class-files.stamp): Fix -sourcepath.
+
 2010-10-20  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
