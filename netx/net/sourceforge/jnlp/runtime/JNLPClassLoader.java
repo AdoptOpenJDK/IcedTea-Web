@@ -59,6 +59,7 @@ import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.security.SecurityWarningDialog;
 import net.sourceforge.jnlp.tools.JarSigner;
+import net.sourceforge.jnlp.util.FileUtils;
 import sun.misc.JarIndex;
 
 /**
@@ -169,6 +170,41 @@ public class JNLPClassLoader extends URLClassLoader {
 
         setSecurity();
 
+        installShutdownHooks();
+
+    }
+
+    /**
+     * Install JVM shutdown hooks to clean up resources allocated by this
+     * ClassLoader.
+     */
+    private void installShutdownHooks() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                if (JNLPRuntime.isDebug()) {
+                    System.out.println("Cleaning up native directory" + nativeDir.getAbsolutePath());
+                }
+
+                /*
+                 * Delete only the native dir created by this classloader (if
+                 * there is one). Other classloaders (parent, peers) will all
+                 * cleanup things they created
+                 */
+                if (nativeDir != null) {
+                    try {
+                        FileUtils.recursiveDelete(nativeDir,
+                                new File(System.getProperty("java.io.tmpdir")));
+                    } catch (IOException e) {
+                        /*
+                         * failed to delete a file in tmpdir, no big deal (not
+                         * to mention that the VM is shutting down at this
+                         * point so no much we can do)
+                         */
+                    }
+                }
+            }
+        });
     }
 
     private void setSecurity() throws LaunchException {
@@ -741,9 +777,6 @@ public class JNLPClassLoader extends URLClassLoader {
         if (localFile == null)
             return;
 
-        if (nativeDir == null)
-            nativeDir = getNativeDir();
-
         String[] librarySuffixes = { ".so", ".dylib", ".jnilib", ".framework", ".dll" };
 
         try {
@@ -770,10 +803,14 @@ public class JNLPClassLoader extends URLClassLoader {
                     continue;
                 }
 
+                if (nativeDir == null)
+                    nativeDir = getNativeDir();
+
                 File outFile = new File(nativeDir, name);
 
                 CacheUtil.streamCopy(jarFile.getInputStream(e),
                                      new FileOutputStream(outFile));
+
             }
         }
         catch (IOException ex) {

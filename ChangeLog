@@ -1,3 +1,12 @@
+2010-10-20  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(JNLPClassLoader): Call installShutdownHooks.
+	(installShutdownHooks): New method. Installs a shutdown hook to
+	recursively delete the contents of nativeDir.
+	(activateNative): Only create a nativeDir if there are native
+	libraries.
+
 2010-10-19  Deepak Bhole  <dbhole@redhat.com>
 
 	* Makefile.am:
