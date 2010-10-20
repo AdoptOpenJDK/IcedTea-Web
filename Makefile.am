@@ -306,7 +306,7 @@ $(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 	$(CC) $(LAUNCHER_FLAGS) -DJAVA_ARGS='{ "-J-ms8m", "net.sourceforge.jnlp.runtime.Boot",  }' -DPROGNAME='"javaws"' \
 	-c -o $@ $<
 
-launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
+$(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
 	mkdir -p launcher
 	$(CC) $(LAUNCHER_LINK) $(NETX_LAUNCHER_OBJECTS)
 
