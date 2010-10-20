@@ -26,9 +26,11 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Calendar;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -50,6 +52,26 @@ public class PluginBridge extends JNLPFile
         fileVersion = new Version("1.1");
         this.codeBase = codebase;
         this.sourceLocation = documentBase;
+        
+        if (atts.containsKey("jnlp_href")){
+            try {
+                URL jnlp = new URL(codeBase.toExternalForm() + (String) atts.get("jnlp_href"));
+                JNLPFile jnlp_file = new JNLPFile(jnlp);
+                Map jnlp_params = jnlp_file.getApplet().getParameters();
+                
+                // Change the parameter name to lowercase to follow conventions.
+                Iterator it = jnlp_params.keySet().iterator();
+                while(it.hasNext()){
+                    String key = (String) it.next();
+                    atts.put(key.toLowerCase(), jnlp_params.get(key));
+                }
+            } catch (MalformedURLException e) {
+                // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
+                // it is the site developer who should ensure that file exist.
+                System.err.println("Unable to get JNLP file at: " + codeBase.toExternalForm() 
+                        + (String) atts.get("jnlp_href"));
+            }
+        }
 
         // also, see if cache_archive is specified
         if (atts.get("cache_archive") != null && ((String) atts.get("cache_archive")).length() > 0) {

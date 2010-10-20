@@ -1,3 +1,9 @@
+2010-10-20  Andrew Su  <asu@redhat.com>
+
+	* PluginBridge.java:
+	(PluginBridge): Added parsing for jnlp_href, and reading the jnlp file
+	for applet parameters.
+
 2010-10-20  Matthias Klose  <doko@ubuntu.com>
 
 	* Makefile.am (stamps/extra-class-files.stamp): Fix -sourcepath.
