@@ -1,5 +1,6 @@
 # Source directories
 
+NETX_DIR = $(abs_top_builddir)/netx.build
 NETX_SRCDIR = $(abs_top_srcdir)/netx
 NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/jnlp/about/resources
@@ -93,14 +94,14 @@ endif
 LAUNCHER_SRCDIR = $(abs_top_srcdir)/launcher
 LAUNCHER_OBJECTS = java.o java_md.o splashscreen_stubs.o
 PLUGIN_LAUNCHER_OBJECTS = $(addprefix $(PLUGIN_DIR)/launcher/,$(LAUNCHER_OBJECTS))
-NETX_LAUNCHER_OBJECTS = $(addprefix $(PLUGIN_DIR)/launcher/,$(LAUNCHER_OBJECTS))
+NETX_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/,$(LAUNCHER_OBJECTS))
 LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -W -Wall -Wno-unused -Wno-parentheses -pipe -fno-omit-frame-pointer \
 	-g -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -D_REENTRANT -DLAUNCHER_NAME='"java"' -I$(LAUNCHER_SRCDIR) \
 	-DJDK_MAJOR_VERSION='"1"' -DJDK_MINOR_VERSION='"6"' -DLIBARCHNAME='"$(JRE_ARCH_DIR)"'
 LAUNCHER_LINK = -o $@ -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_DIR)/lib/$(INSTALL_ARCH_DIR) \
 	-Wl,-soname=lib.so  -L $(BOOT_DIR)/jre/lib/$(INSTALL_ARCH_DIR)/jli -Wl,-z -Wl,origin \
-	-Wl,--allow-shlib-undefined -Wl,-rpath -Wl,$$ORIGIN/../lib/$(INSTALL_ARCH_DIR)/jli -Wl,-rpath \
-	-Wl,$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli -lpthread $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lc -lz
+	-Wl,--allow-shlib-undefined -Wl,-rpath -Wl,\$$ORIGIN/../lib/$(INSTALL_ARCH_DIR)/jli -Wl,-rpath \
+	-Wl,\$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli -lpthread $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lc -lz
 PLUGIN_VERSION = IcedTea $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
 
 EXTRA_DIST = $(NETX_SRCDIR) $(abs_top_srcdir)/plugin javaws.png javaws.desktop extra launcher
@@ -108,7 +109,7 @@ EXTRA_DIST = $(NETX_SRCDIR) $(abs_top_srcdir)/plugin javaws.png javaws.desktop e
 # Top-Level Targets
 # =================
 
-all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher/javaws
+all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX_DIR)/launcher/javaws
 
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory clean-native-ecj
 
@@ -123,8 +124,8 @@ if ENABLE_PLUGIN
 	cp -pPRf $(PLUGIN_DIR)/launcher/pluginappletviewer $(DESTDIR)$(bindir)
 	cp -pPRf $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/plugin.jar
 endif
-	cp -pPRf $(abs_top_builddir)/netx.build/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/netx.jar
-	cp -pPRf launcher/javaws $(DESTDIR)$(bindir)
+	cp -pPRf $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/netx.jar
+	cp -pPRf $(NETX_DIR)/launcher/javaws $(DESTDIR)$(bindir)
 	cp extra-lib/about.jar $(DESTDIR)$(prefix)/jre/lib
 
 install-data-local:
@@ -202,6 +203,7 @@ stamps/plugin.stamp: $(ICEDTEAPLUGIN_TARGET)
 	touch stamps/plugin.stamp
 
 clean-plugin: $(ICEDTEAPLUGIN_CLEAN)
+	rm -rf $(PLUGIN_DIR)/launcher
 	rm -f stamps/plugin.stamp
 
 liveconnect-source-files.txt:
@@ -215,7 +217,7 @@ stamps/liveconnect.stamp: liveconnect-source-files.txt stamps/netx.stamp
 	  mkdir -p $(abs_top_builddir)/liveconnect && \
 	  $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	      -d $(abs_top_builddir)/liveconnect \
-	      -classpath $(abs_top_builddir)/netx.build:$(RUNTIME) \
+	      -classpath $(NETX_DIR):$(RUNTIME) \
 	      -sourcepath $(LIVECONNECT_SRCS) \
 	      @liveconnect-source-files.txt ; \
 	fi
@@ -249,31 +251,31 @@ netx-source-files.txt:
 	find $(NETX_SRCDIR) -name '*.java' | sort > $@
 
 stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
-	mkdir -p $(abs_top_builddir)/netx.build
+	mkdir -p $(NETX_DIR)
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	    -d $(abs_top_builddir)/netx.build \
+	    -d $(NETX_DIR) \
 	    -sourcepath $(NETX_SRCDIR) \
 	    -bootclasspath $(RUNTIME) \
 	    @netx-source-files.txt
-	cp -r $(NETX_RESOURCE_DIR) $(abs_top_builddir)/netx.build/net/sourceforge/jnlp
+	cp -r $(NETX_RESOURCE_DIR) $(NETX_DIR)/net/sourceforge/jnlp
 	mkdir -p stamps
 	touch $@
 
 stamps/netx-dist.stamp: stamps/netx.stamp
-	(cd $(abs_top_builddir)/netx.build ; \
+	(cd $(NETX_DIR) ; \
 	 mkdir -p lib ; \
 	 $(BOOT_DIR)/bin/jar cf lib/classes.jar javax/jnlp net ; \
 	 cp -pPR $(SRC_DIR_LINK) $(NETX_SRCDIR) src; \
 	 find src -type f -exec chmod 640 '{}' ';' -o -type d -exec chmod 750 '{}' ';'; \
 	 cd src ; \
-	 $(BOOT_DIR)/bin/jar uf $(abs_top_builddir)/netx.build/lib/classes.jar \
+	 $(BOOT_DIR)/bin/jar uf $(NETX_DIR)/lib/classes.jar \
 	  `find . -type f -not -name '*.java'` ; \
-	 $(ZIP) -qr $(abs_top_builddir)/netx.build/lib/src.zip javax net )
+	 $(ZIP) -qr $(NETX_DIR)/lib/src.zip javax net )
 	mkdir -p stamps
 	touch $@
 
 clean-netx:
-	rm -rf $(abs_top_builddir)/netx.build
+	rm -rf $(NETX_DIR)
 	rm -f stamps/netx-dist.stamp
 	rm -f netx-source-files.txt
 	rm -f stamps/netx.stamp
@@ -299,8 +301,8 @@ clean-extra:
 extra-lib/about.jar: stamps/extra-class-files.stamp
 	$(BOOT_DIR)/bin/jar cf $@ -C extra-lib net ;
 
-launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
-	mkdir -p launcher && \
+$(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
+	mkdir -p $(NETX_DIR)/launcher && \
 	$(CC) $(LAUNCHER_FLAGS) -DJAVA_ARGS='{ "-J-ms8m", "net.sourceforge.jnlp.runtime.Boot",  }' -DPROGNAME='"javaws"' \
 	-c -o $@ $<
 

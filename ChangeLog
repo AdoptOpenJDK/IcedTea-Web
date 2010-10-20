@@ -1,3 +1,19 @@
+2010-10-19  Deepak Bhole  <dbhole@redhat.com>
+
+	* Makefile.am:
+	(NETX_DIR): New variable representing the NetX build dir.
+	(NETX_LAUNCHER_OBJECTS): Prefix with $(NETX_DIR).
+	(LAUNCHER_LINK): Fixed escaping of ORIGIN to the rpath argument.
+	(all-local): Fix javaws launcher path.
+	(install-exec-local): Likewise, and use $(NETX_DIR) for NetX classes.jar.
+	(clean-plugin): Remove launcher.
+	(liveconnect): Use NETX_DIR in classpath.
+	(netx): Use NETX_DIR throughout.
+	(netx-dist): Likewise.
+	(clean-netx): Likewise.
+	($(NETX_DIR)/launcher/%.o)): Likewise.
+	* launcher/jni_md.h: Imported from OpenJDK.
+
 2010-10-20  Matthias Klose  <doko@ubuntu.com>
 
 	* Makefile.am: Fix build with builddir != srcdir.
