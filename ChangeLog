@@ -1,3 +1,7 @@
+2010-10-20  Matthias Klose  <doko@ubuntu.com>
+
+	* Makefile.am: Fix build with builddir != srcdir.
+
 2010-10-19  Andrew John Hughes  <ahughes@redhat.com>
 
 	* Makefile.am:

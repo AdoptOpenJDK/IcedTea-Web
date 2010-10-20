@@ -93,7 +93,7 @@ endif
 LAUNCHER_SRCDIR = $(abs_top_srcdir)/launcher
 LAUNCHER_OBJECTS = java.o java_md.o splashscreen_stubs.o
 PLUGIN_LAUNCHER_OBJECTS = $(addprefix $(PLUGIN_DIR)/launcher/,$(LAUNCHER_OBJECTS))
-NETX_LAUNCHER_OBJECTS = $(addprefix $(abs_top_builddir)/launcher/,$(LAUNCHER_OBJECTS))
+NETX_LAUNCHER_OBJECTS = $(addprefix $(PLUGIN_DIR)/launcher/,$(LAUNCHER_OBJECTS))
 LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -W -Wall -Wno-unused -Wno-parentheses -pipe -fno-omit-frame-pointer \
 	-g -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -D_REENTRANT -DLAUNCHER_NAME='"java"' -I$(LAUNCHER_SRCDIR) \
 	-DJDK_MAJOR_VERSION='"1"' -DJDK_MINOR_VERSION='"6"' -DLIBARCHNAME='"$(JRE_ARCH_DIR)"'
@@ -305,6 +305,7 @@ launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 	-c -o $@ $<
 
 launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
+	mkdir -p launcher
 	$(CC) $(LAUNCHER_LINK) $(NETX_LAUNCHER_OBJECTS)
 
 # plugin tests
