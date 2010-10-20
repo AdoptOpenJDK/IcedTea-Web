@@ -1,6 +1,12 @@
 2010-10-20  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(initializeResources): Do not perform url encoding on the file url. Stay
+	consistent with the unencoded urls used in getPermissions.
+
+2010-10-20  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
 	(JNLPClassLoader): Call installShutdownHooks.
 	(installShutdownHooks): New method. Installs a shutdown hook to
 	recursively delete the contents of nativeDir.
