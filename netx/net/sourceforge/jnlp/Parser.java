@@ -239,8 +239,10 @@ class Parser {
      * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
-    public List getResources(Node parent, boolean j2se) throws ParseException {
-        List result = new ArrayList();
+    public List<ResourcesDesc> getResources(Node parent, boolean j2se)
+        throws ParseException
+    {
+        List<ResourcesDesc> result = new ArrayList<ResourcesDesc>();
         Node resources[] = getChildNodes(parent, "resources");
 
         // ensure that there are at least one information section present
@@ -433,8 +435,10 @@ class Parser {
      * @param parent the parent node (jnlp)
      * @throws ParseException if the JNLP file is invalid
      */
-    public List getInfo(Node parent) throws ParseException {
-        List result = new ArrayList();
+    public List<InformationDesc> getInfo(Node parent)
+        throws ParseException
+    {
+        List<InformationDesc> result = new ArrayList<InformationDesc>();
         Node info[] = getChildNodes(parent, "information");
 
         // ensure that there are at least one information section present
@@ -455,7 +459,7 @@ class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     public InformationDesc getInformationDesc(Node node) throws ParseException {
-        List descriptionsUsed = new ArrayList();
+        List<String> descriptionsUsed = new ArrayList<String>();
 
         // locale
         Locale locales[] = getLocales(node);
@@ -642,7 +646,7 @@ class Parser {
         String name = getRequiredAttribute(node, "name", R("PUnknownApplet"));
         String main = getRequiredAttribute(node, "main-class", null);
         URL docbase = getURL(node, "documentbase", base);
-        Map paramMap = new HashMap();
+        Map<String,String> paramMap = new HashMap<String,String>();
         int width = 0;
         int height = 0;
 
@@ -673,7 +677,7 @@ class Parser {
      */
     public ApplicationDesc getApplication(Node node) throws ParseException {
         String main = getAttribute(node, "main-class", null);
-        List argsList = new ArrayList();
+        List<String> argsList = new ArrayList<String>();
 
         // if (main == null)
         //   only ok if can be found in main jar file (can't check here but make a note)
@@ -687,8 +691,7 @@ class Parser {
             argsList.add( getSpanText(args[i]) );
         }
 
-        String argStrings[] =
-            (String[]) argsList.toArray( new String[argsList.size()] );
+        String argStrings[] = argsList.toArray( new String[argsList.size()] );
 
         return new ApplicationDesc(main, argStrings);
     }
@@ -825,9 +828,9 @@ class Parser {
         if (source == null)
             return new String[0];
 
-        List result = new ArrayList();
+        List<String> result = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(source, " ");
-        StringBuffer part = new StringBuffer();
+        StringBuilder part = new StringBuilder();
         while (st.hasMoreTokens()) {
             part.setLength(0);
 
@@ -849,7 +852,7 @@ class Parser {
             result.add( part.toString() );
         }
 
-        return (String[]) result.toArray(new String[result.size()] );
+        return result.toArray(new String[result.size()] );
     }
 
     /**
@@ -858,7 +861,7 @@ class Parser {
      * @param node the node with a locale attribute
      */
     public Locale[] getLocales(Node node) {
-        List locales = new ArrayList();
+        List<Locale> locales = new ArrayList<Locale>();
         String localeParts[] =
             splitString(getAttribute(node, "locale", ""));
 
@@ -868,7 +871,7 @@ class Parser {
                 locales.add(l);
         }
 
-        return (Locale[]) locales.toArray(new Locale[locales.size()] );
+        return locales.toArray(new Locale[locales.size()] );
     }
 
     /**
@@ -936,7 +939,7 @@ class Parser {
      * Returns all child nodes with the specified name.
      */
     public static Node[] getChildNodes(Node node, String name) {
-        List result = new ArrayList();
+        List<Node> result = new ArrayList<Node>();
 
         Node child = node.getFirstChild();
         while (child != null) {
@@ -945,7 +948,7 @@ class Parser {
             child = child.getNextSibling();
         }
 
-        return (Node[]) result.toArray( new Node[result.size()] );
+        return result.toArray( new Node[result.size()] );
     }
 
 

@@ -40,64 +40,65 @@ public class PluginBridge extends JNLPFile
 
     String name;
     String[] jars = new String[0];
-    String[] cache_jars = new String[0];
-    String[] cache_ex_jars = new String[0];
-    Hashtable atts;
+    String[] cacheJars = new String[0];
+    String[] cacheExJars = new String[0];
+    Hashtable<String,String> atts;
 
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
-                        int width, int height, Hashtable atts)
+                        int width, int height, Hashtable<String,String> atts)
     throws Exception
     {
         specVersion = new Version("1.0");
         fileVersion = new Version("1.1");
         this.codeBase = codebase;
         this.sourceLocation = documentBase;
-        
+
         if (atts.containsKey("jnlp_href")){
             try {
-                URL jnlp = new URL(codeBase.toExternalForm() + (String) atts.get("jnlp_href"));
-                JNLPFile jnlp_file = new JNLPFile(jnlp);
-                Map jnlp_params = jnlp_file.getApplet().getParameters();
-                
+                URL jnlp = new URL(codeBase.toExternalForm() + atts.get("jnlp_href"));
+                JNLPFile jnlpFile = new JNLPFile(jnlp);
+                Map<String,String> jnlpParams = jnlpFile.getApplet().getParameters();
+
                 // Change the parameter name to lowercase to follow conventions.
-                Iterator it = jnlp_params.keySet().iterator();
-                while(it.hasNext()){
-                    String key = (String) it.next();
-                    atts.put(key.toLowerCase(), jnlp_params.get(key));
+                for (Map.Entry<String,String> entry : jnlpParams.entrySet()){
+                    atts.put(entry.getKey().toLowerCase(), entry.getValue());
                 }
             } catch (MalformedURLException e) {
                 // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
                 // it is the site developer who should ensure that file exist.
-                System.err.println("Unable to get JNLP file at: " + codeBase.toExternalForm() 
-                        + (String) atts.get("jnlp_href"));
+                System.err.println("Unable to get JNLP file at: " + codeBase.toExternalForm()
+                        + atts.get("jnlp_href"));
             }
         }
 
         // also, see if cache_archive is specified
-        if (atts.get("cache_archive") != null && ((String) atts.get("cache_archive")).length() > 0) {
+        String cacheArchive = atts.get("cache_archive");
+        if (cacheArchive != null && cacheArchive.length() > 0) {
 
             String[] versions = new String[0];
 
             // are there accompanying versions?
-            if (atts.get("cache_version") != null) {
-                versions = ((String) atts.get("cache_version")).split(",");
+            String cacheVersion = atts.get("cache_version");
+            if (cacheVersion != null) {
+                versions = cacheVersion.split(",");
             }
 
-            String[] jars = ((String) atts.get("cache_archive")).split(",");
-            cache_jars = new String[jars.length];
+            String[] jars = cacheArchive.split(",");
+            cacheJars = new String[jars.length];
 
             for (int i=0; i < jars.length; i++) {
 
-                cache_jars[i] = jars[i].trim();
+                cacheJars[i] = jars[i].trim();
 
                 if (versions.length > 0) {
-                    cache_jars[i] += ";" + versions[i].trim();
+                    cacheJars[i] += ";" + versions[i].trim();
                 }
             }
         }
 
-        if (atts.get("cache_archive_ex") != null && ((String) atts.get("cache_archive_ex")).length() > 0) {
-            cache_ex_jars = ((String) atts.get("cache_archive_ex")).split(",");
+        String cacheArchiveEx = atts.get("cache_archive_ex");
+        if (cacheArchiveEx != null && cacheArchiveEx.length() > 0) {
+            cacheExJars = cacheArchiveEx.split(",");
         }
 
         if (jar != null && jar.length() > 0) {
@@ -109,7 +110,7 @@ public class PluginBridge extends JNLPFile
         }
         this.atts = atts;
 
-        name = (String) atts.get("name");
+        name = atts.get("name");
         if (name == null)
             name = "Applet";
         else
@@ -140,11 +141,10 @@ public class PluginBridge extends JNLPFile
     public InformationDesc getInformation(final Locale locale)
     {
         return new InformationDesc(this, new Locale[] {locale}) {
-            protected List getItems(Object key)
+            protected List<Object> getItems(Object key)
             {
                 // Should we populate this list with applet attribute tags?
-                List result = new ArrayList();
-                return result;
+                return new ArrayList<Object>();
             }
         };
     }
@@ -153,102 +153,92 @@ public class PluginBridge extends JNLPFile
                                       final String arch)
     {
         return new ResourcesDesc(this, new Locale[] {locale}, new String[] {os},
-        new String[] {arch}) {
-            public List getResources(Class launchType)
+          new String[] {arch}) {
+            @Override
+            public <T> List<T> getResources(Class<T> launchType)
             {
-                List result = new ArrayList();
-                result.addAll(sharedResources.getResources(launchType));
-
                 // Need to add the JAR manually...
                 //should this be done to sharedResources on init?
-                try
+                if (launchType.equals(JARDesc.class))
                 {
-                    if (launchType.equals(JARDesc.class))
+                    try
                     {
+                        List<JARDesc> jarDescs = new ArrayList<JARDesc>();
+                        jarDescs.addAll(sharedResources.getResources(JARDesc.class));
+
                         for (int i = 0; i < jars.length; i++)
                             if (jars[i].length() > 0)
-                                result.add(new JARDesc(new URL(codeBase, jars[i]),
+                                jarDescs.add(new JARDesc(new URL(codeBase, jars[i]),
                                         null, null, false, true, false, true));
 
                         boolean cacheable = true;
 
-                        if (atts.get("cache_option") != null &&
-                                ((String) atts.get("cache_option")).equalsIgnoreCase("no"))
+                        String cacheOption = atts.get("cache_option");
+                        if (cacheOption != null && cacheOption.equalsIgnoreCase("no"))
                             cacheable = false;
 
-                        for (int i = 0; i < cache_jars.length; i++) {
+                        for (int i = 0; i < cacheJars.length; i++) {
 
-                            String[] jar_and_ver = cache_jars[i].split(";");
+                            String[] jarAndVer = cacheJars[i].split(";");
 
-                            String jar = jar_and_ver[0];
+                            String jar = jarAndVer[0];
                             Version version = null;
 
                             if (jar.length() == 0)
                                 continue;
 
-                            if (jar_and_ver.length > 1) {
-                                version = new Version(jar_and_ver[1]);
+                            if (jarAndVer.length > 1) {
+                                version = new Version(jarAndVer[1]);
                             }
 
-                            result.add(new JARDesc(new URL(codeBase, jar),
+                            jarDescs.add(new JARDesc(new URL(codeBase, jar),
                                     version, null, false, true, false, cacheable));
                         }
 
-                        for (int i = 0; i < cache_ex_jars.length; i++) {
+                        for (int i = 0; i < cacheExJars.length; i++) {
 
-                            if (cache_ex_jars[i].length() == 0)
+                            if (cacheExJars[i].length() == 0)
                                 continue;
 
-                            String[] jar_info = cache_ex_jars[i].split(";");
+                            String[] jarInfo = cacheExJars[i].split(";");
 
-                            String jar = jar_info[0].trim();
+                            String jar = jarInfo[0].trim();
                             Version version = null;
                             boolean lazy = true;
 
-                            if (jar_info.length > 1) {
+                            if (jarInfo.length > 1) {
 
                                 // format is name[[;preload];version]
 
-                                if (jar_info[1].equals("preload")) {
+                                if (jarInfo[1].equals("preload")) {
                                     lazy = false;
                                 } else {
-                                    version = new Version(jar_info[1].trim());
+                                    version = new Version(jarInfo[1].trim());
                                 }
 
-                                if (jar_info.length > 2) {
+                                if (jarInfo.length > 2) {
                                     lazy = false;
-                                    version = new Version(jar_info[2].trim());
+                                    version = new Version(jarInfo[2].trim());
                                 }
                             }
 
-                            result.add(new JARDesc(new URL(codeBase, jar),
+                            jarDescs.add(new JARDesc(new URL(codeBase, jar),
                                     version, null, lazy, true, false, false));
                         }
+                        // We know this is a safe list of JarDesc objects
+                        @SuppressWarnings("unchecked")
+                            List<T> result = (List<T>) jarDescs;
+                        return result;
                     }
+                    catch (MalformedURLException ex) { /* Ignored */ }
                 }
-                catch (MalformedURLException ex)
-                    { }
-                return result;
-            }
+                return sharedResources.getResources(launchType);
+             }
 
+            @Override
             public JARDesc[] getJARs() {
-                List resources = getResources(JARDesc.class);
-                ArrayList<JARDesc> jars = new ArrayList<JARDesc>();
-
-                //Only get the JARDescs
-                for (int i = 0; i < resources.size(); i++) {
-                    Object resource = resources.get(i);
-                    if (resource instanceof JARDesc)
-                        jars.add((JARDesc) resource);
-                }
-
-                Object[] objectArray = jars.toArray();
-                JARDesc[] jarArray = new JARDesc[objectArray.length];
-
-                for (int i = 0; i < objectArray.length; i++)
-                    jarArray[i] = (JARDesc) objectArray[i];
-
-                return jarArray;
+                List<JARDesc> jarDescs = getResources(JARDesc.class);
+                return jarDescs.toArray(new JARDesc[jarDescs.size()]);
             }
 
             public void addResource(Object resource)

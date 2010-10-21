@@ -32,10 +32,10 @@ import java.util.*;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.3 $
  */
-public class WeakList extends AbstractList {
+public class WeakList<E> extends AbstractList<E> {
 
     /* list of weak references */
-    private ArrayList refs = new ArrayList();
+    private ArrayList<WeakReference<E>> refs = new ArrayList<WeakReference<E>>();
 
 
     /**
@@ -47,9 +47,9 @@ public class WeakList extends AbstractList {
     /**
      * Extract the hard reference out of a weak reference.
      */
-    private Object deref(Object o) {
-        if (o != null && o instanceof WeakReference)
-            return ((WeakReference)o).get();
+    private E deref(WeakReference<E> o) {
+        if (o != null)
+            return o.get();
         else
             return null;
     }
@@ -58,7 +58,7 @@ public class WeakList extends AbstractList {
      * Returns the object at the specified index, or null if the
      * object has been collected.
      */
-    public Object get(int index) {
+    public E get(int index) {
         return deref(refs.get(index));
     }
 
@@ -75,23 +75,23 @@ public class WeakList extends AbstractList {
      * previous object at that position or null if it was already
      * collected.
      */
-    public Object set(int index, Object element) {
-        return deref(refs.set(index, new WeakReference(element)));
+    public E set(int index, E element) {
+        return deref(refs.set(index, new WeakReference<E>(element)));
     }
 
     /**
      * Inserts the object at the specified position in the list.
      * Automatically creates a weak reference to the object.
      */
-    public void add(int index, Object element) {
-        refs.add(index, new WeakReference(element));
+    public void add(int index, E element) {
+        refs.add(index, new WeakReference<E>(element));
     }
 
     /**
      * Removes the object at the specified position and returns it
      * or returns null if it was already collected.
      */
-    public Object remove(int index) {
+    public E remove(int index) {
         return deref(refs.remove(index));
     }
 
@@ -100,11 +100,11 @@ public class WeakList extends AbstractList {
      * returned list does not include the collected elements, so its
      * indices do not necessarily correlate with those of this list.
      */
-    public List hardList() {
-        List result = new ArrayList();
+    public List<E> hardList() {
+        List<E> result = new ArrayList<E>();
 
         for (int i=0; i < size(); i++) {
-            Object tmp = get(i);
+            E tmp = get(i);
 
             if (tmp != null)
                 result.add(tmp);

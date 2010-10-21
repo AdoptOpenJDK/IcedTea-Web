@@ -58,7 +58,7 @@ import net.sourceforge.jnlp.services.ServiceUtil;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.21 $
  */
-public final class Boot implements PrivilegedAction {
+public final class Boot implements PrivilegedAction<Void> {
 
     // todo: decide whether a spawned netx (external launch)
     // should inherit the same options as this instance (store argv?)
@@ -199,7 +199,7 @@ public final class Boot implements PrivilegedAction {
     /**
      * The privileged part (jdk1.3 compatibility).
      */
-    public Object run() {
+    public Void run() {
         JNLPRuntime.setBaseDir(getBaseDir());
         JNLPRuntime.setSecurityEnabled(null == getOption("-nosecurity"));
         JNLPRuntime.initialize(true);
@@ -418,7 +418,7 @@ public final class Boot implements PrivilegedAction {
      * returned once for each occurrence.
      */
     private static String[] getOptions(String option) {
-        List result = new ArrayList();
+        List<String> result = new ArrayList<String>();
 
         for (int i=0; i < args.length; i++) {
             if (option.equals(args[i])) {
@@ -433,7 +433,7 @@ public final class Boot implements PrivilegedAction {
                 i++;
         }
 
-        return (String[]) result.toArray( new String[result.size()] );
+        return result.toArray( new String[result.size()] );
     }
 
     /**

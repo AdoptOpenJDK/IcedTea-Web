@@ -43,8 +43,8 @@ public class ResourcesDesc {
     private JNLPFile jnlpFile;
 
     /** list of jars, packages, properties, and extensions */
-    private List resources = new ArrayList(); // mixed list makes easier for lookup code
-
+    private List<Object> resources = new ArrayList<Object>();
+    // mixed list makes easier for lookup code
 
     /**
      * Create a representation of one information section of the
@@ -66,8 +66,8 @@ public class ResourcesDesc {
      * Returns the JVMs.
      */
     public JREDesc[] getJREs() {
-        List resources = getResources(JREDesc.class);
-        return (JREDesc[]) resources.toArray( new JREDesc[resources.size()] );
+        List<JREDesc> resources = getResources(JREDesc.class);
+        return resources.toArray( new JREDesc[resources.size()] );
     }
 
     /**
@@ -92,8 +92,8 @@ public class ResourcesDesc {
      * Returns all of the JARs.
      */
     public JARDesc[] getJARs() {
-        List resources = getResources(JARDesc.class);
-        return (JARDesc[]) resources.toArray( new JARDesc[resources.size()] );
+        List<JARDesc> resources = getResources(JARDesc.class);
+        return resources.toArray( new JARDesc[resources.size()] );
     }
 
     /**
@@ -102,32 +102,32 @@ public class ResourcesDesc {
      * @param partName the part name, null and "" equivalent
      */
     public JARDesc[] getJARs(String partName) {
-        List resources = getResources(JARDesc.class);
+        List<JARDesc> resources = getResources(JARDesc.class);
 
         for (int i = resources.size(); i-- > 0;) {
-            JARDesc jar = (JARDesc) resources.get(i);
+            JARDesc jar = resources.get(i);
 
             if (!(""+jar.getPart()).equals(""+partName))
                 resources.remove(i);
         }
 
-        return (JARDesc[]) resources.toArray( new JARDesc[resources.size()] );
+        return resources.toArray( new JARDesc[resources.size()] );
     }
 
     /**
      * Returns the Extensions.
      */
     public ExtensionDesc[] getExtensions() {
-        List resources = getResources(ExtensionDesc.class);
-        return (ExtensionDesc[]) resources.toArray( new ExtensionDesc[resources.size()] );
+        List<ExtensionDesc> resources = getResources(ExtensionDesc.class);
+        return resources.toArray( new ExtensionDesc[resources.size()] );
     }
 
     /**
      * Returns the Packages.
      */
     public PackageDesc[] getPackages() {
-        List resources = getResources(PackageDesc.class);
-        return (PackageDesc[]) resources.toArray( new PackageDesc[resources.size()] );
+        List<PackageDesc> resources = getResources(PackageDesc.class);
+        return resources.toArray( new PackageDesc[resources.size()] );
     }
 
     /**
@@ -137,34 +137,34 @@ public class ResourcesDesc {
      * @return the PackageDesc objects matching the class name
      */
     public PackageDesc[] getPackages(String className) {
-        List resources = getResources(PackageDesc.class);
+        List<PackageDesc> resources = getResources(PackageDesc.class);
 
         for (int i = resources.size(); i-- > 0;) {
-            PackageDesc pk = (PackageDesc) resources.get(i);
+            PackageDesc pk = resources.get(i);
 
             if (!pk.matches(className))
                 resources.remove(i);
         }
 
-        return (PackageDesc[]) resources.toArray( new PackageDesc[resources.size()] );
+        return resources.toArray( new PackageDesc[resources.size()] );
     }
 
     /**
      * Returns the Properties as a list.
      */
     public PropertyDesc[] getProperties() {
-        List resources = getResources(PropertyDesc.class);
-        return (PropertyDesc[]) resources.toArray( new PropertyDesc[resources.size()] );
+        List<PropertyDesc> resources = getResources(PropertyDesc.class);
+        return resources.toArray( new PropertyDesc[resources.size()] );
     }
 
     /**
      * Returns the properties as a map.
      */
-    public Map getPropertiesMap() {
-        Properties properties = new Properties();
-        List resources = getResources(PropertyDesc.class);
+    public Map<String,String> getPropertiesMap() {
+        Map<String,String> properties = new HashMap<String,String>();
+        List<PropertyDesc> resources = getResources(PropertyDesc.class);
         for (int i=0; i < resources.size(); i++) {
-            PropertyDesc prop = (PropertyDesc) resources.get(i);
+            PropertyDesc prop = resources.get(i);
             properties.put( prop.getKey(), prop.getValue() );
         }
 
@@ -205,12 +205,12 @@ public class ResourcesDesc {
     /**
      * Returns all resources of the specified type.
      */
-    public List getResources(Class type) {
-        List result = new ArrayList();
+    public <T> List<T> getResources(Class<T> type) {
+        List<T> result = new ArrayList<T>();
 
         for (int i=0; i < resources.size(); i++)
             if ( type.isAssignableFrom(resources.get(i).getClass()) )
-                result.add(resources.get(i));
+                result.add(type.cast(resources.get(i)));
 
         return result;
     }

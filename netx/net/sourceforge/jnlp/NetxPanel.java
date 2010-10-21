@@ -45,13 +45,14 @@ public class NetxPanel extends AppletViewerPanel
     private AppletInstance appInst = null;
     private boolean appletAlive;
 
-    public NetxPanel(URL documentURL, Hashtable atts)
+    public NetxPanel(URL documentURL, Hashtable<String,String> atts)
     {
         super(documentURL, atts);
     }
 
     // overloaded constructor, called when initialized via plugin
-    public NetxPanel(URL documentURL, Hashtable atts, boolean exitOnFailure)
+    public NetxPanel(URL documentURL, Hashtable<String,String> atts,
+                     boolean exitOnFailure)
     {
         this(documentURL, atts);
         this.exitOnFailure = exitOnFailure;

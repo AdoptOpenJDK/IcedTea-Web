@@ -106,7 +106,7 @@ public class XMLElement
      *     <li>The keys and the values are strings.
      * </ul></dd></dl>
      */
-    private Hashtable attributes;
+    private Hashtable<String,Object> attributes;
 
 
     /**
@@ -119,7 +119,7 @@ public class XMLElement
      *         or a subclass of <code>XMLElement</code>.
      * </ul></dd></dl>
      */
-    private Vector children;
+    private Vector<XMLElement> children;
 
 
     /**
@@ -162,7 +162,7 @@ public class XMLElement
      *     <li>The values are char arrays
      * </ul></dd></dl>
      */
-    private Hashtable entities;
+    private Hashtable<String,char[]> entities;
 
 
     /**
@@ -242,7 +242,7 @@ public class XMLElement
      */
     public XMLElement()
     {
-        this(new Hashtable(), false, true, true);
+        this(new Hashtable<String,char[]>(), false, true, true);
     }
 
 
@@ -284,7 +284,7 @@ public class XMLElement
      * </ul></dd></dl><dl>
      *
      */
-    protected XMLElement(Hashtable entities,
+    protected XMLElement(Hashtable<String,char[]> entities,
                          boolean   skipLeadingWhitespace,
                          boolean   fillBasicConversionTable,
                          boolean   ignoreCase)
@@ -293,17 +293,16 @@ public class XMLElement
         this.ignoreCase = ignoreCase;
         this.name = null;
         this.contents = "";
-        this.attributes = new Hashtable();
-        this.children = new Vector();
+        this.attributes = new Hashtable<String,Object>();
+        this.children = new Vector<XMLElement>();
         this.entities = entities;
         this.lineNr = 0;
-        Enumeration e = this.entities.keys();
+        Enumeration<String> e = this.entities.keys();
         while (e.hasMoreElements()) {
-            Object key = e.nextElement();
+            String key = e.nextElement();
             Object value = this.entities.get(key);
             if (value instanceof String) {
-                value = ((String) value).toCharArray();
-                this.entities.put(key, value);
+                entities.put(key, ((String) value).toCharArray());
             }
         }
         if (fillBasicConversionTable) {
@@ -1096,7 +1095,7 @@ public class XMLElement
             }
             buf.append(ch);
         } else {
-            char[] value = (char[]) this.entities.get(key);
+            char[] value = entities.get(key);
             if (value == null) {
                 throw this.unknownEntity(key);
             }

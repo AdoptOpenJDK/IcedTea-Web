@@ -58,17 +58,17 @@ public class ApplicationDesc {
      * Returns the arguments
      */
     public String[] getArguments() {
-        return (String[]) arguments.clone();
+        return arguments.clone();
     }
 
     /**
      * Add an argument to the end of the arguments.
      */
     public void addArgument(String arg) {
-        ArrayList l = new ArrayList(Arrays.asList(arguments));
+        List<String> l = new ArrayList<String>(Arrays.asList(arguments));
         l.add(arg);
 
-        arguments = (String[]) l.toArray(arguments);
+        arguments = l.toArray(arguments);
     }
 
 }

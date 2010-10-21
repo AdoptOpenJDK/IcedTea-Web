@@ -94,10 +94,10 @@ public class Version {
      * @param version a Version object
      */
     public boolean matches(Version version) {
-        List versionStrings = version.getVersionStrings();
+        List<String> versionStrings = version.getVersionStrings();
 
         for (int i=0; i < versionStrings.size(); i++) {
-            if (!this.matchesSingle( (String)versionStrings.get(i) ))
+            if (!this.matchesSingle(versionStrings.get(i) ))
                 return false;
         }
 
@@ -122,10 +122,10 @@ public class Version {
      * @param version a Version object
      */
     public boolean matchesAny(Version version) {
-        List versionStrings = version.getVersionStrings();
+        List<String> versionStrings = version.getVersionStrings();
 
         for (int i=0; i < versionStrings.size(); i++) {
-            if (this.matchesSingle( (String)versionStrings.get(i) ))
+            if (this.matchesSingle( versionStrings.get(i) ))
                 return true;
         }
 
@@ -139,9 +139,9 @@ public class Version {
      * @param version a non-compound version of the form "1.2.3[+*]"
      */
     private boolean matchesSingle(String version) {
-        List versionStrings = this.getVersionStrings();
+        List<String> versionStrings = this.getVersionStrings();
         for (int i=0; i < versionStrings.size(); i++) {
-            if ( matches(version, (String)versionStrings.get(i)) )
+            if ( matches(version, versionStrings.get(i)) )
                 return true;
         }
         return false;
@@ -156,14 +156,17 @@ public class Version {
      * @param version a non-compound version optionally with "+" or "*"
      */
     private boolean matches(String subversion, String version) {
-        List subparts = getParts(subversion);
-        List parts = getParts(version);
+        List<String> subparts = getParts(subversion);
+        List<String> parts = getParts(version);
 
         int maxLength = Math.max(subversion.length(), version.length());
         if (version.endsWith("*")) // star means rest of parts irrelevant: truncate them
             maxLength = parts.size();
 
-        normalize(new List[] {subparts, parts}, maxLength);
+        List<List<String>> versions = new ArrayList<List<String>>();
+        versions.add(subparts);
+        versions.add(parts);
+        normalize(versions, maxLength);
 
         if (equal(subparts, parts))
             return true;
@@ -181,9 +184,9 @@ public class Version {
      * @param parts1 normalized version parts
      * @param parts2 normalized version parts
      */
-    protected boolean equal(List parts1, List parts2) {
+    protected boolean equal(List<String> parts1, List<String> parts2) {
         for (int i=0; i < parts1.size(); i++) {
-            if ( 0 != compare((String)parts1.get(i), (String)parts2.get(i)) )
+            if ( 0 != compare(parts1.get(i), parts2.get(i)) )
                 return false;
         }
 
@@ -197,16 +200,16 @@ public class Version {
      * @param parts1 normalized version parts
      * @param parts2 normalized version parts
      */
-    protected boolean greater(List parts1, List parts2) {
+    protected boolean greater(List<String> parts1, List<String> parts2) {
         //if (true) return false;
 
         for (int i=0; i < parts1.size(); i++) {
             // if part1 > part2 then it's a later version, so return true
-            if (compare((String)parts1.get(i), (String)parts2.get(i)) > 0)
+            if (compare(parts1.get(i), parts2.get(i)) > 0)
                 return true;
 
             // if part1 < part2 then it's a ealier version, so return false
-            if (compare((String)parts1.get(i), (String)parts2.get(i)) < 0)
+            if (compare(parts1.get(i), parts2.get(i)) < 0)
                 return false;
 
             // if equal go to next part
@@ -229,8 +232,8 @@ public class Version {
      * @return comparison of the two parts
      */
     protected int compare(String part1, String part2) {
-        Integer number1 = new Integer(0);
-        Integer number2 = new Integer(0);
+        Integer number1 = Integer.valueOf(0);
+        Integer number2 = Integer.valueOf(0);
 
         // compare as integers
         try {
@@ -261,30 +264,30 @@ public class Version {
      * @param versions list array of parts of a version string
      * @param maxLength truncate lists to this maximum length
      */
-    protected void normalize(List versions[], int maxLength) {
+    protected void normalize(List<List<String>> versions, int maxLength) {
         int length = 0;
-        for (int i=0; i < versions.length; i++)
-            length = Math.max(length, versions[i].size());
+        for (List<String> vers : versions)
+            length = Math.max(length, vers.size());
 
         if (length > maxLength)
             length = maxLength;
 
-        for (int i=0; i < versions.length; i++) {
+        for (List<String> vers : versions) {
             // remove excess elements
-            while (versions[i].size() > length)
-                versions[i].remove( versions[i].size()-1 );
+            while (vers.size() > length)
+                vers.remove( vers.size()-1 );
 
             // add in empty pad elements
-            while (versions[i].size() < length)
-                versions[i].add( emptyString );
+            while (vers.size() < length)
+                vers.add( emptyString );
         }
     }
 
     /**
      * Return the individual version strings that make up a Version.
      */
-    protected List getVersionStrings() {
-        ArrayList strings = new ArrayList();
+    protected List<String> getVersionStrings() {
+        ArrayList<String> strings = new ArrayList<String>();
 
         StringTokenizer st = new StringTokenizer(versionString, " ");
         while (st.hasMoreTokens())
@@ -298,8 +301,8 @@ public class Version {
      *
      * @param oneVersion a single version id string (not compound)
      */
-    protected List getParts(String oneVersion) {
-        ArrayList strings = new ArrayList();
+    protected List<String> getParts(String oneVersion) {
+        ArrayList<String> strings = new ArrayList<String>();
 
         StringTokenizer st = new StringTokenizer(oneVersion, seperators+"+*");
         while (st.hasMoreTokens()) {

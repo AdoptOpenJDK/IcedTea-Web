@@ -45,10 +45,10 @@ public class ExtensionDesc {
     private JNLPFile file;
 
     /** map from ext-part to local part */
-    private Map extToPart = new HashMap();
+    private Map<String,String> extToPart = new HashMap<String,String>();
 
     /** eager ext parts */
-    private List eagerExtParts = new ArrayList();
+    private List<String> eagerExtParts = new ArrayList<String>();
 
 
     /**

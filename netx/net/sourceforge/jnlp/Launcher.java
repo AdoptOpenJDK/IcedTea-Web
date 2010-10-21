@@ -455,11 +455,11 @@ public class Launcher {
                         R("LSFatal"), R("LCClient"), R("LCantDetermineMainClass") ,
                         R("LCantDetermineMainClassInfo")));
 
-            Class mainClass = app.getClassLoader().loadClass(mainName);
+            Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
-            Method main = mainClass.getMethod("main", new Class[] {String[].class} );
+            Method main = mainClass.getMethod("main", new Class<?>[] {String[].class} );
             String args[] = file.getApplication().getArguments();
-            
+
             SwingUtilities.invokeAndWait(new Runnable() {
                 // dummy method to force Event Dispatch Thread creation
                 public void run(){}

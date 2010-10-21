@@ -138,7 +138,7 @@ class XPersistenceService implements PersistenceService {
         if (!file.isDirectory())
             return new String[0];
 
-        List result = new ArrayList();
+        List<String> result = new ArrayList<String>();
 
         // check whether this is right: only add files and not directories.
         File entries[] = file.listFiles();
@@ -146,7 +146,7 @@ class XPersistenceService implements PersistenceService {
             if (entries[i].isFile())
                 result.add(entries[i].getName());
 
-        return (String[]) result.toArray(new String[result.size()]);
+        return result.toArray(new String[result.size()]);
     }
 
     /**

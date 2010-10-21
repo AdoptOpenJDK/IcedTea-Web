@@ -1,3 +1,172 @@
+2010-10-20  Andrew John Hughes  <ahughes@redhat.com>
+
+	* netx/javax/jnlp/ServiceManager.java:
+	(lookupTable): Add generic types.
+	* netx/net/sourceforge/jnlp/AppletDesc.java:
+	(parameters): Likewise.
+	(AppletDesc(String,String,URL,int,int,Map)): Likewise.
+	(getParameters()): Likewise.
+	* netx/net/sourceforge/jnlp/ApplicationDesc.java:
+	(getArguments()): Remove redundant cast.
+	(addArgument(String)): Add generic typing.
+	* netx/net/sourceforge/jnlp/ExtensionDesc.java:
+	(extToPart): Add generic types.
+	(eagerExtParts): Likewise.
+	* netx/net/sourceforge/jnlp/InformationDesc.java:
+	(info): Likewise.
+	(getIcons(Object)): Add generic typing.
+	(getAssociations()): Likewise.
+	(getRelatedContents()): Likewise.
+	(getItem(Object)): Likewise.
+	(getItems(Object)): Likewise.
+	(addItem(String,Object)): Likewise.
+	* netx/net/sourceforge/jnlp/JNLPFile.java:
+	(resources): Likewise.
+	(InformationDesc.getItems(Object)): Likewise.
+	(getResources(Class)): Likewise.
+	* netx/net/sourceforge/jnlp/LaunchException.java:
+	(getCauses()): Likewise.
+	* netx/net/sourceforge/jnlp/Launcher.java:
+	(launchApplication(JNLPFile)): Likewise.
+	* netx/net/sourceforge/jnlp/NetxPanel.java:
+	(NetxPanel(URL,Hashtable)): Likewise.
+	(NetxPanel(URL,Hashtable,boolean)): Likewise.
+	* netx/net/sourceforge/jnlp/Node.java:
+	(getChildNodes()): Likewise.
+	* netx/net/sourceforge/jnlp/Parser.java:
+	(getResources(Node,boolean)): Likewise.
+	(getInfo(Node)): Likewise.
+	(getInformationDesc(Node)): Likewise.
+	(getApplet(Node)): Likewise.
+	(getApplication(Node)): Likewise.
+	(splitString(String)): Likewise.
+	(getLocales(Node)): Likewise.
+	(getChildNodes(Node,String)): Likewise.
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	Fix variable naming and add generic types.
+	(cacheJars): Changed from cache_jars.
+	(cacheExJars): Changed from cache_ex-jars.
+	(atts): Add generic typing.
+	(PluginBridge(URL,URL,String,String,int,int,Hashtable)): Likewise.
+	(getInformation(Locale)): Likewise.
+	(getResources(Locale,String,String)): Likewise.
+	(getJARs()): Avoid excessive copying; filtering already performed
+	by getResources in JNLPFile.
+	* netx/net/sourceforge/jnlp/ResourcesDesc.java:
+	(resources): Add generic typing.
+	(getJREs()): Likewise.
+	(getJARs()): Likewise.
+	(getJARs(String)): Likewise.
+	(getExtensions()): Likewise.
+	(getPackages()): Likewise.
+	(getPackages(String)): Likewise.
+	(getProperties()): Likewise.
+	(getPropertiesMap()): Likewise.
+	(getResources(Class)): Make generic.
+	* netx/net/sourceforge/jnlp/Version.java:
+	(matches(Version)): Add generic types.
+	(matchesAny(Version)): Likewise.
+	(matchesSingle(String)): Likewise.
+	(matches(String,String)): Likewise.
+	(equal(List,List)): Likewise.
+	(greater(List,List)): Likewise.
+	(compare(String,String)): Use Integer.valueOf.
+	(normalize(List,int)): Add generic types, using
+	a List of lists rather than an array of lists.
+	(getVersionStrings()): Add generic types.
+	(getParts()): Likewise.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
+	(waitForResources(ApplicationInstance,ResourceTracker,
+	URL,String)): Likewise.
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java:
+	(getListener(ApplicatonInstance,String,URL)): Use setVisible instead
+	of show().
+	(disposeListener(DownloadServiceListener)): Use setVisible instead
+	of hide().
+	(DownloadPanel.urls): Add generic typing.
+	(DownloadPanel.panels): Likewise.
+	(DownloadPanel.update(URL,String,long,long,int)): Fix formatting.
+	Add generic types.
+	* netx/net/sourceforge/jnlp/cache/Resource.java:
+	(resources): Add generic typing.
+	(trackers): Likewise.
+	(getResource(URL,Version,UpdatePolicy)): Use generic types.
+	(getTracker()): Likewise.
+	(addTracker(ResourceTracker)): Likewise.
+	(fireDownloadEvent()): Likewise.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
+	(prefetchTrackers): Add generic typing.
+	(queue): Likewise.
+	(active): Likewise.
+	(resources): Likewise.
+	(listeners): Likewise.
+	(fireDownloadEvent(Resource)): Remove unneeded cast.
+	(getPrefetch()): Use generic typing.
+	(selectByFlag(List,int,int)): Likewise.
+	(getResource(URL)): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java:
+	(weakClips): Add generic types.
+	(destroy()): Use generic typing.
+	(getApplets()): Likewise.
+	(getStreamKeys()): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java:
+	(weakWindows): Add generic types.
+	(installEnvironment()): Likewise.
+	(destroy()): Remove redundant cast.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java:
+	Extend PrivilegedAction<Void>.
+	(run()): Add generic typing.
+	(getOptions(String)): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/Boot13.java:
+	(main(String[]): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	Fix formatting.
+	(urlToLoader): Add generic types.
+	(resourcePermissions): Likewise.
+	(available): Likewise.
+	(jarEntries): Likewise.
+	(getInstance(JNLPFile,UpdatePolicy)): Remove redundant cast.
+	(getInstance(URL,String,Version,UpdatePolicy)): Likewise.
+	(initializeExtensions()): Add generic types.
+	(initializePermissions()): Likewise.
+	(initializeResources()): Likewise.
+	(getPermissions(CodeSource)): Likewise.
+	(fillInPartJars(List)): Likewise.
+	(activateJars(List)): Likewise.
+	(loadClass(String)): Likewise.  Suppress warnings due to
+	sun.misc.JarIndex usage.
+	(findResources(String)): Mark as overriding.  Add generic
+	types.
+	(getExtensionName()): Add @Deprecated annotation.
+	(getExtensionHREF()): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java:
+	(weakWindows): Add generic typing.
+	(weakApplications): Likewise.
+	(getApplication(Window)): Remove redundant casts.  Add w,
+	which is window cast to Window.
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java:
+	(invoke(Object,Method,Object[])): Use generic types.
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java:
+	(getNames(URL)): Likewise.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java:
+	(verifyJars(List,ResourceTracker)): Remove redundant cast.
+	* netx/net/sourceforge/jnlp/util/WeakList.java:
+	Redesign as a generic type.
+	(refs): Add generic types.
+	(deref(WeakReference)): Likewise.
+	(get(int)): Likewise.
+	(set(int,Object)): Likewise.
+	(add(int,E)): Likewise.
+	(remove()): Likewise.
+	(hardList()): Likewise.
+	* netx/net/sourceforge/nanoxml/XMLElement.java:
+	(attributes): Add generic typing.
+	(children): Likewise.
+	(entities): Likewise.
+	(XMLElement()): Use generic types.
+	(XMLElement(Hashtable): Likewise.
+	(resolveEntity(StringBuffer)): Remove redundant cast.
+
 2010-10-20  Omair Majid  <omajid@redhat.com>
 
 	* AUTHORS: Add Francis Kung, Andrew Su, Joshua Sumali, Mark Wielaard and

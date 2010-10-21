@@ -146,7 +146,7 @@ public class LaunchException extends Exception {
      * and will be removed once netx no longer supports 1.3.
      */
     public Throwable[] getCauses() {
-        ArrayList result = new ArrayList();
+        ArrayList<Throwable> result = new ArrayList<Throwable>();
 
         Reflect r = new Reflect();
         Throwable cause = this.cause;
@@ -156,7 +156,7 @@ public class LaunchException extends Exception {
             cause = (Throwable) r.invoke(cause, "getCause");
         }
 
-        return (Throwable[]) result.toArray(new Throwable[0]);
+        return result.toArray(new Throwable[0]);
     }
 
     /**

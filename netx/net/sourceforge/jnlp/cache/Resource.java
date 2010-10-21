@@ -60,10 +60,10 @@ public class Resource {
     public static final int STARTED = 128; // enqueued or being worked on
 
     /** list of weak references of resources currently in use */
-    private static WeakList resources = new WeakList();
+    private static WeakList<Resource> resources = new WeakList<Resource>();
 
     /** weak list of trackers monitoring this resource */
-    private WeakList trackers = new WeakList();
+    private WeakList<ResourceTracker> trackers = new WeakList<ResourceTracker>();
 
     /** the remote location of the resource */
     URL location;
@@ -111,7 +111,7 @@ public class Resource {
 
             int index = resources.indexOf(resource);
             if (index >= 0) { // return existing object
-                Resource result = (Resource) resources.get(index);
+                Resource result = resources.get(index);
                 if (result != null)
                     return result;
             }
@@ -136,9 +136,9 @@ public class Resource {
      */
     ResourceTracker getTracker() {
         synchronized (trackers) {
-            List t = trackers.hardList();
+            List<ResourceTracker> t = trackers.hardList();
             if (t.size() > 0)
-                return (ResourceTracker) t.get(0);
+                return t.get(0);
 
             return null;
         }
@@ -225,7 +225,8 @@ public class Resource {
      */
     public void addTracker(ResourceTracker tracker) {
         synchronized (trackers) {
-            List t = trackers.hardList(); // prevent GC between contains and add
+            // prevent GC between contains and add
+            List<ResourceTracker> t = trackers.hardList();
             if (!t.contains(tracker))
                 trackers.add(tracker);
 
@@ -238,14 +239,14 @@ public class Resource {
      * download event.
      */
     protected void fireDownloadEvent() {
-        List send;
+        List<ResourceTracker> send;
 
         synchronized (trackers) {
             send = trackers.hardList();
         }
 
         for (int i=0; i < send.size(); i++) {
-            ResourceTracker rt = (ResourceTracker) send.get(i);
+            ResourceTracker rt = send.get(i);
             rt.fireDownloadEvent(this);
         }
     }

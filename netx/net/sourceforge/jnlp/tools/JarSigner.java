@@ -204,7 +204,7 @@ public class JarSigner implements CertVerifier {
         certs = new ArrayList<CertPath>();
         for (int i = 0; i < jars.size(); i++) {
 
-            JARDesc jar = (JARDesc) jars.get(i);
+            JARDesc jar = jars.get(i);
             verifiedJars = new ArrayList<String>();
             unverifiedJars = new ArrayList<String>();
 

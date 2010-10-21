@@ -77,7 +77,7 @@ public class ApplicationInstance {
     private boolean stopped = false;
 
     /** weak list of windows opened by the application */
-    private WeakList weakWindows = new WeakList();
+    private WeakList<Window> weakWindows = new WeakList<Window>();
 
     /** list of application listeners  */
     private EventListenerList listeners = new EventListenerList();
@@ -193,7 +193,7 @@ public class ApplicationInstance {
         // Add to hashmap
         AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] {pd});
 
-        PrivilegedAction installProps = new PrivilegedAction() {
+        PrivilegedAction<Object> installProps = new PrivilegedAction<Object>() {
             public Object run() {
                 for (int i=0; i < props.length; i++) {
                     System.setProperty(props[i].getKey(), props[i].getValue());
@@ -236,7 +236,7 @@ public class ApplicationInstance {
         try {
             // destroy resources
             for (int i=0; i < weakWindows.size(); i++) {
-                Window w = (Window) weakWindows.get(i);
+                Window w = weakWindows.get(i);
                 if (w != null)
                     w.dispose();
             }

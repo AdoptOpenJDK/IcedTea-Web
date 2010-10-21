@@ -47,12 +47,12 @@ class Node {
 
     Node[] getChildNodes() {
         if (children == null) {
-            List list = new ArrayList();
+            List<Node> list = new ArrayList<Node>();
 
             for (Enumeration e = xml.enumerateChildren(); e.hasMoreElements();)
                 list.add( new Node((XMLElement)e.nextElement()) );
 
-            children = (Node[]) list.toArray( new Node[list.size()] );
+            children = list.toArray( new Node[list.size()] );
 
             for (int i=0; i < children.length-1; i++)
                 children[i].next = children[i+1];

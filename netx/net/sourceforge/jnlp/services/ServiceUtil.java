@@ -182,7 +182,7 @@ public class ServiceUtil {
                         System.err.println("           arg: "+args[i]);
             }
 
-            PrivilegedExceptionAction invoker = new PrivilegedExceptionAction() {
+            PrivilegedExceptionAction<Object> invoker = new PrivilegedExceptionAction<Object>() {
                 public Object run() throws Exception {
                     return method.invoke(receiver, args);
                 }

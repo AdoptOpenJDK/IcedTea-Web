@@ -93,8 +93,8 @@ public class Boot13 extends URLClassLoader {
 
         Thread.currentThread().setContextClassLoader(b); // try to prevent getting the non-policy version of classes
 
-        Class c = b.loadClass("net.sourceforge.jnlp.runtime.Boot");
-        Method main = c.getDeclaredMethod("main", new Class[] {String[].class} );
+        Class<?> c = b.loadClass("net.sourceforge.jnlp.runtime.Boot");
+        Method main = c.getDeclaredMethod("main", new Class<?>[] {String[].class} );
 
         main.invoke(null, new Object[] { args } );
     }

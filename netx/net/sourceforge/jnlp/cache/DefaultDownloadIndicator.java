@@ -118,7 +118,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                               screen.height-frame.getHeight());
         }
 
-        frame.show();
+        frame.setVisible(true);
 
         return result;
     }
@@ -135,7 +135,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         ActionListener hider = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if (frame.getContentPane().getComponentCount() == 1)
-                    frame.hide();
+                    frame.setVisible(false);
 
                 frame.getContentPane().remove((DownloadPanel) listener);
                 frame.pack();
@@ -161,10 +161,10 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         private JLabel header = new JLabel();
 
         /** list of URLs being downloaded */
-        private List urls = new ArrayList();
+        private List<URL> urls = new ArrayList<URL>();
 
         /** list of ProgressPanels */
-        private List panels = new ArrayList();
+        private List<ProgressPanel> panels = new ArrayList<ProgressPanel>();
 
 
         /**
@@ -199,7 +199,9 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         /**
          * Update the download progress of a url.
          */
-        protected void update(final URL url, final String version, final long readSoFar, final long total, final int overallPercent) {
+        protected void update(final URL url, final String version,
+                              final long readSoFar, final long total,
+                              final int overallPercent) {
             Runnable r = new Runnable() {
                 public void run() {
                     if (!urls.contains(url))
@@ -207,7 +209,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
 
                     setOverallPercent(overallPercent);
 
-                    ProgressPanel panel = (ProgressPanel) panels.get(urls.indexOf(url));
+                    ProgressPanel panel = panels.get(urls.indexOf(url));
                     panel.setProgress(readSoFar, total);
                     panel.repaint();
                 }

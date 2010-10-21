@@ -52,7 +52,7 @@ public class InformationDesc {
     private Locale locales[];
 
     /** the data as list of key,value pairs */
-    private List info;
+    private List<Object> info;
 
     /** the JNLPFile this information is for */
     private JNLPFile jnlpFile;
@@ -129,9 +129,9 @@ public class InformationDesc {
      * @return an array of zero of more IconDescs of the specified icon type
      */
     public IconDesc[] getIcons(Object kind) {
-        List icons = getItems("icon-"+kind);
+        List<Object> icons = getItems("icon-"+kind);
 
-        return (IconDesc[]) icons.toArray(new IconDesc[icons.size()]);
+        return icons.toArray(new IconDesc[icons.size()]);
     };
 
     /**
@@ -204,9 +204,9 @@ public class InformationDesc {
      * Returns the associations specified in the JNLP file
      */
     public AssociationDesc[] getAssociations() {
-        List associations = getItems("association");
+        List<Object> associations = getItems("association");
 
-        return (AssociationDesc[]) associations.toArray(new AssociationDesc[associations.size()]);
+        return associations.toArray(new AssociationDesc[associations.size()]);
     }
 
     /**
@@ -220,17 +220,16 @@ public class InformationDesc {
      * Returns the related-contents specified by this JNLP file
      */
     public RelatedContentDesc[] getRelatedContents() {
-        List relatedContents = getItems("related-content");
+        List<Object> relatedContents = getItems("related-content");
 
-        return (RelatedContentDesc[]) relatedContents.toArray(
-                new RelatedContentDesc[relatedContents.size()]);
+        return relatedContents.toArray(new RelatedContentDesc[relatedContents.size()]);
     }
 
     /**
      * Returns the last item matching the specified key.
      */
     protected Object getItem(Object key) {
-        List items = getItems(key);
+        List<Object> items = getItems(key);
         if (items.size() == 0)
             return null;
         else
@@ -240,11 +239,11 @@ public class InformationDesc {
     /**
      * Returns all items matching the specified key.
      */
-    protected List getItems(Object key) {
+    protected List<Object> getItems(Object key) {
         if (info == null)
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
 
-        List result = new ArrayList();
+        List<Object> result = new ArrayList<Object>();
         for (int i=0; i < info.size(); i+=2)
             if (info.get(i).equals(key))
                 result.add( info.get(i+1) );
@@ -258,7 +257,7 @@ public class InformationDesc {
      */
     protected void addItem(String key, Object value) {
         if (info == null)
-            info = new ArrayList();
+          info = new ArrayList<Object>();
 
         info.add(key);
         info.add(value);

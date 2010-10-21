@@ -400,12 +400,12 @@ public class CacheUtil {
                 return;
 
             // only resources not starting out downloaded are displayed
-            List urlList = new ArrayList();
+            List<URL> urlList = new ArrayList<URL>();
             for (int i=0; i < resources.length; i++) {
                 if (!tracker.checkResource(resources[i]))
                     urlList.add(resources[i]);
             }
-            URL undownloaded[] = (URL[]) urlList.toArray( new URL[urlList.size()] );
+            URL undownloaded[] = urlList.toArray( new URL[urlList.size()] );
 
             listener = indicator.getListener(app, title, undownloaded);
 

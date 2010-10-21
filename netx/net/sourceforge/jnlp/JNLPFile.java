@@ -86,7 +86,7 @@ public class JNLPFile {
     protected UpdateDesc update;
 
     /** resources */
-    protected List resources;
+    protected List<ResourcesDesc> resources;
 
     /** additional resources not in JNLP file (from command line) */
     protected ResourcesDesc sharedResources = new ResourcesDesc(this, null, null, null);
@@ -330,8 +330,8 @@ public class JNLPFile {
      */
     public InformationDesc getInformation(final Locale locale) {
         return new InformationDesc(this, new Locale[] {locale}) {
-            protected List getItems(Object key) {
-                List result = new ArrayList();
+            protected List<Object> getItems(Object key) {
+                List<Object> result = new ArrayList<Object>();
 
                 for (int i=0; i < info.size(); i++) {
                     InformationDesc infoDesc = (InformationDesc) info.get(i);
@@ -375,11 +375,11 @@ public class JNLPFile {
      */
     public ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
         return new ResourcesDesc(this, new Locale[] {locale}, new String[] {os}, new String[] {arch}) {
-            public List getResources(Class launchType) {
-                List result = new ArrayList();
+            public <T> List<T> getResources(Class<T> launchType) {
+                List<T> result = new ArrayList<T>();
 
                 for (int i=0; i < resources.size(); i++) {
-                    ResourcesDesc rescDesc = (ResourcesDesc) resources.get(i);
+                    ResourcesDesc rescDesc = resources.get(i);
 
                     if (localMatches(locale, rescDesc.getLocales())
                         && stringMatches(os, rescDesc.getOS())

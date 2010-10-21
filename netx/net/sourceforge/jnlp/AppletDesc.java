@@ -45,7 +45,7 @@ public class AppletDesc {
     private int height;
 
     /** the parameters */
-    private Map parameters;
+    private Map<String,String> parameters;
 
 
     /**
@@ -58,13 +58,14 @@ public class AppletDesc {
      * @param height the height
      * @param parameters the parameters
      */
-    public AppletDesc(String name, String mainClass, URL documentBase, int width, int height, Map parameters) {
+    public AppletDesc(String name, String mainClass, URL documentBase, int width, int height,
+                      Map<String,String> parameters) {
         this.name = name;
         this.mainClass = mainClass;
         this.documentBase = documentBase;
         this.width = width;
         this.height = height;
-        this.parameters = new HashMap(parameters);
+        this.parameters = new HashMap<String,String>(parameters);
     }
 
     /**
@@ -105,8 +106,8 @@ public class AppletDesc {
     /**
      * Returns the applet parameters
      */
-    public Map getParameters() {
-        return new HashMap(parameters);
+    public Map<String,String> getParameters() {
+        return new HashMap<String,String>(parameters);
     }
 
     /**

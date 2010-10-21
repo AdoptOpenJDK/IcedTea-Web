@@ -98,10 +98,11 @@ class JNLPSecurityManager extends AWTSecurityManager {
         new SecurityException(JNLPRuntime.getMessage("RShutdown"));
 
     /** weak list of windows created */
-    private WeakList weakWindows = new WeakList();
+    private WeakList<Window> weakWindows = new WeakList<Window>();
 
     /** weak list of applications corresponding to window list */
-    private WeakList weakApplications = new WeakList();
+    private WeakList<ApplicationInstance> weakApplications =
+        new WeakList<ApplicationInstance>();
 
     /** weak reference to most app who's windows was most recently activated */
     private WeakReference activeApplication = null;
@@ -182,14 +183,14 @@ class JNLPSecurityManager extends AWTSecurityManager {
      */
     protected ApplicationInstance getApplication(Window window) {
         for (int i = weakWindows.size(); i-->0;) {
-            Window w = (Window) weakWindows.get(i);
+            Window w = weakWindows.get(i);
             if (w == null) {
                 weakWindows.remove(i);
                 weakApplications.remove(i);
             }
 
             if (w == window)
-                return (ApplicationInstance) weakApplications.get(i);
+                return weakApplications.get(i);
         }
 
         return null;
@@ -436,7 +437,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
             if (JNLPRuntime.isDebug())
                 System.err.println("SM: app: "+app.getTitle()+" is adding a window: "+window);
 
-            weakWindows.add(window); // for mapping window -> app
+            weakWindows.add(w); // for mapping window -> app
             weakApplications.add(app);
 
             app.addWindow(w);

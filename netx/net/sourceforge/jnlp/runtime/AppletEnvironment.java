@@ -57,7 +57,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     private Container cont;
 
     /** weak references to the audio clips */
-    private WeakList weakClips = new WeakList();
+    private WeakList<AppletAudioClip> weakClips = new WeakList<AppletAudioClip>();
 
     /** whether the applet has been started / displayed */
     private boolean appletStarted = false;
@@ -121,9 +121,9 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     public void destroy() {
         destroyed = true;
 
-        List clips = weakClips.hardList();
+        List<AppletAudioClip> clips = weakClips.hardList();
         for (int i = 0; i < clips.size(); i++) {
-            ((AppletAudioClip)clips.get(i)).dispose();
+            clips.get(i).dispose();
         }
     }
 
@@ -217,7 +217,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
      * Returns an enumeration that contains only the applet
      * from the JNLP file.
      */
-    public Enumeration getApplets() {
+    public Enumeration<Applet> getApplets() {
         checkDestroyed();
 
         return Collections.enumeration( Arrays.asList(new Applet[] { applet }) );
@@ -293,7 +293,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     /**
      * Required for JRE1.4, but not implemented yet.
      */
-    public Iterator getStreamKeys()  {
+    public Iterator<String> getStreamKeys()  {
         checkDestroyed();
 
         return null;

@@ -113,19 +113,21 @@ public class ResourceTracker {
     private static int threads = 0;
 
     /** weak list of resource trackers with resources to prefetch */
-    private static WeakList prefetchTrackers = new WeakList();
+    private static WeakList<ResourceTracker> prefetchTrackers =
+      new WeakList<ResourceTracker>();
 
     /** resources requested to be downloaded */
-    private static ArrayList queue = new ArrayList();
+    private static ArrayList<Resource> queue = new ArrayList<Resource>();
 
     /** resource trackers threads are working for (used for load balancing across multi-tracker downloads) */
-    private static ArrayList active = new ArrayList(); //
+    private static ArrayList<ResourceTracker> active =
+      new ArrayList<ResourceTracker>(); //
 
     /** the resources known about by this resource tracker */
-    private List resources = new ArrayList();
+    private List<Resource> resources = new ArrayList<Resource>();
 
     /** download listeners for this tracker */
-    private List listeners = new ArrayList();
+    private List<DownloadListener> listeners = new ArrayList<DownloadListener>();
 
     /** whether to download parts before requested */
     private boolean prefetch;
@@ -293,7 +295,7 @@ public class ResourceTracker {
     protected void fireDownloadEvent(Resource resource) {
         DownloadListener l[] = null;
         synchronized (listeners) {
-            l = (DownloadListener[]) listeners.toArray(new DownloadListener[0]);
+            l = listeners.toArray(new DownloadListener[0]);
         }
 
         int status;
@@ -865,7 +867,7 @@ public class ResourceTracker {
         // first find one to initialize
         synchronized (prefetchTrackers) {
             for (int i=0; i < prefetchTrackers.size() && result == null; i++) {
-                ResourceTracker tracker = (ResourceTracker) prefetchTrackers.get(i);
+                ResourceTracker tracker = prefetchTrackers.get(i);
                 if (tracker == null)
                     continue;
 
@@ -907,12 +909,13 @@ public class ResourceTracker {
      * Calls to this method should be synchronized on lock and
      * source list.<p>
      */
-    private static Resource selectByFlag(List source, int flag, int notflag) {
+    private static Resource selectByFlag(List<Resource> source, int flag,
+                                         int notflag) {
         Resource result = null;
         int score = Integer.MAX_VALUE;
 
         for (int i=0; i < source.size(); i++) {
-            Resource resource = (Resource) source.get(i);
+            Resource resource = source.get(i);
             boolean selectable = false;
 
             synchronized (resource) {
@@ -924,7 +927,7 @@ public class ResourceTracker {
                 int activeCount = 0;
 
                 for (int j=0; j < active.size(); j++)
-                    if ((ResourceTracker)active.get(j) == resource.getTracker())
+                    if (active.get(j) == resource.getTracker())
                         activeCount++;
 
                 // try to spread out the downloads so that a slow host
@@ -947,7 +950,7 @@ public class ResourceTracker {
     private Resource getResource(URL location) {
         synchronized (resources) {
             for (int i=0; i < resources.size(); i++) {
-                Resource resource = (Resource) resources.get(i);
+                Resource resource = resources.get(i);
 
                 if (CacheUtil.urlEquals(resource.location, location))
                     return resource;
