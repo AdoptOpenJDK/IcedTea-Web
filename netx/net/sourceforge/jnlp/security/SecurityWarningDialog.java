@@ -39,48 +39,28 @@ package net.sourceforge.jnlp.security;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.security.SecurityWarning.DialogType;
 
 import java.awt.*;
 
 import javax.swing.*;
 
 import java.awt.event.*;
-
 import java.security.cert.X509Certificate;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import java.util.List;
 
 /**
- * Provides methods for showing security warning dialogs
- * for a wide range of JNLP security issues.
+ * Provides methods for showing security warning dialogs for a wide range of
+ * JNLP security issues. Note that the security dialogs should be running in the
+ * secure AppContext - this class should not be used directly from an applet or
+ * application. See {@link SecurityWarning} for a way to show security dialogs.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
  */
 public class SecurityWarningDialog extends JDialog {
-
-        /** Types of dialogs we can create */
-        public static enum DialogType {
-                CERT_WARNING,
-                MORE_INFO,
-                CERT_INFO,
-                SINGLE_CERT_INFO,
-                ACCESS_WARNING,
-                NOTALLSIGNED_WARNING,
-                APPLET_WARNING
-        }
-
-        /** The types of access which may need user permission. */
-        public static enum AccessType {
-        READ_FILE,
-        WRITE_FILE,
-        CREATE_DESTKOP_SHORTCUT,
-        CLIPBOARD_READ,
-        CLIPBOARD_WRITE,
-        PRINTER,
-        NETWORK,
-        VERIFIED,
-        UNVERIFIED,
-        NOTALLSIGNED,
-        SIGNING_ERROR
-    }
 
         /** The type of dialog we want to show */
         private DialogType dialogType;
@@ -112,61 +92,59 @@ public class SecurityWarningDialog extends JDialog {
      */
         private Object value;
 
-        public SecurityWarningDialog(DialogType dialogType, AccessType accessType,
-                        JNLPFile file) {
-            super();
-                this.dialogType = dialogType;
-                this.accessType = accessType;
-                this.file = file;
-                this.certVerifier = null;
-                initialized = true;
-                initDialog();
-        }
-
-        public SecurityWarningDialog(DialogType dialogType, AccessType accessType,
-                        JNLPFile file, CertVerifier jarSigner) {
-            super();
-                this.dialogType = dialogType;
-                this.accessType = accessType;
-                this.file = file;
-                this.certVerifier = jarSigner;
-                initialized = true;
-                initDialog();
-        }
-
-        public SecurityWarningDialog(DialogType dialogType, AccessType accessType,
-                CertVerifier certVerifier) {
+        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+                JNLPFile file, CertVerifier jarSigner, X509Certificate cert, Object[] extras) {
             super();
             this.dialogType = dialogType;
             this.accessType = accessType;
-            this.file = null;
-            this.certVerifier = certVerifier;
+            this.file = file;
+            this.certVerifier = jarSigner;
+            this.cert = cert;
+            this.extras = extras;
             initialized = true;
+
             initDialog();
         }
 
-        public SecurityWarningDialog(DialogType dialogType, AccessType accessType,
-                        JNLPFile file, Object[] extras) {
-            super();
-                this.dialogType = dialogType;
-                this.accessType = accessType;
-                this.file = file;
-                this.certVerifier = null;
-                initialized = true;
-                this.extras = extras;
-                initDialog();
+        /**
+         * Construct a SecurityWarningDialog to display some sort of access warning
+         */
+        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+                        JNLPFile file) {
+            this(dialogType, accessType, file, null, null, null);
         }
 
-        //for displaying a single certificate
-        public SecurityWarningDialog(DialogType dialogType, X509Certificate c) {
-            super();
-                this.dialogType = dialogType;
-                this.accessType = null;
-                this.file = null;
-                this.certVerifier = null;
-                this.cert = c;
-                initialized = true;
-                initDialog();
+        /**
+         * Create a SecurityWarningDialog to display a certificate-related warning
+         */
+        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+                        JNLPFile file, CertVerifier jarSigner) {
+            this(dialogType, accessType, file, jarSigner, null, null);
+        }
+
+        /**
+         * Create a SecurityWarningDialog to display a certificate-related warning
+         */
+        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+                CertVerifier certVerifier) {
+            this(dialogType, accessType, null, certVerifier, null, null);
+        }
+
+        /**
+         * Create a SecurityWarningDialog to display some sort of access warning
+         * with more information
+         */
+        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+                        JNLPFile file, Object[] extras) {
+            this(dialogType, accessType, file, null, null, extras);
+        }
+
+        /**
+         * Create a SecurityWarningDailog to display information about a single
+         * certificate
+         */
+        SecurityWarningDialog(DialogType dialogType, X509Certificate c) {
+            this(dialogType, null, null, null, c, null);
         }
 
         /**
@@ -175,105 +153,6 @@ public class SecurityWarningDialog extends JDialog {
          */
         public boolean isInitialized(){
                 return initialized;
-        }
-
-        /**
-         * Shows a warning dialog for different types of system access (i.e. file
-         * open/save, clipboard read/write, printing, etc).
-         *
-         * @param accessType the type of system access requested.
-         * @param file the jnlp file associated with the requesting application.
-         * @return true if permission was granted by the user, false otherwise.
-         */
-        public static boolean showAccessWarningDialog(AccessType accessType,
-                JNLPFile file) {
-                return showAccessWarningDialog(accessType, file, null);
-        }
-
-        /**
-         * Shows a warning dialog for different types of system access (i.e. file
-         * open/save, clipboard read/write, printing, etc).
-         *
-         * @param accessType the type of system access requested.
-         * @param file the jnlp file associated with the requesting application.
-         * @param extras an optional array of Strings (typically) that gets
-         * passed to the dialog labels.
-         * @return true if permission was granted by the user, false otherwise.
-         */
-        public static boolean showAccessWarningDialog(AccessType accessType,
-                        JNLPFile file, Object[] extras) {
-                        SecurityWarningDialog dialog = new SecurityWarningDialog(
-                                        DialogType.ACCESS_WARNING, accessType, file, extras);
-                        dialog.setVisible(true);
-                        dialog.dispose();
-
-                        Object selectedValue = dialog.getValue();
-                        if (selectedValue == null) {
-                                return false;
-                        } else if (selectedValue instanceof Integer) {
-                                if (((Integer)selectedValue).intValue() == 0)
-                                        return true;
-                                else
-                                        return false;
-                        } else {
-                                return false;
-                        }
-                }
-
-        /**
-         * Shows a warning dialog for when the main application jars are signed,
-         * but extensions aren't
-         *
-         * @return true if permission was granted by the user, false otherwise.
-         */
-        public static boolean showNotAllSignedWarningDialog(JNLPFile file) {
-                        SecurityWarningDialog dialog = new SecurityWarningDialog(
-                                        DialogType.NOTALLSIGNED_WARNING, AccessType.NOTALLSIGNED, file, (new Object[0]));
-                        dialog.setVisible(true);
-                        dialog.dispose();
-
-                        Object selectedValue = dialog.getValue();
-                        if (selectedValue == null) {
-                                return false;
-                        } else if (selectedValue instanceof Integer) {
-                                if (((Integer)selectedValue).intValue() == 0)
-                                        return true;
-                                else
-                                        return false;
-                        } else {
-                                return false;
-                        }
-                }
-
-        /**
-         * Shows a security warning dialog according to the specified type of
-         * access. If <code>type</code> is one of AccessType.VERIFIED or
-         * AccessType.UNVERIFIED, extra details will be available with regards
-         * to code signing and signing certificates.
-         *
-         * @param accessType the type of warning dialog to show
-         * @param file the JNLPFile associated with this warning
-         * @param jarSigner the JarSigner used to verify this application
-         */
-        public static boolean showCertWarningDialog(AccessType accessType,
-                        JNLPFile file, CertVerifier jarSigner) {
-                SecurityWarningDialog dialog =
-                        new SecurityWarningDialog(DialogType.CERT_WARNING, accessType, file,
-                        jarSigner);
-                dialog.setVisible(true);
-                dialog.dispose();
-
-                Object selectedValue = dialog.getValue();
-                if (selectedValue == null) {
-                        return false;
-                } else if (selectedValue instanceof Integer) {
-                        if (((Integer)selectedValue).intValue() == 0)
-                                return true;
-                        else
-                                return false;
-                } else {
-                        return false;
-                }
         }
 
         /**
@@ -320,23 +199,7 @@ public class SecurityWarningDialog extends JDialog {
                         dialog.dispose();
         }
 
-        public static int showAppletWarning() {
-                SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.APPLET_WARNING,
-                        null, null, (CertVerifier) null);
-                dialog.setVisible(true);
-                dialog.dispose();
 
-                Object selectedValue = dialog.getValue();
-
-                //result 0 = Yes, 1 = No, 2 = Cancel
-                if (selectedValue == null) {
-                        return 2;
-                } else if (selectedValue instanceof Integer) {
-                        return ((Integer)selectedValue).intValue();
-                } else {
-                        return 2;
-                }
-        }
 
         private void initDialog() {
             setSystemLookAndFeel();
@@ -356,7 +219,7 @@ public class SecurityWarningDialog extends JDialog {
                         dialogTitle = "Security Warning";
 
                 setTitle(dialogTitle);
-                setModal(true);
+                setModal(false);
 
                 setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -366,10 +229,7 @@ public class SecurityWarningDialog extends JDialog {
 
                 WindowAdapter adapter = new WindowAdapter() {
             private boolean gotFocus = false;
-            @Override
-            public void windowClosing(WindowEvent we) {
-                setValue(null);
-            }
+
             @Override
             public void windowGainedFocus(WindowEvent we) {
                 // Once window gets focus, set initial focus
@@ -454,11 +314,21 @@ public class SecurityWarningDialog extends JDialog {
         this.value = value;
     }
 
-    protected Object getValue() {
+    public Object getValue() {
         if (JNLPRuntime.isDebug()) {
             System.out.println("Returning value:" + value);
         }
         return value;
+    }
+
+    /**
+     * Called when the SecurityWarningDialog is hidden - either because the user
+     * made a choice (Ok, Cancel, etc) or closed the window
+     */
+    @Override
+    public void dispose() {
+        notifySelectionMade();
+        super.dispose();
     }
 
     /**
@@ -471,4 +341,26 @@ public class SecurityWarningDialog extends JDialog {
             //don't worry if we can't.
         }
     }
+
+    private List<ActionListener> listeners = new CopyOnWriteArrayList<ActionListener>();
+
+    /**
+     * Notify all the listeners that the user has made a decision using this
+     * security dialog.
+     */
+    public void notifySelectionMade() {
+        for (ActionListener listener : listeners) {
+            listener.actionPerformed(null);
+        }
+    }
+
+    /**
+     * Adds an {@link ActionListener} which will be notified if the user makes a
+     * choice using this SecurityWarningDialog. The listener should use {@link #getValue()}
+     * to actually get the user's response.
+     */
+    public void addActionListener(ActionListener listener) {
+        listeners.add(listener);
+    }
+
 }

@@ -43,8 +43,7 @@ import java.util.*;
 import java.lang.ref.*;
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.*;
-import net.sourceforge.jnlp.security.*;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -67,7 +66,7 @@ class XFileSaveService implements FileSaveService {
         java.lang.String[] extensions, java.io.InputStream stream,
         java.lang.String name) throws java.io.IOException {
 
-        if (ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.WRITE_FILE)) {
+        if (ServiceUtil.checkAccess(AccessType.WRITE_FILE)) {
             JFileChooser chooser = new JFileChooser();
             int chosen = chooser.showSaveDialog(null);
 
@@ -90,7 +89,7 @@ class XFileSaveService implements FileSaveService {
     public FileContents saveAsFileDialog(java.lang.String pathHint,
         java.lang.String[] extensions, FileContents contents) throws java.io.IOException {
 
-        if (ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.WRITE_FILE)) {
+        if (ServiceUtil.checkAccess(AccessType.WRITE_FILE)) {
             JFileChooser chooser = new JFileChooser();
             chooser.setSelectedFile(new File(contents.getName()));
             int chosen = chooser.showSaveDialog(null);

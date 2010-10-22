@@ -52,6 +52,8 @@ import sun.security.validator.ValidatorException;
 
 import com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager;
 
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+
 /**
  * This class implements an X509 Trust Manager. The certificates it trusts are
  * "variable", in the sense that it can dynamically, and temporarily support
@@ -293,8 +295,8 @@ public class VariableX509TrustManager extends X509ExtendedTrustManager {
     private boolean askUser(X509Certificate[] chain, String authType,
                             boolean isTrusted, boolean hostMatched,
                             String hostName) {
-        return SecurityWarningDialog.showCertWarningDialog(
-                        SecurityWarningDialog.AccessType.UNVERIFIED, null,
+        return SecurityWarning.showCertWarningDialog(
+                        AccessType.UNVERIFIED, null,
                         new HttpsCertVerifier(this, chain, authType,
                                               isTrusted, hostMatched,
                                               hostName));

@@ -1,3 +1,85 @@
+2010-10-22  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/NetxPanel.java
+	(runLoader): Do not initialize JNLPRuntime here.
+	(createAppletThreads): Initialize JNLPRuntim here.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java:
+	Switch from SecurityWarningDialog.AccessType to
+	SecurityWarning.AccessType.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getInstance(JNLPFile,UpdatePolicy)): Switch to SecurityWarning.
+	(initializeResources): Likewise.
+	(checkTrustWithUser): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	Add securityDialogMesasgeHandler.
+	(initialize): Set System look and feel. Start security thread.
+	(startSecurityThread): New method. Starts a thread to show security
+	dialogs.
+	(getSecurityDialogHandler): Returns the securityDialogMessageHandler.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java:
+	Switch from SecurityWarningDialog.AccessType to
+	SecurityWarning.AccessType.
+	(checkAwtEventQueueAccess): New method. Skeleton code for allowing
+	EventQueue acccess to applets.
+	* netx/net/sourceforge/jnlp/security/AccessWarningPane.java:
+	Switch from SecurityWarningDialog.AccessType to
+	SecurityWarning.AccessType.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/security/SecurityWarningDialog.java:
+	Move DialogType and AccessType to SecurityWarning.
+	(SecurityWarningDialog(DialogType,AccessType,JNLPFile,CertVerifier,
+	X509Certificate,Object[])): New method. The catch-all construction.
+	(SecurityWarningDialog(DialogType,AccessType,JNLPFile): Delegate to
+	the new constructor.
+	(SecurityWarningDialog(DialogType,AccessType,JNLPFile,CertVerifier)):
+	Likewise.
+	(SecurityWarningDialog(DialogType,AccessType,CertVerifier)): Likewise.
+	(SecurityWarningDialog(DialogType,AccessType,JNLPFile,Object[])):
+	Likewise.
+	(SecurityWarningDialog(DialogType,X509Certificate)): Likewise.
+	(showAccessWarningDialog(AccessType,JNLPFile)): Move to SecurityWarning
+	class.
+	(showAccessWarningDialog(AccessType,JNLPFile,Object[])): Likewise.
+	(showNotAllSignedWarningDialog(JNLPFile)): Likewise.
+	(showCertWarningDialog(AccessType,JNLPFile,CertVerifier)): Likewise.
+	(showAppletWarning): Likewise.
+	(initDialog): Make dialog non modal and remove window closing listener.
+	(getValue): Make public.
+	(dispose): New method. Notify listeners.
+	(notifySelectionMade): New method. Notify listeners that user has made
+	a decision.
+	(addActionListener): New method. Add a listener to be notified when
+	user makes a decision about this security warning.
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java:
+	Switch from SecurityWarningDialog.AccessType to
+	SecurityWarning.AccessType.
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XClipboardService.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XExtendedService.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XFileOpenService.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XFileSaveService.java: Likewise.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessage.java:
+	New class.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessageHandler.java:
+	New class.
+	(run): New method. Runs the security message loop.
+	(handleMessage): New method. Handles a SecurityDialogMessage to show a
+	security warning.
+	(postMessage): New method. Posts a message to sthe security message
+	queue.
+	* netx/net/sourceforge/jnlp/security/SecurityWarning.java: New class.
+	Move AccessType and DialogType from SecurityWarningDialog to here.
+	(showAccessWarningDialog): Moved from SecurityWarningDialog to here.
+	(showAccessWarningDialog): Moved from SecurityWarningDialog to here.
+	Modified to post messages to the security queue instead of showing a
+	SecurityWarningDialog directly.
+	(showNotAllSignedWarningDialog): Likewise.
+	(showCertWarningDialog): Likewise.
+	(showAppletWarning): Likewise.
+	(getUserReponse): New method. Posts a message to the security thread and
+	blocks until it gets a response from the user.
+
 2010-10-20  Andrew John Hughes  <ahughes@redhat.com>
 
 	* netx/javax/jnlp/ServiceManager.java:

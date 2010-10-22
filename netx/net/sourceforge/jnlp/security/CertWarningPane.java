@@ -60,6 +60,7 @@ import javax.swing.SwingConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 import net.sourceforge.jnlp.tools.KeyTool;
 
 /**
@@ -85,7 +86,7 @@ public class CertWarningPane extends SecurityDialogPanel {
          * Creates the actual GUI components, and adds it to this panel
          */
         private void addComponents() {
-                SecurityWarningDialog.AccessType type = parent.getAccessType();
+                AccessType type = parent.getAccessType();
                 JNLPFile file = parent.getFile();
                 Certificate c = parent.getJarSigner().getPublisher();
 

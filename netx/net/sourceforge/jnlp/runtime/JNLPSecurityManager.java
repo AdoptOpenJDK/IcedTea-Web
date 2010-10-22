@@ -34,7 +34,7 @@ import java.util.PropertyPermission;
 import javax.swing.JWindow;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AWTSecurityManager;
@@ -393,7 +393,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         ApplicationInstance app = getApplication();
         if (app != null && !app.isSigned()) {
                 if (perm instanceof SocketPermission
-                                && ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.NETWORK, perm.getName())) {
+                                && ServiceUtil.checkAccess(AccessType.NETWORK, perm.getName())) {
                         return true;
                 }
         }
@@ -435,7 +435,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
             Window w = (Window) window;
 
             if (JNLPRuntime.isDebug())
-                System.err.println("SM: app: "+app.getTitle()+" is adding a window: "+window);
+                System.err.println("SM: app: "+app.getTitle()+" is adding a window: "+window+" with appContext "+AppContext.getAppContext());
 
             weakWindows.add(w); // for mapping window -> app
             weakApplications.add(app);
@@ -537,6 +537,33 @@ class JNLPSecurityManager extends AWTSecurityManager {
             return app.getAppContext();
         }
 
+    }
+
+    /**
+     * Tests if a client can get access to the AWT event queue. This version allows
+     * complete access to the EventQueue for its own AppContext-specific EventQueue.
+     *
+     * FIXME there are probably huge security implications for this. Eg:
+     * http://hg.openjdk.java.net/jdk7/awt/jdk/rev/8022709a306d
+     *
+     * @exception  SecurityException  if the caller does not have
+     *             permission to accesss the AWT event queue.
+     */
+    public void checkAwtEventQueueAccess() {
+        /*
+         * this is the templace of the code that should allow applets access to
+         * eventqueues
+         */
+
+        // AppContext appContext = AppContext.getAppContext();
+        // ApplicationInstance instance = getApplication();
+
+        // if ((appContext == mainAppContext) && (instance != null)) {
+        // If we're about to allow access to the main EventQueue,
+        // and anything untrusted is on the class context stack,
+        // disallow access.
+        super.checkAwtEventQueueAccess();
+        // }
     }
 
 }

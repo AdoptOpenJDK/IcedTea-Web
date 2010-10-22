@@ -57,7 +57,8 @@ import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.security.SecurityWarning;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 import net.sourceforge.jnlp.tools.JarSigner;
 import net.sourceforge.jnlp.util.FileUtils;
 import sun.misc.JarIndex;
@@ -292,7 +293,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                         if (extLoader != null && extLoader != loader) {
                             if (loader.signing && !extLoader.signing)
-                                if (!SecurityWarningDialog.showNotAllSignedWarningDialog(file))
+                                if (!SecurityWarning.showNotAllSignedWarningDialog(file))
                                     throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
 
                                 loader.merge(extLoader);
@@ -439,7 +440,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 signing = true;
 
                                 if (!js.allJarsSigned() &&
-                                    !SecurityWarningDialog.showNotAllSignedWarningDialog(file))
+                                    !SecurityWarning.showNotAllSignedWarningDialog(file))
                                     throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
 
 
@@ -493,19 +494,19 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private void checkTrustWithUser(JarSigner js) throws LaunchException {
         if (!js.getRootInCacerts()) { //root cert is not in cacerts
-            boolean b = SecurityWarningDialog.showCertWarningDialog(
-                SecurityWarningDialog.AccessType.UNVERIFIED, file, js);
+            boolean b = SecurityWarning.showCertWarningDialog(
+                AccessType.UNVERIFIED, file, js);
             if (!b)
                 throw new LaunchException(null, null, R("LSFatal"),
                     R("LCLaunching"), R("LNotVerified"), "");
         } else if (js.getRootInCacerts()) { //root cert is in cacerts
             boolean b = false;
             if (js.noSigningIssues())
-                b = SecurityWarningDialog.showCertWarningDialog(
-                        SecurityWarningDialog.AccessType.VERIFIED, file, js);
+                b = SecurityWarning.showCertWarningDialog(
+                        AccessType.VERIFIED, file, js);
             else if (!js.noSigningIssues())
-                b = SecurityWarningDialog.showCertWarningDialog(
-                        SecurityWarningDialog.AccessType.SIGNING_ERROR, file, js);
+                b = SecurityWarning.showCertWarningDialog(
+                        AccessType.SIGNING_ERROR, file, js);
             if (!b)
                 throw new LaunchException(null, null, R("LSFatal"),
                     R("LCLaunching"), R("LCancelOnUserRequest"), "");

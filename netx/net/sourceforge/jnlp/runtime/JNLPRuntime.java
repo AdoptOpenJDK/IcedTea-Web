@@ -25,9 +25,11 @@ import java.util.*;
 import java.util.List;
 import java.security.*;
 import javax.jnlp.*;
+import javax.swing.UIManager;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
+import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.services.*;
 import net.sourceforge.jnlp.util.*;
 
@@ -62,6 +64,9 @@ public class JNLPRuntime {
 
     /** the security policy */
     private static JNLPPolicy policy;
+
+    /** handles all security message to show appropriate security dialogs */
+    private static SecurityDialogMessageHandler securityDialogMessageHandler;
 
     /** the base dir for cache, etc */
     private static File baseDir;
@@ -165,6 +170,8 @@ public class JNLPRuntime {
      * security manager and security policy, initializing the JNLP
      * standard services, etc.<p>
      *
+     * This method should be called from the main AppContext/Thread. <p>
+     *
      * This method cannot be called more than once.  Once
      * initialized, methods that alter the runtime can only be
      * called by the exit class.<p>
@@ -206,12 +213,37 @@ public class JNLPRuntime {
         policy = new JNLPPolicy();
         security = new JNLPSecurityManager(); // side effect: create JWindow
 
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // ignore it
+        }
+
         if (securityEnabled) {
             Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
             System.setSecurityManager(security);
         }
 
+        securityDialogMessageHandler = startSecurityThreads();
+
         initialized = true;
+    }
+
+    /**
+     * This must NOT be called form the application ThreadGroup. An application
+     * can inject events into its {@link EventQueue} and bypass the security
+     * dialogs.
+     *
+     * @return a {@link SecurityDialogMessageHandler} that can be used to post
+     * security messages
+     */
+    private static SecurityDialogMessageHandler startSecurityThreads() {
+        ThreadGroup securityThreadGroup = new ThreadGroup("NetxSecurityThreadGroup");
+        SecurityDialogMessageHandler runner = new SecurityDialogMessageHandler();
+        Thread securityThread = new Thread(securityThreadGroup, runner, "NetxSecurityThread");
+        securityThread.setDaemon(true);
+        securityThread.start();
+        return runner;
     }
 
     /**
@@ -318,6 +350,19 @@ public class JNLPRuntime {
     public static void setSecurityEnabled(boolean enabled) {
         checkInitialized();
         securityEnabled = enabled;
+    }
+
+    /**
+     *
+     * @return the {@link SecurityDialogMessageHandler} that should be used to
+     * post security dialog messages
+     */
+    public static SecurityDialogMessageHandler getSecurityDialogHandler() {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(new AllPermission());
+        }
+        return securityDialogMessageHandler;
     }
 
     /**

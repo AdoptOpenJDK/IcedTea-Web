@@ -45,7 +45,7 @@ import javax.jnlp.*;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.runtime.*;
-import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -67,7 +67,7 @@ class XFileOpenService implements FileOpenService {
     public FileContents openFileDialog (java.lang.String pathHint,
         java.lang.String[] extensions) throws java.io.IOException {
 
-        if (ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.READ_FILE)) {
+        if (ServiceUtil.checkAccess(AccessType.READ_FILE)) {
 
             //open a file dialog here, let the user choose the file.
             JFileChooser chooser = new JFileChooser();
@@ -90,7 +90,7 @@ class XFileOpenService implements FileOpenService {
     public FileContents[] openMultiFileDialog (java.lang.String pathHint,
             java.lang.String[] extensions) throws java.io.IOException {
 
-        if (ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.WRITE_FILE)) {
+        if (ServiceUtil.checkAccess(AccessType.WRITE_FILE)) {
             JFileChooser chooser = new JFileChooser();
             chooser.setMultiSelectionEnabled(true);
             int chosen = chooser.showOpenDialog(null);

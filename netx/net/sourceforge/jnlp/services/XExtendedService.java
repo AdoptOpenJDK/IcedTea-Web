@@ -22,7 +22,7 @@ import java.io.IOException;
 import javax.jnlp.ExtendedService;
 import javax.jnlp.FileContents;
 
-import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 
 /**
  * Implementation of ExtendedService
@@ -35,8 +35,7 @@ public class XExtendedService implements ExtendedService {
     public FileContents openFile(File file) throws IOException {
 
         /* FIXME: this opens a file with read/write mode, not just read or write */
-        if (ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.READ_FILE,
-                new Object[]{ file.getAbsolutePath() })) {
+        if (ServiceUtil.checkAccess(AccessType.READ_FILE, new Object[]{ file.getAbsolutePath() })) {
             return (FileContents) ServiceUtil.createPrivilegedProxy(FileContents.class,
                     new XFileContents(file));
         } else {

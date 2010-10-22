@@ -39,7 +39,7 @@ package net.sourceforge.jnlp.services;
 
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 
 import java.awt.datatransfer.Transferable;
 import java.awt.Toolkit;
@@ -59,7 +59,7 @@ class XClipboardService implements ClipboardService {
          */
         public java.awt.datatransfer.Transferable getContents(){
 
-                if (ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.CLIPBOARD_READ)) {
+                if (ServiceUtil.checkAccess(AccessType.CLIPBOARD_READ)) {
                         Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
                         return (Transferable) ServiceUtil.createPrivilegedProxy(
                                 Transferable.class, t);
@@ -72,7 +72,7 @@ class XClipboardService implements ClipboardService {
          * Sets the contents of the system clipboard.
          */
         public void setContents(java.awt.datatransfer.Transferable contents) {
-                if (ServiceUtil.checkAccess(SecurityWarningDialog.AccessType.CLIPBOARD_WRITE)) {
+                if (ServiceUtil.checkAccess(AccessType.CLIPBOARD_WRITE)) {
                         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
                                 contents, null);
                 }

@@ -35,7 +35,7 @@ import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.ShortcutDesc;
 import net.sourceforge.jnlp.event.ApplicationEvent;
 import net.sourceforge.jnlp.event.ApplicationListener;
-import net.sourceforge.jnlp.security.SecurityWarningDialog.AccessType;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.XDesktopEntry;

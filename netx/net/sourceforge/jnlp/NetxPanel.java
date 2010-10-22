@@ -84,19 +84,6 @@ public class NetxPanel extends AppletViewerPanel
                                 getHeight(),
                                 atts);
 
-                synchronized(JNLPRuntime.initMutex) {
-                        //The custom NetX Policy and SecurityManager are set here.
-                        if (!JNLPRuntime.isInitialized()) {
-                            if (JNLPRuntime.isDebug())
-                                System.out.println("initializing JNLPRuntime...");
-
-                                JNLPRuntime.initialize(false);
-                        } else {
-                            if (JNLPRuntime.isDebug())
-                                System.out.println("JNLPRuntime already initialized");
-                        }
-                }
-
                 doInit = true;
                 dispatchAppletEvent(APPLET_LOADING, null);
                 status = APPLET_LOAD;
@@ -146,6 +133,20 @@ public class NetxPanel extends AppletViewerPanel
      */
     // Reminder: Relax visibility in sun.applet.AppletPanel
     protected synchronized void createAppletThread() {
+        // initialize JNLPRuntime in the main threadgroup
+        synchronized(JNLPRuntime.initMutex) {
+            //The custom NetX Policy and SecurityManager are set here.
+            if (!JNLPRuntime.isInitialized()) {
+                if (JNLPRuntime.isDebug())
+                    System.out.println("initializing JNLPRuntime...");
+
+                    JNLPRuntime.initialize(false);
+            } else {
+                if (JNLPRuntime.isDebug())
+                    System.out.println("JNLPRuntime already initialized");
+            }
+        }
+
         // when this was being done (incorrectly) in Launcher, the call was
         // new AppThreadGroup(mainGroup, file.getTitle());
         ThreadGroup tg = new AppThreadGroup(Launcher.mainGroup,

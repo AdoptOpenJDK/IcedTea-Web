@@ -40,7 +40,8 @@ import javax.jnlp.UnavailableServiceException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.security.SecurityWarning;
+import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 
 /**
  * Provides static methods to interact useful for using the JNLP
@@ -219,8 +220,7 @@ public class ServiceUtil {
      * message formatting.
      * @return true if the access was granted, false otherwise.
      */
-    public static boolean checkAccess(SecurityWarningDialog.AccessType type,
-            Object... extras) {
+    public static boolean checkAccess(AccessType type, Object... extras) {
         return checkAccess(null, type, extras);
     }
 
@@ -235,8 +235,7 @@ public class ServiceUtil {
      * message formatting.
      * @return true if the access was granted, false otherwise.
      */
-    public static boolean checkAccess(ApplicationInstance app,
-            SecurityWarningDialog.AccessType type,
+    public static boolean checkAccess(ApplicationInstance app, AccessType type,
                 Object... extras) {
 
         if (app == null)
@@ -270,7 +269,7 @@ public class ServiceUtil {
         }
 
         if (!codeTrusted) {
-                final SecurityWarningDialog.AccessType tmpType = type;
+                final AccessType tmpType = type;
                 final Object[] tmpExtras = extras;
                 final ApplicationInstance tmpApp = app;
 
@@ -279,7 +278,7 @@ public class ServiceUtil {
                 //from resources.jar.
                 Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
-                        boolean b = SecurityWarningDialog.showAccessWarningDialog(tmpType,
+                        boolean b = SecurityWarning.showAccessWarningDialog(tmpType,
                                 tmpApp.getJNLPFile(), tmpExtras);
                         return new Boolean(b);
                     }
