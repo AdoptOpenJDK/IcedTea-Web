@@ -1,3 +1,9 @@
+2010-10-25  Andrew Su <asu@redhat.com>
+
+	* Makefile.am:
+	(clean-IcedTeaPlugin): Remove launcher folder first.
+	(clean-plugin): Removed called to remove launcher folder
+
 2010-10-22  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/NetxPanel.java

@@ -188,6 +188,7 @@ $(PLUGIN_DIR)/launcher/pluginappletviewer: $(PLUGIN_LAUNCHER_OBJECTS)
 	$(CC) $(LAUNCHER_LINK) $(PLUGIN_LAUNCHER_OBJECTS)
 
 clean-IcedTeaPlugin:
+	rm -rf $(PLUGIN_DIR)/launcher
 	rm -f $(PLUGIN_DIR)/*.o
 	rm -f $(PLUGIN_DIR)/IcedTeaPlugin.so
 	if [ $(abs_top_srcdir) != $(abs_top_builddir) ]; then \
@@ -203,7 +204,6 @@ stamps/plugin.stamp: $(ICEDTEAPLUGIN_TARGET)
 	touch stamps/plugin.stamp
 
 clean-plugin: $(ICEDTEAPLUGIN_CLEAN)
-	rm -rf $(PLUGIN_DIR)/launcher
 	rm -f stamps/plugin.stamp
 
 liveconnect-source-files.txt:
