@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.List;
 import java.security.*;
 import javax.jnlp.*;
+import javax.naming.ConfigurationException;
 import javax.swing.UIManager;
 
 import net.sourceforge.jnlp.*;
@@ -58,6 +59,8 @@ public class JNLPRuntime {
 
     /** the localized resource strings */
     private static ResourceBundle resources;
+
+    private static final DeploymentConfiguration config = new DeploymentConfiguration();
 
     /** the security manager */
     private static JNLPSecurityManager security;
@@ -183,6 +186,16 @@ public class JNLPRuntime {
     public static void initialize(boolean isApplication) throws IllegalStateException {
         checkInitialized();
 
+        try {
+            config.load();
+        } catch (ConfigurationException e) {
+            /* exit if there is a fatal exception loading the configuration */
+            if (isApplication) {
+                System.out.println(getMessage("RConfigurationError"));
+                System.exit(1);
+            }
+        }
+
         isWebstartApplication = isApplication;
 
         //Setting the system property for javawebstart's version.
@@ -227,6 +240,7 @@ public class JNLPRuntime {
         securityDialogMessageHandler = startSecurityThreads();
 
         initialized = true;
+
     }
 
     /**
@@ -244,6 +258,15 @@ public class JNLPRuntime {
         securityThread.setDaemon(true);
         securityThread.start();
         return runner;
+    }
+
+    /**
+     * Gets the Configuration associated with this runtime
+     * @return a {@link DeploymentConfiguration} object that can be queried to
+     * find relevant configuration settings
+     */
+    public static DeploymentConfiguration getConfiguration() {
+        return config;
     }
 
     /**

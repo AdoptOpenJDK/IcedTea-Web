@@ -1,5 +1,33 @@
 2010-10-25  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/ShortcutDesc.java:
+	Add SHORTCUT_NEVER, SHORTCUT_ALWAYS, SHORTCUT_ASK_USER,
+	SHORTCUT_ASK_USER_IF_HINTED, SHORTCUT_ALWAYS_IF_HINTED,
+	SHORTCUT_DEFAULT.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Add RConfigurationError.
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	New file.
+	(ConfigValue): New class. Holds a configuration value.
+	(DeploymentConfiguration): New method.
+	(load): New method.
+	(getProperty): Likewise.
+	(getAllPropertyNames): Likewise.
+	(setProperty): Likewise.
+	(loadDefaultProperties): Likewise.
+	(findSystemConfigFile): Likewise.
+	(loadSystemConfiguration): Likewise.
+	(loadProperties): Likewise.
+	(save): Likewise.
+	(parsePropertiesFile): Likewise.
+	(mergeMaps): Likewise.
+	(dumpConfiguration): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	(initialize): Load configuration.
+	(getConfiguration): Return the configuration.
+
+2010-10-25  Omair Majid  <omajid@redhat.com>
+
 	* net/sourceforge/jnlp/ExtensionDesc.java: Import Translator.R and use
 	that.
 	* net/sourceforge/jnlp/JNLPFile.java: Import Translator.R.
