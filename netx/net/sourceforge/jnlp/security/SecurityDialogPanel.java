@@ -44,9 +44,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-
 /**
  * Provides a JPanel for use in JNLP warning dialogs.
  */
@@ -68,18 +65,6 @@ public abstract class SecurityDialogPanel extends JPanel {
                 this.parent = dialog;
                 this.setLayout(new BorderLayout());
         }
-
-        /*
-         * String translation functions
-         */
-
-        protected static String R(String key) {
-                return JNLPRuntime.getMessage(key);
-        }
-
-    protected static String R(String key, Object param) {
-        return JNLPRuntime.getMessage(key, new Object[] {param});
-    }
 
         /**
          * Needed to get word wrap working in JLabels.

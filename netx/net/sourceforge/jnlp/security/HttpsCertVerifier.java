@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.IOException;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
@@ -50,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.tools.KeyTool;
 import sun.security.util.DerValue;
 import sun.security.util.HostnameChecker;
@@ -196,14 +197,6 @@ public class HttpsCertVerifier implements CertVerifier {
     private void addToDetails(String detail) {
       if (!details.contains(detail))
         details.add(detail);
-    }
-
-    private static String R(String key) {
-      return JNLPRuntime.getMessage(key);
-    }
-
-    private static String R(String key, String arg1, String arg2) {
-        return JNLPRuntime.getMessage(key, new Object[] { arg1, arg2 });
     }
 
     public Certificate getPublisher() {

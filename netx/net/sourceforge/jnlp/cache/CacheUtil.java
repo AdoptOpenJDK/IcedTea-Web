@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp.cache;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.*;
 import java.net.*;
 import java.nio.channels.FileChannel;
@@ -37,14 +39,6 @@ import net.sourceforge.jnlp.util.FileUtils;
  * @version $Revision: 1.17 $
  */
 public class CacheUtil {
-
-    private static String R(String key) {
-        return JNLPRuntime.getMessage(key);
-    }
-
-    private static String R(String key, Object param) {
-        return JNLPRuntime.getMessage(key, new Object[] {param});
-    }
 
     /**
      * Compares a URL using string compare of its protocol, host,

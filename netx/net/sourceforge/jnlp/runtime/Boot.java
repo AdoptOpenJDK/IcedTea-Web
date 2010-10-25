@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -62,9 +64,6 @@ public final class Boot implements PrivilegedAction<Void> {
 
     // todo: decide whether a spawned netx (external launch)
     // should inherit the same options as this instance (store argv?)
-
-    private static String R(String key) { return JNLPRuntime.getMessage(key); }
-    private static String R(String key, Object param) { return JNLPRuntime.getMessage(key, new Object[] {param}); }
 
     private static final String version = "0.5";
 
@@ -225,8 +224,7 @@ public final class Boot implements PrivilegedAction<Void> {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
-            fatalError(JNLPRuntime.getMessage("RUnexpected",
-                        new Object[] {ex.toString(), ex.getStackTrace()[0]} ));
+            fatalError(R("RUnexpected", ex.toString(), ex.getStackTrace()[0]));
         }
 
         return null;

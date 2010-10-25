@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -31,6 +33,7 @@ import java.util.Locale;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 
 /**
  * Provides methods to access the information in a Java Network
@@ -59,8 +62,6 @@ public class JNLPFile {
     //
     // todo: currently does not filter resources by jvm version.
     //
-
-    private static String R(String key) { return JNLPRuntime.getMessage(key); }
 
     /** the location this JNLP file was created from */
     protected URL sourceLocation = null;

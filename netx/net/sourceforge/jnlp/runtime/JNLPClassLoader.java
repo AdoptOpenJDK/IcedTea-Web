@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -77,9 +79,6 @@ public class JNLPClassLoader extends URLClassLoader {
     // todo: initializePermissions should get the permissions from
     // extension classes too so that main file classes can load
     // resources in an extension.
-
-    /** shortcut for resources */
-    private static String R(String key) { return JNLPRuntime.getMessage(key); }
 
     /** map from JNLPFile url to shared classloader */
     private static Map<String,JNLPClassLoader> urlToLoader =

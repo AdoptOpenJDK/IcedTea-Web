@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
@@ -88,14 +90,12 @@ class JNLPSecurityManager extends AWTSecurityManager {
     // another way for different apps to have different properties
     // in java.lang.Sytem with the same names.
 
-    private static String R(String key) { return JNLPRuntime.getMessage(key); }
-
     /** only class that can exit the JVM, if set */
     private Object exitClass = null;
 
     /** this exception prevents exiting the JVM */
     private SecurityException closeAppEx = // making here prevents huge stack traces
-        new SecurityException(JNLPRuntime.getMessage("RShutdown"));
+        new SecurityException(R("RShutdown"));
 
     /** weak list of windows created */
     private WeakList<Window> weakWindows = new WeakList<Window>();

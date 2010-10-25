@@ -17,11 +17,11 @@
 
 package net.sourceforge.jnlp;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
  * The J2SE/Java element.
@@ -143,7 +143,7 @@ public class JREDesc {
         if ((lastChar < '0' || lastChar > '9')) {
             lastCharacterIsDigit = false;
             if (lastChar != 'k' && lastChar!= 'm' ) {
-                throw new ParseException(JNLPRuntime.getMessage("PBadHeapSize",new Object[] {heapSize}));
+                throw new ParseException(R("PBadHeapSize", heapSize));
             }
         }
 
@@ -157,7 +157,7 @@ public class JREDesc {
             // check that the number is a number!
             Integer.valueOf(size);
         } catch (NumberFormatException numberFormat) {
-            throw new ParseException(JNLPRuntime.getMessage("PBadHeapSize", new Object[] {heapSize}), numberFormat);
+            throw new ParseException(R("PBadHeapSize", heapSize), numberFormat);
         }
 
     }

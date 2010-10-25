@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp.cache;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -60,7 +62,7 @@ public class CacheEntry {
         File infoFile = CacheUtil.getCacheFile(location, version);
         infoFile = new File(infoFile.getPath()+".info"); // replace with something that can't be clobbered
 
-        properties = new PropertiesFile(infoFile, JNLPRuntime.getMessage("CAutoGen"));
+        properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
     /**

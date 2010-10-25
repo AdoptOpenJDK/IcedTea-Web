@@ -522,7 +522,7 @@ public class JNLPRuntime {
      *
      * @param args the formatting arguments to the resource string
      */
-    public static String getMessage(String key, Object args[]) {
+    public static String getMessage(String key, Object... args) {
         return MessageFormat.format(getMessage(key), args);
     }
 

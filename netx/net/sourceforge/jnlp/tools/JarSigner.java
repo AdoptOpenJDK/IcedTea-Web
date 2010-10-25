@@ -25,6 +25,8 @@
 
 package net.sourceforge.jnlp.tools;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
@@ -40,7 +42,6 @@ import sun.security.util.*;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
-import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.security.*;
 
 /**
@@ -51,10 +52,6 @@ import net.sourceforge.jnlp.security.*;
  */
 
 public class JarSigner implements CertVerifier {
-
-    private static String R(String key) {
-        return JNLPRuntime.getMessage(key);
-    }
 
     private static final Collator collator = Collator.getInstance();
     static {

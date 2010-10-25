@@ -17,12 +17,13 @@
 
 package net.sourceforge.jnlp;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-
 
 /**
  * The extension element.
@@ -128,7 +129,7 @@ public class ExtensionDesc {
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())
-                throw new ParseException(JNLPRuntime.getMessage("JInvalidExtensionDescriptor", new Object[] {name, location} ));
+                throw new ParseException(R("JInvalidExtensionDescriptor", name, location));
         }
 
     }

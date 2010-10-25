@@ -1,3 +1,56 @@
+2010-10-25  Omair Majid  <omajid@redhat.com>
+
+	* net/sourceforge/jnlp/ExtensionDesc.java: Import Translator.R and use
+	that.
+	* net/sourceforge/jnlp/JNLPFile.java: Import Translator.R.
+	(R): Remove.
+	* net/sourceforge/jnlp/JREDesc.java: Import Translator.R.
+	(checkHeapSize): Use R instead of JNLPRuntime.getMessage.
+	* net/sourceforge/jnlp/Launcher.java: Import Translator.R.
+	(R): Remove.
+	* net/sourceforge/jnlp/Parser.java: Import Translator.R
+	(R(String)): Remove.
+	(R(String,Object)): Remove.
+	(R(String,Object,Object)): Remove.
+	(R(String,Object,Object,Object)): Remove.
+	* net/sourceforge/jnlp/cache/CacheEntry.java: Import Translator.R
+	(CacheEntry): Use R instead of JNLPRuntime.getMessage.
+	* net/sourceforge/jnlp/cache/CacheUtil.java: Import Translator.R
+	(R(String)): Remove.
+	(R(String,Object)): Remove.
+	* net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java: Import
+	Translator.R and use that instead of JNLPRuntime.getMessage.
+	* net/sourceforge/jnlp/runtime/Boot.java: Import Translator.R.
+	(R(String)): Remove.
+	(R(String, Object)): Remove.
+	(run): Use R instead of JNLPRuntime.getMessage.
+	* net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Import Translator.R.
+	(R): Remove.
+	* net/sourceforge/jnlp/runtime/JNLPSecurityManager.java: Import
+	Translator.R.  Use it instead of JNLPRuntime.getMeesage.
+	(R): Remove.
+	* net/sourceforge/jnlp/security/AccessWarningPane.java: Import
+	Translator.R.
+	* net/sourceforge/jnlp/security/CertWarningPane.java: Likewise.
+	* net/sourceforge/jnlp/security/HttpsCertVerifier.java: Import
+	Translator.R.
+	(R(String)): Remove.
+	(R(String,String,String)): Remove.
+	* net/sourceforge/jnlp/security/MoreInfoPane.java: Import Translator.R.
+	* net/sourceforge/jnlp/security/SecurityDialogPanel.java
+	(R(String)): Remove.
+	(R(String,Object)): Remove.
+	* net/sourceforge/jnlp/services/ServiceUtil.java
+	(R): Remove.
+	* net/sourceforge/jnlp/services/SingleInstanceLock.java: Import
+	Translator.R
+	(R(String)): Remove.
+	(R(String,Object)): Remove.
+	* net/sourceforge/jnlp/tools/JarSigner.java: Import Translator.R.
+	(R): Remove.
+	* net/sourceforge/jnlp/runtime/Translator.java: New file
+	(R(String,Object...)): New method.
+
 2010-10-25  Andrew Su <asu@redhat.com>
 
 	* Makefile.am:

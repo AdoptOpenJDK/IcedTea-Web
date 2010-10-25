@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;

@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.applet.Applet;
 import java.awt.Container;
 import java.io.File;
@@ -51,6 +53,7 @@ import javax.swing.SwingUtilities;
 
 import sun.awt.SunToolkit;
 
+
 /**
  * Launches JNLPFiles either in the foreground or background.<p>
  *
@@ -66,9 +69,6 @@ import sun.awt.SunToolkit;
 public class Launcher {
 
     // defines class Launcher.BgRunner, Launcher.TgThread
-
-    /** shortcut for resources */
-    private static String R(String key) { return JNLPRuntime.getMessage(key); }
 
     /** shared thread group */
     /*package*/ static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));

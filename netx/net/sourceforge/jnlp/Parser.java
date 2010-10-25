@@ -18,6 +18,8 @@
 
 package net.sourceforge.jnlp;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -27,9 +29,7 @@ import java.util.*;
 //import gd.xml.tiny.*;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.nanoxml.*;
-
 
 /**
  * Contains methods to parse an XML document into a JNLPFile.
@@ -39,12 +39,6 @@ import net.sourceforge.nanoxml.*;
  * @version $Revision: 1.13 $
  */
 class Parser {
-
-    private static String R(String key) { return JNLPRuntime.getMessage(key); }
-    private static String R(String key, Object p1) { return R(key, p1, null); }
-    private static String R(String key, Object p1, Object p2) { return R(key, p1, p2, null); }
-    private static String R(String key, Object p1, Object p2, Object p3) { return JNLPRuntime.getMessage(key, new Object[] { p1, p2, p3 }); }
-
 
     // defines netx.jnlp.Node class if using Tiny XML or Nano XML
 

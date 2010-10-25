@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp.cache;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
@@ -49,8 +51,8 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
     // todo: this should be synchronized at some point but conflicts
     // aren't very likely.
 
-    private static String downloading = JNLPRuntime.getMessage("CDownloading");
-    private static String complete = JNLPRuntime.getMessage("CComplete");
+    private static String downloading = R("CDownloading");
+    private static String complete = R("CComplete");
 
     /** time to wait after completing but before window closes */
     private static final int CLOSE_DELAY = 750;

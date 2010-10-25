@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp.services;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -181,14 +183,6 @@ class SingleInstanceLock {
     private String getCurrentDisplay() {
         String display = System.getenv("DISPLAY");
         return (display == null) ? "" : display;
-    }
-
-    private static String R(String key) {
-        return JNLPRuntime.getMessage(key);
-    }
-
-    private static String R(String key, Object param) {
-        return JNLPRuntime.getMessage(key, new Object[] { param });
     }
 
 }

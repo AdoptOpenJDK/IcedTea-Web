@@ -53,10 +53,6 @@ import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
  */
 public class ServiceUtil {
 
-    private static String R(String key) {
-        return JNLPRuntime.getMessage(key);
-    }
-
     /**
      * Returns the BasicService reference, or null if the service is
      * unavailable.
