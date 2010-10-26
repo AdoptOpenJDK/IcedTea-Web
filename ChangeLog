@@ -1,3 +1,8 @@
+2010-10-26  Andrew Su  <asu@redhat.com>
+
+	* Makefile.am: Split rm -rf into rm -f and rmdir for launcher
+	directory.
+
 2010-10-25  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/ShortcutDesc.java:
