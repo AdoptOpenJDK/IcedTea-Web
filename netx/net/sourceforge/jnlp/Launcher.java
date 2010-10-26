@@ -50,6 +50,7 @@ import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.Reflect;
 
 import javax.swing.SwingUtilities;
+import javax.swing.text.html.parser.ParserDelegator;
 
 import sun.awt.SunToolkit;
 
@@ -779,6 +780,22 @@ public class Launcher {
         }
     }
 
+    /**
+     * Do hacks on per-application level to allow different AppContexts to work
+     *
+     * @see JNLPRuntime#doMainAppContextHacks
+     */
+    private static void doPerApplicationAppContextHacks() {
+
+        /*
+         * With OpenJDK6 (but not with 7) a per-AppContext dtd is maintained.
+         * This dtd is created by the ParserDelgate. However, the code in
+         * HTMLEditorKit (used to render HTML in labels and textpanes) creates
+         * the ParserDelegate only if there are no existing ParserDelegates. The
+         * result is that all other AppContexts see a null dtd.
+         */
+        new ParserDelegator();
+    }
 
     /**
      * This runnable is used to call the appropriate launch method
@@ -815,6 +832,8 @@ public class Launcher {
                 // The plugin needs an AppContext too, but it has to be created earlier.
                 if (context && !isPlugin)
                         SunToolkit.createNewAppContext();
+
+                doPerApplicationAppContextHacks();
 
                 if (isPlugin) {
                         // Do not display download indicators if we're using gcjwebplugin.

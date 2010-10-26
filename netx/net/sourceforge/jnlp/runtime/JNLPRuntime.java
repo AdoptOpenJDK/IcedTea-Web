@@ -27,6 +27,7 @@ import java.security.*;
 import javax.jnlp.*;
 import javax.naming.ConfigurationException;
 import javax.swing.UIManager;
+import javax.swing.text.html.parser.ParserDelegator;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
@@ -232,6 +233,8 @@ public class JNLPRuntime {
             // ignore it
         }
 
+        doMainAppContextHacks();
+
         if (securityEnabled) {
             Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
             System.setSecurityManager(security);
@@ -258,6 +261,23 @@ public class JNLPRuntime {
         securityThread.setDaemon(true);
         securityThread.start();
         return runner;
+    }
+
+    /**
+     * Performs a few hacks that are needed for the main AppContext
+     *
+     * @see Launcher#doPerApplicationAppContextHacks
+     */
+    private static void doMainAppContextHacks() {
+
+        /*
+         * With OpenJDK6 (but not with 7) a per-AppContext dtd is maintained.
+         * This dtd is created by the ParserDelgate. However, the code in
+         * HTMLEditorKit (used to render HTML in labels and textpanes) creates
+         * the ParserDelegate only if there are no existing ParserDelegates. The
+         * result is that all other AppContexts see a null dtd.
+         */
+        new ParserDelegator();
     }
 
     /**

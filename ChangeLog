@@ -1,6 +1,17 @@
 2010-10-26  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Launcher.java
+	(doPerApplicationAppContextHacks): New method. Create a new ParserDelegate
+	to intialize the per AppContext dtd used by Swing HTML controls.
+	(TgThread.run): Call doPerApplicationAppContextHacks.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Call doMainAppContextHacks.
+	(doMainAppContextHacks): New method. Create a new ParserDelegate to
+	initialize the per AppContext dtd used by Swing HTML controls.
+
+2010-10-26  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java
 	(launchApplication): Mark main method as accessible before
 	invoking it.
 
