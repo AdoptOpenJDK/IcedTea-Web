@@ -1,5 +1,11 @@
 2010-10-26  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/Launcher.java
+	(launchApplication): Mark main method as accessible before
+	invoking it.
+
+2010-10-26  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/Parser.java: Add 1.1, 1.2, 1.3 and
 	1.4 to supportedVersions.
 

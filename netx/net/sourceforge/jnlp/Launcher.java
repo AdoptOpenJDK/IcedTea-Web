@@ -474,6 +474,7 @@ public class Launcher {
                 splashScreen.dispose();
             }
 
+            main.setAccessible(true);
             main.invoke(null, new Object[] { args } );
 
             return app;
