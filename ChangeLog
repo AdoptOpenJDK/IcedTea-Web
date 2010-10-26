@@ -1,3 +1,8 @@
+2010-10-26  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/Translator.java
+	(R(String)): New method.
+
 2010-10-26  Deepak Bhole <dbhole@redhat.com>
 
 	* netx/net/sourceforge/jnlp/PluginBridge.java: Trim whitespace from jar

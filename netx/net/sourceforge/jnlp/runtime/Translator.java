@@ -28,4 +28,13 @@ public class Translator {
         return JNLPRuntime.getMessage(message, params);
     }
 
+    /**
+     * Return a translated (localized) version of the message
+     * @param message the message to translate
+     * @return a string representing the localized message
+     */
+    public static String R(String message) {
+        return JNLPRuntime.getMessage(message);
+    }
+
 }
