@@ -103,6 +103,12 @@ public class PluginBridge extends JNLPFile
 
         if (jar != null && jar.length() > 0) {
             this.jars = jar.split(",");
+            
+            // trim white spaces
+            for (int i =0; i < this.jars.length; i++) {
+            	this.jars[i] = this.jars[i].trim();
+            }
+
             if (JNLPRuntime.isDebug()) {
                 System.err.println("Jar string: " + jar);
                 System.err.println("jars length: " + jars.length);

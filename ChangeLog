@@ -1,5 +1,10 @@
 2010-10-26  Deepak Bhole <dbhole@redhat.com>
 
+	* netx/net/sourceforge/jnlp/PluginBridge.java: Trim whitespace from jar
+	names in the constructor.
+
+2010-10-26  Deepak Bhole <dbhole@redhat.com>
+
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
 	Replace all status.put calls with calls to updateStatus().
 	(createPanel): Create a frame with a 0 handle. Use the new
