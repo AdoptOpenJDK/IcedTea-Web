@@ -1,3 +1,10 @@
+2010-10-27  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java
+	(load): Do a security check at start. A security exception later on may
+	accidentally reveal a filename or a system property.
+	(save): Likewise.
+
 2010-10-26  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Launcher.java

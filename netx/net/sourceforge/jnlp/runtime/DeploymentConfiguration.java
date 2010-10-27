@@ -155,6 +155,15 @@ public final class DeploymentConfiguration {
      * @throws DeploymentException if it encounters a fatal error.
      */
     public void load() throws ConfigurationException {
+        // make sure no state leaks if security check fails later on
+        File userFile = new File(System.getProperty("user.home") + File.separator + ".netx"
+                + File.separator + DEPLOYMENT_PROPERTIES);
+
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkRead(userFile.toString());
+        }
+
         Map<String, ConfigValue> initialProperties = loadDefaultProperties();
 
         Map<String, ConfigValue> systemProperties = null;
@@ -189,8 +198,7 @@ public final class DeploymentConfiguration {
         /*
          * Third, read the user's deployment.properties file
          */
-        userPropertiesFile = new File(System.getProperty("user.home") + File.separator + ".netx"
-                + File.separator + DEPLOYMENT_PROPERTIES);
+        userPropertiesFile = userFile;
         Map<String, ConfigValue> userProperties = loadProperties(ConfigType.User, userPropertiesFile,
                 false);
         if (userProperties != null) {
@@ -466,9 +474,19 @@ public final class DeploymentConfiguration {
     /**
      * Saves all properties that are not part of default or system properties
      *
-     * @throws IOException
+     * @throws IOException if unable to save the file
+     * @throws IllegalStateException if save() is called before load()
      */
     public void save() throws IOException {
+        if (userPropertiesFile == null) {
+            throw new IllegalStateException("must load() before save()");
+        }
+
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkWrite(userPropertiesFile.toString());
+        }
+
         if (JNLPRuntime.isDebug()) {
             System.out.println("Saving properties into " + userPropertiesFile.toString());
         }
