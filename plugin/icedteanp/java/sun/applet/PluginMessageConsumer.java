@@ -126,6 +126,10 @@ class PluginMessageConsumer {
 	}
 
 	private String getPriorityStrIfPriority(String message) {
+		
+		// Destroy messages are permanently high priority
+		if (message.endsWith("destroy"))
+            return "destroy";
 
 	    synchronized (priorityWaitQueue) {
 	        Iterator<String> it = priorityWaitQueue.iterator();
@@ -149,7 +153,6 @@ class PluginMessageConsumer {
             initWorkers.put(instanceNum, worker);
         }
 	}
-
 
 	public void notifyWorkerIsFree(PluginMessageHandlerWorker worker) {
 	    synchronized (initWorkers) {
@@ -176,6 +179,32 @@ class PluginMessageConsumer {
 	}
 
 	protected class ConsumerThread extends Thread { 
+		
+		/**
+		 * Scans the readQueue for priority messages and brings them to the front
+		 */
+		private void bringPriorityMessagesToFront() {
+			synchronized (readQueue) {
+				
+				// iterate through the list
+				for (int i=0; i < readQueue.size(); i++) {
+					
+					// remove element at i to inspect it
+					String message = readQueue.remove(i);
+					
+					// if element at i is a priority msg, bring it forward
+					if (getPriorityStrIfPriority(message) != null) {
+						readQueue.addFirst(message);
+					} else { // else keep it where it was
+						readQueue.add(i, message);
+					}
+					
+					// by the end the queue size is the same, so the 
+					// position indicator (i) is still valid
+				}
+			}
+		}
+
 	    public void run() {
 
 	        while (true) {
@@ -190,7 +219,6 @@ class PluginMessageConsumer {
 
 	                String[] msgParts = message.split(" ");
 
-
 	                String priorityStr = getPriorityStrIfPriority(message);
 	                boolean isPriorityResponse = (priorityStr != null);
 		
@@ -199,9 +227,12 @@ class PluginMessageConsumer {
 	                
 	                if (worker == null) {
 	                    synchronized(readQueue) {
-                            readQueue.addLast(message);
+                            readQueue.addFirst(message);
                         }
 
+	                    // re-scan to see if any priority message came in
+                        bringPriorityMessagesToFront();
+	                    
 	                    continue; // re-loop to try next msg
 	                }
 

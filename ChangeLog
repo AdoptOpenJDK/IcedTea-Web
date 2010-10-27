@@ -1,3 +1,28 @@
+2010-10-26  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	Replace all status.put calls with calls to updateStatus().
+	(createPanel): Create a frame with a 0 handle. Use the new
+	waitForAppletInit function to wait until applet is ready.
+	(reFrame): Re-order code so that the panel is never parentless.
+	(handleMessage): Re-wrote message processing to handle destroy calls
+	correctly, checking for them more often to prevent a frame from popping up
+	if the tab/page is closed before loading finishes. Decode special
+	characters in the message.
+	(updateStatus): New function. Updates the status for the given instance if
+	applicable.
+	(destroyApplet): New function. Destroys a given applet and frees related
+	resources.
+	(waitForAppletInit): New function. Blocks until applet is initialized.
+	(parse): Remove part that decoded the params. Decoding is now done earlier
+	in handleMessage().
+	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java:
+	(getPriorityStrIfPriority): Mark destroy messages as priority.
+	(bringPriorityMessagesToFront): Scans the queue for priority messages and
+	brings them to the front.
+	(run): If the queue is not empty and there are no workers left, run
+	bringPriorityMessagesToFront() and retry.
+
 2010-10-26  Andrew Su  <asu@redhat.com>
 
 	* Makefile.am: Split rm -rf into rm -f and rmdir for launcher

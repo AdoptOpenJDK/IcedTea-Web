@@ -136,12 +136,10 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                     }
              }
          });
-
          
-
          // create the frame.
-         PluginAppletViewer.reFrame(null, identifier, System.out, handle, panel);
-         
+         PluginAppletViewer.reFrame(null, identifier, System.out, 0, panel);
+
          panel.init();
 
          // Start the applet
@@ -179,15 +177,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          
          // Wait for the panel to initialize
          // (happens in a separate thread)
-         while (panel.getApplet() == null &&
-                ((NetxPanel) panel).isAlive()) {
-             try {
-                 Thread.sleep(50);
-                 PluginDebug.debug("Waiting for applet to initialize...");
-             } catch (InterruptedException ie) {
-                 // just wait
-             }
-         }
+         PluginAppletViewer.waitForAppletInit((NetxPanel) panel);
 
          a = panel.getApplet();
 
@@ -317,7 +307,17 @@ import com.sun.jndi.toolkit.url.UrlUtil;
       */
      private static String defaultSaveFile = "Applet.ser";
      
-     private static enum PAV_INIT_STATUS {PRE_INIT, IN_INIT, INIT_COMPLETE, INACTIVE};
+     
+     /**
+      *  Enumerates the current status of an applet
+      *  
+      *  PRE_INIT -> Parsing and initialization phase
+      *  INIT_COMPLETE -> Initialization complete, reframe pending
+      *  REFRAME_COMPLETE -> Reframe complete, applet is initialized and usable by the user
+      *  INACTIVE -> Browser has directed that the applet be destroyed (this state is non-overridable except by DESTROYED)
+      *  DESTROYED -> Applet has been destroyed
+      */
+     private static enum PAV_INIT_STATUS {PRE_INIT, INIT_COMPLETE, REFRAME_COMPLETE, INACTIVE, DESTROYED};
 
      /**
       * The panel in which the applet is being displayed.
@@ -350,7 +350,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
      private static HashMap<Integer, PAV_INIT_STATUS> status = 
          new HashMap<Integer,PAV_INIT_STATUS>();
-
      
      private long handle = 0;
      private WindowListener windowEventListener = null;
@@ -380,16 +379,20 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              return;
 
          PluginAppletViewer newFrame = new PluginAppletViewer(handle, identifier, statusMsgStream, panel);
-
+         
          if (oldFrame != null) {
              applets.remove(oldFrame.identifier);
              oldFrame.removeWindowListener(oldFrame.windowEventListener);
              panel.removeAppletListener(oldFrame.appletEventListener);
+
+			 // Add first, remove later
+             newFrame.add("Center", panel);
              oldFrame.remove(panel);
              oldFrame.dispose();
+         } else {
+	         newFrame.add("Center", panel);
          }
 
-         newFrame.add("Center", panel);
          newFrame.pack();
 
          newFrame.appletEventListener = new AppletEventListener(newFrame, newFrame);
@@ -397,11 +400,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
          applets.put(identifier, newFrame);
 
-         // dispose oldframe if necessary
-         if (oldFrame != null) {
-             oldFrame.dispose();
-         }
-         
          PluginDebug.debug(panel + " reframed");
      }
 
@@ -449,7 +447,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          this.frame = frame;
          this.appletViewer = appletViewer;
          }
-  
+   
          public void appletStateChanged(AppletEvent evt) 
          {
          AppletPanel src = (AppletPanel)evt.getSource();
@@ -483,9 +481,9 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  AppletPanel.changeFrameAppContext(frame, SunToolkit.targetToAppContext(a));
              else
                  AppletPanel.changeFrameAppContext(frame, AppContext.getAppContext());
-  
-             status.put(appletViewer.identifier, PAV_INIT_STATUS.INIT_COMPLETE);
-             
+
+           	 updateStatus(appletViewer.identifier, PAV_INIT_STATUS.INIT_COMPLETE);
+
              break;
              }
          }
@@ -510,7 +508,13 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          
          try {
              if (message.startsWith("handle")) {
-                 
+
+          		 // If there is a key for this status, it means it 
+          		 // was either initialized before, or destroy has been 
+           		 // processed. Stop moving further.
+           		 if (updateStatus(identifier, PAV_INIT_STATUS.PRE_INIT) != null)
+           			 return;
+            	 
             	 // Extract the information from the message
             	 String[] msgParts = new String[4];
             	 for (int i=0; i < 3; i++) {
@@ -519,32 +523,38 @@ import com.sun.jndi.toolkit.url.UrlUtil;
             		 msgParts[i] = message.substring(spaceLocation + 1, nextSpaceLocation);
             		 message = message.substring(nextSpaceLocation + 1);
             	 }
-                 
+
             	 long handle = Long.parseLong(msgParts[0]);
             	 String width = msgParts[1];
             	 String height = msgParts[2];
-
+            	 
             	 int spaceLocation = message.indexOf(' ', "tag".length()+1); 
             	 String documentBase = 
                      UrlUtil.decode(message.substring("tag".length() + 1, spaceLocation));
-            	 String tag = message.substring(spaceLocation+1); 
+            	 String tag = message.substring(spaceLocation+1);
+            	 
+            	 // Decode the tag
+                 tag = tag.replace("&gt;", ">");
+                 tag = tag.replace("&lt;", "<");
+                 tag = tag.replace("&amp;", "&");
+                 tag = tag.replace("&#10;", "\n");
+                 tag = tag.replace("&#13;", "\r");
+                 tag = tag.replace("&quot;", "\"");
 
             	 PluginDebug.debug ("Handle = " + handle + "\n" +
             	                    "Width = " + width + "\n" +
             	                    "Height = " + height + "\n" +
             	                    "DocumentBase = " + documentBase + "\n" +
             	                    "Tag = " + tag);
-
-                     status.put(identifier, PAV_INIT_STATUS.PRE_INIT);
+            	 
             	 PluginAppletViewer.parse
                  			(identifier, handle, width, height,
                  				new StringReader(tag),
                  				new URL(documentBase));
-                     
 
                  int maxWait = APPLET_TIMEOUT; // wait for applet to fully load
                  int wait = 0;
-                 while (!status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE) &&
+                 while ( !applets.containsKey(identifier) && // Map is populated only by reFrame
                          (wait < maxWait)) {
 
                       try {
@@ -555,9 +565,44 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                       }
                  }
 
-                 if (!status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE))
+                 // If wait exceeded maxWait, we timed out. Throw an exception
+                 if (wait >= maxWait)
                      throw new Exception("Applet initialization timeout");
                  
+                 PluginAppletViewer oldFrame = applets.get(identifier);
+
+                 // We should not try to destroy an applet during 
+                 // initialization. It may cause an inconsistent state, 
+                 // which would bad if it's a trusted applet that 
+                 // read/writes to files 
+                 waitForAppletInit((NetxPanel) applets.get(identifier).panel);
+
+                 // Should we proceed with reframing?
+                 if (status.get(identifier).equals(PAV_INIT_STATUS.INACTIVE)) {
+                     destroyApplet(identifier);
+                     return;
+                 }
+
+                 // Proceed with re-framing
+          		 reFrame(oldFrame, identifier, System.out, handle, oldFrame.panel);
+
+                 // There is a slight chance that destroy can happen 
+                 // between the above and below line
+                 if (updateStatus(identifier, PAV_INIT_STATUS.REFRAME_COMPLETE).equals(PAV_INIT_STATUS.INACTIVE)) {
+                     destroyApplet(identifier);
+                 }
+
+             } else if (message.startsWith("destroy")) {
+
+            	 // Set it inactive, and try to do cleanup is applicable
+            	 PAV_INIT_STATUS previousStatus = updateStatus(identifier, PAV_INIT_STATUS.INACTIVE);
+            	 PluginDebug.debug("Destroy status set for " + identifier);
+
+            	 if (previousStatus != null &&
+            		 previousStatus.equals(PAV_INIT_STATUS.REFRAME_COMPLETE)) {
+            		 destroyApplet(identifier);
+            	 }
+
              } else {
                  PluginDebug.debug ("Handling message: " + message + " instance " + identifier + " " + Thread.currentThread());
 
@@ -568,7 +613,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                             status.get(identifier).equals(PAV_INIT_STATUS.PRE_INIT)
                          )
                         );
-                 
+
                  // don't bother processing further for inactive applets
                  if (status.get(identifier).equals(PAV_INIT_STATUS.INACTIVE))
                      return;
@@ -580,31 +625,131 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              e.printStackTrace();
              
              // If an exception happened during pre-init, we need to update status
-             if (status.get(identifier).equals(PAV_INIT_STATUS.PRE_INIT))
-                 status.put(identifier, PAV_INIT_STATUS.INACTIVE);
+             updateStatus(identifier, PAV_INIT_STATUS.INACTIVE);
 
              throw new RuntimeException("Failed to handle message: " + 
                      message + " for instance " + identifier, e);
          }
      }
- 
+     
+     /**
+      * Sets the status unless an overriding status is set (e.g. if 
+      * status is DESTROYED, it may not be overridden).
+      * 
+      * @param identifier The identifier for which the status is to be set
+      * @param status The status to switch to
+      * @return The previous status
+      */
+     private static synchronized PAV_INIT_STATUS updateStatus(int identifier, PAV_INIT_STATUS newStatus) {
+    	
+    	 PAV_INIT_STATUS prev = status.get(identifier);
+
+    	 // If the status is set
+    	 if (status.containsKey(identifier)) {
+
+    	     // Nothing may override destroyed status
+    	     if (status.get(identifier).equals(PAV_INIT_STATUS.DESTROYED)) {
+   	    		 return prev;
+    	     }
+    		 
+    		 // If status is inactive, only DESTROYED may override it
+    	     if (status.get(identifier).equals(PAV_INIT_STATUS.INACTIVE)) {
+    	    	 if (!newStatus.equals(PAV_INIT_STATUS.DESTROYED)) {
+    	    		 return prev;
+    	    	 }
+    	     }
+    	 }
+
+    	// Else set to given status
+    	status.put(identifier, newStatus);
+    	
+    	return prev;
+     }
+
+     /**
+      * Destroys the given applet instance.
+      * 
+      * This function may be called multiple times without problems. 
+      * It does a synchronized check on the status and will only 
+      * attempt to destroy the applet if not previously destroyed.
+      * 
+      * @param identifier The instance which is to be destroyed
+      */
+     
+     private static synchronized void destroyApplet(int identifier) {
+
+    	 PluginDebug.debug("DestroyApplet called for " + identifier);
+    	 
+    	 PAV_INIT_STATUS prev = updateStatus(identifier, PAV_INIT_STATUS.DESTROYED);
+
+    	 // If already destroyed, return
+    	 if (prev.equals(PAV_INIT_STATUS.DESTROYED)) {
+    		 PluginDebug.debug(identifier + " already destroyed. Returning.");
+    		 return;
+    	 }
+
+    	 // If already disposed, return
+    	 if (applets.get(identifier).panel.applet == null) {
+    		 // Try to still dispose the panel itself -- no harm done with double dispose
+    		 applets.get(identifier).dispose();
+
+    		 PluginDebug.debug(identifier + " inactive. Returning.");
+    		 return;
+    	 }
+
+    	 PluginDebug.debug("Attempting to destroy " + identifier);
+
+    	 final int fIdentifier = identifier;
+   		 SwingUtilities.invokeLater(new Runnable() {
+   			public void run() {
+   				 applets.get(fIdentifier).appletClose();
+   		 	}
+   		 });
+
+    	 PluginDebug.debug(identifier + " destroyed");
+     }
+     
+     /**
+      * Function to block until applet initialization is complete
+      * 
+      * @param identifier The instance to wait for
+      */
+     public static void waitForAppletInit(NetxPanel panel) {
+    	 
+    	 int waitTime = 0;
+    	 
+         // Wait till initialization finishes
+         while (panel.getApplet() == null &&
+                panel.isAlive() &&
+                waitTime < APPLET_TIMEOUT) {
+             try {
+                 if (waitTime%500 == 0)
+                	 PluginDebug.debug("Waiting for applet panel " + panel + " to initialize...");
+
+                 Thread.sleep(waitTime += 50);
+             } catch (InterruptedException ie) {
+                 // just wait
+             }
+         }
+         
+         PluginDebug.debug("Applet panel " + panel + " initialized");
+     }
+
      public void handleMessage(int reference, String message)
      {
          if (message.startsWith("width")) {
 
              // Wait for panel to come alive
              int maxWait = APPLET_TIMEOUT; // wait for panel to come alive
-                     int wait = 0;
+             int wait = 0;
              while (!status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE) && wait < maxWait) {
-
-                          try {
-                              Thread.sleep(50);
-                              wait += 50;
-                          } catch (InterruptedException ie) {
-                              // just wait
-                          }
-                     }
-
+                  try {
+                      Thread.sleep(50);
+                      wait += 50;
+                  } catch (InterruptedException ie) {
+                      // just wait
+                  }
+             }
              
              // 0 => width, 1=> width_value, 2 => height, 3=> height_value
              String[] dimMsg = message.split(" ");
@@ -636,7 +781,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
                          panel.setSize(width, height);
                          panel.validate();
-
+                         
                          panel.applet.resize(width, height);
                          panel.applet.validate();
                      }
@@ -649,9 +794,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                 e.printStackTrace();
             }
 
-         } else if (message.startsWith("destroy")) {
-             dispose();
-             status.put(identifier, PAV_INIT_STATUS.INACTIVE);
          } else if (message.startsWith("GetJavaObject")) {
 
              // FIXME: how do we determine what security context this
@@ -672,15 +814,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              
              // Wait for the panel to initialize
              // (happens in a separate thread)
-             while (panel.getApplet() == null &&
-                    ((NetxPanel) panel).isAlive()) {
-                 try {
-                     Thread.sleep(50);
-                     PluginDebug.debug("Waiting for applet to initialize...");
-                 } catch (InterruptedException ie) {
-                     // just wait
-                 }
-             }
+             waitForAppletInit((NetxPanel) panel);
 
              PluginDebug.debug(panel + " -- " + panel.getApplet() + " -- " + ((NetxPanel) panel).isAlive());
 
@@ -1548,10 +1682,11 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  if (countApplets() == 0) {
                      appletSystemExit();
                  }
+
+                 updateStatus(identifier, PAV_INIT_STATUS.DESTROYED);
              }
          }).start();
 
-         status.put(identifier, PAV_INIT_STATUS.INACTIVE);
      }
  
      /**
@@ -1677,18 +1812,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
         val = buf.toString();
         }
 
-        att = att.replace("&gt;", ">");
-        att = att.replace("&lt;", "<");
-        att = att.replace("&amp;", "&");
-        att = att.replace("&#10;", "\n");
-        att = att.replace("&#13;", "\r");
-        
-        val = val.replace("&gt;", ">");
-        val = val.replace("&lt;", "<");
-        val = val.replace("&amp;", "&");
-        val = val.replace("&#10;", "\n");
-        val = val.replace("&#13;", "\r");
-
         PluginDebug.debug("PUT " + att + " = '" + val + "'");
         atts.put(att.toLowerCase(java.util.Locale.ENGLISH), val);
 
@@ -1708,7 +1831,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
      // private static final == inline
      private static final boolean isInt(Object o) {
          boolean isInt = false;
-
          try {
              Integer.parseInt((String) o);
              isInt = true;
@@ -1763,7 +1885,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  } catch (IOException ioe) {
                      return ioe;
                  }
-                 
                  return null;
              }
          };
@@ -1785,6 +1906,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          boolean isObjectTag = false;
          boolean isEmbedTag = false;
          boolean objectTagAlreadyParsed = false;
+
          // The current character
          // FIXME: This is an evil hack to force pass-by-reference.. the 
          // parsing code needs to be rewritten from scratch to prevent such 
@@ -1879,19 +2001,6 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                              if (val == null) {
                                  statusMsgStream.println(requiresNameWarning);
                              } else if (atts != null) {
-                                 att = att.replace("&gt;", ">");
-                                 att = att.replace("&lt;", "<");
-                                 att = att.replace("&amp;", "&");
-                                 att = att.replace("&#10;", "\n");
-                                 att = att.replace("&#13;", "\r");
-                                 att = att.replace("&quot;", "\"");
-
-                                 val = val.replace("&gt;", ">");
-                                 val = val.replace("&lt;", "<");
-                                 val = val.replace("&amp;", "&");
-                                 val = val.replace("&#10;", "\n");
-                                 val = val.replace("&#13;", "\r");
-                                 val = val.replace("&quot;", "\"");
                                  PluginDebug.debug("PUT " + att + " = " + val);
                                  atts.put(att.toLowerCase(), val);
                              } else {
@@ -1920,8 +2029,8 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
                          if (atts.get("width") == null || !isInt(atts.get("width"))) {
                              atts.put("width", width);
-                          }
-
+                         }
+                         
                          if (atts.get("height") == null || !isInt(atts.get("height"))) {
                              atts.put("height", height);
                          }
@@ -1974,7 +2083,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                          if (atts.get("width") == null || !isInt(atts.get("width"))) {
                              atts.put("width", width);
                          }
-
+                         
                          if (atts.get("height") == null || !isInt(atts.get("height"))) {
                              atts.put("height", height);
                          }
@@ -2023,10 +2132,11 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                          if (atts.get("width") == null || !isInt(atts.get("width"))) {
                              atts.put("width", width);
                          }
-
+                         
                          if (atts.get("height") == null || !isInt(atts.get("height"))) {
                              atts.put("height", height);
                          }
+
                      }
                  }
              }
