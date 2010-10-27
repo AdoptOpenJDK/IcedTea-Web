@@ -1,3 +1,8 @@
+2010-10-27  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc (plugin_create_applet_tag): Escape
+	the entire applet tag, not just the params.
+
 2010-10-27  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java

@@ -755,6 +755,7 @@ ITNP_SetWindow (NPP instance, NPWindow* window)
     }
   else
     {
+
 	  // Else this is initialization
       PLUGIN_DEBUG ("ITNP_SetWindow: setting window.\n");
 
@@ -1693,57 +1694,59 @@ plugin_create_applet_tag (int16_t argc, char* argn[], char* argv[])
     }
       else
         {
-          // Escape the parameter value so that line termination
-          // characters will pass through the pipe.
+
           if (argv[i] != '\0')
             {
-              // worst case scenario -> all characters are newlines or
-              // returns, each of which translates to 5 substitutions
-              char* escaped = (char*) calloc(((strlen(argv[i])*5)+1), sizeof(char));
-
-              strcpy(escaped, "");
-              for (int j=0; j < strlen(argv[i]); j++)
-              {
-                  if (argv[i][j] == '\r')
-                      strcat(escaped, "&#13;");
-                  else if (argv[i][j] == '\n')
-                      strcat(escaped, "&#10;");
-                  else if (argv[i][j] == '>')
-                      strcat(escaped, "&gt;");
-                  else if (argv[i][j] == '<')
-                      strcat(escaped, "&lt;");
-                  else if (argv[i][j] == '&')
-                      strcat(escaped, "&amp;");
-                  else
-                  {
-                      char* orig_char = (char*) calloc(2, sizeof(char));
-                      orig_char[0] = argv[i][j];
-                      orig_char[1] = '\0';
-
-                      strcat(escaped, orig_char);
-
-                      free(orig_char);
-                      orig_char = NULL;
-                  }
-              }
-
               parameters = g_strconcat (parameters, "<PARAM NAME=\"", argn[i],
-                                        "\" VALUE=\"", escaped, "\">", NULL);
-
-              free (escaped);
-              escaped = NULL;
+                                        "\" VALUE=\"", argv[i], "\">", NULL);
             }
         }
     }
 
   applet_tag = g_strconcat (applet_tag, ">", parameters, "</EMBED>", NULL);
 
+  // Escape the parameter value so that line termination
+  // characters will pass through the pipe.
+          
+  // worst case scenario -> all characters are newlines or
+  // returns, each of which translates to 5 substitutions
+  char* applet_tag_escaped = (char*) calloc(((strlen(applet_tag)*5)+1), sizeof(char));
+
+  strcpy(applet_tag_escaped, "");
+  for (int i=0; i < strlen(applet_tag); i++)
+  {
+      if (applet_tag[i] == '\r')
+          strcat(applet_tag_escaped, "&#13;");
+      else if (applet_tag[i] == '\n')
+          strcat(applet_tag_escaped, "&#10;");
+      else if (applet_tag[i] == '>')
+          strcat(applet_tag_escaped, "&gt;");
+      else if (applet_tag[i] == '<')
+          strcat(applet_tag_escaped, "&lt;");
+      else if (applet_tag[i] == '&')
+          strcat(applet_tag_escaped, "&amp;");
+      else
+      {
+          char* orig_char = (char*) calloc(2, sizeof(char));
+          orig_char[0] = applet_tag[i];
+          orig_char[1] = '\0';
+
+          strcat(applet_tag_escaped, orig_char);
+
+          free(orig_char);
+          orig_char = NULL;
+      }
+  }
+
+  free (applet_tag);
+  applet_tag = NULL;
+
   g_free (parameters);
   parameters = NULL;
 
   PLUGIN_DEBUG ("plugin_create_applet_tag return\n");
 
-  return applet_tag;
+  return applet_tag_escaped;
 }
 
 // plugin_send_message_to_appletviewer must be called while holding
