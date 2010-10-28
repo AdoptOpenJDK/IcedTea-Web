@@ -167,6 +167,7 @@ public class SecurityWarningDialog extends JDialog {
                 SecurityWarningDialog dialog =
                         new SecurityWarningDialog(DialogType.MORE_INFO, null, null,
                         jarSigner);
+                dialog.setModalityType(ModalityType.APPLICATION_MODAL);
                 dialog.setVisible(true);
                 dialog.dispose();
         }
@@ -181,6 +182,7 @@ public class SecurityWarningDialog extends JDialog {
                 SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.CERT_INFO,
                         null, null, jarSigner);
                 dialog.setLocationRelativeTo(parent);
+                dialog.setModalityType(ModalityType.APPLICATION_MODAL);
                 dialog.setVisible(true);
                 dialog.dispose();
         }
@@ -195,6 +197,7 @@ public class SecurityWarningDialog extends JDialog {
                         JDialog parent) {
                 SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.SINGLE_CERT_INFO, c);
                         dialog.setLocationRelativeTo(parent);
+                        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
                         dialog.setVisible(true);
                         dialog.dispose();
         }
@@ -219,7 +222,7 @@ public class SecurityWarningDialog extends JDialog {
                         dialogTitle = "Security Warning";
 
                 setTitle(dialogTitle);
-                setModal(false);
+                setModalityType(ModalityType.MODELESS);
 
                 setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 

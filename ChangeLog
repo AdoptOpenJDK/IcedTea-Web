@@ -1,3 +1,11 @@
+2010-10-28  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/SecurityWarningDialog.java
+	(showMoreInfoDialog): Make dialog modal.
+	(showCertInfoDialog): Likewise.
+	(showSingleCertInfoDialog): Likewise.
+	(initDialog): Use setModality instead of setModal.
+
 2010-10-27  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/IcedTeaNPPlugin.cc (plugin_create_applet_tag): Escape
