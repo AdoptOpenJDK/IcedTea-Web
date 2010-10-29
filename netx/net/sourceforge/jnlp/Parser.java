@@ -598,16 +598,15 @@ class Parser {
 
     /**
      * Returns the launch descriptor element, either AppletDesc,
-     * ApplicationDesc, ComponentDesc, or InstallerDesc.
+     * ApplicationDesc, or InstallerDesc.
      *
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
     public Object getLauncher(Node parent) throws ParseException {
         // check for other than one application type
-        if (1 != getChildNodes(parent, "applet-desc").length
+        if (1 < getChildNodes(parent, "applet-desc").length
             + getChildNodes(parent, "application-desc").length
-            + getChildNodes(parent, "component-desc").length
             + getChildNodes(parent, "installer-desc").length)
             throw new ParseException(R("PTwoDescriptors"));
 
@@ -619,8 +618,6 @@ class Parser {
                 return getApplet(child);
             if ("application-desc".equals(name))
                 return getApplication(child);
-            if ("component-desc".equals(name))
-                return getComponent(child);
             if ("installer-desc".equals(name))
                 return getInstaller(child);
 
@@ -693,8 +690,23 @@ class Parser {
     /**
      * Returns the component descriptor.
      */
-    public ComponentDesc getComponent(Node node) {
-        return new ComponentDesc();
+    public ComponentDesc getComponent(Node parent) throws ParseException {
+
+        if (1 < getChildNodes(parent, "component-desc").length) {
+            throw new ParseException(R("PTwoDescriptors"));
+        }
+
+        Node child = parent.getFirstChild();
+        while (child != null) {
+            String name = child.getNodeName();
+
+            if ("component-desc".equals(name))
+                return new ComponentDesc();
+
+            child = child.getNextSibling();
+        }
+
+        return null;
     }
 
     /**

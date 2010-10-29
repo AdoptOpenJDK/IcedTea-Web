@@ -95,6 +95,9 @@ public class JNLPFile {
     /** the application description */
     protected Object launchType;
 
+    /** the component description */
+    protected ComponentDesc component;
+
     /** the security descriptor */
     protected SecurityDesc security;
 
@@ -402,7 +405,7 @@ public class JNLPFile {
 
     /**
      * Returns an object of one of the following types: AppletDesc,
-     * ApplicationDesc, InstallerDesc, and ComponentDesc.
+     * ApplicationDesc and InstallerDesc
      */
     public Object getLaunchInfo() {
         return launchType;
@@ -441,7 +444,7 @@ public class JNLPFile {
         if (!isComponent())
             throw new UnsupportedOperationException(R("JNotComponent"));
 
-        return (ComponentDesc) launchType;
+        return component;
     }
 
     /**
@@ -474,7 +477,7 @@ public class JNLPFile {
      * Returns whether the lauch descriptor describes a Component.
      */
     public boolean isComponent() {
-        return launchType instanceof ComponentDesc;
+        return component != null;
     }
 
     /**
@@ -574,6 +577,7 @@ public class JNLPFile {
             update = parser.getUpdate(root);
             resources = parser.getResources(root, false); // false == not a j2se/java resources section
             launchType = parser.getLauncher(root);
+            component = parser.getComponent(root);
             security = parser.getSecurity(root);
         }
         catch (ParseException ex) {

@@ -1,3 +1,17 @@
+2010-10-29  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPFile.java: Add component.
+	(getLaunchInfo): Modify javadoc to indicate that it does not return
+	the ComponentDesc.
+	(getComponent): Return component instead of launchType.
+	(isComponent): Check if component is not null.
+	(parse): Find and set component descriptor.
+	* netx/net/sourceforge/jnlp/Parser.java
+	(getLauncher): Remove all checks for component-desc. Allow having
+	none of application-desc, applet-desc and installer-desc.
+	(getComponent): Check for more than one component-desc element.
+	Read and parse the component-desc.
+
 2010-10-28  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/SecurityWarningDialog.java
