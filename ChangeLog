@@ -1,3 +1,8 @@
+2010-11-01  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am (clean-IcedTeaPlugin): Only delete launcher directory if it
+	exists.
+
 2010-11-01  Deepak Bhole <dbhole@redhat.com>
 
 	PR542: Plugin fails with NPE on
