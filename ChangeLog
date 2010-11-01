@@ -1,3 +1,17 @@
+2010-11-01  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/docs: Added new docs folder that contains plugin documentation.
+	* plugin/docs/MessageBusArchitecture.png: Diagram of the JS <-> Java 
+	message handling architectrure.
+	* plugin/docs/OverallArchitecture.png: Diagram of the overall plugin
+	architecture.
+	* plugin/docs/java-js-wf.png: Sequence diagram showing an example
+	LiveConnect call from an applet to JavaScript/Browser.
+	* plugin/docs/js-java-wf.png: Sequence diagram showing an example
+	LiveConnect call from JavaScript/Browser to an applet.
+	* plugin/docs/npplugin_liveconnect_design.pdf: Slides with notes on the
+	above diagrams.
+
 2010-10-29  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPFile.java: Add component.
