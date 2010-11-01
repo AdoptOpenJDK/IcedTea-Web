@@ -462,7 +462,14 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 for (JARDesc jarDesc: file.getResources().getJARs()) {
                         try {
-                                URL location = tracker.getCacheFile(jarDesc.getLocation()).toURL();
+                                File cachedFile = tracker.getCacheFile(jarDesc.getLocation());
+                                
+                                if (cachedFile == null) {
+                                	System.err.println("JAR " + jarDesc.getLocation() + " not found. Continuing.");
+                                	continue; // JAR not found. Keep going.
+                                }
+
+                                URL location = cachedFile.toURL();
                                 SecurityDesc jarSecurity = file.getSecurity();
 
                                 if (file instanceof PluginBridge) {

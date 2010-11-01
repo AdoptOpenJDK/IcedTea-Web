@@ -1,5 +1,14 @@
 2010-11-01  Deepak Bhole <dbhole@redhat.com>
 
+	PR542: Plugin fails with NPE on
+	http://www.openprocessing.org/visuals/iframe.php?visualID=2615
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(initializeResources): If cacheFile is null (JAR couldn't be downloaded),
+	try to continue, rather than allowing the exception to cause an abort.
+	* NEWS: Updated.
+
+2010-11-01  Deepak Bhole <dbhole@redhat.com>
+
 	* plugin/docs: Added new docs folder that contains plugin documentation.
 	* plugin/docs/MessageBusArchitecture.png: Diagram of the JS <-> Java 
 	message handling architectrure.
