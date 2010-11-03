@@ -1,3 +1,41 @@
+2010-11-03  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java
+	(markNetxRunning): Get file name from configuration.
+	(markNetxStopped): Likewise.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java
+	(clearCache): Get cache directory from configuration.
+	(okToClearCache): Get netx_running file from configuration.
+	(getCacheFile): Get cache directory from configuration.
+	(urlToPath): Change semantics to take in the full path of the
+	directory instead of a directory under runtime.
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Change DEPLOYMENT_DIR to ".icedtea". Add constants
+	KEY_USER_CACHE_DIR, KEY_USER_PERSISTENCE_CACHE_DIR,
+	KEY_SYSTEM_CACHE_DIR, KEY_USER_LOG_DIR, KEY_USER_TMP_DIR,
+	KEY_USER_LOCKS_DIR, and KEY_USER_NETX_RUNNING_FILE.
+	(load): Use DEPLOYMENT_DIR instead of hardcoded string.
+	(loadDefaultProperties): Add LOCKS_DIR. Replace strings with
+	constants. Add new default values for persistence cache directory,
+	single instance locks directory and the netx_running file.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Remove
+	unneeded TMP_DIR, LOCKS_DIR and NETX_RUNNING_FILE
+	* netx/net/sourceforge/jnlp/services/SingleInstanceLock.java
+	(getLockFile): Get locks directory from configuration.
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java
+	(toCacheFile): Get persistence cache directory from configuration.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java
+	(getContentsAsReader): Get cache directory from configuration.
+	(installDesktopLauncher): Get temporary directory from
+	configuration. Make parent directories if required.
+	* plugin/icedteanp/java/sun/applet/JavaConsole.java
+	(initialize): Get log directory from configuration and create the
+	error and output files under it.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java:
+	PLUGIN_STDERR_FILE and PLUGIN_STDOUT_FILE are now just filesnames.
+	(PluginMain): Use configuration for finding the log directory.
+	Initialize JNLPRuntime before creating the stderr and stdout logs.
+
 2010-11-01  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (clean-IcedTeaPlugin): Only delete launcher directory if it

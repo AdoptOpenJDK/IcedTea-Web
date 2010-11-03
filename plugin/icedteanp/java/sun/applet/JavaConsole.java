@@ -63,6 +63,9 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 /**
  * A simple Java console for IcedTeaPlugin
  * 
@@ -86,6 +89,8 @@ public class JavaConsole {
             e.printStackTrace();
         }
 
+        final String logDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
+
         consoleWindow = new JFrame("Java Console");
 
         JPanel contentPanel = new JPanel();
@@ -104,7 +109,7 @@ public class JavaConsole {
         stdOutText.setEditable(false);
         stdOutText.setFont(monoSpace);
 
-        TextAreaUpdater stdOutUpdater = new TextAreaUpdater(new File(
+        TextAreaUpdater stdOutUpdater = new TextAreaUpdater(new File(logDir,
                 PluginMain.PLUGIN_STDOUT_FILE), stdOutText);
         stdOutUpdater.setName("IcedteaPlugin Console Thread(System.out)");
 
@@ -117,7 +122,7 @@ public class JavaConsole {
         stdErrText.setEditable(false);
         stdErrText.setFont(monoSpace);
 
-        TextAreaUpdater stdErrUpdater = new TextAreaUpdater(new File(
+        TextAreaUpdater stdErrUpdater = new TextAreaUpdater(new File(logDir,
                 PluginMain.PLUGIN_STDERR_FILE), stdErrText);
         stdErrUpdater.setName("IcedteaPlugin Console Thread(System.err)");
 

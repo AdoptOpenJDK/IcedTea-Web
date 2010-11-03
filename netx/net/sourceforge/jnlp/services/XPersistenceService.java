@@ -80,7 +80,9 @@ class XPersistenceService implements PersistenceService {
      * @return the file
      */
     protected File toCacheFile(URL location) throws MalformedURLException {
-        return CacheUtil.urlToPath(location, "pcache");
+        String pcache = JNLPRuntime.getConfiguration()
+            .getProperty(DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR);
+        return CacheUtil.urlToPath(location, pcache);
     }
 
     /**

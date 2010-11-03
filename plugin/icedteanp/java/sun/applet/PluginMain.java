@@ -80,6 +80,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
+import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.VariableX509TrustManager;
 
 /**
@@ -87,10 +89,9 @@ import net.sourceforge.jnlp.security.VariableX509TrustManager;
  */
 public class PluginMain
 {
-
     // the files where stdout/stderr are sent to
-    public static final String PLUGIN_STDERR_FILE = System.getProperty("user.home") + "/.icedteaplugin/java.stderr";
-    public static final String PLUGIN_STDOUT_FILE = System.getProperty("user.home") + "/.icedteaplugin/java.stdout";
+    public static final String PLUGIN_STDERR_FILE = "java.stderr";
+    public static final String PLUGIN_STDOUT_FILE = "java.stdout";
 
 	final boolean redirectStreams = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
 	static PluginStreamHandler streamHandler;
@@ -123,16 +124,6 @@ public class PluginMain
 
     public PluginMain(String inPipe, String outPipe) {
     	
-    	try {
-    		File errFile = new File(PLUGIN_STDERR_FILE);
-    		File outFile = new File(PLUGIN_STDOUT_FILE);
-
-    		System.setErr(new TeeOutputStream(new FileOutputStream(errFile), System.err));
-    		System.setOut(new TeeOutputStream(new FileOutputStream(outFile), System.out));
-    	} catch (Exception e) {
-    		PluginDebug.debug("Unable to redirect streams");
-    		e.printStackTrace();
-    	}
 
     	connect(inPipe, outPipe);
 
@@ -140,6 +131,20 @@ public class PluginMain
     	securityContext.prePopulateLCClasses();
     	securityContext.setStreamhandler(streamHandler);
     	AppletSecurityContextManager.addContext(0, securityContext);
+
+    	String logDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
+        try {
+            File errFile = new File(logDir, PLUGIN_STDERR_FILE);
+            errFile.getParentFile().mkdirs();
+            File outFile = new File(logDir, PLUGIN_STDOUT_FILE);
+            outFile.getParentFile().mkdirs();
+
+            System.setErr(new TeeOutputStream(new FileOutputStream(errFile), System.err));
+            System.setOut(new TeeOutputStream(new FileOutputStream(outFile), System.out));
+        } catch (Exception e) {
+            PluginDebug.debug("Unable to redirect streams");
+            e.printStackTrace();
+        }
 
 		PluginAppletViewer.setStreamhandler(streamHandler);
 		PluginAppletViewer.setPluginCallRequestFactory(new PluginCallRequestFactory());

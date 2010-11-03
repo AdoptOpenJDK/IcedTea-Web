@@ -141,7 +141,8 @@ public class CacheUtil {
             return;
         }
 
-        File cacheDir = new File(JNLPRuntime.getBaseDir() + File.separator + "cache");
+        File cacheDir = new File(JNLPRuntime.getConfiguration()
+                .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR));
         if (!(cacheDir.isDirectory())) {
             return;
         }
@@ -150,7 +151,8 @@ public class CacheUtil {
             System.err.println("Clearing cache directory: " + cacheDir);
         }
         try {
-            FileUtils.recursiveDelete(cacheDir, JNLPRuntime.getBaseDir());
+            cacheDir = cacheDir.getCanonicalFile();
+            FileUtils.recursiveDelete(cacheDir, cacheDir);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -161,7 +163,8 @@ public class CacheUtil {
      * @return true if the cache can be cleared at this time without problems
      */
     private static boolean okToClearCache() {
-        File otherJavawsRunning = new File(JNLPRuntime.NETX_RUNNING_FILE);
+        File otherJavawsRunning = new File(JNLPRuntime.getConfiguration()
+                .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
         try {
             if (otherJavawsRunning.isFile()) {
                 FileOutputStream fis = new FileOutputStream(otherJavawsRunning);
@@ -289,7 +292,9 @@ public class CacheUtil {
             throw new IllegalArgumentException(R("CNotCacheable", source));
 
         try {
-            File localFile = urlToPath(source, "cache");
+            String cacheDir = JNLPRuntime.getConfiguration()
+                .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+            File localFile = urlToPath(source, cacheDir);
             localFile.getParentFile().mkdirs();
 
             return localFile;
@@ -345,20 +350,23 @@ public class CacheUtil {
     }
 
     /**
-     * Converts a URL into a local path string within the runtime's
-     * base directory.
+     * Converts a URL into a local path string within the given directory. For
+     * example a url with subdirectory /tmp/ will
+     * result in a File that is located somewhere within /tmp/
      *
      * @param location the url
-     * @param subdir subdirectory under the base directory
+     * @param subdir the subdirectory
      * @return the file
      */
     public static File urlToPath(URL location, String subdir) {
+        if (subdir == null) {
+            throw new NullPointerException();
+        }
+
         StringBuffer path = new StringBuffer();
 
-        if (subdir != null) {
-            path.append(subdir);
-            path.append(File.separatorChar);
-        }
+        path.append(subdir);
+        path.append(File.separatorChar);
 
         path.append(location.getProtocol());
         path.append(File.separatorChar);
@@ -366,7 +374,7 @@ public class CacheUtil {
         path.append(File.separatorChar);
         path.append(location.getPath().replace('/', File.separatorChar));
 
-        return new File(JNLPRuntime.getBaseDir(), FileUtils.sanitizePath(path.toString()));
+        return new File(FileUtils.sanitizePath(path.toString()));
     }
 
 

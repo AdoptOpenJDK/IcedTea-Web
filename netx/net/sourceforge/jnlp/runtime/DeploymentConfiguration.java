@@ -28,6 +28,7 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.FileLock;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -98,7 +99,7 @@ public final class DeploymentConfiguration {
         }
     }
 
-    public static final String DEPLOYMENT_DIR = ".netx";
+    public static final String DEPLOYMENT_DIR = ".icedtea";
     public static final String DEPLOYMENT_CONFIG = "deployment.config";
     public static final String DEPLOYMENT_PROPERTIES = "deployment.properties";
 
@@ -124,6 +125,22 @@ public final class DeploymentConfiguration {
     public static final int PROXY_TYPE_MANUAL = 1;
     public static final int PROXY_TYPE_AUTO = 2;
     public static final int PROXY_TYPE_BROWSER = 3;
+
+    public static final String KEY_USER_CACHE_DIR = "deployment.user.cachedir";
+    public static final String KEY_USER_PERSISTENCE_CACHE_DIR = "deployment.user.pcachedir";
+    public static final String KEY_SYSTEM_CACHE_DIR = "deployment.system.cachedir";
+    public static final String KEY_USER_LOG_DIR = "deployment.user.logdir";
+    public static final String KEY_USER_TMP_DIR = "deployment.user.tmp";
+    /** the directory containing locks for single instance applications */
+    public static final String KEY_USER_LOCKS_DIR = "deployment.user.locksdir";
+    /**
+     * The netx_running file is used to indicate if any instances of netx are
+     * running (this file may exist even if no instances are running). All netx
+     * instances acquire a shared lock on this file. If this file can be locked
+     * (using a {@link FileLock}) in exclusive mode, then other netx instances
+     * are not running
+     */
+    public static final String KEY_USER_NETX_RUNNING_FILE = "deployment.user.runningfile";
 
     public enum ConfigType {
         System, User
@@ -156,7 +173,7 @@ public final class DeploymentConfiguration {
      */
     public void load() throws ConfigurationException {
         // make sure no state leaks if security check fails later on
-        File userFile = new File(System.getProperty("user.home") + File.separator + ".netx"
+        File userFile = new File(System.getProperty("user.home") + File.separator + DEPLOYMENT_DIR
                 + File.separator + DEPLOYMENT_PROPERTIES);
 
         SecurityManager sm = System.getSecurityManager();
@@ -277,6 +294,10 @@ public final class DeploymentConfiguration {
         final String USER_HOME = System.getProperty("user.home") + File.separator + DEPLOYMENT_DIR;
         final String USER_SECURITY = USER_HOME + File.separator + "security";
 
+        final String LOCKS_DIR = System.getProperty("java.io.tmpdir") + File.separator
+                + System.getProperty("user.name") + File.separator + "netx" + File.separator
+                + "locks";
+
         /*
          * This is more or less a straight copy from the deployment
          * configuration page, with occasional replacements of "" or no-defaults
@@ -285,10 +306,13 @@ public final class DeploymentConfiguration {
 
         String[][] defaults = new String[][] {
             /* infrastructure */
-            { "deployment.user.cachedir", USER_HOME + File.separator + "cache" },
-            { "deployment.system.cachedir", null },
-            { "deployment.user.logdir", USER_HOME + File.separator + "log" },
-            { "deployment.user.tmp", USER_HOME + File.separator + "tmp" },
+            { KEY_USER_CACHE_DIR, USER_HOME + File.separator + "cache" },
+            { KEY_USER_PERSISTENCE_CACHE_DIR, USER_HOME + File.separator + "pcache" },
+            { KEY_SYSTEM_CACHE_DIR, null },
+            { KEY_USER_LOG_DIR, USER_HOME + File.separator + "log" },
+            { KEY_USER_TMP_DIR, USER_HOME + File.separator + "tmp" },
+            { KEY_USER_LOCKS_DIR, LOCKS_DIR },
+            { KEY_USER_NETX_RUNNING_FILE, LOCKS_DIR + File.separator + "netx_running" },
             /* certificates and policy files */
             { "deployment.user.security.policy", "file://" + USER_SECURITY + File.separator + "java.policy" },
             { "deployment.user.security.trusted.cacerts", USER_SECURITY + File.separator + "trusted.cacerts" },

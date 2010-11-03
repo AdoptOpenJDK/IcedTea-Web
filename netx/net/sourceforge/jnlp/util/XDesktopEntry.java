@@ -32,6 +32,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.StreamEater;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
@@ -73,7 +74,9 @@ public class XDesktopEntry {
 
         String pathToJavaws = System.getProperty("java.home") + File.separator + "bin"
                 + File.separator + "javaws";
-        File cacheFile = CacheUtil.urlToPath(file.getSourceLocation(), "cache");
+        String cacheDir = JNLPRuntime.getConfiguration()
+            .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+        File cacheFile = CacheUtil.urlToPath(file.getSourceLocation(), cacheDir);
 
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
@@ -131,10 +134,14 @@ public class XDesktopEntry {
      * Install this XDesktopEntry into the user's desktop as a launcher
      */
     private void installDesktopLauncher() {
-        File shortcutFile = new File(JNLPRuntime.TMP_DIR + File.separator
-                + FileUtils.sanitizeFileName(file.getTitle()) + ".desktop");
+        File shortcutFile = new File(JNLPRuntime.getConfiguration()
+                .getProperty(DeploymentConfiguration.KEY_USER_TMP_DIR)
+                + File.separator + FileUtils.sanitizeFileName(file.getTitle()) + ".desktop");
         try {
 
+            if (!shortcutFile.getParentFile().isDirectory() && !shortcutFile.getParentFile().mkdirs()) {
+                throw new IOException(shortcutFile.getParentFile().toString());
+            }
             /*
              * Write out a Java String (UTF-16) as a UTF-8 file
              */

@@ -43,6 +43,7 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.AppThreadGroup;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.services.InstanceExistsException;
@@ -724,7 +725,8 @@ public class Launcher {
         try {
             String message = "This file is used to check if netx is running";
 
-            File netxRunningFile = new File(JNLPRuntime.NETX_RUNNING_FILE);
+            File netxRunningFile = new File(JNLPRuntime.getConfiguration()
+                    .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
             netxRunningFile.getParentFile().mkdirs();
             if (netxRunningFile.createNewFile()) {
                 FileOutputStream fos = new FileOutputStream(netxRunningFile);
@@ -749,7 +751,7 @@ public class Launcher {
             if (fileLock != null && fileLock.isShared()) {
                 if (JNLPRuntime.isDebug()) {
                     System.out.println("Acquired shared lock on " +
-                            JNLPRuntime.NETX_RUNNING_FILE + " to indicate javaws is running");
+                            netxRunningFile.toString() + " to indicate javaws is running");
                 }
             } else {
                 fileLock = null;
@@ -773,7 +775,9 @@ public class Launcher {
             fileLock.channel().close();
             fileLock = null;
             if (JNLPRuntime.isDebug()) {
-                System.out.println("Release shared lock on " + JNLPRuntime.NETX_RUNNING_FILE);
+                String file = JNLPRuntime.getConfiguration()
+                    .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE);
+                System.out.println("Release shared lock on " + file);
             }
         } catch (IOException e) {
             e.printStackTrace();

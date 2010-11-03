@@ -132,25 +132,6 @@ public class JNLPRuntime {
     /** the ~/.netx/security/trusted.certs file containing trusted certificates */
     public static final String CERTIFICATES_FILE = SECURITY_DIR + File.separator + "trusted.certs";
 
-    /** the /tmp/ directory used for temporary files */
-    public static final String TMP_DIR = System.getProperty("java.io.tmpdir");
-
-    /**
-     * the /tmp/$USER/netx/locks/ directory containing locks for single instance
-     * applications
-     */
-    public static final String LOCKS_DIR = TMP_DIR + File.separator + USER + File.separator
-            + "netx" + File.separator + "locks";
-
-    /**
-     * The /tmp/$USER/netx/locks/netx_running file is used to indicate if any
-     * instances of netx are running (this file may exist even if no instances
-     * are running). All netx instances acquire a shared lock on this file. If
-     * this file can be locked (using a {@link FileLock}) in exclusive mode, then
-     * other netx instances are not running
-     */
-    public static final String NETX_RUNNING_FILE = LOCKS_DIR + File.separator + "netx_running";
-
     /** the java.home directory */
     public static final String JAVA_HOME_DIR = System.getProperty("java.home");
 
