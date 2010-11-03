@@ -302,19 +302,27 @@ dnl Takes the name of the class as an argument.  The macro name
 dnl is usually the name of the class with '.'
 dnl replaced by '_' and all letters capitalised.
 dnl e.g. IT_CHECK_FOR_CLASS([JAVA_UTIL_SCANNER],[java.util.Scanner])
+dnl Test class has to be in sun.applet for some internal classes
 AC_DEFUN([IT_CHECK_FOR_CLASS],[
-AC_CACHE_CHECK([if $2 is missing], it_cv_$1, [
-CLASS=Test.java
+AC_REQUIRE([IT_FIND_JAVAC])
+AC_REQUIRE([IT_FIND_JAVA])
+AC_CACHE_CHECK([if $2 is available], it_cv_$1, [
+CLASS=sun/applet/Test.java
 BYTECODE=$(echo $CLASS|sed 's#\.java##')
-mkdir tmp.$$
+mkdir -p tmp.$$/$(dirname $CLASS)
 cd tmp.$$
 cat << \EOF > $CLASS
 [/* [#]line __oline__ "configure" */
+package sun.applet;
+
+import $2;
+
 public class Test
 {
   public static void main(String[] args)
+    throws Exception
   {
-    $2.class.toString();
+    System.out.println(Class.forName("$2"));
   }
 }
 ]
@@ -331,7 +339,8 @@ fi
 ])
 rm -f $CLASS *.class
 cd ..
-rmdir tmp.$$
+# should be rmdir but has to be rm -rf due to sun.applet usage
+rm -rf tmp.$$
 if test x"${it_cv_$1}" = "xno"; then
    AC_MSG_ERROR([$2 not found.])
 fi
@@ -506,4 +515,31 @@ AC_DEFUN([IT_SET_ARCH_SETTINGS],
   AC_SUBST(JRE_ARCH_DIR)
   AC_SUBST(ARCH_PREFIX)
   AC_SUBST(ARCHFLAG)
+])
+
+AC_DEFUN_ONCE([IT_FIND_JAVA],
+[
+  AC_MSG_CHECKING([for a Java virtual machine])
+  AC_ARG_WITH([java],
+              [AS_HELP_STRING(--with-java,specify location of the 1.5 java vm)],
+  [
+    JAVA="${withval}"
+  ],
+  [
+    JAVA=${SYSTEM_JDK_DIR}/bin/java
+  ])
+  if ! test -f "${JAVA}"; then
+    AC_PATH_PROG(JAVA, "${JAVA}")
+  fi
+  if test -z "${JAVA}"; then
+    AC_PATH_PROG(JAVA, "java")
+  fi
+  if test -z "${JAVA}"; then
+    AC_PATH_PROG(JAVA, "gij")
+  fi
+  if test -z "${JAVA}"; then
+    AC_MSG_ERROR("A 1.5-compatible Java VM is required.")
+  fi
+  AC_MSG_RESULT(${JAVA})
+  AC_SUBST(JAVA)
 ])

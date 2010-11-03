@@ -1,3 +1,26 @@
+2010-10-28  Andrew John Hughes  <ahughes@redhat.com>
+
+	* Makefile.am:
+	(NETX_BOOTSTRAP_CLASSES): Removed.
+	(PLUGIN_BOOTSTRAP_CLASSES): Likewise.
+	(NETX_SUN_CLASSES): Likewise.
+	(PLUGIN_SUN_CLASSES): Likewise.
+	* acinclude.m4:
+	(IT_CHECK_FOR_CLASS): Require detection
+	of javac and java.  Put test class in
+	sun.applet to get access to some internal
+	classes.  Change test to use forName for
+	the same reason.  I expect to be able to
+	revert this when usage of sun.applet is fixed.
+	(IT_FIND_JAVA): Ported from IcedTea6.  Change
+	to prioritise 'java' over 'gij'.
+	* configure.ac:
+	Add IT_CHECK_FOR_CLASS checks for classes which
+	are required but not found in JDKs other than
+	Oracle-based ones.  Also check for java.* classes
+	missing from current versions of gcj but which
+	may appear there in future.
+
 2010-11-03  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Launcher.java

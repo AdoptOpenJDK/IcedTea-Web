@@ -49,4 +49,32 @@ fi
 AC_SUBST(X11_CFLAGS)
 AC_SUBST(X11_LIBS)
 
+dnl PR46074 (gcc) - Missing java.net cookie code required by IcedTea plugin
+dnl IT563 - NetX uses sun.security code
+dnl IT564 - NetX depends on sun.misc.BASE64Encoder
+dnl IT570 - NetX depends on sun.applet.AppletViewPanel
+dnl IT571 - NetX depends on com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager.java
+dnl IT573 - Plugin depends on sun.awt,X11.XEmbeddedFrame.java
+dnl IT574 - Plugin depends on sun.misc.Ref
+dnl IT575 - Plugin depends on com.sun/jndi.toolkit.url.UrlUtil
+dnl IT576 - Plugin depends on sun.applet.AppletImageRef
+
+IT_CHECK_FOR_CLASS(JAVA_UTIL_JAR_PACK200, [java.util.jar.Pack200])
+IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEMANAGER, [java.net.CookieManager])
+IT_CHECK_FOR_CLASS(JAVA_NET_HTTPCOOKIE, [java.net.HttpCookie])
+IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEHANDLER, [java.net.CookieHandler])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_PROVIDER_X509FACTORY, [sun.security.provider.X509Factory])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_SECURITYCONSTANTS, [sun.security.util.SecurityConstants])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_HOSTNAMECHECKER, [sun.security.util.HostnameChecker])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_X509_X500NAME, [sun.security.x509.X500Name])
+IT_CHECK_FOR_CLASS(SUN_MISC_BASE64ENCODER, [sun.misc.BASE64Encoder])
+IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETVIEWERPANEL, [sun.applet.AppletViewerPanel])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_VALIDATOR_VALIDATOREXCEPTION, [sun.security.validator.ValidatorException])
+IT_CHECK_FOR_CLASS(COM_SUN_NET_SSL_INTERNAL_SSL_X509EXTENDEDTRUSTMANAGER,
+	[com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager])
+IT_CHECK_FOR_CLASS(SUN_AWT_X11_XEMBEDDEDFRAME, [sun.awt.X11.XEmbeddedFrame])
+IT_CHECK_FOR_CLASS(SUN_MISC_REF, [sun.misc.Ref])
+IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.UrlUtil])
+IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef])
+
 AC_OUTPUT

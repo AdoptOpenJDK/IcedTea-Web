@@ -8,46 +8,6 @@ NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/jnlp/about/resources
 # Build directories
 
 BOOT_DIR = $(abs_top_builddir)/bootstrap/jdk1.6.0
-
-# PR43578 - java.security.CodeSource.getCodeSigners() missing
-# PR43582 - Missing javax.swing.JTable.setFillsViewportHeight
-# PR43585 - java.security.KeyStore.TrustedCertificateEntry class missing
-NETX_BOOTSTRAP_CLASSES = \
-	$(SHARE)/java/security/CodeSource.java \
-	$(SHARE)/javax/swing/JTable.java \
-	$(SHARE)/java/security/KeyStore.java
-
-# PR46074 - Missing java.net cookie code required by IcedTea plugin
-PLUGIN_BOOTSTRAP_CLASSES = \
-	$(SHARE)/java/net/CookieManager.java \
-	$(SHARE)/java/net/HttpCookie.java \
-	$(SHARE)/java/net/CookieHandler.java
-
-# IT563 - NetX uses sun.security code
-# IT564 - NetX depends on sun.misc.BASE64Encoder
-# IT570 - NetX depends on sun.applet.AppletViewPanel
-# IT571 - NetX depends on com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager.java
-NETX_SUN_CLASSES = \
-	$(SHARE)/sun/security/provider/X509Factory.java \
-	$(SHARE)/sun/security/util/SecurityConstants.java \
-	$(SHARE)/sun/security/util/HostnameChecker.java \
-	$(SHARE)/sun/security/util/DerValue.java \
-	$(SHARE)/sun/security/x509/X500Name.java \
-	$(SHARE)/sun/misc/BASE64Encoder.java \
-	$(SHARE)/sun/applet/AppletViewerPanel.java \
-	$(SHARE)/sun/security/validator/ValidatorException.java \
-	$(SHARE)/com/sun/net/ssl/internal/ssl/X509ExtendedTrustManager.java
-
-# IT573 - Plugin depends on sun.awt,X11.XEmbeddedFrame.java
-# IT574 - Plugin depends on sun.misc.Ref
-# IT575 - Plugin depends on com.sun/jndi.toolkit.url.UrlUtil
-# IT576 - Plugin depends on sun.applet.AppletImageRef
-PLUGIN_SUN_CLASSES = \
-	$(SOLARIS)/sun/awt/X11/XEmbeddedFrame.java \
-	$(SHARE)/sun/misc/Ref.java \
-	$(SHARE)/com/sun/jndi/toolkit/url/UrlUtil.java \
-	$(SHARE)/sun/applet/AppletImageRef.java
-
 RUNTIME = $(BOOT_DIR)/jre/lib/rt.jar:$(BOOT_DIR)/jre/lib/jsse.jar
 
 # Flags
