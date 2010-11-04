@@ -359,6 +359,9 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
      private static Long requestIdentityCounter = 0L;
      
+     private Image bufFrameImg;
+     private Graphics bufFrameImgGraphics;
+     
      /**
       * Null constructor to allow instantiation via newInstance()
       */
@@ -2162,5 +2165,27 @@ import com.sun.jndi.toolkit.url.UrlUtil;
             security.checkConnect(url.getHost(), url.getPort());
         }
     }
+     }
+
+     /**
+      * {@inheritDoc}
+      *
+      * This method calls paint directly, rather than via super.update() since
+      * the parent class's update() just does a couple of checks (both of 
+      * which are accounted for) and then calls paint anyway.
+      */
+     public void update(Graphics g) {
+
+    	 // If the image or the graphics don't exist, create new ones
+    	 if (bufFrameImg == null || bufFrameImgGraphics == null) {
+    		 bufFrameImg = createImage(getWidth(), getHeight());
+    		 bufFrameImgGraphics = bufFrameImg.getGraphics ();
+    	 }
+
+    	 // Paint off-screen
+    	 paint(bufFrameImgGraphics);
+
+    	 // Draw the painted image
+    	 g.drawImage(bufFrameImg, 0, 0, this);
      }
  }
