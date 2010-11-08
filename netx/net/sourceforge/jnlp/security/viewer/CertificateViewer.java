@@ -48,6 +48,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
 import javax.swing.UIManager;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 public class CertificateViewer extends JDialog {
 
     private boolean initialized = false;
@@ -97,6 +99,7 @@ public class CertificateViewer extends JDialog {
 
 
         public static void showCertificateViewer() throws Exception {
+            JNLPRuntime.initialize(true);
             setSystemLookAndFeel();
 
                 CertificateViewer cv = new CertificateViewer();

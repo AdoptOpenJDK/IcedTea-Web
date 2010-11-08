@@ -1,3 +1,59 @@
+2010-11-04  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Add KEY_USER_TRUSTED_CA_CERTS, KEY_USER_TRUSTED_JSSE_CA_CERTS,
+	KEY_USER_TRUSTED_CERTS, KEY_USER_TRUSTED_JSSE_CERTS,
+	KEY_USER_TRUSTED_CLIENT_CERTS, KEY_SYSTEM_TRUSTED_CA_CERTS,
+	KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS, KEY_SYSTEM_TRUSTED_CERTS,
+	KEY_SYSTEM_TRUSTED_JSSE_CERTS, KEY_SYSTEM_TRUSTED_CLIENT_CERTS
+	(loadDefaultProperties): Use the defined constants.
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: New class.
+	(getPassword): New method. Return the default password used for
+	KeyStores.
+	(getKeyStore(Level,Type)): New method. Returns the appropriate
+	KeyStore.
+	(getKeyStore(Level,Type,String)): Likewise.
+	(getCertKeyStores): New method. Return all the trusted certificate
+	KeyStores.
+	(getCAKeyStores): New method. Return all the trusted CA certificate
+	KeyStores.
+	(getKeyStoreLocation): New method. Return the location of the
+	appropriate KeyStore.
+	(toTranslatableString): New method. Return a string that can be
+	used to create a human-readable name for the KeyStore.
+	(toDisplayableString): New method. Return a human-readable name
+	for the KeyStore.
+	(createKeyStoreFromFile): New method. Creates a new KeyStore object,
+	initializing it from the given file if possible.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	(CertificatePane): Create two JTables. Populate the tables when
+	done creating the user interface.
+	(initializeKeyStore): Use the correct keystore.
+	(addComponents): Do not read KeyStore. Create more interface
+	elements to show the new possible KeyStores. Mark some buttons to
+	be disabled when needed.
+	(repopulateTable): Renamed to...
+	(repopulateTables): New method. Read KeyStore and use the contents
+	to create the user and system tables.
+	(CertificateType): New class.
+	(CertificateTypeListener): New class. Listens to JComboBox change
+	events.
+	(TabChangeListener): New class. Listens to new tab selections.
+	(ImportButtonListener): Import certificates to the appropriate
+	KeyStore.
+	(ExportButtonListener): Find the certificate from the right table.
+	(RemoveButtonListener): Find the certificate from the right table
+	and right the KeyStore.
+	(DetailsButtonListener): Find the certificate from the right table.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificateViewer.java
+	(showCertficaiteViewer): Initialize the JNLPRuntime so the
+	configuration gets loaded.
+	* netx/net/sourceforge/jnlp/tools/KeyTool.java
+	(addToKeyStore(File,KeyStore)): New method. Adds certificate from
+	the file to the KeyStore.
+	(addToKeyStore(X509Certificate,KeyStore)): New method. Adds a
+	certificate to a KeyStore.
+
 2010-11-04  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (update):

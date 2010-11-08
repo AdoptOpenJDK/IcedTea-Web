@@ -44,35 +44,45 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
+import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.tools.KeyTool;
 
 public class CertificatePane extends JPanel {
 
         /**
-         * The certificates stored in the user's trusted.certs file.
+         * The certificates stored in the certificates file.
          */
         private ArrayList<X509Certificate> certs = null;
+
+        private static final Dimension TABLE_DIMENSION = new Dimension(500,200);
 
         /**
          * "Issued To" and "Issued By" string pairs for certs.
@@ -80,57 +90,107 @@ public class CertificatePane extends JPanel {
         private String[][] issuedToAndBy = null;
         private final String[] columnNames = { "Issued To", "Issued By" };
 
-        private JTable table;
+        private final CertificateType[] certificateTypes = new CertificateType[] {
+            new CertificateType(KeyStores.Type.CA_CERTS),
+            new CertificateType(KeyStores.Type.JSSE_CA_CERTS),
+            new CertificateType(KeyStores.Type.CERTS),
+            new CertificateType(KeyStores.Type.JSSE_CERTS),
+        };
+
+        JTabbedPane tabbedPane;
+        private final JTable userTable;
+        private final JTable systemTable;
+        private JComboBox certificateTypeCombo;
+        private KeyStores.Type currentKeyStoreType;
+        private KeyStores.Level currentKeyStoreLevel;
+
+        /** JComponents that should be disbled for system store */
+        private final List<JComponent> disableForSystem;
 
         private JDialog parent;
-
         private JComponent defaultFocusComponent = null;
 
         /**
-         * The KeyStore associated with the user's trusted.certs file.
+         * The Current KeyStore. Only one table/tab is visible for interaction to
+         * the user. This KeyStore corresponds to that.
          */
         private KeyStore keyStore = null;
 
         public CertificatePane(JDialog parent) {
                 super();
                 this.parent = parent;
-                initializeKeyStore();
+
+                userTable = new JTable(null);
+                systemTable = new JTable(null);
+                disableForSystem = new ArrayList<JComponent>();
+
                 addComponents();
+
+                currentKeyStoreType = ((CertificateType)(certificateTypeCombo.getSelectedItem())).getType();
+                if (tabbedPane.getSelectedIndex() == 0) {
+                    currentKeyStoreLevel = Level.USER;
+                } else {
+                    currentKeyStoreLevel = Level.SYSTEM;
+                }
+
+                repopulateTables();
         }
 
         /**
          * Reads the user's trusted.cacerts keystore.
          */
         private void initializeKeyStore() {
-                try {
-                        keyStore = SecurityUtil.getUserKeyStore();
-                } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                }
+            try {
+                keyStore = KeyStores.getKeyStore(currentKeyStoreLevel, currentKeyStoreType);
+            } catch (Exception e) {
+                    e.printStackTrace();
+            }
         }
 
         //create the GUI here.
         protected void addComponents() {
-                readKeyStore();
 
                 JPanel main = new JPanel(new BorderLayout());
 
+                JPanel certificateTypePanel = new JPanel(new BorderLayout());
+                certificateTypePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
+                JLabel certificateTypeLabel = new JLabel("Certificate Type:");
+
+                certificateTypeCombo = new JComboBox(certificateTypes);
+                certificateTypeCombo.addActionListener(new CertificateTypeListener());
+
+                certificateTypePanel.add(certificateTypeLabel, BorderLayout.LINE_START);
+                certificateTypePanel.add(certificateTypeCombo, BorderLayout.CENTER);
+
                 JPanel tablePanel = new JPanel(new BorderLayout());
 
-                //Table
-                DefaultTableModel tableModel
+                // User Table
+                DefaultTableModel userTableModel
                         = new DefaultTableModel(issuedToAndBy, columnNames);
-                table = new JTable(tableModel);
-                table.getTableHeader().setReorderingAllowed(false);
-                table.setFillsViewportHeight(true);
-                JScrollPane tablePane = new JScrollPane(table);
-                tablePane.setPreferredSize(new Dimension(500,200));
-                tablePane.setSize(new Dimension(500,200));
-                tablePane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+                userTable.setModel(userTableModel);
+                userTable.getTableHeader().setReorderingAllowed(false);
+                userTable.setFillsViewportHeight(true);
+                JScrollPane userTablePane = new JScrollPane(userTable);
+                userTablePane.setPreferredSize(TABLE_DIMENSION);
+                userTablePane.setSize(TABLE_DIMENSION);
+                userTablePane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-                JTabbedPane tabbedPane = new JTabbedPane();
-                tabbedPane.addTab("User", tablePane);
+                // System Table
+                DefaultTableModel systemTableModel = new DefaultTableModel(issuedToAndBy, columnNames);
+                systemTable.setModel(systemTableModel);
+                systemTable.getTableHeader().setReorderingAllowed(false);
+                systemTable.setFillsViewportHeight(true);
+                JScrollPane systemTablePane = new JScrollPane(systemTable);
+                systemTablePane.setPreferredSize(TABLE_DIMENSION);
+                systemTablePane.setSize(TABLE_DIMENSION);
+                systemTablePane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+                tabbedPane = new JTabbedPane();
+                tabbedPane.addTab("User", userTablePane);
+                tabbedPane.addTab("System", systemTablePane);
+                tabbedPane.addChangeListener(new TabChangeListener());
+
                 JPanel buttonPanel = new JPanel(new FlowLayout());
 
                 String[] buttonNames = {"Import", "Export", "Remove", "Details"};
@@ -156,6 +216,10 @@ public class CertificatePane extends JPanel {
                         button.setMnemonic(buttonMnemonics[i]);
                         button.addActionListener(listeners[i]);
                         button.setSize(maxWidth, button.getSize().height);
+                        // import and remove buttons
+                        if (i == 0 || i == 2) {
+                            disableForSystem.add(button);
+                        }
                         buttonPanel.add(button);
                 }
 
@@ -169,6 +233,7 @@ public class CertificatePane extends JPanel {
                 defaultFocusComponent = closeButton;
                 closePanel.add(closeButton, BorderLayout.EAST);
 
+                main.add(certificateTypePanel, BorderLayout.NORTH);
                 main.add(tablePanel, BorderLayout.CENTER);
                 main.add(closePanel, BorderLayout.SOUTH);
 
@@ -204,6 +269,7 @@ public class CertificatePane extends JPanel {
                 }
                 } catch (Exception e) {
                         //TODO
+                        e.printStackTrace();
                 }
         }
 
@@ -211,14 +277,16 @@ public class CertificatePane extends JPanel {
          * Re-reads the certs file and repopulates the JTable. This is typically
          * called after a certificate was deleted from the keystore.
          */
-        private void repopulateTable() {
+        private void repopulateTables() {
                 initializeKeyStore();
                 readKeyStore();
                 DefaultTableModel tableModel
                         = new DefaultTableModel(issuedToAndBy, columnNames);
 
-                table.setModel(tableModel);
-                repaint();
+                userTable.setModel(tableModel);
+
+                tableModel = new DefaultTableModel(issuedToAndBy, columnNames);
+                systemTable.setModel(tableModel);
         }
 
         public void focusOnDefaultButton() {
@@ -226,6 +294,61 @@ public class CertificatePane extends JPanel {
                 defaultFocusComponent.requestFocusInWindow();
             }
         }
+
+    /** Allows storing KeyStores.Types in a JComponent */
+    private class CertificateType {
+        private final KeyStores.Type type;
+
+        public CertificateType(KeyStores.Type type) {
+            this.type = type;
+        }
+
+        public KeyStores.Type getType() {
+            return type;
+        }
+
+        public String toString() {
+            return KeyStores.toTranslatableString(null, type);
+        }
+    }
+
+    /** Invoked when a user selects a different certificate type */
+    private class CertificateTypeListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JComboBox source = (JComboBox) e.getSource();
+            CertificateType type = (CertificateType) source.getSelectedItem();
+            currentKeyStoreType = type.getType();
+            repopulateTables();
+        }
+    }
+
+    /**
+     * Invoked when a user selects a different tab (switches from user to system
+     * or vice versa). Changes the currentKeyStore Enables or disables buttons.
+     */
+    private class TabChangeListener implements ChangeListener {
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            JTabbedPane source = (JTabbedPane) e.getSource();
+            switch (source.getSelectedIndex()) {
+                case 0:
+                    currentKeyStoreLevel = Level.USER;
+                    for (JComponent component : disableForSystem) {
+                        component.setEnabled(true);
+                    }
+                    break;
+                case 1:
+                    currentKeyStoreLevel = Level.SYSTEM;
+                    for (JComponent component : disableForSystem) {
+                        component.setEnabled(false);
+                    }
+                    break;
+            }
+            repopulateTables();
+
+        }
+    }
 
         private class ImportButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
@@ -235,8 +358,12 @@ public class CertificatePane extends JPanel {
                 if(returnVal == JFileChooser.APPROVE_OPTION) {
                         try {
                                 KeyTool kt = new KeyTool();
-                                kt.importCert(chooser.getSelectedFile());
-                                repopulateTable();
+                                KeyStore ks = keyStore;
+                                kt.addToKeyStore(chooser.getSelectedFile(), ks);
+                                OutputStream os = new FileOutputStream(
+                                        KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
+                                ks.store(os, KeyStores.getPassword());
+                                repopulateTables();
                         } catch (Exception ex) {
                                 // TODO: handle exception
                                 ex.printStackTrace();
@@ -247,6 +374,14 @@ public class CertificatePane extends JPanel {
 
         private class ExportButtonListener implements ActionListener {
                 public void actionPerformed(ActionEvent e) {
+
+                    JTable table = null;
+                    if (currentKeyStoreLevel == Level.USER) {
+                        table = userTable;
+                    } else {
+                        table = systemTable;
+                    }
+
                         //For now, let's just export in -rfc mode as keytool does.
                         //we'll write to a file the exported certificate.
 
@@ -263,7 +398,7 @@ public class CertificatePane extends JPanel {
                                                 Certificate c = keyStore.getCertificate(alias);
                                                 PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
                                                 KeyTool.dumpCert(c, ps);
-                                                repopulateTable();
+                                                repopulateTables();
                                         }
                                 }
                                 }
@@ -281,6 +416,12 @@ public class CertificatePane extends JPanel {
                  */
         public void actionPerformed(ActionEvent e) {
 
+            JTable table = null;
+            if (currentKeyStoreLevel == Level.USER) {
+                table = userTable;
+            } else {
+                table = systemTable;
+            }
                 try {
                         int selectedRow = table.getSelectedRow();
 
@@ -295,12 +436,12 @@ public class CertificatePane extends JPanel {
                                         if (i == 0) {
                                                 keyStore.deleteEntry(alias);
                                                 FileOutputStream fos = new FileOutputStream(
-                                                        SecurityUtil.getTrustedCertsFilename());
-                                                keyStore.store(fos, SecurityUtil.getTrustedCertsPassword());
+                                                        KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
+                                                keyStore.store(fos, KeyStores.getPassword());
                                                 fos.close();
                                         }
                                 }
-                                repopulateTable();
+                                repopulateTables();
                         }
                 } catch (Exception ex) {
                         // TODO
@@ -316,6 +457,13 @@ public class CertificatePane extends JPanel {
                  * Shows the details of a trusted certificate.
                  */
         public void actionPerformed(ActionEvent e) {
+
+            JTable table = null;
+            if (currentKeyStoreLevel == Level.USER) {
+                table = userTable;
+            } else {
+                table = systemTable;
+            }
 
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1 && selectedRow >= 0) {

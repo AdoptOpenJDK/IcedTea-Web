@@ -142,6 +142,18 @@ public final class DeploymentConfiguration {
      */
     public static final String KEY_USER_NETX_RUNNING_FILE = "deployment.user.runningfile";
 
+    public static final String KEY_USER_TRUSTED_CA_CERTS = "deployment.user.security.trusted.cacerts";
+    public static final String KEY_USER_TRUSTED_JSSE_CA_CERTS = "deployment.user.security.trusted.jssecacerts";
+    public static final String KEY_USER_TRUSTED_CERTS = "deployment.user.security.trusted.certs";
+    public static final String KEY_USER_TRUSTED_JSSE_CERTS = "deployment.user.security.trusted.jssecerts";
+    public static final String KEY_USER_TRUSTED_CLIENT_CERTS = "deployment.user.security.trusted.clientauthcerts";
+
+    public static final String KEY_SYSTEM_TRUSTED_CA_CERTS = "deployment.system.security.cacerts";
+    public static final String KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS = "deployment.system.security.jssecacerts";
+    public static final String KEY_SYSTEM_TRUSTED_CERTS = "deployment.system.security.trusted.certs";
+    public static final String KEY_SYSTEM_TRUSTED_JSSE_CERTS = "deployment.system.security.trusted.jssecerts";
+    public static final String KEY_SYSTEM_TRUSTED_CLIENT_CERTS = "deployment.system.security.trusted.clientautcerts";
+
     public enum ConfigType {
         System, User
     }
@@ -315,17 +327,17 @@ public final class DeploymentConfiguration {
             { KEY_USER_NETX_RUNNING_FILE, LOCKS_DIR + File.separator + "netx_running" },
             /* certificates and policy files */
             { "deployment.user.security.policy", "file://" + USER_SECURITY + File.separator + "java.policy" },
-            { "deployment.user.security.trusted.cacerts", USER_SECURITY + File.separator + "trusted.cacerts" },
-            { "deployment.user.security.trusted.jssecacerts", USER_SECURITY + File.separator + "trusted.jssecacerts" },
-            { "deployment.user.security.trusted.certs", USER_SECURITY + File.separator + "trusted.certs" },
-            { "deployment.user.security.trusted.jssecerts", USER_SECURITY + File.separator + "trusted.jssecerts"},
-            { "deployment.user.security.trusted.clientauthcerts", USER_SECURITY + File.separator + "trusted.clientcerts" },
+            { KEY_USER_TRUSTED_CA_CERTS, USER_SECURITY + File.separator + "trusted.cacerts" },
+            { KEY_USER_TRUSTED_JSSE_CA_CERTS, USER_SECURITY + File.separator + "trusted.jssecacerts" },
+            { KEY_USER_TRUSTED_CERTS, USER_SECURITY + File.separator + "trusted.certs" },
+            { KEY_USER_TRUSTED_JSSE_CERTS, USER_SECURITY + File.separator + "trusted.jssecerts"},
+            { KEY_USER_TRUSTED_CLIENT_CERTS, USER_SECURITY + File.separator + "trusted.clientcerts" },
             { "deployment.system.security.policy", null },
-            { "deployment.system.security.cacerts", SYSTEM_SECURITY + File.separator + "cacerts" },
-            { "deployment.system.security.jssecacerts", SYSTEM_SECURITY + File.separator + "jssecacerts" },
-            { "deployment.system.security.trusted.certs", SYSTEM_SECURITY + File.separator + "trusted.certs" },
-            { "deployment.system.security.trusted.jssecerts", SYSTEM_SECURITY + File.separator + "trusted.jssecerts" },
-            { "deployment.system.security.trusted.clientautcerts", SYSTEM_SECURITY + File.separator + "trusted.clientcerts" },
+            { KEY_SYSTEM_TRUSTED_CA_CERTS , SYSTEM_SECURITY + File.separator + "cacerts" },
+            { KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS, SYSTEM_SECURITY + File.separator + "jssecacerts" },
+            { KEY_SYSTEM_TRUSTED_CERTS, SYSTEM_SECURITY + File.separator + "trusted.certs" },
+            { KEY_SYSTEM_TRUSTED_JSSE_CERTS, SYSTEM_SECURITY + File.separator + "trusted.jssecerts" },
+            { KEY_SYSTEM_TRUSTED_CLIENT_CERTS, SYSTEM_SECURITY + File.separator + "trusted.clientcerts" },
             /* security access and control */
             { "deployment.security.askgrantdialog.show", String.valueOf(true) },
             { "deployment.security.askgrantdialog.notinca", String.valueOf(true) },

@@ -32,7 +32,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -116,6 +118,43 @@ public class KeyTool {
 
                 return importCert((Certificate)cert);
         }
+
+    /**
+     * Adds the X509Certficate in the file to the KeyStore
+     */
+    public final void addToKeyStore(File file, KeyStore ks) throws CertificateException,
+            IOException, KeyStoreException {
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+        CertificateFactory cf = CertificateFactory.getInstance("X509");
+        X509Certificate cert = null;
+
+        try {
+            cert = (X509Certificate) cf.generateCertificate(bis);
+        } catch (ClassCastException cce) {
+            throw new CertificateException("Input file is not an X509 Certificate", cce);
+        }
+
+        addToKeyStore(cert, ks);
+
+    }
+
+    /**
+     * Adds an X509Certificate to the KeyStore
+     */
+    public final void addToKeyStore(X509Certificate cert, KeyStore ks) throws KeyStoreException {
+        String alias = null;
+        Random random = new Random();
+        alias = ks.getCertificateAlias(cert);
+        // already in keystore; done
+        if (alias != null) {
+            return;
+        }
+
+        do {
+            alias = new BigInteger(20, random).toString();
+        } while (ks.getCertificate(alias) != null);
+        ks.setCertificateEntry(alias, cert);
+    }
 
         /**
          * Adds a trusted certificate to the user's keystore.
