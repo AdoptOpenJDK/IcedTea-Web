@@ -1,3 +1,7 @@
+2010-11-08  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am (JDK_UPDATE_VERSION): Define variable.
+
 2010-11-04  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
