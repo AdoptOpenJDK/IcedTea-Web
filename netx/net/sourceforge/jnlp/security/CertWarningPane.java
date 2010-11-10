@@ -131,8 +131,8 @@ public class CertWarningPane extends SecurityDialogPanel {
                 String propertyName = "";
                 if (certVerifier instanceof HttpsCertVerifier)
                 {
-                  topLabelText = "The website's certificate cannot be verified. " +
-                                 "Do you want to continue?";
+                  topLabelText = R("SHttpsUnverified") + " " +
+                                 R("Continue");
                   propertyName = "OptionPane.warningIcon";
                 }
                 else
@@ -162,15 +162,14 @@ public class CertWarningPane extends SecurityDialogPanel {
                 topPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
                 //application info
-                JLabel nameLabel = new JLabel("Name:   " + name);
+                JLabel nameLabel = new JLabel(R("Name") + ":   " + name);
                 nameLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-                JLabel publisherLabel = new JLabel("Publisher: " + publisher);
+                JLabel publisherLabel = new JLabel(R("Publisher") + ": " + publisher);
                 publisherLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-                JLabel fromLabel = new JLabel("From:   " + from);
+                JLabel fromLabel = new JLabel(R("From") + ":   " + from);
                 fromLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-                alwaysTrust = new JCheckBox(
-                "Always trust content from this publisher");
+                alwaysTrust = new JCheckBox(R("SAlwaysTrustPublisher"));
                 alwaysTrust.setEnabled(true);
 
                 JPanel infoPanel = new JPanel(new GridLayout(4,1));
@@ -185,8 +184,8 @@ public class CertWarningPane extends SecurityDialogPanel {
 
                 //run and cancel buttons
                 JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-                JButton run = new JButton("Run");
-                JButton cancel = new JButton("Cancel");
+                JButton run = new JButton(R("ButRun"));
+                JButton cancel = new JButton(R("ButCancel"));
                 int buttonWidth = Math.max(run.getMinimumSize().width,
                         cancel.getMinimumSize().width);
                 int buttonHeight = run.getMinimumSize().height;
@@ -208,7 +207,7 @@ public class CertWarningPane extends SecurityDialogPanel {
                 add(buttonPanel);
 
                 JLabel bottomLabel;
-                JButton moreInfo = new JButton("More information...");
+                JButton moreInfo = new JButton(R("ButMoreInformation"));
                 moreInfo.addActionListener(new MoreInfoButtonListener());
 
                 if (parent.getJarSigner().getRootInCacerts())

@@ -99,12 +99,12 @@ public class AccessWarningPane extends SecurityDialogPanel {
                 //We don't worry about exceptions when trying to fill in
                 //these strings -- we just want to fill in as many as possible.
                 try {
-                        name = file.getInformation().getTitle() != null ? file.getInformation().getTitle() : "<no associated certificate>";
+                        name = file.getInformation().getTitle() != null ? file.getInformation().getTitle() : R("SNoAssociatedCertificate");
                 } catch (Exception e) {
                 }
 
                 try {
-                        publisher = file.getInformation().getVendor() != null ? file.getInformation().getVendor() : "<no associated certificate>";
+                        publisher = file.getInformation().getVendor() != null ? file.getInformation().getVendor() : R("SNoAssociatedCertificate");
                 } catch (Exception e) {
                 }
 
@@ -161,14 +161,14 @@ public class AccessWarningPane extends SecurityDialogPanel {
                 topPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
                 //application info
-                JLabel nameLabel = new JLabel("Name:   " + name);
+                JLabel nameLabel = new JLabel(R("Name") + ":   " + name);
                 nameLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-                JLabel publisherLabel = new JLabel("Publisher: " + publisher);
+                JLabel publisherLabel = new JLabel(R("Publisher") + ": " + publisher);
                 publisherLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-                JLabel fromLabel = new JLabel("From:   " + from);
+                JLabel fromLabel = new JLabel(R("From") + ":   " + from);
                 fromLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-                alwaysAllow = new JCheckBox("Always allow this action");
+                alwaysAllow = new JCheckBox(R("AlwaysAllowAction"));
                 alwaysAllow.setEnabled(false);
 
                 JPanel infoPanel = new JPanel(new GridLayout(4,1));
@@ -181,8 +181,8 @@ public class AccessWarningPane extends SecurityDialogPanel {
                 //run and cancel buttons
                 JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-                JButton run = new JButton("Allow");
-                JButton cancel = new JButton("Cancel");
+                JButton run = new JButton(R("ButAllow"));
+                JButton cancel = new JButton(R("ButCancel"));
                 run.addActionListener(createSetValueListener(parent,0));
                 run.addActionListener(new CheckBoxListener());
                 cancel.addActionListener(createSetValueListener(parent, 1));

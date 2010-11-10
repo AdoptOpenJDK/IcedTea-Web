@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.viewer;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -88,7 +90,7 @@ public class CertificatePane extends JPanel {
          * "Issued To" and "Issued By" string pairs for certs.
          */
         private String[][] issuedToAndBy = null;
-        private final String[] columnNames = { "Issued To", "Issued By" };
+        private final String[] columnNames = { R("CVIssuedTo"), R("CVIssuedBy") };
 
         private final CertificateType[] certificateTypes = new CertificateType[] {
             new CertificateType(KeyStores.Type.CA_CERTS),
@@ -187,13 +189,13 @@ public class CertificatePane extends JPanel {
                 systemTablePane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
                 tabbedPane = new JTabbedPane();
-                tabbedPane.addTab("User", userTablePane);
-                tabbedPane.addTab("System", systemTablePane);
+                tabbedPane.addTab(R("CVUser"), userTablePane);
+                tabbedPane.addTab(R("CVSystem"), systemTablePane);
                 tabbedPane.addChangeListener(new TabChangeListener());
 
                 JPanel buttonPanel = new JPanel(new FlowLayout());
 
-                String[] buttonNames = {"Import", "Export", "Remove", "Details"};
+                String[] buttonNames = {R("CVImport"), R("CVExport"), R("CVRemove"), R("CVDetails")};
                 char[] buttonMnemonics = {      KeyEvent.VK_I,
                                                                         KeyEvent.VK_E,
                                                                         KeyEvent.VK_M,
@@ -228,7 +230,7 @@ public class CertificatePane extends JPanel {
 
                 JPanel closePanel = new JPanel(new BorderLayout());
                 closePanel.setBorder(BorderFactory.createEmptyBorder(7,7,7,7));
-                JButton closeButton = new JButton("Close");
+                JButton closeButton = new JButton(R("ButClose"));
                 closeButton.addActionListener(new CloseButtonListener());
                 defaultFocusComponent = closeButton;
                 closePanel.add(closeButton, BorderLayout.EAST);
@@ -308,7 +310,7 @@ public class CertificatePane extends JPanel {
         }
 
         public String toString() {
-            return KeyStores.toTranslatableString(null, type);
+            return KeyStores.toDisplayableString(null, type);
         }
     }
 
@@ -430,8 +432,8 @@ public class CertificatePane extends JPanel {
                                 if (alias != null) {
 
                                         int i = JOptionPane.showConfirmDialog(parent,
-                                                        "Are you sure you want to remove the selected certificate?",
-                                                        "Confirmation - Remove Certificate?",
+                                                        R("CVRemoveConfirmMessage"),
+                                                        R("CVRemoveConfirmTitle"),
                                                         JOptionPane.YES_NO_OPTION);
                                         if (i == 0) {
                                                 keyStore.deleteEntry(alias);

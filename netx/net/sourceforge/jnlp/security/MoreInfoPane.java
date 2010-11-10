@@ -90,9 +90,9 @@ public class MoreInfoPane extends SecurityDialogPanel {
                 }
 
                 JPanel buttonsPanel = new JPanel(new BorderLayout());
-                JButton certDetails = new JButton("Certificate Details");
+                JButton certDetails = new JButton(R("SCertificateDetails"));
                 certDetails.addActionListener(new CertInfoButtonListener());
-                JButton close = new JButton("Close");
+                JButton close = new JButton(R("ButClose"));
                 close.addActionListener(createSetValueListener(parent, 0));
         buttonsPanel.add(certDetails, BorderLayout.WEST);
         buttonsPanel.add(close, BorderLayout.EAST);

@@ -257,6 +257,8 @@ public final class KeyStores {
     public static final String toTranslatableString(Level level, Type type) {
         StringBuilder response = new StringBuilder();
 
+        response.append("KS");
+
         if (level != null) {
             String levelString = level.toString();
             response.append(levelString.substring(0, 1).toUpperCase());

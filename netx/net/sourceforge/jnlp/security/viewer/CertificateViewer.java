@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.viewer;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -53,7 +55,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 public class CertificateViewer extends JDialog {
 
     private boolean initialized = false;
-    private static final String dialogTitle = "Certificates";
+    private static final String dialogTitle = R("CVCertificateViewer");
 
     CertificatePane panel;
 

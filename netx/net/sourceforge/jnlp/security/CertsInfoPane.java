@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.security.cert.CertPath;
@@ -73,7 +75,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
     private ListSelectionModel listSelectionModel;
     private ListSelectionModel tableSelectionModel;
     protected String[] certNames;
-    private String[] columnNames = { "Field", "Value" };
+    private String[] columnNames = { R("Field"), R("Value") };
         protected ArrayList<String[][]> certsData;
 
         public CertsInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
@@ -163,15 +165,15 @@ public class CertsInfoPane extends SecurityDialogPanel {
                         //fail quietly
                 }
 
-        String[][] cert = { {"Version", version},
-                            {"Serial", serialNumber},
-                            {"Signature Algorithm", signatureAlg},
-                            {"Issuer", issuer},
-                            {"Validity", validity},
-                            {"Subject", subject},
-                            {"Signature", signature},
-                                                        {"MD5 Fingerprint", md5Hash},
-                                                        {"SHA1 Fingerprint", sha1Hash}
+        String[][] cert = { {R("Version"), version},
+                            {R("SSerial"), serialNumber},
+                            {R("SSignatureAlgorithm"), signatureAlg},
+                            {R("SIssuer"), issuer},
+                            {R("SValidity"), validity},
+                            {R("SSubject"), subject},
+                            {R("SSignature"), signature},
+                                                        {R("SMD5Fingerprint"), md5Hash},
+                                                        {R("SSHA1Fingerprint"), sha1Hash}
                                                         };
         return cert;
         }
@@ -223,8 +225,8 @@ public class CertsInfoPane extends SecurityDialogPanel {
                 mainPane.setResizeWeight(0.30);
 
                 JPanel buttonPane = new JPanel(new BorderLayout());
-                JButton close = new JButton("Close");
-                JButton copyToClipboard = new JButton("Copy to Clipboard");
+                JButton close = new JButton(R("ButClose"));
+                JButton copyToClipboard = new JButton(R("ButCopy"));
                 close.addActionListener(createSetValueListener(parent, 0));
                 copyToClipboard.addActionListener(new CopyToClipboardHandler());
                 buttonPane.add(close, BorderLayout.EAST);

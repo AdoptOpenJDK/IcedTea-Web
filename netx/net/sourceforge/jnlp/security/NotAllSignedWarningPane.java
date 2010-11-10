@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -67,13 +69,9 @@ public class NotAllSignedWarningPane extends SecurityDialogPanel {
         private void addComponents() {
                 JNLPFile file = parent.getFile();
 
-                String topLabelText = "Only parts of this application code are signed.";
-                String infoLabelText = "This application contains both signed and" +
-                " unsigned code. While signed code is safe if you trust the " +
-                "provider, unsigned code may imply code outside of the trusted " +
-                "provider's control.";
-                String questionLabelText = "Do you wish to proceed and run this " +
-                "application anyway?";
+                String topLabelText = R("SNotAllSignedSummary");
+                String infoLabelText = R("SNotAllSignedDetail");
+                String questionLabelText = R("SNotAllSignedQuestion");
 
                 ImageIcon icon = new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png"));
                 JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
@@ -100,8 +98,8 @@ public class NotAllSignedWarningPane extends SecurityDialogPanel {
                 //run and cancel buttons
                 JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-                JButton run = new JButton("Proceed");
-                JButton cancel = new JButton("Cancel");
+                JButton run = new JButton(R("ButProceed"));
+                JButton cancel = new JButton(R("ButCancel"));
                 run.addActionListener(createSetValueListener(parent,0));
                 cancel.addActionListener(createSetValueListener(parent, 1));
                 initialFocusComponent = cancel;
