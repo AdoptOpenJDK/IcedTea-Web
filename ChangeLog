@@ -1,5 +1,14 @@
 2010-11-05  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Add KEY_BROWSER_PATH.
+	(loadDefaultProperties): Use KEY_BROWSER_PATH.
+	* netx/net/sourceforge/jnlp/services/XBasicService.java
+	(initialize): Use the browser command from the configuration.
+	Save updates to configuration as well. 
+
+2010-11-05  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/ShortcutDesc.java: Change prefixes from
 	SHORTCUT_ to CREATE_.
 	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java

@@ -30,6 +30,7 @@ import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
@@ -199,15 +200,19 @@ class XBasicService implements BasicService {
             command = "rundll32 url.dll,FileProtocolHandler ";
         }
         else {
-            PropertiesFile props = JNLPRuntime.getProperties();
-            command = props.getProperty("browser.command");
+            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+            command = config.getProperty(DeploymentConfiguration.KEY_BROWSER_PATH);
 
             if(command == null) { // prompt & store
                 command = promptForCommand(null);
 
                 if(command != null) {
-                    props.setProperty("browser.command", command);
-                    props.store();
+                    config.setProperty(DeploymentConfiguration.KEY_BROWSER_PATH, command);
+                    try {
+                        config.save();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

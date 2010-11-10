@@ -156,6 +156,8 @@ public final class DeploymentConfiguration {
 
     public static final String KEY_CREATE_DESKTOP_SHORTCUT = "deployment.javaws.shortcut";
 
+    public static final String KEY_BROWSER_PATH = "deployment.browser.path";
+
     public enum ConfigType {
         System, User
     }
@@ -383,7 +385,7 @@ public final class DeploymentConfiguration {
             /* jre management */
             { "deployment.javaws.autodownload", null },
             /* browser selection */
-            { "deployment.browser.path", null },
+            { KEY_BROWSER_PATH, null },
             /* check for update timeout */
             { "deployment.javaws.update.timeout", String.valueOf(500) }
         };
