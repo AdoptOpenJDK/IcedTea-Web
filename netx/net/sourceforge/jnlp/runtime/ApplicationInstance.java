@@ -35,6 +35,7 @@ import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.ShortcutDesc;
 import net.sourceforge.jnlp.event.ApplicationEvent;
 import net.sourceforge.jnlp.event.ApplicationListener;
+import net.sourceforge.jnlp.security.SecurityWarning;
 import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
@@ -148,10 +149,8 @@ public class ApplicationInstance {
         XDesktopEntry entry = new XDesktopEntry(file);
         ShortcutDesc sd = file.getInformation().getShortcut();
 
-        if (sd != null && sd.onDesktop()) {
-            if (ServiceUtil.checkAccess(this, AccessType.CREATE_DESTKOP_SHORTCUT)) {
-                entry.createDesktopShortcut();
-            }
+        if (shouldCreateShortcut(sd)) {
+            entry.createDesktopShortcut();
         }
 
         if (sd != null && sd.getMenu() != null) {
@@ -164,6 +163,45 @@ public class ApplicationInstance {
             }
         }
 
+    }
+
+    /**
+     * Indicates whether a desktop launcher/shortcut should be created for this
+     * application instance
+     *
+     * @param sd the ShortcutDesc element from the JNLP file
+     * @return true if a desktop shortcut should be created
+     */
+    private boolean shouldCreateShortcut(ShortcutDesc sd) {
+        String currentSetting = JNLPRuntime.getConfiguration()
+            .getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT);
+        boolean createShortcut = false;
+
+        /*
+         * check configuration and possibly prompt user to find out if a
+         * shortcut should be created or not
+         */
+        if (currentSetting.equals(ShortcutDesc.CREATE_NEVER)) {
+            createShortcut = false;
+        } else if (currentSetting.equals(ShortcutDesc.CREATE_ALWAYS)) {
+            createShortcut = true;
+        } else if (currentSetting.equals(ShortcutDesc.CREATE_ASK_USER)) {
+            if (SecurityWarning.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
+                createShortcut = true;
+            }
+        } else if (currentSetting.equals(ShortcutDesc.CREATE_ASK_USER_IF_HINTED)) {
+            if (sd != null && sd.onDesktop()) {
+                if (SecurityWarning.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
+                    createShortcut = true;
+                }
+            }
+        } else if (currentSetting.equals(ShortcutDesc.CREATE_ALWAYS_IF_HINTED)) {
+            if (sd != null && sd.onDesktop()) {
+                createShortcut = true;
+            }
+        }
+
+        return createShortcut;
     }
 
     /**

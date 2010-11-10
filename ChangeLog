@@ -1,3 +1,17 @@
+2010-11-05  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/ShortcutDesc.java: Change prefixes from
+	SHORTCUT_ to CREATE_.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java
+	(addMenuAndDesktopEntries): Call shouldCreateShortcut to find out
+	if shortcut should be created. Remove call to checkAccess which
+	does nothing as the entire stack contains trusted classes.
+	(shouldCreateShortcut): New method. Use the configuration to find
+	out if a shorcut should be created, and possibly prompt the user.
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Add KEY_CREATE_DESKTOP_SHORTCUT.
+	(loadDefaultProperties): Use KEY_CREATE_DESKTOP_SHORTCUT.
+
 2010-11-08  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (JDK_UPDATE_VERSION): Define variable.

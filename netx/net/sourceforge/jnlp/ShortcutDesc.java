@@ -19,16 +19,15 @@ package net.sourceforge.jnlp;
 public final class ShortcutDesc {
 
     /** Never create a shortcut */
-    public static final String SHORTCUT_NEVER = "NEVER";
+    public static final String CREATE_NEVER = "NEVER";
     /** Always create a shortcut */
-    public static final String SHORTCUT_ALWAYS = "ALWAYS";
+    public static final String CREATE_ALWAYS = "ALWAYS";
     /** Always ask user whether to create a shortcut */
-    public static final String SHORTCUT_ASK_USER = "ASK_USER";
+    public static final String CREATE_ASK_USER = "ASK_USER";
     /** Ask user whether to create a shortcut but only if jnlp file asks for it */
-    public static final String SHORTCUT_ASK_USER_IF_HINTED = "ASK_IF_HINTED";
+    public static final String CREATE_ASK_USER_IF_HINTED = "ASK_IF_HINTED";
     /** Create a desktop shortcut without prompting if the jnlp asks for it */
-    public static final String SHORTCUT_ALWAYS_IF_HINTED = "ALWAYS_IF_HINTED";
-    public static final String SHORTCUT_DEFAULT = SHORTCUT_ASK_USER_IF_HINTED;
+    public static final String CREATE_ALWAYS_IF_HINTED = "ALWAYS_IF_HINTED";
 
     /** the application wants to be placed on the desktop */
     private boolean onDesktop = false;

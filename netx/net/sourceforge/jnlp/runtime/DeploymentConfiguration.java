@@ -154,6 +154,8 @@ public final class DeploymentConfiguration {
     public static final String KEY_SYSTEM_TRUSTED_JSSE_CERTS = "deployment.system.security.trusted.jssecerts";
     public static final String KEY_SYSTEM_TRUSTED_CLIENT_CERTS = "deployment.system.security.trusted.clientautcerts";
 
+    public static final String KEY_CREATE_DESKTOP_SHORTCUT = "deployment.javaws.shortcut";
+
     public enum ConfigType {
         System, User
     }
@@ -375,7 +377,7 @@ public final class DeploymentConfiguration {
             /* JNLP association */
             { "deployment.javaws.associations", String.valueOf(JNLP_ASSOCIATION_ASK_USER) },
             /* desktop integration */
-            { "deployment.javaws.shortcut", ShortcutDesc.SHORTCUT_ASK_USER_IF_HINTED},
+            { KEY_CREATE_DESKTOP_SHORTCUT, ShortcutDesc.CREATE_ASK_USER_IF_HINTED},
             /* jre selection */
             { "deployment.javaws.installURL", null },
             /* jre management */
