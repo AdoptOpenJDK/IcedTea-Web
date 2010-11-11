@@ -29,11 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.ApplicationDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -44,7 +39,6 @@ import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.security.VariableX509TrustManager;
 import net.sourceforge.jnlp.security.viewer.CertificateViewer;
 import net.sourceforge.jnlp.services.ServiceUtil;
 
@@ -170,20 +164,6 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (null != getOption("-Xnofork")) {
             JNLPRuntime.setForksAllowed(false);
-        }
-
-        // wire in custom authenticator
-        try {
-            SSLSocketFactory sslSocketFactory;
-            SSLContext context = SSLContext.getInstance("SSL");
-            TrustManager[] trust = new TrustManager[] { VariableX509TrustManager.getInstance() };
-            context.init(null, trust, null);
-            sslSocketFactory = context.getSocketFactory();
-
-            HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
-        } catch (Exception e) {
-            System.err.println("Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...");
-            e.printStackTrace();
         }
 
         JNLPRuntime.setInitialArgments(Arrays.asList(argsIn));

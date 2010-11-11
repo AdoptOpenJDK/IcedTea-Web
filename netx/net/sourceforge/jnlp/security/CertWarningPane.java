@@ -47,6 +47,9 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
@@ -62,8 +65,9 @@ import javax.swing.SwingConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.KeyStores.Level;
+import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
-import net.sourceforge.jnlp.tools.KeyTool;
 
 /**
  * Provides the panel for using inside a SecurityWarningDialog. These dialogs are
@@ -232,25 +236,28 @@ public class CertWarningPane extends SecurityDialogPanel {
                 }
         }
 
-        /**
-         * Updates the user's KeyStore of trusted Certificates.
-         */
-        private class CheckBoxListener implements ActionListener {
-                public void actionPerformed(ActionEvent e) {
-                        if (alwaysTrust != null && alwaysTrust.isSelected()) {
-                                try {
-                                        KeyTool kt = new KeyTool();
-                                        Certificate c = parent.getJarSigner().getPublisher();
-                                        kt.importCert(c);
-                                        if (JNLPRuntime.isDebug()) {
-                                            System.out.println("certificate is now permanently trusted");
-                                        }
-                                } catch (Exception ex) {
-                                        //TODO: Let NetX show a dialog here notifying user
-                                        //about being unable to add cert to keystore
-                                }
-                        }
+    /**
+     * Updates the user's KeyStore of trusted Certificates.
+     */
+    private class CheckBoxListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (alwaysTrust != null && alwaysTrust.isSelected()) {
+                try {
+                    KeyStore ks = KeyStores.getKeyStore(Level.USER, Type.CERTS);
+                    X509Certificate c = (X509Certificate) parent.getJarSigner().getPublisher();
+                    CertificateUtils.addToKeyStore(c, ks);
+                    OutputStream os = new FileOutputStream(KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS));
+                    ks.store(os, KeyStores.getPassword());
+                    if (JNLPRuntime.isDebug()) {
+                        System.out.println("certificate is now permanently trusted");
+                    }
+                } catch (Exception ex) {
+                    // TODO: Let NetX show a dialog here notifying user
+                    // about being unable to add cert to keystore
+                    ex.printStackTrace();
                 }
+            }
         }
+    }
 
 }

@@ -40,6 +40,7 @@ package net.sourceforge.jnlp.security;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.IOException;
+import java.security.KeyStore;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -52,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.jnlp.tools.KeyTool;
 import sun.security.util.DerValue;
 import sun.security.util.HostnameChecker;
 import sun.security.x509.X500Name;
@@ -213,8 +213,8 @@ public class HttpsCertVerifier implements CertVerifier {
 
     public boolean getRootInCacerts() {
         try {
-          KeyTool kt = new KeyTool();
-          return kt.checkCacertsForCertificate(getRoot());
+            KeyStore[] caCertsKeyStores = KeyStores.getCAKeyStores();
+            return CertificateUtils.inKeyStores((X509Certificate)getRoot(), caCertsKeyStores);
         } catch (Exception e) {
         }
         return false;

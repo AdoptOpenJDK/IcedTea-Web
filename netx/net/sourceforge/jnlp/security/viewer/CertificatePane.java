@@ -71,11 +71,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
+import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.SecurityWarningDialog;
 import net.sourceforge.jnlp.security.KeyStores.Level;
-import net.sourceforge.jnlp.tools.KeyTool;
 
 public class CertificatePane extends JPanel {
 
@@ -359,9 +359,8 @@ public class CertificatePane extends JPanel {
                 int returnVal = chooser.showOpenDialog(parent);
                 if(returnVal == JFileChooser.APPROVE_OPTION) {
                         try {
-                                KeyTool kt = new KeyTool();
                                 KeyStore ks = keyStore;
-                                kt.addToKeyStore(chooser.getSelectedFile(), ks);
+                                CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
                                 OutputStream os = new FileOutputStream(
                                         KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
                                 ks.store(os, KeyStores.getPassword());
@@ -399,7 +398,7 @@ public class CertificatePane extends JPanel {
                                         if (alias != null) {
                                                 Certificate c = keyStore.getCertificate(alias);
                                                 PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
-                                                KeyTool.dumpCert(c, ps);
+                                                CertificateUtils.dump(c, ps);
                                                 repopulateTables();
                                         }
                                 }

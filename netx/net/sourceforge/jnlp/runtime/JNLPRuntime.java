@@ -26,12 +26,17 @@ import java.util.List;
 import java.security.*;
 import javax.jnlp.*;
 import javax.naming.ConfigurationException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
+import net.sourceforge.jnlp.security.VariableX509TrustManager;
 import net.sourceforge.jnlp.services.*;
 import net.sourceforge.jnlp.util.*;
 
@@ -222,6 +227,20 @@ public class JNLPRuntime {
         }
 
         securityDialogMessageHandler = startSecurityThreads();
+
+        // wire in custom authenticator for SSL connections
+        try {
+            SSLSocketFactory sslSocketFactory;
+            SSLContext context = SSLContext.getInstance("SSL");
+            TrustManager[] trust = new TrustManager[] { VariableX509TrustManager.getInstance() };
+            context.init(null, trust, null);
+            sslSocketFactory = context.getSocketFactory();
+
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
+        } catch (Exception e) {
+            System.err.println("Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...");
+            e.printStackTrace();
+        }
 
         initialized = true;
 

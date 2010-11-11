@@ -42,6 +42,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -60,59 +62,98 @@ import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
  * different certificates that are not in the keystore.
  */
 
-public class VariableX509TrustManager extends X509ExtendedTrustManager {
+final public class VariableX509TrustManager extends X509ExtendedTrustManager {
 
-    KeyStore userKeyStore = null;
-    KeyStore caKeyStore = null;
+    /** TrustManagers containing trusted CAs */
+    private X509TrustManager[] caTrustManagers = null;
 
-    X509TrustManager userTrustManager = null;
-    X509TrustManager caTrustManager = null;
+    /** TrustManagers containing trusted certificates */
+    private X509TrustManager[] certTrustManagers = null;
 
-    ArrayList<Certificate> temporarilyTrusted = new ArrayList<Certificate>();
-    ArrayList<Certificate> temporarilyUntrusted = new ArrayList<Certificate>();
+    /** TrustManagers containing trusted client certificates */
+    private X509TrustManager[] clientTrustManagers = null;
 
-    static VariableX509TrustManager instance = null;
+    private ArrayList<Certificate> temporarilyTrusted = new ArrayList<Certificate>();
+    private ArrayList<Certificate> temporarilyUntrusted = new ArrayList<Certificate>();
+
+    private static VariableX509TrustManager instance = null;
 
     /**
      * Constructor initializes the system, user and custom stores
      */
     public VariableX509TrustManager() {
 
+        /*
+         * Load TrustManagers for trusted certificates
+         */
         try {
-            userKeyStore = SecurityUtil.getUserKeyStore();
-            TrustManagerFactory tmFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
-            tmFactory.init(userKeyStore);
+            /** KeyStores containing trusted certificates */
+            KeyStore[] trustedCertKeyStores = KeyStores.getCertKeyStores();
+            certTrustManagers = new X509TrustManager[trustedCertKeyStores.length];
 
-            // tm factory initialized, now get the managers so we can assign the X509 one
-            TrustManager[] trustManagers = tmFactory.getTrustManagers();
+            for (int j = 0; j < trustedCertKeyStores.length; j++) {
+                TrustManagerFactory tmFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+                tmFactory.init(trustedCertKeyStores[j]);
 
-            for (int i=0; i < trustManagers.length; i++) {
-                if (trustManagers[i] instanceof X509TrustManager) {
-                    userTrustManager = (X509TrustManager) trustManagers[i];
+                // tm factory initialized, now get the managers so we can assign the X509 one
+                TrustManager[] trustManagers = tmFactory.getTrustManagers();
+
+                for (int i = 0; i < trustManagers.length; i++) {
+                    if (trustManagers[i] instanceof X509TrustManager) {
+                        certTrustManagers[j] = (X509TrustManager) trustManagers[i];
+                    }
                 }
             }
-
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+        /*
+         * Load TrustManagers for trusted CAs
+         */
         try {
-            caKeyStore = SecurityUtil.getCacertsKeyStore();
-            TrustManagerFactory tmFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
-            tmFactory.init(caKeyStore);
+            /** KeyStores containing trusted CAs */
+            KeyStore[] trustedCAKeyStores = KeyStores.getCAKeyStores();
+            caTrustManagers = new X509TrustManager[trustedCAKeyStores.length];
 
-            // tm factory initialized, now get the managers so we can extract the X509 one
-            TrustManager[] trustManagers = tmFactory.getTrustManagers();
+            for (int j = 0; j < caTrustManagers.length; j++) {
+                TrustManagerFactory tmFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+                tmFactory.init(trustedCAKeyStores[j]);
 
-            for (int i=0; i < trustManagers.length; i++) {
-                if (trustManagers[i] instanceof X509TrustManager) {
-                    caTrustManager = (X509TrustManager) trustManagers[i];
+                // tm factory initialized, now get the managers so we can extract the X509 one
+                TrustManager[] trustManagers = tmFactory.getTrustManagers();
+
+                for (int i=0; i < trustManagers.length; i++) {
+                    if (trustManagers[i] instanceof X509TrustManager) {
+                        caTrustManagers[j] = (X509TrustManager) trustManagers[i];
+                    }
                 }
             }
-
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        /*
+         * Load TrustManagers for trusted clients certificates
+         */
+        try {
+            KeyStore[] clientKeyStores = KeyStores.getClientKeyStores();
+            clientTrustManagers = new X509TrustManager[clientKeyStores.length];
+
+            for (int j = 0; j < clientTrustManagers.length; j++) {
+                TrustManagerFactory tmFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+                tmFactory.init(clientKeyStores[j]);
+
+                // tm factory initialized, now get the managers so we can extract the X509 one
+                TrustManager[] trustManagers = tmFactory.getTrustManagers();
+
+                for (int i=0; i < trustManagers.length; i++) {
+                    if (trustManagers[i] instanceof X509TrustManager) {
+                        clientTrustManagers[j] = (X509TrustManager) trustManagers[i];
+                    }
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -123,18 +164,23 @@ public class VariableX509TrustManager extends X509ExtendedTrustManager {
     public void checkClientTrusted(X509Certificate[] chain, String authType,
                                    String hostName, String algorithm)
             throws CertificateException {
-        // First try catrustmanager, then try usertrustmanager
-        try {
-            caTrustManager.checkClientTrusted(chain, authType);
-        } catch (Exception caex) {
+
+        boolean trusted = false;
+        ValidatorException savedException = null;
+        for (int i = 0; i < clientTrustManagers.length; i++) {
             try {
-                userTrustManager.checkClientTrusted(chain, authType);
-            } catch (Exception userex) {
-                // Do nothing here. This trust manager is intended to be used
-                // only in the plugin instance vm, which does not act as a
-                // server
+                clientTrustManagers[i].checkClientTrusted(chain, authType);
+                trusted = true;
+                break;
+            } catch (ValidatorException caex) {
+                savedException = caex;
             }
         }
+        if (trusted) {
+            return;
+        }
+
+        throw savedException;
     }
 
     public void checkClientTrusted(X509Certificate[] chain, String authType)
@@ -214,17 +260,45 @@ public class VariableX509TrustManager extends X509ExtendedTrustManager {
      * Check system, user and custom trust manager
      */
     private void checkAllManagers(X509Certificate[] chain, String authType) throws CertificateException {
-        // First try catrustmanager, then try usertrustmanager, and finally, check temp trusted certs
-        try {
-            caTrustManager.checkServerTrusted(chain, authType);
-        } catch (ValidatorException caex) {
+        // first try CA TrustManagers
+        boolean trusted = false;
+        ValidatorException savedException = null;
+        for (int i = 0; i < caTrustManagers.length; i++) {
             try {
-                userTrustManager.checkServerTrusted(chain, authType);
-            } catch (ValidatorException uex) {
-                if (!temporarilyTrusted.contains(chain[0]))
-                    throw (CertificateException) uex;
+                caTrustManagers[i].checkServerTrusted(chain, authType);
+                trusted = true;
+                break;
+            } catch (ValidatorException caex) {
+                savedException = caex;
             }
         }
+        if (trusted) {
+            return;
+        }
+
+        // then try certificate TrustManagers
+        for (int i = 0; i < certTrustManagers.length; i++) {
+            try {
+                certTrustManagers[i].checkServerTrusted(chain, authType);
+                trusted = true;
+                break;
+            } catch (ValidatorException caex) {
+                savedException = caex;
+            }
+        }
+        if (trusted) {
+            return;
+        }
+
+        // finally check temp trusted certs
+        if (!temporarilyTrusted.contains(chain[0])) {
+            if (savedException == null) {
+                // System.out.println("IMPOSSIBLE!");
+                throw new ValidatorException(ValidatorException.T_SIGNATURE_ERROR, chain[0]);
+            }
+            throw savedException;
+        }
+
     }
 
     /**
@@ -233,23 +307,32 @@ public class VariableX509TrustManager extends X509ExtendedTrustManager {
     private boolean isExplicitlyTrusted(X509Certificate[] chain, String authType) {
         boolean explicitlyTrusted = false;
 
-        try {
-            userTrustManager.checkServerTrusted(chain, authType);
-            explicitlyTrusted = true;
-        } catch (ValidatorException uex) {
-            if (temporarilyTrusted.contains(chain[0]))
+        for (int i = 0; i < certTrustManagers.length; i++) {
+            try {
+                certTrustManagers[i].checkServerTrusted(chain, authType);
                 explicitlyTrusted = true;
-        } catch (CertificateException ce) {
-            // do nothing, this means that the cert is not explicitly trusted
+                break;
+            } catch (ValidatorException uex) {
+                if (temporarilyTrusted.contains(chain[0])) {
+                    explicitlyTrusted = true;
+                    break;
+                }
+            } catch (CertificateException ce) {
+                // not explicitly trusted
+            }
         }
 
         return explicitlyTrusted;
-
     }
 
     public X509Certificate[] getAcceptedIssuers() {
-        // delegate to default
-        return caTrustManager.getAcceptedIssuers();
+        List<X509Certificate> issuers = new ArrayList<X509Certificate>();
+
+        for (int i = 0; i < caTrustManagers.length; i++) {
+            issuers.addAll(Arrays.asList(caTrustManagers[i].getAcceptedIssuers()));
+        }
+
+        return issuers.toArray(new X509Certificate[issuers.size()]);
     }
 
     /**

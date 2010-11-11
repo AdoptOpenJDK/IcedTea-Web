@@ -75,14 +75,8 @@ import java.net.ProxySelector;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-
 import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.VariableX509TrustManager;
 
 /**
  * The main entry point into PluginAppletViewer.
@@ -214,20 +208,6 @@ public class PluginMain
 
 		// INSTALL THE PROPERTY LIST
 		System.setProperties(avProps);
-
-
-		try {
-		    SSLSocketFactory sslSocketFactory;
-		    SSLContext context = SSLContext.getInstance("SSL");
-		    TrustManager[] trust = new TrustManager[] { VariableX509TrustManager.getInstance() };
-		    context.init(null, trust, null);
-		    sslSocketFactory = context.getSocketFactory();
-		    
-		    HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
-		} catch (Exception e) {
-		    System.err.println("Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...");
-		    e.printStackTrace();
-		}
 
 		// plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new CustomAuthenticator());

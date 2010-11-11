@@ -29,12 +29,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
-import java.math.BigInteger;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -48,9 +44,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import net.sourceforge.jnlp.security.SecurityUtil;
-
-import sun.misc.BASE64Encoder;
-import sun.security.provider.X509Factory;
 
 /**
  * This tool manages the user's trusted certificates
@@ -75,11 +68,6 @@ public class KeyTool {
          * Whether we trust the system cacerts file.
          */
         private boolean trustcacerts = true;
-
-        /**
-         * Whether we print certificates in rfc, base64 encoding.
-         */
-        private boolean rfc = true;
 
         private final char[] password = "changeit".toCharArray();
 
@@ -118,43 +106,6 @@ public class KeyTool {
 
                 return importCert((Certificate)cert);
         }
-
-    /**
-     * Adds the X509Certficate in the file to the KeyStore
-     */
-    public final void addToKeyStore(File file, KeyStore ks) throws CertificateException,
-            IOException, KeyStoreException {
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-        CertificateFactory cf = CertificateFactory.getInstance("X509");
-        X509Certificate cert = null;
-
-        try {
-            cert = (X509Certificate) cf.generateCertificate(bis);
-        } catch (ClassCastException cce) {
-            throw new CertificateException("Input file is not an X509 Certificate", cce);
-        }
-
-        addToKeyStore(cert, ks);
-
-    }
-
-    /**
-     * Adds an X509Certificate to the KeyStore
-     */
-    public final void addToKeyStore(X509Certificate cert, KeyStore ks) throws KeyStoreException {
-        String alias = null;
-        Random random = new Random();
-        alias = ks.getCertificateAlias(cert);
-        // already in keystore; done
-        if (alias != null) {
-            return;
-        }
-
-        do {
-            alias = new BigInteger(20, random).toString();
-        } while (ks.getCertificate(alias) != null);
-        ks.setCertificateEntry(alias, cert);
-    }
 
         /**
          * Adds a trusted certificate to the user's keystore.
@@ -477,20 +428,6 @@ public class KeyTool {
             }
         }
         return false;
-    }
-
-    public static void dumpCert(Certificate cert, PrintStream out)
-        throws IOException, CertificateException {
-
-        boolean printRfc = true;
-        if (printRfc) {
-            BASE64Encoder encoder = new BASE64Encoder();
-            out.println(X509Factory.BEGIN_CERT);
-            encoder.encodeBuffer(cert.getEncoded(), out);
-            out.println(X509Factory.END_CERT);
-        } else {
-            out.write(cert.getEncoded()); // binary
-        }
     }
 
         public static void main(String[] args) throws Exception {

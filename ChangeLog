@@ -1,3 +1,45 @@
+2010-11-11  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/Boot.java (main): Move trust
+	manager initialization code into JNLPRuntime.initialize.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java
+	(init): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java (initialize):
+	Set the default SSL TrustManager here.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java
+	(CheckBoxListener.actionPerformed): Add this certificate into
+	user's trusted certificate store.
+	* netx/net/sourceforge/jnlp/tools/KeyTool.java
+	(addToKeyStore(File,KeyStore)): Move to CertificateUtils.
+	(addToKeyStore(X509Certificate,KeyStore)): Likewise.
+	(dumpCert): Likewise.
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java: New
+	class.
+	(addToKeyStore(File,KeyStore)): Moved from KeyTool.
+	(addToKeyStore(X509Certificate,KeyStore)): Likewise.
+	(dumpCert): Likewise.
+	(inKeyStores): New method.
+	* netx/net/sourceforge/jnlp/security/HttpsCertVerifier.java
+	(getRootInCacerts): Check all available CA store to check if
+	root is in CA certificates.
+	* netx/net/sourceforge/jnlp/security/KeyStores.java
+	(getKeyStore(Level,Type,boolean)): Add security check.
+	(getClientKeyStores): New method.
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java
+	(VariableX509TrustManager): Initialize multiple CA, certificate and
+	client trust managers.
+	(checkClientTrusted): Check all the client TrustManagers if
+	certificate is trusted.
+	(checkAllManagers): Check multiple CA certificates and trusted
+	certificates to determine if the certificate chain can be trusted.
+	(isExplicitlyTrusted): Check with multiple TrustManagers.
+	(getAcceptedIssuers): Gather results from multiple TrustManagers.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	(ImportButtonListener): Use CertificateUtils instead of KeyTool.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java
+	(checkTrustedCerts): Use multiple key stores to check if certificate
+	is directly trusted and if the root is trusted.
+
 2010-11-09  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add

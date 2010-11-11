@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.AllPermission;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -111,6 +112,11 @@ public final class KeyStores {
      * @return a KeyStore containing certificates from the appropriate
      */
     public static final KeyStore getKeyStore(Level level, Type type, boolean create) {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(new AllPermission());
+        }
+
         String location = getKeyStoreLocation(level, type);
         KeyStore ks = null;
         try {
@@ -181,6 +187,29 @@ public final class KeyStores {
         }
         /* User-level CA certificates */
         ks = getKeyStore(Level.USER, Type.CA_CERTS);
+        if (ks != null) {
+            result.add(ks);
+        }
+
+        return result.toArray(new KeyStore[result.size()]);
+    }
+
+    /**
+     * Returns KeyStores containing trusted client certificates
+     *
+     * @return an array of KeyStore objects that can be used to check client
+     * authentication certificates
+     */
+    public static KeyStore[] getClientKeyStores() {
+        List<KeyStore> result = new ArrayList<KeyStore>();
+        KeyStore ks = null;
+
+        ks = getKeyStore(Level.SYSTEM, Type.CLIENT_CERTS);
+        if (ks != null) {
+            result.add(ks);
+        }
+
+        ks = getKeyStore(Level.USER, Type.CLIENT_CERTS);
         if (ks != null) {
             result.add(ks);
         }
@@ -335,5 +364,6 @@ public final class KeyStores {
 
         return ks;
     }
+
 
 }
