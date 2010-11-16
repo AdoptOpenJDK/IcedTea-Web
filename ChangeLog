@@ -1,3 +1,8 @@
+2010-11-16  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Corrected typo in one of the default values.
+
 2010-11-11  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/Boot.java (main): Move trust

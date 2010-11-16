@@ -369,7 +369,7 @@ public final class DeploymentConfiguration {
             { "deployment.proxy.override.hosts", null },
             /* cache and optional package repository */
             { "deployment.cache.max.size", String.valueOf("-1") },
-            { "deployment.cache.jarcompresson", String.valueOf(0) },
+            { "deployment.cache.jarcompression", String.valueOf(0) },
             { "deployment.javapi.cache.enabled", String.valueOf(false) },
             /* java console */
             { "deployment.console.startup.mode", CONSOLE_HIDE },
