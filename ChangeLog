@@ -1,5 +1,24 @@
 2010-11-18  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Add KEY_ENABLE_LOGGING.
+	(loadDefaultProperties): Use KEY_ENABLE_LOGGING.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Add
+	redirectStreams, STDERR_FILE and STDOUT_FILE.
+	(initialize): Call initializeStreams.
+	(initializeStreams): New method. Redirects or duplicates stdout and
+	stderr to the logging files as required.
+	(setRedirectStreams): New method. Sets whether stdout/stderr streams
+	should be redirected.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java:
+	(PluginMain): Move code for creating logging files into JNLPRuntime.
+	Call JNLPRuntime.setRedirectStreams to redirect streams.
+	(TeeOutputStream): Move to its own class.
+	* netx/net/sourceforge/jnlp/util/TeeOutputStream.java: Moved from
+	PluginMain into this new class.
+
+2010-11-18  Omair Majid  <omajid@redhat.com>
+
 	* NEWS: Update with new interfaces
 	* netx/javax/jnlp/DownloadService2.java: New interface.
 	(ResourceSpec): New class.

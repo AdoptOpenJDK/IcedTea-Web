@@ -121,24 +121,13 @@ public class PluginMain
 
     	connect(inPipe, outPipe);
 
+        // must be called before JNLPRuntime.initialize()
+        JNLPRuntime.setRedirectStreams(redirectStreams);
+
     	securityContext = new PluginAppletSecurityContext(0);
     	securityContext.prePopulateLCClasses();
     	securityContext.setStreamhandler(streamHandler);
     	AppletSecurityContextManager.addContext(0, securityContext);
-
-    	String logDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
-        try {
-            File errFile = new File(logDir, PLUGIN_STDERR_FILE);
-            errFile.getParentFile().mkdirs();
-            File outFile = new File(logDir, PLUGIN_STDOUT_FILE);
-            outFile.getParentFile().mkdirs();
-
-            System.setErr(new TeeOutputStream(new FileOutputStream(errFile), System.err));
-            System.setOut(new TeeOutputStream(new FileOutputStream(outFile), System.out));
-        } catch (Exception e) {
-            PluginDebug.debug("Unable to redirect streams");
-            e.printStackTrace();
-        }
 
 		PluginAppletViewer.setStreamhandler(streamHandler);
 		PluginAppletViewer.setPluginCallRequestFactory(new PluginCallRequestFactory());
@@ -242,62 +231,6 @@ public class PluginMain
             
             // send it along
             return auth;
-        }
-    }
-
-    /**
-     * Behaves like the 'tee' command, sends output to both actual std stream and a
-     * file
-     */
-    class TeeOutputStream extends PrintStream {
-
-        // Everthing written to TeeOutputStream is written to this file
-        PrintStream logFile;
-
-        public TeeOutputStream(FileOutputStream fileOutputStream,
-                PrintStream stdStream) {
-            super(stdStream);
-            logFile = new PrintStream(fileOutputStream);
-        }
-
-        @Override
-        public boolean checkError() {
-            boolean thisError = super.checkError();
-            boolean fileError = logFile.checkError();
-
-            return thisError || fileError;
-        }
-
-        @Override
-        public void close() {
-            logFile.close();
-            super.close();
-        }
-
-        @Override
-        public void flush() {
-            logFile.flush();
-            super.flush();
-        }
-
-        /*
-         * The big ones: these do the actual writing
-         */
-
-        @Override
-        public void write(byte[] buf, int off, int len) {
-            logFile.write(buf, off, len);
-
-            if (!redirectStreams)
-                super.write(buf, off, len);
-        }
-
-        @Override
-        public void write(int b) {
-            logFile.write(b);
-            
-            if (!redirectStreams)
-                super.write(b);
         }
     }
     

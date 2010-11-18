@@ -154,6 +154,8 @@ public final class DeploymentConfiguration {
     public static final String KEY_SYSTEM_TRUSTED_JSSE_CERTS = "deployment.system.security.trusted.jssecerts";
     public static final String KEY_SYSTEM_TRUSTED_CLIENT_CERTS = "deployment.system.security.trusted.clientautcerts";
 
+    public static final String KEY_ENABLE_LOGGING = "deployment.log";
+
     public static final String KEY_CREATE_DESKTOP_SHORTCUT = "deployment.javaws.shortcut";
 
     public static final String KEY_BROWSER_PATH = "deployment.browser.path";
@@ -375,7 +377,7 @@ public final class DeploymentConfiguration {
             { "deployment.console.startup.mode", CONSOLE_HIDE },
             /* tracing and logging */
             { "deployment.trace", String.valueOf(false) },
-            { "deployment.log", String.valueOf(false) },
+            { KEY_ENABLE_LOGGING, String.valueOf(false) },
             /* JNLP association */
             { "deployment.javaws.associations", String.valueOf(JNLP_ASSOCIATION_ASK_USER) },
             /* desktop integration */

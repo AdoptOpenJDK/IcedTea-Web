@@ -107,6 +107,9 @@ public class JNLPRuntime {
     /** whether debug mode is on */
     private static boolean debug = false; // package access by Boot
 
+    /** whether streams should be redirected */
+    private static boolean redirectStreams = false;
+
     /** mutex to wait on, for initialization */
     public static Object initMutex = new Object();
 
@@ -118,6 +121,9 @@ public class JNLPRuntime {
 
     /** contains the arguments passed to the jnlp runtime */
     private static List<String> initialArguments;
+
+    public static final String STDERR_FILE = "java.stderr";
+    public static final String STDOUT_FILE = "java.stdout";
 
     /** Username */
     public static final String USER = System.getProperty("user.name");
@@ -182,6 +188,8 @@ public class JNLPRuntime {
                 System.exit(1);
             }
         }
+
+        initializeStreams();
 
         isWebstartApplication = isApplication;
 
@@ -278,6 +286,34 @@ public class JNLPRuntime {
          * result is that all other AppContexts see a null dtd.
          */
         new ParserDelegator();
+    }
+
+    /**
+     * Initializes the standard output and error streams, redirecting them or
+     * duplicating them as required.
+     */
+    private static void initializeStreams() {
+        Boolean enableLogging = Boolean.valueOf(config
+                .getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
+        if (redirectStreams || enableLogging) {
+            String logDir = config.getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
+            File errFile = new File(logDir, JNLPRuntime.STDERR_FILE);
+            errFile.getParentFile().mkdirs();
+            File outFile = new File(logDir, JNLPRuntime.STDOUT_FILE);
+            outFile.getParentFile().mkdirs();
+
+            try {
+                if (redirectStreams) {
+                    System.setErr(new PrintStream(new FileOutputStream(errFile)));
+                    System.setOut(new PrintStream(new FileOutputStream(outFile)));
+                } else {
+                    System.setErr(new TeeOutputStream(new FileOutputStream(errFile), System.err));
+                    System.setOut(new TeeOutputStream(new FileOutputStream(outFile), System.out));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -487,6 +523,17 @@ public class JNLPRuntime {
     public static void setDebug(boolean enabled) {
         checkExitClass();
         debug = enabled;
+    }
+
+    /**
+     * Sets whether the standard output/error streams should be redirected to
+     * the loggging files.
+     *
+     * @throws IllegalStateException if the runtime has already been initialized
+     */
+    public static void setRedirectStreams(boolean redirect) {
+        checkInitialized();
+        redirectStreams = redirect;
     }
 
     /**
