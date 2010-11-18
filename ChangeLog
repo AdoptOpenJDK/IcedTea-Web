@@ -1,3 +1,26 @@
+2010-11-18  Omair Majid  <omajid@redhat.com>
+
+	* NEWS: Update with new interfaces
+	* netx/javax/jnlp/DownloadService2.java: New interface.
+	(ResourceSpec): New class.
+	(ResourceSpec.ResourceSpec): New method.
+	(ResourceSpec.getExpirationDate): New method.
+	(ResourceSpec.getLastModified): New method.
+	(ResourceSpec.getSize): New method.
+	(ResourceSpec.getType): New method.
+	(ResourceSpec.getUrl): New method.
+	(ResourceSpec.getVersion): New method.
+	(getCachedResources): New method.
+	(getUpdateAvaiableReosurces): New method.
+	* netx/javax/jnlp/IntegrationService.java: New interface.
+	(hasAssociation): New method.
+	(hasDesktopShortcut): New method.
+	(hasMenuShortcut): New method.
+	(removeAssociation): New method.
+	(removeShortcuts): New method.
+	(requestAssociation): New method.
+	(requestShortcut): New method.
+
 2010-11-16  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
