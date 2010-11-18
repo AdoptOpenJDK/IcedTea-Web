@@ -1,5 +1,35 @@
 2010-11-18  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: Remove window banner
+	permissions from sandboxPermissions and j2eePermissions.
+	(getSandBoxPermissions): Dynamically add window banner permissions
+	if allowed by configuration.
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Add KEY_SECURITY_PROMPT_USER,
+	KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING,
+	KEY_SECURITY_PROMPT_USER_FOR_JNLP, and
+	KEY_SECURITY_INSTALL_AUTHENTICATOR.
+	(loadDefaultProperties): Use the new constants.
+	* netx/net/sourceforge/jnlp/security/SecurityWarning.java
+	(showAccessWarningDialog): Check if the user should be prompted
+	before prompting the user.
+	(showNotAllSignedWarningDialog): Likewise.
+	(showCertWarningDialog): Likewise.
+	(showAppletWarning): Likewise.
+	(shouldPromptUser): New method. Check if configuration allows
+	showing user prompts.
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java
+	(checkAccess(AccessType,Object...)): Clarify javadocs.
+	(checkAccess(ApplicationInstance,AccessType,Object...)): Clarify
+	javadocs. Only prompt the user if showing JNLP prompts is ok.
+	(shouldPromptUser): New method. Returns true if configuration allows
+	for showing JNLP api prompts.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java
+	(init): Only install custom authenticator if allowed by
+	configuration.
+
+2010-11-18  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
 	Add KEY_ENABLE_LOGGING.
 	(loadDefaultProperties): Use KEY_ENABLE_LOGGING.

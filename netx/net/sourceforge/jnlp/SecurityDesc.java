@@ -23,6 +23,9 @@ import java.util.*;
 import java.security.*;
 import java.awt.AWTPermission;
 
+import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 /**
  * The security element.
  *
@@ -67,7 +70,6 @@ public class SecurityDesc {
         // queues, or even prevent access to security dialog queues.
         //
         // new AWTPermission("accessEventQueue"),
-        new AWTPermission("showWindowWithoutWarningBanner"),
         new RuntimePermission("exitVM"),
         new RuntimePermission("loadLibrary"),
         new RuntimePermission("queuePrintJob"),
@@ -105,7 +107,6 @@ public class SecurityDesc {
         new PropertyPermission("javaws.*", "read,write"),
         new RuntimePermission("exitVM"),
         new RuntimePermission("stopThread"),
-        new AWTPermission("showWindowWithoutWarningBanner"),
         // disabled because we can't at this time prevent an
         // application from accessing other applications' event
         // queues, or even prevent access to security dialog queues.
@@ -186,6 +187,11 @@ public class SecurityDesc {
 
         for (int i=0; i < sandboxPermissions.length; i++)
             permissions.add(sandboxPermissions[i]);
+
+        String key = DeploymentConfiguration.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
+        if (Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(key)) == Boolean.TRUE) {
+            permissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
+        }
 
         if (file.isApplication())
             for (int i=0; i < jnlpRIAPermissions.length; i++)

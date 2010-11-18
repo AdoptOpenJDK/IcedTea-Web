@@ -17,6 +17,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import java.awt.AWTPermission;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -154,7 +155,31 @@ public final class DeploymentConfiguration {
     public static final String KEY_SYSTEM_TRUSTED_JSSE_CERTS = "deployment.system.security.trusted.jssecerts";
     public static final String KEY_SYSTEM_TRUSTED_CLIENT_CERTS = "deployment.system.security.trusted.clientautcerts";
 
+    /*
+     * Security and access control
+     */
+
+    /** Boolean. Only show security prompts to user if true */
+    public static final String KEY_SECURITY_PROMPT_USER = "deployment.security.askgrantdialog.show";
+
+    /** Boolean. Only give AWTPermission("showWindowWithoutWarningBanner") if true */
+    public static final String KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING = "deployment.security.sandbox.awtwarningwindow";
+
+    /** Boolean. Only prompt user for granting any JNLP permissions if true */
+    public static final String KEY_SECURITY_PROMPT_USER_FOR_JNLP = "deployment.security.sandbox.jnlp.enhanced";
+
+    /** Boolean. Only install the custom authenticator if true */
+    public static final String KEY_SECURITY_INSTALL_AUTHENTICATOR = "deployment.security.authenticator";
+
+    /*
+     * Tracing and Logging
+     */
+
     public static final String KEY_ENABLE_LOGGING = "deployment.log";
+
+    /*
+     * Desktop Integration
+     */
 
     public static final String KEY_CREATE_DESKTOP_SHORTCUT = "deployment.javaws.shortcut";
 
@@ -345,15 +370,15 @@ public final class DeploymentConfiguration {
             { KEY_SYSTEM_TRUSTED_JSSE_CERTS, SYSTEM_SECURITY + File.separator + "trusted.jssecerts" },
             { KEY_SYSTEM_TRUSTED_CLIENT_CERTS, SYSTEM_SECURITY + File.separator + "trusted.clientcerts" },
             /* security access and control */
-            { "deployment.security.askgrantdialog.show", String.valueOf(true) },
+            { KEY_SECURITY_PROMPT_USER, String.valueOf(true) },
             { "deployment.security.askgrantdialog.notinca", String.valueOf(true) },
             { "deployment.security.notinca.warning", String.valueOf(true) },
             { "deployment.security.expired.warning", String.valueOf(true) },
             { "deployment.security.jsse.hostmismatch.warning", String.valueOf(true) },
             { "deployment.security.trusted.policy", null },
-            { "deployment.security.sandbox.awtwarningwindow", String.valueOf(true) },
-            { "deployment.security.sandbox.jnlp.enhanced", String.valueOf(true) },
-            { "deployment.security.authenticator", String.valueOf(true) },
+            { KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING, String.valueOf(true) },
+            { KEY_SECURITY_PROMPT_USER_FOR_JNLP, String.valueOf(true) },
+            { KEY_SECURITY_INSTALL_AUTHENTICATOR, String.valueOf(true) },
             /* networking */
             { "deployment.proxy.type", String.valueOf(PROXY_TYPE_BROWSER) },
             { "deployment.proxy.same", String.valueOf(false) },

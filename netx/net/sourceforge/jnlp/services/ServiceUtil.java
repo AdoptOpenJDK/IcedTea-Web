@@ -39,6 +39,7 @@ import javax.jnlp.UnavailableServiceException;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityWarning;
 import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
@@ -208,9 +209,10 @@ public class ServiceUtil {
     };
 
     /**
-     * Returns whether the app requesting a service is signed. If the app is
-     * unsigned, the user is prompted with a dialog asking if the action
-     * should be allowed.
+     * Returns whether the app requesting a JNLP service has the right permissions.
+     * If it doesn't, user is prompted for permissions. This method should only be
+     * used for JNLP API related permissions.
+     *
      * @param type the type of access being requested
      * @param extras extra Strings (usually) that are passed to the dialog for
      * message formatting.
@@ -221,8 +223,9 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns whether the app requesting a service has the right permissions.
-     * If it doesn't, user is prompted for permissions.
+     * Returns whether the app requesting a JNLP service has the right permissions.
+     * If it doesn't, user is prompted for permissions. This method should only be
+     * used for JNLP API related permissions.
      *
      * @param app the application which is requesting the check. If null, the current
      * application is used.
@@ -265,6 +268,11 @@ public class ServiceUtil {
         }
 
         if (!codeTrusted) {
+
+                if (!shouldPromptUser()) {
+                    return false;
+                }
+
                 final AccessType tmpType = type;
                 final Object[] tmpExtras = extras;
                 final ApplicationInstance tmpApp = app;
@@ -285,4 +293,16 @@ public class ServiceUtil {
 
         return true; //allow
     }
+
+    /**
+     * Returns whether the current runtime configuration allows prompting the
+     * user for JNLP permissions.
+     *
+     * @return true if the user should be prompted for JNLP API related permissions.
+     */
+    private static boolean shouldPromptUser() {
+        return Boolean.valueOf(JNLPRuntime.getConfiguration()
+                .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP));
+    }
+
 }

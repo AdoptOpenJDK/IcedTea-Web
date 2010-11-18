@@ -49,6 +49,7 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
@@ -111,6 +112,11 @@ public class SecurityWarning {
      */
     public static boolean showAccessWarningDialog(final AccessType accessType,
         final JNLPFile file, final Object[] extras) {
+
+        if (!shouldPromptUser()) {
+            return false;
+        }
+
         final SecurityDialogMessage message = new SecurityDialogMessage();
 
         message.dialogType = DialogType.ACCESS_WARNING;
@@ -139,6 +145,10 @@ public class SecurityWarning {
      * @return true if permission was granted by the user, false otherwise.
      */
     public static boolean showNotAllSignedWarningDialog(JNLPFile file) {
+
+        if (!shouldPromptUser()) {
+            return false;
+        }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
         message.dialogType = DialogType.NOTALLSIGNED_WARNING;
@@ -174,6 +184,10 @@ public class SecurityWarning {
     public static boolean showCertWarningDialog(AccessType accessType,
             JNLPFile file, CertVerifier jarSigner) {
 
+        if (!shouldPromptUser()) {
+            return false;
+        }
+
         final SecurityDialogMessage  message = new SecurityDialogMessage();
         message.dialogType = DialogType.CERT_WARNING;
         message.accessType = accessType;
@@ -199,6 +213,10 @@ public class SecurityWarning {
      * @return (0, 1, 2) => (Yes, No, Cancel)
      */
     public static int showAppletWarning() {
+
+        if (!shouldPromptUser()) {
+            return 2;
+        }
 
         SecurityDialogMessage message = new SecurityDialogMessage();
         message.dialogType = DialogType.APPLET_WARNING;
@@ -293,6 +311,17 @@ public class SecurityWarning {
         }
 
         return message.userResponse;
+    }
+
+    /**
+     * Returns whether the current runtime configuration allows prompting user
+     * for security warnings.
+     *
+     * @return true if security warnings should be shown to the user.
+     */
+    private static boolean shouldPromptUser() {
+        return Boolean.valueOf(JNLPRuntime.getConfiguration()
+                .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER));
     }
 
 }

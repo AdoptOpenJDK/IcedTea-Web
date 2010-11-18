@@ -199,7 +199,11 @@ public class PluginMain
 		System.setProperties(avProps);
 
 		// plug in a custom authenticator and proxy selector
-        Authenticator.setDefault(new CustomAuthenticator());
+		boolean installAuthenticator = Boolean.valueOf(JNLPRuntime.getConfiguration()
+		        .getProperty(DeploymentConfiguration.KEY_SECURITY_INSTALL_AUTHENTICATOR));
+		if (installAuthenticator) {
+		    Authenticator.setDefault(new CustomAuthenticator());
+		}
         ProxySelector.setDefault(new PluginProxySelector());
         
         CookieManager ckManager = new PluginCookieManager();
