@@ -66,17 +66,19 @@ LAUNCHER_LINK = -o $@ -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_DIR)/lib/$
 	-Wl,\$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli -lpthread $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lc -lz
 PLUGIN_VERSION = IcedTea $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
 
-EXTRA_DIST = $(NETX_SRCDIR) $(abs_top_srcdir)/plugin javaws.png javaws.desktop extra launcher
+EXTRA_DIST = $(NETX_SRCDIR) $(abs_top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher
 
 # Top-Level Targets
 # =================
 
-all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX_DIR)/launcher/javaws
+all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX_DIR)/launcher/javaws \
+ javaws.desktop
 
-clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory clean-native-ecj
+clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
+ clean-native-ecj clean-desktop-files
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
- clean-bootstrap-directory clean-native-ecj
+ clean-bootstrap-directory clean-native-ecj clean-desktop-files
 
 install-exec-local:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -246,6 +248,9 @@ clean-netx:
 	rm -f netx-source-files.txt
 	rm -f stamps/netx.stamp
 
+clean-desktop-files:
+	rm -f javaws.desktop
+
 # extras -- used to create about.jar for javaws.
 extra-source-files.txt:
 	find $(abs_top_srcdir)/extra -name '*.java' | sort > $@
@@ -275,6 +280,9 @@ $(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 $(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
 	mkdir -p launcher
 	$(CC) $(LAUNCHER_LINK) $(NETX_LAUNCHER_OBJECTS)
+
+javaws.desktop: javaws.desktop.in
+	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < javaws.desktop.in > javaws.desktop
 
 # plugin tests
 

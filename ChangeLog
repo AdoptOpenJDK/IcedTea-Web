@@ -1,3 +1,17 @@
+2010-11-19  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Replace javaws.desktop with
+	javaws.desktop.in. (all-local): Add javaws.desktop. (clean-local):
+	Add dependency on clean-desktop-files. (.PHONY): Add clean-desktop-
+	files. (clean-desktop-files): New target. (javaws.desktop): New
+	target. Use the absolute path to javaws binary in the Exec= line to
+	create the javaws.desktop file.
+	* javaws.desktop: Renamed to...
+	* javaws.desktop.in: New file. Does not contain Encoding key. Value
+	for Icon does not contain extension.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java
+	(JAVA_ICON_NAME): Set to icon name without the extension.
+
 2010-11-18  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/SecurityDesc.java: Remove window banner

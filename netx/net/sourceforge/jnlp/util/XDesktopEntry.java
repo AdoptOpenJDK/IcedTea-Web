@@ -46,7 +46,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  */
 public class XDesktopEntry {
 
-    public static final String JAVA_ICON_NAME = "java.png";
+    public static final String JAVA_ICON_NAME = "java";
 
     private JNLPFile file = null;
     private int iconSize = -1;

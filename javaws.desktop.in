@@ -1,9 +1,8 @@
 [Desktop Entry]
-Encoding=UTF-8
 Name=IcedTea Web Start
 Comment=IcedTea Application Launcher
-Exec=/usr/bin/javaws %f
-Icon=javaws.png
+Exec=PATH_TO_JAVAWS %f
+Icon=javaws
 Terminal=false
 Type=Application
 NoDisplay=true
