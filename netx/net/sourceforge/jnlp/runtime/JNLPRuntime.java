@@ -18,6 +18,8 @@
 package net.sourceforge.jnlp.runtime;
 
 import java.io.*;
+import java.net.Authenticator;
+import java.net.ProxySelector;
 import java.nio.channels.FileLock;
 import java.awt.*;
 import java.text.*;
@@ -35,6 +37,7 @@ import javax.swing.text.html.parser.ParserDelegator;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
+import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.security.VariableX509TrustManager;
 import net.sourceforge.jnlp.services.*;
@@ -249,6 +252,10 @@ public class JNLPRuntime {
             System.err.println("Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...");
             e.printStackTrace();
         }
+
+        // plug in a custom authenticator and proxy selector
+        Authenticator.setDefault(new JNLPAuthenticator());
+        ProxySelector.setDefault(new JNLPProxySelector());
 
         initialized = true;
 

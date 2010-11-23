@@ -1,3 +1,44 @@
+2010-11-23  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Add KEY_PROXY_TYPE, KEY_PROXY_SAME, KEY_PROXY_AUTO_CONFIG_URL,
+	KEY_PROXY_BYPASS_LIST, KEY_PROXY_BYPASS_LOCAL, KEY_PROXY_HTTP_HOST,
+	KEY_PROXY_HTTP_PORT, KEY_PROXY_HTTPS_HOST, KEY_PROXY_HTTPS_PORT,
+	KEY_PROXY_FTP_HOST, KEY_PROXY_FTP_PORT, KEY_PROXY_SOCKS4_HOST,
+	KEY_PROXY_SOCKS4_PORT, and KEY_PROXY_OVERRIDE_HOSTS.
+	(loadDefaultProperties): Use the new constants.
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java: New
+	class.
+	(JNLPProxySelector): New method.
+	(parseConfiguration): New method. Initializes this object by
+	querying the configuration.
+	(getHost): New method.
+	(getPort): New method.
+	(connectFailed): New method.
+	(select): New method. Returns a list of appropriate proxies to use
+	for a given uri.
+	(inBypassList): New method. Return true if the host in the URI
+	should be bypassed for proxy purposes.
+	(isLocalHost): New method.
+	(getFromConfiguration): New method. Finds a proxy based on
+	configuration.
+	(getFromPAC): New method.
+	(getFromBrowser): New method.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Install proxy selector and authenticator.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java
+	(init): Do not install authenticator.
+	(CustomAuthenticator): Moved to...
+	* netx/net/sourceforge/jnlp/security/JNLPAuthenticator.java: Here.
+	* plugin/icedteanp/java/sun/applet/PasswordAuthenticationDialog.java
+	Moved to...
+	* netx/net/sourceforge/jnlp/security
+	/PasswordAuthenticationDialog.java: Here.
+	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java: Extend
+	JNLPProxySelector.
+	(select): Renamed to...
+	(getFromBrowser): New method.
+
 2010-11-19  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Replace javaws.desktop with

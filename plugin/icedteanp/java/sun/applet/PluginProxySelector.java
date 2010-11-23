@@ -37,17 +37,15 @@ exception statement from your version. */
 
 package sun.applet;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.net.ProxySelector;
-import java.net.SocketAddress;
 import java.net.URI;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 
 /**
  * Proxy selector implementation for plugin network functions.
@@ -58,16 +56,9 @@ import java.util.List;
  * 
  */
 
-public class PluginProxySelector extends ProxySelector {
+public class PluginProxySelector extends JNLPProxySelector {
 
     private TimedHashMap<String, Proxy> proxyCache = new TimedHashMap<String, Proxy>(); 
-
-
-    @Override
-    public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        // If the connection fails, there is little we can do here. Just print the exception
-        ioe.printStackTrace();
-    }
 
     /**
      * Selects the appropriate proxy (or DIRECT connection method) for the given URI
@@ -76,7 +67,7 @@ public class PluginProxySelector extends ProxySelector {
      * @return A list of Proxy objects that are usable for this URI
      */
     @Override
-    public List<Proxy> select(URI uri) {
+    protected List<Proxy> getFromBrowser(URI uri) {
 
         List<Proxy> proxyList = new ArrayList<Proxy>();
 

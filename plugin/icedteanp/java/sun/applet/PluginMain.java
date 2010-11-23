@@ -77,6 +77,7 @@ import java.util.Properties;
 
 import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.JNLPAuthenticator;
 
 /**
  * The main entry point into PluginAppletViewer.
@@ -202,8 +203,9 @@ public class PluginMain
 		boolean installAuthenticator = Boolean.valueOf(JNLPRuntime.getConfiguration()
 		        .getProperty(DeploymentConfiguration.KEY_SECURITY_INSTALL_AUTHENTICATOR));
 		if (installAuthenticator) {
-		    Authenticator.setDefault(new CustomAuthenticator());
+		    Authenticator.setDefault(new JNLPAuthenticator());
 		}
+        // override the proxy selector set by JNLPRuntime
         ProxySelector.setDefault(new PluginProxySelector());
         
         CookieManager ckManager = new PluginCookieManager();
@@ -216,26 +218,6 @@ public class PluginMain
 
     static String getMessage() {
     	return streamHandler.getMessage();
-    }
-    
-    static class CustomAuthenticator extends Authenticator {
-        
-        public PasswordAuthentication getPasswordAuthentication() {
-
-            // No security check is required here, because the only way to 
-            // set parameters for which auth info is needed 
-            // (Authenticator:requestPasswordAuthentication()), has a security 
-            // check
-
-            String type = this.getRequestorType() == RequestorType.PROXY ? "proxy" : "web"; 
-
-            // request auth info from user
-            PasswordAuthenticationDialog pwDialog = new PasswordAuthenticationDialog();
-            PasswordAuthentication auth = pwDialog.askUser(this.getRequestingHost(), this.getRequestingPort(), this.getRequestingPrompt(), type);
-            
-            // send it along
-            return auth;
-        }
     }
     
 }

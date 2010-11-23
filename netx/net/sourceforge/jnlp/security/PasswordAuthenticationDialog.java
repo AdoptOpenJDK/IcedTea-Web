@@ -35,7 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package sun.applet;
+package net.sourceforge.jnlp.security;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -52,12 +52,14 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 /**
  * Modal non-minimizable dialog to request http authentication credentials
  */
 
 public class PasswordAuthenticationDialog extends JDialog {
-    
+
     private JLabel jlInfo = new JLabel("");
     private JTextField jtfUserName = new JTextField();
     private JPasswordField jpfPassword = new JPasswordField();
@@ -70,7 +72,7 @@ public class PasswordAuthenticationDialog extends JDialog {
     /**
      * Initialized the dialog components
      */
-    
+
     public void initialize() {
 
         setTitle("IcedTea Java Plugin - Authorization needed to proceed");
@@ -86,7 +88,7 @@ public class PasswordAuthenticationDialog extends JDialog {
         jpfPassword.setSize(20, 10);
 
         GridBagConstraints c;
-        
+
         c = new GridBagConstraints();
         c.fill = c.HORIZONTAL;
         c.gridx = 0;
@@ -94,13 +96,13 @@ public class PasswordAuthenticationDialog extends JDialog {
         c.gridwidth = 2;
         c.insets = new Insets(10, 5, 3, 3);
         add(jlInfo, c);
-        
+
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;
         c.insets = new Insets(10, 5, 3, 3);
         add(jlUserName, c);
-        
+
         c = new GridBagConstraints();
         c.fill = c.HORIZONTAL;
         c.gridx = 1;
@@ -115,7 +117,7 @@ public class PasswordAuthenticationDialog extends JDialog {
         c.gridy = 2;
         c.insets = new Insets(5, 5, 3, 3);
         add(jlPassword, c);
-        
+
         c = new GridBagConstraints();
         c.fill = c.HORIZONTAL;
         c.gridx = 1;
@@ -131,7 +133,7 @@ public class PasswordAuthenticationDialog extends JDialog {
         c.insets = new Insets(5, 5, 3, 70);
         c.weightx = 0.0;
         add(jbCancel, c);
-        
+
         c = new GridBagConstraints();
         c.anchor = c.SOUTHEAST;
         c.gridx = 1;
@@ -139,11 +141,11 @@ public class PasswordAuthenticationDialog extends JDialog {
         c.insets = new Insets(5, 5, 3, 3);
         c.weightx = 0.0;
         add(jbOK, c);
-        
+
         setMinimumSize(new Dimension(400,150));
         setMaximumSize(new Dimension(1024,150));
         setAlwaysOnTop(true);
-        
+
         setSize(400,150);
         setLocationRelativeTo(null);
 
@@ -154,7 +156,7 @@ public class PasswordAuthenticationDialog extends JDialog {
                 dispose();
             }
         });
-        
+
         // Cancel => discard supplied info and pass on an empty auth
         jbCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -162,7 +164,7 @@ public class PasswordAuthenticationDialog extends JDialog {
                 dispose();
             }
         });
-        
+
         // "return" key in either user or password field => OK
 
         jtfUserName.addActionListener(new ActionListener() {
@@ -171,7 +173,7 @@ public class PasswordAuthenticationDialog extends JDialog {
                 dispose();
             }
         });
-        
+
         jpfPassword.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 userCancelled = false;
@@ -205,9 +207,11 @@ public class PasswordAuthenticationDialog extends JDialog {
                     setVisible(true);
                 }
             });
-        
-            PluginDebug.debug("password dialog shown");
-            
+
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("password dialog shown");
+            }
+
             // wait until dialog is gone
             while (this.isShowing()) {
                 try {
@@ -215,15 +219,17 @@ public class PasswordAuthenticationDialog extends JDialog {
                 } catch (InterruptedException ie) {
                 }
             }
-            
-            PluginDebug.debug("password dialog closed");
+
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("password dialog closed");
+            }
 
             if (!userCancelled) {
                 auth = new PasswordAuthentication(jtfUserName.getText(), jpfPassword.getText().toCharArray());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            
+
             // Nothing else we can do. Empty auth will be returned
         }
 

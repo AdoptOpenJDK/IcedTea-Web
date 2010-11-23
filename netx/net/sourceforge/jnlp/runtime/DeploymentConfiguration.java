@@ -120,13 +120,6 @@ public final class DeploymentConfiguration {
     public static final String CONSOLE_SHOW = "SHOW";
     public static final String CONSOLE_DISABLE = "DISABLE";
 
-    /* FIXME these should be moved into the proxy class */
-    public static final int PROXY_TYPE_UNKNOWN = -1;
-    public static final int PROXY_TYPE_NONE = 0;
-    public static final int PROXY_TYPE_MANUAL = 1;
-    public static final int PROXY_TYPE_AUTO = 2;
-    public static final int PROXY_TYPE_BROWSER = 3;
-
     public static final String KEY_USER_CACHE_DIR = "deployment.user.cachedir";
     public static final String KEY_USER_PERSISTENCE_CACHE_DIR = "deployment.user.pcachedir";
     public static final String KEY_SYSTEM_CACHE_DIR = "deployment.system.cachedir";
@@ -170,6 +163,24 @@ public final class DeploymentConfiguration {
 
     /** Boolean. Only install the custom authenticator if true */
     public static final String KEY_SECURITY_INSTALL_AUTHENTICATOR = "deployment.security.authenticator";
+
+    /*
+     * Networking
+     */
+    public static final String KEY_PROXY_TYPE = "deployment.proxy.type";
+    public static final String KEY_PROXY_SAME = "deployment.proxy.same";
+    public static final String KEY_PROXY_AUTO_CONFIG_URL = "deployment.proxy.auto.config.url";
+    public static final String KEY_PROXY_BYPASS_LIST = "deployment.proxy.bypass.list";
+    public static final String KEY_PROXY_BYPASS_LOCAL = "deployment.proxy.bypass.local";
+    public static final String KEY_PROXY_HTTP_HOST = "deployment.proxy.http.host";
+    public static final String KEY_PROXY_HTTP_PORT = "deployment.proxy.http.port";
+    public static final String KEY_PROXY_HTTPS_HOST = "deployment.proxy.https.host";
+    public static final String KEY_PROXY_HTTPS_PORT = "deployment.proxy.https.port";
+    public static final String KEY_PROXY_FTP_HOST = "deployment.proxy.ftp.host";
+    public static final String KEY_PROXY_FTP_PORT = "deployment.proxy.ftp.port";
+    public static final String KEY_PROXY_SOCKS4_HOST = "deployment.proxy.socks.host";
+    public static final String KEY_PROXY_SOCKS4_PORT = "deployment.proxy.socks.port";
+    public static final String KEY_PROXY_OVERRIDE_HOSTS = "deployment.proxy.override.hosts";
 
     /*
      * Tracing and Logging
@@ -380,20 +391,20 @@ public final class DeploymentConfiguration {
             { KEY_SECURITY_PROMPT_USER_FOR_JNLP, String.valueOf(true) },
             { KEY_SECURITY_INSTALL_AUTHENTICATOR, String.valueOf(true) },
             /* networking */
-            { "deployment.proxy.type", String.valueOf(PROXY_TYPE_BROWSER) },
-            { "deployment.proxy.same", String.valueOf(false) },
-            { "deployment.proxy.auto.config.url", null },
-            { "deployment.proxy.bypass.list", null },
-            { "deployment.proxy.bypass.local", null },
-            { "deployment.proxy.http.host", null },
-            { "deployment.proxy.http.port", null },
-            { "deployment.proxy.https.host", null },
-            { "deployment.proxy.https.port", null },
-            { "deployment.proxy.ftp.host", null },
-            { "deployment.proxy.ftp.port", null },
-            { "deployment.proxy.socks.host", null },
-            { "deployment.proxy.socks.port", null },
-            { "deployment.proxy.override.hosts", null },
+            { KEY_PROXY_TYPE, String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER) },
+            { KEY_PROXY_SAME, String.valueOf(false) },
+            { KEY_PROXY_AUTO_CONFIG_URL, null },
+            { KEY_PROXY_BYPASS_LIST, null },
+            { KEY_PROXY_BYPASS_LOCAL, null },
+            { KEY_PROXY_HTTP_HOST, null },
+            { KEY_PROXY_HTTP_PORT, null },
+            { KEY_PROXY_HTTPS_HOST, null },
+            { KEY_PROXY_HTTPS_PORT, null },
+            { KEY_PROXY_FTP_HOST, null },
+            { KEY_PROXY_FTP_PORT, null },
+            { KEY_PROXY_SOCKS4_HOST, null },
+            { KEY_PROXY_SOCKS4_PORT, null },
+            { KEY_PROXY_OVERRIDE_HOSTS, null },
             /* cache and optional package repository */
             { "deployment.cache.max.size", String.valueOf("-1") },
             { "deployment.cache.jarcompression", String.valueOf(0) },
