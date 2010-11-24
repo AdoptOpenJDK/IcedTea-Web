@@ -1,3 +1,14 @@
+2010-11-24  Matthias Klose  <doko@ubuntu.com>
+
+	* Makefile.am (LAUNCHER_LINK): Don't explicitely link with -lc,
+	link with -pthread instead of -lpthread.
+	(LAUNCHER_FLAGS): Add -pthread.
+
+2010-11-24  Chris Coulson  <chris.coulson@canonical.com>
+
+	* Makefile.am (pluginappletviewer, javaws):
+	Fix linking with --as-needed.
+
 2010-11-23  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:

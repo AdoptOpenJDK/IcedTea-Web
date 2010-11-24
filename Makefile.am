@@ -57,13 +57,13 @@ LAUNCHER_SRCDIR = $(abs_top_srcdir)/launcher
 LAUNCHER_OBJECTS = java.o java_md.o splashscreen_stubs.o
 PLUGIN_LAUNCHER_OBJECTS = $(addprefix $(PLUGIN_DIR)/launcher/,$(LAUNCHER_OBJECTS))
 NETX_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/,$(LAUNCHER_OBJECTS))
-LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -W -Wall -Wno-unused -Wno-parentheses -pipe -fno-omit-frame-pointer \
+LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -pthread -W -Wall -Wno-unused -Wno-parentheses -pipe -fno-omit-frame-pointer \
 	-g -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -D_REENTRANT -DLAUNCHER_NAME='"java"' -I$(LAUNCHER_SRCDIR) \
 	-DJDK_MAJOR_VERSION='"1"' -DJDK_MINOR_VERSION='"6"' -DLIBARCHNAME='"$(JRE_ARCH_DIR)"'
-LAUNCHER_LINK = -o $@ -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_DIR)/lib/$(INSTALL_ARCH_DIR) \
+LAUNCHER_LINK = -o $@ -pthread -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_DIR)/lib/$(INSTALL_ARCH_DIR) \
 	-Wl,-soname=lib.so  -L $(BOOT_DIR)/jre/lib/$(INSTALL_ARCH_DIR)/jli -Wl,-z -Wl,origin \
 	-Wl,--allow-shlib-undefined -Wl,-rpath -Wl,\$$ORIGIN/../lib/$(INSTALL_ARCH_DIR)/jli -Wl,-rpath \
-	-Wl,\$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli -lpthread $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lc -lz
+	-Wl,\$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lz
 PLUGIN_VERSION = IcedTea $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
 
 EXTRA_DIST = $(NETX_SRCDIR) $(abs_top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher
@@ -149,7 +149,7 @@ $(PLUGIN_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 	$(CC) $(LAUNCHER_FLAGS) -DJAVA_ARGS='{ "sun.applet.PluginMain" }' -DPROGNAME='"pluginappletviewer"'  -c -o $@ $<
 
 $(PLUGIN_DIR)/launcher/pluginappletviewer: $(PLUGIN_LAUNCHER_OBJECTS)
-	$(CC) $(LAUNCHER_LINK) $(PLUGIN_LAUNCHER_OBJECTS)
+	$(CC) $(PLUGIN_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
 
 clean-IcedTeaPlugin:
 	rm -f $(PLUGIN_DIR)/launcher/*.o
@@ -279,7 +279,7 @@ $(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 
 $(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
 	mkdir -p launcher
-	$(CC) $(LAUNCHER_LINK) $(NETX_LAUNCHER_OBJECTS)
+	$(CC) $(NETX_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
 
 javaws.desktop: javaws.desktop.in
 	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < javaws.desktop.in > javaws.desktop
