@@ -1,3 +1,10 @@
+2010-11-24  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: Add grantAwtPermissions.
+	(SecurityDesc): Set grantAwtPermissions.
+	(getSandboxPermissions): Use grantAwtPermissions to determine whether to
+	grant permissions.
+
 2010-11-24  Matthias Klose  <doko@ubuntu.com>
 
 	* Makefile.am (javaws.desktop): Search javaws.desktop.in in $(srcdir).

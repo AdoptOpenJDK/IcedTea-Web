@@ -53,6 +53,9 @@ public class SecurityDesc {
     /** the download host */
     private String downloadHost;
 
+    /** whether sandbox applications should get the show window without banner permission */
+    private final boolean grantAwtPermissions;
+
     /** the JNLP file */
     private JNLPFile file;
 
@@ -146,6 +149,9 @@ public class SecurityDesc {
         this.file = file;
         this.type = type;
         this.downloadHost = downloadHost;
+
+        String key = DeploymentConfiguration.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
+        grantAwtPermissions = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(key));
     }
 
     /**
@@ -188,8 +194,7 @@ public class SecurityDesc {
         for (int i=0; i < sandboxPermissions.length; i++)
             permissions.add(sandboxPermissions[i]);
 
-        String key = DeploymentConfiguration.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
-        if (Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(key)) == Boolean.TRUE) {
+        if (grantAwtPermissions) {
             permissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
         }
 
