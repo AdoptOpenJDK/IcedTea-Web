@@ -157,7 +157,7 @@ public class CertificatePane extends JPanel {
                 JPanel certificateTypePanel = new JPanel(new BorderLayout());
                 certificateTypePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-                JLabel certificateTypeLabel = new JLabel("Certificate Type:");
+                JLabel certificateTypeLabel = new JLabel(R("CVCertificateType"));
 
                 certificateTypeCombo = new JComboBox(certificateTypes);
                 certificateTypeCombo.addActionListener(new CertificateTypeListener());
