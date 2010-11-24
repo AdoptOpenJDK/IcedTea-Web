@@ -80,9 +80,9 @@ public class XDesktopEntry {
 
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
-        fileContents += "Name=" + file.getTitle() + "\n";
+        fileContents += "Name=" + sanitize(file.getTitle()) + "\n";
         fileContents += "GenericName=Java Web Start Application\n";
-        fileContents += "Comment=" + file.getInformation().getDescription() + "\n";
+        fileContents += "Comment=" + sanitize(file.getInformation().getDescription()) + "\n";
         fileContents += "Type=Application\n";
         if (iconLocation != null) {
             fileContents += "Icon=" + iconLocation + "\n";
@@ -91,7 +91,7 @@ public class XDesktopEntry {
 
         }
         if (file.getInformation().getVendor() != null) {
-            fileContents += "Vendor=" + file.getInformation().getVendor() + "\n";
+            fileContents += "Vendor=" + sanitize(file.getInformation().getVendor()) + "\n";
         }
 
         //Shortcut executes the jnlp from cache and system preferred java..
@@ -99,6 +99,22 @@ public class XDesktopEntry {
 
         return new StringReader(fileContents);
 
+    }
+
+    /**
+     * Sanitizes a string so that it can be used safely in a key=value pair in a
+     * desktop entry file.
+     *
+     * @param input a String to sanitize
+     * @return a string safe to use as either the key or the value in the
+     * key=value pair in a desktop entry file
+     */
+    private static String sanitize(String input) {
+        if (input == null) {
+            return "";
+        }
+        /* key=value pairs must be a single line */
+        return input.split("\n")[0];
     }
 
     /**

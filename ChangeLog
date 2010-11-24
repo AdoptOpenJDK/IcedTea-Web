@@ -1,5 +1,12 @@
 2010-11-24  Omair Majid  <omajid@redhat.com>
 
+	Fix PR592.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java
+	(getContentsAsReader): Sanitize information before adding to desktop file.
+	(sanitize): New method. Ensure that there are no newlines in input.
+
+2010-11-24  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
 	CVCertificateType.
 	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: Use
