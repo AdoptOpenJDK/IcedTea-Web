@@ -1,5 +1,14 @@
 2010-11-24  Deepak Bhole <dbhole@redhat.com>
 
+	Fix PR593: Increment of invalidated iterator in IcedTeaPluginUtils (patch
+	from barbara.xxx1975@libero.it)
+	* plugin/icedteanp/IcedTeaPluginUtils.cc
+	(invalidateInstance): Act on the pointer directly, rather than via
+	members.
+	* NEWS: Updated.
+
+2010-11-24  Deepak Bhole <dbhole@redhat.com>
+
 	Fix PR552: Support for FreeBSD's pthread implementation (patch from
 	jkim@freebsd.org)
 	* plugin/icedteanp/IcedTeaNPPlugin.cc

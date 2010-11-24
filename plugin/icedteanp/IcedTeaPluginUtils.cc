@@ -510,11 +510,15 @@ IcedTeaPluginUtilities::invalidateInstance(NPP instance)
 
     std::map<void*,NPP>::iterator iterator;
 
-    for (iterator = instance_map->begin(); iterator != instance_map->end(); iterator++)
+    for (iterator = instance_map->begin(); iterator != instance_map->end(); )
     {
         if ((*iterator).second == instance)
         {
-            instance_map->erase((*iterator).first);
+            instance_map->erase(iterator++);
+        }
+        else
+        {
+            ++iterator;
         }
     }
 }
