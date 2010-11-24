@@ -67,6 +67,7 @@ class SingleInstanceLock {
      */
     public void createWithPort(int localPort) throws IOException {
 
+        FileUtils.createRestrictedFile(lockFile, true);
         BufferedWriter lockFileWriter = new BufferedWriter(new FileWriter(lockFile, false));
         lockFileWriter.write(String.valueOf(localPort));
         lockFileWriter.newLine();
@@ -132,9 +133,17 @@ class SingleInstanceLock {
         File baseDir = new File(JNLPRuntime.getConfiguration()
                 .getProperty(DeploymentConfiguration.KEY_USER_LOCKS_DIR));
 
-        if (!baseDir.isDirectory() && !baseDir.mkdirs()) {
-            throw new RuntimeException(R("RNoLockDir", baseDir));
+        if (!baseDir.isDirectory()) {
+            if (!baseDir.getParentFile().isDirectory() && !baseDir.getParentFile().mkdirs()) {
+                throw new RuntimeException(R("RNoLockDir", baseDir));
+            }
+            try {
+                FileUtils.createRestrictedDirectory(baseDir);
+            } catch (IOException e) {
+                throw new RuntimeException(R("RNoLockDir", baseDir));
+            }
         }
+
         String lockFileName = getLockFileName();
         File applicationLockFile = new File(baseDir, lockFileName);
         return applicationLockFile;

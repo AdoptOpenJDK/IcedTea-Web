@@ -26,6 +26,7 @@ import javax.jnlp.*;
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
 import net.sourceforge.jnlp.runtime.*;
+import net.sourceforge.jnlp.util.FileUtils;
 
 /**
  * The BasicService JNLP service.
@@ -96,8 +97,10 @@ class XPersistenceService implements PersistenceService {
         File file = toCacheFile(location);
         file.getParentFile().mkdirs();
 
-        if (!file.createNewFile())
+        if (file.exists())
             throw new IOException("File already exists.");
+
+        FileUtils.createRestrictedFile(file, true);
 
         return maxsize;
     }

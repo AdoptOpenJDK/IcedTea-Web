@@ -53,6 +53,7 @@ import java.util.StringTokenizer;
 import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.FileUtils;
 
 /**
  * The <code>KeyStores</code> class allows easily accessing the various KeyStores
@@ -339,6 +340,8 @@ public final class KeyStores {
                 if (!parent.isDirectory() && !parent.mkdirs()) {
                     throw new IOException("unable to create " + parent);
                 }
+                FileUtils.createRestrictedFile(file, true);
+
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
                 ks.load(null, password.toCharArray());
                 FileOutputStream fos = new FileOutputStream(file);

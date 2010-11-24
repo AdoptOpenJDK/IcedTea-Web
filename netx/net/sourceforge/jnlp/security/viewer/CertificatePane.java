@@ -45,6 +45,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -76,6 +77,7 @@ import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.SecurityWarningDialog;
 import net.sourceforge.jnlp.security.KeyStores.Level;
+import net.sourceforge.jnlp.util.FileUtils;
 
 public class CertificatePane extends JPanel {
 
@@ -361,8 +363,13 @@ public class CertificatePane extends JPanel {
                         try {
                                 KeyStore ks = keyStore;
                                 CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
-                                OutputStream os = new FileOutputStream(
-                                        KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
+                                File keyStoreFile = new File(KeyStores
+                                        .getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
+                                if (!keyStoreFile.isFile()) {
+                                    FileUtils.createRestrictedFile(keyStoreFile, true);
+                                }
+
+                                OutputStream os = new FileOutputStream(keyStoreFile);
                                 ks.store(os, KeyStores.getPassword());
                                 repopulateTables();
                         } catch (Exception ex) {
@@ -436,8 +443,12 @@ public class CertificatePane extends JPanel {
                                                         JOptionPane.YES_NO_OPTION);
                                         if (i == 0) {
                                                 keyStore.deleteEntry(alias);
-                                                FileOutputStream fos = new FileOutputStream(
-                                                        KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
+                                                File keyStoreFile = new File(KeyStores
+                                                        .getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
+                                                if (!keyStoreFile.isFile()) {
+                                                    FileUtils.createRestrictedFile(keyStoreFile, true);
+                                                }
+                                                FileOutputStream fos = new FileOutputStream(keyStoreFile);
                                                 keyStore.store(fos, KeyStores.getPassword());
                                                 fos.close();
                                         }

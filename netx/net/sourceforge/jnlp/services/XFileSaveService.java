@@ -44,6 +44,7 @@ import java.lang.ref.*;
 import javax.jnlp.*;
 
 import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.util.FileUtils;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -121,7 +122,7 @@ class XFileSaveService implements FileSaveService {
             if (!replace)
                 return;
         } else {
-            file.createNewFile();
+            FileUtils.createRestrictedFile(file, true);
         }
 
         if (file.canWrite()) {

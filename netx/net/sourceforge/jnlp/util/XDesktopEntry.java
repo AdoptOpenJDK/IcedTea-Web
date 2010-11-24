@@ -158,6 +158,9 @@ public class XDesktopEntry {
             if (!shortcutFile.getParentFile().isDirectory() && !shortcutFile.getParentFile().mkdirs()) {
                 throw new IOException(shortcutFile.getParentFile().toString());
             }
+
+            FileUtils.createRestrictedFile(shortcutFile, true);
+
             /*
              * Write out a Java String (UTF-16) as a UTF-8 file
              */

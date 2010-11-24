@@ -48,6 +48,7 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.Reflect;
 
 import javax.swing.SwingUtilities;
@@ -727,22 +728,15 @@ public class Launcher {
 
             File netxRunningFile = new File(JNLPRuntime.getConfiguration()
                     .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
-            netxRunningFile.getParentFile().mkdirs();
-            if (netxRunningFile.createNewFile()) {
+            if (!netxRunningFile.exists()) {
+                netxRunningFile.getParentFile().mkdirs();
+                FileUtils.createRestrictedFile(netxRunningFile, true);
                 FileOutputStream fos = new FileOutputStream(netxRunningFile);
                 try {
                     fos.write(message.getBytes());
                 } finally {
                     fos.close();
                 }
-            }
-
-            if (!netxRunningFile.isFile()) {
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println("Unable to create instance file");
-                }
-                fileLock = null;
-                return;
             }
 
             FileInputStream is = new FileInputStream(netxRunningFile);

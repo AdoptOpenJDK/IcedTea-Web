@@ -815,7 +815,9 @@ public class JNLPClassLoader extends URLClassLoader {
                     nativeDir = getNativeDir();
 
                 File outFile = new File(nativeDir, name);
-
+                if (!outFile.isFile()) {
+                    FileUtils.createRestrictedFile(outFile, true);
+                }
                 CacheUtil.streamCopy(jarFile.getInputStream(e),
                                      new FileOutputStream(outFile));
 
@@ -837,12 +839,18 @@ public class JNLPClassLoader extends URLClassLoader {
                              + File.separator + "netx-native-"
                              + (new Random().nextInt() & 0xFFFF));
 
-        if (!nativeDir.mkdirs())
+        File parent = nativeDir.getParentFile();
+        if (!parent.isDirectory() && !parent.mkdirs()) {
             return null;
-        else {
+        }
+
+        try {
+            FileUtils.createRestrictedDirectory(nativeDir);
             // add this new native directory to the search path
             addNativeDirectory(nativeDir);
             return nativeDir;
+        } catch (IOException e) {
+            return null;
         }
     }
 

@@ -105,7 +105,6 @@ public final class Boot implements PrivilegedAction<Void> {
         + "  -noupdate             "+R("BONoupdate")+"\n"
         + "  -headless             "+R("BOHeadless")+"\n"
         + "  -strict               "+R("BOStrict")+"\n"
-        + "  -umask=value          "+R("BOUmask")+"\n"
         + "  -Xnofork              "+R("BXnofork")+"\n"
         + "  -Xclearcache          "+R("BXclearcache")+"\n"
         + "  -help                 "+R("BOHelp")+"\n";

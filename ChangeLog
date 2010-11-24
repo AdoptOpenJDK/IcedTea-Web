@@ -1,3 +1,41 @@
+2010-11-24  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/util/FileUtils.java
+	(createRestrictedDirectory): New method. Creates a directory with reduced
+	permissions.
+	(createRestrictedFile(File,boolean)): New method. Creates a file with reduced
+	permissions.
+	(createRestrictedFile(File,boolean,boolean): New method. Creates a file or
+	a directory with reduced permissions.
+	* netx/net/sourceforge/jnlp/Launcher.java
+	(markNetxRunning): Do not grant unnecessary file permissions.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: Remove umask from
+	help message.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(activateNative): Create file with proper permissions.
+	(getNativeDir): Create directory with proper permissions.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initializeStreams): Create files with proper permissions.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java
+	(CheckBoxListener.actionPerformed): Likewise.
+	* netx/net/sourceforge/jnlp/security/KeyStores.java
+	(createKeyStoreFromFile): Likewise.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	(ImportButtonListener.actionPerformed): Likewise.
+	(RemoveButtonListener.actionPerformed): Likewise.
+	* netx/net/sourceforge/jnlp/services/SingleInstanceLock.java
+	(createWithPort): Likewise.
+	(getLockFile): Likewise.
+	* netx/net/sourceforge/jnlp/services/XExtendedService.java
+	(openFile): Likewise.
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java
+	(create): Likewise.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java
+	(installDesktopLauncher): Likewise.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	CantCreateFile, RCantCreateDir and RCantRename. Remove BNoBase and
+	BOUmask.
+
 2010-11-24  Deepak Bhole <dbhole@redhat.com>
 
 	Fix PR593: Increment of invalidated iterator in IcedTeaPluginUtils (patch

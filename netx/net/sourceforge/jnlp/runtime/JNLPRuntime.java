@@ -268,12 +268,15 @@ public class JNLPRuntime {
                 .getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
         if (redirectStreams || enableLogging) {
             String logDir = config.getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
-            File errFile = new File(logDir, JNLPRuntime.STDERR_FILE);
-            errFile.getParentFile().mkdirs();
-            File outFile = new File(logDir, JNLPRuntime.STDOUT_FILE);
-            outFile.getParentFile().mkdirs();
 
             try {
+                File errFile = new File(logDir, JNLPRuntime.STDERR_FILE);
+                errFile.getParentFile().mkdirs();
+                FileUtils.createRestrictedFile(errFile, true);
+                File outFile = new File(logDir, JNLPRuntime.STDOUT_FILE);
+                outFile.getParentFile().mkdirs();
+                FileUtils.createRestrictedFile(outFile, true);
+
                 if (redirectStreams) {
                     System.setErr(new PrintStream(new FileOutputStream(errFile)));
                     System.setOut(new PrintStream(new FileOutputStream(outFile)));

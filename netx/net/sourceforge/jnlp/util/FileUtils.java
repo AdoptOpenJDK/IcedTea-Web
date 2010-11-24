@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp.util;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -69,6 +71,79 @@ public final class FileUtils {
                 filename = filename.replace(INVALID_CHARS[i], SANITIZED_CHAR);
 
         return filename;
+    }
+
+    /**
+     * Creates a new directory with minimum permissions. The directory is not
+     * readable or writable by anyone other than the owner. The parent
+     * directories are not created; they must exist before this is called.
+     *
+     * @throws IOException
+     */
+    public static void createRestrictedDirectory(File directory) throws IOException {
+        createRestrictedFile(directory, true, true);
+    }
+
+    /**
+     * Creates a new file with minimum permissions. The file is not readable or
+     * writable by anyone other than the owner. If writeableByOnwer is false,
+     * even the owner can not write to it.
+     *
+     * @throws IOException
+     */
+    public static void createRestrictedFile(File file, boolean writableByOwner) throws IOException {
+        createRestrictedFile(file, false, writableByOwner);
+    }
+
+    /**
+     * Creates a new file or directory with minimum permissions. The file is not
+     * readable or writable by anyone other than the owner. If writeableByOnwer
+     * is false, even the owner can not write to it. If isDir is true, then the
+     * directory can be executed by the owner
+     *
+     * @throws IOException
+     */
+    private static void createRestrictedFile(File file, boolean isDir, boolean writableByOwner) throws IOException {
+
+        File tempFile = null;
+
+        tempFile = new File(file.getCanonicalPath() + ".temp");
+
+        if (isDir) {
+            if (!tempFile.mkdir()) {
+                throw new IOException(R("RCantCreateDir", tempFile));
+            }
+        } else {
+            if (!tempFile.createNewFile()) {
+                throw new IOException(R("RCantCreateFile", tempFile));
+            }
+        }
+
+        // remove all permissions
+        tempFile.setExecutable(false, false);
+        tempFile.setReadable(false, false);
+        tempFile.setWritable(false, false);
+
+        // allow owner to read
+        tempFile.setReadable(true, true);
+
+        // allow owner to write
+        if (writableByOwner) {
+            tempFile.setWritable(true, true);
+        }
+
+        // allow owner to enter directories
+        if (isDir) {
+            tempFile.setExecutable(true, true);
+        }
+
+        // rename this file. Unless the file is moved/renamed, any program that
+        // opened the file right after it was created might still be able to
+        // read the data.
+        if (!tempFile.renameTo(file)) {
+            throw new IOException(R("RCantRename", tempFile, file));
+        }
+
     }
 
     /**

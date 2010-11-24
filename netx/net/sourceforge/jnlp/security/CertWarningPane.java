@@ -47,6 +47,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
@@ -68,6 +69,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.util.FileUtils;
 
 /**
  * Provides the panel for using inside a SecurityWarningDialog. These dialogs are
@@ -246,7 +248,12 @@ public class CertWarningPane extends SecurityDialogPanel {
                     KeyStore ks = KeyStores.getKeyStore(Level.USER, Type.CERTS);
                     X509Certificate c = (X509Certificate) parent.getJarSigner().getPublisher();
                     CertificateUtils.addToKeyStore(c, ks);
-                    OutputStream os = new FileOutputStream(KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS));
+                    File keyStoreFile = new File(KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS));
+                    if (!keyStoreFile.isFile()) {
+                        FileUtils.createRestrictedFile(keyStoreFile, true);
+                    }
+
+                    OutputStream os = new FileOutputStream(keyStoreFile);
                     ks.store(os, KeyStores.getPassword());
                     if (JNLPRuntime.isDebug()) {
                         System.out.println("certificate is now permanently trusted");
