@@ -2372,6 +2372,10 @@ NP_Shutdown (void)
   pthread_cancel(plugin_request_processor_thread2);
   pthread_cancel(plugin_request_processor_thread3);
 
+  pthread_join(plugin_request_processor_thread1, NULL);
+  pthread_join(plugin_request_processor_thread2, NULL);
+  pthread_join(plugin_request_processor_thread3, NULL);
+
   java_to_plugin_bus->unSubscribe(plugin_req_proc);
   plugin_to_java_bus->unSubscribe(java_req_proc);
   //internal_bus->unSubscribe(java_req_proc);

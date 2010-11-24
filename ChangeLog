@@ -1,3 +1,16 @@
+2010-11-24  Deepak Bhole <dbhole@redhat.com>
+
+	Fix PR552: Support for FreeBSD's pthread implementation (patch from
+	jkim@freebsd.org)
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(NP_Shutdown): Do pthread_join after cancel to	avoid destroying mutexes
+	or condition variables in use.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
+	(PluginRequestProcessor): Initialize mutexes dynamically.
+	(queue_cleanup): New method. Destroy dynamically created mytexes.
+	(queue_processor): Initialize wait_mutex and push cleanup on exit. Clean
+	up after processing stops.
+
 2010-11-24  Andrew John Hughes  <ahughes@redhat.com>
 
 	* NEWS: Bring in changes from IcedTea6 1.10

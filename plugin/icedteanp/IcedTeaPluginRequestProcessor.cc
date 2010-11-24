@@ -63,6 +63,12 @@ PluginRequestProcessor::PluginRequestProcessor()
     this->pendingRequests = new std::map<pthread_t, uintmax_t>();
 
     internal_req_ref_counter = 0;
+
+    pthread_mutex_init(&message_queue_mutex, NULL);
+    pthread_mutex_init(&syn_write_mutex, NULL);
+    pthread_mutex_init(&tc_mutex, NULL);
+
+    pthread_cond_init(&cond_message_available, NULL);
 }
 
 /**
@@ -77,6 +83,12 @@ PluginRequestProcessor::~PluginRequestProcessor()
 
     if (pendingRequests)
         delete pendingRequests;
+
+    pthread_mutex_destroy(&message_queue_mutex);
+    pthread_mutex_destroy(&syn_write_mutex);
+    pthread_mutex_destroy(&tc_mutex);
+
+    pthread_cond_destroy(&cond_message_available);
 }
 
 /**
@@ -701,6 +713,14 @@ PluginRequestProcessor::finalize(std::vector<std::string*>* message_parts)
     plugin_to_java_bus->post(response.c_str());
 }
 
+static void
+queue_cleanup(void* data)
+{
+
+    pthread_mutex_destroy((pthread_mutex_t*) data);
+
+    PLUGIN_DEBUG("Queue processing stopped.\n");
+}
 
 void*
 queue_processor(void* data)
@@ -709,9 +729,13 @@ queue_processor(void* data)
     PluginRequestProcessor* processor = (PluginRequestProcessor*) data;
     std::vector<std::string*>* message_parts = NULL;
     std::string command;
-    pthread_mutex_t wait_mutex = PTHREAD_MUTEX_INITIALIZER; // This is needed for API compat. and is unused
+    pthread_mutex_t wait_mutex = PTHREAD_MUTEX_INITIALIZER;
 
     PLUGIN_DEBUG("Queue processor initialized. Queue = %p\n", message_queue);
+
+    pthread_mutex_init(&wait_mutex, NULL);
+
+    pthread_cleanup_push(queue_cleanup, (void*) &wait_mutex);
 
     while (true)
     {
@@ -780,14 +804,17 @@ queue_processor(void* data)
 
         } else
         {
-        	pthread_cond_wait(&cond_message_available, &wait_mutex);
-            pthread_testcancel();
+	    pthread_mutex_lock(&wait_mutex);
+	    pthread_cond_wait(&cond_message_available, &wait_mutex);
+	    pthread_mutex_unlock(&wait_mutex);
         }
 
         message_parts = NULL;
+
+	pthread_testcancel();
     }
 
-    PLUGIN_DEBUG("Queue processing stopped.\n");
+    pthread_cleanup_pop(1);
 }
 
 /******************************************
