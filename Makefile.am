@@ -282,7 +282,7 @@ $(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
 	$(CC) $(NETX_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
 
 javaws.desktop: javaws.desktop.in
-	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < javaws.desktop.in > javaws.desktop
+	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < $(srcdir)/javaws.desktop.in > javaws.desktop
 
 # plugin tests
 

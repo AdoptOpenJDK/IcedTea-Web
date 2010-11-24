@@ -1,5 +1,9 @@
 2010-11-24  Matthias Klose  <doko@ubuntu.com>
 
+	* Makefile.am (javaws.desktop): Search javaws.desktop.in in $(srcdir).
+
+2010-11-24  Matthias Klose  <doko@ubuntu.com>
+
 	* Makefile.am (LAUNCHER_LINK): Don't explicitely link with -lc,
 	link with -pthread instead of -lpthread.
 	(LAUNCHER_FLAGS): Add -pthread.
