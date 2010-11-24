@@ -11,7 +11,16 @@ CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 New in release 1.0 (2010-XX-XX):
 
 * Initial release of IcedTea-Web
-* CVE-2010-3860: IcedTea System property information leak via public static
-* PR542: Plugin fails with NPE on http://www.openprocessing.org/visuals/iframe.php?visualID=2615
-* Applets are now double-buffered to eliminate flicker in ones that do heavy drawing
-* Iinterfaces javax.jnlp.IntegrationService and javax.jnlp.DownloadService2 are now available
+* Security updates
+  - RH645843, CVE-2010-3860: IcedTea System property information leak via public static
+* Plugin
+  - PR542: Plugin fails with NPE on http://www.openprocessing.org/visuals/iframe.php?visualID=2615
+  - PR554: System.err writes content two times
+  - PR556: Applet initialization code is prone to race conditions
+  - PR557: Applet opens in a separate window if tab is closed when the applet loads
+  - PR565: UIDefaults.getUI fails with jgoodies:looks 2.3.1
+  - Applets are now double-buffered to eliminate flicker in ones that do heavy drawing
+* NetX
+  - Add a new option -Xclearcache
+  - Interfaces javax.jnlp.IntegrationService and javax.jnlp.DownloadService2 are now available
+  - PR592: NetX can create invalid desktop entry files

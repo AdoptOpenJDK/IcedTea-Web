@@ -1,3 +1,9 @@
+2010-11-24  Andrew John Hughes  <ahughes@redhat.com>
+
+	* NEWS: Bring in changes from IcedTea6 1.10
+	NEWS (now redundant there) and apply same structure
+	as in IcedTea6.
+
 2010-11-24  Omair Majid  <omajid@redhat.com>
 
 	CVE-2010-3860 IcedTea System property information leak via public static
