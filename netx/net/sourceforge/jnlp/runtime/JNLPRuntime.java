@@ -80,9 +80,6 @@ public class JNLPRuntime {
     /** handles all security message to show appropriate security dialogs */
     private static SecurityDialogMessageHandler securityDialogMessageHandler;
 
-    /** the base dir for cache, etc */
-    private static File baseDir;
-
     /** a default launch handler */
     private static LaunchHandler handler = null;
 
@@ -127,33 +124,6 @@ public class JNLPRuntime {
 
     public static final String STDERR_FILE = "java.stderr";
     public static final String STDOUT_FILE = "java.stdout";
-
-    /** Username */
-    public static final String USER = System.getProperty("user.name");
-
-    /** User's home directory */
-    public static final String HOME_DIR = System.getProperty("user.home");
-
-    /** the ~/.netxrc file containing netx settings */
-    public static final String NETXRC_FILE = HOME_DIR + File.separator + ".netxrc";
-
-    /** the ~/.netx directory containing user-specific data */
-    public static final String NETX_DIR = HOME_DIR + File.separator + ".netx";
-
-    /** the ~/.netx/security directory containing security related information */
-    public static final String SECURITY_DIR = NETX_DIR + File.separator + "security";
-
-    /** the ~/.netx/security/trusted.certs file containing trusted certificates */
-    public static final String CERTIFICATES_FILE = SECURITY_DIR + File.separator + "trusted.certs";
-
-    /** the java.home directory */
-    public static final String JAVA_HOME_DIR = System.getProperty("java.home");
-
-    /** the JNLP file to open to display the network-based about window */
-    public static final String NETX_ABOUT_FILE = JAVA_HOME_DIR + File.separator + "lib"
-            + File.separator + "about.jnlp";
-
-
 
     /**
      * Returns whether the JNLP runtime environment has been
@@ -212,12 +182,6 @@ public class JNLPRuntime {
 
         if (handler == null)
             handler = new DefaultLaunchHandler();
-
-        if (baseDir == null)
-            baseDir = getDefaultBaseDir();
-
-        if (baseDir == null)
-            throw new IllegalStateException(JNLPRuntime.getMessage("BNoBase"));
 
         ServiceManager.setServiceManagerStub(new XServiceManagerStub()); // ignored if we're running under Web Start
 
@@ -395,25 +359,6 @@ public class JNLPRuntime {
     }
 
     /**
-     * Return the base directory containing the cache, persistence
-     * store, etc.
-     */
-    public static File getBaseDir() {
-        return baseDir;
-    }
-
-    /**
-     * Sets the base directory containing the cache, persistence
-     * store, etc.
-     *
-     * @throws IllegalStateException if caller is not the exit class
-     */
-    public static void setBaseDir(File baseDirectory) {
-        checkInitialized();
-        baseDir = baseDirectory;
-    }
-
-    /**
      * Returns whether the secure runtime environment is enabled.
      */
     public static boolean isSecurityEnabled() {
@@ -452,31 +397,6 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns the system default base dir for or if not set,
-     * prompts the user for the location.
-     *
-     * @return the base dir, or null if the user canceled the dialog
-     * @throws IOException if there was an io exception
-     */
-    public static File getDefaultBaseDir() {
-        PropertiesFile props = JNLPRuntime.getProperties();
-
-        String baseStr = props.getProperty("basedir");
-        if (baseStr != null)
-            return new File(baseStr);
-
-        String homeDir = HOME_DIR;
-        File baseDir = new File(NETX_DIR);
-        if (homeDir == null || (!baseDir.isDirectory() && !baseDir.mkdir()))
-            return null;
-
-        props.setProperty("basedir", baseDir.toString());
-        props.store();
-
-        return baseDir;
-    }
-
-    /**
      * Set a class that can exit the JVM; if not set then any class
      * can exit the JVM.
      *
@@ -502,15 +422,6 @@ public class JNLPRuntime {
      */
     public static ApplicationInstance getApplication() {
         return security.getApplication();
-    }
-
-    /**
-     * Return a PropertiesFile object backed by the runtime's
-     * properties file.
-     */
-    public static PropertiesFile getProperties() {
-        File netxrc = new File(NETXRC_FILE);
-        return new PropertiesFile(netxrc);
     }
 
     /**

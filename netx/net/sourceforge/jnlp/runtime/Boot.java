@@ -95,7 +95,6 @@ public final class Boot implements PrivilegedAction<Void> {
         + "  -viewer               "+R("BOViewer")+"\n"
         + "\n"
         + "run-options:"+"\n"
-        + "  -basedir dir          "+R("BOBasedir")+"\n"
         + "  -arg arg              "+R("BOArg")+"\n"
         + "  -param name=value     "+R("BOParam")+"\n"
         + "  -property name=value  "+R("BOProperty")+"\n"
@@ -110,6 +109,11 @@ public final class Boot implements PrivilegedAction<Void> {
         + "  -Xnofork              "+R("BXnofork")+"\n"
         + "  -Xclearcache          "+R("BXclearcache")+"\n"
         + "  -help                 "+R("BOHelp")+"\n";
+
+    /** the JNLP file to open to display the network-based about window */
+    private static final String NETX_ABOUT_FILE = System.getProperty("java.home") + File.separator + "lib"
+            + File.separator + "about.jnlp";
+
 
     private static final String doubleArgs = "-basedir -jnlp -arg -param -property -update";
 
@@ -179,7 +183,6 @@ public final class Boot implements PrivilegedAction<Void> {
      * The privileged part (jdk1.3 compatibility).
      */
     public Void run() {
-        JNLPRuntime.setBaseDir(getBaseDir());
         JNLPRuntime.setSecurityEnabled(null == getOption("-nosecurity"));
         JNLPRuntime.initialize(true);
 
@@ -221,8 +224,8 @@ public final class Boot implements PrivilegedAction<Void> {
      */
     private static String getAboutFile() {
 
-        if (new File(JNLPRuntime.NETX_ABOUT_FILE).exists())
-            return JNLPRuntime.NETX_ABOUT_FILE;
+        if (new File(NETX_ABOUT_FILE).exists())
+            return NETX_ABOUT_FILE;
         else
             return null;
     }
@@ -412,30 +415,6 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         return result.toArray( new String[result.size()] );
-    }
-
-    /**
-     * Return the base dir.  If the base dir parameter is not set
-     * the value is read from JNLPRuntime.NETX_ABOUT_FILE file.
-     * If that file does not exist, an install dialog is displayed
-     * to select the base directory.
-     */
-    private static File getBaseDir() {
-        if (getOption("-basedir") != null) {
-            File basedir = new File(getOption("-basedir"));
-
-            if (!basedir.exists() || !basedir.isDirectory())
-                fatalError(R("BNoDir", basedir));
-
-            return basedir;
-        }
-
-        // check .netxrc
-        File basedir = JNLPRuntime.getDefaultBaseDir();
-        if (basedir == null)
-            fatalError(R("BNoBase"));
-
-        return basedir;
     }
 
 }

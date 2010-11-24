@@ -43,20 +43,15 @@ import java.io.FileOutputStream;
 import java.security.KeyStore;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.KeyStores.Level;
+import net.sourceforge.jnlp.security.KeyStores.Type;
 
 public class SecurityUtil {
 
         private static final char[] password = "changeit".toCharArray();
 
         public static String getTrustedCertsFilename() throws Exception{
-
-                String homeDir = JNLPRuntime.HOME_DIR;
-
-                if (homeDir == null) {
-                        throw new Exception("Could not access home directory");
-                } else {
-                        return JNLPRuntime.CERTIFICATES_FILE;
-                }
+                return KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS);
         }
 
         public static char[] getTrustedCertsPassword() {

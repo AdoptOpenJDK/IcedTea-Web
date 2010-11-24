@@ -1,5 +1,27 @@
 2010-11-24  Omair Majid  <omajid@redhat.com>
 
+	CVE-2010-3860 IcedTea System property information leak via public static
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: Remove basedir
+	 option. Add NETX_ABOUT_FILE.
+	 (run): Remove call to JNLPRuntime.setBaseDir.
+	 (getAboutFile): Use the constant in this file, not JNLPRuntime.
+	 (getBaseDir): Remove obsolete method.
+	 * netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Remove
+	 baseDir, USER, HOME_DIR, NETXRC_FILE, NETX_DIR, SECURITY_DIR,
+	 CERTFICIATES_FILE, JAVA_HOME_DIR, NETX_ABOUT_FILE.
+	 (initialize): Do not set baseDir.
+	 (getBaseDir): Remove method.
+	 (setBaseDir): Likewise.
+	 (getDefaultBaseDir): Likewise.
+	 (getProperties): Likewise.
+	 * netx/net/sourceforge/jnlp/security/SecurityUtil.java
+	 (getTrustedCertsFilename): Delegate to
+	 KeyStores.getKeyStoreLocation.
+	 * plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java
+	 (PluginAppletSecurityContext): Remove call to obsolete method.
+
+2010-11-24  Omair Majid  <omajid@redhat.com>
+
 	Fix PR592.
 	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java
 	(getContentsAsReader): Sanitize information before adding to desktop file.

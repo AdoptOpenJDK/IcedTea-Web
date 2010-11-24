@@ -11,6 +11,7 @@ CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 New in release 1.0 (2010-XX-XX):
 
 * Initial release of IcedTea-Web
+* CVE-2010-3860: IcedTea System property information leak via public static
 * PR542: Plugin fails with NPE on http://www.openprocessing.org/visuals/iframe.php?visualID=2615
 * Applets are now double-buffered to eliminate flicker in ones that do heavy drawing
 * Iinterfaces javax.jnlp.IntegrationService and javax.jnlp.DownloadService2 are now available

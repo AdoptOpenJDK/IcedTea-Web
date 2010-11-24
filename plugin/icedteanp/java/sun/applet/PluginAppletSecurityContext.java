@@ -250,11 +250,6 @@ public class PluginAppletSecurityContext {
 
 	public PluginAppletSecurityContext(int identifier) {
 		this.identifier = identifier;
-		
-		// also, override the basedir, use a different one for the plugin
-		File f = new File(System.getProperty("user.home") + "/.icedteaplugin/");
-		f.mkdir();
-		JNLPRuntime.setBaseDir(f);
 
 		// We need a security manager.. and since there is a good chance that 
 		// an applet will be loaded at some point, we should make it the SM 
