@@ -1,3 +1,8 @@
+2010-11-25  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am (stamps/liveconnect.stamp): Set a bootclasspath to
+	avoid using an older netx.jar during compilation.
+
 2010-11-24  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/util/FileUtils.java
