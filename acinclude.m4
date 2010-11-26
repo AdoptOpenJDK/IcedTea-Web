@@ -543,3 +543,65 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
   AC_MSG_RESULT(${JAVA})
   AC_SUBST(JAVA)
 ])
+
+AC_DEFUN([IT_FIND_JAVADOC],
+[
+  AC_REQUIRE([IT_CHECK_FOR_JDK])
+  AC_MSG_CHECKING([for javadoc])
+  AC_ARG_WITH([javadoc],
+              [AS_HELP_STRING(--with-javadoc,specify location of Java documentation tool (javadoc))],
+  [
+    JAVADOC="${withval}"
+  ],
+  [
+    JAVADOC=${SYSTEM_JDK_DIR}/bin/javadoc
+  ])
+  if ! test -f "${JAVADOC}"; then
+    AC_PATH_PROG(JAVADOC, "${JAVADOC}")
+  fi
+  if test -z "${JAVADOC}"; then
+    AC_PATH_PROG(JAVADOC, "javadoc")
+  fi
+  if test -z "${JAVADOC}"; then
+    AC_PATH_PROG(JAVADOC, "gjdoc")
+  fi
+  if test -z "${JAVADOC}" && test "x$ENABLE_DOCS" = "xyes"; then
+    AC_MSG_ERROR("No Java documentation tool was found.")
+  fi
+  AC_MSG_RESULT(${JAVADOC})
+  AC_MSG_CHECKING([whether javadoc supports -J options])
+  CLASS=pkg/Test.java
+  mkdir tmp.$$
+  cd tmp.$$
+  mkdir pkg
+  cat << \EOF > $CLASS
+[/* [#]line __oline__ "configure" */
+package pkg;
+
+public class Test
+{
+  /**
+   * Does stuff.
+   *
+   *
+   * @param args arguments from cli.
+   */
+  public static void main(String[] args)
+  {
+    System.out.println("Hello World!");
+  }
+}
+]
+EOF
+  if $JAVADOC -J-Xmx896m pkg >&AS_MESSAGE_LOG_FD 2>&1; then
+    JAVADOC_KNOWS_J_OPTIONS=yes
+  else
+    JAVADOC_KNOWS_J_OPTIONS=no
+  fi
+  cd ..
+  rm -rf tmp.$$
+  AC_MSG_RESULT([${JAVADOC_KNOWS_J_OPTIONS}])
+  AC_SUBST(JAVADOC)
+  AC_SUBST(JAVADOC_KNOWS_J_OPTIONS)
+  AM_CONDITIONAL([JAVADOC_SUPPORTS_J_OPTIONS], test x"${JAVADOC_KNOWS_J_OPTIONS}" = "xyes")
+])

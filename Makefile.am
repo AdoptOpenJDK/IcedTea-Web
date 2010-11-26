@@ -17,11 +17,19 @@ IT_LANGUAGE_SOURCE_VERSION=6
 IT_CLASS_TARGET_VERSION=6
 IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
 
+# Fake update version to shut up the plugin detector hosted by Oracle.
+# If Oracle ever release a JDK update greater than 50, this needs to be increased.
 JDK_UPDATE_VERSION=50
 
 # Sources list
 
 PLUGIN_TEST_SRCS = $(abs_top_srcdir)/plugin/tests/LiveConnect/*.java
+
+NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
+	net.sourceforge.jnlp.cache net.sourceforge.jnlp.event \
+	net.sourceforge.jnlp.security net.sourceforge.jnlp.security.viewer \
+	net.sourceforge.jnlp.services net.sourceforge.jnlp.tools \
+	net.sourceforge.jnlp.util
 
 # Conditional defintions
 if ENABLE_PLUGIN
@@ -32,6 +40,7 @@ PLUGIN_SRCDIR=$(abs_top_srcdir)/plugin/icedteanp
 LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
 ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/IcedTeaPlugin.so stamps/liveconnect-dist.stamp \
  $(PLUGIN_DIR)/launcher/pluginappletviewer
+PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
 endif
 
 if CP_SUPPORTS_REFLINK
@@ -49,6 +58,14 @@ ICEDTEA_REV = +${ICEDTEA_REVISION}
 endif
 if HAS_PKGVERSION
 ICEDTEA_PKG = $(EMPTY) (${PKGVERSION})
+endif
+
+if ENABLE_DOCS
+JAVADOC_OPTS=-use -keywords -encoding UTF-8 -splitIndex \
+ -bottom '<font size="-1"> <a href="http://icedtea.classpath.org/bugzilla">Submit a bug or feature</a></font>'
+if JAVADOC_SUPPORTS_J_OPTIONS
+JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m -J-XX:PermSize=32m -J-XX:MaxPermSize=160m
+endif
 endif
 
 # Launcher
@@ -72,13 +89,13 @@ EXTRA_DIST = $(NETX_SRCDIR) $(abs_top_srcdir)/plugin javaws.png javaws.desktop.i
 # =================
 
 all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX_DIR)/launcher/javaws \
- javaws.desktop
+ javaws.desktop stamps/docs.stamp
 
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
- clean-native-ecj clean-desktop-files
+ clean-native-ecj clean-desktop-files clean-docs
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
- clean-bootstrap-directory clean-native-ecj clean-desktop-files
+ clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs
 
 install-exec-local:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -96,6 +113,13 @@ install-data-local:
 	mkdir -p $(DESTDIR)$(prefix)/man/man1
 	cp $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(prefix)/man/man1
 	cp $(NETX_RESOURCE_DIR)/about.jnlp $(DESTDIR)$(prefix)/jre/lib
+if ENABLE_DOCS
+	mkdir -p $(DESTDIR)$(htmldir)
+	cp -pPRf ${abs_top_builddir}/docs/netx $(DESTDIR)$(htmldir)
+if ENABLE_PLUGIN
+	cp -pPRf ${abs_top_builddir}/docs/plugin $(DESTDIR)$(htmldir)
+endif
+endif
 
 uninstall-local:
 	rm -f $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)/IcedTeaPlugin.so
@@ -285,6 +309,48 @@ $(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
 javaws.desktop: javaws.desktop.in
 	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < $(srcdir)/javaws.desktop.in > javaws.desktop
 
+# documentation
+
+stamps/docs.stamp: stamps/netx-docs.stamp stamps/plugin-docs.stamp
+	touch stamps/docs.stamp
+
+clean-docs: clean-netx-docs clean-plugin-docs
+	rm -f stamps/docs.stamp
+
+stamps/netx-docs.stamp: stamps/bootstrap-directory.stamp
+if ENABLE_DOCS
+	$(BOOT_DIR)/bin/javadoc $(JAVADOC_MEM_OPTS) $(JAVADOC_OPTS) \
+	 -d ${abs_top_builddir}/docs/netx -sourcepath $(NETX_SRCDIR) \
+	 -doctitle 'IcedTea-Web: NetX API Specification' \
+	 -windowtitle 'IcedTea-Web: NetX ' \
+	 -header '<strong>IcedTea-Web<br/>NetX</strong>' \
+	 $(NETX_PKGS)
+endif
+	mkdir -p stamps
+	touch stamps/netx-docs.stamp
+
+clean-netx-docs:
+	rm -rf ${abs_top_builddir}/docs/netx
+	rm -f stamps/netx-docs.stamp
+
+stamps/plugin-docs.stamp: stamps/bootstrap-directory.stamp
+if ENABLE_DOCS
+if ENABLE_PLUGIN
+	$(BOOT_DIR)/bin/javadoc $(JAVADOC_MEM_OPTS) $(JAVADOC_OPTS) \
+	 -d ${abs_top_builddir}/docs/plugin -sourcepath $(NETX_SRCDIR):$(LIVECONNECT_SRCS) \
+	 -doctitle 'IcedTea-Web: Plugin API Specification' \
+	 -windowtitle 'IcedTea-Web: Plugin ' \
+	 -header '<strong>IcedTea-Web<br/>Plugin</strong>' \
+	 $(PLUGIN_PKGS)
+endif
+endif
+	mkdir -p stamps
+	touch stamps/plugin-docs.stamp
+
+clean-plugin-docs:
+	rm -rf ${abs_top_builddir}/docs/plugin
+	rm -f stamps/plugin-docs.stamp
+
 # plugin tests
 
 if ENABLE_PLUGIN
@@ -323,6 +389,7 @@ stamps/bootstrap-directory.stamp: stamps/native-ecj.stamp
 	mkdir -p $(BOOT_DIR)/bin stamps/
 	ln -sf $(JAR) $(BOOT_DIR)/bin/jar
 	ln -sf $(abs_top_builddir)/javac $(BOOT_DIR)/bin/javac
+	ln -sf $(JAVADOC) $(BOOT_DIR)/bin/javadoc
 	mkdir -p $(BOOT_DIR)/jre/lib && \
 	ln -s $(SYSTEM_JDK_DIR)/jre/lib/rt.jar $(BOOT_DIR)/jre/lib && \
 	if [ -e $(SYSTEM_JDK_DIR)/jre/lib/jsse.jar ] ; then \

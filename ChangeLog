@@ -1,3 +1,30 @@
+2010-11-25  Andrew John Hughes  <ahughes@redhat.com>
+
+	* Makefile.am:
+	(JDK_UPDATE_VERSION): Document.
+	(NETX_PKGS): NetX packages for documentation.
+	(PLUGIN_PKGS): Same for the plugin.
+	(JAVADOC_OPTS): Common options passed to javadoc.
+	(JAVADOC_MEM_OPTS): Memory options passed to JVM
+	if possible (taken from the previous OpenJDK build).
+	(all-local): Depend on docs.stamp.
+	(clean-local): Add clean-docs.
+	(.PHONY): Add clean-docs, clean-plugin-docs, clean-netx-docs.
+	(install-exec-local): Install the documentation if enabled.
+	(docs): Meta-dependency for netx-docs and plugin-docs.
+	(clean-docs): Likewise but for clean targets.
+	(netx-docs): Build documentation for the NetX API.
+	(clean-netx-docs): Remove the NetX docs.
+	(plugin-docs): Build documentation for the plugin API.
+	(clean-plugin-docs): Likewise.
+	(bootstrap-directory): Link to javadoc binary.
+	* acinclude.m4:
+	(IT_FIND_JAVADOC): Find a javadoc binary, first checking
+	user input, then the JDK and the path for 'javadoc' and
+	'gjdoc'.  Also sets JAVADOC_SUPPORTS_J_OPTIONS if it does.
+	* configure.ac:
+	Call IT_FIND_JAVADOC.
+
 2010-11-25  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (stamps/liveconnect.stamp): Set a bootclasspath to
