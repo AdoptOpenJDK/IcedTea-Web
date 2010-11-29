@@ -1,3 +1,14 @@
+2010-11-29  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(createPanel): Call the new framePanel() method with the proper handle.
+	(framePanel): New method, renamed from reFrame. Changed to now do one-time
+	framing of panel into the plugin.
+	(handleMessage): Don't re-frame the panel. Panel is now framed only once.
+	(destroyApplet): Dispose the frame right away, and try to remove the panel
+	if possible. If not, handleMessage() will do it when the panel is
+	ready/removable.
+
 2010-11-25  Andrew John Hughes  <ahughes@redhat.com>
 
 	* Makefile.am:

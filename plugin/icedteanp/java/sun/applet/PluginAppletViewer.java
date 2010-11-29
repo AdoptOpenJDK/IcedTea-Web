@@ -138,7 +138,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          });
          
          // create the frame.
-         PluginAppletViewer.reFrame(null, identifier, System.out, 0, panel);
+         PluginAppletViewer.framePanel(identifier, System.out, handle, panel);
 
          panel.init();
 
@@ -368,42 +368,25 @@ import com.sun.jndi.toolkit.url.UrlUtil;
      public PluginAppletViewer() {
      }
 
-     public static void reFrame(PluginAppletViewer oldFrame, 
-                         int identifier, PrintStream statusMsgStream, 
-                         long handle, AppletViewerPanel panel) {
+     public static void framePanel(int identifier, PrintStream statusMsgStream, 
+                         	  long handle, AppletViewerPanel panel) {
 
-         PluginDebug.debug("Reframing " + panel);
+         PluginDebug.debug("Framing " + panel);
          
          // SecurityManager MUST be set, and only privileged code may call reFrame()
          System.getSecurityManager().checkPermission(new AllPermission());
 
-         // Same handle => nothing to do
-         if (oldFrame != null && handle == oldFrame.handle)
-             return;
-
-         PluginAppletViewer newFrame = new PluginAppletViewer(handle, identifier, statusMsgStream, panel);
+         PluginAppletViewer appletFrame = new PluginAppletViewer(handle, identifier, statusMsgStream, panel);
          
-         if (oldFrame != null) {
-             applets.remove(oldFrame.identifier);
-             oldFrame.removeWindowListener(oldFrame.windowEventListener);
-             panel.removeAppletListener(oldFrame.appletEventListener);
+         appletFrame.add("Center", panel);
+         appletFrame.pack();
 
-			 // Add first, remove later
-             newFrame.add("Center", panel);
-             oldFrame.remove(panel);
-             oldFrame.dispose();
-         } else {
-	         newFrame.add("Center", panel);
-         }
+         appletFrame.appletEventListener = new AppletEventListener(appletFrame, appletFrame);
+         panel.addAppletListener(appletFrame.appletEventListener);
 
-         newFrame.pack();
+         applets.put(identifier, appletFrame);
 
-         newFrame.appletEventListener = new AppletEventListener(newFrame, newFrame);
-         panel.addAppletListener(newFrame.appletEventListener);
-
-         applets.put(identifier, newFrame);
-
-         PluginDebug.debug(panel + " reframed");
+         PluginDebug.debug(panel + " framed");
      }
 
      /**
@@ -581,18 +564,9 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  waitForAppletInit((NetxPanel) applets.get(identifier).panel);
 
                  // Should we proceed with reframing?
-                 if (status.get(identifier).equals(PAV_INIT_STATUS.INACTIVE)) {
-                     destroyApplet(identifier);
-                     return;
-                 }
-
-                 // Proceed with re-framing
-          		 reFrame(oldFrame, identifier, System.out, handle, oldFrame.panel);
-
-                 // There is a slight chance that destroy can happen 
-                 // between the above and below line
                  if (updateStatus(identifier, PAV_INIT_STATUS.REFRAME_COMPLETE).equals(PAV_INIT_STATUS.INACTIVE)) {
                      destroyApplet(identifier);
+                     return;
                  }
 
              } else if (message.startsWith("destroy")) {
@@ -691,16 +665,19 @@ import com.sun.jndi.toolkit.url.UrlUtil;
     		 return;
     	 }
 
-    	 // If already disposed, return
-    	 if (applets.get(identifier).panel.applet == null) {
-    		 // Try to still dispose the panel itself -- no harm done with double dispose
+    	 PluginDebug.debug("Attempting to destroy frame " + identifier);
+    	 
+    	 // Try to dispose the panel right away
+    	 if (applets.containsKey(identifier)) 
     		 applets.get(identifier).dispose();
 
-    		 PluginDebug.debug(identifier + " inactive. Returning.");
+    	 // If panel is already disposed, return
+    	 if (applets.get(identifier).panel.applet == null) {
+    		 PluginDebug.debug(identifier + " panel inactive. Returning.");
     		 return;
     	 }
 
-    	 PluginDebug.debug("Attempting to destroy " + identifier);
+    	 PluginDebug.debug("Attempting to destroy panel " + identifier);
 
     	 final int fIdentifier = identifier;
    		 SwingUtilities.invokeLater(new Runnable() {
@@ -1674,7 +1651,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              public void run()
              {
                  ThreadGroup tg = ((JNLPClassLoader) p.applet.getClass().getClassLoader()).getApplication().getThreadGroup();
-                
+
                  appletShutdown(p);
                  appletPanels.removeElement(p);
                  dispose();
