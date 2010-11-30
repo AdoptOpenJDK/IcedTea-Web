@@ -83,7 +83,7 @@ LAUNCHER_LINK = -o $@ -pthread -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_D
 	-Wl,\$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lz
 PLUGIN_VERSION = IcedTea $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
 
-EXTRA_DIST = $(NETX_SRCDIR) $(abs_top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher
+EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher
 
 # Top-Level Targets
 # =================
@@ -93,31 +93,41 @@ all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX
 
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
  clean-native-ecj clean-desktop-files clean-docs
+	if [ -e stamps ] ; then \
+	  rmdir stamps ; \
+	fi
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs
 
 install-exec-local:
-	mkdir -p $(DESTDIR)$(bindir)
-	mkdir -p $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)
+	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)
 if ENABLE_PLUGIN
-	cp -pPRf $(PLUGIN_DIR)/IcedTeaPlugin.so $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)/
-	cp -pPRf $(PLUGIN_DIR)/launcher/pluginappletviewer $(DESTDIR)$(bindir)
-	cp -pPRf $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/plugin.jar
+	${INSTALL_PROGRAM} $(PLUGIN_DIR)/IcedTeaPlugin.so $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)/
+	${INSTALL_PROGRAM} $(PLUGIN_DIR)/launcher/pluginappletviewer $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/plugin.jar
 endif
-	cp -pPRf $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/netx.jar
-	cp -pPRf $(NETX_DIR)/launcher/javaws $(DESTDIR)$(bindir)
-	cp extra-lib/about.jar $(DESTDIR)$(prefix)/jre/lib
+	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/netx.jar
+	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/javaws $(DESTDIR)$(bindir)
+	${INSTALL_DATA} extra-lib/about.jar $(DESTDIR)$(prefix)/jre/lib
 
 install-data-local:
-	mkdir -p $(DESTDIR)$(prefix)/man/man1
-	cp $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(prefix)/man/man1
-	cp $(NETX_RESOURCE_DIR)/about.jnlp $(DESTDIR)$(prefix)/jre/lib
+	${mkinstalldirs} -d $(DESTDIR)$(prefix)/man/man1
+	${INSTALL_DATA} $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(prefix)/man/man1
+	${INSTALL_DATA} $(NETX_RESOURCE_DIR)/about.jnlp $(DESTDIR)$(prefix)/jre/lib
 if ENABLE_DOCS
-	mkdir -p $(DESTDIR)$(htmldir)
-	cp -pPRf ${abs_top_builddir}/docs/netx $(DESTDIR)$(htmldir)
+	${mkinstalldirs} $(DESTDIR)$(htmldir)
+	(cd ${abs_top_builddir}/docs/netx; \
+	 for files in $$(find . -type f); \
+	 do \
+	   ${INSTALL_DATA} -D $${files} $(DESTDIR)$(htmldir)/netx/$${files}; \
+	 done)
 if ENABLE_PLUGIN
-	cp -pPRf ${abs_top_builddir}/docs/plugin $(DESTDIR)$(htmldir)
+	(cd ${abs_top_builddir}/docs/plugin; \
+	 for files in $$(find . -type f); \
+	 do \
+	   ${INSTALL_DATA} -D $${files} $(DESTDIR)$(htmldir)/plugin/$${files}; \
+	 done)
 endif
 endif
 
@@ -130,6 +140,7 @@ uninstall-local:
 	rm -f $(DESTDIR)$(prefix)/man/man1/javaws.1
 	rm -f $(DESTDIR)$(bindir)/pluginappletviewer
 	rm -f $(DESTDIR)$(bindir)/javaws
+	rm -rf $(DESTDIR)$(htmldir)
 
 # Plugin
 
@@ -250,7 +261,12 @@ stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
 	    -sourcepath $(NETX_SRCDIR) \
 	    -bootclasspath $(RUNTIME) \
 	    @netx-source-files.txt
-	cp -r $(NETX_RESOURCE_DIR) $(NETX_DIR)/net/sourceforge/jnlp
+	(cd $(NETX_RESOURCE_DIR); \
+	 for files in $$(find . -type f); \
+	 do \
+	   ${INSTALL_DATA} -D $${files} \
+	   $(NETX_DIR)/net/sourceforge/jnlp/resources/$${files}; \
+	 done)
 	mkdir -p stamps
 	touch $@
 
@@ -285,7 +301,12 @@ stamps/extra-class-files.stamp: extra-source-files.txt stamps/netx.stamp
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) -d extra-lib \
           -sourcepath $(abs_top_srcdir)/extra -cp netx.build \
           -bootclasspath $(RUNTIME) @extra-source-files.txt
-	cp -r $(NETX_EXTRA_DIR) extra-lib/net/sourceforge/jnlp/about
+	(cd $(NETX_EXTRA_DIR); \
+	 for files in $$(find . -type f); \
+	 do \
+	   ${INSTALL_DATA} -D $${files} \
+	   ${abs_top_builddir}/extra-lib/net/sourceforge/jnlp/about/resources/$${files}; \
+	 done)
 	mkdir -p stamps
 	touch $@
 
@@ -303,7 +324,6 @@ $(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 	-c -o $@ $<
 
 $(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
-	mkdir -p launcher
 	$(CC) $(NETX_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
 
 javaws.desktop: javaws.desktop.in
@@ -315,6 +335,9 @@ stamps/docs.stamp: stamps/netx-docs.stamp stamps/plugin-docs.stamp
 	touch stamps/docs.stamp
 
 clean-docs: clean-netx-docs clean-plugin-docs
+	if [ -e ${abs_top_builddir}/docs ] ; then \
+	  rmdir ${abs_top_builddir}/docs ; \
+	fi
 	rm -f stamps/docs.stamp
 
 stamps/netx-docs.stamp: stamps/bootstrap-directory.stamp
@@ -416,6 +439,9 @@ stamps/bootstrap-directory.stamp: stamps/native-ecj.stamp
 
 clean-bootstrap-directory:
 	rm -rf $(BOOT_DIR)
+	if [ -e ${abs_top_builddir}/bootstrap ] ; then \
+	  rmdir ${abs_top_builddir}/bootstrap ; \
+	fi
 	rm -f stamps/bootstrap-directory.stamp
 
 # Target Aliases

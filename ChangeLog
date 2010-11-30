@@ -1,3 +1,23 @@
+2010-11-26  Andrew John Hughes  <ahughes@redhat.com>
+
+	Make distcheck work.
+	* Makefile.am:
+	(EXTRA_DIST): Use relative paths for netx
+	and the plugin.
+	(clean-local): Remove empty stamps directory.
+	(install-exec-local): Use install to install
+	programs and data with the correct permissions.
+	(install-data-local): Likewise.
+	(uninstall-local): Remove documentation.
+	(netx): Use ${INSTALL_DATA} to add resources so
+	that read-only files aren't copied.
+	(extra-files): Likewise.
+	($(NETX_DIR)/launcher/javaws): Don't create empty launcher
+	directory.
+	(clean-docs): Remove empty docs directory.
+	(clean-bootstrap-directory): Remove empty bootstrap
+	directory.
+
 2010-11-29  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
