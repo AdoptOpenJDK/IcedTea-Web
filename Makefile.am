@@ -220,8 +220,7 @@ stamps/liveconnect.stamp: liveconnect-source-files.txt stamps/netx.stamp
 	  mkdir -p $(abs_top_builddir)/liveconnect && \
 	  $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	      -d $(abs_top_builddir)/liveconnect \
-	      -classpath $(NETX_DIR) \
-	      -bootclasspath $(RUNTIME) \
+	      -bootclasspath $(NETX_DIR):$(RUNTIME) \
 	      -sourcepath $(LIVECONNECT_SRCS) \
 	      @liveconnect-source-files.txt ; \
 	fi

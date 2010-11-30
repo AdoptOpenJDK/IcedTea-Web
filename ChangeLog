@@ -1,3 +1,10 @@
+2010-11-30  Andrew John Hughes  <ahughes@redhat.com>
+
+	* Makefile.am:
+	(liveconnect): Add NETX_DIR first on the bootclasspath
+	so the plugin can be built against 1.7 and 1.8
+	branch releases of IcedTea6.
+
 2010-11-26  Andrew John Hughes  <ahughes@redhat.com>
 
 	Make distcheck work.
