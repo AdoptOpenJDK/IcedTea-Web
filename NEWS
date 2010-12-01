@@ -26,3 +26,5 @@ New in release 1.0 (2010-XX-XX):
   - Add a new option -Xclearcache
   - Interfaces javax.jnlp.IntegrationService and javax.jnlp.DownloadService2 are now available
   - PR592: NetX can create invalid desktop entry files
+* Control Panel
+  - Modifications to deployments.properties file can now be done through a GUI

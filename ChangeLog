@@ -1,3 +1,34 @@
+2010-12-01  Andrew Su  <asu@redhat.com>
+
+	* NEWS: Added controlpanel for modifying deployments.properties
+	* Makefile.am:
+	(CONTROLPANEL_LAUNCHER_OBJECTS): Objects used to compile binary
+	control panel.
+	(all-local): Add $(NETX_DIR)/launcher/controlpanel/itw-settings.
+	(install-exec-local): Install the control panel binary.
+	(uninstall-local): Removes the compiled control panel binary.
+	($(NETX_DIR)/launcher/controlpanel/%.o): Create the launcher objects.
+	($(NETX_DIR)/launcher/controlpanel/itw-settings): Link the objects to
+	make the launcher.
+	* netx/net/sourceforge/jnlp/controlpanel/AboutPanel.java,
+	* netx/net/sourceforge/jnlp/controlpanel/ComboItem.java,
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java,
+	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java,
+	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java,
+	* netx/net/sourceforge/jnlp/controlpanel/JREPanel.java,
+	* netx/net/sourceforge/jnlp/controlpanel/NamedBorderPanel.java,
+	* netx/net/sourceforge/jnlp/controlpanel/MiddleClickListener.java,
+	* netx/net/sourceforge/jnlp/controlpanel/SecuritySettingsPanel.java,
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java,
+	* netx/net/sourceforge/jnlp/controlpanel/network/AdvancedProxySettingsDialog.java,
+	* netx/net/sourceforge/jnlp/controlpanel/network/AdvancedProxySettingsPane.java,
+	* netx/net/sourceforge/jnlp/controlpanel/network/NetworkSettingsPanel.java,:
+	New classes. All methods are new as well.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Added
+	messages used by control panel.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java:
+	Changed to not display a close button if null parent frame.
+
 2010-11-30  Andrew John Hughes  <ahughes@redhat.com>
 
 	* Makefile.am:

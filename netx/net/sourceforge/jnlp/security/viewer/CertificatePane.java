@@ -230,17 +230,18 @@ public class CertificatePane extends JPanel {
                 tablePanel.add(tabbedPane, BorderLayout.CENTER);
                 tablePanel.add(buttonPanel, BorderLayout.SOUTH);
 
-                JPanel closePanel = new JPanel(new BorderLayout());
-                closePanel.setBorder(BorderFactory.createEmptyBorder(7,7,7,7));
-                JButton closeButton = new JButton(R("ButClose"));
-                closeButton.addActionListener(new CloseButtonListener());
-                defaultFocusComponent = closeButton;
-                closePanel.add(closeButton, BorderLayout.EAST);
-
                 main.add(certificateTypePanel, BorderLayout.NORTH);
                 main.add(tablePanel, BorderLayout.CENTER);
-                main.add(closePanel, BorderLayout.SOUTH);
-
+                
+                if (parent != null){
+                        JPanel closePanel = new JPanel(new BorderLayout());
+                        closePanel.setBorder(BorderFactory.createEmptyBorder(7,7,7,7));
+                        JButton closeButton = new JButton(R("ButClose"));
+                        closeButton.addActionListener(new CloseButtonListener());
+                        defaultFocusComponent = closeButton;
+                        closePanel.add(closeButton, BorderLayout.EAST);
+                        main.add(closePanel, BorderLayout.SOUTH);
+                }
                 add(main);
 
         }

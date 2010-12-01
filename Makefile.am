@@ -29,7 +29,7 @@ NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
 	net.sourceforge.jnlp.cache net.sourceforge.jnlp.event \
 	net.sourceforge.jnlp.security net.sourceforge.jnlp.security.viewer \
 	net.sourceforge.jnlp.services net.sourceforge.jnlp.tools \
-	net.sourceforge.jnlp.util
+	net.sourceforge.jnlp.util net.sourceforge.jnlp.controlpanel
 
 # Conditional defintions
 if ENABLE_PLUGIN
@@ -74,6 +74,7 @@ LAUNCHER_SRCDIR = $(abs_top_srcdir)/launcher
 LAUNCHER_OBJECTS = java.o java_md.o splashscreen_stubs.o
 PLUGIN_LAUNCHER_OBJECTS = $(addprefix $(PLUGIN_DIR)/launcher/,$(LAUNCHER_OBJECTS))
 NETX_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/,$(LAUNCHER_OBJECTS))
+CONTROLPANEL_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/controlpanel/,$(LAUNCHER_OBJECTS))
 LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -pthread -W -Wall -Wno-unused -Wno-parentheses -pipe -fno-omit-frame-pointer \
 	-g -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -D_REENTRANT -DLAUNCHER_NAME='"java"' -I$(LAUNCHER_SRCDIR) \
 	-DJDK_MAJOR_VERSION='"1"' -DJDK_MINOR_VERSION='"6"' -DLIBARCHNAME='"$(JRE_ARCH_DIR)"'
@@ -89,7 +90,7 @@ EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.i
 # =================
 
 all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX_DIR)/launcher/javaws \
- javaws.desktop stamps/docs.stamp
+ javaws.desktop stamps/docs.stamp $(NETX_DIR)/launcher/controlpanel/itweb-settings
 
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
  clean-native-ecj clean-desktop-files clean-docs
@@ -110,6 +111,7 @@ endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/netx.jar
 	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/javaws $(DESTDIR)$(bindir)
 	${INSTALL_DATA} extra-lib/about.jar $(DESTDIR)$(prefix)/jre/lib
+	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/controlpanel/itweb-settings $(DESTDIR)$(bindir)
 
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(prefix)/man/man1
@@ -140,6 +142,7 @@ uninstall-local:
 	rm -f $(DESTDIR)$(prefix)/man/man1/javaws.1
 	rm -f $(DESTDIR)$(bindir)/pluginappletviewer
 	rm -f $(DESTDIR)$(bindir)/javaws
+	rm -f $(DESTDIR)$(bindir)/itweb-settings
 	rm -rf $(DESTDIR)$(htmldir)
 
 # Plugin
@@ -322,8 +325,16 @@ $(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 	$(CC) $(LAUNCHER_FLAGS) -DJAVA_ARGS='{ "-J-ms8m", "net.sourceforge.jnlp.runtime.Boot",  }' -DPROGNAME='"javaws"' \
 	-c -o $@ $<
 
+$(NETX_DIR)/launcher/controlpanel/%.o: $(LAUNCHER_SRCDIR)/%.c
+	mkdir -p $(NETX_DIR)/launcher/controlpanel && \
+	$(CC) $(LAUNCHER_FLAGS) -DJAVA_ARGS='{ "-J-ms8m", "net.sourceforge.jnlp.controlpanel.ControlPanel",  }' \
+	-DPROGNAME='"itweb-settings"' -c -o $@ $<
+
 $(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
 	$(CC) $(NETX_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
+
+$(NETX_DIR)/launcher/controlpanel/itweb-settings: $(CONTROLPANEL_LAUNCHER_OBJECTS)
+	$(CC) $(CONTROLPANEL_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
 
 javaws.desktop: javaws.desktop.in
 	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < $(srcdir)/javaws.desktop.in > javaws.desktop
