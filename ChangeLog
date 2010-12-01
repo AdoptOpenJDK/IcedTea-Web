@@ -20,9 +20,9 @@
 	* netx/net/sourceforge/jnlp/controlpanel/MiddleClickListener.java,
 	* netx/net/sourceforge/jnlp/controlpanel/SecuritySettingsPanel.java,
 	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java,
-	* netx/net/sourceforge/jnlp/controlpanel/network/AdvancedProxySettingsDialog.java,
-	* netx/net/sourceforge/jnlp/controlpanel/network/AdvancedProxySettingsPane.java,
-	* netx/net/sourceforge/jnlp/controlpanel/network/NetworkSettingsPanel.java,:
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java,
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsPane.java,
+	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java,:
 	New classes. All methods are new as well.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Added
 	messages used by control panel.
