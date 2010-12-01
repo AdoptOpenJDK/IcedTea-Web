@@ -59,7 +59,7 @@ dnl IT573 - Plugin depends on sun.awt,X11.XEmbeddedFrame.java
 dnl IT574 - Plugin depends on sun.misc.Ref
 dnl IT575 - Plugin depends on com.sun/jndi.toolkit.url.UrlUtil
 dnl IT576 - Plugin depends on sun.applet.AppletImageRef
-
+dnl IT578 - Remove need for patching AppletPanel for Plugin/Webstart
 IT_CHECK_FOR_CLASS(JAVA_UTIL_JAR_PACK200, [java.util.jar.Pack200])
 IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEMANAGER, [java.net.CookieManager])
 IT_CHECK_FOR_CLASS(JAVA_NET_HTTPCOOKIE, [java.net.HttpCookie])
@@ -69,7 +69,6 @@ IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_SECURITYCONSTANTS, [sun.security.util.Secur
 IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_HOSTNAMECHECKER, [sun.security.util.HostnameChecker])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_X509_X500NAME, [sun.security.x509.X500Name])
 IT_CHECK_FOR_CLASS(SUN_MISC_BASE64ENCODER, [sun.misc.BASE64Encoder])
-IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETVIEWERPANEL, [sun.applet.AppletViewerPanel])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_VALIDATOR_VALIDATOREXCEPTION, [sun.security.validator.ValidatorException])
 IT_CHECK_FOR_CLASS(COM_SUN_NET_SSL_INTERNAL_SSL_X509EXTENDEDTRUSTMANAGER,
 	[com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager])
@@ -77,5 +76,6 @@ IT_CHECK_FOR_CLASS(SUN_AWT_X11_XEMBEDDEDFRAME, [sun.awt.X11.XEmbeddedFrame])
 IT_CHECK_FOR_CLASS(SUN_MISC_REF, [sun.misc.Ref])
 IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.UrlUtil])
 IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef])
+IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE
 
 AC_OUTPUT

@@ -1,3 +1,14 @@
+2010-12-01  Andrew John Hughes  <ahughes@redhat.com>
+
+	* acinclude.m4:
+	(IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE):
+	New check to ensure sun.applet.AppletViewerPanel
+	is public (via the patch in IcedTea, applet_hole.patch).
+	* configure.ac: Invoke the above macro.  Don't call
+	IT_CHECK_FOR_CLASS for the same class (the above macro
+	handles this too).
+	* README: Mention this limitation.
+
 2010-12-01  Andrew Su  <asu@redhat.com>
 
 	* NEWS: Added controlpanel for modifying deployments.properties

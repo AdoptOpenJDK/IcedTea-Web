@@ -77,12 +77,17 @@ The following locations are checked for a JDK:
     * /usr/lib/jvm/java-gcj
     * /usr/lib/jvm/gcj-jdk
     * /usr/lib/jvm/cacao
-in the order given above.  Some currently fail.
+in the order given above.  
 
-Most targets in IcedTea create stamp files in the stamps directory to
-determine what and when dependencies were compiled.  Each target has a
-corresponding clean-x target which removes the output and the stamp
-file, allowing it to be rebuilt.
+At present, some of these options fail due to sun.* classes required
+by IcedTea-Web.  Upstream OpenJDK will only be able to compile
+IcedTea-Web if the patch applet_hole.patch from IcedTea has been
+applied.
+
+Most targets in IcedTea-Web create stamp files in the stamps directory
+to determine what and when dependencies were compiled.  Each target
+has a corresponding clean-x target which removes the output and the
+stamp file, allowing it to be rebuilt.
 
 Build Modification Options
 ==========================

@@ -605,3 +605,65 @@ EOF
   AC_SUBST(JAVADOC_KNOWS_J_OPTIONS)
   AM_CONDITIONAL([JAVADOC_SUPPORTS_J_OPTIONS], test x"${JAVADOC_KNOWS_J_OPTIONS}" = "xyes")
 ])
+
+dnl Checks that sun.applet.AppletViewerPanel is available
+dnl and public (via the patch in IcedTea6, applet_hole.patch)
+dnl Can be removed when that is upstream or unneeded
+AC_DEFUN([IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE],[
+AC_REQUIRE([IT_FIND_JAVAC])
+AC_REQUIRE([IT_FIND_JAVA])
+AC_CACHE_CHECK([if sun.applet.AppletViewerPanel is available and public], it_cv_applet_hole, [
+CLASS=TestAppletViewer.java
+BYTECODE=$(echo $CLASS|sed 's#\.java##')
+mkdir -p tmp.$$
+cd tmp.$$
+cat << \EOF > $CLASS
+[/* [#]line __oline__ "configure" */
+import java.lang.reflect.Modifier;
+
+public class TestAppletViewer
+{
+  public static void main(String[] args)
+  {
+    try
+      {
+        Class<?> clazz = Class.forName("sun.applet.AppletViewerPanel");
+        if (Modifier.isPublic(clazz.getModifiers()))
+          {
+            System.err.println("Found public sun.applet.AppletViewerPanel");
+            System.exit(0);
+          }
+        System.err.println("Found non-public sun.applet.AppletViewerPanel");
+        System.exit(2);
+      }
+    catch (ClassNotFoundException e)
+      {
+        System.err.println("Could not find sun.applet.AppletViewerPanel");
+        System.exit(1);
+      }
+  }
+}
+]
+EOF
+if $JAVAC -cp . $JAVACFLAGS -nowarn $CLASS >&AS_MESSAGE_LOG_FD 2>&1; then
+  if $JAVA -classpath . $BYTECODE >&AS_MESSAGE_LOG_FD 2>&1; then
+      it_cv_applet_hole=yes;
+  else
+      it_cv_applet_hole=$?;
+  fi
+else
+  it_cv_applet_hole=3;
+fi
+])
+rm -f $CLASS *.class
+cd ..
+rmdir tmp.$$
+if test x"${it_cv_applet_hole}" = "x1"; then
+   AC_MSG_ERROR([sun.applet.AppletViewerPanel is not available.])
+elif test x"${it_cv_applet_hole}" = "x2"; then
+   AC_MSG_ERROR([sun.applet.AppletViewerPanel is not public.])
+elif test x"${it_cv_applet_hole}" = "x3"; then
+   AC_MSG_ERROR([Compilation failed.  See config.log.])
+fi
+AC_PROVIDE([$0])dnl
+])
