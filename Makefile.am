@@ -84,13 +84,14 @@ LAUNCHER_LINK = -o $@ -pthread -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_D
 	-Wl,\$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lz
 PLUGIN_VERSION = IcedTea $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
 
-EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher
+EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
+ itweb-settings.desktop.in
 
 # Top-Level Targets
 # =================
 
 all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX_DIR)/launcher/javaws \
- javaws.desktop stamps/docs.stamp $(NETX_DIR)/launcher/controlpanel/itweb-settings
+ javaws.desktop stamps/docs.stamp $(NETX_DIR)/launcher/controlpanel/itweb-settings itweb-settings.desktop
 
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
  clean-native-ecj clean-desktop-files clean-docs
@@ -293,6 +294,7 @@ clean-netx:
 
 clean-desktop-files:
 	rm -f javaws.desktop
+	rm -f itweb-settings.desktop
 
 # extras -- used to create about.jar for javaws.
 extra-source-files.txt:
@@ -338,6 +340,10 @@ $(NETX_DIR)/launcher/controlpanel/itweb-settings: $(CONTROLPANEL_LAUNCHER_OBJECT
 
 javaws.desktop: javaws.desktop.in
 	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < $(srcdir)/javaws.desktop.in > javaws.desktop
+
+itweb-settings.desktop: $(srcdir)/itweb-settings.desktop.in
+	sed "s#PATH_TO_ITWEB_SETTINGS#$(DESTDIR)$(bindir)/itweb-settings#" \
+	  < $(srcdir)/itweb-settings.desktop.in > itweb-settings.desktop
 
 # documentation
 

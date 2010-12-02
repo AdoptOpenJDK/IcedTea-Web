@@ -1,3 +1,11 @@
+2010-12-02  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add itweb-settings.desktop.in.
+	(all-local): Add itweb-settings.desktop.
+	(clean-desktop-files): Remove itweb-settings.desktop.
+	(itweb-settings.desktop): New target.
+	* itweb-settings.desktop.in: New file.
+
 2010-12-01  Andrew John Hughes  <ahughes@redhat.com>
 
 	* acinclude.m4:
