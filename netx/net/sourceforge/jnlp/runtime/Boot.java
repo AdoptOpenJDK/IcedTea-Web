@@ -258,7 +258,8 @@ public final class Boot implements PrivilegedAction<Void> {
 
         try {
             if (new File(location).exists())
-                url = new File(location).toURI().toURL(); // Why use file.getCanonicalFile?
+                // TODO: Should be toURI().toURL()
+                url = new File(location).toURL(); // Why use file.getCanonicalFile?
             else
                 url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
         } catch (Exception e) {

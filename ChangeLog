@@ -1,3 +1,16 @@
+2010-12-03  Andrew John Hughes  <ahughes@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java,
+	(getCachedResource(URL,Version,UpdatePolicy)):
+	Revert change to use toURI() for now.
+	See http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2010-December/011270.html
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java,
+	(getCacheURL(URL)): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java,
+	(getFile()): Use toURI.toURL() to avoid broken escaping.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(initializeResources()): Likewise.
+
 2010-12-01  Andrew John Hughes  <ahughes@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:

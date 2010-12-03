@@ -331,7 +331,8 @@ public class ResourceTracker {
         try {
             File f = getCacheFile(location);
             if (f != null)
-                return f.toURI().toURL();
+                // TODO: Should be toURI().toURL()
+                return f.toURL();
         }
         catch (MalformedURLException ex) {
             if (JNLPRuntime.isDebug())

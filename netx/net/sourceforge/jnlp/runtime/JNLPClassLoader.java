@@ -469,7 +469,8 @@ public class JNLPClassLoader extends URLClassLoader {
                                         continue; // JAR not found. Keep going.
                                 }
 
-                                URL location = cachedFile.toURI().toURL();
+                                // TODO: Should be toURI().toURL()
+                                URL location = cachedFile.toURL();
                                 SecurityDesc jarSecurity = file.getSecurity();
 
                                 if (file instanceof PluginBridge) {
@@ -651,7 +652,8 @@ public class JNLPClassLoader extends URLClassLoader {
                     try {
                         URL location = jar.getLocation(); // non-cacheable, use source location
                         if (localFile != null) {
-                            location = localFile.toURI().toURL(); // cached file
+                            // TODO: Should be toURI().toURL()
+                            location = localFile.toURL(); // cached file
 
                             // This is really not the best way.. but we need some way for
                             // PluginAppletViewer::getCachedImageRef() to check if the image
