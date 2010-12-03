@@ -80,7 +80,7 @@ public class CacheUtil {
         rt.addResource(location, version, policy);
         try {
             File f = rt.getCacheFile(location);
-            return f.toURL();
+            return f.toURI().toURL();
         }
         catch (MalformedURLException ex) {
             return location;

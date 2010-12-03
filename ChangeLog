@@ -1,3 +1,89 @@
+2010-12-01  Andrew John Hughes  <ahughes@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
+	(getCachedResource(URL,Version,UpdatePolicy)): Use
+	toURI().toURL() to avoid broken escaping.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
+	(getCacheURL(URL)): Likewise.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java:
+	(destroy()): Suppress deprecated warning from use of thread.stop().
+	Only use when interrupt() has already been tried.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java:
+	(getFile()): Use toURI.toURL() to avoid broken escaping.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(initializeResources()): Likewise.
+	* netx/net/sourceforge/jnlp/security/PasswordAuthenticationDialog.java:
+	(askUser(String,int,String,String)): Use getPassword() to retrieve
+	a character array directly.  Fix overrunning line.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java:
+	Remove unused IdentityScope variable, scope.
+	* netx/net/sourceforge/nanoxml/XMLElement.java:
+	(scanWhitespace(StringBuffer)): Don't fallthrough.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc:
+	Fix warnings where std::string is used in printf
+	rather than char* by invoking c_str on these strings.
+	* plugin/icedteanp/java/netscape/javascript/JSException.java:
+	(JSException()): Mark with @Deprecated annotation.
+	(JSException(String)): Likewise.
+	(JSException(String,String,int,String,int)): Likewise.
+	* plugin/icedteanp/java/netscape/javascript/JSObject.java:
+	(JSObject(String)): Remove redundant cast.
+	(getWindow(Applet)): Likewise.
+	* plugin/icedteanp/java/sun/applet/AppletSecurityContextManager.java:
+	(contexts): Initialise properly with generic typing.
+	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java:
+	(getMatchingMethod(Object[]): Add missing generic type to Class
+	instances.
+	(getMatchingConstructor(Object[])): Likewise.
+	(getCostAndCastedObject(Object,Class<?>)): Likewise.
+	(getMatchingMethods(Class<?>,String,int)): Likewise.
+	(getMatchingConstructors(Class<?>,int)): Likewise.
+	(getNum(String,Class<?>)): Likewise.
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java:
+	(parseCall(String,ClassLoader,Class<V>)): Use c.cast rather than (V).
+	(handleMessage(int,String,AccessControlContext,String)): Add
+	missing generic type to Class instances.  Remove redundant casts.
+	(prepopulateField(int,String)): Add missing generic type to Class instance.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	(createPanel(PluginStreamHandler,int,long,URL,Hashtable<String,String>)):
+	Add missing generic types on Hashtable and PrivilegedAction.
+	(initEventQueue(AppletPanel)): Add missing generic type to PrivilegedAction.
+	(splitSeparator(String,String)): Use an ArrayList rather than Vector
+	to avoid locking and use generic types.
+	(requests): Initialise properly with generic typing.
+	(applets): Likewise.
+	(appletStateChanged(AppletEvent)): Use setSize and getPreferredSize.
+	(handleMessage(int,String)): Remove redundant casts.
+	(audioClips): Add generic types.
+	(getAudioClip): Remove redundant cast.
+	(imageRefs): Add generic types.
+	(getCachedImageRef(URL)): Remove redundant cast.
+	(appletPanels): Add generic types.
+	(getApplets()): Likewise.
+	(getStream(String)): Mark with @Override.
+	(getStreamKeys()): Likewise.
+	(systemParam): Add generic types.
+	(printTag(PrintStream,Hashtable<String,String>)): Likewise.
+	Remove redundant casts.
+	(updateAtts()): Use getSize() and getInsets().  Use Integer.valueOf().
+	(appletReload()): Add generic types to PrivilegedAction.
+	(scanIdentifier(int[],Reader)): Use StringBuilder to avoid unnecessary
+	locking.
+	(skipComment(int[],Reader)): Likewise.
+	(scanTag(int[],Reader)): Likewise. Add generic types.
+	(parse(int,long,String,String,Reader,URL)): Use PrivilegedExceptionAction
+	to avoid catching and rethrowing the exception manually.  Add generic types.
+	(parse(int,long,String,String,Reader,URL,PrintStream,PluginAppletPanelFactory)):
+	Add generic types.  Remove unnecessary casts.  Fix overlong lines.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java:
+	(init()): Add generic types.  Remove unnecessary cast.
+	* plugin/icedteanp/java/sun/applet/PluginObjectStore.java:
+	(objects): Initialise properly with generic typing.
+	(counts): Likewise.
+	(identifiers): Likewise.
+	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java:
+	(get(Object)): Suppress unchecked warning arising from cast to K.
+
 2010-12-02  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add itweb-settings.desktop.in.

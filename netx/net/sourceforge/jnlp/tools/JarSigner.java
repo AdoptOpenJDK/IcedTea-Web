@@ -83,8 +83,6 @@ public class JarSigner implements CertVerifier {
     PrivateKey privateKey;
     KeyStore store;
 
-    IdentityScope scope;
-
     String keystore; // key store file
     boolean nullStream = false; // null keystore input stream (NONE)
     boolean token = false; // token-based keystore

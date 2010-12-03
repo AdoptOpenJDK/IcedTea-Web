@@ -68,13 +68,14 @@ class JSException extends RuntimeException {
      *
      * @deprecated Not for public use in future versions.
      */
+    @Deprecated
     public JSException() {
-	super();
+        super();
         filename = "unknown";
         lineno = 0;
         source = "";
         tokenIndex = 0;
-	wrappedExceptionType = EXCEPTION_TYPE_EMPTY;
+        wrappedExceptionType = EXCEPTION_TYPE_EMPTY;
     }
 
     /**
@@ -84,26 +85,27 @@ class JSException extends RuntimeException {
      *
      * @deprecated Not for public use in future versions.
      */
+    @Deprecated
     public JSException(String s) {
-	super(s);
+        super(s);
         filename = "unknown";
         lineno = 0;
         source = "";
         tokenIndex = 0;
-	wrappedExceptionType = EXCEPTION_TYPE_EMPTY;
+        wrappedExceptionType = EXCEPTION_TYPE_EMPTY;
     }
 
     /**
      * Constructs a JSException with a wrapped JavaScript exception object.
-     * This constructor needs to be public so that Java users can throw 
+     * This constructor needs to be public so that Java users can throw
      * exceptions to JS cleanly.
      */
     public JSException(int wrappedExceptionType, Object wrappedException) {
-	super();
-	this.wrappedExceptionType = wrappedExceptionType;
-	this.wrappedException = wrappedException;
+        super();
+        this.wrappedExceptionType = wrappedExceptionType;
+        this.wrappedException = wrappedException;
     }
-    
+
     /**
      * Constructs a JSException with a detail message and all the
      * other info that usually comes with a JavaScript error.
@@ -111,14 +113,15 @@ class JSException extends RuntimeException {
      *
      * @deprecated Not for public use in future versions.
      */
+    @Deprecated
     public JSException(String s, String filename, int lineno,
                        String source, int tokenIndex) {
-	super(s);
+        super(s);
         this.filename = filename;
         this.lineno = lineno;
         this.source = source;
         this.tokenIndex = tokenIndex;
-	wrappedExceptionType = EXCEPTION_TYPE_EMPTY;
+        wrappedExceptionType = EXCEPTION_TYPE_EMPTY;
     }
 
     /**
@@ -126,14 +129,14 @@ class JSException extends RuntimeException {
      * type of the wrappedException Object.
      */
     public int getWrappedExceptionType() {
-	return wrappedExceptionType;
+        return wrappedExceptionType;
     }
 
     /**
      * Instance method getWrappedException.
      */
     public Object getWrappedException() {
-	return wrappedException;
+        return wrappedException;
     }
 
 }

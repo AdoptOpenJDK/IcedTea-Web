@@ -49,20 +49,20 @@ import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 
 /**
  * Proxy selector implementation for plugin network functions.
- * 
- * This class fetches proxy information from the web browser and 
- * uses that information in the context of all network connection 
+ *
+ * This class fetches proxy information from the web browser and
+ * uses that information in the context of all network connection
  * (plugin specific and applet connections) as applicable
- * 
+ *
  */
 
 public class PluginProxySelector extends JNLPProxySelector {
 
-    private TimedHashMap<String, Proxy> proxyCache = new TimedHashMap<String, Proxy>(); 
+    private TimedHashMap<String, Proxy> proxyCache = new TimedHashMap<String, Proxy>();
 
     /**
      * Selects the appropriate proxy (or DIRECT connection method) for the given URI
-     * 
+     *
      * @param uri The URI being accessed
      * @return A list of Proxy objects that are usable for this URI
      */
@@ -87,11 +87,11 @@ public class PluginProxySelector extends JNLPProxySelector {
             if (o != null) {
                 PluginDebug.debug("Proxy URI = " + o);
                 URI proxyURI = (URI) o;
-                
+
                 // If origin uri is http/ftp, we're good. If origin uri is not that, the proxy _must_ be socks, else we fallback to direct
                 if (uri.getScheme().startsWith("http") || uri.getScheme().equals("ftp") || proxyURI.getScheme().startsWith("socks")) {
 
-                    Proxy.Type type = proxyURI.getScheme().equals("http") ? Proxy.Type.HTTP : Proxy.Type.SOCKS; 
+                    Proxy.Type type = proxyURI.getScheme().equals("http") ? Proxy.Type.HTTP : Proxy.Type.SOCKS;
                     InetSocketAddress socketAddr = new InetSocketAddress(proxyURI.getHost(), proxyURI.getPort());
 
                     proxy = new Proxy(type, socketAddr);
@@ -113,14 +113,14 @@ public class PluginProxySelector extends JNLPProxySelector {
         return proxyList;
     }
 
-    /** 
-     * Checks to see if proxy information is already cached. 
-     * 
+    /**
+     * Checks to see if proxy information is already cached.
+     *
      * @param uri The URI to check
-     * @return The cached Proxy. null if there is no suitable cached proxy. 
+     * @return The cached Proxy. null if there is no suitable cached proxy.
      */
     private Proxy checkCache(URI uri) {
-        
+
         String uriKey = uri.getScheme() + "://" + uri.getHost();
         if (proxyCache.get(uriKey) != null) {
             return proxyCache.get(uriKey);
@@ -128,10 +128,10 @@ public class PluginProxySelector extends JNLPProxySelector {
 
         return null;
     }
-    
+
     /**
      * Simple utility class that extends HashMap by adding an expiry to the entries.
-     * 
+     *
      * This map stores entries, and returns them only if the entries were last accessed within time t=10 seconds
      *
      * @param <K> The key type
@@ -142,10 +142,10 @@ public class PluginProxySelector extends JNLPProxySelector {
 
         HashMap<K, Long> timeStamps = new HashMap<K, Long>();
         Long expiry = 10000L;
-        
+
         /**
          * Store the item in the map and associate a timestamp with it
-         * 
+         *
          * @param key The key
          * @param value The value to store
          */
@@ -156,12 +156,13 @@ public class PluginProxySelector extends JNLPProxySelector {
 
         /**
          * Return cached item if it has not already expired.
-         * 
-         * Before returning, this method also resets the "last accessed" 
+         *
+         * Before returning, this method also resets the "last accessed"
          * time for this entry, so it is good for another 10 seconds
-         * 
+         *
          * @param key The key
          */
+        @SuppressWarnings("unchecked")
         public V get(Object key) {
 
             Long now = new Date().getTime();
@@ -169,7 +170,7 @@ public class PluginProxySelector extends JNLPProxySelector {
             if (super.containsKey(key)) {
                 Long age = now - timeStamps.get(key);
 
-                // Item exists. If it has not expired, renew its access time and return it 
+                // Item exists. If it has not expired, renew its access time and return it
                 if (age <= expiry) {
                     PluginDebug.debug("Returning proxy " + super.get(key) + " from cache for " + key);
                     timeStamps.put((K) key, (new Date()).getTime());
@@ -177,10 +178,10 @@ public class PluginProxySelector extends JNLPProxySelector {
                 } else {
                     PluginDebug.debug("Proxy cache for " + key + " has expired (age=" + age/1000.0 + " seconds)");
                 }
-            } 
+            }
 
             return null;
         }
     }
-    
+
 }

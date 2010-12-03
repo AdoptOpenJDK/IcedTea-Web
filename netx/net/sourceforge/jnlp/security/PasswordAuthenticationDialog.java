@@ -184,7 +184,7 @@ public class PasswordAuthenticationDialog extends JDialog {
 
     /**
      * Present a dialog to the user asking them for authentication information
-     * 
+     *
      * @param hostThe host for with authentication is needed
      * @param port The port being accessed
      * @param prompt The prompt (realm) as presented by the server
@@ -198,7 +198,8 @@ public class PasswordAuthenticationDialog extends JDialog {
 
         // This frame is reusable. So reset everything first.
         userCancelled = true;
-        jlInfo.setText("<html>The " + type + " server at " + host + " is requesting authentication. It says \"" + prompt + "\"</html>");
+        jlInfo.setText("<html>The " + type + " server at " + host +
+                       " is requesting authentication. It says \"" + prompt + "\"</html>");
 
         try {
             SwingUtilities.invokeAndWait( new Runnable() {
@@ -225,7 +226,7 @@ public class PasswordAuthenticationDialog extends JDialog {
             }
 
             if (!userCancelled) {
-                auth = new PasswordAuthentication(jtfUserName.getText(), jpfPassword.getText().toCharArray());
+                auth = new PasswordAuthentication(jtfUserName.getText(), jpfPassword.getPassword());
             }
         } catch (Exception e) {
             e.printStackTrace();

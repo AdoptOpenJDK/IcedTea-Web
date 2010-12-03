@@ -473,7 +473,7 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
         // the result we want is in result_string (assuming there was no error)
         if (java_result->error_occurred)
         {
-            printf("Unable to get member name for setMember. Error occurred: %s\n", java_result->error_msg);
+	    printf("Unable to get member name for setMember. Error occurred: %s\n", java_result->error_msg->c_str());
             //goto cleanup;
         }
 
@@ -571,7 +571,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
         // the result we want is in result_string (assuming there was no error)
         if (java_result->error_occurred)
         {
-            printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg);
+	    printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
             //goto cleanup;
         }
 
@@ -611,7 +611,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     // the result we want is in result_string (assuming there was no error)
     if (java_result->error_occurred)
     {
-        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg);
+        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
         //goto cleanup;
     }
 
@@ -628,7 +628,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     // the result we want is in result_string (assuming there was no error)
     if (java_result->error_occurred)
     {
-        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg);
+        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
         //goto cleanup;
     }
 
@@ -646,7 +646,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     // the result we want is in result_string (assuming there was no error)
     if (java_result->error_occurred)
     {
-        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg);
+        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
         //goto cleanup;
     }
 

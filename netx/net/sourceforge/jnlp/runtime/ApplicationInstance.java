@@ -267,6 +267,7 @@ public class ApplicationInstance {
     /**
      * Stop the application and destroy its resources.
      */
+    @SuppressWarnings("deprecation")
     public void destroy() {
         if (stopped)
             return;

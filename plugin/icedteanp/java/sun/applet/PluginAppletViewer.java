@@ -1,5 +1,5 @@
 /* PluginAppletViewer -- Handles embedding of the applet panel
-   Copyright (C) 2008  Red Hat 
+   Copyright (C) 2008  Red Hat
 
 This file is part of IcedTea.
 
@@ -59,9 +59,9 @@ exception statement from your version. */
   * CA 95054 USA or visit www.sun.com if you need additional information or
   * have any questions.
   */
- 
+
  package sun.applet;
- 
+
  import java.applet.Applet;
 import java.applet.AppletContext;
 import java.applet.AudioClip;
@@ -93,10 +93,14 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -110,23 +114,23 @@ import sun.awt.X11.XEmbeddedFrame;
 import sun.misc.Ref;
 
 import com.sun.jndi.toolkit.url.UrlUtil;
- 
+
  /**
   * Lets us construct one using unix-style one shot behaviors
   */
- 
+
  class PluginAppletPanelFactory
  {
 
-     public AppletPanel createPanel(PluginStreamHandler streamhandler, 
+     public AppletPanel createPanel(PluginStreamHandler streamhandler,
                                     int identifier,
                                     long handle, int x, int y,
-                                    final URL doc, final Hashtable atts) {
-
-         AppletViewerPanel panel = (AppletViewerPanel) AccessController.doPrivileged(new PrivilegedAction() {
-             public Object run() {
+                                    final URL doc,
+                                    final Hashtable<String,String> atts) {
+         AppletViewerPanel panel = AccessController.doPrivileged(new PrivilegedAction<AppletViewerPanel>() {
+             public AppletViewerPanel run() {
                     try {
-                        AppletPanel panel = new NetxPanel(doc, atts, false);
+                        AppletViewerPanel panel = new NetxPanel(doc, atts, false);
                         AppletViewerPanel.debug("Using NetX panel");
                         PluginDebug.debug(atts.toString());
                         return panel;
@@ -136,7 +140,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                     }
              }
          });
-         
+
          // create the frame.
          PluginAppletViewer.framePanel(identifier, System.out, handle, panel);
 
@@ -151,7 +155,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
          if (atts.get("codebase") != null) {
              try {
-                 URL appletSrcURL = new URL(codeBase + (String) atts.get("codebase"));
+                 URL appletSrcURL = new URL(codeBase + atts.get("codebase"));
                  codeBase = appletSrcURL.getProtocol() + "://" + appletSrcURL.getHost();
              } catch (MalformedURLException mfue) {
                  // do nothing
@@ -162,7 +166,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          // Wait for the panel to initialize
          // (happens in a separate thread)
          Applet a;
-         
+
          // Wait for panel to come alive
          int maxWait = PluginAppletViewer.APPLET_TIMEOUT; // wait for panel to come alive
          int wait = 0;
@@ -174,7 +178,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                   // just wait
               }
          }
-         
+
          // Wait for the panel to initialize
          // (happens in a separate thread)
          PluginAppletViewer.waitForAppletInit((NetxPanel) panel);
@@ -189,18 +193,18 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
          PluginDebug.debug("Applet " + a.getClass() + " initialized");
          streamhandler.write("instance " + identifier + " reference 0 initialized");
-         
+
          AppletSecurityContextManager.getSecurityContext(0).associateSrc(((NetxPanel) panel).getAppletClassLoader(), doc);
          AppletSecurityContextManager.getSecurityContext(0).associateInstance(identifier, ((NetxPanel) panel).getAppletClassLoader());
-         
+
          return panel;
      }
- 
+
      public boolean isStandalone()
      {
          return false;
      }
-     
+
      /**
       * Send the initial set of events to the appletviewer event queue.
       * On start-up the current behaviour is to load the applet and call
@@ -209,12 +213,12 @@ import com.sun.jndi.toolkit.url.UrlUtil;
      private void initEventQueue(AppletPanel panel) {
          // appletviewer.send.event is an undocumented and unsupported system
          // property which is used exclusively for testing purposes.
-         PrivilegedAction pa = new PrivilegedAction() {
-             public Object run() {
+         PrivilegedAction<String> pa = new PrivilegedAction<String>() {
+             public String run() {
                  return System.getProperty("appletviewer.send.event");
              }
          };
-         String eventList = (String) AccessController.doPrivileged(pa); 
+         String eventList = AccessController.doPrivileged(pa);
 
          if (eventList == null) {
              // Add the standard events onto the event queue.
@@ -256,8 +260,8 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              while (!panel.emptyEventQueue()) ;
          }
      }
-     
-     
+
+
      /**
       * Split a string based on the presence of a specified separator.  Returns
       * an array of arbitrary length.  The end of each element in the array is
@@ -273,30 +277,28 @@ import com.sun.jndi.toolkit.url.UrlUtil;
       *             s.  Whitespace not stripped.
       */
      private String [] splitSeparator(String sep, String s) {
-         Vector v = new Vector();
+         List<String> l = new ArrayList<String>();
          int tokenStart = 0;
          int tokenEnd   = 0;
 
          while ((tokenEnd = s.indexOf(sep, tokenStart)) != -1) {
-             v.addElement(s.substring(tokenStart, tokenEnd));
+             l.add(s.substring(tokenStart, tokenEnd));
              tokenStart = tokenEnd+1;
          }
          // Add the final element.
-         v.addElement(s.substring(tokenStart));
+         l.add(s.substring(tokenStart));
 
-         String [] retVal = new String[v.size()];
-         v.copyInto(retVal);
-         return retVal;
+         return l.toArray(new String[l.size()]);
      }
  }
- 
+
  class PluginParseRequest
  {
      long handle;
      String tag;
      String documentbase;
  }
- 
+
  /*
   */
  // FIXME: declare JSProxy implementation
@@ -306,11 +308,11 @@ import com.sun.jndi.toolkit.url.UrlUtil;
       * Some constants...
       */
      private static String defaultSaveFile = "Applet.ser";
-     
-     
+
+
      /**
       *  Enumerates the current status of an applet
-      *  
+      *
       *  PRE_INIT -> Parsing and initialization phase
       *  INIT_COMPLETE -> Initialization complete, reframe pending
       *  REFRAME_COMPLETE -> Reframe complete, applet is initialized and usable by the user
@@ -323,61 +325,61 @@ import com.sun.jndi.toolkit.url.UrlUtil;
       * The panel in which the applet is being displayed.
       */
      AppletViewerPanel panel;
- 
+
      /**
       * The status line.
       */
      Label label;
- 
+
      /**
       * output status messages to this stream
       */
- 
+
      PrintStream statusMsgStream;
- 
+
      int identifier;
- 
-     private static HashMap<Integer, PluginParseRequest> requests = 
-         new HashMap();
- 
+
+     private static HashMap<Integer, PluginParseRequest> requests =
+         new HashMap<Integer,PluginParseRequest>();
+
      // Instance identifier -> PluginAppletViewer object.
-     private static HashMap<Integer, PluginAppletViewer> applets = 
-         new HashMap();
-     
+     private static HashMap<Integer, PluginAppletViewer> applets =
+         new HashMap<Integer,PluginAppletViewer>();
+
      private static PluginStreamHandler streamhandler;
-     
+
      private static PluginCallRequestFactory requestFactory;
 
-     private static HashMap<Integer, PAV_INIT_STATUS> status = 
+     private static HashMap<Integer, PAV_INIT_STATUS> status =
          new HashMap<Integer,PAV_INIT_STATUS>();
-     
+
      private long handle = 0;
      private WindowListener windowEventListener = null;
      private AppletEventListener appletEventListener = null;
-     
+
      public static final int APPLET_TIMEOUT = 180000;
 
      private static Long requestIdentityCounter = 0L;
-     
+
      private Image bufFrameImg;
      private Graphics bufFrameImgGraphics;
-     
+
      /**
       * Null constructor to allow instantiation via newInstance()
       */
      public PluginAppletViewer() {
      }
 
-     public static void framePanel(int identifier, PrintStream statusMsgStream, 
-                         	  long handle, AppletViewerPanel panel) {
+     public static void framePanel(int identifier, PrintStream statusMsgStream,
+                                  long handle, AppletViewerPanel panel) {
 
          PluginDebug.debug("Framing " + panel);
-         
+
          // SecurityManager MUST be set, and only privileged code may call reFrame()
          System.getSecurityManager().checkPermission(new AllPermission());
 
          PluginAppletViewer appletFrame = new PluginAppletViewer(handle, identifier, statusMsgStream, panel);
-         
+
          appletFrame.add("Center", panel);
          appletFrame.pack();
 
@@ -392,10 +394,10 @@ import com.sun.jndi.toolkit.url.UrlUtil;
      /**
       * Create new plugin appletviewer frame
       */
-     private PluginAppletViewer(long handle, final int identifier, 
-                         PrintStream statusMsgStream, 
+     private PluginAppletViewer(long handle, final int identifier,
+                         PrintStream statusMsgStream,
                          AppletViewerPanel appletPanel) {
-         
+
          super(handle, true);
          this.statusMsgStream = statusMsgStream;
          this.identifier = identifier;
@@ -423,37 +425,37 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
      }
 
-     private static class AppletEventListener implements AppletListener  
+     private static class AppletEventListener implements AppletListener
      {
          final Frame frame;
          final PluginAppletViewer appletViewer;
-  
+
          public AppletEventListener(Frame frame, PluginAppletViewer appletViewer)
          {
          this.frame = frame;
          this.appletViewer = appletViewer;
          }
-   
-         public void appletStateChanged(AppletEvent evt) 
+
+         public void appletStateChanged(AppletEvent evt)
          {
          AppletPanel src = (AppletPanel)evt.getSource();
-  
+
          switch (evt.getID()) {
                       case AppletPanel.APPLET_RESIZE: {
              if(src != null) {
-                 appletViewer.resize(appletViewer.preferredSize());
+                 appletViewer.setSize(appletViewer.getPreferredSize());
                  appletViewer.validate();
-                          }
+             }
              break;
              }
              case AppletPanel.APPLET_LOADING_COMPLETED: {
              Applet a = src.getApplet(); // sun.applet.AppletPanel
-             
+
              // Fixed #4754451: Applet can have methods running on main
-             // thread event queue. 
-             // 
-             // The cause of this bug is that the frame of the applet 
-             // is created in main thread group. Thus, when certain 
+             // thread event queue.
+             //
+             // The cause of this bug is that the frame of the applet
+             // is created in main thread group. Thus, when certain
              // AWT/Swing events are generated, the events will be
              // dispatched through the wrong event dispatch thread.
              //
@@ -468,14 +470,14 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              else
                  AppletPanel.changeFrameAppContext(frame, AppContext.getAppContext());
 
-           	 updateStatus(appletViewer.identifier, PAV_INIT_STATUS.INIT_COMPLETE);
+                 updateStatus(appletViewer.identifier, PAV_INIT_STATUS.INIT_COMPLETE);
 
              break;
              }
          }
          }
      }
-     
+
     public static void setStreamhandler(PluginStreamHandler sh) {
         streamhandler = sh;
     }
@@ -491,35 +493,35 @@ import com.sun.jndi.toolkit.url.UrlUtil;
      {
 
          PluginDebug.debug("PAV handling: " + message);
-         
+
          try {
              if (message.startsWith("handle")) {
 
-          		 // If there is a key for this status, it means it 
-          		 // was either initialized before, or destroy has been 
-           		 // processed. Stop moving further.
-           		 if (updateStatus(identifier, PAV_INIT_STATUS.PRE_INIT) != null)
-           			 return;
-            	 
-            	 // Extract the information from the message
-            	 String[] msgParts = new String[4];
-            	 for (int i=0; i < 3; i++) {
-            		 int spaceLocation = message.indexOf(' ');
-            		 int nextSpaceLocation = message.indexOf(' ', spaceLocation+1);
-            		 msgParts[i] = message.substring(spaceLocation + 1, nextSpaceLocation);
-            		 message = message.substring(nextSpaceLocation + 1);
-            	 }
+                         // If there is a key for this status, it means it
+                         // was either initialized before, or destroy has been
+                         // processed. Stop moving further.
+                         if (updateStatus(identifier, PAV_INIT_STATUS.PRE_INIT) != null)
+                                 return;
 
-            	 long handle = Long.parseLong(msgParts[0]);
-            	 String width = msgParts[1];
-            	 String height = msgParts[2];
-            	 
-            	 int spaceLocation = message.indexOf(' ', "tag".length()+1); 
-            	 String documentBase = 
+                 // Extract the information from the message
+                 String[] msgParts = new String[4];
+                 for (int i=0; i < 3; i++) {
+                         int spaceLocation = message.indexOf(' ');
+                         int nextSpaceLocation = message.indexOf(' ', spaceLocation+1);
+                         msgParts[i] = message.substring(spaceLocation + 1, nextSpaceLocation);
+                         message = message.substring(nextSpaceLocation + 1);
+                 }
+
+                 long handle = Long.parseLong(msgParts[0]);
+                 String width = msgParts[1];
+                 String height = msgParts[2];
+
+                 int spaceLocation = message.indexOf(' ', "tag".length()+1);
+                 String documentBase =
                      UrlUtil.decode(message.substring("tag".length() + 1, spaceLocation));
-            	 String tag = message.substring(spaceLocation+1);
-            	 
-            	 // Decode the tag
+                 String tag = message.substring(spaceLocation+1);
+
+                 // Decode the tag
                  tag = tag.replace("&gt;", ">");
                  tag = tag.replace("&lt;", "<");
                  tag = tag.replace("&amp;", "&");
@@ -527,16 +529,16 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  tag = tag.replace("&#13;", "\r");
                  tag = tag.replace("&quot;", "\"");
 
-            	 PluginDebug.debug ("Handle = " + handle + "\n" +
-            	                    "Width = " + width + "\n" +
-            	                    "Height = " + height + "\n" +
-            	                    "DocumentBase = " + documentBase + "\n" +
-            	                    "Tag = " + tag);
-            	 
-            	 PluginAppletViewer.parse
-                 			(identifier, handle, width, height,
-                 				new StringReader(tag),
-                 				new URL(documentBase));
+                 PluginDebug.debug ("Handle = " + handle + "\n" +
+                                    "Width = " + width + "\n" +
+                                    "Height = " + height + "\n" +
+                                    "DocumentBase = " + documentBase + "\n" +
+                                    "Tag = " + tag);
+
+                 PluginAppletViewer.parse
+                                        (identifier, handle, width, height,
+                                                new StringReader(tag),
+                                                new URL(documentBase));
 
                  int maxWait = APPLET_TIMEOUT; // wait for applet to fully load
                  int wait = 0;
@@ -554,13 +556,13 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  // If wait exceeded maxWait, we timed out. Throw an exception
                  if (wait >= maxWait)
                      throw new Exception("Applet initialization timeout");
-                 
+
                  PluginAppletViewer oldFrame = applets.get(identifier);
 
-                 // We should not try to destroy an applet during 
-                 // initialization. It may cause an inconsistent state, 
-                 // which would bad if it's a trusted applet that 
-                 // read/writes to files 
+                 // We should not try to destroy an applet during
+                 // initialization. It may cause an inconsistent state,
+                 // which would bad if it's a trusted applet that
+                 // read/writes to files
                  waitForAppletInit((NetxPanel) applets.get(identifier).panel);
 
                  // Should we proceed with reframing?
@@ -571,22 +573,22 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
              } else if (message.startsWith("destroy")) {
 
-            	 // Set it inactive, and try to do cleanup is applicable
-            	 PAV_INIT_STATUS previousStatus = updateStatus(identifier, PAV_INIT_STATUS.INACTIVE);
-            	 PluginDebug.debug("Destroy status set for " + identifier);
+                 // Set it inactive, and try to do cleanup is applicable
+                 PAV_INIT_STATUS previousStatus = updateStatus(identifier, PAV_INIT_STATUS.INACTIVE);
+                 PluginDebug.debug("Destroy status set for " + identifier);
 
-            	 if (previousStatus != null &&
-            		 previousStatus.equals(PAV_INIT_STATUS.REFRAME_COMPLETE)) {
-            		 destroyApplet(identifier);
-            	 }
+                 if (previousStatus != null &&
+                         previousStatus.equals(PAV_INIT_STATUS.REFRAME_COMPLETE)) {
+                         destroyApplet(identifier);
+                 }
 
              } else {
                  PluginDebug.debug ("Handling message: " + message + " instance " + identifier + " " + Thread.currentThread());
 
                  // Wait till initialization finishes
-                 while (!applets.containsKey(identifier) && 
+                 while (!applets.containsKey(identifier) &&
                          (
-                           !status.containsKey(identifier) || 
+                           !status.containsKey(identifier) ||
                             status.get(identifier).equals(PAV_INIT_STATUS.PRE_INIT)
                          )
                         );
@@ -600,118 +602,118 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          } catch (Exception e) {
 
              e.printStackTrace();
-             
+
              // If an exception happened during pre-init, we need to update status
              updateStatus(identifier, PAV_INIT_STATUS.INACTIVE);
 
-             throw new RuntimeException("Failed to handle message: " + 
+             throw new RuntimeException("Failed to handle message: " +
                      message + " for instance " + identifier, e);
          }
      }
-     
+
      /**
-      * Sets the status unless an overriding status is set (e.g. if 
+      * Sets the status unless an overriding status is set (e.g. if
       * status is DESTROYED, it may not be overridden).
-      * 
+      *
       * @param identifier The identifier for which the status is to be set
       * @param status The status to switch to
       * @return The previous status
       */
      private static synchronized PAV_INIT_STATUS updateStatus(int identifier, PAV_INIT_STATUS newStatus) {
-    	
-    	 PAV_INIT_STATUS prev = status.get(identifier);
 
-    	 // If the status is set
-    	 if (status.containsKey(identifier)) {
+         PAV_INIT_STATUS prev = status.get(identifier);
 
-    	     // Nothing may override destroyed status
-    	     if (status.get(identifier).equals(PAV_INIT_STATUS.DESTROYED)) {
-   	    		 return prev;
-    	     }
-    		 
-    		 // If status is inactive, only DESTROYED may override it
-    	     if (status.get(identifier).equals(PAV_INIT_STATUS.INACTIVE)) {
-    	    	 if (!newStatus.equals(PAV_INIT_STATUS.DESTROYED)) {
-    	    		 return prev;
-    	    	 }
-    	     }
-    	 }
+         // If the status is set
+         if (status.containsKey(identifier)) {
 
-    	// Else set to given status
-    	status.put(identifier, newStatus);
-    	
-    	return prev;
+             // Nothing may override destroyed status
+             if (status.get(identifier).equals(PAV_INIT_STATUS.DESTROYED)) {
+                         return prev;
+             }
+
+                 // If status is inactive, only DESTROYED may override it
+             if (status.get(identifier).equals(PAV_INIT_STATUS.INACTIVE)) {
+                 if (!newStatus.equals(PAV_INIT_STATUS.DESTROYED)) {
+                         return prev;
+                 }
+             }
+         }
+
+        // Else set to given status
+        status.put(identifier, newStatus);
+
+        return prev;
      }
 
      /**
       * Destroys the given applet instance.
-      * 
-      * This function may be called multiple times without problems. 
-      * It does a synchronized check on the status and will only 
+      *
+      * This function may be called multiple times without problems.
+      * It does a synchronized check on the status and will only
       * attempt to destroy the applet if not previously destroyed.
-      * 
+      *
       * @param identifier The instance which is to be destroyed
       */
-     
+
      private static synchronized void destroyApplet(int identifier) {
 
-    	 PluginDebug.debug("DestroyApplet called for " + identifier);
-    	 
-    	 PAV_INIT_STATUS prev = updateStatus(identifier, PAV_INIT_STATUS.DESTROYED);
+         PluginDebug.debug("DestroyApplet called for " + identifier);
 
-    	 // If already destroyed, return
-    	 if (prev.equals(PAV_INIT_STATUS.DESTROYED)) {
-    		 PluginDebug.debug(identifier + " already destroyed. Returning.");
-    		 return;
-    	 }
+         PAV_INIT_STATUS prev = updateStatus(identifier, PAV_INIT_STATUS.DESTROYED);
 
-    	 PluginDebug.debug("Attempting to destroy frame " + identifier);
-    	 
-    	 // Try to dispose the panel right away
-    	 if (applets.containsKey(identifier)) 
-    		 applets.get(identifier).dispose();
+         // If already destroyed, return
+         if (prev.equals(PAV_INIT_STATUS.DESTROYED)) {
+                 PluginDebug.debug(identifier + " already destroyed. Returning.");
+                 return;
+         }
 
-    	 // If panel is already disposed, return
-    	 if (applets.get(identifier).panel.applet == null) {
-    		 PluginDebug.debug(identifier + " panel inactive. Returning.");
-    		 return;
-    	 }
+         PluginDebug.debug("Attempting to destroy frame " + identifier);
 
-    	 PluginDebug.debug("Attempting to destroy panel " + identifier);
+         // Try to dispose the panel right away
+         if (applets.containsKey(identifier))
+                 applets.get(identifier).dispose();
 
-    	 final int fIdentifier = identifier;
-   		 SwingUtilities.invokeLater(new Runnable() {
-   			public void run() {
-   				 applets.get(fIdentifier).appletClose();
-   		 	}
-   		 });
+         // If panel is already disposed, return
+         if (applets.get(identifier).panel.applet == null) {
+                 PluginDebug.debug(identifier + " panel inactive. Returning.");
+                 return;
+         }
 
-    	 PluginDebug.debug(identifier + " destroyed");
+         PluginDebug.debug("Attempting to destroy panel " + identifier);
+
+         final int fIdentifier = identifier;
+                 SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                                 applets.get(fIdentifier).appletClose();
+                        }
+                 });
+
+         PluginDebug.debug(identifier + " destroyed");
      }
-     
+
      /**
       * Function to block until applet initialization is complete
-      * 
+      *
       * @param identifier The instance to wait for
       */
      public static void waitForAppletInit(NetxPanel panel) {
-    	 
-    	 int waitTime = 0;
-    	 
+
+         int waitTime = 0;
+
          // Wait till initialization finishes
          while (panel.getApplet() == null &&
                 panel.isAlive() &&
                 waitTime < APPLET_TIMEOUT) {
              try {
                  if (waitTime%500 == 0)
-                	 PluginDebug.debug("Waiting for applet panel " + panel + " to initialize...");
+                         PluginDebug.debug("Waiting for applet panel " + panel + " to initialize...");
 
                  Thread.sleep(waitTime += 50);
              } catch (InterruptedException ie) {
                  // just wait
              }
          }
-         
+
          PluginDebug.debug("Applet panel " + panel + " initialized");
      }
 
@@ -730,12 +732,12 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                       // just wait
                   }
              }
-             
+
              // 0 => width, 1=> width_value, 2 => height, 3=> height_value
              String[] dimMsg = message.split(" ");
-             
-             final int height = (int) (Integer.parseInt(dimMsg[3]));
-             final int width = (int) (Integer.parseInt(dimMsg[1]));
+
+             final int height = Integer.parseInt(dimMsg[3]);
+             final int width = Integer.parseInt(dimMsg[1]);
 
              if (panel instanceof NetxPanel)
                  ((NetxPanel) panel).updateSizeInAtts(height, width);
@@ -745,15 +747,15 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                      public void run() {
 
                          setSize(width, height);
-                         
-                         // There is a rather odd drawing bug whereby resizing 
-                         // the panel makes no difference on initial call 
-                         // because the panel thinks that it is already the 
-                         // right size. Validation has no effect there either. 
-                         // So we work around by setting size to 1, validating, 
-                         // and then setting to the right size and validating 
-                         // again. This is not very efficient, and there is 
-                         // probably a better way -- but resizing happens 
+
+                         // There is a rather odd drawing bug whereby resizing
+                         // the panel makes no difference on initial call
+                         // because the panel thinks that it is already the
+                         // right size. Validation has no effect there either.
+                         // So we work around by setting size to 1, validating,
+                         // and then setting to the right size and validating
+                         // again. This is not very efficient, and there is
+                         // probably a better way -- but resizing happens
                          // quite infrequently, so for now this is how we do it
 
                          panel.setSize(1,1);
@@ -761,7 +763,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
                          panel.setSize(width, height);
                          panel.validate();
-                         
+
                          panel.applet.resize(width, height);
                          panel.applet.validate();
                      }
@@ -791,7 +793,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                       // just wait
                   }
              }
-             
+
              // Wait for the panel to initialize
              // (happens in a separate thread)
              waitForAppletInit((NetxPanel) panel);
@@ -815,7 +817,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          }
      }
 
-     // FIXME: Kind of hackish way to ensure synchronized re-drawing 
+     // FIXME: Kind of hackish way to ensure synchronized re-drawing
      private synchronized void forceredraw() {
          doLayout();
      }
@@ -823,43 +825,43 @@ import com.sun.jndi.toolkit.url.UrlUtil;
      /*
       * Methods for java.applet.AppletContext
       */
- 
-     private static Map audioClips = new HashMap();
- 
+
+     private static Map<URL,AudioClip> audioClips = new HashMap<URL,AudioClip>();
+
      /**
       * Get an audio clip.
       */
      public AudioClip getAudioClip(URL url) {
-    checkConnect(url);
-    synchronized (audioClips) {
-        AudioClip clip = (AudioClip)audioClips.get(url);
-        if (clip == null) {
-        audioClips.put(url, clip = new AppletAudioClip(url));
-        }
-        return clip;
-    }
+         checkConnect(url);
+         synchronized (audioClips) {
+             AudioClip clip = audioClips.get(url);
+             if (clip == null) {
+                 audioClips.put(url, clip = new AppletAudioClip(url));
+             }
+             return clip;
+         }
      }
- 
-     private static Map imageRefs = new HashMap();
- 
+
+     private static Map<URL,AppletImageRef> imageRefs = new HashMap<URL,AppletImageRef>();
+
      /**
       * Get an image.
       */
      public Image getImage(URL url) {
-    return getCachedImage(url);
+         return getCachedImage(url);
      }
- 
+
      private Image getCachedImage(URL url) {
     // System.getSecurityManager().checkConnection(url.getHost(), url.getPort());
     return (Image)getCachedImageRef(url).get();
      }
- 
+
      /**
       * Get an image ref.
       */
      private synchronized Ref getCachedImageRef(URL url) {
          PluginDebug.debug("getCachedImageRef() searching for " + url);
-         
+
          try {
 
              String originalURL = url.toString();
@@ -874,9 +876,9 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  if (panel instanceof NetxPanel) {
 
                      URL localURL = null;
-                     
-                     String resourceName = originalURL.substring(codeBase.length()); 
-                     JNLPClassLoader loader = (JNLPClassLoader) ((NetxPanel) panel).getAppletClassLoader(); 
+
+                     String resourceName = originalURL.substring(codeBase.length());
+                     JNLPClassLoader loader = (JNLPClassLoader) ((NetxPanel) panel).getAppletClassLoader();
 
                      if (loader.resourceAvailableLocally(resourceName))
                          localURL = loader.getResource(resourceName);
@@ -888,7 +890,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              PluginDebug.debug("getCachedImageRef() getting img from URL = " + url);
 
              synchronized (imageRefs) {
-                 AppletImageRef ref = (AppletImageRef)imageRefs.get(url);
+                 AppletImageRef ref = imageRefs.get(url);
                  if (ref == null) {
                      ref = new AppletImageRef(url);
                      imageRefs.put(url, ref);
@@ -901,16 +903,16 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              return null;
          }
      }
- 
+
      /**
       * Flush the image cache.
       */
      static void flushImageCache() {
-    imageRefs.clear();
+        imageRefs.clear();
      }
- 
-     static Vector appletPanels = new Vector();
- 
+
+     static Vector<AppletPanel> appletPanels = new Vector<AppletPanel>();
+
      /**
       * Get an applet by name.
       */
@@ -926,10 +928,10 @@ import com.sun.jndi.toolkit.url.UrlUtil;
         }
         if (name.equals(param) &&
         p.getDocumentBase().equals(panel.getDocumentBase())) {
- 
+
         SocketPermission sp =
             new SocketPermission(p.getCodeBase().getHost(), "connect");
- 
+
         if (panelSp.implies(sp)) {
             return p.applet;
         }
@@ -937,30 +939,30 @@ import com.sun.jndi.toolkit.url.UrlUtil;
     }
     return null;
      }
- 
+
      /**
       * Return an enumeration of all the accessible
       * applets on this page.
       */
-     public Enumeration getApplets() {
-    Vector v = new Vector();
-    SocketPermission panelSp =
-        new SocketPermission(panel.getCodeBase().getHost(), "connect");
- 
-    for (Enumeration e = appletPanels.elements() ; e.hasMoreElements() ;) {
-        AppletPanel p = (AppletPanel)e.nextElement();
-        if (p.getDocumentBase().equals(panel.getDocumentBase())) {
- 
-        SocketPermission sp =
-            new SocketPermission(p.getCodeBase().getHost(), "connect");
-        if (panelSp.implies(sp)) {
-            v.addElement(p.applet);
-        }
-        }
-    }
-    return v.elements();
+     public Enumeration<Applet> getApplets() {
+         Vector<Applet> v = new Vector<Applet>();
+         SocketPermission panelSp =
+             new SocketPermission(panel.getCodeBase().getHost(), "connect");
+
+         for (Enumeration<AppletPanel> e = appletPanels.elements() ; e.hasMoreElements() ;) {
+             AppletPanel p = e.nextElement();
+             if (p.getDocumentBase().equals(panel.getDocumentBase())) {
+
+                 SocketPermission sp =
+                     new SocketPermission(p.getCodeBase().getHost(), "connect");
+                 if (panelSp.implies(sp)) {
+                     v.addElement(p.applet);
+                 }
+             }
+         }
+         return v.elements();
      }
- 
+
      /**
       * Ignore.
       */
@@ -968,7 +970,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          PluginDebug.debug("Showing document...");
     showDocument(url, "_self");
      }
- 
+
      /**
       * Ignore.
       */
@@ -982,7 +984,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
         // streamhandler.pluginOutputStream has been closed.
     }
      }
- 
+
      /**
       * Show status.
       */
@@ -998,11 +1000,11 @@ import com.sun.jndi.toolkit.url.UrlUtil;
         // streamhandler.pluginOutputStream has been closed.
     }
      }
-     
+
      /**
-      * Returns an incremental number (unique identifier) for a message. 
+      * Returns an incremental number (unique identifier) for a message.
       * If identifier hits Long.MAX_VALUE it loops back starting at 0.
-      * 
+      *
       *  @return A unique Long identifier for the request
       */
      private static Long getRequestIdentifier() {
@@ -1010,7 +1012,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
              if (requestIdentityCounter == Long.MAX_VALUE)
                  requestIdentityCounter = 0L;
-             
+
              return requestIdentityCounter++;
         }
      }
@@ -1020,7 +1022,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          Long reference = getRequestIdentifier();
 
          PluginCallRequest request = requestFactory.getPluginCallRequest("window",
-             "instance " + identifier + " reference " +  
+             "instance " + identifier + " reference " +
              + reference + " " + "GetWindow", reference);
 
          PluginDebug.debug ("STARTING postCallRequest");
@@ -1043,17 +1045,17 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          PluginDebug.debug ("STARTING getWindow DONE");
          return (Long) request.getObject();
      }
- 
+
      // FIXME: make private, access via reflection.
      public static Object getMember(long internal, String name)
      {
          AppletSecurityContextManager.getSecurityContext(0).store(name);
          int nameID = AppletSecurityContextManager.getSecurityContext(0).getIdentifier(name);
          Long reference = getRequestIdentifier();
- 
+
          // Prefix with dummy instance for convenience.
-         PluginCallRequest request = requestFactory.getPluginCallRequest("member", 
-             "instance " + 0 + " reference " + reference + " GetMember " + 
+         PluginCallRequest request = requestFactory.getPluginCallRequest("member",
+             "instance " + 0 + " reference " + reference + " GetMember " +
              internal + " " + nameID, reference);
 
          streamhandler.postCallRequest(request);
@@ -1073,14 +1075,14 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          PluginDebug.debug (" getMember DONE");
          return request.getObject();
      }
- 
+
      public static void setMember(long internal, String name, Object value) {
          System.err.println("Setting to class " + value.getClass() + ":" + value.getClass().isPrimitive());
          AppletSecurityContextManager.getSecurityContext(0).store(name);
          int nameID = AppletSecurityContextManager.getSecurityContext(0).getIdentifier(name);
          Long reference = getRequestIdentifier();
 
-         // work on a copy of value, as we don't want to be manipulating 
+         // work on a copy of value, as we don't want to be manipulating
          // complex objects
          String valueToSetTo;
          if (value instanceof java.lang.Byte ||
@@ -1094,23 +1096,23 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
              valueToSetTo = "literalreturn " + value.toString();
 
-             // Character -> Str results in str value.. we need int value as 
+             // Character -> Str results in str value.. we need int value as
              // per specs.
              if (value instanceof java.lang.Character) {
-                 valueToSetTo = "literalreturn " + (int) ((java.lang.Character) value).charValue();                 
+                 valueToSetTo = "literalreturn " + (int) ((java.lang.Character) value).charValue();
              } else if (value instanceof Float ||
                         value instanceof Double) {
                  valueToSetTo = "literalreturn " + String.format("%308.308e", value);
-             } 
-             
+             }
+
          } else {
              AppletSecurityContextManager.getSecurityContext(0).store(value);
              valueToSetTo = Integer.toString(AppletSecurityContextManager.getSecurityContext(0).getIdentifier(value));
          }
- 
+
          // Prefix with dummy instance for convenience.
          PluginCallRequest request = requestFactory.getPluginCallRequest("void",
-             "instance " + 0 + " reference " + reference + " SetMember " + 
+             "instance " + 0 + " reference " + reference + " SetMember " +
              internal + " " + nameID + " " + valueToSetTo, reference);
 
          streamhandler.postCallRequest(request);
@@ -1130,13 +1132,13 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          }
          PluginDebug.debug (" setMember DONE");
      }
- 
+
      // FIXME: handle long index as well.
      public static void setSlot(long internal, int index, Object value) {
          AppletSecurityContextManager.getSecurityContext(0).store(value);
          Long reference = getRequestIdentifier();
-         
-         // work on a copy of value, as we don't want to be manipulating 
+
+         // work on a copy of value, as we don't want to be manipulating
          // complex objects
          String valueToSetTo;
          if (value instanceof java.lang.Byte ||
@@ -1150,23 +1152,23 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
              valueToSetTo = "literalreturn " + value.toString();
 
-             // Character -> Str results in str value.. we need int value as 
+             // Character -> Str results in str value.. we need int value as
              // per specs.
              if (value instanceof java.lang.Character) {
-                 valueToSetTo = "literalreturn " + (int) ((java.lang.Character) value).charValue();                 
+                 valueToSetTo = "literalreturn " + (int) ((java.lang.Character) value).charValue();
              } else if (value instanceof Float ||
                         value instanceof Double) {
                  valueToSetTo = "literalreturn " + String.format("%308.308e", value);
-             } 
-             
+             }
+
          } else {
              AppletSecurityContextManager.getSecurityContext(0).store(value);
              valueToSetTo = Integer.toString(AppletSecurityContextManager.getSecurityContext(0).getIdentifier(value));
          }
- 
+
          // Prefix with dummy instance for convenience.
          PluginCallRequest request = requestFactory.getPluginCallRequest("void",
-             "instance " + 0 + " reference " + reference + " SetSlot " + 
+             "instance " + 0 + " reference " + reference + " SetSlot " +
              internal + " " + index + " " + valueToSetTo, reference);
 
          streamhandler.postCallRequest(request);
@@ -1185,14 +1187,14 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          }
          PluginDebug.debug (" setSlot DONE");
      }
- 
+
      public static Object getSlot(long internal, int index)
      {
          Long reference = getRequestIdentifier();
 
          // Prefix with dummy instance for convenience.
-         PluginCallRequest request = requestFactory.getPluginCallRequest("member", 
-             "instance " + 0 + " reference " + reference + " GetSlot " + 
+         PluginCallRequest request = requestFactory.getPluginCallRequest("member",
+             "instance " + 0 + " reference " + reference + " GetSlot " +
              internal + " " + index, reference);
          streamhandler.postCallRequest(request);
          streamhandler.write(request.getMessage());
@@ -1211,7 +1213,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          PluginDebug.debug (" getSlot DONE");
          return request.getObject();
      }
- 
+
      public static Object eval(long internal, String s)
      {
          AppletSecurityContextManager.getSecurityContext(0).store(s);
@@ -1220,8 +1222,8 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
          // Prefix with dummy instance for convenience.
          // FIXME: rename GetMemberPluginCallRequest ObjectPluginCallRequest.
-         PluginCallRequest request = requestFactory.getPluginCallRequest("member",  
-             "instance " + 0 + " reference " + reference + " Eval " + 
+         PluginCallRequest request = requestFactory.getPluginCallRequest("member",
+             "instance " + 0 + " reference " + reference + " Eval " +
              internal + " " + stringID, reference);
          streamhandler.postCallRequest(request);
          streamhandler.write(request.getMessage());
@@ -1240,15 +1242,15 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          PluginDebug.debug (" getSlot DONE");
          return request.getObject();
      }
- 
+
      public static void removeMember (long internal, String name) {
          AppletSecurityContextManager.getSecurityContext(0).store(name);
          int nameID = AppletSecurityContextManager.getSecurityContext(0).getIdentifier(name);
          Long reference = getRequestIdentifier();
- 
+
          // Prefix with dummy instance for convenience.
          PluginCallRequest request = requestFactory.getPluginCallRequest("void",
-             "instance " + 0 + " reference " + reference + " RemoveMember " + 
+             "instance " + 0 + " reference " + reference + " RemoveMember " +
              internal + " " + nameID, reference);
 
          streamhandler.postCallRequest(request);
@@ -1267,7 +1269,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          }
          PluginDebug.debug (" RemoveMember DONE");
      }
- 
+
      public static Object call(long internal, String name, Object args[])
      {
          // FIXME: when is this removed from the object store?
@@ -1276,7 +1278,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          AppletSecurityContextManager.getSecurityContext(0).store(name);
          int nameID = AppletSecurityContextManager.getSecurityContext(0).getIdentifier(name);
          Long reference = getRequestIdentifier();
-         
+
          String argIDs = "";
          for (Object arg : args)
          {
@@ -1284,10 +1286,10 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              argIDs += AppletSecurityContextManager.getSecurityContext(0).getIdentifier(arg) + " ";
          }
          argIDs = argIDs.trim();
- 
+
          // Prefix with dummy instance for convenience.
          PluginCallRequest request = requestFactory.getPluginCallRequest("member",
-             "instance " + 0 + " reference " + reference + " Call " + 
+             "instance " + 0 + " reference " + reference + " Call " +
              internal + " " + nameID + " " + argIDs, reference);
 
          streamhandler.postCallRequest(request);
@@ -1307,7 +1309,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          PluginDebug.debug (" Call DONE");
          return request.getObject();
      }
- 
+
      public static Object requestPluginCookieInfo(URI uri) {
 
          PluginCallRequest request;
@@ -1315,9 +1317,9 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
          try
          {
-             String encodedURI = UrlUtil.encode(uri.toString(), "UTF-8"); 
+             String encodedURI = UrlUtil.encode(uri.toString(), "UTF-8");
              request = requestFactory.getPluginCallRequest("cookieinfo",
-                 "plugin PluginCookieInfo " + "reference " + reference + 
+                 "plugin PluginCookieInfo " + "reference " + reference +
                  " " + encodedURI, reference);
 
          } catch (UnsupportedEncodingException e)
@@ -1352,12 +1354,12 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
          try {
 
-             // there is no easy way to get SOCKS proxy info. So, we tell mozilla that we want proxy for 
-             // an HTTP uri in case of non http/ftp protocols. If we get back a SOCKS proxy, we can 
+             // there is no easy way to get SOCKS proxy info. So, we tell mozilla that we want proxy for
+             // an HTTP uri in case of non http/ftp protocols. If we get back a SOCKS proxy, we can
              // use that, if we get back an http proxy, we fallback to DIRECT connect
 
              String scheme = uri.getScheme();
-             String port = uri.getPort() != -1 ? ":" + uri.getPort() : ""; 
+             String port = uri.getPort() != -1 ? ":" + uri.getPort() : "";
              if (!uri.getScheme().startsWith("http") && !uri.getScheme().equals("ftp"))
                  scheme = "http";
 
@@ -1369,7 +1371,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          }
 
          PluginCallRequest request = requestFactory.getPluginCallRequest("proxyinfo",
-             "plugin PluginProxyInfo reference " + reference + " " + 
+             "plugin PluginProxyInfo reference " + reference + " " +
              requestURI, reference);
 
          PluginMessageConsumer.registerPriorityWait(reference);
@@ -1390,14 +1392,14 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          PluginDebug.debug (" Call DONE");
          return request.getObject();
      }
-     
+
      public static void JavaScriptFinalize(long internal)
      {
          Long reference = getRequestIdentifier();
 
          // Prefix with dummy instance for convenience.
          PluginCallRequest request = requestFactory.getPluginCallRequest("void",
-             "instance " + 0 + " reference " + reference + " Finalize " + 
+             "instance " + 0 + " reference " + reference + " Finalize " +
              internal, reference);
 
          streamhandler.postCallRequest(request);
@@ -1416,14 +1418,14 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          }
          PluginDebug.debug (" finalize DONE");
      }
- 
+
      public static String javascriptToString(long internal)
      {
          Long reference = getRequestIdentifier();
 
          // Prefix with dummy instance for convenience.
          PluginCallRequest request = requestFactory.getPluginCallRequest("member",
-             "instance " + 0 + " reference " + reference + " ToString " + 
+             "instance " + 0 + " reference " + reference + " ToString " +
              internal, reference);
 
          streamhandler.postCallRequest(request);
@@ -1443,7 +1445,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          PluginDebug.debug (" ToString DONE");
          return (String) request.getObject();
      }
- 
+
      // FIXME: make this private and access it from JSObject using
      // reflection.
      private void write(String message) throws IOException {
@@ -1455,22 +1457,24 @@ import com.sun.jndi.toolkit.url.UrlUtil;
      public void setStream(String key, InputStream stream)throws IOException{
     // We do nothing.
      }
- 
+
+     @Override
      public InputStream getStream(String key){
-    // We do nothing.
-    return null;
+         // We do nothing.
+         return null;
      }
- 
-     public Iterator getStreamKeys(){
-    // We do nothing.
-    return null;
+
+     @Override
+     public Iterator<String> getStreamKeys(){
+         // We do nothing.
+         return null;
      }
- 
+
      /**
       * System parameters.
       */
-     static Hashtable systemParam = new Hashtable();
- 
+     static Hashtable<String,String> systemParam = new Hashtable<String,String>();
+
      static {
     systemParam.put("codebase", "codebase");
     systemParam.put("code", "code");
@@ -1481,58 +1485,58 @@ import com.sun.jndi.toolkit.url.UrlUtil;
     systemParam.put("vspace", "vspace");
     systemParam.put("hspace", "hspace");
      }
- 
+
      /**
       * Print the HTML tag.
       */
-     public static void printTag(PrintStream out, Hashtable atts) {
+     public static void printTag(PrintStream out, Hashtable<String,String> atts) {
     out.print("<applet");
- 
-    String v = (String)atts.get("codebase");
+
+    String v = atts.get("codebase");
     if (v != null) {
         out.print(" codebase=\"" + v + "\"");
     }
- 
-    v = (String)atts.get("code");
+
+    v = atts.get("code");
     if (v == null) {
         v = "applet.class";
     }
     out.print(" code=\"" + v + "\"");
-    v = (String)atts.get("width");
+    v = atts.get("width");
     if (v == null) {
         v = "150";
     }
     out.print(" width=" + v);
- 
-    v = (String)atts.get("height");
+
+    v = atts.get("height");
     if (v == null) {
         v = "100";
     }
     out.print(" height=" + v);
- 
-    v = (String)atts.get("name");
+
+    v = atts.get("name");
     if (v != null) {
         out.print(" name=\"" + v + "\"");
     }
     out.println(">");
- 
+
     // A very slow sorting algorithm
     int len = atts.size();
     String params[] = new String[len];
     len = 0;
-    for (Enumeration e = atts.keys() ; e.hasMoreElements() ;) {
-        String param = (String)e.nextElement();
+    for (Enumeration<String> e = atts.keys() ; e.hasMoreElements() ;) {
+        String param = e.nextElement();
         int i = 0;
         for (; i < len ; i++) {
-        if (params[i].compareTo(param) >= 0) {
-            break;
-        }
+            if (params[i].compareTo(param) >= 0) {
+                break;
+            }
         }
         System.arraycopy(params, i, params, i + 1, len - i);
         params[i] = param;
         len++;
     }
- 
+
     for (int i = 0 ; i < len ; i++) {
         String param = params[i];
         if (systemParam.get(param) == null) {
@@ -1542,19 +1546,19 @@ import com.sun.jndi.toolkit.url.UrlUtil;
     }
     out.println("</applet>");
      }
- 
+
      /**
       * Make sure the atrributes are uptodate.
       */
-     public void updateAtts() {
-    Dimension d = panel.size();
-    Insets in = panel.insets();
-    panel.atts.put("width",
-               new Integer(d.width - (in.left + in.right)).toString());
-    panel.atts.put("height",
-               new Integer(d.height - (in.top + in.bottom)).toString());
+    public void updateAtts() {
+        Dimension d = panel.getSize();
+        Insets in = panel.getInsets();
+        panel.atts.put("width",
+                       Integer.valueOf(d.width - (in.left + in.right)).toString());
+        panel.atts.put("height",
+                       Integer.valueOf(d.height - (in.top + in.bottom)).toString());
      }
- 
+
      /**
       * Restart the applet.
       */
@@ -1564,7 +1568,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
     panel.sendEvent(AppletPanel.APPLET_INIT);
     panel.sendEvent(AppletPanel.APPLET_START);
      }
- 
+
      /**
       * Reload the applet.
       */
@@ -1572,14 +1576,14 @@ import com.sun.jndi.toolkit.url.UrlUtil;
     panel.sendEvent(AppletPanel.APPLET_STOP);
     panel.sendEvent(AppletPanel.APPLET_DESTROY);
     panel.sendEvent(AppletPanel.APPLET_DISPOSE);
- 
+
     /**
-     * Fixed #4501142: Classlaoder sharing policy doesn't 
+     * Fixed #4501142: Classlaoder sharing policy doesn't
      * take "archive" into account. This will be overridden
      * by Java Plug-in.         [stanleyh]
      */
     AppletPanel.flushClassLoader(panel.getClassLoaderCacheKey());
- 
+
          /*
           * Make sure we don't have two threads running through the event queue
           * at the same time.
@@ -1590,37 +1594,37 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          } catch (InterruptedException e) {
              return;   // abort the reload
          }
- 
-         AccessController.doPrivileged(new PrivilegedAction() {
-             public Object run() {
+
+         AccessController.doPrivileged(new PrivilegedAction<Void>() {
+             public Void run() {
                  panel.createAppletThread();
                  return null;
              }
-         });     
-    
+         });
+
     panel.sendEvent(AppletPanel.APPLET_LOAD);
     panel.sendEvent(AppletPanel.APPLET_INIT);
     panel.sendEvent(AppletPanel.APPLET_START);
      }
- 
+
      public int print(Graphics graphics, PageFormat pf, int pageIndex) {
          return Printable.NO_SUCH_PAGE;
      }
- 
+
      /**
       * Start the applet.
       */
      void appletStart() {
     panel.sendEvent(AppletPanel.APPLET_START);
      }
- 
+
      /**
       * Stop the applet.
       */
      void appletStop() {
     panel.sendEvent(AppletPanel.APPLET_STOP);
      }
- 
+
      /**
       * Shutdown a viewer.
       * Stop, Destroy, Dispose and Quit a viewer
@@ -1631,7 +1635,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
     p.sendEvent(AppletPanel.APPLET_DISPOSE);
     p.sendEvent(AppletPanel.APPLET_QUIT);
      }
- 
+
      /**
       * Close this viewer.
       * Stop, Destroy, Dispose and Quit an AppletView, then
@@ -1657,7 +1661,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  dispose();
 
                  if (tg.activeCount() > 0)
-                 tg.stop();
+                   tg.stop();
 
                  if (countApplets() == 0) {
                      appletSystemExit();
@@ -1668,24 +1672,24 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          }).start();
 
      }
- 
+
      /**
       * Exit the program.
       * Exit from the program (if not stand alone) - do no clean-up
       */
      private void appletSystemExit() {
-         // Do nothing. Exit is handled by another 
+         // Do nothing. Exit is handled by another
          // block of code, called when _all_ applets are gone
      }
- 
+
      /**
       * How many applets are running?
       */
- 
+
      public static int countApplets() {
     return appletPanels.size();
      }
- 
+
  
      /**
       * Scan spaces.
@@ -1693,39 +1697,39 @@ import com.sun.jndi.toolkit.url.UrlUtil;
      public static void skipSpace(int[] c, Reader in) throws IOException {
          while ((c[0] >= 0) &&
            ((c[0] == ' ') || (c[0] == '\t') || (c[0] == '\n') || (c[0] == '\r'))) {
-        	 c[0] = in.read();
+                 c[0] = in.read();
     }
      }
- 
+
      /**
       * Scan identifier
       */
      public static String scanIdentifier(int[] c, Reader in) throws IOException {
-    StringBuffer buf = new StringBuffer();
-    
-    if (c[0] == '!') {
-        // Technically, we should be scanning for '!--' but we are reading 
-        // from a stream, and there is no way to peek ahead. That said, 
-        // a ! at this point can only mean comment here afaik, so we 
-        // should be okay
-        skipComment(c, in);
-        return "";
-    }
-    
-    while (true) {
-        if (((c[0] >= 'a') && (c[0] <= 'z')) ||
-        ((c[0] >= 'A') && (c[0] <= 'Z')) ||
-        ((c[0] >= '0') && (c[0] <= '9')) || (c[0] == '_')) {
-        buf.append((char)c[0]);
-        c[0] = in.read();
-        } else {
-        return buf.toString();
-        }
-    }
+         StringBuilder buf = new StringBuilder();
+
+         if (c[0] == '!') {
+             // Technically, we should be scanning for '!--' but we are reading
+             // from a stream, and there is no way to peek ahead. That said,
+             // a ! at this point can only mean comment here afaik, so we
+             // should be okay
+             skipComment(c, in);
+             return "";
+         }
+
+         while (true) {
+             if (((c[0] >= 'a') && (c[0] <= 'z')) ||
+                 ((c[0] >= 'A') && (c[0] <= 'Z')) ||
+                 ((c[0] >= '0') && (c[0] <= '9')) || (c[0] == '_')) {
+                 buf.append((char)c[0]);
+                 c[0] = in.read();
+             } else {
+                 return buf.toString();
+             }
+         }
      }
 
      public static void skipComment(int[] c, Reader in) throws IOException {
-         StringBuffer buf = new StringBuffer();
+         StringBuilder buf = new StringBuilder();
          boolean commentHeaderPassed = false;
          c[0] = in.read();
          buf.append((char)c[0]);
@@ -1758,42 +1762,42 @@ import com.sun.jndi.toolkit.url.UrlUtil;
              buf.append((char)c[0]);
          }
      }
- 
+
      /**
       * Scan tag
       */
-     public static Hashtable scanTag(int[] c, Reader in) throws IOException {
-    Hashtable atts = new Hashtable();
-    skipSpace(c, in);
+     public static Hashtable<String,String> scanTag(int[] c, Reader in) throws IOException {
+         Hashtable<String,String> atts = new Hashtable<String,String>();
+         skipSpace(c, in);
          while (c[0] >= 0 && c[0] != '>') {
-        String att = scanIdentifier(c, in);
-        String val = "";
-        skipSpace(c, in);
-        if (c[0] == '=') {
-        int quote = -1;
-        c[0] = in.read();
-        skipSpace(c, in);
-        if ((c[0] == '\'') || (c[0] == '\"')) {
-            quote = c[0];
-            c[0] = in.read();
-        }
-        StringBuffer buf = new StringBuffer();
+             String att = scanIdentifier(c, in);
+             String val = "";
+             skipSpace(c, in);
+             if (c[0] == '=') {
+                 int quote = -1;
+                 c[0] = in.read();
+                 skipSpace(c, in);
+                 if ((c[0] == '\'') || (c[0] == '\"')) {
+                     quote = c[0];
+                     c[0] = in.read();
+                 }
+                 StringBuilder buf = new StringBuilder();
                  while ((c[0] > 0) &&
-               (((quote < 0) && (c[0] != ' ') && (c[0] != '\t') &&
+                        (((quote < 0) && (c[0] != ' ') && (c[0] != '\t') &&
                           (c[0] != '\n') && (c[0] != '\r') && (c[0] != '>'))
-            || ((quote >= 0) && (c[0] != quote)))) {
-            buf.append((char)c[0]);
-            c[0] = in.read();
-        }
-        if (c[0] == quote) {
-            c[0] = in.read();
-        }
-        skipSpace(c, in);
-        val = buf.toString();
-        }
+                         || ((quote >= 0) && (c[0] != quote)))) {
+                     buf.append((char)c[0]);
+                     c[0] = in.read();
+                 }
+                 if (c[0] == quote) {
+                     c[0] = in.read();
+                 }
+                 skipSpace(c, in);
+                 val = buf.toString();
+             }
 
-        PluginDebug.debug("PUT " + att + " = '" + val + "'");
-        atts.put(att.toLowerCase(java.util.Locale.ENGLISH), val);
+             PluginDebug.debug("PUT " + att + " = '" + val + "'");
+             atts.put(att.toLowerCase(java.util.Locale.ENGLISH), val);
 
              while (true) {
                  if ((c[0] == '>') || (c[0] < 0) ||
@@ -1804,10 +1808,10 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  c[0] = in.read();
              }
              //skipSpace(in);
-    }
-    return atts;
+         }
+         return atts;
      }
-     
+
      // private static final == inline
      private static final boolean isInt(Object o) {
          boolean isInt = false;
@@ -1820,15 +1824,15 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 
          return isInt;
      }
- 
+
      /* values used for placement of AppletViewer's frames */
      private static int x = 0;
      private static int y = 0;
      private static final int XDELTA = 30;
      private static final int YDELTA = XDELTA;
- 
+
      static String encoding = null;
- 
+
      static private Reader makeReader(InputStream is) {
     if (encoding != null) {
         try {
@@ -1839,7 +1843,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
     encoding = r.getEncoding();
     return new BufferedReader(r);
      }
- 
+
      /**
       * Scan an html file for <applet> tags
       */
@@ -1848,35 +1852,27 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          encoding = enc;
          parse(identifier, handle, width, height, in, url, System.out, new PluginAppletPanelFactory());
      }
- 
+
      public static void parse(int identifier, long handle, String width, String height, Reader in, URL url)
-         throws IOException {
-         
+         throws PrivilegedActionException {
+
          final int fIdentifier = identifier;
          final long fHandle = handle;
          final String fWidth = width;
          final String fHeight = height;
          final Reader fIn = in;
          final URL fUrl = url;
-         PrivilegedAction pa = new PrivilegedAction() {
-             public Object run() {
-                 try {
-                     parse(fIdentifier, fHandle, fWidth, fHeight, fIn, fUrl, System.out, new PluginAppletPanelFactory());
-                 } catch (IOException ioe) {
-                     return ioe;
-                 }
+         AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
+             public Void run() throws IOException {
+                 parse(fIdentifier, fHandle, fWidth, fHeight, fIn, fUrl,
+                       System.out, new PluginAppletPanelFactory());
                  return null;
              }
-         };
-
-         Object ret = AccessController.doPrivileged(pa);
-         if (ret instanceof IOException) {
-             throw (IOException) ret;
-         }
+         });
      }
- 
-     public static void parse(int identifier, long handle, String width, 
-    		 String height, Reader in, URL url,
+
+     public static void parse(int identifier, long handle, String width,
+                 String height, Reader in, URL url,
                               PrintStream statusMsgStream,
                               PluginAppletPanelFactory factory)
          throws IOException
@@ -1888,8 +1884,8 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          boolean objectTagAlreadyParsed = false;
 
          // The current character
-         // FIXME: This is an evil hack to force pass-by-reference.. the 
-         // parsing code needs to be rewritten from scratch to prevent such 
+         // FIXME: This is an evil hack to force pass-by-reference.. the
+         // parsing code needs to be rewritten from scratch to prevent such
          //a need
          int[] c = new int[1];
 
@@ -1914,7 +1910,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
          url = conn.getURL();
 
          int ydisp = 1;
-         Hashtable atts = null;
+         Hashtable<String,String> atts = null;
 
          while(true) {
              c[0] = in.read();
@@ -1944,11 +1940,11 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                              // shouldn't be part of parsing.  It's presence
                              // causes things to be a little too much of a
                              // hack.
-                             
+
                              // Let user know we are starting up
                              streamhandler.write("instance " + identifier + " status " + amh.getMessage("status.start"));
                              factory.createPanel(streamhandler, identifier, handle, x, y, url, atts);
-                             
+
                              x += XDELTA;
                              y += YDELTA;
                              // make sure we don't go too far!
@@ -1968,8 +1964,8 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                  else {
                      String nm = scanIdentifier(c, in);
                      if (nm.equalsIgnoreCase("param")) {
-                         Hashtable t = scanTag(c, in);
-                         String att = (String)t.get("name");
+                         Hashtable<String,String> t = scanTag(c, in);
+                         String att = t.get("name");
 
                          if (atts.containsKey(att))
                              continue;
@@ -1977,7 +1973,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                          if (att == null) {
                              statusMsgStream.println(requiresNameWarning);
                          } else {
-                             String val = (String)t.get("value");
+                             String val = t.get("value");
                              if (val == null) {
                                  statusMsgStream.println(requiresNameWarning);
                              } else if (atts != null) {
@@ -1993,13 +1989,14 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                          atts = scanTag(c, in);
 
                          // If there is a classid and no code tag present, transform it to code tag
-                         if (atts.get("code") == null && atts.get("classid") != null && !((String) atts.get("classid")).startsWith("clsid:")) {
+                         if (atts.get("code") == null && atts.get("classid") != null
+                           && !(atts.get("classid")).startsWith("clsid:")) {
                              atts.put("code", atts.get("classid"));
                          }
-                         
+
                          // remove java: from code tag
-                         if (atts.get("code") != null && ((String) atts.get("code")).startsWith("java:")) {
-                             atts.put("code", ((String) atts.get("code")).substring(5));
+                         if (atts.get("code") != null && (atts.get("code")).startsWith("java:")) {
+                             atts.put("code", (atts.get("code")).substring(5));
                          }
 
                          if (atts.get("code") == null && atts.get("object") == null) {
@@ -2010,7 +2007,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                          if (atts.get("width") == null || !isInt(atts.get("width"))) {
                              atts.put("width", width);
                          }
-                         
+
                          if (atts.get("height") == null || !isInt(atts.get("height"))) {
                              atts.put("height", height);
                          }
@@ -2025,19 +2022,20 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                          }
 
                          // If there is a classid and no code tag present, transform it to code tag
-                         if (atts.get("code") == null && atts.get("classid") != null && !((String) atts.get("classid")).startsWith("clsid:")) {
+                         if (atts.get("code") == null && atts.get("classid") != null
+                           && !(atts.get("classid")).startsWith("clsid:")) {
                              atts.put("code", atts.get("classid"));
                          }
-                         
+
                          // remove java: from code tag
-                         if (atts.get("code") != null && ((String) atts.get("code")).startsWith("java:")) {
-                             atts.put("code", ((String) atts.get("code")).substring(5));
+                         if (atts.get("code") != null && (atts.get("code")).startsWith("java:")) {
+                             atts.put("code", (atts.get("code")).substring(5));
                          }
 
                          // java_* aliases override older names:
                          // http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/using_tags.html#in-ie
                          if (atts.get("java_code") != null) {
-                             atts.put("code", ((String) atts.get("java_code")));
+                             atts.put("code", (atts.get("java_code")));
                          }
 
                          if (atts.containsKey("code")) {
@@ -2045,25 +2043,25 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                          }
 
                          if (atts.get("java_codebase") != null) {
-                             atts.put("codebase", ((String) atts.get("java_codebase")));
+                             atts.put("codebase", (atts.get("java_codebase")));
                          }
 
                          if (atts.get("java_archive") != null) {
-                             atts.put("archive", ((String) atts.get("java_archive")));
+                             atts.put("archive", (atts.get("java_archive")));
                          }
 
                          if (atts.get("java_object") != null) {
-                             atts.put("object", ((String) atts.get("java_object")));
+                             atts.put("object", (atts.get("java_object")));
                          }
 
                          if (atts.get("java_type") != null) {
-                             atts.put("type", ((String) atts.get("java_type")));
+                             atts.put("type", (atts.get("java_type")));
                          }
 
                          if (atts.get("width") == null || !isInt(atts.get("width"))) {
                              atts.put("width", width);
                          }
-                         
+
                          if (atts.get("height") == null || !isInt(atts.get("height"))) {
                              atts.put("height", height);
                          }
@@ -2073,46 +2071,47 @@ import com.sun.jndi.toolkit.url.UrlUtil;
                          atts = scanTag(c, in);
 
                          // If there is a classid and no code tag present, transform it to code tag
-                         if (atts.get("code") == null && atts.get("classid") != null && !((String) atts.get("classid")).startsWith("clsid:")) {
+                         if (atts.get("code") == null && atts.get("classid") != null
+                           && !(atts.get("classid")).startsWith("clsid:")) {
                              atts.put("code", atts.get("classid"));
                          }
 
                          // remove java: from code tag
-                         if (atts.get("code") != null && ((String) atts.get("code")).startsWith("java:")) {
-                             atts.put("code", ((String) atts.get("code")).substring(5));
+                         if (atts.get("code") != null && (atts.get("code")).startsWith("java:")) {
+                             atts.put("code", (atts.get("code")).substring(5));
                          }
-                         
+
                          // java_* aliases override older names:
                          // http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/using_tags.html#in-nav
                          if (atts.get("java_code") != null) {
-                             atts.put("code", ((String) atts.get("java_code")));
+                             atts.put("code", (atts.get("java_code")));
                          }
-                         
+
                          if (atts.get("java_codebase") != null) {
-                             atts.put("codebase", ((String) atts.get("java_codebase")));
+                             atts.put("codebase", (atts.get("java_codebase")));
                          }
-                         
+
                          if (atts.get("java_archive") != null) {
-                             atts.put("archive", ((String) atts.get("java_archive")));
+                             atts.put("archive", (atts.get("java_archive")));
                          }
-                         
+
                          if (atts.get("java_object") != null) {
-                             atts.put("object", ((String) atts.get("java_object")));
+                             atts.put("object", (atts.get("java_object")));
                          }
-                         
+
                          if (atts.get("java_type") != null) {
-                             atts.put("type", ((String) atts.get("java_type")));
+                             atts.put("type", (atts.get("java_type")));
                          }
 
                          if (atts.get("code") == null && atts.get("object") == null) {
                              statusMsgStream.println(embedRequiresCodeWarning);
                              atts = null;
                          }
-                         
+
                          if (atts.get("width") == null || !isInt(atts.get("width"))) {
                              atts.put("width", width);
                          }
-                         
+
                          if (atts.get("height") == null || !isInt(atts.get("height"))) {
                              atts.put("height", height);
                          }
@@ -2126,7 +2125,7 @@ import com.sun.jndi.toolkit.url.UrlUtil;
  
 
      private static AppletMessageHandler amh = new AppletMessageHandler("appletviewer");
- 
+
      private static void checkConnect(URL url)
      {
     SecurityManager security = System.getSecurityManager();
@@ -2148,21 +2147,21 @@ import com.sun.jndi.toolkit.url.UrlUtil;
       * {@inheritDoc}
       *
       * This method calls paint directly, rather than via super.update() since
-      * the parent class's update() just does a couple of checks (both of 
+      * the parent class's update() just does a couple of checks (both of
       * which are accounted for) and then calls paint anyway.
       */
      public void update(Graphics g) {
 
-    	 // If the image or the graphics don't exist, create new ones
-    	 if (bufFrameImg == null || bufFrameImgGraphics == null) {
-    		 bufFrameImg = createImage(getWidth(), getHeight());
-    		 bufFrameImgGraphics = bufFrameImg.getGraphics ();
-    	 }
+         // If the image or the graphics don't exist, create new ones
+         if (bufFrameImg == null || bufFrameImgGraphics == null) {
+                 bufFrameImg = createImage(getWidth(), getHeight());
+                 bufFrameImgGraphics = bufFrameImg.getGraphics ();
+         }
 
-    	 // Paint off-screen
-    	 paint(bufFrameImgGraphics);
+         // Paint off-screen
+         paint(bufFrameImgGraphics);
 
-    	 // Draw the painted image
-    	 g.drawImage(bufFrameImg, 0, 0, this);
+         // Draw the painted image
+         g.drawImage(bufFrameImg, 0, 0, this);
      }
  }

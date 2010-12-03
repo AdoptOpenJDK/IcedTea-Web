@@ -674,6 +674,7 @@ public class XMLElement
                 case '\t':
                 case '\n':
                     result.append(ch);
+                    break;
                 case '\r':
                     break;
                 default:

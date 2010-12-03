@@ -40,7 +40,7 @@
 /* more doc todo:
  *  threads
  *  gc
- *  
+ *
  *
  */
 
@@ -114,26 +114,26 @@ public final class JSObject {
      * it is illegal to construct a JSObject manually
      */
     public JSObject(String jsobj_addr) {
-        this((long) Long.parseLong(jsobj_addr));
+        this(Long.parseLong(jsobj_addr));
     }
 
     public JSObject(long jsobj_addr) {
-        
+
         // See if the caller has permission
-        
+
         try {
             AccessController.getContext().checkPermission(new JSObjectCreatePermission());
         } catch (AccessControlException ace) {
-            
-            // If not, only caller with JSObject.getWindow on the stack may 
+
+            // If not, only caller with JSObject.getWindow on the stack may
             // make this call unprivileged.
-            
+
             // Although this check is inefficient, it should happen only once
             // during applet init, so we look the other way
 
             StackTraceElement[] stack =  Thread.currentThread().getStackTrace();
             boolean mayProceed = false;
-            
+
             for (int i=0; i < stack.length; i++) {
                 if (stack[i].getClassName().equals("netscape.javascript.JSObject") &&
                     stack[i].getMethodName().equals("getWindow")) {
@@ -149,10 +149,10 @@ public final class JSObject {
     }
 
     /**
-     * Retrieves a named member of a JavaScript object. 
+     * Retrieves a named member of a JavaScript object.
      * Equivalent to "this.<i>name</i>" in JavaScript.
      */
-    public Object	getMember(String name)
+    public Object       getMember(String name)
     {
         PluginDebug.debug ("JSObject.getMember " + name);
 
@@ -166,8 +166,8 @@ public final class JSObject {
      * Retrieves an indexed member of a JavaScript object.
      * Equivalent to "this[<i>index</i>]" in JavaScript.
      */
-    //    public Object		getMember(int index) { return getSlot(index); }
-    public Object	getSlot(int index)
+    //    public Object         getMember(int index) { return getSlot(index); }
+    public Object       getSlot(int index)
     {
         PluginDebug.debug ("JSObject.getSlot " + index);
 
@@ -176,10 +176,10 @@ public final class JSObject {
 
 
     /**
-     * Sets a named member of a JavaScript object. 
+     * Sets a named member of a JavaScript object.
      * Equivalent to "this.<i>name</i> = <i>value</i>" in JavaScript.
      */
-    public void 		setMember(String name, Object value)
+    public void                 setMember(String name, Object value)
     {
         PluginDebug.debug ("JSObject.setMember " + name + " " + value);
 
@@ -187,13 +187,13 @@ public final class JSObject {
     }
 
     /**
-     * Sets an indexed member of a JavaScript object. 
+     * Sets an indexed member of a JavaScript object.
      * Equivalent to "this[<i>index</i>] = <i>value</i>" in JavaScript.
      */
-    //    public void 		setMember(int index, Object value) {
+    //    public void           setMember(int index, Object value) {
     //        setSlot(index, value);
     //    }
-    public void 		setSlot(int index, Object value)
+    public void                 setSlot(int index, Object value)
     {
         PluginDebug.debug ("JSObject.setSlot " + index + " " + value);
 
@@ -206,7 +206,7 @@ public final class JSObject {
     /**
      * Removes a named member of a JavaScript object.
      */
-    public void 		removeMember(String name)
+    public void                 removeMember(String name)
     {
         PluginDebug.debug ("JSObject.removeMember " + name);
 
@@ -218,12 +218,12 @@ public final class JSObject {
      * Calls a JavaScript method.
      * Equivalent to "this.<i>methodName</i>(<i>args</i>[0], <i>args</i>[1], ...)" in JavaScript.
      */
-    public Object	call(String methodName, Object args[])
+    public Object       call(String methodName, Object args[])
     {
-    	if (args == null)
-    		args = new Object[0];
+        if (args == null)
+                args = new Object[0];
 
-    	PluginDebug.debug ("JSObject.call " + methodName);
+        PluginDebug.debug ("JSObject.call " + methodName);
         for (int i = 0; i < args.length; i++)
             PluginDebug.debug (" " + args[i]);
         PluginDebug.debug("");
@@ -232,11 +232,11 @@ public final class JSObject {
 
 
     /**
-     * Evaluates a JavaScript expression. The expression is a string 
+     * Evaluates a JavaScript expression. The expression is a string
      * of JavaScript source code which will be evaluated in the context
      * given by "this".
      */
-    public Object	eval(String s)
+    public Object       eval(String s)
     {
         PluginDebug.debug("JSObject.eval " + s);
         return PluginAppletViewer.eval(internal, s);
@@ -261,7 +261,7 @@ public final class JSObject {
     /**
      * get a JSObject for the window containing the given applet
      */
-    public static JSObject	getWindow(Applet applet)
+    public static JSObject      getWindow(Applet applet)
     {
         PluginDebug.debug("JSObject.getWindow");
         // FIXME: handle long case as well.
@@ -269,7 +269,7 @@ public final class JSObject {
         internal = ((PluginAppletViewer)
                     applet.getAppletContext()).getWindow();
         PluginDebug.debug ("GOT IT: " + internal);
-        return new JSObject((long) internal);
+        return new JSObject(internal);
     }
 
 
@@ -277,7 +277,7 @@ public final class JSObject {
      * Finalization decrements the reference count on the corresponding
      * JavaScript object.
      */
-    protected void	finalize()
+    protected void      finalize()
     {
         PluginDebug.debug("JSObject.finalize ");
         PluginAppletViewer.JavaScriptFinalize(internal);
