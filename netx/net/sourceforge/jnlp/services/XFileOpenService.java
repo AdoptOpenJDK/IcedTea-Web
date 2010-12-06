@@ -64,8 +64,8 @@ class XFileOpenService implements FileOpenService {
     /**
      * Prompts the user to select a single file.
      */
-    public FileContents openFileDialog (java.lang.String pathHint,
-        java.lang.String[] extensions) throws java.io.IOException {
+    public FileContents openFileDialog(java.lang.String pathHint,
+            java.lang.String[] extensions) throws java.io.IOException {
 
         if (ServiceUtil.checkAccess(AccessType.READ_FILE)) {
 
@@ -87,7 +87,7 @@ class XFileOpenService implements FileOpenService {
     /**
      * Prompts the user to select one or more files.
      */
-    public FileContents[] openMultiFileDialog (java.lang.String pathHint,
+    public FileContents[] openMultiFileDialog(java.lang.String pathHint,
             java.lang.String[] extensions) throws java.io.IOException {
 
         if (ServiceUtil.checkAccess(AccessType.WRITE_FILE)) {

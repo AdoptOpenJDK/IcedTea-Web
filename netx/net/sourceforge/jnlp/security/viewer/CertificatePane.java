@@ -81,224 +81,222 @@ import net.sourceforge.jnlp.util.FileUtils;
 
 public class CertificatePane extends JPanel {
 
-        /**
-         * The certificates stored in the certificates file.
-         */
-        private ArrayList<X509Certificate> certs = null;
+    /**
+     * The certificates stored in the certificates file.
+     */
+    private ArrayList<X509Certificate> certs = null;
 
-        private static final Dimension TABLE_DIMENSION = new Dimension(500,200);
+    private static final Dimension TABLE_DIMENSION = new Dimension(500, 200);
 
-        /**
-         * "Issued To" and "Issued By" string pairs for certs.
-         */
-        private String[][] issuedToAndBy = null;
-        private final String[] columnNames = { R("CVIssuedTo"), R("CVIssuedBy") };
+    /**
+     * "Issued To" and "Issued By" string pairs for certs.
+     */
+    private String[][] issuedToAndBy = null;
+    private final String[] columnNames = { R("CVIssuedTo"), R("CVIssuedBy") };
 
-        private final CertificateType[] certificateTypes = new CertificateType[] {
+    private final CertificateType[] certificateTypes = new CertificateType[] {
             new CertificateType(KeyStores.Type.CA_CERTS),
             new CertificateType(KeyStores.Type.JSSE_CA_CERTS),
             new CertificateType(KeyStores.Type.CERTS),
             new CertificateType(KeyStores.Type.JSSE_CERTS),
         };
 
-        JTabbedPane tabbedPane;
-        private final JTable userTable;
-        private final JTable systemTable;
-        private JComboBox certificateTypeCombo;
-        private KeyStores.Type currentKeyStoreType;
-        private KeyStores.Level currentKeyStoreLevel;
+    JTabbedPane tabbedPane;
+    private final JTable userTable;
+    private final JTable systemTable;
+    private JComboBox certificateTypeCombo;
+    private KeyStores.Type currentKeyStoreType;
+    private KeyStores.Level currentKeyStoreLevel;
 
-        /** JComponents that should be disbled for system store */
-        private final List<JComponent> disableForSystem;
+    /** JComponents that should be disbled for system store */
+    private final List<JComponent> disableForSystem;
 
-        private JDialog parent;
-        private JComponent defaultFocusComponent = null;
+    private JDialog parent;
+    private JComponent defaultFocusComponent = null;
 
-        /**
-         * The Current KeyStore. Only one table/tab is visible for interaction to
-         * the user. This KeyStore corresponds to that.
-         */
-        private KeyStore keyStore = null;
+    /**
+     * The Current KeyStore. Only one table/tab is visible for interaction to
+     * the user. This KeyStore corresponds to that.
+     */
+    private KeyStore keyStore = null;
 
-        public CertificatePane(JDialog parent) {
-                super();
-                this.parent = parent;
+    public CertificatePane(JDialog parent) {
+        super();
+        this.parent = parent;
 
-                userTable = new JTable(null);
-                systemTable = new JTable(null);
-                disableForSystem = new ArrayList<JComponent>();
+        userTable = new JTable(null);
+        systemTable = new JTable(null);
+        disableForSystem = new ArrayList<JComponent>();
 
-                addComponents();
+        addComponents();
 
-                currentKeyStoreType = ((CertificateType)(certificateTypeCombo.getSelectedItem())).getType();
-                if (tabbedPane.getSelectedIndex() == 0) {
-                    currentKeyStoreLevel = Level.USER;
-                } else {
-                    currentKeyStoreLevel = Level.SYSTEM;
-                }
-
-                repopulateTables();
+        currentKeyStoreType = ((CertificateType) (certificateTypeCombo.getSelectedItem())).getType();
+        if (tabbedPane.getSelectedIndex() == 0) {
+            currentKeyStoreLevel = Level.USER;
+        } else {
+            currentKeyStoreLevel = Level.SYSTEM;
         }
 
-        /**
-         * Reads the user's trusted.cacerts keystore.
-         */
-        private void initializeKeyStore() {
-            try {
-                keyStore = KeyStores.getKeyStore(currentKeyStoreLevel, currentKeyStoreType);
-            } catch (Exception e) {
-                    e.printStackTrace();
-            }
+        repopulateTables();
+    }
+
+    /**
+     * Reads the user's trusted.cacerts keystore.
+     */
+    private void initializeKeyStore() {
+        try {
+            keyStore = KeyStores.getKeyStore(currentKeyStoreLevel, currentKeyStoreType);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
-        //create the GUI here.
-        protected void addComponents() {
+    //create the GUI here.
+    protected void addComponents() {
 
-                JPanel main = new JPanel(new BorderLayout());
+        JPanel main = new JPanel(new BorderLayout());
 
-                JPanel certificateTypePanel = new JPanel(new BorderLayout());
-                certificateTypePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        JPanel certificateTypePanel = new JPanel(new BorderLayout());
+        certificateTypePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-                JLabel certificateTypeLabel = new JLabel(R("CVCertificateType"));
+        JLabel certificateTypeLabel = new JLabel(R("CVCertificateType"));
 
-                certificateTypeCombo = new JComboBox(certificateTypes);
-                certificateTypeCombo.addActionListener(new CertificateTypeListener());
+        certificateTypeCombo = new JComboBox(certificateTypes);
+        certificateTypeCombo.addActionListener(new CertificateTypeListener());
 
-                certificateTypePanel.add(certificateTypeLabel, BorderLayout.LINE_START);
-                certificateTypePanel.add(certificateTypeCombo, BorderLayout.CENTER);
+        certificateTypePanel.add(certificateTypeLabel, BorderLayout.LINE_START);
+        certificateTypePanel.add(certificateTypeCombo, BorderLayout.CENTER);
 
-                JPanel tablePanel = new JPanel(new BorderLayout());
+        JPanel tablePanel = new JPanel(new BorderLayout());
 
-                // User Table
-                DefaultTableModel userTableModel
-                        = new DefaultTableModel(issuedToAndBy, columnNames);
-                userTable.setModel(userTableModel);
-                userTable.getTableHeader().setReorderingAllowed(false);
-                userTable.setFillsViewportHeight(true);
-                JScrollPane userTablePane = new JScrollPane(userTable);
-                userTablePane.setPreferredSize(TABLE_DIMENSION);
-                userTablePane.setSize(TABLE_DIMENSION);
-                userTablePane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        // User Table
+        DefaultTableModel userTableModel = new DefaultTableModel(issuedToAndBy, columnNames);
+        userTable.setModel(userTableModel);
+        userTable.getTableHeader().setReorderingAllowed(false);
+        userTable.setFillsViewportHeight(true);
+        JScrollPane userTablePane = new JScrollPane(userTable);
+        userTablePane.setPreferredSize(TABLE_DIMENSION);
+        userTablePane.setSize(TABLE_DIMENSION);
+        userTablePane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                // System Table
-                DefaultTableModel systemTableModel = new DefaultTableModel(issuedToAndBy, columnNames);
-                systemTable.setModel(systemTableModel);
-                systemTable.getTableHeader().setReorderingAllowed(false);
-                systemTable.setFillsViewportHeight(true);
-                JScrollPane systemTablePane = new JScrollPane(systemTable);
-                systemTablePane.setPreferredSize(TABLE_DIMENSION);
-                systemTablePane.setSize(TABLE_DIMENSION);
-                systemTablePane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        // System Table
+        DefaultTableModel systemTableModel = new DefaultTableModel(issuedToAndBy, columnNames);
+        systemTable.setModel(systemTableModel);
+        systemTable.getTableHeader().setReorderingAllowed(false);
+        systemTable.setFillsViewportHeight(true);
+        JScrollPane systemTablePane = new JScrollPane(systemTable);
+        systemTablePane.setPreferredSize(TABLE_DIMENSION);
+        systemTablePane.setSize(TABLE_DIMENSION);
+        systemTablePane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                tabbedPane = new JTabbedPane();
-                tabbedPane.addTab(R("CVUser"), userTablePane);
-                tabbedPane.addTab(R("CVSystem"), systemTablePane);
-                tabbedPane.addChangeListener(new TabChangeListener());
+        tabbedPane = new JTabbedPane();
+        tabbedPane.addTab(R("CVUser"), userTablePane);
+        tabbedPane.addTab(R("CVSystem"), systemTablePane);
+        tabbedPane.addChangeListener(new TabChangeListener());
 
-                JPanel buttonPanel = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel(new FlowLayout());
 
-                String[] buttonNames = {R("CVImport"), R("CVExport"), R("CVRemove"), R("CVDetails")};
-                char[] buttonMnemonics = {      KeyEvent.VK_I,
+        String[] buttonNames = { R("CVImport"), R("CVExport"), R("CVRemove"), R("CVDetails") };
+        char[] buttonMnemonics = { KeyEvent.VK_I,
                                                                         KeyEvent.VK_E,
                                                                         KeyEvent.VK_M,
-                                                                        KeyEvent.VK_D};
-                ActionListener[] listeners = {  new ImportButtonListener(),
+                                                                        KeyEvent.VK_D };
+        ActionListener[] listeners = { new ImportButtonListener(),
                                                                                 new ExportButtonListener(),
                                                                                 new RemoveButtonListener(),
                                                                                 new DetailsButtonListener() };
-                JButton button;
+        JButton button;
 
-                //get the max width
-                int maxWidth = 0;
-                for (int i = 0; i < buttonNames.length; i++) {
-                        button = new JButton(buttonNames[i]);
-                        maxWidth = Math.max(maxWidth, button.getMinimumSize().width);
-                }
-
-                for (int i = 0; i < buttonNames.length; i++) {
-                        button = new JButton(buttonNames[i]);
-                        button.setMnemonic(buttonMnemonics[i]);
-                        button.addActionListener(listeners[i]);
-                        button.setSize(maxWidth, button.getSize().height);
-                        // import and remove buttons
-                        if (i == 0 || i == 2) {
-                            disableForSystem.add(button);
-                        }
-                        buttonPanel.add(button);
-                }
-
-                tablePanel.add(tabbedPane, BorderLayout.CENTER);
-                tablePanel.add(buttonPanel, BorderLayout.SOUTH);
-
-                main.add(certificateTypePanel, BorderLayout.NORTH);
-                main.add(tablePanel, BorderLayout.CENTER);
-                
-                if (parent != null){
-                        JPanel closePanel = new JPanel(new BorderLayout());
-                        closePanel.setBorder(BorderFactory.createEmptyBorder(7,7,7,7));
-                        JButton closeButton = new JButton(R("ButClose"));
-                        closeButton.addActionListener(new CloseButtonListener());
-                        defaultFocusComponent = closeButton;
-                        closePanel.add(closeButton, BorderLayout.EAST);
-                        main.add(closePanel, BorderLayout.SOUTH);
-                }
-                add(main);
-
+        //get the max width
+        int maxWidth = 0;
+        for (int i = 0; i < buttonNames.length; i++) {
+            button = new JButton(buttonNames[i]);
+            maxWidth = Math.max(maxWidth, button.getMinimumSize().width);
         }
 
-        /**
-         * Read in the optionPane's keystore to issuedToAndBy.
-         */
-        private void readKeyStore() {
-
-                Enumeration<String> aliases = null;
-                certs = new ArrayList<X509Certificate>();
-                try {
-
-                        //Get all of the X509Certificates and put them into an ArrayList
-                        aliases = keyStore.aliases();
-                        while (aliases.hasMoreElements()) {
-                                Certificate c = keyStore.getCertificate(aliases.nextElement());
-                                if (c instanceof X509Certificate)
-                                        certs.add((X509Certificate)c);
-                        }
-
-                        //get the publisher and root information
-                        issuedToAndBy = new String[certs.size()][2];
-                        for (int i = 0; i < certs.size(); i++) {
-                    X509Certificate c = certs.get(i);
-                                issuedToAndBy[i][0] =
-                                        SecurityUtil.getCN(c.getSubjectX500Principal().getName());
-                                issuedToAndBy[i][1] =
-                                        SecurityUtil.getCN(c.getIssuerX500Principal().getName());
-                }
-                } catch (Exception e) {
-                        //TODO
-                        e.printStackTrace();
-                }
-        }
-
-        /**
-         * Re-reads the certs file and repopulates the JTable. This is typically
-         * called after a certificate was deleted from the keystore.
-         */
-        private void repopulateTables() {
-                initializeKeyStore();
-                readKeyStore();
-                DefaultTableModel tableModel
-                        = new DefaultTableModel(issuedToAndBy, columnNames);
-
-                userTable.setModel(tableModel);
-
-                tableModel = new DefaultTableModel(issuedToAndBy, columnNames);
-                systemTable.setModel(tableModel);
-        }
-
-        public void focusOnDefaultButton() {
-            if (defaultFocusComponent != null) {
-                defaultFocusComponent.requestFocusInWindow();
+        for (int i = 0; i < buttonNames.length; i++) {
+            button = new JButton(buttonNames[i]);
+            button.setMnemonic(buttonMnemonics[i]);
+            button.addActionListener(listeners[i]);
+            button.setSize(maxWidth, button.getSize().height);
+            // import and remove buttons
+            if (i == 0 || i == 2) {
+                disableForSystem.add(button);
             }
+            buttonPanel.add(button);
         }
+
+        tablePanel.add(tabbedPane, BorderLayout.CENTER);
+        tablePanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        main.add(certificateTypePanel, BorderLayout.NORTH);
+        main.add(tablePanel, BorderLayout.CENTER);
+
+        if (parent != null) {
+            JPanel closePanel = new JPanel(new BorderLayout());
+            closePanel.setBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
+            JButton closeButton = new JButton(R("ButClose"));
+            closeButton.addActionListener(new CloseButtonListener());
+            defaultFocusComponent = closeButton;
+            closePanel.add(closeButton, BorderLayout.EAST);
+            main.add(closePanel, BorderLayout.SOUTH);
+        }
+        add(main);
+
+    }
+
+    /**
+     * Read in the optionPane's keystore to issuedToAndBy.
+     */
+    private void readKeyStore() {
+
+        Enumeration<String> aliases = null;
+        certs = new ArrayList<X509Certificate>();
+        try {
+
+            //Get all of the X509Certificates and put them into an ArrayList
+            aliases = keyStore.aliases();
+            while (aliases.hasMoreElements()) {
+                Certificate c = keyStore.getCertificate(aliases.nextElement());
+                if (c instanceof X509Certificate)
+                    certs.add((X509Certificate) c);
+            }
+
+            //get the publisher and root information
+            issuedToAndBy = new String[certs.size()][2];
+            for (int i = 0; i < certs.size(); i++) {
+                X509Certificate c = certs.get(i);
+                issuedToAndBy[i][0] =
+                                        SecurityUtil.getCN(c.getSubjectX500Principal().getName());
+                issuedToAndBy[i][1] =
+                                        SecurityUtil.getCN(c.getIssuerX500Principal().getName());
+            }
+        } catch (Exception e) {
+            //TODO
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Re-reads the certs file and repopulates the JTable. This is typically
+     * called after a certificate was deleted from the keystore.
+     */
+    private void repopulateTables() {
+        initializeKeyStore();
+        readKeyStore();
+        DefaultTableModel tableModel = new DefaultTableModel(issuedToAndBy, columnNames);
+
+        userTable.setModel(tableModel);
+
+        tableModel = new DefaultTableModel(issuedToAndBy, columnNames);
+        systemTable.setModel(tableModel);
+    }
+
+    public void focusOnDefaultButton() {
+        if (defaultFocusComponent != null) {
+            defaultFocusComponent.requestFocusInWindow();
+        }
+    }
 
     /** Allows storing KeyStores.Types in a JComponent */
     private class CertificateType {
@@ -355,74 +353,33 @@ public class CertificatePane extends JPanel {
         }
     }
 
-        private class ImportButtonListener implements ActionListener {
+    private class ImportButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
 
-                JFileChooser chooser = new JFileChooser();
-                int returnVal = chooser.showOpenDialog(parent);
-                if(returnVal == JFileChooser.APPROVE_OPTION) {
-                        try {
-                                KeyStore ks = keyStore;
-                                CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
-                                File keyStoreFile = new File(KeyStores
+            JFileChooser chooser = new JFileChooser();
+            int returnVal = chooser.showOpenDialog(parent);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                try {
+                    KeyStore ks = keyStore;
+                    CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
+                    File keyStoreFile = new File(KeyStores
                                         .getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
-                                if (!keyStoreFile.isFile()) {
-                                    FileUtils.createRestrictedFile(keyStoreFile, true);
-                                }
+                    if (!keyStoreFile.isFile()) {
+                        FileUtils.createRestrictedFile(keyStoreFile, true);
+                    }
 
-                                OutputStream os = new FileOutputStream(keyStoreFile);
-                                ks.store(os, KeyStores.getPassword());
-                                repopulateTables();
-                        } catch (Exception ex) {
-                                // TODO: handle exception
-                                ex.printStackTrace();
-                        }
+                    OutputStream os = new FileOutputStream(keyStoreFile);
+                    ks.store(os, KeyStores.getPassword());
+                    repopulateTables();
+                } catch (Exception ex) {
+                    // TODO: handle exception
+                    ex.printStackTrace();
                 }
+            }
         }
     }
 
-        private class ExportButtonListener implements ActionListener {
-                public void actionPerformed(ActionEvent e) {
-
-                    JTable table = null;
-                    if (currentKeyStoreLevel == Level.USER) {
-                        table = userTable;
-                    } else {
-                        table = systemTable;
-                    }
-
-                        //For now, let's just export in -rfc mode as keytool does.
-                        //we'll write to a file the exported certificate.
-
-
-                        try {
-                                int selectedRow = table.getSelectedRow();
-                                if (selectedRow != -1) {
-                                JFileChooser chooser = new JFileChooser();
-                                int returnVal = chooser.showOpenDialog(parent);
-                                if(returnVal == JFileChooser.APPROVE_OPTION) {
-                                        String alias = keyStore.getCertificateAlias(certs
-                                                        .get(selectedRow));
-                                        if (alias != null) {
-                                                Certificate c = keyStore.getCertificate(alias);
-                                                PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
-                                                CertificateUtils.dump(c, ps);
-                                                repopulateTables();
-                                        }
-                                }
-                                }
-                        } catch (Exception ex) {
-                                // TODO
-                                ex.printStackTrace();
-                        }
-                }
-        }
-
-        private class RemoveButtonListener implements ActionListener {
-
-                /**
-                 * Removes a certificate from the keyStore and writes changes to disk.
-                 */
+    private class ExportButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
 
             JTable table = null;
@@ -431,44 +388,84 @@ public class CertificatePane extends JPanel {
             } else {
                 table = systemTable;
             }
-                try {
-                        int selectedRow = table.getSelectedRow();
 
-                        if (selectedRow != -1){
-                                String alias = keyStore.getCertificateAlias(certs.get(selectedRow));
-                                if (alias != null) {
+            //For now, let's just export in -rfc mode as keytool does.
+            //we'll write to a file the exported certificate.
 
-                                        int i = JOptionPane.showConfirmDialog(parent,
+            try {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    JFileChooser chooser = new JFileChooser();
+                    int returnVal = chooser.showOpenDialog(parent);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        String alias = keyStore.getCertificateAlias(certs
+                                                        .get(selectedRow));
+                        if (alias != null) {
+                            Certificate c = keyStore.getCertificate(alias);
+                            PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
+                            CertificateUtils.dump(c, ps);
+                            repopulateTables();
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                // TODO
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private class RemoveButtonListener implements ActionListener {
+
+        /**
+         * Removes a certificate from the keyStore and writes changes to disk.
+         */
+        public void actionPerformed(ActionEvent e) {
+
+            JTable table = null;
+            if (currentKeyStoreLevel == Level.USER) {
+                table = userTable;
+            } else {
+                table = systemTable;
+            }
+            try {
+                int selectedRow = table.getSelectedRow();
+
+                if (selectedRow != -1) {
+                    String alias = keyStore.getCertificateAlias(certs.get(selectedRow));
+                    if (alias != null) {
+
+                        int i = JOptionPane.showConfirmDialog(parent,
                                                         R("CVRemoveConfirmMessage"),
                                                         R("CVRemoveConfirmTitle"),
                                                         JOptionPane.YES_NO_OPTION);
-                                        if (i == 0) {
-                                                keyStore.deleteEntry(alias);
-                                                File keyStoreFile = new File(KeyStores
+                        if (i == 0) {
+                            keyStore.deleteEntry(alias);
+                            File keyStoreFile = new File(KeyStores
                                                         .getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
-                                                if (!keyStoreFile.isFile()) {
-                                                    FileUtils.createRestrictedFile(keyStoreFile, true);
-                                                }
-                                                FileOutputStream fos = new FileOutputStream(keyStoreFile);
-                                                keyStore.store(fos, KeyStores.getPassword());
-                                                fos.close();
-                                        }
-                                }
-                                repopulateTables();
+                            if (!keyStoreFile.isFile()) {
+                                FileUtils.createRestrictedFile(keyStoreFile, true);
+                            }
+                            FileOutputStream fos = new FileOutputStream(keyStoreFile);
+                            keyStore.store(fos, KeyStores.getPassword());
+                            fos.close();
                         }
-                } catch (Exception ex) {
-                        // TODO
-                                ex.printStackTrace();
+                    }
+                    repopulateTables();
                 }
+            } catch (Exception ex) {
+                // TODO
+                ex.printStackTrace();
+            }
 
         }
     }
 
-        private class DetailsButtonListener implements ActionListener {
+    private class DetailsButtonListener implements ActionListener {
 
-                /**
-                 * Shows the details of a trusted certificate.
-                 */
+        /**
+         * Shows the details of a trusted certificate.
+         */
         public void actionPerformed(ActionEvent e) {
 
             JTable table = null;
@@ -478,19 +475,19 @@ public class CertificatePane extends JPanel {
                 table = systemTable;
             }
 
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow != -1 && selectedRow >= 0) {
-                        X509Certificate c = certs.get(selectedRow);
-                        SecurityWarningDialog.showSingleCertInfoDialog(c, parent);
-                }
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1 && selectedRow >= 0) {
+                X509Certificate c = certs.get(selectedRow);
+                SecurityWarningDialog.showSingleCertInfoDialog(c, parent);
+            }
         }
     }
 
-        private class CloseButtonListener implements ActionListener {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.dispose();
-            }
+    private class CloseButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            parent.dispose();
         }
+    }
 
 }

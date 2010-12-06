@@ -35,7 +35,6 @@ import java.util.*;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-
 /**
  * XMLElement is a representation of an XML object. The object is able to parse
  * XML code.
@@ -94,8 +93,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  *         &lt;<A href="mailto:cyberelf@mac.com">cyberelf@mac.com</A>&gt;
  * @version $Name:  $, $Revision: 1.2 $
  */
-public class XMLElement
-{
+public class XMLElement {
 
     /**
      * The attributes given to the element.
@@ -106,8 +104,7 @@ public class XMLElement
      *     <li>The keys and the values are strings.
      * </ul></dd></dl>
      */
-    private Hashtable<String,Object> attributes;
-
+    private Hashtable<String, Object> attributes;
 
     /**
      * Child elements of the element.
@@ -120,7 +117,6 @@ public class XMLElement
      * </ul></dd></dl>
      */
     private Vector<XMLElement> children;
-
 
     /**
      * The name of the element.
@@ -135,7 +131,6 @@ public class XMLElement
      */
     private String name;
 
-
     /**
      * The #PCDATA content of the object.
      *
@@ -146,7 +141,6 @@ public class XMLElement
      * </ul></dd></dl>
      */
     private String contents;
-
 
     /**
      * Conversion table for &amp;...; entities. The keys are the entity names
@@ -162,8 +156,7 @@ public class XMLElement
      *     <li>The values are char arrays
      * </ul></dd></dl>
      */
-    private Hashtable<String,char[]> entities;
-
+    private Hashtable<String, char[]> entities;
 
     /**
      * The line number where the element starts.
@@ -174,20 +167,17 @@ public class XMLElement
      */
     private int lineNr;
 
-
     /**
      * <code>true</code> if the case of the element and attribute names
      * are case insensitive.
      */
     private boolean ignoreCase;
 
-
     /**
      * <code>true</code> if the leading and trailing whitespace of #PCDATA
      * sections have to be ignored.
      */
     private boolean ignoreWhitespace;
-
 
     /**
      * Character read too much.
@@ -212,7 +202,6 @@ public class XMLElement
      */
     private Reader reader;
 
-
     /**
      * The current line number in the source content.
      *
@@ -221,7 +210,6 @@ public class XMLElement
      * </ul></dd></dl>
      */
     private int parserLineNr;
-
 
     /**
      * Creates and initializes a new XML element.
@@ -240,11 +228,9 @@ public class XMLElement
      * </ul></dd></dl>
      *
      */
-    public XMLElement()
-    {
-        this(new Hashtable<String,char[]>(), false, true, true);
+    public XMLElement() {
+        this(new Hashtable<String, char[]>(), false, true, true);
     }
-
 
     /**
      * Creates and initializes a new XML element.
@@ -284,16 +270,15 @@ public class XMLElement
      * </ul></dd></dl><dl>
      *
      */
-    protected XMLElement(Hashtable<String,char[]> entities,
-                         boolean   skipLeadingWhitespace,
-                         boolean   fillBasicConversionTable,
-                         boolean   ignoreCase)
-    {
+    protected XMLElement(Hashtable<String, char[]> entities,
+                         boolean skipLeadingWhitespace,
+                         boolean fillBasicConversionTable,
+                         boolean ignoreCase) {
         this.ignoreWhitespace = skipLeadingWhitespace;
         this.ignoreCase = ignoreCase;
         this.name = null;
         this.contents = "";
-        this.attributes = new Hashtable<String,Object>();
+        this.attributes = new Hashtable<String, Object>();
         this.children = new Vector<XMLElement>();
         this.entities = entities;
         this.lineNr = 0;
@@ -314,7 +299,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * Adds a child element.
      *
@@ -334,11 +318,9 @@ public class XMLElement
      * </ul></dd></dl><dl>
      *
      */
-    public void addChild(XMLElement child)
-    {
+    public void addChild(XMLElement child) {
         this.children.addElement(child);
     }
-
 
     /**
      * Adds or modifies an attribute.
@@ -362,14 +344,12 @@ public class XMLElement
      *
      */
     public void setAttribute(String name,
-                             Object value)
-    {
+                             Object value) {
         if (this.ignoreCase) {
             name = name.toUpperCase();
         }
         this.attributes.put(name, value.toString());
     }
-
 
     /**
      * Returns the number of child elements of the element.
@@ -379,11 +359,9 @@ public class XMLElement
      * </ul></dd></dl>
      *
      */
-    public int countChildren()
-    {
+    public int countChildren() {
         return this.children.size();
     }
-
 
     /**
      * Enumerates the attribute names.
@@ -393,11 +371,9 @@ public class XMLElement
      * </ul></dd></dl>
      *
      */
-    public Enumeration enumerateAttributeNames()
-    {
+    public Enumeration enumerateAttributeNames() {
         return this.attributes.keys();
     }
-
 
     /**
      * Enumerates the child elements.
@@ -407,22 +383,18 @@ public class XMLElement
      * </ul></dd></dl>
      *
      */
-    public Enumeration enumerateChildren()
-    {
+    public Enumeration enumerateChildren() {
         return this.children.elements();
     }
-
 
     /**
      * Returns the PCDATA content of the object. If there is no such content,
      * <CODE>null</CODE> is returned.
      *
      */
-    public String getContent()
-    {
+    public String getContent() {
         return this.contents;
     }
-
 
     /**
      * Returns the line nr in the source data on which the element is found.
@@ -432,11 +404,9 @@ public class XMLElement
      * <ul><li><code>result >= 0</code>
      * </ul></dd></dl>
      */
-    public int getLineNr()
-    {
+    public int getLineNr() {
         return this.lineNr;
     }
-
 
     /**
      * Returns an attribute of the element.
@@ -450,8 +420,7 @@ public class XMLElement
      * </ul></dd></dl><dl>
      *
      */
-    public Object getAttribute(String name)
-    {
+    public Object getAttribute(String name) {
         if (this.ignoreCase) {
             name = name.toUpperCase();
         }
@@ -459,16 +428,13 @@ public class XMLElement
         return value;
     }
 
-
     /**
      * Returns the name of the element.
      *
      */
-    public String getName()
-    {
+    public String getName() {
         return this.name;
     }
-
 
     /**
      * Reads one XML element from a java.io.Reader and parses it.
@@ -494,11 +460,9 @@ public class XMLElement
      *     If an error occured while parsing the read data.
      */
     public void parseFromReader(Reader reader)
-    throws IOException, XMLParseException
-    {
-        this.parseFromReader(reader, /*startingLineNr*/ 1);
+            throws IOException, XMLParseException {
+        this.parseFromReader(reader, /*startingLineNr*/1);
     }
-
 
     /**
      * Reads one XML element from a java.io.Reader and parses it.
@@ -526,9 +490,8 @@ public class XMLElement
      *     If an error occured while parsing the read data.
      */
     public void parseFromReader(Reader reader,
-                                int    startingLineNr)
-        throws IOException, XMLParseException
-    {
+                                int startingLineNr)
+            throws IOException, XMLParseException {
         this.charReadTooMuch = '\0';
         this.reader = reader;
         this.parserLineNr = startingLineNr;
@@ -552,20 +515,17 @@ public class XMLElement
         }
     }
 
-
     /**
      * Creates a new similar XML element.
      * <P>
      * You should override this method when subclassing XMLElement.
      */
-    protected XMLElement createAnotherElement()
-    {
+    protected XMLElement createAnotherElement() {
         return new XMLElement(this.entities,
                               this.ignoreWhitespace,
                               false,
                               this.ignoreCase);
     }
-
 
     /**
      * Changes the content string.
@@ -573,11 +533,9 @@ public class XMLElement
      * @param content
      *     The new content string.
      */
-    public void setContent(String content)
-    {
+    public void setContent(String content) {
         this.contents = content;
     }
-
 
     /**
      * Changes the name of the element.
@@ -591,11 +549,9 @@ public class XMLElement
      * </ul></dd></dl>
      *
      */
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
-
 
     /**
      * Scans an identifier from the current reader.
@@ -616,13 +572,12 @@ public class XMLElement
      * </ul></dd></dl><dl>
      */
     protected void scanIdentifier(StringBuffer result)
-        throws IOException
-    {
+            throws IOException {
         for (;;) {
             char ch = this.readChar();
             if (((ch < 'A') || (ch > 'Z')) && ((ch < 'a') || (ch > 'z'))
-                && ((ch < '0') || (ch > '9')) && (ch != '_') && (ch != '.')
-                && (ch != ':') && (ch != '-') && (ch <= '\u007E')) {
+                    && ((ch < '0') || (ch > '9')) && (ch != '_') && (ch != '.')
+                    && (ch != ':') && (ch != '-') && (ch <= '\u007E')) {
                 this.unreadChar(ch);
                 return;
             }
@@ -630,15 +585,13 @@ public class XMLElement
         }
     }
 
-
     /**
      * This method scans an identifier from the current reader.
      *
      * @return the next character following the whitespace.
      */
     protected char scanWhitespace()
-        throws IOException
-    {
+            throws IOException {
         for (;;) {
             char ch = this.readChar();
             switch (ch) {
@@ -653,7 +606,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * This method scans an identifier from the current reader.
      * The scanned whitespace is appended to <code>result</code>.
@@ -665,8 +617,7 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected char scanWhitespace(StringBuffer result)
-        throws IOException
-    {
+            throws IOException {
         for (;;) {
             char ch = this.readChar();
             switch (ch) {
@@ -683,7 +634,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * This method scans a delimited string from the current reader.
      * The scanned string without delimiters is appended to
@@ -695,8 +645,7 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected void scanString(StringBuffer string)
-        throws IOException
-    {
+            throws IOException {
         char delimiter = this.readChar();
         if ((delimiter != '\'') && (delimiter != '"')) {
             throw this.expectedInput("' or \"");
@@ -713,7 +662,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * Scans a #PCDATA element. CDATA sections and entities are resolved.
      * The next &lt; char is skipped.
@@ -724,8 +672,7 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected void scanPCData(StringBuffer data)
-        throws IOException
-    {
+            throws IOException {
         for (;;) {
             char ch = this.readChar();
             if (ch == '<') {
@@ -744,7 +691,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * Scans a special tag and if the tag is a CDATA section, append its
      * content to <code>buf</code>.
@@ -755,14 +701,13 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected boolean checkCDATA(StringBuffer buf)
-        throws IOException
-    {
+            throws IOException {
         char ch = this.readChar();
         if (ch != '[') {
             this.unreadChar(ch);
             this.skipSpecialTag(0);
             return false;
-        } else if (! this.checkLiteral("CDATA[")) {
+        } else if (!this.checkLiteral("CDATA[")) {
             this.skipSpecialTag(1); // one [ has already been read
             return false;
         } else {
@@ -802,7 +747,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * Skips a comment.
      *
@@ -811,8 +755,7 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected void skipComment()
-        throws IOException
-    {
+            throws IOException {
         int dashesToRead = 2;
         while (dashesToRead > 0) {
             char ch = this.readChar();
@@ -841,7 +784,6 @@ public class XMLElement
         */
     }
 
-
     /**
      * Skips a special tag or comment.
      *
@@ -854,8 +796,7 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected void skipSpecialTag(int bracketLevel)
-        throws IOException
-    {
+            throws IOException {
         int tagLevel = 1; // <
         char stringDelimiter = '\0';
         if (bracketLevel == 0) {
@@ -899,7 +840,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * Scans the data for literal text.
      * Scanning stops when a character does not match or after the complete
@@ -912,8 +852,7 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected boolean checkLiteral(String literal)
-        throws IOException
-    {
+            throws IOException {
         int length = literal.length();
         for (int i = 0; i < length; i += 1) {
             if (this.readChar() != literal.charAt(i)) {
@@ -923,13 +862,11 @@ public class XMLElement
         return true;
     }
 
-
     /**
      * Reads a character from a reader.
      */
     protected char readChar()
-        throws IOException
-    {
+            throws IOException {
         if (this.charReadTooMuch != '\0') {
             char ch = this.charReadTooMuch;
             this.charReadTooMuch = '\0';
@@ -947,7 +884,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * Scans an XML element.
      *
@@ -959,8 +895,7 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected void scanElement(XMLElement elt)
-        throws IOException
-    {
+            throws IOException {
         StringBuffer buf = new StringBuffer();
         this.scanIdentifier(buf);
         String name = buf.toString();
@@ -1051,14 +986,13 @@ public class XMLElement
             throw this.expectedInput("/");
         }
         this.unreadChar(this.scanWhitespace());
-        if (! this.checkLiteral(name)) {
+        if (!this.checkLiteral(name)) {
             throw this.expectedInput(name);
         }
         if (this.scanWhitespace() != '>') {
             throw this.expectedInput(">");
         }
     }
-
 
     /**
      * Resolves an entity. The name of the entity is read from the reader.
@@ -1072,8 +1006,7 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected void resolveEntity(StringBuffer buf)
-        throws IOException
-    {
+            throws IOException {
         char ch = '\0';
         StringBuffer keyBuf = new StringBuffer();
         for (;;) {
@@ -1104,7 +1037,6 @@ public class XMLElement
         }
     }
 
-
     /**
      * Pushes a character back to the read-back buffer.
      *
@@ -1115,11 +1047,9 @@ public class XMLElement
      *     <li><code>ch != '\0'</code>
      * </ul></dd></dl>
      */
-    protected void unreadChar(char ch)
-    {
+    protected void unreadChar(char ch) {
         this.charReadTooMuch = ch;
     }
-
 
     /**
      * Creates a parse exception for when an invalid valueset is given to
@@ -1131,12 +1061,10 @@ public class XMLElement
      * <ul><li><code>name != null</code>
      * </ul></dd></dl>
      */
-    protected XMLParseException invalidValueSet(String name)
-    {
+    protected XMLParseException invalidValueSet(String name) {
         String msg = "Invalid value set (entity name = \"" + name + "\")";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
-
 
     /**
      * Creates a parse exception for when an invalid value is given to a
@@ -1151,24 +1079,20 @@ public class XMLElement
      * </ul></dd></dl>
      */
     protected XMLParseException invalidValue(String name,
-                                             String value)
-    {
+                                             String value) {
         String msg = "Attribute \"" + name + "\" does not contain a valid "
                    + "value (\"" + value + "\")";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
 
-
     /**
      * Creates a parse exception for when the end of the data input has been
      * reached.
      */
-    protected XMLParseException unexpectedEndOfData()
-    {
+    protected XMLParseException unexpectedEndOfData() {
         String msg = "Unexpected end of data reached";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
-
 
     /**
      * Creates a parse exception for when a syntax error occured.
@@ -1180,12 +1104,10 @@ public class XMLElement
      *     <li><code>context.length() &gt; 0</code>
      * </ul></dd></dl>
      */
-    protected XMLParseException syntaxError(String context)
-    {
+    protected XMLParseException syntaxError(String context) {
         String msg = "Syntax error while parsing " + context;
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
-
 
     /**
      * Creates a parse exception for when the next character read is not
@@ -1199,8 +1121,7 @@ public class XMLElement
      *     <li><code>charSet.length() &gt; 0</code>
      * </ul></dd></dl>
      */
-    protected XMLParseException expectedInput(String charSet)
-    {
+    protected XMLParseException expectedInput(String charSet) {
         String msg = "Expected: " + charSet;
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
@@ -1217,9 +1138,8 @@ public class XMLElement
      *     <li><code>charSet.length() &gt; 0</code>
      * </ul></dd></dl>
      */
-    protected XMLParseException expectedInput(String charSet, char ch)
-    {
-        String msg = "Expected: '" + charSet +"'" + " but got: '" + ch + "'";
+    protected XMLParseException expectedInput(String charSet, char ch) {
+        String msg = "Expected: '" + charSet + "'" + " but got: '" + ch + "'";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
 
@@ -1233,8 +1153,7 @@ public class XMLElement
      *     <li><code>name.length() &gt; 0</code>
      * </ul></dd></dl>
      */
-    protected XMLParseException unknownEntity(String name)
-    {
+    protected XMLParseException unknownEntity(String name) {
         String msg = "Unknown or invalid entity: &" + name + ";";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
@@ -1257,7 +1176,7 @@ public class XMLElement
             int newline = 2;
             char prev = ' ';
 
-            while(true) {
+            while (true) {
                 char ch;
                 if (this.sanitizeCharReadTooMuch != '\0') {
                     ch = this.sanitizeCharReadTooMuch;

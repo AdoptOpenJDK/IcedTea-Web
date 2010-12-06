@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.io.*;
@@ -42,7 +41,6 @@ import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.security.VariableX509TrustManager;
 import net.sourceforge.jnlp.services.*;
 import net.sourceforge.jnlp.util.*;
-
 
 /**
  * Configure and access the runtime environment.  This class
@@ -98,8 +96,8 @@ public class JNLPRuntime {
     /** whether netx is in command-line mode (headless) */
     private static boolean headless = false;
 
-        /** whether we'll be checking for jar signing */
-        private static boolean verify = true;
+    /** whether we'll be checking for jar signing */
+    private static boolean verify = true;
 
     /** whether the runtime uses security */
     private static boolean securityEnabled = true;
@@ -169,7 +167,7 @@ public class JNLPRuntime {
         //Setting the system property for javawebstart's version.
         //The version stored will be the same as java's version.
         System.setProperty("javawebstart.version", "javaws-" +
-            System.getProperty("java.version"));
+                System.getProperty("java.version"));
 
         if (headless == false)
             checkHeadless();
@@ -333,12 +331,13 @@ public class JNLPRuntime {
         return headless;
     }
 
-        /**
-         * Returns whether we are verifying code signing.
-         */
-        public static boolean isVerifying() {
-                return verify;
-        }
+    /**
+     * Returns whether we are verifying code signing.
+     */
+    public static boolean isVerifying() {
+        return verify;
+    }
+
     /**
      * Sets whether the JNLP client will use any AWT/Swing
      * components.  In headless mode, client features that use the
@@ -352,13 +351,13 @@ public class JNLPRuntime {
         headless = enabled;
     }
 
-   /**
-        * Sets whether we will verify code signing.
-        * @throws IllegalStateException if the runtime was previously initialized
-        */
+    /**
+         * Sets whether we will verify code signing.
+         * @throws IllegalStateException if the runtime was previously initialized
+         */
     public static void setVerify(boolean enabled) {
-                checkInitialized();
-                verify = enabled;
+        checkInitialized();
+        verify = enabled;
     }
 
     /**
@@ -518,12 +517,11 @@ public class JNLPRuntime {
                 return null;
             else
                 return result;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (!key.equals("RNoResource"))
-                return getMessage("RNoResource", new Object[] {key});
+                return getMessage("RNoResource", new Object[] { key });
             else
-                return "Missing resource: "+key;
+                return "Missing resource: " + key;
         }
     }
 
@@ -578,8 +576,7 @@ public class JNLPRuntime {
         try {
             if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless")))
                 headless = true;
-        }
-        catch (SecurityException ex) {
+        } catch (SecurityException ex) {
         }
     }
 
@@ -589,8 +586,7 @@ public class JNLPRuntime {
     private static void loadResources() {
         try {
             resources = ResourceBundle.getBundle("net.sourceforge.jnlp.resources.Messages");
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new IllegalStateException("Missing resource bundle in netx.jar:net/sourceforge/jnlp/resource/Messages.properties");
         }
     }
@@ -605,13 +601,11 @@ public class JNLPRuntime {
         try {
             windowIcon = new javax.swing.ImageIcon((new sun.misc.Launcher())
                         .getClassLoader().getResource("net/sourceforge/jnlp/resources/netx-icon.png")).getImage();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
         }
     }
-
 
     public static void setInitialArgments(List<String> args) {
         checkInitialized();

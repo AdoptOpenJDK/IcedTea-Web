@@ -38,22 +38,19 @@ import sun.awt.SunToolkit;
  *
  * @author      Francis Kung <fkung@redhat.com>
  */
-public class NetxPanel extends AppletViewerPanel
-{
+public class NetxPanel extends AppletViewerPanel {
     private PluginBridge bridge = null;
     private boolean exitOnFailure = true;
     private AppletInstance appInst = null;
     private boolean appletAlive;
 
-    public NetxPanel(URL documentURL, Hashtable<String,String> atts)
-    {
+    public NetxPanel(URL documentURL, Hashtable<String, String> atts) {
         super(documentURL, atts);
     }
 
     // overloaded constructor, called when initialized via plugin
-    public NetxPanel(URL documentURL, Hashtable<String,String> atts,
-                     boolean exitOnFailure)
-    {
+    public NetxPanel(URL documentURL, Hashtable<String, String> atts,
+                     boolean exitOnFailure) {
         this(documentURL, atts);
         this.exitOnFailure = exitOnFailure;
         this.appletAlive = true;
@@ -76,7 +73,7 @@ public class NetxPanel extends AppletViewerPanel
     protected void runLoader() {
 
         try {
-                bridge = new PluginBridge(baseURL,
+            bridge = new PluginBridge(baseURL,
                                 getDocumentBase(),
                                 getJarFiles(),
                                 getCode(),
@@ -84,46 +81,45 @@ public class NetxPanel extends AppletViewerPanel
                                 getHeight(),
                                 atts);
 
-                doInit = true;
-                dispatchAppletEvent(APPLET_LOADING, null);
-                status = APPLET_LOAD;
+            doInit = true;
+            dispatchAppletEvent(APPLET_LOADING, null);
+            status = APPLET_LOAD;
 
-                Launcher l = new Launcher(exitOnFailure);
+            Launcher l = new Launcher(exitOnFailure);
 
-                try {
-                    appInst = (AppletInstance) l.launch(bridge, this);
-                } catch (LaunchException e) {
-                    // Assume user has indicated he does not trust the
-                    // applet.
-                        if (exitOnFailure)
-                                System.exit(0);
-                }
-                applet = appInst.getApplet();
+            try {
+                appInst = (AppletInstance) l.launch(bridge, this);
+            } catch (LaunchException e) {
+                // Assume user has indicated he does not trust the
+                // applet.
+                if (exitOnFailure)
+                    System.exit(0);
+            }
+            applet = appInst.getApplet();
 
-                //On the other hand, if you create an applet this way, it'll work
-                //fine. Note that you might to open visibility in sun.applet.AppletPanel
-                //for this to work (the loader field, and getClassLoader).
-                //loader = getClassLoader(getCodeBase(), getClassLoaderCacheKey());
-                //applet = createApplet(loader);
+            //On the other hand, if you create an applet this way, it'll work
+            //fine. Note that you might to open visibility in sun.applet.AppletPanel
+            //for this to work (the loader field, and getClassLoader).
+            //loader = getClassLoader(getCodeBase(), getClassLoaderCacheKey());
+            //applet = createApplet(loader);
 
-                // This shows that when using NetX's JNLPClassLoader, keyboard input
-                // won't make it to the applet, whereas using sun.applet.AppletClassLoader
-                // works just fine.
+            // This shows that when using NetX's JNLPClassLoader, keyboard input
+            // won't make it to the applet, whereas using sun.applet.AppletClassLoader
+            // works just fine.
 
-                dispatchAppletEvent(APPLET_LOADING_COMPLETED, null);
+            dispatchAppletEvent(APPLET_LOADING_COMPLETED, null);
 
-                if (applet != null)
-                {
-                        // Stick it in the frame
-                        applet.setStub(this);
-                        applet.setVisible(false);
-                        add("Center", applet);
-                        showAppletStatus("loaded");
-                        validate();
-                }
+            if (applet != null) {
+                // Stick it in the frame
+                applet.setStub(this);
+                applet.setVisible(false);
+                add("Center", applet);
+                showAppletStatus("loaded");
+                validate();
+            }
         } catch (Exception e) {
             this.appletAlive = false;
-                e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -134,13 +130,13 @@ public class NetxPanel extends AppletViewerPanel
     // Reminder: Relax visibility in sun.applet.AppletPanel
     protected synchronized void createAppletThread() {
         // initialize JNLPRuntime in the main threadgroup
-        synchronized(JNLPRuntime.initMutex) {
+        synchronized (JNLPRuntime.initMutex) {
             //The custom NetX Policy and SecurityManager are set here.
             if (!JNLPRuntime.isInitialized()) {
                 if (JNLPRuntime.isDebug())
                     System.out.println("initializing JNLPRuntime...");
 
-                    JNLPRuntime.initialize(false);
+                JNLPRuntime.initialize(false);
             } else {
                 if (JNLPRuntime.isDebug())
                     System.out.println("JNLPRuntime already initialized");

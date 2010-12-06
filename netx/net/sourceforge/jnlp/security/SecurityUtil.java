@@ -48,15 +48,15 @@ import net.sourceforge.jnlp.security.KeyStores.Type;
 
 public class SecurityUtil {
 
-        private static final char[] password = "changeit".toCharArray();
+    private static final char[] password = "changeit".toCharArray();
 
-        public static String getTrustedCertsFilename() throws Exception{
-                return KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS);
-        }
+    public static String getTrustedCertsFilename() throws Exception {
+        return KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS);
+    }
 
-        public static char[] getTrustedCertsPassword() {
-                return password;
-        }
+    public static char[] getTrustedCertsPassword() {
+        return password;
+    }
 
     /**
      * Extracts the CN field from a Certificate principal string. Or, if it
@@ -98,55 +98,55 @@ public class SecurityUtil {
         for (int i = start + 3; i < principal.length(); i++) {
             char ch = principal.charAt(i);
             switch (ch) {
-            case '"':
-                if (escaped) {
-                    commonName.append(ch);
-                    escaped = false;
-                } else {
-                    inQuotes = !inQuotes;
-                }
-                break;
-
-            case '\\':
-                if (escaped) {
-                    commonName.append(ch);
-                    escaped = false;
-                } else {
-                    escaped = true;
-                }
-                break;
-
-            case ',':
-                /* fall through */
-            case ';':
-                /* fall through */
-            case '+':
-                if (escaped || inQuotes) {
-                    commonName.append(ch);
+                case '"':
                     if (escaped) {
+                        commonName.append(ch);
                         escaped = false;
+                    } else {
+                        inQuotes = !inQuotes;
                     }
-                } else {
-                    return commonName.toString();
-                }
-                break;
+                    break;
 
-            default:
-                if (escaped && isHexDigit(ch)) {
-                    hexBits = new char[2];
-                    hexBits[0] = ch;
-                } else if (hexBits != null) {
-                    if (!isHexDigit(ch)) {
-                        /* error parsing */
-                        return "";
+                case '\\':
+                    if (escaped) {
+                        commonName.append(ch);
+                        escaped = false;
+                    } else {
+                        escaped = true;
                     }
-                    hexBits[1] = ch;
-                    commonName.append((char) Integer.parseInt(new String(hexBits), 16));
-                    hexBits = null;
-                } else {
-                    commonName.append(ch);
-                }
-                escaped = false;
+                    break;
+
+                case ',':
+                    /* fall through */
+                case ';':
+                    /* fall through */
+                case '+':
+                    if (escaped || inQuotes) {
+                        commonName.append(ch);
+                        if (escaped) {
+                            escaped = false;
+                        }
+                    } else {
+                        return commonName.toString();
+                    }
+                    break;
+
+                default:
+                    if (escaped && isHexDigit(ch)) {
+                        hexBits = new char[2];
+                        hexBits[0] = ch;
+                    } else if (hexBits != null) {
+                        if (!isHexDigit(ch)) {
+                            /* error parsing */
+                            return "";
+                        }
+                        hexBits[1] = ch;
+                        commonName.append((char) Integer.parseInt(new String(hexBits), 16));
+                        hexBits = null;
+                    } else {
+                        commonName.append(ch);
+                    }
+                    escaped = false;
             }
         }
 
@@ -158,68 +158,68 @@ public class SecurityUtil {
         return ((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f'));
     }
 
-        /**
-         * Checks the user's home directory to see if the trusted.certs file exists.
-         * If it does not exist, it tries to create an empty keystore.
-         * @return true if the trusted.certs file exists or a new trusted.certs
-         * was created successfully, otherwise false.
-         */
-        public static boolean checkTrustedCertsFile() throws Exception {
+    /**
+     * Checks the user's home directory to see if the trusted.certs file exists.
+     * If it does not exist, it tries to create an empty keystore.
+     * @return true if the trusted.certs file exists or a new trusted.certs
+     * was created successfully, otherwise false.
+     */
+    public static boolean checkTrustedCertsFile() throws Exception {
 
-                File certFile = new File(getTrustedCertsFilename());
+        File certFile = new File(getTrustedCertsFilename());
 
-                //file does not exist
-                if (!certFile.isFile()) {
-                        File dir = certFile.getAbsoluteFile().getParentFile();
-                        boolean madeDir = false;
-                        if (!dir.isDirectory()) {
-                                madeDir = dir.mkdirs();
-                        }
+        //file does not exist
+        if (!certFile.isFile()) {
+            File dir = certFile.getAbsoluteFile().getParentFile();
+            boolean madeDir = false;
+            if (!dir.isDirectory()) {
+                madeDir = dir.mkdirs();
+            }
 
-                        //made directory, or directory exists
-                        if (madeDir || dir.isDirectory()) {
-                                KeyStore ks = KeyStore.getInstance("JKS");
-                                ks.load(null, password);
-                                FileOutputStream fos = new FileOutputStream(certFile);
-                                ks.store(fos, password);
-                                fos.close();
-                                return true;
-                        } else {
-                                return false;
-                        }
-                } else {
-                        return true;
-                }
+            //made directory, or directory exists
+            if (madeDir || dir.isDirectory()) {
+                KeyStore ks = KeyStore.getInstance("JKS");
+                ks.load(null, password);
+                FileOutputStream fos = new FileOutputStream(certFile);
+                ks.store(fos, password);
+                fos.close();
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
         }
+    }
 
-        /**
-         * Returns the keystore associated with the user's trusted.certs file,
-         * or null otherwise.
-         */
-        public static KeyStore getUserKeyStore() throws Exception {
+    /**
+     * Returns the keystore associated with the user's trusted.certs file,
+     * or null otherwise.
+     */
+    public static KeyStore getUserKeyStore() throws Exception {
 
-                KeyStore ks = null;
-                FileInputStream fis = null;
+        KeyStore ks = null;
+        FileInputStream fis = null;
 
-                if (checkTrustedCertsFile()) {
+        if (checkTrustedCertsFile()) {
 
-                        try {
-                                File file = new File(getTrustedCertsFilename());
-                                if (file.exists()) {
-                                        fis = new FileInputStream(file);
-                                        ks = KeyStore.getInstance("JKS");
-                                        ks.load(fis, password);
-                                }
-                        } catch (Exception e) {
-                                e.printStackTrace();
-                                throw e;
-                        } finally {
-                                if (fis != null)
-                                        fis.close();
-                        }
+            try {
+                File file = new File(getTrustedCertsFilename());
+                if (file.exists()) {
+                    fis = new FileInputStream(file);
+                    ks = KeyStore.getInstance("JKS");
+                    ks.load(fis, password);
                 }
-                return ks;
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            } finally {
+                if (fis != null)
+                    fis.close();
+            }
         }
+        return ks;
+    }
 
     /**
      * Returns the keystore associated with the JDK cacerts file,
@@ -227,54 +227,54 @@ public class SecurityUtil {
      */
     public static KeyStore getCacertsKeyStore() throws Exception {
 
-                KeyStore caks = null;
-                FileInputStream fis = null;
+        KeyStore caks = null;
+        FileInputStream fis = null;
 
-                try {
-                File file = new File(System.getProperty("java.home")
+        try {
+            File file = new File(System.getProperty("java.home")
                                 + "/lib/security/cacerts");
-                if (file.exists()) {
-                        fis = new FileInputStream(file);
-                        caks = KeyStore.getInstance("JKS");
-                        caks.load(fis, null);
-                }
-                } catch (Exception e) {
-                        caks = null;
-                } finally {
-                        if (fis != null)
-                                fis.close();
-                }
+            if (file.exists()) {
+                fis = new FileInputStream(file);
+                caks = KeyStore.getInstance("JKS");
+                caks.load(fis, null);
+            }
+        } catch (Exception e) {
+            caks = null;
+        } finally {
+            if (fis != null)
+                fis.close();
+        }
 
-                return caks;
+        return caks;
     }
 
-        /**
-         * Returns the keystore associated with the system certs file,
-         * or null otherwise.
-         */
-        public static KeyStore getSystemCertStore() throws Exception {
+    /**
+     * Returns the keystore associated with the system certs file,
+     * or null otherwise.
+     */
+    public static KeyStore getSystemCertStore() throws Exception {
 
-                KeyStore caks = null;
-                FileInputStream fis = null;
+        KeyStore caks = null;
+        FileInputStream fis = null;
 
-                try {
-                        File file = new File(System.getProperty("javax.net.ssl.trustStore"));
-                        String type = System.getProperty("javax.net.ssl.trustStoreType");
-                        //String provider = "SUN";
-                        char[] password = System.getProperty(
+        try {
+            File file = new File(System.getProperty("javax.net.ssl.trustStore"));
+            String type = System.getProperty("javax.net.ssl.trustStoreType");
+            //String provider = "SUN";
+            char[] password = System.getProperty(
                                 "javax.net.ssl.trustStorePassword").toCharArray();
-                        if (file.exists()) {
-                                fis = new FileInputStream(file);
-                                caks = KeyStore.getInstance(type);
-                                caks.load(fis, password);
-                        }
-                } catch (Exception e) {
-                        caks = null;
-                } finally {
-                        if (fis != null)
-                                fis.close();
-                }
-
-                return caks;
+            if (file.exists()) {
+                fis = new FileInputStream(file);
+                caks = KeyStore.getInstance(type);
+                caks.load(fis, password);
+            }
+        } catch (Exception e) {
+            caks = null;
+        } finally {
+            if (fis != null)
+                fis.close();
         }
+
+        return caks;
+    }
 }

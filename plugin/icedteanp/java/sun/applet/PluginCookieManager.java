@@ -45,35 +45,34 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class PluginCookieManager extends CookieManager 
-{
+public class PluginCookieManager extends CookieManager {
     public Map<String, List<String>> get(URI uri,
-			Map<String, List<String>> requestHeaders) throws IOException {
-		// pre-condition check
-		if (uri == null || requestHeaders == null) {
-			throw new IllegalArgumentException("Argument is null");
-		}
+            Map<String, List<String>> requestHeaders) throws IOException {
+        // pre-condition check
+        if (uri == null || requestHeaders == null) {
+            throw new IllegalArgumentException("Argument is null");
+        }
 
-		Map<String, List<String>> cookieMap = new java.util.HashMap<String, List<String>>();
+        Map<String, List<String>> cookieMap = new java.util.HashMap<String, List<String>>();
 
-		String cookies = (String) PluginAppletViewer
-				.requestPluginCookieInfo(uri);
-		List<String> cookieHeader = new java.util.ArrayList<String>();
+        String cookies = (String) PluginAppletViewer
+                .requestPluginCookieInfo(uri);
+        List<String> cookieHeader = new java.util.ArrayList<String>();
 
-		if (cookies != null && cookies.length() > 0)
-			cookieHeader.add(cookies);
-		
-		// Add anything else that mozilla didn't add
+        if (cookies != null && cookies.length() > 0)
+            cookieHeader.add(cookies);
+
+        // Add anything else that mozilla didn't add
         for (HttpCookie cookie : getCookieStore().get(uri)) {
             // apply path-matches rule (RFC 2965 sec. 3.3.4)
             if (pathMatches(uri.getPath(), cookie.getPath())) {
-            	cookieHeader.add(cookie.toString());
+                cookieHeader.add(cookie.toString());
             }
         }
 
-		cookieMap.put("Cookie", cookieHeader);
-		return Collections.unmodifiableMap(cookieMap);
-	}
+        cookieMap.put("Cookie", cookieHeader);
+        return Collections.unmodifiableMap(cookieMap);
+    }
 
     private boolean pathMatches(String path, String pathToMatchWith) {
         if (path == pathToMatchWith)

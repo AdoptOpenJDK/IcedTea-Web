@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -56,7 +55,6 @@ import javax.swing.text.html.parser.ParserDelegator;
 
 import sun.awt.SunToolkit;
 
-
 /**
  * Launches JNLPFiles either in the foreground or background.<p>
  *
@@ -74,7 +72,7 @@ public class Launcher {
     // defines class Launcher.BgRunner, Launcher.TgThread
 
     /** shared thread group */
-    /*package*/ static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
+    /*package*/static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
 
     /** the handler */
     private LaunchHandler handler = null;
@@ -220,19 +218,18 @@ public class Launcher {
         }
 
         if (file instanceof PluginBridge && cont != null)
-                tg = new TgThread(file, cont, true);
+            tg = new TgThread(file, cont, true);
         else if (cont == null)
-                tg = new TgThread(file);
+            tg = new TgThread(file);
         else
-                tg = new TgThread(file, cont);
+            tg = new TgThread(file, cont);
 
         tg.start();
 
         try {
             tg.join();
-        }
-        catch (InterruptedException ex) {
-                        //By default, null is thrown here, and the message dialog is shown.
+        } catch (InterruptedException ex) {
+            //By default, null is thrown here, and the message dialog is shown.
             throw launchWarning(new LaunchException(file, ex, R("LSMinor"), R("LCSystem"), R("LThreadInterrupted"), R("LThreadInterruptedInfo")));
         }
 
@@ -339,7 +336,7 @@ public class Launcher {
                                       "javaws";
             commands.add(pathToWebstartBinary);
             // use -Jargument format to pass arguments to the JVM through the launcher
-            for (String arg: vmArgs) {
+            for (String arg : vmArgs) {
                 commands.add("-J" + arg);
             }
             commands.addAll(javawsArgs);
@@ -351,11 +348,9 @@ public class Launcher {
             new StreamEater(p.getInputStream()).start();
             p.getOutputStream().close();
 
-        }
-        catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
             throw launchError(new LaunchException(null, null, R("LSFatal"), R("LCExternalLaunch"), R("LNetxJarMissing"), R("LNetxJarMissingInfo")));
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw launchError(new LaunchException(null, ex, R("LSFatal"), R("LCExternalLaunch"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")));
         }
     }
@@ -369,24 +364,23 @@ public class Launcher {
 
             try {
                 file = new JNLPFile(location, (Version) null, true, updatePolicy); // strict
-            }
-            catch (ParseException ex) {
+            } catch (ParseException ex) {
                 file = new JNLPFile(location, (Version) null, false, updatePolicy);
 
                 // only here if strict failed but lax did not fail
                 LaunchException lex =
-                    launchWarning(new LaunchException(file, ex, R("LSMinor"), R("LCFileFormat"), R("LNotToSpec"), R("LNotToSpecInfo")));
+                        launchWarning(new LaunchException(file, ex, R("LSMinor"), R("LCFileFormat"), R("LNotToSpec"), R("LNotToSpecInfo")));
 
                 if (lex != null)
                     throw lex;
             }
 
             return file;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (ex instanceof LaunchException)
                 throw (LaunchException) ex; // already sent to handler when first thrown
-            else  // IO and Parse
+            else
+                // IO and Parse
                 throw launchError(new LaunchException(null, ex, R("LSFatal"), R("LCReadError"), R("LCantRead"), R("LCantReadInfo")));
         }
     }
@@ -401,8 +395,10 @@ public class Launcher {
 
         markNetxRunning();
         Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() { markNetxStopped(); }
-         });
+            public void run() {
+                markNetxStopped();
+            }
+        });
 
         try {
 
@@ -435,7 +431,6 @@ public class Launcher {
                 }
             }
 
-
             ApplicationInstance app = createApplication(file);
             app.initialize();
 
@@ -447,25 +442,26 @@ public class Launcher {
                 JARDesc mainJarDesc = file.getResources().getMainJAR();
                 File f = CacheUtil.getCacheFile(mainJarDesc.getLocation(), null);
                 if (f != null) {
-                        JarFile mainJar = new JarFile(f);
-                        mainName = mainJar.getManifest().
+                    JarFile mainJar = new JarFile(f);
+                    mainName = mainJar.getManifest().
                                 getMainAttributes().getValue("Main-Class");
                 }
             }
 
             if (mainName == null)
                 throw launchError(new LaunchException(file, null,
-                        R("LSFatal"), R("LCClient"), R("LCantDetermineMainClass") ,
+                        R("LSFatal"), R("LCClient"), R("LCantDetermineMainClass"),
                         R("LCantDetermineMainClassInfo")));
 
             Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
-            Method main = mainClass.getMethod("main", new Class<?>[] {String[].class} );
+            Method main = mainClass.getMethod("main", new Class<?>[] { String[].class });
             String args[] = file.getApplication().getArguments();
 
             SwingUtilities.invokeAndWait(new Runnable() {
                 // dummy method to force Event Dispatch Thread creation
-                public void run(){}
+                public void run() {
+                }
             });
 
             setContextClassLoaderForAllThreads(app.getThreadGroup(), app.getClassLoader());
@@ -478,14 +474,12 @@ public class Launcher {
             }
 
             main.setAccessible(true);
-            main.invoke(null, new Object[] { args } );
+            main.invoke(null, new Object[] { args });
 
             return app;
-        }
-        catch (LaunchException lex) {
+        } catch (LaunchException lex) {
             throw launchError(lex);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")));
         }
     }
@@ -509,10 +503,9 @@ public class Launcher {
             threadCountGuess = threadCountGuess * 2;
             threads = new Thread[threadCountGuess];
             tg.enumerate(threads, true);
-        } while (threads[threadCountGuess-1] != null);
+        } while (threads[threadCountGuess - 1] != null);
 
-
-        for (Thread thread: threads) {
+        for (Thread thread : threads) {
             if (thread != null) {
                 if (JNLPRuntime.isDebug()) {
                     System.err.println("Setting " + classLoader + " as the classloader for thread " + thread.getName());
@@ -548,11 +541,9 @@ public class Launcher {
 
             applet.getAppletEnvironment().startApplet(); // this should be a direct call to applet instance
             return applet;
-        }
-        catch (LaunchException lex) {
+        } catch (LaunchException lex) {
             throw launchError(lex);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")));
         }
     }
@@ -568,11 +559,9 @@ public class Launcher {
             AppletInstance applet = createApplet(file, enableCodeBase, cont);
             applet.initialize();
             return applet;
-        }
-        catch (LaunchException lex) {
+        } catch (LaunchException lex) {
             throw launchError(lex);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")));
         }
     }
@@ -601,17 +590,17 @@ public class Launcher {
 
             String appletName = file.getApplet().getMainClass();
 
-                        //Classloader chokes if there's '/' in the path to the main class.
-                        //Must replace with '.' instead.
-                        appletName = appletName.replace('/', '.');
+            //Classloader chokes if there's '/' in the path to the main class.
+            //Must replace with '.' instead.
+            appletName = appletName.replace('/', '.');
             Class appletClass = loader.loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
 
             AppletInstance appletInstance;
             if (cont == null)
-              appletInstance = new AppletInstance(file, group, loader, applet);
+                appletInstance = new AppletInstance(file, group, loader, applet);
             else
-              appletInstance = new AppletInstance(file, group, loader, applet, cont);
+                appletInstance = new AppletInstance(file, group, loader, applet, cont);
 
             group.setApplication(appletInstance);
             loader.setApplication(appletInstance);
@@ -619,8 +608,7 @@ public class Launcher {
             setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
 
             return appletInstance;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplet"), R("LInitAppletInfo")));
         }
     }
@@ -640,15 +628,14 @@ public class Launcher {
 
             String appletName = file.getApplet().getMainClass();
 
-                        //Classloader chokes if there's '/' in the path to the main class.
-                        //Must replace with '.' instead.
-                        appletName = appletName.replace('/', '.');
+            //Classloader chokes if there's '/' in the path to the main class.
+            //Must replace with '.' instead.
+            appletName = appletName.replace('/', '.');
             Class appletClass = loader.loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
 
             return applet;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplet"), R("LInitAppletInfo")));
         }
     }
@@ -666,8 +653,7 @@ public class Launcher {
             loader.setApplication(app);
 
             return app;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplication"), R("LInitApplicationInfo"));
         }
     }
@@ -770,7 +756,7 @@ public class Launcher {
             fileLock = null;
             if (JNLPRuntime.isDebug()) {
                 String file = JNLPRuntime.getConfiguration()
-                    .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE);
+                        .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE);
                 System.out.println("Release shared lock on " + file);
             }
         } catch (IOException e) {
@@ -829,33 +815,32 @@ public class Launcher {
                 // Do not create new AppContext if we're using NetX and icedteaplugin.
                 // The plugin needs an AppContext too, but it has to be created earlier.
                 if (context && !isPlugin)
-                        SunToolkit.createNewAppContext();
+                    SunToolkit.createNewAppContext();
 
                 doPerApplicationAppContextHacks();
 
                 if (isPlugin) {
-                        // Do not display download indicators if we're using gcjwebplugin.
-                        JNLPRuntime.setDefaultDownloadIndicator(null);
-                        application = getApplet(file, true, cont);
+                    // Do not display download indicators if we're using gcjwebplugin.
+                    JNLPRuntime.setDefaultDownloadIndicator(null);
+                    application = getApplet(file, true, cont);
                 } else {
-                        if (file.isApplication())
-                                application = launchApplication(file);
-                        else if (file.isApplet())
-                                application = launchApplet(file, true, cont); // enable applet code base
-                        else if (file.isInstaller())
-                                application = launchInstaller(file);
-                        else
-                                throw launchError(new LaunchException(file, null,
+                    if (file.isApplication())
+                        application = launchApplication(file);
+                    else if (file.isApplet())
+                        application = launchApplet(file, true, cont); // enable applet code base
+                    else if (file.isInstaller())
+                        application = launchInstaller(file);
+                    else
+                        throw launchError(new LaunchException(file, null,
                                                 R("LSFatal"), R("LCClient"), R("LNotLaunchable"),
                                                 R("LNotLaunchableInfo")));
                 }
-            }
-            catch (LaunchException ex) {
+            } catch (LaunchException ex) {
                 ex.printStackTrace();
                 exception = ex;
                 // Exit if we can't launch the application.
                 if (exitOnFailure)
-                        System.exit(0);
+                    System.exit(0);
             }
         }
 
@@ -868,7 +853,6 @@ public class Launcher {
         }
 
     };
-
 
     /**
      * This runnable is used by the <code>launchBackground</code>
@@ -889,8 +873,7 @@ public class Launcher {
                     launch(file);
                 if (location != null)
                     launch(location);
-            }
-            catch (LaunchException ex) {
+            } catch (LaunchException ex) {
                 // launch method communicates error conditions to the
                 // handler if it exists, otherwise we don't care because
                 // there's nothing that can be done about the exception.

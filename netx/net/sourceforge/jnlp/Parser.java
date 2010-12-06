@@ -15,7 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -66,7 +65,6 @@ class Parser {
     };
     */
 
-
     /** the supported JNLP file versions */
     private static Version supportedVersions = new Version("1.0 1.1 1.2 1.3 1.4 1.5 1.6 6.0");
 
@@ -98,7 +96,6 @@ class Parser {
     /** whether to allow extensions to the JNLP specification */
     private boolean allowExtensions; // true if extensions to JNLP spec are ok
 
-
     /**
      * Create a parser for the JNLP file.  If the location
      * parameters is not null it is used as the default codebase
@@ -128,7 +125,7 @@ class Parser {
         // JNLP tag information
         this.spec = getVersion(root, "spec", "1.0+");
         this.codebase = addSlash(getURL(root, "codebase", base));
-        this.base = (codebase!=null) ? codebase : base; // if codebase not specified use default codebase
+        this.base = (codebase != null) ? codebase : base; // if codebase not specified use default codebase
         fileLocation = getURL(root, "href", this.base);
 
         // ensure version is supported
@@ -188,7 +185,7 @@ class Parser {
                 Check check;
                 String checkValue = getAttribute(node, "check", "timeout");
                 if (checkValue.equals("always")) {
-                   check = Check.ALWAYS;
+                    check = Check.ALWAYS;
                 } else if (checkValue.equals("timeout")) {
                     check = Check.TIMEOUT;
                 } else if (checkValue.equals("background")) {
@@ -234,8 +231,7 @@ class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     public List<ResourcesDesc> getResources(Node parent, boolean j2se)
-        throws ParseException
-    {
+            throws ParseException {
         List<ResourcesDesc> result = new ArrayList<ResourcesDesc>();
         Node resources[] = getChildNodes(parent, "resources");
 
@@ -244,7 +240,7 @@ class Parser {
             throw new ParseException(R("PNoResources"));
 
         // create objects from the resources sections
-        for (int i=0; i < resources.length; i++)
+        for (int i = 0; i < resources.length; i++)
             result.add(getResourcesDesc(resources[i], j2se));
 
         return result;
@@ -262,7 +258,7 @@ class Parser {
 
         // create resources
         ResourcesDesc resources =
-            new ResourcesDesc(file,
+                new ResourcesDesc(file,
                               getLocales(node),
                               splitString(getAttribute(node, "os", null)),
                               splitString(getAttribute(node, "arch", null)));
@@ -282,7 +278,7 @@ class Parser {
                     if (strict)
                         throw new ParseException(R("PExtensionHasJ2SE"));
                 if (!j2se)
-                    resources.addResource( getJRE(child) );
+                    resources.addResource(getJRE(child));
                 else
                     throw new ParseException(R("PInnerJ2SE"));
             }
@@ -302,13 +298,13 @@ class Parser {
             }
 
             if ("extension".equals(name))
-                resources.addResource( getExtension(child) );
+                resources.addResource(getExtension(child));
 
             if ("property".equals(name))
-                resources.addResource( getProperty(child) );
+                resources.addResource(getProperty(child));
 
             if ("package".equals(name))
-                resources.addResource( getPackage(child) );
+                resources.addResource(getPackage(child));
 
             child = child.getNextSibling();
         }
@@ -325,7 +321,7 @@ class Parser {
     public JREDesc getJRE(Node node) throws ParseException {
         Version version = getVersion(node, "version", null);
         URL location = getURL(node, "href", base);
-        String vmArgs = getAttribute(node, "java-vm-args",null);
+        String vmArgs = getAttribute(node, "java-vm-args", null);
         try {
             checkVMArgs(vmArgs);
         } catch (IllegalArgumentException argumentException) {
@@ -340,8 +336,6 @@ class Parser {
 
         return new JREDesc(version, location, vmArgs, initialHeap, maxHeap, resources);
     }
-
-
 
     /**
      * Returns the JAR element at the specified node.
@@ -380,7 +374,7 @@ class Parser {
         ExtensionDesc ext = new ExtensionDesc(name, version, location);
 
         Node dload[] = getChildNodes(node, "ext-download");
-        for (int i=0; i < dload.length; i++) {
+        for (int i = 0; i < dload.length; i++) {
             boolean lazy = "lazy".equals(getAttribute(dload[i], "download", "eager"));
 
             ext.addPart(getRequiredAttribute(dload[i], "ext-part", null),
@@ -430,8 +424,7 @@ class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     public List<InformationDesc> getInfo(Node parent)
-        throws ParseException
-    {
+            throws ParseException {
         List<InformationDesc> result = new ArrayList<InformationDesc>();
         Node info[] = getChildNodes(parent, "information");
 
@@ -440,7 +433,7 @@ class Parser {
             throw new ParseException(R("PNoInfoElement"));
 
         // create objects from the info sections
-        for (int i=0; i < info.length; i++)
+        for (int i = 0; i < info.length; i++)
             result.add(getInformationDesc(info[i]));
 
         return result;
@@ -515,12 +508,12 @@ class Parser {
      * @param value the info object to add (icon or string)
      */
     protected void addInfo(InformationDesc info, Node node, String mod, Object value) {
-        String modStr = (mod == null) ? "" : "-"+mod;
+        String modStr = (mod == null) ? "" : "-" + mod;
 
         if (node == null)
             return;
 
-        info.addItem(node.getNodeName()+modStr, value);
+        info.addItem(node.getNodeName() + modStr, value);
     }
 
     /**
@@ -586,7 +579,7 @@ class Parser {
 
         if (security != null)
             if (getChildNode(security, "all-permissions") != null
-                || getChildNode(security, "j2ee-application-client-permissions") != null)
+                    || getChildNode(security, "j2ee-application-client-permissions") != null)
                 return true;
 
         return false;
@@ -606,8 +599,8 @@ class Parser {
     public Object getLauncher(Node parent) throws ParseException {
         // check for other than one application type
         if (1 < getChildNodes(parent, "applet-desc").length
-            + getChildNodes(parent, "application-desc").length
-            + getChildNodes(parent, "installer-desc").length)
+                + getChildNodes(parent, "application-desc").length
+                + getChildNodes(parent, "installer-desc").length)
             throw new ParseException(R("PTwoDescriptors"));
 
         Node child = parent.getFirstChild();
@@ -637,15 +630,14 @@ class Parser {
         String name = getRequiredAttribute(node, "name", R("PUnknownApplet"));
         String main = getRequiredAttribute(node, "main-class", null);
         URL docbase = getURL(node, "documentbase", base);
-        Map<String,String> paramMap = new HashMap<String,String>();
+        Map<String, String> paramMap = new HashMap<String, String>();
         int width = 0;
         int height = 0;
 
         try {
             width = Integer.parseInt(getRequiredAttribute(node, "width", "100"));
             height = Integer.parseInt(getRequiredAttribute(node, "height", "100"));
-        }
-        catch (NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) {
             if (width <= 0)
                 throw new ParseException(R("PBadWidth"));
             throw new ParseException(R("PBadWidth"));
@@ -653,7 +645,7 @@ class Parser {
 
         // read params
         Node params[] = getChildNodes(node, "param");
-        for (int i=0; i < params.length; i++) {
+        for (int i = 0; i < params.length; i++) {
             paramMap.put(getRequiredAttribute(params[i], "name", null),
                          getRequiredAttribute(params[i], "value", ""));
         }
@@ -675,14 +667,14 @@ class Parser {
 
         // read parameters
         Node args[] = getChildNodes(node, "argument");
-        for (int i=0; i < args.length; i++) {
+        for (int i = 0; i < args.length; i++) {
             //argsList.add( args[i].getNodeValue() );
 
             //This approach was not finding the argument text
-            argsList.add( getSpanText(args[i]) );
+            argsList.add(getSpanText(args[i]));
         }
 
-        String argStrings[] = argsList.toArray( new String[argsList.size()] );
+        String argStrings[] = argsList.toArray(new String[argsList.size()]);
 
         return new ApplicationDesc(main, argStrings);
     }
@@ -749,7 +741,7 @@ class Parser {
                     throw new ParseException(R("PTwoDesktops"));
                 }
                 showOnDesktop = true;
-            } else if ("menu".equals(name)){
+            } else if ("menu".equals(name)) {
                 if (menu != null && strict) {
                     throw new ParseException(R("PTwoMenus"));
                 }
@@ -774,7 +766,6 @@ class Parser {
 
         return new MenuDesc(subMenu);
     }
-
 
     /**
      * Returns the related-content descriptor.
@@ -844,21 +835,22 @@ class Parser {
             while (true) {
                 part.append(st.nextToken());
 
-                if (st.hasMoreTokens() && part.charAt(part.length()-1) == '\\')
-                    part.setCharAt(part.length()-1, ' '); // join with the space
+                if (st.hasMoreTokens() && part.charAt(part.length() - 1) == '\\')
+                    part.setCharAt(part.length() - 1, ' '); // join with the space
                 else
                     break; // bizarre while format gets \ at end of string right (no extra space added at end)
             }
 
             // delete \ quote chars
-            for (int i = part.length(); i-- > 0;) // sweet syntax for reverse loop
+            for (int i = part.length(); i-- > 0;)
+                // sweet syntax for reverse loop
                 if (part.charAt(i) == '\\')
                     part.deleteCharAt(i--); // and skip previous char so \\ becomes \
 
-            result.add( part.toString() );
+            result.add(part.toString());
         }
 
-        return result.toArray(new String[result.size()] );
+        return result.toArray(new String[result.size()]);
     }
 
     /**
@@ -869,15 +861,15 @@ class Parser {
     public Locale[] getLocales(Node node) {
         List<Locale> locales = new ArrayList<Locale>();
         String localeParts[] =
-            splitString(getAttribute(node, "locale", ""));
+                splitString(getAttribute(node, "locale", ""));
 
-        for (int i=0; i < localeParts.length; i++) {
-            Locale l = getLocale( localeParts[i] );
+        for (int i = 0; i < localeParts.length; i++) {
+            Locale l = getLocale(localeParts[i]);
             if (l != null)
                 locales.add(l);
         }
 
-        return locales.toArray(new Locale[locales.size()] );
+        return locales.toArray(new Locale[locales.size()]);
     }
 
     /**
@@ -890,14 +882,12 @@ class Parser {
             return null;
 
         String language = localeStr.substring(0, 2);
-        String country = (localeStr.length()<5) ? "" : localeStr.substring(3, 5);
-        String variant = (localeStr.length()<7) ? "" : localeStr.substring(6, 8);
+        String country = (localeStr.length() < 5) ? "" : localeStr.substring(3, 5);
+        String variant = (localeStr.length() < 7) ? "" : localeStr.substring(6, 8);
 
         // null is not allowed n locale but "" is
         return new Locale(language, country, variant);
     }
-
-
 
     // XML junk
 
@@ -954,9 +944,8 @@ class Parser {
             child = child.getNextSibling();
         }
 
-        return result.toArray( new Node[result.size()] );
+        return result.toArray(new Node[result.size()]);
     }
-
 
     /**
      * Returns a URL with a trailing / appended to it if there is no
@@ -968,15 +957,13 @@ class Parser {
 
         if (!source.toString().endsWith("/")) {
             try {
-                source = new URL(source.toString()+"/");
-            }
-            catch (MalformedURLException ex) {
+                source = new URL(source.toString() + "/");
+            } catch (MalformedURLException ex) {
             }
         }
 
         return source;
     }
-
 
     /**
      * Returns the same result as getURL except that a
@@ -994,7 +981,6 @@ class Parser {
 
         return getURL(node, name, base);
     }
-
 
     /**
      * Returns a URL object from a href string relative to the
@@ -1018,23 +1004,21 @@ class Parser {
             else {
                 try {
                     return new URL(href);
-                }
-                catch (MalformedURLException ex) {
+                } catch (MalformedURLException ex) {
                     // is relative
                 }
 
                 URL result = new URL(base, href);
 
                 // check for going above the codebase
-                if (! result.toString().startsWith( base.toString()) )
+                if (!result.toString().startsWith(base.toString()))
                     if (strict)
                         throw new ParseException(R("PUrlNotInCodebase", node.getNodeName(), href, base));
 
                 return result;
             }
 
-        }
-        catch (MalformedURLException ex) {
+        } catch (MalformedURLException ex) {
             if (base == null)
                 throw new ParseException(R("PBadNonrelativeUrl", node.getNodeName(), href));
             else
@@ -1074,13 +1058,13 @@ class Parser {
 
         String[] arguments = vmArgs.split(" ");
         boolean argumentIsValid = false;
-        for (String argument: arguments) {
+        for (String argument : arguments) {
             argumentIsValid = false;
 
             if (validArguments.contains(argument)) {
                 argumentIsValid = true;
             } else {
-                for (String validStartingArgument: validStartingArguments) {
+                for (String validStartingArgument : validStartingArguments) {
                     if (argument.startsWith(validStartingArgument)) {
                         argumentIsValid = true;
                         break;
@@ -1102,33 +1086,33 @@ class Parser {
      */
     private String[] getValidVMArguments() {
         return new String[] {
-        "-d32",                             /* use a 32-bit data model if available */
-        "-client",                          /* to select the client VM */
-        "-server",                          /* to select the server VM */
-        "-verbose",                         /* enable verbose output */
-        "-version",                         /* print product version and exit */
-        "-showversion",                     /* print product version and continue */
-        "-help",                            /* print this help message */
-        "-X",                               /* print help on non-standard options */
-        "-ea",                              /* enable assertions */
-        "-enableassertions",                /* enable assertions */
-        "-da",                              /* disable assertions */
-        "-disableassertions",               /* disable assertions */
-        "-esa",                             /* enable system assertions */
-        "-enablesystemassertions",          /* enable system assertions */
-        "-dsa",                             /* disable system assertione */
-        "-disablesystemassertions",         /* disable system assertione */
-        "-Xmixed",                          /* mixed mode execution (default) */
-        "-Xint",                            /* interpreted mode execution only */
-        "-Xnoclassgc",                      /* disable class garbage collection */
-        "-Xincgc",                          /* enable incremental garbage collection */
-        "-Xbatch",                          /* disable background compilation */
-        "-Xprof",                           /* output cpu profiling data */
-        "-Xdebug",                          /* enable remote debugging */
-        "-Xfuture",                         /* enable strictest checks, anticipating future default */
-        "-Xrs",                             /* reduce use of OS signals by Java/VM (see documentation) */
-        "-XX:+ForceTimeHighResolution",     /* use high resolution timer */
-        "-XX:-ForceTimeHighResolution",     /* use low resolution (default) */
+                "-d32", /* use a 32-bit data model if available */
+                "-client", /* to select the client VM */
+                "-server", /* to select the server VM */
+                "-verbose", /* enable verbose output */
+                "-version", /* print product version and exit */
+                "-showversion", /* print product version and continue */
+                "-help", /* print this help message */
+                "-X", /* print help on non-standard options */
+                "-ea", /* enable assertions */
+                "-enableassertions", /* enable assertions */
+                "-da", /* disable assertions */
+                "-disableassertions", /* disable assertions */
+                "-esa", /* enable system assertions */
+                "-enablesystemassertions", /* enable system assertions */
+                "-dsa", /* disable system assertione */
+                "-disablesystemassertions", /* disable system assertione */
+                "-Xmixed", /* mixed mode execution (default) */
+                "-Xint", /* interpreted mode execution only */
+                "-Xnoclassgc", /* disable class garbage collection */
+                "-Xincgc", /* enable incremental garbage collection */
+                "-Xbatch", /* disable background compilation */
+                "-Xprof", /* output cpu profiling data */
+                "-Xdebug", /* enable remote debugging */
+                "-Xfuture", /* enable strictest checks, anticipating future default */
+                "-Xrs", /* reduce use of OS signals by Java/VM (see documentation) */
+                "-XX:+ForceTimeHighResolution", /* use high resolution timer */
+                "-XX:-ForceTimeHighResolution", /* use low resolution (default) */
         };
     }
 
@@ -1140,26 +1124,26 @@ class Parser {
      */
     private String[] getValidStartingVMArguments() {
         return new String[] {
-        "-ea",                          /* enable assertions for classes */
-        "-enableassertions",            /* enable assertions for classes */
-        "-da",                          /* disable assertions for classes */
-        "-disableassertions",           /* disable assertions for classes */
-        "-verbose",                     /* enable verbose output */
-        "-Xms",                         /* set initial Java heap size */
-        "-Xmx",                         /* set maximum Java heap size */
-        "-Xss",                         /* set java thread stack size */
-        "-XX:NewRatio",                 /* set Ratio of new/old gen sizes */
-        "-XX:NewSize",                  /* set initial size of new generation */
-        "-XX:MaxNewSize",               /* set max size of new generation */
-        "-XX:PermSize",                 /* set initial size of permanent gen */
-        "-XX:MaxPermSize",              /* set max size of permanent gen */
-        "-XX:MaxHeapFreeRatio",         /* heap free percentage (default 70) */
-        "-XX:MinHeapFreeRatio",         /* heap free percentage (default 40) */
-        "-XX:UseSerialGC",              /* use serial garbage collection */
-        "-XX:ThreadStackSize",          /* thread stack size (in KB) */
-        "-XX:MaxInlineSize",            /* set max num of bytecodes to inline */
-        "-XX:ReservedCodeCacheSize",    /* Reserved code cache size (bytes) */
-        "-XX:MaxDirectMemorySize",
+                "-ea", /* enable assertions for classes */
+                "-enableassertions", /* enable assertions for classes */
+                "-da", /* disable assertions for classes */
+                "-disableassertions", /* disable assertions for classes */
+                "-verbose", /* enable verbose output */
+                "-Xms", /* set initial Java heap size */
+                "-Xmx", /* set maximum Java heap size */
+                "-Xss", /* set java thread stack size */
+                "-XX:NewRatio", /* set Ratio of new/old gen sizes */
+                "-XX:NewSize", /* set initial size of new generation */
+                "-XX:MaxNewSize", /* set max size of new generation */
+                "-XX:PermSize", /* set initial size of permanent gen */
+                "-XX:MaxPermSize", /* set max size of permanent gen */
+                "-XX:MaxHeapFreeRatio", /* heap free percentage (default 70) */
+                "-XX:MinHeapFreeRatio", /* heap free percentage (default 40) */
+                "-XX:UseSerialGC", /* use serial garbage collection */
+                "-XX:ThreadStackSize", /* thread stack size (in KB) */
+                "-XX:MaxInlineSize", /* set max num of bytecodes to inline */
+                "-XX:ReservedCodeCacheSize", /* Reserved code cache size (bytes) */
+                "-XX:MaxDirectMemorySize",
 
         };
     }
@@ -1200,7 +1184,7 @@ class Parser {
         // String result = ((Element) node).getAttribute(name);
         String result = node.getAttribute(name);
 
-        if (result == null || result.length()==0)
+        if (result == null || result.length() == 0)
             return defaultValue;
 
         return result;
@@ -1242,22 +1226,20 @@ class Parser {
             // Clean the jnlp xml file of all comments before passing
             // it to the parser.
             new Thread(
-                new Runnable(){
-                    public void run(){
-                        (new XMLElement()).sanitizeInput(isr, pout);
-                        try {
-                            pout.close();
-                        } catch (IOException ioe) {
-                            ioe.printStackTrace();
+                    new Runnable() {
+                        public void run() {
+                            (new XMLElement()).sanitizeInput(isr, pout);
+                            try {
+                                pout.close();
+                            } catch (IOException ioe) {
+                                ioe.printStackTrace();
+                            }
                         }
-                    }
-                }
-            ).start();
+                    }).start();
             xml.parseFromReader(new InputStreamReader(pin));
             Node jnlpNode = new Node(xml);
             return jnlpNode;
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             throw new ParseException(R("PBadXML"), ex);
         }
     }
@@ -1268,7 +1250,7 @@ class Parser {
      * @param input the InputStream
      * @return a String representation of encoding
      */
-    private static String getEncoding(InputStream input) throws IOException{
+    private static String getEncoding(InputStream input) throws IOException {
         //Fixme: This only recognizes UTF-8, UTF-16, and
         //UTF-32, which is enough to parse the prolog portion of xml to
         //find out the exact encoding (if it exists). The reason being
@@ -1300,26 +1282,26 @@ class Parser {
                 }
             }
         } else if (s[0] == 254 && s[1] == 255 && (s[2] != 0 ||
-          s[3] != 0)) {
+                s[3] != 0)) {
             encoding = "UTF-16";
 
         } else if (s[0] == 0 && s[1] == 0 && s[2] == 254 &&
-          s[3] == 255) {
+                s[3] == 255) {
             encoding = "X-UTF-32BE-BOM";
 
         } else if (s[0] == 0 && s[1] == 0 && s[2] == 0 &&
-          s[3] == 60) {
+                s[3] == 60) {
             encoding = "UTF-32BE";
 
         } else if (s[0] == 60 && s[1] == 0 && s[2] == 0 &&
-          s[3] == 0) {
+                s[3] == 0) {
             encoding = "UTF-32LE";
 
         } else if (s[0] == 0 && s[1] == 60 && s[2] == 0 &&
-          s[3] == 63) {
+                s[3] == 63) {
             encoding = "UTF-16BE";
         } else if (s[0] == 60 && s[1] == 0 && s[2] == 63 &&
-          s[3] == 0) {
+                s[3] == 0) {
             encoding = "UTF-16LE";
         }
 

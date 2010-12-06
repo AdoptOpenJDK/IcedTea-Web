@@ -59,8 +59,8 @@ public class CertificateViewer extends JDialog {
 
     CertificatePane panel;
 
-        public CertificateViewer() {
-            super((Frame)null, dialogTitle, true);
+    public CertificateViewer() {
+        super((Frame) null, dialogTitle, true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -84,32 +84,31 @@ public class CertificateViewer extends JDialog {
         };
         addWindowFocusListener(adapter);
 
-                initialized = true;
-        }
+        initialized = true;
+    }
 
-        public boolean isInitialized(){
-                return initialized;
-        }
+    public boolean isInitialized() {
+        return initialized;
+    }
 
-        private void centerDialog() {
-                Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-                Dimension dialogSize = getSize();
+    private void centerDialog() {
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension dialogSize = getSize();
 
-                setLocation((screen.width - dialogSize.width)/2,
-                        (screen.height - dialogSize.height)/2);
-        }
+        setLocation((screen.width - dialogSize.width) / 2,
+                        (screen.height - dialogSize.height) / 2);
+    }
 
+    public static void showCertificateViewer() throws Exception {
+        JNLPRuntime.initialize(true);
+        setSystemLookAndFeel();
 
-        public static void showCertificateViewer() throws Exception {
-            JNLPRuntime.initialize(true);
-            setSystemLookAndFeel();
-
-                CertificateViewer cv = new CertificateViewer();
-                cv.setResizable(true);
-                cv.centerDialog();
-                cv.setVisible(true);
-                cv.dispose();
-        }
+        CertificateViewer cv = new CertificateViewer();
+        cv.setResizable(true);
+        cv.centerDialog();
+        cv.setVisible(true);
+        cv.dispose();
+    }
 
     private static void setSystemLookAndFeel() {
         try {
@@ -119,7 +118,7 @@ public class CertificateViewer extends JDialog {
         }
     }
 
-        public static void main(String[] args) throws Exception {
-                CertificateViewer.showCertificateViewer();
-        }
+    public static void main(String[] args) throws Exception {
+        CertificateViewer.showCertificateViewer();
+    }
 }

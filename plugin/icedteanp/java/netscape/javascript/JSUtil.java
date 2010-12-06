@@ -39,21 +39,22 @@
 /* ** */
 
 package netscape.javascript;
+
 import java.io.*;
 
 public class JSUtil {
 
     /* Return the stack trace of an exception or error as a String */
     public static String getStackTrace(Throwable t) {
-	ByteArrayOutputStream captureStream;
-	PrintWriter p;
-	
-	captureStream = new ByteArrayOutputStream();
-	p = new PrintWriter(captureStream);
+        ByteArrayOutputStream captureStream;
+        PrintWriter p;
 
-	t.printStackTrace(p);
-	p.flush();
+        captureStream = new ByteArrayOutputStream();
+        p = new PrintWriter(captureStream);
 
-	return captureStream.toString();
+        t.printStackTrace(p);
+        p.flush();
+
+        return captureStream.toString();
     }
 }

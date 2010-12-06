@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import java.io.*;
@@ -57,7 +56,6 @@ public class Version {
     /** contains all the versions matched */
     private String versionString;
 
-
     /**
      * Create a Version object based on a version string (ie,
      * "1.2.3+ 4.56*").
@@ -96,8 +94,8 @@ public class Version {
     public boolean matches(Version version) {
         List<String> versionStrings = version.getVersionStrings();
 
-        for (int i=0; i < versionStrings.size(); i++) {
-            if (!this.matchesSingle(versionStrings.get(i) ))
+        for (int i = 0; i < versionStrings.size(); i++) {
+            if (!this.matchesSingle(versionStrings.get(i)))
                 return false;
         }
 
@@ -114,7 +112,6 @@ public class Version {
         return matches(new Version(version));
     }
 
-
     /**
      * Returns true if any of this version's version-ids match one
      * or more of the specifed version's version-id.
@@ -124,8 +121,8 @@ public class Version {
     public boolean matchesAny(Version version) {
         List<String> versionStrings = version.getVersionStrings();
 
-        for (int i=0; i < versionStrings.size(); i++) {
-            if (this.matchesSingle( versionStrings.get(i) ))
+        for (int i = 0; i < versionStrings.size(); i++) {
+            if (this.matchesSingle(versionStrings.get(i)))
                 return true;
         }
 
@@ -140,13 +137,12 @@ public class Version {
      */
     private boolean matchesSingle(String version) {
         List<String> versionStrings = this.getVersionStrings();
-        for (int i=0; i < versionStrings.size(); i++) {
-            if ( matches(version, versionStrings.get(i)) )
+        for (int i = 0; i < versionStrings.size(); i++) {
+            if (matches(version, versionStrings.get(i)))
                 return true;
         }
         return false;
     }
-
 
     /**
      * Returns whether a single version string is supported by
@@ -185,8 +181,8 @@ public class Version {
      * @param parts2 normalized version parts
      */
     protected boolean equal(List<String> parts1, List<String> parts2) {
-        for (int i=0; i < parts1.size(); i++) {
-            if ( 0 != compare(parts1.get(i), parts2.get(i)) )
+        for (int i = 0; i < parts1.size(); i++) {
+            if (0 != compare(parts1.get(i), parts2.get(i)))
                 return false;
         }
 
@@ -203,7 +199,7 @@ public class Version {
     protected boolean greater(List<String> parts1, List<String> parts2) {
         //if (true) return false;
 
-        for (int i=0; i < parts1.size(); i++) {
+        for (int i = 0; i < parts1.size(); i++) {
             // if part1 > part2 then it's a later version, so return true
             if (compare(parts1.get(i), parts2.get(i)) > 0)
                 return true;
@@ -244,8 +240,7 @@ public class Version {
                 number2 = Integer.valueOf(part2);
 
             return number1.compareTo(number2);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             // means to compare as strings
         }
 
@@ -275,11 +270,11 @@ public class Version {
         for (List<String> vers : versions) {
             // remove excess elements
             while (vers.size() > length)
-                vers.remove( vers.size()-1 );
+                vers.remove(vers.size() - 1);
 
             // add in empty pad elements
             while (vers.size() < length)
-                vers.add( emptyString );
+                vers.add(emptyString);
         }
     }
 
@@ -291,7 +286,7 @@ public class Version {
 
         StringTokenizer st = new StringTokenizer(versionString, " ");
         while (st.hasMoreTokens())
-            strings.add( st.nextToken() );
+            strings.add(st.nextToken());
 
         return strings;
     }
@@ -304,9 +299,9 @@ public class Version {
     protected List<String> getParts(String oneVersion) {
         ArrayList<String> strings = new ArrayList<String>();
 
-        StringTokenizer st = new StringTokenizer(oneVersion, seperators+"+*");
+        StringTokenizer st = new StringTokenizer(oneVersion, seperators + "+*");
         while (st.hasMoreTokens()) {
-            strings.add( st.nextToken() );
+            strings.add(st.nextToken());
         }
 
         return strings;

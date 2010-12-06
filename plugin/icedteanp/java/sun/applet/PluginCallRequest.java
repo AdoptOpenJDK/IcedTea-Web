@@ -54,23 +54,23 @@ public abstract class PluginCallRequest {
     }
 
     public String getMessage() {
-    	return this.message;
+        return this.message;
     }
-    
+
     public boolean isDone() {
-    	return this.done;
+        return this.done;
     }
-    
+
     public boolean setDone(boolean done) {
-    	return this.done = done;
+        return this.done = done;
     }
-    
+
     public void setNext(PluginCallRequest next) {
-    	this.next = next;
+        this.next = next;
     }
-    
+
     public PluginCallRequest getNext() {
-    	return this.next;
+        return this.next;
     }
 
     /**
@@ -82,8 +82,8 @@ public abstract class PluginCallRequest {
     public boolean serviceable(String message) {
         return message.contains("reference " + reference);
     }
-    
+
     public abstract void parseReturn(String message);
-    
+
     public abstract Object getObject();
 }

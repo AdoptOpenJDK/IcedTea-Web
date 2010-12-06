@@ -54,7 +54,7 @@ public class NamedBorderPanel extends JPanel {
     public NamedBorderPanel(String title) {
         super();
         setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(title), 
+                BorderFactory.createTitledBorder(title),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
     }
 }

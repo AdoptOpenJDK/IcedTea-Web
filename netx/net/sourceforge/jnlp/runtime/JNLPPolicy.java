@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.security.*;
@@ -41,7 +40,6 @@ public class JNLPPolicy extends Policy {
     /** the previous policy */
     private static Policy systemPolicy;
 
-
     protected JNLPPolicy() {
         shellSource = JNLPPolicy.class.getProtectionDomain().getCodeSource();
         systemSource = Policy.class.getProtectionDomain().getCodeSource();
@@ -59,19 +57,19 @@ public class JNLPPolicy extends Policy {
         // if we check the SecurityDesc here then keep in mind that
         // code can add properties at runtime to the ResourcesDesc!
         if (JNLPRuntime.getApplication() != null) {
-                if (JNLPRuntime.getApplication().getClassLoader() instanceof JNLPClassLoader) {
-                        JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
+            if (JNLPRuntime.getApplication().getClassLoader() instanceof JNLPClassLoader) {
+                JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
 
-                        PermissionCollection clPermissions = cl.getPermissions(source);
+                PermissionCollection clPermissions = cl.getPermissions(source);
 
-                        // systempolicy permissions need to be accounted for as well
-                        CodeSource appletCS = new CodeSource(JNLPRuntime.getApplication().getJNLPFile().getSourceLocation(), (java.security.cert.Certificate[]) null);
-                        Enumeration e = systemPolicy.getPermissions(appletCS).elements();
+                // systempolicy permissions need to be accounted for as well
+                CodeSource appletCS = new CodeSource(JNLPRuntime.getApplication().getJNLPFile().getSourceLocation(), (java.security.cert.Certificate[]) null);
+                Enumeration e = systemPolicy.getPermissions(appletCS).elements();
                 while (e.hasMoreElements())
                     clPermissions.add((Permission) e.nextElement());
 
-                        return clPermissions;
-                }
+                return clPermissions;
+            }
         }
 
         // delegate to original Policy object; required to run under WebStart
@@ -91,13 +89,13 @@ public class JNLPPolicy extends Policy {
     private Permissions getAllPermissions() {
         Permissions result = new Permissions();
 
-        result.add( new AllPermission() );
+        result.add(new AllPermission());
         return result;
     }
 
-        public boolean implies(ProtectionDomain domain, Permission permission) {
-                //Include the permissions that may be added during runtime.
-                PermissionCollection pc = getPermissions(domain.getCodeSource());
-                return super.implies(domain, permission) || pc.implies(permission);
-        }
+    public boolean implies(ProtectionDomain domain, Permission permission) {
+        //Include the permissions that may be added during runtime.
+        PermissionCollection pc = getPermissions(domain.getCodeSource());
+        return super.implies(domain, permission) || pc.implies(permission);
+    }
 }

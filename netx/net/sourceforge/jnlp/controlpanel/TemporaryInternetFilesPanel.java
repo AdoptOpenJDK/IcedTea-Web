@@ -226,7 +226,8 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
         Object o = e.getSource();
         if (o instanceof JSlider)
             spCacheSize.setValue(((JSlider) o).getValue());
-        else if (o instanceof JSpinner) slCacheSize.setValue((Integer) ((JSpinner) o).getValue());
+        else if (o instanceof JSpinner)
+            slCacheSize.setValue((Integer) ((JSpinner) o).getValue());
 
         config.setProperty(properties[2], spCacheSize.getValue().toString());
     }

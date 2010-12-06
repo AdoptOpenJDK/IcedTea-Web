@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import java.io.*;
@@ -67,75 +66,75 @@ public class SecurityDesc {
 
     /** basic permissions for restricted mode */
     private static Permission j2eePermissions[] = {
-        new AWTPermission("accessClipboard"),
-        // disabled because we can't at this time prevent an
-        // application from accessing other applications' event
-        // queues, or even prevent access to security dialog queues.
-        //
-        // new AWTPermission("accessEventQueue"),
-        new RuntimePermission("exitVM"),
-        new RuntimePermission("loadLibrary"),
-        new RuntimePermission("queuePrintJob"),
-        new SocketPermission("*", "connect"),
-        new SocketPermission("localhost:1024-", "accept, listen"),
-        new FilePermission("*", "read, write"),
-        new PropertyPermission("*", "read"),
+            new AWTPermission("accessClipboard"),
+            // disabled because we can't at this time prevent an
+            // application from accessing other applications' event
+            // queues, or even prevent access to security dialog queues.
+            //
+            // new AWTPermission("accessEventQueue"),
+            new RuntimePermission("exitVM"),
+            new RuntimePermission("loadLibrary"),
+            new RuntimePermission("queuePrintJob"),
+            new SocketPermission("*", "connect"),
+            new SocketPermission("localhost:1024-", "accept, listen"),
+            new FilePermission("*", "read, write"),
+            new PropertyPermission("*", "read"),
     };
 
     /** basic permissions for restricted mode */
     private static Permission sandboxPermissions[] = {
-        new SocketPermission("localhost:1024-", "listen"),
-        // new SocketPermission("<DownloadHost>", "connect, accept"), // added by code
-        new PropertyPermission("java.version", "read"),
-        new PropertyPermission("java.vendor", "read"),
-        new PropertyPermission("java.vendor.url", "read"),
-        new PropertyPermission("java.class.version", "read"),
-        new PropertyPermission("os.name", "read"),
-        new PropertyPermission("os.version", "read"),
-        new PropertyPermission("os.arch", "read"),
-        new PropertyPermission("file.separator", "read"),
-        new PropertyPermission("path.separator", "read"),
-        new PropertyPermission("line.separator", "read"),
-        new PropertyPermission("java.specification.version", "read"),
-        new PropertyPermission("java.specification.vendor", "read"),
-        new PropertyPermission("java.specification.name", "read"),
-        new PropertyPermission("java.vm.specification.vendor", "read"),
-        new PropertyPermission("java.vm.specification.name", "read"),
-        new PropertyPermission("java.vm.version", "read"),
-        new PropertyPermission("java.vm.vendor", "read"),
-        new PropertyPermission("java.vm.name", "read"),
-        new PropertyPermission("javawebstart.version", "read"),
-        new PropertyPermission("javaplugin.*", "read"),
-        new PropertyPermission("jnlp.*", "read,write"),
-        new PropertyPermission("javaws.*", "read,write"),
-        new RuntimePermission("exitVM"),
-        new RuntimePermission("stopThread"),
+            new SocketPermission("localhost:1024-", "listen"),
+            // new SocketPermission("<DownloadHost>", "connect, accept"), // added by code
+            new PropertyPermission("java.version", "read"),
+            new PropertyPermission("java.vendor", "read"),
+            new PropertyPermission("java.vendor.url", "read"),
+            new PropertyPermission("java.class.version", "read"),
+            new PropertyPermission("os.name", "read"),
+            new PropertyPermission("os.version", "read"),
+            new PropertyPermission("os.arch", "read"),
+            new PropertyPermission("file.separator", "read"),
+            new PropertyPermission("path.separator", "read"),
+            new PropertyPermission("line.separator", "read"),
+            new PropertyPermission("java.specification.version", "read"),
+            new PropertyPermission("java.specification.vendor", "read"),
+            new PropertyPermission("java.specification.name", "read"),
+            new PropertyPermission("java.vm.specification.vendor", "read"),
+            new PropertyPermission("java.vm.specification.name", "read"),
+            new PropertyPermission("java.vm.version", "read"),
+            new PropertyPermission("java.vm.vendor", "read"),
+            new PropertyPermission("java.vm.name", "read"),
+            new PropertyPermission("javawebstart.version", "read"),
+            new PropertyPermission("javaplugin.*", "read"),
+            new PropertyPermission("jnlp.*", "read,write"),
+            new PropertyPermission("javaws.*", "read,write"),
+            new RuntimePermission("exitVM"),
+            new RuntimePermission("stopThread"),
         // disabled because we can't at this time prevent an
         // application from accessing other applications' event
         // queues, or even prevent access to security dialog queues.
         //
         // new AWTPermission("accessEventQueue"),
-    };
+        };
 
     /** basic permissions for restricted mode */
     private static Permission jnlpRIAPermissions[] = {
-        new PropertyPermission("awt.useSystemAAFontSettings", "read,write"),
-        new PropertyPermission("http.agent", "read,write"),
-        new PropertyPermission("http.keepAlive", "read,write"),
-        new PropertyPermission("java.awt.syncLWRequests", "read,write"),
-        new PropertyPermission("java.awt.Window.locationByPlatform", "read,write"),
-        new PropertyPermission("javaws.cfg.jauthenticator", "read,write"),
-        new PropertyPermission("javax.swing.defaultlf", "read,write"),
-        new PropertyPermission("sun.awt.noerasebackground", "read,write"),
-        new PropertyPermission("sun.awt.erasebackgroundonresize", "read,write"),
-        new PropertyPermission("sun.java2d.d3d", "read,write"),
-        new PropertyPermission("sun.java2d.dpiaware", "read,write"),
-        new PropertyPermission("sun.java2d.noddraw", "read,write"),
-        new PropertyPermission("sun.java2d.opengl", "read,write"),
-        new PropertyPermission("swing.boldMetal", "read,write"),
-        new PropertyPermission("swing.metalTheme", "read,write"),
-        new PropertyPermission("swing.noxp", "read,write"),
-        new PropertyPermission("swing.useSystemFontSettings", "read,write"),
+            new PropertyPermission("awt.useSystemAAFontSettings", "read,write"),
+            new PropertyPermission("http.agent", "read,write"),
+            new PropertyPermission("http.keepAlive", "read,write"),
+            new PropertyPermission("java.awt.syncLWRequests", "read,write"),
+            new PropertyPermission("java.awt.Window.locationByPlatform", "read,write"),
+            new PropertyPermission("javaws.cfg.jauthenticator", "read,write"),
+            new PropertyPermission("javax.swing.defaultlf", "read,write"),
+            new PropertyPermission("sun.awt.noerasebackground", "read,write"),
+            new PropertyPermission("sun.awt.erasebackgroundonresize", "read,write"),
+            new PropertyPermission("sun.java2d.d3d", "read,write"),
+            new PropertyPermission("sun.java2d.dpiaware", "read,write"),
+            new PropertyPermission("sun.java2d.noddraw", "read,write"),
+            new PropertyPermission("sun.java2d.opengl", "read,write"),
+            new PropertyPermission("swing.boldMetal", "read,write"),
+            new PropertyPermission("swing.metalTheme", "read,write"),
+            new PropertyPermission("swing.noxp", "read,write"),
+            new PropertyPermission("swing.useSystemFontSettings", "read,write"),
     };
 
     /**
@@ -178,7 +177,7 @@ public class SecurityDesc {
 
         // add j2ee to sandbox if needed
         if (type == J2EE_PERMISSIONS)
-            for (int i=0; i < j2eePermissions.length; i++)
+            for (int i = 0; i < j2eePermissions.length; i++)
                 permissions.add(j2eePermissions[i]);
 
         return permissions;
@@ -191,7 +190,7 @@ public class SecurityDesc {
 
         Permissions permissions = new Permissions();
 
-        for (int i=0; i < sandboxPermissions.length; i++)
+        for (int i = 0; i < sandboxPermissions.length; i++)
             permissions.add(sandboxPermissions[i]);
 
         if (grantAwtPermissions) {
@@ -199,7 +198,7 @@ public class SecurityDesc {
         }
 
         if (file.isApplication())
-            for (int i=0; i < jnlpRIAPermissions.length; i++)
+            for (int i = 0; i < jnlpRIAPermissions.length; i++)
                 permissions.add(jnlpRIAPermissions[i]);
 
         if (downloadHost != null)

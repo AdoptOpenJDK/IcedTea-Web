@@ -48,12 +48,11 @@ public class LaunchException extends Exception {
     /** severity of the warning/error */
     private String severity;
 
-
     /**
      * Creates a LaunchException without detail message.
      */
     public LaunchException(JNLPFile file, Exception cause, String severity, String category, String summary, String description) {
-        super(severity + ": " + category  + ": "+ summary);
+        super(severity + ": " + category + ": " + summary);
 
         this.file = file;
         this.category = category;
@@ -79,7 +78,7 @@ public class LaunchException extends Exception {
      * Creates a LaunchException with a cause and detail message
      */
     public LaunchException(String message, Throwable cause) {
-        this(message+": "+cause.getMessage());
+        this(message + ": " + cause.getMessage());
 
         // replace with setCause when no longer 1.3 compatible
         this.cause = cause;

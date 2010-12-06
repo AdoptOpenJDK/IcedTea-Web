@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.awt.*;
@@ -29,7 +28,6 @@ public class AppThreadGroup extends ThreadGroup {
 
     /** the app */
     private ApplicationInstance app = null;
-
 
     /**
      * Creates new JavaAppThreadGroup
@@ -63,6 +61,5 @@ public class AppThreadGroup extends ThreadGroup {
     public void uncaughtException(Thread t, Throwable e) {
         super.uncaughtException(t, e);
     }
-
 
 }

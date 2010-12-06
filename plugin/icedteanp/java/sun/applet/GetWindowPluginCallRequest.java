@@ -40,8 +40,6 @@ package sun.applet;
 import java.security.AccessControlContext;
 import java.security.ProtectionDomain;
 
-
-
 public class GetWindowPluginCallRequest extends PluginCallRequest {
     // FIXME: look into int vs long JavaScript internal values.
     long internal;
@@ -51,7 +49,7 @@ public class GetWindowPluginCallRequest extends PluginCallRequest {
     }
 
     public void parseReturn(String message) {
-    	PluginDebug.debug ("GetWindowParseReturn GOT: " + message);
+        PluginDebug.debug("GetWindowParseReturn GOT: " + message);
         String[] args = message.split(" ");
         // FIXME: add thread ID to messages to support multiple
         // threads using the netscape.javascript package.
@@ -60,6 +58,6 @@ public class GetWindowPluginCallRequest extends PluginCallRequest {
     }
 
     public Long getObject() {
-    	return this.internal;
+        return this.internal;
     }
 }

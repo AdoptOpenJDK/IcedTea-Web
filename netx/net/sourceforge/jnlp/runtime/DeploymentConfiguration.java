@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.awt.AWTPermission;
@@ -215,7 +214,7 @@ public final class DeploymentConfiguration {
     private Map<String, ConfigValue> unchangeableConfiguration;
 
     public DeploymentConfiguration() {
-        currentConfiguration = new HashMap<String,ConfigValue>();
+        currentConfiguration = new HashMap<String, ConfigValue>();
         unchangeableConfiguration = new HashMap<String, ConfigValue>();
     }
 
@@ -372,10 +371,10 @@ public final class DeploymentConfiguration {
             { KEY_USER_TRUSTED_CA_CERTS, USER_SECURITY + File.separator + "trusted.cacerts" },
             { KEY_USER_TRUSTED_JSSE_CA_CERTS, USER_SECURITY + File.separator + "trusted.jssecacerts" },
             { KEY_USER_TRUSTED_CERTS, USER_SECURITY + File.separator + "trusted.certs" },
-            { KEY_USER_TRUSTED_JSSE_CERTS, USER_SECURITY + File.separator + "trusted.jssecerts"},
+            { KEY_USER_TRUSTED_JSSE_CERTS, USER_SECURITY + File.separator + "trusted.jssecerts" },
             { KEY_USER_TRUSTED_CLIENT_CERTS, USER_SECURITY + File.separator + "trusted.clientcerts" },
             { "deployment.system.security.policy", null },
-            { KEY_SYSTEM_TRUSTED_CA_CERTS , SYSTEM_SECURITY + File.separator + "cacerts" },
+            { KEY_SYSTEM_TRUSTED_CA_CERTS, SYSTEM_SECURITY + File.separator + "cacerts" },
             { KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS, SYSTEM_SECURITY + File.separator + "jssecacerts" },
             { KEY_SYSTEM_TRUSTED_CERTS, SYSTEM_SECURITY + File.separator + "trusted.certs" },
             { KEY_SYSTEM_TRUSTED_JSSE_CERTS, SYSTEM_SECURITY + File.separator + "trusted.jssecerts" },
@@ -417,7 +416,7 @@ public final class DeploymentConfiguration {
             /* JNLP association */
             { "deployment.javaws.associations", String.valueOf(JNLP_ASSOCIATION_ASK_USER) },
             /* desktop integration */
-            { KEY_CREATE_DESKTOP_SHORTCUT, ShortcutDesc.CREATE_ASK_USER_IF_HINTED},
+            { KEY_CREATE_DESKTOP_SHORTCUT, ShortcutDesc.CREATE_ASK_USER_IF_HINTED },
             /* jre selection */
             { "deployment.javaws.installURL", null },
             /* jre management */
@@ -500,7 +499,7 @@ public final class DeploymentConfiguration {
                             + systemPropertiesFile);
                 }
                 ConfigValue mandatory = systemConfiguration.get("deployment.system.config.mandatory");
-                systemPropertiesMandatory = Boolean.valueOf(mandatory == null? null: mandatory.get());
+                systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.get());
                 return true;
             } else {
                 if (JNLPRuntime.isDebug()) {
@@ -547,7 +546,6 @@ public final class DeploymentConfiguration {
             return null;
         }
     }
-
 
     /**
      * Saves all properties that are not part of default or system properties
@@ -659,7 +657,7 @@ public final class DeploymentConfiguration {
      * @param srcMap the source for reading key value pairs
      */
     private void mergeMaps(Map<String, ConfigValue> finalMap, Map<String, ConfigValue> srcMap) {
-        for (String key: srcMap.keySet()) {
+        for (String key : srcMap.keySet()) {
             ConfigValue configValue = finalMap.get(key);
             if (configValue == null) {
                 configValue = srcMap.get(key);

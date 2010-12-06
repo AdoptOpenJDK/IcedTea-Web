@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.cache;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -47,7 +46,6 @@ public class CacheEntry {
     /** info about the cached file */
     private PropertiesFile properties;
 
-
     /**
      * Create a CacheEntry for the resources specified as a remote
      * URL.
@@ -60,7 +58,7 @@ public class CacheEntry {
         this.version = version;
 
         File infoFile = CacheUtil.getCacheFile(location, version);
-        infoFile = new File(infoFile.getPath()+".info"); // replace with something that can't be clobbered
+        infoFile = new File(infoFile.getPath() + ".info"); // replace with something that can't be clobbered
 
         properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
@@ -91,8 +89,7 @@ public class CacheEntry {
     public long getLastUpdated() {
         try {
             return Long.parseLong(properties.getProperty("last-updated"));
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             return 0;
         }
     }
@@ -127,8 +124,7 @@ public class CacheEntry {
                 return true;
             else
                 return false;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
@@ -155,8 +151,7 @@ public class CacheEntry {
                 return false;
             else
                 return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 

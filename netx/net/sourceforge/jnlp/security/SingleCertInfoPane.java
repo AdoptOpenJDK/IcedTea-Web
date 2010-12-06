@@ -44,34 +44,33 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-
 public class SingleCertInfoPane extends CertsInfoPane {
 
-        public SingleCertInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
-                super(x, certVerifier);
-        }
+    public SingleCertInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+        super(x, certVerifier);
+    }
 
-        protected void buildTree() {
-                X509Certificate cert = parent.getCert();
-                String subjectString =
+    protected void buildTree() {
+        X509Certificate cert = parent.getCert();
+        String subjectString =
                         SecurityUtil.getCN(cert.getSubjectX500Principal().getName());
-                String issuerString =
+        String issuerString =
                         SecurityUtil.getCN(cert.getIssuerX500Principal().getName());
 
-                DefaultMutableTreeNode top = new DefaultMutableTreeNode(subjectString
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode(subjectString
                                 + " (" + issuerString + ")");
 
-                tree = new JTree(top);
-                tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-                tree.addTreeSelectionListener(new TreeSelectionHandler());
-        }
+        tree = new JTree(top);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.addTreeSelectionListener(new TreeSelectionHandler());
+    }
 
-        protected void populateTable() {
-                X509Certificate c = parent.getCert();
-                certNames = new String[1];
-                certsData = new ArrayList<String[][]>();
-                certsData.add(parseCert(c));
-                certNames[0] = SecurityUtil.getCN(c.getSubjectX500Principal().getName())
+    protected void populateTable() {
+        X509Certificate c = parent.getCert();
+        certNames = new String[1];
+        certsData = new ArrayList<String[][]>();
+        certsData.add(parseCert(c));
+        certNames[0] = SecurityUtil.getCN(c.getSubjectX500Principal().getName())
                 + " (" + SecurityUtil.getCN(c.getIssuerX500Principal().getName()) + ")";
-        }
+    }
 }

@@ -111,7 +111,6 @@ public class PasswordAuthenticationDialog extends JDialog {
         c.weightx = 1.0;
         add(jtfUserName, c);
 
-
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 2;
@@ -142,11 +141,11 @@ public class PasswordAuthenticationDialog extends JDialog {
         c.weightx = 0.0;
         add(jbOK, c);
 
-        setMinimumSize(new Dimension(400,150));
-        setMaximumSize(new Dimension(1024,150));
+        setMinimumSize(new Dimension(400, 150));
+        setMaximumSize(new Dimension(1024, 150));
         setAlwaysOnTop(true);
 
-        setSize(400,150);
+        setSize(400, 150);
         setLocationRelativeTo(null);
 
         // OK => read supplied info and pass it on
@@ -202,7 +201,7 @@ public class PasswordAuthenticationDialog extends JDialog {
                        " is requesting authentication. It says \"" + prompt + "\"</html>");
 
         try {
-            SwingUtilities.invokeAndWait( new Runnable() {
+            SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                     // show dialog to user
                     setVisible(true);

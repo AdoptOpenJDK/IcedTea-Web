@@ -35,113 +35,109 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package sun.applet;
-
 
 class PluginMessageHandlerWorker extends Thread {
 
-	private boolean free = true;
-	private boolean isPriorityWorker = false;
-	private int id;
-	private String message = null;
-	private SecurityManager sm;
-	PluginStreamHandler streamHandler = null;
-	PluginMessageConsumer consumer = null;
+    private boolean free = true;
+    private boolean isPriorityWorker = false;
+    private int id;
+    private String message = null;
+    private SecurityManager sm;
+    PluginStreamHandler streamHandler = null;
+    PluginMessageConsumer consumer = null;
 
-	public PluginMessageHandlerWorker(
-	            PluginMessageConsumer consumer, 
-	            PluginStreamHandler streamHandler, int id, 
-	            SecurityManager sm, boolean isPriorityWorker) {
+    public PluginMessageHandlerWorker(
+                PluginMessageConsumer consumer,
+                PluginStreamHandler streamHandler, int id,
+                SecurityManager sm, boolean isPriorityWorker) {
 
-		this.id = id;
-		this.streamHandler = streamHandler;
-		this.sm = sm;
-		this.isPriorityWorker = isPriorityWorker;
-		this.consumer = consumer;
-		
-		PluginDebug.debug("Worker " + this.id + " (priority=" + isPriorityWorker + ") created."); 
-	}
+        this.id = id;
+        this.streamHandler = streamHandler;
+        this.sm = sm;
+        this.isPriorityWorker = isPriorityWorker;
+        this.consumer = consumer;
 
-	public void setmessage(String message) {
-		this.message = message;
-	}
+        PluginDebug.debug("Worker " + this.id + " (priority=" + isPriorityWorker + ") created.");
+    }
 
-	public void run() {
-		while (true) {
+    public void setmessage(String message) {
+        this.message = message;
+    }
 
-			if (message != null) {
-				
-			    PluginDebug.debug("Consumer (priority=" + isPriorityWorker + ") thread " + id + " consuming " + message);
-			    
-				// ideally, whoever returns things object should mark it 
-				// busy first, but just in case..
-				busy();
+    public void run() {
+        while (true) {
 
-				try {
-					streamHandler.handleMessage(message);
-				} catch (PluginException pe) {
-					/*
-					   catch the exception and DO NOTHING. The plugin should take over after 
-					   this error and let the user know. We don't quit because otherwise the 
-					   exception will spread to the rest of the applets which is a no-no
-					 */ 
-				}
+            if (message != null) {
 
-				this.message = null;
-				
-				PluginDebug.debug("Consumption (priority=" + isPriorityWorker + ") completed by consumer thread " + id);
+                PluginDebug.debug("Consumer (priority=" + isPriorityWorker + ") thread " + id + " consuming " + message);
 
-	            // mark ourselves free again
-				free();
-				
-			} else {
-				
-				// Sleep when there is nothing to do
-			    try {
-			        Thread.sleep(Integer.MAX_VALUE);
-			        PluginDebug.debug("Consumer thread " + id + " sleeping...");
-			    } catch (InterruptedException ie) {
-			        PluginDebug.debug("Consumer thread " + id + " woken...");
-			        // nothing.. someone woke us up, see if there 
-			        // is work to do
-			    }
-			}
-		}
-	}
-	
-	
-	
-	public int getWorkerId() {
-		return id;
-	}
+                // ideally, whoever returns things object should mark it 
+                // busy first, but just in case..
+                busy();
 
-	public void busy() {
-	    synchronized (this) {
-	        this.free = false;            
+                try {
+                    streamHandler.handleMessage(message);
+                } catch (PluginException pe) {
+                    /*
+                       catch the exception and DO NOTHING. The plugin should take over after 
+                       this error and let the user know. We don't quit because otherwise the 
+                       exception will spread to the rest of the applets which is a no-no
+                     */
+                }
+
+                this.message = null;
+
+                PluginDebug.debug("Consumption (priority=" + isPriorityWorker + ") completed by consumer thread " + id);
+
+                // mark ourselves free again
+                free();
+
+            } else {
+
+                // Sleep when there is nothing to do
+                try {
+                    Thread.sleep(Integer.MAX_VALUE);
+                    PluginDebug.debug("Consumer thread " + id + " sleeping...");
+                } catch (InterruptedException ie) {
+                    PluginDebug.debug("Consumer thread " + id + " woken...");
+                    // nothing.. someone woke us up, see if there 
+                    // is work to do
+                }
+            }
         }
-	}
-	
-	public void free() {
-	    synchronized (this) {
-	        this.free = true;
+    }
 
-	        // Signal the consumer that we are done in case it was waiting
-	        consumer.notifyWorkerIsFree(this); 
-	    }
-	}
+    public int getWorkerId() {
+        return id;
+    }
 
-	public boolean isPriority() {
-	    return isPriorityWorker;
-	}
+    public void busy() {
+        synchronized (this) {
+            this.free = false;
+        }
+    }
 
-	public boolean isFree(boolean prioritized) {
-	    synchronized (this) {
-	        return free && (prioritized == isPriorityWorker);
-	    }
-	}
+    public void free() {
+        synchronized (this) {
+            this.free = true;
 
-	public String toString() {
-		return "Worker #" + this.id + "/IsPriority=" + this.isPriorityWorker + "/IsFree=" + this.free + "/Message=" + message;  
-	}
+            // Signal the consumer that we are done in case it was waiting
+            consumer.notifyWorkerIsFree(this);
+        }
+    }
+
+    public boolean isPriority() {
+        return isPriorityWorker;
+    }
+
+    public boolean isFree(boolean prioritized) {
+        synchronized (this) {
+            return free && (prioritized == isPriorityWorker);
+        }
+    }
+
+    public String toString() {
+        return "Worker #" + this.id + "/IsPriority=" + this.isPriorityWorker + "/IsFree=" + this.free + "/Message=" + message;
+    }
 }

@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.services;
 
 import java.lang.reflect.InvocationHandler;
@@ -143,8 +142,7 @@ public class ServiceUtil {
     private static Object getService(String name) {
         try {
             return ServiceManager.lookup(name);
-        }
-        catch (UnavailableServiceException ex) {
+        } catch (UnavailableServiceException ex) {
             return null;
         }
     }
@@ -174,10 +172,10 @@ public class ServiceUtil {
 
         public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
             if (JNLPRuntime.isDebug()) {
-                System.err.println("call privileged method: "+method.getName());
+                System.err.println("call privileged method: " + method.getName());
                 if (args != null)
-                    for (int i=0; i < args.length; i++)
-                        System.err.println("           arg: "+args[i]);
+                    for (int i = 0; i < args.length; i++)
+                        System.err.println("           arg: " + args[i]);
             }
 
             PrivilegedExceptionAction<Object> invoker = new PrivilegedExceptionAction<Object>() {
@@ -190,7 +188,7 @@ public class ServiceUtil {
                 Object result = AccessController.doPrivileged(invoker);
 
                 if (JNLPRuntime.isDebug())
-                    System.err.println("        result: "+result);
+                    System.err.println("        result: " + result);
 
                 return result;
             } catch (PrivilegedActionException e) {
@@ -238,57 +236,57 @@ public class ServiceUtil {
                 Object... extras) {
 
         if (app == null)
-                app = JNLPRuntime.getApplication();
+            app = JNLPRuntime.getApplication();
 
         boolean codeTrusted = true;
 
-        StackTraceElement[] stack =  Thread.currentThread().getStackTrace();
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 
-        for (int i=0; i < stack.length; i++) {
+        for (int i = 0; i < stack.length; i++) {
 
-                Class c = null;
+            Class c = null;
 
+            try {
+                c = Class.forName(stack[i].getClassName());
+            } catch (Exception e1) {
                 try {
-                        c = Class.forName(stack[i].getClassName());
-                } catch (Exception e1) {
-                        try {
-                                c = Class.forName(stack[i].getClassName(), false, app.getClassLoader());
-                        } catch (Exception e2) {
-                                System.err.println(e2.getMessage());
-                        }
+                    c = Class.forName(stack[i].getClassName(), false, app.getClassLoader());
+                } catch (Exception e2) {
+                    System.err.println(e2.getMessage());
                 }
+            }
 
             // Everything up to the desired class/method must be trusted
             if (c == null || // class not found
-                        ( c.getProtectionDomain().getCodeSource() != null && // class is not in bootclasspath
-                          c.getProtectionDomain().getCodeSource().getCodeSigners() == null) // class is trusted
-                        ) {
+                    (c.getProtectionDomain().getCodeSource() != null && // class is not in bootclasspath
+                    c.getProtectionDomain().getCodeSource().getCodeSigners() == null) // class is trusted
+            ) {
                 codeTrusted = false;
             }
         }
 
         if (!codeTrusted) {
 
-                if (!shouldPromptUser()) {
-                    return false;
-                }
+            if (!shouldPromptUser()) {
+                return false;
+            }
 
-                final AccessType tmpType = type;
-                final Object[] tmpExtras = extras;
-                final ApplicationInstance tmpApp = app;
+            final AccessType tmpType = type;
+            final Object[] tmpExtras = extras;
+            final ApplicationInstance tmpApp = app;
 
-                //We need to do this to allow proper icon loading for unsigned
-                //applets, otherwise permissions won't be granted to load icons
-                //from resources.jar.
-                Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
-                    public Boolean run() {
-                        boolean b = SecurityWarning.showAccessWarningDialog(tmpType,
+            //We need to do this to allow proper icon loading for unsigned
+            //applets, otherwise permissions won't be granted to load icons
+            //from resources.jar.
+            Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                public Boolean run() {
+                    boolean b = SecurityWarning.showAccessWarningDialog(tmpType,
                                 tmpApp.getJNLPFile(), tmpExtras);
-                        return new Boolean(b);
-                    }
-                });
+                    return new Boolean(b);
+                }
+            });
 
-                return b.booleanValue();
+            return b.booleanValue();
         }
 
         return true; //allow

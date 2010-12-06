@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.net.*;
@@ -35,7 +34,6 @@ public class AppletAudioClip implements AudioClip {
     /** the clip */
     private Clip clip;
 
-
     /**
      * Creates new AudioClip.  If the clip cannot be opened no
      * exception is thrown, instead the methods of the AudioClip
@@ -49,9 +47,8 @@ public class AppletAudioClip implements AudioClip {
 
             clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
             clip.open(stream);
-        }
-        catch (Exception ex) {
-            System.err.println("Error loading sound:"+location.toString());
+        } catch (Exception ex) {
+            System.err.println("Error loading sound:" + location.toString());
             clip = null;
         }
     }

@@ -35,7 +35,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-
 package net.sourceforge.jnlp.security;
 
 import java.awt.Dialog.ModalityType;
@@ -97,7 +96,7 @@ public class SecurityWarning {
      * @return true if permission was granted by the user, false otherwise.
      */
     public static boolean showAccessWarningDialog(AccessType accessType, JNLPFile file) {
-            return showAccessWarningDialog(accessType, file, null);
+        return showAccessWarningDialog(accessType, file, null);
     }
 
     /**
@@ -111,7 +110,7 @@ public class SecurityWarning {
      * @return true if permission was granted by the user, false otherwise.
      */
     public static boolean showAccessWarningDialog(final AccessType accessType,
-        final JNLPFile file, final Object[] extras) {
+            final JNLPFile file, final Object[] extras) {
 
         if (!shouldPromptUser()) {
             return false;
@@ -161,7 +160,7 @@ public class SecurityWarning {
         if (selectedValue == null) {
             return false;
         } else if (selectedValue instanceof Integer) {
-            if (((Integer)selectedValue).intValue() == 0) {
+            if (((Integer) selectedValue).intValue() == 0) {
                 return true;
             } else {
                 return false;
@@ -188,7 +187,7 @@ public class SecurityWarning {
             return false;
         }
 
-        final SecurityDialogMessage  message = new SecurityDialogMessage();
+        final SecurityDialogMessage message = new SecurityDialogMessage();
         message.dialogType = DialogType.CERT_WARNING;
         message.accessType = accessType;
         message.file = file;

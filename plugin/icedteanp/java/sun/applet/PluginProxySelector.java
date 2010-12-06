@@ -138,7 +138,7 @@ public class PluginProxySelector extends JNLPProxySelector {
      * @param <V> The Object type
      */
 
-    private class TimedHashMap<K,V> extends HashMap<K,V> {
+    private class TimedHashMap<K, V> extends HashMap<K, V> {
 
         HashMap<K, Long> timeStamps = new HashMap<K, Long>();
         Long expiry = 10000L;
@@ -176,7 +176,7 @@ public class PluginProxySelector extends JNLPProxySelector {
                     timeStamps.put((K) key, (new Date()).getTime());
                     return super.get(key);
                 } else {
-                    PluginDebug.debug("Proxy cache for " + key + " has expired (age=" + age/1000.0 + " seconds)");
+                    PluginDebug.debug("Proxy cache for " + key + " has expired (age=" + age / 1000.0 + " seconds)");
                 }
             }
 

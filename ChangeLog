@@ -1,3 +1,10 @@
+2010-12-06  Deepak Bhole <dbhole@redhat.com>
+
+	Fixed indentation and spacing for all .java files
+	* .settings/org.eclipse.jdt.core.prefs: New file. Contains code style
+	preference settings for Eclipse.
+	* .settings/org.eclipse.jdt.ui.prefs: Same.
+
 2010-12-03  Andrew John Hughes  <ahughes@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java,

@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -95,14 +94,14 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
     /** this exception prevents exiting the JVM */
     private SecurityException closeAppEx = // making here prevents huge stack traces
-        new SecurityException(R("RShutdown"));
+    new SecurityException(R("RShutdown"));
 
     /** weak list of windows created */
     private WeakList<Window> weakWindows = new WeakList<Window>();
 
     /** weak list of applications corresponding to window list */
     private WeakList<ApplicationInstance> weakApplications =
-        new WeakList<ApplicationInstance>();
+            new WeakList<ApplicationInstance>();
 
     /** weak reference to most app who's windows was most recently activated */
     private WeakReference activeApplication = null;
@@ -148,7 +147,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         if (exitClass == null)
             return true;
 
-        for (int i=0; i < stack.length; i++)
+        for (int i = 0; i < stack.length; i++)
             if (stack[i] == exitClass)
                 return true;
 
@@ -182,7 +181,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * call from event dispatch thread).
      */
     protected ApplicationInstance getApplication(Window window) {
-        for (int i = weakWindows.size(); i-->0;) {
+        for (int i = weakWindows.size(); i-- > 0;) {
             Window w = weakWindows.get(i);
             if (w == null) {
                 weakWindows.remove(i);
@@ -201,17 +200,17 @@ class JNLPSecurityManager extends AWTSecurityManager {
      */
     protected ApplicationInstance getApplication(Class stack[], int maxDepth) {
         if (maxDepth <= 0)
-                maxDepth = stack.length;
+            maxDepth = stack.length;
 
         // this needs to be tightened up
-        for (int i=0; i < stack.length && i < maxDepth; i++) {
-                if (stack[i].getClassLoader() instanceof JNLPClassLoader) {
-                        JNLPClassLoader loader = (JNLPClassLoader) stack[i].getClassLoader();
+        for (int i = 0; i < stack.length && i < maxDepth; i++) {
+            if (stack[i].getClassLoader() instanceof JNLPClassLoader) {
+                JNLPClassLoader loader = (JNLPClassLoader) stack[i].getClassLoader();
 
-                        if (loader != null && loader.getApplication() != null) {
-                                return loader.getApplication();
-                        }
+                if (loader != null && loader.getApplication() != null) {
+                    return loader.getApplication();
                 }
+            }
         }
 
         return null;
@@ -243,113 +242,112 @@ class JNLPSecurityManager extends AWTSecurityManager {
         //        System.out.println("Checking permission: " + perm.toString());
 
         if (!JNLPRuntime.isWebstartApplication() &&
-              ("setPolicy".equals(name) || "setSecurityManager".equals(name)))
+                ("setPolicy".equals(name) || "setSecurityManager".equals(name)))
             throw new SecurityException(R("RCantReplaceSM"));
 
         try {
             // deny all permissions to stopped applications
-                // The call to getApplication() below might not work if an
-                // application hasn't been fully initialized yet.
-//            if (JNLPRuntime.isDebug()) {
-//                if (!"getClassLoader".equals(name)) {
-//                    ApplicationInstance app = getApplication();
-//                    if (app != null && !app.isRunning())
-//                        throw new SecurityException(R("RDenyStopped"));
-//                }
-//            }
+            // The call to getApplication() below might not work if an
+            // application hasn't been fully initialized yet.
+            //            if (JNLPRuntime.isDebug()) {
+            //                if (!"getClassLoader".equals(name)) {
+            //                    ApplicationInstance app = getApplication();
+            //                    if (app != null && !app.isRunning())
+            //                        throw new SecurityException(R("RDenyStopped"));
+            //                }
+            //            }
 
-                        try {
-                                super.checkPermission(perm);
-                        } catch (SecurityException se) {
+            try {
+                super.checkPermission(perm);
+            } catch (SecurityException se) {
 
-                                //This section is a special case for dealing with SocketPermissions.
-                                if (JNLPRuntime.isDebug())
-                                        System.err.println("Requesting permission: " + perm.toString());
+                //This section is a special case for dealing with SocketPermissions.
+                if (JNLPRuntime.isDebug())
+                    System.err.println("Requesting permission: " + perm.toString());
 
-                                //Change this SocketPermission's action to connect and accept
-                                //(and resolve). This is to avoid asking for connect permission
-                                //on every address resolve.
-                                Permission tmpPerm = null;
-                                if (perm instanceof SocketPermission) {
-                                        tmpPerm = new SocketPermission(perm.getName(),
+                //Change this SocketPermission's action to connect and accept
+                //(and resolve). This is to avoid asking for connect permission
+                //on every address resolve.
+                Permission tmpPerm = null;
+                if (perm instanceof SocketPermission) {
+                    tmpPerm = new SocketPermission(perm.getName(),
                                                         SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION);
 
-                                        // before proceeding, check if we are trying to connect to same origin
-                                        ApplicationInstance app = getApplication();
-                                        JNLPFile file = app.getJNLPFile();
+                    // before proceeding, check if we are trying to connect to same origin
+                    ApplicationInstance app = getApplication();
+                    JNLPFile file = app.getJNLPFile();
 
-                                        String srcHost =  file.getSourceLocation().getAuthority();
-                                        String destHost = name;
+                    String srcHost = file.getSourceLocation().getAuthority();
+                    String destHost = name;
 
-                                        // host = abc.xyz.com or abc.xyz.com:<port>
-                                        if (destHost.indexOf(':') >= 0)
-                                                destHost = destHost.substring(0, destHost.indexOf(':'));
+                    // host = abc.xyz.com or abc.xyz.com:<port>
+                    if (destHost.indexOf(':') >= 0)
+                        destHost = destHost.substring(0, destHost.indexOf(':'));
 
-                                        // host = abc.xyz.com
-                                        String[] hostComponents = destHost.split("\\.");
+                    // host = abc.xyz.com
+                    String[] hostComponents = destHost.split("\\.");
 
-                                        int length = hostComponents.length;
-                                        if (length >= 2) {
+                    int length = hostComponents.length;
+                    if (length >= 2) {
 
-                                                // address is in xxx.xxx.xxx format
-                                                destHost = hostComponents[length -2] + "." + hostComponents[length -1];
+                        // address is in xxx.xxx.xxx format
+                        destHost = hostComponents[length - 2] + "." + hostComponents[length - 1];
 
-                                                // host = xyz.com i.e. origin
-                                                boolean isDestHostName = false;
+                        // host = xyz.com i.e. origin
+                        boolean isDestHostName = false;
 
-                                                // make sure that it is not an ip address
-                                                try {
-                                                        Integer.parseInt(hostComponents[length -1]);
-                                                } catch (NumberFormatException e) {
-                                                        isDestHostName = true;
-                                                }
-
-                                                if (isDestHostName) {
-                                                        // okay, destination is hostname. Now figure out if it is a subset of origin
-                                                        if (srcHost.endsWith(destHost)) {
-                                                                addPermission(tmpPerm);
-                                                                return;
-                                                        }
-                                                }
-                                        }
-
-                                } else if (perm instanceof SecurityPermission) {
-
-                                    // JCE's initialization requires putProviderProperty permission
-                                    if (perm.equals(new SecurityPermission("putProviderProperty.SunJCE"))) {
-                                        if (inTrustedCallChain("com.sun.crypto.provider.SunJCE", "run")) {
-                                            return;
-                                        }
-                                    }
-
-                                } else if (perm instanceof RuntimePermission) {
-
-                                    // KeyGenerator's init method requires internal spec access
-                                    if (perm.equals(new SecurityPermission("accessClassInPackage.sun.security.internal.spec"))) {
-                                        if (inTrustedCallChain("javax.crypto.KeyGenerator", "init")) {
-                                            return;
-                                        }
-                                    }
-
-                                } else {
-                                    tmpPerm = perm;
-                                }
-
-                                if (tmpPerm != null) {
-                                    //askPermission will only prompt the user on SocketPermission
-                                    //meaning we're denying all other SecurityExceptions that may arise.
-                                    if (askPermission(tmpPerm)) {
-                                        addPermission(tmpPerm);
-                                        //return quietly.
-                                    } else {
-                                        throw se;
-                                    }
-                                }
+                        // make sure that it is not an ip address
+                        try {
+                            Integer.parseInt(hostComponents[length - 1]);
+                        } catch (NumberFormatException e) {
+                            isDestHostName = true;
                         }
-        }
-        catch (SecurityException ex) {
+
+                        if (isDestHostName) {
+                            // okay, destination is hostname. Now figure out if it is a subset of origin
+                            if (srcHost.endsWith(destHost)) {
+                                addPermission(tmpPerm);
+                                return;
+                            }
+                        }
+                    }
+
+                } else if (perm instanceof SecurityPermission) {
+
+                    // JCE's initialization requires putProviderProperty permission
+                    if (perm.equals(new SecurityPermission("putProviderProperty.SunJCE"))) {
+                        if (inTrustedCallChain("com.sun.crypto.provider.SunJCE", "run")) {
+                            return;
+                        }
+                    }
+
+                } else if (perm instanceof RuntimePermission) {
+
+                    // KeyGenerator's init method requires internal spec access
+                    if (perm.equals(new SecurityPermission("accessClassInPackage.sun.security.internal.spec"))) {
+                        if (inTrustedCallChain("javax.crypto.KeyGenerator", "init")) {
+                            return;
+                        }
+                    }
+
+                } else {
+                    tmpPerm = perm;
+                }
+
+                if (tmpPerm != null) {
+                    //askPermission will only prompt the user on SocketPermission
+                    //meaning we're denying all other SecurityExceptions that may arise.
+                    if (askPermission(tmpPerm)) {
+                        addPermission(tmpPerm);
+                        //return quietly.
+                    } else {
+                        throw se;
+                    }
+                }
+            }
+        } catch (SecurityException ex) {
             if (JNLPRuntime.isDebug()) {
-                System.out.println("Denying permission: "+perm);
+                System.out.println("Denying permission: " + perm);
             }
             throw ex;
         }
@@ -365,9 +363,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
      */
     private boolean inTrustedCallChain(String className, String methodName) {
 
-        StackTraceElement[] stack =  Thread.currentThread().getStackTrace();
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 
-        for (int i=0; i < stack.length; i++) {
+        for (int i = 0; i < stack.length; i++) {
 
             // Everything up to the desired class/method must be trusted
             if (!stack[i].getClass().getProtectionDomain().implies(new AllPermission())) {
@@ -375,7 +373,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
             }
 
             if (stack[i].getClassName().equals(className) &&
-                stack[i].getMethodName().equals(methodName)) {
+                    stack[i].getMethodName().equals(methodName)) {
                 return true;
             }
         }
@@ -388,14 +386,14 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * @param perm the permission to be granted
      * @return true if the permission was granted, false otherwise.
      */
-    private boolean askPermission(Permission perm)      {
+    private boolean askPermission(Permission perm) {
 
         ApplicationInstance app = getApplication();
         if (app != null && !app.isSigned()) {
-                if (perm instanceof SocketPermission
+            if (perm instanceof SocketPermission
                                 && ServiceUtil.checkAccess(AccessType.NETWORK, perm.getName())) {
-                        return true;
-                }
+                return true;
+            }
         }
 
         return false;
@@ -408,17 +406,17 @@ class JNLPSecurityManager extends AWTSecurityManager {
     private void addPermission(Permission perm) {
         if (JNLPRuntime.getApplication().getClassLoader() instanceof JNLPClassLoader) {
 
-                JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
-                cl.addPermission(perm);
-                if (JNLPRuntime.isDebug()) {
-                        if (cl.getPermissions(null).implies(perm))
-                                System.err.println("Added permission: " + perm.toString());
-                        else
-                                System.err.println("Unable to add permission: " + perm.toString());
-                }
+            JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
+            cl.addPermission(perm);
+            if (JNLPRuntime.isDebug()) {
+                if (cl.getPermissions(null).implies(perm))
+                    System.err.println("Added permission: " + perm.toString());
+                else
+                    System.err.println("Unable to add permission: " + perm.toString());
+            }
         } else {
-                if (JNLPRuntime.isDebug())
-                        System.err.println("Unable to add permission: " + perm + ", classloader not JNLP.");
+            if (JNLPRuntime.isDebug())
+                System.err.println("Unable to add permission: " + perm + ", classloader not JNLP.");
         }
     }
 
@@ -435,7 +433,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
             Window w = (Window) window;
 
             if (JNLPRuntime.isDebug())
-                System.err.println("SM: app: "+app.getTitle()+" is adding a window: "+window+" with appContext "+AppContext.getAppContext());
+                System.err.println("SM: app: " + app.getTitle() + " is adding a window: " + window + " with appContext " + AppContext.getAppContext());
 
             weakWindows.add(w); // for mapping window -> app
             weakApplications.add(app);
@@ -445,9 +443,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
         // change coffee cup to netx for default icon
         if (window instanceof Window)
-            for (Window w = (Window)window; w != null; w = w.getOwner())
+            for (Window w = (Window) window; w != null; w = w.getOwner())
                 if (window instanceof Frame)
-                    ((Frame)window).setIconImage(JNLPRuntime.getWindowIcon());
+                    ((Frame) window).setIconImage(JNLPRuntime.getWindowIcon());
 
         // todo: set awt.appletWarning to custom message
         // todo: logo on with glass pane on JFrame/JWindow?
@@ -473,9 +471,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
         // applets are not allowed to exit, but the plugin main class (primordial loader) is
         Class stack[] = getClassContext();
         if (!exitAllowed) {
-                for (int i=0; i < stack.length; i++)
-                        if (stack[i].getClassLoader() != null)
-                                throw new AccessControlException("Applets may not call System.exit()");
+            for (int i = 0; i < stack.length; i++)
+                if (stack[i].getClassLoader() != null)
+                    throw new AccessControlException("Applets may not call System.exit()");
         }
 
         super.checkExit(status);

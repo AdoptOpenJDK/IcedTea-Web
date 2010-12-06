@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.cache;
 
 import java.io.*;
@@ -27,6 +26,7 @@ import javax.jnlp.*;
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.*;
+
 /**
  * A policy that determines when a resource should be checked for
  * an updated version.<p>
@@ -51,7 +51,6 @@ public class UpdatePolicy {
     public static UpdatePolicy NEVER = new UpdatePolicy(Long.MAX_VALUE);
 
     private long timeDiff = -1;
-
 
     /**
      * Create a new update policy; this policy always updates the

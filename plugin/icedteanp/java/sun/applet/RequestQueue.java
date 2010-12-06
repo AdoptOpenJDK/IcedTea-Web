@@ -35,9 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package sun.applet;
-
 
 public class RequestQueue {
     PluginCallRequest head = null;
@@ -45,7 +43,7 @@ public class RequestQueue {
     private int size = 0;
 
     public void post(PluginCallRequest request) {
-    	PluginDebug.debug("Securitymanager=" + System.getSecurityManager());
+        PluginDebug.debug("Securitymanager=" + System.getSecurityManager());
         if (head == null) {
             head = tail = request;
             tail.setNext(null);
@@ -54,7 +52,7 @@ public class RequestQueue {
             tail = request;
             tail.setNext(null);
         }
-        
+
         size++;
     }
 
@@ -67,11 +65,11 @@ public class RequestQueue {
         ret.setNext(null);
 
         size--;
-        
+
         return ret;
     }
-    
+
     public int size() {
-    	return size;
+        return size;
     }
 }

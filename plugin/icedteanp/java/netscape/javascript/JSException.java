@@ -44,8 +44,7 @@ package netscape.javascript;
  * returns an error.
  */
 
-public
-class JSException extends RuntimeException {
+public class JSException extends RuntimeException {
     public static final int EXCEPTION_TYPE_EMPTY = -1;
     public static final int EXCEPTION_TYPE_VOID = 0;
     public static final int EXCEPTION_TYPE_OBJECT = 1;
@@ -140,4 +139,3 @@ class JSException extends RuntimeException {
     }
 
 }
-

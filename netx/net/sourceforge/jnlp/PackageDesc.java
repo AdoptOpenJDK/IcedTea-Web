@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import java.io.*;
@@ -37,7 +36,6 @@ public class PackageDesc {
 
     /** whether the package includes subpackages */
     private boolean recursive;
-
 
     /**
      * Create a package descriptor.
@@ -64,10 +62,10 @@ public class PackageDesc {
 
         // form 2: package.*
         if (name.endsWith(".*")) {
-            String pkName = name.substring(0, name.length()-1);
+            String pkName = name.substring(0, name.length() - 1);
 
             if (className.startsWith(pkName)) {
-                String postfix = className.substring(pkName.length()+1);
+                String postfix = className.substring(pkName.length() + 1);
 
                 if (recursive || -1 == postfix.indexOf("."))
                     return true;

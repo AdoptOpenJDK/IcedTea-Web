@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.cache;
 
 import java.io.*;
@@ -169,17 +168,26 @@ public class Resource {
     private String getStatusString(int flag) {
         StringBuffer result = new StringBuffer();
 
-        if (flag == 0) result.append("<> ");
-        if ((flag & CONNECT) != 0) result.append("CONNECT ");
-        if ((flag & CONNECTING) != 0) result.append("CONNECTING ");
-        if ((flag & CONNECTED) != 0) result.append("CONNECTED ");
-        if ((flag & DOWNLOAD) != 0) result.append("DOWNLOAD ");
-        if ((flag & DOWNLOADING) != 0) result.append("DOWNLOADING ");
-        if ((flag & DOWNLOADED) != 0) result.append("DOWNLOADED ");
-        if ((flag & ERROR) != 0) result.append("ERROR ");
-        if ((flag & STARTED) != 0) result.append("STARTED ");
+        if (flag == 0)
+            result.append("<> ");
+        if ((flag & CONNECT) != 0)
+            result.append("CONNECT ");
+        if ((flag & CONNECTING) != 0)
+            result.append("CONNECTING ");
+        if ((flag & CONNECTED) != 0)
+            result.append("CONNECTED ");
+        if ((flag & DOWNLOAD) != 0)
+            result.append("DOWNLOAD ");
+        if ((flag & DOWNLOADING) != 0)
+            result.append("DOWNLOADING ");
+        if ((flag & DOWNLOADED) != 0)
+            result.append("DOWNLOADED ");
+        if ((flag & ERROR) != 0)
+            result.append("ERROR ");
+        if ((flag & STARTED) != 0)
+            result.append("STARTED ");
 
-        return result.deleteCharAt(result.length()-1).toString();
+        return result.deleteCharAt(result.length() - 1).toString();
     }
 
     /**
@@ -190,7 +198,7 @@ public class Resource {
     public void changeStatus(int clear, int add) {
         int orig = 0;
 
-        synchronized(this) {
+        synchronized (this) {
             orig = status;
 
             this.status &= ~clear;
@@ -199,12 +207,12 @@ public class Resource {
 
         if (JNLPRuntime.isDebug())
             if (status != orig) {
-                System.out.print("Status: "+getStatusString(status));
+                System.out.print("Status: " + getStatusString(status));
                 if ((status & ~orig) != 0)
-                    System.out.print(" +("+getStatusString(status & ~orig)+")");
+                    System.out.print(" +(" + getStatusString(status & ~orig) + ")");
                 if ((~status & orig) != 0)
-                    System.out.print(" -("+getStatusString(~status & orig)+")");
-                System.out.println(" @ "+location.getPath());
+                    System.out.print(" -(" + getStatusString(~status & orig) + ")");
+                System.out.println(" @ " + location.getPath());
             }
     }
 
@@ -245,7 +253,7 @@ public class Resource {
             send = trackers.hardList();
         }
 
-        for (int i=0; i < send.size(); i++) {
+        for (int i = 0; i < send.size(); i++) {
             ResourceTracker rt = send.get(i);
             rt.fireDownloadEvent(this);
         }
@@ -258,13 +266,13 @@ public class Resource {
             // time spent in synchronized addResource determining if
             // Resource is already in a tracker, and better for offline
             // mode on some OS.
-            return CacheUtil.urlEquals(location, ((Resource)other).location);
+            return CacheUtil.urlEquals(location, ((Resource) other).location);
         }
         return false;
     }
 
     public String toString() {
-        return "location="+location.toString() + " state="+getStatusString(status);
+        return "location=" + location.toString() + " state=" + getStatusString(status);
     }
 
 }

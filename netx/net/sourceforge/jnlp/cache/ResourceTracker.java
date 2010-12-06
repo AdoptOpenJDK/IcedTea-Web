@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.cache;
 
 import java.io.BufferedInputStream;
@@ -85,7 +84,6 @@ public class ResourceTracker {
     // todo: might make a tracker be able to download more than one
     // version of a resource, but probably not very useful.
 
-
     // defines
     //    ResourceTracker.Downloader (download threads)
 
@@ -114,14 +112,14 @@ public class ResourceTracker {
 
     /** weak list of resource trackers with resources to prefetch */
     private static WeakList<ResourceTracker> prefetchTrackers =
-      new WeakList<ResourceTracker>();
+            new WeakList<ResourceTracker>();
 
     /** resources requested to be downloaded */
     private static ArrayList<Resource> queue = new ArrayList<Resource>();
 
     /** resource trackers threads are working for (used for load balancing across multi-tracker downloads) */
     private static ArrayList<ResourceTracker> active =
-      new ArrayList<ResourceTracker>(); //
+            new ArrayList<ResourceTracker>(); //
 
     /** the resources known about by this resource tracker */
     private List<Resource> resources = new ArrayList<Resource>();
@@ -131,7 +129,6 @@ public class ResourceTracker {
 
     /** whether to download parts before requested */
     private boolean prefetch;
-
 
     /**
      * Creates a resource tracker that does not prefetch resources.
@@ -227,7 +224,7 @@ public class ResourceTracker {
             // they will just 'pass through' the tracker as if they were
             // never added (for example, not affecting the total download size).
             synchronized (resource) {
-                resource.changeStatus(0, DOWNLOADED|CONNECTED|STARTED);
+                resource.changeStatus(0, DOWNLOADED | CONNECTED | STARTED);
             }
             fireDownloadEvent(resource);
             return true;
@@ -238,13 +235,13 @@ public class ResourceTracker {
 
             if (entry.isCached() && !updatePolicy.shouldUpdate(entry)) {
                 if (JNLPRuntime.isDebug())
-                    System.out.println("not updating: "+resource.location);
+                    System.out.println("not updating: " + resource.location);
 
                 synchronized (resource) {
                     resource.localFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion);
                     resource.size = resource.localFile.length();
                     resource.transferred = resource.localFile.length();
-                    resource.changeStatus(0, DOWNLOADED|CONNECTED|STARTED);
+                    resource.changeStatus(0, DOWNLOADED | CONNECTED | STARTED);
                 }
                 fireDownloadEvent(resource);
                 return true;
@@ -304,8 +301,8 @@ public class ResourceTracker {
         }
 
         DownloadEvent event = new DownloadEvent(this, resource);
-        for (int i=0; i < l.length; i++) {
-            if (0 != ((ERROR|DOWNLOADED) & status))
+        for (int i = 0; i < l.length; i++) {
+            if (0 != ((ERROR | DOWNLOADED) & status))
                 l[i].downloadCompleted(event);
             else if (0 != (DOWNLOADING & status))
                 l[i].downloadStarted(event);
@@ -333,8 +330,7 @@ public class ResourceTracker {
             if (f != null)
                 // TODO: Should be toURI().toURL()
                 return f.toURL();
-        }
-        catch (MalformedURLException ex) {
+        } catch (MalformedURLException ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
         }
@@ -358,7 +354,7 @@ public class ResourceTracker {
     public File getCacheFile(URL location) {
         try {
             Resource resource = getResource(location);
-            if (!resource.isSet(DOWNLOADED|ERROR))
+            if (!resource.isSet(DOWNLOADED | ERROR))
                 waitForResource(location, 0);
 
             if (resource.isSet(ERROR))
@@ -374,8 +370,7 @@ public class ResourceTracker {
             }
 
             return null;
-        }
-        catch (InterruptedException ex) {
+        } catch (InterruptedException ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
@@ -398,15 +393,14 @@ public class ResourceTracker {
     public InputStream getInputStream(URL location) throws IOException {
         try {
             Resource resource = getResource(location);
-            if (!resource.isSet(DOWNLOADED|ERROR))
+            if (!resource.isSet(DOWNLOADED | ERROR))
                 waitForResource(location, 0);
 
             if (resource.localFile != null)
                 return new FileInputStream(resource.localFile);
 
             return resource.location.openStream();
-        }
-        catch (InterruptedException ex) {
+        } catch (InterruptedException ex) {
             throw new IOException("wait was interrupted");
         }
     }
@@ -421,11 +415,11 @@ public class ResourceTracker {
      * @throws IllegalArgumentException if the resource is not being tracked
      */
     public boolean waitForResources(URL urls[], long timeout) throws InterruptedException {
-        Resource resources[] = new Resource[ urls.length ];
+        Resource resources[] = new Resource[urls.length];
 
-        synchronized(resources) {
+        synchronized (resources) {
             // keep the lock so getResource doesn't have to aquire it each time
-            for (int i=0; i < urls.length; i++)
+            for (int i = 0; i < urls.length; i++)
                 resources[i] = getResource(urls[i]);
         }
 
@@ -469,7 +463,7 @@ public class ResourceTracker {
      * @throws IllegalArgumentException if the resource is not being tracked
      */
     public boolean checkResource(URL location) {
-        return getResource(location).isSet(DOWNLOADED|ERROR); // isSet atomic
+        return getResource(location).isSet(DOWNLOADED | ERROR); // isSet atomic
     }
 
     /**
@@ -505,11 +499,11 @@ public class ResourceTracker {
             enqueue = !resource.isSet(STARTED);
 
             if (!resource.isSet(CONNECTED | CONNECTING))
-                resource.changeStatus(0, CONNECT|STARTED);
+                resource.changeStatus(0, CONNECT | STARTED);
             if (!resource.isSet(DOWNLOADED | DOWNLOADING))
-                resource.changeStatus(0, DOWNLOAD|STARTED);
+                resource.changeStatus(0, DOWNLOAD | STARTED);
 
-            if (!resource.isSet(DOWNLOAD|CONNECT))
+            if (!resource.isSet(DOWNLOAD | CONNECT))
                 enqueue = false;
         }
 
@@ -580,8 +574,8 @@ public class ResourceTracker {
      */
     private void queueResource(Resource resource) {
         synchronized (lock) {
-            if (!resource.isSet(CONNECT|DOWNLOAD))
-                throw new IllegalArgumentException("Invalid resource state (resource: "+resource+")");
+            if (!resource.isSet(CONNECT | DOWNLOAD))
+                throw new IllegalArgumentException("Invalid resource state (resource: " + resource + ")");
 
             queue.add(resource);
             startThread();
@@ -668,7 +662,7 @@ public class ResourceTracker {
 
             // explicitly close the URLConnection.
             if (con instanceof HttpURLConnection)
-                ((HttpURLConnection)con).disconnect();
+                ((HttpURLConnection) con).disconnect();
 
             /*
              * If the file was compressed, uncompress it.
@@ -709,17 +703,16 @@ public class ResourceTracker {
             }
 
             resource.changeStatus(DOWNLOADING, DOWNLOADED);
-            synchronized(lock) {
+            synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
             resource.fireDownloadEvent(); // fire DOWNLOADED
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
             resource.changeStatus(0, ERROR);
-            synchronized(lock) {
+            synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
             resource.fireDownloadEvent(); // fire ERROR
@@ -743,15 +736,15 @@ public class ResourceTracker {
             int size = connection.getContentLength();
             boolean current = CacheUtil.isCurrent(resource.location, resource.requestVersion, connection) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
 
-            synchronized(resource) {
+            synchronized (resource) {
                 resource.localFile = localFile;
                 // resource.connection = connection;
                 resource.size = size;
-                resource.changeStatus(CONNECT|CONNECTING, CONNECTED);
+                resource.changeStatus(CONNECT | CONNECTING, CONNECTED);
 
                 // check if up-to-date; if so set as downloaded
                 if (current)
-                    resource.changeStatus(DOWNLOAD|DOWNLOADING, DOWNLOADED);
+                    resource.changeStatus(DOWNLOAD | DOWNLOADING, DOWNLOADED);
             }
 
             // update cache entry
@@ -762,21 +755,20 @@ public class ResourceTracker {
             entry.setLastUpdated(System.currentTimeMillis());
             entry.store();
 
-            synchronized(lock) {
+            synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
             resource.fireDownloadEvent(); // fire CONNECTED
 
             // explicitly close the URLConnection.
-                        if (connection instanceof HttpURLConnection)
-                ((HttpURLConnection)connection).disconnect();
-        }
-        catch (Exception ex) {
+            if (connection instanceof HttpURLConnection)
+                ((HttpURLConnection) connection).disconnect();
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
             resource.changeStatus(0, ERROR);
-            synchronized(lock) {
+            synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
             resource.fireDownloadEvent(); // fire ERROR
@@ -807,7 +799,6 @@ public class ResourceTracker {
         return versionedURL;
     }
 
-
     /**
      * Pick the next resource to download or initialize.  If there
      * are no more resources requested then one is taken from a
@@ -826,7 +817,7 @@ public class ResourceTracker {
         // pick from queue
         result = selectByFlag(queue, CONNECT, ERROR); // connect but not error
         if (result == null)
-            result = selectByFlag(queue, DOWNLOAD, ERROR|CONNECT|CONNECTING);
+            result = selectByFlag(queue, DOWNLOAD, ERROR | CONNECT | CONNECTING);
 
         // remove from queue if found
         if (result != null)
@@ -842,8 +833,7 @@ public class ResourceTracker {
         synchronized (result) {
             if (result.isSet(CONNECT)) {
                 result.changeStatus(CONNECT, CONNECTING);
-            }
-            else if (result.isSet(DOWNLOAD)) {
+            } else if (result.isSet(DOWNLOAD)) {
                 // only download if *not* connecting, when done connecting
                 // select next will pick up the download part.  This makes
                 // all requested connects happen before any downloads, so
@@ -867,7 +857,7 @@ public class ResourceTracker {
 
         // first find one to initialize
         synchronized (prefetchTrackers) {
-            for (int i=0; i < prefetchTrackers.size() && result == null; i++) {
+            for (int i = 0; i < prefetchTrackers.size() && result == null; i++) {
                 ResourceTracker tracker = prefetchTrackers.get(i);
                 if (tracker == null)
                     continue;
@@ -876,7 +866,7 @@ public class ResourceTracker {
                     result = selectByFlag(tracker.resources, UNINITIALIZED, ERROR);
 
                     if (result == null && alternate == null)
-                        alternate = selectByFlag(tracker.resources, CONNECTED, ERROR|DOWNLOADED|DOWNLOADING|DOWNLOAD);
+                        alternate = selectByFlag(tracker.resources, CONNECTED, ERROR | DOWNLOADED | DOWNLOADING | DOWNLOAD);
                 }
             }
         }
@@ -915,7 +905,7 @@ public class ResourceTracker {
         Resource result = null;
         int score = Integer.MAX_VALUE;
 
-        for (int i=0; i < source.size(); i++) {
+        for (int i = 0; i < source.size(); i++) {
             Resource resource = source.get(i);
             boolean selectable = false;
 
@@ -927,7 +917,7 @@ public class ResourceTracker {
             if (selectable) {
                 int activeCount = 0;
 
-                for (int j=0; j < active.size(); j++)
+                for (int j = 0; j < active.size(); j++)
                     if (active.get(j) == resource.getTracker())
                         activeCount++;
 
@@ -950,7 +940,7 @@ public class ResourceTracker {
      */
     private Resource getResource(URL location) {
         synchronized (resources) {
-            for (int i=0; i < resources.size(); i++) {
+            for (int i = 0; i < resources.size(); i++) {
                 Resource resource = resources.get(i);
 
                 if (CacheUtil.urlEquals(resource.location, location))
@@ -974,7 +964,7 @@ public class ResourceTracker {
         long startTime = System.currentTimeMillis();
 
         // start them downloading / connecting in background
-        for (int i=0; i < resources.length; i++)
+        for (int i = 0; i < resources.length; i++)
             startResource(resources[i]);
 
         // wait for completion
@@ -983,9 +973,9 @@ public class ResourceTracker {
 
             synchronized (lock) {
                 // check for completion
-                for (int i=0; i < resources.length; i++) {
-                        //NetX Deadlocking may be solved by removing this
-                        //synch block.
+                for (int i = 0; i < resources.length; i++) {
+                    //NetX Deadlocking may be solved by removing this
+                    //synch block.
                     synchronized (resources[i]) {
                         if (!resources[i].isSet(DOWNLOADED | ERROR)) {
                             finished = false;
@@ -1000,7 +990,7 @@ public class ResourceTracker {
                 long waitTime = 0;
 
                 if (timeout > 0) {
-                    waitTime = timeout - (System.currentTimeMillis()-startTime);
+                    waitTime = timeout - (System.currentTimeMillis() - startTime);
                     if (waitTime <= 0)
                         return false;
                 }
@@ -1009,7 +999,6 @@ public class ResourceTracker {
             }
         }
     }
-
 
     // inner classes
 
@@ -1039,8 +1028,7 @@ public class ResourceTracker {
 
                 try {
                     processResource(resource);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     if (JNLPRuntime.isDebug())
                         ex.printStackTrace();
                 }

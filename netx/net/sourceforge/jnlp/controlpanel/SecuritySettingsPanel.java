@@ -64,7 +64,7 @@ public class SecuritySettingsPanel extends NamedBorderPanel implements ActionLis
             "deployment.security.SSLv2Hello", // Default FALSE
             "deployment.security.SSLv3", // Default TRUE
             "deployment.security.TLSv1", // Default TRUE
-//            "deployment.security.mixcode", // Default TRUE
+            //            "deployment.security.mixcode", // Default TRUE
     };
 
     /**

@@ -61,49 +61,49 @@ import javax.swing.SwingConstants;
  */
 public class MoreInfoPane extends SecurityDialogPanel {
 
-        public MoreInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
-                super(x, certVerifier);
-                addComponents();
-        }
+    public MoreInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+        super(x, certVerifier);
+        addComponents();
+    }
 
-        /**
-         * Constructs the GUI components of this panel
-         */
-        private void addComponents() {
-                ArrayList<String> details = certVerifier.getDetails();
+    /**
+     * Constructs the GUI components of this panel
+     */
+    private void addComponents() {
+        ArrayList<String> details = certVerifier.getDetails();
 
-                int numLabels = details.size();
-                JPanel errorPanel = new JPanel(new GridLayout(numLabels,1));
-                errorPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-                errorPanel.setPreferredSize(new Dimension(400, 70*(numLabels)));
+        int numLabels = details.size();
+        JPanel errorPanel = new JPanel(new GridLayout(numLabels, 1));
+        errorPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        errorPanel.setPreferredSize(new Dimension(400, 70 * (numLabels)));
 
-                for (int i = 0; i < numLabels; i++) {
-                        ImageIcon icon = null;
-                        if (details.get(i).equals(R("STrustedCertificate")))
-                                icon = new ImageIcon((new sun.misc.Launcher())
+        for (int i = 0; i < numLabels; i++) {
+            ImageIcon icon = null;
+            if (details.get(i).equals(R("STrustedCertificate")))
+                icon = new ImageIcon((new sun.misc.Launcher())
                                                 .getClassLoader().getResource("net/sourceforge/jnlp/resources/info-small.png"));
-                        else
-                                icon = new ImageIcon((new sun.misc.Launcher())
+            else
+                icon = new ImageIcon((new sun.misc.Launcher())
                                                 .getClassLoader().getResource("net/sourceforge/jnlp/resources/warning-small.png"));
 
-                        errorPanel.add(new JLabel(htmlWrap(details.get(i)), icon, SwingConstants.LEFT));
-                }
+            errorPanel.add(new JLabel(htmlWrap(details.get(i)), icon, SwingConstants.LEFT));
+        }
 
-                JPanel buttonsPanel = new JPanel(new BorderLayout());
-                JButton certDetails = new JButton(R("SCertificateDetails"));
-                certDetails.addActionListener(new CertInfoButtonListener());
-                JButton close = new JButton(R("ButClose"));
-                close.addActionListener(createSetValueListener(parent, 0));
+        JPanel buttonsPanel = new JPanel(new BorderLayout());
+        JButton certDetails = new JButton(R("SCertificateDetails"));
+        certDetails.addActionListener(new CertInfoButtonListener());
+        JButton close = new JButton(R("ButClose"));
+        close.addActionListener(createSetValueListener(parent, 0));
         buttonsPanel.add(certDetails, BorderLayout.WEST);
         buttonsPanel.add(close, BorderLayout.EAST);
-                buttonsPanel.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
+        buttonsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         add(errorPanel, BorderLayout.NORTH);
         add(buttonsPanel, BorderLayout.SOUTH);
 
-        }
+    }
 
-        private class CertInfoButtonListener implements ActionListener {
+    private class CertInfoButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             SecurityWarningDialog.showCertInfoDialog(parent.getJarSigner(),
                                 parent);

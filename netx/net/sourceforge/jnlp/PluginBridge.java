@@ -34,33 +34,30 @@ import java.util.Map;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-
-public class PluginBridge extends JNLPFile
-{
+public class PluginBridge extends JNLPFile {
 
     String name;
     String[] jars = new String[0];
     String[] cacheJars = new String[0];
     String[] cacheExJars = new String[0];
-    Hashtable<String,String> atts;
+    Hashtable<String, String> atts;
 
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
-                        int width, int height, Hashtable<String,String> atts)
-    throws Exception
-    {
+                        int width, int height, Hashtable<String, String> atts)
+            throws Exception {
         specVersion = new Version("1.0");
         fileVersion = new Version("1.1");
         this.codeBase = codebase;
         this.sourceLocation = documentBase;
 
-        if (atts.containsKey("jnlp_href")){
+        if (atts.containsKey("jnlp_href")) {
             try {
                 URL jnlp = new URL(codeBase.toExternalForm() + atts.get("jnlp_href"));
                 JNLPFile jnlpFile = new JNLPFile(jnlp);
-                Map<String,String> jnlpParams = jnlpFile.getApplet().getParameters();
+                Map<String, String> jnlpParams = jnlpFile.getApplet().getParameters();
 
                 // Change the parameter name to lowercase to follow conventions.
-                for (Map.Entry<String,String> entry : jnlpParams.entrySet()){
+                for (Map.Entry<String, String> entry : jnlpParams.entrySet()) {
                     atts.put(entry.getKey().toLowerCase(), entry.getValue());
                 }
             } catch (MalformedURLException e) {
@@ -86,7 +83,7 @@ public class PluginBridge extends JNLPFile
             String[] jars = cacheArchive.split(",");
             cacheJars = new String[jars.length];
 
-            for (int i=0; i < jars.length; i++) {
+            for (int i = 0; i < jars.length; i++) {
 
                 cacheJars[i] = jars[i].trim();
 
@@ -103,10 +100,10 @@ public class PluginBridge extends JNLPFile
 
         if (jar != null && jar.length() > 0) {
             this.jars = jar.split(",");
-            
+
             // trim white spaces
-            for (int i =0; i < this.jars.length; i++) {
-            	this.jars[i] = this.jars[i].trim();
+            for (int i = 0; i < this.jars.length; i++) {
+                this.jars[i] = this.jars[i].trim();
             }
 
             if (JNLPRuntime.isDebug()) {
@@ -139,16 +136,13 @@ public class PluginBridge extends JNLPFile
                          documentBase;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return name;
     }
 
-    public InformationDesc getInformation(final Locale locale)
-    {
-        return new InformationDesc(this, new Locale[] {locale}) {
-            protected List<Object> getItems(Object key)
-            {
+    public InformationDesc getInformation(final Locale locale) {
+        return new InformationDesc(this, new Locale[] { locale }) {
+            protected List<Object> getItems(Object key) {
                 // Should we populate this list with applet attribute tags?
                 return new ArrayList<Object>();
             }
@@ -156,19 +150,15 @@ public class PluginBridge extends JNLPFile
     }
 
     public ResourcesDesc getResources(final Locale locale, final String os,
-                                      final String arch)
-    {
-        return new ResourcesDesc(this, new Locale[] {locale}, new String[] {os},
-          new String[] {arch}) {
+                                      final String arch) {
+        return new ResourcesDesc(this, new Locale[] { locale }, new String[] { os },
+                new String[] { arch }) {
             @Override
-            public <T> List<T> getResources(Class<T> launchType)
-            {
+            public <T> List<T> getResources(Class<T> launchType) {
                 // Need to add the JAR manually...
                 //should this be done to sharedResources on init?
-                if (launchType.equals(JARDesc.class))
-                {
-                    try
-                    {
+                if (launchType.equals(JARDesc.class)) {
+                    try {
                         List<JARDesc> jarDescs = new ArrayList<JARDesc>();
                         jarDescs.addAll(sharedResources.getResources(JARDesc.class));
 
@@ -233,13 +223,13 @@ public class PluginBridge extends JNLPFile
                         }
                         // We know this is a safe list of JarDesc objects
                         @SuppressWarnings("unchecked")
-                            List<T> result = (List<T>) jarDescs;
+                        List<T> result = (List<T>) jarDescs;
                         return result;
+                    } catch (MalformedURLException ex) { /* Ignored */
                     }
-                    catch (MalformedURLException ex) { /* Ignored */ }
                 }
                 return sharedResources.getResources(launchType);
-             }
+            }
 
             @Override
             public JARDesc[] getJARs() {
@@ -247,8 +237,7 @@ public class PluginBridge extends JNLPFile
                 return jarDescs.toArray(new JARDesc[jarDescs.size()]);
             }
 
-            public void addResource(Object resource)
-            {
+            public void addResource(Object resource) {
                 // todo: honor the current locale, os, arch values
                 sharedResources.addResource(resource);
             }
@@ -259,12 +248,15 @@ public class PluginBridge extends JNLPFile
     public boolean isApplet() {
         return true;
     }
+
     public boolean isApplication() {
         return false;
     }
+
     public boolean isComponent() {
         return false;
     }
+
     public boolean isInstaller() {
         return false;
     }

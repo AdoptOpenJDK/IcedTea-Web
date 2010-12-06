@@ -81,162 +81,160 @@ import net.sourceforge.jnlp.util.FileUtils;
  */
 public class CertWarningPane extends SecurityDialogPanel {
 
-        JCheckBox alwaysTrust;
-        CertVerifier certVerifier;
+    JCheckBox alwaysTrust;
+    CertVerifier certVerifier;
 
-        public CertWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
-                super(x, certVerifier);
-                this.certVerifier = certVerifier;
-                addComponents();
-        }
+    public CertWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+        super(x, certVerifier);
+        this.certVerifier = certVerifier;
+        addComponents();
+    }
 
-        /**
-         * Creates the actual GUI components, and adds it to this panel
-         */
-        private void addComponents() {
-                AccessType type = parent.getAccessType();
-                JNLPFile file = parent.getFile();
-                Certificate c = parent.getJarSigner().getPublisher();
+    /**
+     * Creates the actual GUI components, and adds it to this panel
+     */
+    private void addComponents() {
+        AccessType type = parent.getAccessType();
+        JNLPFile file = parent.getFile();
+        Certificate c = parent.getJarSigner().getPublisher();
 
-                String name = "";
-                String publisher = "";
-                String from = "";
+        String name = "";
+        String publisher = "";
+        String from = "";
 
-                //We don't worry about exceptions when trying to fill in
-                //these strings -- we just want to fill in as many as possible.
-                try {
-                        if ((certVerifier instanceof HttpsCertVerifier) &&
+        //We don't worry about exceptions when trying to fill in
+        //these strings -- we just want to fill in as many as possible.
+        try {
+            if ((certVerifier instanceof HttpsCertVerifier) &&
                              (c instanceof X509Certificate))
-                           name = SecurityUtil.getCN(((X509Certificate)c)
+                name = SecurityUtil.getCN(((X509Certificate) c)
                                         .getSubjectX500Principal().getName());
-                        else if (file instanceof PluginBridge)
-                                name = file.getTitle();
-                        else
-                                name = file.getInformation().getTitle();
-                } catch (Exception e) {
-                }
+            else if (file instanceof PluginBridge)
+                name = file.getTitle();
+            else
+                name = file.getInformation().getTitle();
+        } catch (Exception e) {
+        }
 
-                try {
-                        if (c instanceof X509Certificate) {
-                                publisher = SecurityUtil.getCN(((X509Certificate)c)
+        try {
+            if (c instanceof X509Certificate) {
+                publisher = SecurityUtil.getCN(((X509Certificate) c)
                                         .getSubjectX500Principal().getName());
-                        }
-                } catch (Exception e) {
-                }
+            }
+        } catch (Exception e) {
+        }
 
-                try {
-                        if (file instanceof PluginBridge)
-                                from = file.getCodeBase().getHost();
-                        else
-                                from = file.getInformation().getHomepage().toString();
-                } catch (Exception e) {
-                }
+        try {
+            if (file instanceof PluginBridge)
+                from = file.getCodeBase().getHost();
+            else
+                from = file.getInformation().getHomepage().toString();
+        } catch (Exception e) {
+        }
 
-                //Top label
-                String topLabelText = "";
-                String propertyName = "";
-                if (certVerifier instanceof HttpsCertVerifier)
-                {
-                  topLabelText = R("SHttpsUnverified") + " " +
+        //Top label
+        String topLabelText = "";
+        String propertyName = "";
+        if (certVerifier instanceof HttpsCertVerifier) {
+            topLabelText = R("SHttpsUnverified") + " " +
                                  R("Continue");
-                  propertyName = "OptionPane.warningIcon";
-                }
-                else
-                  switch (type) {
-                  case VERIFIED:
-                        topLabelText = R("SSigVerified");
-                        propertyName = "OptionPane.informationIcon";
-                        break;
-                  case UNVERIFIED:
-                        topLabelText = R("SSigUnverified");
-                        propertyName = "OptionPane.warningIcon";
-                        break;
-                  case SIGNING_ERROR:
-                        topLabelText = R("SSignatureError");
-                        propertyName = "OptionPane.warningIcon";
-                        break;
-                  }
-                ImageIcon icon = new ImageIcon((new sun.misc.Launcher())
+            propertyName = "OptionPane.warningIcon";
+        } else
+            switch (type) {
+                case VERIFIED:
+                    topLabelText = R("SSigVerified");
+                    propertyName = "OptionPane.informationIcon";
+                    break;
+                case UNVERIFIED:
+                    topLabelText = R("SSigUnverified");
+                    propertyName = "OptionPane.warningIcon";
+                    break;
+                case SIGNING_ERROR:
+                    topLabelText = R("SSignatureError");
+                    propertyName = "OptionPane.warningIcon";
+                    break;
+            }
+        ImageIcon icon = new ImageIcon((new sun.misc.Launcher())
                                 .getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png"));
-                JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
-                topLabel.setFont(new Font(topLabel.getFont().toString(),
+        JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
+        topLabel.setFont(new Font(topLabel.getFont().toString(),
                                 Font.BOLD, 12));
-                JPanel topPanel = new JPanel(new BorderLayout());
-                topPanel.setBackground(Color.WHITE);
-                topPanel.add(topLabel, BorderLayout.CENTER);
-                topPanel.setPreferredSize(new Dimension(400,60));
-                topPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(topLabel, BorderLayout.CENTER);
+        topPanel.setPreferredSize(new Dimension(400, 60));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                //application info
-                JLabel nameLabel = new JLabel(R("Name") + ":   " + name);
-                nameLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-                JLabel publisherLabel = new JLabel(R("Publisher") + ": " + publisher);
-                publisherLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-                JLabel fromLabel = new JLabel(R("From") + ":   " + from);
-                fromLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        //application info
+        JLabel nameLabel = new JLabel(R("Name") + ":   " + name);
+        nameLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel publisherLabel = new JLabel(R("Publisher") + ": " + publisher);
+        publisherLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel fromLabel = new JLabel(R("From") + ":   " + from);
+        fromLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-                alwaysTrust = new JCheckBox(R("SAlwaysTrustPublisher"));
-                alwaysTrust.setEnabled(true);
+        alwaysTrust = new JCheckBox(R("SAlwaysTrustPublisher"));
+        alwaysTrust.setEnabled(true);
 
-                JPanel infoPanel = new JPanel(new GridLayout(4,1));
-                infoPanel.add(nameLabel);
-                infoPanel.add(publisherLabel);
+        JPanel infoPanel = new JPanel(new GridLayout(4, 1));
+        infoPanel.add(nameLabel);
+        infoPanel.add(publisherLabel);
 
-                if (!(certVerifier instanceof HttpsCertVerifier))
-                  infoPanel.add(fromLabel);
+        if (!(certVerifier instanceof HttpsCertVerifier))
+            infoPanel.add(fromLabel);
 
-                infoPanel.add(alwaysTrust);
-                infoPanel.setBorder(BorderFactory.createEmptyBorder(25,25,25,25));
+        infoPanel.add(alwaysTrust);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
-                //run and cancel buttons
-                JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-                JButton run = new JButton(R("ButRun"));
-                JButton cancel = new JButton(R("ButCancel"));
-                int buttonWidth = Math.max(run.getMinimumSize().width,
+        //run and cancel buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton run = new JButton(R("ButRun"));
+        JButton cancel = new JButton(R("ButCancel"));
+        int buttonWidth = Math.max(run.getMinimumSize().width,
                         cancel.getMinimumSize().width);
-                int buttonHeight = run.getMinimumSize().height;
-                Dimension d = new Dimension(buttonWidth, buttonHeight);
-                run.setPreferredSize(d);
-                cancel.setPreferredSize(d);
-                run.addActionListener(createSetValueListener(parent, 0));
-                run.addActionListener(new CheckBoxListener());
-                cancel.addActionListener(createSetValueListener(parent, 1));
-                initialFocusComponent = cancel;
-                buttonPanel.add(run);
-                buttonPanel.add(cancel);
-                buttonPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        int buttonHeight = run.getMinimumSize().height;
+        Dimension d = new Dimension(buttonWidth, buttonHeight);
+        run.setPreferredSize(d);
+        cancel.setPreferredSize(d);
+        run.addActionListener(createSetValueListener(parent, 0));
+        run.addActionListener(new CheckBoxListener());
+        cancel.addActionListener(createSetValueListener(parent, 1));
+        initialFocusComponent = cancel;
+        buttonPanel.add(run);
+        buttonPanel.add(cancel);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                //all of the above
-                setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-                add(topPanel);
-                add(infoPanel);
-                add(buttonPanel);
+        //all of the above
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(topPanel);
+        add(infoPanel);
+        add(buttonPanel);
 
-                JLabel bottomLabel;
-                JButton moreInfo = new JButton(R("ButMoreInformation"));
-                moreInfo.addActionListener(new MoreInfoButtonListener());
+        JLabel bottomLabel;
+        JButton moreInfo = new JButton(R("ButMoreInformation"));
+        moreInfo.addActionListener(new MoreInfoButtonListener());
 
-                if (parent.getJarSigner().getRootInCacerts())
-                        bottomLabel = new JLabel(htmlWrap(R("STrustedSource")));
-                else
-                        bottomLabel = new JLabel(htmlWrap(R("SUntrustedSource")));
+        if (parent.getJarSigner().getRootInCacerts())
+            bottomLabel = new JLabel(htmlWrap(R("STrustedSource")));
+        else
+            bottomLabel = new JLabel(htmlWrap(R("SUntrustedSource")));
 
-                JPanel bottomPanel = new JPanel();
-                bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
-                bottomPanel.add(bottomLabel);
-                bottomPanel.add(moreInfo);
-                bottomPanel.setPreferredSize(new Dimension(500,100));
-                bottomPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-                add(bottomPanel);
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+        bottomPanel.add(bottomLabel);
+        bottomPanel.add(moreInfo);
+        bottomPanel.setPreferredSize(new Dimension(500, 100));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(bottomPanel);
 
-        }
+    }
 
-        private class MoreInfoButtonListener implements ActionListener {
-                public void actionPerformed(ActionEvent e) {
-                        SecurityWarningDialog.showMoreInfoDialog(parent.getJarSigner(),
+    private class MoreInfoButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            SecurityWarningDialog.showMoreInfoDialog(parent.getJarSigner(),
                                 parent);
-                }
         }
+    }
 
     /**
      * Updates the user's KeyStore of trusted Certificates.

@@ -35,27 +35,25 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package sun.applet;
 
-
 public class PluginCallRequestFactory {
-    
-	public PluginCallRequest getPluginCallRequest(String id, String message, Long reference) {
 
-		if (id == "member") {
-			return new GetMemberPluginCallRequest(message, reference);
-		} else if (id == "void") {
-			return new VoidPluginCallRequest(message, reference);
-		} else if (id == "window") {
-			return new GetWindowPluginCallRequest(message, reference);
-		} else if (id == "proxyinfo") {
+    public PluginCallRequest getPluginCallRequest(String id, String message, Long reference) {
+
+        if (id == "member") {
+            return new GetMemberPluginCallRequest(message, reference);
+        } else if (id == "void") {
+            return new VoidPluginCallRequest(message, reference);
+        } else if (id == "window") {
+            return new GetWindowPluginCallRequest(message, reference);
+        } else if (id == "proxyinfo") {
             return new PluginProxyInfoRequest(message, reference);
         } else if (id == "cookieinfo") {
             return new PluginCookieInfoRequest(message, reference);
         } else {
-			throw new RuntimeException ("Unknown plugin call request type requested from factory");
-		}
-	}
+            throw new RuntimeException("Unknown plugin call request type requested from factory");
+        }
+    }
 
 }

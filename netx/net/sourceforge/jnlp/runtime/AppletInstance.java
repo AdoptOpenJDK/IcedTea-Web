@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.applet.*;
@@ -28,7 +27,6 @@ import java.lang.reflect.*;
 import java.lang.ref.*;
 
 import net.sourceforge.jnlp.*;
-
 
 /**
  * Represents a launched application instance created from a JNLP
@@ -48,7 +46,6 @@ public class AppletInstance extends ApplicationInstance {
 
     /** the applet environment */
     private AppletEnvironment environment;
-
 
     /**
      * Create a New Task based on the Specified URL
@@ -124,8 +121,7 @@ public class AppletInstance extends ApplicationInstance {
         try {
             applet.stop();
             applet.destroy();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
         }

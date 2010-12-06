@@ -67,66 +67,66 @@ import net.sourceforge.jnlp.tools.*;
  */
 public class CertsInfoPane extends SecurityDialogPanel {
 
-        private ArrayList<CertPath> certs;
+    private ArrayList<CertPath> certs;
     private JList list;
-        protected JTree tree;
+    protected JTree tree;
     private JTable table;
     private JTextArea output;
     private ListSelectionModel listSelectionModel;
     private ListSelectionModel tableSelectionModel;
     protected String[] certNames;
     private String[] columnNames = { R("Field"), R("Value") };
-        protected ArrayList<String[][]> certsData;
+    protected ArrayList<String[][]> certsData;
 
-        public CertsInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
-                super(x, certVerifier);
-                addComponents();
-        }
+    public CertsInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+        super(x, certVerifier);
+        addComponents();
+    }
 
-        /**
-         * Builds the JTree out of CertPaths.
-         */
-        void buildTree() {
-                certs = parent.getJarSigner().getCerts();
-                //for now, we're only going to display the first signer, even though
-                //jars can be signed by multiple people.
-                CertPath firstPath = certs.get(0);
-                X509Certificate firstCert =
-                        ((X509Certificate)firstPath.getCertificates().get(0));
-                String subjectString =
+    /**
+     * Builds the JTree out of CertPaths.
+     */
+    void buildTree() {
+        certs = parent.getJarSigner().getCerts();
+        //for now, we're only going to display the first signer, even though
+        //jars can be signed by multiple people.
+        CertPath firstPath = certs.get(0);
+        X509Certificate firstCert =
+                        ((X509Certificate) firstPath.getCertificates().get(0));
+        String subjectString =
                         SecurityUtil.getCN(firstCert.getSubjectX500Principal().getName());
-                String issuerString =
+        String issuerString =
                         SecurityUtil.getCN(firstCert.getIssuerX500Principal().getName());
 
-                DefaultMutableTreeNode top =
+        DefaultMutableTreeNode top =
                         new DefaultMutableTreeNode(subjectString
                                 + " (" + issuerString + ")");
 
-                //not self signed
-                if (!firstCert.getSubjectDN().equals(firstCert.getIssuerDN())
+        //not self signed
+        if (!firstCert.getSubjectDN().equals(firstCert.getIssuerDN())
                         && (firstPath.getCertificates().size() > 1)) {
-                        X509Certificate secondCert =
-                                ((X509Certificate)firstPath.getCertificates().get(1));
-                        subjectString =
+            X509Certificate secondCert =
+                                ((X509Certificate) firstPath.getCertificates().get(1));
+            subjectString =
                                 SecurityUtil.getCN(secondCert.getSubjectX500Principal().getName());
-                        issuerString =
+            issuerString =
                                 SecurityUtil.getCN(secondCert.getIssuerX500Principal().getName());
-                        top.add(new DefaultMutableTreeNode(subjectString
+            top.add(new DefaultMutableTreeNode(subjectString
                                 + " (" + issuerString + ")"));
-                }
-
-                tree = new JTree(top);
-                tree.getSelectionModel().setSelectionMode
-                                (TreeSelectionModel.SINGLE_TREE_SELECTION);
-                tree.addTreeSelectionListener(new TreeSelectionHandler());
         }
 
-        /**
-         * Fills in certsNames, certsData with data from the certificates.
-         */
-        protected void populateTable() {
-                certNames = new String[certs.get(0).getCertificates().size()];
-                certsData = new ArrayList<String[][]>();
+        tree = new JTree(top);
+        tree.getSelectionModel().setSelectionMode
+                                (TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.addTreeSelectionListener(new TreeSelectionHandler());
+    }
+
+    /**
+     * Fills in certsNames, certsData with data from the certificates.
+     */
+    protected void populateTable() {
+        certNames = new String[certs.get(0).getCertificates().size()];
+        certsData = new ArrayList<String[][]>();
 
         for (int i = 0; i < certs.get(0).getCertificates().size(); i++) {
 
@@ -135,11 +135,11 @@ public class CertsInfoPane extends SecurityDialogPanel {
             certNames[i] = SecurityUtil.getCN(c.getSubjectX500Principal().getName())
                                 + " (" + SecurityUtil.getCN(c.getIssuerX500Principal().getName()) + ")";
         }
-        }
+    }
 
-        protected String[][] parseCert(X509Certificate c) {
+    protected String[][] parseCert(X509Certificate c) {
 
-        String version = ""+c.getVersion();
+        String version = "" + c.getVersion();
         String serialNumber = c.getSerialNumber().toString();
         String signatureAlg = c.getSigAlgName();
         String issuer = c.getIssuerX500Principal().toString();
@@ -151,146 +151,148 @@ public class CertsInfoPane extends SecurityDialogPanel {
         HexDumpEncoder encoder = new HexDumpEncoder();
         String signature = encoder.encodeBuffer(c.getSignature());
 
-                String md5Hash = "";
-                String sha1Hash = "";
-                try {
-                        MessageDigest digest = MessageDigest.getInstance("MD5");
-                        digest.update(c.getEncoded());
-                        md5Hash = makeFingerprint(digest.digest());
+        String md5Hash = "";
+        String sha1Hash = "";
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(c.getEncoded());
+            md5Hash = makeFingerprint(digest.digest());
 
-                        digest = MessageDigest.getInstance("SHA-1");
-                        digest.update(c.getEncoded());
-                        sha1Hash = makeFingerprint(digest.digest());
-                } catch (Exception e) {
-                        //fail quietly
-                }
-
-        String[][] cert = { {R("Version"), version},
-                            {R("SSerial"), serialNumber},
-                            {R("SSignatureAlgorithm"), signatureAlg},
-                            {R("SIssuer"), issuer},
-                            {R("SValidity"), validity},
-                            {R("SSubject"), subject},
-                            {R("SSignature"), signature},
-                                                        {R("SMD5Fingerprint"), md5Hash},
-                                                        {R("SSHA1Fingerprint"), sha1Hash}
-                                                        };
-        return cert;
+            digest = MessageDigest.getInstance("SHA-1");
+            digest.update(c.getEncoded());
+            sha1Hash = makeFingerprint(digest.digest());
+        } catch (Exception e) {
+            //fail quietly
         }
 
+        String[][] cert = { { R("Version"), version },
+                            { R("SSerial"), serialNumber },
+                            { R("SSignatureAlgorithm"), signatureAlg },
+                            { R("SIssuer"), issuer },
+                            { R("SValidity"), validity },
+                            { R("SSubject"), subject },
+                            { R("SSignature"), signature },
+                                                        { R("SMD5Fingerprint"), md5Hash },
+                                                        { R("SSHA1Fingerprint"), sha1Hash }
+                                                        };
+        return cert;
+    }
+
+    /**
+     * Constructs the GUI components of this panel
+     */
+    protected void addComponents() {
+        buildTree();
+        populateTable();
         /**
-         * Constructs the GUI components of this panel
-         */
-        protected void addComponents() {
-                buildTree();
-                populateTable();
-                /**
-                //List of Certs
+        //List of Certs
         list = new JList(certNames);
-                list.setSelectedIndex(0); //assuming there's at least 1 cert
+        list.setSelectedIndex(0); //assuming there's at least 1 cert
         listSelectionModel = list.getSelectionModel();
         listSelectionModel.addListSelectionListener(new ListSelectionHandler());
         JScrollPane listPane = new JScrollPane(list);
-                */
-                JScrollPane listPane = new JScrollPane(tree);
+        */
+        JScrollPane listPane = new JScrollPane(tree);
 
         //Table of field-value pairs
         DefaultTableModel tableModel = new DefaultTableModel(certsData.get(0),
                                                             columnNames);
         table = new JTable(tableModel);
-                table.getTableHeader().setReorderingAllowed(false);
+        table.getTableHeader().setReorderingAllowed(false);
         tableSelectionModel = table.getSelectionModel();
         tableSelectionModel.addListSelectionListener(new TableSelectionHandler());
         table.setFillsViewportHeight(true);
         JScrollPane tablePane = new JScrollPane(table);
-                tablePane.setPreferredSize(new Dimension(500,200));
+        tablePane.setPreferredSize(new Dimension(500, 200));
 
         //Text area to display the larger values
         output = new JTextArea();
         output.setEditable(false);
         JScrollPane outputPane = new JScrollPane(output,
-            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                outputPane.setPreferredSize(new Dimension(500,200));
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        outputPane.setPreferredSize(new Dimension(500, 200));
 
-                //split pane of the field-value pairs and textbox
-                JSplitPane rightSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+        //split pane of the field-value pairs and textbox
+        JSplitPane rightSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                         tablePane, outputPane);
-                rightSplitPane.setDividerLocation(0.50);
-                rightSplitPane.setResizeWeight(0.50);
+        rightSplitPane.setDividerLocation(0.50);
+        rightSplitPane.setResizeWeight(0.50);
 
-                JSplitPane mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+        JSplitPane mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                         listPane, rightSplitPane);
-                mainPane.setDividerLocation(0.30);
-                mainPane.setResizeWeight(0.30);
+        mainPane.setDividerLocation(0.30);
+        mainPane.setResizeWeight(0.30);
 
-                JPanel buttonPane = new JPanel(new BorderLayout());
-                JButton close = new JButton(R("ButClose"));
-                JButton copyToClipboard = new JButton(R("ButCopy"));
-                close.addActionListener(createSetValueListener(parent, 0));
-                copyToClipboard.addActionListener(new CopyToClipboardHandler());
-                buttonPane.add(close, BorderLayout.EAST);
-                buttonPane.add(copyToClipboard, BorderLayout.WEST);
-                buttonPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        JPanel buttonPane = new JPanel(new BorderLayout());
+        JButton close = new JButton(R("ButClose"));
+        JButton copyToClipboard = new JButton(R("ButCopy"));
+        close.addActionListener(createSetValueListener(parent, 0));
+        copyToClipboard.addActionListener(new CopyToClipboardHandler());
+        buttonPane.add(close, BorderLayout.EAST);
+        buttonPane.add(copyToClipboard, BorderLayout.WEST);
+        buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-                add(mainPane, BorderLayout.CENTER);
-                add(buttonPane, BorderLayout.SOUTH);
-        }
+        add(mainPane, BorderLayout.CENTER);
+        add(buttonPane, BorderLayout.SOUTH);
+    }
 
-        /**
-         * Copies the currently selected certificate to the system Clipboard.
-         */
-        private class CopyToClipboardHandler implements ActionListener {
-                public void actionPerformed(ActionEvent e) {
-                        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                        int certIndex = 0;
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                tree.getLastSelectedPathComponent();
-            if (node == null) return;
+    /**
+     * Copies the currently selected certificate to the system Clipboard.
+     */
+    private class CopyToClipboardHandler implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            int certIndex = 0;
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+                    tree.getLastSelectedPathComponent();
+            if (node == null)
+                return;
             if (node.isRoot())
-                                certIndex = 0;
+                certIndex = 0;
             else if (node.isLeaf())
-                                certIndex = 1;
+                certIndex = 1;
 
-                        String[][] cert = certsData.get(certIndex);
-                        int rows = cert.length;
-                        int cols = cert[0].length;
+            String[][] cert = certsData.get(certIndex);
+            int rows = cert.length;
+            int cols = cert[0].length;
 
-                        String certString = "";
-                        for (int i = 0; i < rows; i++) {
-                                for (int j = 0; j < cols; j++) {
-                                        certString += cert[i][j];
-                                        certString += " ";
-                                }
-                                certString += "\n";
-                        }
-
-                        clipboard.setContents(new StringSelection(certString), null);
+            String certString = "";
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    certString += cert[i][j];
+                    certString += " ";
                 }
-        }
+                certString += "\n";
+            }
 
-        /**
-         * Updates the JTable when the JTree selection has changed.
-         */
-        protected class TreeSelectionHandler implements TreeSelectionListener {
-                public void valueChanged(TreeSelectionEvent e) {
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+            clipboard.setContents(new StringSelection(certString), null);
+        }
+    }
+
+    /**
+     * Updates the JTable when the JTree selection has changed.
+     */
+    protected class TreeSelectionHandler implements TreeSelectionListener {
+        public void valueChanged(TreeSelectionEvent e) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                                 tree.getLastSelectedPathComponent();
 
-                        if (node == null) return;
-                        if (node.isRoot()) {
-                                table.setModel(new DefaultTableModel(certsData.get(0),
+            if (node == null)
+                return;
+            if (node.isRoot()) {
+                table.setModel(new DefaultTableModel(certsData.get(0),
                                         columnNames));
-                        } else if (node.isLeaf()) {
-                                table.setModel(new DefaultTableModel(certsData.get(1),
+            } else if (node.isLeaf()) {
+                table.setModel(new DefaultTableModel(certsData.get(1),
                                         columnNames));
-                        }
-                }
+            }
         }
+    }
 
-        /**
-     * Updates the JTable when the selection on the list has changed.
-     */
+    /**
+    * Updates the JTable when the selection on the list has changed.
+    */
     private class ListSelectionHandler implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
@@ -320,24 +322,24 @@ public class CertsInfoPane extends SecurityDialogPanel {
 
             for (int i = minIndex; i <= maxIndex; i++) {
                 if (lsm.isSelectedIndex(i)) {
-                    output.setText((String) table.getValueAt(i,1));
+                    output.setText((String) table.getValueAt(i, 1));
                 }
             }
         }
     }
 
-        /**
-         * Makes a human readable hash fingerprint.
-         * For example: 11:22:33:44:AA:BB:CC:DD:EE:FF.
-         */
-        private String makeFingerprint(byte[] hash) {
-                String fingerprint = "";
-                for (int i = 0; i < hash.length; i++) {
-                        if (!fingerprint.equals(""))
-                                fingerprint += ":";
-                        fingerprint += Integer.toHexString(
-                                ((hash[i] & 0xFF)|0x100)).substring(1,3);
-                }
-                return fingerprint.toUpperCase();
+    /**
+     * Makes a human readable hash fingerprint.
+     * For example: 11:22:33:44:AA:BB:CC:DD:EE:FF.
+     */
+    private String makeFingerprint(byte[] hash) {
+        String fingerprint = "";
+        for (int i = 0; i < hash.length; i++) {
+            if (!fingerprint.equals(""))
+                fingerprint += ":";
+            fingerprint += Integer.toHexString(
+                                ((hash[i] & 0xFF) | 0x100)).substring(1, 3);
         }
+        return fingerprint.toUpperCase();
+    }
 }

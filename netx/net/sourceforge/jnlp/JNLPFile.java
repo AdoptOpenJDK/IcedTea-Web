@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -33,7 +32,6 @@ import java.util.Locale;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-
 
 /**
  * Provides methods to access the information in a Java Network
@@ -115,8 +113,7 @@ public class JNLPFile {
             defaultLocale = Locale.getDefault();
             defaultOS = System.getProperty("os.name");
             defaultArch = System.getProperty("os.arch");
-        }
-        catch (SecurityException ex) {
+        } catch (SecurityException ex) {
             // null values will still work, and app can set defaults later
         }
     }
@@ -241,7 +238,6 @@ public class JNLPFile {
         //parse(Parser.getRootNode(input), strict, null);
     }
 
-
     /**
      * Open the jnlp file URL from the cache if there, otherwise
      * download to the cache.  Called from constructor.
@@ -252,11 +248,10 @@ public class JNLPFile {
 
         try {
             ResourceTracker tracker = new ResourceTracker(false); // no prefetch
-            tracker.addResource(location, version , policy);
+            tracker.addResource(location, version, policy);
 
             return tracker.getInputStream(location);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new IOException(ex.getMessage());
         }
     }
@@ -333,16 +328,16 @@ public class JNLPFile {
      * through the specified locale.
      */
     public InformationDesc getInformation(final Locale locale) {
-        return new InformationDesc(this, new Locale[] {locale}) {
+        return new InformationDesc(this, new Locale[] { locale }) {
             protected List<Object> getItems(Object key) {
                 List<Object> result = new ArrayList<Object>();
 
-                for (int i=0; i < info.size(); i++) {
+                for (int i = 0; i < info.size(); i++) {
                     InformationDesc infoDesc = (InformationDesc) info.get(i);
 
                     if (localMatches(locale, infoDesc.getLocales()))
                         if (localMatches(locale, infoDesc.getLocales()))
-                            result.addAll(infoDesc.getItems(key) );
+                            result.addAll(infoDesc.getItems(key));
                 }
 
                 return result;
@@ -378,17 +373,17 @@ public class JNLPFile {
      * specified locale, os, and arch.
      */
     public ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
-        return new ResourcesDesc(this, new Locale[] {locale}, new String[] {os}, new String[] {arch}) {
+        return new ResourcesDesc(this, new Locale[] { locale }, new String[] { os }, new String[] { arch }) {
             public <T> List<T> getResources(Class<T> launchType) {
                 List<T> result = new ArrayList<T>();
 
-                for (int i=0; i < resources.size(); i++) {
+                for (int i = 0; i < resources.size(); i++) {
                     ResourcesDesc rescDesc = resources.get(i);
 
                     if (localMatches(locale, rescDesc.getLocales())
-                        && stringMatches(os, rescDesc.getOS())
-                        && stringMatches(arch, rescDesc.getArch()))
-                        result.addAll(rescDesc.getResources(launchType) );
+                            && stringMatches(os, rescDesc.getOS())
+                            && stringMatches(arch, rescDesc.getArch()))
+                        result.addAll(rescDesc.getResources(launchType));
                 }
 
                 result.addAll(sharedResources.getResources(launchType));
@@ -499,7 +494,6 @@ public class JNLPFile {
         defaultLocale = locale;
     }
 
-
     /**
      * Returns whether a locale is matched by one of more other
      * locales.  Only the non-empty language, country, and variant
@@ -515,7 +509,7 @@ public class JNLPFile {
         if (available == null || available.length == 0)
             return true;
 
-        for (int i=0; i < available.length; i++) {
+        for (int i = 0; i < available.length; i++) {
             String language = requested.getLanguage(); // "" but never null
             String country = requested.getCountry();
             String variant = requested.getVariant();
@@ -546,7 +540,7 @@ public class JNLPFile {
         if (available == null || available.length == 0)
             return true;
 
-        for (int i=0; i < available.length; i++)
+        for (int i = 0; i < available.length; i++)
             if (available[i] != null && available[i].startsWith(prefixStr))
                 return true;
 
@@ -579,11 +573,9 @@ public class JNLPFile {
             launchType = parser.getLauncher(root);
             component = parser.getComponent(root);
             security = parser.getSecurity(root);
-        }
-        catch (ParseException ex) {
+        } catch (ParseException ex) {
             throw ex;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 

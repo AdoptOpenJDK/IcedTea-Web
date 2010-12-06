@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -48,7 +47,6 @@ public class JREDesc {
 
     /** list of ResourceDesc objects */
     private List resources;
-
 
     /**
      * Create a JRE descriptor.
@@ -139,10 +137,10 @@ public class JREDesc {
 
         boolean lastCharacterIsDigit = true;
         // the last character must be 0-9 or k/K/m/M
-        char lastChar = Character.toLowerCase(heapSize.charAt(heapSize.length()-1));
+        char lastChar = Character.toLowerCase(heapSize.charAt(heapSize.length() - 1));
         if ((lastChar < '0' || lastChar > '9')) {
             lastCharacterIsDigit = false;
-            if (lastChar != 'k' && lastChar!= 'm' ) {
+            if (lastChar != 'k' && lastChar != 'm') {
                 throw new ParseException(R("PBadHeapSize", heapSize));
             }
         }
@@ -152,7 +150,7 @@ public class JREDesc {
             indexOfLastDigit = indexOfLastDigit - 1;
         }
 
-        String size = heapSize.substring(0,indexOfLastDigit);
+        String size = heapSize.substring(0, indexOfLastDigit);
         try {
             // check that the number is a number!
             Integer.valueOf(size);

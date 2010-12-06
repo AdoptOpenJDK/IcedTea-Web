@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.applet.*;
@@ -64,7 +63,6 @@ public class AppletEnvironment implements AppletContext, AppletStub {
 
     /** whether the applet has been destroyed */
     private boolean destroyed = false;
-
 
     /**
      * Create a new applet environment for the applet specified by
@@ -151,7 +149,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
             AppletDesc appletDesc = file.getApplet();
 
             if (cont instanceof AppletStub)
-                applet.setStub((AppletStub)cont);
+                applet.setStub((AppletStub) cont);
             else
                 applet.setStub(this);
 
@@ -171,26 +169,25 @@ public class AppletEnvironment implements AppletContext, AppletStub {
 
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                                // do first because some applets need to be displayed before
-                                // starting (they use Component.getImage or something)
-                                cont.setVisible(true);
+                    public void run() {
+                        // do first because some applets need to be displayed before
+                        // starting (they use Component.getImage or something)
+                        cont.setVisible(true);
 
-                                applet.init();
-                                applet.start();
+                        applet.init();
+                        applet.start();
 
-                                cont.invalidate(); // this should force the applet to
-                                cont.validate();   // the correct size and to repaint
-                                cont.repaint();
-                        }
+                        cont.invalidate(); // this should force the applet to
+                        cont.validate(); // the correct size and to repaint
+                        cont.repaint();
+                    }
                 });
             } catch (InterruptedException ie) {
 
             } catch (InvocationTargetException ite) {
 
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
@@ -220,7 +217,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     public Enumeration<Applet> getApplets() {
         checkDestroyed();
 
-        return Collections.enumeration( Arrays.asList(new Applet[] { applet }) );
+        return Collections.enumeration(Arrays.asList(new Applet[] { applet }));
     }
 
     /**
@@ -293,7 +290,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     /**
      * Required for JRE1.4, but not implemented yet.
      */
-    public Iterator<String> getStreamKeys()  {
+    public Iterator<String> getStreamKeys() {
         checkDestroyed();
 
         return null;
@@ -349,6 +346,5 @@ public class AppletEnvironment implements AppletContext, AppletStub {
         // it won't be started or stopped, so if it can call it's running
         return true;
     }
-
 
 }

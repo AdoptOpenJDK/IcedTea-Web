@@ -130,9 +130,7 @@ public class AdvancedProxySettingsDialog extends JDialog {
                 psd.dispose();
             }
         });
-        
-        
-        
+
     }
 
     /**

@@ -55,64 +55,63 @@ import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
 
-
 public class NotAllSignedWarningPane extends SecurityDialogPanel {
 
-        public NotAllSignedWarningPane(SecurityWarningDialog x) {
-                super(x);
-                addComponents();
-        }
+    public NotAllSignedWarningPane(SecurityWarningDialog x) {
+        super(x);
+        addComponents();
+    }
 
-        /**
-         * Creates the actual GUI components, and adds it to this panel
-         */
-        private void addComponents() {
-                JNLPFile file = parent.getFile();
+    /**
+     * Creates the actual GUI components, and adds it to this panel
+     */
+    private void addComponents() {
+        JNLPFile file = parent.getFile();
 
-                String topLabelText = R("SNotAllSignedSummary");
-                String infoLabelText = R("SNotAllSignedDetail");
-                String questionLabelText = R("SNotAllSignedQuestion");
+        String topLabelText = R("SNotAllSignedSummary");
+        String infoLabelText = R("SNotAllSignedDetail");
+        String questionLabelText = R("SNotAllSignedQuestion");
 
-                ImageIcon icon = new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png"));
-                JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
-                topLabel.setFont(new Font(topLabel.getFont().toString(),
+        ImageIcon icon = new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png"));
+        JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
+        topLabel.setFont(new Font(topLabel.getFont().toString(),
                         Font.BOLD, 12));
-                JPanel topPanel = new JPanel(new BorderLayout());
-                topPanel.setBackground(Color.WHITE);
-                topPanel.add(topLabel, BorderLayout.CENTER);
-                topPanel.setPreferredSize(new Dimension(500,80));
-                topPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(topLabel, BorderLayout.CENTER);
+        topPanel.setPreferredSize(new Dimension(500, 80));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                JLabel infoLabel = new JLabel(htmlWrap(infoLabelText));
-                JPanel infoPanel = new JPanel(new BorderLayout());
-                infoPanel.add(infoLabel, BorderLayout.CENTER);
-                infoPanel.setPreferredSize(new Dimension(500,100));
-                infoPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JLabel infoLabel = new JLabel(htmlWrap(infoLabelText));
+        JPanel infoPanel = new JPanel(new BorderLayout());
+        infoPanel.add(infoLabel, BorderLayout.CENTER);
+        infoPanel.setPreferredSize(new Dimension(500, 100));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                JLabel questionLabel = new JLabel(htmlWrap(questionLabelText));
-                JPanel questionPanel = new JPanel(new BorderLayout());
-                questionPanel.add(questionLabel, BorderLayout.CENTER);
-                questionPanel.setPreferredSize(new Dimension(500,100));
-                questionPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JLabel questionLabel = new JLabel(htmlWrap(questionLabelText));
+        JPanel questionPanel = new JPanel(new BorderLayout());
+        questionPanel.add(questionLabel, BorderLayout.CENTER);
+        questionPanel.setPreferredSize(new Dimension(500, 100));
+        questionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                //run and cancel buttons
-                JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        //run and cancel buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-                JButton run = new JButton(R("ButProceed"));
-                JButton cancel = new JButton(R("ButCancel"));
-                run.addActionListener(createSetValueListener(parent,0));
-                cancel.addActionListener(createSetValueListener(parent, 1));
-                initialFocusComponent = cancel;
-                buttonPanel.add(run);
-                buttonPanel.add(cancel);
-                buttonPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JButton run = new JButton(R("ButProceed"));
+        JButton cancel = new JButton(R("ButCancel"));
+        run.addActionListener(createSetValueListener(parent, 0));
+        cancel.addActionListener(createSetValueListener(parent, 1));
+        initialFocusComponent = cancel;
+        buttonPanel.add(run);
+        buttonPanel.add(cancel);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                //all of the above
-                setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-                add(topPanel);
-                add(infoPanel);
-                add(questionPanel);
-                add(buttonPanel);
+        //all of the above
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(topPanel);
+        add(infoPanel);
+        add(questionPanel);
+        add(buttonPanel);
 
-        }
+    }
 }

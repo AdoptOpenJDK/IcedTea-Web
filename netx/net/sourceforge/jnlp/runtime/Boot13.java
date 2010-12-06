@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.lang.reflect.*;
@@ -50,7 +49,7 @@ public class Boot13 extends URLClassLoader {
 
     protected PermissionCollection getPermissions(CodeSource source) {
         Permissions result = new Permissions();
-        result.add( new AllPermission() );
+        result.add(new AllPermission());
 
         return result;
     }
@@ -66,8 +65,7 @@ public class Boot13 extends URLClassLoader {
         // but the wrong permissions.
         try {
             return findClass(name);
-        }
-        catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
         }
 
         return getParent().loadClass(name);
@@ -89,14 +87,14 @@ public class Boot13 extends URLClassLoader {
             System.exit(1);
         }
 
-        Boot13 b = new Boot13(new URL[] {cs});
+        Boot13 b = new Boot13(new URL[] { cs });
 
         Thread.currentThread().setContextClassLoader(b); // try to prevent getting the non-policy version of classes
 
         Class<?> c = b.loadClass("net.sourceforge.jnlp.runtime.Boot");
-        Method main = c.getDeclaredMethod("main", new Class<?>[] {String[].class} );
+        Method main = c.getDeclaredMethod("main", new Class<?>[] { String[].class });
 
-        main.invoke(null, new Object[] { args } );
+        main.invoke(null, new Object[] { args });
     }
 
 }

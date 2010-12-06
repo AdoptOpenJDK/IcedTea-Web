@@ -44,7 +44,6 @@ public class KeyStoreUtil {
         // this class is not meant to be instantiated
     }
 
-
     /**
      * Returns true if KeyStore has a password. This is true except for
      * MSCAPI KeyStores
@@ -60,7 +59,7 @@ public class KeyStoreUtil {
     public static String niceStoreTypeName(String storetype) {
         if (storetype.equalsIgnoreCase("Windows-MY")) {
             return "Windows-MY";
-        } else if(storetype.equalsIgnoreCase("Windows-ROOT")) {
+        } else if (storetype.equalsIgnoreCase("Windows-ROOT")) {
             return "Windows-ROOT";
         } else {
             return storetype.toUpperCase();

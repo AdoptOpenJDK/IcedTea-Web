@@ -37,8 +37,7 @@ exception statement from your version. */
 
 package sun.applet;
 
-public class TestEnv
-{
+public class TestEnv {
     public static int intField = 103;
     public int intInstanceField = 7822;
     public String stringField = "hello";
@@ -92,20 +91,20 @@ public class TestEnv
     public static void TestItIntArray(int[] arg) {
         PluginDebug.debug("TestItIntArray: " + arg);
         for (int i = 0; i < arg.length; i++)
-            PluginDebug.debug ("ELEMENT: " + i + " " + arg[i]);
+            PluginDebug.debug("ELEMENT: " + i + " " + arg[i]);
     }
 
     public static void TestItObjectArray(String[] arg) {
         PluginDebug.debug("TestItObjectArray: " + arg);
         for (int i = 0; i < arg.length; i++)
-            PluginDebug.debug ("ELEMENT: " + i + " " + arg[i]);
+            PluginDebug.debug("ELEMENT: " + i + " " + arg[i]);
     }
 
     public static void TestItObjectArrayMulti(String[][] arg) {
         PluginDebug.debug("TestItObjectArrayMulti: " + arg);
         for (int i = 0; i < arg.length; i++)
             for (int j = 0; j < arg[i].length; j++)
-                PluginDebug.debug ("ELEMENT: " + i + " " + j + " " + arg[i][j]);
+                PluginDebug.debug("ELEMENT: " + i + " " + j + " " + arg[i][j]);
     }
 
     public static boolean TestItBoolReturnTrue() {
@@ -161,8 +160,8 @@ public class TestEnv
     }
 
     public static String[][] TestItObjectArrayMultiReturn() {
-        return new String[][] { {"Thomas", "Brigitte"},
-                                {"Lindsay", "Michael"} };
+        return new String[][] { { "Thomas", "Brigitte" },
+                                { "Lindsay", "Michael" } };
     }
 
     public int TestItIntInstance(int arg) {

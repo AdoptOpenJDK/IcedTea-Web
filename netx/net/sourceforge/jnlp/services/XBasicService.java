@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.services;
 
 import java.io.IOException;
@@ -47,7 +46,6 @@ class XBasicService implements BasicService {
 
     /** whether the command was loaded / prompted for */
     private boolean initialized = false;
-
 
     protected XBasicService() {
     }
@@ -128,7 +126,7 @@ class XBasicService implements BasicService {
             }
 
             JARDesc[] jarDescs = jnlpFile.getResources().getJARs();
-            for (JARDesc jarDesc: jarDescs) {
+            for (JARDesc jarDesc : jarDescs) {
                 return jarDesc.getLocation();
             }
         }
@@ -159,15 +157,14 @@ class XBasicService implements BasicService {
      *
      * @return whether the document was opened
      */
-    public boolean showDocument(URL url)  {
+    public boolean showDocument(URL url) {
         initialize();
 
         if (url.toString().endsWith(".jnlp")) {
             try {
                 new Launcher().launchExternal(url);
                 return true;
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 return false;
             }
         }
@@ -181,8 +178,7 @@ class XBasicService implements BasicService {
                 //Runtime.getRuntime().exec(new String[]{command,url.toString()});
 
                 return true;
-            }
-            catch(IOException ex){
+            } catch (IOException ex) {
                 if (JNLPRuntime.isDebug())
                     ex.printStackTrace();
             }
@@ -196,17 +192,16 @@ class XBasicService implements BasicService {
             return;
         initialized = true;
 
-        if(isWindows()) {
+        if (isWindows()) {
             command = "rundll32 url.dll,FileProtocolHandler ";
-        }
-        else {
+        } else {
             DeploymentConfiguration config = JNLPRuntime.getConfiguration();
             command = config.getProperty(DeploymentConfiguration.KEY_BROWSER_PATH);
 
-            if(command == null) { // prompt & store
+            if (command == null) { // prompt & store
                 command = promptForCommand(null);
 
-                if(command != null) {
+                if (command != null) {
                     config.setProperty(DeploymentConfiguration.KEY_BROWSER_PATH, command);
                     try {
                         config.save();
@@ -220,7 +215,7 @@ class XBasicService implements BasicService {
 
     private boolean isWindows() {
         String os = System.getProperty("os.name");
-        if(os != null && os.startsWith("Windows"))
+        if (os != null && os.startsWith("Windows"))
             return true;
         else
             return false;

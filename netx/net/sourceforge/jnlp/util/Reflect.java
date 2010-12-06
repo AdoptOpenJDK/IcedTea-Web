@@ -19,7 +19,6 @@ package net.sourceforge.jnlp.util;
 import java.util.*;
 import java.lang.reflect.*;
 
-
 /**
  * Provides simply, convenient methods to invoke methods by
  * name.  This class is used to consolidate reflection needed to
@@ -47,7 +46,6 @@ public class Reflect {
     private boolean accessible;
 
     private static Object zero[] = new Object[0];
-
 
     /**
      * Create a new Reflect instance.
@@ -84,8 +82,7 @@ public class Reflect {
                 m.setAccessible(accessible);
 
             return m.invoke(null, args);
-        }
-        catch (Exception ex) { // eat
+        } catch (Exception ex) { // eat
             return null;
         }
     }
@@ -110,8 +107,7 @@ public class Reflect {
                 m.setAccessible(accessible);
 
             return m.invoke(object, args);
-        }
-        catch (Exception ex) { // eat
+        } catch (Exception ex) { // eat
             ex.printStackTrace();
             return null;
         }
@@ -126,7 +122,7 @@ public class Reflect {
             for (Class c = type; c != null; c = c.getSuperclass()) {
                 Method methods[] = c.getMethods();
 
-                for (int i=0; i < methods.length; i++) {
+                for (int i = 0; i < methods.length; i++) {
                     if (methods[i].getName().equals(method)) {
                         Class parameters[] = methods[i].getParameterTypes();
 
@@ -135,8 +131,7 @@ public class Reflect {
                     }
                 }
             }
-        }
-        catch (Exception ex) { // eat
+        } catch (Exception ex) { // eat
             ex.printStackTrace();
         }
 

@@ -38,7 +38,6 @@ public class DownloadEvent extends EventObject {
     /** the resource */
     private Resource resource;
 
-
     /**
      * Creates a launch event for the specified application
      * instance.

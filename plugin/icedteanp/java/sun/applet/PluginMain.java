@@ -82,14 +82,13 @@ import net.sourceforge.jnlp.security.JNLPAuthenticator;
 /**
  * The main entry point into PluginAppletViewer.
  */
-public class PluginMain
-{
+public class PluginMain {
     // the files where stdout/stderr are sent to
     public static final String PLUGIN_STDERR_FILE = "java.stderr";
     public static final String PLUGIN_STDOUT_FILE = "java.stdout";
 
-        final boolean redirectStreams = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
-        static PluginStreamHandler streamHandler;
+    final boolean redirectStreams = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
+    static PluginStreamHandler streamHandler;
 
     // This is used in init().  Getting rid of this is desirable but depends
     // on whether the property that uses it is necessary/standard.
@@ -101,24 +100,22 @@ public class PluginMain
      * The main entry point into AppletViewer.
      */
     public static void main(String args[])
-        throws IOException
-    {
+            throws IOException {
         if (args.length != 2 || !(new File(args[0]).exists()) || !(new File(args[1]).exists())) {
             System.err.println("Invalid pipe names provided. Refusing to proceed.");
             System.exit(1);
         }
 
         try {
-                PluginMain pm = new PluginMain(args[0], args[1]);
+            PluginMain pm = new PluginMain(args[0], args[1]);
         } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Something very bad happened. I don't know what to do, so I am going to exit :(");
-                System.exit(1);
+            e.printStackTrace();
+            System.err.println("Something very bad happened. I don't know what to do, so I am going to exit :(");
+            System.exit(1);
         }
     }
 
     public PluginMain(String inPipe, String outPipe) {
-
 
         connect(inPipe, outPipe);
 
@@ -130,87 +127,87 @@ public class PluginMain
         securityContext.setStreamhandler(streamHandler);
         AppletSecurityContextManager.addContext(0, securityContext);
 
-                PluginAppletViewer.setStreamhandler(streamHandler);
-                PluginAppletViewer.setPluginCallRequestFactory(new PluginCallRequestFactory());
+        PluginAppletViewer.setStreamhandler(streamHandler);
+        PluginAppletViewer.setPluginCallRequestFactory(new PluginCallRequestFactory());
 
         init();
 
-                // Streams set. Start processing.
-                streamHandler.startProcessing();
+        // Streams set. Start processing.
+        streamHandler.startProcessing();
     }
 
-        public void connect(String inPipe, String outPipe) {
-                try {
-                        streamHandler = new PluginStreamHandler(new FileInputStream(inPipe), new FileOutputStream(outPipe));
-                PluginDebug.debug("Streams initialized");
-                } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                }
+    public void connect(String inPipe, String outPipe) {
+        try {
+            streamHandler = new PluginStreamHandler(new FileInputStream(inPipe), new FileOutputStream(outPipe));
+            PluginDebug.debug("Streams initialized");
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    private static void init() {
+        Properties avProps = new Properties();
+
+        // ADD OTHER RANDOM PROPERTIES
+        // XXX 5/18 need to revisit why these are here, is there some
+        // standard for what is available?
+
+        // Standard browser properties
+        avProps.put("browser", "sun.applet.AppletViewer");
+        avProps.put("browser.version", "1.06");
+        avProps.put("browser.vendor", "Sun Microsystems Inc.");
+        avProps.put("http.agent", "Java(tm) 2 SDK, Standard Edition v" + theVersion);
+
+        // Define which packages can be extended by applets
+        // XXX 5/19 probably not needed, not checked in AppletSecurity
+        avProps.put("package.restrict.definition.java", "true");
+        avProps.put("package.restrict.definition.sun", "true");
+
+        // Define which properties can be read by applets.
+        // A property named by "key" can be read only when its twin
+        // property "key.applet" is true.  The following ten properties
+        // are open by default.  Any other property can be explicitly
+        // opened up by the browser user by calling appletviewer with
+        // -J-Dkey.applet=true
+        avProps.put("java.version.applet", "true");
+        avProps.put("java.vendor.applet", "true");
+        avProps.put("java.vendor.url.applet", "true");
+        avProps.put("java.class.version.applet", "true");
+        avProps.put("os.name.applet", "true");
+        avProps.put("os.version.applet", "true");
+        avProps.put("os.arch.applet", "true");
+        avProps.put("file.separator.applet", "true");
+        avProps.put("path.separator.applet", "true");
+        avProps.put("line.separator.applet", "true");
+
+        avProps.put("javaplugin.nodotversion", "160_17");
+        avProps.put("javaplugin.version", "1.6.0_17");
+        avProps.put("javaplugin.vm.options", "");
+
+        // Read in the System properties.  If something is going to be
+        // over-written, warn about it.
+        Properties sysProps = System.getProperties();
+        for (Enumeration<?> e = sysProps.propertyNames(); e.hasMoreElements();) {
+            String key = (String) e.nextElement();
+            String val = sysProps.getProperty(key);
+            avProps.setProperty(key, val);
         }
 
-        private static void init() {
-                Properties avProps = new Properties();
+        // INSTALL THE PROPERTY LIST
+        System.setProperties(avProps);
 
-                // ADD OTHER RANDOM PROPERTIES
-                // XXX 5/18 need to revisit why these are here, is there some
-                // standard for what is available?
-
-                // Standard browser properties
-                avProps.put("browser", "sun.applet.AppletViewer");
-                avProps.put("browser.version", "1.06");
-                avProps.put("browser.vendor", "Sun Microsystems Inc.");
-                avProps.put("http.agent", "Java(tm) 2 SDK, Standard Edition v" + theVersion);
-
-                // Define which packages can be extended by applets
-                // XXX 5/19 probably not needed, not checked in AppletSecurity
-                avProps.put("package.restrict.definition.java", "true");
-                avProps.put("package.restrict.definition.sun", "true");
-
-                // Define which properties can be read by applets.
-                // A property named by "key" can be read only when its twin
-                // property "key.applet" is true.  The following ten properties
-                // are open by default.  Any other property can be explicitly
-                // opened up by the browser user by calling appletviewer with
-                // -J-Dkey.applet=true
-                avProps.put("java.version.applet", "true");
-                avProps.put("java.vendor.applet", "true");
-                avProps.put("java.vendor.url.applet", "true");
-                avProps.put("java.class.version.applet", "true");
-                avProps.put("os.name.applet", "true");
-                avProps.put("os.version.applet", "true");
-                avProps.put("os.arch.applet", "true");
-                avProps.put("file.separator.applet", "true");
-                avProps.put("path.separator.applet", "true");
-                avProps.put("line.separator.applet", "true");
-
-                avProps.put("javaplugin.nodotversion", "160_17");
-                avProps.put("javaplugin.version", "1.6.0_17");
-                avProps.put("javaplugin.vm.options", "");
-
-                // Read in the System properties.  If something is going to be
-                // over-written, warn about it.
-                Properties sysProps = System.getProperties();
-                for (Enumeration<?> e = sysProps.propertyNames(); e.hasMoreElements(); ) {
-                        String key = (String) e.nextElement();
-                        String val = sysProps.getProperty(key);
-                        avProps.setProperty(key, val);
-                }
-
-                // INSTALL THE PROPERTY LIST
-                System.setProperties(avProps);
-
-                // plug in a custom authenticator and proxy selector
-                boolean installAuthenticator = Boolean.valueOf(JNLPRuntime.getConfiguration()
+        // plug in a custom authenticator and proxy selector
+        boolean installAuthenticator = Boolean.valueOf(JNLPRuntime.getConfiguration()
                         .getProperty(DeploymentConfiguration.KEY_SECURITY_INSTALL_AUTHENTICATOR));
-                if (installAuthenticator) {
-                    Authenticator.setDefault(new JNLPAuthenticator());
-                }
+        if (installAuthenticator) {
+            Authenticator.setDefault(new JNLPAuthenticator());
+        }
         // override the proxy selector set by JNLPRuntime
         ProxySelector.setDefault(new PluginProxySelector());
 
         CookieManager ckManager = new PluginCookieManager();
         CookieHandler.setDefault(ckManager);
-        }
+    }
 
     static boolean messageAvailable() {
         return streamHandler.messageAvailable();

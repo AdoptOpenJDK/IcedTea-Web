@@ -45,36 +45,36 @@ import java.util.Set;
 
 class PluginMessageConsumer {
 
-	private static int MAX_PARALLEL_INITS = 1;
+    private static int MAX_PARALLEL_INITS = 1;
 
-	// Each initialization requires 5 responses (tag, handle, width, proxy, cookie) 
-	// before the message stack unlocks/collapses. This works out well because we 
-	// want to allow upto 5 parallel tasks anyway
-	private static int MAX_WORKERS = MAX_PARALLEL_INITS*4;
-	private static int PRIORITY_WORKERS = MAX_PARALLEL_INITS*2;
+    // Each initialization requires 5 responses (tag, handle, width, proxy, cookie) 
+    // before the message stack unlocks/collapses. This works out well because we 
+    // want to allow upto 5 parallel tasks anyway
+    private static int MAX_WORKERS = MAX_PARALLEL_INITS * 4;
+    private static int PRIORITY_WORKERS = MAX_PARALLEL_INITS * 2;
 
-	private static Hashtable<Integer, PluginMessageHandlerWorker> initWorkers = new Hashtable<Integer, PluginMessageHandlerWorker>(2);
+    private static Hashtable<Integer, PluginMessageHandlerWorker> initWorkers = new Hashtable<Integer, PluginMessageHandlerWorker>(2);
 
-	LinkedList<String> readQueue = new LinkedList<String>();
-	private static LinkedList<String> priorityWaitQueue = new LinkedList<String>();
-	ArrayList<PluginMessageHandlerWorker> workers = new ArrayList<PluginMessageHandlerWorker>();
-	PluginStreamHandler streamHandler = null;
-	AppletSecurity as;
-	ConsumerThread consumerThread = new ConsumerThread();
-	private static ArrayList<Integer> processedIds = new ArrayList<Integer>();
+    LinkedList<String> readQueue = new LinkedList<String>();
+    private static LinkedList<String> priorityWaitQueue = new LinkedList<String>();
+    ArrayList<PluginMessageHandlerWorker> workers = new ArrayList<PluginMessageHandlerWorker>();
+    PluginStreamHandler streamHandler = null;
+    AppletSecurity as;
+    ConsumerThread consumerThread = new ConsumerThread();
+    private static ArrayList<Integer> processedIds = new ArrayList<Integer>();
 
-	/** 
-	 * Registers a reference to wait for. Responses to registered priority 
-	 * references get handled by priority worker if normal workers are busy.
-	 *
-	 * @param reference The reference to give priority to
-	 */
-	public static void registerPriorityWait(Long reference) {
-	    PluginDebug.debug("Registering priority for reference " + reference);
-	    registerPriorityWait("reference " + reference.toString());
-	}
+    /** 
+     * Registers a reference to wait for. Responses to registered priority 
+     * references get handled by priority worker if normal workers are busy.
+     *
+     * @param reference The reference to give priority to
+     */
+    public static void registerPriorityWait(Long reference) {
+        PluginDebug.debug("Registering priority for reference " + reference);
+        registerPriorityWait("reference " + reference.toString());
+    }
 
-	/** 
+    /** 
      * Registers a string to wait for.
      *
      * @param searchString the string to look for in a response
@@ -87,7 +87,7 @@ class PluginMessageConsumer {
         }
     }
 
-	/** 
+    /** 
      * Unregisters a priority reference to wait for.
      *
      * @param reference The reference to remove
@@ -117,46 +117,46 @@ class PluginMessageConsumer {
     private Long getReference(String[] msgParts) {
         return Long.parseLong(msgParts[3]);
     }
-    
-	public PluginMessageConsumer(PluginStreamHandler streamHandler) {
-		
-		as = new AppletSecurity();
-		this.streamHandler = streamHandler;
-		this.consumerThread.start();
-	}
 
-	private String getPriorityStrIfPriority(String message) {
-		
-		// Destroy messages are permanently high priority
-		if (message.endsWith("destroy"))
+    public PluginMessageConsumer(PluginStreamHandler streamHandler) {
+
+        as = new AppletSecurity();
+        this.streamHandler = streamHandler;
+        this.consumerThread.start();
+    }
+
+    private String getPriorityStrIfPriority(String message) {
+
+        // Destroy messages are permanently high priority
+        if (message.endsWith("destroy"))
             return "destroy";
 
-	    synchronized (priorityWaitQueue) {
-	        Iterator<String> it = priorityWaitQueue.iterator();
+        synchronized (priorityWaitQueue) {
+            Iterator<String> it = priorityWaitQueue.iterator();
 
-	        while (it.hasNext()) {
-	            String priorityStr = it.next();
-	            if (message.indexOf(priorityStr) > 0)
-	                return priorityStr;
-	        }
-	    }
+            while (it.hasNext()) {
+                String priorityStr = it.next();
+                if (message.indexOf(priorityStr) > 0)
+                    return priorityStr;
+            }
+        }
 
-	    return null;
-	}
+        return null;
+    }
 
-	private boolean isInInit(Integer instanceNum) {
-	    return initWorkers.containsKey(instanceNum);
-	}
+    private boolean isInInit(Integer instanceNum) {
+        return initWorkers.containsKey(instanceNum);
+    }
 
-	private void addToInitWorkers(Integer instanceNum, PluginMessageHandlerWorker worker) {
-        synchronized(initWorkers) {
+    private void addToInitWorkers(Integer instanceNum, PluginMessageHandlerWorker worker) {
+        synchronized (initWorkers) {
             initWorkers.put(instanceNum, worker);
         }
-	}
+    }
 
-	public void notifyWorkerIsFree(PluginMessageHandlerWorker worker) {
-	    synchronized (initWorkers) {
-	        Iterator<Integer> i = initWorkers.keySet().iterator();
+    public void notifyWorkerIsFree(PluginMessageHandlerWorker worker) {
+        synchronized (initWorkers) {
+            Iterator<Integer> i = initWorkers.keySet().iterator();
             while (i.hasNext()) {
                 Integer key = i.next();
                 if (initWorkers.get(key).equals(worker)) {
@@ -164,136 +164,137 @@ class PluginMessageConsumer {
                     initWorkers.remove(key);
                 }
             }
-	    }
-	    
-	    consumerThread.interrupt();
-	}
+        }
 
-	public void queue(String message) {
-	    synchronized(readQueue) {
-	        readQueue.addLast(message);
-	    }
-	    
-	    // Wake that lazy consumer thread
-	    consumerThread.interrupt();
-	}
+        consumerThread.interrupt();
+    }
 
-	protected class ConsumerThread extends Thread { 
-		
-		/**
-		 * Scans the readQueue for priority messages and brings them to the front
-		 */
-		private void bringPriorityMessagesToFront() {
-			synchronized (readQueue) {
-				
-				// iterate through the list
-				for (int i=0; i < readQueue.size(); i++) {
-					
-					// remove element at i to inspect it
-					String message = readQueue.remove(i);
-					
-					// if element at i is a priority msg, bring it forward
-					if (getPriorityStrIfPriority(message) != null) {
-						readQueue.addFirst(message);
-					} else { // else keep it where it was
-						readQueue.add(i, message);
-					}
-					
-					// by the end the queue size is the same, so the 
-					// position indicator (i) is still valid
-				}
-			}
-		}
+    public void queue(String message) {
+        synchronized (readQueue) {
+            readQueue.addLast(message);
+        }
 
-	    public void run() {
+        // Wake that lazy consumer thread
+        consumerThread.interrupt();
+    }
 
-	        while (true) {
+    protected class ConsumerThread extends Thread {
+
+        /**
+         * Scans the readQueue for priority messages and brings them to the front
+         */
+        private void bringPriorityMessagesToFront() {
+            synchronized (readQueue) {
+
+                // iterate through the list
+                for (int i = 0; i < readQueue.size(); i++) {
+
+                    // remove element at i to inspect it
+                    String message = readQueue.remove(i);
+
+                    // if element at i is a priority msg, bring it forward
+                    if (getPriorityStrIfPriority(message) != null) {
+                        readQueue.addFirst(message);
+                    } else { // else keep it where it was
+                        readQueue.add(i, message);
+                    }
+
+                    // by the end the queue size is the same, so the 
+                    // position indicator (i) is still valid
+                }
+            }
+        }
+
+        public void run() {
+
+            while (true) {
 
                 String message = null;
 
-	            synchronized(readQueue) {
-	                message = readQueue.poll();
-	            }
+                synchronized (readQueue) {
+                    message = readQueue.poll();
+                }
 
-	            if (message != null) {
+                if (message != null) {
 
-	                String[] msgParts = message.split(" ");
+                    String[] msgParts = message.split(" ");
 
-	                String priorityStr = getPriorityStrIfPriority(message);
-	                boolean isPriorityResponse = (priorityStr != null);
-		
-	                //PluginDebug.debug("Message " + message + " (priority=" + isPriorityResponse + ") ready to be processed. Looking for free worker...");
-	                final PluginMessageHandlerWorker worker = getFreeWorker(isPriorityResponse);
-	                
-	                if (worker == null) {
-	                    synchronized(readQueue) {
+                    String priorityStr = getPriorityStrIfPriority(message);
+                    boolean isPriorityResponse = (priorityStr != null);
+
+                    //PluginDebug.debug("Message " + message + " (priority=" + isPriorityResponse + ") ready to be processed. Looking for free worker...");
+                    final PluginMessageHandlerWorker worker = getFreeWorker(isPriorityResponse);
+
+                    if (worker == null) {
+                        synchronized (readQueue) {
                             readQueue.addFirst(message);
                         }
 
-	                    // re-scan to see if any priority message came in
+                        // re-scan to see if any priority message came in
                         bringPriorityMessagesToFront();
-	                    
-	                    continue; // re-loop to try next msg
-	                }
 
-	                if (msgParts[2].equals("tag"))
-	                    addToInitWorkers((new Integer(msgParts[1])), worker);
+                        continue; // re-loop to try next msg
+                    }
 
-	                if (isPriorityResponse) {
-	                    unRegisterPriorityWait(priorityStr);
-	                }
+                    if (msgParts[2].equals("tag"))
+                        addToInitWorkers((new Integer(msgParts[1])), worker);
+
+                    if (isPriorityResponse) {
+                        unRegisterPriorityWait(priorityStr);
+                    }
 
                     worker.setmessage(message);
-	                worker.interrupt();
+                    worker.interrupt();
 
-	            } else {
-	                try {
-	                    Thread.sleep(1000);
-	                } catch (InterruptedException ie) {}
-	            }
-	        }
-	    }
-	}
+                } else {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ie) {
+                    }
+                }
+            }
+        }
+    }
 
-	private PluginMessageHandlerWorker getFreeWorker(boolean prioritized) {
+    private PluginMessageHandlerWorker getFreeWorker(boolean prioritized) {
 
-			for (PluginMessageHandlerWorker worker: workers) {
-				if (worker.isFree(prioritized)) {
-					PluginDebug.debug("Found free worker (" + worker.isPriority() + ") with id " + worker.getWorkerId());
-					// mark it busy before returning
-					worker.busy();
-					return worker;
-				}
-			}
+        for (PluginMessageHandlerWorker worker : workers) {
+            if (worker.isFree(prioritized)) {
+                PluginDebug.debug("Found free worker (" + worker.isPriority() + ") with id " + worker.getWorkerId());
+                // mark it busy before returning
+                worker.busy();
+                return worker;
+            }
+        }
 
-			// If we have less than MAX_WORKERS, create a new worker
-			if (workers.size() <= MAX_WORKERS) {
-			    PluginMessageHandlerWorker worker = null;
-			    
-			    if (workers.size() < (MAX_WORKERS - PRIORITY_WORKERS)) {
-			        PluginDebug.debug("Cannot find free worker, creating worker " + workers.size());
-			        worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), as, false);
-			    } else if (prioritized) {
-			        PluginDebug.debug("Cannot find free worker, creating priority worker " + workers.size());
-			        worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), as, true);
-			    } else {
-			        return null;
-			    }
+        // If we have less than MAX_WORKERS, create a new worker
+        if (workers.size() <= MAX_WORKERS) {
+            PluginMessageHandlerWorker worker = null;
 
-		        worker.start();
-		        worker.busy();
-		        workers.add(worker);
-		        return worker;
+            if (workers.size() < (MAX_WORKERS - PRIORITY_WORKERS)) {
+                PluginDebug.debug("Cannot find free worker, creating worker " + workers.size());
+                worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), as, false);
+            } else if (prioritized) {
+                PluginDebug.debug("Cannot find free worker, creating priority worker " + workers.size());
+                worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), as, true);
+            } else {
+                return null;
+            }
 
-			}
-			
-			// No workers available. Better luck next time! 
-			return null;
-	}
-	
-	private void dumpWorkerStatus() {
-		for (PluginMessageHandlerWorker worker: workers) {
-			PluginDebug.debug(worker.toString());
-		}
-	}
+            worker.start();
+            worker.busy();
+            workers.add(worker);
+            return worker;
+
+        }
+
+        // No workers available. Better luck next time! 
+        return null;
+    }
+
+    private void dumpWorkerStatus() {
+        for (PluginMessageHandlerWorker worker : workers) {
+            PluginDebug.debug(worker.toString());
+        }
+    }
 }

@@ -26,9 +26,7 @@
  *  3. This notice may not be removed or altered from any source distribution.
  *****************************************************************************/
 
-
 package net.sourceforge.nanoxml;
-
 
 /**
  * An XMLParseException is thrown when an error occures while parsing an XML
@@ -43,14 +41,12 @@ package net.sourceforge.nanoxml;
  * @version $Name:  $, $Revision: 1.1 $
  */
 public class XMLParseException
-    extends RuntimeException
-{
+        extends RuntimeException {
 
     /**
      * Indicates that no line number has been associated with this exception.
      */
     public static final int NO_LINE = -1;
-
 
     /**
      * The line number in the source code where the error occurred, or
@@ -61,7 +57,6 @@ public class XMLParseException
      * </ul></dd></dl>
      */
     private int lineNr;
-
 
     /**
      * Creates an exception.
@@ -78,15 +73,13 @@ public class XMLParseException
      * </ul></dd></dl><dl>
      */
     public XMLParseException(String name,
-                             String message)
-    {
+                             String message) {
         super("XML Parse Exception during parsing of "
-              + ((name == null) ? "the XML definition"
+                + ((name == null) ? "the XML definition"
                                 : ("a " + name + " element"))
-              + ": " + message);
+                + ": " + message);
         this.lineNr = XMLParseException.NO_LINE;
     }
-
 
     /**
      * Creates an exception.
@@ -105,16 +98,14 @@ public class XMLParseException
      * </ul></dd></dl><dl>
      */
     public XMLParseException(String name,
-                             int    lineNr,
-                             String message)
-    {
+                             int lineNr,
+                             String message) {
         super("XML Parse Exception during parsing of "
-              + ((name == null) ? "the XML definition"
+                + ((name == null) ? "the XML definition"
                                 : ("a " + name + " element"))
-              + " at line " + lineNr + ": " + message);
+                + " at line " + lineNr + ": " + message);
         this.lineNr = lineNr;
     }
-
 
     /**
      * Where the error occurred, or <code>NO_LINE</code> if the line number is
@@ -122,8 +113,7 @@ public class XMLParseException
      *
      * @see net.sourceforge.nanoxml.XMLParseException#NO_LINE
      */
-    public int getLineNr()
-    {
+    public int getLineNr() {
         return this.lineNr;
     }
 

@@ -39,7 +39,8 @@ class MiddleClickListener extends MouseAdapter {
         String result = null;
         if (obj instanceof JTextField)
             result = ((JTextField) obj).getText();
-        else if (obj instanceof JTextArea) result = ((JTextArea) obj).getText();
+        else if (obj instanceof JTextArea)
+            result = ((JTextArea) obj).getText();
 
         config.setProperty(property, result);
     }

@@ -50,74 +50,74 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 public class XPrintService implements PrintService {
 
-        // If pj is null, then we do not have a printer to use.
-        private PrinterJob pj;
+    // If pj is null, then we do not have a printer to use.
+    private PrinterJob pj;
 
-        public XPrintService() {
-                pj = PrinterJob.getPrinterJob();
+    public XPrintService() {
+        pj = PrinterJob.getPrinterJob();
+    }
+
+    public PageFormat getDefaultPage() {
+        if (pj != null)
+            return pj.defaultPage();
+        else {
+            showWarning();
+            return new PageFormat(); // might not have default settings.
+        }
+    }
+
+    public PageFormat showPageFormatDialog(PageFormat page) {
+        if (pj != null)
+            return pj.pageDialog(page);
+        else {
+            showWarning();
+            return page;
         }
 
-        public PageFormat getDefaultPage() {
-                if (pj != null)
-                        return pj.defaultPage();
-                else {
-                        showWarning();
-                        return new PageFormat(); // might not have default settings.
+    }
+
+    public boolean print(Pageable document) {
+        if (pj != null) {
+            pj.setPageable(document);
+            if (pj.printDialog()) {
+                try {
+                    pj.print();
+                    return true;
+                } catch (PrinterException pe) {
+                    System.err.println("Could not print: " + pe);
+                    return false;
                 }
-        }
+            }
+        } else
+            showWarning();
 
-        public PageFormat showPageFormatDialog(PageFormat page) {
-                if (pj != null)
-                        return pj.pageDialog(page);
-                else {
-                        showWarning();
-                        return page;
+        return false;
+    }
+
+    public boolean print(Printable painter) {
+        if (pj != null) {
+            pj.setPrintable(painter);
+            if (pj.printDialog()) {
+                try {
+                    pj.print();
+                    return true;
+                } catch (PrinterException pe) {
+                    System.err.println("Could not print: " + pe);
+                    return false;
                 }
 
-        }
+            }
+        } else
+            showWarning();
 
-        public boolean print(Pageable document) {
-                if (pj != null) {
-                        pj.setPageable(document);
-                        if (pj.printDialog()) {
-                                try {
-                                        pj.print();
-                                        return true;
-                                } catch(PrinterException pe) {
-                                        System.err.println("Could not print: " + pe);
-                                        return false;
-                                }
-                        }
-                } else
-                        showWarning();
+        return false;
+    }
 
-                return false;
-        }
-
-        public boolean print(Printable painter) {
-                if (pj != null) {
-                        pj.setPrintable(painter);
-                        if (pj.printDialog()) {
-                                try {
-                                        pj.print();
-                                        return true;
-                                } catch(PrinterException pe) {
-                                        System.err.println("Could not print: " + pe);
-                                        return false;
-                                }
-
-                        }
-                } else
-                        showWarning();
-
-                return false;
-        }
-
-        private void showWarning() {
-                JOptionPane.showMessageDialog(null,
+    private void showWarning() {
+        JOptionPane.showMessageDialog(null,
                                 "Unable to find a default printer.",
                                 "Warning",
                                 JOptionPane.WARNING_MESSAGE);
-                System.err.println("Unable to print: Unable to find default printer.");
-        }
+        System.err.println("Unable to print: Unable to find default printer.");
+    }
 }

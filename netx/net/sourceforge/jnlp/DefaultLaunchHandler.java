@@ -23,7 +23,6 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 
-
 /**
  * This default implementation shows prints the exception to
  * stdout and if not in headless mode displays the exception in a
@@ -100,7 +99,7 @@ public class DefaultLaunchHandler implements LaunchHandler {
 
         Throwable causes[] = ex.getCauses();
 
-        for (int i=0; i < causes.length; i++) {
+        for (int i = 0; i < causes.length; i++) {
             result.append(" (");
             result.append(causes[i].getClass().getName());
             result.append(" ");

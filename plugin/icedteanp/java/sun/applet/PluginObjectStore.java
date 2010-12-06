@@ -41,11 +41,10 @@ import java.util.*;
 import java.lang.reflect.*;
 import java.io.*;
 
-public class PluginObjectStore
-{
-    private static HashMap<Integer, Object> objects = new HashMap<Integer,Object>();
-    private static HashMap<Integer, Integer> counts = new HashMap<Integer,Integer>();
-    private static HashMap<Object, Integer> identifiers = new HashMap<Object,Integer>();
+public class PluginObjectStore {
+    private static HashMap<Integer, Object> objects = new HashMap<Integer, Object>();
+    private static HashMap<Integer, Integer> counts = new HashMap<Integer, Integer>();
+    private static HashMap<Object, Integer> identifiers = new HashMap<Object, Integer>();
     // FIXME:
     //
     // IF uniqueID == MAX_LONG, uniqueID =
@@ -73,13 +72,13 @@ public class PluginObjectStore
 
     public boolean contains(Object object) {
         if (object == null)
-                return identifiers.containsKey(object);
+            return identifiers.containsKey(object);
 
         return false;
     }
 
     public boolean contains(int identifier) {
-                return objects.containsKey(identifier);
+        return objects.containsKey(identifier);
     }
 
     public void reference(Object object) {
@@ -122,11 +121,10 @@ public class PluginObjectStore
     }
 
     public void dump() {
-                Iterator i = objects.keySet().iterator();
-                while (i.hasNext()) {
-                        Object key = i.next();
-                        PluginDebug.debug(key + "::" +  objects.get(key));
-                }
+        Iterator i = objects.keySet().iterator();
+        while (i.hasNext()) {
+            Object key = i.next();
+            PluginDebug.debug(key + "::" + objects.get(key));
+        }
     }
 }
-

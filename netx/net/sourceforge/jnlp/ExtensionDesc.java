@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -46,11 +45,10 @@ public class ExtensionDesc {
     private JNLPFile file;
 
     /** map from ext-part to local part */
-    private Map<String,String> extToPart = new HashMap<String,String>();
+    private Map<String, String> extToPart = new HashMap<String, String>();
 
     /** eager ext parts */
     private List<String> eagerExtParts = new ArrayList<String>();
-
 
     /**
      * Create an extention descriptor.
@@ -125,7 +123,7 @@ public class ExtensionDesc {
             file = new JNLPFile(location);
 
             if (JNLPRuntime.isDebug())
-                System.out.println("Resolve: "+file.getInformation().getTitle());
+                System.out.println("Resolve: " + file.getInformation().getTitle());
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())

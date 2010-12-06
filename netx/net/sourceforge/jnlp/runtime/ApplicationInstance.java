@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import java.awt.Window;
@@ -54,7 +53,6 @@ public class ApplicationInstance {
     // todo: should attempt to unload the environment variables
     // installed by the application.
 
-
     /** the file */
     private JNLPFile file;
 
@@ -83,8 +81,8 @@ public class ApplicationInstance {
     /** list of application listeners  */
     private EventListenerList listeners = new EventListenerList();
 
-        /** whether or not this application is signed */
-        private boolean isSigned = false;
+    /** whether or not this application is signed */
+    private boolean isSigned = false;
 
     /**
      * Create an application instance for the file. This should be done in the
@@ -119,11 +117,11 @@ public class ApplicationInstance {
         Object list[] = listeners.getListenerList();
         ApplicationEvent event = null;
 
-        for (int i=list.length-1; i>0; i-=2) { // last to first required
+        for (int i = list.length - 1; i > 0; i -= 2) { // last to first required
             if (event == null)
                 event = new ApplicationEvent(this);
 
-            ((ApplicationListener)list[i]).applicationDestroyed(event);
+            ((ApplicationListener) list[i]).applicationDestroyed(event);
         }
     }
 
@@ -174,7 +172,7 @@ public class ApplicationInstance {
      */
     private boolean shouldCreateShortcut(ShortcutDesc sd) {
         String currentSetting = JNLPRuntime.getConfiguration()
-            .getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT);
+                .getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT);
         boolean createShortcut = false;
 
         /*
@@ -221,7 +219,7 @@ public class ApplicationInstance {
     void installEnvironment() {
         final PropertyDesc props[] = file.getResources().getProperties();
 
-        CodeSource cs = new CodeSource((URL) null, (java.security.cert.Certificate  [])null);
+        CodeSource cs = new CodeSource((URL) null, (java.security.cert.Certificate[]) null);
 
         JNLPClassLoader loader = (JNLPClassLoader) this.loader;
         SecurityDesc s = loader.getSecurity();
@@ -229,11 +227,11 @@ public class ApplicationInstance {
         ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(), null, null);
 
         // Add to hashmap
-        AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] {pd});
+        AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
 
         PrivilegedAction<Object> installProps = new PrivilegedAction<Object>() {
             public Object run() {
-                for (int i=0; i < props.length; i++) {
+                for (int i = 0; i < props.length; i++) {
                     System.setProperty(props[i].getKey(), props[i].getValue());
                 }
 
@@ -274,7 +272,7 @@ public class ApplicationInstance {
 
         try {
             // destroy resources
-            for (int i=0; i < weakWindows.size(); i++) {
+            for (int i = 0; i < weakWindows.size(); i++) {
                 Window w = weakWindows.get(i);
                 if (w != null)
                     w.dispose();
@@ -282,12 +280,12 @@ public class ApplicationInstance {
 
             weakWindows.clear();
 
-             // interrupt threads
-            Thread threads[] = new Thread[ group.activeCount() * 2 ];
+            // interrupt threads
+            Thread threads[] = new Thread[group.activeCount() * 2];
             int nthreads = group.enumerate(threads);
-            for (int i=0; i < nthreads; i++) {
+            for (int i = 0; i < nthreads; i++) {
                 if (JNLPRuntime.isDebug())
-                    System.out.println("Interrupt thread: "+threads[i]);
+                    System.out.println("Interrupt thread: " + threads[i]);
 
                 threads[i].interrupt();
             }
@@ -295,17 +293,16 @@ public class ApplicationInstance {
             // then stop
             Thread.currentThread().yield();
             nthreads = group.enumerate(threads);
-            for (int i=0; i < nthreads; i++) {
+            for (int i = 0; i < nthreads; i++) {
                 if (JNLPRuntime.isDebug())
-                    System.out.println("Stop thread: "+threads[i]);
+                    System.out.println("Stop thread: " + threads[i]);
 
                 threads[i].stop();
             }
 
             // then destroy - except Thread.destroy() not implemented in jdk
 
-       }
-        finally {
+        } finally {
             stopped = true;
             fireDestroyed();
         }
@@ -344,12 +341,12 @@ public class ApplicationInstance {
         weakWindows.trimToSize();
     }
 
-        /**
-         * Returns whether or not this jar is signed.
-         */
-        public boolean isSigned() {
-                return isSigned;
-        }
+    /**
+     * Returns whether or not this jar is signed.
+     */
+    public boolean isSigned() {
+        return isSigned;
+    }
 
     public AppContext getAppContext() {
         return appContext;

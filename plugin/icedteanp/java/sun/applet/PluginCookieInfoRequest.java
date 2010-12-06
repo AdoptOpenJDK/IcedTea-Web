@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package sun.applet;
 
-
 /**
  * This class represents a request object for cookie information for a given URI
  */
@@ -55,20 +54,20 @@ public class PluginCookieInfoRequest extends PluginCallRequest {
         // try to parse the proxy information. If things go wrong, do nothing .. 
         // this will keep internal = null which forces a direct connection
 
-    	PluginDebug.debug ("PluginCookieInfoRequest GOT: " + cookieInfo);
+        PluginDebug.debug("PluginCookieInfoRequest GOT: " + cookieInfo);
 
-    	// Skip the first 5 components. We are guaranteed 5 components, 
-    	// so no index -1 to worry about
-    	cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ')+1);
-    	cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ')+1);
-    	cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ')+1);
-    	cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ')+1);
-    	cookieString = cookieInfo.substring(cookieInfo.indexOf(' ')+1);
+        // Skip the first 5 components. We are guaranteed 5 components, 
+        // so no index -1 to worry about
+        cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
+        cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
+        cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
+        cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
+        cookieString = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
 
         setDone(true);
     }
 
     public String getObject() {
-    	return this.cookieString;
+        return this.cookieString;
     }
 }

@@ -35,17 +35,16 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package sun.applet;
 
 public class PluginClassLoader extends ClassLoader {
 
-	public PluginClassLoader() {
-		super();
-	}
+    public PluginClassLoader() {
+        super();
+    }
 
-	public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-		return super.loadClass(name, resolve);
-	}
-	
+    public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        return super.loadClass(name, resolve);
+    }
+
 }

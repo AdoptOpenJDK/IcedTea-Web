@@ -49,67 +49,66 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
 public class AppletWarningPane extends SecurityDialogPanel {
 
-        public AppletWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
-                super(x, certVerifier);
-                addComponents();
-        }
+    public AppletWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+        super(x, certVerifier);
+        addComponents();
+    }
 
-        protected void addComponents() {
+    protected void addComponents() {
 
-                //Top label
-                String topLabelText = "While support for verifying signed code" +
+        //Top label
+        String topLabelText = "While support for verifying signed code" +
                                 " has not been implemented yet, some applets will not run " +
                                 "properly under the default restricted security level.";
-                String bottomLabelText = "Do you want to run this applet under the " +
+        String bottomLabelText = "Do you want to run this applet under the " +
                                 "restricted security level? (clicking No will run this applet " +
                                 "without any security checking, and should only be done if you " +
                                 "trust the applet!)";
 
-                JLabel topLabel = new JLabel(htmlWrap(topLabelText));
-                topLabel.setFont(new Font(topLabel.getFont().toString(),
+        JLabel topLabel = new JLabel(htmlWrap(topLabelText));
+        topLabel.setFont(new Font(topLabel.getFont().toString(),
                         Font.BOLD, 12));
-                JPanel topPanel = new JPanel(new BorderLayout());
-                topPanel.setBackground(Color.WHITE);
-                topPanel.add(topLabel, BorderLayout.CENTER);
-                topPanel.setPreferredSize(new Dimension(400,80));
-                topPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(topLabel, BorderLayout.CENTER);
+        topPanel.setPreferredSize(new Dimension(400, 80));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                JLabel bottomLabel = new JLabel(htmlWrap(bottomLabelText));
-                JPanel infoPanel = new JPanel(new BorderLayout());
-                infoPanel.add(bottomLabel, BorderLayout.CENTER);
-                infoPanel.setPreferredSize(new Dimension(400,80));
-                infoPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JLabel bottomLabel = new JLabel(htmlWrap(bottomLabelText));
+        JPanel infoPanel = new JPanel(new BorderLayout());
+        infoPanel.add(bottomLabel, BorderLayout.CENTER);
+        infoPanel.setPreferredSize(new Dimension(400, 80));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                //run and cancel buttons
-                JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        //run and cancel buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-                JButton yes = new JButton("Yes");
-                JButton no = new JButton("No");
-                JButton cancel = new JButton("Cancel");
-                int buttonWidth = cancel.getMinimumSize().width;
-                int buttonHeight = cancel.getMinimumSize().height;
-                Dimension d = new Dimension(buttonWidth, buttonHeight);
-                yes.setPreferredSize(d);
-                no.setPreferredSize(d);
-                cancel.setPreferredSize(d);
-                yes.addActionListener(createSetValueListener(parent, 0));
-                no.addActionListener(createSetValueListener(parent, 1));
-                cancel.addActionListener(createSetValueListener(parent, 2));
-                initialFocusComponent = cancel;
-                buttonPanel.add(yes);
-                buttonPanel.add(no);
-                buttonPanel.add(cancel);
-                buttonPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JButton yes = new JButton("Yes");
+        JButton no = new JButton("No");
+        JButton cancel = new JButton("Cancel");
+        int buttonWidth = cancel.getMinimumSize().width;
+        int buttonHeight = cancel.getMinimumSize().height;
+        Dimension d = new Dimension(buttonWidth, buttonHeight);
+        yes.setPreferredSize(d);
+        no.setPreferredSize(d);
+        cancel.setPreferredSize(d);
+        yes.addActionListener(createSetValueListener(parent, 0));
+        no.addActionListener(createSetValueListener(parent, 1));
+        cancel.addActionListener(createSetValueListener(parent, 2));
+        initialFocusComponent = cancel;
+        buttonPanel.add(yes);
+        buttonPanel.add(no);
+        buttonPanel.add(cancel);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                //all of the above
-                setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-                add(topPanel);
-                add(infoPanel);
-                add(buttonPanel);
+        //all of the above
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(topPanel);
+        add(infoPanel);
+        add(buttonPanel);
 
-        }
+    }
 
 }

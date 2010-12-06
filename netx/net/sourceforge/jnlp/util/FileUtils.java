@@ -192,7 +192,7 @@ public final class FileUtils {
             return path.substring(path.length() - visibleChars);
         }
 
-        int affixLength = (visibleChars - OMITTED_LENGTH)/2;
+        int affixLength = (visibleChars - OMITTED_LENGTH) / 2;
         String prefix = path.substring(0, affixLength);
         String suffix = path.substring(path.length() - affixLength);
 

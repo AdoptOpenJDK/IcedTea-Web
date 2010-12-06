@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.cache;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -100,12 +99,12 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         DownloadPanel result = new DownloadPanel(downloadName);
 
         if (frame == null) {
-            frame = new JFrame(downloading+"...");
+            frame = new JFrame(downloading + "...");
             frame.getContentPane().setLayout(new GridBagLayout());
         }
 
         if (resources != null)
-            for (int i=0; i < resources.length; i++)
+            for (int i = 0; i < resources.length; i++)
                 result.addProgressPanel(resources[i], null);
 
         frame.getContentPane().add(result, vertical);
@@ -114,10 +113,10 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         if (!frame.isVisible()) {
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
             Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(frame.getGraphicsConfiguration());
-            Dimension screen = new Dimension(screenSize.width - insets.left ,
+            Dimension screen = new Dimension(screenSize.width - insets.left,
                     screenSize.height - insets.top);
-            frame.setLocation(screen.width-frame.getWidth(),
-                              screen.height-frame.getHeight());
+            frame.setLocation(screen.width - frame.getWidth(),
+                              screen.height - frame.getHeight());
         }
 
         frame.setVisible(true);
@@ -149,8 +148,6 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         timer.start();
     }
 
-
-
     /**
      * Groups the url progress in a panel.
      */
@@ -167,7 +164,6 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
 
         /** list of ProgressPanels */
         private List<ProgressPanel> panels = new ArrayList<ProgressPanel>();
-
 
         /**
          * Create a new download panel for with the specified download
@@ -226,7 +222,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
             // don't get whole string from resource and sub in
             // values because it'll be doing a MessageFormat for
             // each update.
-            header.setText(downloading+" "+downloadName+": "+percent+"% "+complete+".");
+            header.setText(downloading + " " + downloadName + ": " + percent + "% " + complete + ".");
         }
 
         /**
@@ -259,8 +255,6 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
 
     };
 
-
-
     /**
      * A progress bar with the URL next to it.
      */
@@ -271,10 +265,10 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         private long readSoFar;
 
         ProgressPanel(URL url, String version) {
-            JLabel location = new JLabel(" "+url.getHost()+"/"+url.getFile());
+            JLabel location = new JLabel(" " + url.getHost() + "/" + url.getFile());
 
-            bar.setMinimumSize(new Dimension(80,15));
-            bar.setPreferredSize(new Dimension(80,15));
+            bar.setMinimumSize(new Dimension(80, 15));
+            bar.setPreferredSize(new Dimension(80, 15));
             bar.setOpaque(false);
 
             setLayout(new GridBagLayout());
@@ -308,15 +302,14 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
 
             if (readSoFar <= 0 || total <= 0) {
                 // make barber pole
-            }
-            else {
-                double progress = (double)readSoFar / (double)total;
-                int divide = (int)(w * progress);
+            } else {
+                double progress = (double) readSoFar / (double) total;
+                int divide = (int) (w * progress);
 
                 g.setColor(Color.white);
                 g.fillRect(x, y, w, h);
                 g.setColor(Color.blue);
-                g.fillRect(x+1, y+1, divide-1, h-1);
+                g.fillRect(x + 1, y + 1, divide - 1, h - 1);
             }
         }
     };

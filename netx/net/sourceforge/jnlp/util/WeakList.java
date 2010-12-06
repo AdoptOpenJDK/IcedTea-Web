@@ -14,12 +14,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.util;
 
 import java.lang.ref.*;
 import java.util.*;
-
 
 /**
  * This list stores objects automatically using weak references.
@@ -36,7 +34,6 @@ public class WeakList<E> extends AbstractList<E> {
 
     /* list of weak references */
     private ArrayList<WeakReference<E>> refs = new ArrayList<WeakReference<E>>();
-
 
     /**
      * Create a weak random-access list.
@@ -103,7 +100,7 @@ public class WeakList<E> extends AbstractList<E> {
     public List<E> hardList() {
         List<E> result = new ArrayList<E>();
 
-        for (int i=0; i < size(); i++) {
+        for (int i = 0; i < size(); i++) {
             E tmp = get(i);
 
             if (tmp != null)
@@ -118,8 +115,8 @@ public class WeakList<E> extends AbstractList<E> {
      * objects.
      */
     public void trimToSize() {
-        for (int i=size(); i-->0;)
-            if (get(i)==null)
+        for (int i = size(); i-- > 0;)
+            if (get(i) == null)
                 remove(i);
     }
 

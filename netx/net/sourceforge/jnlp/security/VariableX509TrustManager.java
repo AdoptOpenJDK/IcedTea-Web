@@ -123,7 +123,7 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
                 // tm factory initialized, now get the managers so we can extract the X509 one
                 TrustManager[] trustManagers = tmFactory.getTrustManagers();
 
-                for (int i=0; i < trustManagers.length; i++) {
+                for (int i = 0; i < trustManagers.length; i++) {
                     if (trustManagers[i] instanceof X509TrustManager) {
                         caTrustManagers[j] = (X509TrustManager) trustManagers[i];
                     }
@@ -147,7 +147,7 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
                 // tm factory initialized, now get the managers so we can extract the X509 one
                 TrustManager[] trustManagers = tmFactory.getTrustManagers();
 
-                for (int i=0; i < trustManagers.length; i++) {
+                for (int i = 0; i < trustManagers.length; i++) {
                     if (trustManagers[i] instanceof X509TrustManager) {
                         clientTrustManagers[j] = (X509TrustManager) trustManagers[i];
                     }

@@ -267,9 +267,9 @@ public class JavaConsole {
         System.out.println(" ----");
         System.out.println("Available Classloaders: ");
         Set<String> loaders = PluginAppletSecurityContext.getLoaderInfo().keySet();
-        for (String loader: loaders) {
+        for (String loader : loaders) {
             System.out.println(loader + "\n"
-                    + "  codebase = " 
+                    + "  codebase = "
                     + PluginAppletSecurityContext.getLoaderInfo().get(loader));
         }
         System.out.println(" ----");
@@ -278,7 +278,7 @@ public class JavaConsole {
     private void printMemoryInfo() {
         System.out.println(" ----- ");
         System.out.println("  Memory Info:");
-        System.out.println("    Max Memory:   " 
+        System.out.println("    Max Memory:   "
                 + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
         System.out.println("    Total Memory: "
                 + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
@@ -304,7 +304,7 @@ public class JavaConsole {
 
         final JavaConsole console = new JavaConsole();
 
-        boolean toShowConsole = false; 
+        boolean toShowConsole = false;
 
         for (int i = 0; i < args.length; i++) {
             if (args[i] == "--show-console") {

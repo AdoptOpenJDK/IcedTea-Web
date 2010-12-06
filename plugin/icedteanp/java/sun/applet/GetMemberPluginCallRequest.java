@@ -37,27 +37,25 @@ exception statement from your version. */
 
 package sun.applet;
 
-
 public class GetMemberPluginCallRequest extends PluginCallRequest {
     Object object = null;
 
     public GetMemberPluginCallRequest(String message, Long reference) {
         super(message, reference);
-        PluginDebug.debug ("GetMemberPluginCall " + message);
+        PluginDebug.debug("GetMemberPluginCall " + message);
     }
 
     public void parseReturn(String message) {
-    	PluginDebug.debug ("GetMemberParseReturn GOT: " + message);
+        PluginDebug.debug("GetMemberParseReturn GOT: " + message);
         String[] args = message.split(" ");
         // FIXME: Is it even possible to distinguish between null and void
         // here?
         if (args[3] != "null" && args[3] != "void")
-        	object = AppletSecurityContextManager.getSecurityContext(0).getObject(Integer.parseInt(args[3]));
+            object = AppletSecurityContextManager.getSecurityContext(0).getObject(Integer.parseInt(args[3]));
         setDone(true);
     }
 
     public Object getObject() {
-    	return this.object;
+        return this.object;
     }
 }
-

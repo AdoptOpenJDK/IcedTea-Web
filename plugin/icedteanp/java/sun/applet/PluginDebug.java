@@ -35,17 +35,16 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package sun.applet;
 
 import java.io.*;
 
 public class PluginDebug {
 
-	static final boolean DEBUG = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG"); 
+    static final boolean DEBUG = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
 
     public static void debug(String message) {
-    	if (DEBUG)
-    		System.err.println(message);
-	}
+        if (DEBUG)
+            System.err.println(message);
+    }
 }

@@ -64,8 +64,8 @@ class XFileSaveService implements FileSaveService {
      * Prompts the user to save a file.
      */
     public FileContents saveFileDialog(java.lang.String pathHint,
-        java.lang.String[] extensions, java.io.InputStream stream,
-        java.lang.String name) throws java.io.IOException {
+            java.lang.String[] extensions, java.io.InputStream stream,
+            java.lang.String name) throws java.io.IOException {
 
         if (ServiceUtil.checkAccess(AccessType.WRITE_FILE)) {
             JFileChooser chooser = new JFileChooser();
@@ -88,7 +88,7 @@ class XFileSaveService implements FileSaveService {
      * Prompts the user to save a file, with an optional pre-set filename.
      */
     public FileContents saveAsFileDialog(java.lang.String pathHint,
-        java.lang.String[] extensions, FileContents contents) throws java.io.IOException {
+            java.lang.String[] extensions, FileContents contents) throws java.io.IOException {
 
         if (ServiceUtil.checkAccess(AccessType.WRITE_FILE)) {
             JFileChooser chooser = new JFileChooser();
@@ -117,7 +117,7 @@ class XFileSaveService implements FileSaveService {
         if (!file.createNewFile()) { //file exists
             boolean replace = (JOptionPane.showConfirmDialog(null,
                                 file.getAbsolutePath() + " already exists.\n"
-                +"Do you want to replace it?",
+                                        + "Do you want to replace it?",
                                 "Warning - File Exists", JOptionPane.YES_NO_OPTION) == 0);
             if (!replace)
                 return;

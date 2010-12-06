@@ -50,19 +50,19 @@ class Node {
             List<Node> list = new ArrayList<Node>();
 
             for (Enumeration e = xml.enumerateChildren(); e.hasMoreElements();)
-                list.add( new Node((XMLElement)e.nextElement()) );
+                list.add(new Node((XMLElement) e.nextElement()));
 
-            children = list.toArray( new Node[list.size()] );
+            children = list.toArray(new Node[list.size()]);
 
-            for (int i=0; i < children.length-1; i++)
-                children[i].next = children[i+1];
+            for (int i = 0; i < children.length - 1; i++)
+                children[i].next = children[i + 1];
         }
 
         return children;
     }
 
     String getAttribute(String name) {
-        return (String)xml.getAttribute(name);
+        return (String) xml.getAttribute(name);
     }
 
     String getNodeName() {

@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import java.io.*;
@@ -44,6 +43,7 @@ public class ResourcesDesc {
 
     /** list of jars, packages, properties, and extensions */
     private List<Object> resources = new ArrayList<Object>();
+
     // mixed list makes easier for lookup code
 
     /**
@@ -67,7 +67,7 @@ public class ResourcesDesc {
      */
     public JREDesc[] getJREs() {
         List<JREDesc> resources = getResources(JREDesc.class);
-        return resources.toArray( new JREDesc[resources.size()] );
+        return resources.toArray(new JREDesc[resources.size()]);
     }
 
     /**
@@ -78,7 +78,7 @@ public class ResourcesDesc {
     public JARDesc getMainJAR() {
         JARDesc jars[] = getJARs();
 
-        for (int i=0; i < jars.length; i++)
+        for (int i = 0; i < jars.length; i++)
             if (jars[i].isMain())
                 return jars[i];
 
@@ -93,7 +93,7 @@ public class ResourcesDesc {
      */
     public JARDesc[] getJARs() {
         List<JARDesc> resources = getResources(JARDesc.class);
-        return resources.toArray( new JARDesc[resources.size()] );
+        return resources.toArray(new JARDesc[resources.size()]);
     }
 
     /**
@@ -107,11 +107,11 @@ public class ResourcesDesc {
         for (int i = resources.size(); i-- > 0;) {
             JARDesc jar = resources.get(i);
 
-            if (!(""+jar.getPart()).equals(""+partName))
+            if (!("" + jar.getPart()).equals("" + partName))
                 resources.remove(i);
         }
 
-        return resources.toArray( new JARDesc[resources.size()] );
+        return resources.toArray(new JARDesc[resources.size()]);
     }
 
     /**
@@ -119,7 +119,7 @@ public class ResourcesDesc {
      */
     public ExtensionDesc[] getExtensions() {
         List<ExtensionDesc> resources = getResources(ExtensionDesc.class);
-        return resources.toArray( new ExtensionDesc[resources.size()] );
+        return resources.toArray(new ExtensionDesc[resources.size()]);
     }
 
     /**
@@ -127,7 +127,7 @@ public class ResourcesDesc {
      */
     public PackageDesc[] getPackages() {
         List<PackageDesc> resources = getResources(PackageDesc.class);
-        return resources.toArray( new PackageDesc[resources.size()] );
+        return resources.toArray(new PackageDesc[resources.size()]);
     }
 
     /**
@@ -146,7 +146,7 @@ public class ResourcesDesc {
                 resources.remove(i);
         }
 
-        return resources.toArray( new PackageDesc[resources.size()] );
+        return resources.toArray(new PackageDesc[resources.size()]);
     }
 
     /**
@@ -154,18 +154,18 @@ public class ResourcesDesc {
      */
     public PropertyDesc[] getProperties() {
         List<PropertyDesc> resources = getResources(PropertyDesc.class);
-        return resources.toArray( new PropertyDesc[resources.size()] );
+        return resources.toArray(new PropertyDesc[resources.size()]);
     }
 
     /**
      * Returns the properties as a map.
      */
-    public Map<String,String> getPropertiesMap() {
-        Map<String,String> properties = new HashMap<String,String>();
+    public Map<String, String> getPropertiesMap() {
+        Map<String, String> properties = new HashMap<String, String>();
         List<PropertyDesc> resources = getResources(PropertyDesc.class);
-        for (int i=0; i < resources.size(); i++) {
+        for (int i = 0; i < resources.size(); i++) {
             PropertyDesc prop = resources.get(i);
-            properties.put( prop.getKey(), prop.getValue() );
+            properties.put(prop.getKey(), prop.getValue());
         }
 
         return properties;
@@ -208,8 +208,8 @@ public class ResourcesDesc {
     public <T> List<T> getResources(Class<T> type) {
         List<T> result = new ArrayList<T>();
 
-        for (int i=0; i < resources.size(); i++)
-            if ( type.isAssignableFrom(resources.get(i).getClass()) )
+        for (int i = 0; i < resources.size(); i++)
+            if (type.isAssignableFrom(resources.get(i).getClass()))
                 result.add(type.cast(resources.get(i)));
 
         return result;

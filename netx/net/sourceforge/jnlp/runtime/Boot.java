@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -63,61 +62,59 @@ public final class Boot implements PrivilegedAction<Void> {
 
     /** the text to display before launching the about link */
     private static final String aboutMessage = ""
-        + "netx v"+version+" - (C)2001-2003 Jon A. Maxwell (jmaxwell@users.sourceforge.net)\n"
-        + "\n"
-        + R("BLaunchAbout");
+            + "netx v" + version + " - (C)2001-2003 Jon A. Maxwell (jmaxwell@users.sourceforge.net)\n"
+            + "\n"
+            + R("BLaunchAbout");
 
     private static final String miniLicense = "\n"
-        + "   netx - an open-source JNLP client.\n"
-        + "   Copyright (C) 2001-2003 Jon A. Maxwell (JAM)\n"
-        + "\n"
-        + "   // This library is free software; you can redistribute it and/or\n"
-        + "   modify it under the terms of the GNU Lesser General Public\n"
-        + "   License as published by the Free Software Foundation; either\n"
-        + "   version 2.1 of the License, or (at your option) any later version.\n"
-        + "\n"
-        + "   This library is distributed in the hope that it will be useful,\n"
-        + "   but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-        + "   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
-        + "   Lesser General Public License for more details.\n"
-        + "\n"
-        + "   You should have received a copy of the GNU Lesser General Public\n"
-        + "   License along with this library; if not, write to the Free Software\n"
-        + "   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\n"
-        + "\n";
+            + "   netx - an open-source JNLP client.\n"
+            + "   Copyright (C) 2001-2003 Jon A. Maxwell (JAM)\n"
+            + "\n"
+            + "   // This library is free software; you can redistribute it and/or\n"
+            + "   modify it under the terms of the GNU Lesser General Public\n"
+            + "   License as published by the Free Software Foundation; either\n"
+            + "   version 2.1 of the License, or (at your option) any later version.\n"
+            + "\n"
+            + "   This library is distributed in the hope that it will be useful,\n"
+            + "   but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+            + "   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
+            + "   Lesser General Public License for more details.\n"
+            + "\n"
+            + "   You should have received a copy of the GNU Lesser General Public\n"
+            + "   License along with this library; if not, write to the Free Software\n"
+            + "   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\n"
+            + "\n";
 
     private static final String helpMessage = "\n"
-        + "Usage:   " + R("BOUsage")+"\n"
-        + "         " + R("BOUsage2")+"\n"
-        + "\n"
-        + "control-options:"+"\n"
-        + "  -about                "+R("BOAbout")+"\n"
-        + "  -viewer               "+R("BOViewer")+"\n"
-        + "\n"
-        + "run-options:"+"\n"
-        + "  -arg arg              "+R("BOArg")+"\n"
-        + "  -param name=value     "+R("BOParam")+"\n"
-        + "  -property name=value  "+R("BOProperty")+"\n"
-        + "  -update seconds       "+R("BOUpdate")+"\n"
-        + "  -license              "+R("BOLicense")+"\n"
-        + "  -verbose              "+R("BOVerbose")+"\n"
-        + "  -nosecurity           "+R("BONosecurity")+"\n"
-        + "  -noupdate             "+R("BONoupdate")+"\n"
-        + "  -headless             "+R("BOHeadless")+"\n"
-        + "  -strict               "+R("BOStrict")+"\n"
-        + "  -Xnofork              "+R("BXnofork")+"\n"
-        + "  -Xclearcache          "+R("BXclearcache")+"\n"
-        + "  -help                 "+R("BOHelp")+"\n";
+            + "Usage:   " + R("BOUsage") + "\n"
+            + "         " + R("BOUsage2") + "\n"
+            + "\n"
+            + "control-options:" + "\n"
+            + "  -about                " + R("BOAbout") + "\n"
+            + "  -viewer               " + R("BOViewer") + "\n"
+            + "\n"
+            + "run-options:" + "\n"
+            + "  -arg arg              " + R("BOArg") + "\n"
+            + "  -param name=value     " + R("BOParam") + "\n"
+            + "  -property name=value  " + R("BOProperty") + "\n"
+            + "  -update seconds       " + R("BOUpdate") + "\n"
+            + "  -license              " + R("BOLicense") + "\n"
+            + "  -verbose              " + R("BOVerbose") + "\n"
+            + "  -nosecurity           " + R("BONosecurity") + "\n"
+            + "  -noupdate             " + R("BONoupdate") + "\n"
+            + "  -headless             " + R("BOHeadless") + "\n"
+            + "  -strict               " + R("BOStrict") + "\n"
+            + "  -Xnofork              " + R("BXnofork") + "\n"
+            + "  -Xclearcache          " + R("BXclearcache") + "\n"
+            + "  -help                 " + R("BOHelp") + "\n";
 
     /** the JNLP file to open to display the network-based about window */
     private static final String NETX_ABOUT_FILE = System.getProperty("java.home") + File.separator + "lib"
             + File.separator + "about.jnlp";
 
-
     private static final String doubleArgs = "-basedir -jnlp -arg -param -property -update";
 
     private static String args[]; // avoid the hot potato
-
 
     /**
      * Launch the JNLP file specified by the command-line arguments.
@@ -155,12 +152,11 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (null != getOption("-update")) {
             int value = Integer.parseInt(getOption("-update"));
-            JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value*1000l));
+            JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000l));
         }
 
         if (null != getOption("-headless"))
             JNLPRuntime.setHeadless(true);
-
 
         if (null != getOption("-noupdate"))
             JNLPRuntime.setDefaultUpdatePolicy(UpdatePolicy.NEVER);
@@ -198,11 +194,9 @@ public final class Boot implements PrivilegedAction<Void> {
 
         try {
             new Launcher().launch(getFile());
-        }
-        catch (LaunchException ex) {
+        } catch (LaunchException ex) {
             // default handler prints this
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
@@ -213,7 +207,7 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     private static void fatalError(String message) {
-        System.err.println("netx: "+message);
+        System.err.println("netx: " + message);
         System.exit(1);
     }
 
@@ -252,7 +246,7 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         if (JNLPRuntime.isDebug())
-            System.out.println(R("BFileLoc")+": "+location);
+            System.out.println(R("BFileLoc") + ": " + location);
 
         URL url = null;
 
@@ -306,14 +300,14 @@ public final class Boot implements PrivilegedAction<Void> {
         String props[] = getOptions("-property");
         ResourcesDesc resources = file.getResources();
 
-        for (int i=0; i < props.length; i++) {
+        for (int i = 0; i < props.length; i++) {
             // allows empty property, not sure about validity of that.
             int equals = props[i].indexOf("=");
             if (equals == -1)
                 fatalError(R("BBadProp", props[i]));
 
             String key = props[i].substring(0, equals);
-            String value = props[i].substring(equals+1, props[i].length());
+            String value = props[i].substring(equals + 1, props[i].length());
 
             resources.addResource(new PropertyDesc(key, value));
         }
@@ -327,14 +321,14 @@ public final class Boot implements PrivilegedAction<Void> {
         String params[] = getOptions("-param");
         AppletDesc applet = file.getApplet();
 
-        for (int i=0; i < params.length; i++) {
+        for (int i = 0; i < params.length; i++) {
             // allows empty param, not sure about validity of that.
             int equals = params[i].indexOf("=");
             if (equals == -1)
                 fatalError(R("BBadParam", params[i]));
 
             String name = params[i].substring(0, equals);
-            String value = params[i].substring(equals+1, params[i].length());
+            String value = params[i].substring(equals + 1, params[i].length());
 
             applet.addParameter(name, value);
         }
@@ -345,10 +339,10 @@ public final class Boot implements PrivilegedAction<Void> {
      * actually an application (not installer).
      */
     private static void addArguments(JNLPFile file) {
-        String args[] = getOptions("-arg");  // FYI args also global variable
+        String args[] = getOptions("-arg"); // FYI args also global variable
         ApplicationDesc app = file.getApplication();
 
-        for (int i=0; i < args.length; i++) {
+        for (int i = 0; i < args.length; i++) {
             app.addArgument(args[i]);
         }
     }
@@ -401,20 +395,19 @@ public final class Boot implements PrivilegedAction<Void> {
     private static String[] getOptions(String option) {
         List<String> result = new ArrayList<String>();
 
-        for (int i=0; i < args.length; i++) {
+        for (int i = 0; i < args.length; i++) {
             if (option.equals(args[i])) {
                 if (-1 == doubleArgs.indexOf(option))
                     result.add(option);
-                else
-                    if (i+1 < args.length)
-                        result.add(args[i+1]);
+                else if (i + 1 < args.length)
+                    result.add(args[i + 1]);
             }
 
             if (args[i].startsWith("-") && -1 != doubleArgs.indexOf(args[i]))
                 i++;
         }
 
-        return result.toArray( new String[result.size()] );
+        return result.toArray(new String[result.size()]);
     }
 
 }

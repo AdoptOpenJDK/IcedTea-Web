@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import java.io.*;
@@ -45,8 +44,7 @@ public class AppletDesc {
     private int height;
 
     /** the parameters */
-    private Map<String,String> parameters;
-
+    private Map<String, String> parameters;
 
     /**
      * Create an Applet descriptor.
@@ -59,13 +57,13 @@ public class AppletDesc {
      * @param parameters the parameters
      */
     public AppletDesc(String name, String mainClass, URL documentBase, int width, int height,
-                      Map<String,String> parameters) {
+                      Map<String, String> parameters) {
         this.name = name;
         this.mainClass = mainClass;
         this.documentBase = documentBase;
         this.width = width;
         this.height = height;
-        this.parameters = new HashMap<String,String>(parameters);
+        this.parameters = new HashMap<String, String>(parameters);
     }
 
     /**
@@ -106,8 +104,8 @@ public class AppletDesc {
     /**
      * Returns the applet parameters
      */
-    public Map<String,String> getParameters() {
-        return new HashMap<String,String>(parameters);
+    public Map<String, String> getParameters() {
+        return new HashMap<String, String>(parameters);
     }
 
     /**

@@ -1,5 +1,5 @@
-    /* SecurityDialogPanel.java
-   Copyright (C) 2008-2010 Red Hat, Inc.
+/* SecurityDialogPanel.java
+Copyright (C) 2008-2010 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -49,71 +49,71 @@ import javax.swing.JPanel;
  */
 public abstract class SecurityDialogPanel extends JPanel {
 
-        protected SecurityWarningDialog parent;
+    protected SecurityWarningDialog parent;
 
-        JComponent initialFocusComponent = null;
+    JComponent initialFocusComponent = null;
 
-        CertVerifier certVerifier = null;
+    CertVerifier certVerifier = null;
 
-        public SecurityDialogPanel(SecurityWarningDialog dialog, CertVerifier certVerifier){
-                this.parent = dialog;
-                this.certVerifier = certVerifier;
-                this.setLayout(new BorderLayout());
+    public SecurityDialogPanel(SecurityWarningDialog dialog, CertVerifier certVerifier) {
+        this.parent = dialog;
+        this.certVerifier = certVerifier;
+        this.setLayout(new BorderLayout());
+    }
+
+    public SecurityDialogPanel(SecurityWarningDialog dialog) {
+        this.parent = dialog;
+        this.setLayout(new BorderLayout());
+    }
+
+    /**
+     * Needed to get word wrap working in JLabels.
+     */
+    protected String htmlWrap(String s) {
+        return "<html>" + s + "</html>";
+    }
+
+    /**
+     * Create an ActionListener suitable for use with buttons. When this {@link ActionListener}
+     * is invoked, it will set the value of the {@link SecurityWarningDialog} and then dispossed.
+     *
+     * @param buttonIndex the index of the button. By convention 0 = Yes. 1 = No, 2 = Cancel
+     * @return
+     */
+    protected ActionListener createSetValueListener(SecurityWarningDialog dialog, int buttonIndex) {
+        return new SetValueHandler(dialog, buttonIndex);
+    }
+
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag);
+        requestFocusOnDefaultButton();
+    }
+
+    public void requestFocusOnDefaultButton() {
+        if (initialFocusComponent != null) {
+            initialFocusComponent.requestFocusInWindow();
         }
+    }
 
-        public SecurityDialogPanel(SecurityWarningDialog dialog) {
-                this.parent = dialog;
-                this.setLayout(new BorderLayout());
+    /**
+     * Creates a handler that sets a dialog's value and then disposes it when activated
+     *
+     */
+    private class SetValueHandler implements ActionListener {
+
+        Integer buttonIndex;
+        SecurityWarningDialog dialog;
+
+        public SetValueHandler(SecurityWarningDialog dialog, int buttonIndex) {
+            this.dialog = dialog;
+            this.buttonIndex = buttonIndex;
         }
-
-        /**
-         * Needed to get word wrap working in JLabels.
-         */
-        protected String htmlWrap (String s) {
-                return "<html>"+s+"</html>";
-        }
-
-        /**
-         * Create an ActionListener suitable for use with buttons. When this {@link ActionListener}
-         * is invoked, it will set the value of the {@link SecurityWarningDialog} and then dispossed.
-         *
-         * @param buttonIndex the index of the button. By convention 0 = Yes. 1 = No, 2 = Cancel
-         * @return
-         */
-        protected ActionListener createSetValueListener(SecurityWarningDialog dialog, int buttonIndex) {
-            return new SetValueHandler(dialog, buttonIndex);
-        }
-
-        @Override
-        public void setVisible(boolean aFlag) {
-            super.setVisible(aFlag);
-            requestFocusOnDefaultButton();
-        }
-
-        public void requestFocusOnDefaultButton() {
-               if (initialFocusComponent != null) {
-                    initialFocusComponent.requestFocusInWindow();
-                }
-        }
-
-        /**
-         * Creates a handler that sets a dialog's value and then disposes it when activated
-         *
-         */
-        private class SetValueHandler implements ActionListener {
-
-            Integer buttonIndex;
-            SecurityWarningDialog dialog;
-
-            public SetValueHandler(SecurityWarningDialog dialog, int buttonIndex) {
-                this.dialog = dialog;
-                this.buttonIndex = buttonIndex;
-            }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             dialog.setValue(buttonIndex);
             dialog.dispose();
         }
-        }
+    }
 }

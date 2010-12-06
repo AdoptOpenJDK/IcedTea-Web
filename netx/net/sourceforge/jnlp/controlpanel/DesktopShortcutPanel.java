@@ -72,7 +72,8 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
         shortcutComboOptions.setActionCommand("deployment.javaws.shortcut"); // The configuration property this combobox affects.
         for (int j = 0; j < items.length; j++) {
             shortcutComboOptions.addItem(items[j]);
-            if (config.getProperty("deployment.javaws.shortcut").equals(items[j].getValue())) shortcutComboOptions.setSelectedIndex(j);
+            if (config.getProperty("deployment.javaws.shortcut").equals(items[j].getValue()))
+                shortcutComboOptions.setSelectedIndex(j);
         }
 
         shortcutComboOptions.addItemListener(this);

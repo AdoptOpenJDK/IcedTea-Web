@@ -62,175 +62,173 @@ import java.util.List;
  */
 public class SecurityWarningDialog extends JDialog {
 
-        /** The type of dialog we want to show */
-        private DialogType dialogType;
+    /** The type of dialog we want to show */
+    private DialogType dialogType;
 
-        /** The type of access that this dialog is for */
-        private AccessType accessType;
+    /** The type of access that this dialog is for */
+    private AccessType accessType;
 
-        private SecurityDialogPanel panel;
+    private SecurityDialogPanel panel;
 
-        /** The application file associated with this security warning */
-        private JNLPFile file;
+    /** The application file associated with this security warning */
+    private JNLPFile file;
 
-        private CertVerifier certVerifier;
+    private CertVerifier certVerifier;
 
-        private X509Certificate cert;
+    private X509Certificate cert;
 
-        /** An optional String array that's only necessary when a dialog
-         * label requires some parameters (e.g. showing which address an application
-         * is trying to connect to).
-         */
-        private Object[] extras;
+    /** An optional String array that's only necessary when a dialog
+     * label requires some parameters (e.g. showing which address an application
+     * is trying to connect to).
+     */
+    private Object[] extras;
 
-        /** Whether or not this object has been fully initialized */
-        private boolean initialized = false;
+    /** Whether or not this object has been fully initialized */
+    private boolean initialized = false;
 
     /**
      * the return value of this dialog. result: 0 = Yes, 1 = No, 2 = Cancel,
      * null = Window closed.
      */
-        private Object value;
+    private Object value;
 
-        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
                 JNLPFile file, CertVerifier jarSigner, X509Certificate cert, Object[] extras) {
-            super();
-            this.dialogType = dialogType;
-            this.accessType = accessType;
-            this.file = file;
-            this.certVerifier = jarSigner;
-            this.cert = cert;
-            this.extras = extras;
-            initialized = true;
+        super();
+        this.dialogType = dialogType;
+        this.accessType = accessType;
+        this.file = file;
+        this.certVerifier = jarSigner;
+        this.cert = cert;
+        this.extras = extras;
+        initialized = true;
 
-            initDialog();
-        }
+        initDialog();
+    }
 
-        /**
-         * Construct a SecurityWarningDialog to display some sort of access warning
-         */
-        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    /**
+     * Construct a SecurityWarningDialog to display some sort of access warning
+     */
+    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file) {
-            this(dialogType, accessType, file, null, null, null);
-        }
+        this(dialogType, accessType, file, null, null, null);
+    }
 
-        /**
-         * Create a SecurityWarningDialog to display a certificate-related warning
-         */
-        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    /**
+     * Create a SecurityWarningDialog to display a certificate-related warning
+     */
+    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file, CertVerifier jarSigner) {
-            this(dialogType, accessType, file, jarSigner, null, null);
-        }
+        this(dialogType, accessType, file, jarSigner, null, null);
+    }
 
-        /**
-         * Create a SecurityWarningDialog to display a certificate-related warning
-         */
-        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    /**
+     * Create a SecurityWarningDialog to display a certificate-related warning
+     */
+    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
                 CertVerifier certVerifier) {
-            this(dialogType, accessType, null, certVerifier, null, null);
-        }
+        this(dialogType, accessType, null, certVerifier, null, null);
+    }
 
-        /**
-         * Create a SecurityWarningDialog to display some sort of access warning
-         * with more information
-         */
-        SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    /**
+     * Create a SecurityWarningDialog to display some sort of access warning
+     * with more information
+     */
+    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file, Object[] extras) {
-            this(dialogType, accessType, file, null, null, extras);
-        }
+        this(dialogType, accessType, file, null, null, extras);
+    }
 
-        /**
-         * Create a SecurityWarningDailog to display information about a single
-         * certificate
-         */
-        SecurityWarningDialog(DialogType dialogType, X509Certificate c) {
-            this(dialogType, null, null, null, c, null);
-        }
+    /**
+     * Create a SecurityWarningDailog to display information about a single
+     * certificate
+     */
+    SecurityWarningDialog(DialogType dialogType, X509Certificate c) {
+        this(dialogType, null, null, null, c, null);
+    }
 
-        /**
-         * Returns if this dialog has been fully initialized yet.
-         * @return true if this dialog has been initialized, and false otherwise.
-         */
-        public boolean isInitialized(){
-                return initialized;
-        }
+    /**
+     * Returns if this dialog has been fully initialized yet.
+     * @return true if this dialog has been initialized, and false otherwise.
+     */
+    public boolean isInitialized() {
+        return initialized;
+    }
 
-        /**
-         * Shows more information regarding jar code signing
-         *
-         * @param jarSigner the JarSigner used to verify this application
-         * @param parent the parent option pane
-         */
-        public static void showMoreInfoDialog(
+    /**
+     * Shows more information regarding jar code signing
+     *
+     * @param jarSigner the JarSigner used to verify this application
+     * @param parent the parent option pane
+     */
+    public static void showMoreInfoDialog(
                 CertVerifier jarSigner, SecurityWarningDialog parent) {
 
-                SecurityWarningDialog dialog =
+        SecurityWarningDialog dialog =
                         new SecurityWarningDialog(DialogType.MORE_INFO, null, null,
-                        jarSigner);
-                dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-                dialog.setVisible(true);
-                dialog.dispose();
-        }
+                                jarSigner);
+        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.setVisible(true);
+        dialog.dispose();
+    }
 
-        /**
-         * Displays CertPath information in a readable table format.
-         *
-         * @param certs the certificates used in signing.
-         */
-        public static void showCertInfoDialog(CertVerifier jarSigner,
+    /**
+     * Displays CertPath information in a readable table format.
+     *
+     * @param certs the certificates used in signing.
+     */
+    public static void showCertInfoDialog(CertVerifier jarSigner,
                 SecurityWarningDialog parent) {
-                SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.CERT_INFO,
+        SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.CERT_INFO,
                         null, null, jarSigner);
-                dialog.setLocationRelativeTo(parent);
-                dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-                dialog.setVisible(true);
-                dialog.dispose();
-        }
+        dialog.setLocationRelativeTo(parent);
+        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.setVisible(true);
+        dialog.dispose();
+    }
 
-        /**
-         * Displays a single certificate's information.
-         *
-         * @param c
-         * @param optionPane
-         */
-        public static void showSingleCertInfoDialog(X509Certificate c,
+    /**
+     * Displays a single certificate's information.
+     *
+     * @param c
+     * @param optionPane
+     */
+    public static void showSingleCertInfoDialog(X509Certificate c,
                         JDialog parent) {
-                SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.SINGLE_CERT_INFO, c);
-                        dialog.setLocationRelativeTo(parent);
-                        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-                        dialog.setVisible(true);
-                        dialog.dispose();
-        }
+        SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.SINGLE_CERT_INFO, c);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.setVisible(true);
+        dialog.dispose();
+    }
 
+    private void initDialog() {
+        setSystemLookAndFeel();
 
+        String dialogTitle = "";
+        if (dialogType == DialogType.CERT_WARNING)
+            dialogTitle = "Warning - Security";
+        else if (dialogType == DialogType.MORE_INFO)
+            dialogTitle = "More Information";
+        else if (dialogType == DialogType.CERT_INFO)
+            dialogTitle = "Details - Certificate";
+        else if (dialogType == DialogType.ACCESS_WARNING)
+            dialogTitle = "Security Warning";
+        else if (dialogType == DialogType.APPLET_WARNING)
+            dialogTitle = "Applet Warning";
+        else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
+            dialogTitle = "Security Warning";
 
-        private void initDialog() {
-            setSystemLookAndFeel();
+        setTitle(dialogTitle);
+        setModalityType(ModalityType.MODELESS);
 
-                String dialogTitle = "";
-                if (dialogType == DialogType.CERT_WARNING)
-                        dialogTitle = "Warning - Security";
-                else if (dialogType == DialogType.MORE_INFO)
-                        dialogTitle = "More Information";
-                else if (dialogType == DialogType.CERT_INFO)
-                        dialogTitle = "Details - Certificate";
-                else if (dialogType == DialogType.ACCESS_WARNING)
-                        dialogTitle = "Security Warning";
-                else if (dialogType == DialogType.APPLET_WARNING)
-                        dialogTitle = "Applet Warning";
-                else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
-                        dialogTitle = "Security Warning";
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-                setTitle(dialogTitle);
-                setModalityType(ModalityType.MODELESS);
+        installPanel();
 
-                setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        pack();
 
-                installPanel();
-
-                pack();
-
-                WindowAdapter adapter = new WindowAdapter() {
+        WindowAdapter adapter = new WindowAdapter() {
             private boolean gotFocus = false;
 
             @Override
@@ -241,6 +239,7 @@ public class SecurityWarningDialog extends JDialog {
                     gotFocus = true;
                 }
             }
+
             @Override
             public void windowOpened(WindowEvent e) {
                 if (e.getSource() instanceof SecurityWarningDialog) {
@@ -251,57 +250,57 @@ public class SecurityWarningDialog extends JDialog {
                 }
             }
         };
-                addWindowListener(adapter);
-                addWindowFocusListener(adapter);
+        addWindowListener(adapter);
+        addWindowFocusListener(adapter);
 
-        }
+    }
 
-        public AccessType getAccessType() {
-                return accessType;
-        }
+    public AccessType getAccessType() {
+        return accessType;
+    }
 
-        public JNLPFile getFile() {
-                return file;
-        }
+    public JNLPFile getFile() {
+        return file;
+    }
 
-        public CertVerifier getJarSigner() {
-                return certVerifier;
-        }
+    public CertVerifier getJarSigner() {
+        return certVerifier;
+    }
 
-        public X509Certificate getCert() {
-                return cert;
-        }
+    public X509Certificate getCert() {
+        return cert;
+    }
 
-        /**
-         * Adds the appropriate JPanel to this Dialog, based on {@link DialogType}.
-         */
-        private void installPanel() {
+    /**
+     * Adds the appropriate JPanel to this Dialog, based on {@link DialogType}.
+     */
+    private void installPanel() {
 
-                if (dialogType == DialogType.CERT_WARNING)
-                        panel = new CertWarningPane(this, this.certVerifier);
-                else if (dialogType == DialogType.MORE_INFO)
-                        panel = new MoreInfoPane(this, this.certVerifier);
-                else if (dialogType == DialogType.CERT_INFO)
-                        panel = new CertsInfoPane(this, this.certVerifier);
-                else if (dialogType == DialogType.SINGLE_CERT_INFO)
-                        panel = new SingleCertInfoPane(this, this.certVerifier);
-                else if (dialogType == DialogType.ACCESS_WARNING)
-                        panel = new AccessWarningPane(this, extras, this.certVerifier);
-                else if (dialogType == DialogType.APPLET_WARNING)
-                        panel = new AppletWarningPane(this, this.certVerifier);
-                else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
-                        panel = new NotAllSignedWarningPane(this);
+        if (dialogType == DialogType.CERT_WARNING)
+            panel = new CertWarningPane(this, this.certVerifier);
+        else if (dialogType == DialogType.MORE_INFO)
+            panel = new MoreInfoPane(this, this.certVerifier);
+        else if (dialogType == DialogType.CERT_INFO)
+            panel = new CertsInfoPane(this, this.certVerifier);
+        else if (dialogType == DialogType.SINGLE_CERT_INFO)
+            panel = new SingleCertInfoPane(this, this.certVerifier);
+        else if (dialogType == DialogType.ACCESS_WARNING)
+            panel = new AccessWarningPane(this, extras, this.certVerifier);
+        else if (dialogType == DialogType.APPLET_WARNING)
+            panel = new AppletWarningPane(this, this.certVerifier);
+        else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
+            panel = new NotAllSignedWarningPane(this);
 
-                add(panel, BorderLayout.CENTER);
-        }
+        add(panel, BorderLayout.CENTER);
+    }
 
-        private static void centerDialog(JDialog dialog) {
-                Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-                Dimension dialogSize = dialog.getSize();
+    private static void centerDialog(JDialog dialog) {
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension dialogSize = dialog.getSize();
 
-                dialog.setLocation((screen.width - dialogSize.width)/2,
-                        (screen.height - dialogSize.height)/2);
-        }
+        dialog.setLocation((screen.width - dialogSize.width) / 2,
+                        (screen.height - dialogSize.height) / 2);
+    }
 
     private void selectDefaultButton() {
         if (panel == null) {

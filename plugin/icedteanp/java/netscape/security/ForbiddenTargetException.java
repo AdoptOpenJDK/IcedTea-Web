@@ -37,7 +37,7 @@ exception statement from your version. */
 
 package netscape.security;
 
-public class ForbiddenTargetException extends RuntimeException{
+public class ForbiddenTargetException extends RuntimeException {
 
     private static final long serialVersionUID = 1271219852541058396L;
 

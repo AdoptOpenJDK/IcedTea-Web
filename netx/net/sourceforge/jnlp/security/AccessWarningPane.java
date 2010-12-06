@@ -71,142 +71,141 @@ import net.sourceforge.jnlp.util.FileUtils;
  */
 public class AccessWarningPane extends SecurityDialogPanel {
 
-        JCheckBox alwaysAllow;
-        Object[] extras;
+    JCheckBox alwaysAllow;
+    Object[] extras;
 
-        public AccessWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
-                super(x, certVerifier);
-                addComponents();
+    public AccessWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+        super(x, certVerifier);
+        addComponents();
+    }
+
+    public AccessWarningPane(SecurityWarningDialog x, Object[] extras, CertVerifier certVerifier) {
+        super(x, certVerifier);
+        this.extras = extras;
+        addComponents();
+    }
+
+    /**
+     * Creates the actual GUI components, and adds it to this panel
+     */
+    private void addComponents() {
+        AccessType type = parent.getAccessType();
+        JNLPFile file = parent.getFile();
+
+        String name = "";
+        String publisher = "";
+        String from = "";
+
+        //We don't worry about exceptions when trying to fill in
+        //these strings -- we just want to fill in as many as possible.
+        try {
+            name = file.getInformation().getTitle() != null ? file.getInformation().getTitle() : R("SNoAssociatedCertificate");
+        } catch (Exception e) {
         }
 
-        public AccessWarningPane(SecurityWarningDialog x, Object[] extras, CertVerifier certVerifier) {
-                super(x, certVerifier);
-                this.extras = extras;
-                addComponents();
+        try {
+            publisher = file.getInformation().getVendor() != null ? file.getInformation().getVendor() : R("SNoAssociatedCertificate");
+        } catch (Exception e) {
         }
 
-        /**
-         * Creates the actual GUI components, and adds it to this panel
-         */
-        private void addComponents() {
-                AccessType type = parent.getAccessType();
-                JNLPFile file = parent.getFile();
+        try {
+            from = !file.getInformation().getHomepage().toString().equals("") ? file.getInformation().getHomepage().toString() : file.getSourceLocation().getAuthority();
+        } catch (Exception e) {
+            from = file.getSourceLocation().getAuthority();
+        }
 
-                String name = "";
-                String publisher = "";
-                String from = "";
-
-                //We don't worry about exceptions when trying to fill in
-                //these strings -- we just want to fill in as many as possible.
-                try {
-                        name = file.getInformation().getTitle() != null ? file.getInformation().getTitle() : R("SNoAssociatedCertificate");
-                } catch (Exception e) {
+        //Top label
+        String topLabelText = "";
+        switch (type) {
+            case READ_FILE:
+                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
+                    topLabelText = R("SFileReadAccess", FileUtils.displayablePath((String) extras[0]));
+                } else {
+                    topLabelText = R("SFileReadAccess", R("AFileOnTheMachine"));
                 }
-
-                try {
-                        publisher = file.getInformation().getVendor() != null ? file.getInformation().getVendor() : R("SNoAssociatedCertificate");
-                } catch (Exception e) {
+                break;
+            case WRITE_FILE:
+                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
+                    topLabelText = R("SFileWriteAccess", FileUtils.displayablePath((String) extras[0]));
+                } else {
+                    topLabelText = R("SFileWriteAccess", R("AFileOnTheMachine"));
                 }
+                break;
+            case CREATE_DESTKOP_SHORTCUT:
+                topLabelText = R("SDesktopShortcut");
+                break;
+            case CLIPBOARD_READ:
+                topLabelText = R("SClipboardReadAccess");
+                break;
+            case CLIPBOARD_WRITE:
+                topLabelText = R("SClipboardWriteAccess");
+                break;
+            case PRINTER:
+                topLabelText = R("SPrinterAccess");
+                break;
+            case NETWORK:
+                if (extras != null && extras.length >= 0)
+                    topLabelText = R("SNetworkAccess", extras[0]);
+                else
+                    topLabelText = R("SNetworkAccess", "(address here)");
+        }
 
-                try {
-                        from = !file.getInformation().getHomepage().toString().equals("") ? file.getInformation().getHomepage().toString() : file.getSourceLocation().getAuthority();
-                } catch (Exception e) {
-                        from = file.getSourceLocation().getAuthority();
-                }
-
-                //Top label
-                String topLabelText = "";
-                switch (type) {
-                        case READ_FILE:
-                                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
-                                    topLabelText = R("SFileReadAccess", FileUtils.displayablePath((String)extras[0]));
-                                } else {
-                                    topLabelText = R("SFileReadAccess", R("AFileOnTheMachine"));
-                                }
-                                break;
-                        case WRITE_FILE:
-                                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
-                                    topLabelText = R("SFileWriteAccess", FileUtils.displayablePath((String)extras[0]));
-                                } else {
-                                    topLabelText = R("SFileWriteAccess", R("AFileOnTheMachine"));
-                                }
-                                break;
-                        case CREATE_DESTKOP_SHORTCUT:
-                            topLabelText = R("SDesktopShortcut");
-                            break;
-                        case CLIPBOARD_READ:
-                                topLabelText = R("SClipboardReadAccess");
-                                break;
-                        case CLIPBOARD_WRITE:
-                                topLabelText = R("SClipboardWriteAccess");
-                                break;
-                        case PRINTER:
-                                topLabelText = R("SPrinterAccess");
-                                break;
-                        case NETWORK:
-                                if (extras != null && extras.length >= 0)
-                                        topLabelText = R("SNetworkAccess", extras[0]);
-                                else
-                                        topLabelText = R("SNetworkAccess", "(address here)");
-                }
-
-                ImageIcon icon = new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png"));
-                JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
-                topLabel.setFont(new Font(topLabel.getFont().toString(),
+        ImageIcon icon = new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png"));
+        JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
+        topLabel.setFont(new Font(topLabel.getFont().toString(),
                         Font.BOLD, 12));
-                JPanel topPanel = new JPanel(new BorderLayout());
-                topPanel.setBackground(Color.WHITE);
-                topPanel.add(topLabel, BorderLayout.CENTER);
-                topPanel.setPreferredSize(new Dimension(450,100));
-                topPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(topLabel, BorderLayout.CENTER);
+        topPanel.setPreferredSize(new Dimension(450, 100));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                //application info
-                JLabel nameLabel = new JLabel(R("Name") + ":   " + name);
-                nameLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-                JLabel publisherLabel = new JLabel(R("Publisher") + ": " + publisher);
-                publisherLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-                JLabel fromLabel = new JLabel(R("From") + ":   " + from);
-                fromLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        //application info
+        JLabel nameLabel = new JLabel(R("Name") + ":   " + name);
+        nameLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel publisherLabel = new JLabel(R("Publisher") + ": " + publisher);
+        publisherLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel fromLabel = new JLabel(R("From") + ":   " + from);
+        fromLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-                alwaysAllow = new JCheckBox(R("AlwaysAllowAction"));
-                alwaysAllow.setEnabled(false);
+        alwaysAllow = new JCheckBox(R("AlwaysAllowAction"));
+        alwaysAllow.setEnabled(false);
 
-                JPanel infoPanel = new JPanel(new GridLayout(4,1));
-                infoPanel.add(nameLabel);
-                infoPanel.add(publisherLabel);
-                infoPanel.add(fromLabel);
-                infoPanel.add(alwaysAllow);
-                infoPanel.setBorder(BorderFactory.createEmptyBorder(25,25,25,25));
+        JPanel infoPanel = new JPanel(new GridLayout(4, 1));
+        infoPanel.add(nameLabel);
+        infoPanel.add(publisherLabel);
+        infoPanel.add(fromLabel);
+        infoPanel.add(alwaysAllow);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
-                //run and cancel buttons
-                JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        //run and cancel buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-                JButton run = new JButton(R("ButAllow"));
-                JButton cancel = new JButton(R("ButCancel"));
-                run.addActionListener(createSetValueListener(parent,0));
-                run.addActionListener(new CheckBoxListener());
-                cancel.addActionListener(createSetValueListener(parent, 1));
-                initialFocusComponent = cancel;
-                buttonPanel.add(run);
-                buttonPanel.add(cancel);
-                buttonPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        JButton run = new JButton(R("ButAllow"));
+        JButton cancel = new JButton(R("ButCancel"));
+        run.addActionListener(createSetValueListener(parent, 0));
+        run.addActionListener(new CheckBoxListener());
+        cancel.addActionListener(createSetValueListener(parent, 1));
+        initialFocusComponent = cancel;
+        buttonPanel.add(run);
+        buttonPanel.add(cancel);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                //all of the above
-                setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-                add(topPanel);
-                add(infoPanel);
-                add(buttonPanel);
+        //all of the above
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(topPanel);
+        add(infoPanel);
+        add(buttonPanel);
 
+    }
+
+    private class CheckBoxListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            if (alwaysAllow != null && alwaysAllow.isSelected()) {
+                // TODO: somehow tell the ApplicationInstance
+                // to stop asking for permission
+            }
         }
-
-
-        private class CheckBoxListener implements ActionListener {
-                public void actionPerformed(ActionEvent e) {
-                        if (alwaysAllow != null && alwaysAllow.isSelected()) {
-                                // TODO: somehow tell the ApplicationInstance
-                                // to stop asking for permission
-                        }
-                }
-        }
+    }
 
 }

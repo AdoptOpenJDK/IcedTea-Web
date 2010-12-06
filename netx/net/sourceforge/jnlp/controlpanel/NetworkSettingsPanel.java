@@ -190,7 +190,8 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         locationField.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 String value = locationField.getText();
-                if (value.trim().equals("")) value = null;
+                if (value.trim().equals(""))
+                    value = null;
                 config.setProperty(properties[4], value);
             }
         });

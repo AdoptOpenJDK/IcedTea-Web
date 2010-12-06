@@ -197,7 +197,8 @@ public class MethodOverloadResolver {
                         suppliedParam, paramTypeClass);
                 methodCost += (Integer) costAndCastedObj[0];
 
-                if ((Integer) costAndCastedObj[0] < 0) break;
+                if ((Integer) costAndCastedObj[0] < 0)
+                    break;
 
                 Object castedObj = paramTypeClass.isPrimitive() ? costAndCastedObj[1]
                         : paramTypeClass.cast(costAndCastedObj[1]);
@@ -218,7 +219,7 @@ public class MethodOverloadResolver {
             }
 
             if ((methodCost > 0 && methodCost < lowestCost) ||
-                 paramTypes.length == 0) {
+                    paramTypes.length == 0) {
                 ret = methodAndArgs;
                 lowestCost = methodCost;
             }
@@ -261,7 +262,8 @@ public class MethodOverloadResolver {
                         suppliedParam, paramTypeClass);
                 constructorCost += (Integer) costAndCastedObj[0];
 
-                if ((Integer) costAndCastedObj[0] < 0) break;
+                if ((Integer) costAndCastedObj[0] < 0)
+                    break;
 
                 Object castedObj = paramTypeClass.isPrimitive() ? costAndCastedObj[1]
                         : paramTypeClass.cast(costAndCastedObj[1]);
@@ -282,7 +284,7 @@ public class MethodOverloadResolver {
             }
 
             if ((constructorCost > 0 && constructorCost < lowestCost) ||
-                 paramTypes.length == 0) {
+                    paramTypes.length == 0) {
                 ret = constructorAndArgs;
                 lowestCost = constructorCost;
             }
@@ -297,14 +299,14 @@ public class MethodOverloadResolver {
         Integer cost = new Integer(0);
         Object castedObj;
 
-        Class<?> suppliedParamClass = suppliedParam != null ? suppliedParam.getClass() : null ;
+        Class<?> suppliedParamClass = suppliedParam != null ? suppliedParam.getClass() : null;
 
         // Either both are an array, or neither are
         boolean suppliedParamIsArray = suppliedParamClass != null && suppliedParamClass.isArray();
         if (paramTypeClass.isArray() != suppliedParamIsArray &&
-                !paramTypeClass.equals(Object.class)         &&
+                !paramTypeClass.equals(Object.class) &&
                 !paramTypeClass.equals(String.class)) {
-                ret[0] = Integer.MIN_VALUE; // Not allowed
+            ret[0] = Integer.MIN_VALUE; // Not allowed
             ret[1] = suppliedParam;
             return ret;
         }
@@ -317,7 +319,7 @@ public class MethodOverloadResolver {
         if (paramTypeClass.isArray()) {
 
             Object newArray = Array.newInstance(paramTypeClass.getComponentType(), Array.getLength(suppliedParam));
-            for (int i=0; i < Array.getLength(suppliedParam); i++) {
+            for (int i = 0; i < Array.getLength(suppliedParam); i++) {
                 Object original = Array.get(suppliedParam, i);
 
                 // When dealing with arrays, we represent empty slots with
@@ -331,7 +333,7 @@ public class MethodOverloadResolver {
                 Object[] costAndCastedObject = getCostAndCastedObject(original, paramTypeClass.getComponentType());
 
                 if ((Integer) costAndCastedObject[0] < 0) {
-                        ret[0] = Integer.MIN_VALUE; // Not allowed
+                    ret[0] = Integer.MIN_VALUE; // Not allowed
                     ret[1] = suppliedParam;
                     return ret;
                 }
@@ -364,15 +366,14 @@ public class MethodOverloadResolver {
             cost += 1; // Numeric type to the analogous Java primitive type
             castedObj = suppliedParam; // Let auto-boxing handle it
         } else if (suppliedParamClass.equals(paramTypeClass)) {
-           cost += 3; // Class type to Class type where the types are equal
-           castedObj = suppliedParam;
+            cost += 3; // Class type to Class type where the types are equal
+            castedObj = suppliedParam;
         } else if (isNum(suppliedParam) &&
                        (paramTypeClass.isPrimitive() ||
-                        java.lang.Number.class.isAssignableFrom(paramTypeClass) ||
-                        java.lang.Character.class.isAssignableFrom(paramTypeClass) ||
+                               java.lang.Number.class.isAssignableFrom(paramTypeClass) ||
+                               java.lang.Character.class.isAssignableFrom(paramTypeClass) ||
                         java.lang.Byte.class.isAssignableFrom(paramTypeClass)
-                       )
-                   ) {
+                       )) {
             cost += 4; // Numeric type to a different primitive type
 
             if (suppliedParam.toString().equals("true"))
@@ -389,10 +390,9 @@ public class MethodOverloadResolver {
         } else if (suppliedParam instanceof java.lang.String &&
                     isNum(suppliedParam) &&
                         (paramTypeClass.isInstance(java.lang.Number.class) ||
-                         paramTypeClass.isInstance(java.lang.Character.class) ||
-                         paramTypeClass.isInstance(java.lang.Byte.class) ||
-                         paramTypeClass.isPrimitive())
-                   ) {
+                                paramTypeClass.isInstance(java.lang.Character.class) ||
+                                paramTypeClass.isInstance(java.lang.Byte.class) ||
+                         paramTypeClass.isPrimitive())) {
             cost += 5; // String to numeric type
 
             if (suppliedParam.toString().equals("true"))
@@ -404,10 +404,9 @@ public class MethodOverloadResolver {
                 castedObj = (char) Short.decode(suppliedParam.toString()).shortValue();
             else
                 castedObj = getNum(suppliedParam.toString(), paramTypeClass);
-        }  else if (suppliedParam instanceof java.lang.String &&
+        } else if (suppliedParam instanceof java.lang.String &&
                      (paramTypeClass.equals(java.lang.Boolean.class) ||
-                      paramTypeClass.equals(java.lang.Boolean.TYPE))
-                    ){
+                      paramTypeClass.equals(java.lang.Boolean.TYPE))) {
 
             cost += 5; // Same cost as above
             castedObj = new Boolean(suppliedParam.toString().length() > 0);
@@ -437,7 +436,7 @@ public class MethodOverloadResolver {
         Method[] allMethods = c.getMethods();
         ArrayList<Method> matchingMethods = new ArrayList<Method>(5);
 
-        for (Method m: allMethods) {
+        for (Method m : allMethods) {
             if (m.getName().equals(name) && m.getParameterTypes().length == paramCount)
                 matchingMethods.add(m);
         }
@@ -449,7 +448,7 @@ public class MethodOverloadResolver {
         Constructor[] allConstructors = c.getConstructors();
         ArrayList<Constructor> matchingConstructors = new ArrayList<Constructor>(5);
 
-        for (Constructor cs: allConstructors) {
+        for (Constructor cs : allConstructors) {
             if (cs.getParameterTypes().length == paramCount)
                 matchingConstructors.add(cs);
         }
@@ -480,7 +479,7 @@ public class MethodOverloadResolver {
         return o.getClass();
     }
 
-    private static boolean isNum (Object o) {
+    private static boolean isNum(Object o) {
 
         if (o instanceof java.lang.Number)
             return true;
@@ -497,18 +496,19 @@ public class MethodOverloadResolver {
         try {
             Long.parseLong((String) o); // whole number test
             return true;
-        } catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException nfe) {
+        }
 
         try {
             Float.parseFloat((String) o); // decimal
             return true;
-        } catch (NumberFormatException nfe) {}
-
+        } catch (NumberFormatException nfe) {
+        }
 
         return false;
     }
 
-    private static Number getNum (String s, Class<?> c) throws NumberFormatException {
+    private static Number getNum(String s, Class<?> c) throws NumberFormatException {
 
         Number n;
         if (s.contains("."))
@@ -518,39 +518,39 @@ public class MethodOverloadResolver {
 
         // See if we need to collapse first
         if (c.equals(java.lang.Integer.class) ||
-            c.equals(java.lang.Integer.TYPE)) {
+                c.equals(java.lang.Integer.TYPE)) {
             return n.intValue();
         }
 
         if (c.equals(java.lang.Long.class) ||
-            c.equals(java.lang.Long.TYPE)) {
+                c.equals(java.lang.Long.TYPE)) {
             return n.longValue();
         }
 
         if (c.equals(java.lang.Short.class) ||
-            c.equals(java.lang.Short.TYPE)) {
+                c.equals(java.lang.Short.TYPE)) {
             return n.shortValue();
         }
 
         if (c.equals(java.lang.Float.class) ||
-            c.equals(java.lang.Float.TYPE)) {
+                c.equals(java.lang.Float.TYPE)) {
             return n.floatValue();
         }
 
         if (c.equals(java.lang.Double.class) ||
-            c.equals(java.lang.Double.TYPE)) {
+                c.equals(java.lang.Double.TYPE)) {
             return n.doubleValue();
         }
 
         if (c.equals(java.lang.Byte.class) ||
-            c.equals(java.lang.Byte.TYPE)) {
+                c.equals(java.lang.Byte.TYPE)) {
             return n.byteValue();
         }
 
         return n;
     }
 
-    private static String printList (Object[] oList) {
+    private static String printList(Object[] oList) {
 
         String ret = "";
 
@@ -562,7 +562,7 @@ public class MethodOverloadResolver {
             ret += oStr;
             ret += ", ";
         }
-        ret = ret.substring(0, ret.length()-2); // remove last ", "
+        ret = ret.substring(0, ret.length() - 2); // remove last ", "
         ret += " }";
 
         return ret;
@@ -573,7 +573,7 @@ public class MethodOverloadResolver {
 
         String ret = new String();
 
-        for (int i=0; i < Array.getLength(array); i++) {
+        for (int i = 0; i < Array.getLength(array); i++) {
             Object element = Array.get(array, i);
 
             if (element != null) {
@@ -600,97 +600,147 @@ public class MethodOverloadResolver {
 
 class FooClass {
 
-    public FooClass() {}
+    public FooClass() {
+    }
 
-    public FooClass(Boolean b, int i) {}
+    public FooClass(Boolean b, int i) {
+    }
 
-    public FooClass(Boolean b, Integer i) {}
+    public FooClass(Boolean b, Integer i) {
+    }
 
-    public FooClass(Boolean b, short s) {}
+    public FooClass(Boolean b, short s) {
+    }
 
-    public FooClass(String s, int i) {}
+    public FooClass(String s, int i) {
+    }
 
-    public FooClass(String s, Integer i) {}
+    public FooClass(String s, Integer i) {
+    }
 
-    public FooClass(java.lang.Number num) {}
+    public FooClass(java.lang.Number num) {
+    }
 
-    public FooClass(java.lang.Integer integer) {}
+    public FooClass(java.lang.Integer integer) {
+    }
 
-    public FooClass(long l) {}
+    public FooClass(long l) {
+    }
 
-    public FooClass(double d) {}
+    public FooClass(double d) {
+    }
 
-    public FooClass(float f) {}
+    public FooClass(float f) {
+    }
 
-    public FooClass(JSObject j) {}
+    public FooClass(JSObject j) {
+    }
 
-    public FooClass(BarClass1 b) {}
+    public FooClass(BarClass1 b) {
+    }
 
-    public FooClass(BarClass2 b) {}
+    public FooClass(BarClass2 b) {
+    }
 
-    public FooClass(String s) {}
+    public FooClass(String s) {
+    }
 
-    public FooClass(byte b) {}
+    public FooClass(byte b) {
+    }
 
-    public FooClass(String s, Float f) {}
+    public FooClass(String s, Float f) {
+    }
 
-    public FooClass (int i) {}
+    public FooClass(int i) {
+    }
 
-    public void FooClass() {}
+    public void FooClass() {
+    }
 
-    public void FooClass(boolean b) {}
+    public void FooClass(boolean b) {
+    }
 
+    public void foo(Boolean b, int i) {
+    }
 
-    public void foo(Boolean b, int i) {}
+    public void foo(Boolean b, Integer i) {
+    }
 
-    public void foo(Boolean b, Integer i) {}
+    public void foo(Boolean b, short s) {
+    }
 
-    public void foo(Boolean b, short s) {}
+    public void foo_string_int(String s, int i) {
+    }
 
-    public void foo_string_int(String s, int i) {}
+    public void foo_string_int(String s, Integer i) {
+    }
 
-    public void foo_string_int(String s, Integer i) {}
+    public void foo_jsobj(JSObject j) {
+    }
 
-    public void foo_jsobj(JSObject j) {}
+    public void foo_jsobj(String s) {
+    }
 
-    public void foo_jsobj(String s) {}
+    public void foo_classtype(java.lang.Number num) {
+    }
 
-    public void foo_classtype(java.lang.Number num) {}
+    public void foo_classtype(java.lang.Integer integer) {
+    }
 
-    public void foo_classtype(java.lang.Integer integer) {}
+    public void foo_multiprim(int i) {
+    }
 
-    public void foo_multiprim(int i) {}
+    public void foo_multiprim(long l) {
+    }
 
-    public void foo_multiprim(long l) {}
+    public void foo_multiprim(float f) {
+    }
 
-    public void foo_multiprim(float f) {}
+    public void foo_multiprim(double d) {
+    }
 
-    public void foo_multiprim(double d) {}
+    public void foo_float(float f) {
+    }
 
-    public void foo_float(float f) {}
+    public void foo_float(String s) {
+    }
 
-    public void foo_float(String s) {}
+    public void foo_float(JSObject j) {
+    }
 
-    public void foo_float(JSObject j) {}
+    public void foo_class(BarClass1 b) {
+    }
 
-    public void foo_class(BarClass1 b) {}
+    public void foo_class(BarClass2 b) {
+    }
 
-    public void foo_class(BarClass2 b) {}
+    public void foo_strandbyteonly(String s) {
+    }
 
-    public void foo_strandbyteonly(String s) {}
+    public void foo_strandbyteonly(byte b) {
+    }
 
-    public void foo_strandbyteonly(byte b) {}
+    public void foo_str_and_float(String s, Float f) {
+    }
 
-    public void foo_str_and_float(String s, Float f) {}
+    public void foo_int_only(int i) {
+    }
 
-    public void foo_int_only (int i) {}
+    public void foo_noargs() {
+    }
 
-    public void foo_noargs() {}
-
-    public void foo_boolonly(boolean b) {}
+    public void foo_boolonly(boolean b) {
+    }
 }
 
-class BarClass1 {}
-class BarClass2 extends BarClass1 {}
-class BarClass3 extends BarClass2 {}
-class JSObject {}
+class BarClass1 {
+}
+
+class BarClass2 extends BarClass1 {
+}
+
+class BarClass3 extends BarClass2 {
+}
+
+class JSObject {
+}

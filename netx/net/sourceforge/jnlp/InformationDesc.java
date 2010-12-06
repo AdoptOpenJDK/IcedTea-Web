@@ -15,7 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import java.io.*;
@@ -37,13 +36,13 @@ public class InformationDesc {
     // specification name.
 
     /** one-line description */
-    public static final Object ONE_LINE= "oneline";
+    public static final Object ONE_LINE = "oneline";
 
     /** short description */
-    public static final Object SHORT= "short";
+    public static final Object SHORT = "short";
 
     /** tooltip description */
-    public static final Object TOOLTIP= "tooltip";
+    public static final Object TOOLTIP = "tooltip";
 
     /** default description */
     public static final Object DEFAULT = "default";
@@ -56,7 +55,6 @@ public class InformationDesc {
 
     /** the JNLPFile this information is for */
     private JNLPFile jnlpFile;
-
 
     /**
      * Create an information element object.
@@ -87,7 +85,7 @@ public class InformationDesc {
      * Returns the application's homepage.
      */
     public URL getHomepage() {
-        return (URL)getItem("homepage");
+        return (URL) getItem("homepage");
     }
 
     /**
@@ -114,9 +112,9 @@ public class InformationDesc {
      * Information.TOOLTIP, Information.DEFAULT
      */
     public String getDescription(Object kind) {
-        String result = (String) getItem("description-"+kind);
+        String result = (String) getItem("description-" + kind);
         if (result == null)
-            return (String) getItem("description-"+DEFAULT);
+            return (String) getItem("description-" + DEFAULT);
         else
             return result;
     }
@@ -129,7 +127,7 @@ public class InformationDesc {
      * @return an array of zero of more IconDescs of the specified icon type
      */
     public IconDesc[] getIcons(Object kind) {
-        List<Object> icons = getItems("icon-"+kind);
+        List<Object> icons = getItems("icon-" + kind);
 
         return icons.toArray(new IconDesc[icons.size()]);
     };
@@ -151,14 +149,14 @@ public class InformationDesc {
             return null;
 
         IconDesc best = null;
-        for (int i=0; i < icons.length; i++) {
+        for (int i = 0; i < icons.length; i++) {
             if (icons[i].getWidth() >= width &&
-                icons[i].getHeight() >= height) {
+                    icons[i].getHeight() >= height) {
                 if (best == null)
                     best = icons[i];
 
                 if (icons[i].getWidth() <= best.getWidth() && // Use <= so last specified of
-                    icons[i].getHeight() <= best.getHeight()) // equivalent icons is chosen.
+                        icons[i].getHeight() <= best.getHeight()) // equivalent icons is chosen.
                     best = icons[i];
             }
         }
@@ -233,7 +231,7 @@ public class InformationDesc {
         if (items.size() == 0)
             return null;
         else
-            return items.get( items.size()-1 );
+            return items.get(items.size() - 1);
     }
 
     /**
@@ -244,9 +242,9 @@ public class InformationDesc {
             return Collections.emptyList();
 
         List<Object> result = new ArrayList<Object>();
-        for (int i=0; i < info.size(); i+=2)
+        for (int i = 0; i < info.size(); i += 2)
             if (info.get(i).equals(key))
-                result.add( info.get(i+1) );
+                result.add(info.get(i + 1));
 
         return result;
     }
@@ -257,7 +255,7 @@ public class InformationDesc {
      */
     protected void addItem(String key, Object value) {
         if (info == null)
-          info = new ArrayList<Object>();
+            info = new ArrayList<Object>();
 
         info.add(key);
         info.add(value);

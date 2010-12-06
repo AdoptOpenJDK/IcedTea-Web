@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.cache;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -49,17 +48,17 @@ public class CacheUtil {
      * ie sourceforge.net and www.sourceforge.net).
      */
     public static boolean urlEquals(URL u1, URL u2) {
-        if (u1==u2)
+        if (u1 == u2)
             return true;
-        if (u1==null || u2==null)
+        if (u1 == null || u2 == null)
             return false;
 
         if (!compare(u1.getProtocol(), u2.getProtocol(), true) ||
-            !compare(u1.getHost(), u2.getHost(), true) ||
-            //u1.getDefaultPort() != u2.getDefaultPort() || // only in 1.4
-            !compare(u1.getPath(), u2.getPath(), false) ||
-            !compare(u1.getQuery(), u2.getQuery(), false) ||
-            !compare(u1.getRef(), u2.getRef(), false))
+                !compare(u1.getHost(), u2.getHost(), true) ||
+                //u1.getDefaultPort() != u2.getDefaultPort() || // only in 1.4
+                !compare(u1.getPath(), u2.getPath(), false) ||
+                !compare(u1.getQuery(), u2.getQuery(), false) ||
+                !compare(u1.getRef(), u2.getRef(), false))
             return false;
         else
             return true;
@@ -82,8 +81,7 @@ public class CacheUtil {
             File f = rt.getCacheFile(location);
             // TODO: Should be toURI().toURL()
             return f.toURL();
-        }
-        catch (MalformedURLException ex) {
+        } catch (MalformedURLException ex) {
             return location;
         }
     }
@@ -92,9 +90,9 @@ public class CacheUtil {
      * Compare strings that can be null.
      */
     private static boolean compare(String s1, String s2, boolean ignore) {
-        if (s1==s2)
+        if (s1 == s2)
             return true;
-        if (s1==null || s2==null)
+        if (s1 == null || s2 == null)
             return false;
 
         if (ignore)
@@ -112,16 +110,14 @@ public class CacheUtil {
             File file = CacheUtil.getCacheFile(location, version);
 
             return new FilePermission(file.getPath(), "read");
-        }
-        else {
+        } else {
             try {
                 // this is what URLClassLoader does
                 return location.openConnection().getPermission();
-            }
-            catch (java.io.IOException ioe) {
+            } catch (java.io.IOException ioe) {
                 // should try to figure out the permission
                 if (JNLPRuntime.isDebug())
-                        ioe.printStackTrace();
+                    ioe.printStackTrace();
             }
         }
 
@@ -223,11 +219,10 @@ public class CacheUtil {
             boolean result = entry.isCurrent(connection);
 
             if (JNLPRuntime.isDebug())
-                System.out.println("isCurrent: "+source+" = "+result);
+                System.out.println("isCurrent: " + source + " = " + result);
 
             return result;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
@@ -252,7 +247,7 @@ public class CacheUtil {
         boolean result = entry.isCached();
 
         if (JNLPRuntime.isDebug())
-            System.out.println("isCached: "+source+" = "+result);
+            System.out.println("isCached: " + source + " = " + result);
 
         return result;
     }
@@ -294,13 +289,12 @@ public class CacheUtil {
 
         try {
             String cacheDir = JNLPRuntime.getConfiguration()
-                .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+                    .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
             File localFile = urlToPath(source, cacheDir);
             localFile.getParentFile().mkdirs();
 
             return localFile;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
 
@@ -343,8 +337,7 @@ public class CacheUtil {
 
                 os.write(b, 0, c);
             }
-        }
-        finally {
+        } finally {
             is.close();
             os.close();
         }
@@ -378,7 +371,6 @@ public class CacheUtil {
         return new File(FileUtils.sanitizePath(path.toString()));
     }
 
-
     /**
      * Waits until the resources are downloaded, while showing a
      * progress indicator.
@@ -404,11 +396,11 @@ public class CacheUtil {
 
             // only resources not starting out downloaded are displayed
             List<URL> urlList = new ArrayList<URL>();
-            for (int i=0; i < resources.length; i++) {
+            for (int i = 0; i < resources.length; i++) {
                 if (!tracker.checkResource(resources[i]))
                     urlList.add(resources[i]);
             }
-            URL undownloaded[] = urlList.toArray( new URL[urlList.size()] );
+            URL undownloaded[] = urlList.toArray(new URL[urlList.size()]);
 
             listener = indicator.getListener(app, title, undownloaded);
 
@@ -416,35 +408,32 @@ public class CacheUtil {
                 long read = 0;
                 long total = 0;
 
-                for (int i=0; i < undownloaded.length; i++) {
+                for (int i = 0; i < undownloaded.length; i++) {
                     // add in any -1's; they're insignificant
                     total += tracker.getTotalSize(undownloaded[i]);
                     read += tracker.getAmountRead(undownloaded[i]);
                 }
 
-                int percent = (int)( (100*read)/Math.max(1,total) );
+                int percent = (int) ((100 * read) / Math.max(1, total));
 
-                for (int i=0; i < undownloaded.length; i++)
+                for (int i = 0; i < undownloaded.length; i++)
                     listener.progress(undownloaded[i], "version",
                                       tracker.getAmountRead(undownloaded[i]),
                                       tracker.getTotalSize(undownloaded[i]),
                                       percent);
-            }
-            while (!tracker.waitForResources(resources, indicator.getUpdateRate()));
+            } while (!tracker.waitForResources(resources, indicator.getUpdateRate()));
 
             // make sure they read 100% until indicator closes
-            for (int i=0; i < undownloaded.length; i++)
+            for (int i = 0; i < undownloaded.length; i++)
                 listener.progress(undownloaded[i], "version",
                                   tracker.getTotalSize(undownloaded[i]),
                                   tracker.getTotalSize(undownloaded[i]),
                                   100);
 
-        }
-        catch (InterruptedException ex) {
+        } catch (InterruptedException ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
-        }
-        finally {
+        } finally {
             if (listener != null)
                 indicator.disposeListener(listener);
         }

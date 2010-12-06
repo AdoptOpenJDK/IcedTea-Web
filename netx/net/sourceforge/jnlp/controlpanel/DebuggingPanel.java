@@ -116,7 +116,8 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
                     case 3:
                         for (int j = 0; j < javaConsoleItems.length; j++) {
                             consoleComboBox.addItem(javaConsoleItems[j]);
-                            if (config.getProperty("deployment.console.startup.mode").equals(javaConsoleItems[j].getValue())) consoleComboBox.setSelectedIndex(j);
+                            if (config.getProperty("deployment.console.startup.mode").equals(javaConsoleItems[j].getValue()))
+                                consoleComboBox.setSelectedIndex(j);
                         }
                         consoleComboBox.addItemListener(this);
                         add(consolePanel, c);

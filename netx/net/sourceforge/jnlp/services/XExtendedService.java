@@ -35,7 +35,7 @@ public class XExtendedService implements ExtendedService {
     public FileContents openFile(File file) throws IOException {
 
         /* FIXME: this opens a file with read/write mode, not just read or write */
-        if (ServiceUtil.checkAccess(AccessType.READ_FILE, new Object[]{ file.getAbsolutePath() })) {
+        if (ServiceUtil.checkAccess(AccessType.READ_FILE, new Object[] { file.getAbsolutePath() })) {
             return (FileContents) ServiceUtil.createPrivilegedProxy(FileContents.class,
                     new XFileContents(file));
         } else {

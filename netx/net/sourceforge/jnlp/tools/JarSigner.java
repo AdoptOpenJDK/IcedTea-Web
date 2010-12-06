@@ -64,15 +64,16 @@ public class JarSigner implements CertVerifier {
     // prefix for new signature-related files in META-INF directory
     private static final String SIG_PREFIX = META_INF + "SIG-";
 
-
-    private static final long SIX_MONTHS = 180*24*60*60*1000L; //milliseconds
+    private static final long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L; //milliseconds
 
     static final String VERSION = "1.0";
 
     static final int IN_KEYSTORE = 0x01;
     static final int IN_SCOPE = 0x02;
 
-    static enum verifyResult {UNSIGNED, SIGNED_OK, SIGNED_NOT_OK}
+    static enum verifyResult {
+        UNSIGNED, SIGNED_OK, SIGNED_NOT_OK
+    }
 
     // signer's certificate chain (when composing)
     X509Certificate[] certChain;
@@ -86,14 +87,14 @@ public class JarSigner implements CertVerifier {
     String keystore; // key store file
     boolean nullStream = false; // null keystore input stream (NONE)
     boolean token = false; // token-based keystore
-    String jarfile;  // jar file to sign
-    String alias;    // alias to sign jar with
+    String jarfile; // jar file to sign
+    String alias; // alias to sign jar with
     char[] storepass; // keystore password
     boolean protectedPath; // protected authentication path
     String storetype; // keystore type
     String providerName; // provider name
     Vector<String> providers = null; // list of providers
-    HashMap<String,String> providerArgs = new HashMap<String, String>(); // arguments for provider constructors
+    HashMap<String, String> providerArgs = new HashMap<String, String>(); // arguments for provider constructors
     char[] keypass; // private key password
     String sigfile; // name of .SF file
     String sigalg; // name of signature algorithm
@@ -165,7 +166,7 @@ public class JarSigner implements CertVerifier {
      */
     public boolean hasSigningIssues() {
         return hasExpiredCert || notYetValidCert || badKeyUsage
-               || badExtendedKeyUsage || badNetscapeCertType;
+                || badExtendedKeyUsage || badNetscapeCertType;
     }
 
     /* (non-Javadoc)
@@ -194,7 +195,7 @@ public class JarSigner implements CertVerifier {
     }
 
     public void verifyJars(List<JARDesc> jars, ResourceTracker tracker)
-    throws Exception {
+            throws Exception {
 
         certs = new ArrayList<CertPath>();
         for (int i = 0; i < jars.size(); i++) {
@@ -224,7 +225,7 @@ public class JarSigner implements CertVerifier {
                 } else if (result == verifyResult.SIGNED_OK) {
                     verifiedJars.add(localFile);
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 // We may catch exceptions from using verifyJar()
                 // or from checkTrustedCerts
                 throw e;
@@ -267,7 +268,8 @@ public class JarSigner implements CertVerifier {
             }
 
             if (jarFile.getManifest() != null) {
-                if (verbose) System.out.println();
+                if (verbose)
+                    System.out.println();
                 Enumeration<JarEntry> e = entriesVec.elements();
 
                 long now = System.currentTimeMillis();
@@ -290,16 +292,16 @@ public class JarSigner implements CertVerifier {
                                 certs.add(certPath);
 
                             //we really only want the first certPath
-                            if (!certPath.equals(this.certPath)){
+                            if (!certPath.equals(this.certPath)) {
                                 this.certPath = certPath;
                             }
 
                             Certificate cert = signers[i].getSignerCertPath()
-                                .getCertificates().get(0);
+                                    .getCertificates().get(0);
                             if (cert instanceof X509Certificate) {
-                                checkCertUsage((X509Certificate)cert, null);
+                                checkCertUsage((X509Certificate) cert, null);
                                 if (!showcerts) {
-                                    long notAfter = ((X509Certificate)cert)
+                                    long notAfter = ((X509Certificate) cert)
                                                     .getNotAfter().getTime();
 
                                     if (notAfter < now) {
@@ -358,8 +360,7 @@ public class JarSigner implements CertVerifier {
 
         //anySigned does not guarantee that all files were signed.
         return (anySigned && !(hasUnsignedEntry || hasExpiredCert
-                              || badKeyUsage || badExtendedKeyUsage || badNetscapeCertType
-                              || notYetValidCert)) ? verifyResult.SIGNED_OK : verifyResult.SIGNED_NOT_OK;
+                              || badKeyUsage || badExtendedKeyUsage || badNetscapeCertType || notYetValidCert)) ? verifyResult.SIGNED_OK : verifyResult.SIGNED_NOT_OK;
     }
 
     /**
@@ -368,24 +369,24 @@ public class JarSigner implements CertVerifier {
      */
     private void checkTrustedCerts() throws Exception {
         if (certPath != null) {
-                try {
-                        X509Certificate publisher = (X509Certificate) getPublisher();
-                        KeyStore[] certKeyStores = KeyStores.getCertKeyStores();
-                        alreadyTrustPublisher = CertificateUtils.inKeyStores(publisher, certKeyStores);
-                        X509Certificate root = (X509Certificate) getRoot();
-                        KeyStore[] caKeyStores = KeyStores.getCAKeyStores();
-                        rootInCacerts = CertificateUtils.inKeyStores(root, caKeyStores);
-                } catch (Exception e) {
-                        // TODO: Warn user about not being able to
-                        // look through their cacerts/trusted.certs
-                        // file depending on exception.
-                        throw e;
-                }
+            try {
+                X509Certificate publisher = (X509Certificate) getPublisher();
+                KeyStore[] certKeyStores = KeyStores.getCertKeyStores();
+                alreadyTrustPublisher = CertificateUtils.inKeyStores(publisher, certKeyStores);
+                X509Certificate root = (X509Certificate) getRoot();
+                KeyStore[] caKeyStores = KeyStores.getCAKeyStores();
+                rootInCacerts = CertificateUtils.inKeyStores(root, caKeyStores);
+            } catch (Exception e) {
+                // TODO: Warn user about not being able to
+                // look through their cacerts/trusted.certs
+                // file depending on exception.
+                throw e;
+            }
 
-                if (!rootInCacerts)
-                        addToDetails(R("SUntrustedCertificate"));
-                else
-                        addToDetails(R("STrustedCertificate"));
+            if (!rootInCacerts)
+                addToDetails(R("SUntrustedCertificate"));
+            else
+                addToDetails(R("STrustedCertificate"));
         }
     }
 
@@ -394,15 +395,14 @@ public class JarSigner implements CertVerifier {
      */
     public Certificate getPublisher() {
         if (certPath != null) {
-                List<? extends Certificate> certList
-                        = certPath.getCertificates();
-                if (certList.size() > 0) {
-                        return (Certificate)certList.get(0);
-                } else {
-                        return null;
-                }
-        } else {
+            List<? extends Certificate> certList = certPath.getCertificates();
+            if (certList.size() > 0) {
+                return (Certificate) certList.get(0);
+            } else {
                 return null;
+            }
+        } else {
+            return null;
         }
     }
 
@@ -411,26 +411,25 @@ public class JarSigner implements CertVerifier {
      */
     public Certificate getRoot() {
         if (certPath != null) {
-                List<? extends Certificate> certList
-                        = certPath.getCertificates();
-                if (certList.size() > 0) {
-                        return (Certificate)certList.get(
+            List<? extends Certificate> certList = certPath.getCertificates();
+            if (certList.size() > 0) {
+                return (Certificate) certList.get(
                                 certList.size() - 1);
-                } else {
-                        return null;
-                }
-        } else {
+            } else {
                 return null;
+            }
+        } else {
+            return null;
         }
     }
 
-        private void addToDetails(String detail) {
-                if (!details.contains(detail))
-                        details.add(detail);
-        }
+    private void addToDetails(String detail) {
+        if (!details.contains(detail))
+            details.add(detail);
+    }
 
     Hashtable<Certificate, String> storeHash =
-        new Hashtable<Certificate, String>();
+            new Hashtable<Certificate, String>();
 
     /**
      * signature-related files include:
@@ -498,7 +497,7 @@ public class JarSigner implements CertVerifier {
             List<String> xKeyUsage = userCert.getExtendedKeyUsage();
             if (xKeyUsage != null) {
                 if (!xKeyUsage.contains("2.5.29.37.0") // anyExtendedKeyUsage
-                        && !xKeyUsage.contains("1.3.6.1.5.5.7.3.3")) {  // codeSigning
+                        && !xKeyUsage.contains("1.3.6.1.5.5.7.3.3")) { // codeSigning
                     if (bad != null) {
                         bad[1] = true;
                     } else {
@@ -518,12 +517,12 @@ public class JarSigner implements CertVerifier {
                 DerInputStream in = new DerInputStream(netscapeEx);
                 byte[] encoded = in.getOctetString();
                 encoded = new DerValue(encoded).getUnalignedBitString()
-                .toByteArray();
+                        .toByteArray();
 
                 NetscapeCertTypeExtension extn =
-                    new NetscapeCertTypeExtension(encoded);
+                        new NetscapeCertTypeExtension(encoded);
 
-                Boolean val = (Boolean)extn.get(
+                Boolean val = (Boolean) extn.get(
                                   NetscapeCertTypeExtension.OBJECT_SIGNING);
                 if (!val) {
                     if (bad != null) {
@@ -538,14 +537,13 @@ public class JarSigner implements CertVerifier {
         }
     }
 
-
     /**
      * Returns if all jars are signed.
      *
      * @return True if all jars are signed, false if there are one or more unsigned jars
      */
     public boolean allJarsSigned() {
-       return this.unverifiedJars.size() == 0;
+        return this.unverifiedJars.size() == 0;
     }
 
 }

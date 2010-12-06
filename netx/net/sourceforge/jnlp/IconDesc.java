@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp;
 
 import java.io.*;
@@ -47,7 +46,6 @@ public class IconDesc {
     /** destop shortcut icon */
     public static final Object SHORTCUT = "shortcut";
 
-
     /** the location of the icon */
     private URL location;
 
@@ -65,7 +63,6 @@ public class IconDesc {
 
     /** the size, or -1 if unknown*/
     private int size;
-
 
     /**
      * Creates an icon descriptor with the specified information.
@@ -130,6 +127,5 @@ public class IconDesc {
     public int getDepth() {
         return depth;
     }
-
 
 }

@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.services;
 
 import java.io.*;
@@ -42,32 +41,31 @@ public class XServiceManagerStub implements ServiceManagerStub {
     // run less code in the secure environment (or avoid privileged
     // actions by giving permission to the code source).
 
-        private static String serviceNames[] = {
-        "javax.jnlp.BasicService", // required
-        "javax.jnlp.DownloadService", // required
-        "javax.jnlp.ExtendedService",
-        "javax.jnlp.ExtensionInstallerService", // required
-        "javax.jnlp.PersistenceService",
-        "javax.jnlp.FileOpenService",
-        "javax.jnlp.FileSaveService",
-        "javax.jnlp.ClipboardService",
-        "javax.jnlp.PrintService",
-        "javax.jnlp.SingleInstanceService"
+    private static String serviceNames[] = {
+            "javax.jnlp.BasicService", // required
+            "javax.jnlp.DownloadService", // required
+            "javax.jnlp.ExtendedService",
+            "javax.jnlp.ExtensionInstallerService", // required
+            "javax.jnlp.PersistenceService",
+            "javax.jnlp.FileOpenService",
+            "javax.jnlp.FileSaveService",
+            "javax.jnlp.ClipboardService",
+            "javax.jnlp.PrintService",
+            "javax.jnlp.SingleInstanceService"
     };
 
     private static Object services[] = {
-        ServiceUtil.createPrivilegedProxy(BasicService.class, new XBasicService()),
-        ServiceUtil.createPrivilegedProxy(DownloadService.class, new XDownloadService()),
-        ServiceUtil.createPrivilegedProxy(ExtendedService.class, new XExtendedService()),
-        ServiceUtil.createPrivilegedProxy(ExtensionInstallerService.class, new XExtensionInstallerService()),
-        ServiceUtil.createPrivilegedProxy(PersistenceService.class, new XPersistenceService()),
-        ServiceUtil.createPrivilegedProxy(FileOpenService.class, new XFileOpenService()),
-        ServiceUtil.createPrivilegedProxy(FileSaveService.class, new XFileSaveService()),
-        ServiceUtil.createPrivilegedProxy(ClipboardService.class, new XClipboardService()),
-        ServiceUtil.createPrivilegedProxy(PrintService.class, new XPrintService()),
-        ServiceUtil.createPrivilegedProxy(ExtendedSingleInstanceService.class, new XSingleInstanceService())
+            ServiceUtil.createPrivilegedProxy(BasicService.class, new XBasicService()),
+            ServiceUtil.createPrivilegedProxy(DownloadService.class, new XDownloadService()),
+            ServiceUtil.createPrivilegedProxy(ExtendedService.class, new XExtendedService()),
+            ServiceUtil.createPrivilegedProxy(ExtensionInstallerService.class, new XExtensionInstallerService()),
+            ServiceUtil.createPrivilegedProxy(PersistenceService.class, new XPersistenceService()),
+            ServiceUtil.createPrivilegedProxy(FileOpenService.class, new XFileOpenService()),
+            ServiceUtil.createPrivilegedProxy(FileSaveService.class, new XFileSaveService()),
+            ServiceUtil.createPrivilegedProxy(ClipboardService.class, new XClipboardService()),
+            ServiceUtil.createPrivilegedProxy(PrintService.class, new XPrintService()),
+            ServiceUtil.createPrivilegedProxy(ExtendedSingleInstanceService.class, new XSingleInstanceService())
     };
-
 
     public XServiceManagerStub() {
     }
@@ -91,16 +89,16 @@ public class XServiceManagerStub implements ServiceManagerStub {
      */
     public Object lookup(String name) throws UnavailableServiceException {
         // exact match
-        for (int i=0; i < serviceNames.length; i++)
+        for (int i = 0; i < serviceNames.length; i++)
             if (serviceNames[i].equals(name))
                 return services[i];
 
         // substring match
-        for (int i=0; i < serviceNames.length; i++)
+        for (int i = 0; i < serviceNames.length; i++)
             if (-1 != serviceNames[i].indexOf(name))
                 return services[i];
 
-        throw new UnavailableServiceException(""+name);
+        throw new UnavailableServiceException("" + name);
     }
 
 }

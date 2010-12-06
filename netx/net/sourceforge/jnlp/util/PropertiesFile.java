@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.util;
 
 import java.io.*;
@@ -44,7 +43,6 @@ public class PropertiesFile extends Properties {
 
     /** lazy loaded on getProperty */
     boolean loaded = false;
-
 
     /**
      * Create a properties object backed by the specified file.
@@ -121,8 +119,7 @@ public class PropertiesFile extends Properties {
 
             InputStream s = new FileInputStream(file);
             load(s);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             // eat
         }
     }
@@ -137,8 +134,7 @@ public class PropertiesFile extends Properties {
         try {
             OutputStream s = new FileOutputStream(file);
             store(s, header);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             // eat
         }
     }

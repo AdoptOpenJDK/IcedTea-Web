@@ -32,7 +32,6 @@ public class ApplicationEvent extends EventObject {
     /** the application instance */
     private ApplicationInstance application;
 
-
     /**
      * Creates a launch event for the specified application
      * instance.

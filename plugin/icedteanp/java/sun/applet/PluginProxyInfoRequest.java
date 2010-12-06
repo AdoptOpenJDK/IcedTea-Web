@@ -45,37 +45,37 @@ import java.net.URI;
  */
 
 public class PluginProxyInfoRequest extends PluginCallRequest {
-    
+
     URI internal = null;
 
     public PluginProxyInfoRequest(String message, Long reference) {
         super(message, reference);
     }
-    
+
     public void parseReturn(String proxyInfo) {
 
         // try to parse the proxy information. If things go wrong, do nothing .. 
         // this will keep internal = null which forces a direct connection
 
-    	PluginDebug.debug ("PluginProxyInfoRequest GOT: " + proxyInfo);
-    	String[] messageComponents = proxyInfo.split(" ");
+        PluginDebug.debug("PluginProxyInfoRequest GOT: " + proxyInfo);
+        String[] messageComponents = proxyInfo.split(" ");
 
-    	try {
-    	    String protocol = messageComponents[4].equals("PROXY") ? "http" : "socks";
-    	    String host = messageComponents[5].split(":")[0];
-    	    int port = Integer.parseInt(messageComponents[5].split(":")[1]);
+        try {
+            String protocol = messageComponents[4].equals("PROXY") ? "http" : "socks";
+            String host = messageComponents[5].split(":")[0];
+            int port = Integer.parseInt(messageComponents[5].split(":")[1]);
 
-    	    internal = new URI(protocol, null, host, port, null, null, null);
-    	} catch (ArrayIndexOutOfBoundsException aioobe) {
-    	    // Nothing.. this is expected if there is no proxy
-    	} catch (Exception e) {
-    	    e.printStackTrace();
-    	}
+            internal = new URI(protocol, null, host, port, null, null, null);
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            // Nothing.. this is expected if there is no proxy
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         setDone(true);
     }
 
     public URI getObject() {
-    	return this.internal;
+        return this.internal;
     }
 }

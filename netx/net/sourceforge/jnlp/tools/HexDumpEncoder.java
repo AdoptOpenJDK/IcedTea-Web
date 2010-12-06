@@ -55,15 +55,15 @@ public class HexDumpEncoder extends CharacterEncoder {
 
         c = (char) ((x >> 4) & 0xf);
         if (c > 9)
-            c = (char) ((c-10) + 'A');
+            c = (char) ((c - 10) + 'A');
         else
-            c = (char)(c + '0');
+            c = (char) (c + '0');
         p.write(c);
         c = (char) (x & 0xf);
         if (c > 9)
-            c = (char)((c-10) + 'A');
+            c = (char) ((c - 10) + 'A');
         else
-            c = (char)(c + '0');
+            c = (char) (c + '0');
         p.write(c);
     }
 
@@ -81,8 +81,8 @@ public class HexDumpEncoder extends CharacterEncoder {
     }
 
     protected void encodeLinePrefix(OutputStream o, int len) throws IOException {
-        hexDigit(pStream, (byte)((offset >>> 8) & 0xff));
-        hexDigit(pStream, (byte)(offset & 0xff));
+        hexDigit(pStream, (byte) ((offset >>> 8) & 0xff));
+        hexDigit(pStream, (byte) (offset & 0xff));
         pStream.print(": ");
         currentByte = 0;
         thisLineLength = len;

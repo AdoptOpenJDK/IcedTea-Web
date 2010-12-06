@@ -35,19 +35,17 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package sun.applet;
-
 
 public class PluginException extends Exception {
 
-	public PluginException (PluginStreamHandler sh, int instance, int reference, Throwable t) {
-		t.printStackTrace();
-		this.setStackTrace(t.getStackTrace());
-		
-		AppletSecurityContextManager.dumpStore(0);
+    public PluginException(PluginStreamHandler sh, int instance, int reference, Throwable t) {
+        t.printStackTrace();
+        this.setStackTrace(t.getStackTrace());
 
-		String message = "instance " + instance + " reference " + reference + " Error " + t.getMessage();
-		sh.write(message);
-	}
+        AppletSecurityContextManager.dumpStore(0);
+
+        String message = "instance " + instance + " reference " + reference + " Error " + t.getMessage();
+        sh.write(message);
+    }
 }

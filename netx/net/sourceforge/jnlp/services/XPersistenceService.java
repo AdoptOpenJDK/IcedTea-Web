@@ -14,7 +14,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 package net.sourceforge.jnlp.services;
 
 import java.io.*;
@@ -67,8 +66,8 @@ class XPersistenceService implements PersistenceService {
             requestPath = "";
 
         if (JNLPRuntime.isDebug()) {
-            System.out.println("codebase path: "+source.getFile());
-            System.out.println("request path: "+requestPath);
+            System.out.println("codebase path: " + source.getFile());
+            System.out.println("request path: " + requestPath);
         }
 
         if (!source.getFile().startsWith(requestPath))
@@ -82,7 +81,7 @@ class XPersistenceService implements PersistenceService {
      */
     protected File toCacheFile(URL location) throws MalformedURLException {
         String pcache = JNLPRuntime.getConfiguration()
-            .getProperty(DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR);
+                .getProperty(DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR);
         return CacheUtil.urlToPath(location, pcache);
     }
 
@@ -125,7 +124,7 @@ class XPersistenceService implements PersistenceService {
         File file = toCacheFile(location);
         if (!file.exists())
             throw new FileNotFoundException("Persistence store for "
-              + location.toString() + " is not found.");
+                    + location.toString() + " is not found.");
         file.getParentFile().mkdirs();
 
         return (FileContents) ServiceUtil.createPrivilegedProxy(FileContents.class, new XFileContents(file));
@@ -138,7 +137,6 @@ class XPersistenceService implements PersistenceService {
     public String[] getNames(URL location) throws MalformedURLException, IOException {
         checkLocation(location);
 
-
         File file = toCacheFile(location);
         if (!file.isDirectory())
             return new String[0];
@@ -147,7 +145,7 @@ class XPersistenceService implements PersistenceService {
 
         // check whether this is right: only add files and not directories.
         File entries[] = file.listFiles();
-        for (int i=0; i < entries.length; i++)
+        for (int i = 0; i < entries.length; i++)
             if (entries[i].isFile())
                 result.add(entries[i].getName());
 

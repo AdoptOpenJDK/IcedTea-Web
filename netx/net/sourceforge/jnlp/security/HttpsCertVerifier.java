@@ -86,7 +86,7 @@ public class HttpsCertVerifier implements CertVerifier {
     public ArrayList<CertPath> getCerts() {
 
         ArrayList<X509Certificate> list = new ArrayList<X509Certificate>();
-        for (int i=0; i < chain.length; i++)
+        for (int i = 0; i < chain.length; i++)
             list.add(chain[i]);
 
         ArrayList<CertPath> certPaths = new ArrayList<CertPath>();
@@ -104,52 +104,50 @@ public class HttpsCertVerifier implements CertVerifier {
 
     public ArrayList<String> getDetails() {
 
-        boolean hasExpiredCert=false;
-        boolean hasExpiringCert=false;
-        boolean notYetValidCert=false;
-        boolean isUntrusted=false;
+        boolean hasExpiredCert = false;
+        boolean hasExpiringCert = false;
+        boolean notYetValidCert = false;
+        boolean isUntrusted = false;
         boolean CNMisMatch = !hostMatched;
 
-        if (! getAlreadyTrustPublisher())
-              isUntrusted = true;
+        if (!getAlreadyTrustPublisher())
+            isUntrusted = true;
 
-        for (int i=0; i < chain.length; i++)
-        {
-           X509Certificate cert = chain[i];
+        for (int i = 0; i < chain.length; i++) {
+            X509Certificate cert = chain[i];
 
-           long now = System.currentTimeMillis();
-           long SIX_MONTHS = 180*24*60*60*1000L;
-           long notAfter = cert.getNotAfter().getTime();
-           if (notAfter < now) {
-             hasExpiredCert = true;
-           } else if (notAfter < now + SIX_MONTHS) {
-             hasExpiringCert = true;
-           }
+            long now = System.currentTimeMillis();
+            long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L;
+            long notAfter = cert.getNotAfter().getTime();
+            if (notAfter < now) {
+                hasExpiredCert = true;
+            } else if (notAfter < now + SIX_MONTHS) {
+                hasExpiringCert = true;
+            }
 
-           try {
-             cert.checkValidity();
-           } catch (CertificateNotYetValidException cnyve) {
-             notYetValidCert = true;
-           } catch (CertificateExpiredException cee) {
-             hasExpiredCert = true;
-           }
+            try {
+                cert.checkValidity();
+            } catch (CertificateNotYetValidException cnyve) {
+                notYetValidCert = true;
+            } catch (CertificateExpiredException cee) {
+                hasExpiredCert = true;
+            }
         }
 
         String altNames = getNamesForCert(chain[0]);
 
         if (isUntrusted || hasExpiredCert || hasExpiringCert || notYetValidCert || CNMisMatch) {
-              if (isUntrusted)
+            if (isUntrusted)
                 addToDetails(R("SUntrustedCertificate"));
-              if (hasExpiredCert)
+            if (hasExpiredCert)
                 addToDetails(R("SHasExpiredCert"));
-              if (hasExpiringCert)
+            if (hasExpiringCert)
                 addToDetails(R("SHasExpiringCert"));
-              if (notYetValidCert)
+            if (notYetValidCert)
                 addToDetails(R("SNotYetValidCert"));
-              if (CNMisMatch)
-                  addToDetails(R("SCNMisMatch", altNames, this.hostName));
+            if (CNMisMatch)
+                addToDetails(R("SCNMisMatch", altNames, this.hostName));
         }
-
 
         return details;
     }
@@ -157,7 +155,6 @@ public class HttpsCertVerifier implements CertVerifier {
     private String getNamesForCert(X509Certificate c) {
 
         String names = "";
-
 
         // We use the specification from
         // http://java.sun.com/j2se/1.5.0/docs/api/java/security/cert/X509Certificate.html#getSubjectAlternativeNames()
@@ -174,10 +171,9 @@ public class HttpsCertVerifier implements CertVerifier {
 
             if (subjAltNames != null) {
                 for (List<?> next : subjAltNames) {
-                    if ( ((Integer)next.get(0)).intValue() == ALTNAME_IP ||
-                            ((Integer)next.get(0)).intValue() == ALTNAME_DNS
-                    ) {
-                        names += ", " + (String)next.get(1);
+                    if (((Integer) next.get(0)).intValue() == ALTNAME_IP ||
+                            ((Integer) next.get(0)).intValue() == ALTNAME_DNS) {
+                        names += ", " + (String) next.get(1);
                     }
                 }
             }
@@ -195,26 +191,26 @@ public class HttpsCertVerifier implements CertVerifier {
     }
 
     private void addToDetails(String detail) {
-      if (!details.contains(detail))
-        details.add(detail);
+        if (!details.contains(detail))
+            details.add(detail);
     }
 
     public Certificate getPublisher() {
-      if (chain.length > 0)
-        return (Certificate)chain[0];
-      return null;
+        if (chain.length > 0)
+            return (Certificate) chain[0];
+        return null;
     }
 
     public Certificate getRoot() {
-      if (chain.length > 0)
-        return (Certificate)chain[chain.length - 1];
-      return null;
+        if (chain.length > 0)
+            return (Certificate) chain[chain.length - 1];
+        return null;
     }
 
     public boolean getRootInCacerts() {
         try {
             KeyStore[] caCertsKeyStores = KeyStores.getCAKeyStores();
-            return CertificateUtils.inKeyStores((X509Certificate)getRoot(), caCertsKeyStores);
+            return CertificateUtils.inKeyStores((X509Certificate) getRoot(), caCertsKeyStores);
         } catch (Exception e) {
         }
         return false;
