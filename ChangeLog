@@ -1,3 +1,8 @@
+2010-12-07  Andrew Su  <asu@redhat.com>
+
+	* MiddleClickListener.java: Added copyright header. Corrected typo in
+	javadoc.
+
 2010-12-07  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am
