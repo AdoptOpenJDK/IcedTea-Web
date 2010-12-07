@@ -82,7 +82,7 @@ LAUNCHER_LINK = -o $@ -pthread -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_D
 	-Wl,-soname=lib.so  -L $(BOOT_DIR)/jre/lib/$(INSTALL_ARCH_DIR)/jli -Wl,-z -Wl,origin \
 	-Wl,--allow-shlib-undefined -Wl,-rpath -Wl,\$$ORIGIN/../lib/$(INSTALL_ARCH_DIR)/jli -Wl,-rpath \
 	-Wl,\$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lz
-PLUGIN_VERSION = IcedTea $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
+PLUGIN_VERSION = IcedTea-Web $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
 
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
  itweb-settings.desktop.in
@@ -167,7 +167,9 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	cd $(PLUGIN_DIR) && \
 	$(CXX) $(CXXFLAGS) \
 	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
+	  -DPLUGIN_NAME="\"IcedTea-Web Plugin\"" \
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
+	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
 	  $(GLIB_CFLAGS) \
 	  $(GTK_CFLAGS) \

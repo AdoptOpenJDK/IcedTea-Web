@@ -1,3 +1,16 @@
+2010-12-07  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am
+	(PLUGIN_VERSION): Change to IcedTea-Web
+	($(PLUGIN_DIR)/%.o): Define PLUGIN_NAME and PACKAGE_URL.
+	* configure.ac
+	(AC_INTIT): Add url.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(PLUGIN_NAME): Removed.
+	(PLUGIN_FULL_NAME): New definition.
+	(PLUGIN_DESC): Add link to IcedTea-Web wiki page.
+	(NP_GetValue): Return PLUGIN_FULL_NAME instead of PLUGIN_NAME.
+
 2010-12-06  Deepak Bhole <dbhole@redhat.com>
 
 	Fixed indentation and spacing for all .java files
