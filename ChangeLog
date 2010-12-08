@@ -1,5 +1,13 @@
 2010-12-08  Omair Majid  <omajid@redhat.com>
 
+	* configure.ac: Add check for sun.misc.HexDumpEncoder
+	* netx/net/sourceforge/jnlp/security/CertsInfoPane.java: Import
+	sun.misc.HexDumpEncoder. Remove import of net.sourceforge.jnlp.tools.*
+	* netx/net/sourceforge/jnlp/tools/CharacterEncoder.java: Remove file.
+	* netx/net/sourceforge/jnlp/tools/HexDumpEncoder.java: Remove file.
+
+2010-12-08  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/JNLPFile.java
 	(getSupportedVersions): Remove method.
 	* netx/net/sourceforge/jnlp/Parser.java: Remove supportedVersions.

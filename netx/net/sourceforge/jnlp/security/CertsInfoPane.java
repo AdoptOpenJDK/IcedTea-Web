@@ -46,6 +46,8 @@ import java.security.cert.X509Certificate;
 import java.security.MessageDigest;
 import java.math.BigInteger;
 import javax.security.auth.x500.X500Principal;
+
+import sun.misc.HexDumpEncoder;
 import sun.security.x509.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -56,8 +58,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
-
-import net.sourceforge.jnlp.tools.*;
 
 /**
  * Provides the panel for the Certificate Info dialog. This dialog displays data from
