@@ -21,6 +21,7 @@ New in release 1.0 (2010-XX-XX):
   - PR557: Applet opens in a separate window if tab is closed when the applet loads
   - PR565: UIDefaults.getUI fails with jgoodies:looks 2.3.1
   - PR593: Increment of invalidated iterator in IcedTeaPluginUtils (patch from barbara.xxx1975@libero.it)
+  - PR597: Entities are parsed incorrectly in PARAM tag in applet plugin
   - Applets are now double-buffered to eliminate flicker in ones that do heavy drawing
 * NetX
   - Add a new option -Xclearcache

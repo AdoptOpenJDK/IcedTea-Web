@@ -1617,6 +1617,56 @@ plugin_start_appletviewer (ITNPPluginData* data)
   return error;
 }
 
+/*
+ * Replaces certain characters (\r, \n, etc) with HTML escape equivalents.
+ *
+ * Return string is allocated on the heap. Caller assumes responsibility 
+ * for freeing the memory via free()
+ */
+static char*
+encode_string(char* to_encode)
+{
+
+  // Do nothing for an empty string
+  if (to_encode == '\0')
+      return to_encode;
+
+  // worst case scenario -> all characters are newlines or
+  // returns, each of which translates to 5 substitutions
+  char* encoded = (char*) calloc(((strlen(to_encode)*5)+1), sizeof(char));
+
+  strcpy(encoded, "");
+
+  for (int i=0; i < strlen(to_encode); i++)
+  {
+      if (to_encode[i] == '\r')
+          encoded = strcat(encoded, "&#13;");
+      else if (to_encode[i] == '\n')
+          encoded = strcat(encoded, "&#10;");
+      else if (to_encode[i] == '>')
+          encoded = strcat(encoded, "&gt;");
+      else if (to_encode[i] == '<')
+          encoded = strcat(encoded, "&lt;");
+      else if (to_encode[i] == '&')
+          encoded = strcat(encoded, "&amp;");
+      else if (to_encode[i] == '"')
+          encoded = strcat(encoded, "&quot;");
+      else
+      {
+           char* orig_char = (char*) calloc(2, sizeof(char));
+           orig_char[0] = to_encode[i];
+           orig_char[1] = '\0';
+ 
+           strcat(encoded, orig_char);
+ 
+           free(orig_char);
+           orig_char = NULL;
+      }
+  }
+
+  return encoded;
+}
+
 // Build up the applet tag string that we'll send to the applet
 // viewer.
 static gchar*
@@ -1629,65 +1679,68 @@ plugin_create_applet_tag (int16_t argc, char* argn[], char* argv[])
 
   for (int16_t i = 0; i < argc; i++)
     {
-      if (!g_ascii_strcasecmp (argn[i], "code"))
+      gchar* argn_escaped = encode_string(argn[i]);
+      gchar* argv_escaped = encode_string(argv[i]);
+
+      if (!g_ascii_strcasecmp (argn_escaped, "code"))
         {
-          gchar* code = g_strdup_printf ("CODE=\"%s\" ", argv[i]);
+          gchar* code = g_strdup_printf ("CODE=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, code, NULL);
           g_free (code);
           code = NULL;
     }
-      else if (!g_ascii_strcasecmp (argn[i], "java_code"))
+      else if (!g_ascii_strcasecmp (argn_escaped, "java_code"))
     {
-          gchar* java_code = g_strdup_printf ("JAVA_CODE=\"%s\" ", argv[i]);
+          gchar* java_code = g_strdup_printf ("JAVA_CODE=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, java_code, NULL);
           g_free (java_code);
           java_code = NULL;
     }
-      else if (!g_ascii_strcasecmp (argn[i], "codebase"))
+      else if (!g_ascii_strcasecmp (argn_escaped, "codebase"))
     {
-          gchar* codebase = g_strdup_printf ("CODEBASE=\"%s\" ", argv[i]);
+          gchar* codebase = g_strdup_printf ("CODEBASE=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, codebase, NULL);
           g_free (codebase);
           codebase = NULL;
     }
-      else if (!g_ascii_strcasecmp (argn[i], "java_codebase"))
+      else if (!g_ascii_strcasecmp (argn_escaped, "java_codebase"))
     {
-          gchar* java_codebase = g_strdup_printf ("JAVA_CODEBASE=\"%s\" ", argv[i]);
+          gchar* java_codebase = g_strdup_printf ("JAVA_CODEBASE=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, java_codebase, NULL);
           g_free (java_codebase);
           java_codebase = NULL;
     }
-      else if (!g_ascii_strcasecmp (argn[i], "classid"))
+      else if (!g_ascii_strcasecmp (argn_escaped, "classid"))
     {
-          gchar* classid = g_strdup_printf ("CLASSID=\"%s\" ", argv[i]);
+          gchar* classid = g_strdup_printf ("CLASSID=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, classid, NULL);
           g_free (classid);
           classid = NULL;
     }
-      else if (!g_ascii_strcasecmp (argn[i], "archive"))
+      else if (!g_ascii_strcasecmp (argn_escaped, "archive"))
     {
-          gchar* archive = g_strdup_printf ("ARCHIVE=\"%s\" ", argv[i]);
+          gchar* archive = g_strdup_printf ("ARCHIVE=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, archive, NULL);
           g_free (archive);
           archive = NULL;
     }
-      else if (!g_ascii_strcasecmp (argn[i], "java_archive"))
+      else if (!g_ascii_strcasecmp (argn_escaped, "java_archive"))
     {
-          gchar* java_archive = g_strdup_printf ("JAVA_ARCHIVE=\"%s\" ", argv[i]);
+          gchar* java_archive = g_strdup_printf ("JAVA_ARCHIVE=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, java_archive, NULL);
           g_free (java_archive);
           java_archive = NULL;
     }
-      else if (!g_ascii_strcasecmp (argn[i], "width"))
+      else if (!g_ascii_strcasecmp (argn_escaped, "width"))
     {
-          gchar* width = g_strdup_printf ("width=\"%s\" ", argv[i]);
+          gchar* width = g_strdup_printf ("width=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, width, NULL);
           g_free (width);
           width = NULL;
     }
-      else if (!g_ascii_strcasecmp (argn[i], "height"))
+      else if (!g_ascii_strcasecmp (argn_escaped, "height"))
     {
-          gchar* height = g_strdup_printf ("height=\"%s\" ", argv[i]);
+          gchar* height = g_strdup_printf ("height=\"%s\" ", argv_escaped);
           applet_tag = g_strconcat (applet_tag, height, NULL);
           g_free (height);
           height = NULL;
@@ -1695,58 +1748,28 @@ plugin_create_applet_tag (int16_t argc, char* argn[], char* argv[])
       else
         {
 
-          if (argv[i] != '\0')
+          if (argv_escaped != '\0')
             {
-              parameters = g_strconcat (parameters, "<PARAM NAME=\"", argn[i],
-                                        "\" VALUE=\"", argv[i], "\">", NULL);
+              parameters = g_strconcat (parameters, "<PARAM NAME=\"", argn_escaped,
+                                        "\" VALUE=\"", argv_escaped, "\">", NULL);
             }
         }
+
+      free(argn_escaped);
+      free(argv_escaped);
+
+      argn_escaped = NULL;
+      argv_escaped = NULL;
     }
 
   applet_tag = g_strconcat (applet_tag, ">", parameters, "</EMBED>", NULL);
-
-  // Escape the parameter value so that line termination
-  // characters will pass through the pipe.
-          
-  // worst case scenario -> all characters are newlines or
-  // returns, each of which translates to 5 substitutions
-  char* applet_tag_escaped = (char*) calloc(((strlen(applet_tag)*5)+1), sizeof(char));
-
-  strcpy(applet_tag_escaped, "");
-  for (int i=0; i < strlen(applet_tag); i++)
-  {
-      if (applet_tag[i] == '\r')
-          strcat(applet_tag_escaped, "&#13;");
-      else if (applet_tag[i] == '\n')
-          strcat(applet_tag_escaped, "&#10;");
-      else if (applet_tag[i] == '>')
-          strcat(applet_tag_escaped, "&gt;");
-      else if (applet_tag[i] == '<')
-          strcat(applet_tag_escaped, "&lt;");
-      else if (applet_tag[i] == '&')
-          strcat(applet_tag_escaped, "&amp;");
-      else
-      {
-          char* orig_char = (char*) calloc(2, sizeof(char));
-          orig_char[0] = applet_tag[i];
-          orig_char[1] = '\0';
-
-          strcat(applet_tag_escaped, orig_char);
-
-          free(orig_char);
-          orig_char = NULL;
-      }
-  }
-
-  free (applet_tag);
-  applet_tag = NULL;
 
   g_free (parameters);
   parameters = NULL;
 
   PLUGIN_DEBUG ("plugin_create_applet_tag return\n");
 
-  return applet_tag_escaped;
+  return applet_tag;
 }
 
 // plugin_send_message_to_appletviewer must be called while holding

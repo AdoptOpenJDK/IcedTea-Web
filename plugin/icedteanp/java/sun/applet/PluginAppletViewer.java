@@ -514,14 +514,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
                         UrlUtil.decode(message.substring("tag".length() + 1, spaceLocation));
                 String tag = message.substring(spaceLocation + 1);
 
-                // Decode the tag
-                tag = tag.replace("&gt;", ">");
-                tag = tag.replace("&lt;", "<");
-                tag = tag.replace("&amp;", "&");
-                tag = tag.replace("&#10;", "\n");
-                tag = tag.replace("&#13;", "\r");
-                tag = tag.replace("&quot;", "\"");
-
                 PluginDebug.debug("Handle = " + handle + "\n" +
                                     "Width = " + width + "\n" +
                                     "Height = " + height + "\n" +
@@ -1454,6 +1446,24 @@ public class PluginAppletViewer extends XEmbeddedFrame
     }
 
     /**
+     * Decodes the string (converts html escapes into proper characters)
+     * 
+     * @param toDecode The string to decode
+     * @return The decoded string
+     */
+    public static String decodeString(String toDecode) {
+
+        toDecode = toDecode.replace("&gt;", ">");
+        toDecode = toDecode.replace("&lt;", "<");
+        toDecode = toDecode.replace("&amp;", "&");
+        toDecode = toDecode.replace("&#10;", "\n");
+        toDecode = toDecode.replace("&#13;", "\r");
+        toDecode = toDecode.replace("&quot;", "\"");
+
+        return toDecode;
+    }
+    
+    /**
      * System parameters.
      */
     static Hashtable<String, String> systemParam = new Hashtable<String, String>();
@@ -1752,7 +1762,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         Hashtable<String, String> atts = new Hashtable<String, String>();
         skipSpace(c, in);
         while (c[0] >= 0 && c[0] != '>') {
-            String att = scanIdentifier(c, in);
+            String att = decodeString(scanIdentifier(c, in));
             String val = "";
             skipSpace(c, in);
             if (c[0] == '=') {
@@ -1775,7 +1785,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                     c[0] = in.read();
                 }
                 skipSpace(c, in);
-                val = buf.toString();
+                val = decodeString(buf.toString());
             }
 
             PluginDebug.debug("PUT " + att + " = '" + val + "'");

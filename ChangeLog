@@ -1,3 +1,19 @@
+2010-12-08  Deepak Bhole <dbhole@redhat.com>
+
+	PR597: Entities are parsed incorrectly in PARAM tag in applet plugin
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(encode_string): New function. Takes a string and replaces certain special
+	characters with html escapes.
+	(plugin_create_applet_tag): Use the new encode_string function to encode
+	argn and argv right away, rather than encoding the whole tag.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(handleMessage): Move decoding out so that it is done after parsing.
+	(decodeString): New function. Decodes the given string such that html
+	escapes are replaced by the original special characters.
+	(scanTag): Decode parameter name and value before adding it to attribute
+	array.
+	* NEWS: Updated.
+
 2010-12-08  Omair Majid  <omajid@redhat.com>
 
 	* configure.ac: Add check for sun.misc.HexDumpEncoder
