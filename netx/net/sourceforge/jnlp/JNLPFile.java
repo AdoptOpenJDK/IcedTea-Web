@@ -257,13 +257,6 @@ public class JNLPFile {
     }
 
     /**
-     * Returns the JNLP specification versions supported.
-     */
-    public static Version getSupportedVersions() {
-        return Parser.getSupportedVersions();
-    }
-
-    /**
      * Returns the JNLP file's title.  This method returns the same
      * value as InformationDesc.getTitle().
      */

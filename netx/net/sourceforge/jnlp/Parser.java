@@ -65,9 +65,6 @@ class Parser {
     };
     */
 
-    /** the supported JNLP file versions */
-    private static Version supportedVersions = new Version("1.0 1.1 1.2 1.3 1.4 1.5 1.6 6.0");
-
     // fix: some descriptors need to use the jnlp file at a later
     // date and having file ref lets us pass it to their
     // constructors
@@ -128,19 +125,8 @@ class Parser {
         this.base = (codebase != null) ? codebase : base; // if codebase not specified use default codebase
         fileLocation = getURL(root, "href", this.base);
 
-        // ensure version is supported
-        if (!supportedVersions.matchesAny(spec))
-            throw new ParseException(R("PSpecUnsupported", supportedVersions));
-
         // normalize the text nodes
         root.normalize();
-    }
-
-    /**
-     * Return the JNLP specification versions supported.
-     */
-    public static Version getSupportedVersions() {
-        return supportedVersions;
     }
 
     /**

@@ -1,5 +1,16 @@
 2010-12-08  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/JNLPFile.java
+	(getSupportedVersions): Remove method.
+	* netx/net/sourceforge/jnlp/Parser.java: Remove supportedVersions.
+	(Parser(JNLPFile,URL,Node,boolean,boolean)): Remove check for supported
+	version.
+	(getSupportedVersions): Remove method.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Remove PSpecUnsupported.
+
+2010-12-08  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/tools/JarRunner.java: Remove unused class.
 	* netx/net/sourceforge/jnlp/tools/JarSignerResources.java: Remove unused
 	class.
