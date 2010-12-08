@@ -1,3 +1,7 @@
+2010-12-08  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/tools/KeyTool.java: Remove unused class.
+
 2010-12-07  Andrew Su  <asu@redhat.com>
 
 	* MiddleClickListener.java: Added copyright header. Corrected typo in
