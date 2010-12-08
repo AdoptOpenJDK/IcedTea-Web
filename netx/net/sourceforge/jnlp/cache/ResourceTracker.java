@@ -263,8 +263,7 @@ public class ResourceTracker {
      * Adds the listener to the list of objects interested in
      * receivind DownloadEvents.<p>
      *
-     * @param location the resource to add a callback for
-     * @param runnable the runnable to call when resource is completed
+     * @param listener the listener to add.
      */
     public void addDownloadListener(DownloadListener listener) {
         synchronized (listeners) {
@@ -275,6 +274,8 @@ public class ResourceTracker {
 
     /**
      * Removes a download listener.
+     *
+     * @param listener the listener to remove.
      */
     public void removeDownloadListener(DownloadListener listener) {
         synchronized (listeners) {

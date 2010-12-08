@@ -55,7 +55,7 @@ public class JREDesc {
      * if location is not null
      * @param location the location of a JRE product or null
      * @param initialHeapSize inital heap size
-     * @param maximumHeadSize maximum head size
+     * @param maximumHeapSize maximum head size
      * @param resources list of ResourceDesc objects
      */
     public JREDesc(Version version, URL location,

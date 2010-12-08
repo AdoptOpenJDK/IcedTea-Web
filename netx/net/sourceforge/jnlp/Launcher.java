@@ -104,7 +104,7 @@ public class Launcher {
      * Create a launcher with the runtime's default update policy
      * and launch handler.
      *
-     * @param exitOnError Exit if there is an error (usually default, but false when being used from the plugin)
+     * @param exitOnFailure Exit if there is an error (usually default, but false when being used from the plugin)
      */
     public Launcher(boolean exitOnFailure) {
         this(null, null);

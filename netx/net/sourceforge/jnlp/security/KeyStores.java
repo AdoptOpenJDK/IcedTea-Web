@@ -220,9 +220,10 @@ public final class KeyStores {
 
     /**
      * Returns the location of a KeyStore corresponding to the given level and type.
-     * @param level
-     * @param type
-     * @return
+     *
+     * @param level the specified level of the key store to be returned.
+     * @param type the specified type of the key store to be returned.
+     * @return the location of the key store.
      */
     public static final String getKeyStoreLocation(Level level, Type type) {
         String configKey = null;
@@ -280,9 +281,9 @@ public final class KeyStores {
      * concatenating a level and type, converting everything to Title Case and
      * removing the _'s. (USER,CA_CERTS) becomes UserCaCerts.
      *
-     * @param level
-     * @param type
-     * @return
+     * @param level the level of the key store.
+     * @param type the type of the key store.
+     * @return the translation key.
      */
     public static final String toTranslatableString(Level level, Type type) {
         StringBuilder response = new StringBuilder();

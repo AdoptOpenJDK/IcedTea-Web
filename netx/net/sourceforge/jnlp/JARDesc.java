@@ -57,7 +57,8 @@ public class JARDesc {
      * @param part the part name, or null
      * @param lazy whether to load the JAR on demand
      * @param main whether the JAR contains the main class
-     * @param nativeJam whether the JAR contains native libraries
+     * @param nativeJar whether the JAR contains native libraries
+     * @param cacheable whether the JAR can be cached or not
      */
     public JARDesc(URL location, Version version, String part, boolean lazy, boolean main, boolean nativeJar, boolean cacheable) {
         this.location = location;

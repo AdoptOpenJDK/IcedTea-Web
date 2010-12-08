@@ -78,7 +78,7 @@ public abstract class SecurityDialogPanel extends JPanel {
      * is invoked, it will set the value of the {@link SecurityWarningDialog} and then dispossed.
      *
      * @param buttonIndex the index of the button. By convention 0 = Yes. 1 = No, 2 = Cancel
-     * @return
+     * @return the ActionListener instance.
      */
     protected ActionListener createSetValueListener(SecurityWarningDialog dialog, int buttonIndex) {
         return new SetValueHandler(dialog, buttonIndex);

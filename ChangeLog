@@ -1,3 +1,40 @@
+2010-12-07  Andrew John Hughes  <ahughes@redhat.com>
+
+	* netx/net/sourceforge/jnlp/InformationDesc.java,
+	(InformationDesc(JNLPFile,Locale)): Correct @param tag.
+	* netx/net/sourceforge/jnlp/JARDesc.java:
+	(JARDesc(URL,Version,String,boolean,boolean,boolean,boolean)):
+	Correct typo and add missing @param tag for cacheable.
+	* netx/net/sourceforge/jnlp/JREDesc.java:
+	(JREDesc(Version,URL,String,String,String,List)): Correct typo
+	in @param tag.
+	* netx/net/sourceforge/jnlp/Launcher.java:
+	(Launcher(boolean)): Correct broken @param tag.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
+	(addDownloadListener(DownloadListener)): Remove broken @param tags.
+	Add correct one.
+	(removeDownloadListener(DownloadListener)): Add missing @param tag.
+	* netx/net/sourceforge/jnlp/security/KeyStores.java:
+	(getKeyStoreLocation(Level,Type)): Add content to @param and @return tags.
+	(toTranslatableString(Level,Type)): Likewise.
+	* netx/net/sourceforge/jnlp/security/PasswordAuthenticationDialog.java:
+	(askUser(String,int,String,String)): Correct typo in @param tag.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogPanel.java:
+	(createSetValueListener(SecurityWarningDialog,int)): Add content to @return tag.
+	* netx/net/sourceforge/jnlp/security/SecurityWarningDialog.java:
+	(showCertInfoDialog(CertVerifier,SecurityWarningDialog)): Remove broken
+	@param tag and add correct ones.
+	(showSingleCertInfoDialog(X509Certificate,JDialog)): Add content to @param tags.
+	* netx/net/sourceforge/jnlp/tools/CharacterEncoder.java:
+	Remove broken @see tags from import from OpenJDK.
+	* netx/net/sourceforge/jnlp/util/FileUtils.java:
+	Fix bad whitespace.
+	(sanitizeFileName(String)): Fix @param tag.
+	* netx/net/sourceforge/nanoxml/XMLElement.java:
+	Fix example in class documentation.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java,
+	(waitForAppletInit(NetxPanel)): Fix @param tag.
+
 2010-12-08  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/tools/KeyTool.java: Remove unused class.

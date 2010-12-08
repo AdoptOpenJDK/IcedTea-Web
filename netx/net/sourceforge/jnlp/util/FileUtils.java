@@ -61,7 +61,7 @@ public final class FileUtils {
      * Given an input, return a sanitized form of the input suitable for use as
      * a file/directory name
      *
-     * @param input
+     * @param filename the filename to sanitize.
      * @return a sanitized version of the input
      */
     public static String sanitizeFileName(String filename) {
@@ -172,7 +172,7 @@ public final class FileUtils {
         /*
          * use a very simple method: prefix + "..." + suffix
          *
-         * where prefix is the beginning part of path (as much as we can squeeze in) 
+         * where prefix is the beginning part of path (as much as we can squeeze in)
          * and suffix is the end path of path
          */
 

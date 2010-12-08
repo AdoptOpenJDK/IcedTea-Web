@@ -52,14 +52,14 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  * You can enumerate the attributes of an element using the method
  * {@link #enumerateAttributeNames() enumerateAttributeNames}.
  * The attribute values can be retrieved using the method
- * {@link #getStringAttribute(java.lang.String) getStringAttribute}.
+ * {@link #getAttribute(java.lang.String) getAttribute}.
  * The following example shows how to list the attributes of an element:
  * <UL><CODE>
  * XMLElement element = ...;<BR>
- * Enumeration enum = element.getAttributeNames();<BR>
+ * Enumeration enum = element.enumerateAttributeNames();<BR>
  * while (enum.hasMoreElements()) {<BR>
  * &nbsp;&nbsp;&nbsp;&nbsp;String key = (String) enum.nextElement();<BR>
- * &nbsp;&nbsp;&nbsp;&nbsp;String value = element.getStringAttribute(key);<BR>
+ * &nbsp;&nbsp;&nbsp;&nbsp;String value = (String) element.getAttribute(key);<BR>
  * &nbsp;&nbsp;&nbsp;&nbsp;System.out.println(key + " = " + value);<BR>
  * }
  * </CODE></UL></DD></DL>

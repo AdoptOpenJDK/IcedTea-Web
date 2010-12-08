@@ -687,7 +687,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     /**
      * Function to block until applet initialization is complete
      *
-     * @param identifier The instance to wait for
+     * @param panel the instance to wait for.
      */
     public static void waitForAppletInit(NetxPanel panel) {
 

@@ -60,7 +60,7 @@ public class InformationDesc {
      * Create an information element object.
      *
      * @param jnlpFile file that the information is for
-     * @param locale the the information is for
+     * @param locales the locales the information is for
      */
     public InformationDesc(JNLPFile jnlpFile, Locale locales[]) {
         this.jnlpFile = jnlpFile;

@@ -184,7 +184,7 @@ public class PasswordAuthenticationDialog extends JDialog {
     /**
      * Present a dialog to the user asking them for authentication information
      *
-     * @param hostThe host for with authentication is needed
+     * @param host The host for with authentication is needed
      * @param port The port being accessed
      * @param prompt The prompt (realm) as presented by the server
      * @param type The type of server (proxy/web)

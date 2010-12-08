@@ -175,7 +175,8 @@ public class SecurityWarningDialog extends JDialog {
     /**
      * Displays CertPath information in a readable table format.
      *
-     * @param certs the certificates used in signing.
+     * @param jarSigner the JarSigner used to verify this application
+     * @param parent the parent option pane
      */
     public static void showCertInfoDialog(CertVerifier jarSigner,
                 SecurityWarningDialog parent) {
@@ -190,8 +191,8 @@ public class SecurityWarningDialog extends JDialog {
     /**
      * Displays a single certificate's information.
      *
-     * @param c
-     * @param optionPane
+     * @param c the X509 certificate.
+     * @param parent the parent pane.
      */
     public static void showSingleCertInfoDialog(X509Certificate c,
                         JDialog parent) {
