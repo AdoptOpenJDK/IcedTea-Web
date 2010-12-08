@@ -1,3 +1,9 @@
+2010-12-08  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/tools/JarRunner.java: Remove unused class.
+	* netx/net/sourceforge/jnlp/tools/JarSignerResources.java: Remove unused
+	class.
+
 2010-12-07  Andrew John Hughes  <ahughes@redhat.com>
 
 	* netx/net/sourceforge/jnlp/InformationDesc.java,
