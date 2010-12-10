@@ -1,3 +1,14 @@
+2010-12-10  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java: Remove unused variables
+	collator, VERSION, IN_KEYSTORE, IN_SCOPE, privateKey, store, keystore,
+	nullStream, token, jarfile, alias, storepass, protectedPath, storetype,
+	providerName, providers, providerArgs, keypass, sigfile, sigalg,
+	digestalg, signedjar, tsaUrl, tsaAlias, verify, debug, signManifest and
+	externalSF.
+	(getPublisher): Remove unnecessary cast.
+	(getRoot): Likewise.
+
 2010-12-08  Deepak Bhole <dbhole@redhat.com>
 
 	PR597: Entities are parsed incorrectly in PARAM tag in applet plugin

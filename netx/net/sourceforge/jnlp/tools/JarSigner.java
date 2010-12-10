@@ -29,10 +29,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.*;
 import java.util.*;
-import java.util.zip.*;
 import java.util.jar.*;
-import java.text.Collator;
-import java.text.MessageFormat;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertPath;
@@ -53,23 +50,12 @@ import net.sourceforge.jnlp.security.*;
 
 public class JarSigner implements CertVerifier {
 
-    private static final Collator collator = Collator.getInstance();
-    static {
-        // this is for case insensitive string comparisions
-        collator.setStrength(Collator.PRIMARY);
-    }
-
     private static final String META_INF = "META-INF/";
 
     // prefix for new signature-related files in META-INF directory
     private static final String SIG_PREFIX = META_INF + "SIG-";
 
     private static final long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L; //milliseconds
-
-    static final String VERSION = "1.0";
-
-    static final int IN_KEYSTORE = 0x01;
-    static final int IN_SCOPE = 0x02;
 
     static enum verifyResult {
         UNSIGNED, SIGNED_OK, SIGNED_NOT_OK
@@ -78,36 +64,8 @@ public class JarSigner implements CertVerifier {
     // signer's certificate chain (when composing)
     X509Certificate[] certChain;
 
-    /*
-     * private key
-     */
-    PrivateKey privateKey;
-    KeyStore store;
-
-    String keystore; // key store file
-    boolean nullStream = false; // null keystore input stream (NONE)
-    boolean token = false; // token-based keystore
-    String jarfile; // jar file to sign
-    String alias; // alias to sign jar with
-    char[] storepass; // keystore password
-    boolean protectedPath; // protected authentication path
-    String storetype; // keystore type
-    String providerName; // provider name
-    Vector<String> providers = null; // list of providers
-    HashMap<String, String> providerArgs = new HashMap<String, String>(); // arguments for provider constructors
-    char[] keypass; // private key password
-    String sigfile; // name of .SF file
-    String sigalg; // name of signature algorithm
-    String digestalg = "SHA1"; // name of digest algorithm
-    String signedjar; // output filename
-    String tsaUrl; // location of the Timestamping Authority
-    String tsaAlias; // alias for the Timestamping Authority's certificate
-    boolean verify = false; // verify the jar
     boolean verbose = false; // verbose output when signing/verifying
     boolean showcerts = false; // show certs when verifying
-    boolean debug = false; // debug
-    boolean signManifest = true; // "sign" the whole manifest
-    boolean externalSF = true; // leave the .SF out of the PKCS7 block
 
     private boolean hasExpiredCert = false;
     private boolean hasExpiringCert = false;
@@ -397,7 +355,7 @@ public class JarSigner implements CertVerifier {
         if (certPath != null) {
             List<? extends Certificate> certList = certPath.getCertificates();
             if (certList.size() > 0) {
-                return (Certificate) certList.get(0);
+                return certList.get(0);
             } else {
                 return null;
             }
@@ -413,8 +371,7 @@ public class JarSigner implements CertVerifier {
         if (certPath != null) {
             List<? extends Certificate> certList = certPath.getCertificates();
             if (certList.size() > 0) {
-                return (Certificate) certList.get(
-                                certList.size() - 1);
+                return certList.get(certList.size() - 1);
             } else {
                 return null;
             }
