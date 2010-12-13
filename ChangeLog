@@ -1,3 +1,13 @@
+2010-12-13  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Parser.java
+	(getInformationDesc): Fix whitespace in title, vendor and description
+	elements.
+	(getRelatedContent): Fix whitespace in title and description elements.
+	(getSpanText(Node)): Delegate to ...
+	(getSpanText(Node,boolean)): New method.  Return the text in an element,
+	optionally fixing whitespace.
+
 2010-12-10  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/tools/JarSigner.java: Remove unused variables

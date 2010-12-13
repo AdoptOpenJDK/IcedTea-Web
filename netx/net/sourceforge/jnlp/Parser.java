@@ -446,9 +446,9 @@ class Parser {
             String name = child.getNodeName();
 
             if ("title".equals(name))
-                addInfo(info, child, null, getSpanText(child));
+                addInfo(info, child, null, getSpanText(child, false));
             if ("vendor".equals(name))
-                addInfo(info, child, null, getSpanText(child));
+                addInfo(info, child, null, getSpanText(child, false));
             if ("description".equals(name)) {
                 String kind = getAttribute(child, "kind", "default");
                 if (descriptionsUsed.contains(kind))
@@ -456,7 +456,7 @@ class Parser {
                         throw new ParseException(R("PTwoDescriptions", kind));
 
                 descriptionsUsed.add(kind);
-                addInfo(info, child, kind, getSpanText(child));
+                addInfo(info, child, kind, getSpanText(child, false));
             }
             if ("homepage".equals(name))
                 addInfo(info, child, null, getRequiredURL(child, "href", base));
@@ -774,12 +774,12 @@ class Parser {
                 if (title != null && strict) {
                     throw new ParseException(R("PTwoTitles"));
                 }
-                title = getSpanText(child);
+                title = getSpanText(child, false);
             } else if ("description".equals(name)) {
                 if (description != null && strict) {
                     throw new ParseException(R("PTwoDescriptions"));
                 }
-                description = getSpanText(child);
+                description = getSpanText(child, false);
             } else if ("icon".equals(name)) {
                 if (icon != null && strict) {
                     throw new ParseException(R("PTwoIcons"));
@@ -876,7 +876,6 @@ class Parser {
     }
 
     // XML junk
-
     /**
      * Returns the implied text under a node, for example "text" in
      * "<description>text</description>".
@@ -885,11 +884,35 @@ class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     public String getSpanText(Node node) throws ParseException {
+        return getSpanText(node, true);
+    }
+
+    /**
+     * Returns the implied text under a node, for example "text" in
+     * "<description>text</description>". If preserveSpacing is false,
+     * sequences of whitespace characters are turned into a single
+     * space character.
+     *
+     * @param node the node with text under it
+     * @param preserveSpacing if true, preserve whitespace
+     * @throws ParseException if the JNLP file is invalid
+     */
+    public String getSpanText(Node node, boolean preserveSpacing)
+            throws ParseException {
         if (node == null)
             return null;
 
         // NANO
-        return node.getNodeValue();
+        String val = node.getNodeValue();
+        if (preserveSpacing) {
+            return val;
+        } else {
+            if (val == null) {
+                return null;
+            } else {
+                return val.replaceAll("\\s+", " ");
+            }
+        }
 
         /* TINY
         Node child = node.getFirstChild();
