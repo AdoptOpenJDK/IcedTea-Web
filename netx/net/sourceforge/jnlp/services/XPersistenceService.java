@@ -24,6 +24,7 @@ import javax.jnlp.*;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.FileUtils;
 

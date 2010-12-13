@@ -1,5 +1,66 @@
 2010-12-13  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/config/ValueValidator.java: New file.
+	* netx/net/sourceforge/jnlp/config/BasicValueValidators.java: New
+	file. Provides methods to get some common validators.
+	* netx/net/sourceforge/jnlp/config/ConfiguratonValidator.java: New
+	file. Provides methods to validate a configuration.
+	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
+	Moved to config subpackage instead and split off into Setting.java,
+	DeploymentConfiguration.java and Defaults.java.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
+	Renamed version of original DeploymentConfiguration.
+	(load): Delegate to load.
+	(load(boolean)): Load configuration and optionally fix any issues
+	found.
+	(checkAndFixConfiguration): New method. Validate all settings and
+	set them to default values if problems found.
+	* netx/net/sourceforge/jnlp/config/Setting.java: New file. Based on
+	ConfigValue which was originally a part of DeploymentConfiguration.
+	* netx/net/sourceforge/jnlp/config/Defaults.java: New file.
+	Contains the default configuration settings. Originally from
+	DeploymentConfiguration.java's loadDefaultProperties.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add new
+	messages.
+	* netx/net/sourceforge/jnlp/Launcher.java: Fix imports.
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel
+	/AdvancedProxySettingsDialog.java: Likewise
+	* netx/net/sourceforge/jnlp/controlpanel
+	/AdvancedProxySettingsPane.java: Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: Likewise
+	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel/MiddleClickListener.java:
+	Likewise
+	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel/SecuritySettingsPanel.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel
+	/TemporaryInternetFilesPanel.java:Likewise.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Likewise.
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: Likewise.
+	* netx/net/sourceforge/jnlp/security/SecurityWarning.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/SingleInstanceLock.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/services/XBasicService.java: Likewise
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: Likewise.
+	* plugin/icedteanp/java/sun/applet/JavaConsole.java: Likewise.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java: Likewise. 
+
+2010-12-13  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/Parser.java
 	(getInformationDesc): Fix whitespace in title, vendor and description
 	elements.

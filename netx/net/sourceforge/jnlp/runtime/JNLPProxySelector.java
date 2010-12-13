@@ -32,6 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+
 /**
  * A ProxySelector specific to JNLPs. This proxy uses the deployment
  * configuration to determine what to do.

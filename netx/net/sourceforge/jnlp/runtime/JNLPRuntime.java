@@ -36,6 +36,7 @@ import javax.swing.text.html.parser.ParserDelegator;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.security.VariableX509TrustManager;
@@ -103,7 +104,7 @@ public class JNLPRuntime {
     private static boolean securityEnabled = true;
 
     /** whether debug mode is on */
-    private static boolean debug = false; // package access by Boot
+    private static boolean debug = false;
 
     /** whether streams should be redirected */
     private static boolean redirectStreams = false;

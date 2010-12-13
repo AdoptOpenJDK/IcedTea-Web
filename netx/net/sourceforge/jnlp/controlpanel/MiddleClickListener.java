@@ -23,7 +23,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 /**
  * When middle click pastes to the textboxes it doesn't register it... This is

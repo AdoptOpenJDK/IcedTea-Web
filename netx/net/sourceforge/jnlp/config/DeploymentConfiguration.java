@@ -14,9 +14,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.runtime;
+package net.sourceforge.jnlp.config;
 
-import java.awt.AWTPermission;
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,7 +37,7 @@ import java.util.Set;
 
 import javax.naming.ConfigurationException;
 
-import net.sourceforge.jnlp.ShortcutDesc;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
  * Manages the various properties and configuration related to deployment.
@@ -45,59 +46,6 @@ import net.sourceforge.jnlp.ShortcutDesc;
  * http://download.oracle.com/javase/1.5.0/docs/guide/deployment/deployment-guide/properties.html
  */
 public final class DeploymentConfiguration {
-
-    /**
-     * Represents a value for a configuration. Provides methods to get the value
-     * as well as marking the value as locked.
-     */
-    private final class ConfigValue {
-
-        private String value;
-        private boolean locked;
-
-        ConfigValue(String value) {
-            this(value, false);
-        }
-
-        ConfigValue(String value, boolean locked) {
-            this.value = value;
-            this.locked = locked;
-        }
-
-        ConfigValue(ConfigValue other) {
-            this(other.value, other.locked);
-        }
-
-        String get() {
-            return value;
-        }
-
-        /**
-         * Note that setting the value is not enforced - it is the caller's
-         * responsibility to check if a value is locked or not before setting a
-         * new value
-         *
-         * @param value the new value
-         */
-        void set(String value) {
-            this.value = value;
-        }
-
-        /**
-         * @return true if the value has been marked as locked
-         */
-        boolean isLocked() {
-            return locked;
-        }
-
-        /**
-         * Mark a value as locked
-         * @param locked
-         */
-        void setLocked(boolean locked) {
-            this.locked = locked;
-        }
-    }
 
     public static final String DEPLOYMENT_DIR = ".icedtea";
     public static final String DEPLOYMENT_CONFIG = "deployment.config";
@@ -135,12 +83,14 @@ public final class DeploymentConfiguration {
      */
     public static final String KEY_USER_NETX_RUNNING_FILE = "deployment.user.runningfile";
 
+    public static final String KEY_USER_SECURITY_POLICY = "deployment.user.security.policy";
     public static final String KEY_USER_TRUSTED_CA_CERTS = "deployment.user.security.trusted.cacerts";
     public static final String KEY_USER_TRUSTED_JSSE_CA_CERTS = "deployment.user.security.trusted.jssecacerts";
     public static final String KEY_USER_TRUSTED_CERTS = "deployment.user.security.trusted.certs";
     public static final String KEY_USER_TRUSTED_JSSE_CERTS = "deployment.user.security.trusted.jssecerts";
     public static final String KEY_USER_TRUSTED_CLIENT_CERTS = "deployment.user.security.trusted.clientauthcerts";
 
+    public static final String KEY_SYSTEM_SECURITY_POLICY = "deployment.system.security.policy";
     public static final String KEY_SYSTEM_TRUSTED_CA_CERTS = "deployment.system.security.cacerts";
     public static final String KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS = "deployment.system.security.jssecacerts";
     public static final String KEY_SYSTEM_TRUSTED_CERTS = "deployment.system.security.trusted.certs";
@@ -184,16 +134,26 @@ public final class DeploymentConfiguration {
     /*
      * Tracing and Logging
      */
-
+    public static final String KEY_ENABLE_TRACING = "deployment.trace";
     public static final String KEY_ENABLE_LOGGING = "deployment.log";
+
+    /*
+     * Console
+     */
+    public static final String KEY_CONSOLE_STARTUP_MODE = "deployment.console.startup.mode";
 
     /*
      * Desktop Integration
      */
 
+    public static final String KEY_JNLP_ASSOCIATIONS = "deployment.javaws.associations";
     public static final String KEY_CREATE_DESKTOP_SHORTCUT = "deployment.javaws.shortcut";
 
+    public static final String KEY_JRE_INTSTALL_URL = "deployment.javaws.installURL";
+    public static final String KEY_AUTO_DOWNLOAD_JRE = "deployment.javaws.autodownload";
+
     public static final String KEY_BROWSER_PATH = "deployment.browser.path";
+    public static final String KEY_UPDATE_TIMEOUT = "deployment.javaws.update.timeout";
 
     public enum ConfigType {
         System, User
@@ -208,14 +168,14 @@ public final class DeploymentConfiguration {
     private File userPropertiesFile = null;
 
     /** the current deployment properties */
-    private Map<String, ConfigValue> currentConfiguration;
+    private Map<String, Setting<String>> currentConfiguration;
 
     /** the deployment properties that cannot be changed */
-    private Map<String, ConfigValue> unchangeableConfiguration;
+    private Map<String, Setting<String>> unchangeableConfiguration;
 
     public DeploymentConfiguration() {
-        currentConfiguration = new HashMap<String, ConfigValue>();
-        unchangeableConfiguration = new HashMap<String, ConfigValue>();
+        currentConfiguration = new HashMap<String, Setting<String>>();
+        unchangeableConfiguration = new HashMap<String, Setting<String>>();
     }
 
     /**
@@ -225,6 +185,18 @@ public final class DeploymentConfiguration {
      * @throws DeploymentException if it encounters a fatal error.
      */
     public void load() throws ConfigurationException {
+        load(true);
+    }
+
+    /**
+     * Initialize this deployment configuration by reading configuration files.
+     * Generally, it will try to continue and ignore errors it finds (such as file not found).
+     *
+     * @param fixIssues If true, fix issues that are discovered when reading configuration by
+     * resorting to the default values
+     * @throws DeploymentException if it encounters a fatal error.
+     */
+    public void load(boolean fixIssues) throws ConfigurationException {
         // make sure no state leaks if security check fails later on
         File userFile = new File(System.getProperty("user.home") + File.separator + DEPLOYMENT_DIR
                 + File.separator + DEPLOYMENT_PROPERTIES);
@@ -234,9 +206,9 @@ public final class DeploymentConfiguration {
             sm.checkRead(userFile.toString());
         }
 
-        Map<String, ConfigValue> initialProperties = loadDefaultProperties();
+        Map<String, Setting<String>> initialProperties = Defaults.getDefaults();
 
-        Map<String, ConfigValue> systemProperties = null;
+        Map<String, Setting<String>> systemProperties = null;
 
         /*
          * First, try to read the system's deployment.config file to find if
@@ -259,20 +231,23 @@ public final class DeploymentConfiguration {
         }
 
         /* need a copy of the original when we have to save */
-        unchangeableConfiguration = new HashMap<String, ConfigValue>();
+        unchangeableConfiguration = new HashMap<String, Setting<String>>();
         Set<String> keys = initialProperties.keySet();
         for (String key : keys) {
-            unchangeableConfiguration.put(key, new ConfigValue(initialProperties.get(key)));
+            unchangeableConfiguration.put(key, new Setting<String>(initialProperties.get(key)));
         }
 
         /*
          * Third, read the user's deployment.properties file
          */
         userPropertiesFile = userFile;
-        Map<String, ConfigValue> userProperties = loadProperties(ConfigType.User, userPropertiesFile,
-                false);
+        Map<String, Setting<String>> userProperties = loadProperties(ConfigType.User, userPropertiesFile, false);
         if (userProperties != null) {
             mergeMaps(initialProperties, userProperties);
+        }
+
+        if (fixIssues) {
+            checkAndFixConfiguration(initialProperties);
         }
 
         currentConfiguration = initialProperties;
@@ -292,7 +267,7 @@ public final class DeploymentConfiguration {
             }
         }
 
-        return currentConfiguration.get(key).get();
+        return currentConfiguration.get(key).getValue();
     }
 
     /**
@@ -310,6 +285,20 @@ public final class DeploymentConfiguration {
     }
 
     /**
+     * @return a map containing property names and the corresponding settings
+     */
+    public Map<String, Setting<String>> getRaw() {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            if (userPropertiesFile != null) {
+                sm.checkRead(userPropertiesFile.toString());
+            }
+        }
+
+        return currentConfiguration;
+    }
+
+    /**
      * Sets the value of corresponding to the key. If the value has been marked
      * as locked, it is not changed
      *
@@ -324,119 +313,49 @@ public final class DeploymentConfiguration {
             }
         }
 
-        ConfigValue currentValue = currentConfiguration.get(key);
+        Setting<String> currentValue = currentConfiguration.get(key);
         if (currentValue != null) {
             if (!currentValue.isLocked()) {
-                currentValue.set(value);
+                currentValue.setValue(value);
             }
         } else {
-            currentValue = new ConfigValue(value);
+            currentValue = new Setting<String>(key, key, false, null, null, value, "<unknown>");
             currentConfiguration.put(key, currentValue);
         }
     }
 
     /**
-     * Loads the default properties for deployment
+     * Check that the configuration is valid. If there are invalid values,set
+     * those values to the default values. This is done by using check()
+     * method of the ValueCheker for each setting on the actual value. Fixes
+     * are made in-place.
+     *
+     * @param initial a map representing the initial configuration
      */
-    private Map<String, ConfigValue> loadDefaultProperties() {
+    public void checkAndFixConfiguration(Map<String, Setting<String>> initial) {
 
-        final String SYSTEM_HOME = System.getProperty("java.home");
-        final String SYSTEM_SECURITY = SYSTEM_HOME + File.separator + "lib" + File.separator
-                + "security";
+        Map<String, Setting<String>> defaults = Defaults.getDefaults();
 
-        final String USER_HOME = System.getProperty("user.home") + File.separator + DEPLOYMENT_DIR;
-        final String USER_SECURITY = USER_HOME + File.separator + "security";
+        for (String key : initial.keySet()) {
+            Setting<String> s = initial.get(key);
+            if (!(s.getName().equals(key))) {
+                System.out.println(R("DCInternal", "key " + key + " does not match setting name " + s.getName()));
+            } else if (!defaults.containsKey(key)) {
+                System.out.println(R("DCUnknownSettingWithVal", key));
+            } else {
+                ValueValidator checker = defaults.get(key).getValidator();
+                if (checker == null) {
+                    continue;
+                }
 
-        final String LOCKS_DIR = System.getProperty("java.io.tmpdir") + File.separator
-                + System.getProperty("user.name") + File.separator + "netx" + File.separator
-                + "locks";
-
-        /*
-         * This is more or less a straight copy from the deployment
-         * configuration page, with occasional replacements of "" or no-defaults
-         * with null
-         */
-
-        String[][] defaults = new String[][] {
-            /* infrastructure */
-            { KEY_USER_CACHE_DIR, USER_HOME + File.separator + "cache" },
-            { KEY_USER_PERSISTENCE_CACHE_DIR, USER_HOME + File.separator + "pcache" },
-            { KEY_SYSTEM_CACHE_DIR, null },
-            { KEY_USER_LOG_DIR, USER_HOME + File.separator + "log" },
-            { KEY_USER_TMP_DIR, USER_HOME + File.separator + "tmp" },
-            { KEY_USER_LOCKS_DIR, LOCKS_DIR },
-            { KEY_USER_NETX_RUNNING_FILE, LOCKS_DIR + File.separator + "netx_running" },
-            /* certificates and policy files */
-            { "deployment.user.security.policy", "file://" + USER_SECURITY + File.separator + "java.policy" },
-            { KEY_USER_TRUSTED_CA_CERTS, USER_SECURITY + File.separator + "trusted.cacerts" },
-            { KEY_USER_TRUSTED_JSSE_CA_CERTS, USER_SECURITY + File.separator + "trusted.jssecacerts" },
-            { KEY_USER_TRUSTED_CERTS, USER_SECURITY + File.separator + "trusted.certs" },
-            { KEY_USER_TRUSTED_JSSE_CERTS, USER_SECURITY + File.separator + "trusted.jssecerts" },
-            { KEY_USER_TRUSTED_CLIENT_CERTS, USER_SECURITY + File.separator + "trusted.clientcerts" },
-            { "deployment.system.security.policy", null },
-            { KEY_SYSTEM_TRUSTED_CA_CERTS, SYSTEM_SECURITY + File.separator + "cacerts" },
-            { KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS, SYSTEM_SECURITY + File.separator + "jssecacerts" },
-            { KEY_SYSTEM_TRUSTED_CERTS, SYSTEM_SECURITY + File.separator + "trusted.certs" },
-            { KEY_SYSTEM_TRUSTED_JSSE_CERTS, SYSTEM_SECURITY + File.separator + "trusted.jssecerts" },
-            { KEY_SYSTEM_TRUSTED_CLIENT_CERTS, SYSTEM_SECURITY + File.separator + "trusted.clientcerts" },
-            /* security access and control */
-            { KEY_SECURITY_PROMPT_USER, String.valueOf(true) },
-            { "deployment.security.askgrantdialog.notinca", String.valueOf(true) },
-            { "deployment.security.notinca.warning", String.valueOf(true) },
-            { "deployment.security.expired.warning", String.valueOf(true) },
-            { "deployment.security.jsse.hostmismatch.warning", String.valueOf(true) },
-            { "deployment.security.trusted.policy", null },
-            { KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING, String.valueOf(true) },
-            { KEY_SECURITY_PROMPT_USER_FOR_JNLP, String.valueOf(true) },
-            { KEY_SECURITY_INSTALL_AUTHENTICATOR, String.valueOf(true) },
-            /* networking */
-            { KEY_PROXY_TYPE, String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER) },
-            { KEY_PROXY_SAME, String.valueOf(false) },
-            { KEY_PROXY_AUTO_CONFIG_URL, null },
-            { KEY_PROXY_BYPASS_LIST, null },
-            { KEY_PROXY_BYPASS_LOCAL, null },
-            { KEY_PROXY_HTTP_HOST, null },
-            { KEY_PROXY_HTTP_PORT, null },
-            { KEY_PROXY_HTTPS_HOST, null },
-            { KEY_PROXY_HTTPS_PORT, null },
-            { KEY_PROXY_FTP_HOST, null },
-            { KEY_PROXY_FTP_PORT, null },
-            { KEY_PROXY_SOCKS4_HOST, null },
-            { KEY_PROXY_SOCKS4_PORT, null },
-            { KEY_PROXY_OVERRIDE_HOSTS, null },
-            /* cache and optional package repository */
-            { "deployment.cache.max.size", String.valueOf("-1") },
-            { "deployment.cache.jarcompression", String.valueOf(0) },
-            { "deployment.javapi.cache.enabled", String.valueOf(false) },
-            /* java console */
-            { "deployment.console.startup.mode", CONSOLE_HIDE },
-            /* tracing and logging */
-            { "deployment.trace", String.valueOf(false) },
-            { KEY_ENABLE_LOGGING, String.valueOf(false) },
-            /* JNLP association */
-            { "deployment.javaws.associations", String.valueOf(JNLP_ASSOCIATION_ASK_USER) },
-            /* desktop integration */
-            { KEY_CREATE_DESKTOP_SHORTCUT, ShortcutDesc.CREATE_ASK_USER_IF_HINTED },
-            /* jre selection */
-            { "deployment.javaws.installURL", null },
-            /* jre management */
-            { "deployment.javaws.autodownload", null },
-            /* browser selection */
-            { KEY_BROWSER_PATH, null },
-            /* check for update timeout */
-            { "deployment.javaws.update.timeout", String.valueOf(500) }
-        };
-
-        HashMap<String, ConfigValue> result = new HashMap<String, ConfigValue>();
-        for (int i = 0; i < defaults.length; i++) {
-            String key = defaults[i][0];
-            String actualValue = defaults[i][1];
-            boolean locked = false;
-            ConfigValue value = new ConfigValue(actualValue, locked);
-            result.put(key, value);
+                try {
+                    checker.validate(s.getValue());
+                } catch (IllegalArgumentException e) {
+                    System.out.println(R("DCErrorInSetting", key, s.getValue(), s.getDefaultValue(), checker.getPossibleValues()));
+                    s.setValue(s.getDefaultValue());
+                }
+            }
         }
-
-        return result;
     }
 
     /**
@@ -468,7 +387,7 @@ public final class DeploymentConfiguration {
             System.out.println("Loading system configuation from: " + configFile);
         }
 
-        Map<String, ConfigValue> systemConfiguration = new HashMap<String, ConfigValue>();
+        Map<String, Setting<String>> systemConfiguration = new HashMap<String, Setting<String>>();
         try {
             systemConfiguration = parsePropertiesFile(configFile);
         } catch (IOException e) {
@@ -484,7 +403,7 @@ public final class DeploymentConfiguration {
          */
 
         try {
-            String urlString = systemConfiguration.get("deployment.system.config").get();
+            String urlString = systemConfiguration.get("deployment.system.config").getValue();
             if (urlString == null) {
                 if (JNLPRuntime.isDebug()) {
                     System.out.println("No System level " + DEPLOYMENT_PROPERTIES + " found.");
@@ -498,8 +417,8 @@ public final class DeploymentConfiguration {
                     System.out.println("Using System level" + DEPLOYMENT_PROPERTIES + ": "
                             + systemPropertiesFile);
                 }
-                ConfigValue mandatory = systemConfiguration.get("deployment.system.config.mandatory");
-                systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.get());
+                Setting<String> mandatory = systemConfiguration.get("deployment.system.config.mandatory");
+                systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : (String) mandatory.getValue());
                 return true;
             } else {
                 if (JNLPRuntime.isDebug()) {
@@ -524,7 +443,7 @@ public final class DeploymentConfiguration {
      *
      * @throws ConfigurationException if the file is mandatory but cannot be read
      */
-    private Map<String, ConfigValue> loadProperties(ConfigType type, File file, boolean mandatory)
+    private Map<String, Setting<String>> loadProperties(ConfigType type, File file, boolean mandatory)
             throws ConfigurationException {
         if (file == null || !file.isFile()) {
             if (JNLPRuntime.isDebug()) {
@@ -570,9 +489,9 @@ public final class DeploymentConfiguration {
 
         for (String key : currentConfiguration.keySet()) {
             String oldValue = unchangeableConfiguration.get(key) == null ? null
-                    : unchangeableConfiguration.get(key).get();
-            String newValue = currentConfiguration.get(key) == null ? null : currentConfiguration
-                    .get(key).get();
+                    : (String) unchangeableConfiguration.get(key).getValue();
+            String newValue = currentConfiguration.get(key) == null ? null : (String) currentConfiguration
+                    .get(key).getValue();
             if (oldValue == null && newValue == null) {
                 continue;
             } else if (oldValue == null && newValue != null) {
@@ -609,8 +528,8 @@ public final class DeploymentConfiguration {
      * @param destination the map to which all the properties should be added
      * @throws IOException if an IO problem occurs
      */
-    private Map<String, ConfigValue> parsePropertiesFile(File propertiesFile) throws IOException {
-        Map<String, ConfigValue> result = new HashMap<String, ConfigValue>();
+    private Map<String, Setting<String>> parsePropertiesFile(File propertiesFile) throws IOException {
+        Map<String, Setting<String>> result = new HashMap<String, Setting<String>>();
 
         Properties properties = new Properties();
 
@@ -625,9 +544,9 @@ public final class DeploymentConfiguration {
         for (String key : keys) {
             if (key.endsWith(".locked")) {
                 String realKey = key.substring(0, key.length() - ".locked".length());
-                ConfigValue configValue = result.get(realKey);
+                Setting<String> configValue = result.get(realKey);
                 if (configValue == null) {
-                    configValue = new ConfigValue(null, true);
+                    configValue = new Setting<String>(realKey, realKey, true, null, null, null, propertiesFile.toString());
                     result.put(realKey, configValue);
                 } else {
                     configValue.setLocked(true);
@@ -635,12 +554,13 @@ public final class DeploymentConfiguration {
             } else {
                 /* when parsing a properties we set value without checking if it is locked or not */
                 String newValue = properties.getProperty(key);
-                ConfigValue configValue = result.get(key);
+                Setting<String> configValue = result.get(key);
                 if (configValue == null) {
-                    configValue = new ConfigValue(newValue);
+                    configValue = new Setting<String>(key, key, false, null, null, newValue, propertiesFile.toString());
                     result.put(key, configValue);
                 } else {
-                    configValue.set(newValue);
+                    configValue.setValue(newValue);
+                    configValue.setSource(propertiesFile.toString());
                 }
             }
         }
@@ -656,15 +576,16 @@ public final class DeploymentConfiguration {
      * @param finalMap the destination for putting values
      * @param srcMap the source for reading key value pairs
      */
-    private void mergeMaps(Map<String, ConfigValue> finalMap, Map<String, ConfigValue> srcMap) {
+    private void mergeMaps(Map<String, Setting<String>> finalMap, Map<String, Setting<String>> srcMap) {
         for (String key : srcMap.keySet()) {
-            ConfigValue configValue = finalMap.get(key);
-            if (configValue == null) {
-                configValue = srcMap.get(key);
-                finalMap.put(key, configValue);
+            Setting<String> destValue = finalMap.get(key);
+            Setting<String> srcValue = srcMap.get(key);
+            if (destValue == null) {
+                finalMap.put(key, srcValue);
             } else {
-                if (!configValue.isLocked()) {
-                    configValue.set(srcMap.get(key).get());
+                if (!destValue.isLocked()) {
+                    destValue.setSource(srcValue.getSource());
+                    destValue.setValue(srcValue.getValue());
                 }
             }
         }
@@ -678,12 +599,12 @@ public final class DeploymentConfiguration {
      * @param out the PrintStream to write data to
      */
     @SuppressWarnings("unused")
-    private static void dumpConfiguration(Map<String, ConfigValue> config, PrintStream out) {
+    private static void dumpConfiguration(Map<String, Setting<String>> config, PrintStream out) {
         System.out.println("KEY: VALUE [Locked]");
 
         for (String key : config.keySet()) {
-            ConfigValue value = config.get(key);
-            out.println("'" + key + "': '" + value.get() + "'"
+            Setting<String> value = config.get(key);
+            out.println("'" + key + "': '" + value.getValue() + "'"
                     + (value.isLocked() ? " [LOCKED]" : ""));
         }
     }

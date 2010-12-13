@@ -22,7 +22,7 @@ import java.util.*;
 import java.security.*;
 import java.awt.AWTPermission;
 
-import net.sourceforge.jnlp.runtime.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
