@@ -329,11 +329,8 @@ public class Launcher {
 
             List<String> commands = new LinkedList<String>();
 
-            String pathToWebstartBinary = System.getProperty("java.home") +
-                                      File.separatorChar +
-                                      "bin" +
-                                      File.separatorChar +
-                                      "javaws";
+            // this property is set by the javaws launcher to point to the javaws binary
+            String pathToWebstartBinary = System.getProperty("java.icedtea-web.bin");
             commands.add(pathToWebstartBinary);
             // use -Jargument format to pass arguments to the JVM through the launcher
             for (String arg : vmArgs) {

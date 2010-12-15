@@ -106,12 +106,28 @@ install-exec-local:
 if ENABLE_PLUGIN
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/IcedTeaPlugin.so $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)/
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/launcher/pluginappletviewer $(DESTDIR)$(bindir)
-	${INSTALL_PROGRAM} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/plugin.jar
+	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/plugin.jar
 endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/netx.jar
 	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/javaws $(DESTDIR)$(bindir)
+	if [ -d $(DESTDIR)$(prefix)/jre/bin ] ; then \
+	  if [ -L $(DESTDIR)$(prefix)/jre/bin/javaws ] ; then \
+	    rm -f $(DESTDIR)$(prefix)/jre/bin/javaws ; \
+	  fi ; \
+	  if [ ! -e $(prefix)/jre/bin/javaws ] ; then \
+	    ln -s $(DESTDIR)$(bindir)/javaws $(DESTDIR)$(prefix)/jre/bin ; \
+	  fi ; \
+	fi
 	${INSTALL_DATA} extra-lib/about.jar $(DESTDIR)$(prefix)/jre/lib
 	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/controlpanel/itweb-settings $(DESTDIR)$(bindir)
+	if [ -d $(DESTDIR)$(prefix)/jre/bin ] ; then \
+	  if [ -L $(DESTDIR)$(prefix)/jre/bin/itweb-settings ] ; then \
+	    rm -f $(DESTDIR)$(prefix)/jre/bin/itweb-settings ; \
+	  fi ; \
+	  if [ ! -e $(prefix)/jre/bin/itweb-settings ] ; then \
+	    ln -s $(DESTDIR)$(bindir)/itweb-settings $(DESTDIR)$(prefix)/jre/bin ; \
+	  fi ; \
+	fi
 
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(prefix)/man/man1
@@ -142,7 +158,14 @@ uninstall-local:
 	rm -f $(DESTDIR)$(prefix)/man/man1/javaws.1
 	rm -f $(DESTDIR)$(bindir)/pluginappletviewer
 	rm -f $(DESTDIR)$(bindir)/javaws
+	if [ -L $(DESTDIR)$(prefix)/jre/bin/javaws ] ; then \
+	  rm -f $(DESTDIR)$(prefix)/jre/bin/javaws ; \
+	fi
+	rm -f $(DESTDIR)$(prefix)/jre/bin/javaws
 	rm -f $(DESTDIR)$(bindir)/itweb-settings
+	if [ -L $(DESTDIR)$(prefix)/jre/bin/itweb-settings ] ; then \
+	  rm -f $(DESTDIR)$(prefix)/jre/bin/itweb-settings ; \
+	fi
 	rm -rf $(DESTDIR)$(htmldir)
 
 # Plugin
@@ -325,8 +348,9 @@ extra-lib/about.jar: stamps/extra-class-files.stamp
 
 $(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 	mkdir -p $(NETX_DIR)/launcher && \
-	$(CC) $(LAUNCHER_FLAGS) -DJAVA_ARGS='{ "-J-ms8m", "net.sourceforge.jnlp.runtime.Boot",  }' -DPROGNAME='"javaws"' \
-	-c -o $@ $<
+	$(CC) $(LAUNCHER_FLAGS) \
+	  -DJAVA_ARGS='{ "-J-ms8m", "-J-Djava.icedtea-web.bin=$(DESTDIR)$(bindir)/javaws", "net.sourceforge.jnlp.runtime.Boot",  }' \
+	  -DPROGNAME='"javaws"' -c -o $@ $<
 
 $(NETX_DIR)/launcher/controlpanel/%.o: $(LAUNCHER_SRCDIR)/%.c
 	mkdir -p $(NETX_DIR)/launcher/controlpanel && \
