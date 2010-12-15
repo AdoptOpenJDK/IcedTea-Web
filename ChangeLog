@@ -1,3 +1,18 @@
+2010-12-14  Andrew John Hughes  <ahughes@redhat.com>
+
+	* Makefile.am:
+	(LAUNCHER_OBJECTS): Add jli_util.o, parse_manifest.o,
+	version_comp.o, wildcard.o.
+	(LAUNCEHR_FLAGS): Add -DEXPAND_CLASSPATH_WILDCARDS
+	as used in build of libjli in OpenJDK.
+	(LAUNCHER_LINK): Don't link to libjli.
+	* launcher/jli_util.c,
+	* launcher/parse_manifest.c,
+	* launcher/version_comp.c,
+	* launcher/wildcard.c:
+	Add source files from OpenJDK6 to match header files
+	already used.
+
 2010-12-13  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/config/ValueValidator.java: New file.

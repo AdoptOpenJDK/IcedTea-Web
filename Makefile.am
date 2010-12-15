@@ -71,17 +71,16 @@ endif
 # Launcher
 
 LAUNCHER_SRCDIR = $(abs_top_srcdir)/launcher
-LAUNCHER_OBJECTS = java.o java_md.o splashscreen_stubs.o
+LAUNCHER_OBJECTS = java.o java_md.o splashscreen_stubs.o jli_util.o parse_manifest.o version_comp.o wildcard.o
 PLUGIN_LAUNCHER_OBJECTS = $(addprefix $(PLUGIN_DIR)/launcher/,$(LAUNCHER_OBJECTS))
 NETX_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/,$(LAUNCHER_OBJECTS))
 CONTROLPANEL_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/controlpanel/,$(LAUNCHER_OBJECTS))
 LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -pthread -W -Wall -Wno-unused -Wno-parentheses -pipe -fno-omit-frame-pointer \
 	-g -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -D_REENTRANT -DLAUNCHER_NAME='"java"' -I$(LAUNCHER_SRCDIR) \
-	-DJDK_MAJOR_VERSION='"1"' -DJDK_MINOR_VERSION='"6"' -DLIBARCHNAME='"$(JRE_ARCH_DIR)"'
+	-DJDK_MAJOR_VERSION='"1"' -DJDK_MINOR_VERSION='"6"' -DLIBARCHNAME='"$(JRE_ARCH_DIR)"' \
+	-DEXPAND_CLASSPATH_WILDCARDS
 LAUNCHER_LINK = -o $@ -pthread -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_DIR)/lib/$(INSTALL_ARCH_DIR) \
-	-Wl,-soname=lib.so  -L $(BOOT_DIR)/jre/lib/$(INSTALL_ARCH_DIR)/jli -Wl,-z -Wl,origin \
-	-Wl,--allow-shlib-undefined -Wl,-rpath -Wl,\$$ORIGIN/../lib/$(INSTALL_ARCH_DIR)/jli -Wl,-rpath \
-	-Wl,\$$ORIGIN/../jre/lib/$(INSTALL_ARCH_DIR)/jli $(X11_CFLAGS) $(X11_LIBS) -ljli  -ldl -lz
+	-Wl,-soname=lib.so -Wl,-z -Wl,origin -Wl,--allow-shlib-undefined $(X11_CFLAGS) $(X11_LIBS) -ldl -lz
 PLUGIN_VERSION = IcedTea-Web $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
 
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
