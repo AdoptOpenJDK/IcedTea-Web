@@ -1,3 +1,11 @@
+2010-12-17  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/SecurityWarning.java
+	(shouldPromptUser): Use full privileges when checking configuration. This
+	value is not security-sensitive and the method is private.
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java
+	(shouldPromptUser): Likewise.
+
 2010-12-15  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am

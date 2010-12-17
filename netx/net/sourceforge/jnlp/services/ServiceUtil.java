@@ -299,8 +299,13 @@ public class ServiceUtil {
      * @return true if the user should be prompted for JNLP API related permissions.
      */
     private static boolean shouldPromptUser() {
-        return Boolean.valueOf(JNLPRuntime.getConfiguration()
-                .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP));
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean >() {
+            @Override
+            public Boolean run() {
+                return Boolean.valueOf(JNLPRuntime.getConfiguration()
+                        .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP));
+            }
+        });
     }
 
 }

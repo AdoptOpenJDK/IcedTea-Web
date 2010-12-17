@@ -319,8 +319,13 @@ public class SecurityWarning {
      * @return true if security warnings should be shown to the user.
      */
     private static boolean shouldPromptUser() {
-        return Boolean.valueOf(JNLPRuntime.getConfiguration()
-                .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER));
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean >() {
+            @Override
+            public Boolean run() {
+                return Boolean.valueOf(JNLPRuntime.getConfiguration()
+                        .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER));
+            }
+        });
     }
 
 }
