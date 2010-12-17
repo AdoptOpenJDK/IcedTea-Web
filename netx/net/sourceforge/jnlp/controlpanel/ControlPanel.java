@@ -18,10 +18,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,6 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -79,6 +84,7 @@ public class ControlPanel extends JFrame {
             return panel;
         }
 
+        @Override
         public String toString() {
             return value;
         }
@@ -104,15 +110,55 @@ public class ControlPanel extends JFrame {
 
         this.config = config;
 
+        JPanel topPanel = createTopPanel();
         JPanel mainPanel = createMainSettingsPanel();
         JPanel buttonPanel = createButtonPanel();
 
+        add(topPanel, BorderLayout.PAGE_START);
         add(mainPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(buttonPanel, BorderLayout.PAGE_END);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         pack();
         setMinimumSize(getPreferredSize());
         setResizable(false);
+    }
+
+    private JPanel createTopPanel() {
+        Font currentFont = null;
+        JLabel about = new JLabel(R("CPMainDescriptionShort"));
+        currentFont = about.getFont();
+        about.setFont(currentFont.deriveFont(currentFont.getSize2D() + 2));
+        currentFont = about.getFont();
+        about.setFont(currentFont.deriveFont(Font.BOLD));
+
+        JLabel description = new JLabel(R("CPMainDescriptionLong"));
+        description.setBorder(new EmptyBorder(2, 0, 2, 0));
+
+        JPanel descriptionPanel = new JPanel(new GridLayout(0, 1));
+        descriptionPanel.setBackground(UIManager.getColor("TextPane.background"));
+        descriptionPanel.add(about);
+        descriptionPanel.add(description);
+
+        JLabel image = new JLabel();
+
+        ClassLoader cl = getClass().getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
+        try {
+            URL imgUrl = cl.getResource("net/sourceforge/jnlp/resources/netx-icon.png");
+            image.setIcon(new ImageIcon(ImageIO.read(imgUrl)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(UIManager.getColor("TextPane.background"));
+        topPanel.add(descriptionPanel, BorderLayout.LINE_START);
+        topPanel.add(image, BorderLayout.LINE_END);
+        topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        return topPanel;
     }
 
     /**
@@ -273,7 +319,12 @@ public class ControlPanel extends JFrame {
         JPanel notImplementedPanel = new NamedBorderPanel("Unimplemented");
         notImplementedPanel.setLayout(new BorderLayout());
 
-        URL imgUrl = getClass().getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png");
+        ClassLoader cl = getClass().getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
+        URL imgUrl = cl.getResource("net/sourceforge/jnlp/resources/warning.png");
         Image img;
         try {
             img = ImageIO.read(imgUrl);

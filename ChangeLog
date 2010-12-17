@@ -1,5 +1,16 @@
 2010-12-17  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java
+	(ControlPanel): Create and add the topPanel.
+	(createTopPanel): New method. Creates a JPanel to display the
+	description on top of the Control Panel.
+	(createNotImplementedPanel): Use the same way to load resource
+	as createTopPanel to avoid null pointer exceptions.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	CPMainDescriptionShort and CPMainDescriptionLong.
+
+2010-12-17  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/SecurityWarning.java
 	(shouldPromptUser): Use full privileges when checking configuration. This
 	value is not security-sensitive and the method is private.
