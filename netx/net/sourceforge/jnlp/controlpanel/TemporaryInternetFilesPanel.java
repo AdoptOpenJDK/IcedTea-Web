@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.sourceforge.jnlp.controlpanel;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -27,15 +26,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-import javax.naming.ConfigurationException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,6 +38,7 @@ import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -54,9 +50,6 @@ import net.sourceforge.jnlp.runtime.Translator;
  * This is provided as a pane for inside the Panel itself, can also be used to
  * display as a dialog.
  * TODO: Add functionality:
- * Delete Cache.
- * Restore Defaults.
- * View Cache.
  *
  * @author Andrew Su (asu@redhat.com, andrew.su@utoronto.ca)
  *
@@ -189,13 +182,27 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
         diskSpacePanel.add(spCacheSize, c);
 
         JPanel buttonDeleteRestore = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-        JButton bDelete = new JButton(Translator.R("TIFPDeleteFiles") + "...");
-        JButton bRestore = new JButton(Translator.R("TIFPRestoreDefaults"));
-        //TODO: Add functionality to restore and delete. Also need to add a view button!
-        bDelete.setEnabled(false);
-        bRestore.setEnabled(false);
-        buttonDeleteRestore.add(bDelete);
-        buttonDeleteRestore.add(bRestore);
+        JButton bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
+        bViewFiles.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            CacheViewer.showCacheDialog(config);
+                        } catch (Exception e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+
+                    }
+                });
+            }
+
+        });
+        buttonDeleteRestore.add(bViewFiles);
 
         c.weighty = 0;
         c.gridx = 0;
