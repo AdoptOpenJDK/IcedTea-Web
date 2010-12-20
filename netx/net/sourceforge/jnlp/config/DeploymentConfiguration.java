@@ -267,7 +267,11 @@ public final class DeploymentConfiguration {
             }
         }
 
-        return currentConfiguration.get(key).getValue();
+        String value = null;
+        if (currentConfiguration.get(key) != null) {
+            value = currentConfiguration.get(key).getValue();
+        }
+        return value;
     }
 
     /**
@@ -319,7 +323,7 @@ public final class DeploymentConfiguration {
                 currentValue.setValue(value);
             }
         } else {
-            currentValue = new Setting<String>(key, key, false, null, null, value, "<unknown>");
+            currentValue = new Setting<String>(key, R("Unknown"), false, null, null, value, R("Unknown"));
             currentConfiguration.put(key, currentValue);
         }
     }
@@ -341,7 +345,7 @@ public final class DeploymentConfiguration {
             if (!(s.getName().equals(key))) {
                 System.out.println(R("DCInternal", "key " + key + " does not match setting name " + s.getName()));
             } else if (!defaults.containsKey(key)) {
-                System.out.println(R("DCUnknownSettingWithVal", key));
+                System.out.println(R("DCUnknownSettingWithName", key));
             } else {
                 ValueValidator checker = defaults.get(key).getValidator();
                 if (checker == null) {
@@ -351,7 +355,7 @@ public final class DeploymentConfiguration {
                 try {
                     checker.validate(s.getValue());
                 } catch (IllegalArgumentException e) {
-                    System.out.println(R("DCErrorInSetting", key, s.getValue(), s.getDefaultValue(), checker.getPossibleValues()));
+                    System.out.println(R("DCIncorrectValue", key, s.getValue(), checker.getPossibleValues()));
                     s.setValue(s.getDefaultValue());
                 }
             }
@@ -546,7 +550,7 @@ public final class DeploymentConfiguration {
                 String realKey = key.substring(0, key.length() - ".locked".length());
                 Setting<String> configValue = result.get(realKey);
                 if (configValue == null) {
-                    configValue = new Setting<String>(realKey, realKey, true, null, null, null, propertiesFile.toString());
+                    configValue = new Setting<String>(realKey, R("Unknown"), true, null, null, null, propertiesFile.toString());
                     result.put(realKey, configValue);
                 } else {
                     configValue.setLocked(true);
@@ -556,7 +560,7 @@ public final class DeploymentConfiguration {
                 String newValue = properties.getProperty(key);
                 Setting<String> configValue = result.get(key);
                 if (configValue == null) {
-                    configValue = new Setting<String>(key, key, false, null, null, newValue, propertiesFile.toString());
+                    configValue = new Setting<String>(key, R("Unknown"), false, null, null, newValue, propertiesFile.toString());
                     result.put(key, configValue);
                 } else {
                     configValue.setValue(newValue);

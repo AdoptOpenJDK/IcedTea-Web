@@ -354,7 +354,8 @@ $(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 
 $(NETX_DIR)/launcher/controlpanel/%.o: $(LAUNCHER_SRCDIR)/%.c
 	mkdir -p $(NETX_DIR)/launcher/controlpanel && \
-	$(CC) $(LAUNCHER_FLAGS) -DJAVA_ARGS='{ "-J-ms8m", "net.sourceforge.jnlp.controlpanel.ControlPanel",  }' \
+	$(CC) $(LAUNCHER_FLAGS) \
+	-DJAVA_ARGS='{ "-J-ms8m", "-Dprogram.name=itweb-settings", "net.sourceforge.jnlp.controlpanel.CommandLine",  }' \
 	-DPROGNAME='"itweb-settings"' -c -o $@ $<
 
 $(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)

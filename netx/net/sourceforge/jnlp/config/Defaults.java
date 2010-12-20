@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -385,7 +387,7 @@ public class Defaults {
             ValueValidator checker = (ValueValidator) defaults[i][1];
             String actualValue = (String) defaults[i][2];
             boolean locked = false;
-            Setting<String> value = new Setting<String>(name, name, locked, checker, actualValue, actualValue, "<internal>");
+            Setting<String> value = new Setting<String>(name, R("Unknown"), locked, checker, actualValue, actualValue, R("DCSourceInternal"));
             result.put(name, value);
         }
 

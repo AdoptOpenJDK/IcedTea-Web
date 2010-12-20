@@ -1,3 +1,44 @@
+2010-12-20  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am
+	($(NETX_DIR)/launcher/controlpanel/%.o): Set program name, and launch
+	net.sourceforge.jnlp.controlpanel.CommandLine.
+	* netx/net/sourceforge/jnlp/config/Defaults.java
+	(getDefaults): Set descriptions to Unknown rather than the name.
+	Set source to localized form of internal.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java
+	(getProperty): Check for nulls.
+	(setProperty): Add unknown as description and source for new
+	properties.
+	(checkAndFixConfiguration): Fix translation constants.
+	(parsePropertiesFile): Use unknown as description.
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java: New file
+	(CommandLine): New method.
+	(handleHelpCommand): Likewise.
+	(printListHelp): Likewise.
+	(handleListCommand): Likewise.
+	(printGetHelp): Likewise.
+	(handleGetCommand): Likewise.
+	(printSetHelp): Likewise.
+	(handleSetCommand): Likewise.
+	(printResetHelp): Likewise.
+	(handleResetCommand): Likewise.
+	(printInfoHelp): Likewise.
+	(handleInfoCommand): Likewise.
+	(printCheckHelp): Likewise.
+	(handleCheckCommand): Likewise.
+	(handle): Likewise.
+	(main): Likewise.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	Usage, Unknown, RConfigurationFatal, DCIncorrectValue,
+	DCSourceInternal, DCUnknownSettingWithName, VVPossibleValues,
+	CLNoInfo, CLValue, CLValueSource, CLDescription, CLUnknownCommand
+	CLUnknownProperty, CLNoIssuesFound, CLIncorrectValue,
+	CLListDescription, CLGetDescription, CLSetDescription,
+	CLResetDescription, CLInfoDescription, CLCheckDescription and
+	CLHelpDescription. Remove DCErrorInSetting and
+	DCUnknownSettingWithVal.
+
 2010-12-17  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java
