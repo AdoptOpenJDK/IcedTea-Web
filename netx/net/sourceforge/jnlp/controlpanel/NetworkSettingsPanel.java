@@ -114,19 +114,11 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         JLabel addressLabel = new JLabel(Translator.R("NSAddress") + ":");
         JLabel portLabel = new JLabel(Translator.R("NSPort") + ":");
         final JTextField addressField = new JTextField(config.getProperty(properties[1]), 10);
-        addressField.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                config.setProperty(properties[1], addressField.getText());
-            }
-        });
-
-        addressField.addMouseListener(new MiddleClickListener(this.config, properties[1]));
+        addressField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[1]));
+        
         final JTextField portField = new JTextField(config.getProperty(properties[2]), 3);
-        portField.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                config.setProperty(properties[2], portField.getText());
-            }
-        });
+        portField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[1]));
+        
         // Create the button which allows setting of other types of proxy.
         JButton advancedProxyButton = new JButton(Translator.R("NSAdvanced") + "...");
         advancedProxyButton.addActionListener(new ActionListener() {
@@ -187,14 +179,7 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         JPanel proxyAutoPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         JLabel locationLabel = new JLabel(Translator.R("NSScriptLocation") + ":");
         final JTextField locationField = new JTextField(config.getProperty(properties[4]), 20);
-        locationField.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                String value = locationField.getText();
-                if (value.trim().equals(""))
-                    value = null;
-                config.setProperty(properties[4], value);
-            }
-        });
+        locationField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[4]));
 
         proxyAutoPanel.add(Box.createRigidArea(new Dimension(13, 0)));
         proxyAutoPanel.add(locationLabel);

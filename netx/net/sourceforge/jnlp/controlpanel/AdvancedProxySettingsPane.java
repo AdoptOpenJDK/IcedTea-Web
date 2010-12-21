@@ -100,9 +100,7 @@ public class AdvancedProxySettingsPane extends JPanel {
     }
 
     /**
-     * Add the components to the panel. FIXME: We should probably refactor the
-     * listeners and do them in a more generic way. Also can change this from
-     * using textfield to using a table.
+     * Add the components to the panel.
      */
     private void addComponents() {
         JPanel topPanel = new JPanel(new GridBagLayout());
@@ -119,77 +117,29 @@ public class AdvancedProxySettingsPane extends JPanel {
         JLabel http = new JLabel(Translator.R("APSLabelHTTP") + ":");
         final JTextField httpAddressField = new JTextField(fields[0]);
         final JTextField httpPortField = new JTextField(fields[1]);
-        httpAddressField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[0] = httpAddressField.getText();
-            }
-        });
-        httpPortField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[1] = httpPortField.getText();
-            }
-        });
-        httpAddressField.addMouseListener(new MiddleClickListener(this.config, properties[0]));
-        httpPortField.addMouseListener(new MiddleClickListener(this.config, properties[1]));
+        httpAddressField.getDocument().addDocumentListener(new DocumentAdapter(fields, 0));
+        httpPortField.getDocument().addDocumentListener(new DocumentAdapter(fields, 1));
 
         // This addresses the HTTPS proxy settings.
         JLabel secure = new JLabel(Translator.R("APSLabelSecure") + ":");
         final JTextField secureAddressField = new JTextField(fields[2]);
         final JTextField securePortField = new JTextField(fields[3]);
-        secureAddressField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[2] = secureAddressField.getText();
-            }
-        });
-        securePortField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[3] = securePortField.getText();
-            }
-        });
-        secureAddressField.addMouseListener(new MiddleClickListener(this.config, properties[2]));
-        securePortField.addMouseListener(new MiddleClickListener(this.config, properties[3]));
+        secureAddressField.getDocument().addDocumentListener(new DocumentAdapter(fields, 2));
+        securePortField.getDocument().addDocumentListener(new DocumentAdapter(fields, 3));
 
         // This addresses the FTP proxy settings.
         JLabel ftp = new JLabel(Translator.R("APSLabelFTP") + ":");
         final JTextField ftpAddressField = new JTextField(fields[4]);
         final JTextField ftpPortField = new JTextField(fields[5]);
-        ftpAddressField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[4] = ftpAddressField.getText();
-            }
-        });
-        ftpPortField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[5] = ftpPortField.getText();
-            }
-        });
-        ftpAddressField.addMouseListener(new MiddleClickListener(this.config, properties[4]));
-        ftpPortField.addMouseListener(new MiddleClickListener(this.config, properties[5]));
+        ftpAddressField.getDocument().addDocumentListener(new DocumentAdapter(fields, 4));
+        ftpPortField.getDocument().addDocumentListener(new DocumentAdapter(fields, 5));
 
         // This addresses the Socks proxy settings.
         JLabel socks = new JLabel(Translator.R("APSLabelSocks") + ":");
         final JTextField socksAddressField = new JTextField(fields[6]);
         final JTextField socksPortField = new JTextField(fields[7]);
-        socksAddressField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[6] = socksAddressField.getText();
-            }
-        });
-        socksPortField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[7] = socksPortField.getText();
-            }
-        });
-        socksAddressField.addMouseListener(new MiddleClickListener(this.config, properties[6]));
-        socksPortField.addMouseListener(new MiddleClickListener(this.config, properties[7]));
+        socksAddressField.getDocument().addDocumentListener(new DocumentAdapter(fields, 6));
+        socksPortField.getDocument().addDocumentListener(new DocumentAdapter(fields, 7));
 
         JCheckBox sameProxyForAll = new JCheckBox(Translator.R("APSSameProxyForAllProtocols"), Boolean.parseBoolean(fields[8]));
         sameProxyForAll.addItemListener(new ItemListener() {
@@ -235,13 +185,8 @@ public class AdvancedProxySettingsPane extends JPanel {
         final JTextArea exceptionListArea = new JTextArea();
         exceptionListArea.setLineWrap(true);
         exceptionListArea.setText(fields[9]);
-        exceptionListArea.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                fields[9] = exceptionListArea.getText();
-            }
-        });
-        exceptionListArea.addMouseListener(new MiddleClickListener(this.config, fields[9]));
+        exceptionListArea.getDocument().addDocumentListener(new DocumentAdapter(fields, 9));
+
         JLabel exceptionFormat = new JLabel(Translator.R("APSExceptionInstruction"));
         JScrollPane exceptionScroll = new JScrollPane(exceptionListArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         exceptions.add(exceptionDescription, BorderLayout.NORTH);

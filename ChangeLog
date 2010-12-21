@@ -1,3 +1,13 @@
+2010-12-21  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsPane.java,
+	netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java:
+	(addComponents): Replaced key listeners and mouse listeners for text
+	fields with document adapter.
+	* netx/net/sourceforge/jnlp/controlpanel/DocumentAdapter.java: New class.
+	* netx/net/sourceforge/jnlp/controlpanel/MiddleClickListener.java:
+	Removed.
+
 2010-12-20  Andrew Su  <asu@redhat.com>
 
 	Added a cache viewer for the control panel.
