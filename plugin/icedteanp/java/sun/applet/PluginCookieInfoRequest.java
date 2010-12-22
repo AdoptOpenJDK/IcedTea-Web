@@ -56,12 +56,16 @@ public class PluginCookieInfoRequest extends PluginCallRequest {
 
         PluginDebug.debug("PluginCookieInfoRequest GOT: " + cookieInfo);
 
-        // Skip the first 5 components. We are guaranteed 5 components, 
-        // so no index -1 to worry about
+        // skip 'plugin' marker
         cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
+
+        // skip 'PluginCookieInfo' tag
         cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
+
+        // skip 'reference' tag
         cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
-        cookieInfo = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
+
+        // skip reference # and get the rest
         cookieString = cookieInfo.substring(cookieInfo.indexOf(' ') + 1);
 
         setDone(true);

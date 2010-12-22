@@ -1,3 +1,11 @@
+2010-12-22  Deepak Bhole <dbhole@redhat.com>
+
+	RH665104: OpenJDK Firefox Java plugin loses a cookie
+	* plugin/icedteanp/java/sun/applet/PluginCookieInfoRequest.java
+	(parseReturn): Skip one less space so that the first cookie is not
+	skipped.
+	* NEWS: Updated.
+
 2010-12-21  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsPane.java,
