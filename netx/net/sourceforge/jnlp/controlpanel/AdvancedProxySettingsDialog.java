@@ -116,21 +116,14 @@ public class AdvancedProxySettingsDialog extends JDialog {
      * 
      * @param config
      *            A loaded DeploymentConfiguration file.
-     * @throws Exception
      */
-    public static void showAdvancedProxySettingsDialog(final DeploymentConfiguration config) throws Exception {
+    public static void showAdvancedProxySettingsDialog(final DeploymentConfiguration config) {
         setSystemLookAndFeel();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                AdvancedProxySettingsDialog psd = new AdvancedProxySettingsDialog(config);
-                psd.setResizable(false);
-                psd.centerDialog();
-                psd.setVisible(true);
-                psd.dispose();
-            }
-        });
-
+        AdvancedProxySettingsDialog psd = new AdvancedProxySettingsDialog(config);
+        psd.setResizable(false);
+        psd.centerDialog();
+        psd.setVisible(true);
+        psd.dispose();
     }
 
     /**

@@ -184,23 +184,10 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
         JPanel buttonDeleteRestore = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         JButton bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
         bViewFiles.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            CacheViewer.showCacheDialog(config);
-                        } catch (Exception e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        }
-
-                    }
-                });
+                CacheViewer.showCacheDialog(config);
             }
-
         });
         buttonDeleteRestore.add(bViewFiles);
 

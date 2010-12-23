@@ -89,9 +89,8 @@ public class CacheViewer extends JDialog {
      * Display the cache viewer.
      * 
      * @param config Configuration file.
-     * @throws Exception
      */
-    public static void showCacheDialog(final DeploymentConfiguration config) throws Exception {
+    public static void showCacheDialog(final DeploymentConfiguration config) {
         CacheViewer psd = new CacheViewer(config);
         psd.setResizable(true);
         psd.centerDialog();

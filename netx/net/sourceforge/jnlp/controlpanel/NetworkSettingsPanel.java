@@ -115,22 +115,18 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         JLabel portLabel = new JLabel(Translator.R("NSPort") + ":");
         final JTextField addressField = new JTextField(config.getProperty(properties[1]), 10);
         addressField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[1]));
-        
+
         final JTextField portField = new JTextField(config.getProperty(properties[2]), 3);
         portField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[1]));
-        
+
         // Create the button which allows setting of other types of proxy.
         JButton advancedProxyButton = new JButton(Translator.R("NSAdvanced") + "...");
         advancedProxyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    AdvancedProxySettingsDialog.showAdvancedProxySettingsDialog(config);
-                    addressField.setText(config.getProperty(properties[1]));
-                    portField.setText(config.getProperty(properties[2]));
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+                AdvancedProxySettingsDialog.showAdvancedProxySettingsDialog(config);
+                addressField.setText(config.getProperty(properties[1]));
+                portField.setText(config.getProperty(properties[2]));
             }
         });
 

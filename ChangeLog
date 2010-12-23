@@ -1,3 +1,14 @@
+2010-12-23  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java:
+	(showAdvancedProxySettingsDialog): Removed creation of swing thread.
+	* netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java:
+	(showCacheDialog): Removed throwing of exception.
+	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java:
+	(addComponents): Removed try catch block.
+	* /netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java:
+	(addComponents): Removed creation of swing thread and try catch block.
+
 2010-12-22  Deepak Bhole <dbhole@redhat.com>
 
 	RH665104: OpenJDK Firefox Java plugin loses a cookie
