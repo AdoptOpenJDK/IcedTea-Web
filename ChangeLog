@@ -1,6 +1,12 @@
 2010-12-23  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java:
+	(showAdvancedProxySettingsDialog): Removed call to setSystemLookAndFeel().
+	(setSystemLookAndFeel): Method removed.
+
+2010-12-23  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java:
 	(showAdvancedProxySettingsDialog): Removed creation of swing thread.
 	* netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java:
 	(showCacheDialog): Removed throwing of exception.

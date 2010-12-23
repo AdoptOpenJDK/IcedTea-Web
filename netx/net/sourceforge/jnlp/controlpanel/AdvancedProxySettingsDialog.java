@@ -118,22 +118,10 @@ public class AdvancedProxySettingsDialog extends JDialog {
      *            A loaded DeploymentConfiguration file.
      */
     public static void showAdvancedProxySettingsDialog(final DeploymentConfiguration config) {
-        setSystemLookAndFeel();
         AdvancedProxySettingsDialog psd = new AdvancedProxySettingsDialog(config);
         psd.setResizable(false);
         psd.centerDialog();
         psd.setVisible(true);
         psd.dispose();
-    }
-
-    /**
-     * Set the look and feel.
-     */
-    private static void setSystemLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // don't worry if we can't.
-        }
     }
 }
