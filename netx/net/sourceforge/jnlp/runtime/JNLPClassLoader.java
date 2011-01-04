@@ -182,16 +182,15 @@ public class JNLPClassLoader extends URLClassLoader {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                if (JNLPRuntime.isDebug()) {
-                    System.out.println("Cleaning up native directory" + nativeDir.getAbsolutePath());
-                }
-
                 /*
                  * Delete only the native dir created by this classloader (if
                  * there is one). Other classloaders (parent, peers) will all
                  * cleanup things they created
                  */
                 if (nativeDir != null) {
+                    if (JNLPRuntime.isDebug()) {
+                        System.out.println("Cleaning up native directory" + nativeDir.getAbsolutePath());
+                    }
                     try {
                         FileUtils.recursiveDelete(nativeDir,
                                 new File(System.getProperty("java.io.tmpdir")));

@@ -1,3 +1,8 @@
+2011-01-04  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(installShutdownHooks): Only print when not null.
+
 2011-01-04  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/SecuritySettingsPanel.java:
