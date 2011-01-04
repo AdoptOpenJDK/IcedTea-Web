@@ -1,5 +1,24 @@
 2011-01-04  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: Add
+	customTrustedPolicy.
+	(SecurityDesc): Initialize customTrustedPolicy.
+	(getCustomTrustedPolicy): New method. Get custom policy file from
+	configuration and use it to initialize a custom configuration.
+	(getPermissions): If trusted application and customTrustedPolicy is
+	not null, delegate to otherwise return AllPermissions.
+	* netx/net/sourceforge/jnlp/config/Defaults.java
+	(getDefaults): Use constant for property.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
+	Add new constant KEY_SECURITY_TRUSTED_POLICY.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java
+	(installEnvironment): Pass cs as a parameter to
+	SecurityDesc.getPermissions.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getPermissions): Likewise.
+
+2011-01-04  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: Remove
 	JNLPRuntime import. Remove configBrowserCommand.
 	(createMainSettingsPanel): Remove call to loadConfiguration.

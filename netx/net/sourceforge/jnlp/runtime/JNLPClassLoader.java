@@ -578,7 +578,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     (getCodeSourceSecurity(cs.getLocation()).getSecurityType().equals(SecurityDesc.ALL_PERMISSIONS) ||
                      getCodeSourceSecurity(cs.getLocation()).getSecurityType().equals(SecurityDesc.J2EE_PERMISSIONS))) {
 
-                permissions = getCodeSourceSecurity(cs.getLocation()).getPermissions();
+                permissions = getCodeSourceSecurity(cs.getLocation()).getPermissions(cs);
             }
 
             Enumeration<Permission> e = permissions.elements();

@@ -209,7 +209,7 @@ public class Defaults {
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.trusted.policy",
+                        DeploymentConfiguration.KEY_SECURITY_TRUSTED_POLICY,
                         BasicValueValidators.getFilePathValidator(),
                         null
                 },

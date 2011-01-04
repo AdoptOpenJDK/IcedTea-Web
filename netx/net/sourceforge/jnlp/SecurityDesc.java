@@ -58,6 +58,8 @@ public class SecurityDesc {
     /** the JNLP file */
     private JNLPFile file;
 
+    private final Policy customTrustedPolicy;
+
     // We go by the rules here:
     // http://java.sun.com/docs/books/tutorial/deployment/doingMoreWithRIA/properties.html
 
@@ -151,6 +153,33 @@ public class SecurityDesc {
 
         String key = DeploymentConfiguration.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
         grantAwtPermissions = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(key));
+
+        customTrustedPolicy = getCustomTrustedPolicy();
+    }
+
+    /**
+     * Returns a Policy object that represents a custom policy to use instead
+     * of granting {@link AllPermission} to a {@link CodeSource}
+     *
+     * @return a {@link Policy} object to delegate to. May be null, which
+     * indicates that no policy exists and AllPermissions should be granted
+     * instead.
+     */
+    private Policy getCustomTrustedPolicy() {
+        String key = DeploymentConfiguration.KEY_SECURITY_TRUSTED_POLICY;
+        String policyLocation = JNLPRuntime.getConfiguration().getProperty(key);
+
+        Policy policy = null;
+        if (policyLocation != null) {
+            try {
+                URI policyUri = new URI("file://" + policyLocation);
+                policy = Policy.getInstance("JavaPolicy", new URIParameter(policyUri));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // return the appropriate policy, or null
+        return policy;
     }
 
     /**
@@ -164,15 +193,21 @@ public class SecurityDesc {
     /**
      * Returns a PermissionCollection containing the basic
      * permissions granted depending on the security type.
+     *
+     * @param cs the CodeSource to get permissions for
      */
-    public PermissionCollection getPermissions() {
+    public PermissionCollection getPermissions(CodeSource cs) {
         PermissionCollection permissions = getSandBoxPermissions();
 
         // discard sandbox, give all
         if (type == ALL_PERMISSIONS) {
             permissions = new Permissions();
-            permissions.add(new AllPermission());
-            return permissions;
+            if (customTrustedPolicy == null) {
+                permissions.add(new AllPermission());
+                return permissions;
+            } else {
+                return customTrustedPolicy.getPermissions(cs);
+            }
         }
 
         // add j2ee to sandbox if needed

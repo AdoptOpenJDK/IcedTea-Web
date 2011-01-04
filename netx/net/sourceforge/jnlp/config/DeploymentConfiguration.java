@@ -104,6 +104,8 @@ public final class DeploymentConfiguration {
     /** Boolean. Only show security prompts to user if true */
     public static final String KEY_SECURITY_PROMPT_USER = "deployment.security.askgrantdialog.show";
 
+    public static final String KEY_SECURITY_TRUSTED_POLICY = "deployment.security.trusted.policy";
+
     /** Boolean. Only give AWTPermission("showWindowWithoutWarningBanner") if true */
     public static final String KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING = "deployment.security.sandbox.awtwarningwindow";
 

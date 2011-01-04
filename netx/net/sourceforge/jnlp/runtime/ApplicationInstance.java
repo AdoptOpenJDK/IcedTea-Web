@@ -225,7 +225,7 @@ public class ApplicationInstance {
         JNLPClassLoader loader = (JNLPClassLoader) this.loader;
         SecurityDesc s = loader.getSecurity();
 
-        ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(), null, null);
+        ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
 
         // Add to hashmap
         AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
