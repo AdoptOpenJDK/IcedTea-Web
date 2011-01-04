@@ -114,16 +114,16 @@ public class SecuritySettingsPanel extends NamedBorderPanel implements ActionLis
 
         // Only display the ones with properties that are valid or existent.
         for (int i = 0; i < properties.length; i++) {
-            try {
-                String s = config.getProperty(properties[i]);
-                securityGeneralOptions[i].setSelected(Boolean.parseBoolean(s));
-                securityGeneralOptions[i].setActionCommand(properties[i]);
-                securityGeneralOptions[i].addActionListener(this);
-                c.gridy = i + 1;
-                topPanel.add(securityGeneralOptions[i], c);
-            } catch (Exception e) {
+            String s = config.getProperty(properties[i]);
+            if (s == null) {
                 securityGeneralOptions[i] = null;
+                continue;
             }
+            securityGeneralOptions[i].setSelected(Boolean.parseBoolean(s));
+            securityGeneralOptions[i].setActionCommand(properties[i]);
+            securityGeneralOptions[i].addActionListener(this);
+            c.gridy = i + 1;
+            topPanel.add(securityGeneralOptions[i], c);
         }
 
         Component filler = Box.createRigidArea(new Dimension(1, 1));

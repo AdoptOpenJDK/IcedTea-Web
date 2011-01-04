@@ -1,3 +1,8 @@
+2011-01-04  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/SecuritySettingsPanel.java:
+	(addComponents): Hide unsupported options.
+
 2010-12-23  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java:
