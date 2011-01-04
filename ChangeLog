@@ -1,5 +1,15 @@
 2011-01-04  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java: Add
+	systemJnlpPolicy and userJnlpPolicy.
+	(JNLPPolicy): Initialize the new policies.
+	(getPermissions): Consult the extra policies as well to determine the
+	resulting permissions to be granted.
+	(getPolicyFromConfig): New method. Create a new Policy instance to
+	delegate to for system- and user-level policies.
+
+2011-01-04  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/SecurityDesc.java: Add
 	customTrustedPolicy.
 	(SecurityDesc): Initialize customTrustedPolicy.

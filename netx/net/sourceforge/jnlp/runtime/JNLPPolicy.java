@@ -16,8 +16,12 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.*;
 import java.util.Enumeration;
+
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 /**
  * Policy for JNLP environment.  This class delegates to the
@@ -40,10 +44,19 @@ public class JNLPPolicy extends Policy {
     /** the previous policy */
     private static Policy systemPolicy;
 
+    /** the system level policy for jnlps */
+    private Policy systemJnlpPolicy = null;
+
+    /** the user-level policy for jnlps */
+    private Policy userJnlpPolicy = null;
+
     protected JNLPPolicy() {
         shellSource = JNLPPolicy.class.getProtectionDomain().getCodeSource();
         systemSource = Policy.class.getProtectionDomain().getCodeSource();
         systemPolicy = Policy.getPolicy();
+
+        systemJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY);
+        userJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
     }
 
     /**
@@ -62,11 +75,27 @@ public class JNLPPolicy extends Policy {
 
                 PermissionCollection clPermissions = cl.getPermissions(source);
 
-                // systempolicy permissions need to be accounted for as well
+                Enumeration<Permission> e;
                 CodeSource appletCS = new CodeSource(JNLPRuntime.getApplication().getJNLPFile().getSourceLocation(), (java.security.cert.Certificate[]) null);
-                Enumeration e = systemPolicy.getPermissions(appletCS).elements();
+
+                // systempolicy permissions need to be accounted for as well
+                e = systemPolicy.getPermissions(appletCS).elements();
                 while (e.hasMoreElements())
-                    clPermissions.add((Permission) e.nextElement());
+                    clPermissions.add(e.nextElement());
+
+                // and so do permissions from the jnlp-specific system policy
+                if (systemJnlpPolicy != null) {
+                    e = systemJnlpPolicy.getPermissions(appletCS).elements();
+                    while (e.hasMoreElements())
+                        clPermissions.add(e.nextElement());
+                }
+
+                // and permissiosn from jnlp-specific user policy too
+                if (userJnlpPolicy != null) {
+                    e = userJnlpPolicy.getPermissions(appletCS).elements();
+                    while (e.hasMoreElements())
+                        clPermissions.add(e.nextElement());
+                }
 
                 return clPermissions;
             }
@@ -91,6 +120,31 @@ public class JNLPPolicy extends Policy {
 
         result.add(new AllPermission());
         return result;
+    }
+
+    /**
+     * Constructs a delegate policy based on a config setting
+     * @param key a KEY_* in DeploymentConfiguration
+     * @return a policy based on the configuration set by the user
+     */
+    private Policy getPolicyFromConfig(String key) {
+        Policy policy = null;
+        String policyLocation = null;
+        DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+        policyLocation = config.getProperty(key);
+        if (policyLocation != null) {
+            try {
+                URI policyUri = new URI(policyLocation);
+                policy = getInstance("JavaPolicy", new URIParameter(policyUri));
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        return policy;
     }
 
     public boolean implies(ProtectionDomain domain, Permission permission) {
