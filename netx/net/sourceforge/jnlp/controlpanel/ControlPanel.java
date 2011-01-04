@@ -1,5 +1,5 @@
 /* ControlPanel.java -- Display the control panel for modifying deployment settings.
-Copyright (C) 2010 Red Hat
+Copyright (C) 2011 Red Hat
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
 
@@ -91,11 +90,6 @@ public class ControlPanel extends JFrame {
     }
 
     private DeploymentConfiguration config = null;
-
-    /*
-     * actual configuration options
-     */
-    private String configBrowserCommand = null;
 
     /**
      * Creates a new instance of the ControlPanel.
@@ -223,8 +217,6 @@ public class ControlPanel extends JFrame {
      */
     private JPanel createMainSettingsPanel() {
 
-        loadConfiguration();
-
         SettingsPanel[] panels = new SettingsPanel[] { new SettingsPanel(Translator.R("CPTabAbout"), createAboutPanel()),
                 new SettingsPanel(Translator.R("CPTabCache"), createCacheSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabCertificate"), createCertificatesSettingsPanel()),
@@ -338,16 +330,6 @@ public class ControlPanel extends JFrame {
     }
 
     /**
-     * Get the location of the browser.
-     */
-    private void loadConfiguration() {
-        configBrowserCommand = config.getProperty("deployment.browser.path");
-        if (configBrowserCommand == null) {
-            configBrowserCommand = "";
-        }
-    }
-
-    /**
      * Save the configuration changes.
      */
     private void saveConfiguration() {
@@ -359,14 +341,19 @@ public class ControlPanel extends JFrame {
     }
 
     public static void main(String[] args) throws Exception {
-        JNLPRuntime.initialize(true);
-        final DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+        final DeploymentConfiguration config = new DeploymentConfiguration();
         try {
             config.load();
         } catch (ConfigurationException e) {
-            // TODO Auto-generated catch block
+            // FIXME inform user about this and exit properly
+            // the only known condition under which this can happen is when a
+            // required system configuration file is not found
+
+            // if configuration is not loaded, we will get NullPointerExceptions
+            // everywhere
             e.printStackTrace();
         }
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

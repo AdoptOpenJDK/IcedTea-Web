@@ -1,5 +1,15 @@
 2011-01-04  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: Remove
+	JNLPRuntime import. Remove configBrowserCommand.
+	(createMainSettingsPanel): Remove call to loadConfiguration.
+	(loadConfiguration): Remove method. Setting the browser command
+	should be handled by the appropriate panel.
+	(main): Remove call to JNLPRuntime.initialize and just create a new
+	DeploymentConfiguration object. Clarify TODO comment.
+
+2011-01-04  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
 	(installShutdownHooks): Only print when not null.
 
