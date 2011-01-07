@@ -1,5 +1,11 @@
 2011-01-04  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/security/KeyStores.java
+	(getKeyStoreLocation): Fix typo. Return the user-level certificate
+	store correctly.
+
+2011-01-04  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java: Add
 	systemJnlpPolicy and userJnlpPolicy.
 	(JNLPPolicy): Initialize the new policies.

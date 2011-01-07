@@ -262,7 +262,7 @@ public final class KeyStores {
                         configKey = DeploymentConfiguration.KEY_USER_TRUSTED_CERTS;
                         break;
                     case CLIENT_CERTS:
-                        configKey = DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
+                        configKey = DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS;
                         break;
                 }
                 break;
