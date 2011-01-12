@@ -1,5 +1,17 @@
 2011-01-12  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java
+	(main): Set look and feel. Set config object to use with KeyStores.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Set config object to use with KeyStores.
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: Add new member
+	config.
+	(setConfiguration): New method. Sets the value of config after security
+	check.
+	(getKeyStoreLocation): Use config object instead of querying JNLPRuntime.
+
+2011-01-12  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/JNLPFile: Add missing generic type to info.
 	(getInformation): Remove redundant cast.
 

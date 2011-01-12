@@ -37,6 +37,7 @@ import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
+import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.security.VariableX509TrustManager;
 import net.sourceforge.jnlp.services.*;
@@ -159,6 +160,8 @@ public class JNLPRuntime {
                 System.exit(1);
             }
         }
+
+        KeyStores.setConfiguration(config);
 
         initializeStreams();
 

@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
 
@@ -76,12 +75,24 @@ public final class KeyStores {
         CLIENT_CERTS,
     }
 
+    private static DeploymentConfiguration config = null;
+
     private static final String KEYSTORE_TYPE = "JKS";
     /** the default password used to protect the KeyStores */
     private static final String DEFAULT_PASSWORD = "changeit";
 
     public static final char[] getPassword() {
         return DEFAULT_PASSWORD.toCharArray();
+    }
+
+    /** Set the configuration object to use for getting KeyStore paths */
+    public static void setConfiguration(DeploymentConfiguration newConfig) {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(new AllPermission());
+        }
+
+        config = newConfig;
     }
 
     /**
@@ -272,7 +283,7 @@ public final class KeyStores {
             throw new RuntimeException("Unspported");
         }
 
-        return JNLPRuntime.getConfiguration().getProperty(configKey);
+        return config.getProperty(configKey);
     }
 
     /**

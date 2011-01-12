@@ -53,6 +53,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
 
 /**
@@ -353,6 +354,14 @@ public class ControlPanel extends JFrame {
             // everywhere
             e.printStackTrace();
         }
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // ignore; not a big deal
+        }
+
+        KeyStores.setConfiguration(config);
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
