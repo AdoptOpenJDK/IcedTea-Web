@@ -1,5 +1,10 @@
 2011-01-12  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/JNLPFile: Add missing generic type to info.
+	(getInformation): Remove redundant cast.
+
+2011-01-12  Omair Majid  <omajid@redhat.com>
+
 	* netx/javax/jnlp/UnavailableServiceException.java: Remove unused
 	imports.
 	* netx/net/sourceforge/jnlp/AppletDesc.java: Likewise.

@@ -80,7 +80,7 @@ public class JNLPFile {
     protected Version specVersion;
 
     /** information */
-    protected List info;
+    protected List<InformationDesc> info;
 
     protected UpdateDesc update;
 
@@ -326,7 +326,7 @@ public class JNLPFile {
                 List<Object> result = new ArrayList<Object>();
 
                 for (int i = 0; i < info.size(); i++) {
-                    InformationDesc infoDesc = (InformationDesc) info.get(i);
+                    InformationDesc infoDesc = info.get(i);
 
                     if (localMatches(locale, infoDesc.getLocales()))
                         if (localMatches(locale, infoDesc.getLocales()))
