@@ -18,7 +18,6 @@ package net.sourceforge.jnlp.event;
 
 import java.util.*;
 
-import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.runtime.*;
 
 /**

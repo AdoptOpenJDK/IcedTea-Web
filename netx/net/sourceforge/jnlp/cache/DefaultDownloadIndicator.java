@@ -27,7 +27,6 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.runtime.*;
 
 /**

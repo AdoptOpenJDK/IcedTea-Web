@@ -19,7 +19,6 @@ package net.sourceforge.jnlp.runtime;
 import java.io.*;
 import java.net.Authenticator;
 import java.net.ProxySelector;
-import java.nio.channels.FileLock;
 import java.awt.*;
 import java.text.*;
 import java.util.*;

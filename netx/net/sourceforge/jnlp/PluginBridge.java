@@ -26,7 +26,6 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Calendar;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.List;
 import java.util.ArrayList;

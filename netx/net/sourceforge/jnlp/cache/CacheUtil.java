@@ -22,7 +22,6 @@ import java.io.*;
 import java.net.*;
 import java.nio.channels.FileChannel;
 import java.util.*;
-import java.lang.reflect.*;
 import java.security.*;
 import javax.jnlp.*;
 

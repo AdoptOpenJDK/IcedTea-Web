@@ -17,10 +17,8 @@
 package net.sourceforge.jnlp.runtime;
 
 import java.lang.reflect.*;
-import java.io.*;
 import java.net.*;
 import java.security.*;
-import javax.swing.*;
 
 /**
  * Allows a Policy and SecurityManager to be set in JRE1.3 without

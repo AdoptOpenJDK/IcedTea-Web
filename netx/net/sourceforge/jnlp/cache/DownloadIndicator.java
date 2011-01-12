@@ -16,16 +16,9 @@
 
 package net.sourceforge.jnlp.cache;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.net.*;
-import java.util.*;
-import java.util.List;
-import javax.swing.*;
-import javax.swing.Timer;
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.runtime.*;
 
 /**

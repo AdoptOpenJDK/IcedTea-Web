@@ -17,10 +17,7 @@
 package net.sourceforge.jnlp.util;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
-
-import net.sourceforge.jnlp.*;
 
 /**
  * A properties object backed by a specified file without throwing

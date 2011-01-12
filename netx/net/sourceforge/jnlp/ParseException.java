@@ -17,8 +17,6 @@
 package net.sourceforge.jnlp;
 
 import java.io.*;
-import java.net.*;
-import java.util.*;
 
 /**
  * Thrown to indicate that an error has occurred while parsing a

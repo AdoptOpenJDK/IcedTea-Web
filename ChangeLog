@@ -1,3 +1,62 @@
+2011-01-12  Omair Majid  <omajid@redhat.com>
+
+	* netx/javax/jnlp/UnavailableServiceException.java: Remove unused
+	imports.
+	* netx/net/sourceforge/jnlp/AppletDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/ApplicationDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/ComponentDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/DefaultLaunchHandler.java: Likewise.
+	* netx/net/sourceforge/jnlp/IconDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/InformationDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/InstallerDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/JARDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/JREDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/Launcher.java: Likewise.
+	* netx/net/sourceforge/jnlp/PackageDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/ParseException.java: Likewise.
+	* netx/net/sourceforge/jnlp/PluginBridge.java: Likewise.
+	* netx/net/sourceforge/jnlp/PropertyDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/ResourcesDesc.java: Likewise.
+	* netx/net/sourceforge/jnlp/Version.java: Likewise.
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: Likewise.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: Likewise.
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/cache/DownloadIndicator.java: Likewise.
+	* netx/net/sourceforge/jnlp/cache/UpdatePolicy.java: Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel
+	/AdvancedProxySettingsDialog.java: Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel
+	/AdvancedProxySettingsPane.java: Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/controlpanel
+	/TemporaryInternetFilesPanel.java: Likewise.
+	* netx/net/sourceforge/jnlp/event/ApplicationEvent.java: Likewise.
+	* netx/net/sourceforge/jnlp/event/DownloadEvent.java: Likewise.
+	* netx/net/sourceforge/jnlp/runtime/AppThreadGroup.java: Likewise.
+	* netx/net/sourceforge/jnlp/runtime/AppletAudioClip.java: Likewise.
+	* netx/net/sourceforge/jnlp/runtime/AppletInstance.java: Likewise.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/runtime/Boot13.java: Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Likewise.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/security/CertsInfoPane.java: Likewise.
+	* netx/net/sourceforge/jnlp/security/SecurityUtil.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XBasicService.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XDownloadService.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XExtensionInstallerService.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/services/XFileContents.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XFileOpenService.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XFileSaveService.java: Likewise.
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java:
+	Likewise.
+	* netx/net/sourceforge/jnlp/util/PropertiesFile.java: Likewise.
+	* netx/net/sourceforge/jnlp/util/Reflect.java: Likewise.
+	
 2011-01-04  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/KeyStores.java

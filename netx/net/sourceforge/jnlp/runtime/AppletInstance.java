@@ -18,13 +18,6 @@ package net.sourceforge.jnlp.runtime;
 
 import java.applet.*;
 import java.awt.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.List;
-import java.security.*;
-import java.lang.reflect.*;
-import java.lang.ref.*;
 
 import net.sourceforge.jnlp.*;
 

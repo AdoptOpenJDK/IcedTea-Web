@@ -16,17 +16,6 @@
 
 package net.sourceforge.jnlp.cache;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.lang.reflect.*;
-import java.security.*;
-import javax.jnlp.*;
-
-import net.sourceforge.jnlp.*;
-import net.sourceforge.jnlp.runtime.*;
-import net.sourceforge.jnlp.util.*;
-
 /**
  * A policy that determines when a resource should be checked for
  * an updated version.<p>

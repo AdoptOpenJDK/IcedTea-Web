@@ -16,13 +16,9 @@
 
 package net.sourceforge.jnlp.services;
 
-import java.io.*;
 import java.net.*;
-import java.util.*;
-import java.lang.ref.*;
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.*;
 
 /**
  * The ExtensionInstallerService JNLP service.

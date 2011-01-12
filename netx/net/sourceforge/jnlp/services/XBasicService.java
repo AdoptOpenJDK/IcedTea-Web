@@ -31,7 +31,6 @@ import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.PropertiesFile;
 
 /**
  * The BasicService JNLP service.

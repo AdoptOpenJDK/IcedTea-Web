@@ -16,9 +16,6 @@
 
 package net.sourceforge.jnlp;
 
-import java.io.*;
-import java.awt.Dimension;
-import java.net.*;
 import java.util.*;
 
 /**

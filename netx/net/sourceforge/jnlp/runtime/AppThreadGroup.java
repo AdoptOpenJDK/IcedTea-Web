@@ -16,8 +16,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import java.awt.*;
-
 /**
  * Thread group for a JNLP application.
  *

@@ -17,11 +17,6 @@
 package net.sourceforge.jnlp;
 
 import net.sourceforge.jnlp.runtime.*;
-import net.sourceforge.jnlp.util.*;
-
-import java.awt.*;
-import java.util.*;
-import javax.swing.*;
 
 /**
  * This default implementation shows prints the exception to

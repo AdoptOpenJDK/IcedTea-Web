@@ -20,10 +20,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
-import java.lang.reflect.*;
-import java.security.*;
-import javax.jnlp.*;
 
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.runtime.*;

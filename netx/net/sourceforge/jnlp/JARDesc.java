@@ -16,9 +16,7 @@
 
 package net.sourceforge.jnlp;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.net.URL;
 
 /**
  * The JAR element.

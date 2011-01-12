@@ -40,12 +40,9 @@ package net.sourceforge.jnlp.security;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.security.cert.CertPath;
 import java.security.cert.X509Certificate;
 import java.security.MessageDigest;
-import java.math.BigInteger;
-import javax.security.auth.x500.X500Principal;
 
 import sun.misc.HexDumpEncoder;
 import sun.security.x509.*;

@@ -38,18 +38,11 @@ exception statement from your version.
 package net.sourceforge.jnlp.services;
 
 import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.lang.ref.*;
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.*;
-import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
 
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import java.security.*;
 
 /**
  * The FileOpenService JNLP service.

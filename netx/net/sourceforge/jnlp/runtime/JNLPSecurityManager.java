@@ -20,17 +20,12 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.Frame;
 import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.lang.ref.WeakReference;
 import java.net.SocketPermission;
 import java.security.AllPermission;
 import java.security.AccessControlException;
-import java.security.AccessController;
 import java.security.Permission;
-import java.security.PrivilegedAction;
 import java.security.SecurityPermission;
-import java.util.PropertyPermission;
 
 import javax.swing.JWindow;
 

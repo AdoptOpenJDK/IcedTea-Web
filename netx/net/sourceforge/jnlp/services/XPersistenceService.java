@@ -19,10 +19,8 @@ package net.sourceforge.jnlp.services;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.lang.ref.*;
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.*;

@@ -19,9 +19,7 @@ package net.sourceforge.jnlp.event;
 import java.net.*;
 import java.util.*;
 
-import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.cache.*;
-import net.sourceforge.jnlp.runtime.*;
 
 /**
  * This event is sent during the launch of an

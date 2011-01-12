@@ -17,7 +17,6 @@
 package net.sourceforge.jnlp.runtime;
 
 import java.net.*;
-import java.io.*;
 import java.applet.*;
 import javax.sound.sampled.*;
 

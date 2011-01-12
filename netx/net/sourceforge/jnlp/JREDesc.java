@@ -18,7 +18,6 @@ package net.sourceforge.jnlp;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.io.*;
 import java.net.*;
 import java.util.*;
 
