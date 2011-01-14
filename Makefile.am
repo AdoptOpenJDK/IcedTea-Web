@@ -26,10 +26,11 @@ JDK_UPDATE_VERSION=50
 PLUGIN_TEST_SRCS = $(abs_top_srcdir)/plugin/tests/LiveConnect/*.java
 
 NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
-	net.sourceforge.jnlp.cache net.sourceforge.jnlp.event \
-	net.sourceforge.jnlp.security net.sourceforge.jnlp.security.viewer \
-	net.sourceforge.jnlp.services net.sourceforge.jnlp.tools \
-	net.sourceforge.jnlp.util net.sourceforge.jnlp.controlpanel
+	net.sourceforge.jnlp.cache net.sourceforge.jnlp.config \
+	net.sourceforge.jnlp.controlpanel net.sourceforge.jnlp.event \
+	net.sourceforge.jnlp.runtime net.sourceforge.jnlp.security \
+	net.sourceforge.jnlp.security.viewer net.sourceforge.jnlp.services \
+	net.sourceforge.jnlp.tools net.sourceforge.jnlp.util
 
 # Conditional defintions
 if ENABLE_PLUGIN
