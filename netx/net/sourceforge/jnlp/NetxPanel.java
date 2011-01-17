@@ -22,6 +22,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.AppletLog;
 import net.sourceforge.jnlp.runtime.AppThreadGroup;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -68,6 +69,16 @@ public class NetxPanel extends AppletViewerPanel {
         super.run();
     }
 
+    @Override
+    protected void showAppletException(Throwable t) {
+        /*
+         * Log any exceptions thrown while loading, initializing, starting,
+         * and stopping the applet. 
+         */
+        AppletLog.log(t);
+        super.showAppletException(t);
+    }
+    
     //Overriding to use Netx classloader. You might need to relax visibility
     //in sun.applet.AppletPanel for runLoader().
     protected void runLoader() {
