@@ -308,6 +308,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
                     }
 
                 } else if (perm instanceof SecurityPermission) {
+                    tmpPerm = perm;
 
                     // JCE's initialization requires putProviderProperty permission
                     if (perm.equals(new SecurityPermission("putProviderProperty.SunJCE"))) {
@@ -317,6 +318,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
                     }
 
                 } else if (perm instanceof RuntimePermission) {
+                    tmpPerm = perm;
 
                     // KeyGenerator's init method requires internal spec access
                     if (perm.equals(new SecurityPermission("accessClassInPackage.sun.security.internal.spec"))) {

@@ -249,6 +249,13 @@
 	* netx/net/sourceforge/jnlp/services/ServiceUtil.java
 	(shouldPromptUser): Likewise.
 
+2010-12-16 Omair Majid <omajid@redhat.com>
+
+	RH663680, CVE-2010-4351:
+	* NEWS: List issue.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java:
+	Make sure SecurityException is thrown if necessary. 
+
 2010-12-15  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am
