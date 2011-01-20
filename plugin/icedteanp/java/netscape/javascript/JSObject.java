@@ -259,6 +259,11 @@ public final class JSObject {
      * JavaScript object.
      */
     protected void finalize() {
+
+        // Proceed if this is a valid object (0L == default long == invalid)
+        if (internal == 0L)
+            return;
+
         PluginDebug.debug("JSObject.finalize ");
         PluginAppletViewer.JavaScriptFinalize(internal);
     }
