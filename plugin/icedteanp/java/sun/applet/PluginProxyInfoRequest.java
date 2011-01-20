@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package sun.applet;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 
 /**

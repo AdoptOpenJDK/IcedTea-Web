@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 
 class PluginMessageConsumer {
 
@@ -107,17 +106,6 @@ class PluginMessageConsumer {
         }
     }
 
-    /**
-     * Returns the reference for this message. This method assumes that 
-     * the message has a reference number.
-     * 
-     * @param The message
-     * @return the reference number
-     */
-    private Long getReference(String[] msgParts) {
-        return Long.parseLong(msgParts[3]);
-    }
-
     public PluginMessageConsumer(PluginStreamHandler streamHandler) {
 
         as = new AppletSecurity();
@@ -142,10 +130,6 @@ class PluginMessageConsumer {
         }
 
         return null;
-    }
-
-    private boolean isInInit(Integer instanceNum) {
-        return initWorkers.containsKey(instanceNum);
     }
 
     private void addToInitWorkers(Integer instanceNum, PluginMessageHandlerWorker worker) {
@@ -290,11 +274,5 @@ class PluginMessageConsumer {
 
         // No workers available. Better luck next time! 
         return null;
-    }
-
-    private void dumpWorkerStatus() {
-        for (PluginMessageHandlerWorker worker : workers) {
-            PluginDebug.debug(worker.toString());
-        }
     }
 }

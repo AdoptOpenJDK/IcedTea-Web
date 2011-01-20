@@ -43,7 +43,6 @@ class PluginMessageHandlerWorker extends Thread {
     private boolean isPriorityWorker = false;
     private int id;
     private String message = null;
-    private SecurityManager sm;
     PluginStreamHandler streamHandler = null;
     PluginMessageConsumer consumer = null;
 
@@ -54,7 +53,6 @@ class PluginMessageHandlerWorker extends Thread {
 
         this.id = id;
         this.streamHandler = streamHandler;
-        this.sm = sm;
         this.isPriorityWorker = isPriorityWorker;
         this.consumer = consumer;
 

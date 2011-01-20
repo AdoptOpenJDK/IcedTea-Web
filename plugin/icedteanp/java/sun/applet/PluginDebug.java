@@ -37,8 +37,6 @@ exception statement from your version. */
 
 package sun.applet;
 
-import java.io.*;
-
 public class PluginDebug {
 
     static final boolean DEBUG = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");

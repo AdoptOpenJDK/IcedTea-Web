@@ -1,3 +1,45 @@
+2011-01-20  Andrew Su  <asu@redhat.com>
+
+	Removing dead/commented/unused code.
+	* plugin/icedteanp/java/sun/applet/GetWindowPluginCallRequest.java:
+	Removed unused imports.
+	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java:
+	(getMatchingMethod): Removed unused variable.
+	(getMatchingConstructor): Removed unused variable.
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java:
+	Removed unused imports.
+	(Signature): Removed commented code.
+	(handleMessage): Removed commented code.
+	(getAccessControlContext): Remove commented code.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	(getCachedImage): Removed commented code.
+	(makeReader): Removed unused method.
+	(parse): Removed unused variables. Removed dead code.
+	* plugin/icedteanp/java/sun/applet/PluginCallRequest.java: Removed
+	unused imports.
+	* plugin/icedteanp/java/sun/applet/PluginDebug.java: Removed unused
+	imports.
+	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java: Removed
+	unused imports.
+	(getReference): Removed unused method.
+	(isInInit): Removed unused method.
+	(dumpWorkerStatus): Removed unused method.
+	* plugin/icedteanp/java/sun/applet/PluginMessageHandlerWorker.java:
+	Removed unused variable.
+	(PluginMessageHandlerWorker): Removed unused variable.
+	(plugin/icedteanp/java/sun/applet/PluginObjectStore.java): Removed
+	unused imports.
+	(reference): Removed commented code.
+	(unreference): Removed commented code.
+	* plugin/icedteanp/java/sun/applet/PluginProxyInfoRequest.java:
+	Removed unused import.
+	* plugin/icedteanp/java/sun/applet/PluginStreamHandler.java: Removed
+	unused imports. Removed unused variable.
+	(PluginStreamHandler): Removed unnecessary comments. Removed commented
+	code.
+	(startProcessing): Removed unused variables. Removed commented code.
+	(write): Removed commented code.
+
 2011-01-20  Deepak Bhole <dbhole@redhat.com>
 
 	PR619: Improper finalization by the plugin can crash the browser

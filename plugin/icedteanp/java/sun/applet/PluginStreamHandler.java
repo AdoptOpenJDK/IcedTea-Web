@@ -39,13 +39,11 @@ package sun.applet;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StreamTokenizer;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.Date;
@@ -56,7 +54,6 @@ import javax.swing.SwingUtilities;
 public class PluginStreamHandler {
 
     private BufferedReader pluginInputReader;
-    private StreamTokenizer pluginInputTokenizer;
     private BufferedWriter pluginOutputWriter;
 
     private RequestQueue queue = new RequestQueue();
@@ -70,10 +67,6 @@ public class PluginStreamHandler {
 
     PluginAppletViewer pav;
 
-    static Date d = new Date();
-    static long startTime = d.getTime();
-    static long totalWait = 0;
-
     public PluginStreamHandler(InputStream inputstream, OutputStream outputstream)
             throws MalformedURLException, IOException {
 
@@ -82,13 +75,10 @@ public class PluginStreamHandler {
             pav = (PluginAppletViewer) ClassLoader.getSystemClassLoader().loadClass("sun.applet.PluginAppletViewer").newInstance();
             PluginDebug.debug("Loaded: " + pav + " CL=" + pav.getClass().getClassLoader());
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -99,23 +89,9 @@ public class PluginStreamHandler {
         pluginInputReader =
                 new BufferedReader(new InputStreamReader(inputstream,
                         Charset.forName("UTF-8")));
-        /*pluginInputTokenizer = new StreamTokenizer(pluginInputReader);
-        pluginInputTokenizer.resetSyntax();
-        pluginInputTokenizer.whitespaceChars('\u0000', '\u0000');
-        pluginInputTokenizer.wordChars('\u0001', '\u00FF');*/
         pluginOutputWriter =
                 new BufferedWriter(new OutputStreamWriter
                         (outputstream, Charset.forName("UTF-8")));
-
-        /*
-        while(true) {
-            String message = read();
-            PluginDebug.debug(message);
-            handleMessage(message);
-            // TODO:
-            // write(queue.peek());
-        }
-         */
     }
 
     public void startProcessing() {
@@ -128,14 +104,7 @@ public class PluginStreamHandler {
 
                     PluginDebug.debug("Waiting for data...");
 
-                    long b4 = new Date().getTime();
-
                     String s = read();
-
-                    long after = new Date().getTime();
-
-                    totalWait += (after - b4);
-                    //System.err.println("Total wait time: " + totalWait);
 
                     if (s != null) {
                         consumer.queue(s);
@@ -152,35 +121,6 @@ public class PluginStreamHandler {
                         PluginDebug.debug("APPLETVIEWER: exiting appletviewer");
                         System.exit(0);
                     }
-
-                    /*    				
-                        				int readChar = -1;
-                        				// blocking read, discard first character
-                        				try {
-                        					readChar = pluginInputReader.read();
-                        				} catch (IOException ioe) {
-                        					// plugin may have detached
-                        				}
-
-                        				// if not disconnected
-                        				if (readChar != -1) {
-                        					String s = read();
-                        					PluginDebug.debug("Got data, consuming " + s);
-                        					consumer.consume(s);
-                        				} else {
-                        					try {
-                        						// Close input/output channels to plugin.
-                        						pluginInputReader.close();
-                        						pluginOutputWriter.close();
-                        					} catch (IOException exception) {
-                        						// Deliberately ignore IOException caused by broken
-                        						// pipe since plugin may have already detached.
-                        					}
-                        					AppletSecurityContextManager.dumpStore(0);
-                        					PluginDebug.debug("APPLETVIEWER: exiting appletviewer");
-                        					System.exit(0);
-                        				}
-                    */
                 }
             }
         };
@@ -411,13 +351,6 @@ public class PluginStreamHandler {
         }
 
         return;
-        /*	
-        	synchronized(writeQueue) {
-                writeQueue.add(message);
-                PluginDebug.debug("  PIPE: appletviewer wrote: " + message);
-        	}
-        */
-
     }
 
     public boolean messageAvailable() {

@@ -37,9 +37,6 @@ exception statement from your version. */
 
 package sun.applet;
 
-import java.security.AccessControlContext;
-import java.security.ProtectionDomain;
-
 public class GetWindowPluginCallRequest extends PluginCallRequest {
     // FIXME: look into int vs long JavaScript internal values.
     long internal;

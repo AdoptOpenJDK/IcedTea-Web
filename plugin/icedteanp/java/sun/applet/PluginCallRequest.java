@@ -37,9 +37,6 @@ exception statement from your version. */
 
 package sun.applet;
 
-import java.security.AccessControlContext;
-import java.security.ProtectionDomain;
-
 // FIXME: for each type of request extend a new (anonymous?)
 // PluginCallRequest.
 public abstract class PluginCallRequest {

@@ -836,7 +836,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
     }
 
     private Image getCachedImage(URL url) {
-        // System.getSecurityManager().checkConnection(url.getHost(), url.getPort());
         return (Image) getCachedImageRef(url).get();
     }
 
@@ -1825,18 +1824,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     static String encoding = null;
 
-    static private Reader makeReader(InputStream is) {
-        if (encoding != null) {
-            try {
-                return new BufferedReader(new InputStreamReader(is, encoding));
-            } catch (IOException x) {
-            }
-        }
-        InputStreamReader r = new InputStreamReader(is);
-        encoding = r.getEncoding();
-        return new BufferedReader(r);
-    }
-
     /**
      * Scan an html file for <applet> tags
      */
@@ -1869,10 +1856,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                               PrintStream statusMsgStream,
                               PluginAppletPanelFactory factory)
             throws IOException {
-        // <OBJECT> <EMBED> tag flags
-        boolean isAppletTag = false;
         boolean isObjectTag = false;
-        boolean isEmbedTag = false;
         boolean objectTagAlreadyParsed = false;
 
         // The current character
@@ -1948,9 +1932,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                             }
                         }
                         atts = null;
-                        isAppletTag = false;
                         isObjectTag = false;
-                        isEmbedTag = false;
                     }
                 } else {
                     String nm = scanIdentifier(c, in);
@@ -1967,15 +1949,12 @@ public class PluginAppletViewer extends XEmbeddedFrame
                             String val = t.get("value");
                             if (val == null) {
                                 statusMsgStream.println(requiresNameWarning);
-                            } else if (atts != null) {
+                            } else {
                                 PluginDebug.debug("PUT " + att + " = " + val);
                                 atts.put(att.toLowerCase(), val);
-                            } else {
-                                statusMsgStream.println(paramOutsideWarning);
                             }
                         }
                     } else if (nm.equalsIgnoreCase("applet")) {
-                        isAppletTag = true;
                         atts = scanTag(c, in);
 
                         // If there is a classid and no code tag present, transform it to code tag
@@ -2055,7 +2034,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
                             atts.put("height", height);
                         }
                     } else if (nm.equalsIgnoreCase("embed")) {
-                        isEmbedTag = true;
                         atts = scanTag(c, in);
 
                         // If there is a classid and no code tag present, transform it to code tag

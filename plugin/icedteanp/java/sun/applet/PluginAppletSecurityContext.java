@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package sun.applet;
 
-import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -53,13 +52,10 @@ import java.security.CodeSource;
 import java.security.Permissions;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import netscape.javascript.JSObjectCreatePermission;
@@ -144,32 +140,25 @@ class Signature {
             if (elem == null) // end of signature
                 continue;
 
-            // System.out.println ("NEXT TYPE: " + elem);
             Class primitive = primitiveNameToType(elem);
             if (primitive != null)
                 typeList.add(primitive);
             else {
-                // System.out.println ("HERE1");
                 int dimsize = 0;
                 int n = elem.indexOf('[');
                 if (n != -1) {
-                    // System.out.println ("HERE2");
                     String arrayType = elem.substring(0, n);
                     dimsize++;
                     n = elem.indexOf('[', n + 1);
-                    // System.out.println ("HERE2.5");
                     while (n != -1) {
                         dimsize++;
                         n = elem.indexOf('[', n + 1);
-                        // System.out.println ("HERE2.8");
                     }
                     int[] dims = new int[dimsize];
                     primitive = primitiveNameToType(arrayType);
-                    // System.out.println ("HERE3");
                     if (primitive != null) {
                         typeList.add(Array.newInstance(primitive, dims)
                                                                 .getClass());
-                        // System.out.println ("HERE4");
                     } else
                         typeList.add(Array.newInstance(
                                                                 getClass(arrayType, cl), dims).getClass());
@@ -557,11 +546,6 @@ public class PluginAppletSecurityContext {
                 // Cast the object to appropriate type before insertion
                 value = MethodOverloadResolver.getCostAndCastedObject(value, store.getObject(arrayID).getClass().getComponentType())[1];
 
-                //if (value == null &&
-                //    store.getObject(arrayID).getClass().getComponentType().isPrimitive()) {
-                //    value = 0;
-                //}
-
                 Array.set(store.getObject(arrayID), index, value);
 
                 write(reference, "SetObjectArrayElement");
@@ -569,13 +553,10 @@ public class PluginAppletSecurityContext {
                 String[] args = message.split(" ");
                 Integer arrayID = parseCall(args[1], null, Integer.class);
 
-                //System.out.println("ARRAYID: " + arrayID);
                 Object o = store.getObject(arrayID);
                 int len = 0;
                 len = Array.getLength(o);
-                // System.out.println ("Returning array length: " + len);
 
-                // System.out.println ("array length: " + o + " " + len);
                 write(reference, "GetArrayLength " + Array.getLength(o));
             } else if (message.startsWith("GetField")) {
                 String[] args = message.split(" ");
@@ -624,10 +605,7 @@ public class PluginAppletSecurityContext {
             } else if (message.startsWith("GetObjectClass")) {
                 int oid = Integer.parseInt(message.substring("GetObjectClass"
                                                 .length() + 1));
-                // System.out.println ("GETTING CLASS FOR: " + oid);
                 Class<?> c = store.getObject(oid).getClass();
-                // System.out.println (" OBJ: " + store.getObject(oid));
-                // System.out.println (" CLS: " + c);
                 store.reference(c);
 
                 write(reference, "GetObjectClass " + store.getIdentifier(c));
@@ -773,8 +751,6 @@ public class PluginAppletSecurityContext {
                 byte[] b = null;
                 o = (String) store.getObject(stringID);
                 b = o.getBytes("UTF-8");
-                // System.out.println ("STRING UTF-8 LENGTH: " + o + " " +
-                // b.length);
 
                 write(reference, "GetStringUTFLength " + o.length());
             } else if (message.startsWith("GetStringLength")) {
@@ -785,10 +761,7 @@ public class PluginAppletSecurityContext {
                 byte[] b = null;
                 o = (String) store.getObject(stringID);
                 b = o.getBytes("UTF-16LE");
-                // System.out.println ("STRING UTF-16 LENGTH: " + o + " " +
-                // b.length);
 
-                // System.out.println ("Java: GetStringLength " + b.length);
                 write(reference, "GetStringLength " + o.length());
             } else if (message.startsWith("GetStringUTFChars")) {
                 String[] args = message.split(" ");
@@ -807,8 +780,6 @@ public class PluginAppletSecurityContext {
                                                                         + Integer
                                                                                         .toString(((int) b[i]) & 0x0ff, 16));
 
-                // System.out.println ("Java: GetStringUTFChars: " + o);
-                // //System.out.println ("String UTF BYTES: " + buf);
                 write(reference, "GetStringUTFChars " + buf);
             } else if (message.startsWith("GetStringChars")) {
                 String[] args = message.split(" ");
@@ -853,10 +824,6 @@ public class PluginAppletSecurityContext {
                 String[] args = message.split(" ");
                 String type = parseCall(args[1], null, String.class);
                 Integer length = parseCall(args[2], null, Integer.class);
-
-                // System.out.println ("CALLING: NewArray: " + type + " " +
-                // length + " "
-                // + Signature.primitiveNameToType(type));
 
                 Object newArray = null;
 
@@ -939,10 +906,6 @@ public class PluginAppletSecurityContext {
                 Integer classID = parseCall(args[2], null, Integer.class);
                 Integer objectID = parseCall(args[3], null, Integer.class);
 
-                // System.out.println ("CALLING: NewObjectArray: " +
-                // classID + " " + length + " "
-                // + objectID);
-
                 Object newArray = null;
                 newArray = Array.newInstance((Class) store.getObject(classID),
                                                 length);
@@ -962,12 +925,9 @@ public class PluginAppletSecurityContext {
                 final Constructor m = (Constructor) store.getObject(methodID);
                 Class[] argTypes = m.getParameterTypes();
 
-                // System.out.println ("NEWOBJ: HERE1");
                 Object[] arguments = new Object[argTypes.length];
-                // System.out.println ("NEWOBJ: HERE2");
                 for (int i = 0; i < argTypes.length; i++) {
                     arguments[i] = parseArgs(args[3 + i], argTypes[i]);
-                    // System.out.println ("NEWOBJ: GOT ARG: " + arguments[i]);
                 }
 
                 final Object[] fArguments = arguments;
@@ -1090,9 +1050,6 @@ public class PluginAppletSecurityContext {
                 ret = new String(byteArray, 0, bytelength, "UTF-16LE");
                 PluginDebug.debug("NEWSTRING: " + ret);
 
-                // System.out.println ("NEWOBJ: CALLED: " + ret);
-                // System.out.println ("NEWOBJ: CALLED: " +
-                // store.getObject(ret));
                 store.reference(ret);
                 write(reference, "NewString " + store.getIdentifier(ret));
 
@@ -1335,106 +1292,6 @@ public class PluginAppletSecurityContext {
     }
 
     public AccessControlContext getAccessControlContext(String[] nsPrivilegeList, String src) {
-
-        /*
-                        for (int i=0; i < nsPrivilegeList.length; i++) {
-                                String privilege = nsPrivilegeList[i];
-
-                                if (privilege.equals("UniversalAccept")) {
-                                        SocketPermission sp = new SocketPermission("*", "accept,resolve");
-                                        grantedPermissions.add(sp);
-                                } else if (privilege.equals("UniversalAwtEventQueueAccess")) {
-                                        AWTPermission awtp = new AWTPermission("accessEventQueue");
-                                        grantedPermissions.add(awtp);
-                                } else if (privilege.equals("UniversalConnect")) {
-                                        SocketPermission sp = new SocketPermission("*", "connect,resolve");
-                                        grantedPermissions.add(sp);
-                                } else if (privilege.equals("UniversalListen")) {
-                                        SocketPermission sp = new SocketPermission("*", "listen,resolve");
-                                        grantedPermissions.add(sp);
-                                } else if (privilege.equals("UniversalExecAccess")) {
-                                        FilePermission fp = new FilePermission("<<ALL FILES>>", "execute");
-                                        RuntimePermission rtp = new RuntimePermission("setIO");
-                                        grantedPermissions.add(fp);
-                                        grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalExitAccess")) {
-                                        // Doesn't matter what the permissions are. Do not allow VM to exit.. we
-                                        // use a single VM for the entire browser lifecycle once invoked, we
-                                        // cannot let it exit
-
-                                        //RuntimePermission rtp = new RuntimePermission("exitVM.*");
-                                        //grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalFileDelete")) {
-                                        FilePermission fp = new FilePermission("<<ALL FILES>>", "delete");
-                                        grantedPermissions.add(fp);
-                                } else if (privilege.equals("UniversalFileRead")) {
-                                        FilePermission fp = new FilePermission("<<ALL FILES>>", "read");
-                                        grantedPermissions.add(fp);
-                                } else if (privilege.equals("UniversalFileWrite")) {
-                                        FilePermission fp = new FilePermission("<<ALL FILES>>", "write");
-                                        grantedPermissions.add(fp);
-                                }  else if (privilege.equals("UniversalFdRead")) {
-                                        RuntimePermission rtp = new RuntimePermission("readFileDescriptor");
-                                        grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalFdWrite")) {
-                                        RuntimePermission rtp = new RuntimePermission("writeFileDescriptor");
-                                        grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalLinkAccess")) {
-                                        RuntimePermission rtp = new RuntimePermission("loadLibrary.*");
-                                        grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalListen")) {
-                                        SocketPermission sp = new SocketPermission("*", "listen");
-                                        grantedPermissions.add(sp);
-                                } else if (privilege.equals("UniversalMulticast")) {
-                                        SocketPermission sp = new SocketPermission("*", "accept,connect,resolve");
-                                        grantedPermissions.add(sp);
-                                } else if (privilege.equals("UniversalPackageAccess")) {
-                                        RuntimePermission rtp = new RuntimePermission("defineClassInPackage.*");
-                                        grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalPackageDefinition")) {
-                                        RuntimePermission rtp = new RuntimePermission("accessClassInPackage.*");
-                                        grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalPrintJobAccess")) {
-                                        RuntimePermission rtp = new RuntimePermission("queuePrintJob");
-                                        grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalPropertyRead")) {
-                                        PropertyPermission pp = new PropertyPermission("*", "read");
-                                        grantedPermissions.add(pp);
-                                } else if (privilege.equals("UniversalPropertyWrite")) {
-                                        PropertyPermission pp = new PropertyPermission("*", "write");
-                                        grantedPermissions.add(pp);
-                                } else if (privilege.equals("UniversalSetFactory")) {
-                                        RuntimePermission rtp = new RuntimePermission("setFactory");
-                                        grantedPermissions.add(rtp);
-                                } else if (privilege.equals("UniversalSystemClipboardAccess")) {
-                                        AWTPermission awtp = new AWTPermission("accessClipboard");
-                                        grantedPermissions.add(awtp);
-                                } else if (privilege.equals("UniversalThreadAccess")) {
-                                        RuntimePermission rtp1 = new RuntimePermission("modifyThread");
-                                        RuntimePermission rtp2 = new RuntimePermission("stopThread");
-                                        grantedPermissions.add(rtp1);
-                                        grantedPermissions.add(rtp2);
-                                } else if (privilege.equals("UniversalThreadGroupAccess")) {
-                                        RuntimePermission rtp1 = new RuntimePermission("modifyThreadGroup");
-                                        RuntimePermission rtp2 = new RuntimePermission("modifyThread");
-                                        RuntimePermission rtp3 = new RuntimePermission("stopThread");
-                                        grantedPermissions.add(rtp1);
-                                        grantedPermissions.add(rtp2);
-                                        grantedPermissions.add(rtp3);
-                                } else if (privilege.equals("UniversalTopLevelWindow")) {
-                                        AWTPermission awtp = new AWTPermission("topLevelWindow");
-                                        grantedPermissions.add(awtp);
-                                } else if (privilege.equals("UniversalBrowserRead")) {
-                                        BrowserReadPermission bp = new BrowserReadPermission();
-                                        grantedPermissions.add(bp);
-                                } else if (privilege.equals("UniversalJavaPermissions")) {
-                                        AllPermission ap = new AllPermission();
-                                        grantedPermissions.add(ap);
-                                }
-                        }
-
-                        // what to do with these is unknown: UniversalConnectWithRedirect, UniversalDialogModality, UniversalSendMail, LimitedInstall, FullInstall, SilentInstall
-        */
 
         Permissions grantedPermissions = new Permissions();
 

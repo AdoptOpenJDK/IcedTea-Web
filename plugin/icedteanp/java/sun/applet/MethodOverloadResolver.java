@@ -175,8 +175,6 @@ public class MethodOverloadResolver {
 
         int lowestCost = Integer.MAX_VALUE;
 
-        ArrayList<Object> paramList = new ArrayList<Object>();
-
         for (Method matchingMethod : matchingMethods) {
 
             int methodCost = 0;
@@ -239,8 +237,6 @@ public class MethodOverloadResolver {
             System.out.println("getMatchingConstructor called with: " + printList(callList));
 
         int lowestCost = Integer.MAX_VALUE;
-
-        ArrayList<Object> paramList = new ArrayList<Object>();
 
         for (Constructor matchingConstructor : matchingConstructors) {
 
