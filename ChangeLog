@@ -1,5 +1,10 @@
 2011-01-20  Andrew Su  <asu@redhat.com>
 
+	* netx/net/sourceforge/jnlp/AppletLog.java: Restrict log files to
+	owner accessible only.
+
+2011-01-20  Andrew Su  <asu@redhat.com>
+
 	Removing dead/commented/unused code.
 	* plugin/icedteanp/java/sun/applet/GetWindowPluginCallRequest.java:
 	Removed unused imports.

@@ -1,11 +1,14 @@
 package net.sourceforge.jnlp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.XMLFormatter;
+
+import net.sourceforge.jnlp.util.FileUtils;
 
 /**
  * This class writes log information to file.
@@ -20,8 +23,8 @@ class AppletLog extends Log {
             // If logging is enabled, we create logger.
             if (enableLogging) {
                 String fn = icedteaLogDir + "plugin" + java.lang.System.currentTimeMillis() + ".log";
-                boolean append = false;
-                FileHandler fh = new FileHandler(fn, append);
+                FileUtils.createRestrictedFile(new File(fn), true);
+                FileHandler fh = new FileHandler(fn, false);
                 fh.setFormatter(new XMLFormatter());
                 String logClassName = AppletLog.class.getName();
                 logger = Logger.getLogger(logClassName);
