@@ -834,7 +834,7 @@ public class Launcher {
                 exception = ex;
                 // Exit if we can't launch the application.
                 if (exitOnFailure)
-                    System.exit(0);
+                    System.exit(1);
             }
         }
 

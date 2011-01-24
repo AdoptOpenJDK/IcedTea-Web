@@ -104,7 +104,7 @@ public class NetxPanel extends AppletViewerPanel {
                 // Assume user has indicated he does not trust the
                 // applet.
                 if (exitOnFailure)
-                    System.exit(0);
+                    System.exit(1);
             }
             applet = appInst.getApplet();
 

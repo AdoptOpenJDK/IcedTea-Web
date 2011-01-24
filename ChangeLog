@@ -1,3 +1,8 @@
+2011-01-24  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java: Exit with error code
+	* netx/net/sourceforge/jnlp/NetxPanel.java: Likewise.
+
 2011-01-20  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/AppletLog.java: Restrict log files to
