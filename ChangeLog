@@ -1,3 +1,7 @@
+2011-01-25  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/default.jnlp: Remove.
+
 2011-01-24  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Launcher.java: Exit with error code
