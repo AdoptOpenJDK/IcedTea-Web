@@ -8,6 +8,10 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.1 (2011-XX-XX):
+* NetX
+  - Use Firefox's proxy settings if possible
+
 New in release 1.0 (2010-XX-XX):
 
 * Initial release of IcedTea-Web

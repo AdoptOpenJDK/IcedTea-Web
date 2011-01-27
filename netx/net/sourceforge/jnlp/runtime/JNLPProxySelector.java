@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -40,7 +41,7 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
  *
  * @see java.net.ProxySelector
  */
-public class JNLPProxySelector extends ProxySelector {
+public abstract class JNLPProxySelector extends ProxySelector {
 
     public static final int PROXY_TYPE_UNKNOWN = -1;
     public static final int PROXY_TYPE_NONE = 0;
@@ -337,9 +338,7 @@ public class JNLPProxySelector extends ProxySelector {
             return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
         }
         // TODO implement this by reading and using the PAC file
-        if (JNLPRuntime.isDebug()) {
-            System.err.println("WARNING: Using a Proxy Auto Config file is not implemented yet");
-        }
+        System.err.println(R("RPRoxyPacNotImplemented"));
 
         return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
     }
@@ -350,13 +349,7 @@ public class JNLPProxySelector extends ProxySelector {
      * @param uri the uri to get proxies for
      * @return a list of proxies
      */
-    protected List<Proxy> getFromBrowser(URI uri) {
-        // TODO implement this by parsing mozilla config
-        if (JNLPRuntime.isDebug()) {
-            System.err.println("WARNING: Using proxy settings from the browser is not implemented yet");
-        }
+    protected abstract List<Proxy> getFromBrowser(URI uri);
 
-        return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
-    }
 
 }

@@ -34,6 +34,7 @@ import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 
 import net.sourceforge.jnlp.*;
+import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.cache.*;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
@@ -220,7 +221,7 @@ public class JNLPRuntime {
 
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
-        ProxySelector.setDefault(new JNLPProxySelector());
+        ProxySelector.setDefault(new BrowserAwareProxySelector());
 
         initialized = true;
 

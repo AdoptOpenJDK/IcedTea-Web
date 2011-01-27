@@ -1,5 +1,24 @@
 2011-01-27  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	RPRoxyPacNotImplemented, RProxyFirefoxNotFound, and
+	RProxyFirefoxOptionNotImplemented.
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java: Make abstract.
+	(getFromBrowser): Remove implementation; make abstract.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Set BrowserAwareProxySelector as the proxy selector.
+	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java: New
+	file. This class extends JNLPProxySelector and searches the browser's
+	configuration to load additional proxy settings from.
+	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesFinder.java: New
+	file. This class looks into the browser configration to find the
+	preferences file for the default firefox profile.
+	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesParser.java: New
+	file. Parses the browser's preferences and makes it available through a
+	simpler interface.
+
+2011-01-27  Omair Majid  <omajid@redhat.com>
+
 	* AUTHORS: Update to include Jon A Maxwell.
 	* extra/net/sourceforge/jnlp/about/resources/notes.html: Include everyone
 	from AUTHORS.
