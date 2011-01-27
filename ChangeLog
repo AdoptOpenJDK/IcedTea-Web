@@ -1,3 +1,9 @@
+2011-01-27  Omair Majid  <omajid@redhat.com>
+
+	* AUTHORS: Update to include Jon A Maxwell.
+	* extra/net/sourceforge/jnlp/about/resources/notes.html: Include everyone
+	from AUTHORS.
+
 2011-01-25  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/default.jnlp: Remove.
