@@ -667,3 +667,19 @@ elif test x"${it_cv_applet_hole}" = "x3"; then
 fi
 AC_PROVIDE([$0])dnl
 ])
+
+AC_DEFUN_ONCE([IT_SET_VERSION],
+[
+  AC_REQUIRE([IT_OBTAIN_HG_REVISIONS])
+  AC_REQUIRE([IT_GET_PKGVERSION])
+  AC_MSG_CHECKING([what version string to use])
+  if test "x${ICEDTEA_REVISION}" != xnone; then
+    ICEDTEA_REV="+${ICEDTEA_REVISION}"
+  fi
+  if test "x${PKGVERSION}" != "xnone"; then
+    ICEDTEA_PKG=" (${PKGVERSION})"
+  fi
+  FULL_VERSION="${PACKAGE_VERSION}${ICEDTEA_REV}${ICEDTEA_PKG}"
+  AC_MSG_RESULT([${FULL_VERSION}])
+  AC_SUBST([FULL_VERSION])
+])

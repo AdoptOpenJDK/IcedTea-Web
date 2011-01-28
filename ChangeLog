@@ -1,3 +1,16 @@
+2011-01-28  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am: Move ICEDTEA_REV, ICEDTEA_PKG to acinclude.m4. Use
+	FULL_VERSION.
+	(stamps/netx-dist.stamp): Depend on netx.manifest. Use this file as the
+	jar file manifest.
+	* acinclude.m4 (IT_SET_VERSION): New macro. Defines FULL_VERSION.
+	* configure.ac: Add netx.manifest to AC_CONFIG_FILES. Invoke
+	IT_SET_VERSION.
+	* netx.manifest.in: New file.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: Set name and version using
+	information from the manifest file.
+
 2011-01-27  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add

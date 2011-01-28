@@ -54,13 +54,6 @@ else
   SRC_DIR_LINK = $(REFLINK)
 endif
 
-if HAS_ICEDTEA_REVISION
-ICEDTEA_REV = +${ICEDTEA_REVISION}
-endif
-if HAS_PKGVERSION
-ICEDTEA_PKG = $(EMPTY) (${PKGVERSION})
-endif
-
 if ENABLE_DOCS
 JAVADOC_OPTS=-use -keywords -encoding UTF-8 -splitIndex \
  -bottom '<font size="-1"> <a href="http://icedtea.classpath.org/bugzilla">Submit a bug or feature</a></font>'
@@ -82,7 +75,7 @@ LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -pthread -W -Wall -Wno-unused -W
 	-DEXPAND_CLASSPATH_WILDCARDS
 LAUNCHER_LINK = -o $@ -pthread -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_DIR)/lib/$(INSTALL_ARCH_DIR) \
 	-Wl,-soname=lib.so -Wl,-z -Wl,origin -Wl,--allow-shlib-undefined $(X11_CFLAGS) $(X11_LIBS) -ldl -lz
-PLUGIN_VERSION = IcedTea-Web $(PACKAGE_VERSION)$(ICEDTEA_REV)$(ICEDTEA_PKG)
+PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
  itweb-settings.desktop.in
@@ -298,10 +291,11 @@ stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
 	mkdir -p stamps
 	touch $@
 
-stamps/netx-dist.stamp: stamps/netx.stamp
+stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest
 	(cd $(NETX_DIR) ; \
 	 mkdir -p lib ; \
-	 $(BOOT_DIR)/bin/jar cf lib/classes.jar javax/jnlp net ; \
+	 $(BOOT_DIR)/bin/jar cfm lib/classes.jar \
+	  $(abs_top_builddir)/netx.manifest javax/jnlp net ; \
 	 cp -pPR $(SRC_DIR_LINK) $(NETX_SRCDIR) src; \
 	 find src -type f -exec chmod 640 '{}' ';' -o -type d -exec chmod 750 '{}' ';'; \
 	 cd src ; \

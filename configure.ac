@@ -1,6 +1,6 @@
 AC_INIT([icedtea-web],[1.1pre],[distro-pkg-dev@openjdk.java.net], [icedtea-web], [http://icedtea.classpath.org/wiki/IcedTea-Web])
 AM_INIT_AUTOMAKE([1.9 tar-pax foreign])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile netx.manifest])
 
 # Older automake doesn't generate these correctly
 abs_top_builddir=`pwd -P`
@@ -35,8 +35,7 @@ FIND_ECJ_JAR
 IT_FIND_JAVADOC
 AC_CONFIG_FILES([javac], [chmod +x javac])
 
-IT_GET_PKGVERSION
-IT_OBTAIN_HG_REVISIONS
+IT_SET_VERSION
 IT_CHECK_XULRUNNER_VERSION
 
 AC_CHECK_LIB(z, main,, [AC_MSG_ERROR("zlib not found - try installing zlib-devel")])
