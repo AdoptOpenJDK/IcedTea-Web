@@ -76,7 +76,7 @@ public interface CertVerifier {
      * Return a valid certificate path to this certificate(s) being verified
      * @return The CertPath
      */
-    public ArrayList<CertPath> getCerts();
+    public CertPath getCertPath();
 
     /**
      * Returns the application's publisher's certificate.
@@ -89,4 +89,5 @@ public interface CertVerifier {
      * the event that the application is self signed.
      */
     public abstract Certificate getRoot();
+
 }

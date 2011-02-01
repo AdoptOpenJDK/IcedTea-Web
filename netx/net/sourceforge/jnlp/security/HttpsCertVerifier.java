@@ -83,7 +83,7 @@ public class HttpsCertVerifier implements CertVerifier {
         return isTrusted;
     }
 
-    public ArrayList<CertPath> getCerts() {
+    public CertPath getCertPath() {
 
         ArrayList<X509Certificate> list = new ArrayList<X509Certificate>();
         for (int i = 0; i < chain.length; i++)
@@ -99,7 +99,7 @@ public class HttpsCertVerifier implements CertVerifier {
             // carry on
         }
 
-        return certPaths;
+        return certPaths.get(0);
     }
 
     public ArrayList<String> getDetails() {

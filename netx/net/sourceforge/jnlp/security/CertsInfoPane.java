@@ -64,7 +64,7 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class CertsInfoPane extends SecurityDialogPanel {
 
-    private ArrayList<CertPath> certs;
+    private CertPath certPath;
     private JList list;
     protected JTree tree;
     private JTable table;
@@ -84,12 +84,9 @@ public class CertsInfoPane extends SecurityDialogPanel {
      * Builds the JTree out of CertPaths.
      */
     void buildTree() {
-        certs = parent.getJarSigner().getCerts();
-        //for now, we're only going to display the first signer, even though
-        //jars can be signed by multiple people.
-        CertPath firstPath = certs.get(0);
+        certPath = parent.getJarSigner().getCertPath();
         X509Certificate firstCert =
-                        ((X509Certificate) firstPath.getCertificates().get(0));
+                        ((X509Certificate) certPath.getCertificates().get(0));
         String subjectString =
                         SecurityUtil.getCN(firstCert.getSubjectX500Principal().getName());
         String issuerString =
@@ -101,9 +98,9 @@ public class CertsInfoPane extends SecurityDialogPanel {
 
         //not self signed
         if (!firstCert.getSubjectDN().equals(firstCert.getIssuerDN())
-                        && (firstPath.getCertificates().size() > 1)) {
+                        && (certPath.getCertificates().size() > 1)) {
             X509Certificate secondCert =
-                                ((X509Certificate) firstPath.getCertificates().get(1));
+                                ((X509Certificate) certPath.getCertificates().get(1));
             subjectString =
                                 SecurityUtil.getCN(secondCert.getSubjectX500Principal().getName());
             issuerString =
@@ -122,12 +119,12 @@ public class CertsInfoPane extends SecurityDialogPanel {
      * Fills in certsNames, certsData with data from the certificates.
      */
     protected void populateTable() {
-        certNames = new String[certs.get(0).getCertificates().size()];
+        certNames = new String[certPath.getCertificates().size()];
         certsData = new ArrayList<String[][]>();
 
-        for (int i = 0; i < certs.get(0).getCertificates().size(); i++) {
+        for (int i = 0; i < certPath.getCertificates().size(); i++) {
 
-            X509Certificate c = (X509Certificate) certs.get(0).getCertificates().get(i);
+            X509Certificate c = (X509Certificate) certPath.getCertificates().get(i);
             certsData.add(parseCert(c));
             certNames[i] = SecurityUtil.getCN(c.getSubjectX500Principal().getName())
                                 + " (" + SecurityUtil.getCN(c.getIssuerX500Principal().getName()) + ")";

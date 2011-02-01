@@ -1,3 +1,33 @@
+2011-01-24 Deepak Bhole <dbhole@redhat.com>
+
+	RH672262, CVE-2011-0025: IcedTea jarfile signature verification bypass
+	* rt/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(initializeResources): Prompt user only if there is a single certificate
+	that signs all jars in the jnlp file, otherwise treat as unsigned.
+	* rt/net/sourceforge/jnlp/security/CertVerifier.java: Rename getCerts to
+	getCertPath and make it return a CertPath.
+	* rt/net/sourceforge/jnlp/security/CertsInfoPane.java: Rename certs
+	variable to certPath and change its type to CertPath.
+	(buildTree): Use new certPath variable.
+	(populateTable): Same.
+	* rt/net/sourceforge/jnlp/security/HttpsCertVerifier.java: Rename getCerts
+	to getCertPath and make it return a CertPath.
+	* rt/net/sourceforge/jnlp/tools/JarSigner.java: Change type for certs
+	variable to be a hashmap that stores certs and the number of entries they
+	have signed.
+	(totalSignableEntries): New variable to track how many signable entries
+	have been encountered.
+	(getCerts): Updated method to return certs from new hashmap.
+	(isFullySignedByASingleCert): New method. Returns if there is a single
+	cert that signs all the entries in the jars specified in the jnlp file.
+	(verifyJars): Move verifiedJars and unverifiedJars out of the for loop so
+	that the data is not lost when the next jar is processed. After verifying
+	each jar, see if there is a single signer, and prompt the user if there is
+	such an untrusted signer.
+	(verifyJar): Increment totalSignableEntries for each signable entry
+	encountered and the count for each cert when it signs an entry. Move
+	checkTrustedCerts() out of the function into verifyJars(). 
+
 2011-01-28  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am: Move ICEDTEA_REV, ICEDTEA_PKG to acinclude.m4. Use

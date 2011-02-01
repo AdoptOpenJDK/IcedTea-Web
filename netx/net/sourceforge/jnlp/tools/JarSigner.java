@@ -96,10 +96,12 @@ public class JarSigner implements CertVerifier {
     private ArrayList<String> unverifiedJars = null;
 
     /** the certificates used for jar verification */
-    private ArrayList<CertPath> certs = null;
+    private HashMap<CertPath, Integer> certs = new HashMap<CertPath, Integer>();
 
     /** details of this signing */
     private ArrayList<String> details = new ArrayList<String>();
+
+    private int totalSignableEntries = 0;
 
     /* (non-Javadoc)
      * @see net.sourceforge.jnlp.tools.CertVerifier2#getAlreadyTrustPublisher()
@@ -149,18 +151,41 @@ public class JarSigner implements CertVerifier {
      * @see net.sourceforge.jnlp.tools.CertVerifier2#getCerts()
      */
     public ArrayList<CertPath> getCerts() {
-        return certs;
+        return new ArrayList<CertPath>(certs.keySet());
+    }
+
+    /**
+     * Returns whether or not all entries have a common signer.
+     *  
+     * It is possible to create jars where only some entries are signed. In 
+     * such cases, we should not prompt the user to accept anything, as the whole 
+     * application must be treated as unsigned. This method should be called by a 
+     * caller before it is about to ask the user to accept a cert and determine 
+     * whether the application is trusted or not.
+     *  
+     * @return Whether or not all entries have a common signer
+     */
+    public boolean isFullySignedByASingleCert() {
+
+        for (CertPath cPath : certs.keySet()) {
+            // If this cert has signed everything, return true
+            if (certs.get(cPath) == totalSignableEntries)
+                return true;
+        }
+
+        // No cert found that signed all entries. Return false.
+        return false;
     }
 
     public void verifyJars(List<JARDesc> jars, ResourceTracker tracker)
             throws Exception {
 
-        certs = new ArrayList<CertPath>();
+        verifiedJars = new ArrayList<String>();
+        unverifiedJars = new ArrayList<String>();
+
         for (int i = 0; i < jars.size(); i++) {
 
             JARDesc jar = jars.get(i);
-            verifiedJars = new ArrayList<String>();
-            unverifiedJars = new ArrayList<String>();
 
             try {
 
@@ -189,16 +214,28 @@ public class JarSigner implements CertVerifier {
                 throw e;
             }
         }
+
+        //we really only want the first certPath
+        for (CertPath cPath : certs.keySet()) {
+
+            if (certs.get(cPath) != totalSignableEntries)
+                continue;
+            else
+                certPath = cPath;
+
+            // check if the certs added above are in the trusted path
+            checkTrustedCerts();
+
+            if (alreadyTrustPublisher || rootInCacerts)
+                break;
+        }
+
     }
 
     public verifyResult verifyJar(String jarName) throws Exception {
         boolean anySigned = false;
         boolean hasUnsignedEntry = false;
         JarFile jarFile = null;
-
-        // certs could be uninitialized if one calls this method directly
-        if (certs == null)
-            certs = new ArrayList<CertPath>();
 
         try {
             jarFile = new JarFile(jarName, true);
@@ -238,21 +275,22 @@ public class JarSigner implements CertVerifier {
                     CodeSigner[] signers = je.getCodeSigners();
                     boolean isSigned = (signers != null);
                     anySigned |= isSigned;
-                    hasUnsignedEntry |= !je.isDirectory() && !isSigned
-                                        && !signatureRelated(name);
+
+                    boolean shouldHaveSignature = !je.isDirectory()
+                                                && !signatureRelated(name);
+
+                    hasUnsignedEntry |= shouldHaveSignature &&  !isSigned;
+
+                    if (shouldHaveSignature)
+                        totalSignableEntries++;
+
                     if (isSigned) {
-                        // TODO: Perhaps we should check here that
-                        // signers.length is only of size 1, and throw an
-                        // exception if it's not?
                         for (int i = 0; i < signers.length; i++) {
                             CertPath certPath = signers[i].getSignerCertPath();
-                            if (!certs.contains(certPath))
-                                certs.add(certPath);
-
-                            //we really only want the first certPath
-                            if (!certPath.equals(this.certPath)) {
-                                this.certPath = certPath;
-                            }
+                            if (!certs.containsKey(certPath))
+                                certs.put(certPath, 1);
+                            else
+                                certs.put(certPath, certs.get(certPath) + 1);
 
                             Certificate cert = signers[i].getSignerCertPath()
                                     .getCertificates().get(0);
@@ -272,7 +310,12 @@ public class JarSigner implements CertVerifier {
                         }
                     }
                 } //while e has more elements
-            } //if man not null
+            } else { //if man not null
+
+                // Else increment totalEntries by 1 so that unsigned jars with 
+                // no manifests can't sneak in
+                totalSignableEntries++;
+            }
 
             //Alert the user if any of the following are true.
             if (!anySigned) {
@@ -312,9 +355,6 @@ public class JarSigner implements CertVerifier {
                 jarFile.close();
             }
         }
-
-        // check if the certs added above are in the trusted path
-        checkTrustedCerts();
 
         //anySigned does not guarantee that all files were signed.
         return (anySigned && !(hasUnsignedEntry || hasExpiredCert

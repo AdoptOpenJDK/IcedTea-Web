@@ -17,6 +17,7 @@ New in release 1.0 (2010-XX-XX):
 * Initial release of IcedTea-Web
 * Security updates
   - RH645843, CVE-2010-3860: IcedTea System property information leak via public static
+  - RH672262, CVE-2011-0025: IcedTea jarfile signature verification bypass
 * Plugin
   - PR542: Plugin fails with NPE on http://www.openprocessing.org/visuals/iframe.php?visualID=2615
   - PR552: Support for FreeBSD's pthread implementation

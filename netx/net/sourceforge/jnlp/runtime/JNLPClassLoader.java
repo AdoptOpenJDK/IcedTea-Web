@@ -430,7 +430,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
 
             //Case when at least one jar has some signing
-            if (js.anyJarsSigned()) {
+            if (js.anyJarsSigned() && js.isFullySignedByASingleCert()) {
                 signing = true;
 
                 if (!js.allJarsSigned() &&
