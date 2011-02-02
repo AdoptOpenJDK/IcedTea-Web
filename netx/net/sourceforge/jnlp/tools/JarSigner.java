@@ -232,7 +232,7 @@ public class JarSigner implements CertVerifier {
 
     }
 
-    public verifyResult verifyJar(String jarName) throws Exception {
+    private verifyResult verifyJar(String jarName) throws Exception {
         boolean anySigned = false;
         boolean hasUnsignedEntry = false;
         JarFile jarFile = null;

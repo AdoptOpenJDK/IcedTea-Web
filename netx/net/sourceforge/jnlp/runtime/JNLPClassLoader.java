@@ -693,7 +693,11 @@ public class JNLPClassLoader extends URLClassLoader {
                                     }
 
                                     JarSigner signer = new JarSigner();
-                                    signer.verifyJar(extractedJarLocation);
+                                    List<JARDesc> jars = new ArrayList<JARDesc>();
+                                    JARDesc jarDesc = new JARDesc(new File(extractedJarLocation).toURL(), null, null, false, false, false, false);
+                                    jars.add(jarDesc);
+                                    tracker.addResource(new File(extractedJarLocation).toURL(), null, null);
+                                    signer.verifyJars(jars, tracker);
 
                                     if (signer.anyJarsSigned() && !signer.getAlreadyTrustPublisher()) {
                                         checkTrustWithUser(signer);

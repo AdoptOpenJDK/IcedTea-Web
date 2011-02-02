@@ -1,3 +1,12 @@
+2011-02-01  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(activateJars): Add the nested jar to ResourceTracker. Use
+	JarSigner.verifyJars instead of JarSigner.verifyJar.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java
+	(verifyJar): Make private to indicate nothing should be using this
+	directly.
+
 2011-01-24 Deepak Bhole <dbhole@redhat.com>
 
 	RH672262, CVE-2011-0025: IcedTea jarfile signature verification bypass
