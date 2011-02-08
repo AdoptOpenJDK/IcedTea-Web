@@ -120,7 +120,10 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
         }
 
         try {
-            browserAutoConfigUrl = new URL(prefs.get("network.proxy.autoconfig_url"));
+            String url = prefs.get("network.proxy.autoconfig_url");
+            if (url != null) {
+                browserAutoConfigUrl = new URL(url);
+            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -195,7 +198,9 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 if (optionDescription == null) {
                     optionDescription = "Unknown";
                 }
-                System.err.println(R("RProxyFirefoxOptionNotImplemented", browserProxyType, optionDescription));
+                if (JNLPRuntime.isDebug()) {
+                    System.err.println(R("RProxyFirefoxOptionNotImplemented", browserProxyType, optionDescription));
+                }
                 proxies.add(Proxy.NO_PROXY);
         }
 

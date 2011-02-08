@@ -1,3 +1,9 @@
+2011-02-08  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java
+	(initFromBrowserConfig): Do not try to create a URL from null.
+	(getFromBrowser): Only print informational messages in debug mode.
+
 2011-02-01  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
