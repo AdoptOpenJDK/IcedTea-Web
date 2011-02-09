@@ -1,3 +1,9 @@
+2011-02-09  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java
+	(addComponents): Fix the listener attached to the port field to update the
+	right config option.
+
 2011-02-08  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java

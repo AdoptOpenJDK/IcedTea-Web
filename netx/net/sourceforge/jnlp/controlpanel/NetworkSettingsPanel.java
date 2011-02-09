@@ -114,7 +114,7 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         addressField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[1]));
 
         final JTextField portField = new JTextField(config.getProperty(properties[2]), 3);
-        portField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[1]));
+        portField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[2]));
 
         // Create the button which allows setting of other types of proxy.
         JButton advancedProxyButton = new JButton(Translator.R("NSAdvanced") + "...");
