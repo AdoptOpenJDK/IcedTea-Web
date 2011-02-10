@@ -1,3 +1,9 @@
+2011-02-10  Deepak Bhole <dbhole@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java (initialize):
+	Restrict access to net.sourceforge.jnlp.* classes by untrusted
+	classes.
+
 2011-02-09  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java

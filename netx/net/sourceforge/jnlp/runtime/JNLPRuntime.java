@@ -223,6 +223,10 @@ public class JNLPRuntime {
         Authenticator.setDefault(new JNLPAuthenticator());
         ProxySelector.setDefault(new BrowserAwareProxySelector());
 
+        // Restrict access to netx classes
+        Security.setProperty("package.access", 
+                             Security.getProperty("package.access")+",net.sourceforge.jnlp");
+
         initialized = true;
 
     }
