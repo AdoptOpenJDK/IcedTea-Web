@@ -67,6 +67,9 @@ public class Resource {
     /** the remote location of the resource */
     URL location;
 
+    /** the location to use when downloading */
+    private URL downloadLocation;
+
     /** the local file downloaded to */
     File localFile;
 
@@ -96,6 +99,7 @@ public class Resource {
      */
     private Resource(URL location, Version requestVersion, UpdatePolicy updatePolicy) {
         this.location = location;
+        this.downloadLocation = location;
         this.requestVersion = requestVersion;
         this.updatePolicy = updatePolicy;
     }
@@ -127,6 +131,24 @@ public class Resource {
      */
     public URL getLocation() {
         return location;
+    }
+
+    /**
+     * Returns the URL to use for downloading the resource. This can be
+     * different from the original location since it may use a different
+     * file name to support versioning and compression
+     * @return the url to use when downloading
+     */
+    public URL getDownloadLocation() {
+        return downloadLocation;
+    }
+
+    /**
+     * Set the url to use for downloading the resource
+     * @param location
+     */
+    public void setDownloadLocation(URL location) {
+        downloadLocation = location;
     }
 
     /**

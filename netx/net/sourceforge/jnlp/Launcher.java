@@ -417,7 +417,7 @@ public class Launcher {
                     IconDesc.SPLASH, preferredWidth, preferredHeight);
             if (splashImageURL != null) {
                 ResourceTracker resourceTracker = new ResourceTracker(true);
-                resourceTracker.addResource(splashImageURL, file.getFileVersion(), updatePolicy);
+                resourceTracker.addResource(splashImageURL, file.getFileVersion(), null, updatePolicy);
                 splashScreen = new JNLPSplashScreen(resourceTracker, null, null);
                 splashScreen.setSplashImageURL(splashImageURL);
                 if (splashScreen.isSplashScreenValid()) {

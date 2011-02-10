@@ -45,6 +45,7 @@ import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.ExtensionDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -406,6 +407,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             tracker.addResource(jars[i].getLocation(),
                                 jars[i].getVersion(),
+                                getDownloadOptionsForJar(jars[i]),
                                 jars[i].isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE
                                );
         }
@@ -696,7 +698,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                     List<JARDesc> jars = new ArrayList<JARDesc>();
                                     JARDesc jarDesc = new JARDesc(new File(extractedJarLocation).toURL(), null, null, false, false, false, false);
                                     jars.add(jarDesc);
-                                    tracker.addResource(new File(extractedJarLocation).toURL(), null, null);
+                                    tracker.addResource(new File(extractedJarLocation).toURL(), null, null, null);
                                     signer.verifyJars(jars, tracker);
 
                                     if (signer.anyJarsSigned() && !signer.getAlreadyTrustPublisher()) {
@@ -1007,6 +1009,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                             tracker.addResource(desc.getLocation(),
                                     desc.getVersion(),
+                                    null,
                                     JNLPRuntime.getDefaultUpdatePolicy()
                                     );
 
@@ -1247,4 +1250,27 @@ public class JNLPClassLoader extends URLClassLoader {
             jarLocationSecurityMap.put(key, extLoader.jarLocationSecurityMap.get(key));
         }
     }
+
+    private DownloadOptions getDownloadOptionsForJar(JARDesc jar) {
+        boolean usePack = false;
+        boolean useVersion = false;
+
+        ResourcesDesc[] descs = file.getResourceDescs();
+        for (ResourcesDesc desc: descs) {
+            JARDesc[] jars = desc.getJARs();
+            for (JARDesc aJar: jars) {
+                if (jar == aJar) {
+                    if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.packEnabled"))) {
+                        usePack = true;
+                    }
+                    if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.versionEnabled"))) {
+                        useVersion = true;
+                    }
+                }
+            }
+        }
+
+        return new DownloadOptions(usePack, useVersion);
+    }
+
 }

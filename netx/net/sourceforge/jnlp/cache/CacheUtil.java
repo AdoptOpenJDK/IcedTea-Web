@@ -76,7 +76,7 @@ public class CacheUtil {
      */
     public static URL getCachedResource(URL location, Version version, UpdatePolicy policy) {
         ResourceTracker rt = new ResourceTracker();
-        rt.addResource(location, version, policy);
+        rt.addResource(location, version, null, policy);
         try {
             File f = rt.getCacheFile(location);
             // TODO: Should be toURI().toURL()

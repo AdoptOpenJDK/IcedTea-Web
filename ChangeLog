@@ -1,3 +1,40 @@
+2011-02-10  Omair Majid  <omajid@redhat.com>
+
+	Fix RH669942; Add support for packEnabled and versionEnabled.
+	* NEWS: Update with bugfix.
+	* netx/net/sourceforge/jnlp/DownloadOptions.java: New file.
+	* netx/net/sourceforge/jnlp/JNLPFile.java
+	(openURL): Use null for DownloadOptions.
+	(getResourceDescs): New method.
+	(getResourceDescs(Locale,String,String)): New method.
+	* netx/net/sourceforge/jnlp/Launcher.java
+	(launchApplication): Add image to downloader with null DownloadOptions.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java
+	(getCachedResource):  Add resource with null DownloadOptions.
+	* netx/net/sourceforge/jnlp/cache/Resource.java: Add new field
+	downloadLocation.
+	(Resource): Initialize downloadLocation.
+	(getDownloadLocation): New method.
+	(setDownloadLocation): New method.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: Add new field
+	downloadOptions.
+	(addResource(URL,Version,UpdatePolicy)): Renamed to...
+	(addResource(URL,Version,DownloadOptions,UpdatePolicy)): New method.
+	(downloadResource): Add support for explicit downloading of packed jars as
+	well as content-encoded packed jars.
+	(initializeResource): Invokde findBestUrl to find the best url. Set that
+	as the download location for the resource.
+	(getVersionedResourceURL): Remove.
+	(findBestUrl): New method. Use ResourceUrlCreator to get a list of all
+	possible urls that can be used to download this resource. Try them one by
+	one until one works and return that.
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java: New file.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(initializeResources): Add resource with appropriate download options.
+	(activateJars): Likewise.
+	(loadClass): Likewise.
+	(getDownloadOptionsForJar): New method.
+
 2011-02-10  Deepak Bhole <dbhole@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java (initialize):

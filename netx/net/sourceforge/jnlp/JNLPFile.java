@@ -248,7 +248,7 @@ public class JNLPFile {
 
         try {
             ResourceTracker tracker = new ResourceTracker(false); // no prefetch
-            tracker.addResource(location, version, policy);
+            tracker.addResource(location, version, null, policy);
 
             return tracker.getInputStream(location);
         } catch (Exception ex) {
@@ -362,7 +362,7 @@ public class JNLPFile {
     }
 
     /**
-     * Returns the information section of the JNLP file for the
+     * Returns the resources section of the JNLP file for the
      * specified locale, os, and arch.
      */
     public ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
@@ -389,6 +389,31 @@ public class JNLPFile {
                 sharedResources.addResource(resource);
             }
         };
+    }
+
+    /**
+     * Returns the resources section of the JNLP file as viewed
+     * through the default locale and the os.name and os.arch
+     * properties.
+     */
+    public ResourcesDesc[] getResourceDescs() {
+        return getResourceDescs(defaultLocale, defaultOS, defaultArch);
+    }
+
+    /**
+     * Returns the resources section of the JNLP file for the
+     * specified locale, os, and arch.
+     */
+    public ResourcesDesc[] getResourceDescs(final Locale locale, final String os, final String arch) {
+        List<ResourcesDesc> matchingResources = new ArrayList<ResourcesDesc>();
+        for (ResourcesDesc rescDesc: resources) {
+            if (localMatches(locale, rescDesc.getLocales())
+                    && stringMatches(os, rescDesc.getOS())
+                    && stringMatches(arch, rescDesc.getArch())) {
+                matchingResources.add(rescDesc);
+            }
+        }
+        return matchingResources.toArray(new ResourcesDesc[0]);
     }
 
     /**
