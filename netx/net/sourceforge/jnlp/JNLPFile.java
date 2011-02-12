@@ -396,15 +396,15 @@ public class JNLPFile {
      * through the default locale and the os.name and os.arch
      * properties.
      */
-    public ResourcesDesc[] getResourceDescs() {
-        return getResourceDescs(defaultLocale, defaultOS, defaultArch);
+    public ResourcesDesc[] getResourcesDescs() {
+        return getResourcesDescs(defaultLocale, defaultOS, defaultArch);
     }
 
     /**
      * Returns the resources section of the JNLP file for the
      * specified locale, os, and arch.
      */
-    public ResourcesDesc[] getResourceDescs(final Locale locale, final String os, final String arch) {
+    public ResourcesDesc[] getResourcesDescs(final Locale locale, final String os, final String arch) {
         List<ResourcesDesc> matchingResources = new ArrayList<ResourcesDesc>();
         for (ResourcesDesc rescDesc: resources) {
             if (localMatches(locale, rescDesc.getLocales())

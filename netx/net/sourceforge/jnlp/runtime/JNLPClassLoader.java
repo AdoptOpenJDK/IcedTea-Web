@@ -1255,7 +1255,7 @@ public class JNLPClassLoader extends URLClassLoader {
         boolean usePack = false;
         boolean useVersion = false;
 
-        ResourcesDesc[] descs = file.getResourceDescs();
+        ResourcesDesc[] descs = file.getResourcesDescs();
         for (ResourcesDesc desc: descs) {
             JARDesc[] jars = desc.getJARs();
             for (JARDesc aJar: jars) {
