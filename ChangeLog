@@ -1,5 +1,11 @@
 2011-02-11  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(getResourcesDescs): New method implemented to override behaviour in
+	JNLPFile class.
+
+2011-02-11  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/JNLPFile.java
 	(getResourceDescs): Renamed to...
 	(getResourcesDescs): New method.

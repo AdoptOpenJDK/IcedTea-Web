@@ -244,6 +244,14 @@ public class PluginBridge extends JNLPFile {
         };
     }
 
+    /**
+     * Returns the resources section of the JNLP file for the
+     * specified locale, os, and arch.
+     */
+    public ResourcesDesc[] getResourcesDescs(final Locale locale, final String os, final String arch) {
+        return new ResourcesDesc[] { getResources(locale, os, arch) };
+    }
+
     public boolean isApplet() {
         return true;
     }
