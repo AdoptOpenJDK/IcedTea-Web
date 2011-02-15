@@ -1,5 +1,11 @@
 2011-02-15  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: Do not extend HashMap
+	to provide a more type-safe and consistent interface. Use System.nanoTime
+	for a more monotonic clock.
+
+2011-02-15  Omair Majid  <omajid@redhat.com>
+
 	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
 	(TimedHashMap): Moved to...
 	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: New file.

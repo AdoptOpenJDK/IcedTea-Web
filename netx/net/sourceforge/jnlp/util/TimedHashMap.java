@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
-import java.util.Date;
 import java.util.HashMap;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -47,14 +46,14 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  *
  * This map stores entries, and returns them only if the entries were last accessed within time t=10 seconds
  *
- * @param <K> The key type
- * @param <V> The Object type
+ * @param K The key type
+ * @param V The Object type
  */
+public class TimedHashMap<K, V> {
 
-public class TimedHashMap<K, V> extends HashMap<K, V> {
-
+    HashMap<K,V> actualMap = new HashMap<K,V>();
     HashMap<K, Long> timeStamps = new HashMap<K, Long>();
-    Long expiry = 10000L;
+    Long expiry = 10000000000L;
 
     /**
      * Store the item in the map and associate a timestamp with it
@@ -63,8 +62,8 @@ public class TimedHashMap<K, V> extends HashMap<K, V> {
      * @param value The value to store
      */
     public V put(K key, V value) {
-        timeStamps.put(key, new Date().getTime());
-        return super.put(key, value);
+        timeStamps.put(key, System.nanoTime());
+        return actualMap.put(key, value);
     }
 
     /**
@@ -75,24 +74,22 @@ public class TimedHashMap<K, V> extends HashMap<K, V> {
      *
      * @param key The key
      */
-    @SuppressWarnings("unchecked")
-    public V get(Object key) {
+    public V get(K key) {
+        Long now = System.nanoTime();
 
-        Long now = new Date().getTime();
-
-        if (super.containsKey(key)) {
+        if (actualMap.containsKey(key)) {
             Long age = now - timeStamps.get(key);
 
             // Item exists. If it has not expired, renew its access time and return it
             if (age <= expiry) {
                 if (JNLPRuntime.isDebug()) {
-                    System.err.println("Returning proxy " + super.get(key) + " from cache for " + key);
+                    System.err.println("Returning proxy " + actualMap.get(key) + " from cache for " + key);
                 }
-                timeStamps.put((K) key, (new Date()).getTime());
-                return super.get(key);
+                timeStamps.put(key, System.nanoTime());
+                return actualMap.get(key);
             } else {
                 if (JNLPRuntime.isDebug()) {
-                    System.err.println("Proxy cache for " + key + " has expired (age=" + age / 1000.0 + " seconds)");
+                    System.err.println("Proxy cache for " + key + " has expired (age=" + (age * 1e-9) + " seconds)");
                 }
             }
         }
@@ -100,3 +97,4 @@ public class TimedHashMap<K, V> extends HashMap<K, V> {
         return null;
     }
 }
+
