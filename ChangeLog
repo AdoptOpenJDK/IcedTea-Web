@@ -10,6 +10,14 @@
 	(TimedHashMap): Moved to...
 	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: New file.
 
+2011-02-11  Omair Majid  <omajid@redhat.com>
+
+	RH677332, CVE-2011-0706: IcedTea multiple signers privilege escalation
+	* NEWS: Updated.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(initializeResources): Assign appropriate security descriptor based on
+	code signing.
+
 2011-02-11  Deepak Bhole <dbhole@redhat.com>
 
 	Fix S6983554, CVE-2010-4450: Launcher incorrect processing of empty

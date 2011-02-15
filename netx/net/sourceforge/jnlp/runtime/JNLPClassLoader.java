@@ -481,9 +481,15 @@ public class JNLPClassLoader extends URLClassLoader {
                         codebase = file.getResources().getMainJAR().getLocation();
                     }
 
-                    jarSecurity = new SecurityDesc(file,
+                    if (signing) {
+                        jarSecurity = new SecurityDesc(file,
                                                         SecurityDesc.ALL_PERMISSIONS,
                                                         codebase.getHost());
+                    } else {
+                        jarSecurity = new SecurityDesc(file,
+                                                        SecurityDesc.SANDBOX_PERMISSIONS,
+                                                        codebase.getHost());
+                    }
                 }
 
                 jarLocationSecurityMap.put(location, jarSecurity);
