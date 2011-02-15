@@ -10,6 +10,13 @@
 	(TimedHashMap): Moved to...
 	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: New file.
 
+2011-02-11  Deepak Bhole <dbhole@redhat.com>
+
+	Fix S6983554, CVE-2010-4450: Launcher incorrect processing of empty
+	library path entries
+	* NEWS: Updated.
+	* launcher/java_md.c: Ignore empty LD_LIBRARY_PATH.
+
 2011-02-11  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/PluginBridge.java
