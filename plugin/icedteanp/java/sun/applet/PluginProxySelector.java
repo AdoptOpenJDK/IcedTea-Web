@@ -40,12 +40,11 @@ package sun.applet;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
-import java.util.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
+import net.sourceforge.jnlp.util.TimedHashMap;
 
 /**
  * Proxy selector implementation for plugin network functions.
@@ -127,61 +126,6 @@ public class PluginProxySelector extends JNLPProxySelector {
         }
 
         return null;
-    }
-
-    /**
-     * Simple utility class that extends HashMap by adding an expiry to the entries.
-     *
-     * This map stores entries, and returns them only if the entries were last accessed within time t=10 seconds
-     *
-     * @param <K> The key type
-     * @param <V> The Object type
-     */
-
-    private class TimedHashMap<K, V> extends HashMap<K, V> {
-
-        HashMap<K, Long> timeStamps = new HashMap<K, Long>();
-        Long expiry = 10000L;
-
-        /**
-         * Store the item in the map and associate a timestamp with it
-         *
-         * @param key The key
-         * @param value The value to store
-         */
-        public V put(K key, V value) {
-            timeStamps.put(key, new Date().getTime());
-            return super.put(key, value);
-        }
-
-        /**
-         * Return cached item if it has not already expired.
-         *
-         * Before returning, this method also resets the "last accessed"
-         * time for this entry, so it is good for another 10 seconds
-         *
-         * @param key The key
-         */
-        @SuppressWarnings("unchecked")
-        public V get(Object key) {
-
-            Long now = new Date().getTime();
-
-            if (super.containsKey(key)) {
-                Long age = now - timeStamps.get(key);
-
-                // Item exists. If it has not expired, renew its access time and return it
-                if (age <= expiry) {
-                    PluginDebug.debug("Returning proxy " + super.get(key) + " from cache for " + key);
-                    timeStamps.put((K) key, (new Date()).getTime());
-                    return super.get(key);
-                } else {
-                    PluginDebug.debug("Proxy cache for " + key + " has expired (age=" + age / 1000.0 + " seconds)");
-                }
-            }
-
-            return null;
-        }
     }
 
 }
