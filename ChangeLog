@@ -1,3 +1,15 @@
+2011-02-18  Omair Majid  <omajid@redhat.com>
+
+	Remove pluginappletviewer binary
+	* Makefile.am
+	(ICEDTEAPLUGIN_TARGET): Remove dependency on pluginappletviewer.
+	(PLUGIN_LAUNCHER_OBJECTS): Remove.
+	(install-exec-local): Do not install pluginappletviewer.
+	(uninstall-local): Do not remove pluginappletviewer.
+	($(PLUGIN_DIR)/launcher/%.o): Remove.
+	($(PLUGIN_DIR)/launcher/pluginappletviewer): Remove.
+	(clean-IcedTeaPlugin): Dont clean plugin launcher files.
+
 2011-02-15  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: Do not extend HashMap

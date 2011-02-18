@@ -39,8 +39,7 @@ LIVECONNECT_DIR = netscape sun/applet
 PLUGIN_DIR=$(abs_top_builddir)/plugin/icedteanp
 PLUGIN_SRCDIR=$(abs_top_srcdir)/plugin/icedteanp
 LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
-ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/IcedTeaPlugin.so stamps/liveconnect-dist.stamp \
- $(PLUGIN_DIR)/launcher/pluginappletviewer
+ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/IcedTeaPlugin.so stamps/liveconnect-dist.stamp
 PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
 endif
 
@@ -66,7 +65,6 @@ endif
 
 LAUNCHER_SRCDIR = $(abs_top_srcdir)/launcher
 LAUNCHER_OBJECTS = java.o java_md.o splashscreen_stubs.o jli_util.o parse_manifest.o version_comp.o wildcard.o
-PLUGIN_LAUNCHER_OBJECTS = $(addprefix $(PLUGIN_DIR)/launcher/,$(LAUNCHER_OBJECTS))
 NETX_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/,$(LAUNCHER_OBJECTS))
 CONTROLPANEL_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/controlpanel/,$(LAUNCHER_OBJECTS))
 LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -pthread -W -Wall -Wno-unused -Wno-parentheses -pipe -fno-omit-frame-pointer \
@@ -99,7 +97,6 @@ install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)
 if ENABLE_PLUGIN
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/IcedTeaPlugin.so $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)/
-	${INSTALL_PROGRAM} $(PLUGIN_DIR)/launcher/pluginappletviewer $(DESTDIR)$(bindir)
 	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/plugin.jar
 endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/netx.jar
@@ -150,7 +147,6 @@ uninstall-local:
 	rm -f $(DESTDIR)$(prefix)/jre/lib/about.jnlp
 	rm -f $(DESTDIR)$(prefix)/jre/lib/about.jar
 	rm -f $(DESTDIR)$(prefix)/man/man1/javaws.1
-	rm -f $(DESTDIR)$(bindir)/pluginappletviewer
 	rm -f $(DESTDIR)$(bindir)/javaws
 	if [ -L $(DESTDIR)$(prefix)/jre/bin/javaws ] ; then \
 	  rm -f $(DESTDIR)$(prefix)/jre/bin/javaws ; \
@@ -201,19 +197,7 @@ $(PLUGIN_DIR)/IcedTeaPlugin.so: $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS))
 	  $(MOZILLA_LIBS)\
 	  -shared -o $@
 
-$(PLUGIN_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
-	mkdir -p $(PLUGIN_DIR)/launcher && \
-	$(CC) $(LAUNCHER_FLAGS) -DJAVA_ARGS='{ "sun.applet.PluginMain" }' -DPROGNAME='"pluginappletviewer"'  -c -o $@ $<
-
-$(PLUGIN_DIR)/launcher/pluginappletviewer: $(PLUGIN_LAUNCHER_OBJECTS)
-	$(CC) $(PLUGIN_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
-
 clean-IcedTeaPlugin:
-	rm -f $(PLUGIN_DIR)/launcher/*.o
-	rm -f $(PLUGIN_DIR)/launcher/pluginappletviewer
-	if [ -e $(PLUGIN_DIR)/launcher ]; then \
-		rmdir $(PLUGIN_DIR)/launcher ; \
-	fi
 	rm -f $(PLUGIN_DIR)/*.o
 	rm -f $(PLUGIN_DIR)/IcedTeaPlugin.so
 	if [ $(abs_top_srcdir) != $(abs_top_builddir) ]; then \
