@@ -1,5 +1,9 @@
 2011-02-22  Omair Majid  <omajid@redhat.com>
 
+	* Makefile.am (uninstall-local): Fix typo in PACKAGE_NAME.
+
+2011-02-22  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
 	RNoAboutJnlp.
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: Remove NETX_ABOUT_FILE.

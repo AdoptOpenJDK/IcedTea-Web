@@ -131,7 +131,7 @@ endif
 uninstall-local:
 	rm -f $(DESTDIR)$(libdir)/IcedTeaPlugin.so
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
-	rm -f $(DESTDIR)$(datadir)/$(PAKCAGE_NAME)/netx.jar
+	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jnlp
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
 	rm -f $(DESTDIR)$(mandir)/man1/javaws.1
