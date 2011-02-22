@@ -109,10 +109,6 @@ public final class Boot implements PrivilegedAction<Void> {
             + "  -Xclearcache          " + R("BXclearcache") + "\n"
             + "  -help                 " + R("BOHelp") + "\n";
 
-    /** the JNLP file to open to display the network-based about window */
-    private static final String NETX_ABOUT_FILE = System.getProperty("java.home") + File.separator + "lib"
-            + File.separator + "about.jnlp";
-
     private static final String doubleArgs = "-basedir -jnlp -arg -param -property -update";
 
     private static String args[]; // avoid the hot potato
@@ -213,15 +209,19 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     /**
-     * Returns the about.jnlp file in {java.home}/lib or null if this file
+     * Returns the location of the about.jnlp file or null if this file
      * does not exist.
      */
     private static String getAboutFile() {
-
-        if (new File(NETX_ABOUT_FILE).exists())
-            return NETX_ABOUT_FILE;
-        else
+        ClassLoader cl = Boot.class.getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+        try {
+            return cl.getResource("net/sourceforge/jnlp/resources/about.jnlp").toString();
+        } catch (Exception e) {
             return null;
+        }
     }
 
     /**
@@ -236,7 +236,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (getOption("-about") != null) {
             location = getAboutFile();
             if (location == null)
-                fatalError("Unable to find about.jnlp in {java.home}/lib/");
+                fatalError(R("RNoAboutJnlp"));
         } else {
             location = getJNLPFile();
         }
