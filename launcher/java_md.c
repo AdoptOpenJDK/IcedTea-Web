@@ -158,6 +158,7 @@ static char * GetExecname();
 static jboolean GetJVMPath(const char *jrepath, const char *jvmtype,
                            char *jvmpath, jint jvmpathsize, char * arch);
 static jboolean GetJREPath(char *path, jint pathsize, char * arch, jboolean speculative);
+static jboolean GetIcedTeaWebJREPath(char *path, jint pathsize, char * arch, jboolean speculative);
 
 const char *
 GetArch()
@@ -280,7 +281,7 @@ CreateExecutionEnvironment(int *_argcp,
          jvmpath does not exist */
       if (wanted == running) {
         /* Find out where the JRE is that we will be using. */
-        if (!GetJREPath(jrepath, so_jrepath, arch, JNI_FALSE) ) {
+        if (!GetIcedTeaWebJREPath(jrepath, so_jrepath, arch, JNI_FALSE) ) {
           fprintf(stderr, "Error: could not find Java 2 Runtime Environment.\n");
           exit(2);
         }
@@ -603,6 +604,33 @@ GetJVMPath(const char *jrepath, const char *jvmtype,
           printf("no.\n");
         return JNI_FALSE;
     }
+}
+
+/*
+ * Find path to the JRE based on the the compile flag ICEDTEA_WEB_JRE
+ */
+static jboolean
+GetIcedTeaWebJREPath(char* path, jint pathsize, char* arch, jboolean speculative)
+{
+    char libjava[MAXPATHLEN];
+    snprintf(libjava, MAXPATHLEN, ICEDTEA_WEB_JRE "/lib/%s/" JAVA_DLL, arch);
+
+    if (_launcher_debug) {
+      printf(ICEDTEA_WEB_JRE "/lib/%s/" JAVA_DLL "\n", arch);
+      printf("libjava is %s\n", libjava);
+    }
+
+    if (access(libjava, F_OK) == 0) {
+        strncpy(path, ICEDTEA_WEB_JRE, pathsize);
+        goto found;
+    }
+
+    return JNI_FALSE;
+
+ found:
+    if (_launcher_debug)
+      printf("JRE path is %s\n", path);
+    return JNI_TRUE;
 }
 
 /*

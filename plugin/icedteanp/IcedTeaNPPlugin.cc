@@ -1547,23 +1547,25 @@ plugin_start_appletviewer (ITNPPluginData* data)
 
   if (plugin_debug)
   {
-      command_line = (gchar**) malloc(sizeof(gchar*)*8);
+      command_line = (gchar**) malloc(sizeof(gchar*)*9);
       command_line[0] = g_strdup(appletviewer_executable);
-      command_line[1] = g_strdup("-Xdebug");
-      command_line[2] = g_strdup("-Xnoagent");
-      command_line[3] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n");
-      command_line[4] = g_strdup("sun.applet.PluginMain");
-      command_line[5] = g_strdup(out_pipe_name);
-      command_line[6] = g_strdup(in_pipe_name);
-      command_line[7] = NULL;
+      command_line[1] = g_strdup(PLUGIN_BOOTCLASSPATH);
+      command_line[2] = g_strdup("-Xdebug");
+      command_line[3] = g_strdup("-Xnoagent");
+      command_line[4] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n");
+      command_line[5] = g_strdup("sun.applet.PluginMain");
+      command_line[6] = g_strdup(out_pipe_name);
+      command_line[7] = g_strdup(in_pipe_name);
+      command_line[8] = NULL;
    } else
    {
-       command_line = (gchar**) malloc(sizeof(gchar*)*5);
+       command_line = (gchar**) malloc(sizeof(gchar*)*6);
        command_line[0] = g_strdup(appletviewer_executable);
-       command_line[1] = g_strdup("sun.applet.PluginMain");
-       command_line[2] = g_strdup(out_pipe_name);
-       command_line[3] = g_strdup(in_pipe_name);
-       command_line[4] = NULL;
+       command_line[1] = g_strdup(PLUGIN_BOOTCLASSPATH);
+       command_line[2] = g_strdup("sun.applet.PluginMain");
+       command_line[3] = g_strdup(out_pipe_name);
+       command_line[4] = g_strdup(in_pipe_name);
+       command_line[5] = NULL;
    }
 
   environment = plugin_filter_environment();
@@ -1590,17 +1592,21 @@ plugin_start_appletviewer (ITNPPluginData* data)
   command_line[0] = NULL;
   g_free (command_line[1]);
   command_line[1] = NULL;
+  g_free (command_line[2]);
+  command_line[2] = NULL;
+  g_free (command_line[3]);
+  command_line[3] = NULL;
+  g_free (command_line[4]);
+  command_line[4] = NULL;
 
   if (plugin_debug)
   {
-      g_free (command_line[2]);
-      command_line[2] = NULL;
-      g_free (command_line[3]);
-      command_line[3] = NULL;
-      g_free (command_line[4]);
-      command_line[4] = NULL;
       g_free (command_line[5]);
       command_line[5] = NULL;
+      g_free (command_line[6]);
+      command_line[6] = NULL;
+      g_free (command_line[7]);
+      command_line[7] = NULL;
   }
 
   g_free(command_line);
@@ -2173,38 +2179,10 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
     }
 
   // Set appletviewer_executable.
-  Dl_info info;
-  int filename_size;
-  if (dladdr ((const void*) ITNP_New, &info) == 0)
-    {
-      PLUGIN_ERROR_TWO ("Failed to determine plugin shared object filename",
-                        dlerror ());
-      np_error = NPERR_GENERIC_ERROR;
-      goto cleanup_data_directory;
-    }
-  filename = (gchar*) malloc(sizeof(gchar)*1024);
-  filename_size = readlink(info.dli_fname, filename, 1023);
-  if (filename_size >= 0)
-  {
-      filename[filename_size] = '\0';
-  }
-
-  if (!filename)
-    {
-      PLUGIN_ERROR ("Failed to create plugin shared object filename.");
-      np_error = NPERR_OUT_OF_MEMORY_ERROR;
-      goto cleanup_data_directory;
-    }
-
-  if (filename_size <= 0)
-  {
-      free(filename);
-      filename = g_strdup(info.dli_fname);
-  }
-
-  appletviewer_executable = g_strdup_printf ("%s/../../bin/java",
-                                             dirname (filename));
-  PLUGIN_DEBUG(".so is located at: %s and the link points to: %s. Executing java from dir %s to run %s\n", info.dli_fname, filename, dirname (filename), appletviewer_executable);
+  filename = g_strdup(ICEDTEA_WEB_JRE);
+  appletviewer_executable = g_strdup_printf ("%s/bin/java",
+                                             filename);
+  PLUGIN_DEBUG("Executing java at %s\n", appletviewer_executable);
   if (!appletviewer_executable)
     {
       PLUGIN_ERROR ("Failed to create appletviewer executable name.");

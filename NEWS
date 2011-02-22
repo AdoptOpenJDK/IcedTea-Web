@@ -12,6 +12,8 @@ New in release 1.1 (2011-XX-XX):
 * Security updates
   - S6983554, CVE-2010-4450: Launcher incorrect processing of empty library path entries 
   - RH677332, CVE-2011-0706: IcedTea multiple signers privilege escalation
+* New Features
+  - IcedTea-Web now installs to a FHS-compliant location
 * NetX
   - Use Firefox's proxy settings if possible
   - RH669942: javaws fails to download version/packed files (missing support for jnlp.packEnabled and jnlp.versionEnabled)

@@ -17,6 +17,10 @@ IT_LANGUAGE_SOURCE_VERSION=6
 IT_CLASS_TARGET_VERSION=6
 IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
 
+JRE='"$(SYSTEM_JDK_DIR)jre"'
+LAUNCHER_BOOTCLASSPATH="-J-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar"
+PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar"'
+
 # Fake update version to shut up the plugin detector hosted by Oracle.
 # If Oracle ever release a JDK update greater than 50, this needs to be increased.
 JDK_UPDATE_VERSION=50
@@ -94,36 +98,20 @@ clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstr
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs
 
 install-exec-local:
-	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)
+	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir)
 if ENABLE_PLUGIN
-	${INSTALL_PROGRAM} $(PLUGIN_DIR)/IcedTeaPlugin.so $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)/
-	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/plugin.jar
+	${INSTALL_PROGRAM} $(PLUGIN_DIR)/IcedTeaPlugin.so $(DESTDIR)$(libdir)
+	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 endif
-	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(prefix)/jre/lib/netx.jar
+	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/javaws $(DESTDIR)$(bindir)
-	if [ -d $(DESTDIR)$(prefix)/jre/bin ] ; then \
-	  if [ -L $(DESTDIR)$(prefix)/jre/bin/javaws ] ; then \
-	    rm -f $(DESTDIR)$(prefix)/jre/bin/javaws ; \
-	  fi ; \
-	  if [ ! -e $(prefix)/jre/bin/javaws ] ; then \
-	    ln -s $(DESTDIR)$(bindir)/javaws $(DESTDIR)$(prefix)/jre/bin ; \
-	  fi ; \
-	fi
-	${INSTALL_DATA} extra-lib/about.jar $(DESTDIR)$(prefix)/jre/lib
+	${INSTALL_DATA} extra-lib/about.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
 	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/controlpanel/itweb-settings $(DESTDIR)$(bindir)
-	if [ -d $(DESTDIR)$(prefix)/jre/bin ] ; then \
-	  if [ -L $(DESTDIR)$(prefix)/jre/bin/itweb-settings ] ; then \
-	    rm -f $(DESTDIR)$(prefix)/jre/bin/itweb-settings ; \
-	  fi ; \
-	  if [ ! -e $(prefix)/jre/bin/itweb-settings ] ; then \
-	    ln -s $(DESTDIR)$(bindir)/itweb-settings $(DESTDIR)$(prefix)/jre/bin ; \
-	  fi ; \
-	fi
 
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(prefix)/man/man1
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(prefix)/man/man1
-	${INSTALL_DATA} $(NETX_RESOURCE_DIR)/about.jnlp $(DESTDIR)$(prefix)/jre/lib
+	${INSTALL_DATA} $(NETX_RESOURCE_DIR)/about.jnlp $(DESTDIR)$(datarootdir)/$(PACKAGE_NAME)
 if ENABLE_DOCS
 	${mkinstalldirs} $(DESTDIR)$(htmldir)
 	(cd ${abs_top_builddir}/docs/netx; \
@@ -141,21 +129,14 @@ endif
 endif
 
 uninstall-local:
-	rm -f $(DESTDIR)$(prefix)/jre/lib/$(INSTALL_ARCH_DIR)/IcedTeaPlugin.so
-	rm -f $(DESTDIR)$(prefix)/jre/lib/plugin.jar
-	rm -f $(DESTDIR)$(prefix)/jre/lib/netx.jar
-	rm -f $(DESTDIR)$(prefix)/jre/lib/about.jnlp
-	rm -f $(DESTDIR)$(prefix)/jre/lib/about.jar
+	rm -f $(DESTDIR)$(libdir)/IcedTeaPlugin.so
+	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
+	rm -f $(DESTDIR)$(datadir)/$(PAKCAGE_NAME)/netx.jar
+	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jnlp
+	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
 	rm -f $(DESTDIR)$(prefix)/man/man1/javaws.1
 	rm -f $(DESTDIR)$(bindir)/javaws
-	if [ -L $(DESTDIR)$(prefix)/jre/bin/javaws ] ; then \
-	  rm -f $(DESTDIR)$(prefix)/jre/bin/javaws ; \
-	fi
-	rm -f $(DESTDIR)$(prefix)/jre/bin/javaws
 	rm -f $(DESTDIR)$(bindir)/itweb-settings
-	if [ -L $(DESTDIR)$(prefix)/jre/bin/itweb-settings ] ; then \
-	  rm -f $(DESTDIR)$(prefix)/jre/bin/itweb-settings ; \
-	fi
 	rm -rf $(DESTDIR)$(htmldir)
 
 # Plugin
@@ -183,6 +164,8 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
 	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
+	  -DICEDTEA_WEB_JRE=$(JRE) \
+	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
 	  $(GLIB_CFLAGS) \
 	  $(GTK_CFLAGS) \
 	  $(MOZILLA_CFLAGS) \
@@ -328,14 +311,14 @@ extra-lib/about.jar: stamps/extra-class-files.stamp
 $(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
 	mkdir -p $(NETX_DIR)/launcher && \
 	$(CC) $(LAUNCHER_FLAGS) \
-	  -DJAVA_ARGS='{ "-J-ms8m", "-J-Djava.icedtea-web.bin=$(DESTDIR)$(bindir)/javaws", "net.sourceforge.jnlp.runtime.Boot",  }' \
-	  -DPROGNAME='"javaws"' -c -o $@ $<
+	  -DJAVA_ARGS='{ $(LAUNCHER_BOOTCLASSPATH), "-J-ms8m", "-J-Djava.icedtea-web.bin=$(DESTDIR)$(bindir)/javaws", "net.sourceforge.jnlp.runtime.Boot",  }' \
+	  -DICEDTEA_WEB_JRE=$(JRE) -DPROGNAME='"javaws"' -c -o $@ $<
 
 $(NETX_DIR)/launcher/controlpanel/%.o: $(LAUNCHER_SRCDIR)/%.c
 	mkdir -p $(NETX_DIR)/launcher/controlpanel && \
 	$(CC) $(LAUNCHER_FLAGS) \
-	-DJAVA_ARGS='{ "-J-ms8m", "-Dprogram.name=itweb-settings", "net.sourceforge.jnlp.controlpanel.CommandLine",  }' \
-	-DPROGNAME='"itweb-settings"' -c -o $@ $<
+	-DJAVA_ARGS='{ $(LAUNCHER_BOOTCLASSPATH), "-J-ms8m", "-Dprogram.name=itweb-settings", "net.sourceforge.jnlp.controlpanel.CommandLine",  }' \
+	-DICEDTEA_WEB_JRE=$(JRE) -DPROGNAME='"itweb-settings"' -c -o $@ $<
 
 $(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
 	$(CC) $(NETX_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)

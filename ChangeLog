@@ -1,3 +1,23 @@
+2011-02-22  Omair Majid  <omajid@redhat.com>
+
+	Install icedtea-web into a FHS-compliant location
+	* Makefile.am: Add new vars JRE, LAUNCHER_BOOTCLASSPATH and
+	PLUGIN_BOOTCLASSPATH.
+	(install-exec-local): Install files to FHS-compliant location; do not
+	create links.
+	(install-data-local): Likewise.
+	(uninstall-local): Update file paths to delete.
+	($(PLUGIN_DIR)/%.o): Pass PLUGIN_BOOTCLASSPATH and ICEDTEA_WEB_JRE.
+	($(NETX_DIR)/launcher/%.o): Pass LAUNCHER_BOOTCLASSPATH and
+	ICEDTEA_WEB_JRE.
+	($(NETX_DIR)/launcher/controlpanel/%.o): Likewise.
+	* launcher/java_md.c
+	(GetIcedTeaWebJREPath): New method.
+	(CreateExecutionEnvironment): Call GetIcedTeaWebJREPath.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(plugin_start_appletviewer): Add PLUGIN_BOOTCLASSPATH to the command.
+	(NP_Initialize): Use ICEDTEA_WEB_JRE to initialize filename.
+
 2011-02-18  Omair Majid  <omajid@redhat.com>
 
 	Remove pluginappletviewer binary
