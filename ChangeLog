@@ -1,4 +1,12 @@
 2011-02-22  Omair Majid  <omajid@redhat.com>
+            DJ Lucas  <dj@lucasit.com>
+
+	* Makefile.am
+	(install-data-local): Use $(mandir) for man page dir.
+	(uninstall-local): Use $(mandir) for man page dir.
+	* AUTHORS: Update.
+
+2011-02-22  Omair Majid  <omajid@redhat.com>
 
 	Install icedtea-web into a FHS-compliant location
 	* Makefile.am: Add new vars JRE, LAUNCHER_BOOTCLASSPATH and

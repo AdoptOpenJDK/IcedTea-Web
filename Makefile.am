@@ -109,8 +109,8 @@ endif
 	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/controlpanel/itweb-settings $(DESTDIR)$(bindir)
 
 install-data-local:
-	${mkinstalldirs} -d $(DESTDIR)$(prefix)/man/man1
-	${INSTALL_DATA} $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(prefix)/man/man1
+	${mkinstalldirs} -d $(DESTDIR)$(mandir)/man1
+	${INSTALL_DATA} $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(mandir)/man1
 	${INSTALL_DATA} $(NETX_RESOURCE_DIR)/about.jnlp $(DESTDIR)$(datarootdir)/$(PACKAGE_NAME)
 if ENABLE_DOCS
 	${mkinstalldirs} $(DESTDIR)$(htmldir)
@@ -134,7 +134,7 @@ uninstall-local:
 	rm -f $(DESTDIR)$(datadir)/$(PAKCAGE_NAME)/netx.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jnlp
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
-	rm -f $(DESTDIR)$(prefix)/man/man1/javaws.1
+	rm -f $(DESTDIR)$(mandir)/man1/javaws.1
 	rm -f $(DESTDIR)$(bindir)/javaws
 	rm -f $(DESTDIR)$(bindir)/itweb-settings
 	rm -rf $(DESTDIR)$(htmldir)
