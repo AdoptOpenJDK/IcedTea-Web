@@ -1,5 +1,9 @@
 2011-02-23  Omair Majid  <omajid@redhat.com>
 
+	* Makefile.am: Add missing slash to JRE.
+
+2011-02-23  Omair Majid  <omajid@redhat.com>
+
 	RH677772: NoSuchAlgorithmException using SSL/TLS in javaws
 	* NEWS: Update with bugfix.
 	* netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java: Add new field
