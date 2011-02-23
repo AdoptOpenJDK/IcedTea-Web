@@ -1,4 +1,13 @@
 2011-02-22  Omair Majid  <omajid@redhat.com>
+            Mark Greenwood <mark@dcs.shef.ac.uk>
+
+	Fix PR638
+	* NEWS: Update with fix.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java (loadClass): Throw
+	ClassNotFoundException instead of returning null.
+	* AUTHORS: Update.
+
+2011-02-22  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (uninstall-local): Fix typo in PACKAGE_NAME.
 

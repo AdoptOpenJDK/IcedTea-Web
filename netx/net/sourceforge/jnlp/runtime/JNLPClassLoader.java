@@ -1045,6 +1045,10 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             }
 
+        if (result == null) {
+            throw new ClassNotFoundException(name);
+        }
+
         return result;
     }
 
