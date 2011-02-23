@@ -1,3 +1,18 @@
+2011-02-23  Omair Majid  <omajid@redhat.com>
+
+	RH677772: NoSuchAlgorithmException using SSL/TLS in javaws
+	* NEWS: Update with bugfix.
+	* netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java: Add new field
+	jreExtDir.
+	(JNLPPolicy): Initialize jreExtDir.
+	(getPermissions): Grant AllPermissions if the CodeSourse is a system jar.
+	(isSystemJar): New method.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java
+	(checkPermission): Remove special casing of
+	SecurityPermission("putProviderProperty.SunJCE") and
+	SecurityPermission("accessClassInPackage.sun.security.internal.spec").
+	(inTrustedCallChain): Remove.
+
 2011-02-22  Omair Majid  <omajid@redhat.com>
             Mark Greenwood <mark@dcs.shef.ac.uk>
 

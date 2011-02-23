@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.*;
@@ -44,6 +45,8 @@ public class JNLPPolicy extends Policy {
     /** the previous policy */
     private static Policy systemPolicy;
 
+    private final String jreExtDir;
+
     /** the system level policy for jnlps */
     private Policy systemJnlpPolicy = null;
 
@@ -57,6 +60,9 @@ public class JNLPPolicy extends Policy {
 
         systemJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY);
         userJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
+
+        String jre = System.getProperty("java.home");
+        jreExtDir = jre + File.separator + "lib" + File.separator + "ext";
     }
 
     /**
@@ -66,6 +72,10 @@ public class JNLPPolicy extends Policy {
     public PermissionCollection getPermissions(CodeSource source) {
         if (source.equals(systemSource) || source.equals(shellSource))
             return getAllPermissions();
+
+        if (isSystemJar(source)) {
+            return getAllPermissions();
+        }
 
         // if we check the SecurityDesc here then keep in mind that
         // code can add properties at runtime to the ResourcesDesc!
@@ -120,6 +130,22 @@ public class JNLPPolicy extends Policy {
 
         result.add(new AllPermission());
         return result;
+    }
+
+    /**
+     * Returns true if the CodeSource corresponds to a system jar. That is,
+     * it's part of the JRE.
+     */
+    private boolean isSystemJar(CodeSource source) {
+        // anything in JRE/lib/ext is a system jar and has full permissions
+        String sourceProtocol = source.getLocation().getProtocol();
+        String sourcePath = source.getLocation().getPath();
+        if (sourceProtocol.toUpperCase().equals("FILE") &&
+                sourcePath.startsWith(jreExtDir)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
