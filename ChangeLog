@@ -1,3 +1,7 @@
+2011-02-25  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Manifest.mf: Remove unused file.
+
 2011-02-23  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am: Add missing slash to JRE.
