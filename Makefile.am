@@ -266,8 +266,6 @@ stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest
 	 cp -pPR $(SRC_DIR_LINK) $(NETX_SRCDIR) src; \
 	 find src -type f -exec chmod 640 '{}' ';' -o -type d -exec chmod 750 '{}' ';'; \
 	 cd src ; \
-	 $(BOOT_DIR)/bin/jar uf $(NETX_DIR)/lib/classes.jar \
-	  `find . -type f -not -name '*.java'` ; \
 	 $(ZIP) -qr $(NETX_DIR)/lib/src.zip javax net )
 	mkdir -p stamps
 	touch $@
