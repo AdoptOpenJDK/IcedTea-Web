@@ -219,6 +219,8 @@ public class SecurityDialog extends JDialog {
             dialogTitle = "Applet Warning";
         else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
             dialogTitle = "Security Warning";
+        else if (dialogType == DialogType.AUTHENTICATION)
+            dialogTitle = "Authentication Required";
 
         setTitle(dialogTitle);
         setModalityType(ModalityType.MODELESS);
@@ -291,6 +293,8 @@ public class SecurityDialog extends JDialog {
             panel = new AppletWarningPane(this, this.certVerifier);
         else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
             panel = new NotAllSignedWarningPane(this);
+        else if (dialogType == DialogType.AUTHENTICATION)
+            panel = new PasswordAuthenticationPane(this, extras);
 
         add(panel, BorderLayout.CENTER);
     }

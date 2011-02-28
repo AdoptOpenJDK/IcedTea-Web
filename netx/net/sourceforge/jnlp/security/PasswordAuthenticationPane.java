@@ -37,52 +37,59 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.security;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.PasswordAuthentication;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
  * Modal non-minimizable dialog to request http authentication credentials
  */
 
-public class PasswordAuthenticationPane extends JDialog {
+public class PasswordAuthenticationPane extends SecurityDialogPanel {
 
-    private final JLabel jlInfo = new JLabel("");
     private final JTextField jtfUserName = new JTextField();
     private final JPasswordField jpfPassword = new JPasswordField();
-    private boolean userCancelled;
 
-    public PasswordAuthenticationPane() {
-        initialize();
-    }
+    private final String host;
+    private final int port;
+    private final String prompt;
+    private final String type;
+
+    public PasswordAuthenticationPane(SecurityDialog parent, Object[] extras) {
+        super(parent);
+        host = (String) extras[0];
+        port = (Integer) extras[1];
+        prompt = (String) extras[2];
+        type = (String) extras[3];
+
+        addComponents();
+     }
 
     /**
      * Initialized the dialog components
      */
 
-    public void initialize() {
+    public void addComponents() {
 
-        setTitle("IcedTea Java Plugin - Authorization needed to proceed");
+        JLabel jlInfo = new JLabel("");
+        jlInfo.setText("<html>" + R("SAuthenticationPrompt", type, host, prompt)  + "</html>");
 
         setLayout(new GridBagLayout());
 
-        JLabel jlUserName = new JLabel("Username: ");
-        JLabel jlPassword = new JLabel("Password: ");
-        JButton jbOK = new JButton("OK");
-        JButton jbCancel = new JButton("Cancel");
+        JLabel jlUserName = new JLabel(R("Username"));
+        JLabel jlPassword = new JLabel(R("Password"));
+        JButton jbOK = new JButton(R("ButOk"));
+        JButton jbCancel = new JButton(R("ButCancel"));
 
         jtfUserName.setSize(20, 10);
         jpfPassword.setSize(20, 10);
@@ -90,7 +97,7 @@ public class PasswordAuthenticationPane extends JDialog {
         GridBagConstraints c;
 
         c = new GridBagConstraints();
-        c.fill = c.HORIZONTAL;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
@@ -104,7 +111,7 @@ public class PasswordAuthenticationPane extends JDialog {
         add(jlUserName, c);
 
         c = new GridBagConstraints();
-        c.fill = c.HORIZONTAL;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 1;
         c.insets = new Insets(10, 5, 3, 3);
@@ -118,7 +125,7 @@ public class PasswordAuthenticationPane extends JDialog {
         add(jlPassword, c);
 
         c = new GridBagConstraints();
-        c.fill = c.HORIZONTAL;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 2;
         c.insets = new Insets(5, 5, 3, 3);
@@ -126,7 +133,7 @@ public class PasswordAuthenticationPane extends JDialog {
         add(jpfPassword, c);
 
         c = new GridBagConstraints();
-        c.anchor = c.SOUTHEAST;
+        c.anchor = GridBagConstraints.SOUTHEAST;
         c.gridx = 1;
         c.gridy = 3;
         c.insets = new Insets(5, 5, 3, 70);
@@ -134,7 +141,7 @@ public class PasswordAuthenticationPane extends JDialog {
         add(jbCancel, c);
 
         c = new GridBagConstraints();
-        c.anchor = c.SOUTHEAST;
+        c.anchor = GridBagConstraints.SOUTHEAST;
         c.gridx = 1;
         c.gridy = 3;
         c.insets = new Insets(5, 5, 3, 3);
@@ -143,105 +150,33 @@ public class PasswordAuthenticationPane extends JDialog {
 
         setMinimumSize(new Dimension(400, 150));
         setMaximumSize(new Dimension(1024, 150));
-        setAlwaysOnTop(true);
 
         setSize(400, 150);
-        setLocationRelativeTo(null);
+        parent.setLocationRelativeTo(null);
+        initialFocusComponent = jtfUserName;
+
+        ActionListener acceptActionListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                parent.setValue(new Object[] { jtfUserName.getText(), jpfPassword.getPassword() });
+                parent.dispose();
+            }
+        };
+
+        ActionListener cancelActionListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                parent.setValue(null);
+                parent.dispose();
+            }
+        };
 
         // OK => read supplied info and pass it on
-        jbOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                userCancelled = false;
-                dispose();
-            }
-        });
+        jbOK.addActionListener(acceptActionListener);
 
         // Cancel => discard supplied info and pass on an empty auth
-        jbCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                userCancelled = true;
-                dispose();
-            }
-        });
+        jbCancel.addActionListener(cancelActionListener);
 
         // "return" key in either user or password field => OK
-
-        jtfUserName.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                userCancelled = false;
-                dispose();
-            }
-        });
-
-        jpfPassword.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                userCancelled = false;
-                dispose();
-            }
-        });
-    }
-
-    /**
-     * Present a dialog to the user asking them for authentication information
-     *
-     * @param host The host for with authentication is needed
-     * @param port The port being accessed
-     * @param prompt The prompt (realm) as presented by the server
-     * @param type The type of server (proxy/web)
-     * @return PasswordAuthentication containing the credentials (empty credentials if user cancelled)
-     */
-    protected PasswordAuthentication askUser(String host, int port, String prompt, String type) {
-        PasswordAuthentication auth = null;
-
-        host += port != -1 ? ":" + port : "";
-
-        // This frame is reusable. So reset everything first.
-        userCancelled = true;
-        jlInfo.setText("<html>The " + type + " server at " + host +
-                       " is requesting authentication. It says \"" + prompt + "\"</html>");
-
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    // show dialog to user
-                    setVisible(true);
-                }
-            });
-
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("password dialog shown");
-            }
-
-            // wait until dialog is gone
-            while (this.isShowing()) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException ie) {
-                }
-            }
-
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("password dialog closed");
-            }
-
-            if (!userCancelled) {
-                auth = new PasswordAuthentication(jtfUserName.getText(), jpfPassword.getPassword());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            // Nothing else we can do. Empty auth will be returned
-        }
-
-        return auth;
-    }
-
-    public static void main(String[] args) {
-        PasswordAuthenticationPane frame = new PasswordAuthenticationPane();
-
-        PasswordAuthentication auth = frame.askUser("127.0.0.1", 3128, "Password for local proxy", "proxy");
-
-        System.err.println("Auth info: " + auth.getUserName() + ":" + new String(auth.getPassword()));
-        System.exit(0);
+        jtfUserName.addActionListener(acceptActionListener);
+        jpfPassword.addActionListener(acceptActionListener);
     }
 }

@@ -42,6 +42,7 @@ import java.net.PasswordAuthentication;
 
 public class JNLPAuthenticator extends Authenticator {
 
+    @Override
     public PasswordAuthentication getPasswordAuthentication() {
 
         // No security check is required here, because the only way to set
@@ -50,12 +51,16 @@ public class JNLPAuthenticator extends Authenticator {
 
         String type = this.getRequestorType() == RequestorType.PROXY ? "proxy" : "web";
 
-        // request auth info from user
-        PasswordAuthenticationPane pwDialog = new PasswordAuthenticationPane();
-        PasswordAuthentication auth = pwDialog.askUser(this.getRequestingHost(), this.getRequestingPort(), this.getRequestingPrompt(), type);
+        String host = getRequestingHost();
+        int port = getRequestingPort();
+        String prompt = getRequestingPrompt();
 
-        // send it along
-        return auth;
+        Object[] response = SecurityDialogs.showAuthenicationPrompt(host, port, prompt, type);
+        if (response == null) {
+            return null;
+        } else {
+            return new PasswordAuthentication((String) response[0], (char[]) response[1]);
+        }
     }
 
 }

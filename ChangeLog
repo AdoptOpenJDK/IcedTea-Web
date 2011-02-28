@@ -1,5 +1,26 @@
 2011-02-28  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add Password,
+	Username and SAuthenticationPrompt.
+	* netx/net/sourceforge/jnlp/security/JNLPAuthenticator.java
+	(getPasswordAuthentication): Show password prompt using the secure thread.
+	* netx/net/sourceforge/jnlp/security/PasswordAuthenticationPane.java
+	(PasswordAuthenticationPane): Initialize variables.
+	(initialize): For consistency, rename to..
+	(addComponents): New method. Set the appropriate return value when user
+	takes an action.
+	(askUser): Remove.
+	(main): Remove.
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java
+	(initDialog): Add extra case for AUTHENTICATION dialog type.
+	(installPanel): Likewise.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java
+	(DialogType): Add AUTHENTICATION.
+	(showAuthenicationPrompt): New method. Shows a password authentication
+	prompt.
+
+2011-02-28  Omair Majid  <omajid@redhat.com>
+
 	Rename files
 	* netx/net/sourceforge/jnlp/security/PasswordAuthenticationDialog.java:
 	Rename to ...

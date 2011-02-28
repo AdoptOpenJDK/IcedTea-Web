@@ -40,6 +40,7 @@ package net.sourceforge.jnlp.security;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.NetPermission;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.Semaphore;
@@ -69,7 +70,8 @@ public class SecurityDialogs {
         SINGLE_CERT_INFO,
         ACCESS_WARNING,
         NOTALLSIGNED_WARNING,
-        APPLET_WARNING
+        APPLET_WARNING,
+        AUTHENTICATION,
     }
 
     /** The types of access which may need user permission. */
@@ -204,6 +206,40 @@ public class SecurityDialogs {
                 return false;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Present a dialog to the user asking them for authentication information,
+     * and returns the user's response. The caller must have
+     * NetPermission("requestPasswordAuthentication") for this to work.
+     *
+     * @param host The host for with authentication is needed
+     * @param port The port being accessed
+     * @param prompt The prompt (realm) as presented by the server
+     * @param type The type of server (proxy/web)
+     * @return an array of objects representing user's authentication tokens
+     * @throws SecurityException if the caller does not have the appropriate permissions.
+     */
+    public static Object[] showAuthenicationPrompt(String host, int port, String prompt, String type) {
+
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            NetPermission requestPermission
+                = new NetPermission("requestPasswordAuthentication");
+            sm.checkPermission(requestPermission);
+        }
+
+        final SecurityDialogMessage message = new SecurityDialogMessage();
+
+        message.dialogType = DialogType.AUTHENTICATION;
+        message.extras = new Object[] { host, port, prompt, type };
+
+        Object response = getUserResponse(message);
+        if (response == null) {
+            return null;
+        } else {
+            return (Object[]) response;
         }
     }
 
