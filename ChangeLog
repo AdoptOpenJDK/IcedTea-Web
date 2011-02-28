@@ -1,3 +1,14 @@
+2011-02-28  Denis Lila  <dlila@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginMain.java
+	(redirectStreams, streamHandler, securityContext) make them local.
+	(theVersion): make it private.
+	(PluginMain): make it private. Empty the body.
+	(main): Do all the work that used to be in PluginMain.
+	(connect): make it static, and now it returns a PluginStreamHandler
+	instead of setting a static variable.
+	(messageAvailable, getMessage): Remove.
+
 2011-02-28  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add Password,

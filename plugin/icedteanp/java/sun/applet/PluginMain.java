@@ -85,14 +85,9 @@ public class PluginMain {
     public static final String PLUGIN_STDERR_FILE = "java.stderr";
     public static final String PLUGIN_STDOUT_FILE = "java.stdout";
 
-    final boolean redirectStreams = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
-    static PluginStreamHandler streamHandler;
-
     // This is used in init().  Getting rid of this is desirable but depends
     // on whether the property that uses it is necessary/standard.
-    public static final String theVersion = System.getProperty("java.version");
-
-    private PluginAppletSecurityContext securityContext;
+    private static final String theVersion = System.getProperty("java.version");
 
     /**
      * The main entry point into AppletViewer.
@@ -105,7 +100,24 @@ public class PluginMain {
         }
 
         try {
-            PluginMain pm = new PluginMain(args[0], args[1]);
+            PluginStreamHandler streamHandler = connect(args[0], args[1]);
+            boolean redirectStreams = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
+
+            // must be called before JNLPRuntime.initialize()
+            JNLPRuntime.setRedirectStreams(redirectStreams);
+
+            PluginAppletSecurityContext sc = new PluginAppletSecurityContext(0);
+            sc.prePopulateLCClasses();
+            PluginAppletSecurityContext.setStreamhandler(streamHandler);
+            AppletSecurityContextManager.addContext(0, sc);
+
+            PluginAppletViewer.setStreamhandler(streamHandler);
+            PluginAppletViewer.setPluginCallRequestFactory(new PluginCallRequestFactory());
+
+            init();
+
+            // Streams set. Start processing.
+            streamHandler.startProcessing();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Something very bad happened. I don't know what to do, so I am going to exit :(");
@@ -113,34 +125,19 @@ public class PluginMain {
         }
     }
 
-    public PluginMain(String inPipe, String outPipe) {
-
-        connect(inPipe, outPipe);
-
-        // must be called before JNLPRuntime.initialize()
-        JNLPRuntime.setRedirectStreams(redirectStreams);
-
-        securityContext = new PluginAppletSecurityContext(0);
-        securityContext.prePopulateLCClasses();
-        securityContext.setStreamhandler(streamHandler);
-        AppletSecurityContextManager.addContext(0, securityContext);
-
-        PluginAppletViewer.setStreamhandler(streamHandler);
-        PluginAppletViewer.setPluginCallRequestFactory(new PluginCallRequestFactory());
-
-        init();
-
-        // Streams set. Start processing.
-        streamHandler.startProcessing();
+    private PluginMain() {
+        // The PluginMain constructor should never, EVER, be called
     }
 
-    public void connect(String inPipe, String outPipe) {
+    private static PluginStreamHandler connect(String inPipe, String outPipe) {
+        PluginStreamHandler streamHandler = null;
         try {
             streamHandler = new PluginStreamHandler(new FileInputStream(inPipe), new FileOutputStream(outPipe));
             PluginDebug.debug("Streams initialized");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+        return streamHandler;
     }
 
     private static void init() {
@@ -206,13 +203,4 @@ public class PluginMain {
         CookieManager ckManager = new PluginCookieManager();
         CookieHandler.setDefault(ckManager);
     }
-
-    static boolean messageAvailable() {
-        return streamHandler.messageAvailable();
-    }
-
-    static String getMessage() {
-        return streamHandler.getMessage();
-    }
-
 }
