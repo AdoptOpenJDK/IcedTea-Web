@@ -75,7 +75,7 @@ import javax.swing.table.DefaultTableModel;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.security.SecurityWarningDialog;
+import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.util.FileUtils;
 
@@ -478,7 +478,7 @@ public class CertificatePane extends JPanel {
             int selectedRow = table.getSelectedRow();
             if (selectedRow != -1 && selectedRow >= 0) {
                 X509Certificate c = certs.get(selectedRow);
-                SecurityWarningDialog.showSingleCertInfoDialog(c, parent);
+                SecurityDialog.showSingleCertInfoDialog(c, parent);
             }
         }
     }

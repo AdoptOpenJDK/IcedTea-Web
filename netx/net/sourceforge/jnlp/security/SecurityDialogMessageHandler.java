@@ -50,7 +50,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  * Handles {@link SecurityDialogMessage}s and shows appropriate security
  * dialogs.
  * <p>
- * In the current architecture, {@link SecurityWarningDialog}s are shown from a
+ * In the current architecture, {@link SecurityDialog}s are shown from a
  * different {@link AppContext} than the {@link AppContext} that asks for a
  * security prompt. This ensures that all security prompts are isolated and
  * their Look and Feel is not affected by the Look and Feel of the
@@ -86,7 +86,7 @@ public final class SecurityDialogMessageHandler implements Runnable {
 
     /**
      * Handles a single {@link SecurityDialogMessage} by showing a
-     * {@link SecurityWarningDialog}.
+     * {@link SecurityDialog}.
      * <p>
      * Once the user has made a choice the
      * {@link SecurityDialogMessage#toDispose} (if not null) is disposed and
@@ -98,7 +98,7 @@ public final class SecurityDialogMessageHandler implements Runnable {
     private void handleMessage(SecurityDialogMessage message) {
         final SecurityDialogMessage msg = message;
 
-        final SecurityWarningDialog dialog = new SecurityWarningDialog(message.dialogType,
+        final SecurityDialog dialog = new SecurityDialog(message.dialogType,
                 message.accessType, message.file, message.certVerifier, message.certificate, message.extras);
 
         dialog.addActionListener(new ActionListener() {

@@ -1,4 +1,4 @@
-/* SecurityWarningDialogFactory.java
+/* SecurityDialogs.java
    Copyright (C) 2010 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -55,12 +55,12 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  * A factory for showing many possible types of security warning to the user.<p>
  *
  * This contains all the public methods that classes outside this package should
- * use instead of using {@link SecurityWarningDialog} directly.
+ * use instead of using {@link SecurityDialog} directly.
  *
  * All of these methods post a message to the
  * {@link SecurityDialogMessageHandler} and block waiting for a response.
  */
-public class SecurityWarning {
+public class SecurityDialogs {
     /** Types of dialogs we can create */
     public static enum DialogType {
         CERT_WARNING,

@@ -40,8 +40,8 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.SecurityWarning;
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 
 /**
  * Provides static methods to interact useful for using the JNLP
@@ -280,7 +280,7 @@ public class ServiceUtil {
             //from resources.jar.
             Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                 public Boolean run() {
-                    boolean b = SecurityWarning.showAccessWarningDialog(tmpType,
+                    boolean b = SecurityDialogs.showAccessWarningDialog(tmpType,
                                 tmpApp.getJNLPFile(), tmpExtras);
                     return new Boolean(b);
                 }

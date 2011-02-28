@@ -6,8 +6,8 @@ import java.util.concurrent.Semaphore;
 import javax.swing.JDialog;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
-import net.sourceforge.jnlp.security.SecurityWarning.DialogType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
 
 /**
  * Represents a message to the security framework to show a specific security

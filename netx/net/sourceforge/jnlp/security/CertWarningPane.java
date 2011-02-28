@@ -68,11 +68,11 @@ import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.util.FileUtils;
 
 /**
- * Provides the panel for using inside a SecurityWarningDialog. These dialogs are
+ * Provides the panel for using inside a SecurityDialog. These dialogs are
  * used to warn the user when either signed code (with or without signing
  * issues) is going to be run, or when service permission (file, clipboard,
  * printer, etc) is needed with unsigned code.
@@ -84,7 +84,7 @@ public class CertWarningPane extends SecurityDialogPanel {
     JCheckBox alwaysTrust;
     CertVerifier certVerifier;
 
-    public CertWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+    public CertWarningPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
         this.certVerifier = certVerifier;
         addComponents();
@@ -231,7 +231,7 @@ public class CertWarningPane extends SecurityDialogPanel {
 
     private class MoreInfoButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            SecurityWarningDialog.showMoreInfoDialog(parent.getJarSigner(),
+            SecurityDialog.showMoreInfoDialog(parent.getJarSigner(),
                                 parent);
         }
     }

@@ -22,7 +22,7 @@ import java.io.IOException;
 import javax.jnlp.ExtendedService;
 import javax.jnlp.FileContents;
 
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 
 /**
  * Implementation of ExtendedService

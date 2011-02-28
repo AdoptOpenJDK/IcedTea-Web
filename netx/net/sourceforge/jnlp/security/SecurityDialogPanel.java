@@ -49,19 +49,19 @@ import javax.swing.JPanel;
  */
 public abstract class SecurityDialogPanel extends JPanel {
 
-    protected SecurityWarningDialog parent;
+    protected SecurityDialog parent;
 
     JComponent initialFocusComponent = null;
 
     CertVerifier certVerifier = null;
 
-    public SecurityDialogPanel(SecurityWarningDialog dialog, CertVerifier certVerifier) {
+    public SecurityDialogPanel(SecurityDialog dialog, CertVerifier certVerifier) {
         this.parent = dialog;
         this.certVerifier = certVerifier;
         this.setLayout(new BorderLayout());
     }
 
-    public SecurityDialogPanel(SecurityWarningDialog dialog) {
+    public SecurityDialogPanel(SecurityDialog dialog) {
         this.parent = dialog;
         this.setLayout(new BorderLayout());
     }
@@ -75,12 +75,12 @@ public abstract class SecurityDialogPanel extends JPanel {
 
     /**
      * Create an ActionListener suitable for use with buttons. When this {@link ActionListener}
-     * is invoked, it will set the value of the {@link SecurityWarningDialog} and then dispossed.
+     * is invoked, it will set the value of the {@link SecurityDialog} and then dispossed.
      *
      * @param buttonIndex the index of the button. By convention 0 = Yes. 1 = No, 2 = Cancel
      * @return the ActionListener instance.
      */
-    protected ActionListener createSetValueListener(SecurityWarningDialog dialog, int buttonIndex) {
+    protected ActionListener createSetValueListener(SecurityDialog dialog, int buttonIndex) {
         return new SetValueHandler(dialog, buttonIndex);
     }
 
@@ -103,9 +103,9 @@ public abstract class SecurityDialogPanel extends JPanel {
     private class SetValueHandler implements ActionListener {
 
         Integer buttonIndex;
-        SecurityWarningDialog dialog;
+        SecurityDialog dialog;
 
-        public SetValueHandler(SecurityWarningDialog dialog, int buttonIndex) {
+        public SetValueHandler(SecurityDialog dialog, int buttonIndex) {
             this.dialog = dialog;
             this.buttonIndex = buttonIndex;
         }

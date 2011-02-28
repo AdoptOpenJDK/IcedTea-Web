@@ -58,11 +58,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.util.FileUtils;
 
 /**
- * Provides a panel to show inside a SecurityWarningDialog. These dialogs are
+ * Provides a panel to show inside a SecurityDialog. These dialogs are
  * used to warn the user when either signed code (with or without signing
  * issues) is going to be run, or when service permission (file, clipboard,
  * printer, etc) is needed with unsigned code.
@@ -74,12 +74,12 @@ public class AccessWarningPane extends SecurityDialogPanel {
     JCheckBox alwaysAllow;
     Object[] extras;
 
-    public AccessWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+    public AccessWarningPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
         addComponents();
     }
 
-    public AccessWarningPane(SecurityWarningDialog x, Object[] extras, CertVerifier certVerifier) {
+    public AccessWarningPane(SecurityDialog x, Object[] extras, CertVerifier certVerifier) {
         super(x, certVerifier);
         this.extras = extras;
         addComponents();

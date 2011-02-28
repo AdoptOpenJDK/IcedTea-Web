@@ -1,3 +1,38 @@
+2011-02-28  Omair Majid  <omajid@redhat.com>
+
+	Rename files
+	* netx/net/sourceforge/jnlp/security/PasswordAuthenticationDialog.java:
+	Rename to ...
+	* netx/net/sourceforge/jnlp/security/PasswordAuthenticationPane.java: New
+	file.
+	* netx/net/sourceforge/jnlp/security/SecurityWarningDialog.java: Rename
+	to...
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: New file.
+	* netx/net/sourceforge/jnlp/security/SecurityWarning.java: Rename to...
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: New file.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java,
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java,
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java,
+	* netx/net/sourceforge/jnlp/security/AccessWarningPane.java,
+	* netx/net/sourceforge/jnlp/security/AppletWarningPane.java,
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java,
+	* netx/net/sourceforge/jnlp/security/CertsInfoPane.java,
+	* netx/net/sourceforge/jnlp/security/JNLPAuthenticator.java,
+	* netx/net/sourceforge/jnlp/security/MoreInfoPane.java,
+	* netx/net/sourceforge/jnlp/security/NotAllSignedWarningPane.java,
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessage.java,
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessageHandler.java,
+	* netx/net/sourceforge/jnlp/security/SecurityDialogPanel.java,
+	* netx/net/sourceforge/jnlp/security/SingleCertInfoPane.java,
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java,
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java,
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java,
+	* netx/net/sourceforge/jnlp/services/XClipboardService.java,
+	* netx/net/sourceforge/jnlp/services/XExtendedService.java,
+	* netx/net/sourceforge/jnlp/services/XFileOpenService.java,
+	* netx/net/sourceforge/jnlp/services/XFileSaveService.java: Update class
+	names to the new classes.
+
 2011-02-25  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (stamps/netx-dist.stamp): Do not add extra files to

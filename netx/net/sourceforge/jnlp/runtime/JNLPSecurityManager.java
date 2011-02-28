@@ -30,7 +30,7 @@ import java.security.SecurityPermission;
 import javax.swing.JWindow;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AWTSecurityManager;

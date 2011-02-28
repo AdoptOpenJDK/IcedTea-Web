@@ -1,5 +1,5 @@
-/* SecurityWarningDialog.java
-   Copyright (C) 2008 Red Hat, Inc.
+/* SecurityDialog.java
+   Copyright (C) 2010 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -39,8 +39,8 @@ package net.sourceforge.jnlp.security;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
-import net.sourceforge.jnlp.security.SecurityWarning.DialogType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
 
 import java.awt.*;
 
@@ -56,32 +56,32 @@ import java.util.List;
  * Provides methods for showing security warning dialogs for a wide range of
  * JNLP security issues. Note that the security dialogs should be running in the
  * secure AppContext - this class should not be used directly from an applet or
- * application. See {@link SecurityWarning} for a way to show security dialogs.
+ * application. See {@link SecurityDialogs} for a way to show security dialogs.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
  */
-public class SecurityWarningDialog extends JDialog {
+public class SecurityDialog extends JDialog {
 
     /** The type of dialog we want to show */
-    private DialogType dialogType;
+    private final DialogType dialogType;
 
     /** The type of access that this dialog is for */
-    private AccessType accessType;
+    private final AccessType accessType;
 
     private SecurityDialogPanel panel;
 
     /** The application file associated with this security warning */
-    private JNLPFile file;
+    private final JNLPFile file;
 
-    private CertVerifier certVerifier;
+    private final CertVerifier certVerifier;
 
-    private X509Certificate cert;
+    private final X509Certificate cert;
 
     /** An optional String array that's only necessary when a dialog
      * label requires some parameters (e.g. showing which address an application
      * is trying to connect to).
      */
-    private Object[] extras;
+    private final Object[] extras;
 
     /** Whether or not this object has been fully initialized */
     private boolean initialized = false;
@@ -92,7 +92,7 @@ public class SecurityWarningDialog extends JDialog {
      */
     private Object value;
 
-    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    SecurityDialog(DialogType dialogType, AccessType accessType,
                 JNLPFile file, CertVerifier jarSigner, X509Certificate cert, Object[] extras) {
         super();
         this.dialogType = dialogType;
@@ -107,34 +107,34 @@ public class SecurityWarningDialog extends JDialog {
     }
 
     /**
-     * Construct a SecurityWarningDialog to display some sort of access warning
+     * Construct a SecurityDialog to display some sort of access warning
      */
-    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    SecurityDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file) {
         this(dialogType, accessType, file, null, null, null);
     }
 
     /**
-     * Create a SecurityWarningDialog to display a certificate-related warning
+     * Create a SecurityDialog to display a certificate-related warning
      */
-    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    SecurityDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file, CertVerifier jarSigner) {
         this(dialogType, accessType, file, jarSigner, null, null);
     }
 
     /**
-     * Create a SecurityWarningDialog to display a certificate-related warning
+     * Create a SecurityDialog to display a certificate-related warning
      */
-    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    SecurityDialog(DialogType dialogType, AccessType accessType,
                 CertVerifier certVerifier) {
         this(dialogType, accessType, null, certVerifier, null, null);
     }
 
     /**
-     * Create a SecurityWarningDialog to display some sort of access warning
+     * Create a SecurityDialog to display some sort of access warning
      * with more information
      */
-    SecurityWarningDialog(DialogType dialogType, AccessType accessType,
+    SecurityDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file, Object[] extras) {
         this(dialogType, accessType, file, null, null, extras);
     }
@@ -143,7 +143,7 @@ public class SecurityWarningDialog extends JDialog {
      * Create a SecurityWarningDailog to display information about a single
      * certificate
      */
-    SecurityWarningDialog(DialogType dialogType, X509Certificate c) {
+    SecurityDialog(DialogType dialogType, X509Certificate c) {
         this(dialogType, null, null, null, c, null);
     }
 
@@ -162,10 +162,10 @@ public class SecurityWarningDialog extends JDialog {
      * @param parent the parent option pane
      */
     public static void showMoreInfoDialog(
-                CertVerifier jarSigner, SecurityWarningDialog parent) {
+                CertVerifier jarSigner, SecurityDialog parent) {
 
-        SecurityWarningDialog dialog =
-                        new SecurityWarningDialog(DialogType.MORE_INFO, null, null,
+        SecurityDialog dialog =
+                        new SecurityDialog(DialogType.MORE_INFO, null, null,
                                 jarSigner);
         dialog.setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.setVisible(true);
@@ -179,8 +179,8 @@ public class SecurityWarningDialog extends JDialog {
      * @param parent the parent option pane
      */
     public static void showCertInfoDialog(CertVerifier jarSigner,
-                SecurityWarningDialog parent) {
-        SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.CERT_INFO,
+                SecurityDialog parent) {
+        SecurityDialog dialog = new SecurityDialog(DialogType.CERT_INFO,
                         null, null, jarSigner);
         dialog.setLocationRelativeTo(parent);
         dialog.setModalityType(ModalityType.APPLICATION_MODAL);
@@ -196,7 +196,7 @@ public class SecurityWarningDialog extends JDialog {
      */
     public static void showSingleCertInfoDialog(X509Certificate c,
                         JDialog parent) {
-        SecurityWarningDialog dialog = new SecurityWarningDialog(DialogType.SINGLE_CERT_INFO, c);
+        SecurityDialog dialog = new SecurityDialog(DialogType.SINGLE_CERT_INFO, c);
         dialog.setLocationRelativeTo(parent);
         dialog.setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.setVisible(true);
@@ -243,8 +243,8 @@ public class SecurityWarningDialog extends JDialog {
 
             @Override
             public void windowOpened(WindowEvent e) {
-                if (e.getSource() instanceof SecurityWarningDialog) {
-                    SecurityWarningDialog dialog = (SecurityWarningDialog) e.getSource();
+                if (e.getSource() instanceof SecurityDialog) {
+                    SecurityDialog dialog = (SecurityDialog) e.getSource();
                     dialog.setResizable(true);
                     centerDialog(dialog);
                     dialog.setValue(null);
@@ -325,7 +325,7 @@ public class SecurityWarningDialog extends JDialog {
     }
 
     /**
-     * Called when the SecurityWarningDialog is hidden - either because the user
+     * Called when the SecurityDialog is hidden - either because the user
      * made a choice (Ok, Cancel, etc) or closed the window
      */
     @Override
@@ -345,7 +345,7 @@ public class SecurityWarningDialog extends JDialog {
         }
     }
 
-    private List<ActionListener> listeners = new CopyOnWriteArrayList<ActionListener>();
+    private final List<ActionListener> listeners = new CopyOnWriteArrayList<ActionListener>();
 
     /**
      * Notify all the listeners that the user has made a decision using this
@@ -359,7 +359,7 @@ public class SecurityWarningDialog extends JDialog {
 
     /**
      * Adds an {@link ActionListener} which will be notified if the user makes a
-     * choice using this SecurityWarningDialog. The listener should use {@link #getValue()}
+     * choice using this SecurityDialog. The listener should use {@link #getValue()}
      * to actually get the user's response.
      */
     public void addActionListener(ActionListener listener) {

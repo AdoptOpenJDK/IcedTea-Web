@@ -51,7 +51,7 @@ import javax.swing.JPanel;
 
 public class AppletWarningPane extends SecurityDialogPanel {
 
-    public AppletWarningPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+    public AppletWarningPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
         addComponents();
     }

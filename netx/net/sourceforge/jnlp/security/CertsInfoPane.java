@@ -75,7 +75,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
     private String[] columnNames = { R("Field"), R("Value") };
     protected ArrayList<String[][]> certsData;
 
-    public CertsInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+    public CertsInfoPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
         addComponents();
     }

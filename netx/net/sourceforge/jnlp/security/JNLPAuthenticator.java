@@ -51,7 +51,7 @@ public class JNLPAuthenticator extends Authenticator {
         String type = this.getRequestorType() == RequestorType.PROXY ? "proxy" : "web";
 
         // request auth info from user
-        PasswordAuthenticationDialog pwDialog = new PasswordAuthenticationDialog();
+        PasswordAuthenticationPane pwDialog = new PasswordAuthenticationPane();
         PasswordAuthentication auth = pwDialog.askUser(this.getRequestingHost(), this.getRequestingPort(), this.getRequestingPrompt(), type);
 
         // send it along

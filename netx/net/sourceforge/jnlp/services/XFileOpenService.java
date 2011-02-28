@@ -40,7 +40,7 @@ package net.sourceforge.jnlp.services;
 import java.io.*;
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 
 import javax.swing.JFileChooser;
 

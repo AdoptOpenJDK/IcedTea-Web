@@ -1,5 +1,5 @@
-/* PasswordAuthenticationDialog -- requests authentication information from users
-   Copyright (C) 2009  Red Hat
+/* PasswordAuthenticationPane -- requests authentication information from users
+   Copyright (C) 2010  Red Hat
 
 This file is part of IcedTea.
 
@@ -58,14 +58,14 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  * Modal non-minimizable dialog to request http authentication credentials
  */
 
-public class PasswordAuthenticationDialog extends JDialog {
+public class PasswordAuthenticationPane extends JDialog {
 
-    private JLabel jlInfo = new JLabel("");
-    private JTextField jtfUserName = new JTextField();
-    private JPasswordField jpfPassword = new JPasswordField();
+    private final JLabel jlInfo = new JLabel("");
+    private final JTextField jtfUserName = new JTextField();
+    private final JPasswordField jpfPassword = new JPasswordField();
     private boolean userCancelled;
 
-    public PasswordAuthenticationDialog() {
+    public PasswordAuthenticationPane() {
         initialize();
     }
 
@@ -237,7 +237,7 @@ public class PasswordAuthenticationDialog extends JDialog {
     }
 
     public static void main(String[] args) {
-        PasswordAuthenticationDialog frame = new PasswordAuthenticationDialog();
+        PasswordAuthenticationPane frame = new PasswordAuthenticationPane();
 
         PasswordAuthentication auth = frame.askUser("127.0.0.1", 3128, "Password for local proxy", "proxy");
 

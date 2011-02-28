@@ -35,8 +35,8 @@ import net.sourceforge.jnlp.ShortcutDesc;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.event.ApplicationEvent;
 import net.sourceforge.jnlp.event.ApplicationListener;
-import net.sourceforge.jnlp.security.SecurityWarning;
-import net.sourceforge.jnlp.security.SecurityWarning.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 
@@ -184,12 +184,12 @@ public class ApplicationInstance {
         } else if (currentSetting.equals(ShortcutDesc.CREATE_ALWAYS)) {
             createShortcut = true;
         } else if (currentSetting.equals(ShortcutDesc.CREATE_ASK_USER)) {
-            if (SecurityWarning.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
+            if (SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
                 createShortcut = true;
             }
         } else if (currentSetting.equals(ShortcutDesc.CREATE_ASK_USER_IF_HINTED)) {
             if (sd != null && sd.onDesktop()) {
-                if (SecurityWarning.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
+                if (SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
                     createShortcut = true;
                 }
             }

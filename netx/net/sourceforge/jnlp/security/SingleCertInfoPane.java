@@ -46,7 +46,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 public class SingleCertInfoPane extends CertsInfoPane {
 
-    public SingleCertInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+    public SingleCertInfoPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
     }
 

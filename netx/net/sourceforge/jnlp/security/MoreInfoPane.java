@@ -61,7 +61,7 @@ import javax.swing.SwingConstants;
  */
 public class MoreInfoPane extends SecurityDialogPanel {
 
-    public MoreInfoPane(SecurityWarningDialog x, CertVerifier certVerifier) {
+    public MoreInfoPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
         addComponents();
     }
@@ -105,7 +105,7 @@ public class MoreInfoPane extends SecurityDialogPanel {
 
     private class CertInfoButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            SecurityWarningDialog.showCertInfoDialog(parent.getJarSigner(),
+            SecurityDialog.showCertInfoDialog(parent.getJarSigner(),
                                 parent);
         }
     }

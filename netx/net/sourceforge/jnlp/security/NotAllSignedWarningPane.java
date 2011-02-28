@@ -57,7 +57,7 @@ import net.sourceforge.jnlp.JNLPFile;
 
 public class NotAllSignedWarningPane extends SecurityDialogPanel {
 
-    public NotAllSignedWarningPane(SecurityWarningDialog x) {
+    public NotAllSignedWarningPane(SecurityDialog x) {
         super(x);
         addComponents();
     }
