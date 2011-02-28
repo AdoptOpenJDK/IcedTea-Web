@@ -1,3 +1,10 @@
+2011-02-28  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java
+	(printResetHelp): Indicate that "all" is a valid argument.
+	(handleResetCommand): Deal with "all" instead of a property name by
+	reseting all properties.
+
 2011-02-28  Denis Lila  <dlila@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginMain.java

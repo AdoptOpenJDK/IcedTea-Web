@@ -244,7 +244,7 @@ public class CommandLine {
      */
     public void printResetHelp() {
         System.out.println(R("Usage"));
-        System.out.println("  " + PROGRAM_NAME + " reset property-name");
+        System.out.println("  " + PROGRAM_NAME + " reset [all|property-name]");
         System.out.println(R("CLResetDescription"));
     }
 
@@ -268,14 +268,26 @@ public class CommandLine {
 
         String key = args.get(0);
 
+        boolean resetAll = false;
+        if (key.equals("all")) {
+            resetAll = true;
+        }
+
         Map<String, Setting<String>> all = config.getRaw();
-        if (!all.containsKey(key)) {
+        if (!resetAll && !all.containsKey(key)) {
             System.out.println(R("CLUnknownProperty", key));
             return ERROR;
         }
 
-        Setting<String> setting = all.get(key);
-        setting.setValue(setting.getDefaultValue());
+        if (resetAll) {
+            for (String aKey: all.keySet()) {
+                Setting<String> setting = all.get(aKey);
+                setting.setValue(setting.getDefaultValue());
+            }
+        } else {
+            Setting<String> setting = all.get(key);
+            setting.setValue(setting.getDefaultValue());
+        }
 
         try {
             config.save();
