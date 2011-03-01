@@ -137,6 +137,10 @@ public class JNLPPolicy extends Policy {
      * it's part of the JRE.
      */
     private boolean isSystemJar(CodeSource source) {
+        if (source == null || source.getLocation() == null) {
+            return false;
+        }
+
         // anything in JRE/lib/ext is a system jar and has full permissions
         String sourceProtocol = source.getLocation().getProtocol();
         String sourcePath = source.getLocation().getPath();
