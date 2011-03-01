@@ -221,11 +221,13 @@ public class ControlPanel extends JFrame {
         SettingsPanel[] panels = new SettingsPanel[] { new SettingsPanel(Translator.R("CPTabAbout"), createAboutPanel()),
                 new SettingsPanel(Translator.R("CPTabCache"), createCacheSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabCertificate"), createCertificatesSettingsPanel()),
-                //                new SettingsPanel(Translator.R("CPTabClassLoader"), createClassLoaderSettingsPanel()),
+                // TODO: This is commented out since this is not implemented yet
+                // new SettingsPanel(Translator.R("CPTabClassLoader"), createClassLoaderSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabDebugging"), createDebugSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabDesktopIntegration"), createDesktopSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabNetwork"), createNetworkSettingsPanel()),
-                new SettingsPanel(Translator.R("CPTabRuntimes"), createRuntimesSettingsPanel()),
+                // TODO: This is commented out since this is not implemented yet
+                // new SettingsPanel(Translator.R("CPTabRuntimes"), createRuntimesSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabSecurity"), createSecuritySettingsPanel()), };
 
         // Add panels.

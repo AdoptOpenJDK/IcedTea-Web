@@ -1,3 +1,10 @@
+2011-03-01  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java
+	(createMainSettingsPanel): Commented out unimplemented feature.
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java
+	(addComponents): Commented out unimplemented feature.
+
 2011-02-28  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java
