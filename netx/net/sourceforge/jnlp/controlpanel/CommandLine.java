@@ -225,7 +225,7 @@ public class CommandLine {
             }
             config.setProperty(key, value);
         } else {
-            System.out.println(R("CLUnknownProperty", value));
+            System.out.println(R("CLWarningUnknownProperty", key));
             config.setProperty(key, value);
         }
 

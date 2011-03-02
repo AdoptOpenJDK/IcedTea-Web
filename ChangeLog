@@ -1,3 +1,10 @@
+2011-03-02  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java
+	(handleSetCommand): Fix warning message.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	CLWarningUnknownProperty.
+
 2011-03-01  Omair Majid  <omajid@redhat.com>
 
 	 * netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java (isSystemJar): Check
