@@ -20,6 +20,8 @@ New in release 1.1 (2011-XX-XX):
 * NetX
   - Use Firefox's proxy settings if possible
   - RH669942: javaws fails to download version/packed files (missing support for jnlp.packEnabled and jnlp.versionEnabled)
+* Plugin
+  - PR612: NetDania application ends on java.security.AccessControlException: access denied (java.util.PropertyPermission browser read)
 
 New in release 1.0 (2010-XX-XX):
 

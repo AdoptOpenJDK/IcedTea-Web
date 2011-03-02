@@ -109,6 +109,8 @@ public class SecurityDesc {
             new PropertyPermission("javaplugin.*", "read"),
             new PropertyPermission("jnlp.*", "read,write"),
             new PropertyPermission("javaws.*", "read,write"),
+            new PropertyPermission("browser", "read"),
+            new PropertyPermission("browser.*", "read"),
             new RuntimePermission("exitVM"),
             new RuntimePermission("stopThread"),
         // disabled because we can't at this time prevent an
