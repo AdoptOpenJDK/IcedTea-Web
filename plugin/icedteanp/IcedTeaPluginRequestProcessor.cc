@@ -66,7 +66,6 @@ PluginRequestProcessor::PluginRequestProcessor()
 
     pthread_mutex_init(&message_queue_mutex, NULL);
     pthread_mutex_init(&syn_write_mutex, NULL);
-    pthread_mutex_init(&tc_mutex, NULL);
 
     pthread_cond_init(&cond_message_available, NULL);
 }
@@ -86,7 +85,6 @@ PluginRequestProcessor::~PluginRequestProcessor()
 
     pthread_mutex_destroy(&message_queue_mutex);
     pthread_mutex_destroy(&syn_write_mutex);
-    pthread_mutex_destroy(&tc_mutex);
 
     pthread_cond_destroy(&cond_message_available);
 }
@@ -415,12 +413,6 @@ PluginRequestProcessor::sendString(std::vector<std::string*>* message_parts)
     response += thread_data.result;
 
     plugin_to_java_bus->post(response.c_str());
-
-    cleanup:
-
-    pthread_mutex_lock(&tc_mutex);
-    thread_count--;
-    pthread_mutex_unlock(&tc_mutex);
 }
 
 /**
@@ -508,13 +500,6 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
     response.append(" JavaScriptSetMember ");
     plugin_to_java_bus->post(response.c_str());
-
-    cleanup:
-
-    // property_name, type and value are deleted by _setMember
-    pthread_mutex_lock(&tc_mutex);
-    thread_count--;
-    pthread_mutex_unlock(&tc_mutex);
 }
 
 /**
@@ -660,14 +645,6 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     }
     response.append(java_result->return_string->c_str());
     plugin_to_java_bus->post(response.c_str());
-
-
-    // Now be a good citizen and help keep the heap free of garbage
-    cleanup:
-
-    pthread_mutex_lock(&tc_mutex);
-    thread_count--;
-    pthread_mutex_unlock(&tc_mutex);
 }
 
 /**

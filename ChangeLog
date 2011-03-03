@@ -1,3 +1,14 @@
+2011-03-03  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
+	(PluginRequestProcessor): Remove initialization of tc_mutex
+	(~PluginRequestProcessor): Remove destruction of tc_mutex
+	(sendString): Removed thread count incrementer code.
+	(setMember): Same.
+	(sendMember): Same.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.h: Removed tc_mutex and
+	thread_count variables. 
+
 2011-03-02  Omair Majid  <omajid@redhat.com>
 
 	Fix PR612.

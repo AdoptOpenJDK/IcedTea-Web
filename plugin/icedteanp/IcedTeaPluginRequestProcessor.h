@@ -84,9 +84,6 @@ void _call(void* data);
 void _eval(void* data);
 void _getString(void* data);
 
-static pthread_mutex_t tc_mutex = PTHREAD_MUTEX_INITIALIZER;
-static int thread_count = 0;
-
 void* queue_processor(void* data);
 
 /* Mutex to ensure that the request queue is accessed synchronously */
