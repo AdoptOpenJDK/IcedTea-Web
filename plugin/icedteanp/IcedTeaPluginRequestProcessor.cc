@@ -221,6 +221,10 @@ PluginRequestProcessor::eval(std::vector<std::string*>* message_parts)
     window_ptr = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(message_parts->at(5));
     instance = IcedTeaPluginUtilities::getInstanceFromMemberPtr(window_ptr);
 
+    // If instance is invalid, do not proceed further
+    if (!instance)
+    	return;
+
     java_result = request_processor.getString(*(message_parts->at(6)));
     CHECK_JAVA_RESULT(java_result);
     script.append(*(java_result->return_string));
@@ -280,6 +284,10 @@ PluginRequestProcessor::call(std::vector<std::string*>* message_parts)
     std::string response = std::string();
     JavaRequestProcessor java_request = JavaRequestProcessor();
     JavaResultData* java_result;
+    NPVariant* result_variant;
+    std::string result_variant_jniid = std::string();
+    NPVariant* args_array;
+    AsyncCallThreadData thread_data = AsyncCallThreadData();
 
     reference = atoi(message_parts->at(3)->c_str());
 
@@ -289,6 +297,10 @@ PluginRequestProcessor::call(std::vector<std::string*>* message_parts)
 
     // instance
     instance = IcedTeaPluginUtilities::getInstanceFromMemberPtr(window_ptr);
+
+    // If instance is invalid, do not proceed further
+    if (!instance)
+    	goto cleanup;
 
     // function name
     java_result = java_request.getString(*(message_parts->at(6)));
@@ -314,11 +326,10 @@ PluginRequestProcessor::call(std::vector<std::string*>* message_parts)
     }
 
     arg_count = args.size();
-    NPVariant *args_array = (NPVariant*) malloc(sizeof(NPVariant)*args.size());
+    args_array = (NPVariant*) malloc(sizeof(NPVariant)*args.size());
     for (int i=0; i < args.size(); i++)
         args_array[i] = args[i];
 
-    AsyncCallThreadData thread_data = AsyncCallThreadData();
     thread_data.result_ready = false;
     thread_data.parameters = std::vector<void*>();
     thread_data.result = std::string();
@@ -344,8 +355,7 @@ PluginRequestProcessor::call(std::vector<std::string*>* message_parts)
     }
 #endif
 
-    NPVariant* result_variant = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
-    std::string result_variant_jniid = std::string();
+    result_variant = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
 
     if (result_variant)
     {
@@ -390,6 +400,11 @@ PluginRequestProcessor::sendString(std::vector<std::string*>* message_parts)
     thread_data.result = std::string();
 
     NPP instance = IcedTeaPluginUtilities::getInstanceFromMemberPtr(variant);
+
+    // If instance is invalid, do not proceed further
+    if (!instance)
+    	return;
+
     thread_data.parameters.push_back(instance);
     thread_data.parameters.push_back(variant);
 
@@ -454,6 +469,10 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
     }
 
     instance = IcedTeaPluginUtilities::getInstanceFromMemberPtr(member);
+
+    // If instance is invalid, do not proceed further
+    if (!instance)
+    	return;
 
     if (*(message_parts->at(4)) == "SetSlot")
     {
@@ -569,6 +588,11 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     thread_data.result = std::string();
 
     NPP instance = IcedTeaPluginUtilities::getInstanceFromMemberPtr(parent_ptr);
+
+    // If instance is invalid, do not proceed further
+    if (!instance)
+    	return;
+
     thread_data.parameters.push_back(instance);
     thread_data.parameters.push_back(NPVARIANT_TO_OBJECT(*parent_ptr));
     thread_data.parameters.push_back(&member_identifier);

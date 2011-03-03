@@ -1,6 +1,19 @@
 2011-03-03  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
+	(eval): Proceed with _eval only if instance is valid.
+	(call): Proceed with _call only if instance is valid. Moved declaration
+	of result_variant_jniid, result_variant args_array and thread_data to 
+	the top.
+	(sendString): Proceed with _getString only if instance is valid. Remove
+	thread count incrementer.
+	(setMember): Proceed with _setMember only if instance is valid. Remove
+	thread count incrementer.
+	(sendMember): Proceed with _getMember only if instance is valid.
+
+2011-03-03  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
 	(PluginRequestProcessor): Remove initialization of tc_mutex
 	(~PluginRequestProcessor): Remove destruction of tc_mutex
 	(sendString): Removed thread count incrementer code.
