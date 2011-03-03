@@ -220,6 +220,9 @@ NPError get_proxy_info(const char* siteAddr, char** proxy, uint32_t* len);
 void consume_message(gchar* message);
 void start_jvm_if_needed();
 static void appletviewer_monitor(GPid pid, gint status, gpointer data);
+void plugin_send_initialization_message(char* instance, gulong handle,
+                                               int width, int height,
+                                               char* url);
 
 // Global instance counter.
 // Mutex to protect plugin_instance_counter.
@@ -768,18 +771,9 @@ ITNP_SetWindow (NPP instance, NPWindow* window)
       data->window_height = window->height;
 
       // Now we have everything. Send this data to the Java side
-
-      gchar* instance_msg =  g_strdup_printf ("instance %s handle %ld width %d height %d %s",
-											 data->instance_id,
-											 (gulong) data->window_handle,
-											 data->window_width,
-											 data->window_height,
-											 data->applet_tag);
-
-      plugin_send_message_to_appletviewer (instance_msg);
-
-      g_free(instance_msg);
-      instance_msg = NULL;
+      plugin_send_initialization_message(
+    		  data->instance_id, (gulong) data->window_handle,
+    		  data->window_width, data->window_height, data->applet_tag);
 
       g_mutex_unlock (data->appletviewer_mutex);
 
@@ -1834,6 +1828,25 @@ plugin_send_message_to_appletviewer (gchar const* message)
   PLUGIN_DEBUG ("plugin_send_message_to_appletviewer return\n");
 }
 
+/*
+ * Sends the initialization message (handle/size/url) to the plugin
+ */
+void
+plugin_send_initialization_message(char* instance, gulong handle,
+                                   int width, int height, char* url)
+{
+  PLUGIN_DEBUG ("plugin_send_initialization_message\n");
+
+  gchar *window_message = g_strdup_printf ("instance %s handle %ld width %d height %d %s",
+                                            instance, handle, width, height, url);
+  plugin_send_message_to_appletviewer (window_message);
+  g_free (window_message);
+  window_message = NULL;
+
+  PLUGIN_DEBUG ("plugin_send_initialization_message return\n");
+}
+
+
 // Stop the appletviewer process.  When this is called the
 // appletviewer can be in any of three states: running, crashed or
 // hung.  If the appletviewer is running then sending it "shutdown"
@@ -2414,11 +2427,7 @@ get_scriptable_object(NPP instance)
         // a 0 handle
         if (!data->window_handle)
         {
-            data->window_handle = 0;
-            gchar *window_message = g_strdup_printf ("instance %s handle %d",
-                                                    id_str, 0);
-            plugin_send_message_to_appletviewer (window_message);
-            g_free (window_message);
+            plugin_send_initialization_message(data->instance_id, 0, 0, 0, data->applet_tag);
         }
 
         java_result = java_request.getAppletObjectInstance(id_str);

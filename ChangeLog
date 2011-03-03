@@ -1,5 +1,14 @@
 2011-03-03  Deepak Bhole <dbhole@redhat.com>
 
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(plugin_send_initialization_message): New method. Sends initialization
+	information to the Java side.
+	(ITNP_SetWindow): Call the new plugin_send_initialization_message
+	function.
+	(get_scriptable_object): Same.
+
+2011-03-03  Deepak Bhole <dbhole@redhat.com>
+
 	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
 	(eval): Proceed with _eval only if instance is valid.
 	(call): Proceed with _call only if instance is valid. Moved declaration
