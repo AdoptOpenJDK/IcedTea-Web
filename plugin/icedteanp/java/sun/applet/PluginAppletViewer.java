@@ -1646,7 +1646,14 @@ public class PluginAppletViewer extends XEmbeddedFrame
          {
              public void run()
              {
-                 ThreadGroup tg = ((JNLPClassLoader) p.applet.getClass().getClassLoader()).getApplication().getThreadGroup();
+                 ClassLoader cl = p.applet.getClass().getClassLoader();
+                 
+                 // Since we want to deal with JNLPClassLoader, extract it if this 
+                 // is a codebase loader
+                 if (cl instanceof JNLPClassLoader.CodeBaseClassLoader)
+                     cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
+
+                 ThreadGroup tg = ((JNLPClassLoader) cl).getApplication().getThreadGroup();
 
                  appletShutdown(p);
                  appletPanels.removeElement(p);

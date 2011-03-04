@@ -145,6 +145,9 @@ public class JNLPClassLoader extends URLClassLoader {
     /** Map of specific codesources to securitydesc */
     private HashMap<URL, SecurityDesc> jarLocationSecurityMap =
             new HashMap<URL, SecurityDesc>();
+    
+    /** Loader for codebase (which is a path, rather than a file) */
+    private CodeBaseClassLoader codeBaseLoader;
 
     /**
      * Create a new JNLPClassLoader from the specified file.
@@ -276,10 +279,12 @@ public class JNLPClassLoader extends URLClassLoader {
 
         try {
 
-            // If base loader is null, or the baseloader's file and this
-            // file is different, initialize a new loader
+
+            // A null baseloader implies that no loader has been created 
+            // for this codebase/jnlp yet. Create one.
             if (baseLoader == null ||
-                        !baseLoader.getJNLPFile().getFileLocation().equals(file.getFileLocation())) {
+                    (file.isApplication() && 
+                     !baseLoader.getJNLPFile().getFileLocation().equals(file.getFileLocation()))) {
 
                 loader = new JNLPClassLoader(file, policy);
 
@@ -303,6 +308,13 @@ public class JNLPClassLoader extends URLClassLoader {
 
             } else {
                 // if key is same and locations match, this is the loader we want
+                if (!file.isApplication()) {
+                    // If this is an applet, we do need to consider its loader
+                    loader = new JNLPClassLoader(file, policy);
+
+                    if (baseLoader != null)
+                        baseLoader.merge(loader);
+                }
                 loader = baseLoader;
             }
 
@@ -529,7 +541,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * loaded from the codebase are not cached.
      */
     public void enableCodeBase() {
-        addURL(file.getCodeBase()); // nothing happens if called more that once?
+        addToCodeBaseLoader(file.getCodeBase());
     }
 
     /**
@@ -958,8 +970,13 @@ public class JNLPClassLoader extends URLClassLoader {
             if (result != null)
                 return result;
         }
-
-        return null;
+        
+        // Result is still null. Return what the codebaseloader 
+        // has (which returns null if it is not loaded there either)
+        if (codeBaseLoader != null)
+            return codeBaseLoader.findLoadedClassFromParent(name);
+        else
+            return null;
     }
 
     /**
@@ -1067,6 +1084,11 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
 
+        // Try codebase loader
+        if (codeBaseLoader != null)
+            return codeBaseLoader.findClass(name);
+        
+        // All else failed. Throw CNFE
         throw new ClassNotFoundException(name);
     }
 
@@ -1109,6 +1131,10 @@ public class JNLPClassLoader extends URLClassLoader {
         for (int i = 1; i < loaders.length; i++)
             if (result == null)
                 result = loaders[i].getResource(name);
+        
+        // If result is still null, look in the codebase loader
+        if (result == null && codeBaseLoader != null)
+            result = codeBaseLoader.getResource(name);
 
         return result;
     }
@@ -1120,15 +1146,23 @@ public class JNLPClassLoader extends URLClassLoader {
     @Override
     public Enumeration<URL> findResources(String name) throws IOException {
         Vector<URL> resources = new Vector<URL>();
+        Enumeration<URL> e;
 
         for (int i = 0; i < loaders.length; i++) {
-            Enumeration<URL> e;
 
             if (loaders[i] == this)
                 e = super.findResources(name);
             else
                 e = loaders[i].findResources(name);
 
+            while (e.hasMoreElements())
+                resources.add(e.nextElement());
+        }
+
+        // Add resources from codebase (only if nothing was found above, 
+        // otherwise the server will get hammered) 
+        if (resources.isEmpty() && codeBaseLoader != null) {
+            e = codeBaseLoader.findResources(name);
             while (e.hasMoreElements())
                 resources.add(e.nextElement());
         }
@@ -1250,6 +1284,9 @@ public class JNLPClassLoader extends URLClassLoader {
         // jars
         for (URL u : extLoader.getURLs())
             addURL(u);
+        
+        // Codebase
+        addToCodeBaseLoader(extLoader.file.getCodeBase());
 
         // native search paths
         for (File nativeDirectory : extLoader.getNativeDirectories())
@@ -1258,6 +1295,28 @@ public class JNLPClassLoader extends URLClassLoader {
         // security descriptors
         for (URL key : extLoader.jarLocationSecurityMap.keySet()) {
             jarLocationSecurityMap.put(key, extLoader.jarLocationSecurityMap.get(key));
+        }
+    }
+
+    /**
+     * Adds the given path to the path loader
+     * 
+     * @param URL the path to add
+     * @throws IllegalArgumentException If the given url is not a path
+     */
+    private void addToCodeBaseLoader(URL u) {
+
+        // Only paths may be added
+        if (!u.getFile().endsWith("/")) {
+            throw new IllegalArgumentException("addToPathLoader only accepts path based URLs");
+        }
+
+        // If there is no loader yet, create one, else add it to the 
+        // existing one (happens when called from merge())
+        if (codeBaseLoader == null) {
+            codeBaseLoader = new CodeBaseClassLoader(new URL[] { u }, this);
+        } else {
+            codeBaseLoader.addURL(u);
         }
     }
 
@@ -1283,4 +1342,49 @@ public class JNLPClassLoader extends URLClassLoader {
         return new DownloadOptions(usePack, useVersion);
     }
 
+    /*
+     * Helper class to expose protected URLClassLoader methods.
+     */
+
+    public class CodeBaseClassLoader extends URLClassLoader {
+
+        JNLPClassLoader parentJNLPClassLoader;
+        
+        public CodeBaseClassLoader(URL[] urls, JNLPClassLoader cl) {
+            super(urls);
+            parentJNLPClassLoader = cl;
+        }
+
+        @Override
+        public void addURL(URL url) { 
+            super.addURL(url); 
+        }
+
+        @Override
+        public Class<?> findClass(String name) throws ClassNotFoundException { 
+            return super.findClass(name); 
+        }
+
+        /**
+         * Returns the output of super.findLoadedClass().
+         * 
+         * The method is renamed because ClassLoader.findLoadedClass() is final
+         * 
+         * @param name The name of the class to find
+         * @return Output of ClassLoader.findLoadedClass() which is the class if found, null otherwise 
+         * @see java.lang.ClassLoader#findLoadedClass(String)
+         */
+        public Class<?> findLoadedClassFromParent(String name) {
+            return findLoadedClass(name);
+        }
+
+        /**
+         * Returns JNLPClassLoader that encompasses this loader
+         * 
+         * @return parent JNLPClassLoader
+         */
+        public JNLPClassLoader getParentJNLPClassLoader() {
+            return parentJNLPClassLoader;
+        }
+    }
 }

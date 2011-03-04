@@ -199,8 +199,16 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
         // this needs to be tightened up
         for (int i = 0; i < stack.length && i < maxDepth; i++) {
-            if (stack[i].getClassLoader() instanceof JNLPClassLoader) {
-                JNLPClassLoader loader = (JNLPClassLoader) stack[i].getClassLoader();
+            ClassLoader cl = stack[i].getClassLoader();
+            
+            // Since we want to deal with JNLPClassLoader, extract it if this 
+            // is a codebase loader
+            if (cl instanceof JNLPClassLoader.CodeBaseClassLoader)
+                cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
+
+            if (cl instanceof JNLPClassLoader) {
+
+                JNLPClassLoader loader = (JNLPClassLoader) cl;
 
                 if (loader != null && loader.getApplication() != null) {
                     return loader.getApplication();
