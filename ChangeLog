@@ -1,5 +1,18 @@
 2011-03-04  Denis Lila  <dlila@redhat.com>
 
+	* netx/net/sourceforge/jnlp/JNLPFile.java:
+	(getDownloadOptionsForJar): Moved here from JNLPClassLoader.java.
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(usePack, useVersion): added.
+	(PluginBridge): initializing usePack and useVersion.
+	(getDownloadOptionsForJar): return the download options.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getDownloadOptionsForJar): logic moved to JNLPFile.java and its
+	subclasses. Now just calling file.getDownloadOptionsForJar.
+	* NEWS: Updated with fix of PR658.
+
+2011-03-04  Denis Lila  <dlila@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
 	(downloadResource): changed the order in which pack200+gz compression
 	and gzip compression are checked.

@@ -40,6 +40,8 @@ public class PluginBridge extends JNLPFile {
     String[] cacheJars = new String[0];
     String[] cacheExJars = new String[0];
     Hashtable<String, String> atts;
+    private boolean usePack;
+    private boolean useVersion;
 
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
                         int width, int height, Hashtable<String, String> atts)
@@ -134,6 +136,27 @@ public class PluginBridge extends JNLPFile {
         // same page can communicate (there are applets known to require 
         // such communication for proper functionality)
         this.uniqueKey = documentBase.toString();
+
+        usePack = false;
+        useVersion = false;
+        String jargs = atts.get("java_arguments");
+        if (jargs != null) {
+            for (String s : jargs.split(" ")) {
+                String[] parts = s.trim().split("=");
+                if (parts.length == 2 && Boolean.valueOf(parts[1])) {
+                    if ("-Djnlp.packEnabled".equals(parts[0])) {
+                        usePack = true;
+                    } else if ("-Djnlp.versionEnabled".equals(parts[0])) {
+                        useVersion = true;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public DownloadOptions getDownloadOptionsForJar(JARDesc jar) {
+        return new DownloadOptions(usePack, useVersion);
     }
 
     public String getTitle() {

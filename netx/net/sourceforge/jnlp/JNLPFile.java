@@ -645,4 +645,32 @@ public class JNLPFile {
         return newVMArgs;
     }
 
+    /**
+     * XXX: this method does a "==" comparison between the input JARDesc and
+     * jars it finds through getResourcesDescs(). If ever the implementation
+     * of that function should change to return copies of JARDescs objects,
+     * then the "jar == aJar" comparison below should change accordingly. 
+     * @param jar: the jar whose download options to get.
+     * @return the download options.
+     */
+    public DownloadOptions getDownloadOptionsForJar(JARDesc jar) {
+        boolean usePack = false;
+        boolean useVersion = false;
+        ResourcesDesc[] descs = getResourcesDescs();
+        for (ResourcesDesc desc: descs) {
+            JARDesc[] jars = desc.getJARs();
+            for (JARDesc aJar: jars) {
+                if (jar == aJar/*jar.getLocation().equals(aJar.getLocation())*/) {
+                    if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.packEnabled"))) {
+                        usePack = true;
+                    }
+                    if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.versionEnabled"))) {
+                        useVersion = true;
+                    }
+                }
+            }
+        }
+        return new DownloadOptions(usePack, useVersion);
+    }
+
 }

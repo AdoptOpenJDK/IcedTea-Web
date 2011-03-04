@@ -1321,25 +1321,7 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     private DownloadOptions getDownloadOptionsForJar(JARDesc jar) {
-        boolean usePack = false;
-        boolean useVersion = false;
-
-        ResourcesDesc[] descs = file.getResourcesDescs();
-        for (ResourcesDesc desc: descs) {
-            JARDesc[] jars = desc.getJARs();
-            for (JARDesc aJar: jars) {
-                if (jar == aJar) {
-                    if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.packEnabled"))) {
-                        usePack = true;
-                    }
-                    if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.versionEnabled"))) {
-                        useVersion = true;
-                    }
-                }
-            }
-        }
-
-        return new DownloadOptions(usePack, useVersion);
+        return file.getDownloadOptionsForJar(jar);
     }
 
     /*
