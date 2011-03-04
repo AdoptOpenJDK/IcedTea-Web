@@ -1,3 +1,12 @@
+2011-03-04  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+	(downloadResource): changed the order in which pack200+gz compression
+	and gzip compression are checked.
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java
+	(getUrl): if usePack now concatenating strings instead of replacing.
+
+
 2011-03-03  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/IcedTeaNPPlugin.cc

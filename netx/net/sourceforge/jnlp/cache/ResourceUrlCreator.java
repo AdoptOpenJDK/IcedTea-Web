@@ -122,7 +122,7 @@ public class ResourceUrlCreator {
             filename = name + "__V" + resource.requestVersion + "." + extension;
         }
         if (usePack) {
-            filename = filename.replace(".jar", ".pack.gz");
+            filename = filename + ".pack.gz";
         }
 
         location = location.substring(0, lastSlash + 1) + filename;

@@ -653,11 +653,14 @@ public class ResourceTracker {
 
             }
 
-            if ("gzip".equals(contentEncoding)) {
-                downloadLocation = new URL(downloadLocation.toString() + ".gz");
-            } else if ("pack200-gzip".equals(contentEncoding) ||
-                    realLocation.getPath().endsWith(".pack.gz")) {
+            boolean packgz = "pack200-gzip".equals(contentEncoding) ||
+                                realLocation.getPath().endsWith(".pack.gz");
+            boolean gzip = "gzip".equals(contentEncoding);
+            
+            if (packgz) {
                 downloadLocation = new URL(downloadLocation.toString() + ".pack.gz");
+            } else if (gzip) {
+                downloadLocation = new URL(downloadLocation.toString() + ".gz");
             }
 
             InputStream in = new BufferedInputStream(con.getInputStream());
@@ -681,7 +684,21 @@ public class ResourceTracker {
              * If the file was compressed, uncompress it.
              */
 
-            if ("gzip".equals(contentEncoding)) {
+            if (packgz) {
+                GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(
+                        CacheUtil.getCacheFile(downloadLocation, resource.downloadVersion)));
+                InputStream inputStream = new BufferedInputStream(gzInputStream);
+
+                JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(
+                        CacheUtil.getCacheFile(resource.location, resource.downloadVersion)));
+
+                Unpacker unpacker = Pack200.newUnpacker();
+                unpacker.unpack(inputStream, outputStream);
+
+                outputStream.close();
+                inputStream.close();
+                gzInputStream.close();
+            } else if (gzip) {
                 GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                         .getCacheFile(downloadLocation, resource.downloadVersion)));
                 InputStream inputStream = new BufferedInputStream(gzInputStream);
@@ -697,24 +714,7 @@ public class ResourceTracker {
                 outputStream.close();
                 inputStream.close();
                 gzInputStream.close();
-
-            } else if ("pack200-gzip".equals(contentEncoding) ||
-                    realLocation.getPath().endsWith(".pack.gz")) {
-                GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(
-                        CacheUtil.getCacheFile(downloadLocation, resource.downloadVersion)));
-                InputStream inputStream = new BufferedInputStream(gzInputStream);
-
-                JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(
-                        CacheUtil.getCacheFile(resource.location, resource.downloadVersion)));
-
-                Unpacker unpacker = Pack200.newUnpacker();
-                unpacker.unpack(inputStream, outputStream);
-
-                outputStream.close();
-                inputStream.close();
-                gzInputStream.close();
             }
-
 
             resource.changeStatus(DOWNLOADING, DOWNLOADED);
             synchronized (lock) {
