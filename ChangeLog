@@ -6,6 +6,33 @@
 	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java
 	(getUrl): if usePack now concatenating strings instead of replacing.
 
+2011-03-04  Deepak Bhole <dbhole@redhat.com>
+
+	* NEWS: Updated.
+	* netx/net/sourceforge/jnlp/PluginBridge.java (PluginBridge): Use
+	documentbase as a uniquekey so that the classloader may be shared by
+	applets from the same page.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Added new
+	CodeBaseClassLoader class to load codebase (from path instead of a file)
+	classes.
+	(getInstance): Try to match file locations only for Web Start apps. For
+	plugin, merge the new loader into current one.
+	(enableCodeBase): Use the new addToCodeBaseLoader method.
+	(findLoadedClassAll): Search the codebase loader if the class was not
+	found in the file loaders.
+	(findClass): Likewise.
+	(getResource): Likewise.
+	(findResources): Likewise.
+	(merge): Merge codebase loaders.
+	(addToCodeBaseLoader): New method. Adds a given url to the codebase loader
+	if it is a path.
+	(CodeBaseClassLoader): New inner class. Extends URLClassLoader to expose
+	its protected methods like addURL.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java
+	(getApplication): Accomodate the fact that the classloader for a class may
+	be a CodeBaseClassLoader.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (run):
+	Likewise.
 
 2011-03-03  Deepak Bhole <dbhole@redhat.com>
 

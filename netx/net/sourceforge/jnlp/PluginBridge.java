@@ -130,9 +130,10 @@ public class PluginBridge extends JNLPFile {
         else
             security = null;
 
-        this.uniqueKey = Calendar.getInstance().getTimeInMillis() + "-" +
-                         Math.abs(((new java.util.Random()).nextInt())) + "-" +
-                         documentBase;
+        // Plugin needs to share classloaders so that applet instances from 
+        // same page can communicate (there are applets known to require 
+        // such communication for proper functionality)
+        this.uniqueKey = documentBase.toString();
     }
 
     public String getTitle() {
