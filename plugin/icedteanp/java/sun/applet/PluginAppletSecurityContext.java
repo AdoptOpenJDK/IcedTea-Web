@@ -1228,15 +1228,14 @@ public class PluginAppletSecurityContext {
         Class<?> c = (Class<?>) store.getObject(classID);
         Method m = null;
         Constructor cs = null;
-        Object o = null;
 
         try {
             if (methodName.equals("<init>")
                                         || methodName.equals("<clinit>")) {
-                o = cs = c.getConstructor(signature.getClassArray());
+                cs = c.getConstructor(signature.getClassArray());
                 store.reference(cs);
             } else {
-                o = m = c.getMethod(methodName, signature.getClassArray());
+                m = c.getMethod(methodName, signature.getClassArray());
                 store.reference(m);
             }
         } catch (NoSuchMethodException e) {

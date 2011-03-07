@@ -1,5 +1,33 @@
 2011-03-07  Denis Lila  <dlila@redhat.com>
 
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java:
+	(prepopulateMethod) removed unused object o.
+	* plugin/icedteanp/java/sun/applet/PluginCallRequest.java:
+	Made all the members private.
+	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java:
+	Removed unused imports.
+	(MAX_PARALLEL_INITS, MAX_WORKERS, PRIORITY_WORKERS, readQueue,
+	 workers, streamHandler, consumerThread,
+	 registerPriorityWait(String), unRegisterPriorityWait(String)):
+	 made private.
+	(initWorkers, as, processedIds, unRegisterPriorityWait(Long),
+	 addToInitWorkers): removed - unused.
+	(getPriorityStrIfPriority): made static; replaced while with for-each.
+	(notifyWorkerIsFree): removed synchronized section - useless.
+	(ConsumerThread.run): removed call to addToInitWorkers.
+	* plugin/icedteanp/java/sun/applet/PluginMessageHandlerWorker.java:
+	Removed explicit member initializations to the default values; fixed typo.
+	(PluginMessageHandlerWorker): Removed SecurityManager argument - unused.
+	* plugin/icedteanp/java/sun/applet/PluginStreamHandler.java:
+	Removed unused imports.
+	(consumer, shuttingDown): made private.
+	(pav, writeQueue, getMessage, messageAvailable): removed - unused.
+	(PluginStreamHandler): removed pav initialization.
+	* plugin/icedteanp/java/sun/applet/AppletSecurityContextManager.java:
+	Removed FIXME comment.
+
+2011-03-07  Denis Lila  <dlila@redhat.com>
+
 	* netx/net/sourceforge/jnlp/JNLPFile.java:
 	(getResourcesDescs): added comment.
 	(getDownloadOptionsForJar): removed commented out code.

@@ -43,7 +43,6 @@ import java.util.HashMap;
 public class AppletSecurityContextManager {
 
     // Context identifier -> PluginAppletSecurityContext object.
-    // FIXME: make private
     private static HashMap<Integer, PluginAppletSecurityContext> contexts =
             new HashMap<Integer, PluginAppletSecurityContext>();
 

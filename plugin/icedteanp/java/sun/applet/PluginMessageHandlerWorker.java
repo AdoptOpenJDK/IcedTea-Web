@@ -40,16 +40,16 @@ package sun.applet;
 class PluginMessageHandlerWorker extends Thread {
 
     private boolean free = true;
-    private boolean isPriorityWorker = false;
-    private int id;
-    private String message = null;
-    PluginStreamHandler streamHandler = null;
-    PluginMessageConsumer consumer = null;
+    private final boolean isPriorityWorker;
+    private final int id;
+    private String message;
+    private PluginStreamHandler streamHandler;
+    private PluginMessageConsumer consumer;
 
     public PluginMessageHandlerWorker(
                 PluginMessageConsumer consumer,
                 PluginStreamHandler streamHandler, int id,
-                SecurityManager sm, boolean isPriorityWorker) {
+                boolean isPriorityWorker) {
 
         this.id = id;
         this.streamHandler = streamHandler;
@@ -70,7 +70,7 @@ class PluginMessageHandlerWorker extends Thread {
 
                 PluginDebug.debug("Consumer (priority=" + isPriorityWorker + ") thread " + id + " consuming " + message);
 
-                // ideally, whoever returns things object should mark it 
+                // ideally, whoever returns this object should mark it
                 // busy first, but just in case..
                 busy();
 

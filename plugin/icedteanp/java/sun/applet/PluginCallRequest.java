@@ -40,10 +40,10 @@ package sun.applet;
 // FIXME: for each type of request extend a new (anonymous?)
 // PluginCallRequest.
 public abstract class PluginCallRequest {
-    String message;
-    Long reference;
-    PluginCallRequest next;
-    boolean done = false;
+    private String message;
+    private Long reference;
+    private PluginCallRequest next;
+    private boolean done = false;
 
     public PluginCallRequest(String message, Long reference) {
         this.message = message;

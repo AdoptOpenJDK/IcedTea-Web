@@ -38,29 +38,29 @@ exception statement from your version. */
 package sun.applet;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 class PluginMessageConsumer {
 
-    private static int MAX_PARALLEL_INITS = 1;
+    private static final int MAX_PARALLEL_INITS = 1;
 
     // Each initialization requires 5 responses (tag, handle, width, proxy, cookie) 
     // before the message stack unlocks/collapses. This works out well because we 
     // want to allow upto 5 parallel tasks anyway
-    private static int MAX_WORKERS = MAX_PARALLEL_INITS * 4;
-    private static int PRIORITY_WORKERS = MAX_PARALLEL_INITS * 2;
+    private static final int MAX_WORKERS = MAX_PARALLEL_INITS * 4;
+    private static final int PRIORITY_WORKERS = MAX_PARALLEL_INITS * 2;
 
-    private static Hashtable<Integer, PluginMessageHandlerWorker> initWorkers = new Hashtable<Integer, PluginMessageHandlerWorker>(2);
-
-    LinkedList<String> readQueue = new LinkedList<String>();
     private static LinkedList<String> priorityWaitQueue = new LinkedList<String>();
-    ArrayList<PluginMessageHandlerWorker> workers = new ArrayList<PluginMessageHandlerWorker>();
-    PluginStreamHandler streamHandler = null;
-    AppletSecurity as;
-    ConsumerThread consumerThread = new ConsumerThread();
-    private static ArrayList<Integer> processedIds = new ArrayList<Integer>();
+
+    private LinkedList<String> readQueue = new LinkedList<String>();
+    private ArrayList<PluginMessageHandlerWorker> workers = new ArrayList<PluginMessageHandlerWorker>();
+    private PluginStreamHandler streamHandler;
+    private ConsumerThread consumerThread = new ConsumerThread();
+
+    public PluginMessageConsumer(PluginStreamHandler streamHandler) {
+        this.streamHandler = streamHandler;
+        this.consumerThread.start();
+    }
 
     /** 
      * Registers a reference to wait for. Responses to registered priority 
@@ -78,21 +78,13 @@ class PluginMessageConsumer {
      *
      * @param searchString the string to look for in a response
      */
-    public static void registerPriorityWait(String searchString) {
+    private static void registerPriorityWait(String searchString) {
         PluginDebug.debug("Registering priority for string " + searchString);
         synchronized (priorityWaitQueue) {
-            if (!priorityWaitQueue.contains(searchString))
+            if (!priorityWaitQueue.contains(searchString)) {
                 priorityWaitQueue.add(searchString);
+            }
         }
-    }
-
-    /** 
-     * Unregisters a priority reference to wait for.
-     *
-     * @param reference The reference to remove
-     */
-    public static void unRegisterPriorityWait(Long reference) {
-        unRegisterPriorityWait(reference.toString());
     }
 
     /** 
@@ -100,56 +92,31 @@ class PluginMessageConsumer {
      *
      * @param searchString The string to unregister from the priority list
      */
-    public static void unRegisterPriorityWait(String searchString) {
+    private static void unRegisterPriorityWait(String searchString) {
         synchronized (priorityWaitQueue) {
             priorityWaitQueue.remove(searchString);
         }
     }
 
-    public PluginMessageConsumer(PluginStreamHandler streamHandler) {
-
-        as = new AppletSecurity();
-        this.streamHandler = streamHandler;
-        this.consumerThread.start();
-    }
-
-    private String getPriorityStrIfPriority(String message) {
+    private static String getPriorityStrIfPriority(String message) {
 
         // Destroy messages are permanently high priority
-        if (message.endsWith("destroy"))
+        if (message.endsWith("destroy")) {
             return "destroy";
+        }
 
         synchronized (priorityWaitQueue) {
-            Iterator<String> it = priorityWaitQueue.iterator();
-
-            while (it.hasNext()) {
-                String priorityStr = it.next();
-                if (message.indexOf(priorityStr) > 0)
-                    return priorityStr;
+            for (String priorityStr : priorityWaitQueue) {
+                if (message.indexOf(priorityStr) > 0) {
+                    return priorityStr; 
+                }
             }
         }
 
         return null;
     }
 
-    private void addToInitWorkers(Integer instanceNum, PluginMessageHandlerWorker worker) {
-        synchronized (initWorkers) {
-            initWorkers.put(instanceNum, worker);
-        }
-    }
-
     public void notifyWorkerIsFree(PluginMessageHandlerWorker worker) {
-        synchronized (initWorkers) {
-            Iterator<Integer> i = initWorkers.keySet().iterator();
-            while (i.hasNext()) {
-                Integer key = i.next();
-                if (initWorkers.get(key).equals(worker)) {
-                    processedIds.add(key);
-                    initWorkers.remove(key);
-                }
-            }
-        }
-
         consumerThread.interrupt();
     }
 
@@ -201,8 +168,6 @@ class PluginMessageConsumer {
 
                 if (message != null) {
 
-                    String[] msgParts = message.split(" ");
-
                     String priorityStr = getPriorityStrIfPriority(message);
                     boolean isPriorityResponse = (priorityStr != null);
 
@@ -219,9 +184,6 @@ class PluginMessageConsumer {
 
                         continue; // re-loop to try next msg
                     }
-
-                    if (msgParts[2].equals("tag"))
-                        addToInitWorkers((new Integer(msgParts[1])), worker);
 
                     if (isPriorityResponse) {
                         unRegisterPriorityWait(priorityStr);
@@ -257,10 +219,10 @@ class PluginMessageConsumer {
 
             if (workers.size() < (MAX_WORKERS - PRIORITY_WORKERS)) {
                 PluginDebug.debug("Cannot find free worker, creating worker " + workers.size());
-                worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), as, false);
+                worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), false);
             } else if (prioritized) {
                 PluginDebug.debug("Cannot find free worker, creating priority worker " + workers.size());
-                worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), as, true);
+                worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), true);
             } else {
                 return null;
             }

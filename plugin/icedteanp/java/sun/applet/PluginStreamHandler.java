@@ -46,8 +46,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.LinkedList;
 
 import javax.swing.SwingUtilities;
 
@@ -60,27 +58,14 @@ public class PluginStreamHandler {
 
     private JavaConsole console = new JavaConsole();
 
-    LinkedList<String> writeQueue = new LinkedList<String>();
+    private PluginMessageConsumer consumer;
+    private Boolean shuttingDown = false;
 
-    PluginMessageConsumer consumer;
-    Boolean shuttingDown = false;
-
-    PluginAppletViewer pav;
 
     public PluginStreamHandler(InputStream inputstream, OutputStream outputstream)
             throws MalformedURLException, IOException {
 
         PluginDebug.debug("Current context CL=" + Thread.currentThread().getContextClassLoader());
-        try {
-            pav = (PluginAppletViewer) ClassLoader.getSystemClassLoader().loadClass("sun.applet.PluginAppletViewer").newInstance();
-            PluginDebug.debug("Loaded: " + pav + " CL=" + pav.getClass().getClassLoader());
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
         PluginDebug.debug("Creating consumer...");
         consumer = new PluginMessageConsumer(this);
@@ -351,17 +336,6 @@ public class PluginStreamHandler {
         }
 
         return;
-    }
-
-    public boolean messageAvailable() {
-        return writeQueue.size() != 0;
-    }
-
-    public String getMessage() {
-        synchronized (writeQueue) {
-            String ret = writeQueue.size() > 0 ? writeQueue.poll() : "";
-            return ret;
-        }
     }
 
     private void showConsole() {
