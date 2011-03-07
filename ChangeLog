@@ -1,5 +1,10 @@
 2011-03-07  Omair Majid  <omajid@redhat.com>
 
+	* NEWS: Update.
+	* acinclude.m4 (IT_OBTAIN_HG_REVISIONS): Use hg id instead of hg tip.
+
+2011-03-07  Omair Majid  <omajid@redhat.com>
+
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: Add plugin_debug_suspend.
 	(plugin_start_appletviewer): If plugin_debug_suspend is true, start jvm in
 	suspend mode.

@@ -410,7 +410,7 @@ AC_DEFUN_ONCE([IT_OBTAIN_HG_REVISIONS],
   if which ${HG} >&AS_MESSAGE_LOG_FD 2>&1; then
     AC_MSG_CHECKING([for IcedTea Mercurial revision ID])
     if test -e ${abs_top_srcdir}/.hg ; then 
-      ICEDTEA_REVISION="r`(cd ${abs_top_srcdir}; ${HG} tip --template '{node|short}')`" ; 
+      ICEDTEA_REVISION="r`(cd ${abs_top_srcdir}; ${HG} id -i)`" ;
     fi ;
     AC_MSG_RESULT([${ICEDTEA_REVISION}])
     AC_SUBST([ICEDTEA_REVISION])
