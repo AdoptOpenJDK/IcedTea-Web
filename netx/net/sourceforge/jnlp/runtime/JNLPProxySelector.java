@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -51,6 +50,8 @@ public abstract class JNLPProxySelector extends ProxySelector {
 
     /** The default port to use as a fallback. Currently squid's default port */
     public static final int FALLBACK_PROXY_PORT = 3128;
+
+    private PacEvaluator pacEvaluator = null;
 
     /** The proxy type. See PROXY_TYPE_* constants */
     private int proxyType = PROXY_TYPE_UNKNOWN;
@@ -96,14 +97,17 @@ public abstract class JNLPProxySelector extends ProxySelector {
 
         proxyType = Integer.valueOf(config.getProperty(DeploymentConfiguration.KEY_PROXY_TYPE));
 
-        String autoConfigString = config
-                .getProperty(DeploymentConfiguration.KEY_PROXY_AUTO_CONFIG_URL);
+        String autoConfigString = config.getProperty(DeploymentConfiguration.KEY_PROXY_AUTO_CONFIG_URL);
         if (autoConfigString != null) {
             try {
                 autoConfigUrl = new URL(autoConfigString);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
+        }
+
+        if (autoConfigUrl != null) {
+            pacEvaluator = PacEvaluatorFactory.getPacEvaluator(autoConfigUrl);
         }
 
         bypassList = new ArrayList<String>();
@@ -333,14 +337,22 @@ public abstract class JNLPProxySelector extends ProxySelector {
      *
      * @return a List of valid Proxy objects
      */
-    private List<Proxy> getFromPAC(URI uri) {
-        if (autoConfigUrl == null) {
+    protected List<Proxy> getFromPAC(URI uri) {
+        if (autoConfigUrl == null || uri.getScheme().equals("socket")) {
             return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
         }
-        // TODO implement this by reading and using the PAC file
-        System.err.println(R("RPRoxyPacNotImplemented"));
 
-        return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
+        List<Proxy> proxies = new ArrayList<Proxy>();
+
+        try {
+            String proxiesString = pacEvaluator.getProxies(uri.toURL());
+            proxies.addAll(getProxiesFromPacResult(proxiesString));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            proxies.add(Proxy.NO_PROXY);
+        }
+
+        return proxies;
     }
 
     /**
@@ -351,5 +363,56 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     protected abstract List<Proxy> getFromBrowser(URI uri);
 
+    /**
+     * Converts a proxy string from a browser into a List of Proxy objects
+     * suitable for java.
+     * @param pacString a string indicating proxies. For example
+     * "PROXY foo.bar:3128; DIRECT"
+     * @return a list of Proxy objects represeting the parsed string.
+     */
+    public static List<Proxy> getProxiesFromPacResult(String pacString) {
+        List<Proxy> proxies = new ArrayList<Proxy>();
+
+        String[] tokens = pacString.split(";");
+        for (String token: tokens) {
+            if (token.startsWith("PROXY")) {
+                String hostPortPair = token.substring("PROXY".length()).trim();
+                if (!hostPortPair.contains(":")) {
+                    continue;
+                }
+                String host = hostPortPair.split(":")[0];
+                int port;
+                try {
+                    port = Integer.valueOf(hostPortPair.split(":")[1]);
+                } catch (NumberFormatException nfe) {
+                    continue;
+                }
+                SocketAddress sa = new InetSocketAddress(host, port);
+                proxies.add(new Proxy(Type.HTTP, sa));
+            } else if (token.startsWith("SOCKS")) {
+                String hostPortPair = token.substring("SOCKS".length()).trim();
+                if (!hostPortPair.contains(":")) {
+                    continue;
+                }
+                String host = hostPortPair.split(":")[0];
+                int port;
+                try {
+                    port = Integer.valueOf(hostPortPair.split(":")[1]);
+                } catch (NumberFormatException nfe) {
+                    continue;
+                }
+                SocketAddress sa = new InetSocketAddress(host, port);
+                proxies.add(new Proxy(Type.SOCKS, sa));
+            } else if (token.startsWith("DIRECT")) {
+                proxies.add(Proxy.NO_PROXY);
+            } else {
+                if (JNLPRuntime.isDebug()) {
+                    System.out.println("Unrecognized proxy token: " + token);
+                }
+            }
+        }
+
+        return proxies;
+    }
 
 }

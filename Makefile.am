@@ -8,7 +8,14 @@ NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/jnlp/about/resources
 # Build directories
 
 BOOT_DIR = $(abs_top_builddir)/bootstrap/jdk1.6.0
-RUNTIME = $(BOOT_DIR)/jre/lib/rt.jar:$(BOOT_DIR)/jre/lib/jsse.jar
+
+if WITH_RHINO
+  RHINO_RUNTIME=:$(RHINO_JAR)
+else
+  RHINO_RUNTIME=
+endif
+
+RUNTIME = $(BOOT_DIR)/jre/lib/rt.jar:$(BOOT_DIR)/jre/lib/jsse.jar$(RHINO_RUNTIME)
 
 # Flags
 IT_CFLAGS=$(CFLAGS) $(ARCHFLAG)
@@ -18,8 +25,8 @@ IT_CLASS_TARGET_VERSION=6
 IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
 
 JRE='"$(SYSTEM_JDK_DIR)/jre"'
-LAUNCHER_BOOTCLASSPATH="-J-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar"
-PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar"'
+LAUNCHER_BOOTCLASSPATH="-J-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
+PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
 
 # Fake update version to shut up the plugin detector hosted by Oracle.
 # If Oracle ever release a JDK update greater than 50, this needs to be increased.
@@ -88,14 +95,17 @@ EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.i
 all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX_DIR)/launcher/javaws \
  javaws.desktop stamps/docs.stamp $(NETX_DIR)/launcher/controlpanel/itweb-settings itweb-settings.desktop
 
+check-local: check-pac-functions
+
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
- clean-native-ecj clean-desktop-files clean-docs
+ clean-native-ecj clean-desktop-files clean-docs clean-tests
 	if [ -e stamps ] ; then \
 	  rmdir stamps ; \
 	fi
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
- clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs
+ clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs \
+ clean-tests clean-jrunscript check-local
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir)
@@ -241,8 +251,20 @@ clean-liveconnect:
 
 netx-source-files.txt:
 	find $(NETX_SRCDIR) -name '*.java' | sort > $@
+if !WITH_RHINO
+	sed -i '/RhinoBasedPacEvaluator/ d' $@
+endif
 
-stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
+build.properties:
+	echo "# This contains build-time settings " > $@
+if WITH_RHINO
+	echo "rhino.available=true" >> $@
+else
+	echo "rhino.available=false" >> $@
+endif
+
+stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp \
+ build.properties
 	mkdir -p $(NETX_DIR)
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	    -d $(NETX_DIR) \
@@ -255,6 +277,9 @@ stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
 	   ${INSTALL_DATA} -D $${files} \
 	   $(NETX_DIR)/net/sourceforge/jnlp/resources/$${files}; \
 	 done)
+	cp -a $(NETX_SRCDIR)/net/sourceforge/jnlp/runtime/pac-funcs.js \
+	  $(NETX_DIR)/net/sourceforge/jnlp/runtime
+	cp -a build.properties $(NETX_DIR)/net/sourceforge/jnlp/
 	mkdir -p stamps
 	touch $@
 
@@ -272,6 +297,7 @@ stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest
 
 clean-netx:
 	rm -rf $(NETX_DIR)
+	rm -f build.properties
 	rm -f stamps/netx-dist.stamp
 	rm -f netx-source-files.txt
 	rm -f stamps/netx.stamp
@@ -376,6 +402,28 @@ clean-plugin-docs:
 	rm -rf ${abs_top_builddir}/docs/plugin
 	rm -f stamps/plugin-docs.stamp
 
+
+# check
+# ==========================
+
+jrunscript:
+if WITH_RHINO
+	echo '$(BOOT_DIR)/bin/java -cp $(RHINO_JAR) org.mozilla.javascript.tools.shell.Main $$@' > jrunscript
+	chmod u+x jrunscript
+else
+	echo "jrunscript requires rhino support"
+	exit 1
+endif
+
+check-pac-functions: stamps/bootstrap-directory.stamp jrunscript
+	./jrunscript $(abs_top_srcdir)/tests/netx/pac/pac-funcs-test.js \
+	  $$(readlink -f $(abs_top_srcdir)/netx/net/sourceforge/jnlp/runtime/pac-funcs.js)
+
+clean-tests: clean-jrunscript
+
+clean-jrunscript:
+	rm -f jrunscript
+
 # plugin tests
 
 if ENABLE_PLUGIN
@@ -412,6 +460,7 @@ clean-native-ecj:
 # bootstrap
 stamps/bootstrap-directory.stamp: stamps/native-ecj.stamp
 	mkdir -p $(BOOT_DIR)/bin stamps/
+	ln -sf $(JAVA) $(BOOT_DIR)/bin/java
 	ln -sf $(JAR) $(BOOT_DIR)/bin/jar
 	ln -sf $(abs_top_builddir)/javac $(BOOT_DIR)/bin/javac
 	ln -sf $(JAVADOC) $(BOOT_DIR)/bin/javadoc

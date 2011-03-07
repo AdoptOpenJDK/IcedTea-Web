@@ -1,3 +1,50 @@
+2011-03-07  Omair Majid  <omajid@redhat.com>
+
+	* NEWS: Update.
+	* Makefile.am
+	(RHINO_RUNTIME): Define to point to rhino jars, or empty.
+	(RUNTIME, LAUNCHER_BOOTCLASSPATH, PLUGIN_BOOTCLASSPATH): Include
+	RHINO_RUNTIME.
+	(PHONY): Add check-pac-functions, clean-jrunscript and clean-tests.
+	(check-local): New target. Depends on check-pac-functions.
+	(check-pac-functions): New target.
+	(jrunscript): New target.
+	(clean-tests): New target.
+	(clean-jrunscript): New target.
+	(netx-source-files.txt): Remove rhino related files if not building with
+	rhino.
+	(build.properties): New target.
+	(stamps/netx.stamp): Depend on build.properties and copy new files to
+	build location.
+	(clean-netx): Remove build.properties.
+	(stamps/bootstrap-directory.stamp): Add java to bootstrap programs.
+	* acinclude.m4 (IT_FIND_RHINO_JAR): New macro.
+	* configure.ac: Invoke IT_FIND_RHINO_JAR.
+	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java: Add
+	browserProxyAutoConfig.
+	(initFromBrowserConfig): Initialize browserProxyAutoConfig if needed.
+	(getFromBrowserPAC): Use browserProxyAutoConfig to find proxies.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Replace
+	RPRoxyPacNotImplemented with RPRoxyPacNotSupported.
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java: Add
+	pacEvaluator.
+	(parseConfiguration): Initialize pacEvaluator if needed.
+	(getFromPAC): Use pacEvaulator to find proxies.
+	(getProxiesFromPacResult): New method. Converts a proxy string to a list
+	or proxies.
+	* netx/net/sourceforge/jnlp/runtime/PacEvaluator.java: New file. Defines a
+	Java interface for a PAC evaluator.
+	* netx/net/sourceforge/jnlp/runtime/FakePacEvaluator.java: New file. Dummy
+	implementation of a PAC evaluator.
+	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java: New file.
+	A rhino-based PAC evaluator.
+	* netx/net/sourceforge/jnlp/runtime/PacEvaluatorFactory.java: New file. A
+	factory for creating the right PAC evaulator.
+	* netx/net/sourceforge/jnlp/runtime/pac-funcs.js: New file. Defines helper
+	functions needed while evaluating PAC files.
+	* tests/netx/pac/pac-funcs-test.js: New file. Tests the PAC helper
+	functions.
+
 2011-03-07  Denis Lila  <dlila@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java:

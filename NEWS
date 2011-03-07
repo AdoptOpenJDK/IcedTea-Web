@@ -14,6 +14,7 @@ New in release 1.1 (2011-XX-XX):
   - RH677332, CVE-2011-0706: IcedTea multiple signers privilege escalation
 * New Features
   - IcedTea-Web now installs to a FHS-compliant location
+  - IcedTea-Web can now handle Proxy Auto Config files
 * Common Fixes and Improvements
   - PR638: JNLPClassLoader.loadClass(String name) can return null
   - RH677772: NoSuchAlgorithmException using SSL/TLS in javaws

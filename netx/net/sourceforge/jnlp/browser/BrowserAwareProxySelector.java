@@ -54,6 +54,8 @@ import java.util.Map;
 
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.PacEvaluator;
+import net.sourceforge.jnlp.runtime.PacEvaluatorFactory;
 
 /**
  * A ProxySelector which can read proxy settings from a browser's
@@ -84,6 +86,8 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
     private int browserFtpProxyPort;
     private String browserSocks4ProxyHost;
     private int browserSocks4ProxyPort;
+
+    private PacEvaluator browserProxyAutoConfig = null;
 
     /**
      * Create a new instance of this class, reading configuration fropm the browser
@@ -126,6 +130,12 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
+        }
+
+        if (browserProxyType == BROWSER_PROXY_TYPE_PAC) {
+            if (browserAutoConfigUrl != null) {
+                browserProxyAutoConfig = PacEvaluatorFactory.getPacEvaluator(browserAutoConfigUrl);
+            }
         }
 
         browserUseSameProxy = Boolean.valueOf(prefs.get("network.proxy.share_proxy_settings"));
@@ -216,8 +226,21 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      * browser.
      */
     private List<Proxy> getFromBrowserPAC(URI uri) {
-        System.err.println(R("RPRoxyPacNotImplemented"));
-        return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
+        if (browserAutoConfigUrl == null || uri.getScheme().equals("socket")) {
+            return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
+        }
+
+        List<Proxy> proxies = new ArrayList<Proxy>();
+
+        try {
+            String proxiesString = browserProxyAutoConfig.getProxies(uri.toURL());
+            proxies.addAll(getProxiesFromPacResult(proxiesString));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            proxies.add(Proxy.NO_PROXY);
+        }
+
+        return proxies;
     }
 
     /**
