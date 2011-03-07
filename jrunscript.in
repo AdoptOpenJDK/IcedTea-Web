@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ x"@RHINO_JAR@" == x ] ; then
+  echo "jrunscript requires rhino support"
+  exit 1
+fi
+
+@JAVA@ -cp "@RHINO_JAR@" org.mozilla.javascript.tools.shell.Main $@

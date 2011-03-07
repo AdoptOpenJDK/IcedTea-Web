@@ -297,7 +297,13 @@ dnl Clear RHINO_JAR if it doesn't contain a valid filename
   if test x"${RHINO_JAR}" = "xno"; then
     RHINO_JAR=
   fi
+  if test -n ${RHINO_JAR} ; then
+    RHINO_AVAILABLE=true
+  else
+    RHINO_AVAILABLE=false
+  fi
   AC_SUBST(RHINO_JAR)
+  AC_SUBST(RHINO_AVAILABLE)
 ])
 
 AC_DEFUN_ONCE([IT_CHECK_PLUGIN],

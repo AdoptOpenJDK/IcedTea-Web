@@ -105,7 +105,7 @@ clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstr
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs \
- clean-tests clean-jrunscript check-local
+ clean-tests check-local
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir)
@@ -255,16 +255,7 @@ if !WITH_RHINO
 	sed -i '/RhinoBasedPacEvaluator/ d' $@
 endif
 
-build.properties:
-	echo "# This contains build-time settings " > $@
-if WITH_RHINO
-	echo "rhino.available=true" >> $@
-else
-	echo "rhino.available=false" >> $@
-endif
-
-stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp \
- build.properties
+stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
 	mkdir -p $(NETX_DIR)
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	    -d $(NETX_DIR) \
@@ -297,7 +288,6 @@ stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest
 
 clean-netx:
 	rm -rf $(NETX_DIR)
-	rm -f build.properties
 	rm -f stamps/netx-dist.stamp
 	rm -f netx-source-files.txt
 	rm -f stamps/netx.stamp
@@ -406,23 +396,11 @@ clean-plugin-docs:
 # check
 # ==========================
 
-jrunscript:
-if WITH_RHINO
-	echo '$(BOOT_DIR)/bin/java -cp $(RHINO_JAR) org.mozilla.javascript.tools.shell.Main $$@' > jrunscript
-	chmod u+x jrunscript
-else
-	echo "jrunscript requires rhino support"
-	exit 1
-endif
-
-check-pac-functions: stamps/bootstrap-directory.stamp jrunscript
+check-pac-functions: stamps/bootstrap-directory.stamp
 	./jrunscript $(abs_top_srcdir)/tests/netx/pac/pac-funcs-test.js \
 	  $$(readlink -f $(abs_top_srcdir)/netx/net/sourceforge/jnlp/runtime/pac-funcs.js)
 
-clean-tests: clean-jrunscript
-
-clean-jrunscript:
-	rm -f jrunscript
+clean-tests:
 
 # plugin tests
 

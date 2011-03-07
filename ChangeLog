@@ -1,5 +1,22 @@
 2011-03-07  Omair Majid  <omajid@redhat.com>
 
+	* acinclude.m4 (IT_FIND_RHINO_JAR): Set RHINO_AVAILABLE to true or false
+	appropriately.
+	* build.properties.in: New file.
+	* jrunscript.in: New file.
+	* configure.ac: Add build.properties and jrunscript to AC_CONFIG_FILES.
+	* Makefile.am
+	(.PHONY): Remove clean-jrunscript.
+	(build.properties): Remove target.
+	(stamps/netx.stamp): Remove dependency on build.properties.
+	(clean-netx): Do not delete build.properties.
+	(jrunscript): Remove target.
+	(check-pac-functions): Remove dependency on jrunscript.
+	(clean-tests): Remove dependency on clean-jrunscript.
+	(clean-jrunscript): Remove target.
+
+2011-03-07  Omair Majid  <omajid@redhat.com>
+
 	* NEWS: Update.
 	* acinclude.m4 (IT_OBTAIN_HG_REVISIONS): Use hg id instead of hg tip.
 

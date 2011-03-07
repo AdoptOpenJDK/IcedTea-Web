@@ -80,4 +80,7 @@ IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.U
 IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef])
 IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE
 
+AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
+AC_CONFIG_FILES([build.properties])
+
 AC_OUTPUT
