@@ -1,5 +1,11 @@
 2011-03-07  Omair Majid  <omajid@redhat.com>
 
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Add plugin_debug_suspend.
+	(plugin_start_appletviewer): If plugin_debug_suspend is true, start jvm in
+	suspend mode.
+
+2011-03-07  Omair Majid  <omajid@redhat.com>
+
 	* NEWS: Update.
 	* Makefile.am
 	(RHINO_RUNTIME): Define to point to rhino jars, or empty.

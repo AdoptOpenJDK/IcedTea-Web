@@ -238,6 +238,8 @@ static GPid appletviewer_pid = -1;
 static guint appletviewer_watch_id = -1;
 
 int plugin_debug = getenv ("ICEDTEAPLUGIN_DEBUG") != NULL;
+int plugin_debug_suspend = (getenv("ICEDTEAPLUGIN_DEBUG") != NULL) &&
+        (strcmp(getenv("ICEDTEAPLUGIN_DEBUG"), "suspend") == 0);
 
 pthread_cond_t cond_message_available = PTHREAD_COND_INITIALIZER;
 
@@ -1546,7 +1548,13 @@ plugin_start_appletviewer (ITNPPluginData* data)
       command_line[1] = g_strdup(PLUGIN_BOOTCLASSPATH);
       command_line[2] = g_strdup("-Xdebug");
       command_line[3] = g_strdup("-Xnoagent");
-      command_line[4] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n");
+      if (plugin_debug_suspend)
+      {
+          command_line[4] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y");
+      } else
+      {
+          command_line[4] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n");
+      }
       command_line[5] = g_strdup("sun.applet.PluginMain");
       command_line[6] = g_strdup(out_pipe_name);
       command_line[7] = g_strdup(in_pipe_name);
