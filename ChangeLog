@@ -1,3 +1,13 @@
+2011-03-07  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPFile.java:
+	(getResourcesDescs): added comment.
+	(getDownloadOptionsForJar): removed commented out code.
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(getResourcesDescs): added comment.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+	(downloadResource): added comment.
+
 2011-03-04  Denis Lila  <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPFile.java:
@@ -17,7 +27,8 @@
 	(downloadResource): changed the order in which pack200+gz compression
 	and gzip compression are checked.
 	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java
-	(getUrl): if usePack now concatenating strings instead of replacing.
+	(getUrl): if usePack is true, append ".pack.gz" to the file name,
+	instead of replacing ".jar" with ".pack.gz".
 
 2011-03-04  Deepak Bhole <dbhole@redhat.com>
 

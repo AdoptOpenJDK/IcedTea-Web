@@ -656,7 +656,11 @@ public class ResourceTracker {
             boolean packgz = "pack200-gzip".equals(contentEncoding) ||
                                 realLocation.getPath().endsWith(".pack.gz");
             boolean gzip = "gzip".equals(contentEncoding);
-            
+
+            // It's important to check packgz first. If a stream is both
+            // pack200 and gz encoded, then con.getContentEncoding() could
+            // return ".gz", so if we check gzip first, we would end up
+            // treating a pack200 file as a jar file.
             if (packgz) {
                 downloadLocation = new URL(downloadLocation.toString() + ".pack.gz");
             } else if (gzip) {
