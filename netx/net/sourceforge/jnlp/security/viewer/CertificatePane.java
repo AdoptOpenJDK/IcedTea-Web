@@ -369,7 +369,11 @@ public class CertificatePane extends JPanel {
                     }
 
                     OutputStream os = new FileOutputStream(keyStoreFile);
-                    ks.store(os, KeyStores.getPassword());
+                    try {
+                        ks.store(os, KeyStores.getPassword());
+                    } finally {
+                        os.close();
+                    }
                     repopulateTables();
                 } catch (Exception ex) {
                     // TODO: handle exception

@@ -252,7 +252,11 @@ public class CertWarningPane extends SecurityDialogPanel {
                     }
 
                     OutputStream os = new FileOutputStream(keyStoreFile);
-                    ks.store(os, KeyStores.getPassword());
+                    try {
+                        ks.store(os, KeyStores.getPassword());
+                    } finally {
+                        os.close();
+                    }
                     if (JNLPRuntime.isDebug()) {
                         System.out.println("certificate is now permanently trusted");
                     }

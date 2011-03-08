@@ -87,52 +87,56 @@ public final class FirefoxPreferencesParser {
 
         BufferedReader reader = new BufferedReader(new FileReader(prefsFile));
 
-        while (true) {
-            String line = reader.readLine();
-            // end of stream
-            if (line == null) {
-                break;
-            }
+        try {
+            while (true) {
+                String line = reader.readLine();
+                // end of stream
+                if (line == null) {
+                    break;
+                }
 
-            line = line.trim();
-            if (line.startsWith("user_pref")) {
+                line = line.trim();
+                if (line.startsWith("user_pref")) {
 
-                /*
-                 * each line is of the form: user_pref("key",value); where value
-                 * can be a string in double quotes or an integer or float or
-                 * boolean
-                 */
+                    /*
+                     * each line is of the form: user_pref("key",value); where value
+                     * can be a string in double quotes or an integer or float or
+                     * boolean
+                     */
 
-                boolean foundKey = false;
-                boolean foundValue = false;
+                    boolean foundKey = false;
+                    boolean foundValue = false;
 
-                // extract everything inside user_pref( and );
-                String pref = line.substring("user_pref(".length(), line.length() - 2);
-                // key and value are separated by a ,
-                int firstCommaPos = pref.indexOf(',');
-                if (firstCommaPos >= 1) {
-                    String key = pref.substring(0, firstCommaPos).trim();
-                    if (key.startsWith("\"") && key.endsWith("\"")) {
-                        key = key.substring(1, key.length() - 1);
-                        if (key.trim().length() > 0) {
-                            foundKey = true;
+                    // extract everything inside user_pref( and );
+                    String pref = line.substring("user_pref(".length(), line.length() - 2);
+                    // key and value are separated by a ,
+                    int firstCommaPos = pref.indexOf(',');
+                    if (firstCommaPos >= 1) {
+                        String key = pref.substring(0, firstCommaPos).trim();
+                        if (key.startsWith("\"") && key.endsWith("\"")) {
+                            key = key.substring(1, key.length() - 1);
+                            if (key.trim().length() > 0) {
+                                foundKey = true;
+                            }
                         }
-                    }
 
-                    if (pref.length() > firstCommaPos + 1) {
-                        String value = pref.substring(firstCommaPos + 1).trim();
-                        if (value.startsWith("\"") && value.endsWith("\"")) {
-                            value = value.substring(1, value.length() - 1).trim();
-                        }
-                        foundValue = true;
+                        if (pref.length() > firstCommaPos + 1) {
+                            String value = pref.substring(firstCommaPos + 1).trim();
+                            if (value.startsWith("\"") && value.endsWith("\"")) {
+                                value = value.substring(1, value.length() - 1).trim();
+                            }
+                            foundValue = true;
 
-                        if (foundKey && foundValue) {
-                            // System.out.println("added (\"" + key + "\", \"" + value + "\")");
-                            prefs.put(key, value);
+                            if (foundKey && foundValue) {
+                                // System.out.println("added (\"" + key + "\", \"" + value + "\")");
+                                prefs.put(key, value);
+                            }
                         }
                     }
                 }
             }
+        } finally {
+            reader.close();
         }
         if (JNLPRuntime.isDebug()) {
             System.out.println("Read " + prefs.size() + " entries from Firefox's preferences");

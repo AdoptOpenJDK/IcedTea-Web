@@ -140,11 +140,15 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
         StringBuilder contents = null;
         try {
             String line = null;
-            BufferedReader pacReader = new BufferedReader(new InputStreamReader(pacUrl.openStream()));
             contents = new StringBuilder();
-            while ((line = pacReader.readLine()) != null) {
-                // System.out.println(line);
-                contents = contents.append(line).append("\n");
+            BufferedReader pacReader = new BufferedReader(new InputStreamReader(pacUrl.openStream()));
+            try {
+                while ((line = pacReader.readLine()) != null) {
+                    // System.out.println(line);
+                    contents = contents.append(line).append("\n");
+                }
+            } finally {
+                pacReader.close();
             }
         } catch (IOException e) {
             contents = null;
@@ -167,10 +171,14 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
             }
             InputStream in = cl.getResourceAsStream("net/sourceforge/jnlp/runtime/pac-funcs.js");
             BufferedReader pacFuncsReader = new BufferedReader(new InputStreamReader(in));
-            contents = new StringBuilder();
-            while ((line = pacFuncsReader.readLine()) != null) {
-                // System.out.println(line);
-                contents = contents.append(line).append("\n");
+            try {
+                contents = new StringBuilder();
+                while ((line = pacFuncsReader.readLine()) != null) {
+                    // System.out.println(line);
+                    contents = contents.append(line).append("\n");
+                }
+            } finally {
+                pacFuncsReader.close();
             }
         } catch (IOException e) {
             e.printStackTrace();

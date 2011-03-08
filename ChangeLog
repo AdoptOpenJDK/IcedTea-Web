@@ -1,3 +1,16 @@
+2011-03-08  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesFinder.java
+	(find): Close input stream.
+	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesParser.java
+	(parse): Close input stream.
+	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java
+	(getPacContents, getHelperFunctionContents): Close input stream.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java
+	(CheckBoxListener.actionPerformed): Close output stream.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	(ImportButtonListener.actionPerformed): Close output stream.
+
 2011-03-08  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/util/PropertiesFile.java:

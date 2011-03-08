@@ -85,31 +85,34 @@ public class FirefoxPreferencesFinder {
          */
 
         // find the section with an entry Default=1
-        while (true) {
-            String line = reader.readLine();
-            if (line == null) {
-                break;
-            }
-
-            line = line.trim();
-            if (line.startsWith("[") && line.endsWith("]")) {
-                if (foundDefaultSection) {
+        try {
+            while (true) {
+                String line = reader.readLine();
+                if (line == null) {
                     break;
                 }
-                // new section
-                linesInSection = new ArrayList<String>();
-            } else {
-                linesInSection.add(line);
-                int equalSignPos = line.indexOf('=');
-                if (equalSignPos > 0) {
-                    String key = line.substring(0, equalSignPos).trim();
-                    String value = line.substring(equalSignPos+1).trim();
-                    if (key.toLowerCase().equals("default") && value.equals("1")) {
-                        foundDefaultSection = true;
+
+                line = line.trim();
+                if (line.startsWith("[") && line.endsWith("]")) {
+                    if (foundDefaultSection) {
+                        break;
+                    }
+                    // new section
+                    linesInSection = new ArrayList<String>();
+                } else {
+                    linesInSection.add(line);
+                    int equalSignPos = line.indexOf('=');
+                    if (equalSignPos > 0) {
+                        String key = line.substring(0, equalSignPos).trim();
+                        String value = line.substring(equalSignPos+1).trim();
+                        if (key.toLowerCase().equals("default") && value.equals("1")) {
+                            foundDefaultSection = true;
+                        }
                     }
                 }
             }
-
+        } finally {
+            reader.close();
         }
 
         if (!foundDefaultSection) {
