@@ -33,7 +33,6 @@ FIND_JAVAC
 FIND_JAR
 FIND_ECJ_JAR
 IT_FIND_JAVADOC
-IT_FIND_RHINO_JAR
 AC_CONFIG_FILES([javac], [chmod +x javac])
 
 IT_SET_VERSION
@@ -79,6 +78,13 @@ IT_CHECK_FOR_CLASS(SUN_MISC_REF, [sun.misc.Ref])
 IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.UrlUtil])
 IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef])
 IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE
+
+#
+# Find optional depedencies
+#
+
+IT_FIND_OPTIONAL_JAR([rhino], RHINO,
+    [/usr/share/java/js.jar /usr/share/rhino-1.6/lib/js.jar])
 
 AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
 AC_CONFIG_FILES([build.properties])

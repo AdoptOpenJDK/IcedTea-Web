@@ -250,6 +250,79 @@ AC_DEFUN([FIND_ECJ_JAR],
   AC_SUBST(ECJ_JAR)
 ])
 
+#
+# IT_FIND_OPTIONAL_JAR
+# --------------------
+# Find an optional jar required for building and running
+#
+# $1 : jar/feature name
+# $2 : used to set $2_JAR and WITH_$2
+# $3 (optional) : used to specify additional file paths for searching
+#
+# Sets $2_JAR to the jar location (or blank if not found)
+# Defines WITH_$2 if jar is found
+# Sets $2_AVAILABLE to "true" if jar is found (or "false" if not)
+#
+AC_DEFUN([IT_FIND_OPTIONAL_JAR],
+[
+  AC_MSG_CHECKING([for $1 jar])
+  AC_ARG_WITH([$1],
+              [AS_HELP_STRING(--with-$1,specify location of the $1 jar)],
+  [
+    case "${withval}" in
+      yes)
+        $2_JAR=yes
+        ;;
+      no)
+        $2_JAR=no
+        ;;
+      *)
+        if test -f "${withval}"; then
+          $2_JAR="${withval}"
+        elif test -z "${withval}"; then
+          $2_JAR=yes
+        else
+          AC_MSG_RESULT([not found])
+          AC_MSG_ERROR("The $1 jar ${withval} was not found.")
+        fi
+        ;;
+    esac
+  ],
+  [
+    $2_JAR=yes
+  ])
+  it_extra_paths_$1="$3"
+  if test "x${$2_JAR}" = "xyes"; then
+    for path in ${it_extra_paths_$1}; do
+      if test -f ${path}; then
+        $2_JAR=${path}
+        break
+      fi
+    done
+  fi
+  if test x"${$2_JAR}" = "xyes"; then
+    if test -f "/usr/share/java/$1.jar"; then
+      $2_JAR=/usr/share/java/$1.jar
+    fi
+  fi
+  if test x"${$2_JAR}" = "xyes"; then
+    $2_JAR=no
+  fi
+  AC_MSG_RESULT(${$2_JAR})
+  AM_CONDITIONAL(WITH_$2, test x"${$2_JAR}" != "xno")
+  # Clear $2_JAR if it doesn't contain a valid filename
+  if test x"${$2_JAR}" = "xno"; then
+    $2_JAR=
+  fi
+  if test -n "${$2_JAR}" ; then
+    $2_AVAILABLE=true
+  else
+    $2_AVAILABLE=false
+  fi
+  AC_SUBST($2_JAR)
+  AC_SUBST($2_AVAILABLE)
+])
+
 AC_DEFUN([IT_FIND_RHINO_JAR],
 [
   AC_MSG_CHECKING([whether to include Javascript support via Rhino])
