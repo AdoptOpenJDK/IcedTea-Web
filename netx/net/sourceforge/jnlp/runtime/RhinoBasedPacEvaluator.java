@@ -102,7 +102,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
         }
 
         String result = getProxiesWithoutCaching(url);
-        addToCache(url, cachedResult);
+        addToCache(url, result);
         return result;
     }
 

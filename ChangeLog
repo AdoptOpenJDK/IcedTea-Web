@@ -1,5 +1,10 @@
 2011-03-08  Denis Lila  <dlila@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java
+	(getProxies): Add result to cache, not cachedResult.
+
+2011-03-08  Denis Lila  <dlila@redhat.com>
+
 	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesFinder.java
 	(find): Close input stream.
 	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesParser.java
