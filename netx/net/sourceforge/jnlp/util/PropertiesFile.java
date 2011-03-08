@@ -25,8 +25,6 @@ import java.util.*;
  * file when the first property is requested, but the save method
  * must be called before changes are saved to the file.<p>
  *
- * This class does not report IO exceptions.<p>
- *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.4 $
  */
@@ -110,14 +108,19 @@ public class PropertiesFile extends Properties {
     public void load() {
         loaded = true;
 
+        InputStream s = null;
         try {
             if (!file.exists())
                 return;
 
-            InputStream s = new FileInputStream(file);
-            load(s);
+            try {
+                s = new FileInputStream(file);
+                load(s);
+            } finally {
+                if (s != null) s.close();
+            }
         } catch (IOException ex) {
-            // eat
+            ex.printStackTrace();
         }
     }
 
@@ -128,11 +131,16 @@ public class PropertiesFile extends Properties {
         if (!loaded)
             return; // nothing could have changed so save unnecessary load/save
 
+        OutputStream s = null;
         try {
-            OutputStream s = new FileOutputStream(file);
-            store(s, header);
+            try {
+                s = new FileOutputStream(file);
+                store(s, header);
+            } finally {
+                if (s != null) s.close();
+            }
         } catch (IOException ex) {
-            // eat
+            ex.printStackTrace();
         }
     }
 

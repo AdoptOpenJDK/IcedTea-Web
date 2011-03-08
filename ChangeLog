@@ -1,3 +1,9 @@
+2011-03-08  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/util/PropertiesFile.java:
+	(load): Closed streams after opening them.
+	(store): Likewise.
+
 2011-03-08  Denis Lila  <dlila@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
