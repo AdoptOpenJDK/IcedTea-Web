@@ -1,3 +1,10 @@
+2011-03-08  Denis Lila  <dlila@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(getRequestIdentifier): Fix race condition by synchronizing
+	on mutex.
+	(requestIdentityCounter): Now a long.
+
 2011-03-07  Omair Majid  <omajid@redhat.com>
 
 	* acinclude.m4 (IT_FIND_RHINO_JAR): Set RHINO_AVAILABLE to true or false

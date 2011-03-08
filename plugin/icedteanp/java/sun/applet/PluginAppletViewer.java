@@ -356,7 +356,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     public static final int APPLET_TIMEOUT = 180000;
 
-    private static Long requestIdentityCounter = 0L;
+    private static final Object requestMutex = new Object();
+    private static long requestIdentityCounter = 0L;
 
     private Image bufFrameImg;
     private Graphics bufFrameImgGraphics;
@@ -990,11 +991,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
      *
      *  @return A unique Long identifier for the request
      */
-    private static Long getRequestIdentifier() {
-        synchronized (requestIdentityCounter) {
-
-            if (requestIdentityCounter == Long.MAX_VALUE)
+    private static long getRequestIdentifier() {
+        synchronized(requestMutex) {
+            if (requestIdentityCounter == Long.MAX_VALUE) {
                 requestIdentityCounter = 0L;
+            }
 
             return requestIdentityCounter++;
         }
