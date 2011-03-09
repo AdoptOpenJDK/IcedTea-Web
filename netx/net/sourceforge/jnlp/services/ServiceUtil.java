@@ -282,7 +282,7 @@ public class ServiceUtil {
                 public Boolean run() {
                     boolean b = SecurityDialogs.showAccessWarningDialog(tmpType,
                                 tmpApp.getJNLPFile(), tmpExtras);
-                    return new Boolean(b);
+                    return Boolean.valueOf(b);
                 }
             });
 

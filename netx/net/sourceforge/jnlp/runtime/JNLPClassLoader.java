@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.jar.JarEntry;
@@ -853,10 +852,10 @@ public class JNLPClassLoader extends URLClassLoader {
      * calls.
      */
     protected File getNativeDir() {
+        final int rand = (int)((Math.random()*2 - 1) * Integer.MAX_VALUE);
         nativeDir = new File(System.getProperty("java.io.tmpdir")
                              + File.separator + "netx-native-"
-                             + (new Random().nextInt() & 0xFFFF));
-
+                             + (rand & 0xFFFF));
         File parent = nativeDir.getParentFile();
         if (!parent.isDirectory() && !parent.mkdirs()) {
             return null;
@@ -1328,7 +1327,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Helper class to expose protected URLClassLoader methods.
      */
 
-    public class CodeBaseClassLoader extends URLClassLoader {
+    public static class CodeBaseClassLoader extends URLClassLoader {
 
         JNLPClassLoader parentJNLPClassLoader;
         

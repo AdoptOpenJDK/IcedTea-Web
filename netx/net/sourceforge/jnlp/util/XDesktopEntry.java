@@ -72,8 +72,6 @@ public class XDesktopEntry {
      */
     public Reader getContentsAsReader() {
 
-        String pathToJavaws = System.getProperty("java.home") + File.separator + "bin"
-                + File.separator + "javaws";
         String cacheDir = JNLPRuntime.getConfiguration()
                 .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
         File cacheFile = CacheUtil.urlToPath(file.getSourceLocation(), cacheDir);

@@ -94,7 +94,7 @@ public class ResourceTracker {
     //   lock, prefetch, this.resources, each resource, listeners
 
     /** notified on initialization or download of a resource */
-    private static Object lock = new Integer(0); // used to lock static structures
+    private static final Object lock = new Object(); // used to lock static structures
 
     // shortcuts
     private static final int UNINITIALIZED = Resource.UNINITIALIZED;

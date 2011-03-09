@@ -53,8 +53,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import net.sourceforge.jnlp.JNLPFile;
-
 public class NotAllSignedWarningPane extends SecurityDialogPanel {
 
     public NotAllSignedWarningPane(SecurityDialog x) {
@@ -66,7 +64,6 @@ public class NotAllSignedWarningPane extends SecurityDialogPanel {
      * Creates the actual GUI components, and adds it to this panel
      */
     private void addComponents() {
-        JNLPFile file = parent.getFile();
 
         String topLabelText = R("SNotAllSignedSummary");
         String infoLabelText = R("SNotAllSignedDetail");

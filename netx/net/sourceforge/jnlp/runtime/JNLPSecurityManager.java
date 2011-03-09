@@ -98,9 +98,6 @@ class JNLPSecurityManager extends AWTSecurityManager {
     private WeakList<ApplicationInstance> weakApplications =
             new WeakList<ApplicationInstance>();
 
-    /** weak reference to most app who's windows was most recently activated */
-    private WeakReference activeApplication = null;
-
     /** Sets whether or not exit is allowed (in the context of the plugin, this is always false) */
     private boolean exitAllowed = true;
 
@@ -449,13 +446,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         // but when they really call, stop only the app instead of the JVM
         ApplicationInstance app = getApplication(stack, 0);
         if (app == null) {
-            // should check caller to make sure it is JFrame.close or
-            // other known System.exit call
-            if (activeApplication != null)
-                app = (ApplicationInstance) activeApplication.get();
-
-            if (app == null)
-                throw new SecurityException(R("RExitNoApp"));
+            throw new SecurityException(R("RExitNoApp"));
         }
 
         app.destroy();

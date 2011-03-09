@@ -100,7 +100,7 @@ public abstract class SecurityDialogPanel extends JPanel {
      * Creates a handler that sets a dialog's value and then disposes it when activated
      *
      */
-    private class SetValueHandler implements ActionListener {
+    private static class SetValueHandler implements ActionListener {
 
         Integer buttonIndex;
         SecurityDialog dialog;

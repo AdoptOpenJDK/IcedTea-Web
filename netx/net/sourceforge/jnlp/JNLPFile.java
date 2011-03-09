@@ -188,7 +188,7 @@ public class JNLPFile {
         this.fileLocation = location;
 
         this.uniqueKey = Calendar.getInstance().getTimeInMillis() + "-" +
-                         Math.abs(((new java.util.Random()).nextInt())) + "-" +
+                         ((int)(Math.random()*Integer.MAX_VALUE)) + "-" +
                          location;
 
         if (JNLPRuntime.isDebug())

@@ -79,9 +79,6 @@ public class Resource {
     /** the version downloaded from server */
     Version downloadVersion;
 
-    /** connection to resource */
-    URLConnection connection;
-
     /** amount in bytes transferred */
     long transferred = 0;
 

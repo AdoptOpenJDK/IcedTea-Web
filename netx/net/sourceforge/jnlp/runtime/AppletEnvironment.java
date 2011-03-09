@@ -43,14 +43,11 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     /** the JNLP file */
     private JNLPFile file;
 
-    /** the applet instance */
-    private AppletInstance appletInstance;
-
     /** the applet */
     private Applet applet;
 
     /** the parameters */
-    private Map parameters;
+    private Map<String, String> parameters;
 
     /** the applet container */
     private Container cont;
@@ -70,7 +67,6 @@ public class AppletEnvironment implements AppletContext, AppletStub {
      */
     public AppletEnvironment(JNLPFile file, final AppletInstance appletInstance, Container cont) {
         this.file = file;
-        this.appletInstance = appletInstance;
         this.applet = appletInstance.getApplet();
 
         parameters = file.getApplet().getParameters();

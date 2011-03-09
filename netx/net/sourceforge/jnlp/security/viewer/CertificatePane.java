@@ -299,7 +299,7 @@ public class CertificatePane extends JPanel {
     }
 
     /** Allows storing KeyStores.Types in a JComponent */
-    private class CertificateType {
+    private static class CertificateType {
         private final KeyStores.Type type;
 
         public CertificateType(KeyStores.Type type) {

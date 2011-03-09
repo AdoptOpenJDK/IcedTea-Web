@@ -425,9 +425,6 @@ public class JarSigner implements CertVerifier {
             details.add(detail);
     }
 
-    Hashtable<Certificate, String> storeHash =
-            new Hashtable<Certificate, String>();
-
     /**
      * signature-related files include:
      * . META-INF/MANIFEST.MF

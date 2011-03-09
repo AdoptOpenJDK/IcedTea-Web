@@ -31,10 +31,10 @@ import net.sourceforge.jnlp.cache.*;
 public class DownloadEvent extends EventObject {
 
     /** the tracker */
-    private ResourceTracker tracker;
+    transient private ResourceTracker tracker;
 
     /** the resource */
-    private Resource resource;
+    transient private Resource resource;
 
     /**
      * Creates a launch event for the specified application

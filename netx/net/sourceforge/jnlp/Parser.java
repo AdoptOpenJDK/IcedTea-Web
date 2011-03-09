@@ -336,7 +336,6 @@ class Parser {
         String part = getAttribute(node, "part", null);
         boolean main = "true".equals(getAttribute(node, "main", "false"));
         boolean lazy = "lazy".equals(getAttribute(node, "download", "eager"));
-        int size = Integer.parseInt(getAttribute(node, "size", "0"));
 
         if (nativeJar && main)
             if (strict)

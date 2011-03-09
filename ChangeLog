@@ -1,3 +1,45 @@
+2011-03-09  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Parser.java
+	(getJAR): Remove unused variable.
+	* netx/net/sourceforge/jnlp/cache/Resource.java
+	(connection): Remove unused member.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+	(lock): Initialize to Object() instead of Integer(0). Also,
+	make final.
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java
+	(SettingsPanel): Make static class.
+	* netx/net/sourceforge/jnlp/event/ApplicationEvent.java
+	(application): Make member transient.
+	* netx/net/sourceforge/jnlp/event/DownloadEvent.java
+	(tracker, resource): Make members transient.
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java
+	(appletInstance): Remove unused member.
+	(parameters): Add parameters to its type (a map).
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	Remove unused import.
+	(getNativeDir): Improve random int computation.
+	(CodeBaseClassLoader): Make it a static class.
+	* netx/net/sourceforge/jnlp/JNLPFile.java
+	(JNLPFile): Improve random positive int computation.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java
+	(activeApplication): Remove unused member.
+	(checkExit): Remove dead code resulting from activeApplication
+	always being null.
+	* netx/net/sourceforge/jnlp/security/NotAllSignedWarningPane.java
+	Remove unused import.
+	(addComponents): Remove unused variable.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogPanel.java
+	(SetValueHandler): Make it a static class.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	(CertificateType): Make it a static class.
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java
+	(checkAccess): Replace new Boolean with Boolean.valueOf.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java
+	(storeHash): Remove unused member.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java
+	(getContentsAsReader): Remove unused variable pathToJavaws.
+
 2011-03-09  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/SecuritySettingsPanel.java:

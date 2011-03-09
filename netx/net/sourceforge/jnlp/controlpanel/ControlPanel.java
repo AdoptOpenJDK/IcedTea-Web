@@ -71,7 +71,7 @@ public class ControlPanel extends JFrame {
      * @author @author Andrew Su (asu@redhat.com, andrew.su@utoronto.ca)
      * 
      */
-    private class SettingsPanel {
+    private static class SettingsPanel {
         final String value;
         final JPanel panel;
 
