@@ -91,7 +91,7 @@ public class SecuritySettingsPanel extends NamedBorderPanel implements ActionLis
 
         JCheckBox[] securityGeneralOptions = { new JCheckBox(Translator.R("SGPAllowUserGrantSigned")),
                 new JCheckBox(Translator.R("SGPAllowUserGrantUntrust")),
-                new JCheckBox(Translator.R("SGpUseBrowserKeystore")),
+                new JCheckBox(Translator.R("SGPUseBrowserKeystore")),
                 new JCheckBox(Translator.R("SGPUsePersonalCertOneMatch")),
                 new JCheckBox(Translator.R("SGPWarnCertHostMismatch")),
                 new JCheckBox(Translator.R("SGPShowValid")),

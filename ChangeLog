@@ -1,3 +1,8 @@
+2011-03-09  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/SecuritySettingsPanel.java:
+	(addComponents): Fix typo.
+
 2011-03-08  Omair Majid  <omajid@redhat.com>
 
 	* acinclude.m4 (IT_FIND_OPTIONAL_JAR): New macro.
