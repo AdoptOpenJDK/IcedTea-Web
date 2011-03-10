@@ -1,3 +1,9 @@
+2011-03-10  Omair Majid  <omajid@redhat.com>
+
+	* tests/netx/pac/pac-funcs-test.js
+	(main): Make test summary output more jtreg-like.
+	(runTests): Change test output format to be more jtreg-like.
+
 2011-03-09  Denis Lila  <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Parser.java

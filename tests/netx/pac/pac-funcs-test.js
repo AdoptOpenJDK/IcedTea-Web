@@ -25,17 +25,15 @@ function main() {
 	testDateRange();
 	testTimeRange();
 
-	java.lang.System.out.println(testsFailed + " of " + (testsFailed + testsPassed) + " tests failed");
+	java.lang.System.out.println("Test results: passed: " + testsPassed + "; failed: " + testsFailed + ";");
 }
 
 function runTests(name, tests) {
-	java.lang.System.out.println("Testing: " + name.name);
 
 	var undefined_var;
 
 	for ( var i = 0; i < tests.length; i++) {
 
-		java.lang.System.out.print("Test " + (i + 1) + ": ");
 		var expectedVal = tests[i][0];
 		var args = tests[i].slice(1);
 		var returnVal;
@@ -45,12 +43,11 @@ function runTests(name, tests) {
 			returnVal = e;
 		}
 		if (returnVal === expectedVal) {
-			java.lang.System.out.println("Passed.");
+			java.lang.System.out.println("Passed: " + name.name + "(" + args.join(", ") + ")");
 			testsPassed++;
 		} else {
-			java.lang.System.out.println("FAILED.");
-            java.lang.System.out.println(name.name + "(" + args.join(", ") + ")");
-			java.lang.System.out.println("Expected '" + expectedVal + "' but got '" + returnVal + "'");
+			java.lang.System.out.println("FAILED: " + name.name + "(" + args.join(", ") + ")");
+			java.lang.System.out.println("        Expected '" + expectedVal + "' but got '" + returnVal + "'");
 			testsFailed++;
 		}
 	}
