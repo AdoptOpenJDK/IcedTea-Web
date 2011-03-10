@@ -1,5 +1,9 @@
 2011-03-10  Omair Majid  <omajid@redhat.com>
 
+	* acinclude.m4 (IT_FIND_RHINO_JAR): Remove.
+
+2011-03-10  Omair Majid  <omajid@redhat.com>
+
 	* tests/netx/pac/pac-funcs-test.js
 	(main): Make test summary output more jtreg-like.
 	(runTests): Change test output format to be more jtreg-like.

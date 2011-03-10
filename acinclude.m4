@@ -323,62 +323,6 @@ AC_DEFUN([IT_FIND_OPTIONAL_JAR],
   AC_SUBST($2_AVAILABLE)
 ])
 
-AC_DEFUN([IT_FIND_RHINO_JAR],
-[
-  AC_MSG_CHECKING([whether to include Javascript support via Rhino])
-  AC_ARG_WITH([rhino],
-              [AS_HELP_STRING(--with-rhino,specify location of the rhino jar)],
-  [
-    case "${withval}" in
-      yes)
-        RHINO_JAR=yes
-        ;;
-      no)
-        RHINO_JAR=no
-        ;;
-      *)
-        if test -f "${withval}"; then
-          RHINO_JAR="${withval}"
-        elif test -z "${withval}"; then
-          RHINO_JAR=yes
-        else
-          AC_MSG_RESULT([not found])
-          AC_MSG_ERROR("The rhino jar ${withval} was not found.")
-        fi
-    ;;
-     esac
-  ],
-  [
-    RHINO_JAR=yes
-  ])
-  if test x"${RHINO_JAR}" = "xyes"; then
-    if test -e "/usr/share/java/rhino.jar"; then
-      RHINO_JAR=/usr/share/java/rhino.jar
-    elif test -e "/usr/share/java/js.jar"; then
-      RHINO_JAR=/usr/share/java/js.jar
-    elif test -e "/usr/share/rhino-1.6/lib/js.jar"; then
-      RHINO_JAR=/usr/share/rhino-1.6/lib/js.jar
-    fi
-    if test x"${RHINO_JAR}" = "xyes"; then
-      AC_MSG_RESULT([not found])
-      AC_MSG_ERROR("A rhino jar was not found in /usr/share/java as either rhino.jar or js.jar.")
-    fi
-  fi
-  AC_MSG_RESULT(${RHINO_JAR})
-  AM_CONDITIONAL(WITH_RHINO, test x"${RHINO_JAR}" != "xno")
-dnl Clear RHINO_JAR if it doesn't contain a valid filename
-  if test x"${RHINO_JAR}" = "xno"; then
-    RHINO_JAR=
-  fi
-  if test -n ${RHINO_JAR} ; then
-    RHINO_AVAILABLE=true
-  else
-    RHINO_AVAILABLE=false
-  fi
-  AC_SUBST(RHINO_JAR)
-  AC_SUBST(RHINO_AVAILABLE)
-])
-
 AC_DEFUN_ONCE([IT_CHECK_PLUGIN],
 [
 AC_MSG_CHECKING([whether to build the browser plugin])
