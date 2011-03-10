@@ -74,7 +74,7 @@ public class CommandLine {
      * Creates a new instance
      */
     public CommandLine() {
-        PROGRAM_NAME = System.getProperty("program.name");
+        PROGRAM_NAME = System.getProperty("icedtea-web.bin.name");
 
         config = new DeploymentConfiguration();
         try {

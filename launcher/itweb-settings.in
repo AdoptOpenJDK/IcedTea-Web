@@ -1,0 +1,15 @@
+#!/bin/bash
+
+JAVA=@JAVA@
+LAUNCHER_BOOTCLASSPATH=@LAUNCHER_BOOTCLASSPATH@
+LAUNCHER_FLAGS=-Xms8m
+CLASSNAME=net.sourceforge.jnlp.controlpanel.CommandLine
+BINARY_LOCATION=@ITWEB_SETTINGS_BIN_LOCATION@
+PROGRAM_NAME=itweb-settings
+
+${JAVA} ${LAUNCHER_BOOTCLASSPATH} ${LAUNCHER_FLAGS} \
+  -Dicedtea-web.bin.name=${PROGRAM_NAME} \
+  -Dicedtea-web.bin.location=${BINARY_LOCATION} \
+  ${CLASSNAME} \
+  $@
+

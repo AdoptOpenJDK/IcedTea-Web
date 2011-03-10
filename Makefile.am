@@ -25,7 +25,7 @@ IT_CLASS_TARGET_VERSION=6
 IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
 
 JRE='"$(SYSTEM_JDK_DIR)/jre"'
-LAUNCHER_BOOTCLASSPATH="-J-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
+LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
 PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
 
 # Fake update version to shut up the plugin detector hosted by Oracle.
@@ -72,40 +72,36 @@ JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m -J-XX:PermSize=32m -J-XX:MaxPermSize=160
 endif
 endif
 
-# Launcher
-
-LAUNCHER_SRCDIR = $(abs_top_srcdir)/launcher
-LAUNCHER_OBJECTS = java.o java_md.o splashscreen_stubs.o jli_util.o parse_manifest.o version_comp.o wildcard.o
-NETX_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/,$(LAUNCHER_OBJECTS))
-CONTROLPANEL_LAUNCHER_OBJECTS = $(addprefix $(NETX_DIR)/launcher/controlpanel/,$(LAUNCHER_OBJECTS))
-LAUNCHER_FLAGS = -O2 -fno-strict-aliasing -fPIC -pthread -W -Wall -Wno-unused -Wno-parentheses -pipe -fno-omit-frame-pointer \
-	-g -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -D_REENTRANT -DLAUNCHER_NAME='"java"' -I$(LAUNCHER_SRCDIR) \
-	-DJDK_MAJOR_VERSION='"1"' -DJDK_MINOR_VERSION='"6"' -DLIBARCHNAME='"$(JRE_ARCH_DIR)"' \
-	-DEXPAND_CLASSPATH_WILDCARDS
-LAUNCHER_LINK = -o $@ -pthread -Xlinker -O1 -Xlinker -z -Xlinker defs -L$(BOOT_DIR)/lib/$(INSTALL_ARCH_DIR) \
-	-Wl,-soname=lib.so -Wl,-z -Wl,origin -Wl,--allow-shlib-undefined $(X11_CFLAGS) $(X11_LIBS) -ldl -lz
 PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
  itweb-settings.desktop.in
 
+# the launcher needs to know $(bindir) and $(datadir) which can be different at
+# make-time from configure-time
+edit_launcher_script = sed \
+  -e 's|[@]LAUNCHER_BOOTCLASSPATH[@]|$(LAUNCHER_BOOTCLASSPATH)|g' \
+  -e 's|[@]JAVAWS_BIN_LOCATION[@]|$(bindir)/javaws|g' \
+  -e 's|[@]ITWEB_SETTINGS_BIN_LOCATION[@]|$(bindir)/itweb-settings|g' \
+  -e 's|[@]JAVA[@]|$(JAVA)|g'
+
 # Top-Level Targets
 # =================
 
-all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp $(NETX_DIR)/launcher/javaws \
- javaws.desktop stamps/docs.stamp $(NETX_DIR)/launcher/controlpanel/itweb-settings itweb-settings.desktop
+all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/javaws \
+ javaws.desktop stamps/docs.stamp launcher.build/itweb-settings itweb-settings.desktop
 
 check-local: check-pac-functions
 
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
- clean-native-ecj clean-desktop-files clean-docs clean-tests
+ clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-tests
 	if [ -e stamps ] ; then \
 	  rmdir stamps ; \
 	fi
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs \
- clean-tests check-local
+ clean-tests check-local clean-launchers
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir)
@@ -114,9 +110,9 @@ if ENABLE_PLUGIN
 	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/javaws $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/javaws $(DESTDIR)$(bindir)
 	${INSTALL_DATA} extra-lib/about.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
-	${INSTALL_PROGRAM} $(NETX_DIR)/launcher/controlpanel/itweb-settings $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/itweb-settings $(DESTDIR)$(bindir)
 
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(mandir)/man1
@@ -322,23 +318,20 @@ clean-extra:
 extra-lib/about.jar: stamps/extra-class-files.stamp
 	$(BOOT_DIR)/bin/jar cf $@ -C extra-lib net ;
 
-$(NETX_DIR)/launcher/%.o: $(LAUNCHER_SRCDIR)/%.c
-	mkdir -p $(NETX_DIR)/launcher && \
-	$(CC) $(LAUNCHER_FLAGS) \
-	  -DJAVA_ARGS='{ $(LAUNCHER_BOOTCLASSPATH), "-J-ms8m", "-J-Djava.icedtea-web.bin=$(DESTDIR)$(bindir)/javaws", "net.sourceforge.jnlp.runtime.Boot",  }' \
-	  -DICEDTEA_WEB_JRE=$(JRE) -DPROGNAME='"javaws"' -c -o $@ $<
+launcher.build/javaws: launcher/javaws.in
+	mkdir -p launcher.build
+	$(edit_launcher_script) < $< > $@
 
-$(NETX_DIR)/launcher/controlpanel/%.o: $(LAUNCHER_SRCDIR)/%.c
-	mkdir -p $(NETX_DIR)/launcher/controlpanel && \
-	$(CC) $(LAUNCHER_FLAGS) \
-	-DJAVA_ARGS='{ $(LAUNCHER_BOOTCLASSPATH), "-J-ms8m", "-Dprogram.name=itweb-settings", "net.sourceforge.jnlp.controlpanel.CommandLine",  }' \
-	-DICEDTEA_WEB_JRE=$(JRE) -DPROGNAME='"itweb-settings"' -c -o $@ $<
+launcher.build/itweb-settings: launcher/itweb-settings.in
+	mkdir -p launcher.build
+	$(edit_launcher_script) < $< > $@
 
-$(NETX_DIR)/launcher/javaws: $(NETX_LAUNCHER_OBJECTS)
-	$(CC) $(NETX_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
-
-$(NETX_DIR)/launcher/controlpanel/itweb-settings: $(CONTROLPANEL_LAUNCHER_OBJECTS)
-	$(CC) $(CONTROLPANEL_LAUNCHER_OBJECTS) $(LAUNCHER_LINK)
+clean-launchers:
+	rm -f launcher.build/javaws
+	rm -f launcher.build/itweb-settings
+	if [ -e launcher.build ] ; then \
+	  rmdir launcher.build ; \
+	fi
 
 javaws.desktop: javaws.desktop.in
 	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < $(srcdir)/javaws.desktop.in > javaws.desktop

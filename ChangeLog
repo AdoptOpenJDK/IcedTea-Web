@@ -1,5 +1,35 @@
 2011-03-10  Omair Majid  <omajid@redhat.com>
 
+	Replace native launchers with shell scripts
+	* NEWS: Update.
+	* Makefile.am
+	(LAUNCHER_BOOTCLASSPATH): Remove leading -J.
+	(LAUNCHER_SRCDIR),
+	(LAUNCHER_OBJECTS),
+	(NETX_LAUNCHER_OBJECTS),
+	(CONTROLPANEL_LAUNCHER_OBJECTS),
+	(LAUNCHER_FLAGS),
+	(LAUNCHER_LINK): Remove.
+	(edit_launcher_script): New function.
+	(all-local): Depend on new launcher targets.
+	(clean-local): Depend on clean-launchers.
+	(.PHONY): Add clean-launchers.
+	(install-exec-local): Use new launcher paths.
+	(clean-launchers): New target.
+	($(NETX_DIR)/launcher/%.o),
+	($(NETX_DIR)/launcher/controlpanel/%.o),
+	($(NETX_DIR)/launcher/javaws),
+	($(NETX_DIR)/launcher/controlpanel/itweb-settings): Remove.
+	(launcher.build/javaws): New launcher.
+	(launcher.build/itweb-settings): Likewise.
+	* launcher/itweb-settings.in,
+	* launcher/javaws.in: New file.
+	* netx/net/sourceforge/jnlp/Launcher.java (launchExternal),
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java (CommandLine):
+	Use new system properties to find paths and program names.
+
+2011-03-10  Omair Majid  <omajid@redhat.com>
+
 	* acinclude.m4 (IT_FIND_RHINO_JAR): Remove.
 
 2011-03-10  Omair Majid  <omajid@redhat.com>
