@@ -100,7 +100,7 @@ function testIsResolvable() {
     var tests = [
         [ true, "icedtea.classpath.org", "icedtea.classpath.org" ],
         [ true, "classpath.org" ],
-        [ false, "icedtea" ],
+        [ false, "NotIcedTeaHost" ],
         [ false, "foobar.classpath.org" ],
         [ false, "icedtea.classpath.com" ]
     ];

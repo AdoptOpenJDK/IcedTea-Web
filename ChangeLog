@@ -1,3 +1,9 @@
+2011-03-10  Mark Wielaard  <mark@klomp.org>
+
+	* tests/netx/pac/pac-funcs-test.js (testIsResolvable):
+	Change single host name icedtea to NotIcedTeaHost
+	to make sure it really isn't resolvable.
+
 2011-03-10  Omair Majid  <omajid@redhat.com>
 
 	Replace native launchers with shell scripts
