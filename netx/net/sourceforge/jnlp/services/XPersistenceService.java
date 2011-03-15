@@ -93,7 +93,8 @@ class XPersistenceService implements PersistenceService {
         checkLocation(location);
 
         File file = toCacheFile(location);
-        file.getParentFile().mkdirs();
+        FileUtils.createParentDir(file, "Persistence store for "
+                    + location.toString());
 
         if (file.exists())
             throw new IOException("File already exists.");
@@ -110,7 +111,7 @@ class XPersistenceService implements PersistenceService {
     public void delete(URL location) throws MalformedURLException, IOException {
         checkLocation(location);
 
-        toCacheFile(location).delete();
+        FileUtils.deleteWithErrMesg(toCacheFile(location), " tocache");
     }
 
     /**
@@ -124,7 +125,8 @@ class XPersistenceService implements PersistenceService {
         if (!file.exists())
             throw new FileNotFoundException("Persistence store for "
                     + location.toString() + " is not found.");
-        file.getParentFile().mkdirs();
+        FileUtils.createParentDir(file, "Persistence store for "
+                    + location.toString());
 
         return (FileContents) ServiceUtil.createPrivilegedProxy(FileContents.class, new XFileContents(file));
     }

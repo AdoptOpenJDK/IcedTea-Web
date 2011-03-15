@@ -96,6 +96,59 @@ public final class FileUtils {
     }
 
     /**
+     * Tries to create the ancestor directories of file f. Throws
+     * an IOException if it can't be created (but not if it was
+     * already there).
+     * @param f
+     * @param eMsg - the message to use for the exception. null
+     * if the file name is to be used.
+     * @throws IOException if the directory can't be created and doesn't exist.
+     */
+    public static void createParentDir(File f, String eMsg) throws IOException {
+        File parent = f.getParentFile();
+        if (!parent.isDirectory() && !parent.mkdirs()) {
+            throw new IOException(R("RCantCreateDir",
+                    eMsg == null ? parent : eMsg));
+        }
+    }
+
+    /**
+     * Tries to create the ancestor directories of file f. Throws
+     * an IOException if it can't be created (but not if it was
+     * already there).
+     * @param f
+     * @throws IOException if the directory can't be created and doesn't exist.
+     */
+    public static void createParentDir(File f) throws IOException {
+        createParentDir(f, null);
+    }
+
+    /**
+     * Tries to delete file f. If the file exists but couldn't be deleted,
+     * print an error message to stderr with the file name, or eMsg if eMsg
+     * is not null.
+     * @param f the file to be deleted
+     * @param eMsg the message to print on failure (or null to print the
+     * the file name).
+     */
+    public static void deleteWithErrMesg(File f, String eMsg) {
+        if (f.exists()) {
+            if (!f.delete()) {
+                System.err.println(R("RCantDeleteFile", eMsg == null ? f : eMsg));
+            }
+        }
+    }
+
+    /**
+     * Tries to delete file f. If the file exists but couldn't be deleted,
+     * print an error message to stderr with the file name.
+     * @param f the file to be deleted
+     */
+    public static void deleteWithErrMesg(File f) {
+        deleteWithErrMesg(f, null);
+    }
+
+    /**
      * Creates a new file or directory with minimum permissions. The file is not
      * readable or writable by anyone other than the owner. If writeableByOnwer
      * is false, even the owner can not write to it. If isDir is true, then the
@@ -120,21 +173,29 @@ public final class FileUtils {
         }
 
         // remove all permissions
-        tempFile.setExecutable(false, false);
-        tempFile.setReadable(false, false);
-        tempFile.setWritable(false, false);
+        if (!tempFile.setExecutable(false, false)) {
+            throw new IOException(R("RRemoveXPermFailed", tempFile));
+        }
+        if (!tempFile.setReadable(false, false)) {
+            throw new IOException(R("RRemoveRPermFailed", tempFile));
+        }
+        if (!tempFile.setWritable(false, false)) {
+            throw new IOException(R("RRemoveWPermFailed", tempFile));
+        }
 
         // allow owner to read
-        tempFile.setReadable(true, true);
+        if (!tempFile.setReadable(true, true)) {
+            throw new IOException(R("RGetRPermFailed", tempFile));
+        }
 
         // allow owner to write
-        if (writableByOwner) {
-            tempFile.setWritable(true, true);
+        if (writableByOwner && !tempFile.setWritable(true, true)) {
+            throw new IOException(R("RGetWPermFailed", tempFile));
         }
 
         // allow owner to enter directories
-        if (isDir) {
-            tempFile.setExecutable(true, true);
+        if (isDir && !tempFile.setExecutable(true, true)) {
+            throw new IOException(R("RGetXPermFailed", tempFile));
         }
 
         // rename this file. Unless the file is moved/renamed, any program that

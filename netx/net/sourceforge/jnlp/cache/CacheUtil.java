@@ -291,7 +291,7 @@ public class CacheUtil {
             String cacheDir = JNLPRuntime.getConfiguration()
                     .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
             File localFile = urlToPath(source, cacheDir);
-            localFile.getParentFile().mkdirs();
+            FileUtils.createParentDir(localFile);
 
             return localFile;
         } catch (Exception ex) {

@@ -39,6 +39,8 @@ package net.sourceforge.jnlp.cache;
 import java.io.File;
 import java.util.ArrayList;
 
+import net.sourceforge.jnlp.util.FileUtils;
+
 public class CacheDirectory {
     /**
      * Get the structure of directory for keeping track of the protocol and
@@ -103,7 +105,7 @@ public class CacheDirectory {
         if (parent.getParent() == null)
             return; // Don't delete the root.
         if (parent.getChildren().size() == 0) {
-            parent.getFile().delete();
+            FileUtils.deleteWithErrMesg(parent.getFile());
             parent.getParent().removeChild(parent);
             cleanParent(parent);
         }

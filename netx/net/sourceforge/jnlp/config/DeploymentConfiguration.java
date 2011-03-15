@@ -38,6 +38,7 @@ import java.util.Set;
 import javax.naming.ConfigurationException;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.FileUtils;
 
 /**
  * Manages the various properties and configuration related to deployment.
@@ -518,7 +519,7 @@ public final class DeploymentConfiguration {
             }
         }
 
-        userPropertiesFile.getParentFile().mkdirs();
+        FileUtils.createParentDir(userPropertiesFile);
         OutputStream out = new BufferedOutputStream(new FileOutputStream(userPropertiesFile));
         try {
             toSave.store(out, DEPLOYMENT_COMMENT);

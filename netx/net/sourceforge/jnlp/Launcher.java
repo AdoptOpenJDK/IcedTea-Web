@@ -709,7 +709,7 @@ public class Launcher {
             File netxRunningFile = new File(JNLPRuntime.getConfiguration()
                     .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
             if (!netxRunningFile.exists()) {
-                netxRunningFile.getParentFile().mkdirs();
+                FileUtils.createParentDir(netxRunningFile);
                 FileUtils.createRestrictedFile(netxRunningFile, true);
                 FileOutputStream fos = new FileOutputStream(netxRunningFile);
                 try {

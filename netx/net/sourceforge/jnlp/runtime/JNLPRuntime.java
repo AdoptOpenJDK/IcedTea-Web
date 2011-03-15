@@ -277,10 +277,10 @@ public class JNLPRuntime {
 
             try {
                 File errFile = new File(logDir, JNLPRuntime.STDERR_FILE);
-                errFile.getParentFile().mkdirs();
+                FileUtils.createParentDir(errFile);
                 FileUtils.createRestrictedFile(errFile, true);
                 File outFile = new File(logDir, JNLPRuntime.STDOUT_FILE);
-                outFile.getParentFile().mkdirs();
+                FileUtils.createParentDir(outFile);
                 FileUtils.createRestrictedFile(outFile, true);
 
                 if (redirectStreams) {

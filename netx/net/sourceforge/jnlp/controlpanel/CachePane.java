@@ -43,6 +43,7 @@ import net.sourceforge.jnlp.cache.CacheDirectory;
 import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.FileUtils;
 
 public class CachePane extends JPanel {
 
@@ -132,7 +133,7 @@ public class CachePane extends JPanel {
                     DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
                     if (fileNode.getFile().delete()) {
                         fileNode.getParent().removeChild(fileNode);
-                        fileNode.getInfoFile().delete();
+                        FileUtils.deleteWithErrMesg(fileNode.getInfoFile());
                         ((DefaultTableModel) cacheTable.getModel()).removeRow(modelRow);
                         cacheTable.getSelectionModel().setSelectionInterval(row, row);
                         CacheDirectory.cleanParent(fileNode);

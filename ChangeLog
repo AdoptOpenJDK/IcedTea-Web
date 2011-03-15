@@ -1,3 +1,27 @@
+2011-03-15  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java
+	(markNetxRunning): Throw exception if directories can't be created.
+	* netx/net/sourceforge/jnlp/cache/CacheDirectory.java
+	(cleanParent): Print error message if file can't be deleted.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java
+	(getCacheFile): Throw exception if directories can't be created.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java
+	(save): Throw exception if directories can't be created.
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java
+	(createButtonPanel): Print error message if file can't be deleted.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties
+	Added messages.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initializeStreams): Throw exception if directories can't be created.
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java
+	(create, get): Throw exception if directories can't be created.
+	(delete): Print error message if file can't be deleted.
+	* netx/net/sourceforge/jnlp/util/FileUtils.java
+	(createRestrictedFile): Throw exception if file permissions can't be
+	changed.
+	(createParentDir, deleteWithErrMesg): new functions.
+
 2011-03-15  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (LAUNCHER_BOOTCLASSPATH, PLUGIN_BOOTCLASSPATH)
