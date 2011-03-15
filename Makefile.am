@@ -25,8 +25,8 @@ IT_CLASS_TARGET_VERSION=6
 IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
 
 JRE='"$(SYSTEM_JDK_DIR)/jre"'
-LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
-PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
+LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
+PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
 
 # Fake update version to shut up the plugin detector hosted by Oracle.
 # If Oracle ever release a JDK update greater than 50, this needs to be increased.
@@ -334,10 +334,10 @@ clean-launchers:
 	fi
 
 javaws.desktop: javaws.desktop.in
-	sed "s#PATH_TO_JAVAWS#$(DESTDIR)$(bindir)/javaws#" < $(srcdir)/javaws.desktop.in > javaws.desktop
+	sed "s#PATH_TO_JAVAWS#$(bindir)/javaws#" < $(srcdir)/javaws.desktop.in > javaws.desktop
 
 itweb-settings.desktop: $(srcdir)/itweb-settings.desktop.in
-	sed "s#PATH_TO_ITWEB_SETTINGS#$(DESTDIR)$(bindir)/itweb-settings#" \
+	sed "s#PATH_TO_ITWEB_SETTINGS#$(bindir)/itweb-settings#" \
 	  < $(srcdir)/itweb-settings.desktop.in > itweb-settings.desktop
 
 # documentation

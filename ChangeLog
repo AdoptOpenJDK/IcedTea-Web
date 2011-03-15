@@ -1,3 +1,8 @@
+2011-03-15  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am (LAUNCHER_BOOTCLASSPATH, PLUGIN_BOOTCLASSPATH)
+	(javaws.desktop, itweb-settings.desktop): Remove DESTDIR.
+
 2011-03-10  Mark Wielaard  <mark@klomp.org>
 
 	* tests/netx/pac/pac-funcs-test.js (testIsResolvable):
