@@ -1,4 +1,13 @@
-2011-03-02  Jiri Vanek  <jvanek@redhat.com>
+2011-03-16  Jiri Vanek  <jvanek@redhat.com>
+
+	* extras/net/sourceforge/jnlp/about/Main.java: removed hyperlinkUpdate 
+	and HyperlinkListener, as it can not work without all-permissions. 
+	Also all createAndShowGUI was shorten for call from  
+	net.sourceforge.jnlp package. Html resources were redirected to javaws
+	* netx/net/sourceforge/jnlp/resources/about.jnlp: removed 
+	<all-permissions>
+
+2011-03-16  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: getAboutFile changed to 
 	return path to local about.jnlp instead to  inner-from-jar

@@ -41,23 +41,18 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
-import net.sourceforge.jnlp.Launcher;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-public class Main extends JPanel implements HyperlinkListener {
+public class Main extends JPanel  {
 
-	private final String notes = "/net/sourceforge/jnlp/about/resources/notes.html";
-	private final String apps = "/net/sourceforge/jnlp/about/resources/applications.html";
-	private final String about = "/net/sourceforge/jnlp/about/resources/about.html";
+	private final String notes = "/net/sourceforge/javaws/about/resources/notes.html";
+	private final String apps = "/net/sourceforge/javaws/about/resources/applications.html";
+	private final String about = "/net/sourceforge/javaws/about/resources/about.html";
 	JTabbedPane tabbedPane;
 
 	public Main() throws IOException {
@@ -67,7 +62,7 @@ public class Main extends JPanel implements HyperlinkListener {
 		HTMLPanel appsPanel = new HTMLPanel(getClass().getResource(apps));
 		HTMLPanel aboutPanel = new HTMLPanel(getClass().getResource(about));
 		
-		appsPanel.pane.addHyperlinkListener(this);
+	
 		
 		tabbedPane = new JTabbedPane();
 
@@ -80,7 +75,6 @@ public class Main extends JPanel implements HyperlinkListener {
 	}
 
 	private static void createAndShowGUI() {
-		JNLPRuntime.setExitClass(Main.class);
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -119,17 +113,5 @@ public class Main extends JPanel implements HyperlinkListener {
 		});
 	}
 
-	public void hyperlinkUpdate(HyperlinkEvent e) {
-		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-			URL url = e.getURL();
 
-			Launcher launcher = new Launcher(
-					JNLPRuntime.getDefaultLaunchHandler());
-			try {
-				launcher.launchBackground(url);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
 }
