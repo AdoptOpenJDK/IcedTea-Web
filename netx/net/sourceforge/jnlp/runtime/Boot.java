@@ -218,8 +218,19 @@ public final class Boot implements PrivilegedAction<Void> {
             cl = ClassLoader.getSystemClassLoader();
         }
         try {
-            return cl.getResource("net/sourceforge/jnlp/resources/about.jnlp").toString();
-        } catch (Exception e) {
+                    //extracts full path to about.jnlp
+            String s = cl.getResource("net/sourceforge/jnlp/runtime/Boot.class").toString();
+            s=s.substring(0,s.indexOf("!"));
+            s=s.substring(s.indexOf(":")+1);
+            s=s.substring(s.indexOf(":")+1);
+            s="file://"+s.replace("netx.jar","about.jnlp");
+            if (JNLPRuntime.isDebug()){
+                System.out.println("Using " + s + " as about.jnlp URL");
+            }
+
+            return s;
+         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

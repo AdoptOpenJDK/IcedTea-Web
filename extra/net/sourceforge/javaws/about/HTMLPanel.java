@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.about;
+package net.sourceforge.javaws.about;
 
 import java.awt.BorderLayout;
 import java.io.IOException;

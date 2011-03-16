@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0" href="about.jnlp" codebase="http://icedtea.classpath.org/netx/">
+<jnlp spec="1.0" href="about.jnlp" codebase=".">
   <information>
     <title>About window for NetX</title>
     <vendor>NetX</vendor>
@@ -11,10 +11,7 @@
     <j2se version="1.4+"/>
     <jar href="about.jar"/>
   </resources>
-  <security>
-    <all-permissions/>
-  </security>
-  <application-desc main-class="net.sourceforge.jnlp.about.Main">
+  <application-desc main-class="net.sourceforge.javaws.about.Main">
   </application-desc>
 </jnlp>
 

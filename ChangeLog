@@ -1,3 +1,14 @@
+2011-03-02  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: getAboutFile changed to 
+	return path to local about.jnlp instead to  inner-from-jar
+	* extras/net/sourceforge/jnlp/: refactored to 
+	extras/net/sourceforge/javaws/, as /net/sourceforge/jnlp/ package 
+	must be run with all-permissions.
+	* netx/net/sourceforge/jnlp/resources/about.jnlp: codebase changed 
+	to "."
+
+
 2011-03-15  Denis Lila  <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Launcher.java

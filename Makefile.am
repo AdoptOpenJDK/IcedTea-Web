@@ -3,7 +3,8 @@
 NETX_DIR = $(abs_top_builddir)/netx.build
 NETX_SRCDIR = $(abs_top_srcdir)/netx
 NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
-NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/jnlp/about/resources
+NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/javaws/about/resources
+NETX_EXTRA_DIST_DIR=$(abs_top_builddir)/extra-lib/net/sourceforge/javaws/about/resources
 
 # Build directories
 
@@ -305,7 +306,7 @@ stamps/extra-class-files.stamp: extra-source-files.txt stamps/netx.stamp
 	 for files in $$(find . -type f); \
 	 do \
 	   ${INSTALL_DATA} -D $${files} \
-	   ${abs_top_builddir}/extra-lib/net/sourceforge/jnlp/about/resources/$${files}; \
+	   $(NETX_EXTRA_DIST_DIR)/$${files}; \
 	 done)
 	mkdir -p stamps
 	touch $@
