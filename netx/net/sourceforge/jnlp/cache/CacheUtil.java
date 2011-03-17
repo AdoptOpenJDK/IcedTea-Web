@@ -165,23 +165,20 @@ public class CacheUtil {
         try {
             if (otherJavawsRunning.isFile()) {
                 FileOutputStream fis = new FileOutputStream(otherJavawsRunning);
-                try {
-                    FileChannel channel = fis.getChannel();
-                    if (channel.tryLock() == null) {
-                        if (JNLPRuntime.isDebug()) {
-                            System.out.println("Other instances of netx are running");
-                        }
-                        return false;
-                    }
-
+                
+                FileChannel channel = fis.getChannel();
+                if (channel.tryLock() == null) {
                     if (JNLPRuntime.isDebug()) {
-                        System.out.println("No other instances of netx are running");
+                        System.out.println("Other instances of netx are running");
                     }
-                    return true;
-
-                } finally {
-                    fis.close();
+                    return false;
                 }
+
+                if (JNLPRuntime.isDebug()) {
+                    System.out.println("No other instances of netx are running");
+                }
+                return true;
+
             } else {
                 if (JNLPRuntime.isDebug()) {
                     System.out.println("No instance file found");

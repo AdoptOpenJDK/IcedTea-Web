@@ -19,6 +19,8 @@ package net.sourceforge.jnlp.runtime;
 import java.io.*;
 import java.net.Authenticator;
 import java.net.ProxySelector;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.awt.*;
 import java.text.*;
 import java.util.*;
@@ -121,6 +123,9 @@ public class JNLPRuntime {
 
     /** contains the arguments passed to the jnlp runtime */
     private static List<String> initialArguments;
+
+    /** a lock which is held to indicate that an instance of netx is running */
+    private static FileLock fileLock;
 
     public static final String STDERR_FILE = "java.stderr";
     public static final String STDOUT_FILE = "java.stdout";
@@ -625,6 +630,72 @@ public class JNLPRuntime {
 
     public static List<String> getInitialArguments() {
         return initialArguments;
+    }
+
+    /**
+     * Indicate that netx is running by creating the {@link JNLPRuntime#INSTANCE_FILE} and
+     * acquiring a shared lock on it
+     */
+    public synchronized static void markNetxRunning() {
+        if (fileLock != null) return;
+        try {
+            String message = "This file is used to check if netx is running";
+
+            File netxRunningFile = new File(JNLPRuntime.getConfiguration()
+                    .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
+            if (!netxRunningFile.exists()) {
+                FileUtils.createParentDir(netxRunningFile);
+                FileUtils.createRestrictedFile(netxRunningFile, true);
+                FileOutputStream fos = new FileOutputStream(netxRunningFile);
+                try {
+                    fos.write(message.getBytes());
+                } finally {
+                    fos.close();
+                }
+            }
+
+            FileInputStream is = new FileInputStream(netxRunningFile);
+            FileChannel channel = is.getChannel();
+            fileLock = channel.lock(0, Long.MAX_VALUE, true);
+            if (fileLock != null && fileLock.isShared()) {
+                if (JNLPRuntime.isDebug()) {
+                    System.out.println("Acquired shared lock on " +
+                            netxRunningFile.toString() + " to indicate javaws is running");
+                }
+            } else {
+                fileLock = null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                markNetxStopped();
+            }
+        });
+    }
+
+    /**
+     * Indicate that netx is stopped by releasing the shared lock on
+     * {@link JNLPRuntime#INSTANCE_FILE}.
+     */
+    private static void markNetxStopped() {
+        if (fileLock == null) {
+            return;
+        }
+        try {
+            fileLock.release();
+            fileLock.channel().close();
+            fileLock = null;
+            if (JNLPRuntime.isDebug()) {
+                String file = JNLPRuntime.getConfiguration()
+                        .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE);
+                System.out.println("Release shared lock on " + file);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

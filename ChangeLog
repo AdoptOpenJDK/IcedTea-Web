@@ -1,3 +1,19 @@
+2011-03-14  Andrew Su <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java:
+	(fileLock): Removed private static field.
+	(launch): Mark NetX as running before launching apps.
+	(launchApplication): Removed call to markNetxRunning() and removed
+	shutdown hook for calling markNetxStopped().
+	(markNetxRunning): Removed method.
+	(markNetxStopped): Removed method.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
+	(okToClearCache): Removed closing of channel.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	(fileLock): New private static field.
+	(markNetxRunning): New method to indicate NetX is running.
+	(markNetxStopped): New method to indicate NetX has stopped.
+
 2011-03-16  Jiri Vanek  <jvanek@redhat.com>
 
 	* extras/net/sourceforge/jnlp/about/Main.java: removed hyperlinkUpdate 
