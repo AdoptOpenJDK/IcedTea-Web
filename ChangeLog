@@ -1,5 +1,11 @@
 2011-03-14  Andrew Su <asu@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	(markNetxRunning): Handle case for when shared locks are not allowed
+	on the system.
+
+2011-03-14  Andrew Su <asu@redhat.com>
+
 	* netx/net/sourceforge/jnlp/Launcher.java:
 	(fileLock): Removed private static field.
 	(launch): Mark NetX as running before launching apps.

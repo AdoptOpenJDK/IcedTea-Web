@@ -656,14 +656,21 @@ public class JNLPRuntime {
 
             FileInputStream is = new FileInputStream(netxRunningFile);
             FileChannel channel = is.getChannel();
-            fileLock = channel.lock(0, Long.MAX_VALUE, true);
+            fileLock = channel.lock(0, 1, true);
+            if (!fileLock.isShared()){ // We know shared locks aren't offered on this system.
+                FileLock temp = null;
+                for (long pos = 1; temp == null && pos < Long.MAX_VALUE - 1; pos++){
+                    temp = channel.tryLock(pos, 1, false); // No point in requesting for shared lock.
+                }
+                fileLock.release(); // We can release now, since we hold another lock.
+                fileLock = temp; // Keep the new lock so we can release later.
+            }
+            
             if (fileLock != null && fileLock.isShared()) {
                 if (JNLPRuntime.isDebug()) {
                     System.out.println("Acquired shared lock on " +
                             netxRunningFile.toString() + " to indicate javaws is running");
                 }
-            } else {
-                fileLock = null;
             }
         } catch (IOException e) {
             e.printStackTrace();
