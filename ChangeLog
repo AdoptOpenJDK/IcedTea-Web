@@ -1,3 +1,8 @@
+2011-03-21  Matthias Klose  <doko@ubuntu.com>
+
+	* launcher/itweb-settings.in: Use /bin/sh as interpreter.
+	* launcher/javaws.in: Likewise.
+
 2011-03-14  Andrew Su <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
