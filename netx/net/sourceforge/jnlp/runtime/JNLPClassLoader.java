@@ -1367,5 +1367,21 @@ public class JNLPClassLoader extends URLClassLoader {
         public JNLPClassLoader getParentJNLPClassLoader() {
             return parentJNLPClassLoader;
         }
+
+        @Override
+        public Enumeration<URL> findResources(String name) throws IOException {
+            if (!name.startsWith("META-INF")) {
+                return super.findResources(name);
+            }
+            return (new Vector<URL>(0)).elements();
+        }
+
+        @Override
+        public URL findResource(String name) {
+            if (!name.startsWith("META-INF")) {
+                return super.findResource(name);
+            }
+            return null;
+        }
     }
 }

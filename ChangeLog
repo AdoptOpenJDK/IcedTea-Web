@@ -1,3 +1,9 @@
+2011-03-23  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(findResource, findResources): New functions. Return nothing
+	if name.startsWith("META-INF"). Otherwise delegate to superclass.
+
 2011-03-21  Matthias Klose  <doko@ubuntu.com>
 
 	* launcher/itweb-settings.in: Use /bin/sh as interpreter.
