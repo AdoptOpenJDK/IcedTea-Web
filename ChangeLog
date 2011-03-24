@@ -1,3 +1,17 @@
+2011-03-24  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	RBrowserLocationPromptTitle, RBrowserLocationPromptMessage and
+	RBrowserLocationPromptMessageWithReason.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(isWindows): New method. Moved from XBasicService.
+	(isUnix): New method.
+	* netx/net/sourceforge/jnlp/services/XBasicService
+	(initialize): Call initializeBrowserCommand.
+	(initializeBrowserCommand): New method.
+	(posixCommandExists): New method.
+	(isWindows): Moved to JNLPRuntime.
+
 2011-03-23  Denis Lila  <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java

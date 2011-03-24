@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp.services;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -190,9 +192,47 @@ class XBasicService implements BasicService {
         if (initialized)
             return;
         initialized = true;
+        initializeBrowserCommand();
+        if (JNLPRuntime.isDebug()) {
+            System.out.println("browser is " + command);
+        }
+    }
 
-        if (isWindows()) {
+    /**
+     * Initializes {@link #command} to launch a browser
+     */
+    private void initializeBrowserCommand() {
+        if (JNLPRuntime.isWindows()) {
             command = "rundll32 url.dll,FileProtocolHandler ";
+        } else if (JNLPRuntime.isUnix()) {
+            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+            command = config.getProperty(DeploymentConfiguration.KEY_BROWSER_PATH);
+            if (command != null) {
+                return;
+            }
+
+            if (posixCommandExists("xdg-open")) {
+                command = "xdg-open";
+                return;
+            }
+
+            if (posixCommandExists(System.getenv("BROWSER"))) {
+                command = System.getenv("BROWSER");
+                return;
+            }
+
+            while (true) {
+                command = promptForCommand(command);
+                if (command != null && posixCommandExists(command)) {
+                    config.setProperty(DeploymentConfiguration.KEY_BROWSER_PATH, command);
+                    try {
+                        config.save();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
         } else {
             DeploymentConfiguration config = JNLPRuntime.getConfiguration();
             command = config.getProperty(DeploymentConfiguration.KEY_BROWSER_PATH);
@@ -212,18 +252,44 @@ class XBasicService implements BasicService {
         }
     }
 
-    private boolean isWindows() {
-        String os = System.getProperty("os.name");
-        if (os != null && os.startsWith("Windows"))
-            return true;
-        else
+    /**
+     * Check that a command exists on a posix-like system
+     * @param command the command to check
+     * @return true if the command exists
+     */
+    private boolean posixCommandExists(String command) {
+        if (command == null || command.trim().length() == 0) {
             return false;
+        }
+
+        command = command.trim();
+        if (command.contains("\n") || command.contains("\r")) {
+            return false;
+        }
+
+        try {
+            Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", "type " + command });
+            p.waitFor();
+            return (p.exitValue() == 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    private String promptForCommand(String cmd) {
+    private String promptForCommand(String previousCommand) {
+        String message = null;
+        if (previousCommand == null) {
+            message = R("RBrowserLocationPromptMessage");
+        } else {
+            message = R("RBrowserLocationPromptMessageWithReason", previousCommand);
+        }
         return JOptionPane.showInputDialog(new JPanel(),
-                                           "Browser Location:",
-                                           "Specify Browser Location",
+                                           R("RBrowserLocationPromptTitle"),
+                                           message,
                                            JOptionPane.PLAIN_MESSAGE
                                           );
     }
