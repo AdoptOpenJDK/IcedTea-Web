@@ -76,7 +76,7 @@ endif
 PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
- itweb-settings.desktop.in
+ itweb-settings.desktop.in $(top_srcdir)/tests
 
 # the launcher needs to know $(bindir) and $(datadir) which can be different at
 # make-time from configure-time
