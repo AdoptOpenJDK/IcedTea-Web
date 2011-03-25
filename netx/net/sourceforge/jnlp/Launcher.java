@@ -563,8 +563,11 @@ public class Launcher {
         try {
             JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy);
 
-            if (enableCodeBase || file.getResources().getJARs().length == 0)
+            if (enableCodeBase) {
                 loader.enableCodeBase();
+            } else if (file.getResources().getJARs().length == 0) {
+                throw new ClassNotFoundException("Can't do a codebase look up and there are no jars. Failing sooner rather than later");
+            }
 
             AppThreadGroup group = (AppThreadGroup) Thread.currentThread().getThreadGroup();
 
@@ -603,8 +606,11 @@ public class Launcher {
         try {
             JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy);
 
-            if (enableCodeBase || file.getResources().getJARs().length == 0)
+            if (enableCodeBase) {
                 loader.enableCodeBase();
+            } else if (file.getResources().getJARs().length == 0) {
+                throw new ClassNotFoundException("Can't do a codebase look up and there are no jars. Failing sooner rather than later");
+            }
 
             String appletName = file.getApplet().getMainClass();
 
@@ -742,7 +748,7 @@ public class Launcher {
                 if (isPlugin) {
                     // Do not display download indicators if we're using gcjwebplugin.
                     JNLPRuntime.setDefaultDownloadIndicator(null);
-                    application = getApplet(file, true, cont);
+                    application = getApplet(file, ((PluginBridge)file).codeBaseLookup(), cont);
                 } else {
                     if (file.isApplication())
                         application = launchApplication(file);

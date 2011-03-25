@@ -1,3 +1,12 @@
+2011-03-25  Denis Lila <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(codeBaseLookup): new member and getter for it.
+	(PluginBridge): set codeBaseLookup.
+	* netx/net/sourceforge/jnlp/Launcher.java:
+	(createApplet, createAppletObject): call enableCodeBase() if and
+	only if the enableCodeBase argument is true.
+
 2011-03-24  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add $(top_srcdir)/tests.

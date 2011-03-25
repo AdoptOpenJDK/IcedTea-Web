@@ -24,7 +24,6 @@ package net.sourceforge.jnlp;
 
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.List;
@@ -42,6 +41,7 @@ public class PluginBridge extends JNLPFile {
     Hashtable<String, String> atts;
     private boolean usePack;
     private boolean useVersion;
+    private boolean codeBaseLookup;
 
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
                         int width, int height, Hashtable<String, String> atts)
@@ -152,6 +152,12 @@ public class PluginBridge extends JNLPFile {
                 }
             }
         }
+        String cbl = atts.get("codebase_lookup");
+        codeBaseLookup = cbl == null || (Boolean.valueOf(cbl));
+    }
+
+    public boolean codeBaseLookup() {
+    	return codeBaseLookup;
     }
 
     /**
