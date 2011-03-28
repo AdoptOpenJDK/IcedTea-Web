@@ -132,10 +132,33 @@ public class PluginBridge extends JNLPFile {
         else
             security = null;
 
-        // Plugin needs to share classloaders so that applet instances from 
-        // same page can communicate (there are applets known to require 
-        // such communication for proper functionality)
-        this.uniqueKey = documentBase.toString();
+        /* According to http://download.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/applet-compatibility.html, 
+         * classloaders are shared iff these properties match:
+         * codebase, cache_archive, java_archive, archive
+         * 
+         * To achieve this, we create the uniquekey based on those 4 values,
+         * always in the same order. The initial "<NAME>=" parts ensure a 
+         * bad tag cannot trick the loader into getting shared with another.
+         */
+
+        // Firefox sometimes skips the codebase if it is default  -- ".", 
+        // so set it that way if absent
+        String codebaseAttr =      atts.get("codebase") != null ?
+                                   atts.get("codebase") : ".";
+
+        String cache_archiveAttr = atts.get("cache_archive") != null ? 
+                                   atts.get("cache_archive") : "";
+
+        String java_archiveAttr =  atts.get("java_archive") != null ? 
+                                   atts.get("java_archive") : "";
+
+        String archiveAttr =       atts.get("archive") != null ? 
+                                   atts.get("archive") : "";
+
+        this.uniqueKey = "codebase=" + codebaseAttr +
+                         "cache_archive=" + cache_archiveAttr + 
+                         "java_archive=" + java_archiveAttr + 
+                         "archive=" +  archiveAttr;
 
         usePack = false;
         useVersion = false;

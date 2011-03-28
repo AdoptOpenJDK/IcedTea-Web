@@ -1,3 +1,10 @@
+2011-03-28  Deepak Bhole <dbhole@redhat.com>
+
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(PluginBridge): Construct unique key based on a combination of
+	codebase, cache_archive, java_archive, and archive. This automatically
+	ensures are loaders are shared only when appropriate.
+
 2011-03-25  Denis Lila <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/PluginBridge.java
