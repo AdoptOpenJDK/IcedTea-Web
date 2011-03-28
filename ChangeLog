@@ -1,3 +1,7 @@
+2011-03-28  Omair Majid  <omajid@redhat.com>
+
+	* launcher/javaws.in: Split out -J arguments and pass it to the JVM.
+
 2011-03-28  Deepak Bhole <dbhole@redhat.com>
 
 	* netx/net/sourceforge/jnlp/PluginBridge.java
