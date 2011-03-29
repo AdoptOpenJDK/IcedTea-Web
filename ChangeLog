@@ -1,3 +1,9 @@
+2010-03-29  Andrew John Hughes  <ahughes@redhat.com>
+
+	* plugin/docs/npplugin_liveconnect_design.html:
+	Replace binary PDF documentation with editable HTML.
+	* plugin/docs/npplugin_liveconnect_design.pdf: Removed.
+
 2011-03-28  Omair Majid  <omajid@redhat.com>
 
 	* launcher/javaws.in: Split out -J arguments and pass it to the JVM.

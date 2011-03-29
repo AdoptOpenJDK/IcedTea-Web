@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <title>IcedTeaNPPlugin LiveConnect Design</title>
+    </head>
+    <body>
+      <h1>IcedTeaNPPlugin LiveConnect Design</h1>
+      <h2>Plugin Architecture</h2>
+      <ul>
+	<li>Divided into C++ and Java components</li>
+	<li><ul>
+	  <li>C++ side talks to the browser</li>
+	  <li>Java side talks to the JVM</li>
+	  <li>Linked via a FIFO link</li>
+	  <li>Common string exchange format (UTF-8)</li>
+	</ul></li>
+	<li>Over 95% of changes in NPPlugin have been on the C++ side</li>
+	<li>Java side has been reused as much as possible to re-use the proven stable code</li>
+      </ul>
+      <h2>C++ Architecture</h2>
+      <ul>
+	<li>Encompassing classes from the LiveConnect engine (which previously resided in Mozilla
+	  and was exposed via OJI)</li>
+	<li>Each JavaScript var corresponding to a Java object has a corresponding
+	  <code>IcedTeaScriptableJavaObject</code></li>
+	<li>Engine controls the object life and services all requests (get field, set field,
+	  invoke method, etc.)</li>
+      </ul>
+      <h2>C++ Architecture (Browser Interface)</h2>
+      <ul>
+	<li>Browser interface consists primarily of <code>IcedTeaScriptableJavaPackageObject</code>,
+	  <code>IcedTeaScriptableJavaObject</code> and <code>IcedTeaPluginRequestProcessor</code>.</li>
+	<li>Above classes are unaware of Java interactions and delegate to the Java interfaces
+	  for Java interaction.</li>
+	<li>They process all requests coming from the browser and going to the browser (<code>getMember</code>,
+	  <code>call</code>, <code>eval</code>, etc.)</li>
+      </ul>
+      <h2>C++ Architecture (Java Interface)</h2>
+      <ul>
+	<li>Java interface consists primarily of <code>IcedTeaJavaRequestProcessor</code>.</li>
+	<li>This class has full knowledge of how the Java side works, and constructs appropriate
+	  requests to get all information from Java.</li>
+	<li>The class processes all requests to the JVM.</li>
+      </ul>
+      <h2>Java Architecture</h2>
+      <ul>
+	<li>Java side has two core classes aside from helpers: <code>PluginAppletViewer</code>
+	  and <code>PluginAppletSecurityContext</code>.</li>
+	<li><code>PluginAppletViewer</code> is an interface to NetX and processes JS-related
+	  requests to and from NetX (the applet).</li>
+	<li><code>PluginAppletSecurityContext</code> is a direct reflection-based interface
+	  to the VM.  It processes all LiveConnect requests to and from the JVM.</li>
+	<li>Request processing is asynchronous, with scalable generic request processing workers.</li>
+      </ul>
+      <h2>Java Architecture (<code>PluginAppletViewer</code>)</h2>
+      <ul>
+	<li>Control of applet (initialize, resize, destroy, etc.) from browser.</li>
+	<li>Access to JavaScript from the applet (<code>getMember</code>, <code>setMember</code>,
+	  <code>call</code>, <code>eval</code>, etc.)</li>
+      </ul>
+      <h2>Java Architecture (<code>PluginAppletSecurityContext</code>)</h2>
+      <ul>
+	<li>Direct access to the JVM from the browser (LiveConnect) via reflection.</li>
+	<li>All reflection is built-in, so C++ side never needs to be aware of the complexities,
+	  unlike how OJI was.</li>
+	<li>All VM calls are inside a sandbox, so JavaScript can not do things that the default
+	  sandboxed VM can't.</li>
+      </ul>
+      <h2>MessageBus Architecture (C++)</h2>
+      <ul>
+	<li>The link to Java is exposed to the rest of the code via a uniform "MessageBus" interface.</li>
+	<li>Since the code is unaware of the link specifics and has no synchronicity guarantee, the communication
+	  medium can be switched relatively easily.</li>
+	<li>Classes interested in the messages implement a <code>BusSubscriber</code> class and subscribe to
+	  the bus of interest.</li>
+	<li>When messages come in, the bus notifies all subscribers.</li>
+      </ul>
+      <h2>Example JS->Java Workflow</h2>
+      <ul>
+	<li>Example shows how <code>NPP_HasProperty()</code> works</li>
+	<li>Browser has a link to an <code>IcedTeaScriptableJavaObject</code> representing a Java
+	  object instance.</li>
+	<li>It call <code>IcedTeaScriptableJavaObject::HasProperty()</code></li>
+	<li><code>HasProperty()</code> creates an <code>IcedTeaJavaRequestProcessor</code>
+	  ("Java processor")</li>
+	<li>The Java processor exposes all necessary APIs to the VM, including <code>hasProperty</code>
+	  (called <code>hasField</code> for Java naming consistency).</li>
+	<li>Before making a <code>hasField</code> request, the processor subscribes itself
+	  to the "from Java" bus, so that it can read the response.</li>
+	<li>The <code>hasField</code> request is made by the processor and posted to the
+	  "to Java" bus.</li>
+	<li>The processor waits for either a response or a timeout.</li>
+	<li>Once a response is received, the processor unsubscribes itself from the
+	  "from Java" bus, performs post-processing and returns.</li>
+	<li>The <code>IcedTeaScriptableJavaObject</code> object reads the response and
+	  sends it to the browser.</li>
+      </ul>
+      <h2>Example Java->JS Workflow</h2>
+      <ul>
+	<li>All access to JS is via <code>JSObject</code> instances as defined in the
+	  LiveConnect specification.</li>
+	<li>If an applet wants to access a member of <code>JSObject</code>, "window"
+	  for example, it will call <code>getMember</code> on the window's <code>JSObject</code>.</li>
+	<li><code>getMember</code> calls a similarly named function in
+	  <code>PluginAppletViewer</code>.</li>
+	<li><code>PluginAppletViewer</code> constructs a request for the C++ side and
+	  posts it on the FIFO link.</li>
+	<li>On the C++ side, <code>IcedTeaPluginRequestProcessor</code> (the plugin
+	  processor) is always subscribed to the "from Java" bus.</li>
+	<li>When the <code>getMember</code> request comes through, the plugin processor
+	  gets notified.</li>
+	<li>The embedded request</li>
+      </ul>
+    </body>
+</html>
+
