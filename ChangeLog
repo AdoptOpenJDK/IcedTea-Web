@@ -1,3 +1,8 @@
+2011-03-29  Denis Lila <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPFile.java
+	(getInformation): Remove redundant if.
+
 2010-03-29  Andrew John Hughes  <ahughes@redhat.com>
 
 	* plugin/docs/npplugin_liveconnect_design.html:

@@ -329,8 +329,7 @@ public class JNLPFile {
                     InformationDesc infoDesc = info.get(i);
 
                     if (localMatches(locale, infoDesc.getLocales()))
-                        if (localMatches(locale, infoDesc.getLocales()))
-                            result.addAll(infoDesc.getItems(key));
+                        result.addAll(infoDesc.getItems(key));
                 }
 
                 return result;
