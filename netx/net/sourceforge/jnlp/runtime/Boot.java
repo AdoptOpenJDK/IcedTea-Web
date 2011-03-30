@@ -190,7 +190,7 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         try {
-            new Launcher().launch(getFile());
+            new Launcher(false).launch(getFile());
         } catch (LaunchException ex) {
             // default handler prints this
         } catch (Exception ex) {

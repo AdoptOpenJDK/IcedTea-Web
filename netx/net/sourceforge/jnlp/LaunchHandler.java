@@ -56,6 +56,24 @@ public interface LaunchHandler {
     // controller is in place.
 
     /**
+     * Called when an application, applet or installer has been determined.
+     * We have some very basic information about the application at this point,
+     * but do not have everything required. This is a nice point to show the
+     * splash screen.
+     *
+     * @param application the application instance that is starting
+     */
+    public void launchInitialized(JNLPFile file);
+
+    /**
+     * Called when an application, applet or installer is ready to start.
+     * Good point to hide the splash screen.
+     *
+     * @param application the application instance that is ready
+     */
+    public void launchStarting(ApplicationInstance application);
+
+    /**
      * Called when an application, applet, or installer has been
      * launched successfully (the main method or applet start method
      * returned normally).

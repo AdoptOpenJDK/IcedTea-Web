@@ -1,3 +1,28 @@
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/LaunchHandler.java
+	(launchInitialized, launchStarting): New methods.
+	* netx/net/sourceforge/jnlp/DefaultLaunchHandler.java
+	(launchInitialized, launchStarting): New methods. No-op
+	implementation.
+	(printMessage): Make it static.
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: New file.
+	(launchCompleted, launchError, launchStarting, launchInitialized),
+	(launchWarning, validationError): New methods.
+	* netx/net/sourceforge/jnlp/Launcher.java (launchApplication):
+	Invoke handler.launchInitialized and handler.launchStarting instead
+	of showing a splash screen directly.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	ButShowDetails, ButHideDetails and Error.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java (run): Do not exit on
+	error.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Set handler to GuiLaunchHandler if not running in
+	headless mode.
+	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java: New
+	file.
+	(exceptionToString, show): New methods.
+
 2011-03-29  Denis Lila <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPFile.java
