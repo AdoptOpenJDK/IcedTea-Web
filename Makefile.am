@@ -36,8 +36,8 @@ JRE='"$(SYSTEM_JDK_DIR)/jre"'
 LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
 PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
 
-# Fake update version to shut up the plugin detector hosted by Oracle.
-# If Oracle ever release a JDK update greater than 50, this needs to be increased.
+# Fake update version to work with the Deployment Toolkit script used by Oracle
+# http://download.oracle.com/javase/tutorial/deployment/deploymentInDepth/depltoolkit_index.html
 JDK_UPDATE_VERSION=50
 
 # Sources list

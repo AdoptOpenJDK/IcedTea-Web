@@ -1,5 +1,10 @@
 2011-03-30  Omair Majid  <omajid@redhat.com>
 
+	* Makefile.am: Fix comment explaining reasons for setting
+	JDK_UPDATE_VERSION.
+
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Fix typo in
 	RCantRename.
 
