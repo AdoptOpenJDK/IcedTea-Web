@@ -1,5 +1,10 @@
 2011-03-30  Omair Majid  <omajid@redhat.com>
 
+	* netx/javaws.1: Fix FILES section to point to
+	~/.icedtea/deployment.properties.
+
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/LaunchHandler.java
 	(launchInitialized, launchStarting): New methods.
 	* netx/net/sourceforge/jnlp/DefaultLaunchHandler.java
