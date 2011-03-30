@@ -25,6 +25,13 @@ IT_LANGUAGE_SOURCE_VERSION=6
 IT_CLASS_TARGET_VERSION=6
 IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
 
+#
+# We need the jars in bootclasspath for a couple of reasons
+#  - we use classes (in the sun.applet package) loaded by the bootclassloader
+#    using another classloader to load classes from the same package causes an
+#    IllegalAccessException
+#  - we want full privileges
+#
 JRE='"$(SYSTEM_JDK_DIR)/jre"'
 LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
 PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'

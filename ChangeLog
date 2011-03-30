@@ -1,5 +1,9 @@
 2011-03-30  Omair Majid  <omajid@redhat.com>
 
+	* Makefile.am: Document reason for using bootclasspath.
+
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
 	* netx/javaws.1: Fix FILES section to point to
 	~/.icedtea/deployment.properties.
 
