@@ -1,5 +1,10 @@
 2011-03-31  Denis Lila  <dlila@redhat.com>
 
+	* plugin/icedteanp/java/sun/applet/PluginObjectStore.java:
+	Add citation of Effective Java, 2nd edition.
+
+2011-03-31  Denis Lila  <dlila@redhat.com>
+
 	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java
 	(store): Make private and remove fixme to make private.
 	* plugin/icedteanp/java/sun/applet/PluginObjectStore.java

@@ -40,7 +40,8 @@ package sun.applet;
 import java.util.HashMap;
 import java.util.Map;
 
-// Enums are the best way to implement singletons.
+// Enums are the best way to implement singletons:
+// Bloch, Joshua. Effective Java, 2nd Edition. Item 3, Chapter 2. ISBN: 0-321-35668-3.
 enum PluginObjectStore {
     INSTANCE;
 
