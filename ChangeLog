@@ -94,7 +94,6 @@
 	file.
 	(exceptionToString, show): New methods.
 
->>>>>>> /tmp/ChangeLog~other.ZwCGJe
 2011-03-29  Denis Lila <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPFile.java
