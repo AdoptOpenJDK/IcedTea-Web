@@ -1,5 +1,12 @@
 2011-03-31  Denis Lila  <dlila@redhat.com>
 
+	* plugin/icedteanp/java/netscape/javascript/JSObject.java:
+	Fix comments, remove unused imports.
+	(equals): Remove. It was breaking the reflexivity in the
+	equals contract.
+
+2011-03-31  Denis Lila  <dlila@redhat.com>
+
 	* plugin/icedteanp/java/sun/applet/PluginObjectStore.java:
 	Add citation of Effective Java, 2nd edition.
 

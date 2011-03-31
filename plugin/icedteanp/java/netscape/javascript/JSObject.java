@@ -37,7 +37,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-/* more doc todo:
+/* more doc TODO:
  *  threads
  *  gc
  *
@@ -47,10 +47,8 @@
 package netscape.javascript;
 
 import java.applet.Applet;
-import java.security.AccessControlContext;
 import java.security.AccessControlException;
 import java.security.AccessController;
-import java.security.BasicPermission;
 
 import sun.applet.PluginAppletViewer;
 import sun.applet.PluginDebug;
@@ -193,8 +191,6 @@ public final class JSObject {
         PluginAppletViewer.setSlot(internal, index, value);
     }
 
-    // TODO: toString, finalize.
-
     /**
      * Removes a named member of a JavaScript object.
      */
@@ -266,15 +262,5 @@ public final class JSObject {
 
         PluginDebug.debug("JSObject.finalize ");
         PluginAppletViewer.JavaScriptFinalize(internal);
-    }
-
-    /**
-     * Override java.lang.Object.equals() because identity is not preserved
-     * with instances of JSObject.
-     */
-    public boolean equals(Object obj) {
-        PluginDebug.debug("JSObject.equals " + obj);
-
-        return false;
     }
 }
