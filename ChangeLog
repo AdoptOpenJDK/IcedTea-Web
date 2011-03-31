@@ -1,3 +1,24 @@
+2011-03-31  Omair Majid  <omajid@redhat.com>
+
+	Add unit tests for the parser
+	* Makefile.am: Add TESTS_DIR,TESTS_SRCDIR, NETX_UNIT_TEST_DIR,
+	and NETX_UNIT_TEST_SRCDIR, JUNIT_RUNNER_DIR, JUNIT_RUNNER_SRCDIR, and
+	JUNIT_RUNNER_JAR. Conditionally define RHINO_TESTS and UNIT_TESTS.
+	(clean-local): Use RHINO_TESTS and UNIT_TESTS.
+	(clean-tests): Depend on clean-netx-tests. Delete directory.
+	(junit-runner-source-files.txt, $(JUNIT_RUNNER_JAR)),
+	(next-unit-tests-sources-files.txt stamps/netx-unit-tests-compile.stamp),
+	(run-netx-unit-tests, clean-netx-tests, clean-junit-runner)
+	(clean-netx-unit-tests): New targets.
+	* configure.ac: Add new optional dependency on junit.
+	* tests/junit-runner/CommandLine.java,
+	* tests/junit-runner/LessVerboseTextListener.java,
+	* tests/junit-runner/README,
+	* tests/netx/unit/net/sourceforge/jnlp/ParserBasicTests.java,
+	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCaseTests.java,
+	* tests/netx/unit/net/sourceforge/jnlp/ParserMalformedXmlTests.java,
+	* tests/netx/unit/net/sourceforge/jnlp/basic.jnlp: New files.
+
 2011-03-30  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am: Fix comment explaining reasons for setting

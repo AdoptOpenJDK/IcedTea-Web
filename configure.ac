@@ -85,6 +85,8 @@ IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE
 
 IT_FIND_OPTIONAL_JAR([rhino], RHINO,
     [/usr/share/java/js.jar /usr/share/rhino-1.6/lib/js.jar])
+IT_FIND_OPTIONAL_JAR([junit], JUNIT,
+    [/usr/share/java/junit4.jar])
 
 AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
 AC_CONFIG_FILES([build.properties])
