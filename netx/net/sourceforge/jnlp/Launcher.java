@@ -27,6 +27,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarFile;
 
 import net.sourceforge.jnlp.cache.CacheUtil;
@@ -76,6 +77,9 @@ public class Launcher {
     /** If the application should call System.exit on fatal errors */
     private boolean exitOnFailure = true;
 
+    private ParserSettings parserSettings = new ParserSettings();
+
+    private Map<String, String[]> extra = null;
 
     /**
      * Create a launcher with the runtime's default update policy
@@ -165,6 +169,26 @@ public class Launcher {
     }
 
     /**
+     * Set the parser settings to use when the Launcher initiates parsing of
+     * a JNLP file.
+     * @param settings
+     */
+    public void setParserSettings(ParserSettings settings) {
+        parserSettings = settings;
+    }
+
+    /**
+     * Set a map to use when trying to extract extra information, including
+     * arguments, properties and parameters, to be merged into the main JNLP
+     * @param input a map containing extra information to add to the main JNLP.
+     * the values for keys "arguments", "parameters", and "properties" are
+     * used.
+     */
+    public void setInformationToMerge(Map<String, String[]> input) {
+        this.extra = input;
+    }
+
+    /**
      * Launches a JNLP file by calling the launch method for the
      * appropriate file type.  The application will be started in
      * a new window.
@@ -188,6 +212,8 @@ public class Launcher {
      */
     public ApplicationInstance launch(JNLPFile file, Container cont) throws LaunchException {
         TgThread tg;
+
+        mergeExtraInformation(file, extra);
 
         JNLPRuntime.markNetxRunning();
 
@@ -242,6 +268,106 @@ public class Launcher {
      */
     public ApplicationInstance launch(URL location) throws LaunchException {
         return launch(toFile(location));
+    }
+
+    /**
+     * Launches a JNLP file by calling the launch method for the
+     * appropriate file type.
+     *
+     * @param location the URL of the JNLP file to launch
+     * @param fromSource if true, the JNLP file will be re-read from the source
+     * location to get the pristine version
+     * @throws LaunchException if there was an exception
+     * @return the application instance
+     */
+    public ApplicationInstance launch(URL location, boolean fromSource) throws LaunchException {
+        return launch(fromUrl(location, fromSource));
+    }
+
+    /**
+     * Merges extra information into the jnlp file
+     *
+     * @param file the JNLPFile
+     * @param extra extra information to merge into the JNLP file
+     * @throws LaunchException if an exception occurs while extracting
+     * extra information
+     */
+    private void mergeExtraInformation(JNLPFile file, Map<String, String[]> extra) throws LaunchException {
+        if (extra == null) {
+            return;
+        }
+
+        String[] properties = extra.get("properties");
+        if (properties != null) {
+            addProperties(file, properties);
+        }
+
+        String[] arguments = extra.get("arguments");
+        if (arguments != null && file.isApplication()) {
+            addArguments(file, arguments);
+        }
+
+        String[] parameters = extra.get("parameters");
+        if (parameters != null && file.isApplet()) {
+            addParameters(file, parameters);
+        }
+    }
+
+    /**
+     * Add the properties to the JNLP file.
+     * @throws LaunchException if an exception occurs while extracting
+     * extra information
+     */
+    private void addProperties(JNLPFile file, String[] props) throws LaunchException {
+        ResourcesDesc resources = file.getResources();
+
+        for (int i = 0; i < props.length; i++) {
+            // allows empty property, not sure about validity of that.
+            int equals = props[i].indexOf("=");
+            if (equals == -1) {
+                throw launchError(new LaunchException(R("BBadProp", props[i])));
+            }
+
+            String key = props[i].substring(0, equals);
+            String value = props[i].substring(equals + 1, props[i].length());
+
+            resources.addResource(new PropertyDesc(key, value));
+        }
+    }
+
+    /**
+     * Add the params to the JNLP file; only call if file is
+     * actually an applet file.
+     * @throws LaunchException if an exception occurs while extracting
+     * extra information
+     */
+    private void addParameters(JNLPFile file, String[] params) throws LaunchException {
+        AppletDesc applet = file.getApplet();
+
+        for (int i = 0; i < params.length; i++) {
+            // allows empty param, not sure about validity of that.
+            int equals = params[i].indexOf("=");
+            if (equals == -1) {
+                throw launchError(new LaunchException(R("BBadParam", params[i])));
+            }
+
+            String name = params[i].substring(0, equals);
+            String value = params[i].substring(equals + 1, params[i].length());
+
+            applet.addParameter(name, value);
+        }
+    }
+
+    /**
+     * Add the arguments to the JNLP file; only call if file is
+     * actually an application (not installer).
+     */
+    private void addArguments(JNLPFile file, String[] args) {
+        ApplicationDesc app = file.getApplication();
+
+        for (int i = 0; i < args.length; i++) {
+            app.addArgument(args[i]);
+        }
     }
 
     /**
@@ -345,6 +471,32 @@ public class Launcher {
     /**
      * Returns the JNLPFile for the URL, with error handling.
      */
+    private JNLPFile fromUrl(URL location, boolean fromSource) throws LaunchException {
+        try {
+            JNLPFile file = null;
+
+            file = new JNLPFile(location, parserSettings.isStrict());
+
+            if (fromSource) {
+                // Launches the jnlp file where this file originated.
+                if (file.getSourceLocation() != null) {
+                    file = new JNLPFile(file.getSourceLocation(), parserSettings.isStrict());
+                }
+            }
+            return file;
+        } catch (Exception ex) {
+            if (ex instanceof LaunchException)
+                throw (LaunchException) ex; // already sent to handler when first thrown
+            else
+                // IO and Parse
+                throw launchError(new LaunchException(null, ex, R("LSFatal"), R("LCReadError"), R("LCantRead"), R("LCantReadInfo")));
+        }
+    }
+
+    /**
+     * Returns the JNLPFile for the URL, with error handling.
+     */
+    @Deprecated
     private JNLPFile toFile(URL location) throws LaunchException {
         try {
             JNLPFile file = null;

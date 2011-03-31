@@ -19,23 +19,18 @@ package net.sourceforge.jnlp.runtime;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import net.sourceforge.jnlp.AppletDesc;
-import net.sourceforge.jnlp.ApplicationDesc;
-import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
-import net.sourceforge.jnlp.ParseException;
-import net.sourceforge.jnlp.PropertyDesc;
-import net.sourceforge.jnlp.ResourcesDesc;
+import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.security.viewer.CertificateViewer;
@@ -189,8 +184,19 @@ public final class Boot implements PrivilegedAction<Void> {
             return null;
         }
 
+        Map<String, String[]> extra = new HashMap<String, String[]>();
+        extra.put("arguments", getOptions("-arg"));
+        extra.put("parameters", getOptions("-param"));
+        extra.put("properties", getOptions("-property"));
+
+        boolean strict = (null != getOption("-strict"));
+        ParserSettings settings = new ParserSettings(strict);
+
         try {
-            new Launcher(false).launch(getFile());
+            Launcher launcher = new Launcher(false);
+            launcher.setParserSettings(settings);
+            launcher.setInformationToMerge(extra);
+            launcher.launch(getFileLocation(), true);
         } catch (LaunchException ex) {
             // default handler prints this
         } catch (Exception ex) {
@@ -236,10 +242,10 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     /**
-     * Returns the file to open; does not return if no file was
-     * specified.
+     * Returns the url of file to open; does not return if no file was
+     * specified, or if the file location was invalid.
      */
-    private static JNLPFile getFile() throws ParseException, MalformedURLException, IOException {
+    private static URL getFileLocation() {
 
         String location = getJNLPFile();
 
@@ -274,89 +280,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 e.printStackTrace();
         }
 
-        boolean strict = (null != getOption("-strict"));
-
-        JNLPFile file = new JNLPFile(url, strict);
-
-        // Launches the jnlp file where this file originated.
-        if (file.getSourceLocation() != null) {
-            file = new JNLPFile(file.getSourceLocation(), strict);
-        }
-
-        // add in extra params from command line
-        addProperties(file);
-
-        if (file.isApplet())
-            addParameters(file);
-
-        if (file.isApplication())
-            addArguments(file);
-
-        if (JNLPRuntime.isDebug()) {
-            if (getOption("-arg") != null)
-                if (file.isInstaller() || file.isApplet())
-                    System.out.println(R("BArgsNA"));
-
-            if (getOption("-param") != null)
-                if (file.isApplication())
-                    System.out.println(R("BParamNA"));
-        }
-
-        return file;
-    }
-
-    /**
-     * Add the properties to the JNLP file.
-     */
-    private static void addProperties(JNLPFile file) {
-        String props[] = getOptions("-property");
-        ResourcesDesc resources = file.getResources();
-
-        for (int i = 0; i < props.length; i++) {
-            // allows empty property, not sure about validity of that.
-            int equals = props[i].indexOf("=");
-            if (equals == -1)
-                fatalError(R("BBadProp", props[i]));
-
-            String key = props[i].substring(0, equals);
-            String value = props[i].substring(equals + 1, props[i].length());
-
-            resources.addResource(new PropertyDesc(key, value));
-        }
-    }
-
-    /**
-     * Add the params to the JNLP file; only call if file is
-     * actually an applet file.
-     */
-    private static void addParameters(JNLPFile file) {
-        String params[] = getOptions("-param");
-        AppletDesc applet = file.getApplet();
-
-        for (int i = 0; i < params.length; i++) {
-            // allows empty param, not sure about validity of that.
-            int equals = params[i].indexOf("=");
-            if (equals == -1)
-                fatalError(R("BBadParam", params[i]));
-
-            String name = params[i].substring(0, equals);
-            String value = params[i].substring(equals + 1, params[i].length());
-
-            applet.addParameter(name, value);
-        }
-    }
-
-    /**
-     * Add the arguments to the JNLP file; only call if file is
-     * actually an application (not installer).
-     */
-    private static void addArguments(JNLPFile file) {
-        String args[] = getOptions("-arg"); // FYI args also global variable
-        ApplicationDesc app = file.getApplication();
-
-        for (int i = 0; i < args.length; i++) {
-            app.addArgument(args[i]);
-        }
+        return url;
     }
 
     /**

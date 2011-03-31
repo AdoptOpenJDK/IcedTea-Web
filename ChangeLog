@@ -1,3 +1,23 @@
+2011-03-31  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java: Add parserSettings and extra.
+	(setParserSettings): New method.
+	(setInformationToMerge): New method.
+	(launch(JNLPFile,Container)): Call mergeExtraInformation.
+	(launch(URL,boolean)): New method.
+	(mergeExtraInformation): New method.
+	(addProperties, addParameters, addArguments): Moved here from Boot.java
+	(fromUrl): New method.
+	* netx/net/sourceforge/jnlp/ParserSettings.java: New file.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Remove BArgNA,
+	BParamNA.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java
+	(run): Do not parse JNLP file. Pass ParserSettings and other command line
+	additions to launcher.
+	(getFile): Rename to...
+	(getFileLocation): New method.
+	(addProperties, addParameters, addArguments): Move to Launcher.java.	
+
 2011-03-31  Denis Lila  <dlila@redhat.com>
 
 	* plugin/icedteanp/java/netscape/javascript/JSObject.java:
