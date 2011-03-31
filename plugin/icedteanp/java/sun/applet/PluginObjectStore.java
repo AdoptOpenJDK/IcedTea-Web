@@ -40,14 +40,21 @@ package sun.applet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PluginObjectStore {
-    private static HashMap<Integer, Object> objects = new HashMap<Integer, Object>();
-    private static HashMap<Integer, Integer> counts = new HashMap<Integer, Integer>();
-    private static HashMap<Object, Integer> identifiers = new HashMap<Object, Integer>();
-    private static final Object lock = new Object();
+// Enums are the best way to implement singletons.
+enum PluginObjectStore {
+    INSTANCE;
 
-    private static boolean wrapped = false;
-    private static int nextUniqueIdentifier = 1;
+    private HashMap<Integer, Object> objects = new HashMap<Integer, Object>();
+    private HashMap<Integer, Integer> counts = new HashMap<Integer, Integer>();
+    private HashMap<Object, Integer> identifiers = new HashMap<Object, Integer>();
+    private final Object lock = new Object();
+
+    private boolean wrapped = false;
+    private int nextUniqueIdentifier = 1;
+
+    public static PluginObjectStore getInstance() {
+        return INSTANCE;
+    }
 
     public Object getObject(Integer identifier) {
         synchronized(lock) {
@@ -78,7 +85,7 @@ public class PluginObjectStore {
         }
     }
 
-    private static boolean checkNeg() {
+    private boolean checkNeg() {
         if (nextUniqueIdentifier < 1) {
             wrapped = true;
             nextUniqueIdentifier = 1;

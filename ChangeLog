@@ -1,5 +1,15 @@
 2011-03-31  Denis Lila  <dlila@redhat.com>
 
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java
+	(store): Make private and remove fixme to make private.
+	* plugin/icedteanp/java/sun/applet/PluginObjectStore.java
+	(PluginObjectStore): Make it a singleton using enum.
+	(objects, counts, identifiers, lock, wrapped, nextUniqueIdentifier,
+	 checkNeg): Made instance methods/members.
+	(getInstance): New static method.
+
+2011-03-31  Denis Lila  <dlila@redhat.com>
+
 	* plugin/icedteanp/java/sun/applet/AppletSecurityContextManager.java
 	* plugin/icedteanp/java/sun/applet/GetMemberPluginCallRequest.java
 	* plugin/icedteanp/java/sun/applet/GetWindowPluginCallRequest.java

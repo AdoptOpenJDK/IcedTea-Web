@@ -225,8 +225,7 @@ public class PluginAppletSecurityContext {
     private static Hashtable<ClassLoader, URL> classLoaders = new Hashtable<ClassLoader, URL>();
     private static Hashtable<Integer, ClassLoader> instanceClassLoaders = new Hashtable<Integer, ClassLoader>();
 
-    // FIXME: make private
-    public PluginObjectStore store = new PluginObjectStore();
+    private PluginObjectStore store = PluginObjectStore.getInstance();
     private Throwable throwable = null;
     private ClassLoader liveconnectLoader = ClassLoader.getSystemClassLoader();
     int identifier = 0;
