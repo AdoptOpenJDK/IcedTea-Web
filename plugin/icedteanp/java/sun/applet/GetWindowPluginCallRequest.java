@@ -46,7 +46,7 @@ public class GetWindowPluginCallRequest extends PluginCallRequest {
     }
 
     public void parseReturn(String message) {
-        PluginDebug.debug("GetWindowParseReturn GOT: " + message);
+        PluginDebug.debug("GetWindowParseReturn GOT: ", message);
         String[] args = message.split(" ");
         // FIXME: add thread ID to messages to support multiple
         // threads using the netscape.javascript package.

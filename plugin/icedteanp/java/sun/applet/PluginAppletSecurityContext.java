@@ -181,7 +181,7 @@ class Signature {
             c = Class.forName(name);
         } catch (ClassNotFoundException cnfe) {
 
-            PluginDebug.debug("Class " + name + " not found in primordial loader. Looking in " + cl);
+            PluginDebug.debug("Class ", name, " not found in primordial loader. Looking in ", cl);
             try {
                 c = cl.loadClass(name);
             } catch (ClassNotFoundException e) {
@@ -294,12 +294,12 @@ public class PluginAppletSecurityContext {
     }
 
     public void associateSrc(ClassLoader cl, URL src) {
-        PluginDebug.debug("Associating " + cl + " with " + src);
+        PluginDebug.debug("Associating ", cl, " with ", src);
         this.classLoaders.put(cl, src);
     }
 
     public void associateInstance(Integer i, ClassLoader cl) {
-        PluginDebug.debug("Associating " + cl + " with instance " + i);
+        PluginDebug.debug("Associating ", cl, " with instance ", i);
         this.instanceClassLoaders.put(i, cl);
     }
 
@@ -329,7 +329,7 @@ public class PluginAppletSecurityContext {
                 String[] args = message.split(" ");
                 Integer instance = new Integer(args[1]);
                 String className = args[2].replace('/', '.');
-                PluginDebug.debug("Searching for class " + className + " in " + cl);
+                PluginDebug.debug("Searching for class ", className, " in ", cl);
 
                 try {
                     c = cl.loadClass(className);
@@ -338,7 +338,7 @@ public class PluginAppletSecurityContext {
                 } catch (ClassNotFoundException cnfe) {
 
                     cl = this.instanceClassLoaders.get(instance);
-                    PluginDebug.debug("Not found. Looking in " + cl);
+                    PluginDebug.debug("Not found. Looking in ", cl);
 
                     if (instance != 0 && cl != null) {
                         try {
@@ -381,7 +381,7 @@ public class PluginAppletSecurityContext {
                     o = m = c.getMethod(methodName, signature.getClassArray());
                     store.reference(m);
                 }
-                PluginDebug.debug(o + " has id " + store.getIdentifier(o));
+                PluginDebug.debug(o, " has id ", store.getIdentifier(o));
                 write(reference, args[0] + " " + store.getIdentifier(o));
             } else if (message.startsWith("GetStaticFieldID")
                                         || message.startsWith("GetFieldID")) {
@@ -392,7 +392,7 @@ public class PluginAppletSecurityContext {
 
                 Class<?> c = (Class<?>) store.getObject(classID);
 
-                PluginDebug.debug("GetStaticFieldID/GetFieldID got class=" + c.getName());
+                PluginDebug.debug("GetStaticFieldID/GetFieldID got class=", c.getName());
 
                 Field f = null;
                 f = c.getField(fieldName);
@@ -631,7 +631,7 @@ public class PluginAppletSecurityContext {
                 arguments[1] = methodName;
                 for (int i = 0; i < args.length - 3; i++) {
                     arguments[i + 2] = store.getObject(parseCall(args[3 + i], null, Integer.class));
-                    PluginDebug.debug("GOT ARG: " + arguments[i + 2]);
+                    PluginDebug.debug("GOT ARG: ", arguments[i + 2]);
                 }
 
                 Object[] matchingMethodAndArgs = MethodOverloadResolver.getMatchingMethod(arguments);
@@ -652,8 +652,8 @@ public class PluginAppletSecurityContext {
                     collapsedArgs += " " + arg;
                 }
 
-                PluginDebug.debug("Calling method " + m + " on object " + o
-                                                + " (" + c + ") with " + collapsedArgs);
+                PluginDebug.debug("Calling method ", m, " on object ", o
+                                                , " (", c, ") with ", collapsedArgs);
 
                 AccessControlContext acc = callContext != null ? callContext : getClosedAccessControlContext();
                 checkPermission(src, c, acc);
@@ -683,9 +683,9 @@ public class PluginAppletSecurityContext {
                     retO = m.getReturnType().toString();
                 }
 
-                PluginDebug.debug("Calling " + m + " on " + o + " with "
-                                                + collapsedArgs + " and that returned: " + ret
-                                                + " of type " + retO);
+                PluginDebug.debug("Calling ", m, " on ", o, " with "
+                                                , collapsedArgs, " and that returned: ", ret
+                                                , " of type ", retO);
 
                 if (m.getReturnType().equals(java.lang.Void.class) ||
                                     m.getReturnType().equals(java.lang.Void.TYPE)) {
@@ -799,8 +799,8 @@ public class PluginAppletSecurityContext {
                                                                         + Integer
                                                                                         .toString(((int) b[i]) & 0x0ff, 16));
 
-                PluginDebug.debug("Java: GetStringChars: " + o);
-                PluginDebug.debug("  String BYTES: " + buf);
+                PluginDebug.debug("Java: GetStringChars: ", o);
+                PluginDebug.debug("  String BYTES: ", buf);
                 write(reference, "GetStringChars " + buf);
             } else if (message.startsWith("GetToStringValue")) {
                 String[] args = message.split(" ");
@@ -965,7 +965,7 @@ public class PluginAppletSecurityContext {
                 for (int i = 0; i < args.length - 2; i++) {
                     arguments[i + 1] = store.getObject(parseCall(args[2 + i],
                             null, Integer.class));
-                    PluginDebug.debug("GOT ARG: " + arguments[i + 1]);
+                    PluginDebug.debug("GOT ARG: ", arguments[i + 1]);
                 }
 
                 Object[] matchingConstructorAndArgs = MethodOverloadResolver
@@ -990,8 +990,8 @@ public class PluginAppletSecurityContext {
                     collapsedArgs += " " + arg.toString();
                 }
 
-                PluginDebug.debug("Calling constructor on class " + c +
-                                   " with " + collapsedArgs);
+                PluginDebug.debug("Calling constructor on class ", c,
+                                   " with ", collapsedArgs);
 
                 AccessControlContext acc = callContext != null ? callContext : getClosedAccessControlContext();
                 checkPermission(src, c, acc);
@@ -1014,7 +1014,7 @@ public class PluginAppletSecurityContext {
                 write(reference, "NewObject " + store.getIdentifier(ret));
 
             } else if (message.startsWith("NewStringUTF")) {
-                PluginDebug.debug("MESSAGE: " + message);
+                PluginDebug.debug("MESSAGE: ", message);
                 String[] args = message.split(" ");
                 int length = new Integer(args[1]);
                 byte[] byteArray = new byte[length];
@@ -1028,12 +1028,12 @@ public class PluginAppletSecurityContext {
                 }
 
                 ret = new String(byteArray, "UTF-8");
-                PluginDebug.debug("NEWSTRINGUTF: " + ret);
+                PluginDebug.debug("NEWSTRINGUTF: ", ret);
 
                 store.reference(ret);
                 write(reference, "NewStringUTF " + store.getIdentifier(ret));
             } else if (message.startsWith("NewString")) {
-                PluginDebug.debug("MESSAGE: " + message);
+                PluginDebug.debug("MESSAGE: ", message);
                 String[] args = message.split(" ");
                 Integer strlength = parseCall(args[1], null, Integer.class);
                 int bytelength = 2 * strlength;
@@ -1041,20 +1041,20 @@ public class PluginAppletSecurityContext {
                 String ret = null;
                 for (int i = 0; i < strlength; i++) {
                     int c = parseCall(args[2 + i], null, Integer.class);
-                    PluginDebug.debug("char " + i + " " + c);
+                    PluginDebug.debug("char ", i, " ", c);
                     // Low.
                     byteArray[2 * i] = (byte) (c & 0x0ff);
                     // High.
                     byteArray[2 * i + 1] = (byte) ((c >> 8) & 0x0ff);
                 }
                 ret = new String(byteArray, 0, bytelength, "UTF-16LE");
-                PluginDebug.debug("NEWSTRING: " + ret);
+                PluginDebug.debug("NEWSTRING: ", ret);
 
                 store.reference(ret);
                 write(reference, "NewString " + store.getIdentifier(ret));
 
             } else if (message.startsWith("ExceptionOccurred")) {
-                PluginDebug.debug("EXCEPTION: " + throwable);
+                PluginDebug.debug("EXCEPTION: ", throwable);
                 if (throwable != null)
                     store.reference(throwable);
                 write(reference, "ExceptionOccurred "
@@ -1132,7 +1132,7 @@ public class PluginAppletSecurityContext {
     }
 
     private void write(int reference, String message) {
-        PluginDebug.debug("appletviewer writing " + message);
+        PluginDebug.debug("appletviewer writing ", message);
         streamhandler.write("context " + identifier + " reference " + reference
                                 + " " + message);
     }

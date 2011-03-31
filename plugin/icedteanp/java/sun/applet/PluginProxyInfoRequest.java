@@ -56,7 +56,7 @@ public class PluginProxyInfoRequest extends PluginCallRequest {
         // try to parse the proxy information. If things go wrong, do nothing .. 
         // this will keep internal = null which forces a direct connection
 
-        PluginDebug.debug("PluginProxyInfoRequest GOT: " + proxyInfo);
+        PluginDebug.debug("PluginProxyInfoRequest GOT: ", proxyInfo);
         String[] messageComponents = proxyInfo.split(" ");
 
         try {

@@ -41,8 +41,11 @@ public class PluginDebug {
 
     static final boolean DEBUG = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
 
-    public static void debug(String message) {
-        if (DEBUG)
-            System.err.println(message);
+    public static void debug(Object... messageChunks) {
+        if (DEBUG) {
+            for (Object chunk : messageChunks) {
+                System.err.println(chunk.toString());
+            }
+        }
     }
 }

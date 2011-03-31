@@ -189,7 +189,7 @@ class PluginAppletPanelFactory {
             return null;
         }
 
-        PluginDebug.debug("Applet " + a.getClass() + " initialized");
+        PluginDebug.debug("Applet ", a.getClass(), " initialized");
         streamhandler.write("instance " + identifier + " reference 0 initialized");
 
         AppletSecurityContextManager.getSecurityContext(0).associateSrc(((NetxPanel) panel).getAppletClassLoader(), doc);
@@ -232,7 +232,7 @@ class PluginAppletPanelFactory {
             String[] events = splitSeparator(",", eventList);
 
             for (int i = 0; i < events.length; i++) {
-                PluginDebug.debug("Adding event to queue: " + events[i]);
+                PluginDebug.debug("Adding event to queue: ", events[i]);
                 if (events[i].equals("dispose"))
                     panel.sendEvent(AppletPanel.APPLET_DISPOSE);
                 else if (events[i].equals("load"))
@@ -251,7 +251,7 @@ class PluginAppletPanelFactory {
                     panel.sendEvent(AppletPanel.APPLET_ERROR);
                 else
                     // non-fatal error if we get an unrecognized event
-                    PluginDebug.debug("Unrecognized event name: " + events[i]);
+                    PluginDebug.debug("Unrecognized event name: ", events[i]);
             }
 
             while (!panel.emptyEventQueue())
@@ -371,7 +371,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     public static void framePanel(int identifier, PrintStream statusMsgStream,
                                   long handle, AppletViewerPanel panel) {
 
-        PluginDebug.debug("Framing " + panel);
+        PluginDebug.debug("Framing ", panel);
 
         // SecurityManager MUST be set, and only privileged code may call reFrame()
         System.getSecurityManager().checkPermission(new AllPermission());
@@ -386,7 +386,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         applets.put(identifier, appletFrame);
 
-        PluginDebug.debug(panel + " framed");
+        PluginDebug.debug(panel, " framed");
     }
 
     /**
@@ -486,7 +486,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
      */
     public static void handleMessage(int identifier, int reference, String message) {
 
-        PluginDebug.debug("PAV handling: " + message);
+        PluginDebug.debug("PAV handling: ", message);
 
         try {
             if (message.startsWith("handle")) {
@@ -515,11 +515,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
                         UrlUtil.decode(message.substring("tag".length() + 1, spaceLocation));
                 String tag = message.substring(spaceLocation + 1);
 
-                PluginDebug.debug("Handle = " + handle + "\n" +
-                                    "Width = " + width + "\n" +
-                                    "Height = " + height + "\n" +
-                                    "DocumentBase = " + documentBase + "\n" +
-                                    "Tag = " + tag);
+                PluginDebug.debug("Handle = ", handle, "\n",
+                                    "Width = ", width, "\n",
+                                    "Height = ", height, "\n",
+                                    "DocumentBase = ", documentBase, "\n",
+                                    "Tag = ", tag);
 
                 PluginAppletViewer.parse
                                         (identifier, handle, width, height,
@@ -561,7 +561,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
                 // Set it inactive, and try to do cleanup is applicable
                 PAV_INIT_STATUS previousStatus = updateStatus(identifier, PAV_INIT_STATUS.INACTIVE);
-                PluginDebug.debug("Destroy status set for " + identifier);
+                PluginDebug.debug("Destroy status set for ", identifier);
 
                 if (previousStatus != null &&
                          previousStatus.equals(PAV_INIT_STATUS.REFRAME_COMPLETE)) {
@@ -569,7 +569,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 }
 
             } else {
-                PluginDebug.debug("Handling message: " + message + " instance " + identifier + " " + Thread.currentThread());
+                PluginDebug.debug("Handling message: ", message, " instance ", identifier, " ", Thread.currentThread());
 
                 // Wait till initialization finishes
                 while (!applets.containsKey(identifier) &&
@@ -643,17 +643,17 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     private static synchronized void destroyApplet(int identifier) {
 
-        PluginDebug.debug("DestroyApplet called for " + identifier);
+        PluginDebug.debug("DestroyApplet called for ", identifier);
 
         PAV_INIT_STATUS prev = updateStatus(identifier, PAV_INIT_STATUS.DESTROYED);
 
         // If already destroyed, return
         if (prev.equals(PAV_INIT_STATUS.DESTROYED)) {
-            PluginDebug.debug(identifier + " already destroyed. Returning.");
+            PluginDebug.debug(identifier, " already destroyed. Returning.");
             return;
         }
 
-        PluginDebug.debug("Attempting to destroy frame " + identifier);
+        PluginDebug.debug("Attempting to destroy frame ", identifier);
 
         // Try to dispose the panel right away
         if (applets.containsKey(identifier))
@@ -661,11 +661,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         // If panel is already disposed, return
         if (applets.get(identifier).panel.applet == null) {
-            PluginDebug.debug(identifier + " panel inactive. Returning.");
+            PluginDebug.debug(identifier, " panel inactive. Returning.");
             return;
         }
 
-        PluginDebug.debug("Attempting to destroy panel " + identifier);
+        PluginDebug.debug("Attempting to destroy panel ", identifier);
 
         final int fIdentifier = identifier;
         SwingUtilities.invokeLater(new Runnable() {
@@ -674,7 +674,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             }
         });
 
-        PluginDebug.debug(identifier + " destroyed");
+        PluginDebug.debug(identifier, " destroyed");
     }
 
     /**
@@ -692,7 +692,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 waitTime < APPLET_TIMEOUT) {
             try {
                 if (waitTime % 500 == 0)
-                    PluginDebug.debug("Waiting for applet panel " + panel + " to initialize...");
+                    PluginDebug.debug("Waiting for applet panel ", panel, " to initialize...");
 
                 Thread.sleep(waitTime += 50);
             } catch (InterruptedException ie) {
@@ -700,7 +700,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             }
         }
 
-        PluginDebug.debug("Applet panel " + panel + " initialized");
+        PluginDebug.debug("Applet panel ", panel, " initialized");
     }
 
     public void handleMessage(int reference, String message) {
@@ -783,7 +783,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             // (happens in a separate thread)
             waitForAppletInit((NetxPanel) panel);
 
-            PluginDebug.debug(panel + " -- " + panel.getApplet() + " -- " + ((NetxPanel) panel).isAlive());
+            PluginDebug.debug(panel, " -- ", panel.getApplet(), " -- ", ((NetxPanel) panel).isAlive());
 
             // Still null?
             if (panel.getApplet() == null) {
@@ -792,10 +792,10 @@ public class PluginAppletViewer extends XEmbeddedFrame
             }
 
             o = panel.getApplet();
-            PluginDebug.debug("Looking for object " + o + " panel is " + panel);
+            PluginDebug.debug("Looking for object ", o, " panel is ", panel);
             AppletSecurityContextManager.getSecurityContext(0).store(o);
-            PluginDebug.debug("WRITING 1: " + "context 0 reference " + reference + " GetJavaObject "
-                                 + AppletSecurityContextManager.getSecurityContext(0).getIdentifier(o));
+            PluginDebug.debug("WRITING 1: ", "context 0 reference ", reference, " GetJavaObject "
+                                 , AppletSecurityContextManager.getSecurityContext(0).getIdentifier(o));
             streamhandler.write("context 0 reference " + reference + " GetJavaObject "
                               + AppletSecurityContextManager.getSecurityContext(0).getIdentifier(o));
             PluginDebug.debug("WRITING 1 DONE");
@@ -844,7 +844,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
      * Get an image ref.
      */
     private synchronized Ref getCachedImageRef(URL url) {
-        PluginDebug.debug("getCachedImageRef() searching for " + url);
+        PluginDebug.debug("getCachedImageRef() searching for ", url);
 
         try {
 
@@ -853,8 +853,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
             if (originalURL.startsWith(codeBase)) {
 
-                PluginDebug.debug("getCachedImageRef() got URL = " + url);
-                PluginDebug.debug("getCachedImageRef() plugin codebase = " + codeBase);
+                PluginDebug.debug("getCachedImageRef() got URL = ", url);
+                PluginDebug.debug("getCachedImageRef() plugin codebase = ", codeBase);
 
                 // try to fetch it locally
                 if (panel instanceof NetxPanel) {
@@ -871,7 +871,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 }
             }
 
-            PluginDebug.debug("getCachedImageRef() getting img from URL = " + url);
+            PluginDebug.debug("getCachedImageRef() getting img from URL = ", url);
 
             synchronized (imageRefs) {
                 AppletImageRef ref = imageRefs.get(url);
@@ -1049,7 +1049,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 PluginDebug.debug("wait getMEM request 2");
                 while (request.isDone() == false)
                     request.wait();
-                PluginDebug.debug("wait getMEM request 3 GOT: " + request.getObject().getClass());
+                PluginDebug.debug("wait getMEM request 3 GOT: ", request.getObject().getClass());
             }
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted waiting for call request.",
@@ -1101,7 +1101,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         streamhandler.postCallRequest(request);
         streamhandler.write(request.getMessage());
         try {
-            PluginDebug.debug("wait setMem request: " + request.getMessage());
+            PluginDebug.debug("wait setMem request: ", request.getMessage());
             PluginDebug.debug("wait setMem request 1");
             synchronized (request) {
                 PluginDebug.debug("wait setMem request 2");
@@ -1342,7 +1342,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
             requestURI = UrlUtil.encode(scheme + "://" + uri.getHost() + port + "/" + uri.getPath(), "UTF-8");
         } catch (Exception e) {
-            PluginDebug.debug("Cannot construct URL from " + uri.toString() + " ... falling back to DIRECT proxy");
+            PluginDebug.debug("Cannot construct URL from ", uri.toString(), " ... falling back to DIRECT proxy");
             e.printStackTrace();
             return null;
         }
@@ -1424,7 +1424,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     // FIXME: make this private and access it from JSObject using
     // reflection.
     private void write(String message) throws IOException {
-        PluginDebug.debug("WRITING 2: " + "instance " + identifier + " " + message);
+        PluginDebug.debug("WRITING 2: ", "instance ", identifier, " " + message);
         streamhandler.write("instance " + identifier + " " + message);
         PluginDebug.debug("WRITING 2 DONE");
     }
@@ -1741,7 +1741,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                     if ((c[0] = in.read()) == '>') {
                         buf.append((char) c[0]);
 
-                        PluginDebug.debug("Comment skipped: " + buf.toString());
+                        PluginDebug.debug("Comment skipped: ", buf.toString());
 
                         // comment skipped.
                         return;
@@ -1753,7 +1753,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
             } else if (commentHeaderPassed == false) {
                 buf.append((char) c[0]);
-                PluginDebug.debug("Warning: Attempted to skip comment, but this tag does not appear to be a comment: " + buf.toString());
+                PluginDebug.debug("Warning: Attempted to skip comment, but this tag does not appear to be a comment: ", buf.toString());
                 return;
             }
 
@@ -1795,7 +1795,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 val = decodeString(buf.toString());
             }
 
-            PluginDebug.debug("PUT " + att + " = '" + val + "'");
+            PluginDebug.debug("PUT ", att, " = '", val, "'");
             atts.put(att.toLowerCase(java.util.Locale.ENGLISH), val);
 
             while (true) {
@@ -1958,7 +1958,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                             if (val == null) {
                                 statusMsgStream.println(requiresNameWarning);
                             } else {
-                                PluginDebug.debug("PUT " + att + " = " + val);
+                                PluginDebug.debug("PUT ", att, " = ", val);
                                 atts.put(att.toLowerCase(), val);
                             }
                         }

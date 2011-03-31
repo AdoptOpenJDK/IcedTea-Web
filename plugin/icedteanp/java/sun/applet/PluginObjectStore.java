@@ -127,7 +127,7 @@ public class PluginObjectStore {
         synchronized(lock) {
             if (PluginDebug.DEBUG) {
                 for (Map.Entry<Integer, Object> e : objects.entrySet()) {
-                    PluginDebug.debug(e.getKey() + "::" + e.getValue());
+                    PluginDebug.debug(e.getKey(), "::", e.getValue());
                 }
             }
         }

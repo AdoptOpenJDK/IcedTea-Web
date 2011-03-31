@@ -43,7 +43,7 @@ public class RequestQueue {
     private int size = 0;
 
     public void post(PluginCallRequest request) {
-        PluginDebug.debug("Securitymanager=" + System.getSecurityManager());
+        PluginDebug.debug("Securitymanager=", System.getSecurityManager());
         if (head == null) {
             head = tail = request;
             tail.setNext(null);

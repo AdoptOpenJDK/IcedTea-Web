@@ -84,7 +84,7 @@ public class PluginProxySelector extends JNLPProxySelector {
         // If the browser returned anything, try to parse it. If anything in the try block fails, the fallback is direct connection
         try {
             if (o != null) {
-                PluginDebug.debug("Proxy URI = " + o);
+                PluginDebug.debug("Proxy URI = ", o);
                 URI proxyURI = (URI) o;
 
                 // If origin uri is http/ftp, we're good. If origin uri is not that, the proxy _must_ be socks, else we fallback to direct
@@ -98,7 +98,7 @@ public class PluginProxySelector extends JNLPProxySelector {
                     String uriKey = uri.getScheme() + "://" + uri.getHost();
                     proxyCache.put(uriKey, proxy);
                 } else {
-                    PluginDebug.debug("Proxy " + proxyURI + " cannot be used for " + uri + ". Falling back to DIRECT");
+                    PluginDebug.debug("Proxy ", proxyURI, " cannot be used for ", uri, ". Falling back to DIRECT");
                 }
             }
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class PluginProxySelector extends JNLPProxySelector {
 
         proxyList.add(proxy);
 
-        PluginDebug.debug("Proxy for " + uri.toString() + " is " + proxy);
+        PluginDebug.debug("Proxy for ", uri.toString(), " is ", proxy);
 
         return proxyList;
     }

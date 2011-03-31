@@ -42,11 +42,11 @@ public class GetMemberPluginCallRequest extends PluginCallRequest {
 
     public GetMemberPluginCallRequest(String message, Long reference) {
         super(message, reference);
-        PluginDebug.debug("GetMemberPluginCall " + message);
+        PluginDebug.debug("GetMemberPluginCall ", message);
     }
 
     public void parseReturn(String message) {
-        PluginDebug.debug("GetMemberParseReturn GOT: " + message);
+        PluginDebug.debug("GetMemberParseReturn GOT: ", message);
         String[] args = message.split(" ");
         // FIXME: Is it even possible to distinguish between null and void
         // here?

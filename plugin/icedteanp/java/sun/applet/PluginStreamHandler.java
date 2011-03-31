@@ -65,7 +65,7 @@ public class PluginStreamHandler {
     public PluginStreamHandler(InputStream inputstream, OutputStream outputstream)
             throws MalformedURLException, IOException {
 
-        PluginDebug.debug("Current context CL=" + Thread.currentThread().getContextClassLoader());
+        PluginDebug.debug("Current context CL=", Thread.currentThread().getContextClassLoader());
 
         PluginDebug.debug("Creating consumer...");
         consumer = new PluginMessageConsumer(this);
@@ -168,7 +168,7 @@ public class PluginStreamHandler {
 
         try {
 
-            PluginDebug.debug("Breakdown -- type: " + type + " identifier: " + identifier + " reference: " + reference + " src: " + src + " privileges: " + privileges + " rest: \"" + rest + "\"");
+            PluginDebug.debug("Breakdown -- type: ", type, " identifier: ", identifier, " reference: ", reference, " src: ", src, " privileges: ", privileges, " rest: \"", rest, "\"");
 
             if (rest.contains("JavaScriptGetWindow")
                     || rest.contains("JavaScriptGetMember")
@@ -191,7 +191,7 @@ public class PluginStreamHandler {
             if (type.equals("instance")) {
                 PluginAppletViewer.handleMessage(identifier, freference, frest);
             } else if (type.equals("context")) {
-                PluginDebug.debug("Sending to PASC: " + identifier + "/" + reference + " and " + rest);
+                PluginDebug.debug("Sending to PASC: ", identifier, "/", reference, " and ", rest);
                 AppletSecurityContextManager.handleMessage(identifier, reference, src, privileges, rest);
             }
         } catch (Exception e) {
@@ -234,7 +234,7 @@ public class PluginStreamHandler {
 
                 while (!request.serviceable(message)) {
 
-                    PluginDebug.debug(request + " cannot service " + message);
+                    PluginDebug.debug(request, " cannot service ", message);
 
                     // something is very wrong.. we have a message to 
                     // process, but no one to service it
@@ -279,7 +279,7 @@ public class PluginStreamHandler {
 
         try {
             message = pluginInputReader.readLine();
-            PluginDebug.debug("  PIPE: appletviewer read: " + message);
+            PluginDebug.debug("  PIPE: appletviewer read: ", message);
 
             if (message == null || message.equals("shutdown")) {
                 synchronized (shuttingDown) {
@@ -313,7 +313,7 @@ public class PluginStreamHandler {
      */
     public void write(String message) {
 
-        PluginDebug.debug("  PIPE: appletviewer wrote: " + message);
+        PluginDebug.debug("  PIPE: appletviewer wrote: ", message);
         synchronized (pluginOutputWriter) {
             try {
                 pluginOutputWriter.write(message + "\n", 0, message.length());

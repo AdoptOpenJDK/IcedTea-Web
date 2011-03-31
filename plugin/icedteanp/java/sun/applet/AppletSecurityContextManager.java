@@ -59,7 +59,7 @@ public class AppletSecurityContextManager {
     }
 
     public static void handleMessage(int identifier, int reference, String src, String[] privileges, String message) {
-        PluginDebug.debug(identifier + " -- " + src + " -- " + reference + " -- " + message + " CONTEXT= " + contexts.get(identifier));
+        PluginDebug.debug(identifier, " -- ", src, " -- ", reference, " -- ", message, " CONTEXT= ", contexts.get(identifier));
         AccessControlContext callContext = null;
 
         privileges = privileges != null ? privileges : new String[0];

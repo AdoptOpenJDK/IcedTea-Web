@@ -56,7 +56,7 @@ class PluginMessageHandlerWorker extends Thread {
         this.isPriorityWorker = isPriorityWorker;
         this.consumer = consumer;
 
-        PluginDebug.debug("Worker " + this.id + " (priority=" + isPriorityWorker + ") created.");
+        PluginDebug.debug("Worker ", this.id, " (priority=", isPriorityWorker, ") created.");
     }
 
     public void setmessage(String message) {
@@ -68,7 +68,7 @@ class PluginMessageHandlerWorker extends Thread {
 
             if (message != null) {
 
-                PluginDebug.debug("Consumer (priority=" + isPriorityWorker + ") thread " + id + " consuming " + message);
+                PluginDebug.debug("Consumer (priority=", isPriorityWorker, ") thread ", id, " consuming ", message);
 
                 // ideally, whoever returns this object should mark it
                 // busy first, but just in case..
@@ -86,7 +86,7 @@ class PluginMessageHandlerWorker extends Thread {
 
                 this.message = null;
 
-                PluginDebug.debug("Consumption (priority=" + isPriorityWorker + ") completed by consumer thread " + id);
+                PluginDebug.debug("Consumption (priority=", isPriorityWorker, ") completed by consumer thread ", id);
 
                 // mark ourselves free again
                 free();
@@ -96,9 +96,9 @@ class PluginMessageHandlerWorker extends Thread {
                 // Sleep when there is nothing to do
                 try {
                     Thread.sleep(Integer.MAX_VALUE);
-                    PluginDebug.debug("Consumer thread " + id + " sleeping...");
+                    PluginDebug.debug("Consumer thread ", id, " sleeping...");
                 } catch (InterruptedException ie) {
-                    PluginDebug.debug("Consumer thread " + id + " woken...");
+                    PluginDebug.debug("Consumer thread ", id, " woken...");
                     // nothing.. someone woke us up, see if there 
                     // is work to do
                 }

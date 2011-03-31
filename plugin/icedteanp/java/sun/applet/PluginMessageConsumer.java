@@ -69,7 +69,7 @@ class PluginMessageConsumer {
      * @param reference The reference to give priority to
      */
     public static void registerPriorityWait(Long reference) {
-        PluginDebug.debug("Registering priority for reference " + reference);
+        PluginDebug.debug("Registering priority for reference ", reference);
         registerPriorityWait("reference " + reference.toString());
     }
 
@@ -79,7 +79,7 @@ class PluginMessageConsumer {
      * @param searchString the string to look for in a response
      */
     private static void registerPriorityWait(String searchString) {
-        PluginDebug.debug("Registering priority for string " + searchString);
+        PluginDebug.debug("Registering priority for string ", searchString);
         synchronized (priorityWaitQueue) {
             if (!priorityWaitQueue.contains(searchString)) {
                 priorityWaitQueue.add(searchString);
@@ -206,7 +206,7 @@ class PluginMessageConsumer {
 
         for (PluginMessageHandlerWorker worker : workers) {
             if (worker.isFree(prioritized)) {
-                PluginDebug.debug("Found free worker (" + worker.isPriority() + ") with id " + worker.getWorkerId());
+                PluginDebug.debug("Found free worker (", worker.isPriority(), ") with id ", worker.getWorkerId());
                 // mark it busy before returning
                 worker.busy();
                 return worker;
@@ -218,10 +218,10 @@ class PluginMessageConsumer {
             PluginMessageHandlerWorker worker = null;
 
             if (workers.size() < (MAX_WORKERS - PRIORITY_WORKERS)) {
-                PluginDebug.debug("Cannot find free worker, creating worker " + workers.size());
+                PluginDebug.debug("Cannot find free worker, creating worker ", workers.size());
                 worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), false);
             } else if (prioritized) {
-                PluginDebug.debug("Cannot find free worker, creating priority worker " + workers.size());
+                PluginDebug.debug("Cannot find free worker, creating priority worker ", workers.size());
                 worker = new PluginMessageHandlerWorker(this, streamHandler, workers.size(), true);
             } else {
                 return null;

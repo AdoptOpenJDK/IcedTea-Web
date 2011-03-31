@@ -40,7 +40,7 @@ package sun.applet;
 public class VoidPluginCallRequest extends PluginCallRequest {
     public VoidPluginCallRequest(String message, Long reference) {
         super(message, reference);
-        PluginDebug.debug("VoidPluginCall " + message);
+        PluginDebug.debug("VoidPluginCall ", message);
     }
 
     public void parseReturn(String message) {
