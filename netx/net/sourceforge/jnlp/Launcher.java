@@ -396,20 +396,7 @@ public class Launcher {
                 return null;
             }
 
-            final int preferredWidth = 500;
-            final int preferredHeight = 400;
-            JNLPSplashScreen splashScreen = null;
-            URL splashImageURL = file.getInformation().getIconLocation(
-                    IconDesc.SPLASH, preferredWidth, preferredHeight);
-            if (splashImageURL != null) {
-                ResourceTracker resourceTracker = new ResourceTracker(true);
-                resourceTracker.addResource(splashImageURL, file.getFileVersion(), null, updatePolicy);
-                splashScreen = new JNLPSplashScreen(resourceTracker, null, null);
-                splashScreen.setSplashImageURL(splashImageURL);
-                if (splashScreen.isSplashScreenValid()) {
-                    splashScreen.setVisible(true);
-                }
-            }
+            handler.launchInitialized(file);
 
             ApplicationInstance app = createApplication(file);
             app.initialize();
@@ -446,12 +433,7 @@ public class Launcher {
 
             setContextClassLoaderForAllThreads(app.getThreadGroup(), app.getClassLoader());
 
-            if (splashScreen != null) {
-                if (splashScreen.isSplashScreenValid()) {
-                    splashScreen.setVisible(false);
-                }
-                splashScreen.dispose();
-            }
+            handler.launchStarting(app);
 
             main.setAccessible(true);
             main.invoke(null, new Object[] { args });

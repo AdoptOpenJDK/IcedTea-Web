@@ -187,8 +187,13 @@ public class JNLPRuntime {
         if (!headless && indicator == null)
             indicator = new DefaultDownloadIndicator();
 
-        if (handler == null)
-            handler = new DefaultLaunchHandler();
+        if (handler == null) {
+            if (headless) {
+                handler = new DefaultLaunchHandler();
+            } else {
+                handler = new GuiLaunchHandler();
+            }
+        }
 
         ServiceManager.setServiceManagerStub(new XServiceManagerStub()); // ignored if we're running under Web Start
 

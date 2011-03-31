@@ -76,7 +76,7 @@ public class DefaultLaunchHandler implements LaunchHandler {
     /**
      * Print a message to stdout.
      */
-    protected void printMessage(LaunchException ex) {
+    protected static void printMessage(LaunchException ex) {
         StringBuffer result = new StringBuffer();
         result.append("netx: ");
         result.append(ex.getCategory());
@@ -101,6 +101,22 @@ public class DefaultLaunchHandler implements LaunchHandler {
             result.append(causes[i].getMessage());
             result.append(")");
         }
+    }
+
+    /**
+     * Do nothing on when initializing
+     */
+    @Override
+    public void launchInitialized(JNLPFile file) {
+        // do nothing
+    }
+
+    /**
+     * Do nothing when starting
+     */
+    @Override
+    public void launchStarting(ApplicationInstance application) {
+        // do nothing
     }
 
 }

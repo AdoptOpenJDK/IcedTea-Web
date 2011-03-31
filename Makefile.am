@@ -6,6 +6,17 @@ NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/javaws/about/resources
 NETX_EXTRA_DIST_DIR=$(abs_top_builddir)/extra-lib/net/sourceforge/javaws/about/resources
 
+TESTS_SRCDIR=$(abs_top_srcdir)/tests
+TESTS_DIR=$(abs_top_builddir)/tests.build
+
+NETX_UNIT_TEST_SRCDIR=$(TESTS_SRCDIR)/netx/unit
+NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
+
+JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
+JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
+
+JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
+
 # Build directories
 
 BOOT_DIR = $(abs_top_builddir)/bootstrap/jdk1.6.0
@@ -25,12 +36,19 @@ IT_LANGUAGE_SOURCE_VERSION=6
 IT_CLASS_TARGET_VERSION=6
 IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
 
+#
+# We need the jars in bootclasspath for a couple of reasons
+#  - we use classes (in the sun.applet package) loaded by the bootclassloader
+#    using another classloader to load classes from the same package causes an
+#    IllegalAccessException
+#  - we want full privileges
+#
 JRE='"$(SYSTEM_JDK_DIR)/jre"'
 LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
 PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
 
-# Fake update version to shut up the plugin detector hosted by Oracle.
-# If Oracle ever release a JDK update greater than 50, this needs to be increased.
+# Fake update version to work with the Deployment Toolkit script used by Oracle
+# http://download.oracle.com/javase/tutorial/deployment/deploymentInDepth/depltoolkit_index.html
 JDK_UPDATE_VERSION=50
 
 # Sources list
@@ -73,6 +91,19 @@ JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m -J-XX:PermSize=32m -J-XX:MaxPermSize=160
 endif
 endif
 
+if WITH_RHINO
+  RHINO_TESTS=check-pac-functions
+else
+  RHINO_TESTS=
+endif
+
+if WITH_JUNIT
+  JUNIT_TESTS=run-netx-unit-tests
+else
+  JUNIT_TESTS=
+endif
+
+
 PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
@@ -92,7 +123,7 @@ edit_launcher_script = sed \
 all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/javaws \
  javaws.desktop stamps/docs.stamp launcher.build/itweb-settings itweb-settings.desktop
 
-check-local: check-pac-functions
+check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
  clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-tests
@@ -102,7 +133,8 @@ clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstr
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs \
- clean-tests check-local clean-launchers
+ clean-tests check-local clean-launchers check-pac-functions run-netx-unit-tests clean-netx-tests \
+ clean-junit-runner clean-netx-unit-tests
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir)
@@ -390,11 +422,67 @@ clean-plugin-docs:
 # check
 # ==========================
 
+clean-tests: clean-netx-tests
+	if [ -e $(TESTS_DIR) ]; then \
+		rmdir $(TESTS_DIR) ; \
+	fi
+
 check-pac-functions: stamps/bootstrap-directory.stamp
 	./jrunscript $(abs_top_srcdir)/tests/netx/pac/pac-funcs-test.js \
 	  $$(readlink -f $(abs_top_srcdir)/netx/net/sourceforge/jnlp/runtime/pac-funcs.js)
 
-clean-tests:
+junit-runner-source-files.txt:
+	find $(JUNIT_RUNNER_SRCDIR) -name '*.java' | sort > $@
+
+$(JUNIT_RUNNER_JAR): junit-runner-source-files.txt
+	mkdir -p $(JUNIT_RUNNER_DIR) && \
+	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	  -d $(JUNIT_RUNNER_DIR) \
+	  -classpath $(JUNIT_JAR) \
+	  @junit-runner-source-files.txt && \
+	$(BOOT_DIR)/bin/jar cf $@  -C $(JUNIT_RUNNER_DIR) .
+
+netx-unit-tests-source-files.txt:
+	find $(NETX_UNIT_TEST_SRCDIR) -name '*.java' | sort > $@
+
+stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
+ netx-unit-tests-source-files.txt
+	mkdir -p $(NETX_UNIT_TEST_DIR) && \
+	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	 -d $(NETX_UNIT_TEST_DIR) \
+	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar \
+	 @netx-unit-tests-source-files.txt && \
+	mkdir -p stamps && \
+	touch $@
+
+run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
+ $(JUNIT_RUNNER_JAR)
+	cp {$(NETX_UNIT_TEST_SRCDIR),$(NETX_UNIT_TEST_DIR)}/net/sourceforge/jnlp/basic.jnlp
+	cd $(NETX_UNIT_TEST_DIR) ; \
+	class_names= ; \
+	for test in `find -type f` ; do \
+	  class_name=`echo $$test | sed -e 's|\.class$$||' -e 's|^\./||'` ; \
+	  class_name=`echo $$class_name | sed -e 's|/|.|g' ` ; \
+	  class_names="$$class_names $$class_name" ; \
+	done ; \
+	echo $$class_names ; \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
+	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
+
+clean-netx-tests: clean-netx-unit-tests clean-junit-runner
+	if [ -e $(TESTS_DIR)/netx ]; then \
+	  rmdir $(TESTS_DIR)/netx ; \
+	fi
+
+clean-junit-runner:
+	rm -f junit-runner-source-files.txt
+	rm -rf $(JUNIT_RUNNER_DIR)
+	rm -f $(JUNIT_RUNNER_JAR)
+
+clean-netx-unit-tests:
+	rm -f netx-unit-tests-source-files.txt
+	rm -rf $(NETX_UNIT_TEST_DIR)
+	rm -f stamps/netx-unit-tests-compile.stamp
 
 # plugin tests
 

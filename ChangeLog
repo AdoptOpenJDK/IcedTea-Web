@@ -8,6 +8,72 @@
 	(unreference, getObject, getIdentifier, contains(Object),
 	contains(int)): Synchronized.
 
+2011-03-31  Omair Majid  <omajid@redhat.com>
+
+	Add unit tests for the parser
+	* Makefile.am: Add TESTS_DIR,TESTS_SRCDIR, NETX_UNIT_TEST_DIR,
+	and NETX_UNIT_TEST_SRCDIR, JUNIT_RUNNER_DIR, JUNIT_RUNNER_SRCDIR, and
+	JUNIT_RUNNER_JAR. Conditionally define RHINO_TESTS and UNIT_TESTS.
+	(clean-local): Use RHINO_TESTS and UNIT_TESTS.
+	(clean-tests): Depend on clean-netx-tests. Delete directory.
+	(junit-runner-source-files.txt, $(JUNIT_RUNNER_JAR)),
+	(next-unit-tests-sources-files.txt stamps/netx-unit-tests-compile.stamp),
+	(run-netx-unit-tests, clean-netx-tests, clean-junit-runner)
+	(clean-netx-unit-tests): New targets.
+	* configure.ac: Add new optional dependency on junit.
+	* tests/junit-runner/CommandLine.java,
+	* tests/junit-runner/LessVerboseTextListener.java,
+	* tests/junit-runner/README,
+	* tests/netx/unit/net/sourceforge/jnlp/ParserBasicTests.java,
+	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCaseTests.java,
+	* tests/netx/unit/net/sourceforge/jnlp/ParserMalformedXmlTests.java,
+	* tests/netx/unit/net/sourceforge/jnlp/basic.jnlp: New files.
+
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am: Fix comment explaining reasons for setting
+	JDK_UPDATE_VERSION.
+
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Fix typo in
+	RCantRename.
+
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am: Document reason for using bootclasspath.
+
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
+	* netx/javaws.1: Fix FILES section to point to
+	~/.icedtea/deployment.properties.
+
+2011-03-30  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/LaunchHandler.java
+	(launchInitialized, launchStarting): New methods.
+	* netx/net/sourceforge/jnlp/DefaultLaunchHandler.java
+	(launchInitialized, launchStarting): New methods. No-op
+	implementation.
+	(printMessage): Make it static.
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: New file.
+	(launchCompleted, launchError, launchStarting, launchInitialized),
+	(launchWarning, validationError): New methods.
+	* netx/net/sourceforge/jnlp/Launcher.java (launchApplication):
+	Invoke handler.launchInitialized and handler.launchStarting instead
+	of showing a splash screen directly.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	ButShowDetails, ButHideDetails and Error.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java (run): Do not exit on
+	error.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Set handler to GuiLaunchHandler if not running in
+	headless mode.
+	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java: New
+	file.
+	(exceptionToString, show): New methods.
+
+>>>>>>> /tmp/ChangeLog~other.ZwCGJe
 2011-03-29  Denis Lila <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPFile.java
