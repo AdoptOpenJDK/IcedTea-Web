@@ -37,80 +37,99 @@ exception statement from your version. */
 
 package sun.applet;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PluginObjectStore {
     private static HashMap<Integer, Object> objects = new HashMap<Integer, Object>();
     private static HashMap<Integer, Integer> counts = new HashMap<Integer, Integer>();
     private static HashMap<Object, Integer> identifiers = new HashMap<Object, Integer>();
-    // FIXME:
-    //
-    // IF uniqueID == MAX_LONG, uniqueID =
-    // 0 && wrapped = true
-    //
-    // if (wrapped), check if
-    // objects.get(uniqueID) returns null
-    //
-    // if yes, use uniqueID, if no,
-    // uniqueID++ and keep checking
-    // or:
-    // stack of available ids:
-    // derefed id -> derefed id -> nextUniqueIdentifier
+    private static final Object lock = new Object();
+
+    private static boolean wrapped = false;
     private static int nextUniqueIdentifier = 1;
 
     public Object getObject(Integer identifier) {
-        return objects.get(identifier);
+        synchronized(lock) {
+            return objects.get(identifier);
+        }
     }
 
     public Integer getIdentifier(Object object) {
-        if (object == null)
-            return 0;
-        return identifiers.get(object);
+        synchronized(lock) {
+            if (object == null)
+                return 0;
+            return identifiers.get(object);
+        }
     }
 
     public boolean contains(Object object) {
-        if (object == null)
-            return identifiers.containsKey(object);
+        synchronized(lock) {
+            if (object == null)
+                return identifiers.containsKey(object);
 
-        return false;
+            return false;
+        }
     }
 
     public boolean contains(int identifier) {
-        return objects.containsKey(identifier);
+        synchronized(lock) {
+            return objects.containsKey(identifier);
+        }
+    }
+
+    private static boolean checkNeg() {
+        if (nextUniqueIdentifier < 1) {
+            wrapped = true;
+            nextUniqueIdentifier = 1;
+        }
+        return wrapped;
+    }
+
+    private int getNextID() {
+        while (checkNeg() && objects.containsKey(nextUniqueIdentifier))
+            nextUniqueIdentifier++;
+        return nextUniqueIdentifier++;
     }
 
     public void reference(Object object) {
-        Integer identifier = identifiers.get(object);
-        if (identifier == null) {
-            objects.put(nextUniqueIdentifier, object);
-            counts.put(nextUniqueIdentifier, 1);
-            identifiers.put(object, nextUniqueIdentifier);
-            nextUniqueIdentifier++;
-        } else {
-            counts.put(identifier, counts.get(identifier) + 1);
+        synchronized(lock) {
+            Integer identifier = identifiers.get(object);
+            if (identifier == null) {
+                int next = getNextID();
+                objects.put(next, object);
+                counts.put(next, 1);
+                identifiers.put(object, next);
+            } else {
+                counts.put(identifier, counts.get(identifier) + 1);
+            }
         }
     }
 
     public void unreference(int identifier) {
-        Integer currentCount = counts.get(identifier);
-        if (currentCount == null) {
-            return;
-        }
-        if (currentCount == 1) {
-            Object object = objects.get(identifier);
-            objects.remove(identifier);
-            counts.remove(identifier);
-            identifiers.remove(object);
-        } else {
-            counts.put(identifier, currentCount - 1);
+        synchronized(lock) {
+            Integer currentCount = counts.get(identifier);
+            if (currentCount == null) {
+                return;
+            }
+            if (currentCount == 1) {
+                Object object = objects.get(identifier);
+                objects.remove(identifier);
+                counts.remove(identifier);
+                identifiers.remove(object);
+            } else {
+                counts.put(identifier, currentCount - 1);
+            }
         }
     }
 
     public void dump() {
-        Iterator i = objects.keySet().iterator();
-        while (i.hasNext()) {
-            Object key = i.next();
-            PluginDebug.debug(key + "::" + objects.get(key));
+        synchronized(lock) {
+            if (PluginDebug.DEBUG) {
+                for (Map.Entry<Integer, Object> e : objects.entrySet()) {
+                    PluginDebug.debug(e.getKey() + "::" + e.getValue());
+                }
+            }
         }
     }
 }
