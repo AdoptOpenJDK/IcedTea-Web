@@ -43,9 +43,14 @@ public class PluginDebug {
 
     public static void debug(Object... messageChunks) {
         if (DEBUG) {
-            for (Object chunk : messageChunks) {
-                System.err.println(chunk.toString());
+            if (messageChunks == null) {
+                messageChunks = new Object[] {null};
             }
+            StringBuilder b = new StringBuilder();
+            for (Object chunk : messageChunks) {
+                b.append(chunk);
+            }
+            System.err.println(b.toString());
         }
     }
 }
