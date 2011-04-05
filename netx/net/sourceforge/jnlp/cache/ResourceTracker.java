@@ -29,9 +29,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.jar.Pack200.Unpacker;
@@ -120,8 +119,8 @@ public class ResourceTracker {
     /** resources requested to be downloaded */
     private static ArrayList<Resource> queue = new ArrayList<Resource>();
 
-    private static Map<Resource, DownloadOptions> downloadOptions =
-        new HashMap<Resource, DownloadOptions>();
+    private static ConcurrentHashMap<Resource, DownloadOptions> downloadOptions =
+        new ConcurrentHashMap<Resource, DownloadOptions>();
 
     /** resource trackers threads are working for (used for load balancing across multi-tracker downloads) */
     private static ArrayList<ResourceTracker> active =
