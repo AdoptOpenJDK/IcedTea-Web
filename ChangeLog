@@ -1,5 +1,11 @@
 2011-04-05  Denis Lila  <dlila@redhat.com>
 
+	* plugin/icedteanp/java/netscape/javascript/JSObject.java:
+	Replaced every instance of PluginDebug.debug(a + b + c...)
+	with PluginDebug.debug(a, b, c...).
+
+2011-04-05  Denis Lila  <dlila@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
 	Remove unused imports, add import.
 	(downloadOptions): Make ConcurrentHashMap.

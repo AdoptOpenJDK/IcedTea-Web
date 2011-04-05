@@ -150,10 +150,10 @@ public final class JSObject {
      * Equivalent to "this.<i>name</i>" in JavaScript.
      */
     public Object getMember(String name) {
-        PluginDebug.debug("JSObject.getMember " + name);
+        PluginDebug.debug("JSObject.getMember ", name);
 
         Object o = PluginAppletViewer.getMember(internal, name);
-        PluginDebug.debug("JSObject.getMember GOT " + o);
+        PluginDebug.debug("JSObject.getMember GOT ", o);
         return o;
     }
 
@@ -163,7 +163,7 @@ public final class JSObject {
      */
     //    public Object         getMember(int index) { return getSlot(index); }
     public Object getSlot(int index) {
-        PluginDebug.debug("JSObject.getSlot " + index);
+        PluginDebug.debug("JSObject.getSlot ", index);
 
         return PluginAppletViewer.getSlot(internal, index);
     }
@@ -173,7 +173,7 @@ public final class JSObject {
      * Equivalent to "this.<i>name</i> = <i>value</i>" in JavaScript.
      */
     public void setMember(String name, Object value) {
-        PluginDebug.debug("JSObject.setMember " + name + " " + value);
+        PluginDebug.debug("JSObject.setMember ", name, " ", value);
 
         PluginAppletViewer.setMember(internal, name, value);
     }
@@ -186,7 +186,7 @@ public final class JSObject {
     //        setSlot(index, value);
     //    }
     public void setSlot(int index, Object value) {
-        PluginDebug.debug("JSObject.setSlot " + index + " " + value);
+        PluginDebug.debug("JSObject.setSlot ", index, " ", value);
 
         PluginAppletViewer.setSlot(internal, index, value);
     }
@@ -195,7 +195,7 @@ public final class JSObject {
      * Removes a named member of a JavaScript object.
      */
     public void removeMember(String name) {
-        PluginDebug.debug("JSObject.removeMember " + name);
+        PluginDebug.debug("JSObject.removeMember ", name);
 
         PluginAppletViewer.removeMember(internal, name);
     }
@@ -208,9 +208,9 @@ public final class JSObject {
         if (args == null)
             args = new Object[0];
 
-        PluginDebug.debug("JSObject.call " + methodName);
+        PluginDebug.debug("JSObject.call ", methodName);
         for (int i = 0; i < args.length; i++)
-            PluginDebug.debug(" " + args[i]);
+            PluginDebug.debug(" ", args[i]);
         PluginDebug.debug("");
         return PluginAppletViewer.call(internal, methodName, args);
     }
@@ -221,7 +221,7 @@ public final class JSObject {
      * given by "this".
      */
     public Object eval(String s) {
-        PluginDebug.debug("JSObject.eval " + s);
+        PluginDebug.debug("JSObject.eval ", s);
         return PluginAppletViewer.eval(internal, s);
     }
 
@@ -246,7 +246,7 @@ public final class JSObject {
         long internal = 0;
         internal = ((PluginAppletViewer)
                     applet.getAppletContext()).getWindow();
-        PluginDebug.debug("GOT IT: " + internal);
+        PluginDebug.debug("GOT IT: ", internal);
         return new JSObject(internal);
     }
 
