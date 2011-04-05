@@ -6,6 +6,7 @@ LAUNCHER_FLAGS=-Xms8m
 CLASSNAME=net.sourceforge.jnlp.runtime.Boot
 BINARY_LOCATION=@JAVAWS_BIN_LOCATION@
 PROGRAM_NAME=javaws
+CP=@JRE@/lib/rt.jar
 
 JAVA_ARGS=
 ARGS=
@@ -24,6 +25,7 @@ done
 
 ${JAVA} ${LAUNCHER_BOOTCLASSPATH} ${LAUNCHER_FLAGS} \
   ${JAVA_ARGS} \
+  -classpath ${CP} \
   -Dicedtea-web.bin.name=${PROGRAM_NAME} \
   -Dicedtea-web.bin.location=${BINARY_LOCATION} \
   ${CLASSNAME} \

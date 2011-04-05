@@ -1541,34 +1541,40 @@ plugin_start_appletviewer (ITNPPluginData* data)
   gchar** command_line;
   gchar** environment;
 
+  int cmd_num = 0;
   if (plugin_debug)
   {
-      command_line = (gchar**) malloc(sizeof(gchar*)*9);
-      command_line[0] = g_strdup(appletviewer_executable);
-      command_line[1] = g_strdup(PLUGIN_BOOTCLASSPATH);
-      command_line[2] = g_strdup("-Xdebug");
-      command_line[3] = g_strdup("-Xnoagent");
+      command_line = (gchar**) malloc(sizeof(gchar*)*11);
+      command_line[cmd_num++] = g_strdup(appletviewer_executable);
+      command_line[cmd_num++] = g_strdup(PLUGIN_BOOTCLASSPATH);
+      // set the classpath to avoid using the default (cwd).
+      command_line[cmd_num++] = g_strdup("-classpath");
+      command_line[cmd_num++] = g_strdup_printf("%s/lib/rt.jar", ICEDTEA_WEB_JRE);
+      command_line[cmd_num++] = g_strdup("-Xdebug");
+      command_line[cmd_num++] = g_strdup("-Xnoagent");
       if (plugin_debug_suspend)
       {
-          command_line[4] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y");
+          command_line[cmd_num++] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y");
       } else
       {
-          command_line[4] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n");
+          command_line[cmd_num++] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n");
       }
-      command_line[5] = g_strdup("sun.applet.PluginMain");
-      command_line[6] = g_strdup(out_pipe_name);
-      command_line[7] = g_strdup(in_pipe_name);
-      command_line[8] = NULL;
-   } else
-   {
-       command_line = (gchar**) malloc(sizeof(gchar*)*6);
-       command_line[0] = g_strdup(appletviewer_executable);
-       command_line[1] = g_strdup(PLUGIN_BOOTCLASSPATH);
-       command_line[2] = g_strdup("sun.applet.PluginMain");
-       command_line[3] = g_strdup(out_pipe_name);
-       command_line[4] = g_strdup(in_pipe_name);
-       command_line[5] = NULL;
-   }
+      command_line[cmd_num++] = g_strdup("sun.applet.PluginMain");
+      command_line[cmd_num++] = g_strdup(out_pipe_name);
+      command_line[cmd_num++] = g_strdup(in_pipe_name);
+      command_line[cmd_num] = NULL;
+  } else
+  {
+      command_line = (gchar**) malloc(sizeof(gchar*)*8);
+      command_line[cmd_num++] = g_strdup(appletviewer_executable);
+      command_line[cmd_num++] = g_strdup(PLUGIN_BOOTCLASSPATH);
+      command_line[cmd_num++] = g_strdup("-classpath");
+      command_line[cmd_num++] = g_strdup_printf("%s/lib/rt.jar", ICEDTEA_WEB_JRE);
+      command_line[cmd_num++] = g_strdup("sun.applet.PluginMain");
+      command_line[cmd_num++] = g_strdup(out_pipe_name);
+      command_line[cmd_num++] = g_strdup(in_pipe_name);
+      command_line[cmd_num] = NULL;
+  }
 
   environment = plugin_filter_environment();
 
@@ -1590,25 +1596,9 @@ plugin_start_appletviewer (ITNPPluginData* data)
 
   g_strfreev (environment);
 
-  g_free (command_line[0]);
-  command_line[0] = NULL;
-  g_free (command_line[1]);
-  command_line[1] = NULL;
-  g_free (command_line[2]);
-  command_line[2] = NULL;
-  g_free (command_line[3]);
-  command_line[3] = NULL;
-  g_free (command_line[4]);
-  command_line[4] = NULL;
-
-  if (plugin_debug)
-  {
-      g_free (command_line[5]);
-      command_line[5] = NULL;
-      g_free (command_line[6]);
-      command_line[6] = NULL;
-      g_free (command_line[7]);
-      command_line[7] = NULL;
+  for (int i = 0; i < cmd_num; i++) {
+    g_free (command_line[i]);
+    command_line[i] = NULL;
   }
 
   g_free(command_line);

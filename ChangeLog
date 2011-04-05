@@ -1,3 +1,14 @@
+2011-04-05  Denis Lila  <dlila@redhat.com>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(plugin_start_appletviewer): Replace hardcoded indices
+	with a variable; roll up free calls in a loop; fix whitespace;
+	set classpath to ICEDTEA_WEB_JRE/lib/rt.jar.
+	* launcher/javaws.in:
+	Set class path to JRE/lib/rt.jar.
+	* Makefile.am:
+	Replace @JRE@ with $(JRE) in edit_launcher_script.
+
 2011-04-01  Denis Lila  <dlila@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginDebug.java: 

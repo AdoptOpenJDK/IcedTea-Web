@@ -115,7 +115,8 @@ edit_launcher_script = sed \
   -e 's|[@]LAUNCHER_BOOTCLASSPATH[@]|$(LAUNCHER_BOOTCLASSPATH)|g' \
   -e 's|[@]JAVAWS_BIN_LOCATION[@]|$(bindir)/javaws|g' \
   -e 's|[@]ITWEB_SETTINGS_BIN_LOCATION[@]|$(bindir)/itweb-settings|g' \
-  -e 's|[@]JAVA[@]|$(JAVA)|g'
+  -e 's|[@]JAVA[@]|$(JAVA)|g' \
+  -e 's|[@]JRE[@]|$(JRE)|g'
 
 # Top-Level Targets
 # =================
