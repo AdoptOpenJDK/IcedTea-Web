@@ -36,9 +36,13 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -113,8 +117,10 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         final JTextField addressField = new JTextField(config.getProperty(properties[1]), 10);
         addressField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[1]));
 
-        final JTextField portField = new JTextField(config.getProperty(properties[2]), 3);
+        final JTextField portField = new JTextField(5);
+        portField.setDocument(NetworkSettingsPanel.getPortNumberDocument());
         portField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[2]));
+        portField.setText(config.getProperty(properties[2]));
 
         // Create the button which allows setting of other types of proxy.
         JButton advancedProxyButton = new JButton(Translator.R("NSAdvanced") + "...");
@@ -253,5 +259,30 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
             for (JPanel panel : proxyPanels)
                 enablePanel(panel, false);
         }
+    }
+    
+    /**
+     * Creates a PlainDocument that only take numbers if it will create a valid port number.
+     * @return PlainDocument which will ensure numeric values only and is a valid port number.
+     */
+    public static PlainDocument getPortNumberDocument(){
+        return new PlainDocument(){
+            public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+                if (str != null) {
+                    try {
+                        Integer.valueOf(str);
+                        int val = Integer.valueOf(this.getText(0, this.getLength()) + str);
+                        if (val < 1 || val > 65535) { // Invalid port number if true
+                            throw new NumberFormatException("Invalid port number");
+                        }
+                        super.insertString(offs, str, a);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, Translator.R("CPInvalidPort"), Translator.R("CPInvalidPortTitle")
+                                , JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+                return;
+            }
+        };
     }
 }

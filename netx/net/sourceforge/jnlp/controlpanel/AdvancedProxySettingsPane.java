@@ -114,30 +114,38 @@ public class AdvancedProxySettingsPane extends JPanel {
         // This addresses the HTTP proxy settings.
         JLabel http = new JLabel(Translator.R("APSLabelHTTP") + ":");
         final JTextField httpAddressField = new JTextField(fields[0]);
-        final JTextField httpPortField = new JTextField(fields[1]);
+        final JTextField httpPortField = new JTextField();
+        httpPortField.setDocument(NetworkSettingsPanel.getPortNumberDocument());
         httpAddressField.getDocument().addDocumentListener(new DocumentAdapter(fields, 0));
         httpPortField.getDocument().addDocumentListener(new DocumentAdapter(fields, 1));
+        httpPortField.setText(fields[1]);
 
         // This addresses the HTTPS proxy settings.
         JLabel secure = new JLabel(Translator.R("APSLabelSecure") + ":");
         final JTextField secureAddressField = new JTextField(fields[2]);
-        final JTextField securePortField = new JTextField(fields[3]);
+        final JTextField securePortField = new JTextField();
+        securePortField.setDocument(NetworkSettingsPanel.getPortNumberDocument());
         secureAddressField.getDocument().addDocumentListener(new DocumentAdapter(fields, 2));
         securePortField.getDocument().addDocumentListener(new DocumentAdapter(fields, 3));
+        securePortField.setText(fields[3]);
 
         // This addresses the FTP proxy settings.
         JLabel ftp = new JLabel(Translator.R("APSLabelFTP") + ":");
         final JTextField ftpAddressField = new JTextField(fields[4]);
-        final JTextField ftpPortField = new JTextField(fields[5]);
+        final JTextField ftpPortField = new JTextField();
+        ftpPortField.setDocument(NetworkSettingsPanel.getPortNumberDocument());
         ftpAddressField.getDocument().addDocumentListener(new DocumentAdapter(fields, 4));
         ftpPortField.getDocument().addDocumentListener(new DocumentAdapter(fields, 5));
+        ftpPortField.setText(fields[5]);
 
         // This addresses the Socks proxy settings.
         JLabel socks = new JLabel(Translator.R("APSLabelSocks") + ":");
         final JTextField socksAddressField = new JTextField(fields[6]);
-        final JTextField socksPortField = new JTextField(fields[7]);
+        final JTextField socksPortField = new JTextField();
+        socksPortField.setDocument(NetworkSettingsPanel.getPortNumberDocument());
         socksAddressField.getDocument().addDocumentListener(new DocumentAdapter(fields, 6));
         socksPortField.getDocument().addDocumentListener(new DocumentAdapter(fields, 7));
+        socksPortField.setText(fields[7]);
 
         JCheckBox sameProxyForAll = new JCheckBox(Translator.R("APSSameProxyForAllProtocols"), Boolean.parseBoolean(fields[8]));
         sameProxyForAll.addItemListener(new ItemListener() {

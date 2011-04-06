@@ -1,3 +1,14 @@
+2011-04-06  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsPane.java:
+	(addComponents): Changed all port fields to use document which
+	prevents input of non-valid port numbers.
+	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java:
+	(addComponents): likewise.
+	(getPortNumberDocument): New method.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Added CPInvalidPort and CPInvalidPortTitle.
+
 2011-04-05  Denis Lila  <dlila@redhat.com>
 
 	* plugin/icedteanp/java/netscape/javascript/JSObject.java:
