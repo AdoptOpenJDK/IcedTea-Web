@@ -407,7 +407,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         windowEventListener = new WindowAdapter() {
 
             public void windowClosing(WindowEvent evt) {
-                appletClose();
+                destroyApplet(identifier);
             }
 
             public void windowIconified(WindowEvent evt) {

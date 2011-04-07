@@ -1,3 +1,9 @@
+2011-04-07  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(constructor): Make window close event call destroy applet which can be
+	safely called multiple times, unlike appletClose.
+
 2011-04-06  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsPane.java:
