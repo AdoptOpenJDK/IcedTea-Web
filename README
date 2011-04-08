@@ -66,6 +66,11 @@ Additionally, the plugin requires:
 
 The plugin can be disabled by passing --disable-plugin.
 
+The following optional dependencies enable additional features
+
+* rhino (enables support for using proxy auto config files)
+* junit4 (enables unit tests)
+
 See ./configure --help if you need to override the defaults.
 
 The following locations are checked for a JDK:
@@ -113,9 +118,49 @@ Other options may be supplied which enable or disable new features.
 These are documented fully in the relevant section below.
 
 * --disable-plugin: Don't build the browser plugin.
+* --with-rhino: Specify the location of rhino jar
+* --with-junit: Specify the location of the junit 4 jar
+
+Rhino Support
+=============
+
+IcedTea-Web needs rhino for using Proxy Auto Config (PAC) files. If rhino is
+not found, or explicitly disabled, then support for PAC files will be disabled.
+
+By default, the following paths are checked for rhino:
+  - /usr/share/java/js.jar
+  - /usr/share/rhino-1.6/lib/js.jar
+  - /usr/share/java/rhino.jar
+
+If a rhino jar is not found, rhino support is disabled. The --with-rhino build
+option can be used to specify the location of the jar file. To explicitly
+disable rhino use --with-rhino=no.
+
+JUnit Support
+=============
+
+JUnit is needed for running some tests. It has no run-time impact.
+
+By default, the following paths are checked:
+  - /usr/share/java/junit4.jar
+
+If JUnit is not found, JUnit support is disabled. The --with-junit option can
+be used to specify the location of the JUnit 4 jar. To disable JUnit support
+explicitly, use --with-junit=no.
+
+A custom JUnit ouput formatter is supplied. This makes the output of JUnit
+tests match the output of other tests. A simple 'Passed:' or 'FAILED:' is
+printed out, followed by <TestClass>.<testMethod>. This is also the format used
+by JTreg.
 
 Testing
 =======
+
+A set of automated tests is supplied for IcedTea-Web. They can be run by using
+'make check'. Currently, this only tests a few parts of IcedTea-Web.
+
+The number and type of tests run by 'make check' may be affected by the build
+options, including JUnit support and rhino support.
 
 A test suite is supplied for the browser plugin.  It can be built
 using 'make plugin-tests' and run by loading the HTML page specified

@@ -1,3 +1,7 @@
+2011-04-08  Omair Majid  <omajid@redhat.com>
+
+	* README: Update to add notes on rhino and junit.
+
 2011-04-07  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
