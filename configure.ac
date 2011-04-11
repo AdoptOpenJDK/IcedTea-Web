@@ -85,6 +85,12 @@ IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE
 
 IT_FIND_OPTIONAL_JAR([rhino], RHINO,
     [/usr/share/java/js.jar /usr/share/rhino-1.6/lib/js.jar])
+IT_FIND_OPTIONAL_JAR([testng], TESTNG,
+    [/usr/share/java/testng.jar])
+IT_FIND_OPTIONAL_JAR([qdox], QDOX)
+IT_FIND_OPTIONAL_JAR([bsh], BSH)
+
+IT_FIND_OPTIONAL_PROG(XSLT, [xsltproc])
 
 AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
 AC_CONFIG_FILES([build.properties])

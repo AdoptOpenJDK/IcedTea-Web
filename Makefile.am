@@ -6,6 +6,12 @@ NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/javaws/about/resources
 NETX_EXTRA_DIST_DIR=$(abs_top_builddir)/extra-lib/net/sourceforge/javaws/about/resources
 
+TESTS_DIR=$(abs_top_builddir)/tests.build
+TESTS_SRCDIR=$(abs_top_srcdir)/tests
+
+NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
+NETX_UNIT_TEST_SRCDIR=$(TESTS_SRCDIR)/netx/unit
+
 # Build directories
 
 BOOT_DIR = $(abs_top_builddir)/bootstrap/jdk1.6.0
@@ -80,6 +86,23 @@ JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m -J-XX:PermSize=32m -J-XX:MaxPermSize=160
 endif
 endif
 
+if WITH_RHINO
+  RHINO_TESTS=check-pac-functions
+else
+  RHINO_TESTS=
+endif
+
+UNIT_TESTS=
+if WITH_TESTNG
+if WITH_QDOX
+if WITH_BSH
+if WITH_XSLT
+  UNIT_TESTS+=run-netx-unit-tests
+endif
+endif
+endif
+endif
+
 PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
@@ -100,7 +123,7 @@ edit_launcher_script = sed \
 all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/javaws \
  javaws.desktop stamps/docs.stamp launcher.build/itweb-settings itweb-settings.desktop
 
-check-local: check-pac-functions
+check-local: $(RHINO_TESTS) $(UNIT_TESTS)
 
 clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
  clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-tests
@@ -110,7 +133,8 @@ clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstr
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs \
- clean-tests check-local clean-launchers 
+ clean-tests check-local clean-launchers check-pac-functions run-netx-unit-tests clean-netx-tests \
+ clean-netx-unit-tests
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir)
@@ -398,11 +422,53 @@ clean-plugin-docs:
 # check
 # ==========================
 
+clean-tests: clean-netx-tests
+	if [ -e $(TESTS_DIR) ]; then \
+		rmdir $(TESTS_DIR) ; \
+	fi
+
 check-pac-functions: stamps/bootstrap-directory.stamp
 	./jrunscript $(abs_top_srcdir)/tests/netx/pac/pac-funcs-test.js \
 	  $$(readlink -f $(abs_top_srcdir)/netx/net/sourceforge/jnlp/runtime/pac-funcs.js)
 
--clean-tests:
+netx-unit-tests-source-files.txt:
+	find $(NETX_UNIT_TEST_SRCDIR) -name '*.java' | sort > $@
+
+stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
+  netx-unit-tests-source-files.txt
+	mkdir -p $(NETX_UNIT_TEST_DIR)
+	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	 -d $(NETX_UNIT_TEST_DIR) \
+	 -classpath $(TESTNG_JAR):$(NETX_DIR)/lib/classes.jar \
+	 @netx-unit-tests-source-files.txt
+	(cd $(NETX_UNIT_TEST_DIR) ; \
+	 $(BOOT_DIR)/bin/jar cf netx-tests.jar net)
+	mkdir -p stamps
+	touch $@
+
+stamps/netx-unit-tests-update-jar.stamp: stamps/netx-unit-tests-compile.stamp
+	(cd $(NETX_UNIT_TEST_SRCDIR) ; \
+	 $(BOOT_DIR)/bin/jar uf $(NETX_UNIT_TEST_DIR)/netx-tests.jar \
+	   net/sourceforge/jnlp/basic.jnlp)
+	mkdir -p stamps
+	touch $@
+
+run-netx-unit-tests: stamps/netx-unit-tests-update-jar.stamp
+	$(BOOT_DIR)/bin/java \
+	  -classpath $(NETX_UNIT_TEST_DIR)/netx-tests.jar:$(NETX_DIR)/lib/classes.jar:$(TESTNG_JAR):$(QDOX_JAR):$(BSH_JAR) \
+	  org.testng.TestNG -d $(NETX_UNIT_TEST_DIR)/tests-output $(NETX_UNIT_TEST_SRCDIR)/tests.xml  || true
+	$(XSLT) $(abs_top_srcdir)/testng-to-jtreg.xslt $(NETX_UNIT_TEST_DIR)/tests-output/testng-results.xml
+
+clean-netx-tests: clean-netx-unit-tests
+	if [ -e $(TESTS_DIR)/netx ]; then \
+	  rmdir $(TESTS_DIR)/netx ; \
+	fi
+
+clean-netx-unit-tests:
+	rm -f netx-unit-tests-source-files.txt
+	rm -rf $(NETX_UNIT_TEST_DIR)
+	rm -f stamps/netx-unit-tests-compile.stamp
+	rm -f stamps/netx-unit-tests-update-jar.stamp
 
 # plugin tests
 
