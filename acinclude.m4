@@ -497,13 +497,6 @@ AC_DEFUN([FIND_TOOL],
  AC_SUBST([$1])
 ])
 
-AC_DEFUN_ONCE([IT_FIND_OPTIONAL_PROG],
-[
-  AC_PATH_PROG([$1], [$2])
-  AM_CONDITIONAL(WITH_$1, test x"$$1" != "x")
-  AC_SUBST([$1])
-])
-
 AC_DEFUN([IT_SET_ARCH_SETTINGS],
 [
   case "${host_cpu}" in

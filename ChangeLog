@@ -1,9 +1,5 @@
 2011-04-11  Jiri Vanek  <jvanek@redhat.com>
 
-	* added testng support (2/2)
-
-2011-04-11  Jiri Vanek  <jvanek@redhat.com>
-
 	* removed junit (1/2 from mooving to testNG)
 
 2011-04-08  Omair Majid  <omajid@redhat.com>

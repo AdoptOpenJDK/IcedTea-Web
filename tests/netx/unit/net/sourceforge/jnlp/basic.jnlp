@@ -1,11 +1,11 @@
-<?xml version='1.0' encoding='utf-8'?> 
+<?xml version='1.0' encoding='utf-8'?>
 <!-- this is a sample jnlp file -->
 <jnlp spec='1.0'
     codebase='http://localhost/'
     href='jnlp.jnlp'>
-  <information> 
+  <information>
     <!-- this is the information section -->
-    <title>Large JNLP</title> 
+    <title>Large JNLP</title>
     <vendor>The IcedTea Project</vendor>
     <homepage href='http://homepage/' />
     <description kind='one-line'>one-line</description>
@@ -24,7 +24,7 @@
       <description>decription of related-content</description>
       <icon href='related-content-icon.png' />
     </related-content>
-  </information> 
+  </information>
   <security>
     <all-permissions/>
   </security>
@@ -43,4 +43,5 @@
     <argument>arg1</argument>
     <argument>arg2</argument>
   </application-desc>
-</jnlp> 
+</jnlp>
+
