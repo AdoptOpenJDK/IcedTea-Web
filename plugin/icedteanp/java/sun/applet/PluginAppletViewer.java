@@ -103,6 +103,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.swing.SwingUtilities;
 
@@ -340,15 +342,15 @@ public class PluginAppletViewer extends XEmbeddedFrame
             new HashMap<Integer, PluginParseRequest>();
 
     // Instance identifier -> PluginAppletViewer object.
-    private static HashMap<Integer, PluginAppletViewer> applets =
-            new HashMap<Integer, PluginAppletViewer>();
+    private static ConcurrentMap<Integer, PluginAppletViewer> applets =
+            new ConcurrentHashMap<Integer, PluginAppletViewer>();
 
     private static PluginStreamHandler streamhandler;
 
     private static PluginCallRequestFactory requestFactory;
 
-    private static HashMap<Integer, PAV_INIT_STATUS> status =
-            new HashMap<Integer, PAV_INIT_STATUS>();
+    private static ConcurrentMap<Integer, PAV_INIT_STATUS> status =
+            new ConcurrentHashMap<Integer, PAV_INIT_STATUS>();
 
     private long handle = 0;
     private WindowListener windowEventListener = null;
@@ -401,8 +403,10 @@ public class PluginAppletViewer extends XEmbeddedFrame
         this.identifier = identifier;
         this.panel = appletPanel;
 
-        if (!appletPanels.contains(panel))
-            appletPanels.addElement(panel);
+        synchronized(appletPanels) {
+            if (!appletPanels.contains(panel))
+                appletPanels.addElement(panel);
+        }
 
         windowEventListener = new WindowAdapter() {
 
@@ -656,8 +660,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
         PluginDebug.debug("Attempting to destroy frame ", identifier);
 
         // Try to dispose the panel right away
-        if (applets.containsKey(identifier))
-            applets.get(identifier).dispose();
+        PluginAppletViewer pav = applets.get(identifier);
+        if (pav != null)
+            pav.dispose();
 
         // If panel is already disposed, return
         if (applets.get(identifier).panel.applet == null) {
@@ -895,7 +900,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         imageRefs.clear();
     }
 
-    static Vector<AppletPanel> appletPanels = new Vector<AppletPanel>();
+    private static Vector<AppletPanel> appletPanels = new Vector<AppletPanel>();
 
     /**
      * Get an applet by name.
@@ -904,20 +909,22 @@ public class PluginAppletViewer extends XEmbeddedFrame
         name = name.toLowerCase();
         SocketPermission panelSp =
                 new SocketPermission(panel.getCodeBase().getHost(), "connect");
-        for (Enumeration e = appletPanels.elements(); e.hasMoreElements();) {
-            AppletPanel p = (AppletPanel) e.nextElement();
-            String param = p.getParameter("name");
-            if (param != null) {
-                param = param.toLowerCase();
-            }
-            if (name.equals(param) &&
-                    p.getDocumentBase().equals(panel.getDocumentBase())) {
+        synchronized(appletPanels) {
+            for (Enumeration e = appletPanels.elements(); e.hasMoreElements();) {
+                AppletPanel p = (AppletPanel) e.nextElement();
+                String param = p.getParameter("name");
+                if (param != null) {
+                    param = param.toLowerCase();
+                }
+                if (name.equals(param) &&
+                        p.getDocumentBase().equals(panel.getDocumentBase())) {
 
-                SocketPermission sp =
+                    SocketPermission sp =
                         new SocketPermission(p.getCodeBase().getHost(), "connect");
 
-                if (panelSp.implies(sp)) {
-                    return p.applet;
+                    if (panelSp.implies(sp)) {
+                        return p.applet;
+                    }
                 }
             }
         }
@@ -933,14 +940,16 @@ public class PluginAppletViewer extends XEmbeddedFrame
         SocketPermission panelSp =
                 new SocketPermission(panel.getCodeBase().getHost(), "connect");
 
-        for (Enumeration<AppletPanel> e = appletPanels.elements(); e.hasMoreElements();) {
-            AppletPanel p = e.nextElement();
-            if (p.getDocumentBase().equals(panel.getDocumentBase())) {
+        synchronized(appletPanels) {
+            for (Enumeration<AppletPanel> e = appletPanels.elements(); e.hasMoreElements();) {
+                AppletPanel p = e.nextElement();
+                if (p.getDocumentBase().equals(panel.getDocumentBase())) {
 
-                SocketPermission sp =
+                    SocketPermission sp =
                         new SocketPermission(p.getCodeBase().getHost(), "connect");
-                if (panelSp.implies(sp)) {
-                    v.addElement(p.applet);
+                    if (panelSp.implies(sp)) {
+                        v.addElement(p.applet);
+                    }
                 }
             }
         }

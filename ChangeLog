@@ -1,3 +1,13 @@
+2011-04-12  Denis Lila  <dlila@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(applets, status): Make concurrent.
+	(PluginAppletViewer): Synchronize appletPanels addElement.
+	(destroyApplet): Remove applets.containsKey because it and the
+	get that followed it were not atomic.
+	(appletPanels): Privatize.
+	(getApplet, getApplets): Synchronize iteration.
+
 2011-04-08  Omair Majid  <omajid@redhat.com>
 
 	* README: Update to add notes on rhino and junit.
