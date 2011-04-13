@@ -1,3 +1,9 @@
+2011-04-13  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/CacheDirectory.java:
+	Added final modifier to class declaration.
+	(CacheDirectory): New private constructor.
+
 2011-04-12  Denis Lila  <dlila@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java

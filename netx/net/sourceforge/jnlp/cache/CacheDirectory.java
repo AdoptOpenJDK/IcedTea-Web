@@ -41,7 +41,11 @@ import java.util.ArrayList;
 
 import net.sourceforge.jnlp.util.FileUtils;
 
-public class CacheDirectory {
+public final class CacheDirectory {
+
+    /* Don't allow instantiation of this class */
+    private CacheDirectory(){}
+
     /**
      * Get the structure of directory for keeping track of the protocol and
      * domain.
