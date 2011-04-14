@@ -70,23 +70,19 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Label;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.SocketPermission;
 import java.net.URI;
 import java.net.URL;
@@ -128,49 +124,27 @@ class PluginAppletPanelFactory {
                                     long handle, int x, int y,
                                     final URL doc,
                                     final Hashtable<String, String> atts) {
-        AppletViewerPanel panel = AccessController.doPrivileged(new PrivilegedAction<AppletViewerPanel>() {
-            public AppletViewerPanel run() {
-                try {
-                    AppletViewerPanel panel = new NetxPanel(doc, atts, false);
-                    AppletViewerPanel.debug("Using NetX panel");
-                    PluginDebug.debug(atts.toString());
-                    return panel;
-                } catch (Exception ex) {
-                    AppletViewerPanel.debug("Unable to start NetX applet - defaulting to Sun applet", ex);
-                    return new AppletViewerPanel(doc, atts);
-                }
+        NetxPanel panel = AccessController.doPrivileged(new PrivilegedAction<NetxPanel>() {
+            public NetxPanel run() {
+                NetxPanel panel = new NetxPanel(doc, atts, false);
+                NetxPanel.debug("Using NetX panel");
+                PluginDebug.debug(atts.toString());
+                return panel;
             }
         });
 
         // create the frame.
-        PluginAppletViewer.framePanel(identifier, System.out, handle, panel);
+        PluginAppletViewer.framePanel(identifier, handle, panel);
 
         panel.init();
 
         // Start the applet
         initEventQueue(panel);
 
-        // Applet initialized. Find out it's classloader and add it to the list
-        String portComponent = doc.getPort() != -1 ? ":" + doc.getPort() : "";
-        String codeBase = doc.getProtocol() + "://" + doc.getHost() + portComponent;
-
-        if (atts.get("codebase") != null) {
-            try {
-                URL appletSrcURL = new URL(codeBase + atts.get("codebase"));
-                codeBase = appletSrcURL.getProtocol() + "://" + appletSrcURL.getHost();
-            } catch (MalformedURLException mfue) {
-                // do nothing
-            }
-        }
-
-        // Wait for the panel to initialize
-        // (happens in a separate thread)
-        Applet a;
-
         // Wait for panel to come alive
         int maxWait = PluginAppletViewer.APPLET_TIMEOUT; // wait for panel to come alive
         int wait = 0;
-        while ((panel == null) || (!((NetxPanel) panel).isAlive() && wait < maxWait)) {
+        while (!panel.isAlive() && wait < maxWait) {
             try {
                 Thread.sleep(50);
                 wait += 50;
@@ -181,12 +155,12 @@ class PluginAppletPanelFactory {
 
         // Wait for the panel to initialize
         // (happens in a separate thread)
-        PluginAppletViewer.waitForAppletInit((NetxPanel) panel);
+        PluginAppletViewer.waitForAppletInit(panel);
 
-        a = panel.getApplet();
+        Applet a = panel.getApplet();
 
         // Still null?
-        if (panel.getApplet() == null) {
+        if (a == null) {
             streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError " + "Initialization failed");
             return null;
         }
@@ -194,8 +168,8 @@ class PluginAppletPanelFactory {
         PluginDebug.debug("Applet ", a.getClass(), " initialized");
         streamhandler.write("instance " + identifier + " reference 0 initialized");
 
-        AppletSecurityContextManager.getSecurityContext(0).associateSrc(((NetxPanel) panel).getAppletClassLoader(), doc);
-        AppletSecurityContextManager.getSecurityContext(0).associateInstance(identifier, ((NetxPanel) panel).getAppletClassLoader());
+        AppletSecurityContextManager.getSecurityContext(0).associateSrc(panel.getAppletClassLoader(), doc);
+        AppletSecurityContextManager.getSecurityContext(0).associateInstance(identifier, panel.getAppletClassLoader());
 
         return panel;
     }
@@ -231,7 +205,7 @@ class PluginAppletPanelFactory {
 
             // The list of events that will be executed is provided as a
             // ","-separated list.  No error-checking will be done on the list.
-            String[] events = splitSeparator(",", eventList);
+            String[] events = eventList.split(",");
 
             for (int i = 0; i < events.length; i++) {
                 PluginDebug.debug("Adding event to queue: ", events[i]);
@@ -260,52 +234,14 @@ class PluginAppletPanelFactory {
                 ;
         }
     }
-
-    /**
-     * Split a string based on the presence of a specified separator.  Returns
-     * an array of arbitrary length.  The end of each element in the array is
-     * indicated by the separator of the end of the string.  If there is a
-     * separator immediately before the end of the string, the final element
-     * will be empty.  None of the strings will contain the separator.  Useful
-     * when separating strings such as "foo/bar/bas" using separator "/".
-     *
-     * @param sep  The separator.
-     * @param s    The string to split.
-     * @return     An array of strings.  Each string in the array is determined
-     *             by the location of the provided sep in the original string,
-     *             s.  Whitespace not stripped.
-     */
-    private String[] splitSeparator(String sep, String s) {
-        List<String> l = new ArrayList<String>();
-        int tokenStart = 0;
-        int tokenEnd = 0;
-
-        while ((tokenEnd = s.indexOf(sep, tokenStart)) != -1) {
-            l.add(s.substring(tokenStart, tokenEnd));
-            tokenStart = tokenEnd + 1;
-        }
-        // Add the final element.
-        l.add(s.substring(tokenStart));
-
-        return l.toArray(new String[l.size()]);
-    }
-}
-
-class PluginParseRequest {
-    long handle;
-    String tag;
-    String documentbase;
 }
 
 /*
  */
 // FIXME: declare JSProxy implementation
+@SuppressWarnings("serial")
 public class PluginAppletViewer extends XEmbeddedFrame
         implements AppletContext, Printable {
-    /**
-     * Some constants...
-     */
-    private static String defaultSaveFile = "Applet.ser";
 
     /**
      *  Enumerates the current status of an applet
@@ -323,23 +259,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
     /**
      * The panel in which the applet is being displayed.
      */
-    AppletViewerPanel panel;
+    private NetxPanel panel;
 
-    /**
-     * The status line.
-     */
-    Label label;
-
-    /**
-     * output status messages to this stream
-     */
-
-    PrintStream statusMsgStream;
-
-    int identifier;
-
-    private static HashMap<Integer, PluginParseRequest> requests =
-            new HashMap<Integer, PluginParseRequest>();
+    private int identifier;
 
     // Instance identifier -> PluginAppletViewer object.
     private static ConcurrentMap<Integer, PluginAppletViewer> applets =
@@ -352,7 +274,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
     private static ConcurrentMap<Integer, PAV_INIT_STATUS> status =
             new ConcurrentHashMap<Integer, PAV_INIT_STATUS>();
 
-    private long handle = 0;
     private WindowListener windowEventListener = null;
     private AppletEventListener appletEventListener = null;
 
@@ -370,15 +291,14 @@ public class PluginAppletViewer extends XEmbeddedFrame
     public PluginAppletViewer() {
     }
 
-    public static void framePanel(int identifier, PrintStream statusMsgStream,
-                                  long handle, AppletViewerPanel panel) {
+    public static void framePanel(int identifier, long handle, NetxPanel panel) {
 
         PluginDebug.debug("Framing ", panel);
 
         // SecurityManager MUST be set, and only privileged code may call reFrame()
         System.getSecurityManager().checkPermission(new AllPermission());
 
-        PluginAppletViewer appletFrame = new PluginAppletViewer(handle, identifier, statusMsgStream, panel);
+        PluginAppletViewer appletFrame = new PluginAppletViewer(handle, identifier, panel);
 
         appletFrame.add("Center", panel);
         appletFrame.pack();
@@ -395,11 +315,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
      * Create new plugin appletviewer frame
      */
     private PluginAppletViewer(long handle, final int identifier,
-                         PrintStream statusMsgStream,
-                         AppletViewerPanel appletPanel) {
+                               NetxPanel appletPanel) {
 
         super(handle, true);
-        this.statusMsgStream = statusMsgStream;
         this.identifier = identifier;
         this.panel = appletPanel;
 
@@ -547,13 +465,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 if (wait >= maxWait)
                     throw new Exception("Applet initialization timeout");
 
-                PluginAppletViewer oldFrame = applets.get(identifier);
-
                 // We should not try to destroy an applet during
                 // initialization. It may cause an inconsistent state,
                 // which would bad if it's a trusted applet that
                 // read/writes to files
-                waitForAppletInit((NetxPanel) applets.get(identifier).panel);
+                waitForAppletInit(applets.get(identifier).panel);
 
                 // Should we proceed with reframing?
                 if (updateStatus(identifier, PAV_INIT_STATUS.REFRAME_COMPLETE).equals(PAV_INIT_STATUS.INACTIVE)) {
@@ -660,24 +576,24 @@ public class PluginAppletViewer extends XEmbeddedFrame
         PluginDebug.debug("Attempting to destroy frame ", identifier);
 
         // Try to dispose the panel right away
-        PluginAppletViewer pav = applets.get(identifier);
-        if (pav != null)
+        final PluginAppletViewer pav = applets.get(identifier);
+        if (pav != null) {
             pav.dispose();
 
-        // If panel is already disposed, return
-        if (applets.get(identifier).panel.applet == null) {
-            PluginDebug.debug(identifier, " panel inactive. Returning.");
-            return;
-        }
-
-        PluginDebug.debug("Attempting to destroy panel ", identifier);
-
-        final int fIdentifier = identifier;
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                applets.get(fIdentifier).appletClose();
+            // If panel is already disposed, return
+            if (pav.panel.applet == null) {
+                PluginDebug.debug(identifier, " panel inactive. Returning.");
+                return;
             }
-        });
+
+            PluginDebug.debug("Attempting to destroy panel ", identifier);
+
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    pav.appletClose();
+                }
+            });
+        }
 
         PluginDebug.debug(identifier, " destroyed");
     }
@@ -729,8 +645,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             final int height = Integer.parseInt(dimMsg[3]);
             final int width = Integer.parseInt(dimMsg[1]);
 
-            if (panel instanceof NetxPanel)
-                ((NetxPanel) panel).updateSizeInAtts(height, width);
+            panel.updateSizeInAtts(height, width);
 
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
@@ -775,7 +690,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             // Wait for panel to come alive
             int maxWait = APPLET_TIMEOUT; // wait for panel to come alive
             int wait = 0;
-            while ((panel == null) || (!((NetxPanel) panel).isAlive() && wait < maxWait)) {
+            while ((panel == null) || (!panel.isAlive() && wait < maxWait)) {
                 try {
                     Thread.sleep(50);
                     wait += 50;
@@ -786,13 +701,13 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
             // Wait for the panel to initialize
             // (happens in a separate thread)
-            waitForAppletInit((NetxPanel) panel);
+            waitForAppletInit(panel);
 
-            PluginDebug.debug(panel, " -- ", panel.getApplet(), " -- ", ((NetxPanel) panel).isAlive());
+            PluginDebug.debug(panel, " -- ", panel.getApplet(), " -- ", panel.isAlive());
 
             // Still null?
             if (panel.getApplet() == null) {
-                this.streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError " + "Initialization failed");
+                streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError " + "Initialization failed");
                 return;
             }
 
@@ -805,11 +720,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
                               + AppletSecurityContextManager.getSecurityContext(0).getIdentifier(o));
             PluginDebug.debug("WRITING 1 DONE");
         }
-    }
-
-    // FIXME: Kind of hackish way to ensure synchronized re-drawing
-    private synchronized void forceredraw() {
-        doLayout();
     }
 
     /*
@@ -861,19 +771,14 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 PluginDebug.debug("getCachedImageRef() got URL = ", url);
                 PluginDebug.debug("getCachedImageRef() plugin codebase = ", codeBase);
 
-                // try to fetch it locally
-                if (panel instanceof NetxPanel) {
+                String resourceName = originalURL.substring(codeBase.length());
+                JNLPClassLoader loader = (JNLPClassLoader) panel.getAppletClassLoader();
 
-                    URL localURL = null;
+                URL localURL = null;
+                if (loader.resourceAvailableLocally(resourceName))
+                    url = loader.getResource(resourceName);
 
-                    String resourceName = originalURL.substring(codeBase.length());
-                    JNLPClassLoader loader = (JNLPClassLoader) ((NetxPanel) panel).getAppletClassLoader();
-
-                    if (loader.resourceAvailableLocally(resourceName))
-                        localURL = loader.getResource(resourceName);
-
-                    url = localURL != null ? localURL : url;
-                }
+                url = localURL != null ? localURL : url;
             }
 
             PluginDebug.debug("getCachedImageRef() getting img from URL = ", url);
@@ -900,7 +805,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         imageRefs.clear();
     }
 
-    private static Vector<AppletPanel> appletPanels = new Vector<AppletPanel>();
+    private static Vector<NetxPanel> appletPanels = new Vector<NetxPanel>();
 
     /**
      * Get an applet by name.
@@ -910,8 +815,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
         SocketPermission panelSp =
                 new SocketPermission(panel.getCodeBase().getHost(), "connect");
         synchronized(appletPanels) {
-            for (Enumeration e = appletPanels.elements(); e.hasMoreElements();) {
-                AppletPanel p = (AppletPanel) e.nextElement();
+            for (Enumeration<NetxPanel> e = appletPanels.elements(); e.hasMoreElements();) {
+                AppletPanel p = e.nextElement();
                 String param = p.getParameter("name");
                 if (param != null) {
                     param = param.toLowerCase();
@@ -941,7 +846,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 new SocketPermission(panel.getCodeBase().getHost(), "connect");
 
         synchronized(appletPanels) {
-            for (Enumeration<AppletPanel> e = appletPanels.elements(); e.hasMoreElements();) {
+            for (Enumeration<NetxPanel> e = appletPanels.elements(); e.hasMoreElements();) {
                 AppletPanel p = e.nextElement();
                 if (p.getDocumentBase().equals(panel.getDocumentBase())) {
 
@@ -1591,15 +1496,15 @@ public class PluginAppletViewer extends XEmbeddedFrame
          * at the same time.
          */
         try {
-            panel.joinAppletThread();
-            panel.release();
+            ((AppletViewerPanel)panel).joinAppletThread();
+            ((AppletViewerPanel)panel).release();
         } catch (InterruptedException e) {
             return; // abort the reload
         }
 
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             public Void run() {
-                panel.createAppletThread();
+                ((AppletViewerPanel)panel).createAppletThread();
                 return null;
             }
         });
@@ -1652,34 +1557,32 @@ public class PluginAppletViewer extends XEmbeddedFrame
         //
         final AppletPanel p = panel;
 
-        new Thread(new Runnable()
-         {
-             public void run()
-             {
-                 ClassLoader cl = p.applet.getClass().getClassLoader();
-                 
-                 // Since we want to deal with JNLPClassLoader, extract it if this 
-                 // is a codebase loader
-                 if (cl instanceof JNLPClassLoader.CodeBaseClassLoader)
-                     cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
+        new Thread(new Runnable() {
+            @SuppressWarnings("deprecation")
+            public void run() {
+                ClassLoader cl = p.applet.getClass().getClassLoader();
 
-                 ThreadGroup tg = ((JNLPClassLoader) cl).getApplication().getThreadGroup();
+                // Since we want to deal with JNLPClassLoader, extract it if this 
+                // is a codebase loader
+                if (cl instanceof JNLPClassLoader.CodeBaseClassLoader)
+                    cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
 
-                 appletShutdown(p);
-                 appletPanels.removeElement(p);
-                 dispose();
+                ThreadGroup tg = ((JNLPClassLoader) cl).getApplication().getThreadGroup();
 
-                 if (tg.activeCount() > 0)
-                     tg.stop();
+                appletShutdown(p);
+                appletPanels.removeElement(p);
+                dispose();
 
-                 if (countApplets() == 0) {
-                     appletSystemExit();
-                 }
+                if (tg.activeCount() > 0)
+                    tg.stop();
 
-                 updateStatus(identifier, PAV_INIT_STATUS.DESTROYED);
-             }
-         }).start();
+                if (countApplets() == 0) {
+                    appletSystemExit();
+                }
 
+                updateStatus(identifier, PAV_INIT_STATUS.DESTROYED);
+            }
+        }).start();
     }
 
     /**
@@ -1868,6 +1771,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         });
     }
 
+    @SuppressWarnings("unused")
     public static void parse(int identifier, long handle, String width,
                  String height, Reader in, URL url,
                               PrintStream statusMsgStream,

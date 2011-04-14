@@ -1,3 +1,21 @@
+2011-04-14  Denis Lila  <dlila@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	Remove unused imports, added various SuppressWarnings annotations.
+	(createPanel): Return NetxPanel from doPriviledged. Remove dead code.
+	(PluginParseRequest): Remove - unused.
+	(defaultSaveFile, label, statusMsgStream, requests, handle): Remove unused.
+	(panel): Make NetxPanel.
+	(identifier, appletPanels): Privatize.
+	(appletPanels): Change type to NetxPanel.
+	(applets, status): Use ConcurrentHashMaps.
+	(framePanel, PluginAppletViewer): Remove unused PrintStream argument.
+	(forceredraw): Remove - unused.
+	(getApplets): Use generics.
+	(appletClose): Fix style to match our convention.
+	(destroyApplet): Use pav instead of calling get many times.
+	(splitSeparator): Remove. Replace uses by String.split().
+
 2011-04-13  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/CacheDirectory.java:
