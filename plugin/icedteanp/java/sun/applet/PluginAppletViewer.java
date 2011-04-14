@@ -91,12 +91,10 @@ import java.security.AllPermission;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -142,14 +140,19 @@ class PluginAppletPanelFactory {
         initEventQueue(panel);
 
         // Wait for panel to come alive
-        int maxWait = PluginAppletViewer.APPLET_TIMEOUT; // wait for panel to come alive
-        int wait = 0;
-        while (!panel.isAlive() && wait < maxWait) {
-            try {
-                Thread.sleep(50);
-                wait += 50;
-            } catch (InterruptedException ie) {
-                // just wait
+        // Wait implemented the long way so that
+        // PluginAppletViewer.waitTillTimeout() needn't be exposed.
+        long maxTimeToSleep = PluginAppletViewer.APPLET_TIMEOUT/1000000; // ns -> ms
+
+        synchronized(panel) {
+            while (!panel.isAlive() && maxTimeToSleep > 0) {
+                long sleepStart = System.nanoTime();
+
+                try {
+                    panel.wait(maxTimeToSleep);
+                } catch (InterruptedException e) {} // Just loop back
+
+                maxTimeToSleep -= (System.nanoTime() - sleepStart)/1000000; // ns -> ms
             }
         }
 
@@ -161,7 +164,7 @@ class PluginAppletPanelFactory {
 
         // Still null?
         if (a == null) {
-            streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError " + "Initialization failed");
+            streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError: " + "Initialization timed out");
             return null;
         }
 
@@ -277,7 +280,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     private WindowListener windowEventListener = null;
     private AppletEventListener appletEventListener = null;
 
-    public static final int APPLET_TIMEOUT = 180000;
+    public static final long APPLET_TIMEOUT = 180000000000L; // 180s in ns
 
     private static final Object requestMutex = new Object();
     private static long requestIdentityCounter = 0L;
@@ -306,7 +309,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
         appletFrame.appletEventListener = new AppletEventListener(appletFrame, appletFrame);
         panel.addAppletListener(appletFrame.appletEventListener);
 
-        applets.put(identifier, appletFrame);
+        
+        synchronized(applets) {
+            applets.put(identifier, appletFrame);
+            applets.notifyAll();
+        }
 
         PluginDebug.debug(panel, " framed");
     }
@@ -356,6 +363,10 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         public void appletStateChanged(AppletEvent evt) {
             AppletPanel src = (AppletPanel) evt.getSource();
+
+            synchronized (src) {
+                src.notifyAll();
+            }
 
             switch (evt.getID()) {
                 case AppletPanel.APPLET_RESIZE: {
@@ -448,21 +459,16 @@ public class PluginAppletViewer extends XEmbeddedFrame
                                                 new StringReader(tag),
                                                 new URL(documentBase));
 
-                int maxWait = APPLET_TIMEOUT; // wait for applet to fully load
-                int wait = 0;
-                while (!applets.containsKey(identifier) && // Map is populated only by reFrame
-                        (wait < maxWait)) {
-
-                    try {
-                        Thread.sleep(50);
-                        wait += 50;
-                    } catch (InterruptedException ie) {
-                        // just wait
+                long maxTimeToSleep = APPLET_TIMEOUT;
+                synchronized(applets) {
+                    while (!applets.containsKey(identifier) &&
+                            maxTimeToSleep > 0) { // Map is populated only by reFrame
+                        maxTimeToSleep -= waitTillTimeout(applets, maxTimeToSleep);
                     }
                 }
 
                 // If wait exceeded maxWait, we timed out. Throw an exception
-                if (wait >= maxWait)
+                if (maxTimeToSleep <= 0)
                     throw new Exception("Applet initialization timeout");
 
                 // We should not try to destroy an applet during
@@ -546,7 +552,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
         }
 
         // Else set to given status
-        status.put(identifier, newStatus);
+        
+        synchronized(status) {
+            status.put(identifier, newStatus);
+            status.notifyAll();
+        }
 
         return prev;
     }
@@ -599,25 +609,23 @@ public class PluginAppletViewer extends XEmbeddedFrame
     }
 
     /**
-     * Function to block until applet initialization is complete
+     * Function to block until applet initialization is complete.
+     * 
+     * This function will return if the wait is longer than {@link #APPLET_TIMEOUT}
      *
      * @param panel the instance to wait for.
      */
     public static void waitForAppletInit(NetxPanel panel) {
 
-        int waitTime = 0;
-
         // Wait till initialization finishes
-        while (panel.getApplet() == null &&
-                panel.isAlive() &&
-                waitTime < APPLET_TIMEOUT) {
-            try {
-                if (waitTime % 500 == 0)
-                    PluginDebug.debug("Waiting for applet panel ", panel, " to initialize...");
+        long maxTimeToSleep = APPLET_TIMEOUT;
 
-                Thread.sleep(waitTime += 50);
-            } catch (InterruptedException ie) {
-                // just wait
+        synchronized(panel) {
+            while (panel.getApplet() == null &&
+                    panel.isAlive() &&
+                    maxTimeToSleep > 0) {
+                PluginDebug.debug("Waiting for applet panel ", panel, " to initialize...");
+                maxTimeToSleep -= waitTillTimeout(panel, maxTimeToSleep);
             }
         }
 
@@ -628,14 +636,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
         if (message.startsWith("width")) {
 
             // Wait for panel to come alive
-            int maxWait = APPLET_TIMEOUT; // wait for panel to come alive
-            int wait = 0;
-            while (!status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE) && wait < maxWait) {
-                try {
-                    Thread.sleep(50);
-                    wait += 50;
-                } catch (InterruptedException ie) {
-                    // just wait
+            long maxTimeToSleep = APPLET_TIMEOUT;
+            synchronized(status) {
+                while (!status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE) &&
+                        maxTimeToSleep > 0) {
+                    maxTimeToSleep -= waitTillTimeout(status, maxTimeToSleep);
                 }
             }
 
@@ -686,17 +691,21 @@ public class PluginAppletViewer extends XEmbeddedFrame
             // FIXME: how do we determine what security context this
             // object should belong to?
             Object o;
-
-            // Wait for panel to come alive
-            int maxWait = APPLET_TIMEOUT; // wait for panel to come alive
-            int wait = 0;
-            while ((panel == null) || (!panel.isAlive() && wait < maxWait)) {
+            
+            // First, wait for panel to instantiate
+            int waited = 0;
+            while (panel == null && waited < APPLET_TIMEOUT) {
                 try {
                     Thread.sleep(50);
-                    wait += 50;
-                } catch (InterruptedException ie) {
-                    // just wait
-                }
+                    waited += 50;
+                } catch (InterruptedException ie) {} // discard, loop back
+            }
+
+            // Next, wait for panel to come alive
+            long maxTimeToSleep = APPLET_TIMEOUT;
+            synchronized(panel) {
+                while (!panel.isAlive())
+                    maxTimeToSleep -= waitTillTimeout(panel, maxTimeToSleep);
             }
 
             // Wait for the panel to initialize
@@ -707,7 +716,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
             // Still null?
             if (panel.getApplet() == null) {
-                streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError " + "Initialization failed");
+                streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError: " + "Initialization timed out");
                 return;
             }
 
@@ -2048,5 +2057,38 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         // Draw the painted image
         g.drawImage(bufFrameImg, 0, 0, this);
+    }
+
+    /**
+     * Waits on a given object until timeout. 
+     * 
+     * <b>This function assumes that the monitor lock has already been
+     * acquired by the caller.</b>
+     * 
+     * If the given object is null, this function returns immediately.
+     * 
+     * @param obj The object to wait on
+     * @param timeout The maximum time to wait (nanoseconds)
+     * @return Approximate time spent sleeping (not guaranteed to be perfect)
+     */
+    public static long waitTillTimeout(Object obj, long timeout) {
+
+        // Can't wait on null. Return 0 indicating no wait happened.
+        if (obj == null)
+            return 0;
+        
+        // Record when we started sleeping
+        long sleepStart = 0L;
+
+        // Convert timeout to ms since wait() takes ms
+        timeout = timeout >= 1000000 ? timeout/1000000 : 1; 
+
+        try {
+            sleepStart = System.nanoTime();
+            obj.wait(timeout);
+        } catch (InterruptedException ie) {} // Discarded, time to return
+        
+        // Return the difference
+        return System.nanoTime() - sleepStart;
     }
 }

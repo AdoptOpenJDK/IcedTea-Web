@@ -1,3 +1,22 @@
+2011-04-13  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (createPanel):
+	use Object.wait() to wait, rather than pariodic sleep.
+	(APPLET_TIMEOUT): Updated to be in nanoseconds.
+	(framePanel): Synchronize put and notify threads waiting on the applets
+	map instance.
+	(appletStateChanged): Notify all threads waiting on the panel that just
+	changed state.
+	(handleMessage): Use the new waitTillTimeout function to wait, rather than
+	periodically waking up. Improved timeout error string sent back.
+	(updateStatus): Synchronize put and notify all threads waiting on status
+	map.
+	(waitForAppletInit): Use the new waitTillTimeout function to wait, rather
+	than periodically waking up.
+	(waitTillTimeout): New function. For a given non-null object, waits until
+	the specified timeout, or, if an interrupt was thrown during wait, returns
+	immediately.
+
 2011-04-14  Denis Lila  <dlila@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
