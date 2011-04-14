@@ -1,3 +1,8 @@
+2010-04-11  Andrew John Hughes  <ahughes@redhat.com>
+
+	* configure.ac:
+	Check Gentoo install location for JUnit 4.
+
 2011-04-13  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (createPanel):
