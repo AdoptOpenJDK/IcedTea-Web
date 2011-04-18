@@ -1,3 +1,10 @@
+2011-04-18  Deepak Bhole <dbhole@redhat.com>
+
+	RH691259: Midori sends a SIGSEGV with the IcedTea NP Plugin
+	* plugin/icedteanp/IcedTeaNPPlugin.cc (NP_Initialize): Rather than
+	returning immediately if already initialized, return after function tables
+	are reset.
+
 2010-04-11  Andrew John Hughes  <ahughes@redhat.com>
 
 	* configure.ac:

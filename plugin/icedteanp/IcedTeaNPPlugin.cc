@@ -2009,14 +2009,12 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
 {
   PLUGIN_DEBUG ("NP_Initialize\n");
 
-  if (initialized)
-    return NPERR_NO_ERROR;
-  else if ((browserTable == NULL) || (pluginTable == NULL))
-    {
-      PLUGIN_ERROR ("Browser or plugin function table is NULL.");
+  if ((browserTable == NULL) || (pluginTable == NULL))
+  {
+    PLUGIN_ERROR ("Browser or plugin function table is NULL.");
 
-      return NPERR_INVALID_FUNCTABLE_ERROR;
-    }
+    return NPERR_INVALID_FUNCTABLE_ERROR;
+  }
 
   // Ensure that the major version of the plugin API that the browser
   // expects is not more recent than the major version of the API that
@@ -2122,6 +2120,12 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   pluginTable->urlnotify = NPP_URLNotifyProcPtr (ITNP_URLNotify);
   pluginTable->getvalue = NPP_GetValueProcPtr (ITNP_GetValue);
 #endif
+
+  // Re-setting the above tables multiple times is OK (as the 
+  // browser may change its function locations). However 
+  // anything beyond this point should only run once.
+  if (initialized)
+    return NPERR_NO_ERROR;
 
   // Make sure the plugin data directory exists, creating it if
   // necessary.
