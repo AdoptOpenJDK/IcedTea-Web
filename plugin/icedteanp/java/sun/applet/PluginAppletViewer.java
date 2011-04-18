@@ -97,8 +97,13 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.SwingUtilities;
 
@@ -139,25 +144,7 @@ class PluginAppletPanelFactory {
         // Start the applet
         initEventQueue(panel);
 
-        // Wait for panel to come alive
-        // Wait implemented the long way so that
-        // PluginAppletViewer.waitTillTimeout() needn't be exposed.
-        long maxTimeToSleep = PluginAppletViewer.APPLET_TIMEOUT/1000000; // ns -> ms
-
-        synchronized(panel) {
-            while (!panel.isAlive() && maxTimeToSleep > 0) {
-                long sleepStart = System.nanoTime();
-
-                try {
-                    panel.wait(maxTimeToSleep);
-                } catch (InterruptedException e) {} // Just loop back
-
-                maxTimeToSleep -= (System.nanoTime() - sleepStart)/1000000; // ns -> ms
-            }
-        }
-
         // Wait for the panel to initialize
-        // (happens in a separate thread)
         PluginAppletViewer.waitForAppletInit(panel);
 
         Applet a = panel.getApplet();
@@ -287,12 +274,17 @@ public class PluginAppletViewer extends XEmbeddedFrame
      * The panel in which the applet is being displayed.
      */
     private NetxPanel panel;
-
+    static final ReentrantLock panelLock = new ReentrantLock();
+    // CONDITION PREDICATE: panel.isAlive()
+    static final Condition panelLive = panelLock.newCondition();
     private int identifier;
 
     // Instance identifier -> PluginAppletViewer object.
     private static ConcurrentMap<Integer, PluginAppletViewer> applets =
             new ConcurrentHashMap<Integer, PluginAppletViewer>();
+    private static final ReentrantLock appletsLock = new ReentrantLock();
+    // CONDITION PREDICATE: !applets.containsKey(identifier)
+    private static final Condition appletAdded = appletsLock.newCondition();
 
     private static PluginStreamHandler streamhandler;
 
@@ -300,6 +292,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     private static ConcurrentMap<Integer, PAV_INIT_STATUS> status =
             new ConcurrentHashMap<Integer, PAV_INIT_STATUS>();
+    private static final ReentrantLock statusLock = new ReentrantLock();
+    // CONDITION PREDICATE: !status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE)
+    private static final Condition initComplete = statusLock.newCondition();
 
     private WindowListener windowEventListener = null;
     private AppletEventListener appletEventListener = null;
@@ -333,11 +328,10 @@ public class PluginAppletViewer extends XEmbeddedFrame
         appletFrame.appletEventListener = new AppletEventListener(appletFrame, appletFrame);
         panel.addAppletListener(appletFrame.appletEventListener);
 
-        
-        synchronized(applets) {
-            applets.put(identifier, appletFrame);
-            applets.notifyAll();
-        }
+        appletsLock.lock();
+        applets.put(identifier, appletFrame);
+        appletAdded.signalAll();
+        appletsLock.unlock();
 
         PluginDebug.debug(panel, " framed");
     }
@@ -388,9 +382,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
         public void appletStateChanged(AppletEvent evt) {
             AppletPanel src = (AppletPanel) evt.getSource();
 
-            synchronized (src) {
-                src.notifyAll();
-            }
+            panelLock.lock();
+            panelLive.signalAll();
+            panelLock.unlock();
 
             switch (evt.getID()) {
                 case AppletPanel.APPLET_RESIZE: {
@@ -484,11 +478,16 @@ public class PluginAppletViewer extends XEmbeddedFrame
                                                 new URL(documentBase));
 
                 long maxTimeToSleep = APPLET_TIMEOUT;
-                synchronized(applets) {
+                appletsLock.lock();
+                try {
                     while (!applets.containsKey(identifier) &&
                             maxTimeToSleep > 0) { // Map is populated only by reFrame
-                        maxTimeToSleep -= waitTillTimeout(applets, maxTimeToSleep);
+                        maxTimeToSleep -= waitTillTimeout(appletsLock, appletAdded,
+                                                          maxTimeToSleep);
                     }
+                }
+                finally {
+                    appletsLock.unlock();
                 }
 
                 // If wait exceeded maxWait, we timed out. Throw an exception
@@ -576,11 +575,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
         }
 
         // Else set to given status
-        
-        synchronized(status) {
-            status.put(identifier, newStatus);
-            status.notifyAll();
-        }
+
+        statusLock.lock();
+        status.put(identifier, newStatus);
+        initComplete.signalAll();
+        statusLock.unlock();
 
         return prev;
     }
@@ -634,7 +633,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     /**
      * Function to block until applet initialization is complete.
-     * 
+     *
      * This function will return if the wait is longer than {@link #APPLET_TIMEOUT}
      *
      * @param panel the instance to wait for.
@@ -644,13 +643,17 @@ public class PluginAppletViewer extends XEmbeddedFrame
         // Wait till initialization finishes
         long maxTimeToSleep = APPLET_TIMEOUT;
 
-        synchronized(panel) {
+        panelLock.lock();
+        try {
             while (panel.getApplet() == null &&
                     panel.isAlive() &&
                     maxTimeToSleep > 0) {
                 PluginDebug.debug("Waiting for applet panel ", panel, " to initialize...");
-                maxTimeToSleep -= waitTillTimeout(panel, maxTimeToSleep);
+                maxTimeToSleep -= waitTillTimeout(panelLock, panelLive, maxTimeToSleep);
             }
+        }
+        finally {
+            panelLock.unlock();
         }
 
         PluginDebug.debug("Applet panel ", panel, " initialized");
@@ -661,11 +664,16 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
             // Wait for panel to come alive
             long maxTimeToSleep = APPLET_TIMEOUT;
-            synchronized(status) {
+            statusLock.lock();
+            try {
                 while (!status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE) &&
                         maxTimeToSleep > 0) {
-                    maxTimeToSleep -= waitTillTimeout(status, maxTimeToSleep);
+                    maxTimeToSleep -= waitTillTimeout(statusLock, initComplete,
+                                                      maxTimeToSleep);
                 }
+            }
+            finally {
+                statusLock.unlock();
             }
 
             // 0 => width, 1=> width_value, 2 => height, 3=> height_value
@@ -715,21 +723,18 @@ public class PluginAppletViewer extends XEmbeddedFrame
             // FIXME: how do we determine what security context this
             // object should belong to?
             Object o;
-            
-            // First, wait for panel to instantiate
-            int waited = 0;
-            while (panel == null && waited < APPLET_TIMEOUT) {
-                try {
-                    Thread.sleep(50);
-                    waited += 50;
-                } catch (InterruptedException ie) {} // discard, loop back
-            }
 
+            // First, wait for panel to instantiate
             // Next, wait for panel to come alive
             long maxTimeToSleep = APPLET_TIMEOUT;
-            synchronized(panel) {
-                while (!panel.isAlive())
-                    maxTimeToSleep -= waitTillTimeout(panel, maxTimeToSleep);
+            panelLock.lock();
+            try {
+                while (panel == null || !panel.isAlive())
+                    maxTimeToSleep -= waitTillTimeout(panelLock, panelLive,
+                                                      maxTimeToSleep);
+            }
+            finally {
+                panelLock.unlock();
             }
 
             // Wait for the panel to initialize
@@ -1394,7 +1399,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     /**
      * Decodes the string (converts html escapes into proper characters)
-     * 
+     *
      * @param toDecode The string to decode
      * @return The decoded string
      */
@@ -1409,7 +1414,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         return toDecode;
     }
-    
+
     /**
      * System parameters.
      */
@@ -1595,7 +1600,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             public void run() {
                 ClassLoader cl = p.applet.getClass().getClassLoader();
 
-                // Since we want to deal with JNLPClassLoader, extract it if this 
+                // Since we want to deal with JNLPClassLoader, extract it if this
                 // is a codebase loader
                 if (cl instanceof JNLPClassLoader.CodeBaseClassLoader)
                     cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
@@ -2084,34 +2089,35 @@ public class PluginAppletViewer extends XEmbeddedFrame
     }
 
     /**
-     * Waits on a given object until timeout. 
-     * 
+     * Waits on a given condition queue until timeout.
+     *
      * <b>This function assumes that the monitor lock has already been
      * acquired by the caller.</b>
-     * 
-     * If the given object is null, this function returns immediately.
-     * 
-     * @param obj The object to wait on
+     *
+     * If the given lock is null, this function returns immediately.
+     *
+     * @param lock the lock that must be held when this method is called.
+     * @param cond the condition queue on which to wait for notifications.
      * @param timeout The maximum time to wait (nanoseconds)
      * @return Approximate time spent sleeping (not guaranteed to be perfect)
      */
-    public static long waitTillTimeout(Object obj, long timeout) {
+    public static long waitTillTimeout(ReentrantLock lock, Condition cond,
+                                       long timeout) {
 
         // Can't wait on null. Return 0 indicating no wait happened.
-        if (obj == null)
+        if (lock == null)
             return 0;
-        
+
+        assert lock.isHeldByCurrentThread();
+
         // Record when we started sleeping
         long sleepStart = 0L;
 
-        // Convert timeout to ms since wait() takes ms
-        timeout = timeout >= 1000000 ? timeout/1000000 : 1; 
-
         try {
             sleepStart = System.nanoTime();
-            obj.wait(timeout);
+            cond.await(timeout, TimeUnit.NANOSECONDS);
         } catch (InterruptedException ie) {} // Discarded, time to return
-        
+
         // Return the difference
         return System.nanoTime() - sleepStart;
     }

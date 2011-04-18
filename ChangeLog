@@ -1,3 +1,36 @@
+2010-04-14  Andrew John Hughes  <ahughes@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java,
+	(PluginAppletPanelFactory.createPanel(PluginStreamHandler,
+	int,long,int,int,URL,Hashtable)): Remove duplication of wait
+	for panel.isAlive().
+	(PluginAppletViewer.panelLock): New lock used to track panel
+	creation.
+	(PluginAppletViewer.panelLive): Condition queue for panel creation.
+	(PluginAppletViewer.appletsLock): New lock used to track additions
+	to the applets map.
+	(PluginAppletViewer.appletAdded): Condition queue for applet addition.
+	(PluginAppletViewer.statusLock): New lock for status changes.
+	(PluginAppletViewer.initComplete): Condition queue for initialisation
+	completion.
+	(PluginAppletViewer.framePanel(int,long,NetxPanel)):
+	Replace synchronized block with use of appletsLock and notification
+	on appletAdded condition queue.
+	(AppletEventListener.appletStateChanged(AppletEvent)): Signal the
+	panelLive condition queue that the panel is live.
+	(PluginAppletViewer.handleMessage(int,int,String)): Wait on appletAdded
+	condition queue for applet to be added to the applets map.
+	(PluginAppletViewer.updateStatus(Int,PAV_INIT_STATUS)): Signal when a
+	status change occurs using the initComplete condition queue.
+	(PluginAppletViewer.waitForAppletInit(NetxPanel)): Wait on the panelLive
+	condition queue until the panel is created.
+	(PluginAppletViewer.handleMessage(int,String)): Wait on the initComplete
+	condition queue until initialisation is complete.  Wait on the panelLive
+	signal until panel is created.
+	(waitTillTimeout(ReentrantLock,Condition,long)): Convert to use
+	ReentrantLock and Condition.  Add assertion to check the lock is held.
+	Avoid conversion between milliseconds and nanoseconds.
+
 2011-04-18  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
