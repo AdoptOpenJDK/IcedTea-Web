@@ -701,6 +701,7 @@ public class JNLPRuntime {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 markNetxStopped();
+                CacheUtil.cleanCache();
             }
         });
     }

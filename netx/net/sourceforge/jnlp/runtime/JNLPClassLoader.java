@@ -166,10 +166,10 @@ public class JNLPClassLoader extends URLClassLoader {
         // initialize extensions
         initializeExtensions();
 
+        initializeResources();
+
         // initialize permissions
         initializePermissions();
-
-        initializeResources();
 
         setSecurity();
 

@@ -19,7 +19,11 @@ package net.sourceforge.jnlp.util;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -292,4 +296,42 @@ public final class FileUtils {
 
     }
 
+    /**
+     * This will return a lock to the file specified.
+     * 
+     * @param path File path to file we want to lock.
+     * @param shared Specify if the lock will be a shared lock.
+     * @param allowBlock Specify if we should block when we can not get the
+     *            lock. Getting a shared lock will always block.
+     * @return FileLock if we were successful in getting a lock, otherwise null.
+     * @throws FileNotFoundException If the file does not exist.
+     */
+    public static FileLock getFileLock(String path, boolean shared, boolean allowBlock) throws FileNotFoundException {
+        RandomAccessFile rafFile = new RandomAccessFile(path, "rw");
+        FileChannel fc = rafFile.getChannel();
+        FileLock lock = null;
+        try {
+            if (!shared) {
+                if (allowBlock) {
+                    lock = fc.lock(0, Long.MAX_VALUE, false);
+                } else {
+                    lock = fc.tryLock(0, Long.MAX_VALUE, false);
+                }
+            } else { // We want shared lock. This will block regardless if allowBlock is true or not.
+                // Test to see if we can get a shared lock.
+                lock = fc.lock(0, 1, true); // Block if a non exclusive lock is being held.
+                if (!lock.isShared()) { // This lock is an exclusive lock. Use alternate solution.
+                    FileLock tempLock = null;
+                    for (long pos = 1; tempLock == null && pos < Long.MAX_VALUE - 1; pos++) {
+                        tempLock = fc.tryLock(pos, 1, false);
+                    }
+                    lock.release();
+                    lock = tempLock; // Get the unique exclusive lock.
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lock;
+    }
 }

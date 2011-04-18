@@ -629,6 +629,9 @@ public class ResourceTracker {
     private void downloadResource(Resource resource) {
         resource.fireDownloadEvent(); // fire DOWNLOADING
 
+        CacheEntry origEntry = new CacheEntry(resource.location, resource.downloadVersion); // This is where the jar file will be.
+        origEntry.lock();
+
         try {
             // create out second in case in does not exist
             URL realLocation = resource.getDownloadLocation();
@@ -666,57 +669,71 @@ public class ResourceTracker {
                 downloadLocation = new URL(downloadLocation.toString() + ".gz");
             }
 
-            InputStream in = new BufferedInputStream(con.getInputStream());
-            OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.downloadVersion);
-            byte buf[] = new byte[1024];
-            int rlen;
+            File downloadLocationFile = CacheUtil.getCacheFile(downloadLocation, resource.downloadVersion);
+            CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.downloadVersion);
+            File finalFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion); // This is where extracted version will be, or downloaded file if not compressed.
 
-            while (-1 != (rlen = in.read(buf))) {
-                resource.transferred += rlen;
-                out.write(buf, 0, rlen);
-            }
+            if (!finalFile.exists()) {
+                // Make sure we don't re-download the file. however it will wait as if it was downloading.
+                // (This is fine because file is not ready yet anyways)
+                byte buf[] = new byte[1024];
+                int rlen;
 
-            in.close();
-            out.close();
+                InputStream in = new BufferedInputStream(con.getInputStream());
+                OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.downloadVersion);
 
-            // explicitly close the URLConnection.
-            if (con instanceof HttpURLConnection)
-                ((HttpURLConnection) con).disconnect();
-
-            /*
-             * If the file was compressed, uncompress it.
-             */
-
-            if (packgz) {
-                GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(
-                        CacheUtil.getCacheFile(downloadLocation, resource.downloadVersion)));
-                InputStream inputStream = new BufferedInputStream(gzInputStream);
-
-                JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(
-                        CacheUtil.getCacheFile(resource.location, resource.downloadVersion)));
-
-                Unpacker unpacker = Pack200.newUnpacker();
-                unpacker.unpack(inputStream, outputStream);
-
-                outputStream.close();
-                inputStream.close();
-                gzInputStream.close();
-            } else if (gzip) {
-                GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                        .getCacheFile(downloadLocation, resource.downloadVersion)));
-                InputStream inputStream = new BufferedInputStream(gzInputStream);
-
-                BufferedOutputStream outputStream = new BufferedOutputStream(
-                        new FileOutputStream(CacheUtil.getCacheFile(resource.location,
-                                resource.downloadVersion)));
-
-                while (-1 != (rlen = inputStream.read(buf))) {
-                    outputStream.write(buf, 0, rlen);
+                while (-1 != (rlen = in.read(buf))) {
+                    resource.transferred += rlen;
+                    out.write(buf, 0, rlen);
                 }
 
-                outputStream.close();
-                inputStream.close();
-                gzInputStream.close();
+                in.close();
+                out.close();
+
+                // explicitly close the URLConnection.
+                if (con instanceof HttpURLConnection)
+                    ((HttpURLConnection) con).disconnect();
+
+                /*
+                 * If the file was compressed, uncompress it.
+                 */
+                if (packgz) {
+                    GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
+                            .getCacheFile(downloadLocation, resource.downloadVersion)));
+                    InputStream inputStream = new BufferedInputStream(gzInputStream);
+
+                    JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(CacheUtil
+                            .getCacheFile(resource.location, resource.downloadVersion)));
+
+                    Unpacker unpacker = Pack200.newUnpacker();
+                    unpacker.unpack(inputStream, outputStream);
+
+                    outputStream.close();
+                    inputStream.close();
+                    gzInputStream.close();
+                } else if (gzip) {
+                    GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
+                            .getCacheFile(downloadLocation, resource.downloadVersion)));
+                    InputStream inputStream = new BufferedInputStream(gzInputStream);
+
+                    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(CacheUtil
+                            .getCacheFile(resource.location, resource.downloadVersion)));
+
+                    while (-1 != (rlen = inputStream.read(buf))) {
+                        outputStream.write(buf, 0, rlen);
+                    }
+
+                    outputStream.close();
+                    inputStream.close();
+                    gzInputStream.close();
+                }
+            } else {
+                resource.transferred = downloadLocationFile.length();
+            }
+
+            if (!downloadLocationFile.getPath().equals(finalFile.getPath())) {
+                downloadEntry.markForDelete();
+                downloadEntry.store();
             }
 
             resource.changeStatus(DOWNLOADING, DOWNLOADED);
@@ -733,6 +750,8 @@ public class ResourceTracker {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
             resource.fireDownloadEvent(); // fire ERROR
+        } finally {
+            origEntry.unlock();
         }
     }
 
@@ -742,6 +761,9 @@ public class ResourceTracker {
      */
     private void initializeResource(Resource resource) {
         resource.fireDownloadEvent(); // fire CONNECTING
+
+        CacheEntry entry = new CacheEntry(resource.location, resource.requestVersion);
+        entry.lock();
 
         try {
             File localFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion);
@@ -754,6 +776,18 @@ public class ResourceTracker {
 
             int size = connection.getContentLength();
             boolean current = CacheUtil.isCurrent(resource.location, resource.requestVersion, connection) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
+            if (!current) {
+                if (entry.isCached()) {
+                    entry.markForDelete();
+                    entry.store();
+                    // Old entry will still exist. (but removed at cleanup)
+                    localFile = CacheUtil.makeNewCacheFile(resource.location, resource.downloadVersion);
+                    CacheEntry newEntry = new CacheEntry(resource.location, resource.requestVersion);
+                    newEntry.lock();
+                    entry.unlock();
+                    entry = newEntry;
+                }
+            }
 
             synchronized (resource) {
                 resource.localFile = localFile;
@@ -767,7 +801,6 @@ public class ResourceTracker {
             }
 
             // update cache entry
-            CacheEntry entry = new CacheEntry(resource.location, resource.requestVersion);
             if (!current)
                 entry.initialize(connection);
 
@@ -791,6 +824,8 @@ public class ResourceTracker {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
             resource.fireDownloadEvent(); // fire ERROR
+        } finally {
+            entry.unlock();
         }
     }
 

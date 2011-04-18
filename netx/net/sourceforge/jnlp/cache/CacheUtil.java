@@ -21,7 +21,14 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.FileChannel;
-import java.util.*;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.security.*;
 import javax.jnlp.*;
 
@@ -29,6 +36,7 @@ import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.PropertiesFile;
 
 /**
  * Provides static methods to interact with the cache, download
@@ -38,6 +46,11 @@ import net.sourceforge.jnlp.util.FileUtils;
  * @version $Revision: 1.17 $
  */
 public class CacheUtil {
+
+    private static final String cacheDir = new File(JNLPRuntime.getConfiguration()
+            .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR)).getPath(); // Do this with file to standardize it.
+    private static final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+    private static final HashMap<String, FileLock> propertiesLockPool = new HashMap<String, FileLock>();
 
     /**
      * Compares a URL using string compare of its protocol, host,
@@ -138,8 +151,7 @@ public class CacheUtil {
             return;
         }
 
-        File cacheDir = new File(JNLPRuntime.getConfiguration()
-                .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR));
+        File cacheDir = new File(CacheUtil.cacheDir);
         if (!(cacheDir.isDirectory())) {
             return;
         }
@@ -284,18 +296,95 @@ public class CacheUtil {
         if (!isCacheable(source, version))
             throw new IllegalArgumentException(R("CNotCacheable", source));
 
-        try {
-            String cacheDir = JNLPRuntime.getConfiguration()
-                    .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
-            File localFile = urlToPath(source, cacheDir);
-            FileUtils.createParentDir(localFile);
+        File cacheFile = null;
+        synchronized (lruHandler) {
+            lruHandler.lock();
 
-            return localFile;
-        } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
+            // We need to reload the cacheOrder file each time
+            // since another plugin/javaws instance may have updated it.
+            lruHandler.load();
+            cacheFile = getCacheFileIfExist(urlToPath(source, ""));
+            if (cacheFile == null) { // We did not find a copy of it.
+                cacheFile = makeNewCacheFile(source, version);
+            }
+            lruHandler.unlock();
+        }
+        return cacheFile;
+    }
 
-            return null;
+    /**
+     * This will return a File pointing to the location of cache item.
+     * 
+     * @param urlPath Path of cache item within cache directory.
+     * @return File if we have searched before, null otherwise.
+     */
+    private static File getCacheFileIfExist(File urlPath) {
+        synchronized (lruHandler) {
+            File cacheFile = null;
+            List<Entry<String, String>> entries = lruHandler.getLRUSortedEntries();
+            // Start searching from the most recent to least recent.
+            for (Entry<String, String> e : entries) {
+                final String key = e.getKey();
+                final String path = e.getValue();
+
+                if (path != null) {
+                    if (pathToURLPath(path).equals(urlPath.getPath())) { // Match found.
+                        cacheFile = new File(path);
+                        lruHandler.updateEntry(key);
+                        break; // Stop searching since we got newest one already.
+                    }
+                }
+            }
+            return cacheFile;
+        }
+    }
+
+    /**
+     * Get the path to file minus the cache directory and indexed folder.
+     */
+    private static String pathToURLPath(String path) {
+        int len = cacheDir.length();
+        int index = path.indexOf(File.separatorChar, len + 1);
+        return path.substring(index);
+    }
+
+    /**
+     * This will create a new entry for the cache item. It is however not
+     * initialized but any future calls to getCacheFile with the source and
+     * version given to here, will cause it to return this item.
+     * 
+     * @param source the source URL
+     * @param version the version id of the local file
+     * @return the file location in the cache.
+     */
+    public static File makeNewCacheFile(URL source, Version version) {
+        synchronized (lruHandler) {
+            lruHandler.lock();
+            lruHandler.load();
+
+            File cacheFile = null;
+            for (long i = 0; i < Long.MAX_VALUE; i++) {
+                String path = cacheDir + File.separator + i;
+                File cDir = new File(path);
+                if (!cDir.exists()) {
+                    // We can use this directory.
+                    try {
+                        cacheFile = urlToPath(source, path);
+                        FileUtils.createParentDir(cacheFile);
+                        File pf = new File(cacheFile.getPath() + ".info");
+                        FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
+                        lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+
+                    break;
+                }
+            }
+
+            lruHandler.store();
+            lruHandler.unlock();
+            return cacheFile;
         }
     }
 
@@ -436,4 +525,89 @@ public class CacheUtil {
         }
     }
 
+    /**
+     * This will remove all old cache items.
+     */
+    public static void cleanCache() {
+        if (okToClearCache()) {
+            // First we want to figure out which stuff we need to delete.
+            HashSet<String> keep = new HashSet<String>();
+            lruHandler.load();
+
+            for (Entry<String, String> e : lruHandler.getLRUSortedEntries()) {
+                // Check if the item is contained in cacheOrder.
+                final String key = e.getKey();
+                final String value = e.getValue();
+
+                if (value != null) {
+                    PropertiesFile pf = new PropertiesFile(new File(value + ".info"));
+                    boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
+
+                    // This will get me the root directory specific to this cache item.
+                    String rStr = value.substring(cacheDir.length());
+                    rStr = cacheDir + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
+
+                    if (delete || keep.contains(rStr)) {
+                        lruHandler.removeEntry(key);
+                    } else {
+                        keep.add(value.substring(rStr.length()));
+                        keep.add(rStr); // We can just use the same map, since these two things are disjoint with each other.
+                    }
+                } else {
+                    lruHandler.removeEntry(key);
+                }
+            }
+            lruHandler.store();
+
+            removeUntrackedDirectories(keep);
+        }
+    }
+
+    private static void removeUntrackedDirectories(Set<String> keep) {
+        File temp = new File(cacheDir);
+        // Remove all folder not listed in keep.
+        for (File f : temp.listFiles()) {
+            if (f.isDirectory() && !keep.contains(f.getPath())) {
+                try {
+                    FileUtils.recursiveDelete(f, f);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Lock the property file and add it to our pool of locks.
+     * 
+     * @param properties Property file to lock.
+     */
+    public static void lockFile(PropertiesFile properties) {
+        String storeFilePath = properties.getStoreFile().getPath();
+        try {
+            propertiesLockPool.put(storeFilePath, FileUtils.getFileLock(storeFilePath, false, true));
+        } catch (OverlappingFileLockException e) {
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Unlock the property file and remove it from our pool. Nothing happens if
+     * it wasn't locked.
+     * 
+     * @param properties Property file to unlock.
+     */
+    public static void unlockFile(PropertiesFile properties) {
+        File storeFile = properties.getStoreFile();
+        FileLock fl = propertiesLockPool.get(storeFile.getPath());
+        try {
+            if (fl == null) return;
+            fl.release();
+            fl.channel().close();
+            propertiesLockPool.remove(storeFile.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

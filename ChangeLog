@@ -1,3 +1,45 @@
+2011-04-18  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java:
+	(markForDelete): New method. Adds an entry to info file specifying
+	that this file should be delete.
+	(lock): New method. Locks the info file.
+	(unlock): New method. Unlocks the info file.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
+	(cacheDir, lruHandler, propertiesLockPool): New private static fields.
+	(clearCache): Changed to use static field.
+	(getCacheFile): Changed to call getCacheFileIfExist and
+	makeNewCacheFile where appropriate.
+	(getCacheFileIfExist): New method. Get the file of requested item.
+	(makeNewCacheFile): New method. Create a new location to store cache
+	file.
+	(pathToURLPath): New method. Convert the file path to the url path.
+	(cleanCache): New method. Search for redundant entries and remove
+	them.
+	(removeUntrackedDirectories): New method. Remove all untracked
+	directories.
+	(lockFile): New method. Locks the given property file.
+	(unlockFile): New method. Unlocks the property file if we locked
+	before.
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: New class.
+	Provides wrappers for handling cache's LRU.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
+	(downloadResource): Ensure that we only allow downloading the
+	specified file once.
+	(initializeResource): Added creation of new location to store an
+	updated or new file.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(JNLPClassLoader): Reordered the calls since we should check
+	permission after we have the files ready.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	(markNetxRunning): Added call to CacheUtil.cleanCache() when adding
+	shutdown hooks.
+	* netx/net/sourceforge/jnlp/util/FileUtils.java:
+	(getFileLock): New method.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java:
+	(getContentsAsReader): Changed call from using urlToPath to
+	getCacheFile, since the directories are no longer in that location.
+
 2011-04-18  Denis Lila  <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Launcher.java:

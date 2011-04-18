@@ -162,4 +162,24 @@ public class CacheEntry {
         properties.store();
     }
 
+    /**
+     * Mark this entry for deletion at shutdown.
+     */
+    public void markForDelete() { // once marked it should not be unmarked.
+        properties.setProperty("delete", Boolean.toString(true));
+    }
+
+    /**
+     * Lock cache item.
+     */
+    protected void lock() {
+        CacheUtil.lockFile(properties);
+    }
+
+    /**
+     * Unlock cache item.
+     */
+    protected void unlock() {
+        CacheUtil.unlockFile(properties);
+    }
 }

@@ -74,7 +74,7 @@ public class XDesktopEntry {
 
         String cacheDir = JNLPRuntime.getConfiguration()
                 .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
-        File cacheFile = CacheUtil.urlToPath(file.getSourceLocation(), cacheDir);
+        File cacheFile = CacheUtil.getCacheFile(file.getSourceLocation(), null);
 
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
