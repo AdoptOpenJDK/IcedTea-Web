@@ -650,6 +650,7 @@ public class JNLPClassLoader extends URLClassLoader {
     protected void activateJars(final List<JARDesc> jars) {
         PrivilegedAction<Void> activate = new PrivilegedAction<Void>() {
 
+            @SuppressWarnings("deprecation")
             public Void run() {
                 // transfer the Jars
                 waitForJars(jars);
@@ -983,7 +984,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * classloader, or one of the classloaders for the JNLP file's
      * extensions.
      */
-    public Class<?> loadClass(String name) throws ClassNotFoundException {
+    public synchronized Class<?> loadClass(String name) throws ClassNotFoundException {
 
         Class<?> result = findLoadedClassAll(name);
 
@@ -1003,7 +1004,7 @@ public class JNLPClassLoader extends URLClassLoader {
         // validPackage(name);
 
         // search this and the extension loaders
-        if (result == null)
+        if (result == null) {
             try {
                 result = loadClassExt(name);
             } catch (ClassNotFoundException cnfe) {
@@ -1060,6 +1061,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     }
                 }
             }
+        }
 
         if (result == null) {
             throw new ClassNotFoundException(name);

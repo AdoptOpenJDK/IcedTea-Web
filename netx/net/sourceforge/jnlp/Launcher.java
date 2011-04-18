@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.jar.JarFile;
 
 import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.AppThreadGroup;
 import net.sourceforge.jnlp.runtime.AppletInstance;

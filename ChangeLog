@@ -1,3 +1,11 @@
+2011-04-18  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java:
+	Remove unused import.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	Add annotation to suppress warning.
+	(loadClass): Make synchronized.
+
 2010-04-14  Andrew John Hughes  <ahughes@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java,
