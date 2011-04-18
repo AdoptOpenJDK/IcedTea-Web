@@ -122,7 +122,7 @@ class PluginAppletPanelFactory {
                                     long handle, int x, int y,
                                     final URL doc,
                                     final Hashtable<String, String> atts) {
-        NetxPanel panel = AccessController.doPrivileged(new PrivilegedAction<NetxPanel>() {
+        final NetxPanel panel = AccessController.doPrivileged(new PrivilegedAction<NetxPanel>() {
             public NetxPanel run() {
                 NetxPanel panel = new NetxPanel(doc, atts, false);
                 NetxPanel.debug("Using NetX panel");
@@ -170,6 +170,30 @@ class PluginAppletPanelFactory {
 
         PluginDebug.debug("Applet ", a.getClass(), " initialized");
         streamhandler.write("instance " + identifier + " reference 0 initialized");
+
+        /* AppletViewerPanel sometimes doesn't set size right initially. This 
+         * causes the parent frame to be the default (10x10) size.
+         *  
+         * Normally it goes unnoticed since browsers like Firefox make a resize 
+         * call after init. However some browsers (e.g. Midori) don't.
+         * 
+         * We therefore manually set the parent to the right size.
+         */
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    panel.getParent().setSize(Integer.valueOf(atts.get("width")), Integer.valueOf(atts.get("height")));
+                }
+            });
+        } catch (InvocationTargetException ite) {
+            // Not being able to resize is non-fatal
+            PluginDebug.debug("Unable to resize panel: ");
+            ite.printStackTrace();
+        } catch (InterruptedException ie) {
+            // Not being able to resize is non-fatal
+            PluginDebug.debug("Unable to resize panel: ");
+            ie.printStackTrace();
+        }
 
         AppletSecurityContextManager.getSecurityContext(0).associateSrc(panel.getAppletClassLoader(), doc);
         AppletSecurityContextManager.getSecurityContext(0).associateInstance(identifier, panel.getAppletClassLoader());

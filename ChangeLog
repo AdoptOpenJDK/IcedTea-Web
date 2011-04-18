@@ -1,5 +1,12 @@
 2011-04-18  Deepak Bhole <dbhole@redhat.com>
 
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(PluginAppletPanelFactory::createPanel): Make the NetxPanel variable
+	final. Resize frame to work around problem whereby AppletViewerPanel
+	doesn't always set the right size initially.
+
+2011-04-18  Deepak Bhole <dbhole@redhat.com>
+
 	RH691259: Midori sends a SIGSEGV with the IcedTea NP Plugin
 	* plugin/icedteanp/IcedTeaNPPlugin.cc (NP_Initialize): Rather than
 	returning immediately if already initialized, return after function tables
