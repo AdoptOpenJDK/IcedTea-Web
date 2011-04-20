@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -48,6 +49,7 @@ import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.PropertiesFile;
 
 public class CachePane extends JPanel {
 
@@ -153,6 +155,7 @@ public class CachePane extends JPanel {
                     int modelRow = cacheTable.convertRowIndexToModel(row);
                     DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
                     if (fileNode.getFile().delete()) {
+                        updateRecentlyUsed(fileNode.getFile());
                         fileNode.getParent().removeChild(fileNode);
                         FileUtils.deleteWithErrMesg(fileNode.getInfoFile());
                         ((DefaultTableModel) cacheTable.getModel()).removeRow(modelRow);
@@ -171,6 +174,20 @@ public class CachePane extends JPanel {
                         e1.printStackTrace();
                     }
                 }
+            }
+
+            private void updateRecentlyUsed(File f) {
+                File recentlyUsedFile = new File(location + File.separator + "recently_used");
+                PropertiesFile pf = new PropertiesFile(recentlyUsedFile);
+                pf.load();
+                Enumeration<Object> en = pf.keys();
+                while (en.hasMoreElements()) {
+                    String key = (String) en.nextElement();
+                    if (pf.get(key).equals(f.getAbsolutePath())) {
+                        pf.remove(key);
+                    }
+                }
+                pf.store();
             }
         });
         buttons.add(deleteButton);

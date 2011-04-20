@@ -1,3 +1,10 @@
+2011-04-20  Andrew Su  <asu@redhat.com>
+
+        * netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
+        (createButtonPanel): Changed to update the recently_used file to
+        reflect the deletion. Added method updateRecentlyUsed to anonymous
+        ActionListener class which will do the actual updating.
+
 2011-04-20  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Add new private
