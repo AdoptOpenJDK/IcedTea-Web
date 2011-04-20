@@ -26,6 +26,10 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,8 +129,25 @@ public class CachePane extends JPanel {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                FileLock fl = null;
+                File netxRunningFile = new File(config.getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
+                if (!netxRunningFile.exists()) {
+                    try {
+                        FileUtils.createParentDir(netxRunningFile);
+                        FileUtils.createRestrictedFile(netxRunningFile, true);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+                try {
+                    fl = FileUtils.getFileLock(netxRunningFile.getPath(), false, false);
+                } catch (FileNotFoundException e1) {
+                }
+
                 int row = cacheTable.getSelectedRow();
                 try {
+                    if (fl == null) return;
                     if (row == -1 || row > cacheTable.getRowCount() - 1)
                         return;
                     int modelRow = cacheTable.convertRowIndexToModel(row);
@@ -140,6 +161,15 @@ public class CachePane extends JPanel {
                     }
                 } catch (Exception exception) {
                     //ignore
+                }
+
+                if (fl != null) {
+                    try {
+                        fl.release();
+                        fl.channel().close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         });

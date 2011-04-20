@@ -1,5 +1,11 @@
 2011-04-20  Andrew Su  <asu@redhat.com>
 
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
+	(createButtonPanel): Added check to delete button for whether plugin
+	or javaws is not running before proceeding with delete.
+
+2011-04-20  Andrew Su  <asu@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
 	(cleanCache): Added check for removing files that are over set max
 	limit.
