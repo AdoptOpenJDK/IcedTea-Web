@@ -1,5 +1,11 @@
 2011-04-20  Andrew Su  <asu@redhat.com>
 
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java:
+	(addComponents): Uncommented lines of code to reintroduce components
+	to handle setting cache size limit.
+
+2011-04-20  Andrew Su  <asu@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
 	(getCacheFile): Store lru after modifying.
 

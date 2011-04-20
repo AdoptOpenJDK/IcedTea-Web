@@ -151,17 +151,15 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
             }
         });
 
-        // TODO: This property is currently not honored, uncomment to enable when it is implemented.
-        // This is to work with how much space is available for caching.
-        // JLabel lCacheSize = new JLabel(Translator.R("TIFPCacheSize") + ":");
-        // slCacheSize = new JSlider(minSize, maxSize, Integer.parseInt(this.config.getProperty(properties[2])));
-        // slCacheSize.setMinorTickSpacing(50);
-        // slCacheSize.setPaintTicks(true);
-        // SpinnerNumberModel snmCacheSize = new SpinnerNumberModel(Integer.parseInt(this.config.getProperty(properties[2])), minSize, maxSize, 1);
-        // spCacheSize = new JSpinner(snmCacheSize);
-        //
-        // slCacheSize.addChangeListener(this);
-        // spCacheSize.addChangeListener(this);
+        JLabel lCacheSize = new JLabel(Translator.R("TIFPCacheSize") + ":");
+        slCacheSize = new JSlider(minSize, maxSize, Integer.parseInt(this.config.getProperty(properties[2])));
+        slCacheSize.setMinorTickSpacing(50);
+        slCacheSize.setPaintTicks(true);
+        SpinnerNumberModel snmCacheSize = new SpinnerNumberModel(Integer.parseInt(this.config.getProperty(properties[2])), minSize, maxSize, 1);
+        spCacheSize = new JSpinner(snmCacheSize);
+
+        slCacheSize.addChangeListener(this);
+        spCacheSize.addChangeListener(this);
 
         c.gridy = 0;
         c.gridx = 0;
@@ -170,16 +168,16 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
         c.gridx = 1;
         c.weightx = 0;
         diskSpacePanel.add(cbCompression, c);
-        // c.gridy = 1;
-        // c.gridx = 0;
-        // c.gridwidth = GridBagConstraints.REMAINDER;
+        c.gridy = 1;
+        c.gridx = 0;
+        c.gridwidth = GridBagConstraints.REMAINDER;
         c.weightx = 1;
-        // diskSpacePanel.add(lCacheSize, c);
-        // c.gridwidth = 1;
-        // c.gridy = 2;
-        // diskSpacePanel.add(slCacheSize, c);
-        // c.gridx = 1;
-        // diskSpacePanel.add(spCacheSize, c);
+        diskSpacePanel.add(lCacheSize, c);
+        c.gridwidth = 1;
+        c.gridy = 2;
+        diskSpacePanel.add(slCacheSize, c);
+        c.gridx = 1;
+        diskSpacePanel.add(spCacheSize, c);
 
         JPanel buttonDeleteRestore = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         JButton bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
