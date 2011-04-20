@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.DefaultLaunchHandler;
 import netscape.javascript.JSObjectCreatePermission;
 
 class Signature {
@@ -242,6 +243,7 @@ public class PluginAppletSecurityContext {
         // that JNLPRuntime will try to install
         if (System.getSecurityManager() == null) {
             JNLPRuntime.initialize(/* isApplication */false);
+            JNLPRuntime.setDefaultLaunchHandler(new DefaultLaunchHandler());
         }
 
         JNLPRuntime.disableExit();

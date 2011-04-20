@@ -1,3 +1,9 @@
+2011-04-20  Omair Majid  <omajid@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java
+	(PluginAppletSecurityContext): Set the launch handler to the stdout/stderr
+	based one.
+
 2011-04-20  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
