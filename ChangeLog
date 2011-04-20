@@ -1,3 +1,8 @@
+2011-04-20  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
+	(getCacheFile): Store lru after modifying.
+
 2011-04-18  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/CacheEntry.java:

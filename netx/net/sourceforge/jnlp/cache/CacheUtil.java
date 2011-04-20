@@ -307,6 +307,7 @@ public class CacheUtil {
             if (cacheFile == null) { // We did not find a copy of it.
                 cacheFile = makeNewCacheFile(source, version);
             }
+            lruHandler.store();
             lruHandler.unlock();
         }
         return cacheFile;
