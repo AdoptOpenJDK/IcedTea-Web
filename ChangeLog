@@ -1,6 +1,11 @@
 2011-04-20  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
+	(generateData): Skip through the identifier for cached item.
+
+2011-04-20  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
 	(createButtonPanel): Added check to delete button for whether plugin
 	or javaws is not running before proceeding with delete.
 

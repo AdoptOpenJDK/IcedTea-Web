@@ -235,16 +235,18 @@ public class CachePane extends JPanel {
         CacheDirectory.getDirStructure(root);
         ArrayList<Object[]> data = new ArrayList<Object[]>();
 
-        for (DirectoryNode type : root.getChildren()) {
-            for (DirectoryNode domain : type.getChildren()) {
-                for (DirectoryNode leaf : CacheDirectory.getLeafData(domain)) {
-                    Object[] o = { leaf,
-                            leaf.getFile().getAbsolutePath(),
-                            type,
-                            domain,
-                            leaf.getFile().length(),
-                            new SimpleDateFormat("MM/dd/yyyy").format(leaf.getFile().lastModified()) };
-                    data.add(o);
+        for (DirectoryNode identifier : root.getChildren()) {
+            for (DirectoryNode type : identifier.getChildren()) {
+                for (DirectoryNode domain : type.getChildren()) {
+                    for (DirectoryNode leaf : CacheDirectory.getLeafData(domain)) {
+                        Object[] o = { leaf,
+                                leaf.getFile().getAbsolutePath(),
+                                type,
+                                domain,
+                                leaf.getFile().length(),
+                                new SimpleDateFormat("MM/dd/yyyy").format(leaf.getFile().lastModified()) };
+                        data.add(o);
+                    }
                 }
             }
         }
