@@ -533,7 +533,17 @@ public class CacheUtil {
         if (okToClearCache()) {
             // First we want to figure out which stuff we need to delete.
             HashSet<String> keep = new HashSet<String>();
+            HashSet<String> remove = new HashSet<String>();
             lruHandler.load();
+            
+            long maxSize = -1; // Default
+            try {
+                maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty("deployment.cache.max.size"));
+            } catch (NumberFormatException nfe) {
+            }
+            
+            maxSize = maxSize << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
+            long curSize = 0;
 
             for (Entry<String, String> e : lruHandler.getLRUSortedEntries()) {
                 // Check if the item is contained in cacheOrder.
@@ -541,18 +551,49 @@ public class CacheUtil {
                 final String value = e.getValue();
 
                 if (value != null) {
+                    File file = new File(value);
                     PropertiesFile pf = new PropertiesFile(new File(value + ".info"));
                     boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
 
-                    // This will get me the root directory specific to this cache item.
-                    String rStr = value.substring(cacheDir.length());
+                    /*
+                     * This will get me the root directory specific to this cache item.
+                     * Example:
+                     *  cacheDir = /home/user1/.icedtea/cache
+                     *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
+                     *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
+                     *  then rstr becomes: /home/user1/.icedtea/cache/0
+                     */
+                    String rStr = file.getPath().substring(cacheDir.length());
                     rStr = cacheDir + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
+                    long len = file.length();
 
-                    if (delete || keep.contains(rStr)) {
+                    /*
+                     * we remove entries from our lru if any of the following condition is met.
+                     * Conditions:
+                     *  - delete: file has been marked for deletion.
+                     *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
+                     *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
+                     *  on disk would exceed the maximum size.
+                     *  - keep.contains(...): We had already decided to keep an entry with the same
+                     *  url path.
+                     */
+                    if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize) ||
+                            keep.contains(file.getPath().substring(rStr.length()))) {
                         lruHandler.removeEntry(key);
+                        remove.add(rStr);
                     } else {
-                        keep.add(value.substring(rStr.length()));
-                        keep.add(rStr); // We can just use the same map, since these two things are disjoint with each other.
+                        curSize += len;
+                        keep.add(file.getPath().substring(rStr.length()));
+
+                        for (File f : file.getParentFile().listFiles()) {
+                            if (!(f.equals(file) || f.equals(pf.getStoreFile()))){
+                                try {
+                                    FileUtils.recursiveDelete(f, f);
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        }
                     }
                 } else {
                     lruHandler.removeEntry(key);
@@ -560,20 +601,24 @@ public class CacheUtil {
             }
             lruHandler.store();
 
-            removeUntrackedDirectories(keep);
+            /*
+             * FIXME: if cacheDir is for example $USER_HOME and they have a folder called http
+             * and/or https. These would get removed.
+             */
+            remove.add(cacheDir + File.separator + "http");
+            remove.add(cacheDir + File.separator + "https");
+
+            removeSetOfDirectories(remove);
+
         }
     }
 
-    private static void removeUntrackedDirectories(Set<String> keep) {
-        File temp = new File(cacheDir);
-        // Remove all folder not listed in keep.
-        for (File f : temp.listFiles()) {
-            if (f.isDirectory() && !keep.contains(f.getPath())) {
-                try {
-                    FileUtils.recursiveDelete(f, f);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+    private static void removeSetOfDirectories(Set<String> remove) {
+        for (String s : remove) {
+            File f = new File(s);
+            try {
+                FileUtils.recursiveDelete(f, f);
+            } catch (IOException e) {
             }
         }
     }
