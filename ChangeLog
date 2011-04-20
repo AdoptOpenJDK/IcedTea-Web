@@ -1,5 +1,15 @@
 2011-04-20  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Add new private
+	variable classpathsInManifest.
+	(activateJars): When adding jar index, also add Class-Path entries from the
+	Manifest file in the jar.
+	(loadClass): Search for jars specified in classpaths before looking for 
+	entries in jar index.
+	(addNewJar): New method refactored from loadClass. 
+
+2011-04-20  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java
 	(getApplication(Class[],int)): Renamed to ...
 	(getApplication(Thread,Class[],int)): New method. Check the thread's

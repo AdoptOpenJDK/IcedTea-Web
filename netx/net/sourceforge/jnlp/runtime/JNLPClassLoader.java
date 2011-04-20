@@ -36,13 +36,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.ExtensionDesc;
@@ -137,6 +140,9 @@ public class JNLPClassLoader extends URLClassLoader {
 
     /** ArrayList containing jar indexes for various jars available to this classloader */
     private ArrayList<JarIndex> jarIndexes = new ArrayList<JarIndex>();
+
+    /** Set of classpath strings declared in the manifest.mf files */
+    private Set<String> classpaths = new HashSet<String>();
 
     /** File entries in the jar files available to this classloader */
     private TreeSet<String> jarEntries = new TreeSet<String>();
@@ -766,8 +772,10 @@ public class JNLPClassLoader extends URLClassLoader {
                         // there is currently no mechanism to cache files per
                         // instance.. so only index cached files
                         if (localFile != null) {
-                            JarIndex index = JarIndex.getJarIndex(new JarFile(localFile.getAbsolutePath()),
-                                                                  null);
+                            JarFile jarFile = new JarFile(localFile.getAbsolutePath());
+                            Manifest mf = jarFile.getManifest();
+                            classpaths.addAll(getClassPathsFromManifest(mf, jar.getLocation().getPath()));
+                            JarIndex index = JarIndex.getJarIndex(jarFile, null);
                             if (index != null)
                                 jarIndexes.add(index);
                         }
@@ -1008,8 +1016,30 @@ public class JNLPClassLoader extends URLClassLoader {
             try {
                 result = loadClassExt(name);
             } catch (ClassNotFoundException cnfe) {
+                // Not found in external loader either
 
-                // Not found in external loader either. As a last resort, look in any available indexes
+                // Look in 'Class-Path' as specified in the manifest file
+                try {
+                    for (String classpath: classpaths) {
+                        JARDesc desc;
+                        try {
+                            URL jarUrl = new URL(file.getCodeBase(), classpath);
+                            desc = new JARDesc(jarUrl, null, null, false, true, false, true);
+                        } catch (MalformedURLException mfe) {
+                            throw new ClassNotFoundException(name, mfe);
+                        }
+                        addNewJar(desc);
+                    }
+
+                    result = loadClassExt(name);
+                    return result;
+                } catch (ClassNotFoundException cnfe1) {
+                    if (JNLPRuntime.isDebug()) {
+                        cnfe1.printStackTrace();
+                    }
+                }
+
+                // As a last resort, look in any available indexes
 
                 // Currently this loads jars directly from the site. We cannot cache it because this
                 // call is initiated from within the applet, which does not have disk read/write permissions
@@ -1027,33 +1057,13 @@ public class JNLPClassLoader extends URLClassLoader {
                             } catch (MalformedURLException mfe) {
                                 throw new ClassNotFoundException(name);
                             }
-
-                            available.add(desc);
-
-                            tracker.addResource(desc.getLocation(),
-                                    desc.getVersion(),
-                                    null,
-                                    JNLPRuntime.getDefaultUpdatePolicy()
-                                    );
-
-                            URL remoteURL;
                             try {
-                                remoteURL = new URL(file.getCodeBase() + jarName);
-                            } catch (MalformedURLException mfe) {
-                                throw new ClassNotFoundException(name);
-                            }
-
-                            URL u;
-
-                            try {
-                                u = tracker.getCacheURL(remoteURL);
+                                addNewJar(desc);
                             } catch (Exception e) {
-                                throw new ClassNotFoundException(name);
+                                if (JNLPRuntime.isDebug()) {
+                                    e.printStackTrace();
+                                }
                             }
-
-                            if (u != null)
-                                addURL(u);
-
                         }
 
                         // If it still fails, let it error out
@@ -1068,6 +1078,31 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         return result;
+    }
+
+    /**
+     * Adds a new JARDesc into this classloader.
+     * <p>
+     * This will add the JARDesc into the resourceTracker and block until it
+     * is downloaded.
+     * @param desc the JARDesc for the new jar
+     */
+    private void addNewJar(JARDesc desc) {
+
+        available.add(desc);
+
+        tracker.addResource(desc.getLocation(),
+                desc.getVersion(),
+                null,
+                JNLPRuntime.getDefaultUpdatePolicy()
+                );
+
+        URL remoteURL = desc.getLocation();
+
+        URL u = tracker.getCacheURL(remoteURL);
+        if (u != null) {
+            addURL(u);
+        }
     }
 
     /**
@@ -1323,6 +1358,41 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private DownloadOptions getDownloadOptionsForJar(JARDesc jar) {
         return file.getDownloadOptionsForJar(jar);
+    }
+
+    /**
+     * Returns a set of paths that indicate the Class-Path entries in the
+     * manifest file. The paths are rooted in the same directory as the
+     * originalJarPath.
+     * @param mf the manifest
+     * @param originalJarPath the remote/original path of the jar containing
+     * the manifest
+     * @return a Set of String where each string is a path to the jar on
+     * the original jar's classpath.
+     */
+    private Set<String> getClassPathsFromManifest(Manifest mf, String originalJarPath) {
+        Set<String> result = new HashSet<String>();
+        if (mf != null) {
+            // extract the Class-Path entries from the manifest and split them
+            String classpath = mf.getMainAttributes().getValue("Class-Path");
+            String[] paths = classpath.split(" +");
+            for (String path : paths) {
+                if (path.trim().length() == 0) {
+                    continue;
+                }
+                // we want to search for jars in the same subdir on the server
+                // as the original jar that contains the manifest file, so find
+                // out its subdirectory and use that as the dir
+                String dir = "";
+                int lastSlash = originalJarPath.lastIndexOf("/");
+                if (lastSlash != -1) {
+                    dir = originalJarPath.substring(0, lastSlash + 1);
+                }
+                String fullPath = dir + path;
+                result.add(fullPath);
+            }
+        }
+        return result;
     }
 
     /*
