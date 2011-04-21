@@ -1,9 +1,16 @@
+2011-04-21  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc (consume_message): Use
+	NPN_GetURLNotify (non-blocking) instead of NPN_GetURL (blocking) so that
+	the plugin is free to process additional requests.
+	* ChangeLog: Fixed spacing issues in previous entry.
+
 2011-04-20  Andrew Su  <asu@redhat.com>
 
-        * netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
-        (createButtonPanel): Changed to update the recently_used file to
-        reflect the deletion. Added method updateRecentlyUsed to anonymous
-        ActionListener class which will do the actual updating.
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
+	(createButtonPanel): Changed to update the recently_used file to
+	reflect the deletion. Added method updateRecentlyUsed to anonymous
+	ActionListener class which will do the actual updating.
 
 2011-04-20  Omair Majid  <omajid@redhat.com>
 

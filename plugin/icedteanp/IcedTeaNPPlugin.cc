@@ -1179,7 +1179,7 @@ void consume_message(gchar* message) {
           PLUGIN_DEBUG ("plugin_in_pipe_callback: URL target %s\n", parts[4]);
 
           NPError np_error =
-            (*browser_functions.geturl) (data->owner, decoded_url, parts[4]);
+            (*browser_functions.geturlnotify) (data->owner, decoded_url, parts[4], NULL);
 
 
           if (np_error != NPERR_NO_ERROR)
