@@ -1,5 +1,9 @@
 2011-04-21  Deepak Bhole <dbhole@redhat.com>
 
+	* configure.ac: Bumped version to 1.2pre
+
+2011-04-21  Deepak Bhole <dbhole@redhat.com>
+
 	* plugin/icedteanp/IcedTeaNPPlugin.cc (consume_message): Use
 	NPN_GetURLNotify (non-blocking) instead of NPN_GetURL (blocking) so that
 	the plugin is free to process additional requests.
