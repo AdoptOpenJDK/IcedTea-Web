@@ -109,20 +109,24 @@ PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
  itweb-settings.desktop.in $(top_srcdir)/tests
 
+# binary names
+javaws:= $(shell echo javaws | sed '@program_transform_name@')
+itweb_settings:= $(shell echo itweb-settings | sed '@program_transform_name@')
+
 # the launcher needs to know $(bindir) and $(datadir) which can be different at
 # make-time from configure-time
 edit_launcher_script = sed \
   -e 's|[@]LAUNCHER_BOOTCLASSPATH[@]|$(LAUNCHER_BOOTCLASSPATH)|g' \
-  -e 's|[@]JAVAWS_BIN_LOCATION[@]|$(bindir)/javaws|g' \
-  -e 's|[@]ITWEB_SETTINGS_BIN_LOCATION[@]|$(bindir)/itweb-settings|g' \
+  -e 's|[@]JAVAWS_BIN_LOCATION[@]|$(bindir)/$(javaws)|g' \
+  -e 's|[@]ITWEB_SETTINGS_BIN_LOCATION[@]|$(bindir)/$(itweb_settings)|g' \
   -e 's|[@]JAVA[@]|$(JAVA)|g' \
   -e 's|[@]JRE[@]|$(JRE)|g'
 
 # Top-Level Targets
 # =================
 
-all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/javaws \
- javaws.desktop stamps/docs.stamp launcher.build/itweb-settings itweb-settings.desktop
+all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
+ javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop
 
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
@@ -144,9 +148,9 @@ if ENABLE_PLUGIN
 	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	${INSTALL_PROGRAM} launcher.build/javaws $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_DATA} extra-lib/about.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
-	${INSTALL_PROGRAM} launcher.build/itweb-settings $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
 
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(mandir)/man1
@@ -175,8 +179,8 @@ uninstall-local:
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jnlp
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
 	rm -f $(DESTDIR)$(mandir)/man1/javaws.1
-	rm -f $(DESTDIR)$(bindir)/javaws
-	rm -f $(DESTDIR)$(bindir)/itweb-settings
+	rm -f $(DESTDIR)$(bindir)/$(javaws)
+	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
 	rm -rf $(DESTDIR)$(htmldir)
 
 # Plugin
@@ -352,26 +356,26 @@ clean-extra:
 extra-lib/about.jar: stamps/extra-class-files.stamp
 	$(BOOT_DIR)/bin/jar cf $@ -C extra-lib net ;
 
-launcher.build/javaws: launcher/javaws.in
+launcher.build/$(javaws): launcher/javaws.in
 	mkdir -p launcher.build
 	$(edit_launcher_script) < $< > $@
 
-launcher.build/itweb-settings: launcher/itweb-settings.in
+launcher.build/$(itweb_settings): launcher/itweb-settings.in
 	mkdir -p launcher.build
 	$(edit_launcher_script) < $< > $@
 
 clean-launchers:
-	rm -f launcher.build/javaws
-	rm -f launcher.build/itweb-settings
+	rm -f launcher.build/$(javaws)
+	rm -f launcher.build/$(itweb_settings)
 	if [ -e launcher.build ] ; then \
 	  rmdir launcher.build ; \
 	fi
 
 javaws.desktop: javaws.desktop.in
-	sed "s#PATH_TO_JAVAWS#$(bindir)/javaws#" < $(srcdir)/javaws.desktop.in > javaws.desktop
+	sed "s#PATH_TO_JAVAWS#$(bindir)/$(javaws)#" < $(srcdir)/javaws.desktop.in > javaws.desktop
 
 itweb-settings.desktop: $(srcdir)/itweb-settings.desktop.in
-	sed "s#PATH_TO_ITWEB_SETTINGS#$(bindir)/itweb-settings#" \
+	sed "s#PATH_TO_ITWEB_SETTINGS#$(bindir)/$(itweb_settings)#" \
 	  < $(srcdir)/itweb-settings.desktop.in > itweb-settings.desktop
 
 # documentation

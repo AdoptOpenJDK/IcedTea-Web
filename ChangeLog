@@ -1,3 +1,15 @@
+2011-04-28  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am (javaws, itweb_settings): New variables.
+	(edit_launcher_script, all-local, install-exe-local)
+	(uninstall-local, clean-launchers, javaws.desktop)
+	(itweb-settings.desktop): Replace all uses of javaws and
+	itweb-settings with the new variables.
+	(launcher.build/javaws): Replace with ...
+	(launcher.build/$(javaws)): New target.
+	(launcher.build/itweb-settings): Replace with...
+	(launcher.build/$(itweb-settings)): New target. 
+
 2011-04-21  Deepak Bhole <dbhole@redhat.com>
 
 	* configure.ac: Bumped version to 1.2pre
