@@ -123,10 +123,10 @@ import com.sun.jndi.toolkit.url.UrlUtil;
 class PluginAppletPanelFactory {
 
     public AppletPanel createPanel(PluginStreamHandler streamhandler,
-                                    int identifier,
-                                    long handle, int x, int y,
-                                    final URL doc,
-                                    final Hashtable<String, String> atts) {
+                                   final int identifier,
+                                   final long handle, int x, int y,
+                                   final URL doc,
+                                   final Hashtable<String, String> atts) {
         final NetxPanel panel = AccessController.doPrivileged(new PrivilegedAction<NetxPanel>() {
             public NetxPanel run() {
                 NetxPanel panel = new NetxPanel(doc, atts, false);
@@ -136,13 +136,29 @@ class PluginAppletPanelFactory {
             }
         });
 
-        // create the frame.
-        PluginAppletViewer.framePanel(identifier, handle, panel);
+        // Framing the panel needs to happen in a thread whose thread group
+        // is the same as the threadgroup of the applet thread. If this
+        // isn't the case, the awt eventqueue thread's context classloader
+        // won't be set to a JNLPClassLoader, and when an applet class needs
+        // to be loaded from the awt eventqueue, it won't be found.
+        Thread panelInit = new Thread(panel.getThreadGroup(), new Runnable() {
+            @Override public void run() {
+                panel.createNewAppContext();
+                // create the frame.
+                PluginAppletViewer.framePanel(identifier, handle, panel);
+                panel.init();
+                // Start the applet
+                initEventQueue(panel);
+            }
+        }, "NetXPanel initializer");
 
-        panel.init();
-
-        // Start the applet
-        initEventQueue(panel);
+        panelInit.start();
+        while(panelInit.isAlive()) {
+            try {
+                panelInit.join();
+            } catch (InterruptedException e) {
+            }
+        }
 
         // Wait for the panel to initialize
         PluginAppletViewer.waitForAppletInit(panel);

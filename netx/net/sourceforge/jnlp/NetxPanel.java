@@ -23,12 +23,13 @@
 package net.sourceforge.jnlp;
 
 import net.sourceforge.jnlp.AppletLog;
-import net.sourceforge.jnlp.runtime.AppThreadGroup;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import sun.applet.AppletViewerPanel;
 import sun.awt.SunToolkit;
@@ -44,9 +45,58 @@ public class NetxPanel extends AppletViewerPanel {
     private boolean exitOnFailure = true;
     private AppletInstance appInst = null;
     private boolean appletAlive;
+    private final String uKey;
+
+    // We use this so that we can create exactly one thread group
+    // for all panels with the same uKey.
+    private static final ConcurrentMap<String, ThreadGroup> uKeyToTG =
+        new ConcurrentHashMap<String, ThreadGroup>();
+
+    // This map is actually a set (unfortunately there is no ConcurrentSet
+    // in java.util.concurrent). If KEY is in this map, then we know that
+    // an app context has been created for the panel that has uKey.equals(KEY),
+    // so we avoid creating it a second time for panels with the same uKey.
+    // Because it's a set, only the keys matter. However, we can't insert
+    // null values in because if we did, we couldn't use null checks to see
+    // if a key was absent before a putIfAbsent. 
+    private static final ConcurrentMap<String, Boolean> appContextCreated =
+        new ConcurrentHashMap<String, Boolean>();
 
     public NetxPanel(URL documentURL, Hashtable<String, String> atts) {
         super(documentURL, atts);
+
+        /* According to http://download.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/applet-compatibility.html, 
+         * classloaders are shared iff these properties match:
+         * codebase, cache_archive, java_archive, archive
+         * 
+         * To achieve this, we create the uniquekey based on those 4 values,
+         * always in the same order. The initial "<NAME>=" parts ensure a 
+         * bad tag cannot trick the loader into getting shared with another.
+         */
+
+        // Firefox sometimes skips the codebase if it is default  -- ".", 
+        // so set it that way if absent
+        String codebaseAttr =      atts.get("codebase") != null ?
+                                   atts.get("codebase") : ".";
+
+        String cache_archiveAttr = atts.get("cache_archive") != null ? 
+                                   atts.get("cache_archive") : "";
+
+        String java_archiveAttr =  atts.get("java_archive") != null ? 
+                                   atts.get("java_archive") : "";
+
+        String archiveAttr =       atts.get("archive") != null ? 
+                                   atts.get("archive") : "";
+
+        this.uKey = "codebase=" + codebaseAttr +
+                    "cache_archive=" + cache_archiveAttr + 
+                    "java_archive=" + java_archiveAttr + 
+                    "archive=" +  archiveAttr;
+
+        // when this was being done (incorrectly) in Launcher, the call was
+        // new AppThreadGroup(mainGroup, file.getTitle());
+        ThreadGroup tg = new ThreadGroup(Launcher.mainGroup, this.documentURL.toString());
+        uKeyToTG.putIfAbsent(this.uKey, tg);
     }
 
     // overloaded constructor, called when initialized via plugin
@@ -58,18 +108,6 @@ public class NetxPanel extends AppletViewerPanel {
     }
 
     @Override
-    public void run() {
-        /*
-         * create an AppContext for this thread associated with this particular
-         * plugin instance (which runs in a different thread group from the rest
-         * of the plugin).
-         */
-        SunToolkit.createNewAppContext();
-
-        super.run();
-    }
-
-    @Override
     protected void showAppletException(Throwable t) {
         /*
          * Log any exceptions thrown while loading, initializing, starting,
@@ -78,7 +116,7 @@ public class NetxPanel extends AppletViewerPanel {
         AppletLog.log(t);
         super.showAppletException(t);
     }
-    
+
     //Overriding to use Netx classloader. You might need to relax visibility
     //in sun.applet.AppletPanel for runLoader().
     protected void runLoader() {
@@ -90,7 +128,7 @@ public class NetxPanel extends AppletViewerPanel {
                                 getCode(),
                                 getWidth(),
                                 getHeight(),
-                                atts);
+                                atts, uKey);
 
             doInit = true;
             dispatchAppletEvent(APPLET_LOADING, null);
@@ -154,11 +192,7 @@ public class NetxPanel extends AppletViewerPanel {
             }
         }
 
-        // when this was being done (incorrectly) in Launcher, the call was
-        // new AppThreadGroup(mainGroup, file.getTitle());
-        ThreadGroup tg = new AppThreadGroup(Launcher.mainGroup,
-                this.documentURL.toString());
-        handler = new Thread(tg, this);
+        handler = new Thread(getThreadGroup(), this);
         handler.start();
     }
 
@@ -173,5 +207,20 @@ public class NetxPanel extends AppletViewerPanel {
 
     public boolean isAlive() {
         return handler != null && handler.isAlive() && this.appletAlive;
+    }
+
+    public ThreadGroup getThreadGroup() {
+        return uKeyToTG.get(uKey);
+    }
+
+    public void createNewAppContext() {
+        if (Thread.currentThread().getThreadGroup() != getThreadGroup()) {
+            throw new RuntimeException("createNewAppContext called from the wrong thread.");
+        }
+        // only create a new context if one hasn't already been created for the
+        // applets with this unique key.
+        if (null == appContextCreated.putIfAbsent(uKey, Boolean.TRUE)) {
+            SunToolkit.createNewAppContext();
+        }
     }
 }

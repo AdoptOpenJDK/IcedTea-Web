@@ -1,3 +1,27 @@
+2011-04-28  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/NetxPanel.java:
+	Remove unused import; add imports.
+	(uKey, uKeyToTG, appContextCreated): New members.
+	(getThreadGroup, createNewAppContext): New methods.
+	(runLoader): Pass uKey to PluginBridge's constructor.
+	(run): Remove. No longer needed.
+	(NetxPanel): Initialize uKey. If it is a new key, make a new thread
+	group for it and save it in the hash map.
+	(createAppletThread): Use getFutureTG instead of creating a thread
+	group on the spot.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	(createPanel): Initialize and frame the panel in a separate thread.
+	* netx/net/sourceforge/jnlp/Launcher.java:
+	Remove unused import.
+	(createApplet, createApplication, createThreadGroup): Replace
+	AppThreadGroup with ThreadGroup. Remove all calls to setApplication.
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	(PluginBridge): Remove the uniqueKey initialization logic. Set
+	uniqueKey to the uKey parameter.
+	* netx/net/sourceforge/jnlp/runtime/AppThreadGroup.java:
+	Remove file.
+
 2011-04-28  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (javaws, itweb_settings): New variables.
