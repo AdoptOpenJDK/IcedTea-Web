@@ -1,3 +1,11 @@
+2011-05-02  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(appletClose): Do not try to stop threads, now that the loader is shared
+	and the thread group for applets on a page is identical. Call dispose from
+	invokeAndWait.
+	(appletSystemExit): Exit the VM when called.
+
 2011-04-28  Denis Lila  <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/NetxPanel.java:
