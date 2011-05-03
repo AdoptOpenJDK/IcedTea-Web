@@ -1,3 +1,13 @@
+2011-05-03  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/NetxPanel.java:
+	Add imports.
+	(uKeyToTG): Change to HashMap.
+	(TGMapMutex): New mutex to synchronize uKeyToTG.
+	(getThreadGroup): Synchronize on TGMapMutex.
+	(NetxPanel): Only create a new thread group if one doesn't already
+	exist for the computed uKey.
+
 2011-05-02  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java

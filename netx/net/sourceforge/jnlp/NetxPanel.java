@@ -27,7 +27,9 @@ import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -49,8 +51,9 @@ public class NetxPanel extends AppletViewerPanel {
 
     // We use this so that we can create exactly one thread group
     // for all panels with the same uKey.
-    private static final ConcurrentMap<String, ThreadGroup> uKeyToTG =
-        new ConcurrentHashMap<String, ThreadGroup>();
+    private static final Map<String, ThreadGroup> uKeyToTG =
+        new HashMap<String, ThreadGroup>();
+    private static final Object TGMapMutex = new Object();
 
     // This map is actually a set (unfortunately there is no ConcurrentSet
     // in java.util.concurrent). If KEY is in this map, then we know that
@@ -95,8 +98,12 @@ public class NetxPanel extends AppletViewerPanel {
 
         // when this was being done (incorrectly) in Launcher, the call was
         // new AppThreadGroup(mainGroup, file.getTitle());
-        ThreadGroup tg = new ThreadGroup(Launcher.mainGroup, this.documentURL.toString());
-        uKeyToTG.putIfAbsent(this.uKey, tg);
+        synchronized(TGMapMutex) {
+            if (!uKeyToTG.containsKey(this.uKey)) {
+                ThreadGroup tg = new ThreadGroup(Launcher.mainGroup, this.documentURL.toString());
+                uKeyToTG.put(this.uKey, tg);
+            }
+        }
     }
 
     // overloaded constructor, called when initialized via plugin
@@ -210,7 +217,9 @@ public class NetxPanel extends AppletViewerPanel {
     }
 
     public ThreadGroup getThreadGroup() {
-        return uKeyToTG.get(uKey);
+        synchronized(TGMapMutex) {
+            return uKeyToTG.get(uKey);
+        }
     }
 
     public void createNewAppContext() {
