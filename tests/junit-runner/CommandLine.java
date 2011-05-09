@@ -34,6 +34,8 @@ public class CommandLine extends JUnitCore {
         List<Failure> missingClasses = new ArrayList<Failure>();
         for (String each : args) {
             try {
+                if (each.contains("$")) continue;
+                if (each.toLowerCase().endsWith(".jnlp")) continue;
                 classes.add(Class.forName(each));
             } catch (ClassNotFoundException e) {
                 system.out().println("ERROR: Could not find class: " + each);

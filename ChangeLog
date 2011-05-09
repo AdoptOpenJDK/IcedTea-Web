@@ -1,3 +1,7 @@
+2011-05-09  Jiri Vanek  <jvanek@redhat.com>
+	* tests/junit-runner/CommandLine.java:r added skipping of inner 
+	classes and one jnlp file from sources package.
+
 2011-05-03  Denis Lila  <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/NetxPanel.java:
