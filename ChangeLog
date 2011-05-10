@@ -1,3 +1,22 @@
+2011-05-10 Jiri Vanek <jvanek@redhat.com>
+
+	* tests/junit-runner/JunitLikeXmlOutputListener: This listener exports
+	results of junit in xml which "follows junit-output schema". Extended
+	for date, duration and some statististics for future purpose
+	*tests/report-sytles/index.html.in : file which provides runtime
+	transformation	of tests-output.xml and report.xml
+	* tests/report-styles/index.js: runtime transformation script and fast
+	navigation functions
+	* tests/report-styles/report.css: styles for transformed result
+	* tests/report-styles/jreport.xsl: template for human-readable
+	xml->html transformation. 
+	* Makefile.am (javaws, itweb_settings): New variables for report-styles 
+	directory; (edit_tests_index) - sed makro for replacing variables
+	inside 	index.html.in; (index.html) - goal for generating index.html
+	file from index.html.in and copying styles fiels; (run-netx-unit-tests) 
+	cloned stdout/err (clean-netx-unit-tests) cleaning styles dir and 
+	index.html
+
 2011-05-09  Jiri Vanek  <jvanek@redhat.com>
 	* tests/junit-runner/CommandLine.java:r added skipping of inner 
 	classes and one jnlp file from sources package.
