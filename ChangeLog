@@ -1,3 +1,9 @@
+2011-05-10  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
+	(addComponents):Created a new comparator for sorting by file size and
+	date.
+
 2011-05-10 Jiri Vanek <jvanek@redhat.com>
 
 	* tests/junit-runner/JunitLikeXmlOutputListener: This listener exports

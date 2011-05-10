@@ -30,8 +30,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.FileLock;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -43,6 +46,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import net.sourceforge.jnlp.cache.CacheDirectory;
 import net.sourceforge.jnlp.cache.DirectoryNode;
@@ -96,7 +100,6 @@ public class CachePane extends JPanel {
         };
 
         cacheTable = new JTable(model);
-        cacheTable.setAutoCreateRowSorter(true);
         cacheTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         cacheTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
         cacheTable.setPreferredScrollableViewportSize(new Dimension(600, 200));
@@ -104,6 +107,28 @@ public class CachePane extends JPanel {
         JScrollPane scrollPane = new JScrollPane(cacheTable);
 
         populateTable();
+
+        TableRowSorter<DefaultTableModel> tableSorter = new TableRowSorter<DefaultTableModel>(model);
+        tableSorter.setComparator(4, new Comparator<Long>() { // Comparator for size column.
+            @Override
+            public int compare(Long o1, Long o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        tableSorter.setComparator(5, new Comparator<String>() { // Comparator for date column.
+            @Override
+            public int compare(String o1, String o2) {
+                DateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+                try {
+                    Long time1 = format.parse(o1).getTime();
+                    Long time2 = format.parse(o2).getTime();
+                    return time1.compareTo(time2);
+                } catch (ParseException e) {
+                    return 0;
+                }
+            }
+        });
+        cacheTable.setRowSorter(tableSorter);
 
         c.weightx = 1;
         c.weighty = 1;
