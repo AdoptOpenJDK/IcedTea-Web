@@ -7,7 +7,6 @@
  * http://www.eclipse.org/legal/cpl-v10.html
  */
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +41,6 @@ public class CommandLine extends JUnitCore {
                 system.out().println("ERROR: Could not find class: " + each);
             }
         }
-        RunListener jXmlOutput = new JunitLikeXmlOutputListener(system, new File("tests-output.xml"));
-        addListener(jXmlOutput);
         RunListener listener = new LessVerboseTextListener(system);
         addListener(listener);
         Result result = run(classes.toArray(new Class[0]));

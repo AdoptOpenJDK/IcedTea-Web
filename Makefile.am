@@ -6,18 +6,14 @@ NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/javaws/about/resources
 NETX_EXTRA_DIST_DIR=$(abs_top_builddir)/extra-lib/net/sourceforge/javaws/about/resources
 
-REPORT_STYLES_DIRNAME=report-styles
-
 TESTS_SRCDIR=$(abs_top_srcdir)/tests
-NETX_UNIT_TEST_SRCDIR=$(TESTS_SRCDIR)/netx/unit
-TESTS_STYLES_SRCDIR=$(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)
-JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
-
 TESTS_DIR=$(abs_top_builddir)/tests.build
-NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
-TESTS_STYLES_DIR=$(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)
-JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
 
+NETX_UNIT_TEST_SRCDIR=$(TESTS_SRCDIR)/netx/unit
+NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
+
+JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
+JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
 
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 
@@ -125,14 +121,6 @@ edit_launcher_script = sed \
   -e 's|[@]ITWEB_SETTINGS_BIN_LOCATION[@]|$(bindir)/$(itweb_settings)|g' \
   -e 's|[@]JAVA[@]|$(JAVA)|g' \
   -e 's|[@]JRE[@]|$(JRE)|g'
-
-edit_tests_index = sed \
-  -e 's|[@]data_path_unit[@]|netx/unit/tests-output.xml|g' \
-  -e 's|[@]data_path_dist[@]|netx/dist/tests-output.xml|g' \
-  -e 's|[@]css_styles[@]|$(REPORT_STYLES_DIRNAME)/report.css|g' \
-  -e 's|[@]xslt_script[@]|$(REPORT_STYLES_DIRNAME)/index.js|g' \
-  -e 's|[@]sheet_path_unit[@]|$(REPORT_STYLES_DIRNAME)/jreport.xsl|g' \
-  -e 's|[@]sheet_path_dist[@]|$(REPORT_STYLES_DIRNAME)/jreport.xsl|g'
 
 # Top-Level Targets
 # =================
@@ -462,13 +450,6 @@ $(JUNIT_RUNNER_JAR): junit-runner-source-files.txt
 netx-unit-tests-source-files.txt:
 	find $(NETX_UNIT_TEST_SRCDIR) -name '*.java' | sort > $@
 
-$(TESTS_DIR)/index.html: stamps/netx-unit-tests-compile.stamp
-	mkdir $(TESTS_STYLES_DIR)/
-	cp $(TESTS_STYLES_SRCDIR)/*.css $(TESTS_STYLES_DIR)/
-	cp $(TESTS_STYLES_SRCDIR)/*.xsl $(TESTS_STYLES_DIR)/
-	cp $(TESTS_STYLES_SRCDIR)/*.js $(TESTS_STYLES_DIR)/
-	$(edit_tests_index) < $(TESTS_STYLES_SRCDIR)/index.html.in > $@
-
 stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
  netx-unit-tests-source-files.txt
 	mkdir -p $(NETX_UNIT_TEST_DIR) && \
@@ -479,7 +460,7 @@ stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
 	mkdir -p stamps && \
 	touch $@
 
-run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp $(TESTS_DIR)/index.html \
+run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
  $(JUNIT_RUNNER_JAR)
 	cp {$(NETX_UNIT_TEST_SRCDIR),$(NETX_UNIT_TEST_DIR)}/net/sourceforge/jnlp/basic.jnlp
 	cd $(NETX_UNIT_TEST_DIR) ; \
@@ -491,10 +472,7 @@ run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp $(TESTS_DIR)/index.htm
 	done ; \
 	echo $$class_names ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
-	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
-	  > stdout.log 2> stderr.log ; \
-	cat stdout.log ; \
-	cat stderr.log >&2
+	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
 
 clean-netx-tests: clean-netx-unit-tests clean-junit-runner
 	if [ -e $(TESTS_DIR)/netx ]; then \
@@ -507,8 +485,6 @@ clean-junit-runner:
 	rm -f $(JUNIT_RUNNER_JAR)
 
 clean-netx-unit-tests:
-	rm -rf $(TESTS_STYLES_DIR)
-	rm -f $(TESTS_DIR)/index.html
 	rm -f netx-unit-tests-source-files.txt
 	rm -rf $(NETX_UNIT_TEST_DIR)
 	rm -f stamps/netx-unit-tests-compile.stamp
