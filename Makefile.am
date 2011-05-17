@@ -472,7 +472,10 @@ run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
 	done ; \
 	echo $$class_names ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
-	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
+	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
+	  > stdout.log 2> stderr.log ; \
+	cat stdout.log ; \
+	cat stderr.log >&2
 
 clean-netx-tests: clean-netx-unit-tests clean-junit-runner
 	if [ -e $(TESTS_DIR)/netx ]; then \

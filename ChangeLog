@@ -1,3 +1,12 @@
+2011-05-17 Jiri Vanek <jvanek@redhat.com>
+
+	* tests/junit-runner/JunitLikeXmlOutputListener: This listener exports
+	results of junit in xml which "follows junit-output schema". Extended
+	for date, duration and some statististics for future purpose
+	* Makefile.am (run-netx-unit-tests): backuping stdout/stderr of tests 
+	* tests/junit-runner/CommandLine.java: registered 
+	JunitLikeXmlOutputListener
+
 2011-05-10  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
