@@ -26,6 +26,7 @@ New in release 1.1 (2011-XX-XX):
   - The user's default browser (determined from xdg-open or $BROWSER) is used
   - RH669942: javaws fails to download version/packed files (missing support for jnlp.packEnabled and jnlp.versionEnabled)
   - PR658: now jnlp.packEnabled works with applets.
+  - PR726: closing javaws -about no longer throws exceptions.
 * Plugin
   - PR475, RH604061: Allow applets from the same page to use the same classloader
   - PR612: NetDania application ends on java.security.AccessControlException: access denied (java.util.PropertyPermission browser read)
