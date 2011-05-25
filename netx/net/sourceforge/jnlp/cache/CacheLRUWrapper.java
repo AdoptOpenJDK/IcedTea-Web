@@ -78,6 +78,18 @@ enum CacheLRUWrapper {
     private PropertiesFile cacheOrder = new PropertiesFile(
             new File(cacheDir + File.separator + "recently_used"));
 
+    private CacheLRUWrapper(){
+        File f = cacheOrder.getStoreFile();
+        if (!f.exists()) {
+            try {
+                FileUtils.createParentDir(f);
+                FileUtils.createRestrictedFile(f, true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
     /**
      * Returns an instance of the policy.
      * 
@@ -181,12 +193,7 @@ enum CacheLRUWrapper {
      */
     public synchronized void lock() {
         try {
-            File f = cacheOrder.getStoreFile();
-            if (!f.exists()) {
-                FileUtils.createParentDir(f);
-                FileUtils.createRestrictedFile(f, true);
-            }
-            fl = FileUtils.getFileLock(f.getPath(), false, true);
+            fl = FileUtils.getFileLock(cacheOrder.getStoreFile().getPath(), false, true);
         } catch (OverlappingFileLockException e) { // if overlap we just increase the count.
         } catch (Exception e) { // We didn't get a lock..
             e.printStackTrace();

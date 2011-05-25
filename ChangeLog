@@ -1,3 +1,9 @@
+2011-05-20  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java:
+	(CacheLRUWrapper): New constructor to create file.
+	(lock): Removed creation of file here.
+
 2011-05-17 Jiri Vanek <jvanek@redhat.com>
 
 	* tests/junit-runner/JunitLikeXmlOutputListener: This listener exports
