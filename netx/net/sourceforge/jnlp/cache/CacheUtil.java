@@ -567,6 +567,11 @@ public class CacheUtil {
                     rStr = cacheDir + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
                     long len = file.length();
 
+                    if (keep.contains(file.getPath().substring(rStr.length()))) {
+                        lruHandler.removeEntry(key);
+                        continue;
+                    }
+                    
                     /*
                      * we remove entries from our lru if any of the following condition is met.
                      * Conditions:
@@ -574,11 +579,8 @@ public class CacheUtil {
                      *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
                      *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
                      *  on disk would exceed the maximum size.
-                     *  - keep.contains(...): We had already decided to keep an entry with the same
-                     *  url path.
                      */
-                    if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize) ||
-                            keep.contains(file.getPath().substring(rStr.length()))) {
+                    if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
                         lruHandler.removeEntry(key);
                         remove.add(rStr);
                     } else {
