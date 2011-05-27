@@ -1375,6 +1375,9 @@ public class JNLPClassLoader extends URLClassLoader {
         if (mf != null) {
             // extract the Class-Path entries from the manifest and split them
             String classpath = mf.getMainAttributes().getValue("Class-Path");
+            if (classpath == null || classpath.trim().length() == 0) {
+                return result;
+            }
             String[] paths = classpath.split(" +");
             for (String path : paths) {
                 if (path.trim().length() == 0) {

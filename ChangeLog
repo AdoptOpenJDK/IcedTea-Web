@@ -1,3 +1,9 @@
+2011-05-27  Omair Majid  <omajid@redhat.com>
+
+	* NEWS: Update.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getClassPathsFromManifest): Check for possible nulls and empty strings.
+
 2011-05-26  Andrew Su  <asu@redhat.com>
 
 	* NEWS: Update.

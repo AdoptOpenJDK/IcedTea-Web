@@ -21,6 +21,7 @@ New in release 1.1 (2011-XX-XX):
   - PR497: Mercurial revision detection not very reliable
   - PR638: JNLPClassLoader.loadClass(String name) can return null
   - RH677772: NoSuchAlgorithmException using SSL/TLS in javaws
+  - PR724: Possible NullPointerException in JNLPClassLoader.getClassPathsFromManifest
 * NetX
   - Use Firefox's proxy settings if possible
   - The user's default browser (determined from xdg-open or $BROWSER) is used
