@@ -1625,10 +1625,15 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
                 appletShutdown(p);
                 appletPanels.removeElement(p);
-                dispose();
 
-                if (tg.activeCount() > 0)
-                    tg.stop();
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            dispose();
+                        }
+                    });
+                } catch (Exception e) { // ignore, we are just disposing it
+                }
 
                 if (countApplets() == 0) {
                     appletSystemExit();

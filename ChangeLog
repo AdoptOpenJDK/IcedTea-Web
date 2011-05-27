@@ -1,5 +1,11 @@
 2011-05-27  Deepak Bhole <dbhole@redhat.com>
 
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(appletClose): Call dispose from the swing thread. Also, don't try to stop
+	the threadgroup.
+
+2011-05-27  Deepak Bhole <dbhole@redhat.com>
+
 	* Backed out 0256de6a4bf6
 
 2011-05-27  Omair Majid  <omajid@redhat.com>
