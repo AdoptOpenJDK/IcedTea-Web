@@ -28,6 +28,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1078,7 +1080,7 @@ public class ResourceTracker {
     /**
      * This class downloads and initializes the queued resources.
      */
-    class Downloader implements Runnable {
+    private class Downloader implements Runnable {
         Resource resource = null;
 
         public void run() {
@@ -1100,7 +1102,19 @@ public class ResourceTracker {
                 }
 
                 try {
-                    processResource(resource);
+
+                    // Resource processing involves writing to files 
+                    // (cache entry trackers, the files themselves, etc.)
+                    // and it therefore needs to be privileged
+
+                    final Resource fResource = resource;
+                    AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                        public Void run() {
+                            processResource(fResource);                            
+                            return null;
+                        }
+                    });
+
                 } catch (Exception ex) {
                     if (JNLPRuntime.isDebug())
                         ex.printStackTrace();

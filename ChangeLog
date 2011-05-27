@@ -1,5 +1,14 @@
 2011-05-27  Deepak Bhole <dbhole@redhat.com>
 
+	PR723: AccessControlException while downloading resource
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+	(Downloader): Make class private.
+	(Downloader::run): Call processResource via doPrivileged since
+	resources may get added at run time from application code via
+	JNLPClassLoader::addNewJar().
+
+2011-05-27  Deepak Bhole <dbhole@redhat.com>
+
 	PR735: Firefox 4 sometimes freezes if the applet calls showDocument()
 	* plugin/icedteanp/IcedTeaNPPlugin.cc (consume_message): Defer handling to
 	url load request to the queue processor.
