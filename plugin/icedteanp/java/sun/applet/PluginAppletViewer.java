@@ -1621,26 +1621,15 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 if (cl instanceof JNLPClassLoader.CodeBaseClassLoader)
                     cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
 
+                ThreadGroup tg = ((JNLPClassLoader) cl).getApplication().getThreadGroup();
+
                 appletShutdown(p);
                 appletPanels.removeElement(p);
-                
-                /* TODO: Applets don't always shut down nicely. We 
-                 * need to find a proper way to forcibly closing all threads 
-                 * an applet starts during its lifetime 
-                 */
+                dispose();
 
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            dispose();
-                        }
-                    });
-                } catch (Exception e) { // ignore, we are just disposing it
-                }
+                if (tg.activeCount() > 0)
+                    tg.stop();
 
-                // If there are no more applets running, exit the VM
-                // TODO: There is a possible race condition here as count 
-                // can be 0 when an applet is in the initialization phase 
                 if (countApplets() == 0) {
                     appletSystemExit();
                 }
@@ -1651,10 +1640,12 @@ public class PluginAppletViewer extends XEmbeddedFrame
     }
 
     /**
-     * This function should be called to halt the VM when all applets are destroyed.
+     * Exit the program.
+     * Exit from the program (if not stand alone) - do no clean-up
      */
     private void appletSystemExit() {
-        System.exit(0);
+        // Do nothing. Exit is handled by another
+        // block of code, called when _all_ applets are gone
     }
 
     /**
