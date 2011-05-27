@@ -928,8 +928,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
      */
     public void showDocument(URL url, String target) {
         try {
-            // FIXME: change to postCallRequest
-            write("url " + UrlUtil.encode(url.toString(), "UTF-8") + " " + target);
+            Long reference = getRequestIdentifier();
+            write("reference " + reference +  " LoadURL " + UrlUtil.encode(url.toString(), "UTF-8") + " " + target);
         } catch (IOException exception) {
             // Deliberately ignore IOException.  showDocument may be
             // called from threads other than the main thread after

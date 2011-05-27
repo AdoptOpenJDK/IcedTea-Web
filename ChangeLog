@@ -1,5 +1,22 @@
 2011-05-27  Deepak Bhole <dbhole@redhat.com>
 
+	PR735: Firefox 4 sometimes freezes if the applet calls showDocument()
+	* plugin/icedteanp/IcedTeaNPPlugin.cc (consume_message): Defer handling to
+	url load request to the queue processor.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
+	(PluginRequestProcessor::newMessageOnBus): Handle new LoadURL command.
+	(PluginRequestProcessor::loadURL): New method. Loads the specified url in
+	the given target.
+	(queue_processor): Process the LoadURL command.
+	(_loadURL): New async callback function to handle LoadURL commands.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.h: Add _loadURL and
+	loadURL method declerations.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (showDocument):
+	Send the url load command in the standard "instance X reference Y
+	<command> <args>" format.
+
+2011-05-27  Deepak Bhole <dbhole@redhat.com>
+
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
 	(appletClose): Call dispose from the swing thread. Also, don't try to stop
 	the threadgroup.

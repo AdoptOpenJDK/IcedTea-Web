@@ -130,11 +130,12 @@ PluginRequestProcessor::newMessageOnBus(const char* message)
                    !command->find("GetSlot") ||
                    !command->find("SetSlot") ||
                    !command->find("Eval") ||
-                   !command->find("Finalize"))
+                   !command->find("Finalize") ||
+                   !command->find("LoadURL"))
         {
 
             // Update queue synchronously
-        	pthread_mutex_lock(&message_queue_mutex);
+            pthread_mutex_lock(&message_queue_mutex);
             message_queue->push_back(message_parts);
             pthread_mutex_unlock(&message_queue_mutex);
 
@@ -714,6 +715,38 @@ PluginRequestProcessor::finalize(std::vector<std::string*>* message_parts)
     plugin_to_java_bus->post(response.c_str());
 }
 
+/**
+ * Fetches the URL and loads it into the given target
+ *
+ * @param message_parts The request message.
+ */
+void
+PluginRequestProcessor::loadURL(std::vector<std::string*>* message_parts)
+{
+
+    int id = atoi(message_parts->at(1)->c_str());
+
+    AsyncCallThreadData thread_data = AsyncCallThreadData();
+    thread_data.result_ready = false;
+    thread_data.parameters = std::vector<void*>();
+    thread_data.result = std::string();
+
+    NPP instance;
+    get_instance_from_id(id, instance);
+
+    // If instance is invalid, do not proceed further
+    if (!instance)
+    	return;
+
+    thread_data.parameters.push_back(instance);
+    thread_data.parameters.push_back(message_parts->at(5)); // push url
+    thread_data.parameters.push_back(message_parts->at(6)); // push target
+
+    thread_data.result_ready = false;
+    browser_functions.pluginthreadasynccall(instance, &_loadURL, &thread_data);
+    while (!thread_data.result_ready) usleep(2000); // wait till ready
+}
+
 static void
 queue_cleanup(void* data)
 {
@@ -793,6 +826,12 @@ queue_processor(void* data)
                 // write methods are synchronized
                 pthread_mutex_lock(&syn_write_mutex);
                 processor->finalize(message_parts);
+                pthread_mutex_unlock(&syn_write_mutex);
+            } else if (command == "LoadURL") // For instance X url <url> <target>
+            {
+                // write methods are synchronized
+                pthread_mutex_lock(&syn_write_mutex);
+                processor->loadURL(message_parts);
                 pthread_mutex_unlock(&syn_write_mutex);
             } else
             {
@@ -1014,3 +1053,34 @@ _getString(void* data)
     PLUGIN_DEBUG("_getString returning\n");
 }
 
+void
+_loadURL(void* data) {
+
+    PLUGIN_DEBUG("_loadURL called\n");
+
+    NPP instance;
+    std::string* url;
+    std::string* target;
+
+    std::vector<void*> parameters = ((AsyncCallThreadData*) data)->parameters;
+
+    instance = (NPP) parameters.at(0);
+    url = (std::string*) parameters.at(1);
+    target = (std::string*) parameters.at(2);
+
+    PLUGIN_DEBUG("Launching %s in %s\n", url->c_str(), target->c_str());
+
+    // Each decode can expand to 4 chars at the most
+    gchar* decoded_url = (gchar*) calloc(strlen(url->c_str())*4 + 1, sizeof(gchar));
+    IcedTeaPluginUtilities::decodeURL(url->c_str(), &decoded_url);
+
+    ((AsyncCallThreadData*) data)->call_successful =
+        (*browser_functions.geturl) (instance, decoded_url, target->c_str());
+
+    ((AsyncCallThreadData*) data)->result_ready = true;
+
+    g_free(decoded_url);
+    decoded_url = NULL;
+
+    PLUGIN_DEBUG("_loadURL returning %d\n", ((AsyncCallThreadData*) data)->call_successful);
+}

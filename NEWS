@@ -33,6 +33,7 @@ New in release 1.1 (2011-XX-XX):
   - PR475, RH604061: Allow applets from the same page to use the same classloader
   - PR612: NetDania application ends on java.security.AccessControlException: access denied (java.util.PropertyPermission browser read)
   - PR664: Sound doesn't play on runescape.com.
+  - PR735: Firefox 4 sometimes freezes if the applet calls showDocument()
 
 New in release 1.0 (2010-XX-XX):
 

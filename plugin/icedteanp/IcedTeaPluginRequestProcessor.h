@@ -83,6 +83,7 @@ void _setMember(void* data);
 void _call(void* data);
 void _eval(void* data);
 void _getString(void* data);
+void _loadURL(void* data);
 
 void* queue_processor(void* data);
 
@@ -138,6 +139,9 @@ class PluginRequestProcessor : public BusSubscriber
 
         /* Decrements reference count for given object */
         void finalize(std::vector<std::string*>* message_parts);
+
+        /* Loads a URL into the specified target */
+        void loadURL(std::vector<std::string*>* message_parts);
 };
 
 #endif // __ICEDTEAPLUGINREQUESTPROCESSOR_H__

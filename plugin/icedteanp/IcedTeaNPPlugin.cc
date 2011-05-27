@@ -1169,26 +1169,7 @@ void consume_message(gchar* message) {
            data = (ITNPPluginData*) instance->pdata;
         }
 
-      if (g_str_has_prefix (parts[2], "url"))
-        {
-          // Open the URL in a new browser window.
-          gchar* decoded_url = (gchar*) calloc(strlen(parts[3]) + 1, sizeof(gchar));
-          IcedTeaPluginUtilities::decodeURL(parts[3], &decoded_url);
-
-          PLUGIN_DEBUG ("plugin_in_pipe_callback: opening URL %s\n", decoded_url);
-          PLUGIN_DEBUG ("plugin_in_pipe_callback: URL target %s\n", parts[4]);
-
-          NPError np_error =
-            (*browser_functions.geturlnotify) (data->owner, decoded_url, parts[4], NULL);
-
-
-          if (np_error != NPERR_NO_ERROR)
-            PLUGIN_ERROR ("Failed to load URL.");
-
-          g_free(decoded_url);
-          decoded_url = NULL;
-        }
-      else if (g_str_has_prefix (parts[2], "status"))
+      if (g_str_has_prefix (parts[2], "status"))
         {
 
           // clear the "instance X status" parts
