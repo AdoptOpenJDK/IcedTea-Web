@@ -675,7 +675,7 @@ public class ResourceTracker {
             CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.downloadVersion);
             File finalFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion); // This is where extracted version will be, or downloaded file if not compressed.
 
-            if (!finalFile.exists()) {
+            if (!downloadEntry.isCurrent(con)) {
                 // Make sure we don't re-download the file. however it will wait as if it was downloading.
                 // (This is fine because file is not ready yet anyways)
                 byte buf[] = new byte[1024];
@@ -700,6 +700,7 @@ public class ResourceTracker {
                  * If the file was compressed, uncompress it.
                  */
                 if (packgz) {
+                    downloadEntry.initialize(con);
                     GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                             .getCacheFile(downloadLocation, resource.downloadVersion)));
                     InputStream inputStream = new BufferedInputStream(gzInputStream);
@@ -714,6 +715,7 @@ public class ResourceTracker {
                     inputStream.close();
                     gzInputStream.close();
                 } else if (gzip) {
+                    downloadEntry.initialize(con);
                     GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                             .getCacheFile(downloadLocation, resource.downloadVersion)));
                     InputStream inputStream = new BufferedInputStream(gzInputStream);
