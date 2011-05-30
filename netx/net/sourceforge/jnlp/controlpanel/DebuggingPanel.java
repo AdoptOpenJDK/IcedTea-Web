@@ -46,7 +46,6 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
     /** List of properties used by this panel */
     public static String[] properties = { "deployment.trace", // Debugging
             "deployment.log", // Debugging
-            "deployment.javapi.lifecycle.exception", // Debugging
             "deployment.console.startup.mode", // Java Console
     };
     private DeploymentConfiguration config;
@@ -74,8 +73,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
         JLabel debuggingDescription = new JLabel("<html>" + Translator.R("CPDebuggingDescription") + "<hr /><br /></html>");
 
         JCheckBox[] debuggingOptions = { new JCheckBox(Translator.R("DPEnableTracing")),
-                new JCheckBox(Translator.R("DPEnableLogging")),
-                new JCheckBox(Translator.R("DPLifeCycleExceptions")) };
+                new JCheckBox(Translator.R("DPEnableLogging")), };
 
         ComboItem[] javaConsoleItems = { new ComboItem(Translator.R("DPDisable"), "DISABLE"),
                 new ComboItem(Translator.R("DPHide"), "HIDE"),
@@ -107,13 +105,12 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
                 switch (i) {
                     case 0:
                     case 1:
-                    case 2:
                         debuggingOptions[i].setSelected(Boolean.parseBoolean(s));
                         debuggingOptions[i].setActionCommand(properties[i]);
                         debuggingOptions[i].addItemListener(this);
                         add(debuggingOptions[i], c);
                         break;
-                    case 3:
+                    case 2:
                         for (int j = 0; j < javaConsoleItems.length; j++) {
                             consoleComboBox.addItem(javaConsoleItems[j]);
                             if (config.getProperty("deployment.console.startup.mode").equals(javaConsoleItems[j].getValue()))

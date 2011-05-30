@@ -1,3 +1,11 @@
+2011-05-30  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java:
+	(properties): Removed property.
+	(addComponents): Removed checkbox.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Removed translation string for DPLifeCycleExceptions.
+
 2011-05-27  Deepak Bhole <dbhole@redhat.com>
 
 	PR723: AccessControlException while downloading resource
