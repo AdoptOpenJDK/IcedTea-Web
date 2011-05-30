@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -33,6 +34,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
@@ -109,10 +111,27 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                fileChooser.setFileHidingEnabled(false);
                 if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    // Check if we have permission to write to that location.
                     String result = fileChooser.getSelectedFile().getAbsolutePath();
-                    location.setText(result);
-                    config.setProperty(properties[1], result);
+                    File dirLocation = new File(result);
+                    boolean canWrite = dirLocation.canWrite();
+                    while (!canWrite && dirLocation != null){ // File does not exist, or no permission.
+                        
+                        if (dirLocation.exists()) {
+                            JOptionPane.showMessageDialog(null, "No permission to write to this location.");
+                            return;
+                        }
+                        
+                        dirLocation = dirLocation.getParentFile();
+                        canWrite = dirLocation.canWrite();
+                    }
+                    
+                    if (canWrite) {
+                        location.setText(result);
+                        config.setProperty(properties[1], result);
+                    }
                 }
             }
         });

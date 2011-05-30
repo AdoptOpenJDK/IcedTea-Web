@@ -1,5 +1,11 @@
 2011-05-30  Andrew Su  <asu@redhat.com>
 
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java:
+	(addComponent): Add check to see if specified cache directory is
+	writable.
+
+2011-05-30  Andrew Su  <asu@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
 	(downloadResource): Check whether file to be downloaded is current.
 
