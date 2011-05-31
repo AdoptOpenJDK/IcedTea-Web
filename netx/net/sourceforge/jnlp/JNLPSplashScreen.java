@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-public class JNLPSplashScreen extends JFrame {
+public class JNLPSplashScreen extends JDialog {
 
     String applicationTitle;
     String applicationVendor;
