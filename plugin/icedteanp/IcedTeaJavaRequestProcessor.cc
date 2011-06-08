@@ -247,22 +247,43 @@ JavaRequestProcessor::postAndWaitForResponse(std::string message)
     plugin_to_java_bus->post(message.c_str());
 
     // Wait for result to be filled in.
-	struct timespec curr_t;
+    struct timespec curr_t;
+
+    bool isPluginThread = false;
+
+    if (pthread_self() == itnp_plugin_thread_id)
+    {
+        isPluginThread = true;
+        PLUGIN_DEBUG("JRP is in plug-in thread...\n");
+    }
 
     do
     {
-    	clock_gettime(CLOCK_REALTIME, &curr_t);
+        clock_gettime(CLOCK_REALTIME, &curr_t);
 
-		if (!result_ready && (curr_t.tv_sec < t.tv_sec))
-		{
-			if (g_main_context_pending(NULL))
-				g_main_context_iteration(NULL, false);
-			else
-				usleep(200);
-		}
-		else
-			break;
+        if (!result_ready && (curr_t.tv_sec < t.tv_sec))
+        {
+            if (isPluginThread)
+            {
+                processAsyncCallQueue(NULL);
 
+                // Let the browser run its pending events too
+                if (g_main_context_pending(NULL))
+                {
+                    g_main_context_iteration(NULL, false);
+                } else
+                {
+                    usleep(1000); // 1ms
+                }
+            } else
+            {
+                usleep(1000); // 1ms
+            }
+        }
+        else
+        {
+            break;
+        }
     } while (1);
 
     if (curr_t.tv_sec >= t.tv_sec)

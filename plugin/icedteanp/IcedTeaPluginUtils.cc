@@ -54,6 +54,9 @@ pthread_mutex_t IcedTeaPluginUtilities::reference_mutex = PTHREAD_MUTEX_INITIALI
 std::map<void*, NPP>* IcedTeaPluginUtilities::instance_map = new std::map<void*, NPP>();
 std::map<std::string, NPObject*>* IcedTeaPluginUtilities::object_map = new std::map<std::string, NPObject*>();
 
+/* Plugin async call queue */
+static std::vector< PluginThreadCall* >* pendingPluginThreadRequests = new std::vector< PluginThreadCall* >();
+
 /**
  * Given a context number, constructs a message prefix to send to Java
  *
@@ -908,6 +911,108 @@ IcedTeaPluginUtilities::decodeURL(const gchar* url, gchar** decoded_url)
     }
 
     PLUGIN_DEBUG("SENDING URL: %s\n", *decoded_url);
+}
+
+
+/**
+ * Posts a function for execution on the plug-in thread and wait for result.
+ *
+ * @param instance The NPP instance
+ * @param func The function to post
+ * @param data Arguments to *func
+ */
+void
+IcedTeaPluginUtilities::callAndWaitForResult(NPP instance, void (*func) (void *), AsyncCallThreadData* data)
+{
+
+    struct timespec t;
+    struct timespec curr_t;
+    clock_gettime(CLOCK_REALTIME, &t);
+    t.tv_sec += REQUESTTIMEOUT; // timeout
+
+    // post request
+    postPluginThreadAsyncCall(instance, func, data);
+
+    do
+    {
+        clock_gettime(CLOCK_REALTIME, &curr_t);
+        if (data != NULL && !data->result_ready && (curr_t.tv_sec < t.tv_sec))
+        {
+            usleep(2000);
+        } else
+        {
+            break;
+        }
+    } while (1);
+}
+
+
+/**
+ * Posts a request that needs to be handled in a plugin thread.
+ *
+ * @param instance The plugin instance
+ * @param func The function to execute
+ * @param userData The userData for the function to consume/write to
+ * @return if the call was posted successfully
+ */
+
+bool
+IcedTeaPluginUtilities::postPluginThreadAsyncCall(NPP instance, void (*func) (void *), void* data)
+{
+    if (instance)
+    {
+        PluginThreadCall* call = new PluginThreadCall();
+        call->instance = instance;
+        call->func = func;
+        call->userData = data;
+
+        pthread_mutex_lock(&pluginAsyncCallMutex);
+        pendingPluginThreadRequests->push_back(call);
+        pthread_mutex_unlock(&pluginAsyncCallMutex);
+
+        browser_functions.pluginthreadasynccall(instance, &processAsyncCallQueue, NULL); // Always returns immediately
+
+        PLUGIN_DEBUG("Pushed back call evt %p\n", call);
+
+        return true;
+    }
+
+    // Else
+    PLUGIN_DEBUG("Instance is not active. Call rejected.\n");
+    return false;
+}
+
+/**
+ * Runs through the async call wait queue and executes all calls
+ *
+ * @param param Ignored -- required to conform to NPN_PluginThreadAsynCall API
+ */
+void
+processAsyncCallQueue(void* param /* ignored */)
+{
+    do {
+        PluginThreadCall* call = NULL;
+
+        pthread_mutex_lock(&pluginAsyncCallMutex);
+        if (pendingPluginThreadRequests->size() > 0)
+        {
+            call = pendingPluginThreadRequests->front();
+            pendingPluginThreadRequests->erase(pendingPluginThreadRequests->begin());
+        }
+        pthread_mutex_unlock(&pluginAsyncCallMutex);
+
+        if (call)
+        {
+            PLUGIN_DEBUG("Processing call evt %p\n", call);
+            call->func(call->userData);
+            PLUGIN_DEBUG("Call evt %p processed\n", call);
+
+            delete call;
+        } else
+        {
+            break;
+        }
+    } while(1);
 }
 
 /******************************************

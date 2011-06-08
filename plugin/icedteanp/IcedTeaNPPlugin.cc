@@ -160,6 +160,12 @@ gchar* out_pipe_name;
 // Applet viewer output watch source.
 gint out_watch_source;
 
+// Thread ID of plug-in thread
+pthread_t itnp_plugin_thread_id;
+
+// Mutex to lock async call queue
+pthread_mutex_t pluginAsyncCallMutex;
+
 // Applet viewer output channel.
 GIOChannel* out_to_appletviewer;
 
@@ -2204,8 +2210,6 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
 
   PLUGIN_DEBUG ("NP_Initialize: using %s\n", appletviewer_executable);
 
-  PLUGIN_DEBUG ("NP_Initialize return\n");
-
   plugin_req_proc = new PluginRequestProcessor();
   java_req_proc = new JavaMessageSender();
 
@@ -2218,6 +2222,16 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   pthread_create (&plugin_request_processor_thread1, NULL, &queue_processor, (void*) plugin_req_proc);
   pthread_create (&plugin_request_processor_thread2, NULL, &queue_processor, (void*) plugin_req_proc);
   pthread_create (&plugin_request_processor_thread3, NULL, &queue_processor, (void*) plugin_req_proc);
+
+  itnp_plugin_thread_id = pthread_self();
+
+  pthread_mutexattr_t attribute;
+  pthread_mutexattr_init(&attribute);
+  pthread_mutexattr_settype(&attribute, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init(&pluginAsyncCallMutex, &attribute);
+  pthread_mutexattr_destroy(&attribute);
+
+  PLUGIN_DEBUG ("NP_Initialize return\n");
 
   return NPERR_NO_ERROR;
 
@@ -2362,6 +2376,9 @@ NP_Shutdown (void)
   // cleanup_in_pipe_name:
   g_free (in_pipe_name);
   in_pipe_name = NULL;
+
+  // Destroy the call queue mutex
+  pthread_mutex_destroy(&pluginAsyncCallMutex);
 
   initialized = false;
 

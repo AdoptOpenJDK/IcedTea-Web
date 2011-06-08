@@ -57,18 +57,6 @@ exception statement from your version. */
 #include "IcedTeaPluginUtils.h"
 #include "IcedTeaJavaRequestProcessor.h"
 
-/**
- * Data structure passed to functions called in a new thread.
- */
-
-typedef struct async_call_thread_data
-{
-    std::vector<void*> parameters;
-	std::string result;
-	bool result_ready;
-	bool call_successful;
-} AsyncCallThreadData;
-
 /* Internal request reference counter */
 static long internal_req_ref_counter;
 
@@ -109,10 +97,10 @@ class PluginRequestProcessor : public BusSubscriber
     	/* Dispatch request processing to a new thread for asynch. processing */
     	void dispatch(void* func_ptr (void*), std::vector<std::string>* message, std::string* src);
 
-    	/* Send main window pointer to Java */
-    	void sendWindow(std::vector<std::string*>* message_parts);
+        /* Send main window pointer to Java */
+        void sendWindow(std::vector<std::string*>* message_parts);
 
-    	/* Stores the variant on java side */
+        /* Stores the variant on java side */
     	void storeVariantInJava(NPVariant variant, std::string* result);
 
     public:

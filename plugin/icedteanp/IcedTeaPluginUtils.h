@@ -119,11 +119,42 @@ typedef struct java_result_data
 
 } JavaResultData;
 
+/**
+ * This struct holds data to do calls that need to be run in the plugin thread
+ */
+typedef struct plugin_thread_call
+{
+   // The plugin instance
+   NPP instance;
+
+   // The function to call
+   void (*func) (void *);
+
+   // The data to pass to the function
+   void *userData;
+
+} PluginThreadCall;
+
+/**
+ * Data structure passed to functions called in a new thread.
+ */
+
+typedef struct async_call_thread_data
+{
+    std::vector<void*> parameters;
+    std::string result;
+    bool result_ready;
+    bool call_successful;
+} AsyncCallThreadData;
+
 /*
  * Misc. utility functions
  *
  * This class is never instantiated and should contain static functions only
  */
+
+/* Function to process all pending async calls */
+void processAsyncCallQueue(void*);
 
 class IcedTeaPluginUtilities
 {
@@ -139,6 +170,9 @@ class IcedTeaPluginUtilities
 
         /* Map holding java-side-obj-key->NPObject relationship  */
         static std::map<std::string, NPObject*>* object_map;
+
+        /* Posts a call in the async call queue */
+        static bool postPluginThreadAsyncCall(NPP instance, void (*func) (void *), void* data);
 
     public:
 
@@ -227,6 +261,9 @@ class IcedTeaPluginUtilities
     	static bool isObjectJSArray(NPP instance, NPObject* object);
 
     	static void decodeURL(const char* url, char** decoded_url);
+
+    	/* Posts call in async queue and waits till execution completes */
+    	static void callAndWaitForResult(NPP instance, void (*func) (void *), AsyncCallThreadData* data);
 };
 
 /*

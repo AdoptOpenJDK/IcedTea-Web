@@ -411,9 +411,7 @@ IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(NPP instance,
         thread_data.parameters.push_back(np_class);
         thread_data.parameters.push_back(&scriptable_object);
 
-        browser_functions.pluginthreadasynccall(instance, &_createAndRetainJavaObject, &thread_data);
-
-        while (!thread_data.result_ready) usleep(2000); // wait till ready
+        IcedTeaPluginUtilities::callAndWaitForResult(instance, &_createAndRetainJavaObject, &thread_data);
     } else
     {
         // Else retain object and continue

@@ -1,3 +1,51 @@
+2011-06-08  Deepak Bhole <dbhole@redhat.com>
+
+	PR721: IcedTeaPlugin.so cannot run g_main_context_iteration on a different
+	thread unless a different GMainContext *context is used
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc
+	(postAndWaitForResponse): Added logic for tracking when the processor is
+	running from a plugin main thread, and logic to process main thread
+	specific messages queued thereafter until function exit.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc:
+	(itnp_plugin_thread_id): New variable. Tracks plugin main thread ID.
+	(pluginAsyncCallMutex): New variable. Mutex to lock async call queue.
+	(NP_Initialize): Initialize the itnp_plugin_thread_id variable and make
+	ithe make pluginAsyncCallMutex recursive.
+	(NP_Shutdown): Destroy pluginAsyncCallMutex.
+	* plugin/icedteanp/IcedTeaNPPlugin.h:
+	(CHROMIUM_WORKAROUND): Remove macro.
+	(itnp_plugin_thread_id): New variable. Tracks plugin main thread ID.
+	(pluginAsyncCallMutex): New variable. Mutex to lock async call queue.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
+	(eval): Remove chromium workaround.
+	(call): Same.
+	(sendString): Same.
+	(setMember): Same.
+	(sendMember): Same.
+	(loadURL): Same.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.h: Moved
+	async_call_thread_data to IcedTeaPluginUtils.h.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc
+	(pendingPluginThreadRequests): New variable. Queue to track events waiting
+	for async execution on plug-in thread.
+	(callAndWaitForResult): New function. Calls a method on plug-in thread and
+	waits for the execution to complete.
+	(postPluginThreadAsyncCall): New function. Posts a method call to the
+	async execution queue and calls NPN_PluginThreadAsynCall.
+	(processAsyncCallQueue): New function. Called from the plug-in thread,
+	this function empties the event queue of functions waiting for plug-in
+	thread execution.
+	* plugin/icedteanp/IcedTeaPluginUtils.h
+	(plugin_thread_call): New struct to hold async call data.
+	(async_call_thread_data): Struct moved from IcedTeaPluginRequestProcessor.
+	(processAsyncCallQueue): New function.
+	(postPluginThreadAsyncCall): Same.
+	(callAndWaitForResult): Same.
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc
+	(get_scriptable_java_object): Use
+	IcedTeaPluginUtilities::callAndWaitForResult to post async callback for
+	_createAndRetainJavaObject.
+
 2011-05-31  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java: Subclass JDialog, not

@@ -239,20 +239,7 @@ PluginRequestProcessor::eval(std::vector<std::string*>* message_parts)
     thread_data.parameters.push_back(NPVARIANT_TO_OBJECT(*window_ptr));
     thread_data.parameters.push_back(&script);
 
-#ifdef CHROMIUM_WORKAROUND
-    // Workaround for chromium
-    _eval(&thread_data);
-
-    if (!thread_data.call_successful)
-    {
-#endif
-        thread_data.result_ready = false;
-        browser_functions.pluginthreadasynccall(instance, &_eval, &thread_data);
-
-        while (!thread_data.result_ready) usleep(2000); // Wait till result is ready
-#ifdef CHROMIUM_WORKAROUND
-    }
-#endif
+    IcedTeaPluginUtilities::callAndWaitForResult(instance, &_eval, &thread_data);
 
     NPVariant* result_variant = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
     std::string result_variant_jniid = std::string();
@@ -341,20 +328,7 @@ PluginRequestProcessor::call(std::vector<std::string*>* message_parts)
     thread_data.parameters.push_back(&arg_count);
     thread_data.parameters.push_back(args_array);
 
-#ifdef CHROMIUM_WORKAROUND
-    // Workaround for chromium
-    _call(&thread_data);
-
-    if (!thread_data.call_successful)
-    {
-#endif
-        thread_data.result_ready = false;
-        browser_functions.pluginthreadasynccall(instance, &_call, &thread_data);
-
-        while (!thread_data.result_ready) usleep(2000); // wait till ready
-#ifdef CHROMIUM_WORKAROUND
-    }
-#endif
+    IcedTeaPluginUtilities::callAndWaitForResult(instance, &_call, &thread_data);
 
     result_variant = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
 
@@ -409,19 +383,7 @@ PluginRequestProcessor::sendString(std::vector<std::string*>* message_parts)
     thread_data.parameters.push_back(instance);
     thread_data.parameters.push_back(variant);
 
-#ifdef CHROMIUM_WORKAROUND
-    // Workaround for chromium
-    _getString(&thread_data);
-
-    if (!thread_data.call_successful)
-    {
-#endif
-        thread_data.result_ready = false;
-        browser_functions.pluginthreadasynccall(instance, &_getString, &thread_data);
-        while (!thread_data.result_ready) usleep(2000); // wait till ready
-#ifdef CHROMIUM_WORKAROUND
-    }
-#endif
+    IcedTeaPluginUtilities::callAndWaitForResult(instance, &_getString, &thread_data);
 
     // We need the context 0 for backwards compatibility with the Java side
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
@@ -502,20 +464,7 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
     thread_data.parameters.push_back(&property_identifier);
     thread_data.parameters.push_back(&value);
 
-#ifdef CHROMIUM_WORKAROUND
-    // Workaround for chromium
-    _setMember(&thread_data);
-
-    if (!thread_data.call_successful)
-    {
-#endif
-        thread_data.result_ready = false;
-        browser_functions.pluginthreadasynccall(instance, &_setMember, &thread_data);
-
-        while (!thread_data.result_ready) usleep(2000); // wait till ready
-#ifdef CHROMIUM_WORKAROUND
-    }
-#endif
+    IcedTeaPluginUtilities::callAndWaitForResult(instance, &_setMember, &thread_data);
 
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
     response.append(" JavaScriptSetMember ");
@@ -598,21 +547,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     thread_data.parameters.push_back(NPVARIANT_TO_OBJECT(*parent_ptr));
     thread_data.parameters.push_back(&member_identifier);
 
-#ifdef CHROMIUM_WORKAROUND
-    // Workaround for chromium
-    _getMember(&thread_data);
-
-    if (!thread_data.call_successful)
-    {
-#endif
-        thread_data.result_ready = false;
-        browser_functions.pluginthreadasynccall(instance, &_getMember, &thread_data);
-
-        while (!thread_data.result_ready) usleep(2000); // wait till ready
-
-#ifdef CHROMIUM_WORKAROUND
-    }
-#endif
+    IcedTeaPluginUtilities::callAndWaitForResult(instance, &_getMember, &thread_data);
 
     PLUGIN_DEBUG("Member PTR after internal request: %s\n", thread_data.result.c_str());
 
@@ -743,8 +678,7 @@ PluginRequestProcessor::loadURL(std::vector<std::string*>* message_parts)
     thread_data.parameters.push_back(message_parts->at(6)); // push target
 
     thread_data.result_ready = false;
-    browser_functions.pluginthreadasynccall(instance, &_loadURL, &thread_data);
-    while (!thread_data.result_ready) usleep(2000); // wait till ready
+    IcedTeaPluginUtilities::callAndWaitForResult(instance, &_loadURL, &thread_data);
 }
 
 static void

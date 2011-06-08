@@ -57,9 +57,6 @@ exception statement from your version. */
 #include "IcedTeaPluginUtils.h"
 #include "IcedTeaPluginRequestProcessor.h"
 
-// Work around across some chromium issues
-#define CHROMIUM_WORKAROUND
-
 // ITNPPluginData stores all the data associated with a single plugin
 // instance.  A separate plugin instance is created for each <APPLET>
 // tag.  For now, each plugin instance spawns its own applet viewer
@@ -96,6 +93,12 @@ static pthread_t plugin_request_processor_thread3;
 
 // Condition on which the queue processor waits
 extern pthread_cond_t cond_message_available;
+
+// ID of plug-in thread
+extern pthread_t itnp_plugin_thread_id;
+
+/* Mutex around plugin async call queue ops */
+extern pthread_mutex_t pluginAsyncCallMutex;
 
 // debug switch
 extern int plugin_debug;
