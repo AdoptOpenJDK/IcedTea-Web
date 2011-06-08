@@ -1,3 +1,10 @@
+2011-07-08  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	(jars): Changed to use HashSet instead of String[].
+	(PluginBridge): Updated to work with HashSet instead of String[]
+	(getResources): Likewise.
+
 2011-06-08  Deepak Bhole <dbhole@redhat.com>
 
 	PR721: IcedTeaPlugin.so cannot run g_main_context_iteration on a different

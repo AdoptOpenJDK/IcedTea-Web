@@ -24,7 +24,9 @@ package net.sourceforge.jnlp;
 
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.List;
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 public class PluginBridge extends JNLPFile {
 
     String name;
-    String[] jars = new String[0];
+    HashSet<String> jars = new HashSet<String>();
     String[] cacheJars = new String[0];
     String[] cacheExJars = new String[0];
     Hashtable<String, String> atts;
@@ -101,11 +103,13 @@ public class PluginBridge extends JNLPFile {
         }
 
         if (jar != null && jar.length() > 0) {
-            this.jars = jar.split(",");
+            String[] jars = jar.split(",");
 
             // trim white spaces
-            for (int i = 0; i < this.jars.length; i++) {
-                this.jars[i] = this.jars[i].trim();
+            for (int i = 0; i < jars.length; i++) {
+                String jarName = jars[i].trim();
+                if (jarName.length() > 0)
+                    this.jars.add(jarName);
             }
 
             if (JNLPRuntime.isDebug()) {
@@ -191,10 +195,13 @@ public class PluginBridge extends JNLPFile {
                         List<JARDesc> jarDescs = new ArrayList<JARDesc>();
                         jarDescs.addAll(sharedResources.getResources(JARDesc.class));
 
-                        for (int i = 0; i < jars.length; i++)
-                            if (jars[i].length() > 0)
-                                jarDescs.add(new JARDesc(new URL(codeBase, jars[i]),
+                        Iterator<String> it = jars.iterator();
+                        while(it.hasNext()) {
+                            String name = it.next();
+                            if (name.length() > 0)
+                                jarDescs.add(new JARDesc(new URL(codeBase, name),
                                         null, null, false, true, false, true));
+                        }
 
                         boolean cacheable = true;
 
