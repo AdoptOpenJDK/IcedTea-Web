@@ -1,5 +1,19 @@
 2011-07-08  Andrew Su  <asu@redhat.com>
 
+	* NEWS: Updated.
+	* netx/net/sourceforge/jnlp/JNLPFile.java:
+	(JNLPFile): Calls new constructor.
+	(JNLPFile): New constructor to take an option for forcing a codebase.
+	(JNLPFile): Call parse with extra parameter.
+	(parse): Use the given codebase passed in if we did not find one.
+	* netx/net/sourceforge/jnlp/Parser.java:
+	(Parser): Calls new constructor.
+	(Parser): New constructor which takes in a codebase as a last option.
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	(PluginBridge): Calls new JNLPFile's constructor with current codebase
+
+2011-07-08  Andrew Su  <asu@redhat.com>
+
 	* netx/net/sourceforge/jnlp/PluginBridge.java:
 	(jars): Changed to use HashSet instead of String[].
 	(PluginBridge): Updated to work with HashSet instead of String[]

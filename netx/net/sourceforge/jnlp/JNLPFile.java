@@ -174,8 +174,24 @@ public class JNLPFile {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location, Version version, boolean strict, UpdatePolicy policy) throws IOException, ParseException {
+	this(location, version, strict, policy, null);
+    }
+    
+    /**
+     * Create a JNLPFile from a URL and a version, checking for updates
+     * using the specified policy.
+     *
+     * @param location the location of the JNLP file
+     * @param version the version of the JNLP file
+     * @param strict whether to enforce the spec when
+     * @param policy the update policy
+     * @param forceCodebase codebase to use if not specified in JNLP file.
+     * @throws IOException if an IO exception occurred
+     * @throws ParseException if the JNLP file was invalid
+     */
+    protected JNLPFile(URL location, Version version, boolean strict, UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
         Node root = Parser.getRootNode(openURL(location, version, policy));
-        parse(root, strict, location);
+        parse(root, strict, location, forceCodebase);
 
         //Downloads the original jnlp file into the cache if possible
         //(i.e. If the jnlp file being launched exist locally, but it
@@ -222,7 +238,7 @@ public class JNLPFile {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(InputStream input, boolean strict) throws ParseException {
-        parse(Parser.getRootNode(input), strict, null);
+        parse(Parser.getRootNode(input), strict, null, null);
     }
 
     /**
@@ -574,12 +590,12 @@ public class JNLPFile {
      * @param strict whether to enforce the spec when
      * @param location the file location or null
      */
-    private void parse(Node root, boolean strict, URL location) throws ParseException {
+    private void parse(Node root, boolean strict, URL location, URL forceCodebase) throws ParseException {
         try {
             //if (location != null)
             //  location = new URL(location, "."); // remove filename
 
-            Parser parser = new Parser(this, location, root, strict, true); // true == allow extensions
+            Parser parser = new Parser(this, location, root, strict, true, forceCodebase); // true == allow extensions
 
             // JNLP tag information
             specVersion = parser.getSpecVersion();

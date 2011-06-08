@@ -26,6 +26,7 @@ New in release 1.1 (2011-XX-XX):
   - Use Firefox's proxy settings if possible
   - The user's default browser (determined from xdg-open or $BROWSER) is used
   - RH669942: javaws fails to download version/packed files (missing support for jnlp.packEnabled and jnlp.versionEnabled)
+  - PR464: plugin can now load parameters from jnlp files.
   - PR658: now jnlp.packEnabled works with applets.
   - PR726: closing javaws -about no longer throws exceptions.
   - PR727: cache now properly removes files.

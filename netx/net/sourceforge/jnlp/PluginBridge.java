@@ -53,17 +53,23 @@ public class PluginBridge extends JNLPFile {
         fileVersion = new Version("1.1");
         this.codeBase = codebase;
         this.sourceLocation = documentBase;
+        this.atts = atts;
 
         if (atts.containsKey("jnlp_href")) {
             try {
                 URL jnlp = new URL(codeBase.toExternalForm() + atts.get("jnlp_href"));
-                JNLPFile jnlpFile = new JNLPFile(jnlp);
+                JNLPFile jnlpFile = new JNLPFile(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), this.codeBase);
                 Map<String, String> jnlpParams = jnlpFile.getApplet().getParameters();
 
                 // Change the parameter name to lowercase to follow conventions.
                 for (Map.Entry<String, String> entry : jnlpParams.entrySet()) {
-                    atts.put(entry.getKey().toLowerCase(), entry.getValue());
+                    this.atts.put(entry.getKey().toLowerCase(), entry.getValue());
                 }
+                JARDesc[] jarDescs = jnlpFile.getResources().getJARs();
+                for (JARDesc jarDesc : jarDescs) {
+                     String fileName = jarDesc.getLocation().toExternalForm();
+                     this.jars.add(fileName);
+                 }
             } catch (MalformedURLException e) {
                 // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
                 // it is the site developer who should ensure that file exist.
@@ -117,7 +123,6 @@ public class PluginBridge extends JNLPFile {
                 System.err.println("jars length: " + jars.length);
             }
         }
-        this.atts = atts;
 
         name = atts.get("name");
         if (name == null)

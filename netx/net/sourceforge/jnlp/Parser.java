@@ -110,6 +110,27 @@ class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     public Parser(JNLPFile file, URL base, Node root, boolean strict, boolean allowExtensions) throws ParseException {
+	this(file, base, root, strict, allowExtensions, null);
+    }
+
+    /**
+     * Create a parser for the JNLP file.  If the location
+     * parameters is not null it is used as the default codebase
+     * (does not override value of jnlp element's href
+     * attribute).<p>
+     *
+     * The root node may be normalized as a side effect of this
+     * constructor.
+     *
+     * @param file the (uninitialized) file reference
+     * @param base if codebase is not specified, a default base for relative URLs
+     * @param root the root node
+     * @param strict whether to enforce strict compliance with the JNLP spec
+     * @param allowExtensions whether to allow extensions to the JNLP spec
+     * @param codebase codebase to use if we did not parse one from JNLP file.
+     * @throws ParseException if the JNLP file is invalid
+     */
+    public Parser(JNLPFile file, URL base, Node root, boolean strict, boolean allowExtensions, URL codebase) throws ParseException {
         this.file = file;
         this.root = root;
         this.strict = strict;
@@ -122,7 +143,9 @@ class Parser {
         // JNLP tag information
         this.spec = getVersion(root, "spec", "1.0+");
         this.codebase = addSlash(getURL(root, "codebase", base));
-        this.base = (codebase != null) ? codebase : base; // if codebase not specified use default codebase
+        if (this.codebase == null) // We only override it if it is not specified.
+            this.codebase = codebase;
+        this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
         fileLocation = getURL(root, "href", this.base);
 
         // normalize the text nodes
