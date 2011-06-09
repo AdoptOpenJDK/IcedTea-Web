@@ -1,3 +1,14 @@
+2011-06-08  Saad Mohammad  <smohammad@redhat.com>
+
+	* AUTHORS: Updated
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java
+	(checkAccess): Moved the process of checking if the application is a trusted
+	application to a new method called isSigned().
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java
+	(checkLocation): Allows trusted application to have access to
+	PersistenceService data from different hosts. It uses ServiceUtil.isSigned() 
+	to determine if the current application is a trusted application.
+
 2011-06-08  Andrew Su  <asu@redhat.com>
 
 	* NEWS: Updated.

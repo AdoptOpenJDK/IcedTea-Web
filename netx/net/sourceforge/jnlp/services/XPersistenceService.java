@@ -52,9 +52,12 @@ class XPersistenceService implements PersistenceService {
             throw new MalformedURLException("Cannot determine the current application.");
 
         URL source = app.getJNLPFile().getCodeBase();
+        
+        if (!source.getHost().equalsIgnoreCase(location.getHost())
+                && !ServiceUtil.isSigned(app)) // Allow trusted application to have access to data from a different host
+            throw new MalformedURLException(
+                    "Untrusted application cannot access data from a different host.");
 
-        if (!source.getHost().equalsIgnoreCase(location.getHost()))
-            throw new MalformedURLException("Cannot access data from a different host.");
 
         // test for above codebase, not perfect but works for now
 
@@ -69,8 +72,10 @@ class XPersistenceService implements PersistenceService {
             System.out.println("request path: " + requestPath);
         }
 
-        if (!source.getFile().startsWith(requestPath))
-            throw new MalformedURLException("Cannot access data below source URL path.");
+        if (!source.getFile().startsWith(requestPath) 
+                && !ServiceUtil.isSigned(app)) // Allow trusted application to have access to data below source URL path
+            throw new MalformedURLException(
+                    "Cannot access data below source URL path.");
     }
 
     /**

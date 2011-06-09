@@ -235,41 +235,15 @@ public class ServiceUtil {
     public static boolean checkAccess(ApplicationInstance app, AccessType type,
                 Object... extras) {
 
-        if (app == null)
-            app = JNLPRuntime.getApplication();
+        boolean trusted = isSigned(app);
 
-        boolean codeTrusted = true;
-
-        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-
-        for (int i = 0; i < stack.length; i++) {
-
-            Class c = null;
-
-            try {
-                c = Class.forName(stack[i].getClassName());
-            } catch (Exception e1) {
-                try {
-                    c = Class.forName(stack[i].getClassName(), false, app.getClassLoader());
-                } catch (Exception e2) {
-                    System.err.println(e2.getMessage());
-                }
-            }
-
-            // Everything up to the desired class/method must be trusted
-            if (c == null || // class not found
-                    (c.getProtectionDomain().getCodeSource() != null && // class is not in bootclasspath
-                    c.getProtectionDomain().getCodeSource().getCodeSigners() == null) // class is trusted
-            ) {
-                codeTrusted = false;
-            }
-        }
-
-        if (!codeTrusted) {
+        if (!trusted) {
 
             if (!shouldPromptUser()) {
                 return false;
             }
+            if (app == null)
+                app = JNLPRuntime.getApplication();
 
             final AccessType tmpType = type;
             final Object[] tmpExtras = extras;
@@ -306,6 +280,49 @@ public class ServiceUtil {
                         .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP));
             }
         });
+    }
+    
+    /**
+     * Returns whether the app requesting a JNLP service is a trusted
+     * application
+     * 
+     * @param app
+     *            the application which is requesting the check. If null, the
+     *            current application is used.
+     * @return true, if the app is a trusted application; false otherwise
+     */
+
+    public static boolean isSigned(ApplicationInstance app) {
+
+        if (app == null)
+            app = JNLPRuntime.getApplication();
+
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+
+        for (int i = 0; i < stack.length; i++) {
+
+            Class c = null;
+
+            try {
+                c = Class.forName(stack[i].getClassName());
+            } catch (Exception e1) {
+                try {
+                    c = Class.forName(stack[i].getClassName(), false,
+                            app.getClassLoader());
+                } catch (Exception e2) {
+                    System.err.println(e2.getMessage());
+                }
+            }
+
+            // Everything up to the desired class/method must be trusted
+            if (c == null || // class not found
+                    (c.getProtectionDomain().getCodeSource() != null && // class is not in bootclasspath
+                    c.getProtectionDomain().getCodeSource().getCodeSigners() == null) // class is trusted
+            ) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
