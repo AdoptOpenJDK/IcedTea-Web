@@ -1,4 +1,4 @@
-2011-07-08  Andrew Su  <asu@redhat.com>
+2011-06-08  Andrew Su  <asu@redhat.com>
 
 	* NEWS: Updated.
 	* netx/net/sourceforge/jnlp/JNLPFile.java:
@@ -12,7 +12,7 @@
 	* netx/net/sourceforge/jnlp/PluginBridge.java:
 	(PluginBridge): Calls new JNLPFile's constructor with current codebase
 
-2011-07-08  Andrew Su  <asu@redhat.com>
+2011-06-08  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/PluginBridge.java:
 	(jars): Changed to use HashSet instead of String[].
