@@ -57,6 +57,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
 
     /** the display window */
     private static JFrame frame;
+    private static final Object frameMutex = new Object();
 
     /** shared constraint */
     static GridBagConstraints vertical;
@@ -97,30 +98,32 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
     public DownloadServiceListener getListener(ApplicationInstance app, String downloadName, URL resources[]) {
         DownloadPanel result = new DownloadPanel(downloadName);
 
-        if (frame == null) {
-            frame = new JFrame(downloading + "...");
-            frame.getContentPane().setLayout(new GridBagLayout());
+        synchronized (frameMutex) {
+            if (frame == null) {
+                frame = new JFrame(downloading + "...");
+                frame.getContentPane().setLayout(new GridBagLayout());
+            }
+
+            if (resources != null)
+                for (int i = 0; i < resources.length; i++)
+                    result.addProgressPanel(resources[i], null);
+
+            frame.getContentPane().add(result, vertical);
+            frame.pack();
+
+            if (!frame.isVisible()) {
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(frame.getGraphicsConfiguration());
+                Dimension screen = new Dimension(screenSize.width - insets.left,
+                        screenSize.height - insets.top);
+                frame.setLocation(screen.width - frame.getWidth(),
+                        screen.height - frame.getHeight());
+            }
+
+            frame.setVisible(true);
+
+            return result;
         }
-
-        if (resources != null)
-            for (int i = 0; i < resources.length; i++)
-                result.addProgressPanel(resources[i], null);
-
-        frame.getContentPane().add(result, vertical);
-        frame.pack();
-
-        if (!frame.isVisible()) {
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(frame.getGraphicsConfiguration());
-            Dimension screen = new Dimension(screenSize.width - insets.left,
-                    screenSize.height - insets.top);
-            frame.setLocation(screen.width - frame.getWidth(),
-                              screen.height - frame.getHeight());
-        }
-
-        frame.setVisible(true);
-
-        return result;
     }
 
     /**
@@ -134,11 +137,16 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
 
         ActionListener hider = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                if (frame.getContentPane().getComponentCount() == 1)
-                    frame.setVisible(false);
+                synchronized(frameMutex) {
+                    frame.getContentPane().remove((DownloadPanel) listener);
+                    frame.pack();
 
-                frame.getContentPane().remove((DownloadPanel) listener);
-                frame.pack();
+                    if (frame.getContentPane().getComponentCount() == 0) {
+                        frame.setVisible(false);
+                        frame.dispose();
+                        frame = null;
+                    }
+                }
             }
         };
 
@@ -186,7 +194,9 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                 ProgressPanel panel = new ProgressPanel(url, version);
 
                 add(panel, verticalIndent);
-                frame.pack();
+                synchronized (frameMutex) {
+                    frame.pack();
+                }
 
                 urls.add(url);
                 panels.add(panel);

@@ -1,3 +1,12 @@
+2011-06-10  Denis Lila  <dlila@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java:
+	(frameMutex): New mutex to synchronize accesses to "frame".
+	(getListener): Make almost all of it synchronized on frameMutex.
+	(disposeListener): Sync hider's body around frameMutex and call
+	dispose on the frame so that the awt threads die when they should.
+	(addProgressPanel): Sync "frame" usage.
+
 2011-06-08  Saad Mohammad  <smohammad@redhat.com>
 
 	* AUTHORS: Updated
