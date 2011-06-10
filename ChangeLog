@@ -1,5 +1,16 @@
 2011-06-10  Denis Lila  <dlila@redhat.com>
 
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java:
+	(mutex): New mutex for synchronizing splashScreen.
+	(closeSplashScreen): New method to hide and dispose
+	splashScreen.
+	(launchStarting): Call closeSplashScreen instead of doing it
+	inline.
+	(launchInitialized): Sync splashScreen creation.
+	(validationError, launchError): Call closeSplashScreen.
+
+2011-06-10  Denis Lila  <dlila@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java:
 	(frameMutex): New mutex to synchronize accesses to "frame".
 	(getListener): Make almost all of it synchronized on frameMutex.

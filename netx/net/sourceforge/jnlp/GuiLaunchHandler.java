@@ -53,6 +53,7 @@ import net.sourceforge.jnlp.util.BasicExceptionDialog;
 public class GuiLaunchHandler implements LaunchHandler {
 
     private JNLPSplashScreen splashScreen = null;
+    private final Object mutex = new Object();
     private UpdatePolicy policy = UpdatePolicy.ALWAYS;
 
     @Override
@@ -65,9 +66,21 @@ public class GuiLaunchHandler implements LaunchHandler {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                closeSplashScreen();
                 BasicExceptionDialog.show(exception);
             }
         });
+    }
+
+    private void closeSplashScreen() {
+        synchronized(mutex) {
+            if (splashScreen != null) {
+                if (splashScreen.isSplashScreenValid()) {
+                    splashScreen.setVisible(false);
+                }
+                splashScreen.dispose();
+            }
+        }
     }
 
     @Override
@@ -75,12 +88,7 @@ public class GuiLaunchHandler implements LaunchHandler {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                if (splashScreen != null) {
-                    if (splashScreen.isSplashScreenValid()) {
-                        splashScreen.setVisible(false);
-                    }
-                    splashScreen.dispose();
-                }
+                closeSplashScreen();
             }
         });
     }
@@ -98,10 +106,12 @@ public class GuiLaunchHandler implements LaunchHandler {
                 if (splashImageURL != null) {
                     ResourceTracker resourceTracker = new ResourceTracker(true);
                     resourceTracker.addResource(splashImageURL, file.getFileVersion(), null, policy);
-                    splashScreen = new JNLPSplashScreen(resourceTracker, null, null);
-                    splashScreen.setSplashImageURL(splashImageURL);
-                    if (splashScreen.isSplashScreenValid()) {
-                        splashScreen.setVisible(true);
+                    synchronized(mutex) {
+                        splashScreen = new JNLPSplashScreen(resourceTracker, null, null);
+                        splashScreen.setSplashImageURL(splashImageURL);
+                        if (splashScreen.isSplashScreenValid()) {
+                            splashScreen.setVisible(true);
+                        }
                     }
                 }
             }
@@ -116,6 +126,7 @@ public class GuiLaunchHandler implements LaunchHandler {
 
     @Override
     public boolean validationError(LaunchException security) {
+        closeSplashScreen();
         DefaultLaunchHandler.printMessage(security);
         return true;
     }
