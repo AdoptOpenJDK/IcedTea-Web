@@ -42,6 +42,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -241,6 +242,8 @@ public class CertificatePane extends JPanel {
             closePanel.add(closeButton, BorderLayout.EAST);
             main.add(closePanel, BorderLayout.SOUTH);
         }
+
+        setLayout(new GridLayout(0,1));
         add(main);
 
     }

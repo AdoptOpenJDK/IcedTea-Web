@@ -1,3 +1,14 @@
+2011-06-14  Andrew Su  <asu@redhat.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:
+	(ControlPanel): Removed line that prevents resizing.
+	(createMainSettingsPanel): Detect the minimum size of panels instead
+	of fixed size.
+	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java:
+	(addComponents): Changed to update size when tool is being resized.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	addComponents): Changed to a layout that will resize itself.
+
 2011-06-10  Denis Lila  <dlila@redhat.com>
 
 	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java:

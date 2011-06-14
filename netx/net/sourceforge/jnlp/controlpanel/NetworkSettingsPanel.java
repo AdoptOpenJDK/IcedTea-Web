@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -108,8 +109,8 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
             this.description.add(description[i], String.valueOf(i - 1));
 
         // Settings for selecting Proxy Server
-        JPanel proxyServerPanel = new JPanel(new BorderLayout());
-        JPanel proxyLocationPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JPanel proxyServerPanel = new JPanel(new GridLayout(0, 1));
+        JPanel proxyLocationPanel = new JPanel(new GridBagLayout());
         JPanel proxyBypassPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 
         JLabel addressLabel = new JLabel(Translator.R("NSAddress") + ":");
@@ -140,17 +141,24 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
                 config.setProperty(properties[3], String.valueOf(e.getStateChange() == ItemEvent.SELECTED));
             }
         });
-        proxyLocationPanel.add(Box.createRigidArea(new Dimension(13, 0)));
-        proxyLocationPanel.add(addressLabel);
-        proxyLocationPanel.add(addressField);
-        proxyLocationPanel.add(portLabel);
-        proxyLocationPanel.add(portField);
-        proxyLocationPanel.add(advancedProxyButton);
-        proxyBypassPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        c.gridy = 0;
+        c.gridx = GridBagConstraints.RELATIVE;
+        c.weightx = 0;
+        proxyLocationPanel.add(Box.createHorizontalStrut(20), c);
+        proxyLocationPanel.add(addressLabel, c);
+        c.weightx = 1;
+        proxyLocationPanel.add(addressField, c);
+        c.weightx = 0;
+        proxyLocationPanel.add(portLabel, c);
+        c.weightx = 1;
+        proxyLocationPanel.add(portField, c);
+        c.weightx = 0;
+        proxyLocationPanel.add(advancedProxyButton, c);
+        proxyBypassPanel.add(Box.createHorizontalStrut(5));
         proxyBypassPanel.add(bypassCheckBox);
 
-        proxyServerPanel.add(proxyLocationPanel, BorderLayout.CENTER);
-        proxyServerPanel.add(proxyBypassPanel, BorderLayout.SOUTH);
+        proxyServerPanel.add(proxyLocationPanel);
+        proxyServerPanel.add(proxyBypassPanel);
 
         JRadioButton directConnection = new JRadioButton(Translator.R("NSDirectConnection"), config.getProperty(properties[0]).equals("0"));
         directConnection.setActionCommand("0");
@@ -175,15 +183,20 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         modeSelect.add(directConnection);
 
         // Settings for Automatic Proxy Configuration Script
-        JPanel proxyAutoPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JPanel proxyAutoPanel = new JPanel(new GridBagLayout());
         JLabel locationLabel = new JLabel(Translator.R("NSScriptLocation") + ":");
         final JTextField locationField = new JTextField(config.getProperty(properties[4]), 20);
         locationField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[4]));
 
-        proxyAutoPanel.add(Box.createRigidArea(new Dimension(13, 0)));
-        proxyAutoPanel.add(locationLabel);
-        proxyAutoPanel.add(locationField);
+        c.gridx = 0;
+        proxyAutoPanel.add(Box.createHorizontalStrut(20), c);
+        c.gridx = GridBagConstraints.RELATIVE;
+        proxyAutoPanel.add(locationLabel, c);
+        c.weightx = 1;
+        proxyAutoPanel.add(locationField, c);
 
+        c.weighty = 0;
+        c.gridx = 0;
         c.gridy = 0;
         settingPanel.add(networkDesc, c);
         c.gridy = 1;

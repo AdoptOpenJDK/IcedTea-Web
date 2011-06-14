@@ -115,7 +115,6 @@ public class ControlPanel extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         pack();
         setMinimumSize(getPreferredSize());
-        setResizable(false);
     }
 
     private JPanel createTopPanel() {
@@ -232,9 +231,23 @@ public class ControlPanel extends JFrame {
 
         // Add panels.
         final JPanel settingsPanel = new JPanel(new CardLayout());
+
+        // Calculate largest minimum size we should use.
+        int height = 0;
+        int width = 0;
         for (SettingsPanel panel : panels) {
             JPanel p = panel.getPanel();
-            p.setPreferredSize(new Dimension(530, 360));
+            Dimension d = p.getMinimumSize();
+            if (d.height > height)
+                height = d.height;
+            if (d.width > width)
+                width = d.width;
+        }
+        Dimension dim = new Dimension(width, height);
+
+        for (SettingsPanel panel : panels) {
+            JPanel p = panel.getPanel();
+            p.setPreferredSize(dim);
             settingsPanel.add(p, panel.toString());
         }
 
