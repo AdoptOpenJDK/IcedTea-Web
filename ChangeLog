@@ -1,3 +1,17 @@
+2011-06-16 Jiri Vanek <jvanek@redhat.com>
+
+	* tests/report-styles/index.js: fast navigation functions
+	* tests/report-styles/report.css: styles for transformed result
+	* tests/report-styles/jreport.xsl: template for human-readable
+	xml->html transformation.
+	* Makefile.am: New variable for report-styles directory;
+	($(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)): goal for copying styles and    
+	javascripts; (run-netx-unit-tests): added nonfaling xsltproc
+	transformation of sheet and unit-tests' xml report to index_unit.html;
+	(clean-netx-unit-tests): now depends also on clean_tests_reports;
+	(clean_tests_reports): new goal to remove report styles directory and
+	indexs html files. 
+
 2011-06-14  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:

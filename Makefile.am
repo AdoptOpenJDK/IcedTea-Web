@@ -6,6 +6,8 @@ NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/javaws/about/resources
 NETX_EXTRA_DIST_DIR=$(abs_top_builddir)/extra-lib/net/sourceforge/javaws/about/resources
 
+REPORT_STYLES_DIRNAME=report-styles
+
 TESTS_SRCDIR=$(abs_top_srcdir)/tests
 TESTS_DIR=$(abs_top_builddir)/tests.build
 
@@ -460,8 +462,13 @@ stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
 	mkdir -p stamps && \
 	touch $@
 
+$(TESTS_DIR)/$(REPORT_STYLES_DIRNAME):
+	mkdir $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)
+	cp $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/*.css $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
+	cp $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/*.js $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
+
 run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
- $(JUNIT_RUNNER_JAR)
+ $(JUNIT_RUNNER_JAR) $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) 
 	cp {$(NETX_UNIT_TEST_SRCDIR),$(NETX_UNIT_TEST_DIR)}/net/sourceforge/jnlp/basic.jnlp
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names= ; \
@@ -476,6 +483,7 @@ run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
 	  > stdout.log 2> stderr.log ; \
 	cat stdout.log ; \
 	cat stderr.log >&2
+	-xsltproc $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(TESTS_DIR)/netx/unit/tests-output.xml > $(TESTS_DIR)/index_unit.html
 
 clean-netx-tests: clean-netx-unit-tests clean-junit-runner
 	if [ -e $(TESTS_DIR)/netx ]; then \
@@ -487,10 +495,14 @@ clean-junit-runner:
 	rm -rf $(JUNIT_RUNNER_DIR)
 	rm -f $(JUNIT_RUNNER_JAR)
 
-clean-netx-unit-tests:
+clean-netx-unit-tests: clean_tests_reports
 	rm -f netx-unit-tests-source-files.txt
 	rm -rf $(NETX_UNIT_TEST_DIR)
 	rm -f stamps/netx-unit-tests-compile.stamp
+
+clean_tests_reports:
+	rm -rf  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
+	rm -f  $(TESTS_DIR)/index*.html
 
 # plugin tests
 
