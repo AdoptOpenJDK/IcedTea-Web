@@ -1,3 +1,31 @@
+2011-06-17 Jiri Vanek <jvanek@redhat.com>
+
+	* tests/jnlp_tests: directory for reproducers
+	* tests/jnlp_tests/advanced: reproducers which must care about
+	 deploying and compiling thmselves
+	* tests/jnlp_tests/simple: reproducers compiled, jared and deployed
+	automatically 
+	* tests/jnlp_tests/simple/name/srcs|testcases|resources/: sourcefiles,
+	resources and testaces for simple reproducers
+	* tests/jnlp_tests/simple/deadlocktest: test for tracing not-killable
+	javaws
+	* tests/jnlp_tests/simple/simpletest1: tutorial test
+	* tests/jnlp_tests/simple/simpletest2: tutorial test with exception
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ResourcesTest.java:
+	tests for server basic functionality
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+	implementation of server to produce jnlps and resources. Implementation
+	of helpers to run javaws process.
+	Makefile.am: new variables pointing to structure above; 
+	(junit-jnlp-dist-dirs.txt): prepare destination directory structure
+	(stamps/netx-dist-tests-prepare-reproducers.stamp):compile tescascases of simple reproducers
+	(netx-dist-tests-source-files.txt): lookup for server and helping classes
+	(stamps/netx-dist-tests-compile.stamp): compile server and helping classes
+	(stamps/netx-dist-tests-compile-testcases.stamp): compile, jar and deploy all simple testcases and their resources
+	(run-netx-dist-tests): after make install run junit testsuite upon reproducers on virtual server
+	(clean-netx-tests): added dependence on  clean-netx-dist-tests
+	(clean-netx-dist-tests): deleting  of reproducers
+
 2011-06-16 Jiri Vanek <jvanek@redhat.com>
 
 	* tests/report-styles/index.js: fast navigation functions

@@ -17,6 +17,12 @@ NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
 JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
 JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
 
+JNLP_TESTS_ENGINE_SRCDIR=$(TESTS_SRCDIR)/netx/jnlp_testsengine
+JNLP_TESTS_SRCDIR=$(TESTS_SRCDIR)/jnlp_tests
+JNLP_TESTS_ENGINE_DIR=$(TESTS_DIR)/netx/jnlp_testsengine
+JNLP_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/jnlp_test_server
+JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
+
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 
 # Build directories
@@ -449,6 +455,69 @@ $(JUNIT_RUNNER_JAR): junit-runner-source-files.txt
 	  @junit-runner-source-files.txt && \
 	$(BOOT_DIR)/bin/jar cf $@  -C $(JUNIT_RUNNER_DIR) .
 
+junit-jnlp-dist-dirs.txt:
+	mkdir -p $(JNLP_TESTS_SERVER_DEPLOYDIR)
+	mkdir -p $(JNLP_TESTS_DIR)
+	mkdir -p $(JNLP_TESTS_ENGINE_DIR)
+	cd $(JNLP_TESTS_SRCDIR)/simple/ ; \
+	find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/$@
+
+stamps/netx-dist-tests-prepare-reproducers.stamp: junit-jnlp-dist-dirs.txt
+	simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-dirs.txt `); \
+	for dir in "$${simpleReproducers[@]}" ; do \
+	  mkdir -p $(JNLP_TESTS_DIR)/$$dir ; \
+	  $(BOOT_DIR)/bin/javac -d  $(JNLP_TESTS_DIR)/$$dir/ $(JNLP_TESTS_SRCDIR)/simple/$$dir/srcs/* ; \
+	  d=`pwd` ; \
+	  cd $(JNLP_TESTS_DIR)/$$dir/ ; \
+	    $(BOOT_DIR)/bin/jar cf $(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar * ; \
+	  cd $$d ; \
+	  cp -R $(JNLP_TESTS_SRCDIR)/simple/$$dir/resources/*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
+	done ; \
+	mkdir -p stamps && \
+	touch $@
+
+netx-dist-tests-source-files.txt:
+	find $(JNLP_TESTS_ENGINE_SRCDIR) -name '*.java' | sort > $@
+
+stamps/netx-dist-tests-compile.stamp: stamps/netx.stamp \
+ junit-jnlp-dist-dirs.txt netx-dist-tests-source-files.txt
+	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	 -d $(JNLP_TESTS_ENGINE_DIR) \
+	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar \
+	 @netx-dist-tests-source-files.txt && \
+	mkdir -p stamps && \
+	touch $@
+
+stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp junit-jnlp-dist-dirs.txt\
+ netx-dist-tests-source-files.txt stamps/netx-dist-tests-compile.stamp
+	simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-dirs.txt `); \
+	for dir in "$${simpleReproducers[@]}" ; do \
+	  $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	  -d $(JNLP_TESTS_ENGINE_DIR) \
+	  -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
+	  $(JNLP_TESTS_SRCDIR)/simple/$$dir/testcases/* ; \
+	done ; \
+	mkdir -p stamps && \
+	touch $@
+
+run-netx-dist-tests: all-local stamps/netx.stamp junit-jnlp-dist-dirs.txt stamps/netx-dist-tests-prepare-reproducers.stamp \
+ stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR)
+	cd $(JNLP_TESTS_ENGINE_DIR) ; \
+	class_names= ; \
+	for test in `find -type f` ; do \
+	  class_name=`echo $$test | sed -e 's|\.class$$||' -e 's|^\./||'` ; \
+	  class_name=`echo $$class_name | sed -e 's|/|.|g' ` ; \
+	  class_names="$$class_names $$class_name" ; \
+	done ; \
+	echo $$class_names ; \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
+	  $(BOOT_DIR)/bin/java -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) -Djavaws.build.bin=$(DESTDIR)$(bindir)/javaws \
+	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
+	  > stdout.log 2> stderr.log ; \
+	 cat stdout.log ; \
+	 cat stderr.log >&2
+	-xsltproc $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
+
 netx-unit-tests-source-files.txt:
 	find $(NETX_UNIT_TEST_SRCDIR) -name '*.java' | sort > $@
 
@@ -483,9 +552,9 @@ run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
 	  > stdout.log 2> stderr.log ; \
 	cat stdout.log ; \
 	cat stderr.log >&2
-	-xsltproc $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(TESTS_DIR)/netx/unit/tests-output.xml > $(TESTS_DIR)/index_unit.html
+	-xsltproc $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
 
-clean-netx-tests: clean-netx-unit-tests clean-junit-runner
+clean-netx-tests: clean-netx-unit-tests clean-junit-runner clean-netx-dist-tests
 	if [ -e $(TESTS_DIR)/netx ]; then \
 	  rmdir $(TESTS_DIR)/netx ; \
 	fi
@@ -503,6 +572,16 @@ clean-netx-unit-tests: clean_tests_reports
 clean_tests_reports:
 	rm -rf  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
 	rm -f  $(TESTS_DIR)/index*.html
+
+clean-netx-dist-tests:
+	rm -f netx-dist-tests-source-files.txt
+	rm -rf $(JNLP_TESTS_DIR)
+	rm -rf $(JNLP_TESTS_SERVER_DEPLOYDIR)
+	rm -rf $(JNLP_TESTS_ENGINE_DIR)
+	rm -f stamps/netx-dist-tests-compile.stamp
+	rm -f stamps/netx-dist-tests-prepare-reproducers.stamp
+	rm -f stamps/netx-dist-tests-compile-testcases.stamp
+	rm -f junit-jnlp-dist-dirs.txt
 
 # plugin tests
 
