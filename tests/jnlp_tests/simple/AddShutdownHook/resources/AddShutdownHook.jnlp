@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase="./"
+      href="AddShutdownHook.jnlp">
+   <information> 
+      <title>test adding shutdown hooks</title> 
+   </information> 
+   <resources>
+      <jar href="AddShutdownHook.jar" main="true" download="eager"/>
+   </resources>
+   <application-desc main-class="AddShutdownHook"/>
+</jnlp> 

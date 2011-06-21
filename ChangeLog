@@ -1,5 +1,11 @@
 2011-06-21 Jiri Vanek <jvanek@redhat.com>
 
+	*tests/jnlp_tests/simple: AccessClassInPackage, ReplaceSecurityManager,
+	AddShutdownHook, ReadEnvironment,  SetContextClassLoader,
+	AllStackTraces,  ReadProperties, CreateClassLoader, RedirectStreams tests 
+
+2011-06-21 Jiri Vanek <jvanek@redhat.com>
+
 	*Makefile.am: (run-netx-dist-tests): no depends on copying of styles
 	(clean-netx-dist-tests): depends also on removing of styles 
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase="./"
+      href="ReadProperties1.jnlp">
+    <information>
+        <title>read properties using System.getenv()</title>
+    </information>
+    <resources>
+        <jar href="ReadProperties.jar" main="true"/>
+    </resources>
+    <application-desc main-class="ReadProperties">
+      <argument>user.name</argument>
+    </application-desc>
+
+
+</jnlp> 

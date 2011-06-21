@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase="./"
+      href="SetContextClassLoader.jnlp">
+    <information>
+        <title>set context classloader</title>
+    </information>
+    <resources>
+        <jar href="SetContextClassLoader.jar" main="true" download="eager"/>
+    </resources>
+    <application-desc main-class="SetContextClassLoader"/>
+</jnlp> 

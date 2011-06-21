@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase="./"
+      href="ReplaceSecurityManager.jnlp">
+   <information> 
+      <title>Test replacing security manager</title> 
+   </information> 
+   <resources>
+      <jar href="ReplaceSecurityManager.jar" main="true"/>
+   </resources>
+   <application-desc main-class="ReplaceSecurityManager"/>
+</jnlp> 
