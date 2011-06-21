@@ -501,7 +501,7 @@ stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp junit-jnlp-dis
 	touch $@
 
 run-netx-dist-tests: all-local stamps/netx.stamp junit-jnlp-dist-dirs.txt stamps/netx-dist-tests-prepare-reproducers.stamp \
- stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR)
+ stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names= ; \
 	for test in `find -type f` ; do \
@@ -573,7 +573,7 @@ clean_tests_reports:
 	rm -rf  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
 	rm -f  $(TESTS_DIR)/index*.html
 
-clean-netx-dist-tests:
+clean-netx-dist-tests: clean_tests_reports
 	rm -f netx-dist-tests-source-files.txt
 	rm -rf $(JNLP_TESTS_DIR)
 	rm -rf $(JNLP_TESTS_SERVER_DEPLOYDIR)

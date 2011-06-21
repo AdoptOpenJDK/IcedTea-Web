@@ -1,3 +1,8 @@
+2011-06-21 Jiri Vanek <jvanek@redhat.com>
+
+	*Makefile.am: (run-netx-dist-tests): no depends on copying of styles
+	(clean-netx-dist-tests): depends also on removing of styles 
+
 2011-06-17 Jiri Vanek <jvanek@redhat.com>
 
 	* tests/jnlp_tests: directory for reproducers
