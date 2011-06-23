@@ -1,3 +1,7 @@
+2011-06-22 Jiri Vanek <jvanek@redhat.com>
+
+	* tests/report-styles/jreport.xsl: part with classes statistics is now collapsable
+
 2011-06-21 Jiri Vanek <jvanek@redhat.com>
 
 	*tests/jnlp_tests/simple: AccessClassInPackage, ReplaceSecurityManager,
@@ -27,7 +31,7 @@
 	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
 	implementation of server to produce jnlps and resources. Implementation
 	of helpers to run javaws process.
-	Makefile.am: new variables pointing to structure above; 
+	*Makefile.am: new variables pointing to structure above; 
 	(junit-jnlp-dist-dirs.txt): prepare destination directory structure
 	(stamps/netx-dist-tests-prepare-reproducers.stamp):compile tescascases of simple reproducers
 	(netx-dist-tests-source-files.txt): lookup for server and helping classes

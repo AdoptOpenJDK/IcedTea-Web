@@ -83,7 +83,8 @@ exception statement from your version.
         <div class="space-line"></div>
       </div>
     </div>
-    <h2>Classes:</h2>
+    <h2>Classes: <button onclick="negateIdDisplay('ccllaasseess')">show/hide</button></h2>
+<div id='ccllaasseess' style="display:block">
     <xsl:for-each select="/testsuite/stats/classes/class">
       <div>
         <xsl:attribute name="class">
@@ -136,7 +137,7 @@ exception statement from your version.
       </blockquote>
       <hr/>
     </xsl:for-each>
-
+</div>
    
     <h2>Individual results:</h2>
     <button onclick="setClassDisplay('trace','none')">NoneTrace</button>
