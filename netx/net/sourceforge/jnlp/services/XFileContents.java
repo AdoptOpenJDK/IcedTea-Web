@@ -34,7 +34,8 @@ class XFileContents implements FileContents {
      * Create a file contents implementation for the file.
      */
     protected XFileContents(File file) {
-        this.file = file;
+        // create a safe copy
+        this.file = new File(file.getPath());
     }
 
     /**

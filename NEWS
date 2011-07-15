@@ -11,6 +11,7 @@ CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 New in release 1.2 (2011-XX-XX):
 * Security updates:
 	- RH718164, CVE-2011-2513: Home directory path disclosure to untrusted applications
+	- RH718170, CVE-2011-2514: Java Web Start security warning dialog manipulation
 
 New in release 1.1 (2011-XX-XX):
 * Security updates

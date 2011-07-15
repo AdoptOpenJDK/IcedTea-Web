@@ -130,6 +130,15 @@
 
 2011-07-14  Omair Majid  <omajid@redhat.com>
 
+	RH718170, CVE-2011-2514: Java Web Start security warning dialog
+	manipulation
+	* netx/net/sourceforge/jnlp/services/XExtendedService.java
+	(openFile): Create XContents based on a copy of the File object to prevent
+	overloaded File classes from mangling the name.
+	(XFileContents): Create a separate copy of File object for local use.
+
+2011-07-14  Omair Majid  <omajid@redhat.com>
+
 	RH718164, CVE-2011-2513: Home directory path disclosure to untrusted
 	applications
 	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java: New file.
