@@ -35,6 +35,8 @@ import javax.net.ssl.TrustManager;
 import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 
+import sun.net.www.protocol.jar.URLJarFile;
+
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.cache.*;
@@ -236,6 +238,8 @@ public class JNLPRuntime {
         // Restrict access to netx classes
         Security.setProperty("package.access", 
                              Security.getProperty("package.access")+",net.sourceforge.jnlp");
+
+        URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
 
         initialized = true;
 

@@ -128,6 +128,24 @@
 	(clean_tests_reports): new goal to remove report styles directory and
 	indexs html files. 
 
+2011-07-14  Omair Majid  <omajid@redhat.com>
+
+	RH718164, CVE-2011-2513: Home directory path disclosure to untrusted
+	applications
+	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java: New file.
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: New file.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	jarLocationSecurityMap now contains originating urls, not cache urls.
+	(initializeResources): Add remote url to map instead of local url.
+	(activateJars): Add remote url to the classloader's urls. Add mapping for
+	remote to local url. Put remote url in jarLocationSecurityMap.
+	(loadClass): Add remote url to the classloader's urls. Add mapping for
+	remote to local url.
+	(getCodeSourceSecurity): Update javadoc to note that the url must be
+	remote.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Set the callback for URLJarFile.
+
 2011-06-14  Andrew Su  <asu@redhat.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:

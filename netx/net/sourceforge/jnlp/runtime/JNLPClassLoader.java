@@ -147,7 +147,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /** File entries in the jar files available to this classloader */
     private TreeSet<String> jarEntries = new TreeSet<String>();
 
-    /** Map of specific codesources to securitydesc */
+    /** Map of specific original (remote) CodeSource Urls  to securitydesc */
     private HashMap<URL, SecurityDesc> jarLocationSecurityMap =
             new HashMap<URL, SecurityDesc>();
     
@@ -509,7 +509,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     }
                 }
 
-                jarLocationSecurityMap.put(location, jarSecurity);
+                jarLocationSecurityMap.put(jarDesc.getLocation(), jarSecurity);
             } catch (MalformedURLException mfe) {
                 System.err.println(mfe.getMessage());
             }
@@ -731,7 +731,10 @@ public class JNLPClassLoader extends URLClassLoader {
 
                                     try {
                                         URL fileURL = new URL("file://" + extractedJarLocation);
-                                        addURL(fileURL);
+                                        // there is no remote URL for this, so lets fake one
+                                        URL fakeRemote = new URL(jar.getLocation().toString() + "!" + je.getName());
+                                        CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
+                                        addURL(fakeRemote);
 
                                         SecurityDesc jarSecurity = file.getSecurity();
 
@@ -752,7 +755,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                                     codebase.getHost());
                                         }
 
-                                        jarLocationSecurityMap.put(fileURL, jarSecurity);
+                                        jarLocationSecurityMap.put(fakeRemote, jarSecurity);
 
                                     } catch (MalformedURLException mfue) {
                                         if (JNLPRuntime.isDebug())
@@ -767,17 +770,21 @@ public class JNLPClassLoader extends URLClassLoader {
 
                         }
 
-                        addURL(location);
+                        addURL(jar.getLocation());
 
                         // there is currently no mechanism to cache files per
                         // instance.. so only index cached files
                         if (localFile != null) {
+                            CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURL());
+
                             JarFile jarFile = new JarFile(localFile.getAbsolutePath());
                             Manifest mf = jarFile.getManifest();
                             classpaths.addAll(getClassPathsFromManifest(mf, jar.getLocation().getPath()));
                             JarIndex index = JarIndex.getJarIndex(jarFile, null);
                             if (index != null)
                                 jarIndexes.add(index);
+                        } else {
+                            CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), jar.getLocation());
                         }
 
                         if (JNLPRuntime.isDebug())
@@ -1098,11 +1105,9 @@ public class JNLPClassLoader extends URLClassLoader {
                 );
 
         URL remoteURL = desc.getLocation();
-
-        URL u = tracker.getCacheURL(remoteURL);
-        if (u != null) {
-            addURL(u);
-        }
+        URL cachedUrl = tracker.getCacheURL(remoteURL);
+        addURL(remoteURL);
+        CachedJarFileCallback.getInstance().addMapping(remoteURL, cachedUrl);
     }
 
     /**
@@ -1295,7 +1300,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Returns the security descriptor for given code source URL
      *
-     * @param source The code source
+     * @param source the origin (remote) url of the code
      * @return The SecurityDescriptor for that source
      */
 

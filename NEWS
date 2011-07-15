@@ -8,6 +8,10 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.2 (2011-XX-XX):
+* Security updates:
+	- RH718164, CVE-2011-2513: Home directory path disclosure to untrusted applications
+
 New in release 1.1 (2011-XX-XX):
 * Security updates
   - S6983554, CVE-2010-4450: Launcher incorrect processing of empty library path entries 
