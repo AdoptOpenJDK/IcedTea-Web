@@ -19,6 +19,7 @@ class Node {
     private XMLElement xml;
     private Node next;
     private Node children[];
+    private List <String> attributeNames= null;
 
     Node(XMLElement xml) {
         this.xml = xml;
@@ -60,6 +61,21 @@ class Node {
 
         return children;
     }
+    
+    /**
+     * To retrieve all attribute names
+     * @return all attribute names of the Node in ArrayList<String> 
+     */
+    List<String> getAttributeNames() {
+        if (attributeNames == null) {
+            attributeNames= new ArrayList<String>();
+
+            for (Enumeration e = xml.enumerateAttributeNames(); e.hasMoreElements();)
+                attributeNames.add(new String((String) e.nextElement()));
+        }
+
+        return attributeNames;
+    }
 
     String getAttribute(String name) {
         return (String) xml.getAttribute(name);
@@ -86,6 +102,7 @@ class Node {
     private ParsedXML tinyNode;
     private Node next;
     private Node children[];
+    private String attributeNames[];
 
     Node(ParsedXML tinyNode) {
         this.tinyNode = tinyNode;
@@ -126,6 +143,19 @@ class Node {
         }
 
         return children;
+    }
+    
+    String[] getAttributeNames() {
+        if (attributeNames == null) {
+            List<String> list = new ArrayList<String>();
+
+            for (Enumeration e = xml.enumerateAttributeNames(); e.hasMoreElements();)
+                list.add(new String((String) e.nextElement()));
+
+            attributeNames = list.toArray(new String[list.size()]);
+
+        }
+        return attributeNames;
     }
 
     String getAttribute(String name) {

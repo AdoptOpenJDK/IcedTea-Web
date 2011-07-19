@@ -538,7 +538,12 @@ $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME):
 
 run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
  $(JUNIT_RUNNER_JAR) $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) 
-	cp {$(NETX_UNIT_TEST_SRCDIR),$(NETX_UNIT_TEST_DIR)}/net/sourceforge/jnlp/basic.jnlp
+	filename=" " ; \
+	cd $(NETX_UNIT_TEST_SRCDIR) ; \
+	for file in `find . -type f \! -iname "*.java"`; do\
+		filename=`echo $$file `; \
+		cp --parents $$filename $(NETX_UNIT_TEST_DIR) ; \
+	done ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names= ; \
 	for test in `find -type f` ; do \

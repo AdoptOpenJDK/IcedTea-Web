@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<jnlp spec="1.5+" href="www.redhat.com" codebase="file">
+  <resources>
+    <jar main='true' href='myResource.jar' />
+    <j2se version='1.6+' />
+  </resources>
+  <information>
+    <vendor>RedHat</vendor>
+    <title>Sample Test</title>
+    <offline-allowed />
+  </information>
+  <application-desc main-class='Test' />
+</jnlp>

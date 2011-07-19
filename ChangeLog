@@ -1,3 +1,76 @@
+2011-07-19  Saad Mohammad  <smohammad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPMatcher.java:
+	  Created this class to compare signed JNLP file with the launching  
+	  JNLP file. When comparing, it has support for both method of signing
+	  of a JNLP file: APPLICATION_TEMPLATE.JNLP and APPLICATION.JNLP.
+	* netx/net/sourceforge/jnlp/JNLPMatcherException.java:
+	  Added a custom exception: JNLPMatcherException. Thrown if verifying 
+	  signed JNLP files fails.
+	* netx/net/sourceforge/jnlp/Node.java:
+	  Created a method that retrieves the attribute names of the Node and 
+	  stores it in private string [] member. The method returns the
+	  attribute names.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTest.java:
+	  This is a test case that tests the functionality of JNLPMatcher. 
+	  It tests the algorithm with a variety of template and application
+	  JNLP files.
+	* tests/netx/unit/net/sourceforge/jnlp/launchApp.jnlp:
+	  Launching JNLP file: This is the launching JNLP file used to compare 
+	  with templates and application JNLP files in JNLPMatcherTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template0.jnlp:
+	  Test Template JNLP file: Contains CDATA.
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template1.jnlp:
+	  Test Template JNLP file: An exact duplicate of the launching
+	  JNLP file.
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template2.jnlp:
+	  Test Template JNLP file: Contains wildchars as attribute/element
+	  values.
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template3.jnlp:
+	  Test Template JNLP file: Different order of elements/attributes
+	  (same value)
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template4.jnlp:
+	  Test Template JNLP file: Contains wildchars as values of ALL elements 
+	  and attribute.
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template5.jnlp:
+	  Test Template JNLP file: Contains comments.
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template6.jnlp:
+	  Test Template JNLP file: Contains different attribute and element
+	  values.
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template7.jnlp:
+	  Test Template JNLP file: Contains additional children in element.
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template8.jnlp:
+	  Test Template JNLP file: Contains fewer children in element.
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template9.jnlp:
+	  Test Template JNLP file: All values are different from the launching 
+	  JNLP file.
+	* tests/netx/unit/net/sourceforge/jnlp/application/application0.jnlp:
+	  Test Application JNLP file: Contains CDATA.
+	* tests/netx/unit/net/sourceforge/jnlp/application/application1.jnlp:
+	  Test Application JNLP file: An exact duplicate of the launching
+	  JNLP file.
+	* tests/netx/unit/net/sourceforge/jnlp/application/application2.jnlp:
+	  Test Application JNLP file: Different order of element/attributes
+	  (same value).
+	* tests/netx/unit/net/sourceforge/jnlp/application/application3.jnlp:
+	  Test Application JNLP file: Contains comments.
+	* tests/netx/unit/net/sourceforge/jnlp/application/application4.jnlp:
+	  Test Application JNLP file: Contains wildchars as attribute/element
+	  values.
+	* tests/netx/unit/net/sourceforge/jnlp/application/application5.jnlp:
+	  Test Application JNLP file: Contains a different attribute (codebase)
+	  value.
+	* tests/netx/unit/net/sourceforge/jnlp/application/application6.jnlp:
+	  Test Application JNLP file: Contains additional children in element.
+	* tests/netx/unit/net/sourceforge/jnlp/application/application7.jnlp:
+	  Test Application JNLP file: Contains fewer children in element.
+	* tests/netx/unit/net/sourceforge/jnlp/application/application8.jnlp:
+	  Test Application JNLP file: All values are different from the
+	  launching JNLP file.
+	* Makefile.am:
+	  (run-netx-unit-tests): Copies resources(non java files) to test.build
+	  before running the unit tests.
+
 2011-06-22 Jiri Vanek <jvanek@redhat.com>
 
 	* tests/report-styles/jreport.xsl: part with classes statistics is now collapsable
