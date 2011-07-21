@@ -113,18 +113,58 @@ public class PluginStreamHandler {
         listenerThread.start();
     }
 
+    /**
+     * Given a string, reads the first two (space separated) tokens.
+     *
+     * @param message The string to read
+     * @param start The position to start reading at
+     * @param array The array into which the first two tokens are placed
+     * @return Position where the next token starts
+     */
+    private int readPair(String message, int start, String[] array) {
+        
+        int end = start;
+        array[0] = null;
+        array[1] = null;
+
+        if (message.length() > start) {
+            int firstSpace = message.indexOf(' ', start);
+            if (firstSpace == -1) {
+                array[0] = message.substring(start);
+                end = message.length();
+            } else {
+                array[0] = message.substring(start, firstSpace);
+                if (message.length() > firstSpace + 1) {
+                    int secondSpace = message.indexOf(' ', firstSpace + 1);
+                    if (secondSpace == -1) {
+                        array[1] = message.substring(firstSpace + 1);
+                        end = message.length();
+                    } else {
+                        array[1] = message.substring(firstSpace + 1, secondSpace);
+                        end = secondSpace + 1;
+                    }
+                }
+            }
+        }
+
+        PluginDebug.debug("readPair: '", array[0], "' - '", array[1], "' ", end);
+        return end;
+    }
+
     public void handleMessage(String message) throws PluginException {
 
-        int nextIndex = 0;
         int reference = -1;
         String src = null;
         String[] privileges = null;
         String rest = "";
+        String[] msgComponents = new String[2];
+        int pos = 0;
+        int oldPos = 0;
 
-        String[] msgComponents = message.split(" ");
-
-        if (msgComponents.length < 2)
+        pos = readPair(message, oldPos, msgComponents);
+        if (msgComponents[0] == null || msgComponents[1] == null) {
             return;
+        }
 
         if (msgComponents[0].startsWith("plugin")) {
             handlePluginMessage(message);
@@ -134,37 +174,37 @@ public class PluginStreamHandler {
         // type and identifier are guaranteed to be there
         String type = msgComponents[0];
         final int identifier = Integer.parseInt(msgComponents[1]);
-        nextIndex = 2;
 
         // reference, src and privileges are optional components, 
         // and are guaranteed to be in that order, if they occur
+        oldPos = pos;
+        pos = readPair(message, oldPos, msgComponents);
 
         // is there a reference ?
-        if (msgComponents[nextIndex].equals("reference")) {
-            reference = Integer.parseInt(msgComponents[nextIndex + 1]);
-            nextIndex += 2;
+        if ("reference".equals(msgComponents[0])) {
+            reference = Integer.parseInt(msgComponents[1]);
+            oldPos = pos;
+            pos = readPair(message, oldPos, msgComponents);
         }
 
         // is there a src?
-        if (msgComponents[nextIndex].equals("src")) {
-            src = msgComponents[nextIndex + 1];
-            nextIndex += 2;
+        if ("src".equals(msgComponents[0])) {
+            src = msgComponents[1];
+            oldPos = pos;
+            pos = readPair(message, oldPos, msgComponents);
         }
 
         // is there a privileges?
-        if (msgComponents[nextIndex].equals("privileges")) {
-            String privs = msgComponents[nextIndex + 1];
+        if ("privileges".equals(msgComponents[0])) {
+            String privs = msgComponents[1];
             privileges = privs.split(",");
-            nextIndex += 2;
+            oldPos = pos;
         }
 
         // rest
-        for (int i = nextIndex; i < msgComponents.length; i++) {
-            rest += msgComponents[i];
-            rest += " ";
+        if (message.length() > oldPos) {
+            rest = message.substring(oldPos);
         }
-
-        rest = rest.trim();
 
         try {
 

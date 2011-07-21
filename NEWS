@@ -12,6 +12,8 @@ New in release 1.2 (2011-XX-XX):
 * Security updates:
 	- RH718164, CVE-2011-2513: Home directory path disclosure to untrusted applications
 	- RH718170, CVE-2011-2514: Java Web Start security warning dialog manipulation
+* Plugin
+  - PR749: sun.applet.PluginStreamHandler#handleMessage(String) really slow
 
 New in release 1.1 (2011-XX-XX):
 * Security updates

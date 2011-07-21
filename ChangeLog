@@ -1,3 +1,12 @@
+2011-07-21  Deepak Bhole <dbhole@redhat.com>
+
+	PR749: sun.applet.PluginStreamHandler#handleMessage(String) really slow
+	Original patch from: Ricardo Martín Camarero <rickyepoderi at yahoo dot es>
+	* plugin/icedteanp/java/sun/applet/PluginStreamHandler.java
+	(readPair): New function.
+	(handleMessage): Use readPair to incrementally tokenize message, rather
+	than using String.split().
+
 2011-07-19  Saad Mohammad  <smohammad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPMatcher.java:
