@@ -1,3 +1,19 @@
+2011-07-26  Jiri Vanek <jvanek@redhat.com>
+
+	*tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java: String
+	 containing "localhost"  have been declared as final constant.
+	(SERVER_NAME) have been  moved instant Server instance so each server can
+	 have it name without affecting others
+	(getUrl()) added -  can return URL of server singleton. Implementation of
+	 this method is inside server, so each server can return its own useful URL.
+	(saveFile()) is now public.
+	Added identification for ThreadedProcess based on commandlineArgs and its
+	 run is now slowed by Thread.sleep
+	(ServerLuncher) inner class is now public (it was bug to not be as we have
+	 getIndependentInstance of it method ) and renamed to ServerLauncher
+	Enchanted wrapping of executeProcess
+
+
 2011-07-21  Deepak Bhole <dbhole@redhat.com>
 
 	PR749: sun.applet.PluginStreamHandler#handleMessage(String) really slow

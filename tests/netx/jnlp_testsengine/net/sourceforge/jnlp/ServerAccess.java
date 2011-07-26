@@ -50,11 +50,13 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -86,26 +88,22 @@ public class ServerAccess {
      * java property which value containig path to installed (makefile by) javaws binary
      */
     public static final String JAVAWS_BUILD_BIN = "javaws.build.bin";
+    public static final String DEFAULT_LOCALHOST_NAME = "localhost";
     /**
      * server instance singeton
      */
-    private static ServerLuncher server;
+    private static ServerLauncher server;
     /**
      * inner version if engine
      */
-    private static final String version = "3";
+    private static final String version = "4";
     /**
      * timeout to read 'remote' resources
      * This can be changed in runtime, but will affect all following tasks
      */
     public static int READ_TIMEOUT = 1000;
     /**
-     * default url name part.
-     * This can be changed in runtime, but will affect all following tasks
-     */
-    public static String SERVER_NAME = "localhost";
-    /**
-     * timeout to let process to finish, before assasin wil kill it.
+     * timeout in ms to let process to finish, before assasin wil kill it.
      * This can be changed in runtime, but will affect all following tasks
      */
     public static long PROCESS_TIMEOUT = 10 * 1000;//ms
@@ -151,7 +149,7 @@ public class ServerAccess {
      *
      * @return cahed instance. If none, then creates new
      */
-    public static ServerLuncher getInstance() {
+    public static ServerLauncher getInstance() {
         if (server == null) {
             server = getIndependentInstance();
         }
@@ -163,7 +161,7 @@ public class ServerAccess {
      * @return new not cached iserver instance on random port,
      * usefull for testing application loading from different url then base
      */
-    public static ServerLuncher getIndependentInstance() {
+    public static ServerLauncher getIndependentInstance() {
         String dir = (System.getProperty(TEST_SERVER_DIR));
         return getIndependentInstance(dir);
     }
@@ -173,7 +171,7 @@ public class ServerAccess {
      * @return new not cached iserver instance on random port upon custom www root directory,
      * usefull for testing application loading from different url then base
      */
-    public static ServerLuncher getIndependentInstance(String dir) {
+    public static ServerLauncher getIndependentInstance(String dir) {
 
 
         if (dir == null || dir.trim().length() == 0 || !new File(dir).exists() || !new File(dir).isDirectory()) {
@@ -181,7 +179,7 @@ public class ServerAccess {
         }
         try {
             int port = findFreePort();
-            ServerLuncher lServerLuncher = new ServerLuncher(port, new File(dir));
+            ServerLauncher lServerLuncher = new ServerLauncher(port, new File(dir));
             new Thread(lServerLuncher).start();
             return lServerLuncher;
         } catch (Exception ex) {
@@ -243,23 +241,16 @@ public class ServerAccess {
         String portFileContent = getContentOfStream(new FileInputStream(portFile));
         String dirFileContent = getContentOfStream(new FileInputStream(dirFile));
 
-
-
         URL portUrl = new URL("http", "localhost", server.getPort(), "/server.port");
         URL dirUrl = new URL("http", "localhost", server.getPort(), "/server.dir");
 
-
         String portUrlContent = getContentOfStream(portUrl.openConnection().getInputStream());
         String dirUrlContent = getContentOfStream(dirUrl.openConnection().getInputStream());
-
 
         Assert.assertEquals(portUrlContent.trim(), portFileContent.trim());
         Assert.assertEquals(dirUrlContent.trim(), dirFileContent.trim());
         Assert.assertEquals(new File(dirUrlContent.trim()), server.getDir());
         Assert.assertEquals(new Integer(portUrlContent.trim()), server.getPort());
-
-
-
 
     }
 
@@ -286,6 +277,26 @@ public class ServerAccess {
         }
         // if (!server.isRunning()) throw new RuntimeException("Server mysteriously died");
         return server.getDir();
+    }
+
+    /**
+     *
+     * @return url pointing to cached server resource. If non singleton instance is runnig, new is created.
+     */
+    public URL getUrl(String resource) throws MalformedURLException {
+        if (server == null) {
+            getInstance();
+        }
+        //if (!server.isRunning()) throw new RuntimeException("Server mysteriously died");
+        return server.getUrl(resource);
+    }
+
+    /**
+     *
+     * @return url pointing to cached server . If non singleton instance is runnig, new is created.
+     */
+    public URL getUrl() throws MalformedURLException {
+        return getUrl("");
 
     }
 
@@ -310,9 +321,7 @@ public class ServerAccess {
      * @throws IOException if connection cant be established or resource do not exists
      */
     public ByteArrayOutputStream getResourceAsBytes(String resource) throws IOException {
-        URL u = new URL("http", SERVER_NAME, getPort(), resource);
-        return getResourceAsBytes(u);
-
+        return getResourceAsBytes(getUrl(resource));
     }
 
     /**
@@ -323,9 +332,7 @@ public class ServerAccess {
      * @throws IOException if connection cant be established or resource do not exists
      */
     public String getResourceAsString(String resource) throws IOException {
-        URL u = new URL("http", SERVER_NAME, getPort(), resource);
-        return getResourceAsString(u);
-
+        return getResourceAsString(getUrl(resource));
     }
 
     /**
@@ -414,7 +421,7 @@ public class ServerAccess {
      * @param f
      * @throws IOException
      */
-    private static void saveFile(String content, File f) throws IOException {
+    public static void saveFile(String content, File f) throws IOException {
         Writer output = new BufferedWriter(new FileWriter(f));
         output.write(content);
         output.flush();
@@ -471,7 +478,7 @@ public class ServerAccess {
      * @throws Exception
      */
     public ProcessResult executeJavaws(List<String> otherargs, String resource) throws Exception {
-        return executeProcessUponURL(getJavawsLocation(), otherargs, new URL("http", SERVER_NAME, getPort(), resource));
+        return executeProcessUponURL(getJavawsLocation(), otherargs, new URL("http", server.getServerName(), getPort(), resource));
     }
 
     /**
@@ -507,8 +514,6 @@ public class ServerAccess {
         urledArgs.add(u.toString());
         return executeProcess(urledArgs);
     }
-
-
 
     /**
      * utility method to lunch process, get its stdou/stderr, its return value and to kill it if runing to long (@see PROCESS_TIMEOUT)
@@ -553,13 +558,11 @@ public class ServerAccess {
         return new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode());
     }
 
-
     /**
      *
      * wrapper arround Runtime.getRuntime().exec(...) which ensures taht process is run inside its own, by us controlled, thread.
      * Proces sbuilder caused som einexpected and wired behaviour:/
      */
-
     private static class ThreadedProcess extends Thread {
 
         Process p = null;
@@ -576,8 +579,24 @@ public class ServerAccess {
         }
 
         public ThreadedProcess(List<String> args) {
-
             this.args = args;
+        }
+
+        public String getCommandLine() {
+            String commandLine = "unknown command";
+            try {
+                if (args != null && args.size() > 0) {
+                    commandLine = "";
+                    for (String string : args) {
+                        commandLine = commandLine + " " + string;
+
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                return commandLine;
+            }
         }
 
         public Process getP() {
@@ -608,16 +627,28 @@ public class ServerAccess {
      * wrapper arround tiny http server to separate lunch configgurations and servers.
      * to allow terminations and stuff arround.
      */
+    public static class ServerLauncher implements Runnable {
 
-    static class ServerLuncher implements Runnable {
-
+        /**
+         * default url name part.
+         * This can be changed in runtime, but will affect all following tasks upon those server
+         */
+        private String serverName = DEFAULT_LOCALHOST_NAME;
         private boolean running;
         private final Integer port;
         private final File dir;
 
-        public ServerLuncher(Integer portt, File dirr) {
-            port = portt;
-            dir = dirr;
+        public String getServerName() {
+            return serverName;
+        }
+
+        public void setServerName(String serverName) {
+            this.serverName = serverName;
+        }
+
+        public ServerLauncher(Integer port, File dir) {
+            this.port = port;
+            this.dir = dir;
             System.err.println("port: " + port);
             System.err.println("dir: " + dir);
         }
@@ -634,16 +665,16 @@ public class ServerAccess {
             return dir;
         }
 
-        public ServerLuncher(File dir) {
+        public ServerLauncher(File dir) {
             this(8181, dir);
         }
 
-        public ServerLuncher(Integer port) {
+        public ServerLauncher(Integer port) {
 
             this(port, new File(System.getProperty("user.dir")));
         }
 
-        public ServerLuncher() {
+        public ServerLauncher() {
             this(8181, new File(System.getProperty("user.dir")));
 
         }
@@ -664,7 +695,13 @@ public class ServerAccess {
 
         }
 
+        public URL getUrl(String resource) throws MalformedURLException {
+            return new URL("http", getServerName(), getPort(), resource);
+        }
 
+        public URL getUrl() throws MalformedURLException {
+            return getUrl("");
+        }
 
         /**
          * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html
@@ -731,7 +768,6 @@ public class ServerAccess {
         }
     }
 
-
     /**
      * class which timeout any ThreadedProcess. This killing of 'theread with process' replaced not working process.destroy().
      */
@@ -757,6 +793,8 @@ public class ServerAccess {
 
         public void setCanRun(boolean canRun) {
             this.canRun = canRun;
+            System.err.println("Stopping assasin for" + p.toString() + " " + p.getP().toString() + " " + p.getCommandLine() + ": ");
+            System.err.flush();
         }
 
         public boolean isCanRun() {
@@ -778,23 +816,26 @@ public class ServerAccess {
                     //System.out.println(time - startTime);
                     //System.out.println((time - startTime) > timeout);
                     if ((time - startTime) > timeout) {
-                        System.err.println("Timeouted " + p.toString() + " .. killing");
+                        System.err.println("Timeouted " + p.toString() + " " + p.getP().toString() + " .. killing " + p.getCommandLine() + ": ");
                         System.err.flush();
                         wasTerminated = true;
                         p.interrupt();
                         while (!terminated.contains(p)) {
                             Thread.sleep(100);
                         }
-                        System.err.println("Timeouted " + p.toString() + " .. killed");
+                        System.err.println("Timeouted " + p.toString() + " " + p.getP().toString() + " .. killed " + p.getCommandLine());
                         System.err.flush();
                         break;
 
 
                     }
+                    Thread.sleep(100);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
+            System.err.println("assasin for" + p.toString() + " " + p.getP().toString() + " .. done " + p.getCommandLine() + "  termination " + wasTerminated);
+            System.err.flush();
         }
     }
 
