@@ -1,3 +1,10 @@
+2011-08-02 Jiri Vanek <jvanek@redhat.com>
+
+	*Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp):
+	now are compiled files correctly compiled from directory structure.
+	Also not java files are copied with expected directory structure and
+	jarred together with classes.
+
 2011-07-26  Jiri Vanek <jvanek@redhat.com>
 
 	*tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java: String

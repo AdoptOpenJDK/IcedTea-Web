@@ -465,11 +465,18 @@ junit-jnlp-dist-dirs.txt:
 stamps/netx-dist-tests-prepare-reproducers.stamp: junit-jnlp-dist-dirs.txt
 	simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-dirs.txt `); \
 	for dir in "$${simpleReproducers[@]}" ; do \
+	  echo "processing: $$dir" ; \
 	  mkdir -p $(JNLP_TESTS_DIR)/$$dir ; \
-	  $(BOOT_DIR)/bin/javac -d  $(JNLP_TESTS_DIR)/$$dir/ $(JNLP_TESTS_SRCDIR)/simple/$$dir/srcs/* ; \
 	  d=`pwd` ; \
+	  cd $(JNLP_TESTS_SRCDIR)/simple/$$dir/srcs/ ; \
+	  srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
+	  notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
+	  $(BOOT_DIR)/bin/javac -d  $(JNLP_TESTS_DIR)/$$dir/ $$srcFiles ; \
+	  if [ -n "$$notSrcFiles" ] ; then \
+	    cp -R --parents $$notSrcFiles $(JNLP_TESTS_DIR)/$$dir/ ; \
+	  fi ; \
 	  cd $(JNLP_TESTS_DIR)/$$dir/ ; \
-	    $(BOOT_DIR)/bin/jar cf $(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar * ; \
+	  $(BOOT_DIR)/bin/jar cf $(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar * ; \
 	  cd $$d ; \
 	  cp -R $(JNLP_TESTS_SRCDIR)/simple/$$dir/resources/*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
 	done ; \
