@@ -12,6 +12,12 @@
 	* netx/net/sourceforge/jnlp/Node.java:
 	  Removed getAttributeNames() method from the commented section
 
+2011-08-03  Deepak Bhole <dbhole@redhat.com>
+
+	PR768: Signed applets/Web Start apps don't work with OpenJDK7 and up
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java (verifyJar): Put entry in
+	cert hashtable only if the entry is expected to be signed.
+
 2011-08-02 Jiri Vanek <jvanek@redhat.com>
 
 	*Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp):

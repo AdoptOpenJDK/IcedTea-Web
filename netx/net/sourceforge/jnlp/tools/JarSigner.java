@@ -284,7 +284,7 @@ public class JarSigner implements CertVerifier {
                     if (shouldHaveSignature)
                         totalSignableEntries++;
 
-                    if (isSigned) {
+                    if (shouldHaveSignature && isSigned) {
                         for (int i = 0; i < signers.length; i++) {
                             CertPath certPath = signers[i].getSignerCertPath();
                             if (!certs.containsKey(certPath))
