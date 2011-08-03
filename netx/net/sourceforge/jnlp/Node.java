@@ -145,19 +145,6 @@ class Node {
         return children;
     }
     
-    String[] getAttributeNames() {
-        if (attributeNames == null) {
-            List<String> list = new ArrayList<String>();
-
-            for (Enumeration e = xml.enumerateAttributeNames(); e.hasMoreElements();)
-                list.add(new String((String) e.nextElement()));
-
-            attributeNames = list.toArray(new String[list.size()]);
-
-        }
-        return attributeNames;
-    }
-
     String getAttribute(String name) {
         return tinyNode.getAttribute(name);
     }

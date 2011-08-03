@@ -1,3 +1,17 @@
+2011-08-03  Saad Mohammad  <smohammad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPMatcher.java:
+	  (JNLPMatcher): Removed NullPointerException from being thrown, caught and 
+	  then thrown again via JNLPMatcherException. This was replaced by throwing 
+	  a checked exception [JNLPMatcherException] directly. 
+  	  (JNLPMatcher): Removed unused code [getters]
+	  (JNLPMatcher): Closed Input/Output streams that were opened.
+	  (isMatch): Removed caching of return value
+	  (closeInputStream): Added this method to close input streams
+	  (closeOutputStream): Added this method to close output streams
+	* netx/net/sourceforge/jnlp/Node.java:
+	  Removed getAttributeNames() method from the commented section
+
 2011-08-02 Jiri Vanek <jvanek@redhat.com>
 
 	*Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp):

@@ -38,10 +38,11 @@ exception statement from your version.
 package net.sourceforge.jnlp;
 
 import java.util.List;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -59,7 +60,6 @@ public final class JNLPMatcher {
     private final Node appTemplateNode;
     private final Node launchJNLPNode;
     private final boolean isTemplate;
-    private Boolean match;
     
     /**
      * Public constructor
@@ -78,26 +78,33 @@ public final class JNLPMatcher {
     public JNLPMatcher(InputStreamReader appTemplate, InputStreamReader launchJNLP,
             boolean isTemplate) throws JNLPMatcherException {
 
+        if (appTemplate == null && launchJNLP == null)
+            throw new JNLPMatcherException(
+                    "Template JNLP file and Launching JNLP file are both null.");
+        else if (appTemplate == null)
+            throw new JNLPMatcherException("Template JNLP file is null.");
+        else if (launchJNLP == null)
+            throw new JNLPMatcherException("Launching JNLP file is null.");
+        
+        //Declare variables for signed JNLP file
+        PipedInputStream pinTemplate= null;
+        PipedOutputStream poutTemplate= null;
+      
+        //Declare variables for launching JNLP file 
+        PipedInputStream pinJNLPFile = null; 
+        PipedOutputStream poutJNLPFile = null; 
+        
         try {
-
-            if (appTemplate == null && launchJNLP == null)
-                throw new NullPointerException(
-                        "Template JNLP file and Launching JNLP file are both null.");
-            else if (appTemplate == null)
-                throw new NullPointerException("Template JNLP file is null.");
-            else if (launchJNLP == null)
-                throw new NullPointerException("Launching JNLP file is null.");
-
             XMLElement appTemplateXML = new XMLElement();
             XMLElement launchJNLPXML = new XMLElement();
 
             // Remove the comments and CDATA from the JNLP file
-            final PipedInputStream pinTemplate = new PipedInputStream();
-            final PipedOutputStream poutTemplate = new PipedOutputStream(pinTemplate);
+            pinTemplate = new PipedInputStream();
+            poutTemplate = new PipedOutputStream(pinTemplate);
             appTemplateXML.sanitizeInput(appTemplate, poutTemplate);
 
-            final PipedInputStream pinJNLPFile = new PipedInputStream();
-            final PipedOutputStream poutJNLPFile = new PipedOutputStream(pinJNLPFile);
+            pinJNLPFile = new PipedInputStream();
+            poutJNLPFile = new PipedOutputStream(pinJNLPFile);
             launchJNLPXML.sanitizeInput(launchJNLP, poutJNLPFile);
 
             // Parse both files
@@ -113,6 +120,14 @@ public final class JNLPMatcher {
             throw new JNLPMatcherException(
                     "Failed to create an instance of JNLPVerify with specified InputStreamReader",
                     e);
+        } finally {
+            // Close all stream
+            closeInputStream(pinTemplate);
+            closeOutputStream(poutTemplate);
+            
+            closeInputStream(pinJNLPFile);
+            closeOutputStream(poutJNLPFile);
+
         }
     }
 
@@ -122,11 +137,9 @@ public final class JNLPMatcher {
      * @return true if both JNLP files are 'matched', otherwise false
      */
     public boolean isMatch() {
-
-        if (match == null)
-            match = matchNodes(appTemplateNode, launchJNLPNode);
-        
-        return match;
+    
+        return matchNodes(appTemplateNode, launchJNLPNode);
+    
     }
 
     /**
@@ -241,32 +254,34 @@ public final class JNLPMatcher {
         }
         return false;
     }
-
-    /**
-     * Getter for application/template Node
+    
+    /***
+     * Closes an input stream
      * 
-     * @return the Node of the signed application/template file
+     * @param stream
+     *            The input stream that will be closed
      */
-    public Node getAppTemplateNode() {
-        return appTemplateNode;
+    private void closeInputStream(InputStream stream) {
+        if (stream != null)
+            try {
+                stream.close();
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+            }
     }
 
-    /**
-     * Getter for launching application Node
+    /***
+     * Closes an output stream
      * 
-     * @return the Node of the launching JNLP file
+     * @param stream
+     *            The output stream that will be closed
      */
-    public Node getLaunchJNLPNode() {
-        return launchJNLPNode;
-    }
-
-    /**
-     * Getter for isTemplate
-     * 
-     * @return true if a signed template is being used for matching; otherwise
-     *         false.
-     */
-    public boolean isTemplate() {
-        return isTemplate;
+    private void closeOutputStream(OutputStream stream) {
+        if (stream != null)
+            try {
+                stream.close();
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+            }
     }
 }
