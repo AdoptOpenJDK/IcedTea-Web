@@ -428,6 +428,10 @@ public class JNLPClassLoader extends URLClassLoader {
                                 jars[i].isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE
                                );
         }
+        
+        //If there are no eager jars, initialize the first jar
+        if(initialJars.size() == 0)
+            initialJars.add(jars[0]);
 
         if (strict)
             fillInPartJars(initialJars); // add in each initial part's lazy jars
