@@ -43,16 +43,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.Random;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-
 import sun.misc.BASE64Encoder;
 import sun.security.provider.X509Factory;
 
@@ -122,11 +126,36 @@ public class CertificateUtils {
     public static final boolean inKeyStores(X509Certificate c, KeyStore[] keyStores) {
         for (int i = 0; i < keyStores.length; i++) {
             try {
-                if (keyStores[i].getCertificateAlias(c) != null) {
-                    if (JNLPRuntime.isDebug()) {
-                        System.out.println(c.getSubjectX500Principal().getName() + " found in cacerts");
+                // Check against all certs
+                Enumeration<String> aliases = keyStores[i].aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    try {
+                        // Verify against this entry
+                        c.verify(keyStores[i].getCertificate(alias).getPublicKey());
+
+                        if (JNLPRuntime.isDebug()) {
+                            System.out.println(c.getSubjectX500Principal().getName() + " found in cacerts");
+                        }
+                        
+                        // If we got here, it means verification succeeded. Return true.
+                        return true;
+                    } catch (NoSuchAlgorithmException nsae) {
+                        // Unsupported signature algorithm 
+                        // Consider non-match and keep going
+                    } catch (InvalidKeyException ike) {
+                        // Incorrect/corrupt key
+                        // Consider non-match and keep going                     
+                    } catch (NoSuchProviderException nspe) {
+                        // No default provider 
+                        // Consider non-match and keep going
+                    } catch (SignatureException se) {
+                        // Signature error
+                        // Consider non-match and keep going
+                    } catch (CertificateException ce) {
+                        // Encoding error
+                        // Consider non-match and keep going
                     }
-                    return true;
                 }
             } catch (KeyStoreException e) {
                 e.printStackTrace();
