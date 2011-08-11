@@ -19,6 +19,7 @@ New in release 1.2 (2011-XX-XX):
 Common
   - PR768: Signed applets/Web Start apps don't work with OpenJDK7 and up
   - PR771: IcedTea-Web certificate verification code does not use the right API
+  - PR742: IcedTea-Web checks certs only upto 1 level deep before declaring them untrusted.
 
 New in release 1.1 (2011-XX-XX):
 * Security updates

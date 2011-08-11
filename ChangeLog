@@ -1,3 +1,11 @@
+2011-08-11  Danesh Dadachanji <ddadacha@redhat.com>
+
+	PR742: IcedTea-Web checks certs only upto 1 level deep before declaring 
+	them untrusted.
+	* NEWS: Updated.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java:
+	(checkTrustedCerts): All certs along certPath are now checked for trust.
+
 2011-08-09  Deepak Bhole <dbhole@redhat.com>
 
 	PR771: IcedTea-Web certificate verification code does not use the right

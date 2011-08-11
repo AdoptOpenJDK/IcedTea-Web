@@ -373,7 +373,13 @@ public class JarSigner implements CertVerifier {
                 alreadyTrustPublisher = CertificateUtils.inKeyStores(publisher, certKeyStores);
                 X509Certificate root = (X509Certificate) getRoot();
                 KeyStore[] caKeyStores = KeyStores.getCAKeyStores();
-                rootInCacerts = CertificateUtils.inKeyStores(root, caKeyStores);
+                // Check entire cert path for a trusted CA
+                for (Certificate c : certPath.getCertificates()) {
+                	if ((rootInCacerts = CertificateUtils.inKeyStores(
+                            (X509Certificate) c, caKeyStores))) {
+                        break;
+                    }
+                }
             } catch (Exception e) {
                 // TODO: Warn user about not being able to
                 // look through their cacerts/trusted.certs
