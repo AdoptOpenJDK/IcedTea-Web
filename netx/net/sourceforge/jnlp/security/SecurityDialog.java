@@ -207,9 +207,12 @@ public class SecurityDialog extends JDialog {
         setSystemLookAndFeel();
 
         String dialogTitle = "";
-        if (dialogType == DialogType.CERT_WARNING)
-            dialogTitle = "Warning - Security";
-        else if (dialogType == DialogType.MORE_INFO)
+        if (dialogType == DialogType.CERT_WARNING) {
+            if (accessType == AccessType.VERIFIED)
+                dialogTitle = "Security Approval Required";
+            else
+                dialogTitle = "Security Warning";
+        } else if (dialogType == DialogType.MORE_INFO)
             dialogTitle = "More Information";
         else if (dialogType == DialogType.CERT_INFO)
             dialogTitle = "Details - Certificate";

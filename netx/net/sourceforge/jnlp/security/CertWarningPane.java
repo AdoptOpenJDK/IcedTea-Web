@@ -135,6 +135,8 @@ public class CertWarningPane extends SecurityDialogPanel {
         //Top label
         String topLabelText = "";
         String propertyName = "";
+        String iconLocation = "net/sourceforge/jnlp/resources/";
+        boolean alwaysTrustSelected = false;
         if (certVerifier instanceof HttpsCertVerifier) {
             topLabelText = R("SHttpsUnverified") + " " +
                                  R("Continue");
@@ -144,25 +146,30 @@ public class CertWarningPane extends SecurityDialogPanel {
                 case VERIFIED:
                     topLabelText = R("SSigVerified");
                     propertyName = "OptionPane.informationIcon";
+                    iconLocation += "question.png";
+                    alwaysTrustSelected = true;
                     break;
                 case UNVERIFIED:
                     topLabelText = R("SSigUnverified");
                     propertyName = "OptionPane.warningIcon";
+                    iconLocation += "warning.png";
                     break;
                 case SIGNING_ERROR:
                     topLabelText = R("SSignatureError");
                     propertyName = "OptionPane.warningIcon";
+                    iconLocation += "warning.png";
                     break;
             }
+
         ImageIcon icon = new ImageIcon((new sun.misc.Launcher())
-                                .getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png"));
+                                .getClassLoader().getResource(iconLocation));
         JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                                 Font.BOLD, 12));
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
-        topPanel.setPreferredSize(new Dimension(400, 60));
+        topPanel.setPreferredSize(new Dimension(400, 75));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         //application info
@@ -175,6 +182,7 @@ public class CertWarningPane extends SecurityDialogPanel {
 
         alwaysTrust = new JCheckBox(R("SAlwaysTrustPublisher"));
         alwaysTrust.setEnabled(true);
+        alwaysTrust.setSelected(alwaysTrustSelected);
 
         JPanel infoPanel = new JPanel(new GridLayout(4, 1));
         infoPanel.add(nameLabel);

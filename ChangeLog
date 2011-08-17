@@ -1,5 +1,15 @@
 2011-08-17  Danesh Dadachanji <ddadacha@redhat.com>
 
+	Update UI for SecurityDialog
+	* netx/net/sourceforge/jnlp/resources/question.png: New icon added.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java:
+	(addComponents): When certs are verified, question.png is used as the icon 
+	and SAlwaysTrustPublisher is automatically selected.
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: 
+	(initDialog): Changed the title of a CERT_WARNING dialog.
+
+2011-08-17  Danesh Dadachanji <ddadacha@redhat.com>
+
 	AUTHORS: Adding myself and Denis Lila. Removing the extra email from
 	Andrew Hughes.
 
