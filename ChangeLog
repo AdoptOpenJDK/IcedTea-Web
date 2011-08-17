@@ -1,3 +1,8 @@
+2011-08-17  Danesh Dadachanji <ddadacha@redhat.com>
+
+	AUTHORS: Adding myself and Denis Lila. Removing the extra email from
+	Andrew Hughes.
+
 2011-08-11  Danesh Dadachanji <ddadacha@redhat.com>
 
 	PR742: IcedTea-Web checks certs only upto 1 level deep before declaring 
