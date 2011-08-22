@@ -107,7 +107,18 @@ public class JNLPFile {
 
     /** the default jvm */
     protected String defaultArch = null;
+    
+    /** A signed JNLP file is missing from the main jar */
+    private boolean missingSignedJNLP = false;
+    
+    /** JNLP file contains special properties */
+    private boolean containsSpecialProperties = false;
 
+    /**
+     * List of acceptable properties (not-special)
+     */
+    private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
+    
     { // initialize defaults if security allows
         try {
             defaultLocale = Locale.getDefault();
@@ -608,6 +619,9 @@ public class JNLPFile {
             launchType = parser.getLauncher(root);
             component = parser.getComponent(root);
             security = parser.getSecurity(root);
+            
+            checkForSpecialProperties();
+            
         } catch (ParseException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -615,6 +629,30 @@ public class JNLPFile {
                 ex.printStackTrace();
 
             throw new RuntimeException(ex.toString());
+        }
+    }
+
+    /**
+     * Inspects the JNLP file to check if it contains any special properties
+     */
+    private void checkForSpecialProperties() {
+
+        for (ResourcesDesc res : resources) {
+            for (PropertyDesc propertyDesc : res.getProperties()) {
+
+                for (int i = 0; i < generalProperties.length; i++) {
+                    String property = propertyDesc.getKey();
+
+                    if (property.equals(generalProperties[i])) {
+                        break;
+                    } else if (!property.equals(generalProperties[i])
+                            && i == generalProperties.length - 1) {
+                        containsSpecialProperties = true;
+                        return;
+                    }
+                }
+
+            }
         }
     }
 
@@ -688,6 +726,23 @@ public class JNLPFile {
             }
         }
         return new DownloadOptions(usePack, useVersion);
+    }
+
+    /**
+     * Returns a boolean after determining if a signed JNLP warning should be
+     * displayed in the 'More Information' panel.
+     * 
+     * @return true if a warning should be displayed; otherwise false
+     */
+    public boolean requiresSignedJNLPWarning() {
+        return (missingSignedJNLP && containsSpecialProperties);
+    }
+
+    /**
+     * Informs that a signed JNLP file is missing in the main jar
+     */
+    public void setSignedJNLPAsMissing() {
+        missingSignedJNLP = true;
     }
 
 }

@@ -61,8 +61,11 @@ import javax.swing.SwingConstants;
  */
 public class MoreInfoPane extends SecurityDialogPanel {
 
+    private boolean showSignedJNLPWarning;
+
     public MoreInfoPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
+        showSignedJNLPWarning= x.requiresSignedJNLPWarning();
         addComponents();
     }
 
@@ -72,6 +75,11 @@ public class MoreInfoPane extends SecurityDialogPanel {
     private void addComponents() {
         ArrayList<String> details = certVerifier.getDetails();
 
+        // Show signed JNLP warning if the signed main jar does not have a
+        // signed JNLP file and the launching JNLP file contains special properties
+        if(showSignedJNLPWarning)
+            details.add(R("SJNLPFileIsNotSigned"));
+            
         int numLabels = details.size();
         JPanel errorPanel = new JPanel(new GridLayout(numLabels, 1));
         errorPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -88,6 +96,11 @@ public class MoreInfoPane extends SecurityDialogPanel {
 
             errorPanel.add(new JLabel(htmlWrap(details.get(i)), icon, SwingConstants.LEFT));
         }
+        
+        // Removes signed JNLP warning after it has been used. This will avoid
+        // any alteration to certVerifier.
+        if(showSignedJNLPWarning)
+            details.remove(details.size()-1);
 
         JPanel buttonsPanel = new JPanel(new BorderLayout());
         JButton certDetails = new JButton(R("SCertificateDetails"));

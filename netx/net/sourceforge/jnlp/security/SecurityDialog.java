@@ -92,6 +92,9 @@ public class SecurityDialog extends JDialog {
      */
     private Object value;
 
+    /** Should show signed JNLP file warning */
+    private boolean requiresSignedJNLPWarning;
+
     SecurityDialog(DialogType dialogType, AccessType accessType,
                 JNLPFile file, CertVerifier jarSigner, X509Certificate cert, Object[] extras) {
         super();
@@ -102,6 +105,9 @@ public class SecurityDialog extends JDialog {
         this.cert = cert;
         this.extras = extras;
         initialized = true;
+
+        if(file != null)
+            requiresSignedJNLPWarning= file.requiresSignedJNLPWarning();
 
         initDialog();
     }
@@ -164,8 +170,9 @@ public class SecurityDialog extends JDialog {
     public static void showMoreInfoDialog(
                 CertVerifier jarSigner, SecurityDialog parent) {
 
+        JNLPFile file= parent.getFile();
         SecurityDialog dialog =
-                        new SecurityDialog(DialogType.MORE_INFO, null, null,
+                        new SecurityDialog(DialogType.MORE_INFO, null, file,
                                 jarSigner);
         dialog.setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.setVisible(true);
@@ -371,6 +378,11 @@ public class SecurityDialog extends JDialog {
      */
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);
+    }
+    
+    public boolean requiresSignedJNLPWarning()
+    {
+        return requiresSignedJNLPWarning;
     }
 
 }

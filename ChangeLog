@@ -1,3 +1,46 @@
+2011-08-22  Saad Mohammad  <smohammad@redhat.com>
+	* netx/net/sourceforge/jnlp/JNLPFile.java:
+	(parse): After the file has been parsed, it calls 
+	checkForSpecialProperties() to check if the resources contain any special
+	properties.
+	(checkForSpecialProperties): Scans through resources and checks if it 
+	contains any special properties.
+	(requiresSignedJNLPWarning): Returns a boolean after determining if a signed
+	JNLP warning should be displayed.
+	(setSignedJNLPAsMissing): Informs JNLPFile that a signed JNLP file is
+	missing in the main jar.
+	* netx/net/sourceforge/jnlp/SecurityDesc.java:
+	(getJnlpRIAPermissions): Returns all the names of the basic JNLP system
+	properties accessible by RIAs.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Added LSignedJNLPFileDidNotMatch and SJNLPFileIsNotSigned.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(initializeResources): Locates the jar file that contains the main class
+	and verifies if a signed JNLP file is also located in that jar. This also
+	checks 'lazy' jars if the the main class was not found in 'eager' jars.
+	If the main jar was not found, a LaunchException is thrown which terminates
+	the launch of the application.
+	(checkForMain): A method that goes through each jar and checks to see
+	if it has the main class. If the main class is found, it calls
+	verifySignedJNLP() to verify if a valid signed JNLP file is also found in
+	the jar.
+	(verifySignedJNLP): A method that checks if the jar file contains a valid 
+	signed JNLP file.
+	(closeStream): Closes a stream.
+	(loadClassExt): Added a try/catch block when addNextResource() is called.
+	(addNextResource): If the main jar has not been found, checkForMain() is
+	called to check if the jar contains the main class, and verifies if a signed
+	JNLP file is also located.
+	* netx/net/sourceforge/jnlp/security/MoreInfoPane.java:
+	(addComponents): Displays the signed JNLP warning message if necessary.
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java:
+	(SecurityDialog): Stores the value of whether a signed JNLP warning should 
+	be displayed.
+	(showMoreInfoDialog): Passes in the associated JNLP file when creating a
+	SecurityDialog object.
+	(requiresSignedJNLPWarning): Returns a boolean after determining if a signed
+	JNLP warning should be displayed.
+
 2011-08-17  Danesh Dadachanji <ddadacha@redhat.com>
 
 	Update UI for SecurityDialog

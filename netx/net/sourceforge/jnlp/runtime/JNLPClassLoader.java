@@ -17,10 +17,13 @@ package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -46,11 +49,14 @@ import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-
+import net.sourceforge.jnlp.AppletDesc;
+import net.sourceforge.jnlp.ApplicationDesc;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.ExtensionDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPMatcher;
+import net.sourceforge.jnlp.JNLPMatcherException;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.PluginBridge;
@@ -81,6 +87,13 @@ public class JNLPClassLoader extends URLClassLoader {
     // extension classes too so that main file classes can load
     // resources in an extension.
 
+    /** Signed JNLP File and Template */
+    final public static String TEMPLATE = "JNLP-INF/APPLICATION_TEMPLATE.JNLP";
+    final public static String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
+    
+    /** True if the application has a signed JNLP File */
+    private boolean isSignedJNLP = false;
+    
     /** map from JNLPFile url to shared classloader */
     private static Map<String, JNLPClassLoader> urlToLoader =
             new HashMap<String, JNLPClassLoader>(); // never garbage collected!
@@ -153,6 +166,10 @@ public class JNLPClassLoader extends URLClassLoader {
     
     /** Loader for codebase (which is a path, rather than a file) */
     private CodeBaseClassLoader codeBaseLoader;
+    
+    /** True if the jar with the main class has been found
+     * */
+    private boolean foundMainJar= false;
 
     /**
      * Create a new JNLPClassLoader from the specified file.
@@ -460,6 +477,26 @@ public class JNLPClassLoader extends URLClassLoader {
                                     !SecurityDialogs.showNotAllSignedWarningDialog(file))
                     throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
 
+
+                // Check for main class in the downloaded jars, and check/verify signed JNLP fill
+                checkForMain(initialJars);
+
+                // If jar with main class was not found, check available resources
+                while (!foundMainJar && available != null && available.size() != 0) 
+                    addNextResource();
+
+                // If jar with main class was not found and there are no more
+                // available jars, throw a LaunchException
+                if (!foundMainJar
+                        && (available == null || available.size() == 0))
+                    throw new LaunchException(file, null, R("LSFatal"),
+                            R("LCClient"), R("LCantDetermineMainClass"),
+                            R("LCantDetermineMainClassInfo"));
+
+                // If main jar was found, but a signed JNLP file was not located
+                if (!isSignedJNLP && foundMainJar) 
+                    file.setSignedJNLPAsMissing();
+                
                 //user does not trust this publisher
                 if (!js.getAlreadyTrustPublisher()) {
                     checkTrustWithUser(js);
@@ -518,10 +555,205 @@ public class JNLPClassLoader extends URLClassLoader {
                 System.err.println(mfe.getMessage());
             }
         }
-
         activateJars(initialJars);
     }
+    
+    /***
+     * Checks for the jar that contains the main class. If the main class was
+     * found, it checks to see if the jar is signed and whether it contains a
+     * signed JNLP file
+     * 
+     * @param jars Jars that are checked to see if they contain the main class
+     * @throws LaunchException Thrown if the signed JNLP file, within the main jar, fails to be verified or does not match
+     */
+    private void checkForMain(List<JARDesc> jars) throws LaunchException {
 
+        Object obj = file.getLaunchInfo();
+        String mainClass;
+
+        if (obj instanceof ApplicationDesc) {
+            ApplicationDesc ad = (ApplicationDesc) file.getLaunchInfo();
+            mainClass = ad.getMainClass();
+        } else if (obj instanceof AppletDesc) {
+            AppletDesc ad = (AppletDesc) file.getLaunchInfo();
+            mainClass = ad.getMainClass();
+        } else
+            return;
+
+        for (int i = 0; i < jars.size(); i++) {
+
+            try {
+                File localFile = tracker
+                        .getCacheFile(jars.get(i).getLocation());
+
+                if (localFile == null)
+                    throw new NullPointerException(
+                            "Could not locate jar file, returned null");
+
+                JarFile jarFile = new JarFile(localFile);
+                Enumeration<JarEntry> entries = jarFile.entries();
+                JarEntry je;
+
+                while (entries.hasMoreElements()) {
+                    je = entries.nextElement();
+                    String jeName = je.getName().replaceAll("/", ".");
+
+                    if (!jeName.startsWith(mainClass + "$Inner")
+                            && (jeName.startsWith(mainClass) && jeName.endsWith(".class"))) {
+                        foundMainJar = true;
+                        verifySignedJNLP(jars.get(i), jarFile);
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                /*
+                 * After this exception is caught, it is escaped. This will skip
+                 * the jarFile that may have thrown this exception and move on
+                 * to the next jarFile (if there are any)
+                 */
+            }
+        }
+    }
+
+    /**
+     * Is called by checkForMain() to check if the jar file is signed and if it
+     * contains a signed JNLP file.
+     * 
+     * @param jarDesc JARDesc of jar
+     * @param jarFile the jar file
+     * @throws LaunchException thrown if the signed JNLP file, within the main jar, fails to be verified or does not match
+     */
+    private void verifySignedJNLP(JARDesc jarDesc, JarFile jarFile)
+            throws LaunchException {
+
+        JarSigner signer = new JarSigner();
+        List<JARDesc> desc = new ArrayList<JARDesc>();
+        desc.add(jarDesc);
+
+        // Initialize streams
+        InputStream inStream = null;
+        InputStreamReader inputReader = null;
+        FileReader fr = null;
+        InputStreamReader jnlpReader = null;
+
+        try {
+            signer.verifyJars(desc, tracker);
+
+            if (signer.allJarsSigned()) { // If the jar is signed
+
+                Enumeration<JarEntry> entries = jarFile.entries();
+                JarEntry je;
+
+                while (entries.hasMoreElements()) {
+                    je = entries.nextElement();
+                    String jeName = je.getName().toUpperCase();
+
+                    if (jeName.equals(TEMPLATE) || jeName.equals(APPLICATION)) {
+
+                        if (JNLPRuntime.isDebug())
+                            System.err.println("Creating Jar InputStream from JarEntry");
+
+                        inStream = jarFile.getInputStream(je);
+                        inputReader = new InputStreamReader(inStream);
+
+                        if (JNLPRuntime.isDebug())
+                            System.err.println("Creating File InputStream from lauching JNLP file");
+
+                        JNLPFile jnlp = this.getJNLPFile();
+                        URL url = jnlp.getFileLocation();
+                        File jn = null;
+
+                        // If the file is on the local file system, use original path, otherwise find cached file
+                        if (url.getProtocol().toLowerCase().equals("file"))
+                            jn = new File(url.getPath());
+                        else
+                            jn = CacheUtil.getCacheFile(url, null);
+
+                        fr = new FileReader(jn);
+                        jnlpReader = fr;
+
+                        // Initialize JNLPMatcher class
+                        JNLPMatcher matcher;
+
+                        if (jeName.equals(APPLICATION)) { // If signed application was found
+                            if (JNLPRuntime.isDebug())
+                                System.err.println("APPLICATION.JNLP has been located within signed JAR. Starting verfication...");
+                           
+                            matcher = new JNLPMatcher(inputReader, jnlpReader, false);
+                        } else { // Otherwise template was found
+                            if (JNLPRuntime.isDebug())
+                                System.err.println("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verfication...");
+                            
+                            matcher = new JNLPMatcher(inputReader, jnlpReader,
+                                    true);
+                        }
+
+                        // If signed JNLP file does not matches launching JNLP file, throw JNLPMatcherException
+                        if (!matcher.isMatch())
+                            throw new JNLPMatcherException("Signed Application did not match launching JNLP File");
+
+                        this.isSignedJNLP = true;
+                        if (JNLPRuntime.isDebug())
+                            System.err.println("Signed Application Verification Successful");
+
+                        break; 
+                    }
+                }
+            }
+        } catch (JNLPMatcherException e) {
+
+            /*
+             * Throws LaunchException if signed JNLP file fails to be verified
+             * or fails to match the launching JNLP file
+             */
+
+            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"),
+                    R("LSignedJNLPFileDidNotMatch"), R(e.getMessage()));
+
+            /*
+             * Throwing this exception will fail to initialize the application
+             * resulting in the termination of the application
+             */
+
+        } catch (Exception e) {
+            
+            if (JNLPRuntime.isDebug())
+                e.printStackTrace(System.err);
+
+            /*
+             * After this exception is caught, it is escaped. If an exception is
+             * thrown while handling the jar file, (mainly for
+             * JarSigner.verifyJars) it assumes the jar file is unsigned and
+             * skip the check for a signed JNLP file
+             */
+            
+        } finally {
+
+            //Close all streams
+            closeStream(inStream);
+            closeStream(inputReader);
+            closeStream(fr);
+            closeStream(jnlpReader);
+        }
+
+        if (JNLPRuntime.isDebug())
+            System.err.println("Ending check for signed JNLP file...");
+    }
+
+    /***
+     * Closes a stream
+     * 
+     * @param stream the stream that will be closed
+     */
+    private void closeStream (Closeable stream) {
+        if (stream != null)
+            try {
+                stream.close();
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+            }
+    }
+    
     private void checkTrustWithUser(JarSigner js) throws LaunchException {
         if (!js.getRootInCacerts()) { //root cert is not in cacerts
             boolean b = SecurityDialogs.showCertWarningDialog(
@@ -1154,7 +1386,20 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // add resources until found
         while (true) {
-            JNLPClassLoader addedTo = addNextResource();
+            JNLPClassLoader addedTo = null;
+            
+            try {
+                addedTo = addNextResource();
+            } catch (LaunchException e) {
+
+                /*
+                 * This method will never handle any search for the main class
+                 * [It is handled in initializeResources()]. Therefore, this
+                 * exception will never be thrown here and is escaped
+                 */
+
+                throw new IllegalStateException(e);
+            }
 
             if (addedTo == null)
                 throw new ClassNotFoundException(name);
@@ -1245,8 +1490,9 @@ public class JNLPClassLoader extends URLClassLoader {
      * no more resources to add, the method returns immediately.
      *
      * @return the classloader that resources were added to, or null
+     * @throws LaunchException Thrown if the signed JNLP file, within the main jar, fails to be verified or does not match
      */
-    protected JNLPClassLoader addNextResource() {
+    protected JNLPClassLoader addNextResource() throws LaunchException {
         if (available.size() == 0) {
             for (int i = 1; i < loaders.length; i++) {
                 JNLPClassLoader result = loaders[i].addNextResource();
@@ -1262,6 +1508,7 @@ public class JNLPClassLoader extends URLClassLoader {
         jars.add(available.get(0));
 
         fillInPartJars(jars);
+        checkForMain(jars);
         activateJars(jars);
 
         return this;

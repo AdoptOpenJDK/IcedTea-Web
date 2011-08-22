@@ -244,5 +244,17 @@ public class SecurityDesc {
 
         return permissions;
     }
+    
+    /**
+     * Returns all the names of the basic JNLP system properties accessible by RIAs
+     */
+    public static String[] getJnlpRIAPermissions() {
+        String[] jnlpPermissions = new String[jnlpRIAPermissions.length];
+
+        for (int i = 0; i < jnlpRIAPermissions.length; i++)
+            jnlpPermissions[i] = jnlpRIAPermissions[i].getName();
+
+        return jnlpPermissions;
+    }
 
 }
