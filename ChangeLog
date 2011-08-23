@@ -1,5 +1,11 @@
 2011-08-23  Omair Majid  <omajid@redhat.com>
 
+	* configure.ac: Add check for new non-standard classes
+	sun.net.www.protocol.jar.URLJarFile and
+	sun.net.www.protocol.jar.URLJarFileCallBack.
+
+2011-08-23  Omair Majid  <omajid@redhat.com>
+
 	* Makefile.am: Remove JRE. Replace uses with SYSTEM_JRE_DIR instead. Also
 	replace uses of SYSTEM_JDK_DIR/jre with SYSTEM_JRE_DIR.
 	* acinclude.m4
