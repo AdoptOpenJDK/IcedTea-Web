@@ -1,3 +1,12 @@
+2011-08-23  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am: Remove JRE. Replace uses with SYSTEM_JRE_DIR instead. Also
+	replace uses of SYSTEM_JDK_DIR/jre with SYSTEM_JRE_DIR.
+	* acinclude.m4
+	(IT_CHECK_FOR_JRE): New macro.
+	(IT_FIND_JAVA): Require IT_CHECK_FOR_JRE. Use java binary from within the
+	JRE.
+
 2011-08-22  Saad Mohammad  <smohammad@redhat.com>
 	* netx/net/sourceforge/jnlp/JNLPFile.java:
 	(parse): After the file has been parsed, it calls 

@@ -64,6 +64,32 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
   AC_SUBST(SYSTEM_JDK_DIR)
 ])
 
+AC_DEFUN_ONCE([IT_CHECK_FOR_JRE],
+[
+  AC_REQUIRE([IT_CHECK_FOR_JDK])
+  AC_MSG_CHECKING([for a JRE home directory])
+  AC_ARG_WITH([jre-home],
+             [AS_HELP_STRING([--with-jre-home],
+                              [jre home directory \
+                               (default is the JRE under the JDK)])],
+             [
+               SYSTEM_JRE_DIR=${withval}
+             ],
+             [
+               SYSTEM_JRE_DIR=
+             ])
+  if test -z "${SYSTEM_JRE_DIR}" ; then
+    if test -d "${SYSTEM_JDK_DIR}/jre" ; then
+      SYSTEM_JRE_DIR="${SYSTEM_JDK_DIR}/jre"
+    fi
+  fi
+  AC_MSG_RESULT(${SYSTEM_JRE_DIR})
+  if ! test -d "${SYSTEM_JRE_DIR}"; then
+    AC_MSG_ERROR("A JRE home directory could not be found.")
+  fi
+  AC_SUBST(SYSTEM_JRE_DIR)
+])
+
 AC_DEFUN_ONCE([FIND_JAVAC],
 [
   AC_REQUIRE([IT_CHECK_FOR_JDK])
@@ -592,6 +618,7 @@ AC_DEFUN([IT_SET_ARCH_SETTINGS],
 
 AC_DEFUN_ONCE([IT_FIND_JAVA],
 [
+  AC_REQUIRE([IT_CHECK_FOR_JRE])
   AC_MSG_CHECKING([for a Java virtual machine])
   AC_ARG_WITH([java],
               [AS_HELP_STRING(--with-java,specify location of the 1.5 java vm)],
@@ -599,7 +626,7 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
     JAVA="${withval}"
   ],
   [
-    JAVA=${SYSTEM_JDK_DIR}/bin/java
+    JAVA="${SYSTEM_JRE_DIR}/bin/java"
   ])
   if ! test -f "${JAVA}"; then
     AC_PATH_PROG(JAVA, "${JAVA}")

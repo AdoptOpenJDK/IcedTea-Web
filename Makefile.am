@@ -51,7 +51,6 @@ IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target
 #    IllegalAccessException
 #  - we want full privileges
 #
-JRE='"$(SYSTEM_JDK_DIR)/jre"'
 LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
 PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
 
@@ -128,7 +127,7 @@ edit_launcher_script = sed \
   -e 's|[@]JAVAWS_BIN_LOCATION[@]|$(bindir)/$(javaws)|g' \
   -e 's|[@]ITWEB_SETTINGS_BIN_LOCATION[@]|$(bindir)/$(itweb_settings)|g' \
   -e 's|[@]JAVA[@]|$(JAVA)|g' \
-  -e 's|[@]JRE[@]|$(JRE)|g'
+  -e 's|[@]JRE[@]|$(SYSTEM_JRE_DIR)|g'
 
 # Top-Level Targets
 # =================
@@ -216,7 +215,7 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
 	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
-	  -DICEDTEA_WEB_JRE=$(JRE) \
+	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
 	  $(GLIB_CFLAGS) \
 	  $(GTK_CFLAGS) \
@@ -636,13 +635,13 @@ stamps/bootstrap-directory.stamp: stamps/native-ecj.stamp
 	ln -sf $(abs_top_builddir)/javac $(BOOT_DIR)/bin/javac
 	ln -sf $(JAVADOC) $(BOOT_DIR)/bin/javadoc
 	mkdir -p $(BOOT_DIR)/jre/lib && \
-	ln -s $(SYSTEM_JDK_DIR)/jre/lib/rt.jar $(BOOT_DIR)/jre/lib && \
-	if [ -e $(SYSTEM_JDK_DIR)/jre/lib/jsse.jar ] ; then \
-	  ln -s $(SYSTEM_JDK_DIR)/jre/lib/jsse.jar $(BOOT_DIR)/jre/lib ; \
+	ln -s $(SYSTEM_JRE_DIR)/lib/rt.jar $(BOOT_DIR)/jre/lib && \
+	if [ -e $(SYSTEM_JRE_DIR)/lib/jsse.jar ] ; then \
+	  ln -s $(SYSTEM_JRE_DIR)/lib/jsse.jar $(BOOT_DIR)/jre/lib ; \
 	else \
 	  ln -s rt.jar $(BOOT_DIR)/jre/lib/jsse.jar ; \
 	fi
-	ln -sf $(SYSTEM_JDK_DIR)/jre/lib/$(JRE_ARCH_DIR) \
+	ln -sf $(SYSTEM_JRE_DIR)/lib/$(JRE_ARCH_DIR) \
 	  $(BOOT_DIR)/jre/lib/ && \
 	if ! test -d $(BOOT_DIR)/jre/lib/$(INSTALL_ARCH_DIR); \
 	  then \
