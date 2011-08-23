@@ -1,3 +1,10 @@
+2011-08-23  Deepak Bhole <dbhole@redhat.com>
+
+	PR769: IcedTea-Web plugin does not work with some ssl sites with OpenJDK7
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java
+	(checkServerTrusted): Account for a null hostname that the
+	overloaded implementation may pass.
+
 2011-08-23  Omair Majid  <omajid@redhat.com>
 
 	* configure.ac: Add check for new non-standard classes

@@ -224,16 +224,20 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
         // need to prompt the user
         if (!isExplicitlyTrusted(chain, authType)) {
 
-            try {
-                HostnameChecker checker = HostnameChecker
-                        .getInstance(HostnameChecker.TYPE_TLS);
-
-                checker.match(hostName, chain[0]); // only need to match @ 0 for
-                                                   // CN
-
-            } catch (CertificateException e) {
+            if (hostName == null) {
                 CNMatched = false;
-                ce = e;
+            } else {
+                try {
+                    HostnameChecker checker = HostnameChecker
+                            .getInstance(HostnameChecker.TYPE_TLS);
+
+                    checker.match(hostName, chain[0]); // only need to match @ 0 for
+                                                       // CN
+
+                } catch (CertificateException e) {
+                    CNMatched = false;
+                    ce = e;
+                }
             }
         }
 
