@@ -1,3 +1,9 @@
+2011-08-24  Deepak Bhole <dbhole@redhat.com>
+
+	RH718693: MindTerm SSH Applet doesn't work
+	* plugin/icedteanp/java/netscape/security/PrivilegeManager.java: New
+	file. Stub class, not needed with IcedTea-Web.
+
 2011-08-23  Deepak Bhole <dbhole@redhat.com>
 
 	PR769: IcedTea-Web plugin does not work with some ssl sites with OpenJDK7
