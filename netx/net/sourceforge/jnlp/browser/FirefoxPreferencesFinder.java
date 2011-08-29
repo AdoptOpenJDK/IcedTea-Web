@@ -93,7 +93,7 @@ public class FirefoxPreferencesFinder {
                 }
 
                 line = line.trim();
-                if (line.startsWith("[") && line.endsWith("]")) {
+                if (line.startsWith("[Profile") && line.endsWith("]")) {
                     if (foundDefaultSection) {
                         break;
                     }
@@ -115,7 +115,7 @@ public class FirefoxPreferencesFinder {
             reader.close();
         }
 
-        if (!foundDefaultSection) {
+        if (!foundDefaultSection && linesInSection.size() == 0) {
             throw new FileNotFoundException("preferences file");
         }
 

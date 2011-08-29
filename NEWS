@@ -22,6 +22,7 @@ Common
   - PR771: IcedTea-Web certificate verification code does not use the right API
   - PR742: IcedTea-Web checks certs only upto 1 level deep before declaring them untrusted.
   - PR769: IcedTea-Web does not work with some ssl sites with OpenJDK7
+  - RH734081: Javaws cannot use proxy settings from Firefox
 
 New in release 1.1 (2011-XX-XX):
 * Security updates

@@ -1,3 +1,11 @@
+2011-08-29  Deepak Bhole <dbhole@redhat.com>
+
+	RH734081: Javaws cannot use proxy settings from Firefox
+	Based on patch from Lukas Zachar <lzachar at redhat dot com>
+	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesFinder.java
+	(find): Only process Profile sections. Do not throw an exception if a
+	Default= line is not found since it is not guaranteed to exist.
+
 2011-08-24  Deepak Bhole <dbhole@redhat.com>
 
 	RH718693: MindTerm SSH Applet doesn't work
