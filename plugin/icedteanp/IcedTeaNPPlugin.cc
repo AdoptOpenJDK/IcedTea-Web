@@ -249,6 +249,45 @@ int plugin_debug_suspend = (getenv("ICEDTEAPLUGIN_DEBUG") != NULL) &&
 
 pthread_cond_t cond_message_available = PTHREAD_COND_INITIALIZER;
 
+
+#ifdef LEGACY_GLIB
+// Returns key from first item stored in hashtable
+gboolean
+find_first_item_in_hash_table(gpointer key, gpointer value, gpointer user_data)
+{
+    user_data = key;
+    return (gboolean)TRUE;
+}
+
+int
+g_strcmp0(char *str1, char *str2)
+{
+   if (str1 != NULL)
+     return str2 != NULL ? strcmp(str1, str2) : 1;
+   else // str1 == NULL
+     return str2 != NULL ? 1 : 0;
+}
+
+
+#endif
+
+
+/* 
+ * Find first member in GHashTable* depending on version of glib
+ */
+gpointer getFirstInTableInstance(GHashTable* table)
+{
+      gpointer id, instance;
+      #ifndef LEGACY_GLIB
+        GHashTableIter iter;
+        g_hash_table_iter_init (&iter, table);
+        g_hash_table_iter_next (&iter, &instance, &id);
+      #else
+        g_hash_table_find(table, (GHRFunc)find_first_item_in_hash_table, &instance);
+      #endif
+        return instance;
+}
+
 // Functions prefixed by ITNP_ are instance functions.  They are called
 // by the browser and operate on instances of ITNPPluginData.
 // Functions prefixed by plugin_ are static helper functions.
@@ -915,12 +954,7 @@ get_cookie_info(const char* siteAddr, char** cookieString, uint32_t* len)
 
   if (browser_functions.getvalueforurl)
   {
-      GHashTableIter iter;
-      gpointer id, instance;
-
-      g_hash_table_iter_init (&iter, instance_to_id_map);
-      g_hash_table_iter_next (&iter, &instance, &id);
-
+      gpointer instance=getFirstInTableInstance(instance_to_id_map);
       return browser_functions.getvalueforurl((NPP) instance, NPNURLVCookie, siteAddr, cookieString, len);
   } else
   {
@@ -1367,12 +1401,7 @@ get_proxy_info(const char* siteAddr, char** proxy, uint32_t* len)
   {
 
       // As in get_cookie_info, we use the first active instance
-      GHashTableIter iter;
-      gpointer id, instance;
-
-      g_hash_table_iter_init (&iter, instance_to_id_map);
-      g_hash_table_iter_next (&iter, &instance, &id);
-
+      gpointer instance=getFirstInTableInstance(instance_to_id_map);
       browser_functions.getvalueforurl((NPP) instance, NPNURLVProxy, siteAddr, proxy, len);
   } else
   {

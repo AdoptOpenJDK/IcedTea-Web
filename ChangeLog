@@ -1,3 +1,16 @@
+2011-09-01 Jiri Vanek<jvanek@redhat.com>
+	Added functionality to allow icedtea web to be buildable with
+	 rhel5 libraries.
+	*configure.ac: added IT_CHECK_GLIB_VERSION check.
+	*acinclude.m4: added IT_CHECK_GLIB_VERSION definition block to test.
+	  version of glib installed and add LEGACY_GLIB define macro into
+	  variable DEFS if version is <2.16.
+	*plugin/icedteanp/IcedTeaNPPlugin.cc: added replacements for incompatible
+	 functions (g_strcmp0 and find_first_item_in_hash_table)if LEGACY_GLIB
+	 is defined. Added define sections for use this function instead of glib ones.
+	 Duplicated code moved into function getFirstInTableInstance(GHashTble* table).
+	*Makefile.am: ($(PLUGIN_DIR)/%.o): using DEFS setted by configure for compilation 
+
 2011-08-29  Deepak Bhole <dbhole@redhat.com>
 
 	RH734081: Javaws cannot use proxy settings from Firefox
