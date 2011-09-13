@@ -1,5 +1,11 @@
 2011-09-13  Deepak Bhole <dbhole@redhat.com>
 
+	PR782: Support building against npapi-sdk as well
+	Patch from Michał Górny < mgorny at gentoo dot org >
+	* acinclude.m4: Build against npapi-sdk.
+
+2011-09-13  Deepak Bhole <dbhole@redhat.com>
+
 	* ChangeLog: Fixed formatting issues in previous entry.
 
 2011-09-01 Jiri Vanek<jvanek@redhat.com>

@@ -16,6 +16,7 @@ New in release 1.2 (2011-XX-XX):
   - PR765: JNLP file with all resource jars marked as 'lazy' fails to validate signature and stops the launch of application
 * Plugin
   - PR749: sun.applet.PluginStreamHandler#handleMessage(String) really slow
+  - PR782: Support building against npapi-sdk as well
   - RH718693: MindTerm SSH Applet doesn't work
 Common
   - PR768: Signed applets/Web Start apps don't work with OpenJDK7 and up

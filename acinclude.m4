@@ -372,8 +372,15 @@ if test "x${enable_plugin}" = "xyes" ; then
   AC_SUBST(GTK_CFLAGS)
   AC_SUBST(GTK_LIBS)
 
-  PKG_CHECK_MODULES(MOZILLA, mozilla-plugin)
-    
+  PKG_CHECK_MODULES(MOZILLA, npapi-sdk, [
+    AC_CACHE_CHECK([for xulrunner version], [xulrunner_cv_collapsed_version],[
+      # XXX: use NPAPI versions instead
+      xulrunner_cv_collapsed_version=20000000
+    ])
+  ], [
+    PKG_CHECK_MODULES(MOZILLA, mozilla-plugin)
+  ])
+
   AC_SUBST(MOZILLA_CFLAGS)
   AC_SUBST(MOZILLA_LIBS)
 fi
