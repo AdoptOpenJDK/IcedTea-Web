@@ -47,13 +47,17 @@ public class AccessClassInPackageTest {
     @Test
     public void AccessClassInPackageTestLunch1() throws Exception {
         System.out.println("connecting AccessClassInPackageTest request");
+	System.err.println("connecting AccessClassInPackageTest request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/AccessClassInPackage.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        Assert.assertTrue(pr.stderr.contains("java.security.AccessControlException: access denied (java.lang.RuntimePermission accessClassInPackage.sun.security.internal.spec)"));
-        Assert.assertFalse(pr.stderr.contains("ClassNotFoundException"));
-        Assert.assertFalse(pr.stdout.length() > 2);
-        Assert.assertFalse(pr.wasTerminated);
+        String c="java.security.AccessControlException: access denied (java.lang.RuntimePermission accessClassInPackage.sun.security.internal.spec)";
+        Assert.assertTrue("stderr should contains `"+c+"`, but didn't ",pr.stderr.contains(c));
+        String cc="ClassNotFoundException";
+        Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
+        Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
+        Assert.assertFalse("AccessClassInPackageTestLunch1 should not be terminated, but was",pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
+
 }

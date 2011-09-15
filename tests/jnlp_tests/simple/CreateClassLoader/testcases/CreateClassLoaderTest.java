@@ -47,13 +47,16 @@ public class CreateClassLoaderTest {
     @Test
     public void CreateClassLoaderLunch1() throws Exception {
         System.out.println("connecting CreateClassLoader request");
+        System.err.println("connecting CreateClassLoader request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/CreateClassLoader.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        Assert.assertTrue(pr.stderr.contains("java.security.AccessControlException: access denied (java.lang.RuntimePermission createClassLoader)"));
-        Assert.assertFalse(pr.stderr.contains("ClassNotFoundException"));
-        Assert.assertFalse(pr.stdout.length() > 2);
-        Assert.assertFalse(pr.wasTerminated);
+        String s="java.security.AccessControlException: access denied (java.lang.RuntimePermission createClassLoader)";
+        Assert.assertTrue("Stderr should contains "+s+" but didn't",pr.stderr.contains(s));
+        String cc="ClassNotFoundException";
+        Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
+        Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
+        Assert.assertFalse("CreateClassLoaderLunch1 should not be terminated, but was",pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 }

@@ -44,31 +44,36 @@ public class ReadPropertiesTest {
 
     private static ServerAccess server = new ServerAccess();
 
-  
-
+ 
     @Test
     public void ReadPropertiesLunch1() throws Exception {
-        System.out.println("connecting ReadProperties request");
+        System.out.println("connecting ReadProperties1 request");
+        System.err.println("connecting ReadProperties1 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/ReadProperties1.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        Assert.assertTrue(pr.stderr.contains("java.security.AccessControlException: access denied (java.util.PropertyPermission user.name read)"));
-        Assert.assertFalse(pr.stderr.contains("ClassNotFoundException"));
-        Assert.assertFalse(pr.stdout.length()>2);
-        Assert.assertFalse(pr.wasTerminated);
+        String s="java.security.AccessControlException: access denied (java.util.PropertyPermission user.name read)";
+        Assert.assertTrue("stderr should contains "+s+" but didn't",pr.stderr.contains(s));
+        String cc="ClassNotFoundException";
+        Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
+        Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
+        Assert.assertFalse("ReadPropertiesLunch1 should not be terminated, but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
 
  @Test
     public void ReadPropertiesLunch2() throws Exception {
-        System.out.println("connecting ReadProperties request");
+        System.out.println("connecting ReadProperties2 request");
+        System.err.println("connecting ReadProperties2 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/ReadProperties2.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        Assert.assertTrue(pr.stderr.contains("java.security.AccessControlException: access denied (java.util.PropertyPermission user.home read)"));
-        Assert.assertFalse(pr.stderr.contains("ClassNotFoundException"));
-        Assert.assertFalse(pr.stdout.length()>2);
-        Assert.assertFalse(pr.wasTerminated);
+        String s="java.security.AccessControlException: access denied (java.util.PropertyPermission user.home read)";
+        Assert.assertTrue("stderr should contains "+s+" but didn't",pr.stderr.contains(s));
+        String cc="ClassNotFoundException";
+        Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
+        Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
+        Assert.assertFalse("ReadPropertiesLunch2 should not be terminated, but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
   }

@@ -49,12 +49,13 @@ public class DeadLockTestTest {
    @Test
     public void testDeadLockTestTerminated() throws Exception {
         System.out.println("connecting deadlocktest request");
+        System.err.println("connecting deadlocktest request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/deadlocktest.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
         Assert.assertFalse(pr.stdout.contains("This process is hanging more then 30s. Should be killed"));
 //        Assert.assertTrue(pr.stderr.contains("xception"));, exception is thrown by engine,not by application
-        Assert.assertTrue(pr.wasTerminated);
+        Assert.assertTrue("testDeadLockTestTerminated should be terminated, but wasn't",pr.wasTerminated);
         Assert.assertEquals(null, pr.returnValue);//killed process have no value
     }
 

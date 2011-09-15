@@ -48,13 +48,16 @@ public class SimpleTest2Test {
     @Test
     public void testSimpletest2lunchException() throws Exception {
         System.out.println("connecting simpletest2 request");
+        System.err.println("connecting simpletest2 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/simpletest2.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        Assert.assertTrue(pr.stdout.trim().length() < 1);
-        Assert.assertTrue(pr.stderr.contains("Correct exception"));
-        Assert.assertTrue(pr.stderr.contains("Exception"));
-        Assert.assertFalse(pr.wasTerminated);
+        Assert.assertTrue("stdout should be < 1 , but was "+pr.stdout.trim().length(),pr.stdout.trim().length() < 1);
+        String s="Correct exception";
+        Assert.assertTrue("stderr should contains "+s+" but didn't",pr.stderr.contains(s));
+        String ss="Exception";
+        Assert.assertTrue("stderr should contains "+ss+" but did not",pr.stderr.contains(ss));
+        Assert.assertFalse("testSimpletest2lunchException should not be terminated, but was",pr.wasTerminated);
         //Assert.assertFalse(0==pr.returnValue);exception and still returned 0?
     }
 

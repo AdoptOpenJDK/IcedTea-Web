@@ -1,3 +1,11 @@
+2011-09-15  Jiri Vanek <jvanek@redhat.com>
+
+	* tests/jnlp_tests/: all current reproducers (AccessClassInPackage
+	AddShutdownHook AllStackTraces CreateClassLoader deadlocktest
+	ReadEnvironment ReadProperties RedirectStreams ReplaceSecurityManager
+	SetContextClassLoader simpletest1 simpletest2) junit's asserts are enchanted
+	for reason, so junit assertion exception message is much clearer. 
+
 2011-09-13  Deepak Bhole <dbhole@redhat.com>
 
 	PR782: Support building against npapi-sdk as well
