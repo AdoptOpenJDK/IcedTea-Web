@@ -4,7 +4,7 @@
       href="www.redhat.com"    
       >
   
-   <!CDATA[
+   <![CDATA[
     Text you want to escape goes here...
     <test> random tag test </test>
   ]]>

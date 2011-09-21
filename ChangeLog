@@ -1,3 +1,12 @@
+2011-09-20  Omair Majid  <omajid@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCases.java
+	(testCdata, testCdataNested, testCDataFirstChild, testCDataSecondChild)
+	(testCommentInElements2, testDoubleDashesInComments): New methods
+	* tests/netx/unit/net/sourceforge/jnlp/application/application0.jnlp,
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template0.jnlp:
+	Change <!CDATA[ to <![CDATA[.
+
 2011-09-22  Lars Herschke  <lhersch@dssgmbh.de>
 
 	PR789: typo in jrunscript.sh

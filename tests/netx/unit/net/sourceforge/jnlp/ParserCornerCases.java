@@ -38,14 +38,88 @@ exception statement from your version.
 package net.sourceforge.jnlp;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 
-import org.junit.After;
+import net.sourceforge.nanoxml.XMLElement;
+import net.sourceforge.nanoxml.XMLParseException;
+
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /** Test various corner cases of the parser */
 public class ParserCornerCases {
+
+    @Test
+    public void testCdata() throws ParseException, XMLParseException, IOException {
+        String data = "<argument><![CDATA[<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\"> <properties> <entry key=\"key\">value</entry> </properties> ]]></argument>";
+        XMLElement elem = new XMLElement();
+        elem.parseFromReader(new StringReader(data));
+        XMLElement target = elem;
+        Assert.assertEquals("argument", target.getName());
+        Assert.assertTrue("too small", target.getContent().length() > 20);
+        Assert.assertTrue(target.getContent().contains("xml"));
+        Assert.assertTrue(target.getContent().contains("DOCTYPE"));
+        Assert.assertTrue(target.getContent().contains("<entry key=\"key\">value</entry>"));
+
+        Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("argument", node.getNodeName());
+        String contents = node.getNodeValue();
+        Assert.assertTrue(contents.contains("xml"));
+        Assert.assertTrue(contents.contains("DOCTYPE"));
+        Assert.assertTrue(contents.contains("<entry key=\"key\">value</entry>"));
+    }
+
+    @Test
+    public void testCdataNested() throws ParseException, XMLParseException, IOException {
+        String data = "<jnlp>\n" +
+                "<application-desc>\n" +
+                "<argument>\n" +
+                "<![CDATA[<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\"> <properties> <entry key=\"key\">value</entry> </properties> ]]>" +
+                "</argument>\n" +
+                "<argument>1</argument>\n" +
+                "</application-desc>\n" +
+                "</jnlp>";
+        XMLElement elem = new XMLElement();
+        elem.parseFromReader(new StringReader(data));
+        XMLElement target = (XMLElement) ((XMLElement) elem.enumerateChildren().nextElement()).enumerateChildren().nextElement();
+        Assert.assertEquals("argument", target.getName());
+        Assert.assertTrue("too small", target.getContent().length() > 20);
+        Assert.assertTrue(target.getContent().contains("xml"));
+        Assert.assertTrue(target.getContent().contains("DOCTYPE"));
+        Assert.assertTrue(target.getContent().contains("<entry key=\"key\">value</entry>"));
+
+        Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        node = node.getFirstChild().getFirstChild();
+        Assert.assertEquals("argument", node.getNodeName());
+        String contents = node.getNodeValue();
+        Assert.assertTrue(contents.contains("xml"));
+        Assert.assertTrue(contents.contains("DOCTYPE"));
+        Assert.assertTrue(contents.contains("<entry key=\"key\">value</entry>"));
+    }
+
+    @Test
+    public void testCDataFirstChild() throws XMLParseException, IOException {
+        String xml = "<?xml version=\"1.0\"?>\n" +
+                "<jnlp spec=\"1.5+\">\n" +
+                "<![CDATA[Text you want to escape goes here...<test> random tag test </test>]]>\n" +
+                "<information/>\n" +
+                "</jnlp>";
+        XMLElement elem = new XMLElement();
+        elem.parseFromReader(new StringReader(xml));
+    }
+
+    @Test
+    public void testCDataSecondChild() throws XMLParseException, IOException {
+        String xml = "<?xml version=\"1.0\"?>\n" +
+                "<jnlp spec=\"1.5+\">\n" +
+                "<information/>\n" +
+                "<![CDATA[Text you want to escape goes here...<test> random tag test </test>]]>\n" +
+                "</jnlp>";
+        XMLElement elem = new XMLElement();
+        elem.parseFromReader(new StringReader(xml));
+    }
+
     @Test
     public void testUnsupportedSpecNumber() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='11.11'></jnlp>";
@@ -71,6 +145,14 @@ public class ParserCornerCases {
     }
 
     @Test
+    public void testCommentInElements2() throws ParseException {
+        String malformedJnlp = "<?xml?><jnlp <!-- comment --> spec='1.0'> </jnlp>";
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
+        Parser p = new Parser(null, null, root, false, false);
+        Assert.assertEquals("1.0", p.getSpecVersion().toString());
+    }
+
+    @Test
     public void testCommentInAttributes() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
         Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
@@ -88,4 +170,19 @@ public class ParserCornerCases {
         Parser p = new Parser(null, null, root, false, false);
         Assert.assertEquals(" -->", p.getInfo(root).get(0).getDescription());
     }
+
+    @Test
+    public void testDoubleDashesInComments() throws ParseException {
+        String malformedJnlp = "<?xml?>" +
+                "<jnlp> <!-- \n" +
+                " -- a very very long and \n" +
+                " -- multiline comment \n" +
+                " -- that contains double dashes \n" +
+                " -->\n" +
+                "  <information/>" +
+                "</jnlp>";
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
+        Parser p = new Parser(null, null, root, false, false);
+    }
+
 }
