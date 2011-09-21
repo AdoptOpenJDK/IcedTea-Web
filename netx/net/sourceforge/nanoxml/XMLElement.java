@@ -1166,7 +1166,7 @@ public class XMLElement {
      * @param pout The PipedOutputStream that will be receiving the filtered
      *             xml file.
      */
-    public void sanitizeInput(InputStreamReader isr, PipedOutputStream pout) {
+    public void sanitizeInput(Reader isr, OutputStream pout) {
         try {
             PrintStream out = new PrintStream(pout);
 
@@ -1220,11 +1220,35 @@ public class XMLElement {
 
                 this.sanitizeCharReadTooMuch = next;
 
-                // If the next char is a ? or !, then we've hit a special tag,
+                // If the next chars are !--, then we've hit a comment tag,
                 // and should skip it.
-                if (prev == '<' && (next == '!' || next == '?')) {
-                    this.skipSpecialTag(0);
-                    this.sanitizeCharReadTooMuch = '\0';
+                if (ch == '<' && sanitizeCharReadTooMuch == '!') {
+                    ch = (char) this.reader.read();
+                    if (ch == '-') {
+                        ch = (char) this.reader.read();
+                        if (ch == '-') {
+                            this.skipComment();
+                            this.sanitizeCharReadTooMuch = '\0';
+                        } else {
+                            out.print('<');
+                            out.print('!');
+                            out.print('-');
+                            this.sanitizeCharReadTooMuch = ch;
+                            if (JNLPRuntime.isDebug()) {
+                                System.out.print('<');
+                                System.out.print('!');
+                                System.out.print('-');
+                            }
+                        }
+                    } else {
+                        out.print('<');
+                        out.print('!');
+                        this.sanitizeCharReadTooMuch = ch;
+                        if (JNLPRuntime.isDebug()) {
+                            System.out.print('<');
+                            System.out.print('!');
+                        }
+                    }
                 }
                 // Otherwise we haven't hit a comment, and we should write ch.
                 else {

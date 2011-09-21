@@ -1,3 +1,9 @@
+2011-09-21  Omair Majid  <omajid@redhat.com>
+
+	PR766: javaws fails to parse an <argument> node that contains CDATA
+	* netx/net/sourceforge/nanoxml/XMLElement.java
+	(sanitizeInput): Do not remove CDATA sections along with comments.
+
 2011-09-20  Omair Majid  <omajid@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCases.java
