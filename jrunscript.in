@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ x"@RHINO_JAR@" == x ] ; then
+if [ x"@RHINO_JAR@" = x ] ; then
   echo "jrunscript requires rhino support"
   exit 1
 fi
