@@ -655,6 +655,64 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
   AC_SUBST(JAVA)
 ])
 
+AC_DEFUN_ONCE([IT_FIND_KEYTOOL],
+[
+  AC_REQUIRE([IT_CHECK_FOR_JDK])
+  AC_MSG_CHECKING([for keytool])
+  AC_ARG_WITH([keytool],
+              [AS_HELP_STRING(--with-keytool,specify location of keytool for signed part of run-netx-dist)],
+  [
+    if test "${withval}" = "yes" ; then 
+      KEYTOOL=${SYSTEM_JDK_DIR}/bin/keytool  
+    else 
+      KEYTOOL="${withval}"
+    fi
+  ],
+  [
+    KEYTOOL=${SYSTEM_JDK_DIR}/bin/keytool
+  ])
+  if ! test -f "${KEYTOOL}"; then
+    AC_PATH_PROG(KEYTOOL, keytool)
+  fi
+  if ! test -f "${KEYTOOL}"; then
+    KEYTOOL=""
+  fi
+  if test -z "${KEYTOOL}" ; then
+     AC_MSG_WARN("keytool not found so signed part of run-netx-dist will fail")
+  fi
+  AC_MSG_RESULT(${KEYTOOL})
+  AC_SUBST(KEYTOOL)
+])
+
+AC_DEFUN_ONCE([IT_FIND_JARSIGNER],
+[
+  AC_REQUIRE([IT_CHECK_FOR_JDK])
+  AC_MSG_CHECKING([for jarsigner])
+  AC_ARG_WITH([jarsigner],
+              [AS_HELP_STRING(--with-jarsigner,specify location of jarsigner for signed part od run-netx-dist)],
+  [
+    if test "${withval}" = "yes" ; then 
+      JARSIGNER=${SYSTEM_JDK_DIR}/bin/jarsigner  
+    else 
+      JARSIGNER="${withval}"
+    fi
+  ],
+  [
+    JARSIGNER=${SYSTEM_JDK_DIR}/bin/jarsigner
+  ])
+  if ! test -f "${JARSIGNER}"; then
+    AC_PATH_PROG(JARSIGNER, jarsigner,"")
+  fi
+  if ! test -f "${JARSIGNER}"; then
+    JARSIGNER=""
+  fi
+  if test -z "${JARSIGNER}"; then
+     AC_MSG_WARN("jarsigner not found so signed part of run-netx-dist will fail")
+  fi
+  AC_MSG_RESULT(${JARSIGNER})
+  AC_SUBST(JARSIGNER)
+])
+
 AC_DEFUN([IT_FIND_JAVADOC],
 [
   AC_REQUIRE([IT_CHECK_FOR_JDK])

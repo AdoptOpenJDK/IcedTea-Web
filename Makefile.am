@@ -22,6 +22,7 @@ JNLP_TESTS_SRCDIR=$(TESTS_SRCDIR)/jnlp_tests
 JNLP_TESTS_ENGINE_DIR=$(TESTS_DIR)/netx/jnlp_testsengine
 JNLP_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/jnlp_test_server
 JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
+KEYSTORE_NAME=teststore.ks
 
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 
@@ -455,39 +456,61 @@ $(JUNIT_RUNNER_JAR): junit-runner-source-files.txt
 	  @junit-runner-source-files.txt && \
 	$(BOOT_DIR)/bin/jar cf $@  -C $(JUNIT_RUNNER_DIR) .
 
-junit-jnlp-dist-dirs.txt:
+stamps/junit-jnlp-dist-dirs: junit-jnlp-dist-simple.txt junit-jnlp-dist-signed.txt
 	mkdir -p $(JNLP_TESTS_SERVER_DEPLOYDIR)
 	mkdir -p $(JNLP_TESTS_DIR)
 	mkdir -p $(JNLP_TESTS_ENGINE_DIR)
+	touch $@
+
+junit-jnlp-dist-simple.txt:
 	cd $(JNLP_TESTS_SRCDIR)/simple/ ; \
 	find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/$@
 
-stamps/netx-dist-tests-prepare-reproducers.stamp: junit-jnlp-dist-dirs.txt
-	simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-dirs.txt `); \
-	for dir in "$${simpleReproducers[@]}" ; do \
-	  echo "processing: $$dir" ; \
-	  mkdir -p $(JNLP_TESTS_DIR)/$$dir ; \
-	  d=`pwd` ; \
-	  cd $(JNLP_TESTS_SRCDIR)/simple/$$dir/srcs/ ; \
-	  srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
-	  notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
-	  $(BOOT_DIR)/bin/javac -d  $(JNLP_TESTS_DIR)/$$dir/ $$srcFiles ; \
-	  if [ -n "$$notSrcFiles" ] ; then \
-	    cp -R --parents $$notSrcFiles $(JNLP_TESTS_DIR)/$$dir/ ; \
-	  fi ; \
-	  cd $(JNLP_TESTS_DIR)/$$dir/ ; \
-	  $(BOOT_DIR)/bin/jar cf $(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar * ; \
-	  cd $$d ; \
-	  cp -R $(JNLP_TESTS_SRCDIR)/simple/$$dir/resources/*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
+junit-jnlp-dist-signed.txt: 
+	cd $(JNLP_TESTS_SRCDIR)/signed/ ; \
+	find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/$@
+
+stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
+	types=(simple signed); \
+	for which in "$${types[@]}" ; do \
+	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  for dir in "$${simpleReproducers[@]}" ; do \
+	    echo "processing: $$dir" ; \
+	    mkdir -p $(JNLP_TESTS_DIR)/$$dir ; \
+	    d=`pwd` ; \
+	    cd $(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/ ; \
+	    srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
+	    notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
+	    $(BOOT_DIR)/bin/javac -d  $(JNLP_TESTS_DIR)/$$dir/ $$srcFiles ; \
+	    if [ -n "$$notSrcFiles" ] ; then \
+	      cp -R --parents $$notSrcFiles $(JNLP_TESTS_DIR)/$$dir/ ; \
+	    fi ; \
+	    cd $(JNLP_TESTS_DIR)/$$dir/ ; \
+	    $(BOOT_DIR)/bin/jar cf $(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar * ; \
+	    cd $$d ; \
+	    cp -R $(JNLP_TESTS_SRCDIR)/$$which/$$dir/resources/*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
+	  done ; \
 	done ; \
 	mkdir -p stamps && \
 	touch $@
+
+stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepare-reproducers.stamp
+	alias=icedteaweb; \
+	keystore=$(abs_top_builddir)/$(KEYSTORE_NAME); \
+	pass=123456789; \
+	$(BOOT_DIR)/bin/keytool -genkey -alias $$alias -keystore $$keystore -keypass $$pass -storepass $$pass -dname "cn=$$alias, ou=$$alias, o=$$alias, c=$$alias" ; \
+	signedReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-signed.txt `); \
+	for dir in "$${signedReproducers[@]}" ; do \
+	 $(BOOT_DIR)/bin/jarsigner -keystore $$keystore -storepass $$pass -keypass $$pass  $(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar  $$alias ; \
+ 	done ; \
+ 	mkdir -p stamps && \
+ 	touch $@
 
 netx-dist-tests-source-files.txt:
 	find $(JNLP_TESTS_ENGINE_SRCDIR) -name '*.java' | sort > $@
 
 stamps/netx-dist-tests-compile.stamp: stamps/netx.stamp \
- junit-jnlp-dist-dirs.txt netx-dist-tests-source-files.txt
+ stamps/junit-jnlp-dist-dirs netx-dist-tests-source-files.txt
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	 -d $(JNLP_TESTS_ENGINE_DIR) \
 	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar \
@@ -495,19 +518,22 @@ stamps/netx-dist-tests-compile.stamp: stamps/netx.stamp \
 	mkdir -p stamps && \
 	touch $@
 
-stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp junit-jnlp-dist-dirs.txt\
+stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-jnlp-dist-dirs \
  netx-dist-tests-source-files.txt stamps/netx-dist-tests-compile.stamp
-	simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-dirs.txt `); \
-	for dir in "$${simpleReproducers[@]}" ; do \
-	  $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	  -d $(JNLP_TESTS_ENGINE_DIR) \
-	  -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
-	  $(JNLP_TESTS_SRCDIR)/simple/$$dir/testcases/* ; \
+	types=(simple signed); \
+	for which in "$${types[@]}" ; do \
+	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  for dir in "$${simpleReproducers[@]}" ; do \
+	    $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	    -d $(JNLP_TESTS_ENGINE_DIR) \
+	    -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
+	    $(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/* ; \
+	  done ; \
 	done ; \
 	mkdir -p stamps && \
 	touch $@
 
-run-netx-dist-tests: all-local stamps/netx.stamp junit-jnlp-dist-dirs.txt stamps/netx-dist-tests-prepare-reproducers.stamp \
+run-netx-dist-tests: all-local stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-sign-some-reproducers.stamp \
  stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names= ; \
@@ -590,10 +616,14 @@ clean-netx-dist-tests: clean_tests_reports
 	rm -rf $(JNLP_TESTS_DIR)
 	rm -rf $(JNLP_TESTS_SERVER_DEPLOYDIR)
 	rm -rf $(JNLP_TESTS_ENGINE_DIR)
+	rm -f stamps/junit-jnlp-dist-dirs
 	rm -f stamps/netx-dist-tests-compile.stamp
 	rm -f stamps/netx-dist-tests-prepare-reproducers.stamp
 	rm -f stamps/netx-dist-tests-compile-testcases.stamp
-	rm -f junit-jnlp-dist-dirs.txt
+	rm -f stamps/netx-dist-tests-sign-some-reproducers.stamp
+	rm -f junit-jnlp-dist-simple.txt
+	rm -f junit-jnlp-dist-signed.txt
+	rm -f $(abs_top_builddir)/$(KEYSTORE_NAME)
 
 # plugin tests
 
@@ -635,6 +665,20 @@ stamps/bootstrap-directory.stamp: stamps/native-ecj.stamp
 	ln -sf $(JAR) $(BOOT_DIR)/bin/jar
 	ln -sf $(abs_top_builddir)/javac $(BOOT_DIR)/bin/javac
 	ln -sf $(JAVADOC) $(BOOT_DIR)/bin/javadoc
+	if [ -e "$(KEYTOOL)" ] ; then \
+	  ln -sf $(KEYTOOL) $(BOOT_DIR)/bin/keytool ;\
+	else \
+	  echo "#! /bin/sh" > $(BOOT_DIR)/bin/keytool ;\
+	  echo "echo \"keytool not exist on your system, signed part of reproducers test will fail\"" >> $(BOOT_DIR)/bin/keytool ;\
+	  chmod 777 $(BOOT_DIR)/bin/keytool ;\
+	fi
+	if [ -e "$(JARSIGNER)" ] ; then \
+	  ln -sf $(JARSIGNER) $(BOOT_DIR)/bin/jarsigner ;\
+	else \
+	  echo "#! /bin/sh" > $(BOOT_DIR)/bin/jarsigner ;\
+	  echo "echo \"jarsigner not exist on your system, signed part of reproducers test will fail\"" >> $(BOOT_DIR)/bin/jarsigner ;\
+	  chmod 777 $(BOOT_DIR)/bin/jarsigner ;\
+	fi
 	mkdir -p $(BOOT_DIR)/jre/lib && \
 	ln -s $(SYSTEM_JRE_DIR)/lib/rt.jar $(BOOT_DIR)/jre/lib && \
 	if [ -e $(SYSTEM_JRE_DIR)/lib/jsse.jar ] ; then \

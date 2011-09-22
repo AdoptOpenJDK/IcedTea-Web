@@ -1,5 +1,27 @@
 2011-09-22  Jiri Vanek <jvanek@redhat.com>
 
+	Added signed reproducers engine
+	* Makefile.am: added variable KEYSTORE_NAME
+	(stamps/junit-jnlp-dist-dirs): creates stamp and depend on next two targets
+	(junit-jnlp-dist-simple.txt): creates list of simple reproducers, extracted
+	 from stamps/junit-jnlp-dist-dirs
+	(junit-jnlp-dist-signed.txt): creates list of signed reproducers
+	(stamps/netx-dist-tests-prepare-reproducers.stamp): now traverse over 
+	signed and simple
+	(stamps/netx-dist-tests-sign-some-reproducers.stamp): depends 
+	on netx-dist-tests-prepare-reproducers, traverse through signed 
+	reproducers and sign them
+	(stamps/netx-dist-tests-compile-testcases.stamp): now traverse over 
+	signed and simple
+	(stamps/bootstrap-directory.stamp): creates symlinks/stubs to 
+	jarsigner and keytool
+	(clean-netx-dist-tests):remove new stamps, signed and simple list and keysstore
+	* acinclude.m4: declared to proceed IT_FIND_KEYTOOL and IT_FIND_JARSIGNER macro
+	* configure.ac: declared macros to check for keytool and jarsigner
+	* tests/jnlp_tests/README: mentioned signed directory 
+
+2011-09-22  Jiri Vanek <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: (main): added logic to 
 	handle -Xtrustall option
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: declared private static boolean
