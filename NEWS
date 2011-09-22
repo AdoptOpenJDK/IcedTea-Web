@@ -14,6 +14,7 @@ New in release 1.2 (2011-XX-XX):
 	- RH718170, CVE-2011-2514: Java Web Start security warning dialog manipulation
 * NetX
   - PR765: JNLP file with all resource jars marked as 'lazy' fails to validate signature and stops the launch of application
+  - PR788: Elluminate Live! is not working
 * Plugin
   - PR749: sun.applet.PluginStreamHandler#handleMessage(String) really slow
   - PR782: Support building against npapi-sdk as well

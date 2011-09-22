@@ -586,9 +586,10 @@ public class JNLPClassLoader extends URLClassLoader {
                 File localFile = tracker
                         .getCacheFile(jars.get(i).getLocation());
 
-                if (localFile == null)
-                    throw new NullPointerException(
-                            "Could not locate jar file, returned null");
+                if (localFile == null) {
+                    System.err.println("JAR " + jars.get(i).getLocation() + " not found. Continuing.");
+                    continue; // JAR not found. Keep going.
+                }
 
                 JarFile jarFile = new JarFile(localFile);
                 Enumeration<JarEntry> entries = jarFile.entries();

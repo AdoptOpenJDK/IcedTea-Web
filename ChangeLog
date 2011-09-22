@@ -1,3 +1,11 @@
+2011-09-22  Omair Majid  <omajid@redhat.com>
+
+	PR788: Elluminate Live! is not working
+	* NEWS: Update.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(checkForMain): If localFile is null (JAR couldn't be downloaded), try to
+	continue, rather than allowing the exception to cause an abort.
+
 2011-09-21  Omair Majid  <omajid@redhat.com>
 
 	PR766: javaws fails to parse an <argument> node that contains CDATA
