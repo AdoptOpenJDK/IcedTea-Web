@@ -40,6 +40,6 @@ public class ReadProperties {
 *some system property is expected as arg[0], eg user.name or user.home
 */    
     public static void main(String[] args) {
-         System.getProperty(args[0]);
-  }
+         System.out.println(System.getProperty(args[0]));
+    }
 }

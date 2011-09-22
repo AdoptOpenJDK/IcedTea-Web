@@ -1,4 +1,14 @@
 2011-09-22  Jiri Vanek <jvanek@redhat.com>
+    
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned1.jnlp:
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned2.jnlp:
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java:
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/srcs/ReadPropertiesSigned.java: 
+	those four files are  example of signed reproducer
+	* tests/jnlp_tests/simple/ReadProperties/srcs/ReadProperties.java: now prints out got 
+	variable for comparsion with above created signed example
+
+2011-09-22  Jiri Vanek <jvanek@redhat.com>
 
 	Added signed reproducers engine
 	* Makefile.am: added variable KEYSTORE_NAME
