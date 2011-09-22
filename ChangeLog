@@ -1,4 +1,15 @@
 2011-09-22  Jiri Vanek <jvanek@redhat.com>
+
+	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/resources/ReadPropertiesBySignedHack.jnlp: 
+	jnlp file to lunch ReadPropertiesBySignedHack, notice please dependenci 
+	on ReadProperties.jar from simple reproducers
+	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/srcs/ReadPropertiesBySignedHack.java: 
+	this reproducers verify, that even reflection-by enabled 
+	XtrustAll will not allow to lunch unsigned code
+	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/testcases/ReadPropertiesBySignedHackTest.java: 
+	testcase for this reproducer 
+
+2011-09-22  Jiri Vanek <jvanek@redhat.com>
     
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned1.jnlp:
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned2.jnlp:
