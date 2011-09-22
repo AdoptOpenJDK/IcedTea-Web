@@ -755,6 +755,9 @@ public class JNLPClassLoader extends URLClassLoader {
     }
     
     private void checkTrustWithUser(JarSigner js) throws LaunchException {
+        if (JNLPRuntime.isTrustAll()){
+            return;
+        }
         if (!js.getRootInCacerts()) { //root cert is not in cacerts
             boolean b = SecurityDialogs.showCertWarningDialog(
                     AccessType.UNVERIFIED, file, js);

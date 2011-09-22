@@ -156,6 +156,9 @@ public final class Boot implements PrivilegedAction<Void> {
         if (null != getOption("-Xnofork")) {
             JNLPRuntime.setForksAllowed(false);
         }
+        if (null != getOption("-Xtrustall")) {
+            JNLPRuntime.setTrustAll(true);
+        }
 
         JNLPRuntime.setInitialArgments(Arrays.asList(argsIn));
 

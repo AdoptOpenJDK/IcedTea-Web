@@ -53,6 +53,7 @@ import sun.security.util.HostnameChecker;
 import sun.security.validator.ValidatorException;
 
 import com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 
@@ -382,6 +383,9 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
     private boolean askUser(X509Certificate[] chain, String authType,
                             boolean isTrusted, boolean hostMatched,
                             String hostName) {
+        if (JNLPRuntime.isTrustAll()){
+            return true;
+        }
         return SecurityDialogs.showCertWarningDialog(
                         AccessType.UNVERIFIED, null,
                         new HttpsCertVerifier(this, chain, authType,

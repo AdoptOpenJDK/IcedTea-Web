@@ -123,6 +123,9 @@ public class JNLPRuntime {
     /** set to false to indicate another JVM should not be spawned, even if necessary */
     private static boolean forksAllowed = true;
 
+    /** all security dialogs will be consumed and pretented as beeing verified by user and allowed.*/
+    private static boolean trustAll=false;
+
     /** contains the arguments passed to the jnlp runtime */
     private static List<String> initialArguments;
 
@@ -131,6 +134,7 @@ public class JNLPRuntime {
 
     public static final String STDERR_FILE = "java.stderr";
     public static final String STDOUT_FILE = "java.stdout";
+
 
     /**
      * Returns whether the JNLP runtime environment has been
@@ -730,6 +734,14 @@ public class JNLPRuntime {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    static void setTrustAll(boolean b) {
+        trustAll=b;
+    }
+
+    public static boolean isTrustAll() {
+        return trustAll;
     }
 
 }

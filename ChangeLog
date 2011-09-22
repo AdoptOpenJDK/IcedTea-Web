@@ -1,3 +1,14 @@
+2011-09-22  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: (main): added logic to 
+	handle -Xtrustall option
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: declared private static boolean
+	trustAll=false; with public getter and pkg.private  setter
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (checkTrustWithUser): modified,
+	when XtrustAll declared, then user is not asked and certificate is trusted
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java:  (askUser): modified,
+	when XtrustAll declared, then user is not asked and certificate is trusted
+
 2011-09-15  Jiri Vanek <jvanek@redhat.com>
 
 	* tests/jnlp_tests/: all current reproducers (AccessClassInPackage
@@ -17,6 +28,7 @@
 	* ChangeLog: Fixed formatting issues in previous entry.
 
 2011-09-01 Jiri Vanek<jvanek@redhat.com>
+
 	Added functionality to allow icedtea web to be buildable with
 	rhel5 libraries.
 	* configure.ac: added IT_CHECK_GLIB_VERSION check.
