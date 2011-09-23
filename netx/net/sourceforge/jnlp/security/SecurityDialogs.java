@@ -181,6 +181,8 @@ public class SecurityDialogs {
      * @param accessType the type of warning dialog to show
      * @param file the JNLPFile associated with this warning
      * @param jarSigner the JarSigner used to verify this application
+     *
+     * @return true if the user accepted the certificate
      */
     public static boolean showCertWarningDialog(AccessType accessType,
             JNLPFile file, CertVerifier jarSigner) {

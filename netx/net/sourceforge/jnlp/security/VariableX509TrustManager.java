@@ -37,7 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import java.security.AccessController;
 import java.security.KeyStore;
+import java.security.PrivilegedAction;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -380,17 +382,23 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
      * @param authType The authentication algorithm
      * @return user's response
      */
-    private boolean askUser(X509Certificate[] chain, String authType,
-                            boolean isTrusted, boolean hostMatched,
-                            String hostName) {
+    private boolean askUser(final X509Certificate[] chain, final String authType,
+                            final boolean isTrusted, final boolean hostMatched,
+                            final String hostName) {
         if (JNLPRuntime.isTrustAll()){
             return true;
         }
-        return SecurityDialogs.showCertWarningDialog(
+        final VariableX509TrustManager trustManager = this;
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            @Override
+            public Boolean run() {
+                return SecurityDialogs.showCertWarningDialog(
                         AccessType.UNVERIFIED, null,
-                        new HttpsCertVerifier(this, chain, authType,
+                        new HttpsCertVerifier(trustManager, chain, authType,
                                               isTrusted, hostMatched,
                                               hostName));
+            }
+        });
     }
 
     /**
