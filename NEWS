@@ -27,6 +27,7 @@ Common
   - PR789: typo in jrunscript.sh
   - RH734081: Javaws cannot use proxy settings from Firefox
   - RH738814: Access denied at ssl handshake
+  - Support for authenticating using client certificates
 
 New in release 1.1 (2011-XX-XX):
 * Security updates

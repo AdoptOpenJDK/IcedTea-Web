@@ -66,6 +66,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -100,6 +101,7 @@ public class CertificatePane extends JPanel {
             new CertificateType(KeyStores.Type.JSSE_CA_CERTS),
             new CertificateType(KeyStores.Type.CERTS),
             new CertificateType(KeyStores.Type.JSSE_CERTS),
+            new CertificateType(KeyStores.Type.CLIENT_CERTS)
         };
 
     JTabbedPane tabbedPane;
@@ -301,6 +303,18 @@ public class CertificatePane extends JPanel {
         }
     }
 
+    private char[] getPassword(final String label) {
+        JPasswordField jpf = new JPasswordField();
+        int result = JOptionPane.showConfirmDialog(parent,
+                                new Object[]{label, jpf},  R("CVPasswordTitle"),
+                                JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.INFORMATION_MESSAGE);
+        if (result == JOptionPane.OK_OPTION)
+            return jpf.getPassword();
+        else
+            return null;
+    }
+
     /** Allows storing KeyStores.Types in a JComponent */
     private static class CertificateType {
         private final KeyStores.Type type;
@@ -364,7 +378,17 @@ public class CertificatePane extends JPanel {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 try {
                     KeyStore ks = keyStore;
-                    CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
+                    if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
+                        char[] password = getPassword(R("CVImportPasswordMessage"));
+                        if (password != null) {
+                            CertificateUtils.addPKCS12ToKeyStore(
+                                       chooser.getSelectedFile(), ks, password);
+                        } else {
+                            return;
+                        }
+                    } else {
+                        CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
+                    }
                     File keyStoreFile = new File(KeyStores
                                         .getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
                     if (!keyStoreFile.isFile()) {
@@ -408,9 +432,15 @@ public class CertificatePane extends JPanel {
                         String alias = keyStore.getCertificateAlias(certs
                                                         .get(selectedRow));
                         if (alias != null) {
-                            Certificate c = keyStore.getCertificate(alias);
-                            PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
-                            CertificateUtils.dump(c, ps);
+                            if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
+                                char[] password = getPassword(R("CVExportPasswordMessage"));
+                                if (password != null)
+                                    CertificateUtils.dumpPKCS12(alias, chooser.getSelectedFile(), keyStore, password);
+                            } else {
+                                Certificate c = keyStore.getCertificate(alias);
+                                PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
+                                CertificateUtils.dump(c, ps);
+                            }
                             repopulateTables();
                         }
                     }

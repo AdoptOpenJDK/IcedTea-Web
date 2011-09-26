@@ -1,3 +1,19 @@
+2011-09-26  Lars Herschke  <lhersch@dssgmbh.de>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
+	CVExportPasswordMessage, CVImportPasswordMessage and
+	CVPasswordTitle.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java (initialize):
+	Initialize SSLContext with the user's client certificates.
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java
+	(addPKCS12ToKeyStore, addPKCS12ToKeyStore, dumpPKCS12): New methods.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	(getPasswords): New method.
+	(ImportButtonListener.actionPerformed): Import client certificates
+	in PKCS12 format.
+	(ExportButtonListener.actionPerformed): Export client certificates
+	in PKCS12 format.
+
 2011-09-23  Omair Majid  <omajid@redhat.com>
 
 	RH738814: Access denied at ssl handshake

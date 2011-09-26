@@ -29,6 +29,7 @@ import java.security.*;
 import javax.jnlp.*;
 import javax.naming.ConfigurationException;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -225,8 +226,11 @@ public class JNLPRuntime {
         try {
             SSLSocketFactory sslSocketFactory;
             SSLContext context = SSLContext.getInstance("SSL");
+            KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS);
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            kmf.init(ks, KeyStores.getPassword());
             TrustManager[] trust = new TrustManager[] { VariableX509TrustManager.getInstance() };
-            context.init(null, trust, null);
+            context.init(kmf.getKeyManagers(), trust, null);
             sslSocketFactory = context.getSocketFactory();
 
             HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
