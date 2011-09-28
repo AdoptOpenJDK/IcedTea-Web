@@ -35,6 +35,7 @@ import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -1019,7 +1020,11 @@ public class JNLPClassLoader extends URLClassLoader {
 
                             JarFile jarFile = new JarFile(localFile.getAbsolutePath());
                             Manifest mf = jarFile.getManifest();
-                            classpaths.addAll(getClassPathsFromManifest(mf, jar.getLocation().getPath()));
+
+                            if (file instanceof PluginBridge) {
+                                classpaths.addAll(getClassPathsFromManifest(mf, jar.getLocation().getPath()));
+                            }
+
                             JarIndex index = JarIndex.getJarIndex(jarFile, null);
                             if (index != null)
                                 jarIndexes.add(index);
@@ -1334,7 +1339,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * is downloaded.
      * @param desc the JARDesc for the new jar
      */
-    private void addNewJar(JARDesc desc) {
+    private void addNewJar(final JARDesc desc) {
 
         available.add(desc);
 
@@ -1344,10 +1349,72 @@ public class JNLPClassLoader extends URLClassLoader {
                 JNLPRuntime.getDefaultUpdatePolicy()
                 );
 
-        URL remoteURL = desc.getLocation();
-        URL cachedUrl = tracker.getCacheURL(remoteURL);
-        addURL(remoteURL);
-        CachedJarFileCallback.getInstance().addMapping(remoteURL, cachedUrl);
+        // Give read permissions to the cached jar file
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+                Permission p = CacheUtil.getReadPermission(desc.getLocation(),
+                        desc.getVersion());
+
+                resourcePermissions.add(p);
+
+                return null;
+            }
+        });
+
+        final URL remoteURL = desc.getLocation();
+        final URL cachedUrl = tracker.getCacheURL(remoteURL); // blocks till download
+
+        available.remove(desc); // Resource downloaded. Remove from available list.
+        
+        try {
+
+            // Verify if needed
+
+            final JarSigner signer = new JarSigner();
+            final List<JARDesc> jars = new ArrayList<JARDesc>();
+            jars.add(desc);
+
+            // Decide what level of security this jar should have
+            // The verification and security setting functions rely on 
+            // having AllPermissions as those actions normally happen
+            // during initialization. We therefore need to do those 
+            // actions as privileged.
+
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
+                public Void run() throws Exception {
+                    signer.verifyJars(jars, tracker);
+
+                    if (signer.anyJarsSigned() && !signer.getAlreadyTrustPublisher()) {
+                        checkTrustWithUser(signer);
+                    }
+
+                    final SecurityDesc security;
+                    if (signer.anyJarsSigned()) {
+                        security = new SecurityDesc(file,
+                                SecurityDesc.ALL_PERMISSIONS,
+                                file.getCodeBase().getHost());
+                    } else {
+                        security = new SecurityDesc(file,
+                                SecurityDesc.SANDBOX_PERMISSIONS,
+                                file.getCodeBase().getHost());
+                    }
+
+                    jarLocationSecurityMap.put(remoteURL, security);
+
+                    return null;
+                }
+            });
+
+            addURL(remoteURL);
+            CachedJarFileCallback.getInstance().addMapping(remoteURL, cachedUrl);
+
+        } catch (Exception e) {
+            // Do nothing. This code is called by loadClass which cannot 
+            // throw additional exceptions. So instead, just ignore it. 
+            // Exception => jar will not get added to classpath, which will 
+            // result in CNFE from loadClass.
+            e.printStackTrace();
+        }
     }
 
     /**

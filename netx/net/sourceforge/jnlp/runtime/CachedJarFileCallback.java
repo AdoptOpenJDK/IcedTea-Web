@@ -94,7 +94,24 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
 
         if (UrlUtils.isLocalFile(localUrl)) {
             // if it is known to us, just return the cached file
-            return new JarFile(localUrl.getPath());
+            JarFile returnFile = new JarFile(localUrl.getPath());
+            
+            try {
+                
+                // Blank out the class-path because:
+                // 1) Web Start does not support it
+                // 2) For the plug-in, we want to cache files from class-path so we do it manually
+                returnFile.getManifest().getMainAttributes().putValue("Class-Path", "");
+
+                if (JNLPRuntime.isDebug()) {
+                    System.err.println("Class-Path attribute cleared for " + returnFile.getName());
+                }
+
+            } catch (NullPointerException npe) {
+                // Discard NPE here. Maybe there was no manifest, maybe there were no attributes, etc.
+            }
+
+            return returnFile;
         } else {
             // throw new IllegalStateException("a non-local file in cache");
             return null;

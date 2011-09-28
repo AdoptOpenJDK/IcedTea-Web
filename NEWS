@@ -25,6 +25,7 @@ Common
   - PR742: IcedTea-Web checks certs only upto 1 level deep before declaring them untrusted.
   - PR769: IcedTea-Web does not work with some ssl sites with OpenJDK7
   - PR789: typo in jrunscript.sh
+  - PR794: IcedTea-Web does not work if a Web Start app jar has a Class-Path element in the manifest
   - RH734081: Javaws cannot use proxy settings from Firefox
   - RH738814: Access denied at ssl handshake
   - Support for authenticating using client certificates

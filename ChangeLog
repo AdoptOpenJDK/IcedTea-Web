@@ -1,3 +1,14 @@
+2011-09-28  Deepak Bhole <dbhole@redhat.com>
+
+	PR794: IcedTea-Web does not work if a Web Start app jar has a Class-Path
+	element in the manifest.
+	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java
+	(retrieve): Blank out the Class-Path elements in manifest.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(activateJars): Only load Class-Path elements if this is an applet.
+	(addNewJar): Add the right permissions for the cached jar file and verify
+	signatures. 
+
 2011-09-26  Lars Herschke  <lhersch@dssgmbh.de>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add
