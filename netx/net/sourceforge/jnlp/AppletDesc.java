@@ -73,7 +73,7 @@ public class AppletDesc {
     }
 
     /**
-     * Returns the main class name
+     * Returns the main class name in the dot-separated form (eg: foo.bar.Baz)
      */
     public String getMainClass() {
         return mainClass;

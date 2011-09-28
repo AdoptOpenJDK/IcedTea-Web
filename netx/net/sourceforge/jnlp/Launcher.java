@@ -704,10 +704,6 @@ public class Launcher {
             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
             String appletName = file.getApplet().getMainClass();
-
-            //Classloader chokes if there's '/' in the path to the main class.
-            //Must replace with '.' instead.
-            appletName = appletName.replace('/', '.');
             Class appletClass = loader.loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
 
@@ -744,10 +740,6 @@ public class Launcher {
             }
 
             String appletName = file.getApplet().getMainClass();
-
-            //Classloader chokes if there's '/' in the path to the main class.
-            //Must replace with '.' instead.
-            appletName = appletName.replace('/', '.');
             Class appletClass = loader.loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
 

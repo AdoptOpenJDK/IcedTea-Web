@@ -1,3 +1,14 @@
+2011-09-28 Omair Majid <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/AppletDesc.java (getMainClass): Clarify the
+	return value in javadoc.
+	* netx/net/sourceforge/jnlp/Launcher.java
+	(createApplet, createAppletObject): Do not replace '/' with '.'.
+	* netx/net/sourceforge/jnlp/PluginBridge.java (PluginBridge): Ensure that
+	the class name is in the dot-separated from.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(checkForMain): Ensure that the name is an exact match.
+
 2011-09-28  Deepak Bhole <dbhole@redhat.com>
 
 	PR794: IcedTea-Web does not work if a Web Start app jar has a Class-Path

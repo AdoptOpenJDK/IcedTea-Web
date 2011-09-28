@@ -580,6 +580,7 @@ public class JNLPClassLoader extends URLClassLoader {
             mainClass = ad.getMainClass();
         } else
             return;
+        String desiredJarEntryName = mainClass + ".class";
 
         for (int i = 0; i < jars.size(); i++) {
 
@@ -599,9 +600,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 while (entries.hasMoreElements()) {
                     je = entries.nextElement();
                     String jeName = je.getName().replaceAll("/", ".");
-
-                    if (!jeName.startsWith(mainClass + "$Inner")
-                            && (jeName.startsWith(mainClass) && jeName.endsWith(".class"))) {
+                    if (jeName.equals(desiredJarEntryName)) {
                         foundMainJar = true;
                         verifySignedJNLP(jars.get(i), jarFile);
                         break;

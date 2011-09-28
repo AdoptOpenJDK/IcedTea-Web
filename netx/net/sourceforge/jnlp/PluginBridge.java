@@ -133,7 +133,9 @@ public class PluginBridge extends JNLPFile {
         if (main.endsWith(".class"))
             main = main.substring(0, main.length() - 6);
 
-        launchType = new AppletDesc(name, main, documentBase, width,
+        // the class name should be of the form foo.bar.Baz not foo/bar/Baz
+        String mainClass = main.replace('/', '.');
+        launchType = new AppletDesc(name, mainClass, documentBase, width,
                                     height, atts);
 
         if (main.endsWith(".class")) //single class file only
