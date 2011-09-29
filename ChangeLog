@@ -1,4 +1,15 @@
-2011-09-28 Omair Majid <omajid@redhat.com>
+2011-09-29  Omair Majid  <omajid@redhat.com>
+
+	PR618: Can't install OpenDJ, JavaWebStart fails with Input stream is null
+	error.
+	* NEWS: Update.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getResource): Rename to ...
+	(findResource): New method.
+	(findResources): If resource can not be found, search in lazy resources.
+	(findResourcesBySearching): New method.
+
+2011-09-28  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/AppletDesc.java (getMainClass): Clarify the
 	return value in javadoc.

@@ -13,6 +13,7 @@ New in release 1.2 (2011-XX-XX):
 	- RH718164, CVE-2011-2513: Home directory path disclosure to untrusted applications
 	- RH718170, CVE-2011-2514: Java Web Start security warning dialog manipulation
 * NetX
+  - PR618: Can't install OpenDJ, JavaWebStart fails with Input stream is null error
   - PR765: JNLP file with all resource jars marked as 'lazy' fails to validate signature and stops the launch of application
   - PR788: Elluminate Live! is not working
 * Plugin

@@ -1484,31 +1484,64 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Finds the resource in this, the parent, or the extension
      * class loaders.
+     *
+     * @return a <code>URL</code> for the resource, or <code>null</code>
+     * if the resource could not be found.
      */
-    public URL getResource(String name) {
-        URL result = super.getResource(name);
+    @Override
+    public URL findResource(String name) {
+        URL result = null;
 
-        for (int i = 1; i < loaders.length; i++)
-            if (result == null)
-                result = loaders[i].getResource(name);
+        try {
+            Enumeration<URL> e = findResources(name);
+            if (e.hasMoreElements()) {
+                result = e.nextElement();
+            }
+        } catch (IOException e) {
+            if (JNLPRuntime.isDebug()) {
+                e.printStackTrace();
+            }
+        }
         
         // If result is still null, look in the codebase loader
         if (result == null && codeBaseLoader != null)
-            result = codeBaseLoader.getResource(name);
+            result = codeBaseLoader.findResource(name);
 
         return result;
     }
 
     /**
-     * Finds the resource in this, the parent, or the extension
-     * class loaders.
+     * Find the resources in this, the parent, or the extension
+     * class loaders. Load lazy resources if not found in current resources.
      */
     @Override
     public Enumeration<URL> findResources(String name) throws IOException {
-        Vector<URL> resources = new Vector<URL>();
+        Enumeration<URL> resources = findResourcesBySearching(name);
+
+        try {
+            // if not found, load all lazy resources; repeat search
+            while (!resources.hasMoreElements() && addNextResource() != null) {
+                resources = findResourcesBySearching(name);
+            }
+        } catch (LaunchException le) {
+            le.printStackTrace();
+        }
+
+        return resources;
+    }
+
+    /**
+     * Find the resources in this, the parent, or the extension
+     * class loaders.
+     */
+    private Enumeration<URL> findResourcesBySearching(String name) throws IOException {
+        List<URL> resources = new ArrayList<URL>();
         Enumeration<URL> e;
 
         for (int i = 0; i < loaders.length; i++) {
+            // TODO check if this will blow up or not
+            // if loaders[1].getResource() is called, wont it call getResource() on
+            // the original caller? infinite recursion?
 
             if (loaders[i] == this)
                 e = super.findResources(name);
@@ -1527,7 +1560,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 resources.add(e.nextElement());
         }
 
-        return resources.elements();
+        return Collections.enumeration(resources);
     }
 
     /**
