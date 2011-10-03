@@ -1,3 +1,15 @@
+2011-10-03  Jiri Vanek <jvanek@redhat.com>
+
+	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/resources/ReadPropertiesBySignedHack.jnlp
+	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/srcs/ReadPropertiesBySignedHack.java
+	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/testcases/ReadPropertiesBySignedHackTest.java
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned1.jnlp
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned2.jnlp
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/srcs/ReadPropertiesSigned.java
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java
+	Direcory signed was somehow missing from my commit from 2011-09-22. 
+	Now it  have been added with all its original files
+
 2011-09-29  Omair Majid  <omajid@redhat.com>
 
 	PR618: Can't install OpenDJ, JavaWebStart fails with Input stream is null
