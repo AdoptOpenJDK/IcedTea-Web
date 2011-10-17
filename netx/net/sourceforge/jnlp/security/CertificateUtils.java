@@ -60,7 +60,7 @@ import java.util.Enumeration;
 import java.util.Random;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import sun.misc.BASE64Encoder;
+import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
 import sun.security.provider.X509Factory;
 
 /**

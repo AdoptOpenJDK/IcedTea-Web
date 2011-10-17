@@ -1,3 +1,17 @@
+2011-10-17  Jiri Vanek <jvanek@redhat.com>   
+    
+	PR564: NetX depends on sun.misc.BASE64Encoder
+	* configure.ac: removed IT564 comment, removed check for sun.misc.BASE64Encoder
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java : sun.misc.BASE64Encoder;
+	replaced (just changed import) by internal implementation from
+	net.sourceforge.jnlp.util.replacements.BASE64Encoder;
+	* netx/net/sourceforge/jnlp/util/replacements/BASE64Encoder.java:
+	* netx/net/sourceforge/jnlp/util/replacements/CharacterEncoder.java:
+	New files, internal implementation of BASE64Encoder,  copied from OpenJDK
+	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64EncoderTest.java
+	New file, to test internal base64encoder implementation
+
+
 2011-10-03  Jiri Vanek <jvanek@redhat.com>
 
 	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/resources/ReadPropertiesBySignedHack.jnlp
