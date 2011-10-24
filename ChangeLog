@@ -1,3 +1,16 @@
+2011-10-24  Jiri Vanek <jvanek@redhat.com>  
+ 
+	Added reproducer for - PR788: Elluminate Live! is not working
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar.jnlp
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar2.jnlp
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar3.jnlp
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar4.jnlp
+	four testcases's jnlp files. Differs by order and by used resoure tags
+	* tests/jnlp_tests/signed/MissingJar/srcs/MissingJar.java
+	very simple main jar, just printing message when initialized
+	* tests/jnlp_tests/signed/MissingJar/testcases/MissingJarTest.java
+	testing file of reproducer, launchiing above four jnlp files, each in individual test
+
 2011-10-17  Jiri Vanek <jvanek@redhat.com>   
     
 	PR564: NetX depends on sun.misc.BASE64Encoder
