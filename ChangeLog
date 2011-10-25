@@ -1,3 +1,10 @@
+2011-10-25  Omair Majid  <omajid@redhat.com>
+
+	PR804: javaws launcher incorrectly handles file names with spaces
+	* NEWS: Update.
+	* launcher/javaws.in: Use bash arrays to store arguments to handle
+	filenames with spaces correctly.
+
 2011-10-24  Jiri Vanek <jvanek@redhat.com>  
  
 	Added reproducer for - PR788: Elluminate Live! is not working

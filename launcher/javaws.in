@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 JAVA=@JAVA@
 LAUNCHER_BOOTCLASSPATH=@LAUNCHER_BOOTCLASSPATH@
@@ -8,27 +8,57 @@ BINARY_LOCATION=@JAVAWS_BIN_LOCATION@
 PROGRAM_NAME=javaws
 CP=@JRE@/lib/rt.jar
 
-JAVA_ARGS=
-ARGS=
+JAVA_ARGS=( )
+ARGS=( )
+COMMAND=()
+
+i=0
+j=0
 
 while [ "$#" -gt "0" ]; do
   case "$1" in
     -J*)
-      JAVA_ARGS="${JAVA_ARGS} ${1##-J}"
+      JAVA_ARGS[$i]="${1##-J}"
+      i=$((i+1))
       ;;
     *)
-      ARGS="${ARGS} $1"
+      ARGS[$j]="$1"
+      j=$((j+1))
       ;;
   esac
   shift
 done
 
-${JAVA} ${LAUNCHER_BOOTCLASSPATH} ${LAUNCHER_FLAGS} \
-  ${JAVA_ARGS} \
-  -classpath ${CP} \
-  -Dicedtea-web.bin.name=${PROGRAM_NAME} \
-  -Dicedtea-web.bin.location=${BINARY_LOCATION} \
-  ${CLASSNAME} \
-  ${ARGS}
+k=0
+COMMAND[k]="${JAVA}"
+k=$((k+1))
+COMMAND[k]="${LAUNCHER_BOOTCLASSPATH}"
+k=$((k+1))
+COMMAND[k]="${LAUNCHER_FLAGS}"
+k=$((k+1))
+i=0
+while [ "$i" -lt "${#JAVA_ARGS[@]}" ]; do
+  COMMAND[k]="${JAVA_ARGS[$i]}"
+  i=$((i+1))
+  k=$((k+1))
+done
+COMMAND[k]="-classpath"
+k=$((k+1))
+COMMAND[k]="${CP}"
+k=$((k+1))
+COMMAND[k]="-Dicedtea-web.bin.name=${PROGRAM_NAME}"
+k=$((k+1))
+COMMAND[k]="-Dicedtea-web.bin.location=${BINARY_LOCATION}"
+k=$((k+1))
+COMMAND[k]="${CLASSNAME}"
+k=$((k+1))
+j=0
+while [ "$j" -lt "${#ARGS[@]}" ]; do
+  COMMAND[k]="${ARGS[$j]}"
+  j=$((j+1))
+  k=$((k+1))
+done
+
+"${COMMAND[@]}"
 
 exit $?
