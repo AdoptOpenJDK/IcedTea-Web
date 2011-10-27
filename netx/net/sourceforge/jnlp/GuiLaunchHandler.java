@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import javax.swing.SwingUtilities;
@@ -95,20 +96,40 @@ public class GuiLaunchHandler implements LaunchHandler {
 
     @Override
     public void launchInitialized(final JNLPFile file) {
+        
+        int preferredWidth = 500;
+        int preferredHeight = 400;
+
+        final URL splashImageURL = file.getInformation().getIconLocation(
+                IconDesc.SPLASH, preferredWidth, preferredHeight);
+
+        if (splashImageURL != null) {
+            final ResourceTracker resourceTracker = new ResourceTracker(true);
+            resourceTracker.addResource(splashImageURL, file.getFileVersion(), null, policy);
+            synchronized(mutex) {
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            splashScreen = new JNLPSplashScreen(resourceTracker, null, null);
+                        }
+                    });
+                } catch (InterruptedException ie) {
+                    // Wait till splash screen is created
+                    while (splashScreen == null);
+                } catch (InvocationTargetException ite) {
+                    ite.printStackTrace();
+                }
+
+                splashScreen.setSplashImageURL(splashImageURL);
+            }
+        }
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final int preferredWidth = 500;
-                final int preferredHeight = 400;
-
-                URL splashImageURL = file.getInformation().getIconLocation(
-                        IconDesc.SPLASH, preferredWidth, preferredHeight);
                 if (splashImageURL != null) {
-                    ResourceTracker resourceTracker = new ResourceTracker(true);
-                    resourceTracker.addResource(splashImageURL, file.getFileVersion(), null, policy);
                     synchronized(mutex) {
-                        splashScreen = new JNLPSplashScreen(resourceTracker, null, null);
-                        splashScreen.setSplashImageURL(splashImageURL);
                         if (splashScreen.isSplashScreenValid()) {
                             splashScreen.setVisible(true);
                         }

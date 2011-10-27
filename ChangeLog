@@ -1,3 +1,11 @@
+2011-10-27  Deepak Bhole <dbhole@redhat.com>
+
+	PR778: Jar download and server certificate verification deadlock
+	* ChangeLog: Removed extra whitespace from previous entries
+	* NEWS: Updated
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java (launchInitialized):
+	Moved as much code as possible out of the invokeLater block. 
+
 2011-10-25  Omair Majid  <omajid@redhat.com>
 
 	PR804: javaws launcher incorrectly handles file names with spaces
@@ -6,7 +14,7 @@
 	filenames with spaces correctly.
 
 2011-10-24  Jiri Vanek <jvanek@redhat.com>  
- 
+
 	Added reproducer for - PR788: Elluminate Live! is not working
 	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar.jnlp
 	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar2.jnlp
@@ -19,7 +27,7 @@
 	testing file of reproducer, launchiing above four jnlp files, each in individual test
 
 2011-10-17  Jiri Vanek <jvanek@redhat.com>   
-    
+
 	PR564: NetX depends on sun.misc.BASE64Encoder
 	* configure.ac: removed IT564 comment, removed check for sun.misc.BASE64Encoder
 	* netx/net/sourceforge/jnlp/security/CertificateUtils.java : sun.misc.BASE64Encoder;
