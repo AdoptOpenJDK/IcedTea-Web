@@ -1,3 +1,11 @@
+2011-10-28  Deepak Bhole <dbhole@redhat.com>
+
+	RH742515, CVE-2011-3377: IcedTea-Web: second-level domain subdomains and
+	suffix domain SOP bypass
+	* NEWS: Updated
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java
+	(checkPermission): Remove special case for SocketPermission.
+
 2011-10-27  Deepak Bhole <dbhole@redhat.com>
 
 	PR778: Jar download and server certificate verification deadlock

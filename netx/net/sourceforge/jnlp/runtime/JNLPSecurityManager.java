@@ -281,75 +281,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
             //                }
             //            }
 
-            try {
-                super.checkPermission(perm);
-            } catch (SecurityException se) {
-
-                //This section is a special case for dealing with SocketPermissions.
-                if (JNLPRuntime.isDebug())
-                    System.err.println("Requesting permission: " + perm.toString());
-
-                //Change this SocketPermission's action to connect and accept
-                //(and resolve). This is to avoid asking for connect permission
-                //on every address resolve.
-                Permission tmpPerm = null;
-                if (perm instanceof SocketPermission) {
-                    tmpPerm = new SocketPermission(perm.getName(),
-                                                        SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION);
-
-                    // before proceeding, check if we are trying to connect to same origin
-                    ApplicationInstance app = getApplication();
-                    JNLPFile file = app.getJNLPFile();
-
-                    String srcHost = file.getSourceLocation().getAuthority();
-                    String destHost = name;
-
-                    // host = abc.xyz.com or abc.xyz.com:<port>
-                    if (destHost.indexOf(':') >= 0)
-                        destHost = destHost.substring(0, destHost.indexOf(':'));
-
-                    // host = abc.xyz.com
-                    String[] hostComponents = destHost.split("\\.");
-
-                    int length = hostComponents.length;
-                    if (length >= 2) {
-
-                        // address is in xxx.xxx.xxx format
-                        destHost = hostComponents[length - 2] + "." + hostComponents[length - 1];
-
-                        // host = xyz.com i.e. origin
-                        boolean isDestHostName = false;
-
-                        // make sure that it is not an ip address
-                        try {
-                            Integer.parseInt(hostComponents[length - 1]);
-                        } catch (NumberFormatException e) {
-                            isDestHostName = true;
-                        }
-
-                        if (isDestHostName) {
-                            // okay, destination is hostname. Now figure out if it is a subset of origin
-                            if (srcHost.endsWith(destHost)) {
-                                addPermission(tmpPerm);
-                                return;
-                            }
-                        }
-                    }
-                } else {
-                    tmpPerm = perm;
-                }
-
-                if (tmpPerm != null) {
-                    //askPermission will only prompt the user on SocketPermission
-                    //meaning we're denying all other SecurityExceptions that may arise.
-                    if (askPermission(tmpPerm)) {
-                        addPermission(tmpPerm);
-                        //return quietly.
-                    } else {
-                        throw se;
-                    }
-                }
-            }
+            super.checkPermission(perm);
         } catch (SecurityException ex) {
             if (JNLPRuntime.isDebug()) {
                 System.out.println("Denying permission: " + perm);
