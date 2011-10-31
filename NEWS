@@ -29,6 +29,7 @@ Common
   - PR778: Jar download and server certificate verification deadlock
   - PR789: typo in jrunscript.sh
   - PR794: IcedTea-Web does not work if a Web Start app jar has a Class-Path element in the manifest
+  - PR808: javaws is unable to start, when missing jars are enumerated before main jar
   - RH734081: Javaws cannot use proxy settings from Firefox
   - RH738814: Access denied at ssl handshake
   - Support for authenticating using client certificates

@@ -194,7 +194,7 @@ public class JarSigner implements CertVerifier {
                 // some sort of resource download/cache error. Nothing to add
                 // in that case ... but don't fail here
                 if (jarFile == null) {
-                    return;
+                    continue;
                 }
 
                 String localFile = jarFile.getAbsolutePath();

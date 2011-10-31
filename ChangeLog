@@ -1,3 +1,11 @@
+2011-10-31  Omair Majid  <omajid@redhat.com>
+
+	PR808: javaws is unable to start when missing jars are enumerated before
+	main jar
+	* NEWS: Update.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java (verifyJars): Continue
+	with other jars if the first jar can't be used.
+
 2011-10-27  Deepak Bhole <dbhole@redhat.com>
 
 	PR778: Jar download and server certificate verification deadlock
