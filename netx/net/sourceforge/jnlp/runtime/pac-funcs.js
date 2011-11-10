@@ -325,18 +325,20 @@ function weekdayRange() {
  * of the above ways of calling.
  */
 function dateRange() {
+    switch (arguments.length) {
+       case 1: return isDateInRange(new Date(),arguments[0]);
+       case 2: return isDateInRange(new Date(),arguments[0],arguments[1]);
+       case 3: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2]);
+       case 4: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2],arguments[3]);
+       case 5: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4]);
+       case 6: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5]);
+       case 7: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5],arguments[6]); //GMT
+       default:
+           return false;
+    }
+}
 
-    // note: watch out for wrapping around of dates. date ranges, like
-    // month=9 to month=8, wrap around and cover the entire year. this
-    // makes everything more interesting
-
-    var gmt;
-	if (arguments.length > 1) {
-		if (arguments[arguments.length-1] === "GMT") {
-			gmt = true;
-            arguments.splice(0,arguments.length-1);
-        }
-	}
+    function isDateInRange() {
 
     function isDate(date) {
         if (typeof(date) === 'number' && (date <= 31 && date >= 1)) {
@@ -578,8 +580,19 @@ function dateRange() {
         }
     }
 
+    // note: watch out for wrapping around of dates. date ranges, like
+    // month=9 to month=8, wrap around and cover the entire year. this
+    // makes everything more interesting
+
+    var gmt;
+	if (arguments.length > 2) {
+		if (arguments[arguments.length-1] === "GMT") {
+			gmt = true;
+            arguments.splice(0,arguments.length-1);
+        }
+	}
     // TODO: change date to gmt, whatever
-    var today = new Date();
+    var today = arguments[0]
 
     var arg1;
     var arg2;
@@ -588,9 +601,9 @@ function dateRange() {
     var arg5;
     var arg6;
 
-    switch (arguments.length) {
+    switch (arguments.length-1) {
         case 1:
-            var arg = arguments[0];
+            var arg = arguments[1];
             if (isDate(arg)) {
                 if (today.getDate() === arg) {
                     return true;
@@ -611,8 +624,8 @@ function dateRange() {
                 }
             }
         case 2:
-            arg1 = arguments[0];
-            arg2 = arguments[1];
+            arg1 = arguments[1];
+            arg2 = arguments[2];
             if (isDate(arg1) && isDate(arg2)) {
                 var date1 = arg1;
                 var date2 = arg2;
@@ -634,10 +647,10 @@ function dateRange() {
                 return false;
             }
         case 4:
-            arg1 = arguments[0];
-            arg2 = arguments[1];
-            arg3 = arguments[2];
-            arg4 = arguments[3];
+            arg1 = arguments[1];
+            arg2 = arguments[2];
+            arg3 = arguments[3];
+            arg4 = arguments[4];
 
             if (isDate(arg1) && isMonth(arg2) && isDate(arg3) && isMonth(arg4)) {
                 var date1 = arg1;
@@ -658,12 +671,12 @@ function dateRange() {
                 return false;
             }
         case 6:
-            arg1 = arguments[0];
-            arg2 = arguments[1];
-            arg3 = arguments[2];
-            arg4 = arguments[3];
-            arg5 = arguments[4];
-            arg6 = arguments[5];
+            arg1 = arguments[1];
+            arg2 = arguments[2];
+            arg3 = arguments[3];
+            arg4 = arguments[4];
+            arg5 = arguments[5];
+            arg6 = arguments[6];
             if (isDate(arg1) && isMonth(arg2) && isYear(arg3) &&
                 isDate(arg4) && isMonth(arg5) && isYear(arg6)) {
                 var day1 = arg1;

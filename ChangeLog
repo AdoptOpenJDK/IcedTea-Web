@@ -1,3 +1,18 @@
+2011-11-10  Jiri Vanek <jvanek at redhat.com>
+	
+	Added tests which covers corner cases or rhino support function dateRange
+	Enabled testWeekdayRange test
+	* tests/netx/pac/pac-funcs-test.js: (testWeekdayRange) - added mising
+	runTests call
+	(incDate) (decDate) (monthToStr) moved level up from function scope
+	to be shareable
+	(testDateRange2) new method, tests last days of months.
+	(testDateRange3) new method, tests first days of months
+	* netx/net/sourceforge/jnlp/runtime/pac-funcs.js:
+	(dateRange) logic of this method moved to isDateInRange. This one now serve
+	just as api using current date
+	(isDateInRange) logic of dateRange, can calculate ranges against any date
+
 2011-10-31  Omair Majid  <omajid@redhat.com>
 
 	PR808: javaws is unable to start when missing jars are enumerated before

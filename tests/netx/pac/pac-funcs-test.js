@@ -21,9 +21,11 @@ function main() {
 	testDnsResolve();
 	testDnsDomainLevels();
 	testShExpMatch();
-	testWeekdayRange();
 	testDateRange();
 	testTimeRange();
+	testWeekdayRange();
+	testDateRange2();
+	testDateRange3();
 
 	java.lang.System.out.println("Test results: passed: " + testsPassed + "; failed: " + testsFailed + ";");
 }
@@ -235,9 +237,9 @@ function testWeekdayRange() {
        [ false, dayToStr(day+1) ],
        [ false, dayToStr(day-1) ],
     ];
-}
 
-function testDateRange() {
+    runTests(weekdayRange, tests);
+}
 
     function incDate(date) {
         return (date + 1 - 1) % 31 +1 ;
@@ -266,6 +268,9 @@ function testDateRange() {
             default: throw "Invalid Month";
         }
     }
+
+function testDateRange() {
+   
 
     var today = new Date();
     var date = today.getDate();
@@ -367,6 +372,80 @@ function testDateRange() {
 
     runTests(dateRange, tests);
 
+}
+
+function testDateRange2() {
+
+  var dates = [   
+	new Date("January 31, 2011 3:33:33"),
+	new Date("February 28, 2011 3:33:33"),
+	new Date("February 29, 2012 3:33:33"),
+	new Date("March 31, 2011 3:33:33"),
+	new Date("April 30, 2011 3:33:33"),
+	new Date("May 31, 2011 3:33:33"),
+	new Date("June 30, 2011 3:33:33"),
+	new Date("July 31, 2011 3:33:33"),
+	new Date("August 31, 2011 3:33:33"),
+	new Date("September 30, 2011 3:33:33"),
+	new Date("October 31, 2011 3:33:33"),
+	new Date("November 30, 2011 3:33:33"),
+	new Date("December 31, 2011 3:33:33"),
+
+]
+  for (var i = 0; i < dates.length; i++)  {
+      var today = dates[i];
+      var date = today.getDate();
+      var month = today.getMonth();
+      var year = today.getYear();
+
+      var tests = [
+
+        [ true, today, date, monthToStr(month) , incDate(date), monthToStr(month) ],
+        [ true, today, decDate(date), monthToStr(month) , incDate(date), monthToStr(month) ],
+        [ true, today, decDate(date), monthToStr(month), year, incDate(date), monthToStr(month), year ],
+        [ false, today, incDate(date), monthToStr(month), year, incDate(date), monthToStr(month+1), year+1 ],
+
+      ];
+
+      runTests(isDateInRange, tests);
+  }
+
+}
+
+function testDateRange3() {
+  var dates = [   
+	new Date("January 1, 2011 1:11:11"),
+	new Date("February 1, 2011 1:11:11"),
+	new Date("March 1, 2011 1:11:11"),
+	new Date("April 1, 2011 1:11:11"),
+	new Date("May 1, 2011 1:11:11"),
+	new Date("June 1, 2011 1:11:11"),
+	new Date("July 1, 2011 1:11:11"),
+	new Date("August 1, 2011 1:11:11"),
+	new Date("September 1, 2011 1:11:11"),
+	new Date("October 1, 2011 1:11:11"),
+	new Date("November 1, 2011 1:11:11"),
+	new Date("December 1, 2011 1:11:11"),
+
+    ]
+
+
+
+  for (var i = 0; i < dates.length; i++)  {
+    var today = dates[i]
+    var date = today.getDate();
+    var month = today.getMonth();
+    var year = today.getYear();
+
+    var tests = [
+      [ true, today, decDate(date), monthToStr(month) , date, monthToStr(month) ],
+      [ true, today, decDate(date), monthToStr(month) , incDate(date), monthToStr(month) ],
+      [ true, today, decDate(date), monthToStr(month), year, incDate(date), monthToStr(month), year ],
+
+    ];
+
+    runTests(isDateInRange, tests);
+  }
 }
 
 function testTimeRange() {
