@@ -473,22 +473,24 @@ junit-jnlp-dist-signed.txt:
 stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
 	types=(simple signed); \
 	for which in "$${types[@]}" ; do \
+	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    echo "processing: $$dir" ; \
-	    mkdir -p $(JNLP_TESTS_DIR)/$$dir ; \
+	    mkdir -p "$(JNLP_TESTS_DIR)/$$dir" ; \
 	    d=`pwd` ; \
-	    cd $(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/ ; \
+	    cd "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/" ; \
 	    srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
 	    notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
-	    $(BOOT_DIR)/bin/javac -d  $(JNLP_TESTS_DIR)/$$dir/ $$srcFiles ; \
+	    $(BOOT_DIR)/bin/javac -d  "$(JNLP_TESTS_DIR)/$$dir/" $$srcFiles ; \
 	    if [ -n "$$notSrcFiles" ] ; then \
-	      cp -R --parents $$notSrcFiles $(JNLP_TESTS_DIR)/$$dir/ ; \
+	      cp -R --parents "$$notSrcFiles" "$(JNLP_TESTS_DIR)/$$dir/" ; \
 	    fi ; \
-	    cd $(JNLP_TESTS_DIR)/$$dir/ ; \
-	    $(BOOT_DIR)/bin/jar cf $(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar * ; \
-	    cd $$d ; \
-	    cp -R $(JNLP_TESTS_SRCDIR)/$$which/$$dir/resources/*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
+	    cd "$(JNLP_TESTS_DIR)/$$dir/" ; \
+	    $(BOOT_DIR)/bin/jar cf "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" * ; \
+	    cd "$$d" ; \
+	    cp -R "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/resources/"*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
 	  done ; \
 	done ; \
 	mkdir -p stamps && \
@@ -499,9 +501,11 @@ stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepa
 	keystore=$(abs_top_builddir)/$(KEYSTORE_NAME); \
 	pass=123456789; \
 	$(BOOT_DIR)/bin/keytool -genkey -alias $$alias -keystore $$keystore -keypass $$pass -storepass $$pass -dname "cn=$$alias, ou=$$alias, o=$$alias, c=$$alias" ; \
+	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
 	signedReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-signed.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
 	for dir in "$${signedReproducers[@]}" ; do \
-	 $(BOOT_DIR)/bin/jarsigner -keystore $$keystore -storepass $$pass -keypass $$pass  $(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar  $$alias ; \
+	 $(BOOT_DIR)/bin/jarsigner -keystore $$keystore -storepass $$pass -keypass $$pass  "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$alias ; \
  	done ; \
  	mkdir -p stamps && \
  	touch $@
@@ -522,12 +526,14 @@ stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-j
  netx-dist-tests-source-files.txt stamps/netx-dist-tests-compile.stamp
 	types=(simple signed); \
 	for which in "$${types[@]}" ; do \
+	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	    -d $(JNLP_TESTS_ENGINE_DIR) \
 	    -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
-	    $(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/* ; \
+	    "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/"* ; \
 	  done ; \
 	done ; \
 	mkdir -p stamps && \

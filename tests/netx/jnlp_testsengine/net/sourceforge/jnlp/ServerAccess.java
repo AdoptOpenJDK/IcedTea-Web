@@ -53,7 +53,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -134,6 +136,7 @@ public class ServerAccess {
         findPortTestingSocket.close();
         return port;
     }
+    public static final  String HEADLES_OPTION="-headless";
 
     /**
      * we would like to have an singleton instance asap
@@ -454,7 +457,7 @@ public class ServerAccess {
             otherargs = new ArrayList<String>(1);
         }
         List<String> headlesList = new ArrayList<String>(otherargs);
-        headlesList.add("-headless");
+        headlesList.add(HEADLES_OPTION);
         return executeJavaws(headlesList, resource);
     }
 
@@ -515,6 +518,9 @@ public class ServerAccess {
         return executeProcess(urledArgs);
     }
 
+     public static ProcessResult executeProcess(final List<String> args) throws Exception {
+         return  executeProcess(args, null);
+     }
     /**
      * utility method to lunch process, get its stdou/stderr, its return value and to kill it if runing to long (@see PROCESS_TIMEOUT)
      *
@@ -527,12 +533,13 @@ public class ServerAccess {
      * Construct result from readed stdout, stderr, process return value, assasin sucessfulity
      *
      * @param args binary with args to be executed
+     * @param dir optional, directory where this process will run
      * @return what left from process - proces sitself, its stdout, stderr and return value and weather it was terminated by assasin.
      * @throws Exception
      */
-    public static ProcessResult executeProcess(final List<String> args) throws Exception {
+    public static ProcessResult executeProcess(final List<String> args,File dir) throws Exception {
 
-        ThreadedProcess t = new ThreadedProcess(args);
+        ThreadedProcess t = new ThreadedProcess(args,dir);
         ProcessAssasin pa = new ProcessAssasin(t, PROCESS_TIMEOUT);
         pa.start();
         t.start();
@@ -569,6 +576,7 @@ public class ServerAccess {
         List<String> args;
         Integer exitCode;
         Boolean running;
+        File dir;
 
         public Boolean isRunning() {
             return running;
@@ -580,6 +588,10 @@ public class ServerAccess {
 
         public ThreadedProcess(List<String> args) {
             this.args = args;
+        }
+         public ThreadedProcess(List<String> args,File dir) {
+            this.args = args;
+            this.dir=dir;
         }
 
         public String getCommandLine() {
@@ -608,7 +620,11 @@ public class ServerAccess {
             try {
                 running = true;
                 Runtime r = Runtime.getRuntime();
-                p = r.exec(args.toArray(new String[0]));
+                if (dir==null){
+                    p = r.exec(args.toArray(new String[0]));
+                }else{
+                    p = r.exec(args.toArray(new String[0]),new String[0], dir);
+                }
                 exitCode = p.waitFor();
             } catch (Exception ex) {
                 if (ex instanceof InterruptedException) {
@@ -744,6 +760,9 @@ public class ServerAccess {
                                 StringTokenizer t = new StringTokenizer(s, " ");
                                 t.nextToken();
                                 String p = t.nextToken();
+                                System.err.println("Getting: "+p);
+                                p=URLDecoder.decode(p, "UTF-8");
+                                System.err.println("Serving: "+p);
                                 p = (".".concat(((p.endsWith("/")) ? p.concat(
                                         "index.html") : p))).replace('/', File.separatorChar);
                                 File pp = new File(dir, p);

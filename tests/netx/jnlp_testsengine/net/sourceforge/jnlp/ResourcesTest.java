@@ -38,6 +38,7 @@ package net.sourceforge.jnlp;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.net.URI;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -45,7 +46,6 @@ import org.junit.Test;
 public class ResourcesTest {
 
     private static ServerAccess server = new ServerAccess();
-    
 
     @Test
     public void testResourcesExists() throws Exception {
@@ -64,9 +64,15 @@ public class ResourcesTest {
 
         for (int i = 0; i < simpleContent.length; i++) {
             File file = simpleContent[i];
-            System.err.println(file.getName());
+            System.err.print(file.getName());
+            //server port have in fact no usage in converting filename to uri-like-filename.
+            //But if there is null, instead if some number, then nullpointer exception is thrown (Integer->int).
+            //So I'm using "real" currently used port, instead of some random value.
+            URI u = new URI((String)null,(String)null,(String)null,server.getPort(),file.getName(),(String)null,null);
+            System.err.println(" ("+u.toString()+")");
+            String fname=u.toString();
             if (file.getName().toLowerCase().endsWith(".jnlp")) {
-                String c = server.getResourceAsString("/" + file.getName());
+                String c = server.getResourceAsString("/" + fname);
                 Assert.assertTrue(c.contains("<"));
                 Assert.assertTrue(c.contains(">"));
                 Assert.assertTrue(c.contains("jnlp"));
@@ -74,7 +80,7 @@ public class ResourcesTest {
                 Assert.assertTrue(c.replaceAll("\\s*", "").contains("</jnlp>"));
 
             } else {
-                byte[] c = server.getResourceAsBytes("/" + file.getName()).toByteArray();
+                byte[] c = server.getResourceAsBytes("/" + fname).toByteArray();
                 Assert.assertEquals(c.length, file.length());
             }
 
