@@ -1,3 +1,41 @@
+2011-11-11  Jiri Vanek  <jvanek@redhat.com>
+
+	Added reproducer for PR804 and PR8011
+	* tests/jnlp_tests/simple/Spaces can be everywhere/resources/Spaces can be everywhere1.jnlp:
+	new jnlp file with space in name and with jar in resources which name does not contain
+	spaces
+	* tests/jnlp_tests/simple/Spaces can be everywhere/resources/Spaces can be everywhere2.jnlp:
+	new jnlp file with space in name and with jar in resources which name contains spaces
+	* tests/jnlp_tests/simple/Spaces can be everywhere/resources/SpacesCanBeEverywhere1.jnlp:
+	jnlp file without space in name but with jar in resources which name contains spaces
+	* tests/jnlp_tests/simple/Spaces can be everywhere/srcs/SpacesCanBeEverywhere.java:
+	new file containig simple main method of "Spaces can be everywhere.jar" jar
+	* tests/jnlp_tests/simple/Spaces can be everywhere/testcases/SpacesCanBeEverywhereTests.java
+	testcase for this reproducer. It is lunching  each of this jnlp once locally from filesystem and
+	once remotely from server. Please note that except it's own jar, this reproducer is also
+	using simpletest1.jar
+
+2011-11-11  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed reproducers engine to handle spaces in files and in urls
+	* Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp)
+	(stamps/netx-dist-tests-sign-some-reproducers.stamp)
+	(stamps/netx-dist-tests-compile-testcases.stamp):
+	added call to NEW_LINE_IFS to use line breake temporarily as parameter
+	separator while loading files from list and correct quoting
+	* NEW_LINE_IFS: new file, small separate script used in makefile as inline script
+	which backup original IFS variable and then set it to pure new line. It is in
+	separate file because it is reused and I do not know another way how to save a new
+	line variable in makefile. Restore to original vlaue is handled in Makefile
+	*tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ResourcesTest.java:
+	(testResourcesExists) filename is encoded to correct URL before requested from server
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+	"-headless" string extracted to variable HEADLES_OPTION
+	(executeProcess) and (ThreadedProcess) enhanced for variable dir to specify working
+	directory. Backward compatibility kept
+	(TinyHttpdImpl) now expects url on requests, so all requests are now decoded by
+	java.net.URLDecoder 
+
 2011-11-10  Jiri Vanek <jvanek at redhat.com>
 	
 	Added tests which covers corner cases or rhino support function dateRange
