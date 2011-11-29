@@ -208,6 +208,66 @@ public class ServerAccess {
     }
 
     @Test
+    public void testsProcessResultFiltering() throws Exception {
+        ProcessResult pn = new ProcessResult(null, null, null, true, 0);
+        Assert.assertNull(pn.notFilteredStdout);
+        Assert.assertNull(pn.stdout);
+        Assert.assertNull(pn.stderr);
+        String fakeOut2 =
+                "EMMA: processing instrumentation path ...\n"
+                + "EMMA: package [net.sourceforge.filebrowser] contains classes [ArrayOfString] without full debug info\n"
+                + "EMMA: instrumentation path processed in 1407 ms\n"
+                + "test stage 1\n"
+                + "test stage 2\n"
+                + "EMMA: The intruder!\n"
+                + "test stage 3\n"
+                + "EMMA: [45 class(es) instrumented, 13 resource(s) copied]\n"
+                + "EMMA: metadata merged into [icedtea-web/inc] {in 105 ms}\n"
+                + "EMMA: processing instrumentation path ...";
+        String filteredOut2 =
+                "test stage 1\n"
+                + "test stage 2\n"
+                + "test stage 3\n";
+        ProcessResult p2 = new ProcessResult(fakeOut2, fakeOut2, null, true, 0);
+        Assert.assertEquals(p2.notFilteredStdout, fakeOut2);
+        Assert.assertEquals(p2.stdout, filteredOut2);
+        Assert.assertEquals(p2.stderr, fakeOut2);
+        fakeOut2+="\n";
+        p2 = new ProcessResult(fakeOut2, fakeOut2, null, true, 0);
+        Assert.assertEquals(p2.notFilteredStdout, fakeOut2);
+        Assert.assertEquals(p2.stdout, filteredOut2);
+        Assert.assertEquals(p2.stderr, fakeOut2);
+        String fakeOut =
+                "test string\n"
+                + "EMMA: processing instrumentation path ...\n"
+                + "EMMA: package [net.sourceforge.filebrowser] contains classes [ArrayOfString] without full debug info\n"
+                + "EMMA: instrumentation path processed in 1407 ms\n"
+                + "test stage 1\n"
+                + "test stage 2\n"
+                + "test stage 3\n"
+                + "EMMA: [45 class(es) instrumented, 13 resource(s) copied]\n"
+                + "EMMA: metadata merged into [icedtea-web/inc] {in 105 ms}\n"
+                + "EMMA: processing instrumentation path ...\n"
+                + "test ends";
+        String filteredOut =
+                "test string\n"
+                + "test stage 1\n"
+                + "test stage 2\n"
+                + "test stage 3\n"
+                + "test ends";
+        ProcessResult p = new ProcessResult(fakeOut, fakeOut, null, true, 0);
+        Assert.assertEquals(p.notFilteredStdout, fakeOut);
+        Assert.assertEquals(p.stdout, filteredOut);
+        Assert.assertEquals(p.stderr, fakeOut);
+        fakeOut+="\n";
+        filteredOut+="\n";
+        p = new ProcessResult(fakeOut, fakeOut, null, true, 0);
+        Assert.assertEquals(p.notFilteredStdout, fakeOut);
+        Assert.assertEquals(p.stdout, filteredOut);
+        Assert.assertEquals(p.stderr, fakeOut);
+    }
+
+    @Test
     public void ensureJavaws() throws Exception {
         String javawsValue = getJavawsLocation();
         Assert.assertNotNull(javawsValue);
@@ -215,8 +275,6 @@ public class ServerAccess {
         File javawsFile = getJavawsFile();
         Assert.assertTrue(javawsFile.exists());
         Assert.assertFalse(javawsFile.isDirectory());
-
-
     }
 
     @Test
@@ -864,13 +922,19 @@ public class ServerAccess {
     public static class ProcessResult {
 
         public final String stdout;
+        public final String notFilteredStdout;
         public final String stderr;
         public final Process process;
         public final Integer returnValue;
         public final boolean wasTerminated;
 
         public ProcessResult(String stdout, String stderr, Process process, boolean wasTerminated, Integer r) {
-            this.stdout = stdout;
+            this.notFilteredStdout = stdout;
+            if (stdout == null) {
+                this.stdout = null;
+            } else {
+                this.stdout = stdout.replaceAll("EMMA:.*\n?", "");
+            }
             this.stderr = stderr;
             this.process = process;
             this.wasTerminated = wasTerminated;

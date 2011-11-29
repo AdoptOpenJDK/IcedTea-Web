@@ -1,3 +1,26 @@
+2011-11-28 Jiri Vanek <jvanek@redhat.com>
+
+	Added code-coverage generation targets
+	* configure.ac: added search for optional emma.jar
+	* makefile.am: added UNIT_CLASS_NAMES and REPRODUCERS_CLASS_NAMES variables
+	to store tests clases for reuse in emmarun. Both also moved to separate target
+	(run-netx-unit-tests): made dependent on reused stamped version
+	(run-netx-dist-tests): made dependent on reused stamped version
+	(stamps/run-netx-dist-tests): stamped rusable version of run-netx-dist-tests
+	(run-unit-test-code-coverage) targets to generate report from unit-tests. 
+	 Result binary and xml file and html report in tests.build/netx/unit
+	(run-reproducers-test-code-coverage) targets to generate report from
+	 reproducers-test. Result binary file, xml and html report in
+	 tests.build/netx/jnlp_testsengine
+	(run-test-code-coverage): merges binary results from unit and reproducers
+	(clean-unit-test-code-coverage) conditionaly removes html,xml report
+	 and es and ec files from tests.build/netx/unit
+	(clean-reproducers-test-code-coverage) condtionlay removes html and xml 
+	 report and es file from tests.build/netx/jnlp_testsengine
+	(clean-test-code-coverage) conditionlay removes merged html, xml es and em 
+	files from tests.build
+	(clean-netx-tests) now depends also on clean-test-code-coverage
+
 2011-11-11  Jiri Vanek  <jvanek@redhat.com>
 
 	Added reproducer for PR804 and PR8011

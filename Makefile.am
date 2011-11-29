@@ -25,6 +25,8 @@ JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
 KEYSTORE_NAME=teststore.ks
 
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
+UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
+REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
 
 # Build directories
 
@@ -106,7 +108,7 @@ else
 endif
 
 if WITH_JUNIT
-  JUNIT_TESTS=run-netx-unit-tests
+  JUNIT_TESTS=stamps/run-netx-unit-tests.stamp
 else
   JUNIT_TESTS=
 endif
@@ -146,7 +148,7 @@ clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstr
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs \
- clean-tests check-local clean-launchers check-pac-functions run-netx-unit-tests clean-netx-tests \
+ clean-tests check-local clean-launchers check-pac-functions stamps/run-netx-unit-tests.stamp clean-netx-tests \
  clean-junit-runner clean-netx-unit-tests
 
 install-exec-local:
@@ -539,8 +541,7 @@ stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-j
 	mkdir -p stamps && \
 	touch $@
 
-run-netx-dist-tests: all-local stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-sign-some-reproducers.stamp \
- stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)
+$(REPRODUCERS_CLASS_NAMES):
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names= ; \
 	for test in `find -type f` ; do \
@@ -548,7 +549,15 @@ run-netx-dist-tests: all-local stamps/netx.stamp stamps/junit-jnlp-dist-dirs sta
 	  class_name=`echo $$class_name | sed -e 's|/|.|g' ` ; \
 	  class_names="$$class_names $$class_name" ; \
 	done ; \
-	echo $$class_names ; \
+	echo $$class_names > $(REPRODUCERS_CLASS_NAMES)
+
+stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
+ javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop \
+ stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-sign-some-reproducers.stamp \
+ stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) \
+ $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES)
+	cd $(JNLP_TESTS_ENGINE_DIR) ; \
+	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
 	  $(BOOT_DIR)/bin/java -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) -Djavaws.build.bin=$(DESTDIR)$(bindir)/javaws \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
@@ -556,6 +565,7 @@ run-netx-dist-tests: all-local stamps/netx.stamp stamps/junit-jnlp-dist-dirs sta
 	 cat stdout.log ; \
 	 cat stderr.log >&2
 	-xsltproc $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
+	touch $@
 
 netx-unit-tests-source-files.txt:
 	find $(NETX_UNIT_TEST_SRCDIR) -name '*.java' | sort > $@
@@ -575,14 +585,7 @@ $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME):
 	cp $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/*.css $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
 	cp $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/*.js $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
 
-run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
- $(JUNIT_RUNNER_JAR) $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) 
-	filename=" " ; \
-	cd $(NETX_UNIT_TEST_SRCDIR) ; \
-	for file in `find . -type f \! -iname "*.java"`; do\
-		filename=`echo $$file `; \
-		cp --parents $$filename $(NETX_UNIT_TEST_DIR) ; \
-	done ; \
+$(UNIT_CLASS_NAMES):
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names= ; \
 	for test in `find -type f` ; do \
@@ -590,15 +593,179 @@ run-netx-unit-tests: stamps/netx-unit-tests-compile.stamp \
 	  class_name=`echo $$class_name | sed -e 's|/|.|g' ` ; \
 	  class_names="$$class_names $$class_name" ; \
 	done ; \
-	echo $$class_names ; \
+	echo $$class_names > $(UNIT_CLASS_NAMES);
+
+stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_RUNNER_JAR)  \
+ $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)  $(UNIT_CLASS_NAMES)
+	filename=" " ; \
+	cd $(NETX_UNIT_TEST_SRCDIR) ; \
+	for file in `find . -type f \! -iname "*.java"`; do\
+		filename=`echo $$file `; \
+		cp --parents $$filename $(NETX_UNIT_TEST_DIR) ; \
+	done ; \
+	cd $(NETX_UNIT_TEST_DIR) ; \
+	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
 	  > stdout.log 2> stderr.log ; \
 	cat stdout.log ; \
-	cat stderr.log >&2
+	cat stderr.log >&2 ; 
 	-xsltproc $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
+	touch $@
 
-clean-netx-tests: clean-netx-unit-tests clean-junit-runner clean-netx-dist-tests
+#warning,  during this target tests.build/netx/unit/tests-output.xml is backup and rewriten (but not coresponding html file)
+#xml results run from emma sandbox, however, can be wrong, co the new tests-output.xml is then renamed and orginal one restored
+#you can add -ix "-*Test*" -ix "-*test*"  to ignore all test cases from statistics
+stamps/run-unit-test-code-coverage.stamp: check  $(UNIT_CLASS_NAMES);
+if WITH_EMMA
+	mv $(NETX_UNIT_TEST_DIR)/tests-output.xml  $(NETX_UNIT_TEST_DIR)/tests-output.xml_noEmma ; \
+	cd $(NETX_UNIT_TEST_DIR) ; \
+	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
+	$(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) -Demma.report.html.out.encoding=UTF-8 emmarun \
+	 -Dreport.html.out.encoding=UTF-8 \
+	 -raw \
+	 -sp $(NETX_SRCDIR) \
+	 -sp $(NETX_UNIT_TEST_SRCDIR) \
+	 -sp $(JUNIT_RUNNER_SRCDIR) \
+	 -r html \
+	 -r xml \
+	 -cp $(NETX_DIR)/lib/classes.jar \
+	 -cp $(JUNIT_JAR) \
+	 -cp $(JUNIT_RUNNER_JAR) \
+	 -cp $(BOOT_DIR)/jre/lib/rt.jar \
+	 -cp $(BOOT_DIR)/jre/lib/jsse.jar \
+	 -cp $(RHINO_RUNTIME) \
+	 -cp . \
+	 -ix "-org.junit.*" \
+	 -ix "-junit.*" \
+	 CommandLine $$class_names ;  \
+	mv $(NETX_UNIT_TEST_DIR)/tests-output.xml  $(NETX_UNIT_TEST_DIR)/tests-output_withEmma.xml ; \
+	mv $(NETX_UNIT_TEST_DIR)/tests-output.xml_noEmma  $(NETX_UNIT_TEST_DIR)/tests-output.xml ; 
+else 
+	echo "Sorry, coverage report cant be run without emma installed. Try install emma or specify with-emma value" ;
+	exit 5
+endif 
+	touch $@
+
+#warning,  during this target tests.build/netx/jnlp_testsengine/tests-output.xml is backup and rewriten (but not coresponding html file)
+#xml results run from emma sandbox, however, can be wrong, co the new tests-output.xml is then renamed and orginal one restored
+stamps/run-reproducers-test-code-coverage.stamp: stamps/run-netx-dist-tests.stamp $(REPRODUCERS_CLASS_NAMES)
+if WITH_EMMA
+	cd $(TESTS_DIR) ; \
+	mv $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml  $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml_noEmma ; \
+	echo "backuping javaws and netx.jar in $(DESTDIR)" ; \
+	netx_backup=$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx_backup.jar ; \
+	javaws_backup=$(DESTDIR)$(bindir)/javaws_backup ; \
+	mv $(DESTDIR)$(bindir)/javaws $$javaws_backup ;  \
+	mv $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar $$netx_backup ; \
+	nw_bootclasspath="$(LAUNCHER_BOOTCLASSPATH):$(EMMA_JAR):$$netx_backup" ; \
+	instructed_dir=$(TESTS_DIR)/instr ; \
+	echo "instrumenting netx.jar from $$netx_backup through $$instructed_dir" ; \
+	$(BOOT_DIR)/bin/java -cp  $(EMMA_JAR) emma instr -d $$instructed_dir -ip $$netx_backup ; \
+	pushd $$instructed_dir ; \
+	$(BOOT_DIR)/bin/jar -cf $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar * ; \
+	popd ; \
+	rm -rf $$instructed_dir ; \
+	echo "patching javaws" ; \
+	cat $$javaws_backup | sed "s,$(LAUNCHER_BOOTCLASSPATH),$$nw_bootclasspath," > $(DESTDIR)$(bindir)/javaws ; \
+	chmod 777 $(DESTDIR)$(bindir)/javaws ; \
+	testcases_srcs=( ) ; \
+	k=0 ; \
+	types=(simple signed); \
+	for which in "$${types[@]}" ; do \
+	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
+	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
+	  for dir in "$${simpleReproducers[@]}" ; do \
+	    testcases_srcs[k]="-sp" ; \
+	    k=$$((k+1)) ; \
+	    testcases_srcs[k]="$(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/" ; \
+	    k=$$((k+1)) ; \
+	    done ; \
+	  done ; \
+	cd $(JNLP_TESTS_ENGINE_DIR) ; \
+	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
+	$(BOOT_DIR)/bin/java  \
+	 -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) \
+	 -Djavaws.build.bin=$(DESTDIR)$(bindir)/javaws \
+	 -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) emmarun  \
+	   -raw \
+	   -cp $(NETX_DIR)/lib/classes.jar \
+	   -cp $(JUNIT_JAR) \
+	   -cp $(JUNIT_RUNNER_JAR) \
+	   -cp $(BOOT_DIR)/jre/lib/rt.jar \
+	   -cp $(BOOT_DIR)/jre/lib/jsse.jar \
+	   -cp $(RHINO_RUNTIME) \
+	   -cp . \
+	   -ix "-org.junit.*" \
+	   -ix "-junit.*" \
+	   CommandLine $$class_names ; \
+	mv $(JNLP_TESTS_ENGINE_DIR)/coverage.ec $(JNLP_TESTS_ENGINE_DIR)/coverageX.ec ; \
+	mv $(JNLP_TESTS_ENGINE_DIR)/coverage.es $(JNLP_TESTS_ENGINE_DIR)/coverageX.es ; \
+	$(BOOT_DIR)/bin/java -cp $(EMMA_JAR) emma merge \
+	  -in $(TESTS_DIR)/coverage.em \
+	  -in $(JNLP_TESTS_ENGINE_DIR)/coverageX.ec \
+	  -in $(JNLP_TESTS_ENGINE_DIR)/coverageX.es ; \
+	$(BOOT_DIR)/bin/java -cp $(EMMA_JAR)  -Demma.report.html.out.encoding=UTF-8 emma report \
+	  -Dreport.html.out.encoding=UTF-8 \
+	  -in $(JNLP_TESTS_ENGINE_DIR)/coverage.es  \
+	  -sp $(NETX_SRCDIR) \
+	  -sp $(NETX_UNIT_TEST_SRCDIR) \
+	  -sp $(JUNIT_RUNNER_SRCDIR) \
+	  -sp $(JNLP_TESTS_ENGINE_SRCDIR) \
+	  -r html \
+	  -r xml \
+	  "$${testcases_srcs[@]}" ; \
+	echo "restoring javaws and netx.jar in $(DESTDIR)" ; \
+	rm -f $(DESTDIR)$(bindir)/javaws $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar ; \
+	rm -f $(DESTDIR)$(bindir)/javaws;  \
+	mv $$javaws_backup $(DESTDIR)$(bindir)/javaws;  \
+	mv $$netx_backup $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar ; \
+	mv $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml  $(JNLP_TESTS_ENGINE_DIR)/tests-output_withEmma.xml ; \
+	mv $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml_noEmma  $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml ; \
+	rm $(JNLP_TESTS_ENGINE_DIR)/coverage.txt ; 
+else
+	echo "Sorry, coverage report cant be run without emma installed. Try install emma or specify with-emma value" ;
+	exit 5
+endif
+	touch $@
+
+run-test-code-coverage: run-unit-test-code-coverage run-reproducers-test-code-coverage
+if WITH_EMMA
+	cd $(TESTS_DIR) ; \
+	k=0 ; \
+	types=(simple signed); \
+	for which in "$${types[@]}" ; do \
+	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
+	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
+	  for dir in "$${simpleReproducers[@]}" ; do \
+	    testcases_srcs[k]="-sp" ; \
+	    k=$$((k+1)) ; \
+	    testcases_srcs[k]="$(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/" ; \
+	    k=$$((k+1)) ; \
+	  done ; \
+	done ; \
+	$(BOOT_DIR)/bin/java -cp $(EMMA_JAR) emma merge \
+	 -in $(NETX_UNIT_TEST_DIR)/coverage.es \
+	 -in $(JNLP_TESTS_ENGINE_DIR)/coverage.es ; \
+	$(BOOT_DIR)/bin/java -cp $(EMMA_JAR)  -Demma.report.html.out.encoding=UTF-8 emma report \
+	 -Dreport.html.out.encoding=UTF-8 \
+	 -in $(TESTS_DIR)/coverage.es \
+	 -in $(TESTS_DIR)/coverage.em \
+	 -sp $(NETX_SRCDIR) \
+	 -sp $(NETX_UNIT_TEST_SRCDIR) \
+	 -sp $(JUNIT_RUNNER_SRCDIR) \
+	 -sp $(JNLP_TESTS_ENGINE_SRCDIR) \
+	 "$${testcases_srcs[@]}" \
+	 -r html \
+	 -r xml ; 
+else
+	echo "Sorry, coverage report cant be run without emma installed. Try install emma or specify with-emma value" ;
+	exit 5
+endif
+
+clean-netx-tests: clean-netx-unit-tests clean-junit-runner clean-netx-dist-tests clean-test-code-coverage
 	if [ -e $(TESTS_DIR)/netx ]; then \
 	  rmdir $(TESTS_DIR)/netx ; \
 	fi
@@ -611,6 +778,8 @@ clean-junit-runner:
 clean-netx-unit-tests: clean_tests_reports
 	rm -f netx-unit-tests-source-files.txt
 	rm -rf $(NETX_UNIT_TEST_DIR)
+	rm -f $(UNIT_CLASS_NAMES)
+	rm -f stamps/run-netx-unit-tests.stamp
 	rm -f stamps/netx-unit-tests-compile.stamp
 
 clean_tests_reports:
@@ -629,7 +798,38 @@ clean-netx-dist-tests: clean_tests_reports
 	rm -f stamps/netx-dist-tests-sign-some-reproducers.stamp
 	rm -f junit-jnlp-dist-simple.txt
 	rm -f junit-jnlp-dist-signed.txt
+	rm -f $(REPRODUCERS_CLASS_NAMES)
 	rm -f $(abs_top_builddir)/$(KEYSTORE_NAME)
+	rm -f stamps/run-netx-dist-tests.stamp
+
+clean-unit-test-code-coverage:
+	if [ -e stamps/run-unit-test-code-coverage.stamp ]; then \
+	  rm -rf $(NETX_UNIT_TEST_DIR)/coverage ; \
+	  rm -f $(NETX_UNIT_TEST_DIR)/coverage.xml ; \
+	  rm -f $(NETX_UNIT_TEST_DIR)/coverageX.es ; \
+	  rm -f $(NETX_UNIT_TEST_DIR)/coverageX.ec ; \
+	  rm -f $(NETX_UNIT_TEST_DIR)/coverage.es ; \
+	  rm -f $(NETX_UNIT_TEST_DIR)/tests-output_withEmma.xml ; \
+	  rm -f stamps/run-unit-test-code-coverage.stamp ; \
+	fi
+
+clean-reproducers-test-code-coverage:
+	if [ -e stamps/run-reproducers-test-code-coverage.stamp ]; then \
+	 rm -rf $(JNLP_TESTS_ENGINE_DIR)/coverage ; \
+	 rm -f $(JNLP_TESTS_ENGINE_DIR)/coverage.xml ; \
+	 rm -f $(JNLP_TESTS_ENGINE_DIR)/coverage.es ; \
+	 rm -f $(JNLP_TESTS_ENGINE_DIR)/tests-output_withEmma.xml ; \
+	 rm -f stamps/run-reproducers-test-code-coverage.stamp ; \
+	fi
+
+clean-test-code-coverage: clean-unit-test-code-coverage clean-reproducers-test-code-coverage
+	if [ -e $(TESTS_DIR)/coverage.xml ]; then \
+	  rm -rf $(TESTS_DIR)/coverage  ; \
+	  rm -f $(TESTS_DIR)/coverage.xml  ; \
+	  rm -f $(TESTS_DIR)/coverage.es  ; \
+	  rm -f $(TESTS_DIR)/coverage.em ; \
+	fi
+
 
 # plugin tests
 
@@ -730,3 +930,11 @@ netx-dist: stamps/netx-dist.stamp
 plugin: stamps/plugin.stamp
 
 plugin-tests: stamps/plugin-tests.stamp
+
+run-netx-unit-tests: stamps/run-netx-unit-tests.stamp
+
+run-netx-dist-tests: stamps/run-netx-dist-tests.stamp
+
+run-unit-test-code-coverage: stamps/run-unit-test-code-coverage.stamp
+
+run-reproducers-test-code-coverage: stamps/run-reproducers-test-code-coverage.stamp
