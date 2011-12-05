@@ -150,7 +150,7 @@ public class AccessWarningPane extends SecurityDialogPanel {
                     topLabelText = R("SNetworkAccess", "(address here)");
         }
 
-        ImageIcon icon = new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource("net/sourceforge/jnlp/resources/warning.png"));
+        ImageIcon icon = new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource("net/sourceforge/jnlp/resources/question.png"));
         JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                         Font.BOLD, 12));

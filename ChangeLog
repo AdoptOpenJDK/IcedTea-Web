@@ -1,3 +1,9 @@
+2011-12-05  Danesh Dadachanji <ddadacha@redhat.com>
+
+	Update UI for AccessWarningPane
+	* netx/net/sourceforge/jnlp/security/AccessWarningPane.java:
+	Use question.png instead of warning.png for access dialogs.
+
 2011-11-28 Jiri Vanek <jvanek@redhat.com>
 
 	Added code-coverage generation targets
