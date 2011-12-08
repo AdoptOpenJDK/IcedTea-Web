@@ -1,3 +1,9 @@
+2011-12-08  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java
+	(launchApplication): Print arguments being passed to the application's
+	main method in debug mode.
+
 2011-12-05  Danesh Dadachanji <ddadacha@redhat.com>
 
 	Update UI for AccessWarningPane

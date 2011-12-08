@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -586,6 +587,10 @@ public class Launcher {
             handler.launchStarting(app);
 
             main.setAccessible(true);
+
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("Invoking main() with args: " + Arrays.toString(args));
+            }
             main.invoke(null, new Object[] { args });
 
             return app;
