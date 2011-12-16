@@ -1,3 +1,9 @@
+2011-12-16  Deepak Bhole <dbhole@redhat.com>
+
+	Patch from Thomas Meyer <thomas@m3y3r.de>
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: Fixed function name
+	in comment for sendMember. 
+
 2011-12-08  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Launcher.java
