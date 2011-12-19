@@ -52,6 +52,20 @@ public class AppletInstance extends ApplicationInstance {
     }
 
     /**
+     * Set the applet of this launched application; can only be called once.
+     */
+    public void setApplet(Applet applet) {
+        if (this.applet != null) {
+            if (JNLPRuntime.isDebug()) {
+                Exception ex = new IllegalStateException("Applet can only be set once.");
+                ex.printStackTrace();
+            }
+            return;
+        }
+        this.applet = applet;
+    }
+
+    /**
      *
      */
     public AppletInstance(JNLPFile file, ThreadGroup group, ClassLoader loader, Applet applet, Container cont) {

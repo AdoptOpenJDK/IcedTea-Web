@@ -1,3 +1,14 @@
+2011-12-19  Danesh Dadachanji <ddadacha@redhat.com>
+
+	Fix for BasicService being used in applet constructors but not 
+	having access to ApplicationInstance variable.
+	* netx/net/sourceforge/jnlp/Launcher.java: 
+	(createApplet): Moved applet initialization below loader.setApplication,
+	appletInstance is now initialized with applet param as null.
+	* netx/net/sourceforge/jnlp/runtime/AppletInstance.java:
+	(setApplet): New method, allows setting of AppletInstance's applet 
+	only once.
+
 2011-12-16  Deepak Bhole <dbhole@redhat.com>
 
 	Patch from Thomas Meyer <thomas@m3y3r.de>

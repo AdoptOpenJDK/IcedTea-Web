@@ -708,18 +708,19 @@ public class Launcher {
 
             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
-            String appletName = file.getApplet().getMainClass();
-            Class appletClass = loader.loadClass(appletName);
-            Applet applet = (Applet) appletClass.newInstance();
-
             AppletInstance appletInstance;
             if (cont == null)
-                appletInstance = new AppletInstance(file, group, loader, applet);
+                appletInstance = new AppletInstance(file, group, loader, null);
             else
-                appletInstance = new AppletInstance(file, group, loader, applet, cont);
+                appletInstance = new AppletInstance(file, group, loader, null, cont);
 
             loader.setApplication(appletInstance);
 
+            String appletName = file.getApplet().getMainClass();
+            Class appletClass = loader.loadClass(appletName);
+            Applet applet = (Applet) appletClass.newInstance();
+            appletInstance.setApplet(applet);
+            
             setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
 
             return appletInstance;
