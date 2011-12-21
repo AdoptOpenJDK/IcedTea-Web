@@ -1,3 +1,10 @@
+2011-12-21  Thomas Meyer <thomas@m3y3r.de>
+
+	RH586194: Unable to connect to connect with Juniper VPN client
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc(sendMember): Use
+	createJavaObjectFromVariant to create the resulting object on Java side,
+	rather than always creating a JSObject.
+
 2011-12-21  Jiri Vanek  <jvanek@redhat.com>
 
 	* acinclude.m4: added definition of IT_CHECK_XULRUNNER_API_VERSION,

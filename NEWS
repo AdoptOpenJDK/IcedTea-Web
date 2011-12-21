@@ -21,6 +21,7 @@ New in release 1.2 (2011-XX-XX):
 * Plugin
   - PR749: sun.applet.PluginStreamHandler#handleMessage(String) really slow
   - PR782: Support building against npapi-sdk as well
+  - RH586194: Unable to connect to connect with Juniper VPN client
   - RH718693: MindTerm SSH Applet doesn't work
 Common
   - PR768: Signed applets/Web Start apps don't work with OpenJDK7 and up

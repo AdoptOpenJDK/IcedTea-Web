@@ -490,12 +490,12 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     JavaRequestProcessor java_request = JavaRequestProcessor();
     JavaResultData* java_result;
     NPVariant* parent_ptr;
+    NPVariant* member_ptr;
 
     //int reference;
     std::string member_id = std::string();
-    std::string jsObjectClassID = std::string();
-    std::string jsObjectConstructorID = std::string();
     std::string response = std::string();
+    std::string result_id = std::string();
 
     NPIdentifier member_identifier;
 
@@ -551,50 +551,9 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
 
     PLUGIN_DEBUG("Member PTR after internal request: %s\n", thread_data.result.c_str());
 
-    java_result = java_request.findClass(0, "netscape.javascript.JSObject");
+    member_ptr = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
 
-    // the result we want is in result_string (assuming there was no error)
-    if (java_result->error_occurred)
-    {
-        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
-        //goto cleanup;
-    }
-
-    jsObjectClassID.append(*(java_result->return_string));
-
-    args = std::vector<std::string>();
-    std::string longArg = "J";
-    args.push_back(longArg);
-
-    java_result = java_request.getMethodID(jsObjectClassID,
-                                           browser_functions.getstringidentifier("<init>"),
-                                           args);
-
-    // the result we want is in result_string (assuming there was no error)
-    if (java_result->error_occurred)
-    {
-        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
-        //goto cleanup;
-    }
-
-    jsObjectConstructorID.append(*(java_result->return_string));
-
-    // We have the method id. Now create a new object.
-
-    args.clear();
-    args.push_back(thread_data.result);
-    java_result = java_request.newObjectWithConstructor("",
-                                         jsObjectClassID,
-                                         jsObjectConstructorID,
-                                         args);
-
-    // the result we want is in result_string (assuming there was no error)
-    if (java_result->error_occurred)
-    {
-        printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
-        //goto cleanup;
-    }
-
+    createJavaObjectFromVariant(instance, *member_ptr, &result_id);
 
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
     if (*(message_parts->at(2)) == "GetSlot")
@@ -603,7 +562,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     } else {
         response.append(" JavaScriptGetSlot ");
     }
-    response.append(java_result->return_string->c_str());
+    response.append(result_id.c_str());
     plugin_to_java_bus->post(response.c_str());
 }
 
