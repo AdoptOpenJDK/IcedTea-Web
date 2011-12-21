@@ -1,3 +1,13 @@
+2011-12-21  Jiri Vanek  <jvanek@redhat.com>
+
+	* acinclude.m4: added definition of IT_CHECK_XULRUNNER_API_VERSION,
+	which tries to compile small program against new xulrunner api
+	* configure.ac: added call of IT_CHECK_XULRUNNER_API_VERSION
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: (NP_GetMIMEDescription) 
+	return type set-up by dependency on defined LEGACY_XULRUNNERAPI.
+	 This one is set by IT_CHECK_XULRUNNER_API_VERSION during configure.
+	if defined, then old char* is used. New const char* is used otherwise.
+
 2011-12-19  Danesh Dadachanji <ddadacha@redhat.com>
 
 	Fix for BasicService being used in applet constructors but not 
