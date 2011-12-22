@@ -556,11 +556,11 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     createJavaObjectFromVariant(instance, *member_ptr, &result_id);
 
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
-    if (*(message_parts->at(2)) == "GetSlot")
+    if (*(message_parts->at(4)) == "GetSlot")
     {
-        response.append(" JavaScriptGetMember ");
-    } else {
         response.append(" JavaScriptGetSlot ");
+    } else {
+        response.append(" JavaScriptGetMember ");
     }
     response.append(result_id.c_str());
     plugin_to_java_bus->post(response.c_str());

@@ -1,3 +1,8 @@
+2011-12-22  Thomas Meyer <thomas@m3y3r.de>
+
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc(sendMember): Use
+	correct response parameter when returning array member vs member itself.
+
 2011-12-21  Thomas Meyer <thomas@m3y3r.de>
 
 	RH586194: Unable to connect to connect with Juniper VPN client
