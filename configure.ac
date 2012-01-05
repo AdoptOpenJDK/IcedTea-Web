@@ -87,6 +87,8 @@ IT_CHECK_XULRUNNER_API_VERSION
 # Find optional depedencies
 #
 
+AC_CHECK_PROGS([XSLTPROC],[xsltproc],[], [])
+AM_CONDITIONAL([WITH_XSLTPROC], [test x"$XSLTPROC" != x ])
 IT_FIND_OPTIONAL_JAR([rhino], RHINO,
     [/usr/share/java/js.jar /usr/share/rhino-1.6/lib/js.jar])
 IT_FIND_OPTIONAL_JAR([junit], JUNIT,

@@ -564,7 +564,9 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
 	  > stdout.log 2> stderr.log ; \
 	 cat stdout.log ; \
 	 cat stderr.log >&2
-	-xsltproc $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
+if WITH_XSLTPROC
+	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
+endif
 	touch $@
 
 netx-unit-tests-source-files.txt:
@@ -609,8 +611,10 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
 	  > stdout.log 2> stderr.log ; \
 	cat stdout.log ; \
-	cat stderr.log >&2 ; 
-	-xsltproc $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
+	cat stderr.log >&2
+if WITH_XSLTPROC
+	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
+endif
 	touch $@
 
 #warning,  during this target tests.build/netx/unit/tests-output.xml is backup and rewriten (but not coresponding html file)

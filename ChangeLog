@@ -1,3 +1,10 @@
+2011-12-15  Jiri Vanek  <jvanek@redhat.com>
+
+	* configure.ac: added search for xsltproc program and setting
+	WITH_XSLTPROC variable
+	* Makefile.am: xsltproc result is no longer ignored, command
+	itself is in conditional block 
+
 2011-12-22  Thomas Meyer <thomas@m3y3r.de>
 
 	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc(sendMember): Use
