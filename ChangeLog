@@ -1,3 +1,10 @@
+2012-01-05  Omair Majid <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(initializeResources): Only throw exceptions about the main class not
+	being found when the jnlp file can have a main class.
+	(addToCodeBaseLoader): Dont try to process null URLs.
+
 2011-12-15  Jiri Vanek  <jvanek@redhat.com>
 
 	* configure.ac: added search for xsltproc program and setting

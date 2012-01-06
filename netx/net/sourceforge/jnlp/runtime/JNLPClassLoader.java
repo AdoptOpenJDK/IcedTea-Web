@@ -488,11 +488,14 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 // If jar with main class was not found and there are no more
                 // available jars, throw a LaunchException
-                if (!foundMainJar
-                        && (available == null || available.size() == 0))
-                    throw new LaunchException(file, null, R("LSFatal"),
-                            R("LCClient"), R("LCantDetermineMainClass"),
-                            R("LCantDetermineMainClassInfo"));
+                if (file.getLaunchInfo() instanceof AppletDesc ||
+                    file.getLaunchInfo() instanceof ApplicationDesc) {
+                    if (!foundMainJar
+                            && (available == null || available.size() == 0))
+                        throw new LaunchException(file, null, R("LSFatal"),
+                                R("LCClient"), R("LCantDetermineMainClass"),
+                                R("LCantDetermineMainClassInfo"));
+                }
 
                 // If main jar was found, but a signed JNLP file was not located
                 if (!isSignedJNLP && foundMainJar) 
@@ -1700,6 +1703,9 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws IllegalArgumentException If the given url is not a path
      */
     private void addToCodeBaseLoader(URL u) {
+        if (u == null) {
+            return;
+        }
 
         // Only paths may be added
         if (!u.getFile().endsWith("/")) {
