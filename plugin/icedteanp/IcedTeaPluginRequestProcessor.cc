@@ -243,7 +243,13 @@ PluginRequestProcessor::eval(std::vector<std::string*>* message_parts)
 
     NPVariant* result_variant = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
     std::string result_variant_jniid = std::string();
-    createJavaObjectFromVariant(instance, *result_variant, &result_variant_jniid);
+    if (result_variant)
+    {
+        createJavaObjectFromVariant(instance, *result_variant, &result_variant_jniid);
+    } else
+    {
+        result_variant_jniid = "0";
+    }
 
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
     response += " JavaScriptEval ";

@@ -1,3 +1,10 @@
+2012-01-09  Deepak Bhole <dbhole@redhat.com>
+
+	PR838: IcedTea plugin crashes with chrome browser when javascript is executed
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc (eval): Added a check
+	to ensure that the result pointer is valid before attempting to create an
+	NPVariant from it.
+
 2012-01-05  Omair Majid <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
