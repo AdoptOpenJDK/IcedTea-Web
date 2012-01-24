@@ -1,3 +1,17 @@
+2012-01-06  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Use the JNLP file's information section for the Name and
+	Publisher labels of access dialogs, if available.
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	(PluginBridge): Assigned info variable to JNLP file's information
+	section (if one is used), otherwise to a new, empty ArrayList.
+	(getInformation): Removed method, superclass method
+	should be used instead.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Adding SUnverified.
+	* a/netx/net/sourceforge/jnlp/security/AccessWarningPane.java:
+	(addComponents): Append unverified note to the publisher label.
+
 2012-01-09  Deepak Bhole <dbhole@redhat.com>
 
 	PR838: IcedTea plugin crashes with chrome browser when javascript is executed

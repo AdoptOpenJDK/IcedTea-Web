@@ -104,7 +104,9 @@ public class AccessWarningPane extends SecurityDialogPanel {
         }
 
         try {
-            publisher = file.getInformation().getVendor() != null ? file.getInformation().getVendor() : R("SNoAssociatedCertificate");
+            publisher = file.getInformation().getVendor() != null ? 
+                    file.getInformation().getVendor() + " " + R("SUnverified") : 
+                    R("SNoAssociatedCertificate");
         } catch (Exception e) {
         }
 

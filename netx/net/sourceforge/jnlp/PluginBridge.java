@@ -60,6 +60,7 @@ public class PluginBridge extends JNLPFile {
                 URL jnlp = new URL(codeBase.toExternalForm() + atts.get("jnlp_href"));
                 JNLPFile jnlpFile = new JNLPFile(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), this.codeBase);
                 Map<String, String> jnlpParams = jnlpFile.getApplet().getParameters();
+                info = jnlpFile.info;
 
                 // Change the parameter name to lowercase to follow conventions.
                 for (Map.Entry<String, String> entry : jnlpParams.entrySet()) {
@@ -76,6 +77,9 @@ public class PluginBridge extends JNLPFile {
                 System.err.println("Unable to get JNLP file at: " + codeBase.toExternalForm()
                         + atts.get("jnlp_href"));
             }
+        } else {
+            // Should we populate this list with applet attribute tags?
+            info = new ArrayList<InformationDesc>();
         }
 
         // also, see if cache_archive is specified
@@ -178,15 +182,6 @@ public class PluginBridge extends JNLPFile {
 
     public String getTitle() {
         return name;
-    }
-
-    public InformationDesc getInformation(final Locale locale) {
-        return new InformationDesc(this, new Locale[] { locale }) {
-            protected List<Object> getItems(Object key) {
-                // Should we populate this list with applet attribute tags?
-                return new ArrayList<Object>();
-            }
-        };
     }
 
     public ResourcesDesc getResources(final Locale locale, final String os,
