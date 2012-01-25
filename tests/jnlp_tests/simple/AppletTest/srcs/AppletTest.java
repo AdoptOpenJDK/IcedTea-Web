@@ -1,4 +1,7 @@
-/* DeadlockTest.java
+
+import java.applet.Applet;
+
+/* AppletTest.java
 Copyright (C) 2011 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -34,21 +37,46 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
+public class AppletTest extends Applet {
 
-public class DeadlockTest {
+    private class Killer extends Thread {
 
-    private static final int DEADLOCK_TEST_TIME_OF_LIFE=30000;
+        public int n = 2000;
 
-    public static void main(String[] args) throws Exception {
-        long startTime = System.nanoTime() / 1000000l;
-        System.out.println("Deadlock test started");
-        while (true) {
-            long now = System.nanoTime() / 1000000l;
-            Thread.sleep(10);
-            if (now - startTime > DEADLOCK_TEST_TIME_OF_LIFE) {
-                System.out.println("This process is hanging more then "+DEADLOCK_TEST_TIME_OF_LIFE/1000+"s. Should be killed");
-                System.exit(5);
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(n);
+                System.out.println("Aplet killing himself after " + n + " ms of life");
+                System.exit(0);
+            } catch (Exception ex) {
             }
         }
+    }
+    private Killer killer;
+
+    @Override
+    public void init() {
+        System.out.println("applet was initialised");
+        killer = new Killer();
+    }
+
+    @Override
+    public void start() {
+        System.out.println("applet was started");
+        System.out.println(getParameter("key1"));
+        System.out.println(getParameter("key2"));
+        killer.start();
+        System.out.println("killer was started");
+    }
+
+    @Override
+    public void stop() {
+        System.out.println("applet was stopped");
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("applet will be destroyed");
     }
 }

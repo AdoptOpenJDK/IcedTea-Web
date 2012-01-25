@@ -82,6 +82,7 @@ import org.junit.Test;
  */
 public class ServerAccess {
 
+    public static final long NANO_TIME_DELIMITER=1000000l;
     /**
      * java property which value containig path to default (makefile by) directory with deployed resources
      */
@@ -684,6 +685,7 @@ public class ServerAccess {
                     p = r.exec(args.toArray(new String[0]),new String[0], dir);
                 }
                 exitCode = p.waitFor();
+                Thread.sleep(500);//this is giving to fastly done proecesses's e/o readers time to read all. I would like to know better solution :-/
             } catch (Exception ex) {
                 if (ex instanceof InterruptedException) {
                     //add to the set of terminated threadedproceses
@@ -885,11 +887,11 @@ public class ServerAccess {
         @Override
         public void run() {
 
-            long startTime = System.nanoTime() / 1000000l;
+            long startTime = System.nanoTime() / NANO_TIME_DELIMITER;
             while (canRun) {
                 try {
 
-                    long time = System.nanoTime() / 1000000l;
+                    long time = System.nanoTime() / NANO_TIME_DELIMITER;
                     //System.out.println(time - startTime);
                     //System.out.println((time - startTime) > timeout);
                     if ((time - startTime) > timeout) {
@@ -992,7 +994,7 @@ public class ServerAccess {
                 }
                 //do not want to bother output with terminations
             } catch (Exception ex) {
-                //ex.printStackTrace();
+                ex.printStackTrace();
             } finally {
                 try {
                     is.close();

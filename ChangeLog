@@ -1,3 +1,19 @@
+2012-01-25  Jiri Vanek  <jvanek@redhat.com>
+
+	Added test for -Xnofork option and for applet launching by jnlp
+	* tests/jnlp_tests/simple/deadlocktest/resources/deadlocktest_1.jnlp: new file
+	By specifying new max heap size, should invoke jvm to fork when launched
+	* tests/jnlp_tests/simple/deadlocktest/srcs/DeadlockTest.java:
+	improved indentation, added debug output that main method was lunched
+	* tests/jnlp_tests/simple/deadlocktest/testcases/DeadLockTestTest.java:
+	small refactoring, add lunching  of deadlocktest_1.jnlp with and
+	without -Xnofork, and counting java instances during runtime
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java
+	(ThreadedProcess.run) fixed situation, when process ended, but not all
+	the output was read by its stdout/stderr readers
+	(ContentReader.run) enabled exception printing to stderr.
+	* tests/jnlp_tests/simple/AppletTest/ : test for loading applets by jnlp file
+
 2012-01-06  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Use the JNLP file's information section for the Name and
