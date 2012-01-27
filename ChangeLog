@@ -1,3 +1,15 @@
+2012-01-27  Deepak Bhole <dbhole@redhat.com>
+
+	PR852: Classloader not being flushed after last applet from a site is closed
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Added variable
+	to count usage for a given ClassLoader instance.
+	(getInstance): Decrement use count for a loader after it is merged with
+	another. Increment loader use count before returning.
+	(incrementLoaderUseCount): New method. Increments loader use count.
+	(decrementLoaderUseCount): New method. Decrements loader use count.
+	* java/sun/applet/PluginAppletViewer.java (appletClose): Decrement loader
+	use count when applet is closed.
+
 2012-01-25  Jiri Vanek  <jvanek@redhat.com>
 
 	Added test for -Xnofork option and for applet launching by jnlp

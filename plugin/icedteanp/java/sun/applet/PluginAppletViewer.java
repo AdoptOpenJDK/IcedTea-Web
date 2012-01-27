@@ -1625,6 +1625,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
                 appletShutdown(p);
                 appletPanels.removeElement(p);
+                
+                // Mark classloader unusable
+                ((JNLPClassLoader) cl).decrementLoaderUseCount();
 
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {

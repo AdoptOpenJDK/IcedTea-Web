@@ -173,6 +173,11 @@ public class JNLPClassLoader extends URLClassLoader {
     private boolean foundMainJar= false;
 
     /**
+     * Variable to track how many times this loader is in use
+     */
+    private int useCount = 0;
+
+    /**
      * Create a new JNLPClassLoader from the specified file.
      *
      * @param file the JNLP file
@@ -321,6 +326,7 @@ public class JNLPClassLoader extends URLClassLoader {
                             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
 
                     loader.merge(extLoader);
+                    extLoader.decrementLoaderUseCount(); // loader urls have been merged, ext loader is no longer used
                 }
 
                 // loader is now current + ext. But we also need to think of
@@ -347,7 +353,11 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // loaders are mapped to a unique key. Only extensions and parent
         // share a key, so it is safe to always share based on it
-        urlToLoader.put(uniqueKey, loader);
+        
+        loader.incrementLoaderUseCount();
+        synchronized(urlToLoader) {
+            urlToLoader.put(uniqueKey, loader);
+        }
 
         return loader;
     }
@@ -1761,6 +1771,42 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
         return result;
+    }
+    
+    /**
+     * Increments loader use count by 1
+     * 
+     * @throws SecurityException if caller is not trusted
+     */
+    private synchronized void incrementLoaderUseCount() {
+        
+        // For use by trusted code only
+        if (System.getSecurityManager() != null)
+            System.getSecurityManager().checkPermission(new AllPermission());
+        
+        useCount++;
+    }
+
+    /**
+     * Decrements loader use count by 1
+     * 
+     * If count reaches 0, loader is removed from list of available loaders
+     * 
+     * @throws SecurityException if caller is not trusted
+     */
+    public synchronized void decrementLoaderUseCount() {
+
+        // For use by trusted code only
+        if (System.getSecurityManager() != null)
+            System.getSecurityManager().checkPermission(new AllPermission());
+
+        useCount--;
+
+        if (useCount <= 0) {
+            synchronized(urlToLoader) {
+                urlToLoader.remove(file.getUniqueKey());
+            }
+        }
     }
 
     /*
