@@ -109,7 +109,7 @@ public class ServerAccess {
      * timeout in ms to let process to finish, before assasin wil kill it.
      * This can be changed in runtime, but will affect all following tasks
      */
-    public static long PROCESS_TIMEOUT = 10 * 1000;//ms
+    public static long PROCESS_TIMEOUT = 20 * 1000;//ms
     /**
      * all terminated processes are stored here. As wee need to 'wait' to termination to be finished.
      */

@@ -1,3 +1,31 @@
+2012-01-24 Jiri Vanek<jvanek@redhat.com>
+
+	Fix for PR844
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: (getLRUSortedEntries)
+	instead of error throwing own LRU exception. Also catches more then
+	NumberFormatException
+	(clearLRUSortedEntries) new method - making soft clearing of cache public
+	(clearCache) now return true if cache was cleared, false otherwise 
+	(or exception)
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (getCacheFileIfExist) 
+	does three tires to load cache. If ifrst fails, then recently_used file
+	is emptied both in memory and on disc. When second attemmpt fails, then
+	LRU cache is forcibly cleared. if clearing fails, then error is thrown.
+	If it pass, then one more try to load entries is allowed. When third
+	attempt fails, then error is  thrown.
+	* /netx/net/sourceforge/jnlp/cache/LruCacheException.java:
+	new file, for purpose of catching this particular exception
+	* netx/net/sourceforge/jnlp/util/PropertiesFile.java: (store) tries to 
+	mkdirs to its path. It is better then to fail when no cache directory exists.
+	* tests/jnlp_tests/signed/CacheReproducer: new  reproducr trying severals 
+	way of corupted cache on several types of jnlp files. Is signed because
+	of reflection used.
+	* tests/jnlp_tests/signed/SimpletestSigned1: signed hello world to be
+	used in  CacheReproducer tests.
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java: 
+	timeout for processes doubled, as clear cache methods sometimes took
+	more then original allowed.
+
 2012-01-27  Deepak Bhole <dbhole@redhat.com>
 
 	PR852: Classloader not being flushed after last applet from a site is closed

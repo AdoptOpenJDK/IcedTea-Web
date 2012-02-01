@@ -36,6 +36,8 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
+import static  net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileLock;
@@ -178,10 +180,8 @@ enum CacheLRUWrapper {
 
                     int c = t1.compareTo(t2);
                     return c < 0 ? 1 : (c > 0 ? -1 : 0);
-                } catch (NumberFormatException e) {
-                    // Perhaps an error is too harsh. Maybe just somehow turn
-                    // caching off if this is the case.
-                    throw new InternalError("Corrupt LRU file entries");
+                } catch (Exception e) {
+                    throw new LruCacheException(R("Corrupt LRU file entries"));
                 }
             }
         });
@@ -248,5 +248,9 @@ enum CacheLRUWrapper {
      */
     public String generateKey(String path) {
         return System.currentTimeMillis() + "," + getIdForCacheFolder(path);
+    }
+
+    void clearLRUSortedEntries() {
+        cacheOrder.clear();
     }
 }

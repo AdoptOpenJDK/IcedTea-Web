@@ -134,6 +134,7 @@ public class PropertiesFile extends Properties {
         OutputStream s = null;
         try {
             try {
+                file.getParentFile().mkdirs();
                 s = new FileOutputStream(file);
                 store(s, header);
             } finally {

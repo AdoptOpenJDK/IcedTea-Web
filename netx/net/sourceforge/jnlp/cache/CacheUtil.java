@@ -144,16 +144,16 @@ public class CacheUtil {
      * process is using them can be quite disasterous. Hence why Launcher creates lock files
      * and we check for those by calling {@link #okToClearCache()}
      */
-    public static void clearCache() {
+    public static boolean clearCache() {
 
         if (!okToClearCache()) {
             System.err.println(R("CCannotClearCache"));
-            return;
+            return false;
         }
 
         File cacheDir = new File(CacheUtil.cacheDir);
         if (!(cacheDir.isDirectory())) {
-            return;
+            return false;
         }
 
         if (JNLPRuntime.isDebug()) {
@@ -165,6 +165,7 @@ public class CacheUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return true;
     }
 
     /**
@@ -322,7 +323,37 @@ public class CacheUtil {
     private static File getCacheFileIfExist(File urlPath) {
         synchronized (lruHandler) {
             File cacheFile = null;
-            List<Entry<String, String>> entries = lruHandler.getLRUSortedEntries();
+            int tries = 0;
+            List<Entry<String, String>> entries = null;
+            do {
+                try {
+                    tries++;
+                    entries = lruHandler.getLRUSortedEntries();
+                } catch (LruCacheException ex) {
+                    if (tries == 1) {
+                        ex.printStackTrace();
+                        System.out.println(R("CFakeCache"));
+                        lruHandler.clearLRUSortedEntries();
+                        lruHandler.store();
+                        System.out.println(R("CFakedCache"));
+                    } else if (tries == 2) {
+                        ex.printStackTrace();
+                        System.out.println(R("CStillCorupted"));
+                        boolean clearingresult = CacheUtil.clearCache();
+                        if (!clearingresult) {
+                            throw new InternalError(R("CCleaningUnsuccessful"));
+                        }
+                        System.out.println(R("CClearedReloading"));
+                        lruHandler.clearLRUSortedEntries();
+                        lruHandler.store();
+                        System.out.println(R("CReloadRestarting"));
+
+                    } else {
+                        throw new InternalError(R("CStillBroken"));
+                    }
+
+                }
+            } while (entries == null);
             // Start searching from the most recent to least recent.
             for (Entry<String, String> e : entries) {
                 final String key = e.getKey();
