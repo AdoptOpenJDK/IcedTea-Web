@@ -1,4 +1,4 @@
-2012-01-24 Jiri Vanek<jvanek@redhat.com>
+2012-02-01 Jiri Vanek<jvanek@redhat.com>
 
 	Fix for PR844
 	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: (getLRUSortedEntries)
