@@ -52,7 +52,8 @@ public class LaunchException extends Exception {
      * Creates a LaunchException without detail message.
      */
     public LaunchException(JNLPFile file, Exception cause, String severity, String category, String summary, String description) {
-        super(severity + ": " + category + ": " + summary + " " + description);
+        super(severity + ": " + category + ": " + summary + " "
+        	    + (description == null ? "" : description));
 
         this.file = file;
         this.category = category;
