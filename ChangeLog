@@ -1,3 +1,9 @@
+2012-02-10  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Fix path to NEW_LINE_IFS for when one builds outside of src directory.
+	* Makefile.am: Use top src directory instead of top build directory
+	for NEW_LINE_IFS
+
 2012-02-06  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Fixed regression in running webstart applets from JNLP files.

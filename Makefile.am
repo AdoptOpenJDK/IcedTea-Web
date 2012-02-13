@@ -475,7 +475,7 @@ junit-jnlp-dist-signed.txt:
 stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
 	types=(simple signed); \
 	for which in "$${types[@]}" ; do \
-	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
@@ -503,7 +503,7 @@ stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepa
 	keystore=$(abs_top_builddir)/$(KEYSTORE_NAME); \
 	pass=123456789; \
 	$(BOOT_DIR)/bin/keytool -genkey -alias $$alias -keystore $$keystore -keypass $$pass -storepass $$pass -dname "cn=$$alias, ou=$$alias, o=$$alias, c=$$alias" ; \
-	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	signedReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-signed.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	for dir in "$${signedReproducers[@]}" ; do \
@@ -528,7 +528,7 @@ stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-j
  netx-dist-tests-source-files.txt stamps/netx-dist-tests-compile.stamp
 	types=(simple signed); \
 	for which in "$${types[@]}" ; do \
-	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
@@ -677,7 +677,7 @@ if WITH_EMMA
 	k=0 ; \
 	types=(simple signed); \
 	for which in "$${types[@]}" ; do \
-	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
@@ -740,7 +740,7 @@ if WITH_EMMA
 	k=0 ; \
 	types=(simple signed); \
 	for which in "$${types[@]}" ; do \
-	  . $(abs_top_builddir)/NEW_LINE_IFS ; \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
