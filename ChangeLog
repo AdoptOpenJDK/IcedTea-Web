@@ -1,3 +1,11 @@
+2012-02-06  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Fixed regression in running webstart applets from JNLP files.
+	* netx/net/sourceforge/jnlp/Launcher.java (createApplet): Added call to
+	set applet variable in the AppletInstance's AppletEnvironment.
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java
+	(setApplet): New method, set AppletEnvironment's applet variable only once.
+
 2012-02-02  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	* netx/net/sourceforge/jnlp/LaunchException.java: Fix message

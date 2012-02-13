@@ -207,6 +207,20 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     }
 
     /**
+     * Set the applet of this environment; can only be called once.
+     */
+    public void setApplet(Applet applet) {
+        if (this.applet != null) {
+            if (JNLPRuntime.isDebug()) {
+                Exception ex = new IllegalStateException("Applet can only be set once.");
+                ex.printStackTrace();
+            }
+            return;
+        }
+        this.applet = applet;
+    }
+
+    /**
      * Returns an enumeration that contains only the applet
      * from the JNLP file.
      */

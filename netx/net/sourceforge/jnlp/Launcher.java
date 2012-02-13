@@ -708,6 +708,9 @@ public class Launcher {
 
             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
+            // appletInstance is needed by ServiceManager when looking up 
+            // services. This could potentially be done in applet constructor
+            // so initialize appletInstance before creating applet.
             AppletInstance appletInstance;
             if (cont == null)
                 appletInstance = new AppletInstance(file, group, loader, null);
@@ -716,10 +719,14 @@ public class Launcher {
 
             loader.setApplication(appletInstance);
 
+            // Initialize applet now that ServiceManager has access to its
+            // appletInstance.
             String appletName = file.getApplet().getMainClass();
             Class appletClass = loader.loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
+            // Finish setting up appletInstance.
             appletInstance.setApplet(applet);
+            appletInstance.getAppletEnvironment().setApplet(applet);
             
             setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
 
