@@ -1,3 +1,10 @@
+2012-02-22  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Add ability to check for jnlp_href use outside of PluginBridge.
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(PluginBridge): New boolean useJNLPHref is set if jnlp_href is used.
+	(useJNLPHref): New getter method, returns boolean useJNLPHref.
+
 2012-02-10  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Fix path to NEW_LINE_IFS for when one builds outside of src directory.

@@ -44,6 +44,7 @@ public class PluginBridge extends JNLPFile {
     private boolean usePack;
     private boolean useVersion;
     private boolean codeBaseLookup;
+    private boolean useJNLPHref;
 
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
                         int width, int height, Hashtable<String, String> atts,
@@ -56,6 +57,7 @@ public class PluginBridge extends JNLPFile {
         this.atts = atts;
 
         if (atts.containsKey("jnlp_href")) {
+            useJNLPHref = true;
             try {
                 URL jnlp = new URL(codeBase.toExternalForm() + atts.get("jnlp_href"));
                 JNLPFile jnlpFile = new JNLPFile(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), this.codeBase);
@@ -80,6 +82,7 @@ public class PluginBridge extends JNLPFile {
         } else {
             // Should we populate this list with applet attribute tags?
             info = new ArrayList<InformationDesc>();
+            useJNLPHref = false;
         }
 
         // also, see if cache_archive is specified
@@ -170,6 +173,10 @@ public class PluginBridge extends JNLPFile {
 
     public boolean codeBaseLookup() {
     	return codeBaseLookup;
+    }
+
+    public boolean useJNLPHref() {
+        return useJNLPHref;
     }
 
     /**
