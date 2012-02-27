@@ -1,3 +1,23 @@
+2012-02-27  Thomas Meyer <thomas@m3y3r.de>
+			Deepak Bhole <dbhole@redhat.com>
+
+	PR820: IcedTea-Web 1.1.3 crashing Firefox when loading Citrix XenApp
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc
+	(createJavaObjectFromVariant): If variant is a generic object array,
+	create a JSObject on Java side instead of JSObject array.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc 
+	(newMessageOnBus): Run finalize on main thread.
+	(eval): Create Java object in _eval
+	(call): Create Java object in _call.
+	(setMember): Create Java object in _setMember.
+	(sendMember): Create Java object in _getMember.
+	(sendString): Create Java object in _getString.
+	(_setMember): Process result and create Java object if needed.
+	(_getMember): Same.
+	(_eval): Same.
+	(_call): Same.
+	(_getString): Same.
+
 2012-02-22  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Add ability to check for jnlp_href use outside of PluginBridge.

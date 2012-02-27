@@ -123,6 +123,12 @@ PluginRequestProcessor::newMessageOnBus(const char* message)
             // returns immediately, so we do it in the same thread.
             this->sendWindow(message_parts);
             return true;
+        } else if (!command->find("Finalize"))
+        {
+            // Object can be finalized from the main thread only. And this
+        	// call returns immediately, so we do it in the same thread.
+            this->finalize(message_parts);
+            return true;
         } else if (!command->find("GetMember") ||
                    !command->find("SetMember") ||
                    !command->find("ToString") ||
@@ -130,7 +136,6 @@ PluginRequestProcessor::newMessageOnBus(const char* message)
                    !command->find("GetSlot") ||
                    !command->find("SetSlot") ||
                    !command->find("Eval") ||
-                   !command->find("Finalize") ||
                    !command->find("LoadURL"))
         {
 
@@ -241,19 +246,9 @@ PluginRequestProcessor::eval(std::vector<std::string*>* message_parts)
 
     IcedTeaPluginUtilities::callAndWaitForResult(instance, &_eval, &thread_data);
 
-    NPVariant* result_variant = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
-    std::string result_variant_jniid = std::string();
-    if (result_variant)
-    {
-        createJavaObjectFromVariant(instance, *result_variant, &result_variant_jniid);
-    } else
-    {
-        result_variant_jniid = "0";
-    }
-
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
     response += " JavaScriptEval ";
-    response += result_variant_jniid;
+    response += thread_data.result;
 
     plugin_to_java_bus->post(response.c_str());
 }
@@ -336,19 +331,9 @@ PluginRequestProcessor::call(std::vector<std::string*>* message_parts)
 
     IcedTeaPluginUtilities::callAndWaitForResult(instance, &_call, &thread_data);
 
-    result_variant = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
-
-    if (result_variant)
-    {
-        createJavaObjectFromVariant(instance, *result_variant, &result_variant_jniid);
-    } else
-    {
-        result_variant_jniid = "0";
-    }
-
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
     response += " JavaScriptCall ";
-    response += result_variant_jniid;
+    response += thread_data.result;
 
     plugin_to_java_bus->post(response.c_str());
 
@@ -415,7 +400,8 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
 
     NPP instance;
     NPVariant* member;
-    NPIdentifier property_identifier;
+    std::string property_id = std::string();
+    bool int_identifier;
 
     JavaRequestProcessor java_request = JavaRequestProcessor();
     JavaResultData* java_result;
@@ -445,7 +431,8 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
 
     if (*(message_parts->at(4)) == "SetSlot")
     {
-        property_identifier = browser_functions.getintidentifier(atoi(message_parts->at(6)->c_str()));
+    	property_id.append(*(message_parts->at(6)));
+    	int_identifier = true;
     } else
     {
         java_result = java_request.getString(propertyNameID);
@@ -457,7 +444,8 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
             //goto cleanup;
         }
 
-        property_identifier = browser_functions.getstringidentifier(java_result->return_string->c_str());
+        property_id.append(*(java_result->return_string));
+    	int_identifier = false;
     }
 
     AsyncCallThreadData thread_data = AsyncCallThreadData();
@@ -467,8 +455,9 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
 
     thread_data.parameters.push_back(instance);
     thread_data.parameters.push_back(NPVARIANT_TO_OBJECT(*member));
-    thread_data.parameters.push_back(&property_identifier);
+    thread_data.parameters.push_back(&property_id);
     thread_data.parameters.push_back(&value);
+    thread_data.parameters.push_back(&int_identifier);
 
     IcedTeaPluginUtilities::callAndWaitForResult(instance, &_setMember, &thread_data);
 
@@ -508,6 +497,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     int method_id;
     int instance_id;
     int reference;
+    bool int_identifier;
 
     // debug printout of parent thread data
     IcedTeaPluginUtilities::printStringPtrVector("PluginRequestProcessor::getMember:", message_parts);
@@ -522,7 +512,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     /** Request data from Java if necessary **/
     if (*(message_parts->at(4)) == "GetSlot")
     {
-        member_identifier = browser_functions.getintidentifier(atoi(member_id.c_str()));
+    	int_identifier=true;
     } else
     {
         // make a new request for getString, to get the name of the identifier
@@ -535,7 +525,8 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
             //goto cleanup;
         }
 
-        member_identifier = browser_functions.getstringidentifier(java_result->return_string->c_str());
+        member_id.assign(*(java_result->return_string));
+    	int_identifier=false;
     }
 
     AsyncCallThreadData thread_data = AsyncCallThreadData();
@@ -551,15 +542,10 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
 
     thread_data.parameters.push_back(instance);
     thread_data.parameters.push_back(NPVARIANT_TO_OBJECT(*parent_ptr));
-    thread_data.parameters.push_back(&member_identifier);
+    thread_data.parameters.push_back(&member_id);
+    thread_data.parameters.push_back(&int_identifier);
 
     IcedTeaPluginUtilities::callAndWaitForResult(instance, &_getMember, &thread_data);
-
-    PLUGIN_DEBUG("Member PTR after internal request: %s\n", thread_data.result.c_str());
-
-    member_ptr = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(thread_data.result);
-
-    createJavaObjectFromVariant(instance, *member_ptr, &result_id);
 
     IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &response);
     if (*(message_parts->at(4)) == "GetSlot")
@@ -568,7 +554,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
     } else {
         response.append(" JavaScriptGetMember ");
     }
-    response.append(result_id.c_str());
+    response.append(thread_data.result);
     plugin_to_java_bus->post(response.c_str());
 }
 
@@ -720,12 +706,6 @@ queue_processor(void* data)
                 pthread_mutex_lock(&syn_write_mutex);
                 processor->setMember(message_parts);
                 pthread_mutex_unlock(&syn_write_mutex);
-            } else if (command == "Finalize")
-            {
-                // write methods are synchronized
-                pthread_mutex_lock(&syn_write_mutex);
-                processor->finalize(message_parts);
-                pthread_mutex_unlock(&syn_write_mutex);
             } else if (command == "LoadURL") // For instance X url <url> <target>
             {
                 // write methods are synchronized
@@ -768,19 +748,26 @@ _setMember(void* data)
     NPP instance;
     NPVariant value_variant = NPVariant();
     NPObject* member;
-    NPIdentifier* property;
+    NPIdentifier property_identifier;
+
 
     std::vector<void*> parameters = ((AsyncCallThreadData*) data)->parameters;
     instance = (NPP) parameters.at(0);
     member = (NPObject*) parameters.at(1);
-    property = (NPIdentifier*) parameters.at(2);
+    std::string*  property_id = (std::string*) parameters.at(2);
     value = (std::string*) parameters.at(3);
+    bool* int_identifier = (bool*) parameters.at(4);
 
-    PLUGIN_DEBUG("Setting %s on instance %p, object %p to value %s\n", browser_functions.utf8fromidentifier(*property), instance, member, value->c_str());
+    if(*int_identifier==true)
+    	property_identifier = browser_functions.getintidentifier(atoi(property_id->c_str()));
+    else
+    	property_identifier = browser_functions.getstringidentifier(property_id->c_str());
+
+    PLUGIN_DEBUG("Setting %s on instance %p, object %p to value %s\n", browser_functions.utf8fromidentifier(property_identifier), instance, member, value->c_str());
 
     IcedTeaPluginUtilities::javaResultToNPVariant(instance, value, &value_variant);
 
-    ((AsyncCallThreadData*) data)->call_successful = browser_functions.setproperty(instance, member, *property, &value_variant);
+    ((AsyncCallThreadData*) data)->call_successful = browser_functions.setproperty(instance, member, property_identifier, &value_variant);
 
     ((AsyncCallThreadData*) data)->result_ready = true;
 }
@@ -797,23 +784,32 @@ _getMember(void* data)
 
     instance = (NPP) parameters.at(0);
     parent_ptr = (NPObject*) parameters.at(1);
-    NPIdentifier* member_identifier = (NPIdentifier*) parameters.at(2);
+    std::string*  member_id = (std::string*) parameters.at(2);
+    NPIdentifier member_identifier;
+
+    bool* int_identifier = (bool*) parameters.at(3);
+
+    if(*int_identifier==true)
+    	member_identifier = browser_functions.getintidentifier(atoi(member_id->c_str()));
+    else
+    	member_identifier = browser_functions.getstringidentifier(member_id->c_str());
 
     // Get the NPVariant corresponding to this member
-    PLUGIN_DEBUG("Looking for %p %p %p (%s)\n", instance, parent_ptr, member_identifier, browser_functions.utf8fromidentifier(*member_identifier));
+    PLUGIN_DEBUG("Looking for %p %p %p (%s)\n", instance, parent_ptr, member_identifier, browser_functions.utf8fromidentifier(member_identifier));
 
-    if (!browser_functions.hasproperty(instance, parent_ptr, *member_identifier))
+    if (!browser_functions.hasproperty(instance, parent_ptr, member_identifier))
     {
-        printf("%s not found!\n", browser_functions.utf8fromidentifier(*member_identifier));
+        printf("%s not found!\n", browser_functions.utf8fromidentifier(member_identifier));
     }
-    ((AsyncCallThreadData*) data)->call_successful = browser_functions.getproperty(instance, parent_ptr, *member_identifier, member_ptr);
+    ((AsyncCallThreadData*) data)->call_successful = browser_functions.getproperty(instance, parent_ptr, member_identifier, member_ptr);
 
     IcedTeaPluginUtilities::printNPVariant(*member_ptr);
 
     if (((AsyncCallThreadData*) data)->call_successful)
     {
-        IcedTeaPluginUtilities::JSIDToString(member_ptr, &member_ptr_str);
+        createJavaObjectFromVariant(instance, *member_ptr, &member_ptr_str);
         ((AsyncCallThreadData*) data)->result.append(member_ptr_str);
+
     }
     ((AsyncCallThreadData*) data)->result_ready = true;
 
@@ -831,8 +827,8 @@ _eval(void* data)
     std::string* script_str;
     NPIdentifier script_identifier;
     NPString script = NPString();
-    NPVariant* eval_result = new NPVariant();
-    std::string eval_result_ptr_str = std::string();
+    NPVariant* eval_variant = new NPVariant();
+    std::string eval_variant_str = std::string();
 
     PLUGIN_DEBUG("_eval called\n");
 
@@ -854,13 +850,19 @@ _eval(void* data)
     PLUGIN_DEBUG("Evaluating: %s\n", script.UTF8Characters);
 #endif
 
-    ((AsyncCallThreadData*) data)->call_successful = browser_functions.evaluate(instance, window_ptr, &script, eval_result);
-    IcedTeaPluginUtilities::printNPVariant(*eval_result);
+    ((AsyncCallThreadData*) data)->call_successful = browser_functions.evaluate(instance, window_ptr, &script, eval_variant);
+    IcedTeaPluginUtilities::printNPVariant(*eval_variant);
 
     if (((AsyncCallThreadData*) data)->call_successful)
     {
-        IcedTeaPluginUtilities::JSIDToString(eval_result, &eval_result_ptr_str);
-        ((AsyncCallThreadData*) data)->result.append(eval_result_ptr_str);
+        if (eval_variant)
+        {
+            createJavaObjectFromVariant(instance, *eval_variant, &eval_variant_str);
+        } else
+        {
+            eval_variant_str = "0";
+        }
+        ((AsyncCallThreadData*) data)->result.append(eval_variant_str);
     }
     ((AsyncCallThreadData*) data)->result_ready = true;
 
@@ -904,7 +906,15 @@ _call(void* data)
 
     if (((AsyncCallThreadData*) data)->call_successful)
     {
-        IcedTeaPluginUtilities::JSIDToString(call_result, &call_result_ptr_str);
+
+        if (call_result)
+        {
+            createJavaObjectFromVariant(instance, *call_result, &call_result_ptr_str);
+        } else
+        {
+        	call_result_ptr_str = "0";
+        }
+
         ((AsyncCallThreadData*) data)->result.append(call_result_ptr_str);
     }
 
