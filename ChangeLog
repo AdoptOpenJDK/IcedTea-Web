@@ -1,5 +1,10 @@
 2012-02-27  Matthias Klose  <doko@ubuntu.com>
 
+	* acinclude.m4 (IT_CHECK_PLUGIN_DEPENDENCIES): Use the mozilla-plugin
+	 pkgconfig module if the libxul module is not available.
+
+2012-02-27  Matthias Klose  <doko@ubuntu.com>
+
 	* acinclude.m4 (IT_FIND_JAVA): Set VERSION_DEFS.
 	* Makefile.am ($(PLUGIN_DIR)/%.o): Pass $(VERSION_DEFS)
 	* IcedTeaNPPlugin.cc (PLUGIN_MIME_DESC): Define in terms
