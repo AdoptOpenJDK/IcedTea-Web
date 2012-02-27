@@ -1,3 +1,10 @@
+2012-02-27  Matthias Klose  <doko@ubuntu.com>
+
+	* acinclude.m4 (IT_FIND_JAVA): Set VERSION_DEFS.
+	* Makefile.am ($(PLUGIN_DIR)/%.o): Pass $(VERSION_DEFS)
+	* IcedTeaNPPlugin.cc (PLUGIN_MIME_DESC): Define in terms
+	of HAVE_JAVA7.
+
 2012-02-27  Thomas Meyer <thomas@m3y3r.de>
 			Deepak Bhole <dbhole@redhat.com>
 

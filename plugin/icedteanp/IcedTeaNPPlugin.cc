@@ -90,6 +90,18 @@ exception statement from your version. */
 #define PLUGIN_FULL_NAME PLUGIN_NAME " (using " PLUGIN_VERSION ")"
 #define PLUGIN_DESC "The <a href=\"" PACKAGE_URL "\">" PLUGIN_NAME "</a> executes Java applets."
 
+#ifdef HAVE_JAVA7
+ #define JPI_VERSION "1.7.0_" JDK_UPDATE_VERSION
+ #define PLUGIN_APPLET_MIME_DESC7 \
+  "application/x-java-applet;version=1.7:class,jar:IcedTea;"
+ #define PLUGIN_BEAN_MIME_DESC7 \
+  "application/x-java-bean;version=1.7:class,jar:IcedTea;"
+#else
+ #define JPI_VERSION "1.6.0_" JDK_UPDATE_VERSION
+ #define PLUGIN_APPLET_MIME_DESC7
+ #define PLUGIN_BEAN_MIME_DESC7
+#endif
+
 #define PLUGIN_MIME_DESC                                               \
   "application/x-java-vm:class,jar:IcedTea;"                           \
   "application/x-java-applet:class,jar:IcedTea;"                       \
@@ -107,7 +119,8 @@ exception statement from your version. */
   "application/x-java-applet;version=1.4.2:class,jar:IcedTea;"         \
   "application/x-java-applet;version=1.5:class,jar:IcedTea;"           \
   "application/x-java-applet;version=1.6:class,jar:IcedTea;"           \
-  "application/x-java-applet;jpi-version=1.6.0_" JDK_UPDATE_VERSION ":class,jar:IcedTea;"  \
+  PLUGIN_APPLET_MIME_DESC7 \
+  "application/x-java-applet;jpi-version=" JPI_VERSION ":class,jar:IcedTea;"  \
   "application/x-java-bean:class,jar:IcedTea;"                         \
   "application/x-java-bean;version=1.1:class,jar:IcedTea;"             \
   "application/x-java-bean;version=1.1.1:class,jar:IcedTea;"           \
@@ -123,7 +136,8 @@ exception statement from your version. */
   "application/x-java-bean;version=1.4.2:class,jar:IcedTea;"           \
   "application/x-java-bean;version=1.5:class,jar:IcedTea;"             \
   "application/x-java-bean;version=1.6:class,jar:IcedTea;"             \
-  "application/x-java-bean;jpi-version=1.6.0_" JDK_UPDATE_VERSION ":class,jar:IcedTea;"    \
+  PLUGIN_BEAN_MIME_DESC7 \
+  "application/x-java-bean;jpi-version=" JPI_VERSION ":class,jar:IcedTea;"    \
   "application/x-java-vm-npruntime::IcedTea;"
 
 #define PLUGIN_URL NS_INLINE_PLUGIN_CONTRACTID_PREFIX NS_JVM_MIME_TYPE

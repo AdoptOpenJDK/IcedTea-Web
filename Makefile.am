@@ -213,7 +213,7 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	mkdir -p $(PLUGIN_DIR) && \
 	cd $(PLUGIN_DIR) && \
 	$(CXX) $(CXXFLAGS) \
-	   $(DEFS) \
+	   $(DEFS) $(VERSION_DEFS) \
 	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
 	  -DPLUGIN_NAME="\"IcedTea-Web Plugin\"" \
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \

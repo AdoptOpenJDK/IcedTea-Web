@@ -396,6 +396,9 @@ then
     if pkg-config --modversion libxul >/dev/null 2>&1
     then
       xulrunner_cv_collapsed_version=`pkg-config --modversion libxul | awk -F. '{power=6; v=0; for (i=1; i <= NF; i++) {v += $i * 10 ^ power; power -=2}; print v}'`
+    elif pkg-config --modversion mozilla-plugin >/dev/null 2>&1
+    then
+      xulrunner_cv_collapsed_version=`pkg-config --modversion mozilla-plugin | awk -F. '{power=6; v=0; for (i=1; i <= NF; i++) {v += $i * 10 ^ power; power -=2}; print v}'`
     else
       AC_MSG_FAILURE([cannot determine xulrunner version])
     fi])
@@ -673,6 +676,11 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
   fi
   AC_MSG_RESULT(${JAVA})
   AC_SUBST(JAVA)
+  JAVA_VERSION=`$JAVA -version 2>&1 | sed -n '1s/@<:@^"@:>@*"\(.*\)"$/\1/p'`
+  case "${JAVA_VERSION}" in
+    1.7*) VERSION_DEFS='-DHAVE_JAVA7';;
+  esac
+  AC_SUBST(VERSION_DEFS)
 ])
 
 AC_DEFUN_ONCE([IT_FIND_KEYTOOL],
