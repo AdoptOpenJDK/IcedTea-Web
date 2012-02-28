@@ -593,6 +593,39 @@ public class JNLPClassLoader extends URLClassLoader {
             mainClass = ad.getMainClass();
         } else
             return;
+
+        // The main class may be specified in the manifest
+
+        // Check main jar
+        if (mainClass == null) {
+            JARDesc mainJarDesc = file.getResources().getMainJAR();
+            mainClass = getMainClassName(mainJarDesc.getLocation());
+        }
+
+        // Check first jar
+        if (mainClass == null) {
+            JARDesc firstJarDesc = jars.get(0);
+            mainClass = getMainClassName(firstJarDesc.getLocation());
+        }
+
+        // Still not found? Iterate and set if only 1 was found
+        if (mainClass == null) {
+
+            for (JARDesc jarDesc: jars) {
+                String mainClassInThisJar = getMainClassName(jarDesc.getLocation());
+
+                if (mainClassInThisJar != null) {
+
+                    if (mainClass == null) { // first main class
+                        mainClass = mainClassInThisJar;
+                    } else { // There is more than one main class. Set to null and break.
+                        mainClass = null;
+                        break;
+                    }
+                }
+            }
+        }
+
         String desiredJarEntryName = mainClass + ".class";
 
         for (int i = 0; i < jars.size(); i++) {
@@ -627,6 +660,30 @@ public class JNLPClassLoader extends URLClassLoader {
                  */
             }
         }
+    }
+
+    /**
+     * Gets the name of the main method if specified in the manifest
+     *
+     * @param location The JAR location
+     * @return the main class name, null if there isn't one of if there was an error
+     */
+    private String getMainClassName(URL location) {
+
+        String mainClass = null;
+        File f = tracker.getCacheFile(location);
+
+        if( f != null) {
+            try {
+                JarFile mainJar = new JarFile(f);
+                mainClass = mainJar.getManifest().
+                        getMainAttributes().getValue("Main-Class");
+            } catch (IOException ioe) {
+                mainClass = null;
+            }
+        }
+
+        return mainClass;
     }
 
     /**

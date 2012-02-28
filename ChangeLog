@@ -1,5 +1,12 @@
 2012-02-28  Deepak Bhole <dbhole@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(checkForMain): Also check manifest file of main jar.
+	(getMainClassName): New method. Looks in a jar manifest to see if there is
+	a Main-Class specified.
+
+2012-02-28  Deepak Bhole <dbhole@redhat.com>
+
 	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
 	(_eval): Return 0 id to Java side if eval fails.
 	(_call): Return 0 id to Java side if call fails.
