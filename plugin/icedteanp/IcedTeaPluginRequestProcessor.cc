@@ -862,8 +862,12 @@ _eval(void* data)
         {
             eval_variant_str = "0";
         }
-        ((AsyncCallThreadData*) data)->result.append(eval_variant_str);
+    } else
+    {
+        eval_variant_str = "0";
     }
+
+    ((AsyncCallThreadData*) data)->result.append(eval_variant_str);
     ((AsyncCallThreadData*) data)->result_ready = true;
 
     PLUGIN_DEBUG("_eval returning\n");
@@ -914,10 +918,12 @@ _call(void* data)
         {
         	call_result_ptr_str = "0";
         }
-
-        ((AsyncCallThreadData*) data)->result.append(call_result_ptr_str);
+    } else
+    {
+        call_result_ptr_str = "0";
     }
 
+    ((AsyncCallThreadData*) data)->result.append(call_result_ptr_str);
     ((AsyncCallThreadData*) data)->result_ready = true;
 
     PLUGIN_DEBUG("_call returning\n");

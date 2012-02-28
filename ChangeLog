@@ -1,3 +1,9 @@
+2012-02-28  Deepak Bhole <dbhole@redhat.com>
+
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
+	(_eval): Return 0 id to Java side if eval fails.
+	(_call): Return 0 id to Java side if call fails.
+
 2012-02-27  Matthias Klose  <doko@ubuntu.com>
 
 	* acinclude.m4 (IT_CHECK_PLUGIN_DEPENDENCIES): Use the mozilla-plugin
