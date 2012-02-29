@@ -1,3 +1,8 @@
+2012-02-29  Deepak Bhole <dbhole@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java
+	(inKeyStores): Only check for certificate equality.
+
 2012-02-28  Deepak Bhole <dbhole@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java

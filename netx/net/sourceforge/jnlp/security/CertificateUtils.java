@@ -167,34 +167,19 @@ public class CertificateUtils {
                 // Check against all certs
                 Enumeration<String> aliases = keyStores[i].aliases();
                 while (aliases.hasMoreElements()) {
-                    String alias = aliases.nextElement();
-                    try {
-                        // Verify against this entry
-                        c.verify(keyStores[i].getCertificate(alias).getPublicKey());
 
+                    // Verify against this entry
+                    String alias = aliases.nextElement();
+
+                    if (c.equals(keyStores[i].getCertificate(alias))) {
                         if (JNLPRuntime.isDebug()) {
                             System.out.println(c.getSubjectX500Principal().getName() + " found in cacerts");
                         }
-                        
-                        // If we got here, it means verification succeeded. Return true.
+
                         return true;
-                    } catch (NoSuchAlgorithmException nsae) {
-                        // Unsupported signature algorithm 
-                        // Consider non-match and keep going
-                    } catch (InvalidKeyException ike) {
-                        // Incorrect/corrupt key
-                        // Consider non-match and keep going                     
-                    } catch (NoSuchProviderException nspe) {
-                        // No default provider 
-                        // Consider non-match and keep going
-                    } catch (SignatureException se) {
-                        // Signature error
-                        // Consider non-match and keep going
-                    } catch (CertificateException ce) {
-                        // Encoding error
-                        // Consider non-match and keep going
-                    }
+                    } // else continue
                 }
+
             } catch (KeyStoreException e) {
                 e.printStackTrace();
                 // continue
