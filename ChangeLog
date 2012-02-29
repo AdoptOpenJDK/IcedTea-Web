@@ -1,5 +1,9 @@
 2012-02-29  Deepak Bhole <dbhole@redhat.com>
 
+	* configure.ac: Bumped version to 1.3pre
+
+2012-02-29  Deepak Bhole <dbhole@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/CertificateUtils.java
 	(inKeyStores): Only check for certificate equality.
 
