@@ -1,3 +1,24 @@
+2012-03-06  Jiri Vanek <jvanek@redhat.com>
+
+	Improved reflection test:
+	* tests/jnlp_tests/simple/AccessClassInPackage/testcases/AccessClassInPackageTest.java:
+	This testcase was extended for three more unsigned reflection tries and four signed
+	*tests/jnlp_tests/simple/AccessClassInPackage/srcs/AccessClassInPackage.java:
+	now accepting class to be findByName as argument. Four new jnlp files in
+	signed a four in simple are then passing  those argument
+	*tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackageSUNSEC.jnlp:
+	*tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackageNETSF.jnlp:
+	*tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackageJAVAXJNLP.jnlp:
+	*tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackageSELF.jnlp:
+	*tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackage.jnlp:
+	removed
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/srcs/AccessClassInPackageSigned.java
+	signed variation of AccessClassInPackage, tescase is also in AccessClassInPackage
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedSELF.jnlp
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedNETSF.jnlp
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedSUNSEC.jnlp
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedJAVAXJNLP.jnlp
+
 2012-02-29  Deepak Bhole <dbhole@redhat.com>
 
 	* configure.ac: Bumped version to 1.3pre

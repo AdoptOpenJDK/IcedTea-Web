@@ -35,7 +35,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
+import java.util.Arrays;
+import java.util.List;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -43,21 +46,155 @@ import org.junit.Test;
 public class AccessClassInPackageTest {
 
     private static ServerAccess server = new ServerAccess();
+    private String[] files = {
+        "AccessClassInPackageJAVAXJNLP.jnlp",
+        "AccessClassInPackageSELF.jnlp",
+        "AccessClassInPackageNETSF.jnlp",
+        "AccessClassInPackageSUNSEC.jnlp"
+    };
+    private String[] filesSigned = {
+        "AccessClassInPackageSignedJAVAXJNLP.jnlp",
+        "AccessClassInPackageSignedSELF.jnlp",
+        "AccessClassInPackageSignedNETSF.jnlp",
+        "AccessClassInPackageSignedSUNSEC.jnlp"
+    };
+    private String[] badExceptions = {
+        "accessClassInPackage.javax.jnlp.ServiceManager",
+        "accessClassInPackage.AccessClassInPackage",
+        "accessClassInPackage.net.sourceforge.jnlp",
+        "accessClassInPackage.sun.security.internal.spec"
+    };
+    private String[] pass = {
+        "javax.jnlp.ServiceManager",
+        "AccessClassInPackage",
+        "net.sourceforge.jnlp.Parser",
+        "sun.security.internal.spec.TlsKeyMaterialSpec"
+    };
+    private static final List<String> xta = Arrays.asList(new String[]{"-Xtrustall"});
+
+    private void testShouldFail(ServerAccess.ProcessResult pr, String s) {
+        String c = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + s + ".*";
+        Assert.assertTrue("stderr should match `" + c + "`, but didn't ", pr.stderr.matches(c));
+    }
+
+    private void testShouldNOTFail(ServerAccess.ProcessResult pr, String s) {
+        String c = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + s + ".*";
+        Assert.assertFalse("stderr should NOT match `" + c + "`, but did ", pr.stderr.matches(c));
+    }
+
+    private void commonPitfall(ProcessResult pr) {
+        String cc = "ClassNotFoundException";
+        Assert.assertFalse("stderr should NOT contains `" + cc + "`, but did", pr.stderr.contains(cc));
+        Assert.assertFalse("AccessClassInPackageTestLunch1 should not be terminated, but was", pr.wasTerminated);
+        Assert.assertEquals((Integer) 0, pr.returnValue);
+    }
+
+    private void testShouldPass(ServerAccess.ProcessResult pr, String s) {
+        String c = "Class was obtained: " + s;
+        Assert.assertTrue("stdout should contains `" + c + "`, but didn't ", pr.stdout.contains(c));
+    }
+
+    private void testShouldNOTPass(ServerAccess.ProcessResult pr, String s) {
+        String c = "Class was obtained: " + s;
+        Assert.assertFalse("stdout should not contains `" + c + "`, but did ", pr.stdout.contains(c));
+    }
 
     @Test
-    public void AccessClassInPackageTestLunch1() throws Exception {
-        System.out.println("connecting AccessClassInPackageTest request");
-	System.err.println("connecting AccessClassInPackageTest request");
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/AccessClassInPackage.jnlp");
+    public void AccessClassInPackageJAVAXJNLP() throws Exception {
+        System.out.println("AccessClassInPackageJAVAXJNLP");
+        System.err.println("AccessClassInPackageJAVAXJNLP");
+        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[0]);
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        String c="java.security.AccessControlException: access denied (java.lang.RuntimePermission accessClassInPackage.sun.security.internal.spec)";
-        Assert.assertTrue("stderr should contains `"+c+"`, but didn't ",pr.stderr.contains(c));
-        String cc="ClassNotFoundException";
-        Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
-        Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
-        Assert.assertFalse("AccessClassInPackageTestLunch1 should not be terminated, but was",pr.wasTerminated);
-        Assert.assertEquals((Integer) 0, pr.returnValue);
+        commonPitfall(pr);
+        testShouldPass(pr, pass[0]);
+        testShouldNOTFail(pr, badExceptions[0]);
+    }
+
+    @Test
+    public void AccessClassInPackageSELF() throws Exception {
+        System.out.println("AccessClassInPackageSELF");
+        System.err.println("AccessClassInPackageSELF");
+        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[1]);
+        System.out.println(pr.stdout);
+        System.err.println(pr.stderr);
+        commonPitfall(pr);
+        testShouldPass(pr, pass[1]);
+        testShouldNOTFail(pr, badExceptions[1]);
+    }
+
+    @Test
+    public void AccessClassInPackageNETSF() throws Exception {
+        System.out.println("AccessClassInPackageNETSF");
+        System.err.println("AccessClassInPackageNETSF");
+        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[2]);
+        System.out.println(pr.stdout);
+        System.err.println(pr.stderr);
+        commonPitfall(pr);
+        testShouldFail(pr, badExceptions[2]);
+        testShouldNOTPass(pr, pass[2]);
+    }
+
+    @Test
+    public void AccessClassInPackageSUNSEC() throws Exception {
+        System.out.println("AccessClassInPackageSUNSEC");
+        System.err.println("AccessClassInPackageSUNSEC");
+        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[3]);
+        System.out.println(pr.stdout);
+        System.err.println(pr.stderr);
+        commonPitfall(pr);
+        commonPitfall(pr);
+        testShouldFail(pr, badExceptions[3]);
+        testShouldNOTPass(pr, pass[3]);
+    }
+
+    //now signed vaiants
+    @Test
+    public void AccessClassInPackageSignedJAVAXJNLP() throws Exception {
+        System.out.println("AccessClassInPackageSignedJAVAXJNLP");
+        System.err.println("AccessClassInPackageSignedJAVAXJNLP");
+        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[0]);
+        System.out.println(pr.stdout);
+        System.err.println(pr.stderr);
+        commonPitfall(pr);
+        testShouldPass(pr, pass[0]);
+        testShouldNOTFail(pr, badExceptions[0]);
+    }
+
+    @Test
+    public void AccessClassInPackageSignedSELF() throws Exception {
+        System.out.println("AccessClassInPackageSignedSELF");
+        System.err.println("AccessClassInPackageSignedSELF");
+        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[1]);
+        System.out.println(pr.stdout);
+        System.err.println(pr.stderr);
+        commonPitfall(pr);
+        testShouldPass(pr, pass[1]);
+        testShouldNOTFail(pr, badExceptions[1]);
+    }
+
+    @Test
+    public void AccessClassInPackageSignedNETSF() throws Exception {
+        System.out.println("AccessClassInPackageSignedNETSF");
+        System.err.println("AccessClassInPackageSignedNETSF");
+        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[2]);
+        System.out.println(pr.stdout);
+        System.err.println(pr.stderr);
+        commonPitfall(pr);
+        testShouldPass(pr, pass[2]);
+        testShouldNOTFail(pr, badExceptions[2]);
+    }
+
+    @Test
+    public void AccessClassInPackageSignedSUNSEC() throws Exception {
+        System.out.println("AccessClassInPackageSignedSUNSEC");
+        System.err.println("AccessClassInPackageSignedSUNSEC");
+        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[3]);
+        System.out.println(pr.stdout);
+        System.err.println(pr.stderr);
+        commonPitfall(pr);
+        testShouldPass(pr, pass[3]);
+        testShouldNOTFail(pr, badExceptions[3]);
     }
 
 }
