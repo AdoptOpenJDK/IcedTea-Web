@@ -27,6 +27,7 @@ KEYSTORE_NAME=teststore.ks
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
 REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
+META_MANIFEST = META-INF/MANIFEST.MF
 
 # Build directories
 
@@ -490,7 +491,12 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
 	      cp -R --parents "$$notSrcFiles" "$(JNLP_TESTS_DIR)/$$dir/" ; \
 	    fi ; \
 	    cd "$(JNLP_TESTS_DIR)/$$dir/" ; \
-	    $(BOOT_DIR)/bin/jar cf "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" * ; \
+	    if [ -f $(META_MANIFEST) ]; \
+	    then \
+	      $(BOOT_DIR)/bin/jar cfm "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" $(META_MANIFEST) * ; \
+	    else \
+	      $(BOOT_DIR)/bin/jar cf "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" * ; \
+	    fi; \
 	    cd "$$d" ; \
 	    cp -R "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/resources/"*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
 	  done ; \

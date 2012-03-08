@@ -1,3 +1,20 @@
+2012-03-05  Jiri Vanek <jvanek@redhat.com>
+
+	Added test for main-class in manifest for jnlp
+	* Makefile.am: (prepare-reproducers.stamp) fixed manifest handling. Till
+	now was manifest copied as any other non java file, and so was rewritten 
+	by jar tool
+	* tests/jnlp_tests/simple/ManifestedJar2/srcs: secondary jar file which 
+	should have manifest and so should help ManifestedJar1 with testing
+	* tests/jnlp_tests/simple/ManifestedJar2/resources/META-INF/MANIFEST.MF:
+	 manifest for  ManifestedJar2.jar
+	* tests/jnlp_tests/simple/ManifestedJar1/srcs: main testing jar
+	* tests/jnlp_tests/simple/ManifestedJar2/resources/META-INF/MANIFEST.MF:
+	 manifest for  ManifestedJar1.jar
+	* tests/jnlp_tests/simple/ManifestedJar1/testcases/ManifestedJar1Test.java:
+	 testing class for this reproducers
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/: nine reproducers jnlps
+
 2012-03-06  Jiri Vanek <jvanek@redhat.com>
 
 	Improved reflection test:
