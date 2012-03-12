@@ -3,7 +3,8 @@
       codebase="./"
       href="CacheReproducer2_1.jnlp">
     <information>
-        <title><title>Just prints out "Good simple javaws exapmle" using reflection call from CacheReproducer.jar SimpletestSigned1.jar</title></title>
+        <title>Just prints out "Good simple javaws exapmle" using reflection call from CacheReproducer.jar SimpletestSigned1.jar</title>
+        <vendor>Red Hat</vendor>
     </information>
     <resources>
         <jar href="SimpletestSigned1.jar" main="false" download="lazy"/>

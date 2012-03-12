@@ -1,3 +1,29 @@
+2012-03-12  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Update tests that are missing title/vendor tag in their JNLPs.
+	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer1.jnlp,
+	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer1_1.jnlp,
+	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer2.jnlp,
+	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer2_1.jnlp,
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar.jnlp,
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar2.jnlp,
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar3.jnlp,
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar4.jnlp,
+	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/resources/ReadPropertiesBySignedHack.jnlp,
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned1.jnlp,
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned2.jnlp,
+	* tests/jnlp_tests/simple/AddShutdownHook/resources/AddShutdownHook.jnlp,
+	* tests/jnlp_tests/simple/AllStackTraces/resources/AllStackTraces.jnlp
+	* tests/jnlp_tests/simple/CreateClassLoader/resources/CreateClassLoader.jnlp,
+	* tests/jnlp_tests/simple/ReadEnvironment/resources/ReadEnvironment.jnlp,
+	* tests/jnlp_tests/simple/ReadProperties/resources/ReadProperties1.jnlp,
+	* tests/jnlp_tests/simple/ReadProperties/resources/ReadProperties2.jnlp,
+	* tests/jnlp_tests/simple/RedirectStreams/resources/RedirectStreams.jnlp,
+	* tests/jnlp_tests/simple/ReplaceSecurityManager/resources/ReplaceSecurityManager.jnlp,
+	* tests/jnlp_tests/simple/SetContextClassLoader/resources/SetContextClassLoader.jnlp,
+	* tests/netx/unit/net/sourceforge/jnlp/templates/template8.jnlp:
+	Added missing title/vendor tags that make them fail with this changeset.
+
 2012-03-05  Jiri Vanek <jvanek@redhat.com>
 
 	Added test for main-class in manifest for jnlp

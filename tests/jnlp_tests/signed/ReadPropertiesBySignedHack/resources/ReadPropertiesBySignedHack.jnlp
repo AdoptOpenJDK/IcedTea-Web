@@ -4,6 +4,7 @@
       href="ReadPropertiesBySignedHack.jnlp">
     <information>
         <title>read properties using System.getenv()</title>
+        <vendor>Red Hat</vendor>
     </information>
     <resources>
         <jar href="ReadPropertiesBySignedHack.jar" main="true"/>

@@ -4,6 +4,7 @@
       href="MissingJar3.jnlp">
    <information> 
       <title>test MissingJar</title> 
+      <vendor>Red Hat</vendor>
    </information> 
    <resources>
       <!-- MissingJar is name of reproducer and of main jar,

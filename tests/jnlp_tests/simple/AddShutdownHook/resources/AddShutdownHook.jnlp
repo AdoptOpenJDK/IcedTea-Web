@@ -4,6 +4,7 @@
       href="AddShutdownHook.jnlp">
    <information> 
       <title>test adding shutdown hooks</title> 
+      <vendor>Red Hat</vendor>
    </information> 
    <resources>
       <jar href="AddShutdownHook.jar" main="true" download="eager"/>
