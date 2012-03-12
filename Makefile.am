@@ -486,7 +486,7 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
 	    cd "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/" ; \
 	    srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
 	    notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
-	    $(BOOT_DIR)/bin/javac -d  "$(JNLP_TESTS_DIR)/$$dir/" $$srcFiles ; \
+	    $(BOOT_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar -d "$(JNLP_TESTS_DIR)/$$dir/" $$srcFiles ; \
 	    if [ -n "$$notSrcFiles" ] ; then \
 	      cp -R --parents "$$notSrcFiles" "$(JNLP_TESTS_DIR)/$$dir/" ; \
 	    fi ; \

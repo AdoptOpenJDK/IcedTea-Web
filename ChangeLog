@@ -1,5 +1,16 @@
 2012-03-12  Danesh Dadachanji  <ddadacha@redhat.com>
 
+	Adding test for regression of JNLP API accessibility in constructor
+	methods of applets.
+	* Makefile.am: Added classes.jar to classpath when compiling jnlp_tests.
+	* tests/jnlp_tests/simple/CheckServices/resources/CheckServices.jnlp:
+	* tests/jnlp_tests/simple/CheckServices/srcs/CheckServices.java:
+	* tests/jnlp_tests/simple/CheckServices/testcases/CheckServicesTests.java:
+	New test file added. Tests ServiceManager is setup correctly when called
+	from applet constructors.
+
+2012-03-12  Danesh Dadachanji  <ddadacha@redhat.com>
+
 	Update tests that are missing title/vendor tag in their JNLPs.
 	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer1.jnlp,
 	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer1_1.jnlp,
