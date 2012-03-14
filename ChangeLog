@@ -1,3 +1,18 @@
+2012-03-14  Deepak Bhole <dbhole@redhat.com>
+			Omair Majid <omajid@redhat.com>
+
+	PR895: IcedTea-Web searches for missing classes on each loadClass or
+	findClass
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(CodeBaseClassLoader): Added new map to track resources that are not
+	found.
+	(findClass): If resource was not found before, return immediately. If
+	resource was not found for the first time, record it in the new map.
+	(findResouces): Same.
+	(findResource): Same.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
+	Test case for PR895 from Omair Majid.
+
 2012-03-14  Omair Majid  <omajid@redhat.com>
 
 	Print exceptions to terminal when running in gui mode too.

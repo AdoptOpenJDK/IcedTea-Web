@@ -37,6 +37,7 @@ import java.security.Permissions;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -47,9 +48,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.ApplicationDesc;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -1874,6 +1877,11 @@ public class JNLPClassLoader extends URLClassLoader {
 
         JNLPClassLoader parentJNLPClassLoader;
         
+        /**
+         * Classes that are not found, so that findClass can skip them next time
+         */
+        ConcurrentHashMap<String, URL[]> notFoundResources = new ConcurrentHashMap<String, URL[]>();
+
         public CodeBaseClassLoader(URL[] urls, JNLPClassLoader cl) {
             super(urls);
             parentJNLPClassLoader = cl;
@@ -1885,8 +1893,18 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         @Override
-        public Class<?> findClass(String name) throws ClassNotFoundException { 
-            return super.findClass(name); 
+        public Class<?> findClass(String name) throws ClassNotFoundException {
+
+            // If we have searched this path before, don't try again
+            if (Arrays.equals(super.getURLs(), notFoundResources.get(name)))
+                throw new ClassNotFoundException(name);
+
+            try {
+                return super.findClass(name);
+            } catch (ClassNotFoundException cnfe) {
+                notFoundResources.put(name, super.getURLs());
+                throw cnfe;
+            }
         }
 
         /**
@@ -1913,17 +1931,41 @@ public class JNLPClassLoader extends URLClassLoader {
 
         @Override
         public Enumeration<URL> findResources(String name) throws IOException {
+
+            // If we have searched this path before, don't try again
+            if (Arrays.equals(super.getURLs(), notFoundResources.get(name)))
+                return (new Vector<URL>(0)).elements();
+
             if (!name.startsWith("META-INF")) {
-                return super.findResources(name);
+                Enumeration<URL> urls = super.findResources(name);
+
+                if (!urls.hasMoreElements()) {
+                    notFoundResources.put(name, super.getURLs());
+                }
+
+                return urls;
             }
+
             return (new Vector<URL>(0)).elements();
         }
 
         @Override
         public URL findResource(String name) {
+
+            // If we have searched this path before, don't try again
+            if (Arrays.equals(super.getURLs(), notFoundResources.get(name)))
+                return null;
+
             if (!name.startsWith("META-INF")) {
-                return super.findResource(name);
+                URL url = super.findResource(name);
+
+                if (url == null) {
+                    notFoundResources.put(name, super.getURLs());
+                }
+
+                return url;
             }
+
             return null;
         }
     }
