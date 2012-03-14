@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp;
 
+import java.io.PrintStream;
+
 import net.sourceforge.jnlp.runtime.*;
 
 /**
@@ -26,7 +28,11 @@ import net.sourceforge.jnlp.runtime.*;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.1 $
  */
-public class DefaultLaunchHandler implements LaunchHandler {
+public class DefaultLaunchHandler extends AbstractLaunchHandler {
+
+    public DefaultLaunchHandler(PrintStream out) {
+        super(out);
+    }
 
     /**
      * Called when the application could not be launched due to a
@@ -57,8 +63,8 @@ public class DefaultLaunchHandler implements LaunchHandler {
      *
      * @return true to allow the application to continue, false to stop it.
      */
-    public boolean validationError(LaunchException security) {
-        printMessage(security);
+    public boolean validationError(LaunchException error) {
+        printMessage(error);
         return true;
     }
 
@@ -71,36 +77,6 @@ public class DefaultLaunchHandler implements LaunchHandler {
      */
     public void launchCompleted(ApplicationInstance application) {
         //
-    }
-
-    /**
-     * Print a message to stdout.
-     */
-    protected static void printMessage(LaunchException ex) {
-        StringBuffer result = new StringBuffer();
-        result.append("netx: ");
-        result.append(ex.getCategory());
-        if (ex.getSummary() != null) {
-            result.append(": ");
-            result.append(ex.getSummary());
-        }
-
-        if (JNLPRuntime.isDebug()) {
-            if (ex.getCause() != null)
-                ex.getCause().printStackTrace();
-            else
-                ex.printStackTrace();
-        }
-
-        Throwable causes[] = ex.getCauses();
-
-        for (int i = 0; i < causes.length; i++) {
-            result.append(" (");
-            result.append(causes[i].getClass().getName());
-            result.append(" ");
-            result.append(causes[i].getMessage());
-            result.append(")");
-        }
     }
 
     /**

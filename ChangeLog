@@ -1,3 +1,36 @@
+2012-03-14  Omair Majid  <omajid@redhat.com>
+
+	Print exceptions to terminal when running in gui mode too.
+	* netx/net/sourceforge/jnlp/AbstractLaunchHandler.java: New file.
+	* netx/net/sourceforge/jnlp/DefaultLaunchHandler.java: Extend
+	AbstractLaunchHandler.
+	(DefaultLaunchHandler): New method.
+	(printMessage): Moved to parent class.
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: Extend
+	AbstractLaunchHandler.
+	(GuiLauchHandler): New method.
+	(launchError): Print the error too.
+	(launchWarning,validationError): Call parent's printMessage.
+	* netx/net/sourceforge/jnlp/LaunchException.java: Use standard java
+	exception chaining. This removes compatibility with pre-java 1.3 class
+	libraries.
+	(LaunchException(JNLPFile,Exception,String,String,String,String)): Pass
+	cause to parent so exceptions are chanined properly.
+	(LaunchException(String,Throwable),LaunchException(Throwable)): Call
+	parent's constructor.
+	(printStackTrace(PrintStream),printStackTrace(PrintWriter),getCause):
+	Removed. Use parent's implementation instead.
+	(getCauses): Removed.
+	* netx/net/sourceforge/jnlp/LaunchHandler.java
+	(validationError): Rename argument to clarify meaing.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Redirect output of all handlers to System.err.
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java
+	(PluginAppletSecurityContext): Likewise.
+	* tests/netx/unit/net/sourceforge/jnlp/DefaultLaunchHandlerTest.java,
+	* tests/netx/unit/net/sourceforge/jnlp/LaunchExceptionTest.java: New
+	file. Contains tests.
+
 2012-03-12  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Adding test for regression of JNLP API accessibility in constructor

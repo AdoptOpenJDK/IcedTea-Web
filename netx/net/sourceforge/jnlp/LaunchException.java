@@ -16,11 +16,6 @@
 
 package net.sourceforge.jnlp;
 
-import java.io.*;
-import java.util.*;
-
-import net.sourceforge.jnlp.util.*;
-
 /**
  * Thrown when a JNLP application, applet, or installer could not
  * be created.
@@ -30,8 +25,7 @@ import net.sourceforge.jnlp.util.*;
  */
 public class LaunchException extends Exception {
 
-    /** the original exception */
-    private Throwable cause = null;
+    private static final long serialVersionUID = 7283827853612357423L;
 
     /** the file being launched */
     private JNLPFile file;
@@ -53,36 +47,27 @@ public class LaunchException extends Exception {
      */
     public LaunchException(JNLPFile file, Exception cause, String severity, String category, String summary, String description) {
         super(severity + ": " + category + ": " + summary + " "
-        	    + (description == null ? "" : description));
+        	    + (description == null ? "" : description), cause);
 
         this.file = file;
         this.category = category;
         this.summary = summary;
         this.description = description;
         this.severity = severity;
-
-        // replace with setCause when no longer 1.3 compatible
-        this.cause = cause;
     }
 
     /**
      * Creates a LaunchException with a cause.
      */
     public LaunchException(Throwable cause) {
-        this(cause.getMessage());
-
-        // replace with setCause when no longer 1.3 compatible
-        this.cause = cause;
+        super(cause);
     }
 
     /**
      * Creates a LaunchException with a cause and detail message
      */
     public LaunchException(String message, Throwable cause) {
-        this(message + ": " + cause.getMessage());
-
-        // replace with setCause when no longer 1.3 compatible
-        this.cause = cause;
+        super(message, cause);
     }
 
     /**
@@ -130,59 +115,6 @@ public class LaunchException extends Exception {
      */
     public String getSeverity() {
         return severity;
-    }
-
-    /**
-     * Return the cause of the launch exception or null if there
-     * is no cause exception.
-     */
-    public Throwable getCause() {
-        return cause;
-    }
-
-    /**
-     * Returns the causes for this exception.  This method is
-     * useful on JRE 1.3 since getCause is not a standard method,
-     * and will be removed once netx no longer supports 1.3.
-     */
-    public Throwable[] getCauses() {
-        ArrayList<Throwable> result = new ArrayList<Throwable>();
-
-        Reflect r = new Reflect();
-        Throwable cause = this.cause;
-
-        while (cause != null) {
-            result.add(cause);
-            cause = (Throwable) r.invoke(cause, "getCause");
-        }
-
-        return result.toArray(new Throwable[0]);
-    }
-
-    /**
-     * Print the stack trace and the cause exception (1.3
-     * compatible)
-     */
-    public void printStackTrace(PrintStream stream) {
-        super.printStackTrace(stream);
-
-        if (cause != null) {
-            stream.println("Caused by: ");
-            cause.printStackTrace(stream);
-        }
-    }
-
-    /**
-     * Print the stack trace and the cause exception (1.3
-     * compatible)
-     */
-    public void printStackTrace(PrintWriter stream) {
-        super.printStackTrace(stream);
-
-        if (cause != null) {
-            stream.println("Caused by: ");
-            cause.printStackTrace(stream);
-        }
     }
 
 }

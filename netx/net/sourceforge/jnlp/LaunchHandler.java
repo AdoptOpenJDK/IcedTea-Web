@@ -50,7 +50,7 @@ public interface LaunchHandler {
      *
      * @return true to allow the application to continue, false to stop it.
      */
-    public boolean validationError(LaunchException security);
+    public boolean validationError(LaunchException error);
 
     // this method will probably be replaced when real security
     // controller is in place.

@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
@@ -51,11 +52,15 @@ import net.sourceforge.jnlp.util.BasicExceptionDialog;
  * A {@link LaunchHandler} that gives feedback to the user using GUI elements
  * including splash screens and exception dialogs.
  */
-public class GuiLaunchHandler implements LaunchHandler {
+public class GuiLaunchHandler extends AbstractLaunchHandler {
 
     private JNLPSplashScreen splashScreen = null;
     private final Object mutex = new Object();
     private UpdatePolicy policy = UpdatePolicy.ALWAYS;
+
+    public GuiLaunchHandler(PrintStream outputStream) {
+        super(outputStream);
+    }
 
     @Override
     public void launchCompleted(ApplicationInstance application) {
@@ -71,6 +76,7 @@ public class GuiLaunchHandler implements LaunchHandler {
                 BasicExceptionDialog.show(exception);
             }
         });
+        printMessage(exception);
     }
 
     private void closeSplashScreen() {
@@ -141,14 +147,14 @@ public class GuiLaunchHandler implements LaunchHandler {
 
     @Override
     public boolean launchWarning(LaunchException warning) {
-        DefaultLaunchHandler.printMessage(warning);
+        printMessage(warning);
         return true;
     }
 
     @Override
-    public boolean validationError(LaunchException security) {
+    public boolean validationError(LaunchException error) {
         closeSplashScreen();
-        DefaultLaunchHandler.printMessage(security);
+        printMessage(error);
         return true;
     }
 

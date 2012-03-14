@@ -196,9 +196,9 @@ public class JNLPRuntime {
 
         if (handler == null) {
             if (headless) {
-                handler = new DefaultLaunchHandler();
+                handler = new DefaultLaunchHandler(System.err);
             } else {
-                handler = new GuiLaunchHandler();
+                handler = new GuiLaunchHandler(System.err);
             }
         }
 

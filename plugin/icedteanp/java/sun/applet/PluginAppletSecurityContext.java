@@ -243,7 +243,7 @@ public class PluginAppletSecurityContext {
         // that JNLPRuntime will try to install
         if (System.getSecurityManager() == null) {
             JNLPRuntime.initialize(/* isApplication */false);
-            JNLPRuntime.setDefaultLaunchHandler(new DefaultLaunchHandler());
+            JNLPRuntime.setDefaultLaunchHandler(new DefaultLaunchHandler(System.err));
         }
 
         JNLPRuntime.disableExit();
