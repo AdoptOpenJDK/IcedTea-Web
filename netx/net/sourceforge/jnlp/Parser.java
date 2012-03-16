@@ -504,6 +504,11 @@ class Parser {
             child = child.getNextSibling();
         }
 
+        if (info.getTitle() == null || info.getTitle().trim().isEmpty())
+            throw new ParseException(R("PNoTitleElement"));
+        if (info.getVendor() == null || info.getVendor().trim().isEmpty())
+            throw new ParseException(R("PNoVendorElement"));
+
         return info;
     }
 

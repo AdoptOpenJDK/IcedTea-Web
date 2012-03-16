@@ -1,3 +1,20 @@
+2012-03-16  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Applications using JNLP files without a title or vendor section
+	still run, despite them being required elements.
+	* netx/net/sourceforge/jnlp/Parser.java:
+	(getInformationDesc): If title or vendor are not found in info,
+	a new ParseException is thrown.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Added PNoTitleElement and PNoVendorElement
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/resources/InformationParser.jnlp,
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/resources/TitleParser.jnlp,
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/resources/TitleVendorParser.jnlp,
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/resources/VendorParser.jnlp,
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/testcases/TitleVendorParserTest.java:
+	New test that runs JNLPs in a combination of missing information, title
+	and vendor tags, checking for the appropriate exceptions.
+
 2012-03-14  Deepak Bhole <dbhole@redhat.com>
 			Omair Majid <omajid@redhat.com>
 
