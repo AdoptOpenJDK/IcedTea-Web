@@ -1,3 +1,54 @@
+2012-03-19  Jiri Vanek <jvanek@redhat.com>
+	* tests/jnlp_tests/signed/CacheReproducer/testcases/CacheReproducerTest.java: 
+	as javaws have now integrated splash, I have changed this test to lunch javaws
+	 -Xclearcache with -headless to skip this logo (although it is not fatal fr testrun itself)
+	* tests/jnlp_tests/simple/AppletTest/resources/appletAutoTests.html: this html 
+	file is lunched during tests run in browser and stdout of lunched applet is
+	 examined. Is lunched with slow resources to test spalshscreen
+	* tests/jnlp_tests/simple/AppletTest/resources/appletViewTest.html: this 
+	test html file is dedicated to manual lunch and let user to look how the applet 
+	(with slow loading) is 	loaded and how looks splashscreen in small mode and in large mode
+	* tests/jnlp_tests/simple/AppletTest/testcases/AppletTestTests.java: test is enriched
+	 for lunching the html file with applet in browser and is examining output of this file. 
+	Browser must be always terminated as there is no way how to close from inside
+	* tests/jnlp_tests/simple/simpletest1/resources/netxPlugin.png : image to let user 
+	observe that user-defined splashscreen is still working even when internal splashscreen is enabled
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestCustomSplash.jnlp: this and all jnlp 
+	files below are just for manual lunching and for watching various lunches of splash 
+	screen - slow loading of resources and with custom splash
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestMegaSlow.jnlp:
+	slow loading of resource and (XslowX)jnlp also
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestSlow.jnlp:
+	 slow loading of resource
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestSlowBrokenCustomSplash.jnlp: 
+	slow loading of resource with broken user's splash (our internal will be used)
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestSlowSlowCustomSplash.jnlp: 
+	slow loading of custom splash screen and resource
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java: 
+	Main server launcher was modified to support lunching of browser, 
+	stdout listteners and for slowing download of resources to provide time for watching 
+	splash screen
+	 (main) was rewritten to provide free port OR run server in-D specified directory on
+	 custom or default port - very useful for debuging reproducers
+	 (getIndependentInstance) can now run also on specified port and (or) directory
+	 (USED_BROWSER_COMMAND) new constant handling value of -D property to 
+	set browser = "used.browser.command";
+	 (getBrowserLocation) new method  to provide specified 
+	(by used.browser.command -D property) or default browser location (firefox)
+	 (ensureServer) test is testing weather XslowXmodifier is working
+	 (executeBrowser) set of overloaded functions to lunch browser
+	 (TinyHttpdImpl) was enriched for XslowX modifier. When resource starts with this, 
+	 is returned slowly - splited to 10 parts with 1s delay betwen sending each of them.
+	 Although it is throwing BrokenPipe exception, is working fine.
+	 (splitArray) new function to split array of byte to n arrays of bytes, 
+	 which when concated do the same array
+	 (splitArrayTestN) set of tests for splitArray
+	 (ContentReader) now can also have lsteners for catching outputs n runtime.
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ContentReaderListener.java: 
+	Listener for catching chars and lines form processes outputs
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ResourcesTest.java: 
+	added (testListeners) to test listeners behaviour 
+
 2012-03-16  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Applications using JNLP files without a title or vendor section

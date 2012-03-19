@@ -53,6 +53,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -91,6 +92,9 @@ public class ServerAccess {
      * java property which value containig path to installed (makefile by) javaws binary
      */
     public static final String JAVAWS_BUILD_BIN = "javaws.build.bin";
+    /** property to set the different then default browser
+     */
+    public static final String USED_BROWSER_COMMAND = "used.browser.command";
     public static final String DEFAULT_LOCALHOST_NAME = "localhost";
     /**
      * server instance singeton
@@ -117,11 +121,27 @@ public class ServerAccess {
 
     /**
      * main method of thos class prints out random free port
+     * or runs server
+     * param "port" prints out the port
+     * nothing or number will run  sefrver on random(or on number specified)
+     * port in -Dtest.server.dir
      */
-    public static void main(String[] args) throws IOException {
-        int i = findFreePort();
-        System.out.println(i);
+    public static void main(String[] args) throws Exception {
+        if (args.length > 0 && args[0].equalsIgnoreCase("port")) {
+            int i = findFreePort();
+            System.out.println(i);
+            System.exit(0);
+        } else {
+            int port = 44321;
+            if (args.length > 0) {
+                port=new Integer(args[0]);
+            }
+            getIndependentInstance(port);
+            while (true) {
+                Thread.sleep(1000);
+            }
 
+        }
     }
 
     /**
@@ -167,7 +187,22 @@ public class ServerAccess {
      */
     public static ServerLauncher getIndependentInstance() {
         String dir = (System.getProperty(TEST_SERVER_DIR));
-        return getIndependentInstance(dir);
+        try{
+            return getIndependentInstance(dir, findFreePort());
+        }catch (Exception ex){
+            throw  new RuntimeException(ex);
+        }
+    }
+
+
+    /**
+     *
+     * @return new not cached iserver instance on random port,
+     * usefull for testing application loading from different url then base
+     */
+    public static ServerLauncher getIndependentInstance(int port) {
+        String dir = (System.getProperty(TEST_SERVER_DIR));
+        return getIndependentInstance(dir,port);
     }
 
     /**
@@ -175,14 +210,13 @@ public class ServerAccess {
      * @return new not cached iserver instance on random port upon custom www root directory,
      * usefull for testing application loading from different url then base
      */
-    public static ServerLauncher getIndependentInstance(String dir) {
+    public static ServerLauncher getIndependentInstance(String dir, int port) {
 
 
         if (dir == null || dir.trim().length() == 0 || !new File(dir).exists() || !new File(dir).isDirectory()) {
             throw new RuntimeException("test.server.dir property must be set to valid directory!");
         }
         try {
-            int port = findFreePort();
             ServerLauncher lServerLuncher = new ServerLauncher(port, new File(dir));
             new Thread(lServerLuncher).start();
             return lServerLuncher;
@@ -198,6 +232,16 @@ public class ServerAccess {
      */
     public String getJavawsLocation() {
         return System.getProperty(JAVAWS_BUILD_BIN);
+    }
+
+      /**
+     *
+     * @return - value passed inside as javaws binary location. See JAVAWS_BUILD_BIN
+     */
+    public String getBrowserLocation() {
+       String s=System.getProperty(USED_BROWSER_COMMAND);
+       if (s==null) s="firefox";
+       return s;
     }
 
     /**
@@ -313,6 +357,13 @@ public class ServerAccess {
         Assert.assertEquals(dirUrlContent.trim(), dirFileContent.trim());
         Assert.assertEquals(new File(dirUrlContent.trim()), server.getDir());
         Assert.assertEquals(new Integer(portUrlContent.trim()), server.getPort());
+
+         URL fastUrl = new URL("http", "localhost", server.getPort(), "/simpletest1.jnlp");
+         URL slowUrl = new URL("http", "localhost", server.getPort(), "/XslowXsimpletest1.jnlp");
+
+        String fastUrlcontent = getContentOfStream(fastUrl.openConnection().getInputStream());
+        String slowUrlContent = getContentOfStream(slowUrl.openConnection().getInputStream());
+        Assert.assertEquals(fastUrlcontent, slowUrlContent);
 
     }
 
@@ -501,7 +552,10 @@ public class ServerAccess {
     public ProcessResult executeJavawsHeadless(String resource) throws Exception {
         return executeJavawsHeadless(null, resource);
     }
-
+    public ProcessResult executeJavawsHeadless(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+        return executeJavawsHeadless(null, resource,stdoutl,stderrl);
+    }
+     
     /**
      * wrapping method to executeProcess (eg: javaws arg arg -headless http://localhost:port/resource)
      * will execute default javaws (@see JAVAWS_BUILD_BIN) upon default url upon cached server (@see SERVER_NAME @see getPort(), @see getInstance())
@@ -512,13 +566,17 @@ public class ServerAccess {
      * @throws Exception
      */
     public ProcessResult executeJavawsHeadless(List<String> otherargs, String resource) throws Exception {
+         return executeJavawsHeadless(otherargs, resource,null,null);
+     }
+    public ProcessResult executeJavawsHeadless(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
         if (otherargs == null) {
             otherargs = new ArrayList<String>(1);
         }
         List<String> headlesList = new ArrayList<String>(otherargs);
         headlesList.add(HEADLES_OPTION);
-        return executeJavaws(headlesList, resource);
+        return executeJavaws(headlesList, resource,stdoutl,stderrl);
     }
+
 
     /**
      * wrapping method to executeProcess (eg: javaws  http://localhost:port/resource)
@@ -530,6 +588,15 @@ public class ServerAccess {
     public ProcessResult executeJavaws(String resource) throws Exception {
         return executeJavaws(null, resource);
     }
+    public ProcessResult executeJavaws(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+        return executeJavaws(null, resource,stdoutl,stderrl);
+    }
+    public ProcessResult executeBrowser(String resource) throws Exception {
+        return executeBrowser(null, resource);
+    }
+    public ProcessResult executeBrowser(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+        return executeBrowser(null, resource,stderrl,stdoutl);
+    }
 
     /**
      *  wrapping method to executeProcess (eg: javaws arg arg http://localhost:port/resource)
@@ -540,7 +607,27 @@ public class ServerAccess {
      * @throws Exception
      */
     public ProcessResult executeJavaws(List<String> otherargs, String resource) throws Exception {
-        return executeProcessUponURL(getJavawsLocation(), otherargs, new URL("http", server.getServerName(), getPort(), resource));
+        return executeProcessUponURL(getJavawsLocation(), otherargs, getUrlUponThisInstance(resource));
+    }
+    public ProcessResult executeJavaws(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+        return executeProcessUponURL(getJavawsLocation(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl);
+    }
+
+    public ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
+        return executeProcessUponURL(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource));
+    }
+    public ProcessResult executeBrowser(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+        return executeProcessUponURL(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl);
+    }
+
+    /**
+     * Ctreate resource on http, on 'localhost' on port on which this instance is running
+     * @param resource
+     * @return
+     * @throws MalformedURLException
+     */
+    private URL getUrlUponThisInstance(String resource) throws MalformedURLException {
+        return new URL("http", server.getServerName(), getPort(), resource);
     }
 
     /**
@@ -554,6 +641,9 @@ public class ServerAccess {
     public ProcessResult executeJavawsUponUrl(List<String> otherargs, URL u) throws Exception {
         return executeProcessUponURL(getJavawsLocation(), otherargs, u);
     }
+    public ProcessResult executeJavawsUponUrl(List<String> otherargs, URL u,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+        return executeProcessUponURL(getJavawsLocation(), otherargs, u,stdoutl,stderrl);
+    }
 
     /**
      * wrapping utility method to executeProcess (eg: any_binary arg arg arg url)
@@ -565,6 +655,10 @@ public class ServerAccess {
      * @throws Exception
      */
     public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u) throws Exception {
+        return executeProcessUponURL(toBeExecuted, otherargs, u,null,null);
+    }
+
+    public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
         Assert.assertNotNull(u);
         Assert.assertNotNull(toBeExecuted);
         Assert.assertTrue(toBeExecuted.trim().length() > 1);
@@ -574,11 +668,14 @@ public class ServerAccess {
         List<String> urledArgs = new ArrayList<String>(otherargs);
         urledArgs.add(0, toBeExecuted);
         urledArgs.add(u.toString());
-        return executeProcess(urledArgs);
+        return executeProcess(urledArgs, stdoutl, stderrl);
     }
 
      public static ProcessResult executeProcess(final List<String> args) throws Exception {
          return  executeProcess(args, null);
+     }
+      public static ProcessResult executeProcess(final List<String> args,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+         return  executeProcess(args, null,stdoutl,stderrl);
      }
     /**
      * utility method to lunch process, get its stdou/stderr, its return value and to kill it if runing to long (@see PROCESS_TIMEOUT)
@@ -597,6 +694,10 @@ public class ServerAccess {
      * @throws Exception
      */
     public static ProcessResult executeProcess(final List<String> args,File dir) throws Exception {
+        return executeProcess(args, dir, null, null);
+    }
+
+     public static ProcessResult executeProcess(final List<String> args,File dir,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
 
         ThreadedProcess t = new ThreadedProcess(args,dir);
         ProcessAssasin pa = new ProcessAssasin(t, PROCESS_TIMEOUT);
@@ -605,8 +706,8 @@ public class ServerAccess {
         while (t.getP() == null) {
             Thread.sleep(100);
         }
-        ContentReader crs = new ContentReader(t.getP().getInputStream());
-        ContentReader cre = new ContentReader(t.getP().getErrorStream());
+        ContentReader crs = new ContentReader(t.getP().getInputStream(),stdoutl);
+        ContentReader cre = new ContentReader(t.getP().getErrorStream(),stderrl);
 
         OutputStream out = t.getP().getOutputStream();
         if (out != null) {
@@ -782,6 +883,9 @@ public class ServerAccess {
         /**
          * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html
          * Very small implementation of http return headers for our served resources
+         *
+         * When resource starts with XslowX prefix, then resouce (without XslowX)
+         * is returned, but its delivery is delayed
          */
         private class TinyHttpdImpl extends Thread {
 
@@ -789,6 +893,7 @@ public class ServerAccess {
             private final File dir;
             private final int port;
             private boolean canRun = true;
+            private static final String XSX="/XslowX";
 
             public void setCanRun(boolean canRun) {
                 this.canRun = canRun;
@@ -819,7 +924,9 @@ public class ServerAccess {
                             if (s.startsWith("GET")) {
                                 StringTokenizer t = new StringTokenizer(s, " ");
                                 t.nextToken();
-                                String p = t.nextToken();
+                                String op = t.nextToken();
+                                String p = op;
+                                if (p.startsWith(XSX))p=p.replace(XSX, "/");
                                 System.err.println("Getting: "+p);
                                 p=URLDecoder.decode(p, "UTF-8");
                                 System.err.println("Serving: "+p);
@@ -832,9 +939,20 @@ public class ServerAccess {
                                 f.read(b);
                                 o.writeBytes("HTTP/1.0 200 OK\nConten"
                                         + "t-Length:" + l + "\n\n");
+                                if (op.startsWith(XSX)){
+                                    byte[][] bb=ServerAccess.splitArray(b,10);
+                                    for (int j = 0; j < bb.length; j++) {
+                                        Thread.sleep(2000);
+                                        byte[] bs = bb[j];
+                                        o.write(bs, 0, bs.length);
+                                    }
+                                }else{
                                 o.write(b, 0, l);
+                                }
                             }
                         }
+                    }catch (SocketException e) {
+                        e.printStackTrace();
                     } catch (Exception e) {
                         o.writeBytes("HTTP/1.0 404 ERROR\n\n\n");
                         e.printStackTrace();
@@ -846,6 +964,92 @@ public class ServerAccess {
             }
         }
     }
+
+
+    /**
+     * This function splits input array to severasl pieces
+     * from byte[length] splitt to n pieces s is retrunrd byte[n][length/n], except
+     * last piece which contains length%n
+     *
+     * @param input - array to be splitted
+     * @param pieces - to how many pieces it should be broken
+     * @return inidividual pices of original array, which concatet again givs original array
+     */
+  public static byte[][] splitArray(byte[] input, int pieces) {
+        int rest = input.length;
+        int rowLength = rest / pieces;
+        if (rest % pieces > 0) rowLength++;
+        if (pieces * rowLength >= rest + rowLength) pieces--;
+        int i = 0, j = 0;
+        byte[][] array = new byte[pieces][];
+        array[0] = new byte[rowLength];
+        for (byte b : input) {
+            if (i >= rowLength) {
+                i = 0;
+                array[++j] = new byte[Math.min(rowLength, rest)];
+            }
+            array[j][i++] = b;
+            rest--;
+        }
+        return array;
+    }
+
+
+     @Test
+    public void splitArrayTest0() throws Exception {
+         byte[] b={1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+         byte[][] bb=splitArray(b, 3);
+        //printArrays(bb);
+        byte[] b1={1,2,3,4,5};
+        byte[] b2={6,7,8,9,10};
+        byte[] b3={11,12,13,14};
+        Assert.assertEquals(3,bb.length);
+        Assert.assertArrayEquals(b1,bb[0]);
+        Assert.assertArrayEquals(b2,bb[1]);
+        Assert.assertArrayEquals(b3,bb[2]);
+     }
+
+     @Test
+    public void splitArrayTest1() throws Exception {
+         byte[] b={1,2,3,4,5,6,7,8,9,10,11,12,13};
+         byte[][] bb=splitArray(b, 3);
+        //printArrays(bb);
+         byte[] b1={1,2,3,4,5};
+        byte[] b2={6,7,8,9,10};
+        byte[] b3={11,12,13};
+        Assert.assertEquals(3,bb.length);
+        Assert.assertArrayEquals(b1,bb[0]);
+        Assert.assertArrayEquals(b2,bb[1]);
+        Assert.assertArrayEquals(b3,bb[2]);
+     }
+
+      @Test
+    public void splitArrayTest2() throws Exception {
+         byte[] b={1,2,3,4,5,6,7,8,9,10,11,12};
+         byte[][] bb=splitArray(b, 3);
+        //printArrays(bb);
+        byte[] b1={1,2,3,4};
+        byte[] b2={5,6,7,8};
+        byte[] b3={9,10,11,12};
+        Assert.assertEquals(3,bb.length);
+        Assert.assertArrayEquals(b1,bb[0]);
+        Assert.assertArrayEquals(b2,bb[1]);
+        Assert.assertArrayEquals(b3,bb[2]);
+     }
+
+    private void printArrays(byte[][] bb) {
+        System.out.println("[][] l=" + bb.length);
+        for (int i = 0; i < bb.length; i++) {
+            byte[] bs = bb[i];
+            System.out.println(i + ": l=" + bs.length);
+            for (int j = 0; j < bs.length; j++) {
+                byte c = bs[j];
+                System.out.print(" " + j + ":" + c + " ");
+            }
+            System.out.println("");
+        }
+    }
+
 
     /**
      * class which timeout any ThreadedProcess. This killing of 'theread with process' replaced not working process.destroy().
@@ -902,6 +1106,7 @@ public class ServerAccess {
                         while (!terminated.contains(p)) {
                             Thread.sleep(100);
                         }
+                        //p.p.destroy()??
                         System.err.println("Timeouted " + p.toString() + " " + p.getP().toString() + " .. killed " + p.getCommandLine());
                         System.err.flush();
                         break;
@@ -952,6 +1157,7 @@ public class ServerAccess {
         StringBuilder sb = new StringBuilder();
         private final InputStream is;
         private boolean done;
+        ContentReaderListener listener;
 
         public String getContent() {
             return sb.toString();
@@ -960,6 +1166,19 @@ public class ServerAccess {
         public ContentReader(InputStream is) throws IOException {
             this.is = is;
         }
+        public ContentReader(InputStream is,ContentReaderListener l) throws IOException {
+            this.is = is;
+            this.listener=l;
+        }
+
+        public void setListener(ContentReaderListener listener) {
+            this.listener = listener;
+        }
+
+        public ContentReaderListener getListener() {
+            return listener;
+        }
+
 
         /**
          * Blocks until the copy is complete, or until the thread is interrupted
@@ -982,14 +1201,21 @@ public class ServerAccess {
         public void run() {
             try {
                 Reader br = new InputStreamReader(is, "UTF-8");
-
+                StringBuilder line=new StringBuilder();
                 while (true) {
                     int s = br.read();
                     if (s < 0) {
+                        if (line.length()>0 && listener!=null) listener.lineReaded(line.toString());
                         break;
                     }
-
-                    sb.append(((char) s));
+                    char ch=((char) s);
+                    sb.append(ch);
+                    line.append(ch);
+                    if (ch=='\n'){
+                        if (listener!=null) listener.lineReaded(line.toString());
+                        line=new StringBuilder();
+                    }
+                    if (listener!=null) listener.charReaded(ch);
 
                 }
                 //do not want to bother output with terminations

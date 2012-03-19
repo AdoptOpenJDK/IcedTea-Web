@@ -56,7 +56,7 @@ import org.junit.Test;
 public class CacheReproducerTest {
 
     private static final ServerAccess server = new ServerAccess();
-    private static final List<String> clear = Arrays.asList(new String[]{server.getJavawsLocation(), "-Xclearcache"});
+    private static final List<String> clear = Arrays.asList(new String[]{server.getJavawsLocation(), "-Xclearcache",  ServerAccess.HEADLES_OPTION});
     private static final List<String> trusted = Arrays.asList(new String[]{"-Xtrustall", ServerAccess.HEADLES_OPTION});
     private static final String home = System.getProperty("user.home");
     private static final String name = System.getProperty("user.name");

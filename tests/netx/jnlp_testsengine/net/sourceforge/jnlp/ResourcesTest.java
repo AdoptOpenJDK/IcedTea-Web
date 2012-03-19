@@ -87,4 +87,52 @@ public class ResourcesTest {
         }
 
     }
+
+    @Test
+    public void testListeners() throws Exception {
+        final StringBuilder o1=new StringBuilder();
+        final StringBuilder e1=new StringBuilder();
+        final StringBuilder o2=new StringBuilder();
+        final StringBuilder e2=new StringBuilder();
+        final ContentReaderListener lo=new ContentReaderListener() {
+
+            @Override
+            public void charReaded(char ch) {
+                //System.out.println("OO recieved char: "+ch);
+                o1.append(ch);
+            }
+
+            @Override
+            public void lineReaded(String s) {
+                    //System.out.println("OO recieved line: "+s);
+                o2.append(s).append("\n");
+            }
+        };
+        ContentReaderListener le=new ContentReaderListener() {
+
+            @Override
+            public void charReaded(char ch) {
+                    //System.out.println("EE recieved char: "+ch);
+                    e1.append(ch);
+            }
+
+            @Override
+            public void lineReaded(String s) {
+                    //System.out.println("EE recieved line: "+s);
+                e2.append(s).append("\n");
+            }
+        };
+       ServerAccess.ProcessResult pr=server.executeBrowser("simpletest1.jnlp",le,lo);
+       pr.process.destroy();
+//        System.out.println("total o");
+//        System.out.println(pr.stdout);
+//        System.out.println("total e");
+//        System.out.println(pr.stderr);
+       Assert.assertEquals(pr.stdout, o1.toString());
+       Assert.assertEquals(pr.stderr, e1.toString());
+       //the last \n is mandatory as las tline is flushed also when proces dies
+       Assert.assertEquals(pr.stdout.replace("\n", ""), o2.toString().replace("\n", ""));
+       Assert.assertEquals(pr.stderr.replace("\n", ""), e2.toString().replace("\n", ""));
+
+    }
 }

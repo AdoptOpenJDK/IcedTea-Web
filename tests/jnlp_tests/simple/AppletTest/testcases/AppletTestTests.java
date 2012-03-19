@@ -36,6 +36,7 @@ exception statement from your version.
  */
 
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -51,6 +52,12 @@ public class AppletTestTests {
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/AppletTest.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
+        evaluateApplet(pr);
+        Assert.assertFalse(pr.wasTerminated);
+        Assert.assertEquals((Integer) 0, pr.returnValue);
+    }
+
+    private void evaluateApplet(ProcessResult pr) {
         String s3 = "applet was initialised";
         Assert.assertTrue("AppletTest stdout should contains " + s3 + " bud didn't", pr.stdout.contains(s3));
         String s0 = "applet was started";
@@ -67,7 +74,23 @@ public class AppletTestTests {
         Assert.assertFalse("AppletTest stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
         String s7 = "Aplet killing himself after 2000 ms of life";
         Assert.assertTrue("AppletTest stdout should contains " + s7 + " bud didn't", pr.stdout.contains(s7));
-        Assert.assertFalse(pr.wasTerminated);
-        Assert.assertEquals((Integer) 0, pr.returnValue);
+    }
+
+    @Test
+    public void AppletInFirefoxTest() throws Exception {
+        System.out.println("connecting AppletInFirefoxTest request");
+        System.err.println("connecting AppletInFirefoxTest request");
+        server.PROCESS_TIMEOUT = 30 * 1000;
+        try {
+            ServerAccess.ProcessResult pr = server.executeBrowser("/appletAutoTests.html");
+            System.out.println(pr.stdout);
+            System.err.println(pr.stderr);
+            pr.process.destroy();
+            evaluateApplet(pr);
+            Assert.assertTrue(pr.wasTerminated);
+            //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null
+        } finally {
+            server.PROCESS_TIMEOUT = 20 * 1000; //back to normal
+        }
     }
 }
