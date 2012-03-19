@@ -1,3 +1,9 @@
+2012-03-19  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Fix failing unit test missing title/vendor tags in the JNLP stream.
+	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCases.java
+	(testNestedComments): Added title and vendor tags to malformedJnlp. 
+
 2012-03-19  Jiri Vanek <jvanek@redhat.com>
 	* tests/jnlp_tests/signed/CacheReproducer/testcases/CacheReproducerTest.java: 
 	 as javaws have now integrated splash, I have changed this test to lunch

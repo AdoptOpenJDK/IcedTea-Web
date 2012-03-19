@@ -163,7 +163,8 @@ public class ParserCornerCases {
     @Test
     public void testNestedComments() throws ParseException {
         String malformedJnlp = "<?xml?>" +
-                "<jnlp><information><description>" +
+                "<jnlp><information><title>testNestedComments</title>" +
+                "<vendor>IcedTea</vendor><description>" +
                 "<!-- outer <!-- inner --> -->" +
                 "</description></information></jnlp>";
         Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
