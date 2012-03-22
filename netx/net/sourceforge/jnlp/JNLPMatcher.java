@@ -38,11 +38,12 @@ exception statement from your version.
 package net.sourceforge.jnlp;
 
 import java.util.List;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -75,7 +76,7 @@ public final class JNLPMatcher {
      *             if IOException, XMLParseException is thrown during parsing;
      *             Or launchJNLP/appTemplate is null
      */
-    public JNLPMatcher(InputStreamReader appTemplate, InputStreamReader launchJNLP,
+    public JNLPMatcher(Reader appTemplate, Reader launchJNLP,
             boolean isTemplate) throws JNLPMatcherException {
 
         if (appTemplate == null && launchJNLP == null)
@@ -87,29 +88,25 @@ public final class JNLPMatcher {
             throw new JNLPMatcherException("Launching JNLP file is null.");
         
         //Declare variables for signed JNLP file
-        PipedInputStream pinTemplate= null;
-        PipedOutputStream poutTemplate= null;
+        ByteArrayOutputStream poutTemplate= null;
       
         //Declare variables for launching JNLP file 
-        PipedInputStream pinJNLPFile = null; 
-        PipedOutputStream poutJNLPFile = null; 
+        ByteArrayOutputStream poutJNLPFile = null;
         
         try {
             XMLElement appTemplateXML = new XMLElement();
             XMLElement launchJNLPXML = new XMLElement();
 
             // Remove the comments and CDATA from the JNLP file
-            pinTemplate = new PipedInputStream();
-            poutTemplate = new PipedOutputStream(pinTemplate);
+            poutTemplate = new ByteArrayOutputStream();
             appTemplateXML.sanitizeInput(appTemplate, poutTemplate);
 
-            pinJNLPFile = new PipedInputStream();
-            poutJNLPFile = new PipedOutputStream(pinJNLPFile);
+            poutJNLPFile = new ByteArrayOutputStream();
             launchJNLPXML.sanitizeInput(launchJNLP, poutJNLPFile);
 
             // Parse both files
-            appTemplateXML.parseFromReader(new InputStreamReader(pinTemplate));
-            launchJNLPXML.parseFromReader(new InputStreamReader(pinJNLPFile));
+            appTemplateXML.parseFromReader(new StringReader(poutTemplate.toString()));
+            launchJNLPXML.parseFromReader(new StringReader(poutJNLPFile.toString()));
 
             // Initialize parent nodes
             this.appTemplateNode = new Node(appTemplateXML);
@@ -122,10 +119,8 @@ public final class JNLPMatcher {
                     e);
         } finally {
             // Close all stream
-            closeInputStream(pinTemplate);
             closeOutputStream(poutTemplate);
             
-            closeInputStream(pinJNLPFile);
             closeOutputStream(poutJNLPFile);
 
         }

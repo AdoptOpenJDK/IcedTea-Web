@@ -1,3 +1,14 @@
+2012-03-21  Omair Majid  <omajid@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTest.java
+	(testIsMatchDoesNotHangOnLargeData): New method.
+
+2012-03-21  Lars Herschke  <lhersch@dssgmbh.de>
+
+	PR898: signed applications with big jnlp-file doesn't start
+	* netx/net/sourceforge/jnlp/JNLPMatcher.java (JNLPMatcher): Handle large
+	files correctly.
+
 2012-03-19  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Fix failing unit test missing title/vendor tags in the JNLP stream.

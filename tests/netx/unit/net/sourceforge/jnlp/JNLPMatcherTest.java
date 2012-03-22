@@ -37,12 +37,13 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import junit.framework.Assert;
+import java.io.StringReader;
+import java.util.Random;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class JNLPMatcherTest {
@@ -460,5 +461,37 @@ public class JNLPMatcherTest {
 
         fileReader.close();
         launchReader.close();
+    }
+
+    @Test (timeout=1000 /*ms*/)
+    public void testIsMatchDoesNotHangOnLargeData() throws JNLPMatcherException {
+        /* construct an alphabet containing characters 'a' to 'z' */
+        final int ALPHABET_SIZE = 26;
+        char[] alphabet = new char[ALPHABET_SIZE];
+        for (int i = 0; i < ALPHABET_SIZE; i++) {
+            alphabet[i] = (char)('a' + i);
+        }
+        /* generate a long but random string using the alphabet */
+        final Random r = new Random();
+        final int STRING_SIZE = 1024 * 1024; // 1 MB
+        StringBuilder descriptionBuilder = new StringBuilder(STRING_SIZE);
+        for (int i = 0; i < STRING_SIZE; i++) {
+            descriptionBuilder.append(alphabet[r.nextInt(ALPHABET_SIZE)]);
+        }
+        String longDescription = descriptionBuilder.toString();
+
+        String file =
+                "<jnlp>\n" +
+                "  <information>\n" +
+                "    <title>JNLPMatcher hanges on large file size</title>\n" +
+                "    <vendor>IcedTea</vendor>\n" +
+                "    <description>" + longDescription + "</description>\n" +
+                "  </information>\n" +
+                "</jnlp>\n";
+
+        StringReader reader1 = new StringReader(file);
+        StringReader reader2 = new StringReader(file);
+        JNLPMatcher matcher = new JNLPMatcher(reader1, reader2, false);
+        Assert.assertTrue(matcher.isMatch());
     }
 }
