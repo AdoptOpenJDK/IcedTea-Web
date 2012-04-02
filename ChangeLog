@@ -1,3 +1,10 @@
+2012-03-30  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Certificate start dates are not being checked, they are still verified
+	even if the date has yet not been reached.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java (verifyJar): If the start
+	date is in the future, set notYetValidCert to true.
+
 2012-03-21  Omair Majid  <omajid@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTest.java

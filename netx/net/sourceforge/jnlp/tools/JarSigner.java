@@ -297,8 +297,14 @@ public class JarSigner implements CertVerifier {
                             if (cert instanceof X509Certificate) {
                                 checkCertUsage((X509Certificate) cert, null);
                                 if (!showcerts) {
+                                    long notBefore = ((X509Certificate) cert)
+                                                     .getNotBefore().getTime();
                                     long notAfter = ((X509Certificate) cert)
                                                     .getNotAfter().getTime();
+
+                                    if (now < notBefore) {
+                                        notYetValidCert = true;
+                                    }
 
                                     if (notAfter < now) {
                                         hasExpiredCert = true;
