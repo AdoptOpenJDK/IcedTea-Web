@@ -1,3 +1,16 @@
+2012-04-03  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/pac-funcs.js: Replace incorrect use of
+	getYear() with getFullYear().
+	(inYearMonthDateRange): Add missing conditional case.
+	* tests/netx/pac/pac-funcs-test.js
+	(runTest): New function.
+	(runTests): Call runTest.
+	(incDate): Deal with month/year wrapping around.
+	(decDate): Removed.
+	(testDateRange, testDateRange2, testDateRange3): Handle wrapping of month
+	and days.
+
 2012-04-03  Jiri Vanek <jvanek@redhat.com>
 
     Tests virtual server thread marked as daemon by default
