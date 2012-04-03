@@ -186,9 +186,12 @@ public class ServerAccess {
      * usefull for testing application loading from different url then base
      */
     public static ServerLauncher getIndependentInstance() {
+        return getIndependentInstance(true);
+    }
+    public static ServerLauncher getIndependentInstance(boolean daemon) {
         String dir = (System.getProperty(TEST_SERVER_DIR));
         try{
-            return getIndependentInstance(dir, findFreePort());
+            return getIndependentInstance(dir, findFreePort(),daemon);
         }catch (Exception ex){
             throw  new RuntimeException(ex);
         }
@@ -200,9 +203,13 @@ public class ServerAccess {
      * @return new not cached iserver instance on random port,
      * usefull for testing application loading from different url then base
      */
+    
     public static ServerLauncher getIndependentInstance(int port) {
+        return getIndependentInstance(port, true);
+    }
+    public static ServerLauncher getIndependentInstance(int port,boolean daemon) {
         String dir = (System.getProperty(TEST_SERVER_DIR));
-        return getIndependentInstance(dir,port);
+        return getIndependentInstance(dir,port,daemon);
     }
 
     /**
@@ -210,7 +217,11 @@ public class ServerAccess {
      * @return new not cached iserver instance on random port upon custom www root directory,
      * usefull for testing application loading from different url then base
      */
+
     public static ServerLauncher getIndependentInstance(String dir, int port) {
+        return getIndependentInstance(dir, port, true);
+    }
+    public static ServerLauncher getIndependentInstance(String dir, int port,boolean daemon) {
 
 
         if (dir == null || dir.trim().length() == 0 || !new File(dir).exists() || !new File(dir).isDirectory()) {
@@ -218,7 +229,9 @@ public class ServerAccess {
         }
         try {
             ServerLauncher lServerLuncher = new ServerLauncher(port, new File(dir));
-            new Thread(lServerLuncher).start();
+            Thread r=new Thread(lServerLuncher);
+            r.setDaemon(daemon);
+            r.start();
             return lServerLuncher;
         } catch (Exception ex) {
             throw new RuntimeException(ex);

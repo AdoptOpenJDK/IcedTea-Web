@@ -1,3 +1,10 @@
+2012-04-03  Jiri Vanek <jvanek@redhat.com>
+
+    Tests virtual server thread marked as daemon by default
+    * tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+    All (ServerLauncher) instances returned by methods were marked as daemon
+    by default. Possibility to change and api were kept. 
+
 2012-03-30  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Certificate start dates are not being checked, they are still verified
