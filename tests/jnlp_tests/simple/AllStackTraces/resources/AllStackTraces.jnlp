@@ -4,7 +4,7 @@
       href="AllStackTraces.jnlp">
    <information> 
       <title>Test Thread.getAllStackTraces</title> 
-      <vendor>Red Hat</vendor>
+      <vendor>IcedTea</vendor>
    </information> 
    <resources>
       <jar href="AllStackTraces.jar" main="true" download="eager"/>

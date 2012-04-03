@@ -39,8 +39,8 @@ exception statement from your version.
 <jnlp spec="1.0" href="Spaces can be everywhere1.jnlp" codebase=".">
   <information>
     <title>Spaces can be everywhere1</title>
-    <vendor>NetX</vendor>
-    <homepage href="http://jnlp.sourceforge.net/netx/"/>
+    <vendor>IcedTea</vendor>
+    <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
     <description>Spaces can be everywhere1</description>
     <offline/>
   </information>

@@ -41,8 +41,8 @@ exception statement from your version.
       href="ManifestedJar-1main2mainNoAppDesc.jnlp">
    <information> 
       <title>Test Thread.getAllStackTraces</title> 
-      <vendor>NetX</vendor>
-      <homepage href="http://jnlp.sourceforge.net/netx/"/>
+      <vendor>IcedTea</vendor>
+      <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
       <description>testing jar with manin class in manifest. Invalid xml exception should go out</description>
    </information> 
    <resources>

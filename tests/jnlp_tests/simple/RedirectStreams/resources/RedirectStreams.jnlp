@@ -4,7 +4,7 @@
       href="RedirectStreams.jnlp">
     <information>
         <title>redirect stdin/stdout streams</title>
-        <vendor>Red Hat</vendor>
+        <vendor>IcedTea</vendor>
     </information>
     <resources>
         <jar href="RedirectStreams.jar" main="true"/>

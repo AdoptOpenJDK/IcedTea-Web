@@ -41,8 +41,8 @@ exception statement from your version.
       href="AccessClassInPackageSELF.jnlp">
    <information> 
       <title>Test accessClassInPackage</title>
-      <vendor>NetX</vendor>
-      <homepage href="http://jnlp.sourceforge.net/netx/"/>
+      <vendor>IcedTea</vendor>
+      <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
       <description>testing aaccess to package's internal class</description>
    </information> 
    <resources>

@@ -40,7 +40,7 @@ exception statement from your version.
     <information>
         <title>CheckServices</title>
         <vendor>IcedTea</vendor>
-        <homepage href="http://jnlp.sourceforge.net/netx/"/>
+        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
         <description>CheckServices</description>
         <offline/>
     </information>

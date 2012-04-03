@@ -39,8 +39,8 @@ exception statement from your version.
 <jnlp spec="1.0"  codebase="./"  href="ManifestedJar-1noAppDescAtAll.jnlp">
    <information> 
       <title>ManifestedJar-1noAppDescAtAll</title> 
-      <vendor>NetX</vendor>
-      <homepage href="http://jnlp.sourceforge.net/netx/"/>
+      <vendor>IcedTea</vendor>
+      <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
       <description>testing jar with manin class in manifest, exception during launching, no application specified</description>
    </information> 
    <resources>

@@ -4,7 +4,7 @@
       href="ReadProperties1.jnlp">
     <information>
         <title>read properties using System.getenv()</title>
-        <vendor>Red Hat</vendor>
+        <vendor>IcedTea</vendor>
     </information>
     <resources>
         <jar href="ReadProperties.jar" main="true"/>

@@ -39,7 +39,7 @@ exception statement from your version.
 <jnlp spec="1.0" href="TitleParser.jnlp" codebase=".">
   <information>
     <vendor>IcedTea</vendor>
-    <homepage href="http://jnlp.sourceforge.net/netx/"/>
+    <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
     <description>Title tag missing</description>
     <offline/>
   </information>

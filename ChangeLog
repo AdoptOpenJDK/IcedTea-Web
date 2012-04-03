@@ -1,3 +1,65 @@
+2012-04-03  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Change all vendors in JNLP test suite to IcedTea and homepage href's to
+	a link to IcedTea-Web's wiki page.
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedJAVAXJNLP.jnlp
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedNETSF.jnlp
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedSELF.jnlp
+	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedSUNSEC.jnlp
+	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer1.jnlp
+	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer1_1.jnlp
+	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer2.jnlp
+	* tests/jnlp_tests/signed/CacheReproducer/resources/CacheReproducer2_1.jnlp
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar.jnlp
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar2.jnlp
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar3.jnlp
+	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar4.jnlp
+	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/resources/ReadPropertiesBySignedHack.jnlp
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned1.jnlp
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned2.jnlp
+	* tests/jnlp_tests/signed/SimpletestSigned1/resources/SimpletestSigned1.jnlp
+	* tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackageJAVAXJNLP.jnlp
+	* tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackageNETSF.jnlp
+	* tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackageSELF.jnlp
+	* tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackageSUNSEC.jnlp
+	* tests/jnlp_tests/simple/AddShutdownHook/resources/AddShutdownHook.jnlp
+	* tests/jnlp_tests/simple/AllStackTraces/resources/AllStackTraces.jnlp
+	* tests/jnlp_tests/simple/AppletTest/resources/AppletTest.jnlp
+	* tests/jnlp_tests/simple/CheckServices/resources/CheckServices.jnlp
+	* tests/jnlp_tests/simple/CreateClassLoader/resources/CreateClassLoader.jnlp
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/resources/TitleParser.jnlp
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/resources/TitleVendorParser.jnlp
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/resources/VendorParser.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1main2mainAppDesc.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1main2mainNoAppDesc.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1main2nothingNoAppDesc.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1mainHaveAppDesc.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1mainNoAppDesc.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1noAppDesc.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1noAppDescAtAll.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1nothing2nothingAppDesc.jnlp
+	* tests/jnlp_tests/simple/ManifestedJar1/resources/ManifestedJar-1nothing2nothingNoAppDesc.jnlp
+	* tests/jnlp_tests/simple/ReadEnvironment/resources/ReadEnvironment.jnlp
+	* tests/jnlp_tests/simple/ReadProperties/resources/ReadProperties1.jnlp
+	* tests/jnlp_tests/simple/ReadProperties/resources/ReadProperties2.jnlp
+	* tests/jnlp_tests/simple/RedirectStreams/resources/RedirectStreams.jnlp
+	* tests/jnlp_tests/simple/ReplaceSecurityManager/resources/ReplaceSecurityManager.jnlp
+	* tests/jnlp_tests/simple/SetContextClassLoader/resources/SetContextClassLoader.jnlp
+	* tests/jnlp_tests/simple/Spaces can be everywhere/resources/Spaces can be everywhere1.jnlp
+	* tests/jnlp_tests/simple/Spaces can be everywhere/resources/Spaces can be everywhere2.jnlp
+	* tests/jnlp_tests/simple/Spaces can be everywhere/resources/SpacesCanBeEverywhere1.jnlp
+	* tests/jnlp_tests/simple/deadlocktest/resources/deadlocktest.jnlp
+	* tests/jnlp_tests/simple/deadlocktest/resources/deadlocktest_1.jnlp
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletest1.jnlp
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestCustomSplash.jnlp
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestMegaSlow.jnlp
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestSlow.jnlp
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestSlowBrokenCustomSplash.jnlp
+	* tests/jnlp_tests/simple/simpletest1/resources/simpletestSlowSlowCustomSplash.jnlp
+	* tests/jnlp_tests/simple/simpletest2/resources/simpletest2.jnlp:
+	Replaced the specified vendor with IcedTea and homepage with a link to
+	IcedTea-Web's wiki.
+
 2012-04-03  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/pac-funcs.js: Replace incorrect use of

@@ -4,7 +4,7 @@
       href="ReadEnvironment.jnlp">
     <information>
         <title>ReadEnvironment using System.getenv()</title>
-        <vendor>Red Hat</vendor>
+        <vendor>IcedTea</vendor>
     </information>
     <resources>
         <jar href="ReadEnvironment.jar" main="true" />

@@ -4,7 +4,7 @@
       href="CreateClassLoader.jnlp">
     <information>
         <title>set context classloader</title>
-        <vendor>Red Hat</vendor>
+        <vendor>IcedTea</vendor>
     </information>
     <resources>
         <jar href="CreateClassLoader.jar" main="true" download="eager"/>
