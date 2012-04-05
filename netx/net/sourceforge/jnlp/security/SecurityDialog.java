@@ -96,12 +96,12 @@ public class SecurityDialog extends JDialog {
     private boolean requiresSignedJNLPWarning;
 
     SecurityDialog(DialogType dialogType, AccessType accessType,
-                JNLPFile file, CertVerifier jarSigner, X509Certificate cert, Object[] extras) {
+                JNLPFile file, CertVerifier JarCertVerifier, X509Certificate cert, Object[] extras) {
         super();
         this.dialogType = dialogType;
         this.accessType = accessType;
         this.file = file;
-        this.certVerifier = jarSigner;
+        this.certVerifier = JarCertVerifier;
         this.cert = cert;
         this.extras = extras;
         initialized = true;
@@ -124,8 +124,8 @@ public class SecurityDialog extends JDialog {
      * Create a SecurityDialog to display a certificate-related warning
      */
     SecurityDialog(DialogType dialogType, AccessType accessType,
-                        JNLPFile file, CertVerifier jarSigner) {
-        this(dialogType, accessType, file, jarSigner, null, null);
+                        JNLPFile file, CertVerifier certVerifier) {
+        this(dialogType, accessType, file, certVerifier, null, null);
     }
 
     /**
@@ -164,16 +164,16 @@ public class SecurityDialog extends JDialog {
     /**
      * Shows more information regarding jar code signing
      *
-     * @param jarSigner the JarSigner used to verify this application
+     * @param certVerifier the JarCertVerifier used to verify this application
      * @param parent the parent option pane
      */
     public static void showMoreInfoDialog(
-                CertVerifier jarSigner, SecurityDialog parent) {
+                CertVerifier certVerifier, SecurityDialog parent) {
 
         JNLPFile file= parent.getFile();
         SecurityDialog dialog =
                         new SecurityDialog(DialogType.MORE_INFO, null, file,
-                                jarSigner);
+                                certVerifier);
         dialog.setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.setVisible(true);
         dialog.dispose();
@@ -182,13 +182,13 @@ public class SecurityDialog extends JDialog {
     /**
      * Displays CertPath information in a readable table format.
      *
-     * @param jarSigner the JarSigner used to verify this application
+     * @param certVerifier the JarCertVerifier used to verify this application
      * @param parent the parent option pane
      */
-    public static void showCertInfoDialog(CertVerifier jarSigner,
+    public static void showCertInfoDialog(CertVerifier certVerifier,
                 SecurityDialog parent) {
         SecurityDialog dialog = new SecurityDialog(DialogType.CERT_INFO,
-                        null, null, jarSigner);
+                        null, null, certVerifier);
         dialog.setLocationRelativeTo(parent);
         dialog.setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.setVisible(true);
@@ -276,7 +276,7 @@ public class SecurityDialog extends JDialog {
         return file;
     }
 
-    public CertVerifier getJarSigner() {
+    public CertVerifier getCertVerifier() {
         return certVerifier;
     }
 

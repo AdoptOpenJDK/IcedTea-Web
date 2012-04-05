@@ -118,7 +118,7 @@ public class MoreInfoPane extends SecurityDialogPanel {
 
     private class CertInfoButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            SecurityDialog.showCertInfoDialog(parent.getJarSigner(),
+            SecurityDialog.showCertInfoDialog(parent.getCertVerifier(),
                                 parent);
         }
     }

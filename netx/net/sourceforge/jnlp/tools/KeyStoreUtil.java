@@ -33,7 +33,7 @@ package net.sourceforge.jnlp.tools;
 public class KeyStoreUtil {
 
     // Class and methods marked as public so that they can be
-    // accessed by JarSigner, which although lies in a package
+    // accessed by JarCertVerifier, which although lies in a package
     // with the same name, but bundled in tools.jar and loaded
     // by another class loader, hence in a different *runtime*
     // package.

@@ -1,3 +1,23 @@
+2012-04-04  Danesh Dadachanji  <ddadacha@redhat.com>
+	Change the name of JarSigner to JarCertVerifier to make it more
+	relevant to the purpose of the file.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	* netx/net/sourceforge/jnlp/tools/KeyStoreUtil.java:
+	Replace all instances, paramaters and references of JarSigner
+	by JarCertVerifier.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java
+	* netx/net/sourceforge/jnlp/security/CertsInfoPane.java
+	* netx/net/sourceforge/jnlp/security/MoreInfoPane.java
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
+	Replaced all paramaters, references and variable names of JarSigner
+	to CertVerifier to match the variable object type.
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java (getJarSigner):
+	Renamed to getCertVerifier as it returns the certVerfier instance.
+	* netx/net/sourceforge/jnlp/tools/JarSigner.java:
+	Renamed to JarCertVerifier.
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java:
+	The rename of JarSigner.
+
 2012-04-05  Jiri Vanek <jvanek@redhat.com>
 
 	Fixing issue when process was not launched at all and when was killed but

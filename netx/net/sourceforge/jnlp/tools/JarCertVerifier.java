@@ -42,13 +42,13 @@ import net.sourceforge.jnlp.cache.*;
 import net.sourceforge.jnlp.security.*;
 
 /**
- * <p>The jarsigner utility.
+ * <p>The jar certificate verifier utility.
  *
  * @author Roland Schemers
  * @author Jan Luehe
  */
 
-public class JarSigner implements CertVerifier {
+public class JarCertVerifier implements CertVerifier {
 
     private static final String META_INF = "META-INF/";
 

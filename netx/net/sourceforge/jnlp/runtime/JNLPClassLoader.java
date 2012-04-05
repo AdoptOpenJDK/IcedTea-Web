@@ -72,7 +72,7 @@ import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-import net.sourceforge.jnlp.tools.JarSigner;
+import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.FileUtils;
 import sun.misc.JarIndex;
 
@@ -150,8 +150,8 @@ public class JNLPClassLoader extends URLClassLoader {
     /** all of the jar files that were not verified */
     private ArrayList<String> unverifiedJars = null;
 
-    /** the jarsigner tool to verify our jars */
-    private JarSigner js = null;
+    /** the jar cert verifier tool to verify our jars */
+    private JarCertVerifier jcv = null;
 
     private boolean signing = false;
 
@@ -469,13 +469,13 @@ public class JNLPClassLoader extends URLClassLoader {
 
         if (JNLPRuntime.isVerifying()) {
 
-            JarSigner js;
+            JarCertVerifier jcv;
             waitForJars(initialJars); //download the jars first.
 
             try {
-                js = verifyJars(initialJars);
+                jcv = verifyJars(initialJars);
             } catch (Exception e) {
-                //we caught an Exception from the JarSigner class.
+                //we caught an Exception from the JarCertVerifier class.
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
                 e.printStackTrace();
@@ -484,10 +484,10 @@ public class JNLPClassLoader extends URLClassLoader {
             }
 
             //Case when at least one jar has some signing
-            if (js.anyJarsSigned() && js.isFullySignedByASingleCert()) {
+            if (jcv.anyJarsSigned() && jcv.isFullySignedByASingleCert()) {
                 signing = true;
 
-                if (!js.allJarsSigned() &&
+                if (!jcv.allJarsSigned() &&
                                     !SecurityDialogs.showNotAllSignedWarningDialog(file))
                     throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
 
@@ -515,8 +515,8 @@ public class JNLPClassLoader extends URLClassLoader {
                     file.setSignedJNLPAsMissing();
                 
                 //user does not trust this publisher
-                if (!js.getAlreadyTrustPublisher()) {
-                    checkTrustWithUser(js);
+                if (!jcv.getAlreadyTrustPublisher()) {
+                    checkTrustWithUser(jcv);
                 } else {
                     /**
                      * If the user trusts this publisher (i.e. the publisher's certificate
@@ -700,7 +700,7 @@ public class JNLPClassLoader extends URLClassLoader {
     private void verifySignedJNLP(JARDesc jarDesc, JarFile jarFile)
             throws LaunchException {
 
-        JarSigner signer = new JarSigner();
+        JarCertVerifier signer = new JarCertVerifier();
         List<JARDesc> desc = new ArrayList<JARDesc>();
         desc.add(jarDesc);
 
@@ -797,7 +797,7 @@ public class JNLPClassLoader extends URLClassLoader {
             /*
              * After this exception is caught, it is escaped. If an exception is
              * thrown while handling the jar file, (mainly for
-             * JarSigner.verifyJars) it assumes the jar file is unsigned and
+             * JarCertVerifier.verifyJars) it assumes the jar file is unsigned and
              * skip the check for a signed JNLP file
              */
             
@@ -828,24 +828,24 @@ public class JNLPClassLoader extends URLClassLoader {
             }
     }
     
-    private void checkTrustWithUser(JarSigner js) throws LaunchException {
+    private void checkTrustWithUser(JarCertVerifier jcv) throws LaunchException {
         if (JNLPRuntime.isTrustAll()){
             return;
         }
-        if (!js.getRootInCacerts()) { //root cert is not in cacerts
+        if (!jcv.getRootInCacerts()) { //root cert is not in cacerts
             boolean b = SecurityDialogs.showCertWarningDialog(
-                    AccessType.UNVERIFIED, file, js);
+                    AccessType.UNVERIFIED, file, jcv);
             if (!b)
                 throw new LaunchException(null, null, R("LSFatal"),
                         R("LCLaunching"), R("LNotVerified"), "");
-        } else if (js.getRootInCacerts()) { //root cert is in cacerts
+        } else if (jcv.getRootInCacerts()) { //root cert is in cacerts
             boolean b = false;
-            if (js.noSigningIssues())
+            if (jcv.noSigningIssues())
                 b = SecurityDialogs.showCertWarningDialog(
-                        AccessType.VERIFIED, file, js);
-            else if (!js.noSigningIssues())
+                        AccessType.VERIFIED, file, jcv);
+            else if (!jcv.noSigningIssues())
                 b = SecurityDialogs.showCertWarningDialog(
-                        AccessType.SIGNING_ERROR, file, js);
+                        AccessType.SIGNING_ERROR, file, jcv);
             if (!b)
                 throw new LaunchException(null, null, R("LSFatal"),
                         R("LCLaunching"), R("LCancelOnUserRequest"), "");
@@ -1031,7 +1031,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                         continue;
                                     }
 
-                                    JarSigner signer = new JarSigner();
+                                    JarCertVerifier signer = new JarCertVerifier();
                                     List<JARDesc> jars = new ArrayList<JARDesc>();
                                     JARDesc jarDesc = new JARDesc(new File(extractedJarLocation).toURL(), null, null, false, false, false, false);
                                     jars.add(jarDesc);
@@ -1280,11 +1280,11 @@ public class JNLPClassLoader extends URLClassLoader {
          *
          * @param jars the jars to be verified.
          */
-    private JarSigner verifyJars(List<JARDesc> jars) throws Exception {
+    private JarCertVerifier verifyJars(List<JARDesc> jars) throws Exception {
 
-        js = new JarSigner();
-        js.verifyJars(jars, tracker);
-        return js;
+        jcv = new JarCertVerifier();
+        jcv.verifyJars(jars, tracker);
+        return jcv;
     }
 
     /**
@@ -1442,7 +1442,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             // Verify if needed
 
-            final JarSigner signer = new JarSigner();
+            final JarCertVerifier signer = new JarCertVerifier();
             final List<JARDesc> jars = new ArrayList<JARDesc>();
             jars.add(desc);
 
