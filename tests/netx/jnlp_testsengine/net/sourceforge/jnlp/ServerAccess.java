@@ -267,7 +267,7 @@ public class ServerAccess {
 
     @Test
     public void testsProcessResultFiltering() throws Exception {
-        ProcessResult pn = new ProcessResult(null, null, null, true, 0);
+        ProcessResult pn = new ProcessResult(null, null, null, true, 0, null);
         Assert.assertNull(pn.notFilteredStdout);
         Assert.assertNull(pn.stdout);
         Assert.assertNull(pn.stderr);
@@ -286,12 +286,12 @@ public class ServerAccess {
                 "test stage 1\n"
                 + "test stage 2\n"
                 + "test stage 3\n";
-        ProcessResult p2 = new ProcessResult(fakeOut2, fakeOut2, null, true, 0);
+        ProcessResult p2 = new ProcessResult(fakeOut2, fakeOut2, null, true, 0, null);
         Assert.assertEquals(p2.notFilteredStdout, fakeOut2);
         Assert.assertEquals(p2.stdout, filteredOut2);
         Assert.assertEquals(p2.stderr, fakeOut2);
         fakeOut2+="\n";
-        p2 = new ProcessResult(fakeOut2, fakeOut2, null, true, 0);
+        p2 = new ProcessResult(fakeOut2, fakeOut2, null, true, 0, null);
         Assert.assertEquals(p2.notFilteredStdout, fakeOut2);
         Assert.assertEquals(p2.stdout, filteredOut2);
         Assert.assertEquals(p2.stderr, fakeOut2);
@@ -313,13 +313,13 @@ public class ServerAccess {
                 + "test stage 2\n"
                 + "test stage 3\n"
                 + "test ends";
-        ProcessResult p = new ProcessResult(fakeOut, fakeOut, null, true, 0);
+        ProcessResult p = new ProcessResult(fakeOut, fakeOut, null, true, 0, null);
         Assert.assertEquals(p.notFilteredStdout, fakeOut);
         Assert.assertEquals(p.stdout, filteredOut);
         Assert.assertEquals(p.stderr, fakeOut);
         fakeOut+="\n";
         filteredOut+="\n";
-        p = new ProcessResult(fakeOut, fakeOut, null, true, 0);
+        p = new ProcessResult(fakeOut, fakeOut, null, true, 0, null);
         Assert.assertEquals(p.notFilteredStdout, fakeOut);
         Assert.assertEquals(p.stdout, filteredOut);
         Assert.assertEquals(p.stderr, fakeOut);
@@ -486,9 +486,9 @@ public class ServerAccess {
      * @return stream as string
      * @throws IOException if connection cant be established or resource do not exists
      */
-    public static String getContentOfStream(InputStream is) throws IOException {
+    public static String getContentOfStream(InputStream is,String encoding) throws IOException {
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding));
             StringBuilder sb = new StringBuilder();
             while (true) {
                 String s = br.readLine();
@@ -502,6 +502,18 @@ public class ServerAccess {
         } finally {
             is.close();
         }
+
+    }
+
+    /**
+     * utility method which can read from any stream as one long String
+     *
+     * @param input stream
+     * @return stream as string
+     * @throws IOException if connection cant be established or resource do not exists
+     */
+    public static String getContentOfStream(InputStream is) throws IOException {
+        return getContentOfStream(is, "UTF-8");
 
     }
 
@@ -716,8 +728,12 @@ public class ServerAccess {
         ProcessAssasin pa = new ProcessAssasin(t, PROCESS_TIMEOUT);
         pa.start();
         t.start();
-        while (t.getP() == null) {
+        while (t.getP() == null && t.deadlyException == null) {
             Thread.sleep(100);
+        }
+        if (t.deadlyException != null) {
+            pa.setCanRun(false);
+            return new ProcessResult("", "", null, true, Integer.MIN_VALUE, t.deadlyException);
         }
         ContentReader crs = new ContentReader(t.getP().getInputStream(),stdoutl);
         ContentReader cre = new ContentReader(t.getP().getErrorStream(),stderrl);
@@ -732,10 +748,14 @@ public class ServerAccess {
         while (t.isRunning()) {
             Thread.sleep(100);
         }
+
+        while (!t.isDestoyed()) {
+            Thread.sleep(100);
+        }
         pa.setCanRun(false);
         // System.out.println(t.getP().exitValue()); when process is killed, this throws exception
 
-        return new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode());
+        return new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode(), null);
     }
 
     /**
@@ -750,6 +770,20 @@ public class ServerAccess {
         Integer exitCode;
         Boolean running;
         File dir;
+        Throwable deadlyException = null;
+        /*
+         * before removing this "useless" variable
+         * check DeadLockTestTest.testDeadLockTestTerminated2
+         */
+        private boolean destoyed = false;
+
+        public boolean isDestoyed() {
+            return destoyed;
+        }
+
+        public void setDestoyed(boolean destoyed) {
+            this.destoyed = destoyed;
+        }
 
         public Boolean isRunning() {
             return running;
@@ -798,13 +832,21 @@ public class ServerAccess {
                 }else{
                     p = r.exec(args.toArray(new String[0]),new String[0], dir);
                 }
-                exitCode = p.waitFor();
-                Thread.sleep(500);//this is giving to fastly done proecesses's e/o readers time to read all. I would like to know better solution :-/
+                try {
+                    exitCode = p.waitFor();
+                    Thread.sleep(500);//this is giving to fastly done proecesses's e/o readers time to read all. I would like to know better solution :-/
+                } finally {
+                    destoyed = true;
+                }
             } catch (Exception ex) {
                 if (ex instanceof InterruptedException) {
                     //add to the set of terminated threadedproceses
+                    deadlyException = ex;
                     terminated.add(this);
                 } else {
+                    //happens when nonexisting process is launched, is causing p null!
+                    terminated.add(this);
+                    deadlyException = ex;
                     throw new RuntimeException(ex);
                 }
             } finally {
@@ -950,8 +992,17 @@ public class ServerAccess {
                                 byte[] b = new byte[l];
                                 FileInputStream f = new FileInputStream(pp);
                                 f.read(b);
+                                String content = "";
+                                String ct = "Content-Type: ";
+                                if (p.toLowerCase().endsWith(".jnlp")) {
+                                    content = ct + "application/x-java-jnlp-file\n";
+                                } else if (p.toLowerCase().endsWith(".html")) {
+                                    content = ct + "text/html\n";
+                                } else if (p.toLowerCase().endsWith(".jar")) {
+                                    content = ct + "application/x-jar\n";
+                                }
                                 o.writeBytes("HTTP/1.0 200 OK\nConten"
-                                        + "t-Length:" + l + "\n\n");
+                                        + "t-Length:" + l + "\n" + content + "\n");
                                 if (op.startsWith(XSX)){
                                     byte[][] bb=ServerAccess.splitArray(b,10);
                                     for (int j = 0; j < bb.length; j++) {
@@ -1074,6 +1125,13 @@ public class ServerAccess {
         //false == is disabled:(
         private boolean canRun = true;
         private boolean wasTerminated = false;
+        /**
+         * if this is true, then process is not destroyed after timeout, but just left to its own destiny.
+         * Its stdout/err is no longer recorded, and it is leaking system resources until it dies by itself
+         * The contorl is returned to main thread with all informations recorded  untill now.
+         * You will be able to listen to std out from listeners still
+         */
+        private boolean skipInstedOfDesroy = false;
 
         /**
          *
@@ -1087,9 +1145,25 @@ public class ServerAccess {
 
         }
 
+        public ProcessAssasin(ThreadedProcess p, long timeout, boolean skipInstedOfDesroy) {
+            this.p = (p);
+            this.timeout = timeout;
+            this.skipInstedOfDesroy = skipInstedOfDesroy;
+
+
+        }
+
         public void setCanRun(boolean canRun) {
             this.canRun = canRun;
-            System.err.println("Stopping assasin for" + p.toString() + " " + p.getP().toString() + " " + p.getCommandLine() + ": ");
+            if (p != null) {
+                if (p.getP() != null) {
+                    System.err.println("Stopping assassin for" + p.toString() + " " + p.getP().toString() + " " + p.getCommandLine() + ": ");
+                } else {
+                    System.err.println("Stopping assassin for" + p.toString() + " " + p.getCommandLine() + ": ");
+                }
+            } else {
+                System.err.println("Stopping assassin for null job: ");
+            }
             System.err.flush();
         }
 
@@ -1099,6 +1173,14 @@ public class ServerAccess {
 
         public boolean wasTerminated() {
             return wasTerminated;
+        }
+
+        public void setSkipInstedOfDesroy(boolean skipInstedOfDesroy) {
+            this.skipInstedOfDesroy = skipInstedOfDesroy;
+        }
+
+        public boolean isSkipInstedOfDesroy() {
+            return skipInstedOfDesroy;
         }
 
         @Override
@@ -1112,17 +1194,44 @@ public class ServerAccess {
                     //System.out.println(time - startTime);
                     //System.out.println((time - startTime) > timeout);
                     if ((time - startTime) > timeout) {
-                        System.err.println("Timeouted " + p.toString() + " " + p.getP().toString() + " .. killing " + p.getCommandLine() + ": ");
-                        System.err.flush();
-                        wasTerminated = true;
-                        p.interrupt();
-                        while (!terminated.contains(p)) {
-                            Thread.sleep(100);
+                        try {
+                            if (p != null) {
+                                if (p.getP() != null) {
+                                    System.err.println("Timed out " + p.toString() + " " + p.getP().toString() + " .. killing " + p.getCommandLine() + ": ");
+                                } else {
+                                    System.err.println("Timed out " + p.toString() + " " + "null  .. killing " + p.getCommandLine() + ": ");
+                                }
+                                System.err.flush();
+                                wasTerminated = true;
+                                p.interrupt();
+                                while (!terminated.contains(p)) {
+                                    Thread.sleep(100);
+                                }
+                                if (p.getP() != null) {
+                                    try {
+                                        if (!skipInstedOfDesroy) {
+                                            p.getP().destroy();
+                                        }
+                                    } catch (Throwable ex) {
+                                        if (p.deadlyException == null) {
+                                            p.deadlyException = ex;
+                                        }
+                                        ex.printStackTrace();
+                                    }
+                                }
+                                if (p.getP() != null) {
+                                    System.err.println("Timed out " + p.toString() + " " + p.getP().toString() + " .. killed " + p.getCommandLine());
+                                } else {
+                                    System.err.println("Timed out " + p.toString() + " null  .. killed " + p.getCommandLine());
+                                }
+                                System.err.flush();
+                            } else {
+                                System.err.println("Timed out null job");
+                            }
+                            break;
+                        } finally {
+                            p.setDestoyed(true);
                         }
-                        //p.p.destroy()??
-                        System.err.println("Timeouted " + p.toString() + " " + p.getP().toString() + " .. killed " + p.getCommandLine());
-                        System.err.flush();
-                        break;
 
 
                     }
@@ -1131,7 +1240,15 @@ public class ServerAccess {
                     ex.printStackTrace();
                 }
             }
-            System.err.println("assasin for" + p.toString() + " " + p.getP().toString() + " .. done " + p.getCommandLine() + "  termination " + wasTerminated);
+            if (p != null) {
+                if (p.getP() != null) {
+                    System.err.println("assassin for" + p.toString() + " " + p.getP().toString() + " .. done " + p.getCommandLine() + "  termination " + wasTerminated);
+                } else {
+                    System.err.println("assassin for" + p.toString() + " null .. done " + p.getCommandLine() + "  termination " + wasTerminated);
+                }
+            } else {
+                System.err.println("assassin for non exisitng job  termination " + wasTerminated);
+            }
             System.err.flush();
         }
     }
@@ -1147,8 +1264,12 @@ public class ServerAccess {
         public final Process process;
         public final Integer returnValue;
         public final boolean wasTerminated;
+        /*
+         * possible exception which caused Process not to be launched
+         */
+        public final Throwable deadlyException;
 
-        public ProcessResult(String stdout, String stderr, Process process, boolean wasTerminated, Integer r) {
+        public ProcessResult(String stdout, String stderr, Process process, boolean wasTerminated, Integer r, Throwable deadlyException) {
             this.notFilteredStdout = stdout;
             if (stdout == null) {
                 this.stdout = null;
@@ -1159,6 +1280,7 @@ public class ServerAccess {
             this.process = process;
             this.wasTerminated = wasTerminated;
             this.returnValue = r;
+            this.deadlyException = deadlyException;
         }
     }
 
@@ -1214,26 +1336,34 @@ public class ServerAccess {
         public void run() {
             try {
                 Reader br = new InputStreamReader(is, "UTF-8");
-                StringBuilder line=new StringBuilder();
+                StringBuilder line = new StringBuilder();
                 while (true) {
                     int s = br.read();
                     if (s < 0) {
-                        if (line.length()>0 && listener!=null) listener.lineReaded(line.toString());
+                        if (line.length() > 0 && listener != null) {
+                            listener.lineReaded(line.toString());
+                        }
                         break;
                     }
-                    char ch=((char) s);
+                    char ch = ((char) s);
                     sb.append(ch);
                     line.append(ch);
-                    if (ch=='\n'){
-                        if (listener!=null) listener.lineReaded(line.toString());
-                        line=new StringBuilder();
+                    if (ch == '\n') {
+                        if (listener != null) {
+                            listener.lineReaded(line.toString());
+                        }
+                        line = new StringBuilder();
                     }
-                    if (listener!=null) listener.charReaded(ch);
+                    if (listener != null) {
+                        listener.charReaded(ch);
+                    }
 
                 }
                 //do not want to bother output with terminations
+                //mostly compaling when assassin kill the process about StreamClosed
             } catch (Exception ex) {
-                ex.printStackTrace();
+                // ex.printStackTrace();
+                // System.err.flush();
             } finally {
                 try {
                     is.close();

@@ -1,3 +1,20 @@
+2012-04-05  Jiri Vanek <jvanek@redhat.com>
+
+	Fixing issue when process was not launched at all and when was killed but
+	left behind living/hanging, fixing mime-types
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+	(getContentOfStream) this method overloaded with possibility to specify
+	encoding (I needed to set it to ASCII in one test)
+	(deadlyException) field introduced in ThreadedProcess to record exception
+	caused by impassibility of launching the process. And so process have
+	been null without any sign why.
+	(TinyHttpdImpl) now correctly returns known mime types
+	(ProcessAssasin) can now skip or smoothly (and finally correctly)
+	destroy its process, and all his logging messages were done null-proof
+	(as deadlyException now allows)
+	Asynchronous (ContentReader) have been silenced when complaining about 
+	closed streams by Assassin.
+
 2012-04-03  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Change all vendors in JNLP test suite to IcedTea and homepage href's to
