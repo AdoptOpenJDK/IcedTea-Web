@@ -57,7 +57,8 @@ public class CacheReproducerTest {
 
     private static final ServerAccess server = new ServerAccess();
     private static final List<String> clear = Arrays.asList(new String[]{server.getJavawsLocation(), "-Xclearcache",  ServerAccess.HEADLES_OPTION});
-    private static final List<String> trusted = Arrays.asList(new String[]{"-Xtrustall", ServerAccess.HEADLES_OPTION});
+    private static final List<String> trustedVerboses = Arrays.asList(new String[]{"-Xtrustall", ServerAccess.HEADLES_OPTION,"-verbose"});
+    private static final List<String> verbosed = Arrays.asList(new String[]{"-verbose", ServerAccess.HEADLES_OPTION});
     private static final String home = System.getProperty("user.home");
     private static final String name = System.getProperty("user.name");
     private static final String tmp = System.getProperty("java.io.tmpdir");
@@ -66,9 +67,16 @@ public class CacheReproducerTest {
     private static final File icedteaCacheFile = new File(icedteaCache, "recently_used");
     private static final File netxLock = new File(tmp + "/" + name + "/netx/locks/netx_running");
     private static final String lre = "LruCacheException";
+    private static final String ioobe = "IndexOutOfBoundsException";
     private static final String corruptRegex = "\\d{13}";
     private static final Pattern corruptPatern = Pattern.compile(corruptRegex);
     private static final String corruptString = "156dsf1562kd5";
+
+     String testS = "#netx file\n"
+                + "#Mon Dec 12 16:20:46 CET 2011\n"
+                + "1323703236508,0=/home/xp13/.icedtea/cache/0/http/localhost/ReadPropertiesBySignedHack.jnlp\n"
+                + "1323703243086,2=/home/xp14/.icedtea/cache/2/http/localhost/ReadProperties.jar\n"
+                + "1323703243082,1=/home/xp15/.icedtea/cache/1/http/localhost/ReadPropertiesBySignedHack.jar";
 
     @Test
     public void cacheIsWorkingTest() throws Exception {
@@ -131,6 +139,10 @@ public class CacheReproducerTest {
         Assert.assertTrue("icedtea cache file " + icedteaCacheFile.getAbsolutePath() + " should not be empty", icedteaCacheFile.length() > 0);
     }
 
+    /**
+     * This is breaking integer numbers in first part of cache file item
+     * @throws Exception
+     */
     @Test
     public void coruptAndRunCache1() throws Exception {
         clearAndEvaluateCache();
@@ -146,9 +158,13 @@ public class CacheReproducerTest {
         assertLruExceptionNOTappeared(pr2);
     }
 
+    /**
+     * This is breaking integer numbers in first part of cache file item
+     * @throws Exception
+     */
     @Test
     public void coruptAndRunCache2() throws Exception {
-         clearAndEvaluateCache();
+        clearAndEvaluateCache();
         evaluateSimpleTest1OkCache(runSimpleTest1());
         assertCacheIsNotEmpty();
         breakCache1();
@@ -164,6 +180,33 @@ public class CacheReproducerTest {
         assertLruExceptionNOTappeared(pr2);
     }
 
+    /**
+     * This is breaking paths in second part of cache file item
+     * @throws Exception
+     */
+    @Test
+    public void coruptAndRunCache3() throws Exception {
+        clearAndEvaluateCache();
+        evaluateSimpleTest1OkCache(runSimpleTest1());
+        assertCacheIsNotEmpty();
+        breakCache3();
+        ProcessResult pr = runSimpleTest1();
+        assertAoobNOTappeared(pr);
+        assertLruExceptionAppeared(pr);
+        evaluateSimpleTest1OkCache(pr);
+        ProcessResult pr3 = runSimpleTest1();
+        evaluateSimpleTest1OkCache(pr3);
+        assertLruExceptionNOTappeared(pr3);
+        clearAndEvaluateCache();
+        ProcessResult pr2 = runSimpleTest1();
+        evaluateSimpleTest1OkCache(pr2);
+        assertLruExceptionNOTappeared(pr2);
+    }
+
+     private void assertAoobNOTappeared(ProcessResult pr2) {
+        Assert.assertFalse("serr should NOT contain " + ioobe, pr2.stderr.contains(ioobe));
+    }
+
     private void assertLruExceptionNOTappeared(ProcessResult pr2) {
         Assert.assertFalse("serr should NOT contain " + lre, pr2.stderr.contains(lre));
     }
@@ -174,7 +217,7 @@ public class CacheReproducerTest {
 
     @Test
     public void coruptAndRunCache1Signed() throws Exception {
-         clearAndEvaluateCache();
+        clearAndEvaluateCache();
         evaluateSimpleTest1OkCache(runSimpleTest1());
         assertCacheIsNotEmpty();
         breakCache1();
@@ -189,7 +232,7 @@ public class CacheReproducerTest {
 
     @Test
     public void coruptAndRunCache2Signed() throws Exception {
-         clearAndEvaluateCache();
+        clearAndEvaluateCache();
         evaluateSimpleTest1OkCache(runSimpleTest1());
         assertCacheIsNotEmpty();
         breakCache1();
@@ -217,7 +260,7 @@ public class CacheReproducerTest {
                 try {
                     System.out.println("connecting deadlocktest request");
                     System.err.println("connecting deadlocktest request");
-                    ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/deadlocktest.jnlp");
+                    ServerAccess.ProcessResult pr = server.executeJavawsHeadless(verbosed, "/deadlocktest.jnlp");
                     System.out.println(pr.stdout);
                     System.err.println(pr.stderr);
                 } catch (Exception ex) {
@@ -236,7 +279,7 @@ public class CacheReproducerTest {
     }
 
      
-    //next four tests are designed to ensure, that corupted cache wil not break already loaded cached files
+    //next four tests are designed to ensure, that corrupted cache will not break already loaded cached files
     public static final String CR1 = "CacheReproducer1";
     public static final String CR2 = "CacheReproducer2";
     public static final String CR11 = "CacheReproducer1_1";
@@ -327,14 +370,9 @@ public class CacheReproducerTest {
     }
 
     @Test
-    public void assertBreakersAreWorking() {
-        String s = "#netx file\n"
-                + "#Mon Dec 12 16:20:46 CET 2011\n"
-                + "1323703236508,0=/home/xp13/.icedtea/cache/0/http/localhost/ReadPropertiesBySignedHack.jnlp\n"
-                + "1323703243086,2=/home/xp14/.icedtea/cache/2/http/localhost/ReadProperties.jar\n"
-                + "1323703243082,1=/home/xp15/.icedtea/cache/1/http/localhost/ReadPropertiesBySignedHack.jar";
+    public void assertBreakers1AreWorking() {
+        String s=testS;
         String sp[] = s.split("\n");
-
         String ss[] = breakAll(s).split("\n");
         for (int i = 0; i < 2; i++) {
             Assert.assertEquals(sp[i], ss[i]);
@@ -378,6 +416,25 @@ public class CacheReproducerTest {
         return s;
     }
 
+    @Test
+    public void assertBreakers2AreWorking() {
+        String s=testS;
+        String sp[] = s.split("\n");
+        String ss[] = breakPaths    (s).split("\n");
+        for (int i = 0; i < 2; i++) {
+            Assert.assertEquals(sp[i], ss[i]);
+
+        }
+         for (int i = 2; i < ss.length; i++) {
+            Assert.assertNotSame(sp[i], ss[i]);
+
+        }
+    }
+
+    private static String breakPaths(String s) {
+       return s.replaceAll(home+".*", "/ho");
+    }
+
     private static void breakCache1() throws IOException {
         String s = loadCacheFile();
         s = breakAll(s);
@@ -390,8 +447,14 @@ public class CacheReproducerTest {
         ServerAccess.saveFile(s, icedteaCacheFile);
     }
 
+    private static void breakCache3() throws IOException {
+        String s = loadCacheFile();
+        s = breakPaths(s);
+        ServerAccess.saveFile(s, icedteaCacheFile);
+    }
+
     private static ServerAccess.ProcessResult runSimpleTest1() throws Exception {
-        return runSimpleTest1(null, "simpletest1");
+        return runSimpleTest1(verbosed, "simpletest1");
     }
 
     private static ServerAccess.ProcessResult runSimpleTest1(List<String> args, String s) throws Exception {
@@ -408,7 +471,7 @@ public class CacheReproducerTest {
     }
 
     private static ServerAccess.ProcessResult runSimpleTestSigned(String id) throws Exception {
-        return runSimpleTest1(trusted, id);
+        return runSimpleTest1(trustedVerboses, id);
     }
 
     private static void evaluateSimpleTest1OkCache(ServerAccess.ProcessResult pr2) throws Exception {

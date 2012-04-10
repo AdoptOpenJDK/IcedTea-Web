@@ -307,8 +307,8 @@ public class CacheUtil {
             cacheFile = getCacheFileIfExist(urlToPath(source, ""));
             if (cacheFile == null) { // We did not find a copy of it.
                 cacheFile = makeNewCacheFile(source, version);
-            }
-            lruHandler.store();
+            } else
+                lruHandler.store();
             lruHandler.unlock();
         }
         return cacheFile;
@@ -323,48 +323,16 @@ public class CacheUtil {
     private static File getCacheFileIfExist(File urlPath) {
         synchronized (lruHandler) {
             File cacheFile = null;
-            int tries = 0;
-            List<Entry<String, String>> entries = null;
-            do {
-                try {
-                    tries++;
-                    entries = lruHandler.getLRUSortedEntries();
-                } catch (LruCacheException ex) {
-                    if (tries == 1) {
-                        ex.printStackTrace();
-                        System.out.println(R("CFakeCache"));
-                        lruHandler.clearLRUSortedEntries();
-                        lruHandler.store();
-                        System.out.println(R("CFakedCache"));
-                    } else if (tries == 2) {
-                        ex.printStackTrace();
-                        System.out.println(R("CStillCorupted"));
-                        boolean clearingresult = CacheUtil.clearCache();
-                        if (!clearingresult) {
-                            throw new InternalError(R("CCleaningUnsuccessful"));
-                        }
-                        System.out.println(R("CClearedReloading"));
-                        lruHandler.clearLRUSortedEntries();
-                        lruHandler.store();
-                        System.out.println(R("CReloadRestarting"));
-
-                    } else {
-                        throw new InternalError(R("CStillBroken"));
-                    }
-
-                }
-            } while (entries == null);
+            List<Entry<String, String>> entries = lruHandler.getLRUSortedEntries();
             // Start searching from the most recent to least recent.
             for (Entry<String, String> e : entries) {
                 final String key = e.getKey();
                 final String path = e.getValue();
 
-                if (path != null) {
-                    if (pathToURLPath(path).equals(urlPath.getPath())) { // Match found.
-                        cacheFile = new File(path);
-                        lruHandler.updateEntry(key);
-                        break; // Stop searching since we got newest one already.
-                    }
+                if (pathToURLPath(path).equals(urlPath.getPath())) { // Match found.
+                    cacheFile = new File(path);
+                    lruHandler.updateEntry(key);
+                    break; // Stop searching since we got newest one already.
                 }
             }
             return cacheFile;
@@ -561,6 +529,7 @@ public class CacheUtil {
      * This will remove all old cache items.
      */
     public static void cleanCache() {
+
         if (okToClearCache()) {
             // First we want to figure out which stuff we need to delete.
             HashSet<String> keep = new HashSet<String>();
@@ -579,57 +548,55 @@ public class CacheUtil {
             for (Entry<String, String> e : lruHandler.getLRUSortedEntries()) {
                 // Check if the item is contained in cacheOrder.
                 final String key = e.getKey();
-                final String value = e.getValue();
+                final String path = e.getValue();
 
-                if (value != null) {
-                    File file = new File(value);
-                    PropertiesFile pf = new PropertiesFile(new File(value + ".info"));
-                    boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
+                File file = new File(path);
+                PropertiesFile pf = new PropertiesFile(new File(path + ".info"));
+                boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
 
-                    /*
-                     * This will get me the root directory specific to this cache item.
-                     * Example:
-                     *  cacheDir = /home/user1/.icedtea/cache
-                     *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
-                     *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
-                     *  then rstr becomes: /home/user1/.icedtea/cache/0
-                     */
-                    String rStr = file.getPath().substring(cacheDir.length());
-                    rStr = cacheDir + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
-                    long len = file.length();
+                /*
+                 * This will get me the root directory specific to this cache item.
+                 * Example:
+                 *  cacheDir = /home/user1/.icedtea/cache
+                 *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
+                 *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
+                 *  then rstr becomes: /home/user1/.icedtea/cache/0
+                 */
+                String rStr = file.getPath().substring(cacheDir.length());
+                rStr = cacheDir + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
+                long len = file.length();
 
-                    if (keep.contains(file.getPath().substring(rStr.length()))) {
-                        lruHandler.removeEntry(key);
-                        continue;
-                    }
-                    
-                    /*
-                     * we remove entries from our lru if any of the following condition is met.
-                     * Conditions:
-                     *  - delete: file has been marked for deletion.
-                     *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
-                     *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
-                     *  on disk would exceed the maximum size.
-                     */
-                    if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
-                        lruHandler.removeEntry(key);
-                        remove.add(rStr);
-                    } else {
-                        curSize += len;
-                        keep.add(file.getPath().substring(rStr.length()));
+                if (keep.contains(file.getPath().substring(rStr.length()))) {
+                    lruHandler.removeEntry(key);
+                    continue;
+                }
 
-                        for (File f : file.getParentFile().listFiles()) {
-                            if (!(f.equals(file) || f.equals(pf.getStoreFile()))){
-                                try {
-                                    FileUtils.recursiveDelete(f, f);
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
-                            }
+                /*
+                 * we remove entries from our lru if any of the following condition is met.
+                 * Conditions:
+                 *  - delete: file has been marked for deletion.
+                 *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
+                 *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
+                 *  on disk would exceed the maximum size.
+                 */
+                if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
+                    lruHandler.removeEntry(key);
+                    remove.add(rStr);
+                    continue;
+                }
+
+                curSize += len;
+                keep.add(file.getPath().substring(rStr.length()));
+
+                for (File f : file.getParentFile().listFiles()) {
+                    if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
+                        try {
+                            FileUtils.recursiveDelete(f, f);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
                         }
                     }
-                } else {
-                    lruHandler.removeEntry(key);
+
                 }
             }
             lruHandler.store();

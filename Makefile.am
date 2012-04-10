@@ -565,7 +565,7 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
-	  $(BOOT_DIR)/bin/java -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) -Djavaws.build.bin=$(DESTDIR)$(bindir)/javaws \
+	  $(BOOT_DIR)/bin/java -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) -Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
 	  > stdout.log 2> stderr.log ; \
 	 cat stdout.log ; \
@@ -676,9 +676,9 @@ if WITH_EMMA
 	$(BOOT_DIR)/bin/jar -cf $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar * ; \
 	popd ; \
 	rm -rf $$instructed_dir ; \
-	echo "patching javaws" ; \
-	cat $$javaws_backup | sed "s,$(LAUNCHER_BOOTCLASSPATH),$$nw_bootclasspath," > $(DESTDIR)$(bindir)/javaws ; \
-	chmod 777 $(DESTDIR)$(bindir)/javaws ; \
+	echo "patching $(javaws)" ; \
+	cat $$javaws_backup | sed "s,$(LAUNCHER_BOOTCLASSPATH),$$nw_bootclasspath," > $(DESTDIR)$(bindir)/$(javaws) ; \
+	chmod 777 $(DESTDIR)$(bindir)/$(javaws) ; \
 	testcases_srcs=( ) ; \
 	k=0 ; \
 	types=(simple signed); \
@@ -697,7 +697,7 @@ if WITH_EMMA
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	$(BOOT_DIR)/bin/java  \
 	 -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) \
-	 -Djavaws.build.bin=$(DESTDIR)$(bindir)/javaws \
+	 -Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws) \
 	 -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) emmarun  \
 	   -raw \
 	   -cp $(NETX_DIR)/lib/classes.jar \
@@ -727,9 +727,9 @@ if WITH_EMMA
 	  -r xml \
 	  "$${testcases_srcs[@]}" ; \
 	echo "restoring javaws and netx.jar in $(DESTDIR)" ; \
-	rm -f $(DESTDIR)$(bindir)/javaws $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar ; \
-	rm -f $(DESTDIR)$(bindir)/javaws;  \
-	mv $$javaws_backup $(DESTDIR)$(bindir)/javaws;  \
+	rm -f $(DESTDIR)$(bindir)/$(javaws) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar ; \
+	rm -f $(DESTDIR)$(bindir)/$(javaws);  \
+	mv $$javaws_backup $(DESTDIR)$(bindir)/$(javaws);  \
 	mv $$netx_backup $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar ; \
 	mv $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml  $(JNLP_TESTS_ENGINE_DIR)/tests-output_withEmma.xml ; \
 	mv $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml_noEmma  $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml ; \
