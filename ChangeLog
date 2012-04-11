@@ -1,25 +1,26 @@
 2012-06-04  Jiri Vanek <jvanek@redhat.com>
             Thomas Meyer <thomas@m3y3r.de>
 
-        * makefile.am: (stamps/run-netx-dist-tests.stamp) and
-                       (run-reproducers-test-code-coverage.stamp)
-        now using $(javaws) variable instead of plaintext javaws
-        * netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: (checkData) new
-        method checking for sanity of cache entries
-        (load) now checks for data sanity after loading, and stores without
-        corrupted items if necessary
-        (Comparator.compare) for sorting lru items. Now redundant checking for
-        sanity removed
-        * netx/net/sourceforge/jnlp/cache/CacheUtil.java: (getCacheFile) don't
-        call lruHandler.store twice for new cache entries
-        (getCacheFileIfExist) removed iteration and cleaning mechanism
-        * netx/net/sourceforge/jnlp/resources/Messages.properties: modified
-        cache messages
-        * tests/jnlp_tests/signed/CacheReproducer/testcases/CacheReproducerTest.java
-        Added test for checking corrupted path in entry and all tests adapted for
-        exception thrown only in debug mode
+	* makefile.am: (stamps/run-netx-dist-tests.stamp) and
+	               (run-reproducers-test-code-coverage.stamp)
+	now using $(javaws) variable instead of plaintext javaws
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: (checkData) new
+	method checking for sanity of cache entries
+	(load) now checks for data sanity after loading, and stores without
+	corrupted items if necessary
+	(Comparator.compare) for sorting lru items. Now redundant checking for
+	sanity removed
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (getCacheFile) don't
+	call lruHandler.store twice for new cache entries
+	(getCacheFileIfExist) removed iteration and cleaning mechanism
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: modified
+	cache messages
+	* tests/jnlp_tests/signed/CacheReproducer/testcases/CacheReproducerTest.java
+	Added test for checking corrupted path in entry and all tests adapted for
+	exception thrown only in debug mode
 
-2012-04-04  Danesh Dadachanji  <ddadacha@redhat.com>
+2012-04-04  Danesh Dadachanji <ddadacha@redhat.com>
+
 	Change the name of JarSigner to JarCertVerifier to make it more
 	relevant to the purpose of the file.
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
@@ -133,10 +134,10 @@
 
 2012-04-03  Jiri Vanek <jvanek@redhat.com>
 
-    Tests virtual server thread marked as daemon by default
-    * tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
-    All (ServerLauncher) instances returned by methods were marked as daemon
-    by default. Possibility to change and api were kept. 
+	Tests virtual server thread marked as daemon by default
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+	All (ServerLauncher) instances returned by methods were marked as daemon
+	by default. Possibility to change and api were kept. 
 
 2012-03-30  Danesh Dadachanji  <ddadacha@redhat.com>
 
@@ -707,7 +708,7 @@
 	* tests/jnlp_tests/signed/MissingJar/testcases/MissingJarTest.java
 	testing file of reproducer, launchiing above four jnlp files, each in individual test
 
-2011-10-17  Jiri Vanek <jvanek@redhat.com>   
+2011-10-17  Jiri Vanek <jvanek@redhat.com>
 
 	PR564: NetX depends on sun.misc.BASE64Encoder
 	* configure.ac: removed IT564 comment, removed check for sun.misc.BASE64Encoder
@@ -831,7 +832,7 @@
 	testcase for this reproducer 
 
 2011-09-22  Jiri Vanek <jvanek@redhat.com>
-    
+
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned1.jnlp:
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned2.jnlp:
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java:
