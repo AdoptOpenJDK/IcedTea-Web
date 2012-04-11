@@ -27,6 +27,7 @@ KEYSTORE_NAME=teststore.ks
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
 REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
+EMMA_JAVA_ARGS=-Xmx2G
 META_MANIFEST = META-INF/MANIFEST.MF
 
 # Build directories
@@ -631,7 +632,7 @@ if WITH_EMMA
 	mv $(NETX_UNIT_TEST_DIR)/tests-output.xml  $(NETX_UNIT_TEST_DIR)/tests-output.xml_noEmma ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	$(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) -Demma.report.html.out.encoding=UTF-8 emmarun \
+	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) -Demma.report.html.out.encoding=UTF-8 emmarun \
 	 -Dreport.html.out.encoding=UTF-8 \
 	 -raw \
 	 -sp $(NETX_SRCDIR) \
@@ -696,6 +697,7 @@ if WITH_EMMA
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	$(BOOT_DIR)/bin/java  \
+	 $(EMMA_JAVA_ARGS) \
 	 -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) \
 	 -Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws) \
 	 -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) emmarun  \
@@ -712,11 +714,11 @@ if WITH_EMMA
 	   CommandLine $$class_names ; \
 	mv $(JNLP_TESTS_ENGINE_DIR)/coverage.ec $(JNLP_TESTS_ENGINE_DIR)/coverageX.ec ; \
 	mv $(JNLP_TESTS_ENGINE_DIR)/coverage.es $(JNLP_TESTS_ENGINE_DIR)/coverageX.es ; \
-	$(BOOT_DIR)/bin/java -cp $(EMMA_JAR) emma merge \
+	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(EMMA_JAR) emma merge \
 	  -in $(TESTS_DIR)/coverage.em \
 	  -in $(JNLP_TESTS_ENGINE_DIR)/coverageX.ec \
 	  -in $(JNLP_TESTS_ENGINE_DIR)/coverageX.es ; \
-	$(BOOT_DIR)/bin/java -cp $(EMMA_JAR)  -Demma.report.html.out.encoding=UTF-8 emma report \
+	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(EMMA_JAR)  -Demma.report.html.out.encoding=UTF-8 emma report \
 	  -Dreport.html.out.encoding=UTF-8 \
 	  -in $(JNLP_TESTS_ENGINE_DIR)/coverage.es  \
 	  -sp $(NETX_SRCDIR) \
@@ -756,10 +758,10 @@ if WITH_EMMA
 	    k=$$((k+1)) ; \
 	  done ; \
 	done ; \
-	$(BOOT_DIR)/bin/java -cp $(EMMA_JAR) emma merge \
+	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(EMMA_JAR) emma merge \
 	 -in $(NETX_UNIT_TEST_DIR)/coverage.es \
 	 -in $(JNLP_TESTS_ENGINE_DIR)/coverage.es ; \
-	$(BOOT_DIR)/bin/java -cp $(EMMA_JAR)  -Demma.report.html.out.encoding=UTF-8 emma report \
+	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(EMMA_JAR)  -Demma.report.html.out.encoding=UTF-8 emma report \
 	 -Dreport.html.out.encoding=UTF-8 \
 	 -in $(TESTS_DIR)/coverage.es \
 	 -in $(TESTS_DIR)/coverage.em \

@@ -1,3 +1,11 @@
+2012-04-11  Jiri Vanek  <jvanek@redhat.com>
+
+	* Makefile.am: EMMA_JAVA_ARGS, new variable for adjusting emma runs. 
+	Currently set to -Xmx2G.
+	(stamps/run-unit-test-code-coverage.stamp),
+	(stamps/run-reproducers-test-code-coverage.stamp),
+	(run-test-code-coverage): Use EMMA_JAVA_ARGS in theirs emma runs.
+
 2012-06-04  Jiri Vanek <jvanek@redhat.com>
             Thomas Meyer <thomas@m3y3r.de>
 
