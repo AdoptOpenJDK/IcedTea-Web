@@ -1,3 +1,12 @@
+2012-04-17  Jiri Vanek <jvanek@redhat.com>
+
+	Rewritten DeadLockTestTest to stop failing in more then 1/2 of cases
+	All assassinated processes were hanging as zombies, killed forcibly by
+	kill -9 now.
+	* /tests/jnlp_tests/simple/deadlocktest/testcases/DeadLockTestTest.java:
+	(countJavaInstances) now return pids of found javas.
+	(killDiff) new method killing zombie javas forcibly.
+
 2012-04-11  Jiri Vanek  <jvanek@redhat.com>
 
 	* Makefile.am: EMMA_JAVA_ARGS, new variable for adjusting emma runs. 
