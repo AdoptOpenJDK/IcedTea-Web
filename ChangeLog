@@ -1,3 +1,30 @@
+2012-04-18  Jiri Vanek  <jvanek@redhat.com>
+
+	Allowed signed applets in automatic reproducers tests
+	* tests/jnlp_tests/signed/AppletTestSigned/resources/AppletTestSigned.html:
+	html file for launching signed applet. Its style is different from the one for
+	calling unsigned applets - red. 
+	* tests/jnlp_tests/signed/AppletTestSigned/resources/AppletTestSigned.jnlp:
+	jnlp file for launched signed applet
+	* tests/jnlp_tests/signed/AppletTestSigned/srcs/AppletTestSigned.java
+	body of signed applet
+	* tests/jnlp_tests/signed/AppletTestSigned/testcases/AppletTestSignedTests.java:
+	(AppletTestSignedTest): testing method to launch signed applet in javaws
+	(AppletTestSignedFirefoxTest): testing method to launch signed applet in
+	browser
+	* Makefile.am: PUBLIC_KEYSTORE_PASS, EXPORTED_TEST_CERT, TEST_CERT_ALIAS,
+	PUBLIC_KEYSTORE PUBLIC_KEYSTORE_PASS: new global variables holding
+	keystores' credentials
+	(clean-local): clean-bootstrap-directory moved to be last one, as keytool
+	is necessary for removing certificate
+	(EXPORTED_TEST_CERT): new target exporting certificate from testing keystore
+	(stamps/netx-dist-tests-import-cert-to-public): new target to import
+	certificate to PUBLIC_KEYSTORE
+	(netx-dist-tests-remove-cert-from-public): new target removing testing
+	certificate from PUBLIC_KEYSTORE
+	(clean-netx-dist-tests): now depends on netx-dist-tests-remove-cert-from-public
+	and is removing EXPORTED_TEST_CERT file
+
 2012-04-17  Jiri Vanek <jvanek@redhat.com>
 
 	Rewritten DeadLockTestTest to stop failing in more then 1/2 of cases

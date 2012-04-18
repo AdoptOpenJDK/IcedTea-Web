@@ -22,7 +22,12 @@ JNLP_TESTS_SRCDIR=$(TESTS_SRCDIR)/jnlp_tests
 JNLP_TESTS_ENGINE_DIR=$(TESTS_DIR)/netx/jnlp_testsengine
 JNLP_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/jnlp_test_server
 JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
-KEYSTORE_NAME=teststore.ks
+PRIVATE_KEYSTORE_NAME=teststore.ks
+PRIVATE_KEYSTORE_PASS=123456789
+EXPORTED_TEST_CERT=icedteatests.crt
+TEST_CERT_ALIAS=icedteaweb
+PUBLIC_KEYSTORE=~/.icedtea/security/trusted.certs
+PUBLIC_KEYSTORE_PASS=changeit
 
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
@@ -142,8 +147,8 @@ all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launch
 
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
-clean-local: clean-netx clean-plugin clean-liveconnect clean-extra clean-bootstrap-directory \
- clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-tests
+clean-local: clean-netx clean-plugin clean-liveconnect clean-extra  \
+ clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-tests clean-bootstrap-directory
 	if [ -e stamps ] ; then \
 	  rmdir stamps ; \
 	fi
@@ -506,18 +511,29 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
 	touch $@
 
 stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepare-reproducers.stamp
-	alias=icedteaweb; \
-	keystore=$(abs_top_builddir)/$(KEYSTORE_NAME); \
-	pass=123456789; \
-	$(BOOT_DIR)/bin/keytool -genkey -alias $$alias -keystore $$keystore -keypass $$pass -storepass $$pass -dname "cn=$$alias, ou=$$alias, o=$$alias, c=$$alias" ; \
+	keystore=$(abs_top_builddir)/$(PRIVATE_KEYSTORE_NAME); \
+	$(BOOT_DIR)/bin/keytool -genkey -alias $(TEST_CERT_ALIAS) -keystore $$keystore -keypass $(PRIVATE_KEYSTORE_PASS) -storepass $(PRIVATE_KEYSTORE_PASS) -dname "cn=$(TEST_CERT_ALIAS), ou=$(TEST_CERT_ALIAS), o=$(TEST_CERT_ALIAS), c=$(TEST_CERT_ALIAS)" ; \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	signedReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-signed.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	for dir in "$${signedReproducers[@]}" ; do \
-	 $(BOOT_DIR)/bin/jarsigner -keystore $$keystore -storepass $$pass -keypass $$pass  "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$alias ; \
+	 $(BOOT_DIR)/bin/jarsigner -keystore $$keystore -storepass $(PRIVATE_KEYSTORE_PASS) -keypass $(PRIVATE_KEYSTORE_PASS)  "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $(TEST_CERT_ALIAS) ; \
  	done ; \
  	mkdir -p stamps && \
  	touch $@
+
+#this always tries to remove  previous testcert
+$(EXPORTED_TEST_CERT): stamps/netx-dist-tests-sign-some-reproducers.stamp netx-dist-tests-remove-cert-from-public
+	keytool -export -alias $(TEST_CERT_ALIAS) -file $(EXPORTED_TEST_CERT) -storepass $(PRIVATE_KEYSTORE_PASS) -keystore $(PRIVATE_KEYSTORE_NAME) 
+
+stamps/netx-dist-tests-import-cert-to-public: $(EXPORTED_TEST_CERT)
+	yes | $(BOOT_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS) -keystore $(PUBLIC_KEYSTORE) -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT); \
+ 	mkdir -p stamps && \
+ 	touch $@
+
+netx-dist-tests-remove-cert-from-public:
+	-$(BOOT_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS) -keystore $(PUBLIC_KEYSTORE) -storepass $(PUBLIC_KEYSTORE_PASS)
+	-rm -rf stamps/netx-dist-tests-import-cert-to-public
 
 netx-dist-tests-source-files.txt:
 	find $(JNLP_TESTS_ENGINE_SRCDIR) -name '*.java' | sort > $@
@@ -560,7 +576,7 @@ $(REPRODUCERS_CLASS_NAMES):
 
 stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
  javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop \
- stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-sign-some-reproducers.stamp \
+ stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
  stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) \
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES)
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
@@ -798,7 +814,7 @@ clean_tests_reports:
 	rm -rf  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
 	rm -f  $(TESTS_DIR)/index*.html
 
-clean-netx-dist-tests: clean_tests_reports
+clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public
 	rm -f netx-dist-tests-source-files.txt
 	rm -rf $(JNLP_TESTS_DIR)
 	rm -rf $(JNLP_TESTS_SERVER_DEPLOYDIR)
@@ -811,7 +827,8 @@ clean-netx-dist-tests: clean_tests_reports
 	rm -f junit-jnlp-dist-simple.txt
 	rm -f junit-jnlp-dist-signed.txt
 	rm -f $(REPRODUCERS_CLASS_NAMES)
-	rm -f $(abs_top_builddir)/$(KEYSTORE_NAME)
+	rm -f $(abs_top_builddir)/$(PRIVATE_KEYSTORE_NAME)
+	rm -f $(EXPORTED_TEST_CERT)
 	rm -f stamps/run-netx-dist-tests.stamp
 
 clean-unit-test-code-coverage:
