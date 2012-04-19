@@ -28,6 +28,7 @@ import javax.swing.Timer;
 import javax.jnlp.*;
 
 import net.sourceforge.jnlp.runtime.*;
+import net.sourceforge.jnlp.util.ImageResources;
 
 /**
  * Show the progress of downloads.
@@ -101,6 +102,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         synchronized (frameMutex) {
             if (frame == null) {
                 frame = new JFrame(downloading + "...");
+                frame.setIconImages(ImageResources.INSTANCE.getApplicationImages());
                 frame.getContentPane().setLayout(new GridBagLayout());
             }
 

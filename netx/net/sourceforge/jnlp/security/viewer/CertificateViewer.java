@@ -51,6 +51,7 @@ import javax.swing.JDialog;
 import javax.swing.UIManager;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.ImageResources;
 
 public class CertificateViewer extends JDialog {
 
@@ -61,6 +62,7 @@ public class CertificateViewer extends JDialog {
 
     public CertificateViewer() {
         super((Frame) null, dialogTitle, true);
+        setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());

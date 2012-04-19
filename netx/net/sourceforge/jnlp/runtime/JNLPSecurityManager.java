@@ -350,12 +350,6 @@ class JNLPSecurityManager extends AWTSecurityManager {
             app.addWindow(w);
         }
 
-        // change coffee cup to netx for default icon
-        if (window instanceof Window)
-            for (Window w = (Window) window; w != null; w = w.getOwner())
-                if (window instanceof Frame)
-                    ((Frame) window).setIconImage(JNLPRuntime.getWindowIcon());
-
         // todo: set awt.appletWarning to custom message
         // todo: logo on with glass pane on JFrame/JWindow?
 

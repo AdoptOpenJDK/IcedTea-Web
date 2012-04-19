@@ -82,6 +82,7 @@ public class BasicExceptionDialog {
 
         JOptionPane optionPane = new JOptionPane(mainPanel, JOptionPane.ERROR_MESSAGE);
         final JDialog errorDialog = optionPane.createDialog(R("Error"));
+        errorDialog.setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
         final JPanel quickInfoPanel = new JPanel();
         BoxLayout layout = new BoxLayout(quickInfoPanel, BoxLayout.Y_AXIS);

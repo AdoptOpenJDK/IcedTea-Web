@@ -31,6 +31,7 @@ import javax.swing.JDialog;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.ImageResources;
 
 /**
  * This dialog provides a means for user to edit more of the proxy settings.
@@ -54,6 +55,8 @@ public class AdvancedProxySettingsDialog extends JDialog {
      */
     public AdvancedProxySettingsDialog(DeploymentConfiguration config) {
         super((Frame) null, dialogTitle, true); // Don't need a parent.
+        setIconImages(ImageResources.INSTANCE.getApplicationImages());
+
         this.config = config;
 
         /* Prepare for adding components to dialog box */

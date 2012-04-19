@@ -94,9 +94,6 @@ public class JNLPRuntime {
     /** update policy that controls when to check for updates */
     private static UpdatePolicy updatePolicy = UpdatePolicy.ALWAYS;
 
-    /** netx window icon */
-    private static Image windowIcon = null;
-
     /** whether initialized */
     private static boolean initialized = false;
 
@@ -187,9 +184,6 @@ public class JNLPRuntime {
 
         if (headless == false)
             checkHeadless();
-
-        if (!headless && windowIcon == null)
-            loadWindowIcon();
 
         if (!headless && indicator == null)
             indicator = new DefaultDownloadIndicator();
@@ -333,24 +327,6 @@ public class JNLPRuntime {
      */
     public static boolean isWebstartApplication() {
         return isWebstartApplication;
-    }
-
-    /**
-     * Returns the window icon.
-     */
-    public static Image getWindowIcon() {
-        return windowIcon;
-    }
-
-    /**
-     * Sets the window icon that is displayed in Java applications
-     * and applets instead of the default Java icon.
-     *
-     * @throws IllegalStateException if caller is not the exit class
-     */
-    public static void setWindowIcon(Image image) {
-        checkExitClass();
-        windowIcon = image;
     }
 
     /**
@@ -618,22 +594,6 @@ public class JNLPRuntime {
             resources = ResourceBundle.getBundle("net.sourceforge.jnlp.resources.Messages");
         } catch (Exception ex) {
             throw new IllegalStateException("Missing resource bundle in netx.jar:net/sourceforge/jnlp/resource/Messages.properties");
-        }
-    }
-
-    /**
-     * Load the window icon.
-     */
-    private static void loadWindowIcon() {
-        if (windowIcon != null)
-            return;
-
-        try {
-            windowIcon = new javax.swing.ImageIcon((new sun.misc.Launcher())
-                        .getClassLoader().getResource("net/sourceforge/jnlp/resources/netx-icon.png")).getImage();
-        } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
         }
     }
 

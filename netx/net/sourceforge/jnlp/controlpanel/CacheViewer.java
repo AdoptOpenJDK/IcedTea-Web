@@ -30,6 +30,7 @@ import javax.swing.JDialog;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.ImageResources;
 
 /**
  * This class will provide a visual way of viewing cache.
@@ -51,6 +52,7 @@ public class CacheViewer extends JDialog {
      */
     public CacheViewer(DeploymentConfiguration config) {
         super((Frame) null, dialogTitle, true); // Don't need a parent.
+        setIconImages(ImageResources.INSTANCE.getApplicationImages());
         this.config = config;
 
         /* Prepare for adding components to dialog box */

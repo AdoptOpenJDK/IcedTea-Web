@@ -1,3 +1,33 @@
+2012-04-19  Omair Majid  <omajid@redhat.com>
+
+	PR918: java applet windows uses a low resulution black/white icon
+	* NEWS: Update with fix.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Remove windowIcon.
+	(initialize): Do not call loadWindowIcon.
+	(getWindowIcon): Remove.
+	(setWindowIcon): Remove.
+	(loadWindowIcon): Remove.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java
+	(checkTopLevelWindow): Do not set the icon for all top level windows. Use
+	the default java icon instead.
+	* netx/net/sourceforge/jnlp/util/ImageResources.java: New file. Provides
+	access to icons.
+	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java (JNLPSplashScreen),
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java
+	(getListener),
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java
+	(AdvancedProxySettingsDialog),
+	* netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java (CacheViewer),
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java (ControlPanel),
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java (SecurityDialog),
+	* netx/net/sourceforge/jnlp/security/viewer/CertificateViewer.java
+	(CertificateViewer),
+	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java (show),
+	* plugin/icedteanp/java/sun/applet/JavaConsole.java (initialize):
+	Explicitly load icons.
+	* tests/netx/unit/net/sourceforge/jnlp/util/ImageResourcesTest.java: Test
+	for ImageResources class.
+
 2012-04-18  Jiri Vanek  <jvanek@redhat.com>
 
 	Allowed signed applets in automatic reproducers tests

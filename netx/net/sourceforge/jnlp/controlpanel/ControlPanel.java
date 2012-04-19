@@ -55,6 +55,7 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
+import net.sourceforge.jnlp.util.ImageResources;
 
 /**
  * This is the control panel for Java. It provides a GUI for modifying the
@@ -102,6 +103,7 @@ public class ControlPanel extends JFrame {
     public ControlPanel(DeploymentConfiguration config) {
         super();
         setTitle(Translator.R("CPHead"));
+        setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
         this.config = config;
 

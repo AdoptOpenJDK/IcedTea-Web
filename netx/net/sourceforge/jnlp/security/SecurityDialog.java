@@ -41,6 +41,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
+import net.sourceforge.jnlp.util.ImageResources;
 
 import java.awt.*;
 
@@ -98,6 +99,7 @@ public class SecurityDialog extends JDialog {
     SecurityDialog(DialogType dialogType, AccessType accessType,
                 JNLPFile file, CertVerifier JarCertVerifier, X509Certificate cert, Object[] extras) {
         super();
+        setIconImages(ImageResources.INSTANCE.getApplicationImages());
         this.dialogType = dialogType;
         this.accessType = accessType;
         this.file = file;
