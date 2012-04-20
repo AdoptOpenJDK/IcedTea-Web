@@ -54,12 +54,10 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -68,16 +66,16 @@ import org.junit.Test;
 
 /**
  *
- * This class provides access to virtual server and stuff arround.
- * It can find unoccupied port, start server, provides its singleton instantion, lunch paralel instantions,
- * read location of installed (tested javaws) see javaws.build.bin java poperty,
- * location of server www root on filesystem (see test.server.dir java property),
+ * This class provides access to virtual server and stuff around.
+ * It can find unoccupied port, start server, provides its singleton instantiation, lunch parallel instantiations,
+ * read location of installed (tested javaws) see javaws.build.bin java property,
+ * location of server www root on file system (see test.server.dir java property),
  * stubs for lunching javaws and for locating resources and read resources.
  *
  * It can also execute processes with timeout (@see PROCESS_TIMEOUT) (used during lunching javaws)
- * Some protected apis are exported because public clases in this package are put to be tested by makefile.
+ * Some protected apis are exported because public classes in this package are put to be tested by makefile.
  *
- * There are inclued tescases which show some basic usages.
+ * There are included test cases which show some basic usages.
  *
  *
  */
@@ -85,11 +83,11 @@ public class ServerAccess {
 
     public static final long NANO_TIME_DELIMITER=1000000l;
     /**
-     * java property which value containig path to default (makefile by) directory with deployed resources
+     * java property which value containing path to default (makefile by) directory with deployed resources
      */
     public static final String TEST_SERVER_DIR = "test.server.dir";
     /**
-     * java property which value containig path to installed (makefile by) javaws binary
+     * java property which value containing path to installed (makefile by) javaws binary
      */
     public static final String JAVAWS_BUILD_BIN = "javaws.build.bin";
     /** property to set the different then default browser
@@ -97,11 +95,11 @@ public class ServerAccess {
     public static final String USED_BROWSER_COMMAND = "used.browser.command";
     public static final String DEFAULT_LOCALHOST_NAME = "localhost";
     /**
-     * server instance singeton
+     * server instance singleton
      */
     private static ServerLauncher server;
     /**
-     * inner version if engine
+     * inner version of engine
      */
     private static final String version = "4";
     /**
@@ -110,7 +108,7 @@ public class ServerAccess {
      */
     public static int READ_TIMEOUT = 1000;
     /**
-     * timeout in ms to let process to finish, before assasin wil kill it.
+     * timeout in ms to let process to finish, before assassin will kill it.
      * This can be changed in runtime, but will affect all following tasks
      */
     public static long PROCESS_TIMEOUT = 20 * 1000;//ms
@@ -120,10 +118,10 @@ public class ServerAccess {
     private static Set<Thread> terminated = new HashSet<Thread>();
 
     /**
-     * main method of thos class prints out random free port
+     * main method of this class prints out random free port
      * or runs server
      * param "port" prints out the port
-     * nothing or number will run  sefrver on random(or on number specified)
+     * nothing or number will run server on random(or on number specified)
      * port in -Dtest.server.dir
      */
     public static void main(String[] args) throws Exception {
@@ -147,8 +145,8 @@ public class ServerAccess {
     /**
      * utility method to find random free port
      *
-     * @return - foud random free port
-     * @throws IOException - if socket can't be openned or no free port exists
+     * @return - found random free port
+     * @throws IOException - if socket can't be opened or no free port exists
      */
     public static int findFreePort()
             throws IOException {
@@ -160,7 +158,7 @@ public class ServerAccess {
     public static final  String HEADLES_OPTION="-headless";
 
     /**
-     * we would like to have an singleton instance asap
+     * we would like to have an singleton instance ASAP
      */
     public ServerAccess() {
 
@@ -171,7 +169,7 @@ public class ServerAccess {
 
     /**
      *
-     * @return cahed instance. If none, then creates new
+     * @return cached instance. If none, then creates new
      */
     public static ServerLauncher getInstance() {
         if (server == null) {
@@ -183,7 +181,7 @@ public class ServerAccess {
     /**
      *
      * @return new not cached iserver instance on random port,
-     * usefull for testing application loading from different url then base
+     * useful for testing application loading from different url then base
      */
     public static ServerLauncher getIndependentInstance() {
         return getIndependentInstance(true);
@@ -201,7 +199,7 @@ public class ServerAccess {
     /**
      *
      * @return new not cached iserver instance on random port,
-     * usefull for testing application loading from different url then base
+     * useful for testing application loading from different url then base
      */
     
     public static ServerLauncher getIndependentInstance(int port) {
@@ -215,7 +213,7 @@ public class ServerAccess {
     /**
      *
      * @return new not cached iserver instance on random port upon custom www root directory,
-     * usefull for testing application loading from different url then base
+     * useful for testing application loading from different url then base
      */
 
     public static ServerLauncher getIndependentInstance(String dir, int port) {
@@ -382,7 +380,7 @@ public class ServerAccess {
 
     /**
      *
-     * @return port on which is runing cached server. If non singleton instance is runnig, new is created.
+     * @return port on which is running cached server. If non singleton instance is running, new is created.
      */
     public int getPort() {
         if (server == null) {
@@ -395,7 +393,7 @@ public class ServerAccess {
 
     /**
      *
-     * @return directory upon which is runing cached server. If non singleton instance is runnig, new is created.
+     * @return directory upon which is running cached server. If non singleton instance is running, new is created.
      */
     public File getDir() {
         if (server == null) {
@@ -407,7 +405,7 @@ public class ServerAccess {
 
     /**
      *
-     * @return url pointing to cached server resource. If non singleton instance is runnig, new is created.
+     * @return url pointing to cached server resource. If non singleton instance is running, new is created.
      */
     public URL getUrl(String resource) throws MalformedURLException {
         if (server == null) {
@@ -419,7 +417,7 @@ public class ServerAccess {
 
     /**
      *
-     * @return url pointing to cached server . If non singleton instance is runnig, new is created.
+     * @return url pointing to cached server . If non singleton instance is running, new is created.
      */
     public URL getUrl() throws MalformedURLException {
         return getUrl("");
@@ -428,7 +426,7 @@ public class ServerAccess {
 
     /**
      *
-     * @return weather cached server is alive. If non singleton instance is runnig, new is created.
+     * @return whether cached server is alive. If non singleton instance is running, new is created.
      */
     public boolean isRunning() {
         if (server == null) {
@@ -444,7 +442,7 @@ public class ServerAccess {
      * 
      * @param resource to be located on cached server
      * @return individual bytes of resource
-     * @throws IOException if connection cant be established or resource do not exists
+     * @throws IOException if connection can't be established or resource does not exist
      */
     public ByteArrayOutputStream getResourceAsBytes(String resource) throws IOException {
         return getResourceAsBytes(getUrl(resource));
@@ -455,7 +453,7 @@ public class ServerAccess {
      * 
      * @param resource to be located on cached server
      * @return string constructed from  resource
-     * @throws IOException if connection cant be established or resource do not exists
+     * @throws IOException if connection can't be established or resource does not exist
      */
     public String getResourceAsString(String resource) throws IOException {
         return getResourceAsString(getUrl(resource));
@@ -466,7 +464,7 @@ public class ServerAccess {
      * 
      * @param input stream to be read
      * @return individual bytes of resource
-     * @throws IOException if connection cant be established or resource do not exists
+     * @throws IOException if connection can't be established or resource does not exist
      */
     public static ByteArrayOutputStream getBytesFromStream(InputStream is) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -484,7 +482,7 @@ public class ServerAccess {
      * 
      * @param input stream
      * @return stream as string
-     * @throws IOException if connection cant be established or resource do not exists
+     * @throws IOException if connection can't be established or resource does not exist
      */
     public static String getContentOfStream(InputStream is,String encoding) throws IOException {
         try {
@@ -510,7 +508,7 @@ public class ServerAccess {
      *
      * @param input stream
      * @return stream as string
-     * @throws IOException if connection cant be established or resource do not exists
+     * @throws IOException if connection can't be established or resource does not exist
      */
     public static String getContentOfStream(InputStream is) throws IOException {
         return getContentOfStream(is, "UTF-8");
@@ -522,7 +520,7 @@ public class ServerAccess {
      * 
      * @param resource to be located on any url
      * @return individual bytes of resource
-     * @throws IOException if connection cant be established or resource do not exists
+     * @throws IOException if connection can't be established or resource does not exist
      */
     public static ByteArrayOutputStream getResourceAsBytes(URL u) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) u.openConnection();
@@ -538,9 +536,9 @@ public class ServerAccess {
     /**
      * utility method which can read string of resource from any url
      * 
-     * @param resource to be located onany url
+     * @param resource to be located on any url
      * @return resource as string
-     * @throws IOException if connection cant be established or resource do not exists
+     * @throws IOException if connection can't be established or resource does not exist
      */
     public static String getResourceAsString(URL u) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) u.openConnection();
@@ -569,7 +567,7 @@ public class ServerAccess {
     /**
      * wrapping method to executeProcess (eg: javaws -headless http://localhost:port/resource)
      * will execute default javaws (@see JAVAWS_BUILD_BIN) upon default url upon cached server (@see SERVER_NAME @see getPort(), @see getInstance())
-     * with parameter -headles (no gui, no asking)
+     * with parameter -headless (no gui, no asking)
      * @param resource  name of resource
      * @return result what left after running this process
      * @throws Exception
@@ -584,9 +582,9 @@ public class ServerAccess {
     /**
      * wrapping method to executeProcess (eg: javaws arg arg -headless http://localhost:port/resource)
      * will execute default javaws (@see JAVAWS_BUILD_BIN) upon default url upon cached server (@see SERVER_NAME @see getPort(), @see getInstance())
-     * with parameter -headles (no gui, no asking)
+     * with parameter -headless (no gui, no asking)
      * @param resource  name of resource
-     * @param otherargs other arguments to be added to hedales one
+     * @param otherargs other arguments to be added to headless one
      * @return result what left after running this process
      * @throws Exception
      */
@@ -703,19 +701,19 @@ public class ServerAccess {
          return  executeProcess(args, null,stdoutl,stderrl);
      }
     /**
-     * utility method to lunch process, get its stdou/stderr, its return value and to kill it if runing to long (@see PROCESS_TIMEOUT)
+     * utility method to lunch process, get its stdout/stderr, its return value and to kill it if running to long (@see PROCESS_TIMEOUT)
      *
      *
      * Small bacground:
-     * This method creates thread inside which exec will be executed. Then creates assasin thread with given timeout to kill the previously created thread if necessary.
-     * Starts assasin thread, starts process thread. Wait untill process is running, then starts content readers.
+     * This method creates thread inside which exec will be executed. Then creates assassin thread with given timeout to kill the previously created thread if necessary.
+     * Starts assassin thread, starts process thread. Wait until process is running, then starts content readers.
      * Closes input of process.
-     * Wait until process is running (no metter if it teminate itself (correctly or badly), or is terminated by its assasin.
-     * Construct result from readed stdout, stderr, process return value, assasin sucessfulity
+     * Wait until process is running (no matter if it terminate itself (correctly or badly), or is terminated by its assassin.
+     * Construct result from readed stdout, stderr, process return value, assassin successfully
      *
      * @param args binary with args to be executed
      * @param dir optional, directory where this process will run
-     * @return what left from process - proces sitself, its stdout, stderr and return value and weather it was terminated by assasin.
+     * @return what left from process - process itself, its stdout, stderr and return value and whether it was terminated by assassin.
      * @throws Exception
      */
     public static ProcessResult executeProcess(final List<String> args,File dir) throws Exception {
@@ -760,8 +758,8 @@ public class ServerAccess {
 
     /**
      *
-     * wrapper arround Runtime.getRuntime().exec(...) which ensures taht process is run inside its own, by us controlled, thread.
-     * Proces sbuilder caused som einexpected and wired behaviour:/
+     * wrapper around Runtime.getRuntime().exec(...) which ensures that process is run inside its own, by us controlled, thread.
+     * Process builder caused some unexpected and weird behavior :/
      */
     private static class ThreadedProcess extends Thread {
 
@@ -834,17 +832,17 @@ public class ServerAccess {
                 }
                 try {
                     exitCode = p.waitFor();
-                    Thread.sleep(500);//this is giving to fastly done proecesses's e/o readers time to read all. I would like to know better solution :-/
+                    Thread.sleep(500); //this is giving to fast done proecesses's e/o readers time to read all. I would like to know better solution :-/
                 } finally {
                     destoyed = true;
                 }
             } catch (Exception ex) {
                 if (ex instanceof InterruptedException) {
-                    //add to the set of terminated threadedproceses
+                    //add to the set of terminated threaded processes
                     deadlyException = ex;
                     terminated.add(this);
                 } else {
-                    //happens when nonexisting process is launched, is causing p null!
+                    //happens when non-existing process is launched, is causing p null!
                     terminated.add(this);
                     deadlyException = ex;
                     throw new RuntimeException(ex);
@@ -856,8 +854,8 @@ public class ServerAccess {
     }
 
     /**
-     * wrapper arround tiny http server to separate lunch configgurations and servers.
-     * to allow terminations and stuff arround.
+     * wrapper around tiny http server to separate lunch configurations and servers.
+     * to allow terminations and stuff around.
      */
     public static class ServerLauncher implements Runnable {
 
@@ -1116,7 +1114,7 @@ public class ServerAccess {
 
 
     /**
-     * class which timeout any ThreadedProcess. This killing of 'theread with process' replaced not working process.destroy().
+     * class which timeout any ThreadedProcess. This killing of 'thread with process' replaced not working process.destroy().
      */
     private static class ProcessAssasin extends Thread {
 
@@ -1136,7 +1134,7 @@ public class ServerAccess {
         /**
          *
          * @param p
-         * @param timeout - time to die in milis
+         * @param timeout - time to die in milliseconds
          */
         public ProcessAssasin(ThreadedProcess p, long timeout) {
             this.p = (p);
@@ -1285,7 +1283,7 @@ public class ServerAccess {
     }
 
     /**
-     * Class to read content of stdou/err of process, and to cooperate with its running/terminated/finished statuses.
+     * Class to read content of stdout/stderr of process, and to cooperate with its running/terminated/finished statuses.
      */
     private static class ContentReader implements Runnable {
 
