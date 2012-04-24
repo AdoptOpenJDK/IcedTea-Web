@@ -45,7 +45,7 @@ else
   RHINO_RUNTIME=
 endif
 
-RUNTIME = $(BOOT_DIR)/jre/lib/rt.jar:$(BOOT_DIR)/jre/lib/jsse.jar$(RHINO_RUNTIME)
+RUNTIME = $(BOOT_DIR)/jre/lib/rt.jar:$(BOOT_DIR)/jre/lib/jsse.jar$(RHINO_RUNTIME):$(BOOT_DIR)/jre/lib/resources.jar
 
 # Flags
 IT_CFLAGS=$(CFLAGS) $(ARCHFLAG)
@@ -661,6 +661,7 @@ if WITH_EMMA
 	 -cp $(JUNIT_RUNNER_JAR) \
 	 -cp $(BOOT_DIR)/jre/lib/rt.jar \
 	 -cp $(BOOT_DIR)/jre/lib/jsse.jar \
+	 -cp $(BOOT_DIR)/jre/lib/resources.jar \
 	 -cp $(RHINO_RUNTIME) \
 	 -cp . \
 	 -ix "-org.junit.*" \
@@ -723,6 +724,7 @@ if WITH_EMMA
 	   -cp $(JUNIT_RUNNER_JAR) \
 	   -cp $(BOOT_DIR)/jre/lib/rt.jar \
 	   -cp $(BOOT_DIR)/jre/lib/jsse.jar \
+	   -cp $(BOOT_DIR)/jre/lib/resources.jar \
 	   -cp $(RHINO_RUNTIME) \
 	   -cp . \
 	   -ix "-org.junit.*" \
@@ -920,6 +922,11 @@ stamps/bootstrap-directory.stamp: stamps/native-ecj.stamp
 	  ln -s $(SYSTEM_JRE_DIR)/lib/jsse.jar $(BOOT_DIR)/jre/lib ; \
 	else \
 	  ln -s rt.jar $(BOOT_DIR)/jre/lib/jsse.jar ; \
+	fi
+	if [ -e $(SYSTEM_JRE_DIR)/lib/resources.jar ] ; then \
+	  ln -s $(SYSTEM_JRE_DIR)/lib/resources.jar $(BOOT_DIR)/jre/lib ; \
+	else \
+	  ln -s rt.jar $(BOOT_DIR)/jre/lib/resources.jar ; \
 	fi
 	ln -sf $(SYSTEM_JRE_DIR)/lib/$(JRE_ARCH_DIR) \
 	  $(BOOT_DIR)/jre/lib/ && \

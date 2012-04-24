@@ -1,3 +1,14 @@
+2012-04-24  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am
+	(RUNTIME): Add resources.jar.
+	(stamps/run-unit-test-code-coverage.stamp) [WITH_EMMA]: Add resouces.jar
+	to classpath.
+	(stamps/run-reproducers-test-code-coverage.stamp) [WITH_EMMA]: Include
+	resources.jar in classpath.
+	(stamps/bootstrap-directory.stamp): Create a link to resources.jar in
+	BOOT_DIR.
+
 2012-04-19  Omair Majid  <omajid@redhat.com>
 
 	PR918: java applet windows uses a low resulution black/white icon
