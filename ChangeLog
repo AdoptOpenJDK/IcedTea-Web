@@ -1,3 +1,25 @@
+2012-05-02  Jiri Vanek  <jvanek@redhat.com>
+
+	Introduced new annotations Bug (to connect test/reproducer with documentation)
+	and NeedsDisplay which tells the launching engine that this particular 
+	test needs Display. Based on ptisnovs's ideas and jtreg experiences
+	*Makefile.am: (JUNIT_RUNNER_JAR), (stamps/run-netx-unit-tests.stamp) and
+	(stamps/run-unit-test-code-coverage.stamp) are now dependent on (stamps/netx-dist-tests-compile)
+	 and classpaths inside them have been enriched for JNLP_TESTS_ENGINE_DIR
+	which contains definitions of those annotations
+	*tests/jnlp_tests/simple/CheckServices/testcases/CheckServicesTests.java: and
+	*tests/jnlp_tests/simple/ManifestedJar1/testcases/ManifestedJar1Test.java: and
+	*tests/jnlp_tests/simple/Spaces can be everywhere/testcase/SpacesCanBeEverywhereTests.java:
+	 filled Bug annotations
+	*tests/junit-runner/JunitLikeXmlOutputListener.java: made to understand 
+	Bug annotation
+	*tests/netx/jnlp_testsengine/net/sourceforge/jnlp/annotations/NeedsDisplay.java:
+	and
+	*tests/netx/jnlp_testsengine/net/sourceforge/jnlp/annotations/Bug.java:
+	annotations definitions
+	*tests/report-styles/jreport.xsl: made nice links from bug annotation 
+	prepared by JunitLikeXmlOutputListener 
+
 2012-04-24  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am

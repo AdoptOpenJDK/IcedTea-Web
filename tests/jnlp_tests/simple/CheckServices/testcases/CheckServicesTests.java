@@ -36,12 +36,15 @@ exception statement from your version.
  */
 
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.annotations.Bug;
 import org.junit.Assert;
 import org.junit.Test;
 
+@Bug(id="http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-February/017153.html")
 public class CheckServicesTests {
 
     private static ServerAccess server = new ServerAccess();
+
     @Test
     public void CheckServices() throws Exception {
         System.out.println("connecting CheckServices request");

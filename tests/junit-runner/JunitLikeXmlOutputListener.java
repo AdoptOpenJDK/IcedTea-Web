@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import net.sourceforge.jnlp.annotations.Bug;
 
 
 import org.junit.internal.JUnitSystem;
@@ -41,6 +43,8 @@ public class JunitLikeXmlOutputListener extends RunListener {
     private static final String ROOT = "testsuite";
     private static final String DATE_ELEMENT = "date";
     private static final String TEST_ELEMENT = "testcase";
+    private static final String BUGS = "bugs";
+    private static final String BUG = "bug";
     private static final String TEST_NAME_ATTRIBUTE = "name";
     private static final String TEST_TIME_ATTRIBUTE = "time";
     private static final String TEST_ERROR_ELEMENT = "error";
@@ -63,6 +67,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
 
     private class ClassCounter {
 
+        Class c;
         int total;
         int failed;
         int passed;
@@ -94,7 +99,10 @@ public class JunitLikeXmlOutputListener extends RunListener {
             attString.append(" ");
             Set<Entry<String, String>> entries = atts.entrySet();
             for (Entry<String, String> entry : entries) {
-                attString.append(entry.getKey()).append("=\"").append(attributize(entry.getValue())).append("\"");
+                String k=entry.getKey();
+                String v= entry.getValue();
+                if (v==null)v="null";
+                attString.append(k).append("=\"").append(attributize(v)).append("\"");
                 attString.append(" ");
             }
         }
@@ -164,13 +172,35 @@ public class JunitLikeXmlOutputListener extends RunListener {
 
             writeElement(TEST_ERROR_ELEMENT, testFailed.getTrace(), errorAtts);
         }
-
+        try {
+            Class q = description.getTestClass();
+            String qs=description.getMethodName();
+            if (qs.contains(" - ")) qs=qs.replaceAll(" - .*", "");
+            Method qm = q.getMethod(qs);
+            Bug b = qm.getAnnotation(Bug.class);
+            if (b != null) {
+                openElement(BUGS);
+                String[] s = b.id();
+                for (String string : s) {
+                        String ss[]=createBug(string);
+                        Map<String, String> visibleNameAtt=new HashMap<String, String>(1);
+                        visibleNameAtt.put("visibleName", ss[0]);
+                        openElement(BUG,visibleNameAtt);
+                        writer.write(ss[1]);
+                        closeElement(BUG);
+                }
+                closeElement(BUGS);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         closeElement(TEST_ELEMENT);
         writer.flush();
 
         ClassCounter cc = classStats.get(description.getClassName());
         if (cc == null) {
             cc = new ClassCounter();
+            cc.c=description.getTestClass();
             classStats.put(description.getClassName(), cc);
         }
         cc.total++;
@@ -211,7 +241,27 @@ public class JunitLikeXmlOutputListener extends RunListener {
             writeElement(SUMMARY_FAILED_ELEMENT, String.valueOf(entry.getValue().failed));
             writeElement(SUMMARY_IGNORED_ELEMENT, String.valueOf(entry.getValue().total - entry.getValue().failed - entry.getValue().passed));
             writeElement(SUMMARY_TOTAL_ELEMENT, String.valueOf(entry.getValue().total));
-
+            try {
+                Bug b = null;
+                if (entry.getValue().c != null) {
+                    b = (Bug) entry.getValue().c.getAnnotation(Bug.class);
+                }
+                if (b != null) {
+                    openElement(BUGS);
+                    String[] s = b.id();
+                    for (String string : s) {
+                        String ss[]=createBug(string);
+                        Map<String, String> visibleNameAtt=new HashMap<String, String>(1);
+                        visibleNameAtt.put("visibleName", ss[0]);
+                        openElement(BUG,visibleNameAtt);
+                        writer.write(ss[1]);
+                        closeElement(BUG);
+                    }
+                    closeElement(BUGS);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             closeElement(TEST_CLASS_ELEMENT);
         }
         closeElement(CLASSES_ELEMENT);
@@ -221,5 +271,95 @@ public class JunitLikeXmlOutputListener extends RunListener {
         writer.flush();
         writer.close();
 
+    }
+
+
+    /**
+     * When declare for suite class or for Test-marked method,
+     * should be interpreted by report generating tool to links.
+     * Known shortcuts are
+     * SX  - http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=X
+     * PRX - http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=X
+     * RHX - https://bugzilla.redhat.com/show_bug.cgi?id=X
+     * DX  - http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=X
+     * GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
+     * CAX - http://server.complang.tuwien.ac.at/cgi-bin/bugzilla/show_bug.cgi?id=X
+     * LPX - https://bugs.launchpad.net/bugs/X
+     *
+     * http://mail.openjdk.java.net/pipermail/distro-pkg-dev/
+     * and http://mail.openjdk.java.net/pipermail/ are proceed differently
+     *
+     * You just put eg @Bug(id="RH12345",id="http:/my.bukpage.com/terribleNew")
+     * and  RH12345 will be transalated as
+     * <a href="https://bugzilla.redhat.com/show_bug.cgi?id=123456">123456<a> or
+     * similar, the url will be inclueded as is. Both added to proper tests or suites
+     *
+     * @return Strng[2]{nameToBeShown, hrefValue}
+     */
+    public static  String[] createBug(String string) {
+        String[] r = {"ex", string};
+        String[] prefixes = {
+            "S",
+            "PR",
+            "RH",
+            "D",
+            "G",
+            "CA",
+            "LP",};
+        String[] urls = {
+            "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=",
+            "http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=",
+            "http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=",
+            "http://bugs.gentoo.org/show_bug.cgi?id=",
+            "http://server.complang.tuwien.ac.at/cgi-bin/bugzilla/show_bug.cgi?id",
+            "https://bugs.launchpad.net/bugs/",};
+
+        for (int i = 0; i < urls.length; i++) {
+            if (string.startsWith(prefixes[i])) {
+                r[0] = string;
+                r[1] = urls[i] + string.substring(prefixes[i].length());
+                return r;
+            }
+
+        }
+
+        String distro = "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/";
+        String openjdk = "http://mail.openjdk.java.net/pipermail/";
+        if (string.startsWith(distro)){
+            r[0]="distro-pkg";
+            return r;
+        }
+        if (string.startsWith(openjdk)){
+            r[0]="openjdk";
+            return r;
+        }
+        return r;
+
+    }
+
+    public static void main(String[] args){
+        String[] q=createBug("PR608");
+        System.out.println(q[0]+" : "+q[1]);
+        q=createBug("S4854");
+        System.out.println(q[0]+" : "+q[1]);
+        q=createBug("RH649423");
+        System.out.println(q[0]+" : "+q[1]);
+        q=createBug("D464");
+        System.out.println(q[0]+" : "+q[1]);
+        q=createBug("G6554");
+        System.out.println(q[0]+" : "+q[1]);
+        q=createBug("CA1654");
+        System.out.println(q[0]+" : "+q[1]);
+        q=createBug("LP5445");
+        System.out.println(q[0]+" : "+q[1]);
+
+        q=createBug("http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-November/016178.html");
+        System.out.println(q[0]+" : "+q[1]);
+        q=createBug("http://mail.openjdk.java.net/pipermail/awt-dev/2012-March/002324.html");
+        System.out.println(q[0]+" : "+q[1]);
+
+        q=createBug("http://lists.fedoraproject.org/pipermail/chinese/2012-January/008868.html");
+        System.out.println(q[0]+" : "+q[1]);
     }
 }

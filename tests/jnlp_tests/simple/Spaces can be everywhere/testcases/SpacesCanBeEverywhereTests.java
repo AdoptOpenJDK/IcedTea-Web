@@ -39,14 +39,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.annotations.Bug;
 import org.junit.Assert;
 
 import org.junit.Test;
 
+@Bug(id={"http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-October/016127.html","PR804","PR811"})
 public class SpacesCanBeEverywhereTests {
 
     private static ServerAccess server = new ServerAccess();
 
+    @Bug(id={"PR811","http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-October/016144.html"})
     @Test
     public void SpacesCanBeEverywhereRemoteTests1() throws Exception {
         System.out.println("connecting SpacesCanBeEverywhereRemoteTests1 request");
@@ -62,6 +65,7 @@ public class SpacesCanBeEverywhereTests {
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 
+    @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests2() throws Exception {
         System.out.println("connecting SpacesCanBeEverywhereRemoteTests2 request");
@@ -77,6 +81,7 @@ public class SpacesCanBeEverywhereTests {
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 
+    @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests3() throws Exception {
         System.out.println("connecting SpacesCanBeEverywhereRemoteTests3 request");
@@ -93,7 +98,8 @@ public class SpacesCanBeEverywhereTests {
     }
 
 
-     @Test
+    @Bug(id="PR804")
+    @Test
     public void SpacesCanBeEverywhereLocalTests1() throws Exception {
         System.out.println("connecting SpacesCanBeEverywhereLocalTests1 request");
         System.err.println("connecting SpacesCanBeEverywhereLocalTests1 request");
@@ -112,6 +118,7 @@ public class SpacesCanBeEverywhereTests {
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 
+    @Bug(id="PR804")
     @Test
     public void SpacesCanBeEverywhereLocalTests2() throws Exception {
         System.out.println("connecting SpacesCanBeEverywhereLocalTests2 request");
@@ -131,6 +138,7 @@ public class SpacesCanBeEverywhereTests {
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 
+    @Bug(id="PR804")
     @Test
     public void SpacesCanBeEverywhereLocalTests3() throws Exception {
         System.out.println("connecting SpacesCanBeEverywhereLocalTests3 request");

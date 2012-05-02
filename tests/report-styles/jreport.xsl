@@ -102,6 +102,12 @@ exception statement from your version.
   </xsl:attribute><xsl:value-of select="@name"/>
 (<xsl:value-of select="@time"/>ms):
 </a>
+    <xsl:for-each select="bugs/bug">
+      <a>
+        <xsl:attribute name="href"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
+        <xsl:value-of select="@visibleName"/>
+      </a>;
+    </xsl:for-each>
       </div>
       <blockquote>
         <div class="tablee">
@@ -166,6 +172,13 @@ exception statement from your version.
           <xsl:text disable-output-escaping="no"> - </xsl:text>
           <div class="method">
             <xsl:value-of select="@name"/>
+            <xsl:for-each select="bugs/bug">
+            <xsl:text disable-output-escaping="no"> - </xsl:text>
+              <a>
+                <xsl:attribute name="href"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
+                <xsl:value-of select="@visibleName"/>
+              </a>
+            </xsl:for-each>
           </div>
         </div>
         <div class="result">

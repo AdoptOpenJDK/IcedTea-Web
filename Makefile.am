@@ -457,18 +457,17 @@ check-pac-functions: stamps/bootstrap-directory.stamp
 junit-runner-source-files.txt:
 	find $(JUNIT_RUNNER_SRCDIR) -name '*.java' | sort > $@
 
-$(JUNIT_RUNNER_JAR): junit-runner-source-files.txt
+$(JUNIT_RUNNER_JAR): junit-runner-source-files.txt stamps/netx-dist-tests-compile.stamp
 	mkdir -p $(JUNIT_RUNNER_DIR) && \
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	  -d $(JUNIT_RUNNER_DIR) \
-	  -classpath $(JUNIT_JAR) \
+	  -classpath $(JUNIT_JAR):$(JNLP_TESTS_ENGINE_DIR) \
 	  @junit-runner-source-files.txt && \
 	$(BOOT_DIR)/bin/jar cf $@  -C $(JUNIT_RUNNER_DIR) .
 
 stamps/junit-jnlp-dist-dirs: junit-jnlp-dist-simple.txt junit-jnlp-dist-signed.txt
 	mkdir -p $(JNLP_TESTS_SERVER_DEPLOYDIR)
 	mkdir -p $(JNLP_TESTS_DIR)
-	mkdir -p $(JNLP_TESTS_ENGINE_DIR)
 	touch $@
 
 junit-jnlp-dist-simple.txt:
@@ -540,6 +539,7 @@ netx-dist-tests-source-files.txt:
 
 stamps/netx-dist-tests-compile.stamp: stamps/netx.stamp \
  stamps/junit-jnlp-dist-dirs netx-dist-tests-source-files.txt
+	mkdir -p $(JNLP_TESTS_ENGINE_DIR);
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	 -d $(JNLP_TESTS_ENGINE_DIR) \
 	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar \
@@ -596,11 +596,11 @@ netx-unit-tests-source-files.txt:
 	find $(NETX_UNIT_TEST_SRCDIR) -name '*.java' | sort > $@
 
 stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
- netx-unit-tests-source-files.txt
+ netx-unit-tests-source-files.txt stamps/netx-dist-tests-compile.stamp
 	mkdir -p $(NETX_UNIT_TEST_DIR) && \
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	 -d $(NETX_UNIT_TEST_DIR) \
-	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar \
+	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
 	 @netx-unit-tests-source-files.txt && \
 	mkdir -p stamps && \
 	touch $@
@@ -630,7 +630,7 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	done ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(JNLP_TESTS_ENGINE_DIR):. \
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
 	  > stdout.log 2> stderr.log ; \
 	cat stdout.log ; \
@@ -663,6 +663,7 @@ if WITH_EMMA
 	 -cp $(BOOT_DIR)/jre/lib/jsse.jar \
 	 -cp $(BOOT_DIR)/jre/lib/resources.jar \
 	 -cp $(RHINO_RUNTIME) \
+	 -cp $(JNLP_TESTS_ENGINE_DIR) \
 	 -cp . \
 	 -ix "-org.junit.*" \
 	 -ix "-junit.*" \

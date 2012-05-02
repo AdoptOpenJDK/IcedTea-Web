@@ -36,10 +36,12 @@ exception statement from your version.
  */
 
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.annotations.Bug;
 import org.junit.Assert;
 
 import org.junit.Test;
 
+@Bug(id="http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-February/017435.html")
 public class ManifestedJar1Test {
 
     private static ServerAccess server = new ServerAccess();
