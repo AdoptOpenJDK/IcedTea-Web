@@ -127,9 +127,10 @@ class XPersistenceService implements PersistenceService {
         checkLocation(location);
 
         File file = toCacheFile(location);
-        if (!file.exists())
+        if (!file.exists()) {
             throw new FileNotFoundException("Persistence store for "
                     + location.toString() + " is not found.");
+        }
         FileUtils.createParentDir(file, "Persistence store for "
                     + location.toString());
 

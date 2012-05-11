@@ -1,3 +1,18 @@
+2012-05-11  Thomas Meyer  <thomas@m3y3r.de>
+
+	* tests/netx/unit/net/sourceforge/jnlp/util/PropertiesFileTest.java: Add
+	some unit tests for the PropertiesFile class 
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java: Add
+	some unit tests for the CacheLRUWrapper class
+	* netx/net/sourceforge/jnlp/util/PropertiesFile.java: Use last
+	modification timestamp of the underlying file to lazy load properties.
+	(load): Only reload file, if the file modification timestamp has changed.
+	(store): Actually fsync() the file to disk.
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java (create):
+	Fix coding style
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java (load): Only check
+	data when the recently_used file was reloaded.
+
 2012-05-02  Jiri Vanek  <jvanek@redhat.com>
 
 	Introduced new annotations Bug (to connect test/reproducer with documentation)

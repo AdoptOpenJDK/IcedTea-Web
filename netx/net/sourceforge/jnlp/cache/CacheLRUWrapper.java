@@ -108,11 +108,11 @@ enum CacheLRUWrapper {
      * Update map for keeping track of recently used items.
      */
     public synchronized void load() {
-        cacheOrder.load();
+        boolean loaded = cacheOrder.load();
         /* 
          * clean up possibly corrupted entries
          */
-        if (checkData()) {
+        if (loaded && checkData()) {
             if (JNLPRuntime.isDebug()) {
                 new LruCacheException().printStackTrace();
             }
@@ -125,7 +125,7 @@ enum CacheLRUWrapper {
     /**
      * check content of cacheOrder and remove invalid/corrupt entries
      *
-     * @return true, if cache was coruupted and affected entry removed
+     * @return true, if cache was corrupted and affected entry removed
      */
     private boolean checkData () {
         boolean modified = false;

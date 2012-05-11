@@ -35,9 +35,9 @@ public class PropertiesFile extends Properties {
 
     /** the header string */
     String header = "netx file";
-
-    /** lazy loaded on getProperty */
-    boolean loaded = false;
+    
+    /** time of last modification, lazy loaded on getProperty */
+    long lastStore;
 
     /**
      * Create a properties object backed by the specified file.
@@ -64,7 +64,7 @@ public class PropertiesFile extends Properties {
      * does not exist.
      */
     public String getProperty(String key) {
-        if (!loaded)
+        if (lastStore == 0)
             load();
 
         return super.getProperty(key);
@@ -75,7 +75,7 @@ public class PropertiesFile extends Properties {
      * if the key does not exist.
      */
     public String getProperty(String key, String defaultValue) {
-        if (!loaded)
+        if (lastStore == 0)
             load();
 
         return super.getProperty(key, defaultValue);
@@ -87,7 +87,7 @@ public class PropertiesFile extends Properties {
      * @return the previous value
      */
     public Object setProperty(String key, String value) {
-        if (!loaded)
+        if (lastStore == 0)
             load();
 
         return super.setProperty(key, value);
@@ -104,39 +104,62 @@ public class PropertiesFile extends Properties {
      * Ensures that the file backing these properties has been
      * loaded; call this method before calling any method defined by
      * a superclass.
+     * 
+     * @return true, if file was (re-)loaded
+     *         false, if file was still current
      */
-    public void load() {
-        loaded = true;
+    public boolean load() {
 
-        InputStream s = null;
-        try {
-            if (!file.exists())
-                return;
-
-            try {
-                s = new FileInputStream(file);
-                load(s);
-            } finally {
-                if (s != null) s.close();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        if (!file.exists()) {
+            return false;
         }
+
+        long currentStore = file.lastModified();
+        long currentTime = System.currentTimeMillis();
+
+        /* (re)load file, if
+         *  - it wasn't loaded/stored, yet (lastStore == 0)
+         *  - current file modification timestamp has changed since last store (currentStore != lastStore) OR
+         *  - current file modification timestamp has not changed since last store AND current system time equals current file modification timestamp
+         *    This is necessary because some filesystems seems only to provide accuracy of the timestamp on the level of seconds!
+         */
+        if(lastStore == 0 || currentStore != lastStore || (currentStore == lastStore && currentStore / 1000 == currentTime / 1000)) {
+            InputStream s = null;
+            try {
+
+                try {
+                    s = new FileInputStream(file);
+                    load(s);
+                } finally {
+                    if (s != null) {
+                        s.close();
+                        lastStore=currentStore;
+                        return true;
+                    }
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return false;
     }
 
     /**
      * Saves the properties to the file.
      */
     public void store() {
-        if (!loaded)
-            return; // nothing could have changed so save unnecessary load/save
 
-        OutputStream s = null;
+        FileOutputStream s = null;
         try {
             try {
                 file.getParentFile().mkdirs();
                 s = new FileOutputStream(file);
                 store(s, header);
+
+                // fsync()
+                s.getChannel().force(true);
+                lastStore = file.lastModified();
             } finally {
                 if (s != null) s.close();
             }
