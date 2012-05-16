@@ -86,13 +86,13 @@ public class CodeBaseClassLoaderTest {
         classLoader.findResource("net/sourceforge/jnlp/about/Main.class");
         stopTime = System.nanoTime();
         long timeOnFirstTry = stopTime - startTime;
-        System.out.println(timeOnFirstTry);
+        System.err.println(timeOnFirstTry);
 
         startTime = System.nanoTime();
         classLoader.findResource("net/sourceforge/jnlp/about/Main.class");
         stopTime = System.nanoTime();
         long timeOnSecondTry = stopTime - startTime;
-        System.out.println(timeOnSecondTry);
+        System.err.println(timeOnSecondTry);
 
         assertTrue(timeOnSecondTry < (timeOnFirstTry / 10));
     }
@@ -128,13 +128,13 @@ public class CodeBaseClassLoaderTest {
         classLoader.findResource("net/sourceforge/jnlp/about/Main_FOO_.class");
         stopTime = System.nanoTime();
         long timeOnFirstTry = stopTime - startTime;
-        System.out.println(timeOnFirstTry);
+        System.err.println(timeOnFirstTry);
 
         startTime = System.nanoTime();
         classLoader.findResource("net/sourceforge/jnlp/about/Main_FOO_.class");
         stopTime = System.nanoTime();
         long timeOnSecondTry = stopTime - startTime;
-        System.out.println(timeOnSecondTry);
+        System.err.println(timeOnSecondTry);
 
         assertTrue(timeOnSecondTry < (timeOnFirstTry / 10));
     }

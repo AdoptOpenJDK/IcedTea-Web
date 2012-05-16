@@ -90,7 +90,7 @@ public class CacheLRUWrapperTest {
         }
         
         double avg = sum / time.length;
-        System.out.println("Average = " + avg + "ns");
+        System.err.println("Average = " + avg + "ns");
 
         // wait more than 100 microseconds for noLoops = 1000 and noEntries=1000 is bad
         assertTrue("load() must not take longer than 100 µs, but took in avg " + avg/1000 + "µs", avg < 100 * 1000);

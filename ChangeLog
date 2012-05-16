@@ -1,7 +1,13 @@
 2012-05-14  Jiri Vanek  <jvanek@redhat.com>
 
-    * tests/junit-runner/JunitLikeXmlOutputListener.java: fixed indentation
-    and spacing
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java:
+	System.out replaced with System.err 
+
+2012-05-14  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/junit-runner/JunitLikeXmlOutputListener.java: fixed indentation
+	and spacing
 
 2012-05-11  Thomas Meyer  <thomas@m3y3r.de>
 
