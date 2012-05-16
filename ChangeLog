@@ -1,3 +1,8 @@
+2012-05-14  Jiri Vanek  <jvanek@redhat.com>
+
+    * tests/junit-runner/JunitLikeXmlOutputListener.java: fixed indentation
+    and spacing
+
 2012-05-11  Thomas Meyer  <thomas@m3y3r.de>
 
 	* tests/netx/unit/net/sourceforge/jnlp/util/PropertiesFileTest.java: Add

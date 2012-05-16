@@ -111,7 +111,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
     }
 
     private static String attributize(String s) {
-        return s.replace("&", "&amp;").replace("<", "&lt;").replace("\"","&quot;");
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace("\"", "&quot;");
     }
 
     private void closeElement(String name) throws IOException {
@@ -137,7 +137,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
     @Override
     public void testStarted(Description description) throws Exception {
         testFailed = null;
-        testStart = System.nanoTime()/1000l/1000l;
+        testStart = System.nanoTime() / 1000l / 1000l;
     }
 
     @Override
@@ -296,7 +296,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
      *
      * @return Strng[2]{nameToBeShown, hrefValue}
      */
-    public static  String[] createBug(String string) {
+    public static String[] createBug(String string) {
         String[] r = {"ex", string};
         String[] prefixes = {
             "S",
@@ -326,40 +326,40 @@ public class JunitLikeXmlOutputListener extends RunListener {
 
         String distro = "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/";
         String openjdk = "http://mail.openjdk.java.net/pipermail/";
-        if (string.startsWith(distro)){
-            r[0]="distro-pkg";
+        if (string.startsWith(distro)) {
+            r[0] = "distro-pkg";
             return r;
         }
-        if (string.startsWith(openjdk)){
-            r[0]="openjdk";
+        if (string.startsWith(openjdk)) {
+            r[0] = "openjdk";
             return r;
         }
         return r;
 
     }
 
-    public static void main(String[] args){
-        String[] q=createBug("PR608");
-        System.out.println(q[0]+" : "+q[1]);
-        q=createBug("S4854");
-        System.out.println(q[0]+" : "+q[1]);
-        q=createBug("RH649423");
-        System.out.println(q[0]+" : "+q[1]);
-        q=createBug("D464");
-        System.out.println(q[0]+" : "+q[1]);
-        q=createBug("G6554");
-        System.out.println(q[0]+" : "+q[1]);
-        q=createBug("CA1654");
-        System.out.println(q[0]+" : "+q[1]);
-        q=createBug("LP5445");
-        System.out.println(q[0]+" : "+q[1]);
+    public static void main(String[] args) {
+        String[] q = createBug("PR608");
+        System.out.println(q[0] + " : " + q[1]);
+        q = createBug("S4854");
+        System.out.println(q[0] + " : " + q[1]);
+        q = createBug("RH649423");
+        System.out.println(q[0] + " : " + q[1]);
+        q = createBug("D464");
+        System.out.println(q[0] + " : " + q[1]);
+        q = createBug("G6554");
+        System.out.println(q[0] + " : " + q[1]);
+        q = createBug("CA1654");
+        System.out.println(q[0] + " : " + q[1]);
+        q = createBug("LP5445");
+        System.out.println(q[0] + " : " + q[1]);
 
-        q=createBug("http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-November/016178.html");
-        System.out.println(q[0]+" : "+q[1]);
-        q=createBug("http://mail.openjdk.java.net/pipermail/awt-dev/2012-March/002324.html");
-        System.out.println(q[0]+" : "+q[1]);
+        q = createBug("http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-November/016178.html");
+        System.out.println(q[0] + " : " + q[1]);
+        q = createBug("http://mail.openjdk.java.net/pipermail/awt-dev/2012-March/002324.html");
+        System.out.println(q[0] + " : " + q[1]);
 
-        q=createBug("http://lists.fedoraproject.org/pipermail/chinese/2012-January/008868.html");
-        System.out.println(q[0]+" : "+q[1]);
+        q = createBug("http://lists.fedoraproject.org/pipermail/chinese/2012-January/008868.html");
+        System.out.println(q[0] + " : " + q[1]);
     }
 }
