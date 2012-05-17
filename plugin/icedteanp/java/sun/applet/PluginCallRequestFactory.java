@@ -41,15 +41,15 @@ public class PluginCallRequestFactory {
 
     public PluginCallRequest getPluginCallRequest(String id, String message, Long reference) {
 
-        if (id == "member") {
+        if ("member".equals(id)) {
             return new GetMemberPluginCallRequest(message, reference);
-        } else if (id == "void") {
+        } else if ("void".equals(id)) {
             return new VoidPluginCallRequest(message, reference);
-        } else if (id == "window") {
+        } else if ("window".equals(id)) {
             return new GetWindowPluginCallRequest(message, reference);
-        } else if (id == "proxyinfo") {
+        } else if ("proxyinfo".equals(id)) {
             return new PluginProxyInfoRequest(message, reference);
-        } else if (id == "cookieinfo") {
+        } else if ("cookieinfo".equals(id)) {
             return new PluginCookieInfoRequest(message, reference);
         } else {
             throw new RuntimeException("Unknown plugin call request type requested from factory");

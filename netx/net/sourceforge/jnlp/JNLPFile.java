@@ -208,7 +208,7 @@ public class JNLPFile {
         //(i.e. If the jnlp file being launched exist locally, but it
         //originated from a website, then download the one from the website
         //into the cache).
-        if (sourceLocation != null && location.getProtocol() == "file") {
+        if (sourceLocation != null && "file".equals(location.getProtocol())) {
             openURL(sourceLocation, version, policy);
         }
 

@@ -50,7 +50,7 @@ public class GetMemberPluginCallRequest extends PluginCallRequest {
         String[] args = message.split(" ");
         // FIXME: Is it even possible to distinguish between null and void
         // here?
-        if (args[3] != "null" && args[3] != "void")
+        if (!"null".equals(args[3]) && !"void".equals(args[3]))
             object = AppletSecurityContextManager.getSecurityContext(0).getObject(Integer.parseInt(args[3]));
         setDone(true);
     }

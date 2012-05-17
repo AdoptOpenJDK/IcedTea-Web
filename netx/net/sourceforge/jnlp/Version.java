@@ -230,6 +230,7 @@ public class Version {
         Integer number2 = Integer.valueOf(0);
 
         // compare as integers
+        // for normalization key, compare exact object, not using .equals
         try {
             if (!(part1 == emptyString)) // compare to magic normalization key
                 number1 = Integer.valueOf(part1);
@@ -242,9 +243,9 @@ public class Version {
             // means to compare as strings
         }
 
-        if (part1 == emptyString)
+        if (part1 == emptyString) // compare to magic normalization key
             part1 = "";
-        if (part2 == emptyString)
+        if (part2 == emptyString) // compare to magic normalization key
             part2 = "";
 
         return part1.compareTo(part2);

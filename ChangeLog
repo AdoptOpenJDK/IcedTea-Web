@@ -1,3 +1,17 @@
+2012-05-17  Adam Domurad  <adomurad@redhat.com>
+
+	Fixed uses of == to compare String objects to .equals where 
+	appropriate.
+	Noted a non-obvious use of == to compare a 'magic' String reference.
+	* netx/net/sourceforge/jnlp/JNLPFile.java:
+	Changed calls that compare String contents from == to .equals
+	* plugin/icedteanp/java/sun/applet/GetMemberPluginCallRequest.java: 
+	Same
+	* plugin/icedteanp/java/sun/applet/PluginCallRequestFactory.java:
+	Same
+	* netx/net/sourceforge/jnlp/Version.java: Added comment explaining why
+	== was used vs .equals
+
 2012-05-14  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
