@@ -71,8 +71,8 @@ enum CacheLRUWrapper {
     private FileLock fl = null;
 
     /* location of cache directory */
-    private final String cacheDir = new File(JNLPRuntime.getConfiguration()
-            .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR)).getPath();
+    private final String setCachePath = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+    private final String cacheDir = new File(setCachePath != null ? setCachePath : System.getProperty("java.io.tmpdir")).getPath();
 
     /*
      * back-end of how LRU is implemented This file is to keep track of the most

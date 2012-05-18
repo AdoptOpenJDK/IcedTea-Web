@@ -47,8 +47,8 @@ import net.sourceforge.jnlp.util.PropertiesFile;
  */
 public class CacheUtil {
 
-    private static final String cacheDir = new File(JNLPRuntime.getConfiguration()
-            .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR)).getPath(); // Do this with file to standardize it.
+    private static final String setCacheDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+    private static final String cacheDir = new File(setCacheDir != null ? setCacheDir : System.getProperty("java.io.tmpdir")).getPath(); // Do this with file to standardize it.
     private static final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
     private static final HashMap<String, FileLock> propertiesLockPool = new HashMap<String, FileLock>();
 

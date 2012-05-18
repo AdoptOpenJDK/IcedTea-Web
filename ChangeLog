@@ -1,3 +1,21 @@
+2012-05-18  Jiri Vanek  <jvanek@redhat.com>
+
+	More tests for Spaces and characters in urls
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: and
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: for unit-tests
+	purposes (cacheDir) make to point to tmp dir when no
+	DeploymentConfiguration	exists.
+	* tests/jnlp_tests/signed/Spaces can be everywhere signed/:
+	couple of new test doing the same as simple "Spaces can be everywhere"
+	but are signed
+	* tests/jnlp_tests/simple/Spaces can be everywhere/: added new test-cases
+	and html/jnlp test files to try more combinations of encodable characters
+	x launches
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:
+	unittest for url encoder behavior
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java:
+	unittest for urlEquals function
+
 2012-05-17  Adam Domurad  <adomurad@redhat.com>
 
 	Fixed uses of == to compare String objects to .equals where 

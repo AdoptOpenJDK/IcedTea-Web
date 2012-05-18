@@ -1,8 +1,5 @@
-
-import java.applet.Applet;
-
-/* SpacesCanBeEverywhere.java
-Copyright (C) 2011 Red Hat, Inc.
+/* CacheUtilTest.java
+Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -37,40 +34,22 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
+package net.sourceforge.jnlp.cache;
 
-public class SpacesCanBeEverywhere extends Applet{
+import java.net.URL;
+import org.junit.Assert;
+import org.junit.Test;
 
-    public static void main(String[] args){
-        System.out.println("Spaces can be everywhere.jsr was launched correctly");
-    }
+/** Test various corner cases of the parser */
+public class CacheUtilTest {
 
-     private class Killer extends Thread {
-
-        public int n = 2000;
-
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(n);
-                System.out.println("Applet killing himself after " + n + " ms of life");
-                System.exit(0);
-            } catch (Exception ex) {
-            }
+    @Test
+    public void testNormalizeUrlComparsions() throws Exception {
+        URL[] u = ResourceTrackerTest.getUrls();
+        URL[] n = ResourceTrackerTest.getNormalizedUrls();
+        for (int i = 0; i < u.length; i++) {
+            Assert.assertTrue("url " + i + " must CacheUtil.urlEquals to its normalized form " + i, CacheUtil.urlEquals(u[i], n[i]));
+            Assert.assertTrue("normalized form " + i + " must CacheUtil.urlEquals to its original " + i, CacheUtil.urlEquals(n[i], u[i]));
         }
     }
-    private Killer killer;
-
-    @Override
-    public void init() {
-        killer = new Killer();
-    }
-
-    @Override
-    public void start() {
-        main(null);
-        killer.start();
-        System.out.println("killer was started");
-    }
-
-  
 }

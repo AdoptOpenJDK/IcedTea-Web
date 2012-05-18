@@ -1,8 +1,8 @@
 
 import java.applet.Applet;
 
-/* SpacesCanBeEverywhere.java
-Copyright (C) 2011 Red Hat, Inc.
+/* SpacesCanBeEverywhereSigned.java
+Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -38,10 +38,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-public class SpacesCanBeEverywhere extends Applet{
+public class SpacesCanBeEverywhereSigned extends Applet{
 
     public static void main(String[] args){
-        System.out.println("Spaces can be everywhere.jsr was launched correctly");
+        System.out.println("Signed spaces can be everywhere.jsr was launched correctly");
     }
 
      private class Killer extends Thread {
