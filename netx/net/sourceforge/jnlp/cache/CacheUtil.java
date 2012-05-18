@@ -61,22 +61,40 @@ public class CacheUtil {
      * ie sourceforge.net and www.sourceforge.net).
      */
     public static boolean urlEquals(URL u1, URL u2) {
-        if (u1 == u2)
+        if (u1 == u2) {
             return true;
-        if (u1 == null || u2 == null)
+        }
+        if (u1 == null || u2 == null) {
             return false;
+        }
 
-        if (!compare(u1.getProtocol(), u2.getProtocol(), true) ||
-                !compare(u1.getHost(), u2.getHost(), true) ||
-                //u1.getDefaultPort() != u2.getDefaultPort() || // only in 1.4
-                !compare(u1.getPath(), u2.getPath(), false) ||
-                !compare(u1.getQuery(), u2.getQuery(), false) ||
-                !compare(u1.getRef(), u2.getRef(), false))
-            return false;
-        else
+        if (notNullUrlEquals(u1, u2)) {
             return true;
+        }
+        try {
+            URL nu1 = ResourceTracker.normalizeUrl(u1, false);
+            URL nu2 = ResourceTracker.normalizeUrl(u2, false);
+            if (notNullUrlEquals(nu1, nu2)) {
+                return true;
+            }
+        } catch (Exception ex) {
+            //keep silent here and return false
+        }
+        return false;
     }
 
+    private static boolean notNullUrlEquals(URL u1, URL u2) {
+        if (!compare(u1.getProtocol(), u2.getProtocol(), true)
+                || !compare(u1.getHost(), u2.getHost(), true)
+                || //u1.getDefaultPort() != u2.getDefaultPort() || // only in 1.4
+                !compare(u1.getPath(), u2.getPath(), false)
+                || !compare(u1.getQuery(), u2.getQuery(), false)
+                || !compare(u1.getRef(), u2.getRef(), false)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
     /**
      * Caches a resource and returns a URL for it in the cache;
      * blocks until resource is cached.  If the resource location is

@@ -1,5 +1,18 @@
 2012-05-18  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed behavior when encoded/characters needed encoding included in url
+	* NEWS: mentioned PR811
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (urlEquals) Enhanced
+	to be able compare encoded/decoded urls correctly.
+	(notNullUrlEquals) new method to separate comparing of individual parts of
+	url from null checks
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: (addResource)
+	is now encoding url if needed. (normalizeUrl) new method to encode path in
+	url of all except file protocol. (normalizeChunk) New method for encoding
+	of atomic piece.
+
+2012-05-18  Jiri Vanek  <jvanek@redhat.com>
+
 	More tests for Spaces and characters in urls
 	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: and
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: for unit-tests
