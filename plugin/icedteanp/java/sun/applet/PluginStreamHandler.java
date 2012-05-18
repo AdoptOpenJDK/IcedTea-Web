@@ -59,7 +59,7 @@ public class PluginStreamHandler {
     private JavaConsole console = new JavaConsole();
 
     private PluginMessageConsumer consumer;
-    private Boolean shuttingDown = false;
+    private volatile boolean shuttingDown = false;
 
 
     public PluginStreamHandler(InputStream inputstream, OutputStream outputstream)
@@ -322,9 +322,7 @@ public class PluginStreamHandler {
             PluginDebug.debug("  PIPE: appletviewer read: ", message);
 
             if (message == null || message.equals("shutdown")) {
-                synchronized (shuttingDown) {
-                    shuttingDown = true;
-                }
+                shuttingDown = true;
                 try {
                     // Close input/output channels to plugin.
                     pluginInputReader.close();
@@ -362,10 +360,8 @@ public class PluginStreamHandler {
             } catch (IOException e) {
                 // if we are shutting down, ignore write failures as 
                 // pipe may have closed
-                synchronized (shuttingDown) {
-                    if (!shuttingDown) {
-                        e.printStackTrace();
-                    }
+                if (!shuttingDown) {
+                    e.printStackTrace();
                 }
 
                 // either ways, if the pipe is broken, there is nothing 
