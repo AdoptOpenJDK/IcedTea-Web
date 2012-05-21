@@ -1,3 +1,19 @@
+2012-05-21  Jiri Vanek  <jvanek@redhat.com>
+
+	Added detection of installed browsers and added targets to create
+	symbolic links from install dir to browsers' plugin directories.
+	Primarily for testing purposes
+	* Makefile.am: (stamps/user-links.stamp) with alias (links) - new target for
+	creating symlinks for all users. One must be root to execute this target.
+	(stamps/global-links.stamp) with alias (user-links) - new target
+	for creating symlinks for logged user only. Because opera is missing this feature,
+	quite useless for testing or dependence targets, but good for live user.
+	(restore-global-links): target for restoring original global links.
+	One must be root again
+	(restore-user-links): target for restoring user's links
+	* configure.ac: added basic check whether and which browsers are
+	installed 
+
 2012-05-18  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed behavior when encoded/characters needed encoding included in url
