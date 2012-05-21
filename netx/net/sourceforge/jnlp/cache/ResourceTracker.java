@@ -1218,7 +1218,9 @@ public class ResourceTracker {
             }
             return u;
         } else {
-            System.out.println(normalized + " chunks normalized, rejoining url");
+            if (debug) {
+                System.out.println(normalized + " chunks normalized, rejoining url");
+            }
         }
         StringBuilder composed = new StringBuilder("");
         for (int i = 0; i < ss.length; i++) {
