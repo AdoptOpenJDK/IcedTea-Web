@@ -26,7 +26,7 @@ PRIVATE_KEYSTORE_NAME=teststore.ks
 PRIVATE_KEYSTORE_PASS=123456789
 EXPORTED_TEST_CERT=icedteatests.crt
 TEST_CERT_ALIAS=icedteaweb
-PUBLIC_KEYSTORE=~/.icedtea/security/trusted.certs
+PUBLIC_KEYSTORE=${HOME}/.icedtea/security/trusted.certs
 PUBLIC_KEYSTORE_PASS=changeit
 
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
@@ -34,6 +34,19 @@ UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
 REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
 EMMA_JAVA_ARGS=-Xmx2G
 META_MANIFEST = META-INF/MANIFEST.MF
+
+# linking variables
+PLUGIN_LINK_NAME=libjavaplugin.so
+MOZILLA_LOCAL_PLUGINDIR=${HOME}/.mozilla/plugins
+MOZILLA_GLOBAL64_PLUGINDIR=/usr/lib64/mozilla/plugins
+MOZILLA_GLOBAL32_PLUGINDIR=/usr/lib/mozilla/plugins
+OPERA_GLOBAL64_PLUGINDIR=/usr/lib64/opera/plugins
+OPERA_GLOBAL32_PLUGINDIR=/usr/lib/opera/plugins
+BUILT_PLUGIN_LIBRARY=IcedTeaPlugin.so
+MOZILLA_LOCAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origU
+MOZILLA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origMG
+OPERA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origOG
+# end of linking variables
 
 # Build directories
 
@@ -86,7 +99,7 @@ LIVECONNECT_DIR = netscape sun/applet
 PLUGIN_DIR=$(abs_top_builddir)/plugin/icedteanp
 PLUGIN_SRCDIR=$(abs_top_srcdir)/plugin/icedteanp
 LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
-ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/IcedTeaPlugin.so stamps/liveconnect-dist.stamp
+ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) stamps/liveconnect-dist.stamp
 PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
 endif
 
@@ -161,7 +174,7 @@ clean-local: clean-netx clean-plugin clean-liveconnect clean-extra  \
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir)
 if ENABLE_PLUGIN
-	${INSTALL_PROGRAM} $(PLUGIN_DIR)/IcedTeaPlugin.so $(DESTDIR)$(libdir)
+	${INSTALL_PROGRAM} $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) $(DESTDIR)$(libdir)
 	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
@@ -190,7 +203,7 @@ endif
 endif
 
 uninstall-local:
-	rm -f $(DESTDIR)$(libdir)/IcedTeaPlugin.so
+	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jnlp
@@ -233,7 +246,7 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  $(MOZILLA_CFLAGS) \
 	  -fPIC -o $@ -c $<
 
-$(PLUGIN_DIR)/IcedTeaPlugin.so: $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS))
+$(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY): $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS))
 	cd $(PLUGIN_DIR) && \
 	$(CXX) $(CXXFLAGS) \
 	  $(PLUGIN_OBJECTS) \
@@ -244,7 +257,7 @@ $(PLUGIN_DIR)/IcedTeaPlugin.so: $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS))
 
 clean-IcedTeaPlugin:
 	rm -f $(PLUGIN_DIR)/*.o
-	rm -f $(PLUGIN_DIR)/IcedTeaPlugin.so
+	rm -f $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY)
 	if [ $(abs_top_srcdir) != $(abs_top_builddir) ]; then \
 	  if [ -e $(abs_top_builddir)/plugin/icedteanp ] ; then \
 	    rmdir $(abs_top_builddir)/plugin/icedteanp ; \
@@ -582,7 +595,7 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
-	  $(BOOT_DIR)/bin/java -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) -Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws) \
+	  $(BOOT_DIR)/bin/java -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) -Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws) -Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
 	  > stdout.log 2> stderr.log ; \
 	 cat stdout.log ; \
@@ -591,6 +604,112 @@ if WITH_XSLTPROC
 	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
 endif
 	touch $@
+
+#for global-links you must be root, for opera there do not exists user-links
+#although this targets will indeed create symbolic links to enable 
+#icedtea-web plugin inside browser it is intended for testing purposes
+if ENABLE_PLUGIN
+stamps/user-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp \ 
+ launcher.build/$(javaws) stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) 
+	if [ "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" ]  ; then  \
+	  if [ -e $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ] ; then \
+	    mv -f $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME)  $(MOZILLA_LOCAL_BACKUP_FILE) ; \
+	    echo "$(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) backed up as $(MOZILLA_LOCAL_BACKUP_FILE)" ; \
+	  else \
+	    echo "$(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) doesn't exists, nothing to be backed up to $(MOZILLA_LOCAL_BACKUP_FILE)" ; \
+	  fi ; \
+	  pushd $(MOZILLA_LOCAL_PLUGINDIR) ; \
+	  ln -s $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) $(PLUGIN_LINK_NAME) ; \
+	  echo "$(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) linked as  $$PWD/$(PLUGIN_LINK_NAME)" ; \
+	  popd ; \
+	fi ; \
+	touch $@
+
+restore-user-links:
+	if [ "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" ]  ; then  \
+	  if [ -e $(MOZILLA_LOCAL_BACKUP_FILE) ] ; then \
+	    mv -f  $(MOZILLA_LOCAL_BACKUP_FILE)  $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ; \
+	    echo "$(MOZILLA_LOCAL_BACKUP_FILE) restored as $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME)" ; \		
+	  else \
+	    rm -f $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ; \
+	    echo "$(MOZILLA_LOCAL_BACKUP_FILE) do not exists, nothing to be restored. $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) removed" ; \		
+	  fi ; \
+	fi ;
+	if [ -e stamps/user-links.stamp ] ; then \
+	  rm -f stamps/user-links.stamp ; \
+	fi
+
+stamps/global-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
+ stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
+	if [ "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" ]  ; then  \
+	    dir="$(MOZILLA_GLOBAL32_PLUGINDIR)"  ; \
+	    arch=`arch`  ; \
+	    if [ "$$arch" = "x86_64" ]  ; then \
+	      dir="$(MOZILLA_GLOBAL64_PLUGINDIR)"  ; \
+	    fi ; \
+	    if [ -e "$$dir"/$(PLUGIN_LINK_NAME) ] ; then \
+	      mv -f "$$dir"/$(PLUGIN_LINK_NAME)  $(MOZILLA_GLOBAL_BACKUP_FILE) ; \
+	      echo "$$dir/$(PLUGIN_LINK_NAME) backed up as  $(MOZILLA_GLOBAL_BACKUP_FILE)" ; \
+	    else \
+	      echo "$$dir/$(PLUGIN_LINK_NAME) do not exists, nothing to be backed up to $(MOZILLA_GLOBAL_BACKUP_FILE)" ; \
+	    fi ; \
+	    pushd "$$dir"  ; \
+	    ln -s $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) $(PLUGIN_LINK_NAME)  ; \
+	    echo "$(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) linked as  $$PWD/$(PLUGIN_LINK_NAME)" ; \
+	    popd  ; \
+	fi ; 
+	if [ "$(OPERA)" != "" ]  ; then \
+	    dir="$(OPERA_GLOBAL32_PLUGINDIR)"  ; \
+	    arch=`arch`  ; \
+	    if [ "$$arch" = "x86_64" ] ; then \
+	      dir="$(OPERA_GLOBAL64_PLUGINDIR)" ; \
+	    fi ; \
+	    if [ -e "$$dir"/$(PLUGIN_LINK_NAME) ] ; then \
+	      mv -f "$$dir"/$(PLUGIN_LINK_NAME)  $(OPERA_GLOBAL_BACKUP_FILE) ; \
+	      echo "$$dir/$(PLUGIN_LINK_NAME) backed up as  $(OPERA_GLOBAL_BACKUP_FILE) "; \
+	    else \
+	      echo "$$dir/$(PLUGIN_LINK_NAME) do not exists, nothing to be backed up to $(OPERA_GLOBAL_BACKUP_FILE) "; \
+	    fi ; \
+	    pushd "$$dir"  ; \
+	    ln -s $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) $(PLUGIN_LINK_NAME)  ; \
+	    echo "$(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) linked as  $$PWD/$(PLUGIN_LINK_NAME)" ; \
+	    popd  ; \
+	fi   ; \
+	touch $@
+
+restore-global-links:
+	if [ "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" ]  ; then  \
+	    dir="$(MOZILLA_GLOBAL32_PLUGINDIR)"  ; \
+	    arch=`arch`  ; \
+	    if [ "$$arch" = "x86_64" ]  ; then \
+	      dir="$(MOZILLA_GLOBAL64_PLUGINDIR)"  ; \
+	    fi ; \
+	    if [ -e $(MOZILLA_GLOBAL_BACKUP_FILE) ] ; then \
+	      mv -f $(MOZILLA_GLOBAL_BACKUP_FILE) "$$dir"/$(PLUGIN_LINK_NAME) ; \
+	      echo "$(MOZILLA_GLOBAL_BACKUP_FILE) restored as $$dir/$(PLUGIN_LINK_NAME)" ; \
+	    else \
+	      rm -f "$$dir"/$(PLUGIN_LINK_NAME) ; \
+	      echo "$(MOZILLA_GLOBAL_BACKUP_FILE) do not exists, nothing to be restored. $$dir/$(PLUGIN_LINK_NAME) removed" ; \
+	    fi ; \
+	fi ; 
+	if [ "$(OPERA)" != "" ]  ; then \
+	    dir="$(OPERA_GLOBAL32_PLUGINDIR)"  ; \
+	    arch=`arch`  ; \
+	    if [ "$$arch" = "x86_64" ] ; then \
+	      dir="$(OPERA_GLOBAL64_PLUGINDIR)" ; \
+	    fi ; \
+	    if [ -e $(OPERA_GLOBAL_BACKUP_FILE) ] ; then \
+	      mv -f $(OPERA_GLOBAL_BACKUP_FILE) "$$dir"/$(PLUGIN_LINK_NAME) ; \
+	      echo "$(OPERA_GLOBAL_BACKUP_FILE)  restored as $$dir/$(PLUGIN_LINK_NAME)" ; \
+	    else \
+	      rm -f "$$dir"/$(PLUGIN_LINK_NAME) ; \
+	      echo "$(OPERA_GLOBAL_BACKUP_FILE) do not exist, nothing to be restored. $$dir/$(PLUGIN_LINK_NAME) removed" ; \	
+	    fi ; \
+	fi   ;
+	if [ -e stamps/global-links.stamp ] ; then \
+	  rm -f stamps/global-links.stamp ; \
+	fi
+endif
 
 netx-unit-tests-source-files.txt:
 	find $(NETX_UNIT_TEST_SRCDIR) -name '*.java' | sort > $@
@@ -718,6 +837,7 @@ if WITH_EMMA
 	 $(EMMA_JAVA_ARGS) \
 	 -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) \
 	 -Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws) \
+	 -Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA) \
 	 -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) emmarun  \
 	   -raw \
 	   -cp $(NETX_DIR)/lib/classes.jar \
@@ -969,6 +1089,10 @@ plugin: stamps/plugin.stamp
 plugin-tests: stamps/plugin-tests.stamp
 
 run-netx-unit-tests: stamps/run-netx-unit-tests.stamp
+
+links: stamps/global-links.stamp
+
+user-links: stamps/user-links.stamp
 
 run-netx-dist-tests: stamps/run-netx-dist-tests.stamp
 

@@ -88,6 +88,11 @@ IT_CHECK_XULRUNNER_API_VERSION
 #
 
 AC_CHECK_PROGS([XSLTPROC],[xsltproc],[], [])
+AC_CHECK_PROGS([FIREFOX],[firefox],[], [])
+AC_CHECK_PROGS([CHROME],[google-chrome],[], [])
+AC_CHECK_PROGS([CHROMIUM],[chromium-browser],[], [])
+AC_CHECK_PROGS([OPERA],[opera],[], [])
+
 AM_CONDITIONAL([WITH_XSLTPROC], [test x"$XSLTPROC" != x ])
 IT_FIND_OPTIONAL_JAR([rhino], RHINO,
     [/usr/share/java/js.jar /usr/share/rhino-1.6/lib/js.jar])
