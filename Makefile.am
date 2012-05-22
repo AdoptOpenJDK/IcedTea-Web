@@ -617,7 +617,7 @@ endif
 #although this targets will indeed create symbolic links to enable 
 #icedtea-web plugin inside browser it is intended for testing purposes
 if ENABLE_PLUGIN
-stamps/user-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp \ 
+stamps/user-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp \
  launcher.build/$(javaws) stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) 
 	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	  if [ -e $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ] ; then \
@@ -637,7 +637,7 @@ restore-user-links:
 	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	  if [ -e $(MOZILLA_LOCAL_BACKUP_FILE) ] ; then \
 	    mv -f  $(MOZILLA_LOCAL_BACKUP_FILE)  $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ; \
-	    echo "$(MOZILLA_LOCAL_BACKUP_FILE) restored as $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME)" ; \		
+	    echo "$(MOZILLA_LOCAL_BACKUP_FILE) restored as $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME)" ; \
 	  else \
 	    rm -f $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ; \
 	    echo "$(MOZILLA_LOCAL_BACKUP_FILE) do not exists, nothing to be restored. $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) removed" ; \
@@ -711,7 +711,7 @@ restore-global-links:
 	      echo "$(OPERA_GLOBAL_BACKUP_FILE)  restored as $$dir/$(PLUGIN_LINK_NAME)" ; \
 	    else \
 	      rm -f "$$dir"/$(PLUGIN_LINK_NAME) ; \
-	      echo "$(OPERA_GLOBAL_BACKUP_FILE) do not exist, nothing to be restored. $$dir/$(PLUGIN_LINK_NAME) removed" ; \	
+	      echo "$(OPERA_GLOBAL_BACKUP_FILE) do not exist, nothing to be restored. $$dir/$(PLUGIN_LINK_NAME) removed" ; \
 	    fi ; \
 	fi   ;
 	if [ -e stamps/global-links.stamp ] ; then \
