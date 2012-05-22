@@ -53,8 +53,8 @@ public class AllStackTracesTest {
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/AllStackTraces.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        String c="java.security.AccessControlException: access denied (java.lang.RuntimePermission getStackTrace)";	
-        Assert.assertTrue("stderr should contains `"+c+"`, but didn't ",pr.stderr.contains(c));
+        String c = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + "getStackTrace" + ".*";
+        Assert.assertTrue("stderr should match `"+c+"`, but didn't ",pr.stderr.matches(c));
         String cc="ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did ",pr.stderr.contains(cc));
         Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);

@@ -1,3 +1,16 @@
+2012-05-22  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java:
+	* tests/jnlp_tests/simple/AddShutdownHook/testcases/AddShutdownHookTest.java:
+	* tests/jnlp_tests/simple/AllStackTraces/testcases/AllStackTracesTest.java:
+	* tests/jnlp_tests/simple/CreateClassLoader/testcases/CreateClassLoaderTest.java:
+	* tests/jnlp_tests/simple/ReadEnvironment/testcases/ReadEnvironmentTest.java:
+	* tests/jnlp_tests/simple/ReadProperties/testcases/ReadPropertiesTest.java:
+	* tests/jnlp_tests/simple/RedirectStreams/testcases/RedirectStreamsTest.java:
+	* tests/jnlp_tests/simple/ReplaceSecurityManager/testcases/ReplaceSecurityManagerTest.java:
+	* tests/jnlp_tests/simple/SetContextClassLoader/testcases/SetContextClassLoaderTest.java:
+	All exact matches upon AccessControlException replaced by regular expression matching both jdk7 and jdk6 syntax 
+
 2012-05-21  Jiri Vanek  <jvanek@redhat.com>
 
 	* Makefile.am: mzilla-filesystem linking targets now counts also with 

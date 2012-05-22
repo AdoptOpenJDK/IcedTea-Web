@@ -48,6 +48,8 @@ public class ReadPropertiesSignedTest {
     private static ServerAccess server = new ServerAccess();
     private final List<String> l=Collections.unmodifiableList(Arrays.asList(new String[] {"-Xtrustall"}));
 
+    String accessMatcher = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.util.PropertyPermission.{0,5}" + "user.name.{0,5}read" + ".*";
+
     @Test
     public void ReadSignedPropertiesWithoutPermissionsWithXtrustAll() throws Exception {
         //no request for permissions
@@ -56,8 +58,7 @@ public class ReadPropertiesSignedTest {
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesSigned1.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        String s="java.security.AccessControlException: access denied (java.util.PropertyPermission user.name read)";
-        Assert.assertTrue("Stderr should contains "+s+" but did not",pr.stderr.contains(s));
+        Assert.assertTrue("Stderr should match "+accessMatcher+" but did not",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
         Assert.assertTrue("stdout lenght should be <2 but was "+pr.stdout.length(),pr.stdout.length()<2); // /home/user or /root or eanything else :(
@@ -73,8 +74,7 @@ public class ReadPropertiesSignedTest {
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesSigned2.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        String s="java.security.AccessControlException: access denied (java.util.PropertyPermission user.name read)";
-        Assert.assertFalse("Stderr should NOT contains "+s+" but did",pr.stderr.contains(s));
+        Assert.assertFalse("Stderr should NOT match "+accessMatcher+" but did",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
         Assert.assertTrue("stdout lenght should be >= but was "+pr.stdout.length(),pr.stdout.length()>=4); // /home/user or /root or eanything else :(
@@ -89,8 +89,7 @@ public class ReadPropertiesSignedTest {
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadProperties1.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        String s="java.security.AccessControlException: access denied (java.util.PropertyPermission user.name read)";
-        Assert.assertTrue(pr.stderr.contains(s));
+        Assert.assertTrue("Stderr should match "+accessMatcher+" but did not",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
         Assert.assertFalse("stdout lenght should not be  >2 but was "+pr.stdout.length(),pr.stdout.length()>2);

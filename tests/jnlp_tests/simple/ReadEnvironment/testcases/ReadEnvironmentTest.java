@@ -51,8 +51,8 @@ public class ReadEnvironmentTest {
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/ReadEnvironment.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        String s="java.security.AccessControlException: access denied (java.lang.RuntimePermission getenv.USER)";
-        Assert.assertTrue("stderr should contains "+s+"but didn't",pr.stderr.contains(s));
+        String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + "getenv.USER" + ".*";
+        Assert.assertTrue("stderr should match"+s+"but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
         Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);

@@ -52,8 +52,8 @@ public class ReadPropertiesTest {
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/ReadProperties1.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        String s="java.security.AccessControlException: access denied (java.util.PropertyPermission user.name read)";
-        Assert.assertTrue("stderr should contains "+s+" but didn't",pr.stderr.contains(s));
+        String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.util.PropertyPermission.{0,5}" + "user.name.{0,5}read" + ".*";
+        Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
         Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
@@ -61,15 +61,15 @@ public class ReadPropertiesTest {
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
 
- @Test
+    @Test
     public void ReadPropertiesLunch2() throws Exception {
         System.out.println("connecting ReadProperties2 request");
         System.err.println("connecting ReadProperties2 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/ReadProperties2.jnlp");
         System.out.println(pr.stdout);
         System.err.println(pr.stderr);
-        String s="java.security.AccessControlException: access denied (java.util.PropertyPermission user.home read)";
-        Assert.assertTrue("stderr should contains "+s+" but didn't",pr.stderr.contains(s));
+        String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.util.PropertyPermission.{0,5}" + "user.home.{0,5}read" + ".*";
+        Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
         Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
