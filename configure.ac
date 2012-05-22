@@ -88,10 +88,13 @@ IT_CHECK_XULRUNNER_API_VERSION
 #
 
 AC_CHECK_PROGS([XSLTPROC],[xsltproc],[], [])
+# browser to be linked/tested
 AC_CHECK_PROGS([FIREFOX],[firefox],[], [])
 AC_CHECK_PROGS([CHROME],[google-chrome],[], [])
 AC_CHECK_PROGS([CHROMIUM],[chromium-browser],[], [])
 AC_CHECK_PROGS([OPERA],[opera],[], [])
+AC_CHECK_PROGS([MIDORI],[midori],[], [])
+AC_CHECK_PROGS([EPIPHANY],[epiphany],[], [])
 
 AM_CONDITIONAL([WITH_XSLTPROC], [test x"$XSLTPROC" != x ])
 IT_FIND_OPTIONAL_JAR([rhino], RHINO,

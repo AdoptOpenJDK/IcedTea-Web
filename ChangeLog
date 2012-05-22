@@ -1,5 +1,11 @@
 2012-05-21  Jiri Vanek  <jvanek@redhat.com>
 
+	* Makefile.am: mzilla-filesystem linking targets now counts also with 
+	midori and epiphany. Extracted duplicated entries to variables
+	* configure.ac: added  check for midori and epiphany
+
+2012-05-21  Jiri Vanek  <jvanek@redhat.com>
+
 	Added detection of installed browsers and added targets to create
 	symbolic links from install dir to browsers' plugin directories.
 	Primarily for testing purposes

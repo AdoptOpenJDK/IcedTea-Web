@@ -46,6 +46,7 @@ BUILT_PLUGIN_LIBRARY=IcedTeaPlugin.so
 MOZILLA_LOCAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origU
 MOZILLA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origMG
 OPERA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origOG
+MOZILLA_FAMILY_TEST= "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" -o "$(MIDORI)" != "" -o "$(EPIPHANY)" != "" 
 # end of linking variables
 
 # Build directories
@@ -138,6 +139,13 @@ PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
 EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
  itweb-settings.desktop.in $(top_srcdir)/tests
+
+# reproducers `D`shortcuts
+DTEST_SERVER=-Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR)
+DJAVAWS_BUILD=-Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws)
+DBROWSERS=-Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA):$(MIDORI):$(EPIPHANY)
+REPRODUCERS_DPARAMETERS= $(DTEST_SERVER) $(DJAVAWS_BUILD) $(DBROWSERS) 
+# end of `D`shortcuts
 
 # binary names
 javaws:= $(shell echo javaws | sed '@program_transform_name@')
@@ -595,7 +603,7 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
-	  $(BOOT_DIR)/bin/java -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) -Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws) -Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA) \
+	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
 	  > stdout.log 2> stderr.log ; \
 	 cat stdout.log ; \
@@ -611,7 +619,7 @@ endif
 if ENABLE_PLUGIN
 stamps/user-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp \ 
  launcher.build/$(javaws) stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) 
-	if [ "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" ]  ; then  \
+	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	  if [ -e $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ] ; then \
 	    mv -f $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME)  $(MOZILLA_LOCAL_BACKUP_FILE) ; \
 	    echo "$(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) backed up as $(MOZILLA_LOCAL_BACKUP_FILE)" ; \
@@ -626,13 +634,13 @@ stamps/user-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugi
 	touch $@
 
 restore-user-links:
-	if [ "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" ]  ; then  \
+	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	  if [ -e $(MOZILLA_LOCAL_BACKUP_FILE) ] ; then \
 	    mv -f  $(MOZILLA_LOCAL_BACKUP_FILE)  $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ; \
 	    echo "$(MOZILLA_LOCAL_BACKUP_FILE) restored as $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME)" ; \		
 	  else \
 	    rm -f $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ; \
-	    echo "$(MOZILLA_LOCAL_BACKUP_FILE) do not exists, nothing to be restored. $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) removed" ; \		
+	    echo "$(MOZILLA_LOCAL_BACKUP_FILE) do not exists, nothing to be restored. $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) removed" ; \
 	  fi ; \
 	fi ;
 	if [ -e stamps/user-links.stamp ] ; then \
@@ -641,7 +649,7 @@ restore-user-links:
 
 stamps/global-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
  stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
-	if [ "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" ]  ; then  \
+	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	    dir="$(MOZILLA_GLOBAL32_PLUGINDIR)"  ; \
 	    arch=`arch`  ; \
 	    if [ "$$arch" = "x86_64" ]  ; then \
@@ -678,7 +686,7 @@ stamps/global-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plu
 	touch $@
 
 restore-global-links:
-	if [ "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" ]  ; then  \
+	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	    dir="$(MOZILLA_GLOBAL32_PLUGINDIR)"  ; \
 	    arch=`arch`  ; \
 	    if [ "$$arch" = "x86_64" ]  ; then \
@@ -835,9 +843,7 @@ if WITH_EMMA
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	$(BOOT_DIR)/bin/java  \
 	 $(EMMA_JAVA_ARGS) \
-	 -Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR) \
-	 -Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws) \
-	 -Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA) \
+	  $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) emmarun  \
 	   -raw \
 	   -cp $(NETX_DIR)/lib/classes.jar \
