@@ -147,21 +147,20 @@ void
 IcedTeaPluginUtilities::JSIDToString(void* id, std::string* result)
 {
 
-	char* id_str = (char*) malloc(sizeof(char)*20); // max = long long = 8446744073709551615 == 19 chars
+	char id_str[20]; // max = long long = 8446744073709551615 == 19 chars
 
 	if (sizeof(void*) == sizeof(long long))
 	{
-		sprintf(id_str, "%llu", id);
+		snprintf(id_str, sizeof(id_str), "%llu", id);
 	}
 	else
 	{
-		sprintf(id_str, "%lu", id); // else use long
+		snprintf(id_str, sizeof(id_str), "%lu", id); // else use long
 	}
 
 	result->append(id_str);
 
 	PLUGIN_DEBUG("Converting pointer %p to %s\n", id, id_str);
-	free(id_str);
 }
 
 /**
@@ -258,11 +257,9 @@ void
 IcedTeaPluginUtilities::itoa(int i, std::string* result)
 {
 	// largest possible integer is 10 digits long
-	char* int_str = (char*) malloc(sizeof(char)*11);
-	sprintf(int_str, "%d", i);
+	char int_str[11];
+	snprintf(int_str, sizeof(int_str), "%d", i);
 	result->append(int_str);
-
-	free(int_str);
 }
 
 /**
@@ -372,18 +369,17 @@ IcedTeaPluginUtilities::convertStringToUTF8(std::string* str, std::string* utf_s
 	ostream << length;
 
 	// UTF-8 characters are 4-bytes max + space + '\0'
-	char* hex_value = (char*) malloc(sizeof(char)*10);
+	char hex_value[10];
 
 	for (int i = 0; i < str->length(); i++)
 	{
-		sprintf(hex_value, " %hx", str->at(i));
+		snprintf(hex_value, sizeof(hex_value)," %hx", str->at(i));
 		ostream << hex_value;
 	}
 
 	utf_str->clear();
 	*utf_str = ostream.str();
 
-	free(hex_value);
 	PLUGIN_DEBUG("Converted %s to UTF-8 string %s\n", str->c_str(), utf_str->c_str());
 }
 
@@ -683,49 +679,55 @@ IcedTeaPluginUtilities::printNPVariant(NPVariant variant)
 void
 IcedTeaPluginUtilities::NPVariantToString(NPVariant variant, std::string* result)
 {
-	char* str = (char*) malloc(sizeof(char)*32); // enough for everything except string
+	char str[32]; // enough for everything except string
+	char* largestr = NULL;
 
     if (NPVARIANT_IS_VOID(variant))
     {
-        sprintf(str, "%p", variant);
+        snprintf(str, sizeof(str), "%p", variant);
     }
     else if (NPVARIANT_IS_NULL(variant))
     {
-    	sprintf(str, "NULL");
+    	snprintf(str, sizeof(str), "NULL");
     }
     else if (NPVARIANT_IS_BOOLEAN(variant))
     {
     	if (NPVARIANT_TO_BOOLEAN(variant))
-    		sprintf(str, "true");
+    		snprintf(str, sizeof(str), "true");
     	else
-    		sprintf(str, "false");
+    		snprintf(str, sizeof(str), "false");
     }
     else if (NPVARIANT_IS_INT32(variant))
     {
-    	sprintf(str, "%d", NPVARIANT_TO_INT32(variant));
+    	snprintf(str, sizeof(str), "%d", NPVARIANT_TO_INT32(variant));
     }
     else if (NPVARIANT_IS_DOUBLE(variant))
     {
-    	sprintf(str, "%f", NPVARIANT_TO_DOUBLE(variant));;
+    	snprintf(str, sizeof(str), "%f", NPVARIANT_TO_DOUBLE(variant));;
     }
     else if (NPVARIANT_IS_STRING(variant))
     {
     	free(str);
 #if MOZILLA_VERSION_COLLAPSED < 1090200
-    	str = (char*) malloc(sizeof(char)*NPVARIANT_TO_STRING(variant).utf8length);
-    	sprintf(str, "%s", NPVARIANT_TO_STRING(variant).utf8characters);
+    	size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).utf8length;
+    	largestr = (char*) malloc(buffersize);
+    	snprintf(str, buffersize, "%s", NPVARIANT_TO_STRING(variant).utf8characters);
 #else
-        str = (char*) malloc(sizeof(char)*NPVARIANT_TO_STRING(variant).UTF8Length);
-        sprintf(str, "%s", NPVARIANT_TO_STRING(variant).UTF8Characters);
+    	size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).UTF8Length;
+        largestr = (char*) malloc(buffersize);
+        snprintf(str, buffersize, "%s", NPVARIANT_TO_STRING(variant).UTF8Characters);
 #endif
     }
     else
     {
-        sprintf(str, "[Object %p]", variant);
+    	snprintf(str, sizeof(str), "[Object %p]", variant);
     }
-
-    result->append(str);
-    free(str);
+    if (largestr != NULL){
+    	result->append(largestr);
+    	free(largestr);
+    } else {
+    	result->append(str);
+    }
 }
 
 bool
