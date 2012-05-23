@@ -1,5 +1,13 @@
 2012-05-23  Jiri Vanek  <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (getPermissions):
+	Any exception from this method is consumed somewhere. I have cough exception,
+	reprint it in debug mode and re-throw (to be lost). Main condition in this
+	method had several possible NullPointer exceptions. Separated and thrown before
+	this condition.
+
+2012-05-23  Jiri Vanek  <jvanek@redhat.com>
+
 	Enhanced about dialog
 	* extra/net/sourceforge/javaws/about/Main.java: Main frame and Main tab
 	renamed from "About NetX" to "About IcedTea-Web and NetX".

@@ -895,44 +895,66 @@ public class JNLPClassLoader extends URLClassLoader {
      * Returns the permissions for the CodeSource.
      */
     protected PermissionCollection getPermissions(CodeSource cs) {
-        Permissions result = new Permissions();
+        try {
+            Permissions result = new Permissions();
 
-        // should check for extensions or boot, automatically give all
-        // access w/o security dialog once we actually check certificates.
+            // should check for extensions or boot, automatically give all
+            // access w/o security dialog once we actually check certificates.
 
-        // copy security permissions from SecurityDesc element
-        if (security != null) {
-            // Security desc. is used only to track security settings for the
-            // application. However, an application may comprise of multiple
-            // jars, and as such, security must be evaluated on a per jar basis.
+            // copy security permissions from SecurityDesc element
+            if (security != null) {
+                // Security desc. is used only to track security settings for the
+                // application. However, an application may comprise of multiple
+                // jars, and as such, security must be evaluated on a per jar basis.
 
-            // set default perms
-            PermissionCollection permissions = security.getSandBoxPermissions();
+                // set default perms
+                PermissionCollection permissions = security.getSandBoxPermissions();
 
-            // If more than default is needed:
-            // 1. Code must be signed
-            // 2. ALL or J2EE permissions must be requested (note: plugin requests ALL automatically)
-            if (cs.getCodeSigners() != null &&
-                    (getCodeSourceSecurity(cs.getLocation()).getSecurityType().equals(SecurityDesc.ALL_PERMISSIONS) ||
-                     getCodeSourceSecurity(cs.getLocation()).getSecurityType().equals(SecurityDesc.J2EE_PERMISSIONS))) {
+                // If more than default is needed:
+                // 1. Code must be signed
+                // 2. ALL or J2EE permissions must be requested (note: plugin requests ALL automatically)
+                if (cs == null) {
+                    throw new RuntimeException("Code source was null");
+                }
+                if (cs.getLocation() == null) {
+                    throw new RuntimeException("Code source location was null");
+                }
+                if (getCodeSourceSecurity(cs.getLocation()) == null) {
+                    throw new RuntimeException("Code source security was null");
+                }
+                if (getCodeSourceSecurity(cs.getLocation()).getSecurityType() == null) {
+                    throw new RuntimeException("Code source security type was null");
+                }
+                if (cs.getCodeSigners() != null
+                        && (getCodeSourceSecurity(cs.getLocation()).getSecurityType().equals(SecurityDesc.ALL_PERMISSIONS)
+                        || getCodeSourceSecurity(cs.getLocation()).getSecurityType().equals(SecurityDesc.J2EE_PERMISSIONS))) {
 
-                permissions = getCodeSourceSecurity(cs.getLocation()).getPermissions(cs);
+                    permissions = getCodeSourceSecurity(cs.getLocation()).getPermissions(cs);
+                }
+
+                Enumeration<Permission> e = permissions.elements();
+                while (e.hasMoreElements()) {
+                    result.add(e.nextElement());
+                }
             }
 
-            Enumeration<Permission> e = permissions.elements();
-            while (e.hasMoreElements())
-                result.add(e.nextElement());
+            // add in permission to read the cached JAR files
+            for (int i = 0; i < resourcePermissions.size(); i++) {
+                result.add(resourcePermissions.get(i));
+            }
+
+            // add in the permissions that the user granted.
+            for (int i = 0; i < runtimePermissions.size(); i++) {
+                result.add(runtimePermissions.get(i));
+            }
+
+            return result;
+        } catch (RuntimeException ex) {
+            if (JNLPRuntime.isDebug()) {
+                ex.printStackTrace();
+            }
+            throw ex;
         }
-
-        // add in permission to read the cached JAR files
-        for (int i = 0; i < resourcePermissions.size(); i++)
-            result.add(resourcePermissions.get(i));
-
-        // add in the permissions that the user granted.
-        for (int i = 0; i < runtimePermissions.size(); i++)
-            result.add(runtimePermissions.get(i));
-
-        return result;
     }
 
     protected void addPermission(Permission p) {
