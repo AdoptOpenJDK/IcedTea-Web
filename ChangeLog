@@ -1,3 +1,10 @@
+2012-05-23  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed error in reproducers source preparation
+	* Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp) removed
+	inappropriately used quotes when copying notSrcFiles. Source files now
+	copied only if src dir exists in reproducer
+
 2012-05-22  Adam Domurad  <adomurad@redhat.com>
 
         Changed allocation of small, fixed-size buffers to stack-based 

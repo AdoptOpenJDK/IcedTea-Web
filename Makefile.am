@@ -508,22 +508,24 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    echo "processing: $$dir" ; \
 	    mkdir -p "$(JNLP_TESTS_DIR)/$$dir" ; \
-	    d=`pwd` ; \
-	    cd "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/" ; \
-	    srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
-	    notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
-	    $(BOOT_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar -d "$(JNLP_TESTS_DIR)/$$dir/" $$srcFiles ; \
-	    if [ -n "$$notSrcFiles" ] ; then \
-	      cp -R --parents "$$notSrcFiles" "$(JNLP_TESTS_DIR)/$$dir/" ; \
-	    fi ; \
-	    cd "$(JNLP_TESTS_DIR)/$$dir/" ; \
-	    if [ -f $(META_MANIFEST) ]; \
-	    then \
-	      $(BOOT_DIR)/bin/jar cfm "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" $(META_MANIFEST) * ; \
-	    else \
-	      $(BOOT_DIR)/bin/jar cf "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" * ; \
+	    if [ -e "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/" ]; then \
+	      d=`pwd` ; \
+	      cd "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/" ; \
+	      srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
+	      notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
+	      $(BOOT_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar -d "$(JNLP_TESTS_DIR)/$$dir/" $$srcFiles ; \
+	      if [ -n "$$notSrcFiles" ] ; then \
+	        cp -R --parents $$notSrcFiles "$(JNLP_TESTS_DIR)/$$dir/" ; \
+	      fi ; \
+	      cd "$(JNLP_TESTS_DIR)/$$dir/" ; \
+	      if [ -f $(META_MANIFEST) ]; \
+	      then \
+	        $(BOOT_DIR)/bin/jar cfm "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" $(META_MANIFEST) * ; \
+	      else \
+	        $(BOOT_DIR)/bin/jar cf "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" * ; \
+	      fi; \
+	      cd "$$d" ; \
 	    fi; \
-	    cd "$$d" ; \
 	    cp -R "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/resources/"*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
 	  done ; \
 	done ; \
