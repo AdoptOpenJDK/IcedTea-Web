@@ -47,7 +47,9 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -74,6 +76,8 @@ public final class KeyStores {
         JSSE_CA_CERTS,
         CLIENT_CERTS,
     }
+
+    public static final Map<Integer,String> keystoresPaths=new HashMap<Integer, String>();
 
     private static DeploymentConfiguration config = null;
 
@@ -133,10 +137,21 @@ public final class KeyStores {
         KeyStore ks = null;
         try {
             ks = createKeyStoreFromFile(new File(location), create, DEFAULT_PASSWORD);
+            //hashcode is used instead of instance so when no references are left
+            //to keystore, then this will not be blocker for garbage collection
+            keystoresPaths.put(ks.hashCode(),location);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return ks;
+    }
+
+    public static String getPathToKeystore(int k) {
+        String s = keystoresPaths.get(k);
+        if (s == null) {
+            return "unknown keystore location";
+        }
+        return s;
     }
 
     /**

@@ -1754,7 +1754,12 @@ public class JNLPClassLoader extends URLClassLoader {
      */
 
     protected SecurityDesc getCodeSourceSecurity(URL source) {
-        return jarLocationSecurityMap.get(source);
+        SecurityDesc sec=jarLocationSecurityMap.get(source);
+        if (sec == null){
+            System.out.println(Translator.R("LNoSecInstance",source.toString()));
+        }
+        return sec;
+
     }
 
     /**

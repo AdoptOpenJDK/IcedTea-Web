@@ -60,6 +60,7 @@ import java.util.Enumeration;
 import java.util.Random;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
 import sun.security.provider.X509Factory;
 
@@ -173,7 +174,7 @@ public class CertificateUtils {
 
                     if (c.equals(keyStores[i].getCertificate(alias))) {
                         if (JNLPRuntime.isDebug()) {
-                            System.out.println(c.getSubjectX500Principal().getName() + " found in cacerts");
+                            System.out.println(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStores[i].hashCode())));
                         }
 
                         return true;
