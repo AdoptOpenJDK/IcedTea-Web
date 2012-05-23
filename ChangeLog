@@ -1,5 +1,16 @@
 2012-05-23  Jiri Vanek  <jvanek@redhat.com>
 
+	Enhanced about dialog
+	* extra/net/sourceforge/javaws/about/Main.java: Main frame and Main tab
+	renamed from "About NetX" to "About IcedTea-Web and NetX".
+	* extra/net/sourceforge/javaws/about/resources/about.html: mentioned 
+	IcedTea-Web.
+	* extra/net/sourceforge/javaws/about/resources/notes.html: List of authors
+	synchronized with AUTHORS, mentioned classpath's IcedTea-Web as homepage
+	of IcedTea-web.
+
+2012-05-23  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed error in reproducers source preparation
 	* Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp) removed
 	inappropriately used quotes when copying notSrcFiles. Source files now

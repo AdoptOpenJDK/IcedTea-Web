@@ -66,7 +66,7 @@ public class Main extends JPanel  {
 		
 		tabbedPane = new JTabbedPane();
 
-		tabbedPane.add("About NetX", aboutPanel);
+		tabbedPane.add("About IcedTea-Web and NetX", aboutPanel);
 		tabbedPane.add("Applications", appsPanel);
 		tabbedPane.add("Notes", notesPanel);
 		
@@ -81,7 +81,7 @@ public class Main extends JPanel  {
 		} catch (Exception e) {	
 		}
 		
-		JFrame frame = new JFrame("About NetX");
+		JFrame frame = new JFrame("About IcedTea-Web and NetX");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		Main demo = null;
 		try {
