@@ -427,7 +427,7 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
   goto cleanup_done;
 
  cleanup_appletviewer_mutex:
-  g_free (data->appletviewer_mutex);
+  g_mutex_free (data->appletviewer_mutex);
   data->appletviewer_mutex = NULL;
 
   // cleanup_instance_string:
@@ -2000,7 +2000,7 @@ plugin_data_destroy (NPP instance)
   tofree->window_width = 0;
 
   // cleanup_appletviewer_mutex:
-  g_free (tofree->appletviewer_mutex);
+  g_mutex_free (tofree->appletviewer_mutex);
   tofree->appletviewer_mutex = NULL;
 
   // cleanup_instance_string:

@@ -1,3 +1,9 @@
+2012-05-23  Martin Olsson  <martin@minimum.se>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc:
+	Use g_mutex_free instead of g_free to free appletviewer_mutex (fixes
+	crash).
+
 2012-05-23  Deepak Bhole <dbhole@redhat.com>
 
 	* ChangeLog: Converted spaces to tabs in an older entry
