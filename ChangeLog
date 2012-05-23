@@ -1,3 +1,7 @@
+2012-05-23  Deepak Bhole <dbhole@redhat.com>
+
+	* ChangeLog: Converted spaces to tabs in an older entry
+
 2012-05-23  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: fixed error
@@ -44,15 +48,15 @@
 
 2012-05-22  Adam Domurad  <adomurad@redhat.com>
 
-        Changed allocation of small, fixed-size buffers to stack-based 
-        allocations. Changed occurences of sprintf to the safer function
-        snprintf, added buffer information. While unlikely to change
-        functionality, snprintf adds an extra check to prevent buffer
-        overflows.
-        * plugin/icedteanp/IcedTeaNPPlugin.cc: Allocation of small buffers 
-        using malloc changed to stack allocation & changed sprintf calls to 
-        buffer-size aware snprintf calls. 
-        * plugin/icedteanp/IcedTeaPluginUtils.cc: Same as above.
+	Changed allocation of small, fixed-size buffers to stack-based
+	allocations. Changed occurences of sprintf to the safer function
+	snprintf, added buffer information. While unlikely to change
+	functionality, snprintf adds an extra check to prevent buffer
+	overflows.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Allocation of small buffers
+	using malloc changed to stack allocation & changed sprintf calls to
+	buffer-size aware snprintf calls.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Same as above.
 
 2012-05-22  Jiri Vanek  <jvanek@redhat.com>
 
