@@ -1,3 +1,12 @@
+2012-05-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Reproducers engine enhanced for jars in subdirectories by "." naming convention
+	* Makefile.am: (stamps/change-dots-to-paths.stamp) new target to copy jars
+	with dots (.jar omitted) to the java-like package/directory structure in
+	jnlp_test_server
+	(EXPORTED_TEST_CERT) now depends on  stamps/change-dots-to-paths.stamp
+	(clean-netx-dist-tests) removes stamps/change-dots-to-paths.stamp too. 
+
 2012-05-24  Jiri Vanek  <jvanek@redhat.com>
 
 	Introduced whitelist for reproducers

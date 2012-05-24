@@ -545,8 +545,40 @@ stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepa
  	mkdir -p stamps && \
  	touch $@
 
+stamps/change-dots-to-paths.stamp: stamps/netx-dist-tests-sign-some-reproducers.stamp
+	pushd  $(JNLP_TESTS_SERVER_DEPLOYDIR); \
+	types=(simple signed); \
+	for which in "$${types[@]}" ; do \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
+	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
+	  for dir in "$${simpleReproducers[@]}" ; do \
+	    if test "$${dir:0:1}" = "." ; then \
+	      echo "reproducer $$dir starts with dot. It is forbidden" ; \
+	      exit 5; \
+	    fi; \
+	    if test "$${dir:(-1)}" = "." ; then \
+	      echo "reproducer $$dir ends with dot. It is forbidden" ; \
+	      exit 5; \
+	    fi; \
+	    q=`expr index "$$dir" .`; \
+	    r=$$? ; \
+	    if [ $$r = 0  ]; then \
+	      slashed_dir="./$${dir//.//}" ; \
+	      path="`dirname $$slashed_dir`" ; \
+	      file="`basename $$slashed_dir`.jar" ; \
+	      echo "copying $$dir.jar to $$path as $$file" ; \
+	      mkdir --parents $$path ; \
+	      cp $$dir".jar" "$$path"/"$$file" ; \
+	    fi ; \
+	  done ; \
+	done ; \
+	popd ; \
+	mkdir -p stamps && \
+	touch $@
+
 #this always tries to remove  previous testcert
-$(EXPORTED_TEST_CERT): stamps/netx-dist-tests-sign-some-reproducers.stamp netx-dist-tests-remove-cert-from-public
+$(EXPORTED_TEST_CERT): stamps/change-dots-to-paths.stamp netx-dist-tests-remove-cert-from-public
 	keytool -export -alias $(TEST_CERT_ALIAS) -file $(EXPORTED_TEST_CERT) -storepass $(PRIVATE_KEYSTORE_PASS) -keystore $(PRIVATE_KEYSTORE_NAME) 
 
 stamps/netx-dist-tests-import-cert-to-public: $(EXPORTED_TEST_CERT)
@@ -970,6 +1002,7 @@ clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-publ
 	rm -f stamps/netx-dist-tests-prepare-reproducers.stamp
 	rm -f stamps/netx-dist-tests-compile-testcases.stamp
 	rm -f stamps/netx-dist-tests-sign-some-reproducers.stamp
+	rm -f stamps/change-dots-to-paths.stamp
 	rm -f junit-jnlp-dist-simple.txt
 	rm -f junit-jnlp-dist-signed.txt
 	rm -f $(REPRODUCERS_CLASS_NAMES)
