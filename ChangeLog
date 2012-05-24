@@ -1,3 +1,8 @@
+2012-05-23  Martin Olsson <martin@minimum.se>
+
+       * plugin/icedteanp/IcedTeaPluginUtils.cc:
+       Tiny fixup for changeset 383; don't do free(stack_variable).
+
 2012-05-20  Jiri Vanek  <jvanek@redhat.com>
 
 	Reproducers engine enhanced for jars in subdirectories by "." naming convention

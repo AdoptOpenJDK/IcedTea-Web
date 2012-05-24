@@ -707,7 +707,6 @@ IcedTeaPluginUtilities::NPVariantToString(NPVariant variant, std::string* result
     }
     else if (NPVARIANT_IS_STRING(variant))
     {
-    	free(str);
 #if MOZILLA_VERSION_COLLAPSED < 1090200
     	size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).utf8length;
     	largestr = (char*) malloc(buffersize);
