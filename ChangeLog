@@ -1,7 +1,7 @@
 2012-05-23  Martin Olsson <martin@minimum.se>
 
-       * plugin/icedteanp/IcedTeaPluginUtils.cc:
-       Tiny fixup for changeset 383; don't do free(stack_variable).
+	* plugin/icedteanp/IcedTeaPluginUtils.cc:
+	Tiny fixup for changeset 383; don't do free(stack_variable).
 
 2012-05-20  Jiri Vanek  <jvanek@redhat.com>
 
@@ -23,6 +23,7 @@
 	If there is no match, will not be included. 
 
 2012-05-24  Martin Olsson <martin@minimum.se>
+	
 	* plugin/icedteanp/IcedTeaPluginUtils.cc:
 	Fix two typos.
 
