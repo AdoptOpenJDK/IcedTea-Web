@@ -289,7 +289,7 @@ IcedTeaPluginUtilities::freeStringPtrVector(std::vector<std::string*>* v)
  *
  * @param str The string to split
  * @param The delimiters to split on
- * @return A string vector containing the split components
+ * @return A string vector containing the aplit components
  */
 
 std::vector<std::string*>*
@@ -1068,7 +1068,7 @@ MessageBus::MessageBus()
 	if(ret)
 		PLUGIN_DEBUG("Error: Unable to initialize message queue mutex: %d\n", ret);
 
-	PLUGIN_DEBUG("Mutexes %p and %p initialized\n", &subscriber_mutex, &msg_queue_mutex);
+	PLUGIN_DEBUG("Mutexs %p and %p initialized\n", &subscriber_mutex, &msg_queue_mutex);
 }
 
 /**

@@ -1,6 +1,42 @@
-2012-05-24  Martin Olsson <martin@minimum.se>
-	* plugin/icedteanp/IcedTeaPluginUtils.cc:
-	Fix two typos.
+2012-05-23  Deepak Bhole <dbhole@redhat.com>
+
+	* AUTHORS: Added Martin Olsson to list.
+
+2012-05-23  Martin Olsson  <martin@minimum.se>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc:
+	Use g_mutex_free instead of g_free to free appletviewer_mutex (fixes
+	crash).
+
+2012-05-23  Deepak Bhole <dbhole@redhat.com>
+
+	* ChangeLog: Converted spaces to tabs in an older entry
+
+2012-05-23  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: fixed error
+	in PBadNonrelativeUrl 
+
+2012-05-23 Jiri Vanek  <jvanek@redhat.com>
+
+	Added more debugging outputs
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(getCodeSourceSecurity): added output message when no SecurityDesc is found
+	for some url/resource
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added LNoSecInstance
+	and LCertFoundIn values
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: (getPathToKeystore):
+	new method, able to search for file used for creating of KeyStore if possible
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java: (inKeyStores)
+	using getPathToKeystore for debug output
+
+2012-05-23  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (getPermissions):
+	Any exception from this method is consumed somewhere. I have cough exception,
+	reprint it in debug mode and re-throw (to be lost). Main condition in this
+	method had several possible NullPointer exceptions. Separated and thrown before
+	this condition.
 
 2012-05-23  Jiri Vanek  <jvanek@redhat.com>
 
@@ -22,15 +58,15 @@
 
 2012-05-22  Adam Domurad  <adomurad@redhat.com>
 
-        Changed allocation of small, fixed-size buffers to stack-based 
-        allocations. Changed occurences of sprintf to the safer function
-        snprintf, added buffer information. While unlikely to change
-        functionality, snprintf adds an extra check to prevent buffer
-        overflows.
-        * plugin/icedteanp/IcedTeaNPPlugin.cc: Allocation of small buffers 
-        using malloc changed to stack allocation & changed sprintf calls to 
-        buffer-size aware snprintf calls. 
-        * plugin/icedteanp/IcedTeaPluginUtils.cc: Same as above.
+	Changed allocation of small, fixed-size buffers to stack-based
+	allocations. Changed occurences of sprintf to the safer function
+	snprintf, added buffer information. While unlikely to change
+	functionality, snprintf adds an extra check to prevent buffer
+	overflows.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Allocation of small buffers
+	using malloc changed to stack allocation & changed sprintf calls to
+	buffer-size aware snprintf calls.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Same as above.
 
 2012-05-22  Jiri Vanek  <jvanek@redhat.com>
 
