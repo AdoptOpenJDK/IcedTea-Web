@@ -58,14 +58,14 @@
 
 2012-05-22  Adam Domurad  <adomurad@redhat.com>
 
-	Changed allocation of small, fixed-size buffers to stack-based
+	Changed allocation of small, fixed-size buffers to stack-based 
 	allocations. Changed occurences of sprintf to the safer function
 	snprintf, added buffer information. While unlikely to change
 	functionality, snprintf adds an extra check to prevent buffer
 	overflows.
-	* plugin/icedteanp/IcedTeaNPPlugin.cc: Allocation of small buffers
-	using malloc changed to stack allocation & changed sprintf calls to
-	buffer-size aware snprintf calls.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Allocation of small buffers 
+	using malloc changed to stack allocation & changed sprintf calls to 
+	buffer-size aware snprintf calls. 
 	* plugin/icedteanp/IcedTeaPluginUtils.cc: Same as above.
 
 2012-05-22  Jiri Vanek  <jvanek@redhat.com>
