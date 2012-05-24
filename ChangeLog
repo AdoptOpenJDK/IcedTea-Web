@@ -1,3 +1,13 @@
+2012-05-24  Jiri Vanek  <jvanek@redhat.com>
+
+	Introduced whitelist for reproducers
+	* netx-dist-tests-whitelist: new file, contains regular expressions
+	(separated by space) for expr to select testcases which only will be
+	run. By default set to all by expression .*
+	* Makefile.am: (REPRODUCERS_CLASS_NAMES) When class with testcases is
+	going to be included in list, it is at first check for match in whitelist.
+	If there is no match, will not be included. 
+
 2012-05-24  Martin Olsson <martin@minimum.se>
 	* plugin/icedteanp/IcedTeaPluginUtils.cc:
 	Fix two typos.

@@ -32,6 +32,7 @@ PUBLIC_KEYSTORE_PASS=changeit
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
 REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
+REPRODUCERS_CLASS_WHITELIST = $(abs_top_builddir)/netx-dist-tests-whitelist
 EMMA_JAVA_ARGS=-Xmx2G
 META_MANIFEST = META-INF/MANIFEST.MF
 
@@ -587,13 +588,27 @@ stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-j
 	mkdir -p stamps && \
 	touch $@
 
-$(REPRODUCERS_CLASS_NAMES):
+$(REPRODUCERS_CLASS_NAMES): $(REPRODUCERS_CLASS_WHITELIST)
+	whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names= ; \
 	for test in `find -type f` ; do \
 	  class_name=`echo $$test | sed -e 's|\.class$$||' -e 's|^\./||'` ; \
 	  class_name=`echo $$class_name | sed -e 's|/|.|g' ` ; \
-	  class_names="$$class_names $$class_name" ; \
+	  INLCUDE="NO" ; \
+	  for x in $$whiteListed ; do \
+	    q=`expr match "$$class_name" "$$x"`; \
+	    r=$$? ; \
+	    if [ $$r = 0  ]; then \
+	      echo "$$class_name will be included in reproducers testcases because of $$x pattern in $(REPRODUCERS_CLASS_WHITELIST). Matching was  $$q"; \
+	      INLCUDE="YES" ; \
+	    fi; \
+	  done; \
+	  if [ "$$INLCUDE" = "YES"  ]; then \
+	    class_names="$$class_names $$class_name" ; \
+	  else \
+	    echo "$$class_name had no match in $(REPRODUCERS_CLASS_WHITELIST). Excluding"; \
+	  fi; \
 	done ; \
 	echo $$class_names > $(REPRODUCERS_CLASS_NAMES)
 
