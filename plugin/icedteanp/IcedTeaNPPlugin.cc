@@ -1227,9 +1227,9 @@ void consume_message(gchar* message) {
         {
 
           // clear the "instance X status" parts
-          snprintf(parts[0], sizeof(""), "");
-          snprintf(parts[1], sizeof(""), "");
-          snprintf(parts[2], sizeof(""), "");
+          strcpy(parts[0], "");
+          strcpy(parts[1], "");
+          strcpy(parts[2], "");
 
           // join the rest
           gchar* status_message = g_strjoinv(" ", parts);

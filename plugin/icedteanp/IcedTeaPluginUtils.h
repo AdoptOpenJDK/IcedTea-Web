@@ -96,6 +96,10 @@ exception statement from your version. */
      (*c >= 'a' && *c <= 'f') || \
      (*c >= 'A' && *c <= 'F'))
 
+//long long max ~ 19 chars + terminator
+//leave some room for converting strings like "<var> = %d"
+const size_t NUM_STR_BUFFER_SIZE = 32;
+
 /*
  * This struct holds data specific to a Java operation requested by the plugin
  */

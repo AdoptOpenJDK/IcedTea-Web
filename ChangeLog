@@ -1,3 +1,16 @@
+2012-05-23  Adam Domurad  <adomurad@redhat.com>
+	Removed instances of snprintf where buffer size was not known. Added
+	buffer size constant for allocating buffers for numeric conversions.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Removed usage of snprintf for
+	simple blanking of strings. Buffer size was misguided previously.
+	Used NUM_STR_BUFFER_SIZE constant to replace magic numbers/
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Made
+	NPVariantToString(NPVariant variant, std::string* result) use two
+	space indentation. Used NUM_STR_BUFFER_SIZE constant to replace magic
+	numbers.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: Added constant,
+	NUM_STR_BUFFER_SIZE.
+
 2012-05-24  Danesh Dadachanji <ddadacha@redhat.com>
 
 	Fix use of src dir instead of build dir when whitelisting.
