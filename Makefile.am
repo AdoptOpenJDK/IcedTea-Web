@@ -32,7 +32,7 @@ PUBLIC_KEYSTORE_PASS=changeit
 JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
 REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
-REPRODUCERS_CLASS_WHITELIST = $(abs_top_builddir)/netx-dist-tests-whitelist
+REPRODUCERS_CLASS_WHITELIST = $(abs_top_srcdir)/netx-dist-tests-whitelist
 EMMA_JAVA_ARGS=-Xmx2G
 META_MANIFEST = META-INF/MANIFEST.MF
 

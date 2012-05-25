@@ -1,3 +1,9 @@
+2012-05-24  Danesh Dadachanji <ddadacha@redhat.com>
+
+	Fix use of src dir instead of build dir when whitelisting.
+	* Makefile.am (REPRODUCERS_CLASS_WHITELIST): Use abs_top_srcdir
+	instead of abs_top_builddir.
+
 2012-05-23  Martin Olsson <martin@minimum.se>
 
 	* plugin/icedteanp/IcedTeaPluginUtils.cc:
