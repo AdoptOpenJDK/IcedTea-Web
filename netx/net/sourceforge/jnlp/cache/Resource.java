@@ -272,8 +272,7 @@ public class Resource {
             send = trackers.hardList();
         }
 
-        for (int i = 0; i < send.size(); i++) {
-            ResourceTracker rt = send.get(i);
+        for (ResourceTracker rt : send) {
             rt.fireDownloadEvent(this);
         }
     }

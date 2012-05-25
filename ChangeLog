@@ -1,3 +1,21 @@
+2012-05-25  Adam Domurad <adomurad@redhat.com>
+
+	Changed for-loops over iterators and indices to for-each loops if they
+	were sufficient and clearer.
+	* netx/net/sourceforge/jnlp/JNLPFile.java: Changed for-loops that could
+	be expressed more clearly as for-each loops.
+	* netx/net/sourceforge/jnlp/PluginBridge.java: Same
+	* netx/net/sourceforge/jnlp/ResourcesDesc.java: Same
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: Same
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java: Same
+	* netx/net/sourceforge/jnlp/cache/Resource.java: Same
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: Same
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: Same
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: Same
+	* plugin/icedteanp/java/netscape/javascript/JSObject.java: Same
+	* plugin/icedteanp/java/sun/applet/JavaConsole.java: Same
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: Same
+
 2012-05-23  Adam Domurad  <adomurad@redhat.com>
 	Removed instances of snprintf where buffer size was not known. Added
 	buffer size constant for allocating buffers for numeric conversions.

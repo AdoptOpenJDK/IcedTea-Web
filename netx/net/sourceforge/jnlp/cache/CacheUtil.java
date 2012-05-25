@@ -500,9 +500,9 @@ public class CacheUtil {
 
             // only resources not starting out downloaded are displayed
             List<URL> urlList = new ArrayList<URL>();
-            for (int i = 0; i < resources.length; i++) {
-                if (!tracker.checkResource(resources[i]))
-                    urlList.add(resources[i]);
+            for (URL url : resources) {
+                if (!tracker.checkResource(url))
+                    urlList.add(url);
             }
             URL undownloaded[] = urlList.toArray(new URL[urlList.size()]);
 
@@ -512,28 +512,29 @@ public class CacheUtil {
                 long read = 0;
                 long total = 0;
 
-                for (int i = 0; i < undownloaded.length; i++) {
+                for (URL url : undownloaded) {
                     // add in any -1's; they're insignificant
-                    total += tracker.getTotalSize(undownloaded[i]);
-                    read += tracker.getAmountRead(undownloaded[i]);
+                    total += tracker.getTotalSize(url);
+                    read += tracker.getAmountRead(url);
                 }
 
                 int percent = (int) ((100 * read) / Math.max(1, total));
 
-                for (int i = 0; i < undownloaded.length; i++)
-                    listener.progress(undownloaded[i], "version",
-                                      tracker.getAmountRead(undownloaded[i]),
-                                      tracker.getTotalSize(undownloaded[i]),
+                for (URL url : undownloaded) {
+                    listener.progress(url, "version",
+                                      tracker.getAmountRead(url),
+                                      tracker.getTotalSize(url),
                                       percent);
+                }
             } while (!tracker.waitForResources(resources, indicator.getUpdateRate()));
 
             // make sure they read 100% until indicator closes
-            for (int i = 0; i < undownloaded.length; i++)
-                listener.progress(undownloaded[i], "version",
-                                  tracker.getTotalSize(undownloaded[i]),
-                                  tracker.getTotalSize(undownloaded[i]),
+            for (URL url : undownloaded) {
+                listener.progress(url, "version",
+                                  tracker.getTotalSize(url),
+                                  tracker.getTotalSize(url),
                                   100);
-
+            }
         } catch (InterruptedException ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();

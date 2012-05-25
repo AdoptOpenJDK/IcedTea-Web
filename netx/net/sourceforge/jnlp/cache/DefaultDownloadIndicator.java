@@ -106,9 +106,11 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                 frame.getContentPane().setLayout(new GridBagLayout());
             }
 
-            if (resources != null)
-                for (int i = 0; i < resources.length; i++)
-                    result.addProgressPanel(resources[i], null);
+            if (resources != null) {
+                for (URL url : resources) {
+                    result.addProgressPanel(url, null);
+                }
+            }
 
             frame.getContentPane().add(result, vertical);
             frame.pack();

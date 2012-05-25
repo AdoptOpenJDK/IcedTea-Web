@@ -204,9 +204,7 @@ public class PluginBridge extends JNLPFile {
                         List<JARDesc> jarDescs = new ArrayList<JARDesc>();
                         jarDescs.addAll(sharedResources.getResources(JARDesc.class));
 
-                        Iterator<String> it = jars.iterator();
-                        while(it.hasNext()) {
-                            String name = it.next();
+                        for (String name : jars) {
                             if (name.length() > 0)
                                 jarDescs.add(new JARDesc(new URL(codeBase, name),
                                         null, null, false, true, false, true));

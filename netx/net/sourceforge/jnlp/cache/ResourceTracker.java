@@ -331,13 +331,13 @@ public class ResourceTracker {
         }
 
         DownloadEvent event = new DownloadEvent(this, resource);
-        for (int i = 0; i < l.length; i++) {
+        for (DownloadListener dl : l) {
             if (0 != ((ERROR | DOWNLOADED) & status))
-                l[i].downloadCompleted(event);
+                dl.downloadCompleted(event);
             else if (0 != (DOWNLOADING & status))
-                l[i].downloadStarted(event);
+                dl.downloadStarted(event);
             else if (0 != (CONNECTING & status))
-                l[i].updateStarted(event);
+                dl.updateStarted(event);
         }
     }
 
@@ -449,8 +449,9 @@ public class ResourceTracker {
 
         synchronized (resources) {
             // keep the lock so getResource doesn't have to aquire it each time
-            for (int i = 0; i < urls.length; i++)
+            for (int i = 0; i < urls.length; i++) {
                 resources[i] = getResource(urls[i]);
+            }
         }
 
         if (resources.length > 0)
@@ -868,8 +869,7 @@ public class ResourceTracker {
                     resource.toString() + " : " + urls);
         }
         URL bestUrl = null;
-        for (int i = 0; i < urls.size(); i++) {
-            URL url = urls.get(i);
+        for (URL url : urls) {
             try {
                 URLConnection connection = url.openConnection();
                 connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
@@ -999,8 +999,7 @@ public class ResourceTracker {
         Resource result = null;
         int score = Integer.MAX_VALUE;
 
-        for (int i = 0; i < source.size(); i++) {
-            Resource resource = source.get(i);
+        for (Resource resource : source) {
             boolean selectable = false;
 
             synchronized (resource) {
@@ -1011,9 +1010,10 @@ public class ResourceTracker {
             if (selectable) {
                 int activeCount = 0;
 
-                for (int j = 0; j < active.size(); j++)
-                    if (active.get(j) == resource.getTracker())
+                for (ResourceTracker rt : active) {
+                    if (rt == resource.getTracker())
                         activeCount++;
+                }
 
                 // try to spread out the downloads so that a slow host
                 // won't monopolize the downloads
@@ -1034,9 +1034,7 @@ public class ResourceTracker {
      */
     private Resource getResource(URL location) {
         synchronized (resources) {
-            for (int i = 0; i < resources.size(); i++) {
-                Resource resource = resources.get(i);
-
+            for (Resource resource : resources) {
                 if (CacheUtil.urlEquals(resource.location, location))
                     return resource;
             }
@@ -1058,8 +1056,9 @@ public class ResourceTracker {
         long startTime = System.currentTimeMillis();
 
         // start them downloading / connecting in background
-        for (int i = 0; i < resources.length; i++)
-            startResource(resources[i]);
+        for (Resource resource : resources) {
+            startResource(resource);
+        }
 
         // wait for completion
         while (true) {
@@ -1067,11 +1066,11 @@ public class ResourceTracker {
 
             synchronized (lock) {
                 // check for completion
-                for (int i = 0; i < resources.length; i++) {
+                for (Resource resource : resources) {
                     //NetX Deadlocking may be solved by removing this
                     //synch block.
-                    synchronized (resources[i]) {
-                        if (!resources[i].isSet(DOWNLOADED | ERROR)) {
+                    synchronized (resource) {
+                        if (!resource.isSet(DOWNLOADED | ERROR)) {
                             finished = false;
                             break;
                         }

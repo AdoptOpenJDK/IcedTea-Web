@@ -237,27 +237,27 @@ class PluginAppletPanelFactory {
             // ","-separated list.  No error-checking will be done on the list.
             String[] events = eventList.split(",");
 
-            for (int i = 0; i < events.length; i++) {
-                PluginDebug.debug("Adding event to queue: ", events[i]);
-                if (events[i].equals("dispose"))
+            for (String event : events) {
+                PluginDebug.debug("Adding event to queue: ", event);
+                if ("dispose".equals(event))
                     panel.sendEvent(AppletPanel.APPLET_DISPOSE);
-                else if (events[i].equals("load"))
+                else if ("load".equals(event))
                     panel.sendEvent(AppletPanel.APPLET_LOAD);
-                else if (events[i].equals("init"))
+                else if ("init".equals(event))
                     panel.sendEvent(AppletPanel.APPLET_INIT);
-                else if (events[i].equals("start"))
+                else if ("start".equals(event))
                     panel.sendEvent(AppletPanel.APPLET_START);
-                else if (events[i].equals("stop"))
+                else if ("stop".equals(event))
                     panel.sendEvent(AppletPanel.APPLET_STOP);
-                else if (events[i].equals("destroy"))
+                else if ("destroy".equals(event))
                     panel.sendEvent(AppletPanel.APPLET_DESTROY);
-                else if (events[i].equals("quit"))
+                else if ("quit".equals(event))
                     panel.sendEvent(AppletPanel.APPLET_QUIT);
-                else if (events[i].equals("error"))
+                else if ("error".equals(event))
                     panel.sendEvent(AppletPanel.APPLET_ERROR);
                 else
                     // non-fatal error if we get an unrecognized event
-                    PluginDebug.debug("Unrecognized event name: ", events[i]);
+                    PluginDebug.debug("Unrecognized event name: ", event);
             }
 
             while (!panel.emptyEventQueue())

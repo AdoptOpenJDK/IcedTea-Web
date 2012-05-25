@@ -75,9 +75,10 @@ public class ResourcesDesc {
     public JARDesc getMainJAR() {
         JARDesc jars[] = getJARs();
 
-        for (int i = 0; i < jars.length; i++)
-            if (jars[i].isMain())
-                return jars[i];
+        for (JARDesc jar : jars) {
+            if (jar.isMain())
+                return jar;
+        }
 
         if (jars.length > 0)
             return jars[0];
@@ -160,8 +161,7 @@ public class ResourcesDesc {
     public Map<String, String> getPropertiesMap() {
         Map<String, String> properties = new HashMap<String, String>();
         List<PropertyDesc> resources = getResources(PropertyDesc.class);
-        for (int i = 0; i < resources.size(); i++) {
-            PropertyDesc prop = resources.get(i);
+        for (PropertyDesc prop : resources) {
             properties.put(prop.getKey(), prop.getValue());
         }
 
@@ -205,9 +205,10 @@ public class ResourcesDesc {
     public <T> List<T> getResources(Class<T> type) {
         List<T> result = new ArrayList<T>();
 
-        for (int i = 0; i < resources.size(); i++)
-            if (type.isAssignableFrom(resources.get(i).getClass()))
-                result.add(type.cast(resources.get(i)));
+        for (Object resource : resources) {
+            if (type.isAssignableFrom(resource.getClass()))
+                result.add(type.cast(resource));
+        }
 
         return result;
     }

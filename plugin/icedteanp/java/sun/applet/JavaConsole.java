@@ -308,8 +308,8 @@ public class JavaConsole {
 
         boolean toShowConsole = false;
 
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] == "--show-console") {
+        for (String arg : args) {
+            if ("--show-console".equals(arg)) {
                 toShowConsole = true;
             }
         }

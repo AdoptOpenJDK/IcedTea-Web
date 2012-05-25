@@ -116,8 +116,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
         destroyed = true;
 
         List<AppletAudioClip> clips = weakClips.hardList();
-        for (int i = 0; i < clips.size(); i++) {
-            clips.get(i).dispose();
+        for (AppletAudioClip clip : clips) {
+            clip.dispose();
         }
     }
 

@@ -396,9 +396,7 @@ public class JNLPFile {
             public <T> List<T> getResources(Class<T> launchType) {
                 List<T> result = new ArrayList<T>();
 
-                for (int i = 0; i < resources.size(); i++) {
-                    ResourcesDesc rescDesc = resources.get(i);
-
+                for (ResourcesDesc rescDesc : resources) {
                     if (localMatches(locale, rescDesc.getLocales())
                             && stringMatches(os, rescDesc.getOS())
                             && stringMatches(arch, rescDesc.getArch()))

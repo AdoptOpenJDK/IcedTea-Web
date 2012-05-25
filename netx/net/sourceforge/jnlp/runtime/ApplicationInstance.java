@@ -231,8 +231,8 @@ public class ApplicationInstance {
 
         PrivilegedAction<Object> installProps = new PrivilegedAction<Object>() {
             public Object run() {
-                for (int i = 0; i < props.length; i++) {
-                    System.setProperty(props[i].getKey(), props[i].getValue());
+                for (PropertyDesc propDesc : props) {
+                    System.setProperty(propDesc.getKey(), propDesc.getValue());
                 }
 
                 return null;
@@ -272,8 +272,7 @@ public class ApplicationInstance {
 
         try {
             // destroy resources
-            for (int i = 0; i < weakWindows.size(); i++) {
-                Window w = weakWindows.get(i);
+            for (Window w : weakWindows) {
                 if (w != null)
                     w.dispose();
             }
