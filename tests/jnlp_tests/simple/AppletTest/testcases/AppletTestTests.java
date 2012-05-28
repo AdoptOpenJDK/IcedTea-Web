@@ -47,11 +47,7 @@ public class AppletTestTests {
 
     @Test
     public void AppletTest() throws Exception {
-        System.out.println("connecting AppletTest request");
-        System.err.println("connecting AppletTest request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/AppletTest.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         evaluateApplet(pr);
         Assert.assertFalse(pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
@@ -78,13 +74,9 @@ public class AppletTestTests {
 
     @Test
     public void AppletInFirefoxTest() throws Exception {
-        System.out.println("connecting AppletInFirefoxTest request");
-        System.err.println("connecting AppletInFirefoxTest request");
         server.PROCESS_TIMEOUT = 30 * 1000;
         try {
             ServerAccess.ProcessResult pr = server.executeBrowser("/appletAutoTests.html");
-            System.out.println(pr.stdout);
-            System.err.println(pr.stderr);
             pr.process.destroy();
             evaluateApplet(pr);
             Assert.assertTrue(pr.wasTerminated);

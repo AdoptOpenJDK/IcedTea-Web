@@ -40,6 +40,7 @@ package net.sourceforge.jnlp.cache;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import net.sourceforge.jnlp.ServerAccess;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -90,7 +91,7 @@ public class CacheLRUWrapperTest {
         }
         
         double avg = sum / time.length;
-        System.err.println("Average = " + avg + "ns");
+        ServerAccess.logErrorReprint("Average = " + avg + "ns");
 
         // wait more than 100 microseconds for noLoops = 1000 and noEntries=1000 is bad
         assertTrue("load() must not take longer than 100 µs, but took in avg " + avg/1000 + "µs", avg < 100 * 1000);

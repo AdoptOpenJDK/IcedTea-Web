@@ -116,6 +116,10 @@ public class ServerAccess {
      * all terminated processes are stored here. As wee need to 'wait' to termination to be finished.
      */
     private static Set<Thread> terminated = new HashSet<Thread>();
+    /**
+     * this flag is indicating whether output of executeProcess should be logged. By default true.
+     */
+    public static boolean PROCESS_LOG = true;
 
     /**
      * main method of this class prints out random free port
@@ -720,9 +724,87 @@ public class ServerAccess {
         return executeProcess(args, dir, null, null);
     }
 
-     public static ProcessResult executeProcess(final List<String> args,File dir,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+    private static String createConnectionMessage(ThreadedProcess t) {
+        return "Connecting " + t.getCommandLine();
+    }
 
-        ThreadedProcess t = new ThreadedProcess(args,dir);
+    /**
+     * Proceed message s to logging with request to reprint to System.err
+     * @param s
+     */
+    public static void logErrorReprint(String s) {
+        log(s, false, true);
+    }
+
+    /**
+     * Proceed message s to logging with request to reprint to System.out
+     * @param s
+     */
+    public static void logOutputReprint(String s) {
+        log(s, true, false);
+    }
+
+    /**
+     * Proceed message s to logging withhout request to reprint
+     * @param s
+     */
+    public static void logNoReprint(String s) {
+        log(s, false, false);
+    }
+
+    private static void log(String message, boolean printToOut, boolean printToErr) {
+        String idded;
+        StackTraceElement ste = getTestMethod();
+        String fullId = ste.getClassName() + "." + ste.getMethodName();
+        if (message.contains("\n")) {
+            idded = fullId + ": \n" + message + "\n" + fullId + " ---";
+        } else {
+            idded = fullId + ": " + message;
+
+        }
+        if (printToOut) {
+            System.out.println(idded);
+        }
+        if (printToErr) {
+            System.err.println(idded);
+        }
+    }
+
+    private static StackTraceElement getTestMethod() {
+        return getTestMethod(Thread.currentThread().getStackTrace());
+    }
+
+    private static StackTraceElement getTestMethod(StackTraceElement[] stack) {
+        //0 is always thread
+        //1 is net.sourceforge.jnlp.ServerAccess
+        StackTraceElement result = stack[1];
+        String baseClass = stack[1].getClassName();
+        int i = 2;
+        for (; i < stack.length; i++) {
+            result = stack[i];//at least moving up
+            if (!baseClass.equals(stack[i].getClassName())) {
+                break;
+            }
+        }
+        //now we are out of net.sourceforge.jnlp.ServerAccess
+        //method we need (the test)  is highest from following class
+        baseClass = stack[i].getClassName();
+        for (; i < stack.length; i++) {
+            if (!baseClass.equals(stack[i].getClassName())) {
+                break;
+            }
+            result = stack[i];
+        }
+
+        return result;
+    }
+
+    public static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+        ThreadedProcess t = new ThreadedProcess(args, dir);
+        if (PROCESS_LOG) {
+            String connectionMesaage = createConnectionMessage(t);
+            log(connectionMesaage, true, true);
+        }
         ProcessAssasin pa = new ProcessAssasin(t, PROCESS_TIMEOUT);
         pa.start();
         t.start();
@@ -753,7 +835,12 @@ public class ServerAccess {
         pa.setCanRun(false);
         // System.out.println(t.getP().exitValue()); when process is killed, this throws exception
 
-        return new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode(), null);
+        ProcessResult pr=new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode(), null);
+        if (PROCESS_LOG) {
+            log(pr.stdout, true, false);
+            log(pr.stderr, false, true);
+        }
+        return pr;
     }
 
     /**

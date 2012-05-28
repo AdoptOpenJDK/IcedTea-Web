@@ -50,8 +50,6 @@ public class MissingJarTest {
     private final List<String> l = Collections.unmodifiableList(Arrays.asList(new String[]{"-Xtrustall"}));
 
     private void evaluateResult(ProcessResult pr) {
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String c = "only fixed classloader can initialize this app";
         Assert.assertTrue("stdout should contains `" + c + "`, but didn't ", pr.stdout.contains(c));
         String cc = "ClassNotFoundException";
@@ -62,32 +60,24 @@ public class MissingJarTest {
 
     @Test
     public void MissingJarTest1() throws Exception {
-        System.out.println("connecting MissingJar1 request");
-        System.err.println("connecting MissingJar1 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar.jnlp");
         evaluateResult(pr);
     }
 
     @Test
     public void MissingJarTest2() throws Exception {
-        System.out.println("connecting MissingJar2 request");
-        System.err.println("connecting MissingJar2 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar2.jnlp");
         evaluateResult(pr);
     }
 
     @Test
     public void MissingJarTest3() throws Exception {
-        System.out.println("connecting MissingJar3 request");
-        System.err.println("connecting MissingJar3 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar3.jnlp");
         evaluateResult(pr);
     }
 
     @Test
     public void MissingJarTest4() throws Exception {
-        System.out.println("connecting MissingJar4 request");
-        System.err.println("connecting MissingJar4 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar4.jnlp");
         evaluateResult(pr);
     }

@@ -258,11 +258,7 @@ public class CacheReproducerTest {
             @Override
             public void run() {
                 try {
-                    System.out.println("connecting deadlocktest request");
-                    System.err.println("connecting deadlocktest request");
                     ServerAccess.ProcessResult pr = server.executeJavawsHeadless(verbosed, "/deadlocktest.jnlp");
-                    System.out.println(pr.stdout);
-                    System.err.println(pr.stderr);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -271,8 +267,6 @@ public class CacheReproducerTest {
         t.start();
         Thread.sleep(1000);
         pr = tryToClearcache();
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String q = "Can not clear cache at this time";
         Assert.assertTrue("Stderr should contain " + q + ", but did not.", pr.stderr.contains(q));
         assertCacheIsNotEmpty();
@@ -338,8 +332,6 @@ public class CacheReproducerTest {
     }
 
     private static void clearAndEvaluateCache(boolean force) throws Exception {
-        System.out.println("clearing cache");
-        System.err.println("clearing cache");
         if (force) {
             if (netxLock.isFile()) {
                 boolean b = netxLock.delete();
@@ -458,11 +450,7 @@ public class CacheReproducerTest {
     }
 
     private static ServerAccess.ProcessResult runSimpleTest1(List<String> args, String s) throws Exception {
-        System.out.println("connecting " + s + " request");
-        System.err.println("connecting " + s + " request");
         ServerAccess.ProcessResult pr2 = server.executeJavawsHeadless(args, "/" + s + ".jnlp");
-        System.out.println(pr2.stdout);
-        System.err.println(pr2.stderr);
         return pr2;
     }
 
@@ -483,8 +471,6 @@ public class CacheReproducerTest {
 
     private static ProcessResult tryToClearcache() throws Exception {
         ServerAccess.ProcessResult pr1 = ServerAccess.executeProcess(clear);
-        System.out.println(pr1.stdout);
-        System.err.println(pr1.stderr);
         return pr1;
     }
 }

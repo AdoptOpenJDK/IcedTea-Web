@@ -45,11 +45,7 @@ public class ReplaceSecurityManagerTest {
 
     @Test
     public void ReplaceSecurityManagerLunch1() throws Exception {
-        System.out.println("connecting ReplaceSecurityManager request");
-        System.err.println("connecting ReplaceSecurityManager request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/ReplaceSecurityManager.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + "setSecurityManager" + ".*";
         Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";

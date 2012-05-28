@@ -46,11 +46,7 @@ public class AddShutdownHookTest {
 
     @Test
     public void AddShutdownHookTestLunch1() throws Exception {
-        System.out.println("connecting AddShutdownHook request");
-        System.err.println("connecting AddShutdownHook request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/AddShutdownHook.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + "shutdownHooks" + ".*";
         Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";

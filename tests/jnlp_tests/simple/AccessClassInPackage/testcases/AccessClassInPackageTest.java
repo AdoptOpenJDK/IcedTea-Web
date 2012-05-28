@@ -101,11 +101,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageJAVAXJNLP() throws Exception {
-        System.out.println("AccessClassInPackageJAVAXJNLP");
-        System.err.println("AccessClassInPackageJAVAXJNLP");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[0]);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         commonPitfall(pr);
         testShouldPass(pr, pass[0]);
         testShouldNOTFail(pr, badExceptions[0]);
@@ -113,11 +109,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSELF() throws Exception {
-        System.out.println("AccessClassInPackageSELF");
-        System.err.println("AccessClassInPackageSELF");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[1]);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         commonPitfall(pr);
         testShouldPass(pr, pass[1]);
         testShouldNOTFail(pr, badExceptions[1]);
@@ -125,11 +117,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageNETSF() throws Exception {
-        System.out.println("AccessClassInPackageNETSF");
-        System.err.println("AccessClassInPackageNETSF");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[2]);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         commonPitfall(pr);
         testShouldFail(pr, badExceptions[2]);
         testShouldNOTPass(pr, pass[2]);
@@ -137,11 +125,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSUNSEC() throws Exception {
-        System.out.println("AccessClassInPackageSUNSEC");
-        System.err.println("AccessClassInPackageSUNSEC");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[3]);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         commonPitfall(pr);
         commonPitfall(pr);
         testShouldFail(pr, badExceptions[3]);
@@ -151,11 +135,7 @@ public class AccessClassInPackageTest {
     //now signed vaiants
     @Test
     public void AccessClassInPackageSignedJAVAXJNLP() throws Exception {
-        System.out.println("AccessClassInPackageSignedJAVAXJNLP");
-        System.err.println("AccessClassInPackageSignedJAVAXJNLP");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[0]);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         commonPitfall(pr);
         testShouldPass(pr, pass[0]);
         testShouldNOTFail(pr, badExceptions[0]);
@@ -163,11 +143,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSignedSELF() throws Exception {
-        System.out.println("AccessClassInPackageSignedSELF");
-        System.err.println("AccessClassInPackageSignedSELF");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[1]);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         commonPitfall(pr);
         testShouldPass(pr, pass[1]);
         testShouldNOTFail(pr, badExceptions[1]);
@@ -175,11 +151,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSignedNETSF() throws Exception {
-        System.out.println("AccessClassInPackageSignedNETSF");
-        System.err.println("AccessClassInPackageSignedNETSF");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[2]);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         commonPitfall(pr);
         testShouldPass(pr, pass[2]);
         testShouldNOTFail(pr, badExceptions[2]);
@@ -187,11 +159,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSignedSUNSEC() throws Exception {
-        System.out.println("AccessClassInPackageSignedSUNSEC");
-        System.err.println("AccessClassInPackageSignedSUNSEC");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[3]);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         commonPitfall(pr);
         testShouldPass(pr, pass[3]);
         testShouldNOTFail(pr, badExceptions[3]);

@@ -1,3 +1,21 @@
+2012-05-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Get rid of repeated sout/serr  in reproducers testcases/unit tests and
+	introduce bottleneck for loging.
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+	(PROCESS_LOG) static flag for enabling/disabling automatic logging of 
+	statically executed processes.
+	(logErrorReprint) (logOutputReprint) (logNoReprint) new methods, to call  
+	logging bottleneck.
+	(log) main logging bottleneck, reprint message to according stream with 
+	calling test-class and test-method as suffix.
+	(getTestMethod) new method to analyze calling test-method.
+	(executeProcess) enhanced for conditional automatic logging of start of
+	process and outputs of process.
+	* /tests/jnlp_tests/*/*/testcases/*.java : and
+	* /tests/netx/unit/**.java: all System.out replaced by ServerAccess.logOutputReprint 
+	and System.err replaced by ServerAccess.logErrorReprint 
+
 2012-05-25  Adam Domurad <adomurad@redhat.com>
 
 	Changed for-loops over iterators and indices to for-each loops if they

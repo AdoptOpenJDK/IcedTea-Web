@@ -53,11 +53,7 @@ public class ReadPropertiesSignedTest {
     @Test
     public void ReadSignedPropertiesWithoutPermissionsWithXtrustAll() throws Exception {
         //no request for permissions
-        System.out.println("connecting ReadPropertiesSigned1 request");
-        System.err.println("connecting ReadPropertiesSigned1 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesSigned1.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         Assert.assertTrue("Stderr should match "+accessMatcher+" but did not",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
@@ -69,11 +65,7 @@ public class ReadPropertiesSignedTest {
     @Test
     public void ReadSignedPropertiesWithPermissionsWithXtrustAll() throws Exception {
         //request for allpermissions
-        System.out.println("connecting ReadPropertiesSigned2 request");
-        System.err.println("connecting ReadPropertiesSigned2 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesSigned2.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         Assert.assertFalse("Stderr should NOT match "+accessMatcher+" but did",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
@@ -84,11 +76,7 @@ public class ReadPropertiesSignedTest {
 
     @Test
     public void EnsureXtrustallNotAffectingUnsignedBehaviour() throws Exception {
-        System.err.println("connecting ReadPropertiesSigned3 request");
-        System.out.println("connecting ReadPropertiesSigned3 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadProperties1.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         Assert.assertTrue("Stderr should match "+accessMatcher+" but did not",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));

@@ -85,11 +85,7 @@ public class ManifestedJar1Test {
      */
     public void manifestedJar1nothing2nothingNoAppDesc() throws Exception {
         String id = "ManifestedJar-1nothing2nothingNoAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertManifestedJar1(id, pr);
         assertNotDead(id, pr);
     }
@@ -101,11 +97,7 @@ public class ManifestedJar1Test {
     @Test
     public void manifestedJar1noAppDesc() throws Exception {
         String id = "ManifestedJar-1noAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertManifestedJar1(id, pr);
         assertNotDead(id, pr);
     }
@@ -117,11 +109,7 @@ public class ManifestedJar1Test {
     @Test
     public void manifestedJar1mainNoAppDesc() throws Exception {
         String id = "ManifestedJar-1mainNoAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertManifestedJar1(id, pr);
         assertNotDead(id, pr);
     }
@@ -133,11 +121,7 @@ public class ManifestedJar1Test {
     @Test
     public void ManifestedJar1mainHaveAppDesc() throws Exception {
         String id = "ManifestedJar-1mainHaveAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertManifestedJar2(id, pr);
         assertNotDead(id, pr);
     }
@@ -149,11 +133,7 @@ public class ManifestedJar1Test {
     @Test
     public void ManifestedJar1main2nothingNoAppDesc() throws Exception {
         String id = "ManifestedJar-1main2nothingNoAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertManifestedJar2(id, pr);
         assertNotDead(id, pr);
     }
@@ -165,11 +145,7 @@ public class ManifestedJar1Test {
     @Test
     public void manifestedJar1main2nothingNoAppDesc() throws Exception {
         String id = "ManifestedJar-1main2nothingNoAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertManifestedJar2(id, pr);
         assertNotDead(id, pr);
     }
@@ -184,11 +160,7 @@ public class ManifestedJar1Test {
     @Test
     public void manifestedJar1main2mainNoAppDesc() throws Exception {
         String id = "ManifestedJar-1main2mainNoAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertManifestedJar1(id, pr);
         assertNotDead(id, pr);
     }
@@ -202,11 +174,7 @@ public class ManifestedJar1Test {
     @Test
     public void manifestedJar1main2mainAppDesc() throws Exception {
         String id = "ManifestedJar-1main2mainAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertNotManifestedJar1(id, pr);
         assertNotManifestedJar2(id, pr);
         assertNotDead(id, pr);
@@ -221,11 +189,7 @@ public class ManifestedJar1Test {
     @Test
     public void manifestedJar1noAppDescAtAll() throws Exception {
         String id = "ManifestedJar-1noAppDescAtAll";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertNotManifestedJar1(id, pr);
         assertNotManifestedJar2(id, pr);
         assertAppError(id, pr);
@@ -244,11 +208,7 @@ public class ManifestedJar1Test {
     @Test
     public void manifestedJar1nothing2nothingAppDesc() throws Exception {
         String id = "ManifestedJar-1nothing2nothingAppDesc";
-        System.out.println("connecting " + id + " request");
-        System.err.println("connecting " + id + " request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertNotManifestedJar2(id, pr);
         assertNotManifestedJar1(id, pr);
         assertNotDead(id, pr);

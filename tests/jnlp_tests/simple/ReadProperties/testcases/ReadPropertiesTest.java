@@ -47,11 +47,7 @@ public class ReadPropertiesTest {
  
     @Test
     public void ReadPropertiesLunch1() throws Exception {
-        System.out.println("connecting ReadProperties1 request");
-        System.err.println("connecting ReadProperties1 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/ReadProperties1.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.util.PropertyPermission.{0,5}" + "user.name.{0,5}read" + ".*";
         Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";
@@ -63,11 +59,7 @@ public class ReadPropertiesTest {
 
     @Test
     public void ReadPropertiesLunch2() throws Exception {
-        System.out.println("connecting ReadProperties2 request");
-        System.err.println("connecting ReadProperties2 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/ReadProperties2.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.util.PropertyPermission.{0,5}" + "user.home.{0,5}read" + ".*";
         Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";

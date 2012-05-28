@@ -47,11 +47,7 @@ public class CheckServicesTests {
 
     @Test
     public void CheckServices() throws Exception {
-        System.out.println("connecting CheckServices request");
-        System.err.println("connecting CheckServices request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/CheckServices.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s0 = "Codebase for applet was found in constructor";
         Assert.assertTrue("CheckServices stdout should contain `" + s0 + "' bud didn't.", pr.stdout.contains(s0));
         String s1 = "Codebase for applet was found in init()";

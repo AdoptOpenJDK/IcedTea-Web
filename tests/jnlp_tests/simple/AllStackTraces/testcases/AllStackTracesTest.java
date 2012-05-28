@@ -48,11 +48,7 @@ public class AllStackTracesTest {
 
     @Test
     public void AllStackTracesTest1() throws Exception {
-        System.out.println("connecting AllStackTraces request");
-        System.err.println("connecting AllStackTraces request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/AllStackTraces.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String c = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + "getStackTrace" + ".*";
         Assert.assertTrue("stderr should match `"+c+"`, but didn't ",pr.stderr.matches(c));
         String cc="ClassNotFoundException";

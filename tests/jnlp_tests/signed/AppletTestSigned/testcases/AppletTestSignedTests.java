@@ -51,11 +51,7 @@ public class AppletTestSignedTests {
 
     @Test
     public void AppletTestSignedTest() throws Exception {
-        System.out.println("connecting AppletTestSigned request");
-        System.err.println("connecting AppletTestSigned request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/AppletTestSigned.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         evaluateSignedApplet(pr);
         Assert.assertFalse(pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
@@ -82,13 +78,9 @@ public class AppletTestSignedTests {
 
     @Test
     public void AppletTestSignedFirefoxTest() throws Exception {
-        System.out.println("connecting AppletTestSigned in firefox request");
-        System.err.println("connecting AppletTestSigned in firefox request");
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
             ServerAccess.ProcessResult pr = server.executeBrowser("/AppletTestSigned.html");
-            System.out.println(pr.stdout);
-            System.err.println(pr.stderr);
             evaluateSignedApplet(pr);
             Assert.assertTrue(pr.wasTerminated);
             //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null

@@ -45,11 +45,7 @@ public class InformationTitleVendorParserTest {
     private static ServerAccess server = new ServerAccess();
 
     public void runTest(String jnlpName, String exceptionMessage) throws Exception {
-        System.out.println("connecting InformationTitleVendorParser request, testing " + jnlpName);
-        System.err.println("connecting InformationTitleVendorParser request, testing " + jnlpName);
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/" + jnlpName + ".jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s1 = "Good simple javaws exapmle";
         Assert.assertFalse("test" + jnlpName + " stdout should not contain " + s1 + " but did.", pr.stdout.contains(s1));
         // Looking for "Could not read or parse the JNLP file. (${DESCRIPTION})"

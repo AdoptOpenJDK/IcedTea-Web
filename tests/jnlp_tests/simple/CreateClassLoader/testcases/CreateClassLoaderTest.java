@@ -46,11 +46,7 @@ public class CreateClassLoaderTest {
 
     @Test
     public void CreateClassLoaderLunch1() throws Exception {
-        System.out.println("connecting CreateClassLoader request");
-        System.err.println("connecting CreateClassLoader request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/CreateClassLoader.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + "createClassLoader" + ".*";
         Assert.assertTrue("Stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";

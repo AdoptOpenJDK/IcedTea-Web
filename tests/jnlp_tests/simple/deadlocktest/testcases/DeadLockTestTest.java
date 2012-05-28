@@ -55,7 +55,7 @@ public class DeadLockTestTest {
 
     @BeforeClass
     public static void printJavas() throws Exception {
-        System.out.println("Currently runnng javas1 " + countJavaInstances());
+        ServerAccess.logOutputReprint("Currently runnng javas1 " + countJavaInstances());
 
     }
 
@@ -71,15 +71,11 @@ public class DeadLockTestTest {
 
     public void testDeadLockTestTerminatedBody(String jnlp) throws Exception {
         List<String> before = countJavaInstances();
-        System.out.println("java1 "+jnlp+" : " + before.size());
-        System.out.println("connecting " + jnlp + " request");
-        System.err.println("connecting " + jnlp + " request");
+        ServerAccess.logOutputReprint("java1 "+jnlp+" : " + before.size());
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, jnlp);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         assertDeadlockTestLaunched(pr);
         List<String> after = countJavaInstances();
-        System.out.println("java2 "+jnlp+" : " + after.size());
+        ServerAccess.logOutputReprint("java2 "+jnlp+" : " + after.size());
         String ss="This process is hanging more than 30s. Should be killed";
         Assert.assertFalse("stdout shoud not contains: "+ss+", but did",pr.stdout.contains(ss));
 //        Assert.assertTrue(pr.stderr.contains("xception"));, exception is thrown by engine,not by application
@@ -87,7 +83,7 @@ public class DeadLockTestTest {
         Assert.assertEquals(null, pr.returnValue);//killed process have no value
         killDiff(before, after);
         List<String> afterKill = countJavaInstances();
-        System.out.println("java3 "+jnlp+" : " + afterKill.size());
+        ServerAccess.logOutputReprint("java3 "+jnlp+" : " + afterKill.size());
         Assert.assertEquals("assert that just old javas remians", 0, (before.size() - afterKill.size()));
     }
 
@@ -99,25 +95,21 @@ public class DeadLockTestTest {
 
     @Test
     public void testSimpletest1lunchFork() throws Exception {
-        System.out.println("connecting " + deadlocktest_1 + " request");
-        System.err.println("connecting " + deadlocktest_1 + " request");
         List<String> before = countJavaInstances();
-        System.out.println("java4: " + before.size());
+        ServerAccess.logOutputReprint("java4: " + before.size());
         BackgroundDeadlock bd = new BackgroundDeadlock(deadlocktest_1, null);
         bd.start();
         Thread.sleep(ServerAccess.PROCESS_TIMEOUT * 2 / 3);
         List<String> during = countJavaInstances();
-        System.out.println("java5: " + during.size());
+        ServerAccess.logOutputReprint("java5: " + during.size());
         waitForBackgroundDeadlock(bd);
         List<String> after = countJavaInstances();
-        System.out.println("java6: " + after.size());
+        ServerAccess.logOutputReprint("java6: " + after.size());
         Assert.assertNotNull("proces inside background deadlock cant be null. It was.", bd.getPr());
-        System.out.println(bd.getPr().stdout);
-        System.err.println(bd.getPr().stderr);
         assertDeadlockTestLaunched(bd.getPr());
         killDiff(before, during);
         List<String> afterKill = countJavaInstances();
-        System.out.println("java66: " + afterKill.size());
+        ServerAccess.logOutputReprint("java66: " + afterKill.size());
         Assert.assertEquals("assert that just old javas remians", 0, (before.size() - afterKill.size()));
         // div by two is caused by jav in java process hierarchy
         Assert.assertEquals("launched JVMs must be exactly 2, was " + (during.size() - before.size()) / 2, 2, (during.size() - before.size()) / 2);
@@ -125,25 +117,21 @@ public class DeadLockTestTest {
 
     @Test
     public void testSimpletest1lunchNoFork() throws Exception {
-        System.out.println("connecting " + deadlocktest_1 + " Xnofork request");
-        System.err.println("connecting " + deadlocktest_1 + " Xnofork request");
         List<String> before = countJavaInstances();
-        System.out.println("java7: " + before.size());
+        ServerAccess.logOutputReprint("java7: " + before.size());
         BackgroundDeadlock bd = new BackgroundDeadlock(deadlocktest_1, Arrays.asList(new String[]{"-Xnofork"}));
         bd.start();
         Thread.sleep(ServerAccess.PROCESS_TIMEOUT * 2 / 3);
         List<String> during = countJavaInstances();
-        System.out.println("java8: " + during.size());
+        ServerAccess.logOutputReprint("java8: " + during.size());
         waitForBackgroundDeadlock(bd);
         List<String> after = countJavaInstances();
-        System.out.println("java9: " + after.size());
+        ServerAccess.logOutputReprint("java9: " + after.size());
         Assert.assertNotNull("proces inside background deadlock cant be null. It was.", bd.getPr());
-        System.out.println(bd.getPr().stdout);
-        System.err.println(bd.getPr().stderr);
         assertDeadlockTestLaunched(bd.getPr());
         killDiff(before, during);
         List<String> afterKill = countJavaInstances();
-        System.out.println("java99: " + afterKill.size());
+        ServerAccess.logOutputReprint("java99: " + afterKill.size());
         Assert.assertEquals("assert that just old javas remians", 0, (before.size() - afterKill.size()));
         // div by two is caused by jav in java process hierarchy
         Assert.assertEquals("launched JVMs must be exactly 1, was  " + (during.size() - before.size()) / 2, 1, (during.size() - before.size()) / 2);
@@ -168,12 +156,15 @@ public class DeadLockTestTest {
             if (old.contains(string)) {
                 continue;
             }
-            System.out.println("Killing " + string);
-            ServerAccess.ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{"kill", "-9", string}));
+            ServerAccess.logOutputReprint("Killing " + string);
+            ServerAccess.PROCESS_LOG = false;
+            try {
+                ServerAccess.ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{"kill", "-9", string}));
+            } finally {
+                ServerAccess.PROCESS_LOG = true;
+            }
             result.add(string);
-            //System.out.println(pr.stdout);
-            // System.err.println(pr.stderr);
-            System.out.println("Killed " + string);
+            ServerAccess.logOutputReprint("Killed " + string);
         }
         return result;
     }
@@ -181,23 +172,26 @@ public class DeadLockTestTest {
     private static List<String> countJavaInstances() throws Exception {
         ensureLinux();
         List<String> result = new ArrayList<String>();
-        ServerAccess.ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{"ps", "-eo", "pid,ppid,stat,fname"}));
-        Matcher m = Pattern.compile("\\s*\\d+\\s+\\d+ .+ java\\s*").matcher(pr.stdout);
-        //System.out.println(pr.stdout);
-        //System.err.println(pr.stderr);
-        int i = 0;
-        while (m.find()) {
-            i++;
-            String ss = m.group();
-            //System.out.println(i+": "+ss);
-            result.add(ss.trim().split("\\s+")[0]);
+        ServerAccess.PROCESS_LOG = false;
+        try {
+            ServerAccess.ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{"ps", "-eo", "pid,ppid,stat,fname"}));
+            Matcher m = Pattern.compile("\\s*\\d+\\s+\\d+ .+ java\\s*").matcher(pr.stdout);
+            int i = 0;
+            while (m.find()) {
+                i++;
+                String ss = m.group();
+                //ServerAccess.logOutputReprint(i+": "+ss);
+                result.add(ss.trim().split("\\s+")[0]);
+            }
+        } finally {
+            ServerAccess.PROCESS_LOG = true;
         }
         return result;
 
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(countJavaInstances());
+        ServerAccess.logOutputReprint(""+countJavaInstances());
     }
 
     private void assertDeadlockTestLaunched(ProcessResult pr) {

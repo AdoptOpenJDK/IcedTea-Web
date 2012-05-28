@@ -41,6 +41,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import net.sourceforge.jnlp.ServerAccess;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -72,13 +73,13 @@ public class BASE64EncoderTest {
 //        sun.misc.BASE64Encoder e1 = new sun.misc.BASE64Encoder();
 //        e1.encode(data, out1);
 //        byte[] encoded1 = out1.toByteArray();
-//        System.out.println(Arrays.toString(encoded1));
+//        ServerAccess.logErrorReprint(Arrays.toString(encoded1));
         ByteArrayOutputStream out2 = new ByteArrayOutputStream();
         BASE64Encoder e2 = new BASE64Encoder();
         e2.encodeBuffer(data, out2);
         byte[] encoded2 = out2.toByteArray();
         Assert.assertArrayEquals(encoded, encoded2);
-//        System.out.println(Arrays.toString(encoded2));
+//      ServerAccess.logErrorReprint(Arrays.toString(encoded2));
 
 
 

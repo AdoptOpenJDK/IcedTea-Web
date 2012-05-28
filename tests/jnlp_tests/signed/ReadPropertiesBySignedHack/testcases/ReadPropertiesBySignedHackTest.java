@@ -52,11 +52,7 @@ public class ReadPropertiesBySignedHackTest {
     @Test
     public void ReadPropertiesBySignedHackWithjoutXtrustAll() throws Exception {
         //no request for permissions
-        System.out.println("connecting ReadPropertiesBySignedHack request");
-        System.err.println("connecting ReadPropertiesBySignedHack request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesBySignedHack.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="java.lang.SecurityException: class \"ReadProperties\"'s signer information does not match signer information of other classes in the same package";
         Assert.assertTrue("Stderr should contains "+s+" but did not",pr.stderr.contains(s));
         String ss="ClassNotFoundException";

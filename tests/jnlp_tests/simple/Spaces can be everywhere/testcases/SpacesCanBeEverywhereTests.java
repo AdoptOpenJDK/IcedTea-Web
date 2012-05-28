@@ -53,8 +53,6 @@ public class SpacesCanBeEverywhereTests {
     @Test
     @NeedsDisplay
     public void SpacesCanBeEverywhereLocalAppletTestsJnlp2() throws Exception {
-        System.out.println("connecting NotOnly spaces can kill ěščřž too.jnlp request");
-        System.err.println("connecting NotOnly spaces can kill ěščřž too.jnlp request");
         List<String> commands=new ArrayList<String>(1);
         commands.add(server.getJavawsLocation());
         commands.add(server.getDir()+"/NotOnly spaces can kill ěščřž too.jnlp");
@@ -83,8 +81,6 @@ public class SpacesCanBeEverywhereTests {
          * only on ocal files, and probably only from test run - it can be ignored
          */
         ServerAccess.ProcessResult pr =  ServerAccess.executeProcess(commands);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "xception";
@@ -97,11 +93,7 @@ public class SpacesCanBeEverywhereTests {
     @Test
     @NeedsDisplay
     public void SpacesCanBeEverywhereRemoteAppletTestsJnlp2() throws Exception {
-        System.out.println("connecting NotOnly spaces can kill ěščřž too.jnlp request");
-        System.err.println("connecting NotOnly spaces can kill ěščřž too.jnlp request");
         ServerAccess.ProcessResult pr = server.executeJavaws("/NotOnly%20spaces%20can%20kill%20%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%20too.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "xception";
@@ -113,11 +105,7 @@ public class SpacesCanBeEverywhereTests {
     @Test
     @NeedsDisplay
     public void SpacesCanBeEverywhereRemoteAppletTestsHtml2() throws Exception {
-        System.out.println("connecting spaces applet Tests.html request");
-        System.err.println("connecting spaces applet Tests.html request");
         ServerAccess.ProcessResult pr = server.executeBrowser("/spaces+applet+Tests.html");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "xception";
@@ -129,11 +117,7 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id={"PR811","http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-October/016144.html"})
     @Test
     public void SpacesCanBeEverywhereRemoteTests1() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereRemoteTests1 request");
-        System.err.println("connecting SpacesCanBeEverywhereRemoteTests1 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere1.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("stdout should contains `" + s + "`, but did not", pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -145,11 +129,7 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests2() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereRemoteTests2 request");
-        System.err.println("connecting SpacesCanBeEverywhereRemoteTests2 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -161,11 +141,7 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests2_withQuery1() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereRemoteTests2 request");
-        System.err.println("connecting SpacesCanBeEverywhereRemoteTests2 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2.jnlp?test=10");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -178,11 +154,7 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests2_withQuery2() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereRemoteTests2 request");
-        System.err.println("connecting SpacesCanBeEverywhereRemoteTests2 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2.jnlp?test%3D10");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -194,11 +166,7 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests3() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereRemoteTests3 request");
-        System.err.println("connecting SpacesCanBeEverywhereRemoteTests3 request");
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/SpacesCanBeEverywhere1.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -211,15 +179,11 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR804")
     @Test
     public void SpacesCanBeEverywhereLocalTests1() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereLocalTests1 request");
-        System.err.println("connecting SpacesCanBeEverywhereLocalTests1 request");
         List<String> commands=new ArrayList<String>(4);
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add("Spaces can be everywhere1.jnlp");
         ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("stdout should contains `" + s + "`, but did not", pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -231,15 +195,11 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR804")
     @Test
     public void SpacesCanBeEverywhereLocalTests2() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereLocalTests2 request");
-        System.err.println("connecting SpacesCanBeEverywhereLocalTests2 request");
         List<String> commands=new ArrayList<String>(4);
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add("Spaces can be everywhere2.jnlp");
         ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -251,15 +211,11 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR804")
     @Test
     public void SpacesCanBeEverywhereLocalTests4() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereLocalTests2 request");
-        System.err.println("connecting SpacesCanBeEverywhereLocalTests2 request");
         List<String> commands=new ArrayList<String>(4);
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add(server.getDir()+"/Spaces can be everywhere2.jnlp");
         ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands);
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -271,15 +227,11 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR804")
     @Test
     public void SpacesCanBeEverywhereLocalTests3() throws Exception {
-        System.out.println("connecting SpacesCanBeEverywhereLocalTests3 request");
-        System.err.println("connecting SpacesCanBeEverywhereLocalTests3 request");
         List<String> commands=new ArrayList<String>(4);
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add("SpacesCanBeEverywhere1.jnlp");
         ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";

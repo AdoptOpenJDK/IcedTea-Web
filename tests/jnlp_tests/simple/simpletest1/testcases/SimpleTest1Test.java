@@ -49,11 +49,7 @@ public class SimpleTest1Test {
 
     @Test
     public void testSimpletest1lunchOk() throws Exception {
-        System.out.println("connecting simpletest1 request");
-        System.err.println("connecting simpletest1 request");
         ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/simpletest1.jnlp");
-        System.out.println(pr.stdout);
-        System.err.println(pr.stderr);
         String s="Good simple javaws exapmle";
         Assert.assertTrue("testSimpletest1lunchOk stdout should contains "+s+" bud didn't",pr.stdout.contains(s));
         String ss="xception";
@@ -62,8 +58,4 @@ public class SimpleTest1Test {
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
 
-  
-
-
-
-    }
+ }
