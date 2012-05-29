@@ -782,6 +782,9 @@ public class ServerAccess {
         int i = 2;
         for (; i < stack.length; i++) {
             result = stack[i];//at least moving up
+            if(stack[i].getClassName().contains("$")){
+                continue;
+            }
             if (!baseClass.equals(stack[i].getClassName())) {
                 break;
             }
@@ -790,6 +793,9 @@ public class ServerAccess {
         //method we need (the test)  is highest from following class
         baseClass = stack[i].getClassName();
         for (; i < stack.length; i++) {
+            if(stack[i].getClassName().contains("$")){
+                continue;
+            }
             if (!baseClass.equals(stack[i].getClassName())) {
                 break;
             }
