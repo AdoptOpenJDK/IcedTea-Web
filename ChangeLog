@@ -1,4 +1,9 @@
-2012-05-20  Jiri Vanek  <jvanek@redhat.com>
+2012-05-29  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (getPermissions):
+	New rethrow of exceptions and following condition make more accurate. 
+
+2012-05-29  Jiri Vanek  <jvanek@redhat.com>
 
 	Get rid of repeated sout/serr  in reproducers testcases/unit tests and
 	introduce bottleneck for loging.

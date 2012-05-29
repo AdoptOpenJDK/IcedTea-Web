@@ -914,22 +914,26 @@ public class JNLPClassLoader extends URLClassLoader {
                 // 1. Code must be signed
                 // 2. ALL or J2EE permissions must be requested (note: plugin requests ALL automatically)
                 if (cs == null) {
-                    throw new RuntimeException("Code source was null");
+                    throw new NullPointerException("Code source was null");
                 }
-                if (cs.getLocation() == null) {
-                    throw new RuntimeException("Code source location was null");
-                }
-                if (getCodeSourceSecurity(cs.getLocation()) == null) {
-                    throw new RuntimeException("Code source security was null");
-                }
-                if (getCodeSourceSecurity(cs.getLocation()).getSecurityType() == null) {
-                    throw new RuntimeException("Code source security type was null");
-                }
-                if (cs.getCodeSigners() != null
-                        && (getCodeSourceSecurity(cs.getLocation()).getSecurityType().equals(SecurityDesc.ALL_PERMISSIONS)
-                        || getCodeSourceSecurity(cs.getLocation()).getSecurityType().equals(SecurityDesc.J2EE_PERMISSIONS))) {
+                if (cs.getCodeSigners() != null) {
+                    if (cs.getLocation() == null) {
+                        throw new NullPointerException("Code source location was null");
+                    }
+                    if (getCodeSourceSecurity(cs.getLocation()) == null) {
+                        throw new NullPointerException("Code source security was null");
+                    }
+                    if (getCodeSourceSecurity(cs.getLocation()).getSecurityType() == null) {
+                        if (JNLPRuntime.isDebug()){
+                        new NullPointerException("Warning! Code source security type was null").printStackTrace();
+                        }
+                    }
+                    Object securityType = getCodeSourceSecurity(cs.getLocation()).getSecurityType();
+                    if (SecurityDesc.ALL_PERMISSIONS.equals(securityType)
+                            || SecurityDesc.J2EE_PERMISSIONS.equals(securityType)) {
 
-                    permissions = getCodeSourceSecurity(cs.getLocation()).getPermissions(cs);
+                        permissions = getCodeSourceSecurity(cs.getLocation()).getPermissions(cs);
+                    }
                 }
 
                 Enumeration<Permission> e = permissions.elements();
