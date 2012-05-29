@@ -12,8 +12,32 @@
 	(getTestMethod) new method to analyze calling test-method.
 	(executeProcess) enhanced for conditional automatic logging of start of
 	process and outputs of process.
-	* /tests/jnlp_tests/*/*/testcases/*.java : and
-	* /tests/netx/unit/**.java: all System.out replaced by ServerAccess.logOutputReprint 
+	* tests/jnlp_tests/signed/AppletTestSigned/testcases/AppletTestSignedTests.java: 
+	* tests/jnlp_tests/signed/CacheReproducer/testcases/CacheReproducerTest.java: 
+	* tests/jnlp_tests/signed/MissingJar/testcases/MissingJarTest.java: 
+	* tests/jnlp_tests/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java: 
+	* tests/jnlp_tests/signed/Spaces can be everywhere signed/testcases/SpacesCanBeEverywhereTestsSigned.java: 
+	* tests/jnlp_tests/simple/AccessClassInPackage/testcases/AccessClassInPackageTest.java: 
+	* tests/jnlp_tests/simple/AddShutdownHook/testcases/AddShutdownHookTest.java: 
+	* tests/jnlp_tests/simple/AllStackTraces/testcases/AllStackTracesTest.java: 
+	* tests/jnlp_tests/simple/AppletTest/testcases/AppletTestTests.java: 
+	* tests/jnlp_tests/simple/CheckServices/testcases/CheckServicesTests.java: 
+	* tests/jnlp_tests/simple/CreateClassLoader/testcases/CreateClassLoaderTest.java: 
+	* tests/jnlp_tests/simple/InformationTitleVendorParser/testcases/InformationTitleVendorParserTest.java: 
+	* tests/jnlp_tests/simple/ManifestedJar1/testcases/ManifestedJar1Test.java: 
+	* tests/jnlp_tests/simple/ReadEnvironment/testcases/ReadEnvironmentTest.java: 
+	* tests/jnlp_tests/simple/ReadProperties/testcases/ReadPropertiesTest.java: 
+	* tests/jnlp_tests/simple/RedirectStreams/testcases/RedirectStreamsTest.java: 
+	* tests/jnlp_tests/simple/ReplaceSecurityManager/testcases/ReplaceSecurityManagerTest.java: 
+	* tests/jnlp_tests/simple/SetContextClassLoader/testcases/SetContextClassLoaderTest.java: 
+	* tests/jnlp_tests/simple/Spaces can be everywhere/testcases/SpacesCanBeEverywhereTests.java: 
+	* tests/jnlp_tests/simple/deadlocktest/testcases/DeadLockTestTest.java: 
+	* tests/jnlp_tests/simple/simpletest1/testcases/SimpleTest1Test.java: 
+	* tests/jnlp_tests/simple/simpletest2/testcases/SimpleTest2Test.java: 
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java: 
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java: 
+	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64EncoderTest.java: 
+	all System.out replaced by ServerAccess.logOutputReprint 
 	and System.err replaced by ServerAccess.logErrorReprint 
 
 2012-05-25  Adam Domurad <adomurad@redhat.com>
