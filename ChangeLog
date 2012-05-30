@@ -1,3 +1,29 @@
+2012-05-30  Jiri Vanek  <jvanek@redhat.com>
+
+	Enabled multiple certificates and extracted variables
+	* Makefile.am: EXPORTED_TEST_CERT by EXPORTED_TEST_CERT_PREFIX and 
+	EXPORTED_TEST_CERT_SUFIX for further composition
+	SIGNED_REPRODUCERS new variable for  iterating through signed reproducers
+	SIMPLE_REPRODUCERS new variable for  iterating through simple reproducers
+	ALL_REPRODUCER new variable for  iterating through all reproducers
+	(junit-jnlp-dist-signed.txt) replaced by
+	(stamps/junit-jnlp-dist-signed.stamp) which generates 
+	junit-jnlp-dist-signedX.txt for each directory with signed reproducers
+	(stamps/netx-dist-tests-prepare-reproducers.stamp)
+	(stamps/change-dots-to-paths.stamp) 
+	(stamps/netx-dist-tests-compile-testcases.stamp)
+	(run-netx-dist-codecoverage): extracted variables
+	(clean-netx-dist-tests): iterates through all the list and removes them
+	(stamps/netx-dist-tests-sign-some-reproducers.stamp): now iterate through
+	SIGNED_REPRODUCERS and creates special certificate for each member. Each
+	jar from this directory is then signed by corresponding certificate
+	(netx-dist-tests-remove-cert-from-public): iterates through all certificates
+	(stamps/netx-dist-tests-import-cert-to-public): exports each certificate
+	created during tests preparations
+	($(EXPORTED_TEST_CERT)) replaced by stamps/exported-test-certs.stamp which
+	create for each of SIGNED_REPRODUCERS individual certificate
+	(tests/jnlp_tests/README): mentioned possibility of multiple certificate
+
 2012-05-29  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (getPermissions):

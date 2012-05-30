@@ -8,3 +8,8 @@ Files in advanced directory have to care about themselves, but even those can ha
  parts inside simple directory, so some parts of them are processed automatically.
  There are three reproducers – simpletest1, simpletest2 and deadlocktest, which tests 
  test’s suite itself and serve as examples of behaviour.
+
+Directory "signed" is listed in Makefile.am. You can specify as much to-be-signed
+directories as you want. And jars in each of those signed directories will be 
+signed  by their's own unique key (number of signed directories == number of certificates).
+Do not forget to add each this directory into list n Makefile.am
