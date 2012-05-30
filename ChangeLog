@@ -2,7 +2,7 @@
 
 	Enabled multiple certificates and extracted variables
 	* Makefile.am: EXPORTED_TEST_CERT by EXPORTED_TEST_CERT_PREFIX and 
-	EXPORTED_TEST_CERT_SUFIX for further composition
+	EXPORTED_TEST_CERT_SUFFIX for further composition
 	SIGNED_REPRODUCERS new variable for  iterating through signed reproducers
 	SIMPLE_REPRODUCERS new variable for  iterating through simple reproducers
 	ALL_REPRODUCER new variable for  iterating through all reproducers

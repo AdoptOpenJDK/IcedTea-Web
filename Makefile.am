@@ -25,7 +25,7 @@ JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
 PRIVATE_KEYSTORE_NAME=teststore.ks
 PRIVATE_KEYSTORE_PASS=123456789
 EXPORTED_TEST_CERT_PREFIX=icedteatests
-EXPORTED_TEST_CERT_SUFIX=crt
+EXPORTED_TEST_CERT_SUFFIX=crt
 TEST_CERT_ALIAS=icedteaweb
 PUBLIC_KEYSTORE=${HOME}/.icedtea/security/trusted.certs
 PUBLIC_KEYSTORE_PASS=changeit
@@ -596,7 +596,7 @@ stamps/change-dots-to-paths.stamp: stamps/netx-dist-tests-sign-some-reproducers.
 stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp netx-dist-tests-remove-cert-from-public
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
-	  keytool -export -alias $(TEST_CERT_ALIAS)_$$which -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFIX) -storepass $(PRIVATE_KEYSTORE_PASS) -keystore $(PRIVATE_KEYSTORE_NAME) ; \
+	  keytool -export -alias $(TEST_CERT_ALIAS)_$$which -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) -storepass $(PRIVATE_KEYSTORE_PASS) -keystore $(PRIVATE_KEYSTORE_NAME) ; \
 	done ;
 	mkdir -p stamps && \
 	touch $@
@@ -604,7 +604,7 @@ stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp netx-dist-te
 stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
-	  yes | $(BOOT_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS)_$$which -keystore $(PUBLIC_KEYSTORE) -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFIX) ;\
+	  yes | $(BOOT_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS)_$$which -keystore $(PUBLIC_KEYSTORE) -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) ;\
 	done ;
 	mkdir -p stamps && \
 	touch $@
@@ -1033,7 +1033,7 @@ clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-publ
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
 	  rm -f junit-jnlp-dist-$$which.txt ; \
-	  rm -f $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFIX) ; \
+	  rm -f $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) ; \
 	done ;
 	rm -f stamps/exported-test-certs.stamp
 	rm -f stamps/junit-jnlp-dist-signed.stamp
