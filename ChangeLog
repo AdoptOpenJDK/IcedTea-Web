@@ -5,7 +5,7 @@
 	(createJavaObjectFromVariant): Account for length of the characters.
 	* plugin/icedteanp/IcedTeaNPPlugin.cc (plugin_get_documentbase): Same.
 	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc (_eval): Print the
-	string's c_str rather than utf8characters/
+	string's c_str rather than utf8characters.
 	* plugin/icedteanp/IcedTeaPluginUtils.cc (printNPVariant): Account for
 	length of the characters.
 	(NPVariantToString): Same.
