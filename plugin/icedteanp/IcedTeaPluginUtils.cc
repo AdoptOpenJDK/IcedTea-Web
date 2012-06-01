@@ -662,9 +662,9 @@ IcedTeaPluginUtilities::printNPVariant(NPVariant variant)
     else if (NPVARIANT_IS_STRING(variant))
     {
 #if MOZILLA_VERSION_COLLAPSED < 1090200
-    	PLUGIN_DEBUG("STRING: %s\n", NPVARIANT_TO_STRING(variant).utf8characters);
+    	PLUGIN_DEBUG("STRING: %s (length=%d)\n", NPVARIANT_TO_STRING(variant).utf8characters, NPVARIANT_TO_STRING(variant).utf8length);
 #else
-    	PLUGIN_DEBUG("STRING: %s\n", NPVARIANT_TO_STRING(variant).UTF8Characters);
+    	PLUGIN_DEBUG("STRING: %s (length=%d)\n", NPVARIANT_TO_STRING(variant).UTF8Characters, NPVARIANT_TO_STRING(variant).UTF8Length);
 #endif
     }
     else
@@ -704,11 +704,11 @@ IcedTeaPluginUtilities::NPVariantToString(NPVariant variant, std::string* result
   else if (NPVARIANT_IS_STRING(variant))
   {
 #if MOZILLA_VERSION_COLLAPSED < 1090200
-    size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).utf8length;
+    size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).utf8length+1;
     largestr = (char*) malloc(buffersize);
     snprintf(str, buffersize, "%s", NPVARIANT_TO_STRING(variant).utf8characters);
 #else
-    size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).UTF8Length;
+    size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).UTF8Length+1;
     largestr = (char*) malloc(buffersize);
     snprintf(str, buffersize, "%s", NPVARIANT_TO_STRING(variant).UTF8Characters);
 #endif
@@ -864,9 +864,9 @@ IcedTeaPluginUtilities::isObjectJSArray(NPP instance, NPObject* object)
     std::string constructor_name = std::string();
 
 #if MOZILLA_VERSION_COLLAPSED < 1090200
-    constructor_name.append(NPVARIANT_TO_STRING(constructor_str).utf8characters);
+    constructor_name.append(NPVARIANT_TO_STRING(constructor_str).utf8characters, NPVARIANT_TO_STRING(constructor_str).utf8length);
 #else
-    constructor_name.append(NPVARIANT_TO_STRING(constructor_str).UTF8Characters);
+    constructor_name.append(NPVARIANT_TO_STRING(constructor_str).UTF8Characters, NPVARIANT_TO_STRING(constructor_str).UTF8Length);
 #endif
 
     PLUGIN_DEBUG("Constructor for NPObject is %s\n", constructor_name.c_str());

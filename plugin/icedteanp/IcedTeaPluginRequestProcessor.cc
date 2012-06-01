@@ -842,12 +842,12 @@ _eval(void* data)
     script.utf8characters = script_str->c_str();
     script.utf8length = script_str->size();
 
-    PLUGIN_DEBUG("Evaluating: %s\n", script.utf8characters);
+    PLUGIN_DEBUG("Evaluating: %s\n", script_str->c_str());
 #else
     script.UTF8Characters = script_str->c_str();
     script.UTF8Length = script_str->size();
 
-    PLUGIN_DEBUG("Evaluating: %s\n", script.UTF8Characters);
+    PLUGIN_DEBUG("Evaluating: %s\n", script_str->c_str());
 #endif
 
     ((AsyncCallThreadData*) data)->call_successful = browser_functions.evaluate(instance, window_ptr, &script, eval_variant);

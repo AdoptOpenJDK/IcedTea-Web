@@ -1,3 +1,16 @@
+2012-06-01  Deepak Bhole <dbhole@redhat.com>
+
+	PR863: Error passing strings to applet methods in Chromium
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc
+	(createJavaObjectFromVariant): Account for length of the characters.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc (plugin_get_documentbase): Same.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc (_eval): Print the
+	string's c_str rather than utf8characters/
+	* plugin/icedteanp/IcedTeaPluginUtils.cc (printNPVariant): Account for
+	length of the characters.
+	(NPVariantToString): Same.
+	(isObjectJSArray): Same.
+
 2012-05-30  Jiri Vanek  <jvanek@redhat.com>
 
 	Enabled multiple certificates and extracted variables
