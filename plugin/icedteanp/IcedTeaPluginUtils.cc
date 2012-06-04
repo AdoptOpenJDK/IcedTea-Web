@@ -898,7 +898,7 @@ std::string
 IcedTeaPluginUtilities::NPVariantAsString(NPVariant variant)
 {
 #if MOZILLA_VERSION_COLLAPSED < 1090200
-  return std::string((
+  return std::string(
     NPVARIANT_TO_STRING(variant).utf8characters,
     NPVARIANT_TO_STRING(variant).utf8length);
 #else
