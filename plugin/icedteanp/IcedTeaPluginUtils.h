@@ -209,6 +209,9 @@ class IcedTeaPluginUtilities
     	/* Converts the given integer to a string */
     	static void itoa(int i, std::string* result);
 
+    	/* Copies a variant data type into a C++ string */
+    	static std::string NPVariantAsString(NPVariant variant);
+
     	/* Frees the given vector and the strings that its contents point to */
     	static void freeStringPtrVector(std::vector<std::string*>* v);
 

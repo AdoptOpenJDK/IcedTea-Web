@@ -1,3 +1,19 @@
+2012-06-04  Adam Domurad  <adomurad@redhat.com>
+
+	Added self to AUTHORS.
+	This patch fixes PR518, ensures null termination of strings based off
+	of NPVariant results.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: Added declaration of
+	NPVariantAsString
+	* plugin/icedteanp/IcedTeaPluginUtils.cc
+	(NPVariantAsString): New. Converts an NPVariant to a
+	std::string, assumes it is a valid NPString.
+	(isObjectJSArray): Now uses NPVariantAsString, minor cleanup.
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc
+	(plugin_get_documentbase): Now uses NPVariantAsString.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(NPVariantToString): Now uses NPVariantAsString, minor cleanup.
+
 2012-06-01  Deepak Bhole <dbhole@redhat.com>
 
 	PR863: Error passing strings to applet methods in Chromium

@@ -1093,17 +1093,10 @@ plugin_get_documentbase (NPP instance)
   browser_functions.getproperty(instance, NPVARIANT_TO_OBJECT(location), 
                                href_id, &href);
 
-  // Strip everything after the last "/"
-  char *href_str;
-#if MOZILLA_VERSION_COLLAPSED < 1090200
-  href_str = (char*) malloc(sizeof(char)*NPVARIANT_TO_STRING(href).utf8length + 1);
-  snprintf(href_str, NPVARIANT_TO_STRING(href).utf8length+1, "%s", NPVARIANT_TO_STRING(href).utf8characters);
-#else
-  href_str = (char*) malloc(sizeof(char)*NPVARIANT_TO_STRING(href).UTF8Length + 1);
-  snprintf(href_str, NPVARIANT_TO_STRING(href).UTF8Length+1, "%s", NPVARIANT_TO_STRING(href).UTF8Characters);
-#endif
+  std::string href_str = IcedTeaPluginUtilities::NPVariantAsString(href);
 
-  gchar** parts = g_strsplit (href_str, "/", -1);
+  // Strip everything after the last "/"
+  gchar** parts = g_strsplit (href_str.c_str(), "/", -1);
   guint parts_sz = g_strv_length (parts);
 
   std::string location_str;
@@ -1119,8 +1112,6 @@ plugin_get_documentbase (NPP instance)
   browser_functions.releasevariantvalue(&href);
   browser_functions.releasevariantvalue(&location);
   g_strfreev(parts);
-  free(href_str);
-  href_str = NULL;
  cleanup_done:
   PLUGIN_DEBUG ("plugin_get_documentbase return\n");
   PLUGIN_DEBUG("plugin_get_documentbase returning: %s\n", documentbase_copy);

@@ -661,11 +661,8 @@ IcedTeaPluginUtilities::printNPVariant(NPVariant variant)
     }
     else if (NPVARIANT_IS_STRING(variant))
     {
-#if MOZILLA_VERSION_COLLAPSED < 1090200
-    	PLUGIN_DEBUG("STRING: %s (length=%d)\n", NPVARIANT_TO_STRING(variant).utf8characters, NPVARIANT_TO_STRING(variant).utf8length);
-#else
-    	PLUGIN_DEBUG("STRING: %s (length=%d)\n", NPVARIANT_TO_STRING(variant).UTF8Characters, NPVARIANT_TO_STRING(variant).UTF8Length);
-#endif
+    	std::string str = IcedTeaPluginUtilities::NPVariantAsString(variant);
+    	PLUGIN_DEBUG("STRING: %s (length=%d)\n", str.c_str(), str.size());
     }
     else
     {
@@ -676,52 +673,44 @@ IcedTeaPluginUtilities::printNPVariant(NPVariant variant)
 void
 IcedTeaPluginUtilities::NPVariantToString(NPVariant variant, std::string* result)
 {
-  char str[NUM_STR_BUFFER_SIZE]; // enough for everything except string
-  char* largestr = NULL;
-  if (NPVARIANT_IS_VOID(variant))
+  char conv_str[NUM_STR_BUFFER_SIZE]; // conversion buffer
+  bool was_string_already = false;
+
+  if (NPVARIANT_IS_STRING(variant))
   {
-    snprintf(str, NUM_STR_BUFFER_SIZE, "%p", variant);
+    result->append(IcedTeaPluginUtilities::NPVariantAsString(variant));
+    was_string_already = true;
+  }
+  else if (NPVARIANT_IS_VOID(variant))
+  {
+    snprintf(conv_str, NUM_STR_BUFFER_SIZE, "%p", variant);
   }
   else if (NPVARIANT_IS_NULL(variant))
   {
-    snprintf(str, NUM_STR_BUFFER_SIZE, "NULL");
+    snprintf(conv_str, NUM_STR_BUFFER_SIZE, "NULL");
   }
   else if (NPVARIANT_IS_BOOLEAN(variant))
   {
     if (NPVARIANT_TO_BOOLEAN(variant))
-      snprintf(str, NUM_STR_BUFFER_SIZE, "true");
+      snprintf(conv_str, NUM_STR_BUFFER_SIZE, "true");
     else
-      snprintf(str, NUM_STR_BUFFER_SIZE, "false");
+      snprintf(conv_str, NUM_STR_BUFFER_SIZE, "false");
   }
   else if (NPVARIANT_IS_INT32(variant))
   {
-    snprintf(str, NUM_STR_BUFFER_SIZE, "%d", NPVARIANT_TO_INT32(variant));
+    snprintf(conv_str, NUM_STR_BUFFER_SIZE, "%d", NPVARIANT_TO_INT32(variant));
   }
   else if (NPVARIANT_IS_DOUBLE(variant))
   {
-    snprintf(str, NUM_STR_BUFFER_SIZE, "%f", NPVARIANT_TO_DOUBLE(variant));
-  }
-  else if (NPVARIANT_IS_STRING(variant))
-  {
-#if MOZILLA_VERSION_COLLAPSED < 1090200
-    size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).utf8length+1;
-    largestr = (char*) malloc(buffersize);
-    snprintf(str, buffersize, "%s", NPVARIANT_TO_STRING(variant).utf8characters);
-#else
-    size_t buffersize = sizeof(char)*NPVARIANT_TO_STRING(variant).UTF8Length+1;
-    largestr = (char*) malloc(buffersize);
-    snprintf(str, buffersize, "%s", NPVARIANT_TO_STRING(variant).UTF8Characters);
-#endif
+    snprintf(conv_str, NUM_STR_BUFFER_SIZE, "%f", NPVARIANT_TO_DOUBLE(variant));
   }
   else
   {
-    snprintf(str, NUM_STR_BUFFER_SIZE, "[Object %p]", variant);
+    snprintf(conv_str, NUM_STR_BUFFER_SIZE, "[Object %p]", variant);
   }
-  if (largestr != NULL){
-    result->append(largestr);
-    free(largestr);
-  } else {
-    result->append(str);
+
+  if (!was_string_already){
+    result->append(conv_str);
   }
 }
 
@@ -861,13 +850,7 @@ IcedTeaPluginUtilities::isObjectJSArray(NPP instance, NPObject* object)
     browser_functions.invoke(instance, constructor, toString, NULL, 0, &constructor_str);
     IcedTeaPluginUtilities::printNPVariant(constructor_str);
 
-    std::string constructor_name = std::string();
-
-#if MOZILLA_VERSION_COLLAPSED < 1090200
-    constructor_name.append(NPVARIANT_TO_STRING(constructor_str).utf8characters, NPVARIANT_TO_STRING(constructor_str).utf8length);
-#else
-    constructor_name.append(NPVARIANT_TO_STRING(constructor_str).UTF8Characters, NPVARIANT_TO_STRING(constructor_str).UTF8Length);
-#endif
+    std::string constructor_name = IcedTeaPluginUtilities::NPVariantAsString(constructor_str);
 
     PLUGIN_DEBUG("Constructor for NPObject is %s\n", constructor_name.c_str());
 
@@ -910,6 +893,20 @@ IcedTeaPluginUtilities::decodeURL(const gchar* url, gchar** decoded_url)
     PLUGIN_DEBUG("SENDING URL: %s\n", *decoded_url);
 }
 
+/* Copies a variant data type into a C++ string */
+std::string
+IcedTeaPluginUtilities::NPVariantAsString(NPVariant variant)
+{
+#if MOZILLA_VERSION_COLLAPSED < 1090200
+  return std::string((
+    NPVARIANT_TO_STRING(variant).utf8characters,
+    NPVARIANT_TO_STRING(variant).utf8ength);
+#else
+  return std::string(
+    NPVARIANT_TO_STRING(variant).UTF8Characters,
+    NPVARIANT_TO_STRING(variant).UTF8Length);
+#endif
+}
 
 /**
  * Posts a function for execution on the plug-in thread and wait for result.

@@ -904,11 +904,7 @@ createJavaObjectFromVariant(NPP instance, NPVariant variant, std::string* id)
     } else if (NPVARIANT_IS_STRING(variant))
     {
     	className = "java.lang.String";
-#if MOZILLA_VERSION_COLLAPSED < 1090200
-    	stringArg.append(NPVARIANT_TO_STRING(variant).utf8characters, NPVARIANT_TO_STRING(variant).utf8length);
-#else
-    	stringArg.append(NPVARIANT_TO_STRING(variant).UTF8Characters, NPVARIANT_TO_STRING(variant).UTF8Length);
-#endif
+    	stringArg = IcedTeaPluginUtilities::NPVariantAsString(variant);
     } else if (NPVARIANT_IS_OBJECT(variant))
     {
 
