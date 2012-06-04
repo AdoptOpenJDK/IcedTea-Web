@@ -1,3 +1,17 @@
+2012-06-04  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Fix to handle absolute paths passed into jnlp_href's value.
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(PluginBridge): Uses context of codebase to evaluate jnlp_href's value.
+	Uses JNLPCreator's create method to make new JNLPFile variables.
+	New constructor that wraps around the original one, creating a new
+	JNLPCreator to use.
+	* netx/net/sourceforge/jnlp/JNLPCreator.java: New strategy pattern class
+	to be used to wrap around the creation of a JNLPFile. Replace this creator
+	when unit testing to skip running parsing code.
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java:
+	New class to unit test getEvaluatedJNLPHref.
+
 2012-06-04  Adam Domurad  <adomurad@redhat.com>
 
 	Added self to AUTHORS.

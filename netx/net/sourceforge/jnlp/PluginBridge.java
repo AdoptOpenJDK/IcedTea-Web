@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Red Hat, Inc.
+ * Copyright 2012 Red Hat, Inc.
  * This file is part of IcedTea, http://icedtea.classpath.org
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
@@ -46,9 +46,19 @@ public class PluginBridge extends JNLPFile {
     private boolean codeBaseLookup;
     private boolean useJNLPHref;
 
+    /**
+     * Creates a new PluginBridge using a default JNLPCreator.
+     */
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
                         int width, int height, Hashtable<String, String> atts,
                         String uKey)
+            throws Exception {
+        this(codebase, documentBase, jar, main, width, height, atts, uKey, new JNLPCreator());
+    }
+
+    public PluginBridge(URL codebase, URL documentBase, String jar, String main,
+                        int width, int height, Hashtable<String, String> atts,
+                        String uKey, JNLPCreator jnlpCreator)
             throws Exception {
         specVersion = new Version("1.0");
         fileVersion = new Version("1.1");
@@ -59,8 +69,10 @@ public class PluginBridge extends JNLPFile {
         if (atts.containsKey("jnlp_href")) {
             useJNLPHref = true;
             try {
-                URL jnlp = new URL(codeBase.toExternalForm() + atts.get("jnlp_href"));
-                JNLPFile jnlpFile = new JNLPFile(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), this.codeBase);
+                // Use codeBase as the context for the URL. If jnlp_href's
+                // value is a complete URL, it will replace codeBase's context.
+                URL jnlp = new URL(codeBase, atts.get("jnlp_href"));
+                JNLPFile jnlpFile = jnlpCreator.create(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), codeBase);
                 Map<String, String> jnlpParams = jnlpFile.getApplet().getParameters();
                 info = jnlpFile.info;
 
@@ -76,8 +88,8 @@ public class PluginBridge extends JNLPFile {
             } catch (MalformedURLException e) {
                 // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
                 // it is the site developer who should ensure that file exist.
-                System.err.println("Unable to get JNLP file at: " + codeBase.toExternalForm()
-                        + atts.get("jnlp_href"));
+                System.err.println("Unable to get JNLP file at: " + atts.get("jnlp_href")
+                        + " with context of URL as: " + codeBase.toExternalForm());
             }
         } else {
             // Should we populate this list with applet attribute tags?
