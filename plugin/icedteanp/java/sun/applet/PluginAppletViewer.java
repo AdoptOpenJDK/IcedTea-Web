@@ -1923,9 +1923,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
                         Hashtable<String, String> t = scanTag(c, in);
                         String att = t.get("name");
 
-                        if (atts.containsKey(att))
-                            continue;
-
                         if (att == null) {
                             statusMsgStream.println(requiresNameWarning);
                         } else {
