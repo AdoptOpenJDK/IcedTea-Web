@@ -1,3 +1,81 @@
+2012-06-04  Saad Mohammad <smohammad@redhat.com>
+
+	Added signed jnlp file tests.
+	* tests/jnlp_tests/signed/SignedJnlpApplication/resources/SignedJnlpApplication1.jnlp:
+	Launching jnlp file that matches the signed jnlp application file.
+	* tests/jnlp_tests/signed/SignedJnlpApplication/resources/SignedJnlpApplication2.jnlp:
+	* tests/jnlp_tests/signed/SignedJnlpApplication/resources/SignedJnlpApplication3.jnlp:
+	Launching jnlp file that does not match the signed jnlp application file.
+	* tests/jnlp_tests/signed/SignedJnlpApplication/srcs/JNLP-INF/APPLICATION.jnlp:
+	Signed jnlp application file.
+	* tests/jnlp_tests/signed/SignedJnlpApplication/srcs/SignedJnlpApplication.java:
+	A simple java class that outputs a string.
+	* tests/jnlp_tests/signed/SignedJnlpApplication/testcases/SignedJnlpApplicationTest.java:
+	Testcase that tests the launching of applications with a signed jnlp 
+	application file.
+	* tests/jnlp_tests/signed/SignedJnlpTemplate/resources/SignedJnlpTemplate1.jnlp:
+	Launching jnlp file that matches the signed jnlp application template file.
+	* tests/jnlp_tests/signed/SignedJnlpTemplate/resources/SignedJnlpTemplate2.jnlp:
+	* tests/jnlp_tests/signed/SignedJnlpTemplate/resources/SignedJnlpTemplate3.jnlp:
+	Launching jnlp file that does not match the signed jnlp application 
+	template file.
+	* tests/jnlp_tests/signed/SignedJnlpTemplate/srcs/JNLP-INF/APPLICATION_TEMPLATE.jnlp:
+	Signed jnlp application template file.
+	* tests/jnlp_tests/signed/SignedJnlpTemplate/srcs/SignedJnlpTemplate.java:
+	A simple java class that outputs a string.
+	* tests/jnlp_tests/signed/SignedJnlpTemplate/testcases/SignedJnlpTemplateTest.java:
+	Testcase that tests the launching of applications with a signed jnlp 
+	application template file.
+	* tests/jnlp_tests/simple/UnsignedJnlpApplication/resources/UnsignedJnlpApplication1.jnlp:
+	Launching jnlp file that matches the unsigned jnlp application file.
+	* tests/jnlp_tests/simple/UnsignedJnlpApplication/resources/UnsignedJnlpApplication2.jnlp:
+	* tests/jnlp_tests/simple/UnsignedJnlpApplication/resources/UnsignedJnlpApplication3.jnlp:
+	Launching jnlp file that does not match the unsigned jnlp application file.
+	* tests/jnlp_tests/simple/UnsignedJnlpApplication/srcs/JNLP-INF/APPLICATION.jnlp:
+	Unsigned jnlp application file.
+	* tests/jnlp_tests/simple/UnsignedJnlpApplication/srcs/UnsignedJnlpApplication.java:
+	A simple java class that outputs a string.
+	* tests/jnlp_tests/simple/UnsignedJnlpApplication/testcases/UnsignedJnlpApplicationTest.java:
+	Testcase that tests the launching of applications with an unsigned jnlp 
+	application file.
+	* tests/jnlp_tests/simple/UnsignedJnlpTemplate/resources/UnsignedJnlpTemplate1.jnlp:
+	Launching jnlp file that matches the unsigned jnlp application 
+	template file.
+	* tests/jnlp_tests/simple/UnsignedJnlpTemplate/resources/UnsignedJnlpTemplate2.jnlp:
+	* tests/jnlp_tests/simple/UnsignedJnlpTemplate/resources/UnsignedJnlpTemplate3.jnlp:
+	Launching jnlp file that does not match the unsigned jnlp application 
+	template file.
+	* tests/jnlp_tests/simple/UnsignedJnlpTemplate/srcs/JNLP-INF/APPLICATION_TEMPLATE.jnlp:
+	Unsigned jnlp application template file.
+	* tests/jnlp_tests/simple/UnsignedJnlpTemplate/srcs/UnsignedJnlpTemplate.java:
+	A simple java class that outputs a string.
+	* tests/jnlp_tests/simple/UnsignedJnlpTemplate/testcases/UnsignedJnlpTemplateTest.java:
+	Testcase that tests the launching of applications with an unsigned jnlp 
+	application template file.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestOne/resources/SignedJnlpCaseTestOne1.jnlp:
+	Launching jnlp file that matches the signed jnlp application file.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestOne/resources/SignedJnlpCaseTestOne2.jnlp:
+	Launching jnlp file that does not match the signed jnlp application file.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestOne/srcs/JNLP-INF/aPpLiCaTioN.jnlp:
+	Signed jnlp application file.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestOne/srcs/SignedJnlpCase.java:
+	A simple java class that outputs a string.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestOne/testcases/SignedJnlpCaseOneTest.java:
+	Testcase that tests the case-sensitivity of the signed jnlp application's 
+	filename.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestTwo/resources/SignedJnlpCaseTestTwo1.jnlp:
+	Launching jnlp file that matches the signed jnlp application template file.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestTwo/resources/SignedJnlpCaseTestTwo2.jnlp:
+	Launching jnlp file that does not match the signed jnlp application 
+	template file.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestTwo/srcs/JNLP-INF/aPpLiCaTiOn_tEmPlAte.jnlp:
+	Signed jnlp application template file.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestTwo/srcs/SignedJnlpCase.java:
+	A simple java class that outputs a string.
+	* tests/jnlp_tests/signed/SignedJnlpCaseTestTwo/testcases/SignedJnlpCaseTwoTest.java:
+	Testcase that tests the case-sensitivity of the signed jnlp application 
+	template's filename.
+
 2012-06-04  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Fix to handle absolute paths passed into jnlp_href's value.
