@@ -238,7 +238,7 @@ public class SecurityDesc {
             for (int i = 0; i < jnlpRIAPermissions.length; i++)
                 permissions.add(jnlpRIAPermissions[i]);
 
-        if (downloadHost != null)
+        if (downloadHost != null && downloadHost.length() > 0)
             permissions.add(new SocketPermission(downloadHost,
                                                  "connect, accept"));
 

@@ -1,3 +1,23 @@
+2012-06-05  Deepak Bhole <dbhole@redhat.com>
+
+	PR861: Allow loading from non codebase hosts. Allow code to connect to
+	hosting server.
+	* netx/net/sourceforge/jnlp/SecurityDesc.java
+	(getSandBoxPermissions): Only add host if it is not empty.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getPermissions): Add SocketPermission for code source host.
+	(findLoadedClassAll): Call super methods privileged so that connection to
+	non codebase hosts can be made.
+	(findClass): Same.
+	(findResourcesBySearching): Same. Also use privileged context for enum
+	operations because the enum is defined on the fly by URLClassLoader and
+	checks for hosting server connectivity via next().
+	(getAccessControlContextForClassLoading): New method. Returns a control
+	context for classloader operations like find/load/etc.
+	(CodeBaseClassLoader::findClass): Call super methods privileged so that
+	connection to non codebase hosts can be made.
+	(CodeBaseClassLoader::findResource): Same.
+
 2012-06-05  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/annotations/KnownToFail.java

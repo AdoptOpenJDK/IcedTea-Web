@@ -25,9 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.SocketPermission;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessControlContext;
+import java.security.AccessControlException;
 import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.CodeSource;
@@ -35,9 +37,12 @@ import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -952,6 +957,11 @@ public class JNLPClassLoader extends URLClassLoader {
                 result.add(runtimePermissions.get(i));
             }
 
+            // Class from host X should be allowed to connect to host X
+            if (cs.getLocation().getHost().length() > 0)
+                result.add(new SocketPermission(cs.getLocation().getHost(),
+                        "connect, accept"));
+
             return result;
         } catch (RuntimeException ex) {
             if (JNLPRuntime.isDebug()) {
@@ -1320,10 +1330,21 @@ public class JNLPClassLoader extends URLClassLoader {
         for (int i = 0; i < loaders.length; i++) {
             Class result = null;
 
-            if (loaders[i] == this)
-                result = super.findLoadedClass(name);
-            else
+            if (loaders[i] == this) {
+                final String fName = name;
+                try {
+                    result = AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<Class<?>>() {
+                                public Class<?> run() {
+                                    return JNLPClassLoader.super.findLoadedClass(fName);
+                                }
+                            }, getAccessControlContextForClassLoading());
+                } catch (PrivilegedActionException pae) {
+                    result = null;
+                }
+            } else {
                 result = loaders[i].findLoadedClassAll(name);
+            }
 
             if (result != null)
                 return result;
@@ -1521,12 +1542,20 @@ public class JNLPClassLoader extends URLClassLoader {
     protected Class findClass(String name) throws ClassNotFoundException {
         for (int i = 0; i < loaders.length; i++) {
             try {
-                if (loaders[i] == this)
-                    return super.findClass(name);
-                else
+                if (loaders[i] == this) {
+                    final String fName = name;
+                    return AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<Class<?>>() {
+                                public Class<?> run() throws ClassNotFoundException {
+                                    return JNLPClassLoader.super.findClass(fName);
+                                }
+                            }, getAccessControlContextForClassLoading());
+                } else {
                     return loaders[i].findClass(name);
+                }
             } catch (ClassNotFoundException ex) {
             } catch (ClassFormatError cfe) {
+            } catch (PrivilegedActionException pae) {
             }
         }
 
@@ -1635,20 +1664,42 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     private Enumeration<URL> findResourcesBySearching(String name) throws IOException {
         List<URL> resources = new ArrayList<URL>();
-        Enumeration<URL> e;
+        Enumeration<URL> e = null;
 
         for (int i = 0; i < loaders.length; i++) {
             // TODO check if this will blow up or not
             // if loaders[1].getResource() is called, wont it call getResource() on
             // the original caller? infinite recursion?
 
-            if (loaders[i] == this)
-                e = super.findResources(name);
-            else
+            if (loaders[i] == this) {
+                final String fName = name;
+                try {
+                    e = AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<Enumeration<URL>>() {
+                                public Enumeration<URL> run() throws IOException {
+                                    return JNLPClassLoader.super.findResources(fName);
+                                }
+                            }, getAccessControlContextForClassLoading());
+                } catch (PrivilegedActionException pae) {
+                }
+            } else {
                 e = loaders[i].findResources(name);
+            }
 
-            while (e.hasMoreElements())
-                resources.add(e.nextElement());
+            final Enumeration<URL> fURLEnum = e;
+            try {
+                resources.addAll(AccessController.doPrivileged(
+                    new PrivilegedExceptionAction<Collection<URL>>() {
+                        public Collection<URL> run() {
+                            List<URL> resources = new ArrayList<URL>();
+                            while (fURLEnum != null && fURLEnum.hasMoreElements()) {
+                                resources.add(fURLEnum.nextElement());
+                            }
+                            return resources;
+                        }
+                    }, getAccessControlContextForClassLoading()));
+            } catch (PrivilegedActionException pae) {
+            }
         }
 
         // Add resources from codebase (only if nothing was found above, 
@@ -1900,6 +1951,56 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
+    /**
+     * Returns an appropriate AccessControlContext for loading classes in
+     * the running instance.
+     *
+     * The default context during class-loading only allows connection to
+     * codebase. However applets are allowed to load jars from arbitrary
+     * locations and the codebase only access falls short if a class from
+     * one location needs a class from another.
+     *
+     * Given protected access since CodeBaseClassloader uses this function too.
+     *
+     * @return The appropriate AccessControlContext for loading classes for this instance
+     */
+    public AccessControlContext getAccessControlContextForClassLoading() {
+        AccessControlContext context = AccessController.getContext();
+
+        try {
+            context.checkPermission(new AllPermission());
+            return context; // If context already has all permissions, don't bother
+        } catch (AccessControlException ace) {
+            // continue below
+        }
+
+        // Since this is for class-loading, technically any class from one jar
+        // should be able to access a class from another, therefore making the
+        // original context code source irrelevant
+        PermissionCollection permissions = this.security.getSandBoxPermissions();
+
+        // Local cache access permissions
+        for (Permission resourcePermission : resourcePermissions) {
+            permissions.add(resourcePermission);
+        }
+
+        // Permissions for all remote hosting urls
+        for (URL u: jarLocationSecurityMap.keySet()) {
+            permissions.add(new SocketPermission(u.getHost(),
+                                                 "connect, accept"));
+        }
+
+        // Permissions for codebase urls
+        for (URL u : codeBaseLoader.getURLs()) {
+            permissions.add(new SocketPermission(u.getHost(),
+                    "connect, accept"));
+        }
+
+        ProtectionDomain pd = new ProtectionDomain(null, permissions);
+
+        return new AccessControlContext(new ProtectionDomain[] { pd });
+    }
+
     /*
      * Helper class to expose protected URLClassLoader methods.
      */
@@ -1931,10 +2032,16 @@ public class JNLPClassLoader extends URLClassLoader {
                 throw new ClassNotFoundException(name);
 
             try {
-                return super.findClass(name);
-            } catch (ClassNotFoundException cnfe) {
+                final String fName = name;
+                return AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<Class<?>>() {
+                            public Class<?> run() throws ClassNotFoundException {
+                                return CodeBaseClassLoader.super.findClass(fName);
+                            }
+                        }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
+            } catch (PrivilegedActionException pae) {
                 notFoundResources.put(name, super.getURLs());
-                throw cnfe;
+                throw new ClassNotFoundException("Could not find class " + name);
             }
         }
 
@@ -1987,8 +2094,18 @@ public class JNLPClassLoader extends URLClassLoader {
             if (Arrays.equals(super.getURLs(), notFoundResources.get(name)))
                 return null;
 
+            URL url = null;
             if (!name.startsWith("META-INF")) {
-                URL url = super.findResource(name);
+                try {
+                    final String fName = name;
+                    url = AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<URL>() {
+                                public URL run() {
+                                    return CodeBaseClassLoader.super.findResource(fName);
+                                }
+                            }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
+                } catch (PrivilegedActionException pae) {
+                }
 
                 if (url == null) {
                     notFoundResources.put(name, super.getURLs());
