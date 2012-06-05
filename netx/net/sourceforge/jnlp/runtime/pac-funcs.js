@@ -326,19 +326,19 @@ function weekdayRange() {
  */
 function dateRange() {
     switch (arguments.length) {
-       case 1: return isDateInRange(new Date(),arguments[0]);
-       case 2: return isDateInRange(new Date(),arguments[0],arguments[1]);
-       case 3: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2]);
-       case 4: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2],arguments[3]);
-       case 5: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4]);
-       case 6: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5]);
-       case 7: return isDateInRange(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5],arguments[6]); //GMT
+       case 1: return isDateInRange_internallForIcedTeaWebTesting(new Date(),arguments[0]);
+       case 2: return isDateInRange_internallForIcedTeaWebTesting(new Date(),arguments[0],arguments[1]);
+       case 3: return isDateInRange_internallForIcedTeaWebTesting(new Date(),arguments[0],arguments[1],arguments[2]);
+       case 4: return isDateInRange_internallForIcedTeaWebTesting(new Date(),arguments[0],arguments[1],arguments[2],arguments[3]);
+       case 5: return isDateInRange_internallForIcedTeaWebTesting(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4]);
+       case 6: return isDateInRange_internallForIcedTeaWebTesting(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5]);
+       case 7: return isDateInRange_internallForIcedTeaWebTesting(new Date(),arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5],arguments[6]); //GMT
        default:
            return false;
     }
 }
 
-function isDateInRange() {
+function isDateInRange_internallForIcedTeaWebTesting() {
 
     function isDate(date) {
         if (typeof(date) === 'number' && (date <= 31 && date >= 1)) {

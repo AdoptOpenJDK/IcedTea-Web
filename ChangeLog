@@ -1,3 +1,11 @@
+2012-06-05  Jiri Vanek  <jvanek@redhat.com>
+
+	isDateInRange renamed to isDateInRange_internallForIcedTeaWebTesting
+	* netx/net/sourceforge/jnlp/runtime/pac-funcs.js: and
+	* tests/netx/pac/pac-funcs-test.js: 
+	(isDateInRange): Renamed to isDateInRange_internallForIcedTeaWebTesting.
+	(isDateInRange_internallForIcedTeaWebTesting): New function
+
 2012-06-04  Saad Mohammad <smohammad@redhat.com>
 
 	Added signed jnlp file tests.

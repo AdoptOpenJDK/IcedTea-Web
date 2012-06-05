@@ -492,13 +492,13 @@ function testDateRange2() {
       var aYearFromNow = new Date(current.getFullYear()+1, current.getMonth()+1, current.getDate()+1);
       var later = [aYearFromNow.getDate(), aYearFromNow.getMonth(), aYearFromNow.getFullYear()];
 
-      runTest(isDateInRange, [ true, current,
+      runTest(isDateInRange_internallForIcedTeaWebTesting, [ true, current,
         today[0], monthToStr(today[1]) , tomorrow[0], monthToStr(tomorrow[1]) ]);
-      runTest(isDateInRange, [ true, current,
+      runTest(isDateInRange_internallForIcedTeaWebTesting, [ true, current,
         yesterday[0], monthToStr(yesterday[1]) , tomorrow[0], monthToStr(tomorrow[1]) ]);
-      runTest(isDateInRange, [ true, current,
+      runTest(isDateInRange_internallForIcedTeaWebTesting, [ true, current,
         yesterday[0], monthToStr(yesterday[1]), yesterday[2], tomorrow[0], monthToStr(tomorrow[1]), tomorrow[2] ]);
-      runTest(isDateInRange, [ false, current,
+      runTest(isDateInRange_internallForIcedTeaWebTesting, [ false, current,
         tomorrow[0], monthToStr(tomorrow[1]), tomorrow[2], later[0], monthToStr(later[1]), later[2] ]);
   }
 
@@ -528,11 +528,11 @@ function testDateRange3() {
     var yesterday = incDate(current,'day',-1);
     var today = incDate(current,'day',0);
     var tomorrow = incDate(current,'day',1);
-    runTest(isDateInRange, [ true, current,
+    runTest(isDateInRange_internallForIcedTeaWebTesting, [ true, current,
       yesterday[0], monthToStr(yesterday[1]) , today[0], monthToStr(today[1]) ]);
-    runTest(isDateInRange, [ true, current,
+    runTest(isDateInRange_internallForIcedTeaWebTesting, [ true, current,
       yesterday[0], monthToStr(yesterday[1]) , tomorrow[0], monthToStr(tomorrow[1]) ]);
-    runTest(isDateInRange, [ true, current,
+    runTest(isDateInRange_internallForIcedTeaWebTesting, [ true, current,
       yesterday[0], monthToStr(yesterday[1]), yesterday[2], tomorrow[0], monthToStr(tomorrow[1]), tomorrow[2] ]);
   }
 }
