@@ -42,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -74,18 +75,21 @@ public class ParserMalformedXml {
     }
 
     @Test
+    @KnownToFail
     public void testMalformedArguments() throws ParseException {
         String malformedJnlp = originalJnlp.replace("arg2</argument", "arg2<argument");
         Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
     }
 
     @Test
+    @KnownToFail
     public void testTagNotClosed() throws ParseException {
         String malformedJnlp = originalJnlp.replace("</jnlp>", "<jnlp>");
         Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
     }
 
     @Test
+    @KnownToFail
     public void testUnquotedAttributes() throws ParseException {
         String malformedJnlp = originalJnlp.replace("'jnlp.jnlp'", "jnlp.jnlp");
         Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));

@@ -48,6 +48,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerAccess.ProcessResult;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 import org.junit.AfterClass;
 import org.junit.Assert;
 
@@ -108,6 +109,7 @@ public class CacheReproducerTest {
         };
 
     @Test
+    @KnownToFail
     public void startParallelInstancesUponBrokenCache() throws Exception {
         clearAndEvaluateCache();
         evaluateSimpleTest1OkCache(runSimpleTest1());

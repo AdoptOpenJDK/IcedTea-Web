@@ -1,3 +1,22 @@
+2012-05-14  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/annotations/KnownToFail.java
+	New file. Annotation for marking failing tests.
+	* tests/report-styles/jreport.xsl:
+	* tests/junit-runner/LessVerboseTextListener.java:
+	* tests/junit-runner/JunitLikeXmlOutputListener.java:  Added counting
+	and printing of @KnownToFail annotations if presented.
+	* tests/jnlp_tests/simple/Spaces can be everywhere/testcases/SpacesCanBeEverywhereTests.java:
+	(SpacesCanBeEverywhereRemoteTests1) (SpacesCanBeEverywhereRemoteTests2)
+	(SpacesCanBeEverywhereRemoteTests3)
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTest.java: (testTemplateCDATA)
+	(testApplicationCDATA)
+	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCases.java:
+	(testCDataFirstChild) (testCDataSecondChild) (testCommentInAttributes)
+	* tests/netx/unit/net/sourceforge/jnlp/ParserMalformedXml.java:
+	(testMalformedArguments) (testTagNotClosed) (testUnquotedAttributes)
+	marked as KnownToFail 
+
 2012-06-05  Jiri Vanek  <jvanek@redhat.com>
 
 	isDateInRange renamed to isDateInRange_internallForIcedTeaWebTesting

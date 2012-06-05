@@ -40,6 +40,7 @@ package net.sourceforge.jnlp;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 
 import net.sourceforge.nanoxml.XMLElement;
 import net.sourceforge.nanoxml.XMLParseException;
@@ -99,6 +100,7 @@ public class ParserCornerCases {
     }
 
     @Test
+    @KnownToFail
     public void testCDataFirstChild() throws XMLParseException, IOException {
         String xml = "<?xml version=\"1.0\"?>\n" +
                 "<jnlp spec=\"1.5+\">\n" +
@@ -110,6 +112,7 @@ public class ParserCornerCases {
     }
 
     @Test
+    @KnownToFail
     public void testCDataSecondChild() throws XMLParseException, IOException {
         String xml = "<?xml version=\"1.0\"?>\n" +
                 "<jnlp spec=\"1.5+\">\n" +
@@ -153,6 +156,7 @@ public class ParserCornerCases {
     }
 
     @Test
+    @KnownToFail
     public void testCommentInAttributes() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
         Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));

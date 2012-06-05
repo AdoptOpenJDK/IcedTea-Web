@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.Random;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -79,6 +80,7 @@ public class JNLPMatcherTest {
     }
 
     @Test
+    @KnownToFail
     public void testTemplateCDATA() throws JNLPMatcherException, IOException {
 
         InputStreamReader launchReader = this.getLaunchReader();
@@ -240,6 +242,7 @@ public class JNLPMatcherTest {
     }
 
     @Test
+    @KnownToFail
     public void testApplicationCDATA() throws JNLPMatcherException, IOException {
 
         InputStreamReader launchReader = this.getLaunchReader();

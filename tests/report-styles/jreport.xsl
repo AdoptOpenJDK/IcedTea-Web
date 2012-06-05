@@ -53,11 +53,17 @@ exception statement from your version.
     <xsl:value-of select="/testsuite/date"/>
     <br/>
     <h2>Result: (<xsl:value-of select="round(sum(/testsuite/testcase/@time))"/>s)</h2>
+    <h4>In brackets are KnownToFail values if any</h4>
     <div class="tablee">
       <div class="row">
         <div class="cell1">TOTAL: </div>
         <div class="cell2">
           <xsl:value-of select="/testsuite/stats/summary/total"/>
+          <xsl:choose>
+           <xsl:when test="/testsuite/stats/summary/total/@known-to-fail!=0">
+             (<xsl:value-of select="/testsuite/stats/summary/total/@known-to-fail"/>)
+           </xsl:when>
+         </xsl:choose>
         </div>
         <div class="space-line"></div>
       </div>
@@ -65,6 +71,11 @@ exception statement from your version.
         <div class="cell1">passed: </div>
         <div class="cell2">
           <xsl:value-of select="/testsuite/stats/summary/passed"/>
+          <xsl:choose>
+           <xsl:when test="/testsuite/stats/summary/passed/@known-to-fail!=0">
+             (<xsl:value-of select="/testsuite/stats/summary/passed/@known-to-fail"/>)
+           </xsl:when>
+         </xsl:choose>
         </div>
         <div class="space-line"></div>
       </div>
@@ -72,6 +83,11 @@ exception statement from your version.
         <div class="cell1">failed: </div>
         <div class="cell2">
           <xsl:value-of select="/testsuite/stats/summary/failed"/>
+          <xsl:choose>
+           <xsl:when test="/testsuite/stats/summary/failed/@known-to-fail!=0">
+             (<xsl:value-of select="/testsuite/stats/summary/failed/@known-to-fail"/>)
+           </xsl:when>
+         </xsl:choose>
         </div>
         <div class="space-line"></div>
       </div>
@@ -79,6 +95,11 @@ exception statement from your version.
         <div class="cell1">ignored: </div>
         <div class="cell2">
           <xsl:value-of select="/testsuite/stats/summary/ignored"/>
+          <xsl:choose>
+           <xsl:when test="/testsuite/stats/summary/ignored/@known-to-fail!=0">
+             (<xsl:value-of select="/testsuite/stats/summary/ignored/@known-to-fail"/>)
+           </xsl:when>
+         </xsl:choose>
         </div>
         <div class="space-line"></div>
       </div>
@@ -115,6 +136,11 @@ exception statement from your version.
             <div class="cell1">TOTAL: </div>
             <div class="cell2">
               <xsl:value-of select="total"/>
+              <xsl:choose>
+               <xsl:when test="total/@known-to-fail!=0">
+                 (<xsl:value-of select="total/@known-to-fail"/>)
+               </xsl:when>
+             </xsl:choose>
             </div>
             <div class="space-line"></div>
           </div>
@@ -122,6 +148,11 @@ exception statement from your version.
             <div class="cell1">passed: </div>
             <div class="cell2">
               <xsl:value-of select="passed"/>
+              <xsl:choose>
+               <xsl:when test="passed/@known-to-fail!=0">
+                 (<xsl:value-of select="passed/@known-to-fail"/>)
+               </xsl:when>
+             </xsl:choose>
             </div>
             <div class="space-line"></div>
           </div>
@@ -129,6 +160,11 @@ exception statement from your version.
             <div class="cell1">failed: </div>
             <div class="cell2">
               <xsl:value-of select="failed"/>
+              <xsl:choose>
+               <xsl:when test="failed/@known-to-fail!=0">
+                 (<xsl:value-of select="failed/@known-to-fail"/>)
+               </xsl:when>
+             </xsl:choose>
             </div>
             <div class="space-line"></div>
           </div>
@@ -136,6 +172,11 @@ exception statement from your version.
             <div class="cell1">ignored: </div>
             <div class="cell2">
               <xsl:value-of select="ignored"/>
+              <xsl:choose>
+               <xsl:when test="ignored/@known-to-fail!=0">
+                 (<xsl:value-of select="ignored/@known-to-fail"/>)
+               </xsl:when>
+             </xsl:choose>
             </div>
             <div class="space-line"></div>
           </div>
@@ -185,12 +226,29 @@ exception statement from your version.
           <xsl:choose>
             <xsl:when test="not(error)">
               <div class="status">
-         PASSED (<xsl:value-of select="@time"/>s)
+         PASSED (<xsl:value-of select="@time"/>s) 
+         <xsl:choose>
+           <xsl:when test="@known-to-fail">
+             <xsl:choose>
+               <xsl:when test="@known-to-fail=true">
+                 <xsl:text>" - WARNING This test is known to fail, but have passed!</xsl:text>
+               </xsl:when>
+               <xsl:otherwise>
+                 <xsl:text> - This test is known to fail</xsl:text>
+               </xsl:otherwise>
+             </xsl:choose>
+           </xsl:when>
+         </xsl:choose>
          </div>
             </xsl:when>
             <xsl:otherwise>
               <div class="status">
-        FAILED (<xsl:value-of select="@time"/>s)
+        FAILED (<xsl:value-of select="@time"/>s) 
+         <xsl:choose>
+           <xsl:when test="@known-to-fail">
+             <xsl:text> - This test is known to fail</xsl:text>
+           </xsl:when>
+         </xsl:choose>
          </div>
               <div class="wtrace">
                 <div class="theader">

@@ -20,7 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 
 
 import org.junit.internal.JUnitSystem;
@@ -28,6 +30,7 @@ import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
+
 /**
  * This class listens for events in junit testsuite and wrote output to xml.
  * Xml tryes to follow ant-tests schema, and is enriched for by-class statistics
@@ -45,6 +48,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
     private static final String TEST_ELEMENT = "testcase";
     private static final String BUGS = "bugs";
     private static final String BUG = "bug";
+    private static final String K2F = "known-to-fail";
     private static final String TEST_NAME_ATTRIBUTE = "name";
     private static final String TEST_TIME_ATTRIBUTE = "time";
     private static final String TEST_ERROR_ELEMENT = "error";
@@ -65,15 +69,24 @@ public class JunitLikeXmlOutputListener extends RunListener {
     private static final String SUMMARY_IGNORED_ELEMENT = "ignored";
     private long testStart;
 
-    private class ClassCounter {
+    private int  failedK2F=0;
+    private int  passedK2F=0;
+    private int  ignoredK2F=0;
+
+    private class ClassStat {
 
         Class c;
         int total;
         int failed;
         int passed;
+        int ignored;
         long time = 0;
+        int  totalK2F=0;
+        int  failedK2F=0;
+        int  passedK2F=0;
+        int  ignoredK2F=0;
     }
-    Map<String, ClassCounter> classStats = new HashMap<String, ClassCounter>();
+    Map<String, ClassStat> classStats = new HashMap<String, ClassStat>();
 
     public JunitLikeXmlOutputListener(JUnitSystem system, File f) {
         try {
@@ -99,9 +112,11 @@ public class JunitLikeXmlOutputListener extends RunListener {
             attString.append(" ");
             Set<Entry<String, String>> entries = atts.entrySet();
             for (Entry<String, String> entry : entries) {
-                String k=entry.getKey();
-                String v= entry.getValue();
-                if (v==null)v="null";
+                String k = entry.getKey();
+                String v = entry.getValue();
+                if (v == null) {
+                    v = "null";
+                }
                 attString.append(k).append("=\"").append(attributize(v)).append("\"");
                 attString.append(" ");
             }
@@ -137,7 +152,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
     @Override
     public void testStarted(Description description) throws Exception {
         testFailed = null;
-        testStart = System.nanoTime() / 1000l / 1000l;
+        testStart = System.nanoTime();
     }
 
     @Override
@@ -146,20 +161,54 @@ public class JunitLikeXmlOutputListener extends RunListener {
     }
 
     @Override
-    public void testFinished(org.junit.runner.Description description) throws Exception {
-        long testTime = System.nanoTime()/1000l/1000l - testStart;
-        double testTimeSeconds = ((double) testTime) / 1000d;
+    public void testIgnored(Description description) throws Exception {
+        testDone(description, 0, 0, true);
+    }
 
-        Map<String, String> testcaseAtts = new HashMap<String, String>(3);
+    @Override
+    public void testFinished(org.junit.runner.Description description) throws Exception {
+        long testTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - testStart);
+        double testTimeSeconds = ((double) testTime) / 1000d;
+        testDone(description, testTime, testTimeSeconds, false);
+    }
+
+    private void testDone(Description description, long testTime, double testTimeSeconds, boolean ignored) throws Exception {
+        Class testClass = null;
+        Method testMethod = null;
+        try {
+            testClass = description.getTestClass();
+            String qs = description.getMethodName();
+            //handling @Browser'bugsIds marking of used browser
+            if (qs.contains(" - ")) {
+                qs = qs.replaceAll(" - .*", "");
+            }
+            testMethod = testClass.getMethod(qs);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        Map<String, String> testcaseAtts = new HashMap<String, String>(4);
         NumberFormat formatter = new DecimalFormat("#0.0000");
         String stringedTime = formatter.format(testTimeSeconds);
         stringedTime.replace(",", ".");
         testcaseAtts.put(TEST_TIME_ATTRIBUTE, stringedTime);
         testcaseAtts.put(TEST_CLASS_ATTRIBUTE, description.getClassName());
         testcaseAtts.put(TEST_NAME_ATTRIBUTE, description.getMethodName());
-
+        KnownToFail k2f=null;
+        try {
+            if (testClass != null && testMethod != null) {
+                k2f = testMethod.getAnnotation(KnownToFail.class);
+                if (k2f != null) {
+                    testcaseAtts.put(K2F, Boolean.TRUE.toString());
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         openElement(TEST_ELEMENT, testcaseAtts);
         if (testFailed != null) {
+            if (k2f != null) {
+                failedK2F++;
+            }
             Map<String, String> errorAtts = new HashMap<String, String>(3);
 
             errorAtts.put(ERROR_MESSAGE_ATTRIBUTE, testFailed.getMessage());
@@ -171,25 +220,32 @@ public class JunitLikeXmlOutputListener extends RunListener {
             }
 
             writeElement(TEST_ERROR_ELEMENT, testFailed.getTrace(), errorAtts);
+        } else {
+            if (k2f != null) {
+                if (ignored) {
+                    ignoredK2F++;
+                } else {
+                    passedK2F++;
+
+                }
+            }
         }
         try {
-            Class q = description.getTestClass();
-            String qs=description.getMethodName();
-            if (qs.contains(" - ")) qs=qs.replaceAll(" - .*", "");
-            Method qm = q.getMethod(qs);
-            Bug b = qm.getAnnotation(Bug.class);
-            if (b != null) {
-                openElement(BUGS);
-                String[] s = b.id();
-                for (String string : s) {
-                        String ss[]=createBug(string);
-                        Map<String, String> visibleNameAtt=new HashMap<String, String>(1);
-                        visibleNameAtt.put("visibleName", ss[0]);
-                        openElement(BUG,visibleNameAtt);
-                        writer.write(ss[1]);
+            if (testClass != null && testMethod != null) {
+                Bug bug = testMethod.getAnnotation(Bug.class);
+                if (bug != null) {
+                    openElement(BUGS);
+                    String[] bugsIds = bug.id();
+                    for (String bugId : bugsIds) {
+                        String idAndUrl[] = createBug(bugId);
+                        Map<String, String> visibleNameAtt = new HashMap<String, String>(1);
+                        visibleNameAtt.put("visibleName", idAndUrl[0]);
+                        openElement(BUG, visibleNameAtt);
+                        writer.write(idAndUrl[1]);
                         closeElement(BUG);
+                    }
+                    closeElement(BUGS);
                 }
-                closeElement(BUGS);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -197,19 +253,34 @@ public class JunitLikeXmlOutputListener extends RunListener {
         closeElement(TEST_ELEMENT);
         writer.flush();
 
-        ClassCounter cc = classStats.get(description.getClassName());
-        if (cc == null) {
-            cc = new ClassCounter();
-            cc.c=description.getTestClass();
-            classStats.put(description.getClassName(), cc);
+        ClassStat classStat = classStats.get(description.getClassName());
+        if (classStat == null) {
+            classStat = new ClassStat();
+            classStat.c = description.getTestClass();
+            classStats.put(description.getClassName(), classStat);
         }
-        cc.total++;
-        cc.time += testTime;
+        classStat.total++;
+        if (k2f != null) {
+            classStat.totalK2F++;
+        }
+        classStat.time += testTime;
         if (testFailed == null) {
-            cc.passed++;
+            if (ignored) {
+                classStat.ignored++;
+                if (k2f != null) {
+                    classStat.ignoredK2F++;
+                }
+            } else {
+                classStat.passed++;
+                if (k2f != null) {
+                    classStat.passedK2F++;
+                }
+            }
         } else {
-
-            cc.failed++;
+            classStat.failed++;
+            if (k2f != null) {
+                classStat.failedK2F++;
+            }
         }
     }
 
@@ -223,24 +294,24 @@ public class JunitLikeXmlOutputListener extends RunListener {
         int passed = result.getRunCount() - result.getFailureCount() - result.getIgnoreCount();
         int failed = result.getFailureCount();
         int ignored = result.getIgnoreCount();
-        writeElement(SUMMARY_TOTAL_ELEMENT, String.valueOf(result.getRunCount()));
-        writeElement(SUMMARY_FAILED_ELEMENT, String.valueOf(failed));
-        writeElement(SUMMARY_IGNORED_ELEMENT, String.valueOf(ignored));
-        writeElement(SUMMARY_PASSED_ELEMENT, String.valueOf(passed));
+        writeElement(SUMMARY_TOTAL_ELEMENT, String.valueOf(result.getRunCount()),createKnownToFailSumamryAttribute(failedK2F+passedK2F+ignoredK2F));
+        writeElement(SUMMARY_FAILED_ELEMENT, String.valueOf(failed),createKnownToFailSumamryAttribute(failedK2F));
+        writeElement(SUMMARY_IGNORED_ELEMENT, String.valueOf(ignored),createKnownToFailSumamryAttribute(ignoredK2F));
+        writeElement(SUMMARY_PASSED_ELEMENT, String.valueOf(passed),createKnownToFailSumamryAttribute(passedK2F));
         closeElement(SUMMARY_ELEMENT);
         openElement(CLASSES_ELEMENT);
-        Set<Entry<String, ClassCounter>> e = classStats.entrySet();
-        for (Entry<String, ClassCounter> entry : e) {
+        Set<Entry<String, ClassStat>> e = classStats.entrySet();
+        for (Entry<String, ClassStat> entry : e) {
 
             Map<String, String> testcaseAtts = new HashMap<String, String>(3);
             testcaseAtts.put(TEST_NAME_ATTRIBUTE, entry.getKey());
             testcaseAtts.put(TEST_TIME_ATTRIBUTE, String.valueOf(entry.getValue().time));
 
             openElement(TEST_CLASS_ELEMENT, testcaseAtts);
-            writeElement(SUMMARY_PASSED_ELEMENT, String.valueOf(entry.getValue().passed));
-            writeElement(SUMMARY_FAILED_ELEMENT, String.valueOf(entry.getValue().failed));
-            writeElement(SUMMARY_IGNORED_ELEMENT, String.valueOf(entry.getValue().total - entry.getValue().failed - entry.getValue().passed));
-            writeElement(SUMMARY_TOTAL_ELEMENT, String.valueOf(entry.getValue().total));
+            writeElement(SUMMARY_PASSED_ELEMENT, String.valueOf(entry.getValue().passed),createKnownToFailSumamryAttribute(entry.getValue().passedK2F));
+            writeElement(SUMMARY_FAILED_ELEMENT, String.valueOf(entry.getValue().failed),createKnownToFailSumamryAttribute(entry.getValue().failedK2F));
+            writeElement(SUMMARY_IGNORED_ELEMENT, String.valueOf(entry.getValue().ignored),createKnownToFailSumamryAttribute(entry.getValue().ignoredK2F));
+            writeElement(SUMMARY_TOTAL_ELEMENT, String.valueOf(entry.getValue().total),createKnownToFailSumamryAttribute(entry.getValue().totalK2F));
             try {
                 Bug b = null;
                 if (entry.getValue().c != null) {
@@ -250,10 +321,10 @@ public class JunitLikeXmlOutputListener extends RunListener {
                     openElement(BUGS);
                     String[] s = b.id();
                     for (String string : s) {
-                        String ss[]=createBug(string);
-                        Map<String, String> visibleNameAtt=new HashMap<String, String>(1);
+                        String ss[] = createBug(string);
+                        Map<String, String> visibleNameAtt = new HashMap<String, String>(1);
                         visibleNameAtt.put("visibleName", ss[0]);
-                        openElement(BUG,visibleNameAtt);
+                        openElement(BUG, visibleNameAtt);
                         writer.write(ss[1]);
                         closeElement(BUG);
                     }
@@ -273,6 +344,11 @@ public class JunitLikeXmlOutputListener extends RunListener {
 
     }
 
+    public Map<String, String> createKnownToFailSumamryAttribute(int count) {
+        Map<String, String> atts = new HashMap<String, String>(1);
+        atts.put(K2F, String.valueOf(count));
+        return atts;
+    }
 
     /**
      * When declare for suite class or for Test-marked method,
