@@ -1,4 +1,4 @@
-2012-05-14  Jiri Vanek  <jvanek@redhat.com>
+2012-06-05  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/annotations/KnownToFail.java
 	New file. Annotation for marking failing tests.
