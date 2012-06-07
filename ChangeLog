@@ -1,3 +1,11 @@
+2012-06-07  Saad Mohammad  <smohammad@redhat.com>
+
+	Allows the user to configure browser paths and/or disable browsers.
+	* acinclude.m4 (IT_FIND_BROWSER): Checks if the browser is set to be 
+	disabled, or if the path provided is valid. Otherwise, it locates the 
+	default path to the browser if found on the system.
+	* configure.ac: Uses IT_FIND_BROWSER to find/configure browsers.
+
 2012-06-06  Deepak Bhole <dbhole@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java

@@ -880,3 +880,40 @@ AC_DEFUN_ONCE([IT_SET_VERSION],
   AC_MSG_RESULT([${FULL_VERSION}])
   AC_SUBST([FULL_VERSION])
 ])
+
+dnl Allows you to configure (enable/disable/set path to) the browser
+dnl REQUIRED Parameters: 
+dnl [browser name, variable to store path, default command to run browser (if not provided, assume it's the same as the browser name]
+AC_DEFUN([IT_FIND_BROWSER],
+[
+  AC_ARG_WITH([$1],
+              [AS_HELP_STRING(--with-$1,specify the location of $1)],
+  [
+   if test "${withval}" = "no" || test "${withval}" = "yes" || test "${withval}" = "" ; then
+    $2=""
+   elif test -f "${withval}" ; then
+    $2="${withval}"
+   else 
+    AC_MSG_CHECKING([for $1])
+    AC_MSG_RESULT([not found])
+    AC_MSG_FAILURE([invalid location specified to $1: ${withval}])
+   fi
+  ],
+  [
+   withval="yes"
+  ])
+
+  if test -f "${$2}"; then
+   AC_MSG_CHECKING([for $1])
+   AC_MSG_RESULT([${$2}])
+  elif test "${withval}" != "no"; then
+   if test $# -gt 2; then
+    AC_PATH_TOOL([$2], [$3], [], [])  
+   else
+    AC_PATH_TOOL([$2], [$1], [], [])
+   fi
+  else
+   AC_MSG_CHECKING([for $1])        
+   AC_MSG_RESULT([no])
+  fi
+])
