@@ -1,3 +1,9 @@
+2012-06-06  Deepak Bhole <dbhole@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getAccessControlContextForClassLoading): Iterate over codebase URLs only
+	if codeBaseLoader is not null.
+
 2012-06-05  Deepak Bhole <dbhole@redhat.com>
 
 	PR861: Allow loading from non codebase hosts. Allow code to connect to

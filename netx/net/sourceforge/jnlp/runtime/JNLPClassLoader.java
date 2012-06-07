@@ -1990,10 +1990,12 @@ public class JNLPClassLoader extends URLClassLoader {
                                                  "connect, accept"));
         }
 
-        // Permissions for codebase urls
-        for (URL u : codeBaseLoader.getURLs()) {
-            permissions.add(new SocketPermission(u.getHost(),
-                    "connect, accept"));
+        // Permissions for codebase urls (if there is a loader)
+        if (codeBaseLoader != null) {
+            for (URL u : codeBaseLoader.getURLs()) {
+                permissions.add(new SocketPermission(u.getHost(),
+                        "connect, accept"));
+            }
         }
 
         ProtectionDomain pd = new ProtectionDomain(null, permissions);
