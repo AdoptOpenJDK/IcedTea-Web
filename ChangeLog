@@ -1,3 +1,7 @@
+2012-06-11  Adam Domurad  <adomurad@redhat.com>
+
+	* NEWS: Added mention of fixing PR518
+
 2012-06-07  Saad Mohammad  <smohammad@redhat.com>
 
 	Allows the user to configure browser paths and/or disable browsers.

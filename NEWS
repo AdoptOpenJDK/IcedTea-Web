@@ -17,6 +17,7 @@ New in release 1.3 (2012-XX-XX):
   - PR863: Error passing strings to applet methods in Chromium
   - PR895: IcedTea-Web searches for missing classes on each loadClass or findClass
   - PR861: Allow loading from non codebase hosts. Allow code to connect to hosting server
+  - PR518: NPString.utf8characters not guaranteed to be nul-terminated
 * Common
   - PR918: java applet windows uses a low resulution black/white icon
 
