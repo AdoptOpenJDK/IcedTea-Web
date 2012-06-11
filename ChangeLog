@@ -1,3 +1,38 @@
+2012-06-11  Jiri Vanek  <jvanek@redhat.com>
+
+	Implemented xml logging backend
+	* Makefile.am: (stamps/run-netx-unit-tests.stamp) and 
+	(stamps/run-netx-dist-tests.stamp) removed redirection of streams as 
+	logging is now done in ServerAccess tests extensions
+	added xsltproc execution above generated xml log
+	xsltproc generating results html files is now receiving result of above 
+	as parameter
+	* tests/report-styles/jreport.xsl: log parameter is now accepted, and 
+	if set, then all tests are linking into specified file to show the log
+	* tests/report-styles/report.css: added styles for new links
+	* tests/report-styles/index.js: new functions to work for result of below sheet
+	* tests/report-styles/logs.xsl: new file, sheet to convert xml log to html file
+	* tests/report-styles/output.css: new file, styles of above html file
+	* tests/jnlp_tests/simple/deadlocktest/testcases/DeadLockTestTest.java:
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ResourcesTest.java:
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+	Tests', server's and ProcessAssasin's logs are now redirected to bottleneck
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+	(LOGS_REPRINT) flag for debugging purposes, will enable reprinting to 
+	stdout/err again
+	(DEFAULT_LOG_FILE ) default name of xml output
+	(DEFAULT_STDERR_FILE)(DEFAULT_STDOUT_FILE)(DEFAULT_STDLOGS_FILE) default
+	values of plain text output files
+	(*ELEMENT) and( (*ATTRIBUTE) variables keeping repeated names of xml 
+	output parts
+	(writeXmlLog) method called from Sytsem.hook to save xml log
+	(addToXmlLog) method to record item to xml structure
+	(TestsLogs) and (LogItem) inner classes to keep logging information
+	(log) is now reprinting message with id to std out/err dependently on
+	(LOGS_REPRINT) but always to internal streams, possilbe exception is thrown
+	(logException) new method, shortcut to log exception in same way as message
+	(getTestMethod) now can handle methods inside ServerAccess class too 
+
 2012-06-11  Adam Domurad  <adomurad@redhat.com>
 
 	* NEWS: Added mention of fixing PR518

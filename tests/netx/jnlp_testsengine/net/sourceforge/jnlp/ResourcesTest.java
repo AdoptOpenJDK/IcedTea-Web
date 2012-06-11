@@ -64,12 +64,12 @@ public class ResourcesTest {
 
         for (int i = 0; i < simpleContent.length; i++) {
             File file = simpleContent[i];
-            System.err.print(file.getName());
+            ServerAccess.logOutputReprint(file.getName());
             //server port have in fact no usage in converting filename to uri-like-filename.
             //But if there is null, instead if some number, then nullpointer exception is thrown (Integer->int).
             //So I'm using "real" currently used port, instead of some random value.
             URI u = new URI((String)null,(String)null,(String)null,server.getPort(),file.getName(),(String)null,null);
-            System.err.println(" ("+u.toString()+")");
+            ServerAccess.logOutputReprint(" ("+u.toString()+")");
             String fname=u.toString();
             if (file.getName().toLowerCase().endsWith(".jnlp")) {
                 String c = server.getResourceAsString("/" + fname);
@@ -98,13 +98,13 @@ public class ResourcesTest {
 
             @Override
             public void charReaded(char ch) {
-                //System.out.println("OO recieved char: "+ch);
+                //ServerAccess.logOutputReprint("OO recieved char: "+ch);
                 o1.append(ch);
             }
 
             @Override
             public void lineReaded(String s) {
-                    //System.out.println("OO recieved line: "+s);
+                    //ServerAccess.logOutputReprint("OO recieved line: "+s);
                 o2.append(s).append("\n");
             }
         };
@@ -112,22 +112,22 @@ public class ResourcesTest {
 
             @Override
             public void charReaded(char ch) {
-                    //System.out.println("EE recieved char: "+ch);
+                    //ServerAccess.logOutputReprint("EE recieved char: "+ch);
                     e1.append(ch);
             }
 
             @Override
             public void lineReaded(String s) {
-                    //System.out.println("EE recieved line: "+s);
+                    //ServerAccess.logOutputReprint("EE recieved line: "+s);
                 e2.append(s).append("\n");
             }
         };
        ServerAccess.ProcessResult pr=server.executeBrowser("simpletest1.jnlp",le,lo);
        pr.process.destroy();
-//        System.out.println("total o");
-//        System.out.println(pr.stdout);
-//        System.out.println("total e");
-//        System.out.println(pr.stderr);
+//        ServerAccess.logOutputReprint("total o");
+//        ServerAccess.logOutputReprint(pr.stdout);
+//        ServerAccess.logOutputReprint("total e");
+//        ServerAccess.logOutputReprint(pr.stderr);
        Assert.assertEquals(pr.stdout, o1.toString());
        Assert.assertEquals(pr.stderr, e1.toString());
        //the last \n is mandatory as las tline is flushed also when proces dies

@@ -225,7 +225,7 @@ public class DeadLockTestTest {
             try {
                 pr = server.executeJavawsHeadless(args, jnlp);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                ServerAccess.logException(ex);
             } finally {
                 finished = true;
             }

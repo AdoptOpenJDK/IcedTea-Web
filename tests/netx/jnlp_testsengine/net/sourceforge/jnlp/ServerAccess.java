@@ -42,12 +42,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -57,8 +62,13 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 import org.junit.Assert;
@@ -120,7 +130,165 @@ public class ServerAccess {
      * this flag is indicating whether output of executeProcess should be logged. By default true.
      */
     public static boolean PROCESS_LOG = true;
+    public static boolean LOGS_REPRINT = false;
 
+    /**
+     * map of classes, each have map of methods, each have errorlist, outLIst, and allList (allist contains also not std or err messages)
+     * class.testMethod.logs
+     */
+    private static final Map<String, Map<String, TestsLogs>> processLogs = new HashMap<String, Map<String, TestsLogs>>(100);
+    private static final File DEFAULT_LOG_FILE = new File("ServerAccess-logs.xml");
+    private static final File DEFAULT_STDERR_FILE = new File("stderr.log");
+    private static final File DEFAULT_STDOUT_FILE = new File("stdout.log");
+    private static final File DEFAULT_STDLOGS_FILE = new File("all.log");
+    private static BufferedWriter DEFAULT_STDERR_WRITER;
+    private static BufferedWriter DEFAULT_STDOUT_WRITER;
+    private static BufferedWriter DEFAULT_STDLOGS_WRITER;
+
+    static{
+        try{
+            DEFAULT_STDOUT_WRITER=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(DEFAULT_STDOUT_FILE)));
+            DEFAULT_STDERR_WRITER=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(DEFAULT_STDERR_FILE)));
+            DEFAULT_STDLOGS_WRITER=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(DEFAULT_STDLOGS_FILE)));
+        }catch(Throwable t){
+            t.printStackTrace();
+        }
+    }
+    private static final String LOGS_ELEMENT = "logs";
+    private static final String CLASSLOG_ELEMENT = "classlog";
+    private static final String CLASSNAME_ATTRIBUTE = "className";
+    private static final String TESTLOG_ELEMENT = "testLog";
+    private static final String TESTMETHOD_ATTRIBUTE = "testMethod";
+    private static final String FULLID_ATTRIBUTE = "fullId";
+    private static final String LOG_ELEMENT = "log";
+    private static final String LOG_ID_ATTRIBUTE = "id";
+    private static final String ITEM_ELEMENT = "item";
+    private static final String ITEM_ID_ATTRIBUTE = "id";
+    private static final String STAMP_ELEMENT = "stamp";
+    private static final String TEXT_ELEMENT = "text";
+    private static final String FULLTRACE_ELEMENT = "fulltrace";
+
+    private static void writeXmlLog() throws FileNotFoundException, IOException {
+        writeXmlLog(DEFAULT_LOG_FILE);
+    }
+
+    private static void writeXmlLog(File f) throws FileNotFoundException, IOException {
+        Writer w = new OutputStreamWriter(new FileOutputStream(f));
+        Set<Entry<String, Map<String, TestsLogs>>> classes = processLogs.entrySet();
+        w.write("<" + LOGS_ELEMENT + ">");
+        for (Entry<String, Map<String, TestsLogs>> classLog : classes) {
+            String className = classLog.getKey();
+            w.write("<" + CLASSLOG_ELEMENT + " " + CLASSNAME_ATTRIBUTE + "=\"" + className + "\">");
+            Set<Entry<String, TestsLogs>> testsLogs = classLog.getValue().entrySet();
+            for (Entry<String, TestsLogs> testLog : testsLogs) {
+                String testName = testLog.getKey();
+                String testLogs = testLog.getValue().toString();
+                w.write("<" + TESTLOG_ELEMENT + " " + TESTMETHOD_ATTRIBUTE + "=\"" + testName + "\" " + FULLID_ATTRIBUTE + "=\"" + className + "." + testName + "\"  >");
+                w.write(testLogs);
+                w.write("</" + TESTLOG_ELEMENT + ">");
+            }
+            w.write("</" + CLASSLOG_ELEMENT + ">");
+        }
+        w.write("</" + LOGS_ELEMENT + ">");
+        w.flush();
+        w.close();
+    }
+
+    private static void addToXmlLog(String message, boolean printToOut, boolean printToErr, StackTraceElement ste) {
+        Map<String, TestsLogs> classLog = processLogs.get(ste.getClassName());
+        if (classLog == null) {
+            classLog = new HashMap<String, TestsLogs>(50);
+            processLogs.put(ste.getClassName(), classLog);
+        }
+        TestsLogs methodLog = classLog.get(ste.getMethodName());
+        if (methodLog == null) {
+            methodLog = new TestsLogs();
+            classLog.put(ste.getMethodName(), methodLog);
+        }
+        methodLog.add(printToErr, printToOut, message);
+    }
+
+    private static class TestsLogs {
+
+        public final List<LogItem> outs = new LinkedList<LogItem>();
+        public final List<LogItem> errs = new LinkedList<LogItem>();
+        public final List<LogItem> all = new LinkedList<LogItem>();
+        private static boolean added = false;
+
+        public synchronized void add(boolean err, boolean out, String text) {
+            if (text == null) {
+                text = "null";
+            }
+            LogItem li = new LogItem(text);
+            if (out) {
+                outs.add(li);
+            }
+            if (err) {
+                errs.add(li);
+            }
+            all.add(li);
+            if (!added) {
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            writeXmlLog();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+                added = true;
+            }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = listToStringBuilder(outs, "out");
+            sb.append(listToStringBuilder(errs, "err"));
+            sb.append(listToStringBuilder(all, "all"));
+            return sb.toString();
+        }
+
+        private StringBuilder listToStringBuilder(List<LogItem> l, String id) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<" + LOG_ELEMENT + " " + LOG_ID_ATTRIBUTE + "=\"").append(id).append("\">\n");
+            int i = 0;
+            for (LogItem logItem : l) {
+                i++;
+                sb.append(logItem.toStringBuilder(i));
+            }
+            sb.append("</" + LOG_ELEMENT + ">\n");
+            return sb;
+        }
+    };
+
+    private static class LogItem {
+
+        public final Date timeStamp = new Date();
+        public final StackTraceElement[] fullTrace = Thread.currentThread().getStackTrace();
+        public final String text;
+
+        public LogItem(String text) {
+            this.text = text;
+        }
+
+        public StringBuilder toStringBuilder(int id) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("  <" + ITEM_ELEMENT + " " + ITEM_ID_ATTRIBUTE + "=\"").append(id).append("\">\n");
+            sb.append("    <" + STAMP_ELEMENT + "><![CDATA[").append(timeStamp.toString()).append("]]></" + STAMP_ELEMENT + ">\n");
+            sb.append("    <" + TEXT_ELEMENT + "><![CDATA[\n").append(text).append("\n]]></" + TEXT_ELEMENT + ">\n");
+            sb.append("    <" + FULLTRACE_ELEMENT + "><![CDATA[\n");
+            //five methods since call in log methods + getStacktrace method
+            for (int i = 6; i < fullTrace.length; i++) {
+                sb.append(fullTrace[i].toString()).append("\n");
+            }
+            sb.append("\n]]>    </" + FULLTRACE_ELEMENT + ">\n");
+            sb.append("  </" + ITEM_ELEMENT + ">\n");
+            return sb;
+        }
+    }
     /**
      * main method of this class prints out random free port
      * or runs server
@@ -562,7 +730,10 @@ public class ServerAccess {
      * @throws IOException
      */
     public static void saveFile(String content, File f) throws IOException {
-        Writer output = new BufferedWriter(new FileWriter(f));
+        saveFile(content, f, "utf-8");
+    }
+    public static void saveFile(String content, File f,String encoding) throws IOException {
+        Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f),encoding));
         output.write(content);
         output.flush();
         output.close();
@@ -762,11 +933,45 @@ public class ServerAccess {
             idded = fullId + ": " + message;
 
         }
+        if (LOGS_REPRINT) {
+            if (printToOut) {
+                System.out.println(idded);
+            }
+            if (printToErr) {
+                System.err.println(idded);
+            }
+        }
+        try{
         if (printToOut) {
-            System.out.println(idded);
+            DEFAULT_STDOUT_WRITER.write(idded);
+            DEFAULT_STDOUT_WRITER.newLine();
         }
         if (printToErr) {
-            System.err.println(idded);
+            DEFAULT_STDERR_WRITER.write(idded);
+            DEFAULT_STDERR_WRITER.newLine();
+        }
+        DEFAULT_STDLOGS_WRITER.write(idded);
+        DEFAULT_STDLOGS_WRITER.newLine();
+        }catch (Throwable t){
+            t.printStackTrace();
+        }
+
+        addToXmlLog(message,printToOut,printToErr,ste);
+    }
+
+    public static void logException(Throwable t){
+        logException(t, true);
+    }
+    public static void logException(Throwable t, boolean print){
+        try{
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        log(sw.toString(), false, print);
+        pw.close();
+        sw.close();
+        }catch(Exception ex){
+           throw new RuntimeException(ex);
         }
     }
 
@@ -788,6 +993,12 @@ public class ServerAccess {
             if (!baseClass.equals(stack[i].getClassName())) {
                 break;
             }
+        }
+        //if nothing left in stack then we have been in ServerAccess already
+        //so the target method is the highest form it and better to return it
+        //rather then die to ArrayOutOfBounds
+        if(i >= stack.length){
+            return result;
         }
         //now we are out of net.sourceforge.jnlp.ServerAccess
         //method we need (the test)  is highest from following class
@@ -1073,9 +1284,9 @@ public class ServerAccess {
                                 String op = t.nextToken();
                                 String p = op;
                                 if (p.startsWith(XSX))p=p.replace(XSX, "/");
-                                System.err.println("Getting: "+p);
+                                logNoReprint("Getting: "+p);
                                 p=URLDecoder.decode(p, "UTF-8");
-                                System.err.println("Serving: "+p);
+                                logNoReprint("Serving: "+p);
                                 p = (".".concat(((p.endsWith("/")) ? p.concat(
                                         "index.html") : p))).replace('/', File.separatorChar);
                                 File pp = new File(dir, p);
@@ -1107,14 +1318,14 @@ public class ServerAccess {
                             }
                         }
                     }catch (SocketException e) {
-                        e.printStackTrace();
+                        logException(e, false);
                     } catch (Exception e) {
                         o.writeBytes("HTTP/1.0 404 ERROR\n\n\n");
-                        e.printStackTrace();
+                        logException(e, false);
                     }
                     o.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logException(e, false);
                 }
             }
         }
@@ -1248,14 +1459,13 @@ public class ServerAccess {
             this.canRun = canRun;
             if (p != null) {
                 if (p.getP() != null) {
-                    System.err.println("Stopping assassin for" + p.toString() + " " + p.getP().toString() + " " + p.getCommandLine() + ": ");
+                    logNoReprint("Stopping assassin for" + p.toString() + " " + p.getP().toString() + " " + p.getCommandLine() + ": ");
                 } else {
-                    System.err.println("Stopping assassin for" + p.toString() + " " + p.getCommandLine() + ": ");
+                    logNoReprint("Stopping assassin for" + p.toString() + " " + p.getCommandLine() + ": ");
                 }
             } else {
-                System.err.println("Stopping assassin for null job: ");
+                logNoReprint("Stopping assassin for null job: ");
             }
-            System.err.flush();
         }
 
         public boolean isCanRun() {
@@ -1288,11 +1498,10 @@ public class ServerAccess {
                         try {
                             if (p != null) {
                                 if (p.getP() != null) {
-                                    System.err.println("Timed out " + p.toString() + " " + p.getP().toString() + " .. killing " + p.getCommandLine() + ": ");
+                                    logErrorReprint("Timed out " + p.toString() + " " + p.getP().toString() + " .. killing " + p.getCommandLine() + ": ");
                                 } else {
-                                    System.err.println("Timed out " + p.toString() + " " + "null  .. killing " + p.getCommandLine() + ": ");
+                                    logErrorReprint("Timed out " + p.toString() + " " + "null  .. killing " + p.getCommandLine() + ": ");
                                 }
-                                System.err.flush();
                                 wasTerminated = true;
                                 p.interrupt();
                                 while (!terminated.contains(p)) {
@@ -1311,13 +1520,12 @@ public class ServerAccess {
                                     }
                                 }
                                 if (p.getP() != null) {
-                                    System.err.println("Timed out " + p.toString() + " " + p.getP().toString() + " .. killed " + p.getCommandLine());
+                                    logErrorReprint("Timed out " + p.toString() + " " + p.getP().toString() + " .. killed " + p.getCommandLine());
                                 } else {
-                                    System.err.println("Timed out " + p.toString() + " null  .. killed " + p.getCommandLine());
+                                    logErrorReprint("Timed out " + p.toString() + " null  .. killed " + p.getCommandLine());
                                 }
-                                System.err.flush();
                             } else {
-                                System.err.println("Timed out null job");
+                                logErrorReprint("Timed out null job");
                             }
                             break;
                         } finally {
@@ -1333,14 +1541,13 @@ public class ServerAccess {
             }
             if (p != null) {
                 if (p.getP() != null) {
-                    System.err.println("assassin for" + p.toString() + " " + p.getP().toString() + " .. done " + p.getCommandLine() + "  termination " + wasTerminated);
+                    logNoReprint("assassin for" + p.toString() + " " + p.getP().toString() + " .. done " + p.getCommandLine() + "  termination " + wasTerminated);
                 } else {
-                    System.err.println("assassin for" + p.toString() + " null .. done " + p.getCommandLine() + "  termination " + wasTerminated);
+                    logNoReprint("assassin for" + p.toString() + " null .. done " + p.getCommandLine() + "  termination " + wasTerminated);
                 }
             } else {
-                System.err.println("assassin for non exisitng job  termination " + wasTerminated);
+                logNoReprint("assassin for non existing job  termination " + wasTerminated);
             }
-            System.err.flush();
         }
     }
 
@@ -1418,7 +1625,7 @@ public class ServerAccess {
             }
 
             if (interrupted) {
-                System.out.println("Stream copier: throwing InterruptedException");
+                logNoReprint("Stream copier: throwing InterruptedException");
                 //throw new InterruptedException();
             }
         }

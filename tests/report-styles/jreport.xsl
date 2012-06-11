@@ -38,6 +38,14 @@ exception statement from your version.
  -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
   <xsl:template match="/">
+<!--
+when parameter is mentioned (no matter of value) eg:
+<xsl:param name="logs">none</xsl:param>
+then xsltproc is not able to change its value since 2008
+This parameter is providing relative path to file with logs which is then linked from this index
+Bad luck that xsltproc is not able to use default values.
+If there is no need for linking, please use value "none" for this variable
+-->
 <html>
  <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -208,8 +216,20 @@ exception statement from your version.
         </a>
         <div class="lineHeader">
           <div class="clazz">
-            <xsl:value-of select="@classname"/>
-          </div>
+            <xsl:choose>
+              <xsl:when test="$logs!='none'">
+                <a class="logLink" target="new">
+                  <xsl:attribute name="href">
+                    <xsl:value-of select="$logs"/>#<xsl:value-of select="@classname"/>.<xsl:value-of select="@name"/>
+                  </xsl:attribute>
+                  <xsl:value-of select="@classname"/>
+                </a>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="@classname"/>
+              </xsl:otherwise>
+             </xsl:choose>
+           </div>
           <xsl:text disable-output-escaping="no"> - </xsl:text>
           <div class="method">
             <xsl:value-of select="@name"/>

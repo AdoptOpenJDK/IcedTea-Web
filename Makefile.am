@@ -679,12 +679,11 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
-	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
-	  > stdout.log 2> stderr.log ; \
-	 cat stdout.log ; \
-	 cat stderr.log >&2
+	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
+
 if WITH_XSLTPROC
-	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
+	$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(JNLP_TESTS_ENGINE_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
+	$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
 endif
 	touch $@
 
@@ -833,12 +832,10 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(JNLP_TESTS_ENGINE_DIR):. \
-	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names \
-	  > stdout.log 2> stderr.log ; \
-	cat stdout.log ; \
-	cat stderr.log >&2
+	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names 
 if WITH_XSLTPROC
-	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
+	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html
+	$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
 endif
 	touch $@
 
@@ -1016,7 +1013,7 @@ clean-netx-unit-tests: clean_tests_reports
 
 clean_tests_reports:
 	rm -rf  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
-	rm -f  $(TESTS_DIR)/index*.html
+	rm -f  $(TESTS_DIR)/*.html
 
 clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public
 	rm -f netx-dist-tests-source-files.txt

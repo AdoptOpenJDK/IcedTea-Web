@@ -1,0 +1,7 @@
+div.space-line {  clear: both; margin: 0; padding: 0; width: auto;}
+div.classa { border: thin solid black; padding: 5px; margin: 5px;}
+div.method {border: thin solid black; padding: 5px; margin: 5px;}
+div.output { border: thin solid black; padding: 5px; margin: 5px; float: left; display: inline; width:30%;  overflow-x: scroll}
+div.item {border-bottom: thin solid black; border-top: thin solid black; border-left: thin solid black; padding: 5px; margin: 5px;}
+div.stamp { border: thin solid black; padding: 5px; margin: 5px;}
+div.fulltrace {border-bottom: thin solid black; border-top: thin solid black; border-left: thin solid black; padding: 5px; margin: 5px;}
