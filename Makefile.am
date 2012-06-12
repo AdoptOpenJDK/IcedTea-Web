@@ -680,7 +680,6 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
-
 if WITH_XSLTPROC
 	$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(JNLP_TESTS_ENGINE_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
 	$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
