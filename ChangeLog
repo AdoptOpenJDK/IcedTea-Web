@@ -1,3 +1,11 @@
+2012-06-12  Adam Domurad  <adomurad@redhat.com>
+
+	Fixes PR722, javaws failing to run with unsigned content in META-INF/
+	* NEWS: Added entry: Fixes PR722
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: Changed
+	isSignatureRelated => isMetaInfFile. Now all files under META-INF/ are
+	disregarded in checking the jar signage.
+
 2012-06-11  Jiri Vanek  <jvanek@redhat.com>
 
 	Implemented xml logging backend

@@ -277,7 +277,7 @@ public class JarCertVerifier implements CertVerifier {
                     anySigned |= isSigned;
 
                     boolean shouldHaveSignature = !je.isDirectory()
-                                                && !signatureRelated(name);
+                                                && !isMetaInfFile(name);
 
                     hasUnsignedEntry |= shouldHaveSignature &&  !isSigned;
 
@@ -438,32 +438,18 @@ public class JarCertVerifier implements CertVerifier {
     }
 
     /**
-     * signature-related files include:
+     * Returns whether a file is in META-INF, and thus does not require signing.
+     *
+     * Signature-related files under META-INF include:
      * . META-INF/MANIFEST.MF
      * . META-INF/SIG-*
      * . META-INF/*.SF
      * . META-INF/*.DSA
      * . META-INF/*.RSA
-     *
-     * Required for verifyJar()
      */
-    private boolean signatureRelated(String name) {
+    static private boolean isMetaInfFile(String name) {
         String ucName = name.toUpperCase();
-        if (ucName.equals(JarFile.MANIFEST_NAME) ||
-                ucName.equals(META_INF) ||
-                (ucName.startsWith(SIG_PREFIX) &&
-                 ucName.indexOf("/") == ucName.lastIndexOf("/"))) {
-            return true;
-        }
-
-        if (ucName.startsWith(META_INF) &&
-                SignatureFileVerifier.isBlockOrSF(ucName)) {
-            // .SF/.DSA/.RSA files in META-INF subdirs
-            // are not considered signature-related
-            return (ucName.indexOf("/") == ucName.lastIndexOf("/"));
-        }
-
-        return false;
+        return ucName.startsWith(META_INF);
     }
 
     /**
