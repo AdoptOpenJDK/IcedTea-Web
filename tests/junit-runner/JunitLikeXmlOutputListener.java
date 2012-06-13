@@ -51,6 +51,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
     private static final String K2F = "known-to-fail";
     private static final String TEST_NAME_ATTRIBUTE = "name";
     private static final String TEST_TIME_ATTRIBUTE = "time";
+    private static final String TEST_IGNORED_ATTRIBUTE = "ignored";
     private static final String TEST_ERROR_ELEMENT = "error";
     private static final String TEST_CLASS_ATTRIBUTE = "classname";
     private static final String ERROR_MESSAGE_ATTRIBUTE = "message";
@@ -193,6 +194,9 @@ public class JunitLikeXmlOutputListener extends RunListener {
         testcaseAtts.put(TEST_TIME_ATTRIBUTE, stringedTime);
         testcaseAtts.put(TEST_CLASS_ATTRIBUTE, description.getClassName());
         testcaseAtts.put(TEST_NAME_ATTRIBUTE, description.getMethodName());
+        if (ignored){
+            testcaseAtts.put(TEST_IGNORED_ATTRIBUTE, Boolean.TRUE.toString());
+        }
         KnownToFail k2f=null;
         try {
             if (testClass != null && testMethod != null) {

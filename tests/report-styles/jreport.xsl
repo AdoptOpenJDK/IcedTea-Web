@@ -201,6 +201,9 @@ If there is no need for linking, please use value "none" for this variable
       <div>
         <xsl:attribute name="class">
           <xsl:choose>
+            <xsl:when test="@ignored">
+           ignored
+            </xsl:when>
             <xsl:when test="error">
            failed
             </xsl:when>
@@ -246,7 +249,14 @@ If there is no need for linking, please use value "none" for this variable
           <xsl:choose>
             <xsl:when test="not(error)">
               <div class="status">
-         PASSED (<xsl:value-of select="@time"/>s) 
+         <xsl:choose>
+           <xsl:when test="@ignored">
+             IGNORED (<xsl:value-of select="@time"/>s) 
+           </xsl:when>
+           <xsl:otherwise>
+             PASSED (<xsl:value-of select="@time"/>s) 
+           </xsl:otherwise>
+         </xsl:choose>
          <xsl:choose>
            <xsl:when test="@known-to-fail">
              <xsl:choose>

@@ -1,3 +1,10 @@
+2012-06-13  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/junit-runner/JunitLikeXmlOutputListener.java:
+	Introduced TEST_IGNORED_ATTRIBUTE to mark test as ignored if should be.
+	* tests/report-styles/jreport.xsl: Applied correct text and style for
+	tests with attribute ignored. 
+
 2012-06-12  Adam Domurad  <adomurad@redhat.com>
 
 	Fixes PR722, javaws failing to run with unsigned content in META-INF/
