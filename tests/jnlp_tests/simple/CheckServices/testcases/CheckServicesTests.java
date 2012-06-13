@@ -36,7 +36,10 @@ exception statement from your version.
  */
 
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,26 +48,40 @@ public class CheckServicesTests {
 
     private static ServerAccess server = new ServerAccess();
 
-    @Test
-    public void CheckServices() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/CheckServices.jnlp");
+    public void evaluateApplet(ProcessResult pr) {
         String s0 = "Codebase for applet was found in constructor";
-        Assert.assertTrue("CheckServices stdout should contain `" + s0 + "' bud didn't.", pr.stdout.contains(s0));
+        Assert.assertTrue("CheckServices stdout should contain `" + s0 + "' but didn't.", pr.stdout.contains(s0));
         String s1 = "Codebase for applet was found in init()";
-        Assert.assertTrue("CheckServices stdout should contain `" + s1 + "' bud didn't.", pr.stdout.contains(s1));
+        Assert.assertTrue("CheckServices stdout should contain `" + s1 + "' but didn't.", pr.stdout.contains(s1));
         String s2 = "Codebase for applet was found in start()";
-        Assert.assertTrue("CheckServices stdout should contain `" + s2 + "' bud didn't.", pr.stdout.contains(s2));
+        Assert.assertTrue("CheckServices stdout should contain `" + s2 + "' but didn't.", pr.stdout.contains(s2));
         /* FIXME: Once the awt robot can close the applet window (i.e. send 
          * a stop event), stdout should be checked for these asserts. 
         String s3 = "Codebase for applet was found in stop()";
-        Assert.assertTrue("CheckServices stdout should contain `" + s3 + "' bud didn't.", pr.stdout.contains(s3));
+        Assert.assertTrue("CheckServices stdout should contain `" + s3 + "' but didn't.", pr.stdout.contains(s3));
         String s4 = "Codebase for applet was found in destroy()";
-        Assert.assertTrue("CheckServices stdout should contain `" + s4 + "' bud didn't.", pr.stdout.contains(s4));
+        Assert.assertTrue("CheckServices stdout should contain `" + s4 + "' but didn't.", pr.stdout.contains(s4));
         */
         String s5 = "Exception occurred with null codebase in";
-        Assert.assertFalse("CheckServices stderr should not contain `" + s5 + "' bud did.", pr.stdout.contains(s5));
+        Assert.assertFalse("CheckServices stderr should not contain `" + s5 + "' but did.", pr.stdout.contains(s5));
         String s6 = "Applet killing itself after 2000 ms of life";
-        Assert.assertTrue("CheckServices stdout should contain `" + s6 + "' bud didn't.", pr.stdout.contains(s6));
+        Assert.assertTrue("CheckServices stdout should contain `" + s6 + "' but didn't.", pr.stdout.contains(s6));
+    }
+
+    @Test
+    @NeedsDisplay
+    public void CheckWebstartServices() throws Exception {
+        ProcessResult pr = server.executeJavaws(null, "/CheckServices.jnlp");
+        evaluateApplet(pr);
+        Assert.assertFalse(pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
+    }
+
+    @Test
+    @NeedsDisplay
+    public void CheckPluginJNLPHServices() throws Exception {
+        ProcessResult pr = server.executeBrowser(null, "/CheckPluginServices.html");
+        evaluateApplet(pr);
+        Assert.assertTrue(pr.wasTerminated);
     }
 }

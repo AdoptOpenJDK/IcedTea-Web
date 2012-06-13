@@ -1,3 +1,11 @@
+2012-06-13  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Update CheckServices reproducer to handle browser testcase.
+	* tests/jnlp_tests/simple/CheckServices/testcases/CheckServicesTests.java:
+	Added browser test and annotation, refactored asserts into helper method.
+	* tests/jnlp_tests/simple/CheckServices/resources/CheckPluginServices.html:
+	New browser test file that runs applet using jnlp_href.
+
 2012-06-13  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/junit-runner/JunitLikeXmlOutputListener.java:
