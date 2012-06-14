@@ -1,3 +1,18 @@
+2012-06-11  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	PR855: AppletStub getDocumentBase() doesn't return full URL
+	* NEWS: Added PR855 entry.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc (plugin_get_documentbase):
+	Assign documentbase_copy directly to href's value instead of iterating
+	through the segments to remove the file from the path.
+	* tests/jnlp_tests/simple/AppletBaseURLTest/srcs/AppletBaseURL.java:
+	* tests/jnlp_tests/simple/AppletBaseURLTest/testcases/AppletBaseURLTest.java:
+	* tests/jnlp_tests/simple/AppletBaseURLTest/resources/AppletBaseURLTest.html:
+	* tests/jnlp_tests/simple/AppletBaseURLTest/resources/AppletBaseURLTest.jnlp:
+	* tests/jnlp_tests/simple/AppletBaseURLTest/resources/AppletJNLPHrefBaseURLTest.html:
+	New reproducer that checks the URLS that document and codebase
+	point are correct.
+
 2012-06-13  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Update CheckServices reproducer to handle browser testcase.
