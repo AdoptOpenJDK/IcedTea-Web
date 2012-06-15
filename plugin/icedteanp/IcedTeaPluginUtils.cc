@@ -1124,27 +1124,23 @@ MessageBus::unSubscribe(BusSubscriber* b)
 void
 MessageBus::post(const char* message)
 {
-	char* msg = (char*) malloc(sizeof(char)*strlen(message) + 1);
 	bool message_consumed = false;
-
-	// consumer frees this memory
-	strcpy(msg, message);
 
 	PLUGIN_DEBUG("Trying to lock %p...\n", &msg_queue_mutex);
 	pthread_mutex_lock(&subscriber_mutex);
 
-    PLUGIN_DEBUG("Message %s received on bus. Notifying subscribers.\n", msg);
+    PLUGIN_DEBUG("Message %s received on bus. Notifying subscribers.\n", message);
 
     std::list<BusSubscriber*>::const_iterator i;
     for( i = subscribers.begin(); i != subscribers.end() && !message_consumed; ++i ) {
-    	PLUGIN_DEBUG("Notifying subscriber %p of %s\n", *i, msg);
-    	message_consumed = ((BusSubscriber*) *i)->newMessageOnBus(msg);
+    	PLUGIN_DEBUG("Notifying subscriber %p of %s\n", *i, message);
+    	message_consumed = ((BusSubscriber*) *i)->newMessageOnBus(message);
     }
 
     pthread_mutex_unlock(&subscriber_mutex);
 
     if (!message_consumed)
-    	PLUGIN_DEBUG("Warning: No consumer found for message %s\n", msg);
+    	PLUGIN_DEBUG("Warning: No consumer found for message %s\n", message);
 
     PLUGIN_DEBUG("%p unlocked...\n", &msg_queue_mutex);
 }

@@ -1303,11 +1303,14 @@ void consume_message(gchar* message) {
         g_free(cookie_info);
         cookie_info = NULL;
       }
+      g_strfreev (parts);
+      parts = NULL;
     }
   else
     {
         g_print ("  Unable to handle message: %s\n", message);
     }
+
 }
 
 void get_instance_from_id(int id, NPP& instance)

@@ -1,3 +1,12 @@
+2012-06-15  Adam Domurad  <adomurad@redhat.com>
+
+	Fixed two memory leaks
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(consume_message): Call to g_strsplit matched with call to g_strfreev.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc
+	(post): Removed copy of string, which assumed consumer freed string
+	(which was not true and not always possible)
+
 2012-06-11  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	PR855: AppletStub getDocumentBase() doesn't return full URL
