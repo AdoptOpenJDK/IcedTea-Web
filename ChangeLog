@@ -1,3 +1,58 @@
+2012-06-19  Jiri Vanek  <jvanek@redhat.com>
+
+	introduced possibility to run comfortably applets+html reproducers
+	* Makefile.am: used BROWSER_TESTS_MODIFICATION variable to pass global
+	switch from configure
+	* acinclude.m4: (IT_SET_GLOBAL_BROWSERTESTS_BHAVIOUR) new method
+	handling --with-browser-tests
+	* configure.ac: used IT_SET_GLOBAL_BROWSERTESTS_BHAVIOUR
+	switch and passing  BROWSER_TESTS_MODIFICATION variable to Makefile.
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
+	(currentBrowser) variable holding injected browser for ServerAccess instance
+	(loggedBrowser) static variable keeping id of (currentBrowser) for static
+	logging purposes
+	(modifyMethodWithForBrowser) new function changing the name of method to
+	"method - browser" for logging purposes
+	(getBrowserLocation) - returning path to process to be launched when
+	browser requested
+	(getBrowserParams) - gathering set default's browser settings
+	(set/getCurrentBrowsers) - set browser by id/return id of set browser
+	(set/getCurrentBrowser) - set browser instance /returns instance of
+	current browser
+	(executeBrowser) family of methods now cooperate with above methods for
+	default set browser
+	(executeBrowser(Browser) family to work with implicit browser
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/annotations/TestInBrowsers.java:
+	annotation for determining which browser(s) to use with annotated method
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/Browser.java:
+	interface for dealing with various browsers
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/BrowserFactory.java:
+	singleton for mapping configured browsers x requested browser x browsers proxies
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/BrowserTest.java:
+	Forefather of all testcases which have methods to do tests iniside browser.
+	Is allowing correct annotation -> proxy trasnver to VirtualServer for
+	selected method and is requesting custom runner from junit framework
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/BrowserTestRunner.java:
+	custom test Ruuner which is responsible for translating annotation and
+	run the method mutlipletimes for each requested browser and to name it properly
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/Browsers.java:
+	enumeration of abstract browsers and theirs sets or subsets.
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/*:
+	individual browsers proxies and theirs abstractions,namely:
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/Opera.java:
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/Firefox.java:
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/Chrome.java:
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/Chromium.java:
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/Midori.java:
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/Epiphany.java:
+	proxies for  browsers as name suggests
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/LinuxBrowser.java:
+	abstract forefather for all browsers implementing Browser interface. Is
+	setting /usr/bin as bin path, libjavaplugin.so as default plugin library name,
+	intorducing stubs for methods (eg 32/64 bit libs)
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/browsers/MozillaFamilyLinuxBrowser:
+	forefather for all browsers except Opera. Is unifying .mozilla/plugins directories
+
 2012-06-15  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/jnlp_tests/simple/AppletTest/resources/appletAutoTests.html:

@@ -44,7 +44,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -54,6 +53,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
@@ -71,6 +71,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.Browser;
+import net.sourceforge.jnlp.browsertesting.BrowserFactory;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -102,7 +107,7 @@ public class ServerAccess {
     public static final String JAVAWS_BUILD_BIN = "javaws.build.bin";
     /** property to set the different then default browser
      */
-    public static final String USED_BROWSER_COMMAND = "used.browser.command";
+    public static final String USED_BROWSERS = "used.browsers";
     public static final String DEFAULT_LOCALHOST_NAME = "localhost";
     /**
      * server instance singleton
@@ -131,6 +136,13 @@ public class ServerAccess {
      */
     public static boolean PROCESS_LOG = true;
     public static boolean LOGS_REPRINT = false;
+
+    private Browser currentBrowser;
+    /**
+     * This is static copy of name of id of currentBrowser for logging purposes
+     */
+    private static String loggedBrowser=Browsers.none.toString();
+    public static final String UNSET_BROWSER="unset_browser";
 
     /**
      * map of classes, each have map of methods, each have errorlist, outLIst, and allList (allist contains also not std or err messages)
@@ -200,12 +212,37 @@ public class ServerAccess {
             classLog = new HashMap<String, TestsLogs>(50);
             processLogs.put(ste.getClassName(), classLog);
         }
-        TestsLogs methodLog = classLog.get(ste.getMethodName());
+        String methodBrowseredName = ste.getMethodName();
+        methodBrowseredName = modifyMethodWithForBrowser(methodBrowseredName,ste.getClassName());
+        TestsLogs methodLog = classLog.get(methodBrowseredName);
         if (methodLog == null) {
             methodLog = new TestsLogs();
-            classLog.put(ste.getMethodName(), methodLog);
+            classLog.put(methodBrowseredName, methodLog);
         }
         methodLog.add(printToErr, printToOut, message);
+    }
+
+     private static String modifyMethodWithForBrowser(String methodBrowseredName, String className) {
+        try {
+            Class clazz = Class.forName(className);
+            /*
+             * By using this isAssignable to ensure corect class before invocation,
+             * then we lost possibility to track manualy set browsers, but it is correct,
+             * as method description is set only when annotation is used
+             */
+             if (clazz != null && BrowserTest.class.isAssignableFrom(clazz)){
+                Method testMethod = clazz.getMethod(methodBrowseredName);
+                if (testMethod != null) {
+                    TestInBrowsers tib = testMethod.getAnnotation(TestInBrowsers.class);
+                    if (tib != null) {
+                        methodBrowseredName = methodBrowseredName + " - " + loggedBrowser;
+                    }
+                }
+            }
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+        }
+        return methodBrowseredName;
     }
 
     private static class TestsLogs {
@@ -419,13 +456,51 @@ public class ServerAccess {
 
       /**
      *
-     * @return - value passed inside as javaws binary location. See JAVAWS_BUILD_BIN
+     * @return - bianry from where to lunch current browser
      */
     public String getBrowserLocation() {
-       String s=System.getProperty(USED_BROWSER_COMMAND);
-       if (s==null) s="firefox";
-       return s;
+       if (this.currentBrowser==null) return UNSET_BROWSER;
+       return this.currentBrowser.getBin();
     }
+
+    public List<String> getBrowserParams() {
+       if (this.currentBrowser==null) return null;
+       List<String> l1=this.currentBrowser.getComaptibilitySwitches();
+       List<String> l2=this.currentBrowser.getDefaultSwitches();
+       List<String> l= new ArrayList();
+       if (l1!=null)l.addAll(l1);
+       if (l2!=null)l.addAll(l2);
+       return l;
+
+    }
+
+    public Browsers getCurrentBrowsers() {
+        if (currentBrowser==null) return null;
+        return currentBrowser.getID();
+    }
+    public Browser getCurrentBrowser() {
+        return currentBrowser;
+    }
+
+    public void setCurrentBrowser(Browsers currentBrowser) {
+        this.currentBrowser = BrowserFactory.getFactory().getBrowser(currentBrowser);
+        if (this.currentBrowser == null) {
+            loggedBrowser = UNSET_BROWSER;
+        } else {
+            loggedBrowser = this.currentBrowser.getID().toString();
+        }
+    }
+
+    public void setCurrentBrowser(Browser currentBrowser) {
+        this.currentBrowser = currentBrowser;
+        if (this.currentBrowser == null) {
+            loggedBrowser = UNSET_BROWSER;
+        } else {
+            loggedBrowser = this.currentBrowser.getID().toString();
+        }
+    }
+
+
 
     /**
      *
@@ -790,10 +865,10 @@ public class ServerAccess {
         return executeJavaws(null, resource,stdoutl,stderrl);
     }
     public ProcessResult executeBrowser(String resource) throws Exception {
-        return executeBrowser(null, resource);
+        return executeBrowser(getBrowserParams(), resource);
     }
     public ProcessResult executeBrowser(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
-        return executeBrowser(null, resource,stderrl,stdoutl);
+        return executeBrowser(getBrowserParams(), resource,stderrl,stdoutl);
     }
 
     /**
@@ -816,6 +891,13 @@ public class ServerAccess {
     }
     public ProcessResult executeBrowser(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
         return executeProcessUponURL(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl);
+    }
+
+     public ProcessResult executeBrowser(Browser b,List<String> otherargs, String resource) throws Exception {
+        return executeProcessUponURL(b.getBin(), otherargs, getUrlUponThisInstance(resource));
+    }
+    public ProcessResult executeBrowser(Browser b,List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+        return executeProcessUponURL(b.getBin(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl);
     }
 
     /**
@@ -927,6 +1009,7 @@ public class ServerAccess {
         String idded;
         StackTraceElement ste = getTestMethod();
         String fullId = ste.getClassName() + "." + ste.getMethodName();
+        fullId = modifyMethodWithForBrowser(ste.getMethodName(), ste.getClassName());
         if (message.contains("\n")) {
             idded = fullId + ": \n" + message + "\n" + fullId + " ---";
         } else {
@@ -1050,7 +1133,7 @@ public class ServerAccess {
             Thread.sleep(100);
         }
         pa.setCanRun(false);
-        // System.out.println(t.getP().exitValue()); when process is killed, this throws exception
+        // ServerAccess.logOutputReprint(t.getP().exitValue()); when process is killed, this throws exception
 
         ProcessResult pr=new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode(), null);
         if (PROCESS_LOG) {
@@ -1144,11 +1227,13 @@ public class ServerAccess {
                 if (ex instanceof InterruptedException) {
                     //add to the set of terminated threaded processes
                     deadlyException = ex;
+                    logException(deadlyException, false);
                     terminated.add(this);
                 } else {
                     //happens when non-existing process is launched, is causing p null!
                     terminated.add(this);
                     deadlyException = ex;
+                    logException(deadlyException, false);
                     throw new RuntimeException(ex);
                 }
             } finally {
@@ -1492,8 +1577,8 @@ public class ServerAccess {
                 try {
 
                     long time = System.nanoTime() / NANO_TIME_DELIMITER;
-                    //System.out.println(time - startTime);
-                    //System.out.println((time - startTime) > timeout);
+                    //ServerAccess.logOutputReprint(time - startTime);
+                    //ServerAccess.logOutputReprint((time - startTime) > timeout);
                     if ((time - startTime) > timeout) {
                         try {
                             if (p != null) {
@@ -1660,8 +1745,7 @@ public class ServerAccess {
                 //do not want to bother output with terminations
                 //mostly compaling when assassin kill the process about StreamClosed
             } catch (Exception ex) {
-                // ex.printStackTrace();
-                // System.err.flush();
+                // logException(ex);
             } finally {
                 try {
                     is.close();

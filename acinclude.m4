@@ -917,3 +917,32 @@ AC_DEFUN([IT_FIND_BROWSER],
    AC_MSG_RESULT([no])
   fi
 ])
+
+AC_DEFUN_ONCE([IT_SET_GLOBAL_BROWSERTESTS_BEHAVIOUR],
+[
+  AC_MSG_CHECKING([how browser test will be run])
+  AC_ARG_WITH([browser-tests],
+             [AS_HELP_STRING([--with-browser-tests],
+                              [yes - as defined (default), no - all browser tests will be skipped, one - all "mutiple browsers" test will behave as "one" test, all - all browser tests will be run for all set browsers])],
+             [
+               BROWSER_SWITCH=${withval}
+             ],
+             [
+               BROWSER_SWITCH="yes"
+             ])
+  D_PARAM_PART="-Dmodified.browsers.run"
+  case "$BROWSER_SWITCH" in
+    "yes" )
+        BROWSER_TESTS_MODIFICATION="" ;;
+    "no" )
+        BROWSER_TESTS_MODIFICATION="$D_PARAM_PART=ignore" ;;
+    "one" )
+        BROWSER_TESTS_MODIFICATION="$D_PARAM_PART=one" ;;
+    "all" )
+        BROWSER_TESTS_MODIFICATION="$D_PARAM_PART=all" ;;
+    *) 
+        AC_MSG_ERROR([unknown valkue of with-browser-tests ($BROWSER_SWITCH), so not use (yes) or set yes|no|one|all])
+  esac
+  AC_MSG_RESULT(${BROWSER_SWITCH})
+  AC_SUBST(BROWSER_TESTS_MODIFICATION)
+])
