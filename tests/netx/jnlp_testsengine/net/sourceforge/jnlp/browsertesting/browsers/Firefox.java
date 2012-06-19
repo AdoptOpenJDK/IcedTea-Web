@@ -10,7 +10,7 @@ public class Firefox extends MozillaFamilyLinuxBrowser {
         super(bin);
     }
 
-    String[] cs={"-safe-mode ", "-no-remote", "-new-tab"};
+    String[] cs={"-no-remote", "-new-tab"};
 
     @Override
     public Browsers getID() {
