@@ -62,28 +62,36 @@ public class DeadLockTestTest {
     @Test
     public void testDeadLockTestTerminated() throws Exception {
         testDeadLockTestTerminatedBody(deadlocktest);
+        testDeadLockTestTerminatedBody(deadlocktest);
+        ServerAccess.logOutputReprint("Currently running javas12 " + countJavaInstances());
     }
 
     @Test
     public void testDeadLockTestTerminated2() throws Exception {
         testDeadLockTestTerminatedBody(deadlocktest_1);
+        testDeadLockTestTerminatedBody(deadlocktest_1);
+        /**
+         * this happens, when p.p.destroy is called before p.interrupt. and destroyed variable is removedI have no idea why, but it is incorrect.
+        Assert.assertNotNull("return can not be null in no fork process. Was ",pr.returnValue);//in this case forking is forbiden, and sojava throws an exception after destroy
+         */
+        ServerAccess.logOutputReprint("Currently running javas13 " + countJavaInstances());
     }
 
     public void testDeadLockTestTerminatedBody(String jnlp) throws Exception {
         List<String> before = countJavaInstances();
-        ServerAccess.logOutputReprint("java1 "+jnlp+" : " + before.size());
+        ServerAccess.logOutputReprint("java1 " + jnlp + " : " + before.size());
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, jnlp);
         assertDeadlockTestLaunched(pr);
         List<String> after = countJavaInstances();
-        ServerAccess.logOutputReprint("java2 "+jnlp+" : " + after.size());
-        String ss="This process is hanging more than 30s. Should be killed";
-        Assert.assertFalse("stdout shoud not contains: "+ss+", but did",pr.stdout.contains(ss));
+        ServerAccess.logOutputReprint("java2 " + jnlp + " : " + after.size());
+        String ss = "This process is hanging more than 30s. Should be killed";
+        Assert.assertFalse("stdout should not contains: " + ss + ", but did", pr.stdout.contains(ss));
 //        Assert.assertTrue(pr.stderr.contains("xception"));, exception is thrown by engine,not by application
         Assert.assertTrue("testDeadLockTestTerminated should be terminated, but wasn't", pr.wasTerminated);
-        Assert.assertEquals(null, pr.returnValue);//killed process have no value
+        Assert.assertNull("Killed process must have null return value. Have not - ", pr.returnValue);
         killDiff(before, after);
         List<String> afterKill = countJavaInstances();
-        ServerAccess.logOutputReprint("java3 "+jnlp+" : " + afterKill.size());
+        ServerAccess.logOutputReprint("java3 " + jnlp + " : " + afterKill.size());
         Assert.assertEquals("assert that just old javas remians", 0, (before.size() - afterKill.size()));
     }
 
@@ -191,7 +199,7 @@ public class DeadLockTestTest {
     }
 
     public static void main(String[] args) throws Exception {
-        ServerAccess.logOutputReprint(""+countJavaInstances());
+        ServerAccess.logOutputReprint("" + countJavaInstances());
     }
 
     private void assertDeadlockTestLaunched(ProcessResult pr) {
@@ -199,6 +207,15 @@ public class DeadLockTestTest {
         Assert.assertTrue("Deadlock test should print out " + s + ", but did not", pr.stdout.contains(s));
         String ss = "xception";
         Assert.assertFalse("Deadlock test should not stderr " + ss + " but did", pr.stderr.contains(ss));
+        //each 3500 seconds deadlock test stdout something
+        //timeout is 20s
+        //so it should write out FIVE sentences, but is mostly just three or four. Last is nearly always consumed by termination
+        for (int i = 1; i <= 3; i++) {
+            String sentence = i + " Deadlock sleeping";
+            Assert.assertTrue(
+                    "stdout should contains: " + sentence + ", didn't, so framework have consumed to much during termination",
+                    pr.stdout.contains(sentence));
+        }
     }
 
     private void waitForBackgroundDeadlock(final BackgroundDeadlock bd) throws InterruptedException {

@@ -51,9 +51,11 @@ import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.CodeBaseClassLoader;
+import net.sourceforge.jnlp.annotations.Bug;
 
 import org.junit.Test;
 
+@Bug(id={"PR895","http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html","http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
 public class CodeBaseClassLoaderTest {
 
     @Test

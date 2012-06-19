@@ -42,11 +42,15 @@ public class DeadlockTest {
     public static void main(String[] args) throws Exception {
         long startTime = System.nanoTime() / 1000000l;
         System.out.println("Deadlock test started");
+        int i=0;
         while (true) {
             long now = System.nanoTime() / 1000000l;
-            Thread.sleep(10);
+            Thread.sleep(3500);
+            i++;
+            System.out.println(i+" Deadlock sleeping");
             if (now - startTime > DEADLOCK_TEST_TIME_OF_LIFE) {
                 System.out.println("This process is hanging more then "+DEADLOCK_TEST_TIME_OF_LIFE/1000+"s. Should be killed");
+                System.out.flush();
                 System.exit(5);
             }
         }
