@@ -1,5 +1,7 @@
 package net.sourceforge.jnlp.browsertesting.browsers;
 
+import java.util.Arrays;
+import java.util.List;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 
 public class Firefox extends MozillaFamilyLinuxBrowser {
@@ -8,10 +10,19 @@ public class Firefox extends MozillaFamilyLinuxBrowser {
         super(bin);
     }
 
+    String[] cs={"-safe-mode ", "-no-remote", "-new-tab"};
+
     @Override
     public Browsers getID() {
         return Browsers.firefox;
     }
+
+    @Override
+    public List<String> getComaptibilitySwitches() {
+        return Arrays.asList(cs);
+    }
+
+
 
 
     
