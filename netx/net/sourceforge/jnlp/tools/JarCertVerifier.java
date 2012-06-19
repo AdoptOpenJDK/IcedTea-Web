@@ -183,9 +183,7 @@ public class JarCertVerifier implements CertVerifier {
         verifiedJars = new ArrayList<String>();
         unverifiedJars = new ArrayList<String>();
 
-        for (int i = 0; i < jars.size(); i++) {
-
-            JARDesc jar = jars.get(i);
+        for (JARDesc jar : jars) {
 
             try {
 
@@ -242,10 +240,9 @@ public class JarCertVerifier implements CertVerifier {
             Vector<JarEntry> entriesVec = new Vector<JarEntry>();
             byte[] buffer = new byte[8192];
 
-            JarEntry je;
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
-                je = entries.nextElement();
+                JarEntry je = entries.nextElement();
                 entriesVec.addElement(je);
 
                 InputStream is = jarFile.getInputStream(je);
@@ -265,12 +262,10 @@ public class JarCertVerifier implements CertVerifier {
             if (jarFile.getManifest() != null) {
                 if (verbose)
                     System.out.println();
-                Enumeration<JarEntry> e = entriesVec.elements();
 
                 long now = System.currentTimeMillis();
 
-                while (e.hasMoreElements()) {
-                    je = e.nextElement();
+                for (JarEntry je : entriesVec) {
                     String name = je.getName();
                     CodeSigner[] signers = je.getCodeSigners();
                     boolean isSigned = (signers != null);
@@ -352,7 +347,6 @@ public class JarCertVerifier implements CertVerifier {
                         addToDetails(R("SNotYetValidCert"));
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
