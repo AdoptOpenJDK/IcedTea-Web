@@ -40,13 +40,15 @@ import java.util.Collections;
 import java.util.List;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerAccess.ProcessResult;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import org.junit.Assert;
 
 import org.junit.Test;
 
-public class AppletTestSignedTests {
+public class AppletTestSignedTests extends BrowserTest {
 
-    private static ServerAccess server = new ServerAccess();
     private final List<String> l = Collections.unmodifiableList(Arrays.asList(new String[]{"-Xtrustall"}));
 
     @Test
@@ -77,6 +79,7 @@ public class AppletTestSignedTests {
     }
 
     @Test
+    @TestInBrowsers(testIn = {Browsers.all})
     public void AppletTestSignedFirefoxTest() throws Exception {
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {

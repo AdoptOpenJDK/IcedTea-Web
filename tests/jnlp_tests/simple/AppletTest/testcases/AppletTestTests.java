@@ -37,15 +37,48 @@ exception statement from your version.
 
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerAccess.ProcessResult;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import org.junit.Assert;
 
 import org.junit.Test;
 
-public class AppletTestTests {
-
-    private static ServerAccess server = new ServerAccess();
+public class AppletTestTests extends BrowserTest {
 
     @Test
+    @TestInBrowsers(testIn = {Browsers.googleChrome})
+    @NeedsDisplay
+    public void doubleChrome() throws Exception {
+        server.PROCESS_TIMEOUT = 30 * 1000;
+        try {
+            //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
+            //just verify loging is recording browser
+            ServerAccess.ProcessResult pr1 = server.executeBrowser("/appletAutoTests.html");
+            if (pr1.process == null) {
+                Assert.assertTrue("If proces was null here, then google-chrome had to not exist, and so "
+                        + ServerAccess.UNSET_BROWSER
+                        + " should be in exception, but exception was "
+                        + pr1.deadlyException.getMessage(),
+                        pr1.deadlyException.getMessage().contains(ServerAccess.UNSET_BROWSER));
+                return;
+            }
+            evaluateApplet(pr1);
+            Assert.assertTrue(pr1.wasTerminated);
+            //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
+            // just verify loging is recording browser
+            ServerAccess.ProcessResult pr = server.executeBrowser("/appletAutoTests.html");
+            evaluateApplet(pr);
+            Assert.assertTrue(pr.wasTerminated);
+        } finally {
+            server.PROCESS_TIMEOUT = 20 * 1000; //back to normal
+        }
+    }
+
+    @Test
+    @NeedsDisplay
     public void AppletTest() throws Exception {
         ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/AppletTest.jnlp");
         evaluateApplet(pr);
@@ -73,8 +106,28 @@ public class AppletTestTests {
     }
 
     @Test
-    public void AppletInFirefoxTest() throws Exception {
-        server.PROCESS_TIMEOUT = 30 * 1000;
+    @TestInBrowsers(testIn = {Browsers.all})
+    @NeedsDisplay
+    public void AppletInBrowserTest() throws Exception {
+        //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
+        //just verify loging is recordingb rowser
+        ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
+        try {
+            ServerAccess.ProcessResult pr = server.executeBrowser("/appletAutoTests2.html");
+            evaluateApplet(pr);
+            Assert.assertTrue(pr.wasTerminated);
+            //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null
+        } finally {
+            ServerAccess.PROCESS_TIMEOUT = 20 * 1000; //back to normal
+        }
+    }
+
+    @TestInBrowsers(testIn = {Browsers.all})
+    @NeedsDisplay
+    public void AppletInBrowserTestXslowX() throws Exception {
+        //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
+        //just verify loging is recording browser
+        ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
             ServerAccess.ProcessResult pr = server.executeBrowser("/appletAutoTests.html");
             pr.process.destroy();
@@ -82,7 +135,7 @@ public class AppletTestTests {
             Assert.assertTrue(pr.wasTerminated);
             //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null
         } finally {
-            server.PROCESS_TIMEOUT = 20 * 1000; //back to normal
+            ServerAccess.PROCESS_TIMEOUT = 20 * 1000; //back to normal
         }
     }
 }

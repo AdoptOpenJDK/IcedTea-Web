@@ -36,16 +36,16 @@ exception statement from your version.
  */
 
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
-import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 import org.junit.Assert;
 
 import org.junit.Test;
 
-public class AppletReadsInvalidJarTests {
+public class AppletReadsInvalidJarTests extends BrowserTest{
 
-    private static ServerAccess server = new ServerAccess();
-
+  
     static final String CORRECT_EXECUTION = "Program Executed Correctly.";
     static final String JNLP_EXPECTED_EXCEPTION = "ZipException";
 
@@ -60,6 +60,7 @@ public class AppletReadsInvalidJarTests {
 
     /*This SHOULD execute the applet!*/
     @Test
+    @TestInBrowsers(testIn={Browsers.one})
     public void AppletInFirefoxTest() throws Exception {
         ServerAccess.ProcessResult pr = server.executeBrowser("/AppletReadsInvalidJar.html");
 

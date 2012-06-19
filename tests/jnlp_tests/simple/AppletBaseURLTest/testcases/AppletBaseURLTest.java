@@ -35,17 +35,17 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AppletBaseURLTest {
-
-    private static ServerAccess server = new ServerAccess();
+public class AppletBaseURLTest extends BrowserTest{
 
     private void evaluateApplet(ProcessResult pr, String baseName) {
         String s8 = "(?s).*Codebase is http://localhost:[0-9]{5}/ for this applet(?s).*";
@@ -68,6 +68,7 @@ public class AppletBaseURLTest {
     @Bug(id="PR855")
     @NeedsDisplay
     @Test
+    @TestInBrowsers(testIn={Browsers.one})
     public void AppletInFirefoxTest() throws Exception {
         ProcessResult pr = server.executeBrowser("/AppletBaseURLTest.html");
         pr.process.destroy();
@@ -78,6 +79,7 @@ public class AppletBaseURLTest {
     @Bug(id="PR855")
     @NeedsDisplay
     @Test
+    @TestInBrowsers(testIn={Browsers.one})
     public void AppletWithJNLPHrefTest() throws Exception {
         ProcessResult pr = server.executeBrowser("/AppletJNLPHrefBaseURLTest.html");
         pr.process.destroy();

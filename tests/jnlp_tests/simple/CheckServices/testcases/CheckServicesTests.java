@@ -35,18 +35,18 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 @Bug(id="http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-February/017153.html")
-public class CheckServicesTests {
-
-    private static ServerAccess server = new ServerAccess();
+public class CheckServicesTests extends BrowserTest{
 
     public void evaluateApplet(ProcessResult pr) {
         String s0 = "Codebase for applet was found in constructor";
@@ -79,6 +79,7 @@ public class CheckServicesTests {
 
     @Test
     @NeedsDisplay
+    @TestInBrowsers(testIn={Browsers.one})
     public void CheckPluginJNLPHServices() throws Exception {
         ProcessResult pr = server.executeBrowser(null, "/CheckPluginServices.html");
         evaluateApplet(pr);

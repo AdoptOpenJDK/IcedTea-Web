@@ -38,14 +38,179 @@ package net.sourceforge.jnlp;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import net.sourceforge.jnlp.browsertesting.Browser;
+import net.sourceforge.jnlp.browsertesting.BrowserFactory;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.browsers.LinuxBrowser;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import org.junit.Assert;
 
 import org.junit.Test;
 
-public class ResourcesTest {
+public class ResourcesTest extends  BrowserTest{
 
-    private static ServerAccess server = new ServerAccess();
+
+    @Test
+    @NeedsDisplay
+    public void testNonExisitngBrowserWillNotDeadlock() throws Exception {
+        server.setCurrentBrowser(Browsers.none);
+        ServerAccess.ProcessResult pr = server.executeBrowser("simpletest1.jnlp");
+        Assert.assertNull(pr.process);
+        Assert.assertEquals(pr.stderr, "");
+        Assert.assertEquals(pr.stdout, "");
+        Assert.assertTrue(pr.wasTerminated);
+        Assert.assertTrue(pr.returnValue < 0);
+        junit.framework.Assert.assertNotNull(pr.deadlyException);
+    }
+
+    @Test
+    public void testUnexistingProcessWillFailRecognizedly() throws Exception {
+        server.setCurrentBrowser(Browsers.none);
+        List<String> al=Arrays.asList(new String[] {"definietly_not_Existing_process"});
+        ServerAccess.ProcessResult pr = server.executeProcess(al);
+        Assert.assertNull(pr.process);
+        Assert.assertEquals(pr.stderr, "");
+        Assert.assertEquals(pr.stdout, "");
+        Assert.assertTrue(pr.wasTerminated);
+        Assert.assertTrue(pr.returnValue < 0);
+        junit.framework.Assert.assertNotNull(pr.deadlyException);
+    }
+
+    @Test
+    @TestInBrowsers(testIn=Browsers.none)
+    public void testNonExisitngBrowserWillNotCauseMess() throws Exception {
+        ServerAccess.ProcessResult pr = server.executeBrowser("simpletest1.jnlp");
+        Assert.assertNull(pr.process);
+        Assert.assertEquals(pr.stderr, "");
+        Assert.assertEquals(pr.stdout, "");
+        Assert.assertTrue(pr.wasTerminated);
+        Assert.assertTrue(pr.returnValue < 0);
+        junit.framework.Assert.assertNotNull(pr.deadlyException);
+    }
+
+    @Test
+    public void testBrowsers2() throws Exception {
+        List<Browser> a = BrowserFactory.getFactory().getAllBrowsers();
+        Assert.assertNotNull("returned browsers array must not be null", a);
+        Assert.assertTrue("at least one browser must be configured", a.size() > 0);
+        for (Browser b : a) {
+            testBrowser(b);
+        }
+
+    }
+
+    @Test
+    @TestInBrowsers(testIn = Browsers.all)
+    public void testBrowser3() throws Exception {
+        testBrowser(server.getCurrentBrowser());
+
+
+    }
+
+    @Test
+    public void testBrowsers1() throws Exception {
+        BrowserFactory bf = new BrowserFactory(null);
+        int expected = 0;
+        Assert.assertTrue("Created from null there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        bf = new BrowserFactory("");
+        expected = 0;
+        Assert.assertTrue("Created from empty there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        String s = "dsgrdg";
+        bf = new BrowserFactory(s);
+        expected = 0;
+        Assert.assertTrue("Created from nonsense " + s + " there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = "sgrg/jkik";
+        bf = new BrowserFactory(s);
+        expected = 0;
+        Assert.assertTrue("Created from nonsense " + s + " there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = Browsers.firefox + "/jkik";
+        bf = new BrowserFactory(s);
+        expected = 0;
+        Assert.assertTrue("Created from nonsense " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = "sgrg/jkik:sege";
+        bf = new BrowserFactory(s);
+        expected = 0;
+        Assert.assertTrue("Created from  two nonsenses " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = Browsers.firefox.toExec() + ":" + Browsers.firefox;
+        bf = new BrowserFactory(s);
+        expected = 2;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = Browsers.firefox.toExec();
+        bf = new BrowserFactory(s);
+        expected = 1;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = "something/somewhere/" + Browsers.firefox.toExec();
+        bf = new BrowserFactory(s);
+        expected = 1;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = "something/somewhere/" + Browsers.firefox.toExec() + ":" + "something/somewhere/" + Browsers.opera.toExec();
+        bf = new BrowserFactory(s);
+        expected = 2;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = "something/somewhere/" + Browsers.firefox.toExec() + ":" + "something/somewhere/" + Browsers.opera.toExec() + ":" + Browsers.chromiumBrowser;
+        bf = new BrowserFactory(s);
+        expected = 3;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = Browsers.firefox.toExec() + ":" + "vfdgf" + ":" + Browsers.googleChrome.toExec();
+        bf = new BrowserFactory(s);
+        expected = 2;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = Browsers.firefox.toExec() + ":" + Browsers.chromiumBrowser + ":" + Browsers.googleChrome.toExec() + ":" + Browsers.opera;
+        bf = new BrowserFactory(s);
+        expected = 4;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+        testFullFactory(bf);
+
+        s = "fgfd/" + Browsers.firefox.toExec() + ":" + "/fgfd/" + Browsers.chromiumBrowser + ":" + "fgfd/dfsdf/" + Browsers.googleChrome.toExec() + ":" + "/g/fgfd/" + Browsers.opera;
+        bf = new BrowserFactory(s);
+        expected = 4;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+        testFullFactory(bf);
+
+        s = Browsers.firefox.toExec() + ":" + ":" + Browsers.googleChrome.toExec() + ":" + Browsers.opera;
+        bf = new BrowserFactory(s);
+        expected = 3;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = Browsers.firefox.toExec() + ":" + ":" + ":" + Browsers.opera;
+        bf = new BrowserFactory(s);
+        expected = 2;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = ":" + ":" + Browsers.googleChrome.toExec() + ":";
+        bf = new BrowserFactory(s);
+        expected = 1;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+        s = ":" + Browsers.firefox.toExec() + ":bfgbfg/fddf/" + Browsers.googleChrome.toExec() + ":";
+        bf = new BrowserFactory(s);
+        expected = 2;
+        Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
+
+
+
+
+    }
 
     @Test
     public void testResourcesExists() throws Exception {
@@ -68,9 +233,9 @@ public class ResourcesTest {
             //server port have in fact no usage in converting filename to uri-like-filename.
             //But if there is null, instead if some number, then nullpointer exception is thrown (Integer->int).
             //So I'm using "real" currently used port, instead of some random value.
-            URI u = new URI((String)null,(String)null,(String)null,server.getPort(),file.getName(),(String)null,null);
+            URI u = new URI((String) null, (String) null, (String) null, server.getPort(), file.getName(), (String) null, null);
             ServerAccess.logOutputReprint(" ("+u.toString()+")");
-            String fname=u.toString();
+            String fname = u.toString();
             if (file.getName().toLowerCase().endsWith(".jnlp")) {
                 String c = server.getResourceAsString("/" + fname);
                 Assert.assertTrue(c.contains("<"));
@@ -89,12 +254,14 @@ public class ResourcesTest {
     }
 
     @Test
+    @NeedsDisplay
+    @TestInBrowsers(testIn = Browsers.one)
     public void testListeners() throws Exception {
-        final StringBuilder o1=new StringBuilder();
-        final StringBuilder e1=new StringBuilder();
-        final StringBuilder o2=new StringBuilder();
-        final StringBuilder e2=new StringBuilder();
-        final ContentReaderListener lo=new ContentReaderListener() {
+        final StringBuilder o1 = new StringBuilder();
+        final StringBuilder e1 = new StringBuilder();
+        final StringBuilder o2 = new StringBuilder();
+        final StringBuilder e2 = new StringBuilder();
+        final ContentReaderListener lo = new ContentReaderListener() {
 
             @Override
             public void charReaded(char ch) {
@@ -104,26 +271,28 @@ public class ResourcesTest {
 
             @Override
             public void lineReaded(String s) {
-                    //ServerAccess.logOutputReprint("OO recieved line: "+s);
+                //ServerAccess.logOutputReprint("OO recieved line: "+s);
                 o2.append(s).append("\n");
             }
         };
-        ContentReaderListener le=new ContentReaderListener() {
+        ContentReaderListener le = new ContentReaderListener() {
 
             @Override
             public void charReaded(char ch) {
-                    //ServerAccess.logOutputReprint("EE recieved char: "+ch);
-                    e1.append(ch);
+                //ServerAccess.logOutputReprint("EE recieved char: "+ch);
+                e1.append(ch);
             }
 
             @Override
             public void lineReaded(String s) {
-                    //ServerAccess.logOutputReprint("EE recieved line: "+s);
+                //ServerAccess.logOutputReprint("EE recieved line: "+s);
                 e2.append(s).append("\n");
             }
         };
        ServerAccess.ProcessResult pr=server.executeBrowser("simpletest1.jnlp",le,lo);
-       pr.process.destroy();
+        server.setCurrentBrowser(BrowserFactory.getFactory().getFirst().getID());
+        Assert.assertNotNull(server.getCurrentBrowsers());
+        Assert.assertNotNull(server.getCurrentBrowser());
 //        ServerAccess.logOutputReprint("total o");
 //        ServerAccess.logOutputReprint(pr.stdout);
 //        ServerAccess.logOutputReprint("total e");
@@ -134,5 +303,77 @@ public class ResourcesTest {
        Assert.assertEquals(pr.stdout.replace("\n", ""), o2.toString().replace("\n", ""));
        Assert.assertEquals(pr.stderr.replace("\n", ""), e2.toString().replace("\n", ""));
 
+    }
+
+    private void testFullFactory(BrowserFactory bf) {
+        Assert.assertEquals(bf.getBrowser(Browsers.chromiumBrowser).getID(), Browsers.chromiumBrowser);
+        Assert.assertEquals(bf.getBrowser(Browsers.googleChrome).getID(), Browsers.googleChrome);
+        Assert.assertEquals(bf.getBrowser(Browsers.firefox).getID(), Browsers.firefox);
+        Assert.assertEquals(bf.getBrowser(Browsers.opera).getID(), Browsers.opera);
+    }
+
+    private void testBrowser(Browser browser) throws IOException {
+        File f1 = null;
+        if (browser.getDefaultPluginExpectedLocation() != null) {
+            f1 = new File(browser.getDefaultPluginExpectedLocation());
+        }
+        File f2 = null;
+        if (browser.getUserDefaultPluginExpectedLocation() != null) {
+            f2 = new File(browser.getUserDefaultPluginExpectedLocation());
+        }
+        if (f1 != null) {
+            Assert.assertTrue("browser's plugins  location should exist " + f1.toString() + " for " + browser.getID().toString(), f1.exists());
+        }
+        if (f2 != null) {
+            Assert.assertTrue("browser's users-plugins  location should exist " + f2.toString() + " for " + browser.getID().toString(), f2.exists());
+        }
+
+        File[] ff1 = new File[0];
+        if (f1 != null) {
+            ff1 = f1.listFiles();
+        }
+
+        File[] ff2 = new File[0];
+        if (f2 != null) {
+            ff2 = f2.listFiles();
+        }
+
+        Assert.assertTrue("at least one of browser's plugins  directory should contains at least one file didn't. For " + browser.getID().toString(), ff1.length + ff2.length > 0);
+
+        ff1 = new File[0];
+        if (f1 != null) {
+            ff1 = f1.listFiles(new FileFilter() {
+
+                @Override
+                public boolean accept(File pathname) {
+                    return (pathname.getName().equals(LinuxBrowser.DEFAULT_PLUGIN_NAME));
+                }
+            });
+        }
+
+        ff2 = new File[0];
+        if (f2 != null) {
+            ff2 = f2.listFiles(new FileFilter() {
+
+                @Override
+                public boolean accept(File pathname) {
+                    return (pathname.getName().equals(LinuxBrowser.DEFAULT_PLUGIN_NAME));
+                }
+            });
+        }
+
+        Assert.assertTrue("browser's plugins  directories should contains exactly one  " + LinuxBrowser.DEFAULT_PLUGIN_NAME + ", but didnt for " + browser.getID().toString(),
+                ff1.length + ff2.length == 1);
+        String currentPath = server.getJavawsFile().getParentFile().getParentFile().getAbsolutePath();
+
+        File[] ff;
+        if (ff1.length == 1) {
+            ff = ff1;
+        } else {
+            ff = ff2;
+        }
+        String s = ServerAccess.getContentOfStream(new FileInputStream(ff[0]), "ASCII");
+        Assert.assertTrue("browser's plugins  shoud points to" + currentPath + ", but  didnt",
+                s.contains(s));
     }
 }

@@ -40,14 +40,15 @@ import java.util.List;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import org.junit.Assert;
-
 import org.junit.Test;
 
 @Bug(id={"http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-October/016127.html","PR804","PR811"})
-public class SpacesCanBeEverywhereTests {
+public class SpacesCanBeEverywhereTests extends BrowserTest {
 
-    private static ServerAccess server = new ServerAccess();
 
     @Bug(id="PR811")
     @Test
@@ -104,6 +105,7 @@ public class SpacesCanBeEverywhereTests {
     @Bug(id="PR811")
     @Test
     @NeedsDisplay
+    @TestInBrowsers(testIn = {Browsers.all})
     public void SpacesCanBeEverywhereRemoteAppletTestsHtml2() throws Exception {
         ServerAccess.ProcessResult pr = server.executeBrowser("/spaces+applet+Tests.html");
         String s="Spaces can be everywhere.jsr was launched correctly";

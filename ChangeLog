@@ -1,5 +1,43 @@
 2012-06-19  Jiri Vanek  <jvanek@redhat.com>
 
+	various test for browser engine
+	* tests/jnlp_tests/simple/AppletTest/resources/appletAutoTests.html:
+	fixed missing parenthesis
+	* tests/jnlp_tests/simple/AppletTest/resources/appletAutoTests2.html:
+	new test excluding XslowX for applets
+	* tests/jnlp_tests/simple/AppletTest/testcases/AppletTestTests:
+	(doubleChrome) test for ensuring that two chrome browsers launched
+	behind themselves will not cause errors as they were without
+	criticalFixes patch
+	(AppletInBrowserTest) and (AppletInBrowserTestXslowX) testing methods
+	for all browser
+	* tests/jnlp_tests/simple/AppletTest/testcases/AppletBaseURLTest:
+	* tests/jnlp_tests/simple/AppletTest/testcases/CheckServicesTests:
+	* tests/jnlp_tests/simple/AppletTest/testcases/AppletReadsInvalidJarTests:
+	Included @TestInBrowser instead of plain executeBrowser
+	* tests/jnlp_tests/simple/deadlocktest/srcs/DeadlockTest.java: improved
+	to print sometimes something out
+	* tests/jnlp_tests/simple/deadlocktest/testcases/DeadLockTestTest.java:
+	(testDeadLockTestTerminatedBody) enhanced to ensure that not so much is
+	lost when process is terminated, but showing that something can be lost
+	(which is correct)
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ResourcesTest.java:
+	(testNonExisitngBrowserWillNotDeadlock) testing taht when no browser is
+	set, then no deadlock happens as happen before criticalFixes's deadlyException
+	(testUnexistingProcessWillFailRecognizedly)  is actually testing deadlyException
+	(testNonExisitngBrowserWillNotCauseMess) some but with annotation which
+	was also harming output of tool little bit without TestInBrowsersAnnotation fixed.
+	(testBrowsers2) is testing all browsers configuration without annotation
+	and (testBrowser3) do the same configuration tests annotation driven
+	(testBrowser) body of above two methods. Is testing whether used
+	browsers are correctly linked with latest build
+	(testBrowsers1) is testing parsing of -D variable
+	(testListeners) annotated that needs display
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
+	annotated with Bug annotation 
+
+2012-06-19  Jiri Vanek  <jvanek@redhat.com>
+
 	introduced possibility to run comfortably applets+html reproducers
 	* Makefile.am: used BROWSER_TESTS_MODIFICATION variable to pass global
 	switch from configure

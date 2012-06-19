@@ -37,13 +37,14 @@ exception statement from your version.
 
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerAccess.ProcessResult;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import org.junit.Assert;
 
 import org.junit.Test;
 
-public class AppletTakesLastParamTests {
-
-    private static ServerAccess server = new ServerAccess();
+public class AppletTakesLastParamTests extends BrowserTest {
 
     @Test
     public void AppletTest() throws Exception {
@@ -59,6 +60,7 @@ public class AppletTakesLastParamTests {
     }
 
     @Test
+    @TestInBrowsers(testIn = {Browsers.one})
     public void AppletInFirefoxTest() throws Exception {
         ServerAccess.ProcessResult pr = server.executeBrowser("/appletTakesLastParam.html");
         evaluateApplet(pr);
