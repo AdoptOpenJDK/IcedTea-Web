@@ -37,8 +37,6 @@ exception statement from your version. */
 
 package sun.applet;
 
-// FIXME: for each type of request extend a new (anonymous?)
-// PluginCallRequest.
 public abstract class PluginCallRequest {
     private String message;
     private Long reference;

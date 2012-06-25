@@ -1,5 +1,18 @@
 2012-06-25  Adam Domurad  <adomurad@redhat.com>
 
+	Small comment cleanup to classes with missing or wrong descriptions.
+	* plugin/icedteanp/java/sun/applet/PluginMessageHandlerWorker.java: 
+	Comment at top fixed
+	* plugin/icedteanp/java/sun/applet/AppletSecurityContextManager.java: 
+	Same
+	* plugin/icedteanp/java/sun/applet/PluginException.java: Same
+	* plugin/icedteanp/java/sun/applet/PluginCallRequestFactory.java: Same
+	* netx/net/sourceforge/jnlp/PluginBridge.java: Add class description.
+	* plugin/icedteanp/java/sun/applet/PluginCallRequest.java: 
+	Removed FIXME that had already been fixed.
+
+2012-06-25  Adam Domurad  <adomurad@redhat.com>
+
 	Allow passing of plugin tables and browser tables in NP_Initialize that
 	are not the expected length but still large enough for our purposes.
 	* plugin/icedteanp/IcedTeaNPPlugin.cc

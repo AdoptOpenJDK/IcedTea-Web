@@ -1,4 +1,4 @@
-/* VoidPluginCallRequest -- represent Java-to-JavaScript requests
+/* PluginException -- represents an exception in handling a plugin message
    Copyright (C) 2008  Red Hat
 
 This file is part of IcedTea.

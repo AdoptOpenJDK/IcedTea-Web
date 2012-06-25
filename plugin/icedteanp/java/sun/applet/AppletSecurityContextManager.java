@@ -1,4 +1,6 @@
-/* VoidPluginCallRequest -- represent Java-to-JavaScript requests
+/* AppletSecurityContextManager -- handles messages in an appropriate security
+ context
+
    Copyright (C) 2008  Red Hat
 
 This file is part of IcedTea.

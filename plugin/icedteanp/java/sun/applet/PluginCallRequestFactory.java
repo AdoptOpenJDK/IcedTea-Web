@@ -1,4 +1,5 @@
-/* VoidPluginCallRequest -- represent Java-to-JavaScript requests
+/* PluginCallRequestFactory -- contains factory methods for dispatching
+ an appropriate PluginCallRequest.
    Copyright (C) 2008  Red Hat
 
 This file is part of IcedTea.

@@ -34,6 +34,10 @@ import java.util.Map;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
+/**
+ * Allows reuse of code that expects a JNLPFile object,
+ * while overriding behaviour specific to applets.
+ */
 public class PluginBridge extends JNLPFile {
 
     String name;

@@ -1,4 +1,4 @@
-/* VoidPluginCallRequest -- represent Java-to-JavaScript requests
+/* PluginMessageHandlerWorker -- worker thread for handling messages
    Copyright (C) 2008  Red Hat
 
 This file is part of IcedTea.
