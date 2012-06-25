@@ -1,3 +1,16 @@
+2012-06-25  Adam Domurad  <adomurad@redhat.com>
+
+	Allow passing of plugin tables and browser tables in NP_Initialize that
+	are not the expected length but still large enough for our purposes.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(initialize_browser_functions): New function to check size of passed
+	browser function table, and initialize 'browser_functions' global
+	variable.
+	(initialize_plugin_table): New function to check size of passed
+	plugin function table, and initialize proper plugin callbacks.
+	(NP_Initialize): Make use of initialization helper functions, get
+	rid of old size tests and error if the helper functions fail.
+
 2012-06-18  Adam Domurad  <adomurad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java

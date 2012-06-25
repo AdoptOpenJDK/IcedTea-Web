@@ -2012,6 +2012,80 @@ plugin_data_destroy (NPP instance)
   PLUGIN_DEBUG ("plugin_data_destroy return\n");
 }
 
+static bool
+initialize_browser_functions(const NPNetscapeFuncs* browserTable)
+{
+#if MOZILLA_VERSION_COLLAPSED < 1090100
+#define NPNETSCAPEFUNCS_LAST_FIELD_USED (browserTable->pluginthreadasynccall)
+#else
+#define NPNETSCAPEFUNCS_LAST_FIELD_USED (browserTable->setvalueforurl)
+#endif
+
+  //Determine the size in bytes, as a difference of the address past the last used field
+  //And the browser table address
+  size_t usedSize = (char*)(1 + &NPNETSCAPEFUNCS_LAST_FIELD_USED) - (char*)browserTable;
+
+  // compare the reported size versus the size we required
+  if (browserTable->size < usedSize)
+  {
+    return false;
+  }
+
+  //Ensure any unused fields are NULL
+  memset(&browser_functions, 0, sizeof(NPNetscapeFuncs));
+  //Copy fields according to given size
+  memcpy(&browser_functions, browserTable, browserTable->size);
+
+  return true;
+}
+
+/* Set the plugin table to the correct contents, taking care not to write past
+ * the provided object space */
+static bool
+initialize_plugin_table(NPPluginFuncs* pluginTable)
+{
+#define NPPLUGINFUNCS_LAST_FIELD_USED (pluginTable->getvalue)
+
+  //Determine the size in bytes, as a difference of the address past the last used field
+  //And the browser table address
+  size_t usedSize = (char*)(1 + &NPPLUGINFUNCS_LAST_FIELD_USED) - (char*)pluginTable;
+
+  // compare the reported size versus the size we required
+  if (pluginTable->size < usedSize)
+    return false;
+
+  pluginTable->version = (NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR;
+  pluginTable->size = sizeof (NPPluginFuncs);
+
+#if MOZILLA_VERSION_COLLAPSED < 1090100
+  pluginTable->newp = NewNPP_NewProc (ITNP_New);
+  pluginTable->destroy = NewNPP_DestroyProc (ITNP_Destroy);
+  pluginTable->setwindow = NewNPP_SetWindowProc (ITNP_SetWindow);
+  pluginTable->newstream = NewNPP_NewStreamProc (ITNP_NewStream);
+  pluginTable->destroystream = NewNPP_DestroyStreamProc (ITNP_DestroyStream);
+  pluginTable->asfile = NewNPP_StreamAsFileProc (ITNP_StreamAsFile);
+  pluginTable->writeready = NewNPP_WriteReadyProc (ITNP_WriteReady);
+  pluginTable->write = NewNPP_WriteProc (ITNP_Write);
+  pluginTable->print = NewNPP_PrintProc (ITNP_Print);
+  pluginTable->urlnotify = NewNPP_URLNotifyProc (ITNP_URLNotify);
+  pluginTable->getvalue = NewNPP_GetValueProc (ITNP_GetValue);
+#else
+  pluginTable->newp = NPP_NewProcPtr (ITNP_New);
+  pluginTable->destroy = NPP_DestroyProcPtr (ITNP_Destroy);
+  pluginTable->setwindow = NPP_SetWindowProcPtr (ITNP_SetWindow);
+  pluginTable->newstream = NPP_NewStreamProcPtr (ITNP_NewStream);
+  pluginTable->destroystream = NPP_DestroyStreamProcPtr (ITNP_DestroyStream);
+  pluginTable->asfile = NPP_StreamAsFileProcPtr (ITNP_StreamAsFile);
+  pluginTable->writeready = NPP_WriteReadyProcPtr (ITNP_WriteReady);
+  pluginTable->write = NPP_WriteProcPtr (ITNP_Write);
+  pluginTable->print = NPP_PrintProcPtr (ITNP_Print);
+  pluginTable->urlnotify = NPP_URLNotifyProcPtr (ITNP_URLNotify);
+  pluginTable->getvalue = NPP_GetValueProcPtr (ITNP_GetValue);
+#endif
+
+  return true;
+}
+
 // FACTORY FUNCTIONS
 
 // Provides the browser with pointers to the plugin functions that we
@@ -2045,100 +2119,31 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
       return NPERR_INCOMPATIBLE_VERSION_ERROR;
     }
 
-  // Ensure that the plugin function table we've received is large
-  // enough to store the number of functions that we may provide.
-  if (pluginTable->size < sizeof (NPPluginFuncs))
-    {
-      PLUGIN_ERROR ("Invalid plugin function table.");
+  // Copy into a global table (browser_functions) the browser functions that we may use.
+  // If the browser functions needed change, update NPNETSCAPEFUNCS_LAST_FIELD_USED
+  // within this function
+  bool browser_functions_supported = initialize_browser_functions(browserTable);
 
-      return NPERR_INVALID_FUNCTABLE_ERROR;
-    }
+  // Check if everything we rely on is supported
+  if ( !browser_functions_supported )
+  {
+	PLUGIN_ERROR ("Invalid browser function table.");
 
-  // Ensure that the browser function table is large enough to store
-  // the number of browser functions that we may use.
-  if (browserTable->size < sizeof (NPNetscapeFuncs))
-    {
-      fprintf (stderr, "ERROR: Invalid browser function table. Some functionality may be restricted.\n");
-    }
-
-  // Store in a local table the browser functions that we may use.
-  browser_functions.size                    = browserTable->size;
-  browser_functions.version                 = browserTable->version;
-  browser_functions.geturlnotify            = browserTable->geturlnotify;
-  browser_functions.geturl                  = browserTable->geturl;
-  browser_functions.posturlnotify           = browserTable->posturlnotify;
-  browser_functions.posturl                 = browserTable->posturl;
-  browser_functions.requestread             = browserTable->requestread;
-  browser_functions.newstream               = browserTable->newstream;
-  browser_functions.write                   = browserTable->write;
-  browser_functions.destroystream           = browserTable->destroystream;
-  browser_functions.status                  = browserTable->status;
-  browser_functions.uagent                  = browserTable->uagent;
-  browser_functions.memalloc                = browserTable->memalloc;
-  browser_functions.memfree                 = browserTable->memfree;
-  browser_functions.memflush                = browserTable->memflush;
-  browser_functions.reloadplugins           = browserTable->reloadplugins;
-  browser_functions.getJavaEnv              = browserTable->getJavaEnv;
-  browser_functions.getJavaPeer             = browserTable->getJavaPeer;
-  browser_functions.getvalue                = browserTable->getvalue;
-  browser_functions.setvalue                = browserTable->setvalue;
-  browser_functions.invalidaterect          = browserTable->invalidaterect;
-  browser_functions.invalidateregion        = browserTable->invalidateregion;
-  browser_functions.forceredraw             = browserTable->forceredraw;
-  browser_functions.getstringidentifier     = browserTable->getstringidentifier;
-  browser_functions.getstringidentifiers    = browserTable->getstringidentifiers;
-  browser_functions.getintidentifier        = browserTable->getintidentifier;
-  browser_functions.identifierisstring      = browserTable->identifierisstring;
-  browser_functions.utf8fromidentifier      = browserTable->utf8fromidentifier;
-  browser_functions.intfromidentifier       = browserTable->intfromidentifier;
-  browser_functions.createobject            = browserTable->createobject;
-  browser_functions.retainobject            = browserTable->retainobject;
-  browser_functions.releaseobject           = browserTable->releaseobject;
-  browser_functions.invoke                  = browserTable->invoke;
-  browser_functions.invokeDefault           = browserTable->invokeDefault;
-  browser_functions.evaluate                = browserTable->evaluate;
-  browser_functions.getproperty             = browserTable->getproperty;
-  browser_functions.setproperty             = browserTable->setproperty;
-  browser_functions.removeproperty          = browserTable->removeproperty;
-  browser_functions.hasproperty             = browserTable->hasproperty;
-  browser_functions.hasmethod               = browserTable->hasmethod;
-  browser_functions.releasevariantvalue     = browserTable->releasevariantvalue;
-  browser_functions.setexception            = browserTable->setexception;
-  browser_functions.pluginthreadasynccall   = browserTable->pluginthreadasynccall;
-#if MOZILLA_VERSION_COLLAPSED >= 1090100
-  browser_functions.getvalueforurl          = browserTable->getvalueforurl;
-  browser_functions.setvalueforurl          = browserTable->setvalueforurl;
-#endif
+	return NPERR_INVALID_FUNCTABLE_ERROR;
+  }
 
   // Return to the browser the plugin functions that we implement.
-  pluginTable->version = (NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR;
-  pluginTable->size = sizeof (NPPluginFuncs);
+  // If the plugin functions needed change, update NPPLUGINFUNCS_LAST_FIELD_USED
+  // within this function
+  bool plugin_functions_supported = initialize_plugin_table(pluginTable);
 
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-  pluginTable->newp = NewNPP_NewProc (ITNP_New);
-  pluginTable->destroy = NewNPP_DestroyProc (ITNP_Destroy);
-  pluginTable->setwindow = NewNPP_SetWindowProc (ITNP_SetWindow);
-  pluginTable->newstream = NewNPP_NewStreamProc (ITNP_NewStream);
-  pluginTable->destroystream = NewNPP_DestroyStreamProc (ITNP_DestroyStream);
-  pluginTable->asfile = NewNPP_StreamAsFileProc (ITNP_StreamAsFile);
-  pluginTable->writeready = NewNPP_WriteReadyProc (ITNP_WriteReady);
-  pluginTable->write = NewNPP_WriteProc (ITNP_Write);
-  pluginTable->print = NewNPP_PrintProc (ITNP_Print);
-  pluginTable->urlnotify = NewNPP_URLNotifyProc (ITNP_URLNotify);
-  pluginTable->getvalue = NewNPP_GetValueProc (ITNP_GetValue);
-#else
-  pluginTable->newp = NPP_NewProcPtr (ITNP_New);
-  pluginTable->destroy = NPP_DestroyProcPtr (ITNP_Destroy);
-  pluginTable->setwindow = NPP_SetWindowProcPtr (ITNP_SetWindow);
-  pluginTable->newstream = NPP_NewStreamProcPtr (ITNP_NewStream);
-  pluginTable->destroystream = NPP_DestroyStreamProcPtr (ITNP_DestroyStream);
-  pluginTable->asfile = NPP_StreamAsFileProcPtr (ITNP_StreamAsFile);
-  pluginTable->writeready = NPP_WriteReadyProcPtr (ITNP_WriteReady);
-  pluginTable->write = NPP_WriteProcPtr (ITNP_Write);
-  pluginTable->print = NPP_PrintProcPtr (ITNP_Print);
-  pluginTable->urlnotify = NPP_URLNotifyProcPtr (ITNP_URLNotify);
-  pluginTable->getvalue = NPP_GetValueProcPtr (ITNP_GetValue);
-#endif
+  // Check if everything we rely on is supported
+  if ( !plugin_functions_supported )
+  {
+    PLUGIN_ERROR ("Invalid plugin function table.");
+
+    return NPERR_INVALID_FUNCTABLE_ERROR;
+  }
 
   // Re-setting the above tables multiple times is OK (as the 
   // browser may change its function locations). However 
