@@ -1,3 +1,23 @@
+2012-06-26 Jiri Vanek <jvanek@redhat.com>
+
+	Reproducer for classes which should be loaded before verification but are not
+	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-applet-hack.jnlp
+	jnlp launcher of applet variant with injecting new url to classlaoder
+	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-applet-new.jnlp
+	jnlp launcher of applet variant with custom classlaoder
+	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-hack.html
+	html launcher of applet variant with injecting new url to classlaoder
+	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-hack.jnlp
+	jnlp launcher of application variant with injecting new url to classlaoder
+	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-new.html
+	html launcher of applet variant with custom classlaoder
+	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-new.jnlp
+	jnlp launcher of application variant with custom classlaoder
+	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/srcs/InternalClassloaderWithDownloadedResource.java:
+	Both application and applet reproducing behavior of this bug
+	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/testcases/InternalClassloaderWithDownloadedResourceTest.java:
+	Testcase launching jnlp application, jnlp applet and html applet 
+
 2012-06-26  Jiri Vanek  <jvanek@redhat.com>
 
 	Last hope for not downloaded resources to be verified
