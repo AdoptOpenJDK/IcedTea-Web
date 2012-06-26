@@ -9,7 +9,9 @@ import java.util.Random;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.browsers.Chrome;
 import net.sourceforge.jnlp.browsertesting.browsers.Chromium;
+import net.sourceforge.jnlp.browsertesting.browsers.Epiphany;
 import net.sourceforge.jnlp.browsertesting.browsers.Firefox;
+import net.sourceforge.jnlp.browsertesting.browsers.Midory;
 import net.sourceforge.jnlp.browsertesting.browsers.Opera;
 
 public class BrowserFactory {
@@ -49,9 +51,12 @@ public class BrowserFactory {
                 if (string.equals(Browsers.firefox.toString())) {
                     configuredBrowsers.add(new Firefox(s[i]));
                 }
-
-
-
+                if (string.equals(Browsers.epiphany.toString())) {
+                    configuredBrowsers.add(new Epiphany(s[i]));
+                }
+                if (string.equals(Browsers.midori.toString())) {
+                    configuredBrowsers.add(new Midory(s[i]));
+                }
             }
         }
 
