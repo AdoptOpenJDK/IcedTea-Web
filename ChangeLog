@@ -1,3 +1,22 @@
+2012-06-26  Jiri Vanek  <jvanek@redhat.com>
+
+	* Makefile.am:  Most crucial variables exported to be used by custom Makefiles
+	(CUSTOM_REPRODUCERS): new variable to hold custom name
+	(ALL_NONCUSTOM_REPRODUCERS): new variable for gathering all except custom reproducers
+	(ALL_REPRODUCERS): now contains also custom ones
+	(stamps/junit-jnlp-dist-dirs): now depends also on junit-jnlp-dist-custom.txt
+	(junit-jnlp-dist-custom.txt): new target scanning for directories in jnlp_tests/custom
+	and saving them as list for future purposes.
+	(stamps/netx-dist-tests-prepare-reproducers.stamp): and
+	( stamps/change-dots-to-paths.stamp):iterate through ALL_NONCUSTOM_REPRODUCERS instead of ALL__REPRODUCERS
+	(stamps/process-custom-reproducers.stamp) : new target for iterating by junit-jnlp-dist-custom.txt
+	through  jnlp_tests/custom/srcs* and launching make prepare-reproducer in each
+	(clean-custom-reproducers): same as above but launching make clean-reproducer
+	(run-netx-dist-tests) now depends on stamps/process-custom-reproducers.stamp
+	(clean-netx-dist-tests): now depends on clean-custom-reproducers and is removing  stamps/netx-dist-tests-copy-resources.stamp
+	(stamps/netx-dist-tests-copy-resources.stamp): new target extracting copying of resources from stamps/netx-dist-tests-compile-testcases.stamp
+	* tests/jnlp_tests/README: described this mechanism a bit 
+
 2012-06-26 Jiri Vanek <jvanek@redhat.com>
 
 	Reproducer for classes which should be loaded before verification but are not

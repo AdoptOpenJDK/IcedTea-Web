@@ -1,63 +1,65 @@
 # Source directories
 
-NETX_DIR = $(abs_top_builddir)/netx.build
-NETX_SRCDIR = $(abs_top_srcdir)/netx
-NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
-NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/javaws/about/resources
-NETX_EXTRA_DIST_DIR=$(abs_top_builddir)/extra-lib/net/sourceforge/javaws/about/resources
+export NETX_DIR = $(abs_top_builddir)/netx.build
+export NETX_SRCDIR = $(abs_top_srcdir)/netx
+export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
+export NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/javaws/about/resources
+export NETX_EXTRA_DIST_DIR=$(abs_top_builddir)/extra-lib/net/sourceforge/javaws/about/resources
 
-REPORT_STYLES_DIRNAME=report-styles
+export REPORT_STYLES_DIRNAME=report-styles
 
-TESTS_SRCDIR=$(abs_top_srcdir)/tests
-TESTS_DIR=$(abs_top_builddir)/tests.build
+export TESTS_SRCDIR=$(abs_top_srcdir)/tests
+export TESTS_DIR=$(abs_top_builddir)/tests.build
 
-NETX_UNIT_TEST_SRCDIR=$(TESTS_SRCDIR)/netx/unit
-NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
+export NETX_UNIT_TEST_SRCDIR=$(TESTS_SRCDIR)/netx/unit
+export NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
 
-JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
-JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
+export JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
+export JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
 
-JNLP_TESTS_ENGINE_SRCDIR=$(TESTS_SRCDIR)/netx/jnlp_testsengine
-JNLP_TESTS_SRCDIR=$(TESTS_SRCDIR)/jnlp_tests
-JNLP_TESTS_ENGINE_DIR=$(TESTS_DIR)/netx/jnlp_testsengine
-JNLP_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/jnlp_test_server
-JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
-PRIVATE_KEYSTORE_NAME=teststore.ks
-PRIVATE_KEYSTORE_PASS=123456789
-EXPORTED_TEST_CERT_PREFIX=icedteatests
-EXPORTED_TEST_CERT_SUFFIX=crt
-TEST_CERT_ALIAS=icedteaweb
-PUBLIC_KEYSTORE=${HOME}/.icedtea/security/trusted.certs
-PUBLIC_KEYSTORE_PASS=changeit
+export JNLP_TESTS_ENGINE_SRCDIR=$(TESTS_SRCDIR)/netx/jnlp_testsengine
+export JNLP_TESTS_SRCDIR=$(TESTS_SRCDIR)/jnlp_tests
+export JNLP_TESTS_ENGINE_DIR=$(TESTS_DIR)/netx/jnlp_testsengine
+export JNLP_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/jnlp_test_server
+export JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
+export PRIVATE_KEYSTORE_NAME=teststore.ks
+export PRIVATE_KEYSTORE_PASS=123456789
+export EXPORTED_TEST_CERT_PREFIX=icedteatests
+export EXPORTED_TEST_CERT_SUFFIX=crt
+export TEST_CERT_ALIAS=icedteaweb
+export PUBLIC_KEYSTORE=${HOME}/.icedtea/security/trusted.certs
+export PUBLIC_KEYSTORE_PASS=changeit
 
-JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
-UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
-REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
-REPRODUCERS_CLASS_WHITELIST = $(abs_top_srcdir)/netx-dist-tests-whitelist
-EMMA_JAVA_ARGS=-Xmx2G
-META_MANIFEST = META-INF/MANIFEST.MF
-SIGNED_REPRODUCERS=signed
-SIMPLE_REPRODUCERS=simple
-ALL_REPRODUCERS=$(SIMPLE_REPRODUCERS) $(SIGNED_REPRODUCERS)
+export JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
+export UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
+export REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
+export REPRODUCERS_CLASS_WHITELIST = $(abs_top_srcdir)/netx-dist-tests-whitelist
+export EMMA_JAVA_ARGS=-Xmx2G
+export META_MANIFEST = META-INF/MANIFEST.MF
+export SIGNED_REPRODUCERS=signed
+export SIMPLE_REPRODUCERS=simple
+export CUSTOM_REPRODUCERS=custom
+export ALL_NONCUSTOM_REPRODUCERS=$(SIMPLE_REPRODUCERS) $(SIGNED_REPRODUCERS)
+export ALL_REPRODUCERS=$(ALL_NONCUSTOM_REPRODUCERS) $(CUSTOM_REPRODUCERS)
 
 
 # linking variables
-PLUGIN_LINK_NAME=libjavaplugin.so
-MOZILLA_LOCAL_PLUGINDIR=${HOME}/.mozilla/plugins
-MOZILLA_GLOBAL64_PLUGINDIR=/usr/lib64/mozilla/plugins
-MOZILLA_GLOBAL32_PLUGINDIR=/usr/lib/mozilla/plugins
-OPERA_GLOBAL64_PLUGINDIR=/usr/lib64/opera/plugins
-OPERA_GLOBAL32_PLUGINDIR=/usr/lib/opera/plugins
-BUILT_PLUGIN_LIBRARY=IcedTeaPlugin.so
-MOZILLA_LOCAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origU
-MOZILLA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origMG
-OPERA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origOG
-MOZILLA_FAMILY_TEST= "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" -o "$(MIDORI)" != "" -o "$(EPIPHANY)" != "" 
+export PLUGIN_LINK_NAME=libjavaplugin.so
+export MOZILLA_LOCAL_PLUGINDIR=${HOME}/.mozilla/plugins
+export MOZILLA_GLOBAL64_PLUGINDIR=/usr/lib64/mozilla/plugins
+export MOZILLA_GLOBAL32_PLUGINDIR=/usr/lib/mozilla/plugins
+export OPERA_GLOBAL64_PLUGINDIR=/usr/lib64/opera/plugins
+export OPERA_GLOBAL32_PLUGINDIR=/usr/lib/opera/plugins
+export BUILT_PLUGIN_LIBRARY=IcedTeaPlugin.so
+export MOZILLA_LOCAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origU
+export MOZILLA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origMG
+export OPERA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origOG
+export MOZILLA_FAMILY_TEST= "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHROME)" != "" -o "$(MIDORI)" != "" -o "$(EPIPHANY)" != "" 
 # end of linking variables
 
 # Build directories
 
-BOOT_DIR = $(abs_top_builddir)/bootstrap/jdk1.6.0
+export BOOT_DIR = $(abs_top_builddir)/bootstrap/jdk1.6.0
 
 if WITH_RHINO
   RHINO_RUNTIME=:$(RHINO_JAR)
@@ -65,14 +67,14 @@ else
   RHINO_RUNTIME=
 endif
 
-RUNTIME = $(BOOT_DIR)/jre/lib/rt.jar:$(BOOT_DIR)/jre/lib/jsse.jar$(RHINO_RUNTIME):$(BOOT_DIR)/jre/lib/resources.jar
+export RUNTIME = $(BOOT_DIR)/jre/lib/rt.jar:$(BOOT_DIR)/jre/lib/jsse.jar$(RHINO_RUNTIME):$(BOOT_DIR)/jre/lib/resources.jar
 
 # Flags
-IT_CFLAGS=$(CFLAGS) $(ARCHFLAG)
-IT_JAVAC_SETTINGS=-g -encoding utf-8 $(JAVACFLAGS) $(MEMORY_LIMIT) $(PREFER_SOURCE)
-IT_LANGUAGE_SOURCE_VERSION=6
-IT_CLASS_TARGET_VERSION=6
-IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
+export IT_CFLAGS=$(CFLAGS) $(ARCHFLAG)
+export IT_JAVAC_SETTINGS=-g -encoding utf-8 $(JAVACFLAGS) $(MEMORY_LIMIT) $(PREFER_SOURCE)
+export IT_LANGUAGE_SOURCE_VERSION=6
+export IT_CLASS_TARGET_VERSION=6
+export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target $(IT_CLASS_TARGET_VERSION)
 
 #
 # We need the jars in bootclasspath for a couple of reasons
@@ -81,18 +83,18 @@ IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) -target
 #    IllegalAccessException
 #  - we want full privileges
 #
-LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
-PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
+export LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
+export PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
 
 # Fake update version to work with the Deployment Toolkit script used by Oracle
 # http://download.oracle.com/javase/tutorial/deployment/deploymentInDepth/depltoolkit_index.html
-JDK_UPDATE_VERSION=50
+export JDK_UPDATE_VERSION=50
 
 # Sources list
 
-PLUGIN_TEST_SRCS = $(abs_top_srcdir)/plugin/tests/LiveConnect/*.java
+export PLUGIN_TEST_SRCS = $(abs_top_srcdir)/plugin/tests/LiveConnect/*.java
 
-NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
+export NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
 	net.sourceforge.jnlp.cache net.sourceforge.jnlp.config \
 	net.sourceforge.jnlp.controlpanel net.sourceforge.jnlp.event \
 	net.sourceforge.jnlp.runtime net.sourceforge.jnlp.security \
@@ -101,13 +103,13 @@ NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
 
 # Conditional defintions
 if ENABLE_PLUGIN
-ICEDTEAPLUGIN_CLEAN = clean-IcedTeaPlugin
-LIVECONNECT_DIR = netscape sun/applet
-PLUGIN_DIR=$(abs_top_builddir)/plugin/icedteanp
-PLUGIN_SRCDIR=$(abs_top_srcdir)/plugin/icedteanp
-LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
-ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) stamps/liveconnect-dist.stamp
-PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
+export ICEDTEAPLUGIN_CLEAN = clean-IcedTeaPlugin
+export LIVECONNECT_DIR = netscape sun/applet
+export PLUGIN_DIR=$(abs_top_builddir)/plugin/icedteanp
+export PLUGIN_SRCDIR=$(abs_top_srcdir)/plugin/icedteanp
+export LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
+export ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) stamps/liveconnect-dist.stamp
+export PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
 endif
 
 if CP_SUPPORTS_REFLINK
@@ -141,16 +143,16 @@ else
 endif
 
 
-PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
+export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
-EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
+export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
  itweb-settings.desktop.in $(top_srcdir)/tests
 
 # reproducers `D`shortcuts
-DTEST_SERVER=-Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR)
-DJAVAWS_BUILD=-Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws)
-DBROWSERS=-Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA):$(MIDORI):$(EPIPHANY)
-REPRODUCERS_DPARAMETERS= $(DTEST_SERVER) $(DJAVAWS_BUILD) $(DBROWSERS) $(BROWSER_TESTS_MODIFICATION)
+export DTEST_SERVER=-Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR)
+export DJAVAWS_BUILD=-Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws)
+export DBROWSERS=-Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA):$(MIDORI):$(EPIPHANY)
+export REPRODUCERS_DPARAMETERS= $(DTEST_SERVER) $(DJAVAWS_BUILD) $(DBROWSERS) $(BROWSER_TESTS_MODIFICATION)
 # end of `D`shortcuts
 
 # binary names
@@ -492,10 +494,14 @@ $(JUNIT_RUNNER_JAR): junit-runner-source-files.txt stamps/netx-dist-tests-compil
 	  @junit-runner-source-files.txt && \
 	$(BOOT_DIR)/bin/jar cf $@  -C $(JUNIT_RUNNER_DIR) .
 
-stamps/junit-jnlp-dist-dirs: junit-jnlp-dist-simple.txt stamps/junit-jnlp-dist-signed.stamp
+stamps/junit-jnlp-dist-dirs: junit-jnlp-dist-simple.txt stamps/junit-jnlp-dist-signed.stamp junit-jnlp-dist-custom.txt
 	mkdir -p $(JNLP_TESTS_SERVER_DEPLOYDIR)
 	mkdir -p $(JNLP_TESTS_DIR)
 	touch $@
+
+junit-jnlp-dist-custom.txt:
+	cd $(JNLP_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/ ; \
+	find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/$@
 
 junit-jnlp-dist-simple.txt:
 	cd $(JNLP_TESTS_SRCDIR)/simple/ ; \
@@ -512,7 +518,7 @@ stamps/junit-jnlp-dist-signed.stamp:
 	touch $@
 
 stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
-	types=($(ALL_REPRODUCERS)); \
+	types=($(ALL_NONCUSTOM_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
@@ -538,7 +544,6 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
 	      fi; \
 	      cd "$$d" ; \
 	    fi; \
-	    cp -R "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/resources/"*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
 	  done ; \
 	done ; \
 	mkdir -p stamps && \
@@ -562,7 +567,7 @@ stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepa
 
 stamps/change-dots-to-paths.stamp: stamps/netx-dist-tests-sign-some-reproducers.stamp
 	pushd  $(JNLP_TESTS_SERVER_DEPLOYDIR); \
-	types=($(ALL_REPRODUCERS)); \
+	types=($(ALL_NONCUSTOM_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
@@ -638,9 +643,22 @@ stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-j
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	    -d $(JNLP_TESTS_ENGINE_DIR) \
-	    -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
+	      -d $(JNLP_TESTS_ENGINE_DIR) \
+	      -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
 	    "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/"* ; \
+	  done ; \
+	done ; \
+	mkdir -p stamps && \
+	touch $@
+
+stamps/netx-dist-tests-copy-resources.stamp: stamps/junit-jnlp-dist-dirs
+	types=($(ALL_REPRODUCERS)); \
+	for which in "$${types[@]}" ; do \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
+	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
+	  for dir in "$${simpleReproducers[@]}" ; do \
+	    cp -R "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/resources/"*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
 	  done ; \
 	done ; \
 	mkdir -p stamps && \
@@ -673,8 +691,8 @@ $(REPRODUCERS_CLASS_NAMES): $(REPRODUCERS_CLASS_WHITELIST)
 stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
  javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop \
  stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
- stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) \
- $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES)
+ stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/netx-dist-tests-copy-resources.stamp\
+ $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES) stamps/process-custom-reproducers.stamp
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
@@ -685,6 +703,31 @@ if WITH_XSLTPROC
 	$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
 endif
 	touch $@
+
+stamps/process-custom-reproducers.stamp: stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
+ stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/netx-dist-tests-copy-resources.stamp\
+ $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES)
+	. $(abs_top_srcdir)/NEW_LINE_IFS ; \
+	customReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-custom.txt `); \
+	IFS="$$IFS_BACKUP" ; \
+	for dir in "$${customReproducers[@]}" ; do \
+	  pushd $(JNLP_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/$$dir/srcs; \
+	  $(MAKE) prepare-reproducer ; \
+	  popd ; \
+	done ; \
+	mkdir -p stamps && \
+	touch $@
+
+clean-custom-reproducers: junit-jnlp-dist-custom.txt
+	. $(abs_top_srcdir)/NEW_LINE_IFS ; \
+	customReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-custom.txt `); \
+	IFS="$$IFS_BACKUP" ; \
+	for dir in "$${customReproducers[@]}" ; do \
+	  pushd $(JNLP_TESTS_SRCDIR)/custom/$$dir/srcs; \
+	  $(MAKE) clean-reproducer ; \
+	  popd ; \
+	done ; \
+	rm -f stamps/process-custom-reproducers.stamp
 
 #for global-links you must be root, for opera there do not exists user-links
 #although this targets will indeed create symbolic links to enable 
@@ -1014,7 +1057,7 @@ clean_tests_reports:
 	rm -rf  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
 	rm -f  $(TESTS_DIR)/*.html
 
-clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public
+clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public clean-custom-reproducers
 	rm -f netx-dist-tests-source-files.txt
 	rm -rf $(JNLP_TESTS_DIR)
 	rm -rf $(JNLP_TESTS_SERVER_DEPLOYDIR)
@@ -1023,6 +1066,7 @@ clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-publ
 	rm -f stamps/netx-dist-tests-compile.stamp
 	rm -f stamps/netx-dist-tests-prepare-reproducers.stamp
 	rm -f stamps/netx-dist-tests-compile-testcases.stamp
+	rm -f stamps/netx-dist-tests-copy-resources.stamp
 	rm -f stamps/netx-dist-tests-sign-some-reproducers.stamp
 	rm -f stamps/change-dots-to-paths.stamp
 	rm -f junit-jnlp-dist-simple.txt
