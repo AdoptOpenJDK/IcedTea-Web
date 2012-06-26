@@ -172,6 +172,9 @@ public class JNLPClassLoader extends URLClassLoader {
     /** Map of specific original (remote) CodeSource Urls  to securitydesc */
     private HashMap<URL, SecurityDesc> jarLocationSecurityMap =
             new HashMap<URL, SecurityDesc>();
+
+    /*Set to prevent once tried-to-get resources to be tried again*/
+    private Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<URL>());
     
     /** Loader for codebase (which is a path, rather than a file) */
     private CodeBaseClassLoader codeBaseLoader;
@@ -1810,11 +1813,27 @@ public class JNLPClassLoader extends URLClassLoader {
 
     protected SecurityDesc getCodeSourceSecurity(URL source) {
         SecurityDesc sec=jarLocationSecurityMap.get(source);
+        if (sec == null && !alreadyTried.contains(source)) {
+            alreadyTried.add(source);
+            //try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("Application is trying to get permissions for " + source.toString() + ", which was not added by standard way. Trying to download and verify!");
+            }
+            try {
+                JARDesc des = new JARDesc(source, null, null, false, false, false, false);
+                addNewJar(des);
+                sec = jarLocationSecurityMap.get(source);
+            } catch (Throwable t) {
+                if (JNLPRuntime.isDebug()) {
+                    t.printStackTrace();
+                }
+                sec = null;
+            }
+        }
         if (sec == null){
             System.out.println(Translator.R("LNoSecInstance",source.toString()));
         }
         return sec;
-
     }
 
     /**

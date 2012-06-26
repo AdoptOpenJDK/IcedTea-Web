@@ -1,3 +1,11 @@
+2012-06-26  Jiri Vanek  <jvanek@redhat.com>
+
+	Last hope for not downloaded resources to be verified
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(getCodeSourceSecurity): will now try to download and verify resource
+	which was downloaded outside of netx.
+	(alreadyTried) set for memory of once tried resources to not try again 
+
 2012-06-25  Adam Domurad  <adomurad@redhat.com>
 
 	Small comment cleanup to classes with missing or wrong descriptions.
@@ -24,7 +32,7 @@
 	(NP_Initialize): Make use of initialization helper functions, get
 	rid of old size tests and error if the helper functions fail.
 
-2012-06-18  Adam Domurad  <adomurad@redhat.com>
+2012-06-20  Adam Domurad  <adomurad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java
 	(verifyJar): two for loops made into for-each loops
