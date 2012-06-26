@@ -43,15 +43,17 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 @Bug(id = {"RH816592","PR858"})
-public class InternalClassloaderWithDownloadedResourceTest {
+public class InternalClassloaderWithDownloadedResourceTest extends BrowserTest {
 
-    private static ServerAccess server = new ServerAccess();
     private final List<String> l = Collections.unmodifiableList(Arrays.asList(new String[]{"-verbose", "-Xtrustall", "-J-Dserveraccess.port=" + server.getPort()}));
     private static final File portsFile = new File(System.getProperty("java.io.tmpdir"), "serveraccess.port");
 
@@ -101,6 +103,7 @@ public class InternalClassloaderWithDownloadedResourceTest {
     @Test
     @Bug(id = {"RH816592","PR858"})
     @NeedsDisplay
+    @TestInBrowsers(testIn={Browsers.all})
     public void launchInternalClassloaderWithDownloadedResourceAsHtmlApplet() throws Exception {
         ServerAccess.ProcessResult pr = server.executeBrowser("/InternalClassloaderWithDownloadedResource-new.html");
         evaluate(pr);
@@ -128,6 +131,7 @@ public class InternalClassloaderWithDownloadedResourceTest {
     @Test
     @NeedsDisplay
     @Bug(id = {"http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-May/018737.html"})
+    @TestInBrowsers(testIn={Browsers.all})
     public void launchInternalClassloaderWithDownloadedResourceAsHtmlAppletHack() throws Exception {
         ServerAccess.ProcessResult pr = server.executeBrowser("/InternalClassloaderWithDownloadedResource-hack.html");
         evaluate(pr);
