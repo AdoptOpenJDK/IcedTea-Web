@@ -1,4 +1,16 @@
-2012-05-29  Adam Domurad  <adomurad@redhat.com>
+2012-06-28  Jiri Vanek  <jvanek@redhat.com>
+
+	Removed repeated re-runing of tests during coverage, stamped pac tests
+	* Makefile.am: (check-pac-functions) moved to target aliases and replaced
+	by stamps/check-pac-functions.stamp.
+	(clean-netx-unit-tests) added removing of  stamps/check-pac-functions.stamp
+	(stamps/exported-test-certs.stamp): no longer depends on
+	netx-dist-tests-remove-cert-from-public, logic of it have to be
+	copy-pasted from here.
+	(stamps/run-unit-test-code-coverage.stamp): no longer depends on check,
+	but was added direct dependences 
+
+2012-06-28  Adam Domurad  <adomurad@redhat.com>
 
 	Allow for folders in archive tag.
 	* netx/net/sourceforge/jnlp/PluginBridge.java:

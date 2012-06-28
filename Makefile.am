@@ -131,7 +131,7 @@ endif
 endif
 
 if WITH_RHINO
-  RHINO_TESTS=check-pac-functions
+  RHINO_TESTS=stamps/check-pac-functions.stamp
 else
   RHINO_TESTS=
 endif
@@ -188,7 +188,7 @@ clean-local: clean-netx clean-plugin clean-liveconnect clean-extra  \
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs \
- clean-tests check-local clean-launchers check-pac-functions stamps/run-netx-unit-tests.stamp clean-netx-tests \
+ clean-tests check-local clean-launchers stamps/check-pac-functions.stamp stamps/run-netx-unit-tests.stamp clean-netx-tests \
  clean-junit-runner clean-netx-unit-tests
 
 install-exec-local:
@@ -483,9 +483,11 @@ clean-tests: clean-netx-tests
 		rmdir $(TESTS_DIR) ; \
 	fi
 
-check-pac-functions: stamps/bootstrap-directory.stamp
+stamps/check-pac-functions.stamp: stamps/bootstrap-directory.stamp
 	./jrunscript $(abs_top_srcdir)/tests/netx/pac/pac-funcs-test.js \
-	  $$(readlink -f $(abs_top_srcdir)/netx/net/sourceforge/jnlp/runtime/pac-funcs.js)
+	  $$(readlink -f $(abs_top_srcdir)/netx/net/sourceforge/jnlp/runtime/pac-funcs.js) ; \
+	mkdir -p stamps && \
+	touch $@
 
 junit-runner-source-files.txt:
 	find $(JUNIT_RUNNER_SRCDIR) -name '*.java' | sort > $@
@@ -602,7 +604,13 @@ stamps/change-dots-to-paths.stamp: stamps/netx-dist-tests-sign-some-reproducers.
 	touch $@
 
 #this always tries to remove  previous testcert
-stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp netx-dist-tests-remove-cert-from-public
+#the code is copypasted from netx-dist-tests-remove-cert-from-public, because 
+#with depending to not stamped target we always have to rerun reproducers targets
+stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
+	-types=($(SIGNED_REPRODUCERS)) ; \
+	for which in "$${types[@]}" ; do \
+	  $(BOOT_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $(PUBLIC_KEYSTORE) -storepass $(PUBLIC_KEYSTORE_PASS) ; \
+	done ;
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
 	  keytool -export -alias $(TEST_CERT_ALIAS)_$$which -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) -storepass $(PRIVATE_KEYSTORE_PASS) -keystore $(PRIVATE_KEYSTORE_NAME) ; \
@@ -883,12 +891,14 @@ if WITH_XSLTPROC
 	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html
 	$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
 endif
+	mkdir -p stamps && \
 	touch $@
 
 #warning,  during this target tests.build/netx/unit/tests-output.xml is backup and rewriten (but not coresponding html file)
 #xml results run from emma sandbox, however, can be wrong, co the new tests-output.xml is then renamed and orginal one restored
 #you can add -ix "-*Test*" -ix "-*test*"  to ignore all test cases from statistics
-stamps/run-unit-test-code-coverage.stamp: check  $(UNIT_CLASS_NAMES);
+stamps/run-unit-test-code-coverage.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_RUNNER_JAR)  \
+ $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)  $(UNIT_CLASS_NAMES)
 if WITH_EMMA
 	mv $(NETX_UNIT_TEST_DIR)/tests-output.xml  $(NETX_UNIT_TEST_DIR)/tests-output.xml_noEmma ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
@@ -1054,6 +1064,7 @@ clean-netx-unit-tests: clean_tests_reports
 	rm -f netx-unit-tests-source-files.txt
 	rm -rf $(NETX_UNIT_TEST_DIR)
 	rm -f $(UNIT_CLASS_NAMES)
+	rm -f stamps/check-pac-functions.stamp
 	rm -f stamps/run-netx-unit-tests.stamp
 	rm -f stamps/netx-unit-tests-compile.stamp
 
@@ -1218,6 +1229,8 @@ netx-dist: stamps/netx-dist.stamp
 plugin: stamps/plugin.stamp
 
 plugin-tests: stamps/plugin-tests.stamp
+
+check-pac-functions: stamps/check-pac-functions.stamp
 
 run-netx-unit-tests: stamps/run-netx-unit-tests.stamp
 
