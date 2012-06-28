@@ -1,3 +1,11 @@
+2012-06-28 Jiri Vanek <jvanek@redhat.com>
+
+	Correctly backup all log files re-writable by emma during code-coverage
+	* Makefile.am: (EMMA_MODIFIED_FILES) new variable with list of files to
+	backup/restore. (stamps/run-unit-test-code-coverage.stamp) and
+	(stamps/run-reproducers-test-code-coverage.stamp) are now iterating over
+	EMMA_MODIFIED_FILES instead of enumerating them
+
 2012-06-28  Jiri Vanek  <jvanek@redhat.com>
 
 	Removed repeated re-runing of tests during coverage, stamped pac tests

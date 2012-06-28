@@ -35,6 +35,9 @@ export UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
 export REPRODUCERS_CLASS_NAMES = $(abs_top_builddir)/reproducers_class_names
 export REPRODUCERS_CLASS_WHITELIST = $(abs_top_srcdir)/netx-dist-tests-whitelist
 export EMMA_JAVA_ARGS=-Xmx2G
+export EMMA_MODIFIED_FILES=tests-output.xml ServerAccess-logs.xml stdout.log stderr.log all.log
+export EMMA_BACKUP_SUFFIX=_noEmma
+export EMMA_SUFFIX=_withEmma
 export META_MANIFEST = META-INF/MANIFEST.MF
 export SIGNED_REPRODUCERS=signed
 export SIMPLE_REPRODUCERS=simple
@@ -900,8 +903,10 @@ endif
 stamps/run-unit-test-code-coverage.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_RUNNER_JAR)  \
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)  $(UNIT_CLASS_NAMES)
 if WITH_EMMA
-	mv $(NETX_UNIT_TEST_DIR)/tests-output.xml  $(NETX_UNIT_TEST_DIR)/tests-output.xml_noEmma ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
+	for file in $(EMMA_MODIFIED_FILES) ; do \
+	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
+	done ;\
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
 	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) -Demma.report.html.out.encoding=UTF-8 emmarun \
 	 -Dreport.html.out.encoding=UTF-8 \
@@ -923,8 +928,10 @@ if WITH_EMMA
 	 -ix "-org.junit.*" \
 	 -ix "-junit.*" \
 	 CommandLine $$class_names ;  \
-	mv $(NETX_UNIT_TEST_DIR)/tests-output.xml  $(NETX_UNIT_TEST_DIR)/tests-output_withEmma.xml ; \
-	mv $(NETX_UNIT_TEST_DIR)/tests-output.xml_noEmma  $(NETX_UNIT_TEST_DIR)/tests-output.xml ; 
+	for file in $(EMMA_MODIFIED_FILES) ; do \
+	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_SUFFIX)" ; \
+	  mv $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)"  $(NETX_UNIT_TEST_DIR)/$$file ; \
+	done ;
 else 
 	echo "Sorry, coverage report cant be run without emma installed. Try install emma or specify with-emma value" ;
 	exit 5
@@ -936,7 +943,9 @@ endif
 stamps/run-reproducers-test-code-coverage.stamp: stamps/run-netx-dist-tests.stamp $(REPRODUCERS_CLASS_NAMES)
 if WITH_EMMA
 	cd $(TESTS_DIR) ; \
-	mv $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml  $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml_noEmma ; \
+	for file in $(EMMA_MODIFIED_FILES) ; do \
+	  mv $(JNLP_TESTS_ENGINE_DIR)/$$file $(JNLP_TESTS_ENGINE_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
+	done ;\
 	echo "backuping javaws and netx.jar in $(DESTDIR)" ; \
 	netx_backup=$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx_backup.jar ; \
 	javaws_backup=$(DESTDIR)$(bindir)/javaws_backup ; \
@@ -1006,8 +1015,10 @@ if WITH_EMMA
 	rm -f $(DESTDIR)$(bindir)/$(javaws);  \
 	mv $$javaws_backup $(DESTDIR)$(bindir)/$(javaws);  \
 	mv $$netx_backup $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar ; \
-	mv $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml  $(JNLP_TESTS_ENGINE_DIR)/tests-output_withEmma.xml ; \
-	mv $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml_noEmma  $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml ; \
+	for file in $(EMMA_MODIFIED_FILES) ; do \
+	  mv $(JNLP_TESTS_ENGINE_DIR)/$$file  $(JNLP_TESTS_ENGINE_DIR)/"$$file""$(EMMA_SUFFIX)" ; \
+	  mv $(JNLP_TESTS_ENGINE_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)"  $(JNLP_TESTS_ENGINE_DIR)/$$file ; \
+	done ;\
 	rm $(JNLP_TESTS_ENGINE_DIR)/coverage.txt ; 
 else
 	echo "Sorry, coverage report cant be run without emma installed. Try install emma or specify with-emma value" ;
