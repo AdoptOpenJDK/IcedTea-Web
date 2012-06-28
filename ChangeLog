@@ -1,3 +1,28 @@
+2012-05-29  Adam Domurad  <adomurad@redhat.com>
+
+	Allow for folders in archive tag.
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	(PluginBridge) Changes jar -> archive, parse contents with
+	addArchiveEntries.
+	(addArchiveEntries) New method. Adds entries ending with / to the list
+	of folders.
+	(getCodeBaseFolders) Returns the folders collected by addArchiveEntries
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(initializeResources) If ran as plugin, add archive tag folders to the
+	code base loader.
+
+2012-06-27  Adam Domurad  <adomurad@redhat.com>
+
+	Tests folders in archive tag
+	* tests/jnlp_tests/custom/AppletFolderInArchiveTag/testcases/AppletFolderInArchiveTagTests.java:
+	Runs html file in browser
+	* tests/jnlp_tests/custom/AppletFolderInArchiveTag/srcs/Makefile:
+	packages compiled source files in folder
+	* tests/jnlp_tests/custom/AppletFolderInArchiveTag/srcs/AppletFolderInArchiveTag.java:
+	Simple output to confirm it is running
+	* tests/jnlp_tests/custom/AppletFolderInArchiveTag/resources/AppletFolderInArchiveTag.html:
+	Has folder in its archive tag that contains a class file
+
 2012-06-26  Jiri Vanek  <jvanek@redhat.com>
 
 	Added slipped midori and epiphany to recognized browsers.

@@ -155,6 +155,10 @@ export DBROWSERS=-Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA):$(MID
 export REPRODUCERS_DPARAMETERS= $(DTEST_SERVER) $(DJAVAWS_BUILD) $(DBROWSERS) $(BROWSER_TESTS_MODIFICATION)
 # end of `D`shortcuts
 
+#exported autoconf copies
+export EXPORTED_JAVAC=$(BOOT_DIR)/bin/javac
+#end of exported autoconf copies
+
 # binary names
 javaws:= $(shell echo javaws | sed '@program_transform_name@')
 itweb_settings:= $(shell echo itweb-settings | sed '@program_transform_name@')

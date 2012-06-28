@@ -22,15 +22,15 @@
 
 package net.sourceforge.jnlp;
 
+import java.io.File;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -40,11 +40,13 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  */
 public class PluginBridge extends JNLPFile {
 
-    String name;
-    HashSet<String> jars = new HashSet<String>();
-    String[] cacheJars = new String[0];
-    String[] cacheExJars = new String[0];
-    Hashtable<String, String> atts;
+    private String name;
+    private Set<String> jars = new HashSet<String>();
+    //Folders can be added to the code-base through the archive tag
+    private List<String> codeBaseFolders = new ArrayList<String>();
+    private String[] cacheJars = new String[0];
+    private String[] cacheExJars = new String[0];
+    private Map<String, String> atts;
     private boolean usePack;
     private boolean useVersion;
     private boolean codeBaseLookup;
@@ -54,14 +56,32 @@ public class PluginBridge extends JNLPFile {
      * Creates a new PluginBridge using a default JNLPCreator.
      */
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
-                        int width, int height, Hashtable<String, String> atts,
+                        int width, int height, Map<String, String> atts,
                         String uKey)
             throws Exception {
         this(codebase, documentBase, jar, main, width, height, atts, uKey, new JNLPCreator());
     }
 
-    public PluginBridge(URL codebase, URL documentBase, String jar, String main,
-                        int width, int height, Hashtable<String, String> atts,
+    /**
+     * Handles archive tag entries, which may be folders or jar files
+     * @param archives the components of the archive tag
+     */
+    private void addArchiveEntries(String[] archives) {
+        for (String archiveEntry : archives){
+            // trim white spaces
+            archiveEntry = archiveEntry.trim();
+
+            /*Only '/' on linux, '/' or '\\' on windows*/
+            if (archiveEntry.endsWith("/") || archiveEntry.endsWith(File.pathSeparator)) {
+                this.codeBaseFolders.add(archiveEntry);
+            } else {
+                this.jars.add(archiveEntry);
+            }
+        }
+    }
+
+    public PluginBridge(URL codebase, URL documentBase, String archive, String main,
+                        int width, int height, Map<String, String> atts,
                         String uKey, JNLPCreator jnlpCreator)
             throws Exception {
         specVersion = new Version("1.0");
@@ -131,19 +151,14 @@ public class PluginBridge extends JNLPFile {
             cacheExJars = cacheArchiveEx.split(",");
         }
 
-        if (jar != null && jar.length() > 0) {
-            String[] jars = jar.split(",");
+        if (archive != null && archive.length() > 0) {
+            String[] archives = archive.split(",");
 
-            // trim white spaces
-            for (int i = 0; i < jars.length; i++) {
-                String jarName = jars[i].trim();
-                if (jarName.length() > 0)
-                    this.jars.add(jarName);
-            }
+            addArchiveEntries(archives);
 
             if (JNLPRuntime.isDebug()) {
-                System.err.println("Jar string: " + jar);
-                System.err.println("jars length: " + jars.length);
+                System.err.println("Jar string: " + archive);
+                System.err.println("jars length: " + archives.length);
             }
         }
 
@@ -232,9 +247,9 @@ public class PluginBridge extends JNLPFile {
                         if (cacheOption != null && cacheOption.equalsIgnoreCase("no"))
                             cacheable = false;
 
-                        for (int i = 0; i < cacheJars.length; i++) {
+                        for (String cacheJar : cacheJars) {
 
-                            String[] jarAndVer = cacheJars[i].split(";");
+                            String[] jarAndVer = cacheJar.split(";");
 
                             String jar = jarAndVer[0];
                             Version version = null;
@@ -250,12 +265,12 @@ public class PluginBridge extends JNLPFile {
                                     version, null, false, true, false, cacheable));
                         }
 
-                        for (int i = 0; i < cacheExJars.length; i++) {
+                        for (String cacheExJar : cacheExJars) {
 
-                            if (cacheExJars[i].length() == 0)
+                            if (cacheExJar.length() == 0)
                                 continue;
 
-                            String[] jarInfo = cacheExJars[i].split(";");
+                            String[] jarInfo = cacheExJar.split(";");
 
                             String jar = jarInfo[0].trim();
                             Version version = null;
@@ -302,6 +317,13 @@ public class PluginBridge extends JNLPFile {
             }
 
         };
+    }
+
+    /**
+     * Returns the list of folders to be added to the codebase
+     */
+    public List<String> getCodeBaseFolders() {
+        return new ArrayList<String>(codeBaseFolders);
     }
 
     /**

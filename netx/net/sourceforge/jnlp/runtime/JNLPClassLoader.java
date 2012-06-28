@@ -443,6 +443,19 @@ public class JNLPClassLoader extends URLClassLoader {
      * ResourceTracker for downloading.
      */
     void initializeResources() throws LaunchException {
+        if (file instanceof PluginBridge){
+            PluginBridge bridge = (PluginBridge)file;
+
+            for (String codeBaseFolder : bridge.getCodeBaseFolders()){
+                try {
+                    addToCodeBaseLoader(new URL(file.getCodeBase(), codeBaseFolder));
+                } catch (MalformedURLException mfe) {
+                    System.err.println("Problem trying to add folder to code base:");
+                    System.err.println(mfe.getMessage());
+                }
+            }
+        }
+
         JARDesc jars[] = resources.getJARs();
         if (jars == null || jars.length == 0)
             return;
