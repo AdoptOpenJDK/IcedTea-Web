@@ -1,3 +1,13 @@
+2012-06-28  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(findClass): Invoke CodeBaseClassLoader.findClass with a flag to avoid
+	infinite recursion.
+	(CodeBaseClassLoader.findClass(String)): Delegate to ...
+	(CodeBaseClassLoader.findClass(String,boolean)): New method.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java
+	(testParentClassLoaderIsAskedForClasses): New method.
+
 2012-06-28 Jiri Vanek <jvanek@redhat.com>
 
 	Correctly backup all log files re-writable by emma during code-coverage

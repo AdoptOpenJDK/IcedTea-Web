@@ -37,9 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
@@ -55,9 +57,11 @@ import net.sourceforge.jnlp.annotations.Bug;
 
 import org.junit.Test;
 
-@Bug(id={"PR895","http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html","http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
 public class CodeBaseClassLoaderTest {
 
+    @Bug(id={"PR895",
+            "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
+            "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
     @Test
     public void testResourceLoadSuccessCaching() throws LaunchException, ClassNotFoundException, IOException, ParseException {
         final URL JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
@@ -100,6 +104,9 @@ public class CodeBaseClassLoaderTest {
         assertTrue(timeOnSecondTry < (timeOnFirstTry / 10));
     }
 
+    @Bug(id={"PR895",
+            "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
+            "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
     @Test
     public void testResourceLoadFailureCaching() throws LaunchException, ClassNotFoundException, IOException, ParseException {
         final URL JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
@@ -142,4 +149,43 @@ public class CodeBaseClassLoaderTest {
         assertTrue(timeOnSecondTry < (timeOnFirstTry / 10));
     }
 
+    @Test
+    public void testParentClassLoaderIsAskedForClasses() throws MalformedURLException, LaunchException {
+        final URL JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
+        final URL CODEBASE_URL = new URL("http://icedtea.classpath.org/netx/");
+
+        JNLPFile dummyJnlpFile = new JNLPFile() {
+            @Override
+            public ResourcesDesc getResources() {
+                return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
+            }
+
+            @Override
+            public URL getCodeBase() {
+                return CODEBASE_URL;
+            }
+
+            @Override
+            public SecurityDesc getSecurity() {
+                return new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, null);
+            }
+        };
+
+        final boolean[] parentWasInvoked = new boolean[1];
+
+        JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null) {
+            @Override
+            protected Class<?> findClass(String name) throws ClassNotFoundException {
+                parentWasInvoked[0] = true;
+                throw new ClassNotFoundException(name);
+            }
+        };
+        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[] { JAR_URL, CODEBASE_URL }, parent);
+        try {
+            classLoader.findClass("foo");
+            assertFalse("should not happen", true);
+        } catch (ClassNotFoundException cnfe) { /* ignore */ }
+
+        assertTrue(parentWasInvoked[0]);
+    }
 }
