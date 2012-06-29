@@ -1,3 +1,12 @@
+2012-06-29  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed resource tests and Browsers.none behavior
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ResourcesTest.java:
+	Added slash into all executeBrowsers urls.
+	Added midori and epiphany to simple proxies test.
+	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/browsertesting/BrowserTestRunner.java:
+	Corrected handling of Browsers.none together with -Dmodified.browsers.run switch
+
 2012-06-28  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java

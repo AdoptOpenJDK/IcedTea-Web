@@ -906,7 +906,10 @@ public class ServerAccess {
      * @return
      * @throws MalformedURLException
      */
-    private URL getUrlUponThisInstance(String resource) throws MalformedURLException {
+    public URL getUrlUponThisInstance(String resource) throws MalformedURLException {
+        if (!resource.startsWith("/")) {
+            resource = "/" + resource;
+        }
         return new URL("http", server.getServerName(), getPort(), resource);
     }
 

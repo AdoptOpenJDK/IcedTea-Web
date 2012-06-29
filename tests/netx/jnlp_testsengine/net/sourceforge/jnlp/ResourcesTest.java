@@ -40,7 +40,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import net.sourceforge.jnlp.browsertesting.Browser;
@@ -48,7 +50,6 @@ import net.sourceforge.jnlp.browsertesting.BrowserFactory;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.browsers.LinuxBrowser;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import org.junit.Assert;
@@ -62,7 +63,7 @@ public class ResourcesTest extends  BrowserTest{
     @NeedsDisplay
     public void testNonExisitngBrowserWillNotDeadlock() throws Exception {
         server.setCurrentBrowser(Browsers.none);
-        ServerAccess.ProcessResult pr = server.executeBrowser("simpletest1.jnlp");
+        ServerAccess.ProcessResult pr = server.executeBrowser("/simpletest1.jnlp");
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
         Assert.assertEquals(pr.stdout, "");
@@ -85,9 +86,16 @@ public class ResourcesTest extends  BrowserTest{
     }
 
     @Test
+    public void testGetUrlUponThisInstance() throws MalformedURLException{
+        URL u1=server.getUrlUponThisInstance("simple.jsp");
+        URL u2=server.getUrlUponThisInstance("/simple.jsp");
+        Assert.assertEquals(u1, u2);
+    }
+
+    @Test
     @TestInBrowsers(testIn=Browsers.none)
     public void testNonExisitngBrowserWillNotCauseMess() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("simpletest1.jnlp");
+        ServerAccess.ProcessResult pr = server.executeBrowser("/simpletest1.jnlp");
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
         Assert.assertEquals(pr.stdout, "");
@@ -175,15 +183,15 @@ public class ResourcesTest extends  BrowserTest{
         expected = 2;
         Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
 
-        s = Browsers.firefox.toExec() + ":" + Browsers.chromiumBrowser + ":" + Browsers.googleChrome.toExec() + ":" + Browsers.opera;
+        s = Browsers.firefox.toExec() + ":" + Browsers.chromiumBrowser + ":" + Browsers.googleChrome.toExec() + ":" + Browsers.opera + ":" + Browsers.epiphany + ":" + Browsers.midori;
         bf = new BrowserFactory(s);
-        expected = 4;
+        expected = 6;
         Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
         testFullFactory(bf);
 
-        s = "fgfd/" + Browsers.firefox.toExec() + ":" + "/fgfd/" + Browsers.chromiumBrowser + ":" + "fgfd/dfsdf/" + Browsers.googleChrome.toExec() + ":" + "/g/fgfd/" + Browsers.opera;
+        s = "fgfd/" + Browsers.firefox.toExec() + ":" + "/fgfd/" + Browsers.chromiumBrowser + ":" + "fgfd/dfsdf/" + Browsers.googleChrome.toExec() + ":" + "/g/fgfd/" + Browsers.opera + ":" + Browsers.epiphany + ":" + Browsers.midori;
         bf = new BrowserFactory(s);
-        expected = 4;
+        expected = 6;
         Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
         testFullFactory(bf);
 
@@ -289,7 +297,7 @@ public class ResourcesTest extends  BrowserTest{
                 e2.append(s).append("\n");
             }
         };
-       ServerAccess.ProcessResult pr=server.executeBrowser("simpletest1.jnlp",le,lo);
+        ServerAccess.ProcessResult pr = server.executeBrowser("/simpletest1.jnlp", le, lo);
         server.setCurrentBrowser(BrowserFactory.getFactory().getFirst().getID());
         Assert.assertNotNull(server.getCurrentBrowsers());
         Assert.assertNotNull(server.getCurrentBrowser());
@@ -310,6 +318,8 @@ public class ResourcesTest extends  BrowserTest{
         Assert.assertEquals(bf.getBrowser(Browsers.googleChrome).getID(), Browsers.googleChrome);
         Assert.assertEquals(bf.getBrowser(Browsers.firefox).getID(), Browsers.firefox);
         Assert.assertEquals(bf.getBrowser(Browsers.opera).getID(), Browsers.opera);
+        Assert.assertEquals(bf.getBrowser(Browsers.epiphany).getID(), Browsers.epiphany);
+        Assert.assertEquals(bf.getBrowser(Browsers.midori).getID(), Browsers.midori);
     }
 
     private void testBrowser(Browser browser) throws IOException {

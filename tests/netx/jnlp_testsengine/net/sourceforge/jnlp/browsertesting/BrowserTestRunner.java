@@ -36,12 +36,16 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
                 String mbr = System.getProperty("modified.browsers.run");
                 if (mbr != null) {
                     if (mbr.equalsIgnoreCase("all")) {
-                        testableBrowsers = BrowserFactory.getFactory().getBrowsers(new Browsers[]{Browsers.all});
+                        if (!isBrowsersNoneSet(tib)) {
+                            testableBrowsers = BrowserFactory.getFactory().getBrowsers(new Browsers[]{Browsers.all});
+                        }
                     } else if (mbr.equalsIgnoreCase("one")) {
                         //this complication here is for case like
                         // namely enumerated concrete browsers, so we want to pick up
                         // random one from those already enumerated
-                        testableBrowsers = Arrays.asList(new Browsers[]{testableBrowsers.get(new Random().nextInt(testableBrowsers.size()))});
+                        if (isBrowsersNoneSet(tib)) {
+                            testableBrowsers = Arrays.asList(new Browsers[]{testableBrowsers.get(new Random().nextInt(testableBrowsers.size()))});
+                        }
                     } else if (mbr.equalsIgnoreCase("ignore")) {
                         testableBrowsers = BrowserFactory.getFactory().getBrowsers(new Browsers[]{Browsers.none});
                         browserIgnoration = true;
@@ -64,6 +68,13 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
         } else {
             runChildX(method, notifier, null, false);
         }
+    }
+
+    private boolean isBrowsersNoneSet(TestInBrowsers tib) {
+        if (tib.testIn().length == 1 && tib.testIn()[0] == Browsers.none) {
+            return true;
+        }
+        return false;
     }
 
     private void injectBrowserCatched(FrameworkMethod method, Browsers browser) {
