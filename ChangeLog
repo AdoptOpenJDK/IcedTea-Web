@@ -1,3 +1,56 @@
+2012-07-02  Jiri Vanek  <jvanek@redhat.com>
+
+	Makefile adapted to recent (three changelog items) refactoring
+	* Makefile.am: (JNLP_TESTS_ENGINE_SRCDIR) now points correctly to
+	test-extensions. (JNLP_TESTS_ENGINE_TESTS_SRCDIR) new variable for
+	test-extensions-tests. (JNLP_TESTS_SRCDIR) now points to reproducers.
+	(JNLP_TESTS_ENGINE_TESTS_DIR) new variable for built
+	JNLP_TESTS_ENGINE_TESTS_SRCDIR
+	(netx-dist-tests-tests-source-files.txt) new target for list of
+	content of JNLP_TESTS_ENGINE_TESTS_SRCDIR.
+	(stamps/netx-dist-tests-tests-compile.stamp) new target for compiling
+	netx-dist-tests-tests-source-files.txt
+	(netx-dist-tests-source-files.tx) now depends on
+	stamps/netx-dist-tests-tests-compile.stamp
+	($(REPRODUCERS_CLASS_NAMES)) target is now working in JNLP_TESTS_ENGINE_TESTS_DIR
+	instead of JNLP_TESTS_ENGINE_DIR
+	(stamps/run-netx-dist-tests.stamp): added JNLP_TESTS_ENGINE_TESTS_DIR to classpath
+	(stamps/run-unit-test-code-coverage.stamp), (stamps/run-reproducers-test-code-coverage.stamp)
+	added JNLP_TESTS_ENGINE_TESTS_DIR to classpath and
+	JNLP_TESTS_ENGINE_TESTS_SRCDIR to sources path
+
+2012-07-02  Jiri Vanek  <jvanek@redhat.com>
+
+	All tests from test-extensions extracted to test-extensions-tests.
+	All inner classes in test-extensions extracted as outer classes
+	* tests/test-extensions/net/sourceforge/jnlp/ResourcesTest.java:
+	moved to test-extensions-tests
+	* tests/test-extensions-tests/net/sourceforge/jnlp/ResourcesTest.java:
+	new file, copied from test-extensions
+	* tests/test-extensions-tests/net/sourceforge/jnlp/ServerAccessTest.java:
+	all tests from original ServerAccess.java
+	* tests/test-extensions/net/sourceforge/jnlp/ContentReader.java:
+	* tests/test-extensions/net/sourceforge/jnlp/LogItem.java:
+	* tests/test-extensions/net/sourceforge/jnlp/LoggingBottleneck.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessResult.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java:
+	* tests/test-extensions/net/sourceforge/jnlp/TestsLogs.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ThreadedProcess.java:
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java:
+	new files, extracted classes from ServerAccess
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	extracted tests and inner classes
+	
+
+2012-07-02  Jiri Vanek  <jvanek@redhat.com>
+
+	hg move tests/netx/jnlp_testsengine/ tests/test-extensions
+
+2012-07-02  Jiri Vanek  <jvanek@redhat.com>
+
+	hg move tests/jnlp_tests/ tests/reproducers
+
 2012-06-29  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed resource tests and Browsers.none behavior

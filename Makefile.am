@@ -17,9 +17,12 @@ export NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
 export JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
 export JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
 
-export JNLP_TESTS_ENGINE_SRCDIR=$(TESTS_SRCDIR)/netx/jnlp_testsengine
-export JNLP_TESTS_SRCDIR=$(TESTS_SRCDIR)/jnlp_tests
-export JNLP_TESTS_ENGINE_DIR=$(TESTS_DIR)/netx/jnlp_testsengine
+
+export JNLP_TESTS_ENGINE_SRCDIR=$(TESTS_SRCDIR)/test-extensions
+export JNLP_TESTS_ENGINE_TESTS_SRCDIR=$(TESTS_SRCDIR)/test-extensions-tests
+export JNLP_TESTS_SRCDIR=$(TESTS_SRCDIR)/reproducers
+export JNLP_TESTS_ENGINE_DIR=$(TESTS_DIR)/jnlp_testsengine
+export JNLP_TESTS_ENGINE_TESTS_DIR=$(TESTS_DIR)/netx/jnlp_testsengine_tests
 export JNLP_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/jnlp_test_server
 export JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
 export PRIVATE_KEYSTORE_NAME=teststore.ks
@@ -649,8 +652,20 @@ stamps/netx-dist-tests-compile.stamp: stamps/netx.stamp \
 	mkdir -p stamps && \
 	touch $@
 
+netx-dist-tests-tests-source-files.txt:
+	find $(JNLP_TESTS_ENGINE_TESTS_SRCDIR) -name '*.java' | sort > $@
+
+stamps/netx-dist-tests-tests-compile.stamp: stamps/junit-jnlp-dist-dirs netx-dist-tests-tests-source-files.txt  stamps/netx-dist-tests-compile.stamp
+	mkdir -p $(JNLP_TESTS_ENGINE_TESTS_DIR);
+	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	 -d $(JNLP_TESTS_ENGINE_TESTS_DIR) \
+	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
+	 @netx-dist-tests-tests-source-files.txt && \
+	mkdir -p stamps && \
+	touch $@
+
 stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-jnlp-dist-dirs \
- netx-dist-tests-source-files.txt stamps/netx-dist-tests-compile.stamp
+ netx-dist-tests-source-files.txt stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-tests-compile.stamp
 	types=($(ALL_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
@@ -658,7 +673,7 @@ stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-j
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	      -d $(JNLP_TESTS_ENGINE_DIR) \
+	      -d $(JNLP_TESTS_ENGINE_TESTS_DIR) \
 	      -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
 	    "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/"* ; \
 	  done ; \
@@ -681,7 +696,7 @@ stamps/netx-dist-tests-copy-resources.stamp: stamps/junit-jnlp-dist-dirs
 
 $(REPRODUCERS_CLASS_NAMES): $(REPRODUCERS_CLASS_WHITELIST)
 	whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
-	cd $(JNLP_TESTS_ENGINE_DIR) ; \
+	cd $(JNLP_TESTS_ENGINE_TESTS_DIR) ; \
 	class_names= ; \
 	for test in `find -type f` ; do \
 	  class_name=`echo $$test | sed -e 's|\.class$$||' -e 's|^\./||'` ; \
@@ -710,7 +725,7 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES) stamps/process-custom-reproducers.stamp
 	cd $(JNLP_TESTS_ENGINE_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):. \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(JNLP_TESTS_ENGINE_TESTS_DIR) \
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
 if WITH_XSLTPROC
@@ -991,6 +1006,7 @@ if WITH_EMMA
 	   -cp $(BOOT_DIR)/jre/lib/resources.jar \
 	   -cp $(RHINO_RUNTIME) \
 	   -cp . \
+	   -cp $(JNLP_TESTS_ENGINE_TESTS_DIR) \
 	   -ix "-org.junit.*" \
 	   -ix "-junit.*" \
 	   CommandLine $$class_names ; \
@@ -1007,6 +1023,7 @@ if WITH_EMMA
 	  -sp $(NETX_UNIT_TEST_SRCDIR) \
 	  -sp $(JUNIT_RUNNER_SRCDIR) \
 	  -sp $(JNLP_TESTS_ENGINE_SRCDIR) \
+	  -sp $(JNLP_TESTS_ENGINE_TESTS_SRCDIR) \
 	  -r html \
 	  -r xml \
 	  "$${testcases_srcs[@]}" ; \
@@ -1053,6 +1070,7 @@ if WITH_EMMA
 	 -sp $(NETX_UNIT_TEST_SRCDIR) \
 	 -sp $(JUNIT_RUNNER_SRCDIR) \
 	 -sp $(JNLP_TESTS_ENGINE_SRCDIR) \
+	 -sp $(JNLP_TESTS_ENGINE_TESTS_SRCDIR) \
 	 "$${testcases_srcs[@]}" \
 	 -r html \
 	 -r xml ; 
