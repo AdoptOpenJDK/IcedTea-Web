@@ -1,5 +1,35 @@
 2012-07-02  Jiri Vanek  <jvanek@redhat.com>
 
+	Added missing headers
+	* tests/reproducers/simple/CreateClassLoader/resources/CreateClassLoader.jnlp: 
+	* tests/reproducers/simple/ReadEnvironment/resources/ReadEnvironment.jnlp: 
+	* tests/reproducers/simple/ReadProperties/resources/ReadProperties1.jnlp: 
+	* tests/reproducers/simple/ReadProperties/resources/ReadProperties2.jnlp: 
+	* tests/reproducers/simple/RedirectStreams/resources/RedirectStreams.jnlp: 
+	* tests/reproducers/simple/ReplaceSecurityManager/resources/ReplaceSecurityManager.jnlp: 
+	* tests/reproducers/simple/SetContextClassLoader/resources/SetContextClassLoader.jnlp: 
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/annotations/Bug.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/annotations/KnownToFail.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/annotations/NeedsDisplay.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/annotations/TestInBrowsers.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/Browser.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/BrowserFactory.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/BrowserTest.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/BrowserTestRunner.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/Browsers.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Chrome.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Chromium.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Epiphany.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Firefox.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/LinuxBrowser.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Midory.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/MozillaFamilyLinuxBrowser.java: 
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Opera.java: 
+	added license headers
+
+2012-07-02  Jiri Vanek  <jvanek@redhat.com>
+
 	Makefile adapted to recent (three changelog items) refactoring
 	* Makefile.am: (JNLP_TESTS_ENGINE_SRCDIR) now points correctly to
 	test-extensions. (JNLP_TESTS_ENGINE_TESTS_SRCDIR) new variable for
@@ -41,7 +71,6 @@
 	new files, extracted classes from ServerAccess
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
 	extracted tests and inner classes
-	
 
 2012-07-02  Jiri Vanek  <jvanek@redhat.com>
 

@@ -65,12 +65,12 @@ import org.junit.Assert;
 /**
  *
  * This class provides access to virtual server and stuff around.
- * It can find unoccupied port, start server, provides its singleton instantiation, lunch parallel instantiations,
+ * It can find unoccupied port, start server, provides its singleton instantiation, launch parallel instantiations,
  * read location of installed (tested javaws) see javaws.build.bin java property,
  * location of server www root on file system (see test.server.dir java property),
- * stubs for lunching javaws and for locating resources and read resources.
+ * stubs for launching javaws and for locating resources and read resources.
  *
- * It can also execute processes with timeout (@see PROCESS_TIMEOUT) (used during lunching javaws)
+ * It can also execute processes with timeout (@see PROCESS_TIMEOUT) (used during launching javaws)
  * Some protected apis are exported because public classes in this package are put to be tested by makefile.
  *
  * There are included test cases which show some basic usages.
