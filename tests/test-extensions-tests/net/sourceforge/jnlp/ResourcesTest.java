@@ -184,15 +184,15 @@ public class ResourcesTest extends  BrowserTest{
         expected = 2;
         Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
 
-        s = Browsers.firefox.toExec() + ":" + Browsers.chromiumBrowser + ":" + Browsers.googleChrome.toExec() + ":" + Browsers.opera;
+        s = Browsers.firefox.toExec() + ":" + Browsers.chromiumBrowser + ":" + Browsers.googleChrome.toExec() + ":" + Browsers.opera + ":" + Browsers.epiphany + ":" + Browsers.midori;
         bf = new BrowserFactory(s);
-        expected = 4;
+        expected = 6;
         Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
         testFullFactory(bf);
 
-        s = "fgfd/" + Browsers.firefox.toExec() + ":" + "/fgfd/" + Browsers.chromiumBrowser + ":" + "fgfd/dfsdf/" + Browsers.googleChrome.toExec() + ":" + "/g/fgfd/" + Browsers.opera;
+        s = "fgfd/" + Browsers.firefox.toExec() + ":" + "/fgfd/" + Browsers.chromiumBrowser + ":" + "fgfd/dfsdf/" + Browsers.googleChrome.toExec() + ":" + "/g/fgfd/" + Browsers.opera + ":" + Browsers.epiphany + ":" + Browsers.midori;
         bf = new BrowserFactory(s);
-        expected = 4;
+        expected = 6;
         Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
         testFullFactory(bf);
 
@@ -298,7 +298,7 @@ public class ResourcesTest extends  BrowserTest{
                 e2.append(s).append("\n");
             }
         };
-       ServerAccess.ProcessResult pr=server.executeBrowser("not_existing_url.html",le,lo);
+       ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html",le,lo);
         server.setCurrentBrowser(BrowserFactory.getFactory().getFirst().getID());
         Assert.assertNotNull(server.getCurrentBrowsers());
         Assert.assertNotNull(server.getCurrentBrowser());
