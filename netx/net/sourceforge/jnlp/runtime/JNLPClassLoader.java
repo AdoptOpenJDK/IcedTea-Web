@@ -183,6 +183,9 @@ public class JNLPClassLoader extends URLClassLoader {
      * */
     private boolean foundMainJar= false;
 
+    /** Name of the application's main class */
+    private String mainClass = null;
+
     /**
      * Variable to track how many times this loader is in use
      */
@@ -194,6 +197,16 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param file the JNLP file
      */
     protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy) throws LaunchException {
+        this(file,policy,null);
+    }
+
+    /**
+     * Create a new JNLPClassLoader from the specified file.
+     *
+     * @param file the JNLP file
+     * @param name of the application's main class
+     */
+    protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         if (JNLPRuntime.isDebug())
@@ -202,6 +215,8 @@ public class JNLPClassLoader extends URLClassLoader {
         this.file = file;
         this.updatePolicy = policy;
         this.resources = file.getResources();
+
+        this.mainClass = mainName;
 
         // initialize extensions
         initializeExtensions();
@@ -309,6 +324,17 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy the update policy to use when downloading resources
      */
     public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy) throws LaunchException {
+        return getInstance(file, policy, null);
+    }
+
+    /**
+     * Returns a JNLP classloader for the specified JNLP file.
+     *
+     * @param file the file to load classes for
+     * @param policy the update policy to use when downloading resources
+     * @param mainName Overrides the main class name of the application
+     */
+    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName) throws LaunchException {
         JNLPClassLoader baseLoader = null;
         JNLPClassLoader loader = null;
         String uniqueKey = file.getUniqueKey();
@@ -325,7 +351,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     (file.isApplication() && 
                      !baseLoader.getJNLPFile().getFileLocation().equals(file.getFileLocation()))) {
 
-                loader = new JNLPClassLoader(file, policy);
+                loader = new JNLPClassLoader(file, policy, mainName);
 
                 // New loader init may have caused extentions to create a
                 // loader for this unique key. Check.
@@ -343,14 +369,14 @@ public class JNLPClassLoader extends URLClassLoader {
                 // loader is now current + ext. But we also need to think of
                 // the baseLoader
                 if (baseLoader != null && baseLoader != loader) {
-                    loader.merge(baseLoader);
+                   loader.merge(baseLoader);
                 }
 
             } else {
                 // if key is same and locations match, this is the loader we want
                 if (!file.isApplication()) {
                     // If this is an applet, we do need to consider its loader
-                    loader = new JNLPClassLoader(file, policy);
+                   loader = new JNLPClassLoader(file, policy, mainName);
 
                     if (baseLoader != null)
                         baseLoader.merge(loader);
@@ -380,13 +406,17 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param location the file's location
      * @param version the file's version
      * @param policy the update policy to use when downloading resources
+     * @param mainName Overrides the main class name of the application
      */
-    public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version, UpdatePolicy policy)
+    public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version, UpdatePolicy policy, String mainName)
             throws IOException, ParseException, LaunchException {
         JNLPClassLoader loader = urlToLoader.get(uniqueKey);
 
-        if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation()))
-            loader = getInstance(new JNLPFile(location, uniqueKey, version, false, policy), policy);
+        if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
+            JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, false, policy);
+
+            loader = getInstance(jnlpFile, policy, mainName);
+        }
 
         return loader;
     }
@@ -405,7 +435,20 @@ public class JNLPClassLoader extends URLClassLoader {
         for (int i = 0; i < ext.length; i++) {
             try {
                 String uniqueKey = this.getJNLPFile().getUniqueKey();
-                JNLPClassLoader loader = getInstance(ext[i].getLocation(), uniqueKey, ext[i].getVersion(), updatePolicy);
+
+                if (mainClass == null) {
+                    Object obj = file.getLaunchInfo();
+
+                    if (obj instanceof ApplicationDesc) {
+                        ApplicationDesc ad = (ApplicationDesc) file.getLaunchInfo();
+                        mainClass = ad.getMainClass();
+                    } else if (obj instanceof AppletDesc) {
+                        AppletDesc ad = (AppletDesc) file.getLaunchInfo();
+                        mainClass = ad.getMainClass();
+                    }
+                }
+
+                JNLPClassLoader loader = getInstance(ext[i].getLocation(), uniqueKey, ext[i].getVersion(), updatePolicy, mainClass);
                 loaderList.add(loader);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -457,8 +500,25 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         JARDesc jars[] = resources.getJARs();
-        if (jars == null || jars.length == 0)
+
+        if (jars == null || jars.length == 0) {
+
+            boolean allSigned = true;
+            for (int i = 1; i < loaders.length; i++) {
+                if (!loaders[i].getSigning()) {
+                    allSigned = false;
+                    break;
+                }
+            }
+
+            if(allSigned)
+                signing = true;
+
+            //Check if main jar is found within extensions
+            foundMainJar = foundMainJar || hasMainInExtensions();
+
             return;
+        }
         /*
         if (jars == null || jars.length == 0) {
                 throw new LaunchException(null, null, R("LSFatal"),
@@ -519,6 +579,10 @@ public class JNLPClassLoader extends URLClassLoader {
                 // If jar with main class was not found, check available resources
                 while (!foundMainJar && available != null && available.size() != 0) 
                     addNextResource();
+
+                // If the jar with main class was not found, check extension
+                // jnlp's resources
+                foundMainJar = foundMainJar || hasMainInExtensions();
 
                 // If jar with main class was not found and there are no more
                 // available jars, throw a LaunchException
@@ -606,17 +670,18 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     private void checkForMain(List<JARDesc> jars) throws LaunchException {
 
-        Object obj = file.getLaunchInfo();
-        String mainClass;
+        if (mainClass == null) {
+            Object obj = file.getLaunchInfo();
 
-        if (obj instanceof ApplicationDesc) {
-            ApplicationDesc ad = (ApplicationDesc) file.getLaunchInfo();
-            mainClass = ad.getMainClass();
-        } else if (obj instanceof AppletDesc) {
-            AppletDesc ad = (AppletDesc) file.getLaunchInfo();
-            mainClass = ad.getMainClass();
-        } else
-            return;
+            if (obj instanceof ApplicationDesc) {
+                ApplicationDesc ad = (ApplicationDesc) file.getLaunchInfo();
+                mainClass = ad.getMainClass();
+            } else if (obj instanceof AppletDesc) {
+                AppletDesc ad = (AppletDesc) file.getLaunchInfo();
+                mainClass = ad.getMainClass();
+            } else
+                return;
+        }
 
         // The main class may be specified in the manifest
 
@@ -708,6 +773,26 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         return mainClass;
+    }
+
+    /**
+     * Returns true if this loader has the main jar
+     */
+    public boolean hasMainJar() {
+        return this.foundMainJar;
+    }
+
+    /**
+     * Returns true if extension loaders have the main jar
+     */
+    private boolean hasMainInExtensions() {
+        boolean foundMain = false;
+
+        for (int i = 1; i < loaders.length && !foundMain; i++) {
+            foundMain = loaders[i].hasMainJar();
+        }
+
+        return foundMain;
     }
 
     /**

@@ -1,3 +1,47 @@
+2012-07-03  Saad Mohammad  <smohammad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(JNLPClassLoader): New constructor that accepts an additional parameter
+	containing the main class name.
+	(getInstance): Accepts mainName as parameter to override application's
+	main class name
+	(initializeExtensions): Passes in the name of the application's main class
+	when creating a new JNLPClassLoader instance.
+	(initializeResources): If the loader owns no jars, it will consider
+	itself as signed if all of the extension loaders are signed. Also, if the
+	extension jars have the main class, it will set foundMainJar to true.
+	(initializeResources): If the main class was not found, check if it was
+	found within the extension jars.
+	(checkForMain): Uses the overwritten main class name (if set) when
+	searching for the main within the jars.
+	(hasMainJar): Returns true if this loader holds the main jar.
+	(hasMainInExtensions): Returns true if extension loaders have the main jar
+	* tests/jnlp_tests/signed/ExtensionJnlp/resources/UsesSignedJarExtension.jnlp:
+	* tests/jnlp_tests/signed/ExtensionJnlp/resources/UsesSignedJnlpExtension.jnlp:
+	* tests/jnlp_tests/signed/ExtensionJnlp/resources/UsesSignedJnlpJarAndSignedJarExtension.jnlp:
+	Launching jnlps that use extension jnlp as its resource.
+	* tests/jnlp_tests/signed/ExtensionJnlp/resources/UsesSignedJar.jnlp:
+	Launching jnlp that directly launches SignedJarResource class.
+	* tests/jnlp_tests/signed/ExtensionJnlp/resources/UsesSignedJnlp.jnlp:
+	Launching jnlp that directly launches SignedJnlpResource class.
+	* tests/jnlp_tests/signed/ExtensionJnlp/testcases/ExtensionJnlpTest.java:
+	Testcase that tests the launching of jnlp files containing extension jnlps
+	as resource.
+	* tests/jnlp_tests/signed/SignedJarResource/resources/SignedJarExtension.jnlp:
+	Component jnlp file that is used as an extension resource.
+	* tests/jnlp_tests/signed/SignedJarResource/srcs/SignedJarResource.java:
+	A simple java class that outputs a string.
+	* tests/jnlp_tests/signed/SignedJnlpResource/resources/UnmatchingSignedJnlpExtension.jnlp:
+	Component jnlp file that is used as an extension resource and does not
+	match the signed jnlp file.
+	* tests/jnlp_tests/signed/SignedJnlpResource/resources/MatchingSignedJnlpExtension.jnlp:
+	Component jnlp file that is used as an extension resource and matches the
+	signed jnlp file.
+	* tests/jnlp_tests/signed/SignedJnlpResource/srcs/JNLP-INF/APPLICATION_TEMPLATE.jnlp:
+	Signed jnlp file.
+	* tests/jnlp_tests/signed/SignedJnlpResource/srcs/SignedJnlpResource.java:
+	A simple java class that outputs a string.
+
 2012-07-02  Jiri Vanek  <jvanek@redhat.com>
 
 	Added missing headers
