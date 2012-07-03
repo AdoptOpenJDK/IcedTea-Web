@@ -1,5 +1,5 @@
 /* ResourcesTest.java
-Copyright (C) 2011 Red Hat, Inc.
+Copyright (C) 2011-2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -40,7 +40,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import net.sourceforge.jnlp.browsertesting.Browser;
@@ -62,7 +64,7 @@ public class ResourcesTest extends  BrowserTest{
     @NeedsDisplay
     public void testNonExisitngBrowserWillNotDeadlock() throws Exception {
         server.setCurrentBrowser(Browsers.none);
-        ServerAccess.ProcessResult pr = server.executeBrowser("simpletest1.jnlp");
+        ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html");
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
         Assert.assertEquals(pr.stdout, "");
@@ -85,9 +87,16 @@ public class ResourcesTest extends  BrowserTest{
     }
 
     @Test
+    public void testGetUrlUponThisInstance() throws MalformedURLException{
+        URL u1=server.getUrlUponThisInstance("simple.jsp");
+        URL u2=server.getUrlUponThisInstance("/simple.jsp");
+        Assert.assertEquals(u1, u2);
+    }
+
+    @Test
     @TestInBrowsers(testIn=Browsers.none)
     public void testNonExisitngBrowserWillNotCauseMess() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("simpletest1.jnlp");
+        ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html");
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
         Assert.assertEquals(pr.stdout, "");
@@ -289,7 +298,7 @@ public class ResourcesTest extends  BrowserTest{
                 e2.append(s).append("\n");
             }
         };
-       ServerAccess.ProcessResult pr=server.executeBrowser("simpletest1.jnlp",le,lo);
+       ServerAccess.ProcessResult pr=server.executeBrowser("not_existing_url.html",le,lo);
         server.setCurrentBrowser(BrowserFactory.getFactory().getFirst().getID());
         Assert.assertNotNull(server.getCurrentBrowsers());
         Assert.assertNotNull(server.getCurrentBrowser());
@@ -310,6 +319,8 @@ public class ResourcesTest extends  BrowserTest{
         Assert.assertEquals(bf.getBrowser(Browsers.googleChrome).getID(), Browsers.googleChrome);
         Assert.assertEquals(bf.getBrowser(Browsers.firefox).getID(), Browsers.firefox);
         Assert.assertEquals(bf.getBrowser(Browsers.opera).getID(), Browsers.opera);
+        Assert.assertEquals(bf.getBrowser(Browsers.epiphany).getID(), Browsers.epiphany);
+        Assert.assertEquals(bf.getBrowser(Browsers.midori).getID(), Browsers.midori);
     }
 
     private void testBrowser(Browser browser) throws IOException {

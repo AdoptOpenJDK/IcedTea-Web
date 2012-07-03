@@ -1103,17 +1103,21 @@ clean_tests_reports:
 
 clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public clean-custom-reproducers
 	rm -f netx-dist-tests-source-files.txt
+	rm -rf $(JNLP_TESTS_ENGINE_TESTS_DIR)
 	rm -rf $(JNLP_TESTS_DIR)
 	rm -rf $(JNLP_TESTS_SERVER_DEPLOYDIR)
 	rm -rf $(JNLP_TESTS_ENGINE_DIR)
 	rm -f stamps/junit-jnlp-dist-dirs
 	rm -f stamps/netx-dist-tests-compile.stamp
+	rm -f stamps/netx-dist-tests-tests-compile.stamp
 	rm -f stamps/netx-dist-tests-prepare-reproducers.stamp
 	rm -f stamps/netx-dist-tests-compile-testcases.stamp
 	rm -f stamps/netx-dist-tests-copy-resources.stamp
 	rm -f stamps/netx-dist-tests-sign-some-reproducers.stamp
 	rm -f stamps/change-dots-to-paths.stamp
 	rm -f junit-jnlp-dist-simple.txt
+	rm -f junit-jnlp-dist-custom.txt
+	rm -f netx-dist-tests-tests-source-files.txt
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
 	  rm -f junit-jnlp-dist-$$which.txt ; \
