@@ -1,3 +1,19 @@
+2012-07-09  Adam Domurad <adomurad@redhat.com>
+
+	Ignore invalid jar files in applets, like the oracle plugin does.
+	* netx/net/sourceforge/jnlp/cache/IllegalResourceDescriptorException.java:
+	New exception type for ResourceTracker to throw instead of
+	IllegalArgumentException 
+	* netx/net/sourceforge/jnlp/cache/IllegalResourceDescriptorException.java:
+	Throws IllegalArgumentDescriptorException instead of 
+	IllegalArgumentException.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: 
+	(isInvalidJar): New, checks for ZipException in new JarFile(...)
+	(shouldFilterInvalidJars): New, checks if we are in an applet
+	(initializeResources): if 'shouldFilterInvalidJars()' is true and a jar
+	is not a valid jar file, the jar is filtered out and normal execution 
+	continues.
+
 2012-07-03  Saad Mohammad  <smohammad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
