@@ -7,7 +7,7 @@ INDEX_HTML_BODY="<html><body><h1>Required to recognize folder structure</h1></bo
 prepare-reproducer:
 	echo PREPARING REPRODUCER $(TESTNAME)
 	mkdir -p $(DEPLOY_SUBDIR)
-	echo INDEX_HTML_BODY > $(DEPLOY_SUBDIR)/index.html
+	echo $(INDEX_HTML_BODY) > $(DEPLOY_SUBDIR)/index.html
 	$(EXPORTED_JAVAC) -classpath $(JAVAC_CLASSPATH) -d $(DEPLOY_SUBDIR) $(TESTNAME).java
 	echo PREPARED REPRODUCER $(TESTNAME)
 
