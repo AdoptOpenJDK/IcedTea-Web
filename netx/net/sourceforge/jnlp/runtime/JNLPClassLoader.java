@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,7 @@ import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.security.SecurityDialogs;
@@ -482,6 +484,39 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
+     * Check if a described jar file is invalid
+     * @param jar the jar to check
+     * @return true if file exists AND is an invalid jar, false otherwise
+     */
+    private boolean isInvalidJar(JARDesc jar){
+        File cacheFile = tracker.getCacheFile(jar.getLocation());
+        if (cacheFile == null)
+            return false;//File cannot be retrieved, do not claim it is an invalid jar
+        boolean isInvalid = false;
+        try {
+            JarFile jarFile = new JarFile(cacheFile.getAbsolutePath());
+            jarFile.close();
+        } catch (IOException ioe){
+            //Catch a ZipException or any other read failure
+            isInvalid = true;
+        }
+        return isInvalid;
+    }
+
+    /**
+     * Determine how invalid jars should be handled
+     * @return whether to filter invalid jars, or error later on
+     */
+    private boolean shouldFilterInvalidJars(){
+        if (file instanceof PluginBridge){
+            PluginBridge pluginBridge = (PluginBridge)file;
+            /*Ignore on applet, ie !useJNLPHref*/
+            return !pluginBridge.useJNLPHref();
+        }
+        return false;//Error is default behaviour
+    }
+
+    /**
      * Load all of the JARs used in this JNLP file into the
      * ResourceTracker for downloading.
      */
@@ -548,10 +583,26 @@ public class JNLPClassLoader extends URLClassLoader {
         if (strict)
             fillInPartJars(initialJars); // add in each initial part's lazy jars
 
+        waitForJars(initialJars); //download the jars first.
+
+        //A ZipException will propagate later on if the jar is invalid and not checked here
+        if (shouldFilterInvalidJars()){
+            //We filter any invalid jars
+            Iterator<JARDesc> iterator = initialJars.iterator();
+            while (iterator.hasNext()){
+                JARDesc jar = iterator.next();
+                if (isInvalidJar(jar)) {
+                    //Remove this jar as an available jar
+                    iterator.remove();
+                    tracker.removeResource(jar.getLocation());
+                    available.remove(jar);
+                }
+            }
+        }
+
         if (JNLPRuntime.isVerifying()) {
 
             JarCertVerifier jcv;
-            waitForJars(initialJars); //download the jars first.
 
             try {
                 jcv = verifyJars(initialJars);
@@ -618,7 +669,16 @@ public class JNLPClassLoader extends URLClassLoader {
 
         for (JARDesc jarDesc : file.getResources().getJARs()) {
             try {
-                File cachedFile = tracker.getCacheFile(jarDesc.getLocation());
+
+                File cachedFile;
+
+                try {
+                    cachedFile = tracker.getCacheFile(jarDesc.getLocation());
+                } catch (IllegalResourceDescriptorException irde){
+                    //Caused by ignored resource being removed due to not being valid
+                    System.err.println("JAR " + jarDesc.getLocation() + " is not a valid jar file. Continuing.");
+                    continue;
+                }
 
                 if (cachedFile == null) {
                     System.err.println("JAR " + jarDesc.getLocation() + " not found. Continuing.");

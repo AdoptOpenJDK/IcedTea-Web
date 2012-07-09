@@ -184,7 +184,7 @@ public class ResourceTracker {
      */
     public void addResource(URL location, Version version, DownloadOptions options, UpdatePolicy updatePolicy) {
         if (location == null)
-            throw new IllegalArgumentException("location==null");
+            throw new IllegalResourceDescriptorException("location==null");
         try {
             location = normalizeUrl(location, JNLPRuntime.isDebug());
         } catch (Exception ex) {
@@ -225,7 +225,7 @@ public class ResourceTracker {
      * not required as resources are reclaimed when the tracker is
      * collected.
      *
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public void removeResource(URL location) {
         synchronized (resources) {
@@ -351,7 +351,7 @@ public class ResourceTracker {
      *
      * @param location the resource location
      * @return the resource, or null if it could not be downloaded
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      * @see CacheUtil#isCacheable
      */
     public URL getCacheURL(URL location) {
@@ -378,7 +378,7 @@ public class ResourceTracker {
      *
      * @param location the resource location
      * @return a local file containing the resource, or null
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      * @see CacheUtil#isCacheable
      */
     public File getCacheFile(URL location) {
@@ -418,7 +418,7 @@ public class ResourceTracker {
      * the cache.
      *
      * @throws IOException if there was an error opening the stream
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public InputStream getInputStream(URL location) throws IOException {
         try {
@@ -442,7 +442,7 @@ public class ResourceTracker {
      * @param urls the resources to wait for
      * @param timeout the time in ms to wait before returning, 0 for no timeout
      * @return whether the resources downloaded before the timeout
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean waitForResources(URL urls[], long timeout) throws InterruptedException {
         Resource resources[] = new Resource[urls.length];
@@ -468,7 +468,7 @@ public class ResourceTracker {
      * @param timeout the timeout, or 0 to wait until completed
      * @return whether the resource downloaded before the timeout
      * @throws InterruptedException if another thread interrupted the wait
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean waitForResource(URL location, long timeout) throws InterruptedException {
         return wait(new Resource[] { getResource(location) }, timeout);
@@ -479,7 +479,7 @@ public class ResourceTracker {
      *
      * @param location the resource location
      * @return the number of bytes transferred
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public long getAmountRead(URL location) {
         // not atomic b/c transferred is a long, but so what (each
@@ -491,7 +491,7 @@ public class ResourceTracker {
      * Returns whether a resource is available for use (ie, can be
      * accessed with the getCacheFile method).
      *
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean checkResource(URL location) {
         return getResource(location).isSet(DOWNLOADED | ERROR); // isSet atomic
@@ -505,7 +505,7 @@ public class ResourceTracker {
      * resource at a time to conserve system resources.
      *
      * @return true if the resource is already downloaded (or an error occurred)
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean startResource(URL location) {
         Resource resource = getResource(location);
@@ -518,7 +518,7 @@ public class ResourceTracker {
      * enqueues the resource if not already started.
      *
      * @return true if the resource is already downloaded (or an error occurred)
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     private boolean startResource(Resource resource) {
         boolean enqueue = false;
@@ -550,7 +550,7 @@ public class ResourceTracker {
      *
      * @param location the resource location
      * @return the number of bytes, or -1
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public long getTotalSize(URL location) {
         return getResource(location).size; // atomic
@@ -606,7 +606,7 @@ public class ResourceTracker {
     private void queueResource(Resource resource) {
         synchronized (lock) {
             if (!resource.isSet(CONNECT | DOWNLOAD))
-                throw new IllegalArgumentException("Invalid resource state (resource: " + resource + ")");
+                throw new IllegalResourceDescriptorException("Invalid resource state (resource: " + resource + ")");
 
             queue.add(resource);
             startThread();
@@ -1030,7 +1030,7 @@ public class ResourceTracker {
     /**
      * Return the resource matching the specified URL.
      *
-     * @throws IllegalArgumentException if the resource is not being tracked
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     private Resource getResource(URL location) {
         synchronized (resources) {
@@ -1040,7 +1040,7 @@ public class ResourceTracker {
             }
         }
 
-        throw new IllegalArgumentException("Location does not specify a resource being tracked.");
+        throw new IllegalResourceDescriptorException("Location does not specify a resource being tracked.");
     }
 
     /**
