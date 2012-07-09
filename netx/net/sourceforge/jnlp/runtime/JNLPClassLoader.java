@@ -433,23 +433,22 @@ public class JNLPClassLoader extends URLClassLoader {
 
         loaderList.add(this);
 
+        if (mainClass == null) {
+            Object obj = file.getLaunchInfo();
+
+            if (obj instanceof ApplicationDesc) {
+                ApplicationDesc ad = (ApplicationDesc) file.getLaunchInfo();
+                mainClass = ad.getMainClass();
+            } else if (obj instanceof AppletDesc) {
+                AppletDesc ad = (AppletDesc) file.getLaunchInfo();
+                mainClass = ad.getMainClass();
+            }
+        }
+
         //if (ext != null) {
         for (int i = 0; i < ext.length; i++) {
             try {
                 String uniqueKey = this.getJNLPFile().getUniqueKey();
-
-                if (mainClass == null) {
-                    Object obj = file.getLaunchInfo();
-
-                    if (obj instanceof ApplicationDesc) {
-                        ApplicationDesc ad = (ApplicationDesc) file.getLaunchInfo();
-                        mainClass = ad.getMainClass();
-                    } else if (obj instanceof AppletDesc) {
-                        AppletDesc ad = (AppletDesc) file.getLaunchInfo();
-                        mainClass = ad.getMainClass();
-                    }
-                }
-
                 JNLPClassLoader loader = getInstance(ext[i].getLocation(), uniqueKey, ext[i].getVersion(), updatePolicy, mainClass);
                 loaderList.add(loader);
             } catch (Exception ex) {

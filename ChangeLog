@@ -1,3 +1,8 @@
+2012-07-09  Saad Mohammad  <smohammad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java (initializeExtensions):
+	Checks and assigns the main-class name prior to the for loop.
+
 2012-07-09  Martin Olsson  <martin@minimum.se>
 
 	* plugin/icedteanp/IcedTeaPluginUtils.cc: Change calls from g_free
