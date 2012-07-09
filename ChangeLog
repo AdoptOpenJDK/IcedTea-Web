@@ -1,3 +1,7 @@
+2012-07-09  Deepak Bhole <dbhole@redhat.com>
+
+	* configure.ac: Bumped release number to 1.4pre
+
 2012-07-09  Saad Mohammad  <smohammad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java (initializeExtensions):
