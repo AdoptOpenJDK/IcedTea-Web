@@ -275,7 +275,7 @@ PluginRequestProcessor::call(std::vector<std::string*>* message_parts)
     JavaResultData* java_result;
     NPVariant* result_variant;
     std::string result_variant_jniid = std::string();
-    NPVariant* args_array;
+    NPVariant* args_array = NULL;
     AsyncCallThreadData thread_data = AsyncCallThreadData();
 
     reference = atoi(message_parts->at(3)->c_str());
@@ -994,7 +994,7 @@ _loadURL(void* data) {
 
     ((AsyncCallThreadData*) data)->result_ready = true;
 
-    g_free(decoded_url);
+    free(decoded_url);
     decoded_url = NULL;
 
     PLUGIN_DEBUG("_loadURL returning %d\n", ((AsyncCallThreadData*) data)->call_successful);

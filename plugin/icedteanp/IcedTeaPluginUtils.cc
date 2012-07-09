@@ -297,7 +297,7 @@ IcedTeaPluginUtilities::strSplit(const char* str, const char* delim)
 	v->reserve(strlen(str)/2);
 	char* copy;
 
-	// Tokening is done on a copy
+	// Tokenization is done on a copy
 	copy = (char*) malloc (sizeof(char)*strlen(str) + 1);
 	strcpy(copy, str);
 
@@ -308,11 +308,12 @@ IcedTeaPluginUtilities::strSplit(const char* str, const char* delim)
 	{
 	    // Allocation on heap since caller has no way to knowing how much will
 	    // be needed. Make sure caller cleans up!
-		std::string* s = new std::string();
-		s->append(tok_ptr);
-		v->push_back(s);
-		tok_ptr = strtok (NULL, " ");
+	    std::string* s = new std::string();
+	    s->append(tok_ptr);
+	    v->push_back(s);
+	    tok_ptr = strtok (NULL, " ");
 	}
+        free(copy);
 
 	return v;
 }

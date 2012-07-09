@@ -1,4 +1,14 @@
-2012-07-09  Adam Domurad <adomurad@redhat.com>
+2012-07-09  Martin Olsson  <martin@minimum.se>
+
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Change calls from g_free
+	to free when allocated with calloc.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc
+	(PluginRequestProcessor::call): Make sure args_array doesnt hold 
+	garbage when freed.
+	(_loadURL): Change calls from g_free to free when allocated with 
+	calloc.
+
+2012-07-09  Adam Domurad  <adomurad@redhat.com>
 
 	Ignore invalid jar files in applets, like the oracle plugin does.
 	* netx/net/sourceforge/jnlp/cache/IllegalResourceDescriptorException.java:

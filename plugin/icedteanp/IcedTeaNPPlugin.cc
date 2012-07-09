@@ -1272,7 +1272,7 @@ void consume_message(gchar* message) {
         PLUGIN_DEBUG("Proxy info: %s\n", proxy_info);
         plugin_send_message_to_appletviewer(proxy_info);
 
-        g_free(decoded_url);
+        free(decoded_url);
         decoded_url = NULL;
         g_free(proxy_info);
         proxy_info = NULL;
@@ -1298,7 +1298,7 @@ void consume_message(gchar* message) {
         PLUGIN_DEBUG("Cookie info: %s\n", cookie_info);
         plugin_send_message_to_appletviewer(cookie_info);
 
-        g_free(decoded_url);
+        free(decoded_url);
         decoded_url = NULL;
         g_free(cookie_info);
         cookie_info = NULL;
