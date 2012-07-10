@@ -67,6 +67,7 @@ import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPMatcher;
 import net.sourceforge.jnlp.JNLPMatcherException;
+import net.sourceforge.jnlp.LaunchDesc;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.PluginBridge;
@@ -636,8 +637,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 // If jar with main class was not found and there are no more
                 // available jars, throw a LaunchException
-                if (file.getLaunchInfo() instanceof AppletDesc ||
-                    file.getLaunchInfo() instanceof ApplicationDesc) {
+                if (file.getLaunchInfo() != null) {
                     if (!foundMainJar
                             && (available == null || available.size() == 0))
                         throw new LaunchException(file, null, R("LSFatal"),
@@ -729,17 +729,14 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     private void checkForMain(List<JARDesc> jars) throws LaunchException {
 
+        // Check launch info
         if (mainClass == null) {
-            Object obj = file.getLaunchInfo();
-
-            if (obj instanceof ApplicationDesc) {
-                ApplicationDesc ad = (ApplicationDesc) file.getLaunchInfo();
-                mainClass = ad.getMainClass();
-            } else if (obj instanceof AppletDesc) {
-                AppletDesc ad = (AppletDesc) file.getLaunchInfo();
-                mainClass = ad.getMainClass();
-            } else
+            LaunchDesc launchDesc = file.getLaunchInfo();
+            if (launchDesc == null) {
                 return;
+            }
+
+            mainClass = launchDesc.getMainClass();
         }
 
         // The main class may be specified in the manifest

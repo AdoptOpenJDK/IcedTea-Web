@@ -25,7 +25,7 @@ import java.util.*;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.8 $
  */
-public class AppletDesc {
+public class AppletDesc implements LaunchDesc {
 
     /** the applet name */
     private String name;
@@ -75,6 +75,7 @@ public class AppletDesc {
     /**
      * Returns the main class name in the dot-separated form (eg: foo.bar.Baz)
      */
+    @Override
     public String getMainClass() {
         return mainClass;
     }

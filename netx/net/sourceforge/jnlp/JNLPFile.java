@@ -91,7 +91,7 @@ public class JNLPFile {
     protected ResourcesDesc sharedResources = new ResourcesDesc(this, null, null, null);
 
     /** the application description */
-    protected Object launchType;
+    protected LaunchDesc launchType;
 
     /** the component description */
     protected ComponentDesc component;
@@ -446,7 +446,7 @@ public class JNLPFile {
      * Returns an object of one of the following types: AppletDesc,
      * ApplicationDesc and InstallerDesc
      */
-    public Object getLaunchInfo() {
+    public LaunchDesc getLaunchInfo() {
         return launchType;
     }
 

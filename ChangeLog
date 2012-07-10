@@ -1,3 +1,19 @@
+2012-07-10  Adam Domurad  <adomurad@redhat.com>
+
+	Refactor JNLPFile#launchType into its own interface type (as opposed to
+	Object), LaunchDesc.
+	* netx/net/sourceforge/jnlp/AppletDesc.java: Add override annotation to
+	getMainClass().
+	* netx/net/sourceforge/jnlp/ApplicationDesc.java: Same as above
+	* netx/net/sourceforge/jnlp/InstallerDesc.java: Same as above
+	* netx/net/sourceforge/jnlp/JNLPFile.java: Make launchType a 
+	LaunchDesc object. Update getLaunchInfo() accordingly.
+	* netx/net/sourceforge/jnlp/LaunchDesc.java: New launch description. 
+	* netx/net/sourceforge/jnlp/Parser.java
+	(getLauncher): Return type changed to LaunchDesc
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Replace
+	occurences of instanceof with respect to launchType.
+
 2012-07-09  Deepak Bhole <dbhole@redhat.com>
 
 	* configure.ac: Bumped release number to 1.4pre

@@ -609,7 +609,7 @@ class Parser {
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
-    public Object getLauncher(Node parent) throws ParseException {
+    public LaunchDesc getLauncher(Node parent) throws ParseException {
         // check for other than one application type
         if (1 < getChildNodes(parent, "applet-desc").length
                 + getChildNodes(parent, "application-desc").length

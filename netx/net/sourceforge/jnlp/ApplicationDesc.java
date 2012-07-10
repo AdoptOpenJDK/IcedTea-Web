@@ -24,7 +24,7 @@ import java.util.*;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.7 $
  */
-public class ApplicationDesc {
+public class ApplicationDesc implements LaunchDesc {
 
     /** the main class name and package */
     private String mainClass;
@@ -46,6 +46,7 @@ public class ApplicationDesc {
     /**
      * Returns the main class name
      */
+    @Override
     public String getMainClass() {
         return mainClass;
     }

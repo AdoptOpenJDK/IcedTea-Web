@@ -22,7 +22,7 @@ package net.sourceforge.jnlp;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.6 $
  */
-public class InstallerDesc {
+public class InstallerDesc implements LaunchDesc {
 
     /** the main class name and package. */
     private String mainClass;
@@ -39,6 +39,7 @@ public class InstallerDesc {
     /**
      * Returns the main class name and package.
      */
+    @Override
     public String getMainClass() {
         return mainClass;
     }
