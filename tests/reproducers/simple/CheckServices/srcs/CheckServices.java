@@ -93,7 +93,7 @@ public class CheckServices extends Applet {
         killer.start(); 
     }
 
-    /* FIXME: Check ServiceManagaer is setup once stop/destroy can be called.
+   
     @Override
     public void stop() {
         System.out.println("Applet is stopping.");
@@ -105,5 +105,5 @@ public class CheckServices extends Applet {
         System.out.println("Applet is destorying itself.");
         checkSetup("destroy()"); 
     } 
-    */
+    
 }

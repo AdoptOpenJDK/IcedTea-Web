@@ -111,10 +111,6 @@ public class ServerAccess {
      */
     public static long PROCESS_TIMEOUT = 20 * 1000;//ms
     /**
-     * all terminated processes are stored here. As wee need to 'wait' to termination to be finished.
-     */
-    static Set<Thread> terminated = new HashSet<Thread>();
-    /**
      * this flag is indicating whether output of executeProcess should be logged. By default true.
      */
     public static boolean PROCESS_LOG = true;

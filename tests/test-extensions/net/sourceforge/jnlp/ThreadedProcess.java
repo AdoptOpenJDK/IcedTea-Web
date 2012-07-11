@@ -125,10 +125,10 @@ class ThreadedProcess extends Thread {
                 //add to the set of terminated threaded processes
                 deadlyException = ex;
                 ServerAccess.logException(deadlyException, false);
-                ServerAccess.terminated.add(this);
+                //ServerAccess.terminated.add(this);
             } else {
                 //happens when non-existing process is launched, is causing p null!
-                ServerAccess.terminated.add(this);
+                //ServerAccess.terminated.add(this);
                 deadlyException = ex;
                 ServerAccess.logException(deadlyException, false);
                 throw new RuntimeException(ex);

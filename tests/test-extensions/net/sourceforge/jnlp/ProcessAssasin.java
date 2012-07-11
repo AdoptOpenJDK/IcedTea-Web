@@ -34,8 +34,11 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-
 package net.sourceforge.jnlp;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * class which timeout any ThreadedProcess. This killing of 'thread with process' replaced not working process.destroy().
@@ -112,14 +115,10 @@ class ProcessAssasin extends Thread {
                                 ServerAccess.logErrorReprint("Timed out " + p.toString() + " " + "null  .. killing " + p.getCommandLine() + ": ");
                             }
                             wasTerminated = true;
-                            p.interrupt();
-                            while (!ServerAccess.terminated.contains(p)) {
-                                Thread.sleep(100);
-                            }
                             if (p.getP() != null) {
                                 try {
                                     if (!skipInstedOfDesroy) {
-                                        p.getP().destroy();
+                                        destroyProcess(p);
                                     }
                                 } catch (Throwable ex) {
                                     if (p.deadlyException == null) {
@@ -128,6 +127,10 @@ class ProcessAssasin extends Thread {
                                     ex.printStackTrace();
                                 }
                             }
+                            p.interrupt();
+//                            while (!ServerAccess.terminated.contains(p)) {
+//                                Thread.sleep(100);
+//                            }
                             if (p.getP() != null) {
                                 ServerAccess.logErrorReprint("Timed out " + p.toString() + " " + p.getP().toString() + " .. killed " + p.getCommandLine());
                             } else {
@@ -154,6 +157,27 @@ class ProcessAssasin extends Thread {
             }
         } else {
             ServerAccess.logNoReprint("assassin for non existing job  termination " + wasTerminated);
+        }
+    }
+
+    public static void destroyProcess(ThreadedProcess pp) {
+        Process p = pp.getP();
+        try {
+            Field f = p.getClass().getDeclaredField("pid");
+            f.setAccessible(true);
+            String pid = (f.get(p)).toString();
+            List<String> ll=new ArrayList<String>(4);
+            ll.add("kill");
+            ll.add("-s");
+            ll.add("SIGTERM");
+            ll.add(pid);
+            ServerAccess.executeProcess(ll);//sync, but  acctually release
+            //before affected application close
+            Thread.sleep(1000);
+        } catch (Exception ex) {
+            ServerAccess.logException(ex);
+        } finally {
+            p.destroy();
         }
     }
 }

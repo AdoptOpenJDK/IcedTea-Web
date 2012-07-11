@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
@@ -48,20 +48,21 @@ import org.junit.Test;
 @Bug(id="http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-February/017153.html")
 public class CheckServicesTests extends BrowserTest{
 
-    public void evaluateApplet(ProcessResult pr) {
+    public void evaluateApplet(ProcessResult pr, boolean applet) {
         String s0 = "Codebase for applet was found in constructor";
         Assert.assertTrue("CheckServices stdout should contain `" + s0 + "' but didn't.", pr.stdout.contains(s0));
         String s1 = "Codebase for applet was found in init()";
         Assert.assertTrue("CheckServices stdout should contain `" + s1 + "' but didn't.", pr.stdout.contains(s1));
         String s2 = "Codebase for applet was found in start()";
         Assert.assertTrue("CheckServices stdout should contain `" + s2 + "' but didn't.", pr.stdout.contains(s2));
-        /* FIXME: Once the awt robot can close the applet window (i.e. send 
-         * a stop event), stdout should be checked for these asserts. 
+        if (applet){
+            /*this is working correctly in most browser, but not in all. temporarily disabling
         String s3 = "Codebase for applet was found in stop()";
         Assert.assertTrue("CheckServices stdout should contain `" + s3 + "' but didn't.", pr.stdout.contains(s3));
         String s4 = "Codebase for applet was found in destroy()";
         Assert.assertTrue("CheckServices stdout should contain `" + s4 + "' but didn't.", pr.stdout.contains(s4));
-        */
+             */
+        }
         String s5 = "Exception occurred with null codebase in";
         Assert.assertFalse("CheckServices stderr should not contain `" + s5 + "' but did.", pr.stdout.contains(s5));
         String s6 = "Applet killing itself after 2000 ms of life";
@@ -72,7 +73,7 @@ public class CheckServicesTests extends BrowserTest{
     @NeedsDisplay
     public void CheckWebstartServices() throws Exception {
         ProcessResult pr = server.executeJavaws(null, "/CheckServices.jnlp");
-        evaluateApplet(pr);
+        evaluateApplet(pr, false);
         Assert.assertFalse(pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
@@ -82,7 +83,7 @@ public class CheckServicesTests extends BrowserTest{
     @TestInBrowsers(testIn={Browsers.one})
     public void CheckPluginJNLPHServices() throws Exception {
         ProcessResult pr = server.executeBrowser(null, "/CheckPluginServices.html");
-        evaluateApplet(pr);
+        evaluateApplet(pr,false);
         Assert.assertTrue(pr.wasTerminated);
     }
 }

@@ -1,3 +1,18 @@
+2012-07-11  Jiri Vanek  <jvanek@redhat.com>
+
+	try to close browser before kill it
+	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java:
+	* tests/reproducers/simple/AppletTest/testcases/AppletTestTests.java:
+	* tests/reproducers/simple/CheckServices/testcases/CheckServicesTests.java
+	(evaluateSignedApplet) addapted to properly closed browser
+	* tests/reproducers/simple/CheckServices/srcs/CheckServices.java:
+	removed fixme section as it shuld work now	
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java
+	(destroyProcess) new method, launching kill with SIGTERM before clasical
+	process.destroy()
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	removed Set<Thread> terminated, should be removed long ago
+
 2012-07-10  Adam Domurad  <adomurad@redhat.com>
 
 	Refactor JNLPFile#launchType into its own interface type (as opposed to
