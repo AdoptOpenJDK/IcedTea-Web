@@ -745,9 +745,18 @@ public class PluginAppletViewer extends XEmbeddedFrame
             long maxTimeToSleep = APPLET_TIMEOUT;
             panelLock.lock();
             try {
-                while (panel == null || !panel.isAlive())
+                while (panel == null || !panel.isAlive()) {
                     maxTimeToSleep -= waitTillTimeout(panelLock, panelLive,
                                                       maxTimeToSleep);
+
+                    /* we already waited till timeout, give up here directly,
+                     *  instead of waiting 180s again in below waitForAppletInit()
+                     */
+                    if(maxTimeToSleep < 0) {
+                        streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError: " + "Initialization timed out");
+                        return;
+                    }
+                }
             }
             finally {
                 panelLock.unlock();

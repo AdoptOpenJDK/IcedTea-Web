@@ -1,3 +1,9 @@
+2012-07-18  Thomas Meyer  <thomas@m3y3r.de>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (handleMessage):
+	Fix possible endless loop while waiting for the applet object instance to 
+	get created.
+
 2012-07-11  Jiri Vanek  <jvanek@redhat.com>
 
 	try to close browser before kill it
