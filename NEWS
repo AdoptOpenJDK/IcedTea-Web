@@ -23,6 +23,8 @@ New in release 1.3 (2012-XX-XX):
   - PR1011: Folders treated as jar files in archive tag
 * Common
   - PR918: java applet windows uses a low resulution black/white icon
+  - RH838417: Disambiguate signed applet security prompt from certificate warning
+  - RH838559: Disambiguate signed applet security prompt from certificate warning
 
 New in release 1.2 (2011-XX-XX):
 * Security updates:

@@ -1,3 +1,14 @@
+2012-07-18  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Fix RH838417, Fix RH838559: Disambiguate signed applet security prompt
+	from certificate warning.
+	* NEWS: Added entries for RH838417 and RH838559.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Added SWarnFullPermissionsIgnorePolicy and updated SHttpsUnverified.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java: Display
+	SWarnFullPermissionsIgnorePolicy if the cert is from a jar and is either
+	unverified or has a signing error. Also added warning.png to HTTPS dialogs.
+
 2012-07-18  Thomas Meyer  <thomas@m3y3r.de>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (handleMessage):

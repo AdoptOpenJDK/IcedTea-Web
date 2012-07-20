@@ -1,5 +1,5 @@
 /* CertWarningPane.java
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -132,15 +132,19 @@ public class CertWarningPane extends SecurityDialogPanel {
         } catch (Exception e) {
         }
 
-        //Top label
+        // Labels
         String topLabelText = "";
+        String bottomLabelText = parent.getCertVerifier().getRootInCacerts() ?
+                                 R("STrustedSource") : R("SUntrustedSource");
         String propertyName = "";
         String iconLocation = "net/sourceforge/jnlp/resources/";
         boolean alwaysTrustSelected = false;
         if (certVerifier instanceof HttpsCertVerifier) {
-            topLabelText = R("SHttpsUnverified") + " " +
-                                 R("Continue");
+            // HTTPS certs that are verified do not prompt for a dialog.
+            // @see VariableX509TrustManager#checkServerTrusted
+            topLabelText = R("SHttpsUnverified") + " " + R("Continue");
             propertyName = "OptionPane.warningIcon";
+            iconLocation += "warning.png";
         } else
             switch (type) {
                 case VERIFIED:
@@ -153,11 +157,13 @@ public class CertWarningPane extends SecurityDialogPanel {
                     topLabelText = R("SSigUnverified");
                     propertyName = "OptionPane.warningIcon";
                     iconLocation += "warning.png";
+                    bottomLabelText += " " + R("SWarnFullPermissionsIgnorePolicy");
                     break;
                 case SIGNING_ERROR:
                     topLabelText = R("SSignatureError");
                     propertyName = "OptionPane.warningIcon";
                     iconLocation += "warning.png";
+                    bottomLabelText += " " + R("SWarnFullPermissionsIgnorePolicy");
                     break;
             }
 
@@ -218,20 +224,15 @@ public class CertWarningPane extends SecurityDialogPanel {
         add(infoPanel);
         add(buttonPanel);
 
-        JLabel bottomLabel;
+        JLabel bottomLabel = new JLabel(htmlWrap(bottomLabelText));;
         JButton moreInfo = new JButton(R("ButMoreInformation"));
         moreInfo.addActionListener(new MoreInfoButtonListener());
-
-        if (parent.getCertVerifier().getRootInCacerts())
-            bottomLabel = new JLabel(htmlWrap(R("STrustedSource")));
-        else
-            bottomLabel = new JLabel(htmlWrap(R("SUntrustedSource")));
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
         bottomPanel.add(bottomLabel);
         bottomPanel.add(moreInfo);
-        bottomPanel.setPreferredSize(new Dimension(500, 100));
+        bottomPanel.setPreferredSize(new Dimension(600, 100));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(bottomPanel);
 
