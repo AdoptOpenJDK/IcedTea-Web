@@ -1,3 +1,9 @@
+2012-07-24  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/IcedTeaPluginUtils.cc
+	(IcedTeaPluginUtilities::strSplit): Replace usage of " " with proper 
+	delimiter
+
 2012-07-18  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Fix RH838417, Fix RH838559: Disambiguate signed applet security prompt

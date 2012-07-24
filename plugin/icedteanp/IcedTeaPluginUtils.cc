@@ -311,7 +311,7 @@ IcedTeaPluginUtilities::strSplit(const char* str, const char* delim)
 	    std::string* s = new std::string();
 	    s->append(tok_ptr);
 	    v->push_back(s);
-	    tok_ptr = strtok (NULL, " ");
+	    tok_ptr = strtok (NULL, delim);
 	}
         free(copy);
 
