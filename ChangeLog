@@ -1,3 +1,13 @@
+2012-07-24  Adam Domurad  <adomurad@redhat.com>
+
+	CVE-2012-3422, RH840592: Potential read from an uninitialized
+	memory location.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(get_cookie_info): Only attempt to perform this operation if there is a
+	valid plugin instance
+	(get_proxy_info): Only attempt to perform this operation if there is a
+	valid plugin instance
+
 2012-07-31  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	* Makefile.am: Fix call to keytool that is missing its absolute path.

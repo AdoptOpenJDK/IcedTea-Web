@@ -925,6 +925,11 @@ ITNP_URLNotify (NPP instance, const char* url, NPReason reason,
 NPError
 get_cookie_info(const char* siteAddr, char** cookieString, uint32_t* len)
 {
+  // Only attempt to perform this operation if there is a valid plugin instance
+  if (g_hash_table_size(instance_to_id_map) <= 0)
+  {
+    return NPERR_GENERIC_ERROR;
+  }
 #if MOZILLA_VERSION_COLLAPSED < 1090100
   nsresult rv;
   nsCOMPtr<nsIScriptSecurityManager> sec_man =
@@ -1330,6 +1335,11 @@ int get_id_from_instance(NPP instance)
 NPError
 get_proxy_info(const char* siteAddr, char** proxy, uint32_t* len)
 {
+  // Only attempt to perform this operation if there is a valid plugin instance
+  if (g_hash_table_size(instance_to_id_map) <= 0)
+  {
+	  return NPERR_GENERIC_ERROR;
+  }
 #if MOZILLA_VERSION_COLLAPSED < 1090100
   nsresult rv;
 
