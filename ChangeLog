@@ -1,3 +1,7 @@
+2012-07-31  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	* Makefile.am: Fix call to keytool that is missing its absolute path.
+
 2012-07-31  Jiri Vanek  <jvanek@redhat.com>
             Peter Hatina  <phatina@redhat.com>
 

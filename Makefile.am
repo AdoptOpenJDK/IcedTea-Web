@@ -619,7 +619,7 @@ stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
 	done ;
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
-	  keytool -export -alias $(TEST_CERT_ALIAS)_$$which -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) -storepass $(PRIVATE_KEYSTORE_PASS) -keystore $(PRIVATE_KEYSTORE_NAME) ; \
+	  $(BOOT_DIR)/bin/keytool -export -alias $(TEST_CERT_ALIAS)_$$which -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) -storepass $(PRIVATE_KEYSTORE_PASS) -keystore $(PRIVATE_KEYSTORE_NAME) ; \
 	done ;
 	mkdir -p stamps && \
 	touch $@
