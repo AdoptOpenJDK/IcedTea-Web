@@ -359,13 +359,51 @@ AC_ARG_ENABLE([plugin],
 AC_MSG_RESULT(${enable_plugin})
 ])
 
+dnl ITW_GTK_CHECK_VERSION([gtk version])
+AC_DEFUN([ITW_GTK_CHECK_VERSION],
+[
+  AC_MSG_CHECKING([for GTK$1 version])
+  GTK_VER=`$PKG_CONFIG --modversion gtk+-$1.0`
+  AC_MSG_RESULT([$GTK_VER])
+])
+
+dnl ITW_GTK_CHECK([gtk version])
+AC_DEFUN([ITW_GTK_CHECK],
+[
+  case "$1" in
+    default)
+      PKG_CHECK_MODULES(GTK, gtk+-3.0,
+        [ITW_GTK_CHECK_VERSION([3])],
+        [PKG_CHECK_MODULES(GTK, gtk+-2.0,
+           [ITW_GTK_CHECK_VERSION([2])],
+           [AC_MSG_ERROR([GTK $1 not found])]
+        )]
+      )
+      ;;
+    *)
+      PKG_CHECK_MODULES(GTK, gtk+-$1.0,
+        [ITW_GTK_CHECK_VERSION([$1])],
+        [AC_MSG_ERROR([GTK $1 not found])]
+      )
+      ;;
+  esac
+])
+
 AC_DEFUN_ONCE([IT_CHECK_PLUGIN_DEPENDENCIES],
 [
 dnl Check for plugin support headers and libraries.
 dnl FIXME: use unstable
 AC_REQUIRE([IT_CHECK_PLUGIN])
 if test "x${enable_plugin}" = "xyes" ; then
-  PKG_CHECK_MODULES(GTK, gtk+-2.0)
+  AC_ARG_WITH([gtk],
+    [AS_HELP_STRING([--with-gtk=[2|3|default]],
+    [the GTK+ version to use (default: 3)])],
+    [case "$with_gtk" in
+       2|3|default) ;;
+       *) AC_MSG_ERROR([invalid GTK version specified]) ;;
+     esac],
+    [with_gtk=default])
+  ITW_GTK_CHECK([$with_gtk])
   PKG_CHECK_MODULES(GLIB, glib-2.0)
   AC_SUBST(GLIB_CFLAGS)
   AC_SUBST(GLIB_LIBS)

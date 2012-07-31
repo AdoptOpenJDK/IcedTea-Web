@@ -1,3 +1,12 @@
+2012-07-31  Jiri Vanek  <jvanek@redhat.com>
+            Peter Hatina  <phatina@redhat.com>
+
+	Introduced configure option --with-gtk=2|3|default to be able
+	to compile against different version of GTK+ (2.x or 3.x).
+	* NEWS: mentioned bug fix
+	* acinclude.m4: (ITW_GTK_CHECK_VERSION) macro for getting GTK+ version
+	(ITW_GTK_CHECK) macro for checking GTK+ version
+
 2012-07-24  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/IcedTeaPluginUtils.cc
