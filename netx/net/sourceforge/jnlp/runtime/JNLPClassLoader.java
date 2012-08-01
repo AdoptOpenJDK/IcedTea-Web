@@ -650,7 +650,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     file.setSignedJNLPAsMissing();
                 
                 //user does not trust this publisher
-                if (!jcv.getAlreadyTrustPublisher()) {
+                if (!jcv.getAlreadyTrustPublisher() && !jcv.isTriviallySigned()) {
                     checkTrustWithUser(jcv);
                 } else {
                     /**

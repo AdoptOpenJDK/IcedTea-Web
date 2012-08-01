@@ -103,6 +103,16 @@ public class JarCertVerifier implements CertVerifier {
 
     private int totalSignableEntries = 0;
 
+    /** Whether a signable entry was found within jars (jars with content more than just META-INF/*) */
+    private boolean triviallySigned = false;
+
+    /**
+     * Return true if there are signable entries in the jars, otherwise false
+     */
+    public boolean isTriviallySigned() {
+        return triviallySigned;
+    }
+
     /* (non-Javadoc)
      * @see net.sourceforge.jnlp.tools.CertVerifier2#getAlreadyTrustPublisher()
      */
@@ -167,6 +177,9 @@ public class JarCertVerifier implements CertVerifier {
      */
     public boolean isFullySignedByASingleCert() {
 
+        if (triviallySigned)
+            return true;
+
         for (CertPath cPath : certs.keySet()) {
             // If this cert has signed everything, return true
             if (certs.get(cPath) == totalSignableEntries)
@@ -197,6 +210,7 @@ public class JarCertVerifier implements CertVerifier {
 
                 String localFile = jarFile.getAbsolutePath();
                 verifyResult result = verifyJar(localFile);
+                triviallySigned = false;
 
                 if (result == verifyResult.UNSIGNED) {
                     unverifiedJars.add(localFile);
@@ -205,6 +219,7 @@ public class JarCertVerifier implements CertVerifier {
                     verifiedJars.add(localFile);
                 } else if (result == verifyResult.SIGNED_OK) {
                     verifiedJars.add(localFile);
+                    triviallySigned = totalSignableEntries <= 0 && certs.size() <= 0;
                 }
             } catch (Exception e) {
                 // We may catch exceptions from using verifyJar()

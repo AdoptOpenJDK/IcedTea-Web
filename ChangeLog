@@ -1,3 +1,29 @@
+2012-08-01  Saad Mohammad  <smohammad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java (initializeResources):
+	Removes the display of the security dialog for loaders with only empty jars.
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java:
+	(JarCertVerifier): Tracks whether all jars verified are empty jars.
+	(hasAllEmptyJars): Returns true if all jars verified are empty jars.
+	(verifyJars): Checks whether signable entries and certificates are found and
+	decides if all jars are empty jars.
+	(isFullySignedByASingleCert): If all jars are emptyJars, returns true.
+	* tests/reproducers/signed/EmptySignedJar/resources/EmptySignedJarInLaunchingJnlp.jnlp:
+	Launching jnlp with the resource of an empty jar and an extension jnlp
+	containing the main jar.
+	* tests/reproducers/signed/EmptySignedJar/resources/EmptySignedJarInExtensionJnlp.jnlp:
+	Launching jnlp with the resource of the main jar and an extension jnlp
+	containing the empty jar.
+	* tests/reproducers/signed/EmptySignedJar/resources/EmptySignedJarExtension.jnlp:
+	Extension jnlp containing only an empty jar.
+	* tests/reproducers/signed/EmptySignedJar/srcs/META-INF/empty_file:
+	Empty file within META-INF; required to create EmptySignedJar.jar
+	by the test engine.
+	* tests/reproducers/signed/EmptySignedJar/testcases/EmptySignedJarTest.java:
+	Testcase that tests jnlp files with empty jars.
+	* tests/reproducers/signed/SignedJarResource/resources/SignedJarResource.jnlp:
+	Launches SignedJarResource class directly.
+
 2012-07-31  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Minor fix to overly restrictive unit test.
