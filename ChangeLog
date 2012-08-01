@@ -1,3 +1,9 @@
+2012-07-31  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Minor fix to overly restrictive unit test.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTest.java
+	(testIsMatchDoesNotHangOnLargeData): Increase timeout to 5 seconds.
+
 2012-07-24  Adam Domurad  <adomurad@redhat.com>
 
 	CVE-2012-3422, RH840592: Potential read from an uninitialized

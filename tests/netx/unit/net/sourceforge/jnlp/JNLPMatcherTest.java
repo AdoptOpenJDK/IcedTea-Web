@@ -466,7 +466,7 @@ public class JNLPMatcherTest {
         launchReader.close();
     }
 
-    @Test (timeout=1000 /*ms*/)
+    @Test (timeout=5000 /*ms*/)
     public void testIsMatchDoesNotHangOnLargeData() throws JNLPMatcherException {
         /* construct an alphabet containing characters 'a' to 'z' */
         final int ALPHABET_SIZE = 26;
