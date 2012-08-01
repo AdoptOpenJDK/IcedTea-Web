@@ -1,5 +1,8 @@
 2012-08-01  Saad Mohammad  <smohammad@redhat.com>
 
+	Fix PR1049: Extension jnlp's signed jar with the content of only META-INF/*
+	is considered unsigned.
+	* NEWS: Added entry for PR1049.
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java (initializeResources):
 	Removes the display of the security dialog for loaders with only empty jars.
 	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java:
