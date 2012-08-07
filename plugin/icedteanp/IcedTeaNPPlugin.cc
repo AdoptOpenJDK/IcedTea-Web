@@ -2043,8 +2043,13 @@ initialize_browser_functions(const NPNetscapeFuncs* browserTable)
 
   //Ensure any unused fields are NULL
   memset(&browser_functions, 0, sizeof(NPNetscapeFuncs));
+
+  //browserTable->size can be larger than sizeof(NPNetscapeFuncs) (PR1106)
+  size_t copySize = browserTable->size < sizeof(NPNetscapeFuncs) ?
+                    browserTable->size : sizeof(NPNetscapeFuncs);
+
   //Copy fields according to given size
-  memcpy(&browser_functions, browserTable, browserTable->size);
+  memcpy(&browser_functions, browserTable, copySize);
 
   return true;
 }
