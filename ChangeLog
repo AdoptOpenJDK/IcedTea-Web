@@ -1,3 +1,15 @@
+2012-08-07  Saad Mohammad  <smohammad@redhat.com>
+
+	Added license header to files without one.
+	* netx/net/sourceforge/jnlp/AppletLog.java:
+	* netx/net/sourceforge/jnlp/JNLPMatcherException.java:
+	* netx/net/sourceforge/jnlp/Log.java:
+	* netx/net/sourceforge/jnlp/Node.java:
+	* netx/net/sourceforge/jnlp/UpdateDesc.java:
+	* netx/net/sourceforge/jnlp/cache/IllegalResourceDescriptorException.java:
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessage.java: Added
+	license header.
+
 2012-08-07  Adam Domurad  <adomurad@redhat.com>
 
 	Fixes PR1106, plugin crashing with firefox + archlinux/gentoo
