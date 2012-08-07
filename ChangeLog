@@ -1,3 +1,8 @@
+2012-08-07  Thomas Meyer  <thomas@m3y3r.de>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: only export NP_GetMIMEDescription,
+	NP_GetValue, NP_Initialize and NP_Shutdown. This should fix PR472.
+
 2012-08-07  Saad Mohammad  <smohammad@redhat.com>
 
 	Added license header to files without one.

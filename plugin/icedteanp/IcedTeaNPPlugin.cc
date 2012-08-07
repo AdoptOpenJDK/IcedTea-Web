@@ -2112,6 +2112,7 @@ initialize_plugin_table(NPPluginFuncs* pluginTable)
 // this function, then it is evident that NP_Initialize has already
 // been called. There is no need to call this function more than once and
 // this workaround avoids any duplicate calls.
+__attribute__ ((visibility ("default")))
 NPError
 NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
 {
@@ -2314,6 +2315,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
 
 // Returns a string describing the MIME type that this plugin
 // handles.
+__attribute__ ((visibility ("default")))
 #ifdef LEGACY_XULRUNNERAPI
   char* 
 #else
@@ -2330,6 +2332,7 @@ NP_GetMIMEDescription ()
 
 // Returns a value relevant to the plugin as a whole.  The browser
 // calls this function to obtain information about the plugin.
+__attribute__ ((visibility ("default")))
 NPError
 NP_GetValue (void* future, NPPVariable variable, void* value)
 {
@@ -2363,6 +2366,7 @@ NP_GetValue (void* future, NPPVariable variable, void* value)
 
 // Shuts down the plugin.  Called after the last plugin instance is
 // destroyed.
+__attribute__ ((visibility ("default")))
 NPError
 NP_Shutdown (void)
 {

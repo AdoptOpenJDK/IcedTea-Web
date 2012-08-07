@@ -270,6 +270,7 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  $(GLIB_CFLAGS) \
 	  $(GTK_CFLAGS) \
 	  $(MOZILLA_CFLAGS) \
+  	  -fvisibility=hidden \
 	  -fPIC -o $@ -c $<
 
 $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY): $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS))
@@ -278,7 +279,7 @@ $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY): $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJEC
 	  $(PLUGIN_OBJECTS) \
 	  $(GLIB_LIBS) \
 	  $(GTK_LIBS) \
-	  $(MOZILLA_LIBS)\
+	  $(MOZILLA_LIBS) \
 	  -shared -o $@
 
 clean-IcedTeaPlugin:
