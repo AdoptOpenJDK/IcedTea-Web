@@ -36,6 +36,9 @@ exception statement from your version.
  */
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.sourceforge.jnlp.ServerAccess;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,34 +47,33 @@ public class InformationTitleVendorParserTest {
 
     private static ServerAccess server = new ServerAccess();
 
-    public void runTest(String jnlpName, String exceptionMessage) throws Exception {
-        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/" + jnlpName + ".jnlp");
+    public void runTest(String jnlpName, String exception) throws Exception {
+        List<String> verbosed = Arrays.asList(new String[] { "-verbose" });
+        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(verbosed, "/" + jnlpName + ".jnlp");
         String s1 = "Good simple javaws exapmle";
         Assert.assertFalse("test" + jnlpName + " stdout should not contain " + s1 + " but did.", pr.stdout.contains(s1));
-        // Looking for "Could not read or parse the JNLP file. (${DESCRIPTION})"
-        String s2 = "(?s).*Could not read or parse the JNLP file.{0,5}" + exceptionMessage + "(?s).*";
-        Assert.assertTrue("testForTitle stderr should match " + s2 + " but did not.", pr.stderr.matches(s2));
+        Assert.assertTrue("testForTitle stderr should contain " + exception + " but did not.", pr.stderr.contains(exception));
         Assert.assertFalse(pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
 
     @Test
     public void testInformationeParser() throws Exception {
-        runTest("InformationParser", "No information section defined");
+        runTest("InformationParser", "net.sourceforge.jnlp.MissingInformationException");
     }
 
     @Test
     public void testTitleParser() throws Exception {
-        runTest("TitleParser", "The title section has not been defined in the JNLP file.");
+        runTest("TitleParser", "net.sourceforge.jnlp.MissingTitleException");
     }
     @Test
     public void testVendorParser() throws Exception {
-        runTest("VendorParser", "The vendor section has not been defined in the JNLP file.");
+        runTest("VendorParser", "net.sourceforge.jnlp.MissingVendorException");
     }
 
     @Test
     public void testTitleVendorParser() throws Exception {
         // Note that the title message missing causes an immediate exception, regardless of Vendor.
-        runTest("TitleVendorParser", "The title section has not been defined in the JNLP file.");
+        runTest("TitleVendorParser", "net.sourceforge.jnlp.MissingTitleException");
     }
 }

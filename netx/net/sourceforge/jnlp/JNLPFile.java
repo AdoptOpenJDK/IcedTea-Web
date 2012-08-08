@@ -99,18 +99,18 @@ public class JNLPFile {
     /** the security descriptor */
     protected SecurityDesc security;
 
-    /** the default OS */
+    /** the default JVM locale */
     protected Locale defaultLocale = null;
 
-    /** the default arch */
+    /** the default OS */
     protected String defaultOS = null;
 
-    /** the default jvm */
+    /** the default arch */
     protected String defaultArch = null;
-    
+
     /** A signed JNLP file is missing from the main jar */
     private boolean missingSignedJNLP = false;
-    
+
     /** JNLP file contains special properties */
     private boolean containsSpecialProperties = false;
 
@@ -118,7 +118,7 @@ public class JNLPFile {
      * List of acceptable properties (not-special)
      */
     private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
-    
+
     { // initialize defaults if security allows
         try {
             defaultLocale = Locale.getDefault();
@@ -128,6 +128,8 @@ public class JNLPFile {
             // null values will still work, and app can set defaults later
         }
     }
+
+    static enum Match { LANG_COUNTRY_VARIANT, LANG_COUNTRY, LANG, GENERALIZED }
 
     /**
      * Empty stub, allowing child classes to override the constructor
@@ -185,9 +187,9 @@ public class JNLPFile {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location, Version version, boolean strict, UpdatePolicy policy) throws IOException, ParseException {
-	this(location, version, strict, policy, null);
+        this(location, version, strict, policy, null);
     }
-    
+
     /**
      * Create a JNLPFile from a URL and a version, checking for updates
      * using the specified policy.
@@ -284,11 +286,19 @@ public class JNLPFile {
     }
 
     /**
-     * Returns the JNLP file's title.  This method returns the same
+     * Returns the JNLP file's best localized title. This method returns the same
      * value as InformationDesc.getTitle().
      */
     public String getTitle() {
         return getInformation().getTitle();
+    }
+
+    /**
+     * Returns the JNLP file's best localized vendor. This method returns the same
+     * value as InformationDesc.getVendor().
+     */
+    public String getVendor() {
+        return getInformation().getVendor();
     }
 
     /**
@@ -349,17 +359,52 @@ public class JNLPFile {
      */
     public InformationDesc getInformation(final Locale locale) {
         return new InformationDesc(this, new Locale[] { locale }) {
+            @Override
             protected List<Object> getItems(Object key) {
                 List<Object> result = new ArrayList<Object>();
 
-                for (int i = 0; i < info.size(); i++) {
-                    InformationDesc infoDesc = info.get(i);
+                for (Match precision : Match.values()) {
+                    for (InformationDesc infoDesc : JNLPFile.this.info) {
+                        if (localeMatches(locale, infoDesc.getLocales(), precision)) {
+                            result.addAll(infoDesc.getItems(key));
+                        }
+                    }
 
-                    if (localMatches(locale, infoDesc.getLocales()))
-                        result.addAll(infoDesc.getItems(key));
+                    if (result.size() > 0) {
+                        return result;
+                    }
+                }
+                return result;
+            }
+
+            @Override
+            public String getTitle() {
+                for (Match precision : Match.values()) {
+                    for (InformationDesc infoDesc : JNLPFile.this.info) {
+                        String title = infoDesc.getTitle();
+                        if (localeMatches(locale, infoDesc.getLocales(), precision)
+                                && title != null && !"".equals(title)) {
+                            return title;
+                        }
+                    }
                 }
 
-                return result;
+                return null;
+            }
+
+            @Override
+            public String getVendor() {
+                for (Match precision : Match.values()) {
+                    for (InformationDesc infoDesc : JNLPFile.this.info) {
+                        String vendor = infoDesc.getVendor();
+                        if (localeMatches(locale, infoDesc.getLocales(), precision)
+                                && vendor != null && !"".equals(vendor)) {
+                            return vendor;
+                        }
+                    }
+                }
+
+                return null;
             }
         };
     }
@@ -393,11 +438,17 @@ public class JNLPFile {
      */
     public ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
         return new ResourcesDesc(this, new Locale[] { locale }, new String[] { os }, new String[] { arch }) {
+
+            @Override
             public <T> List<T> getResources(Class<T> launchType) {
                 List<T> result = new ArrayList<T>();
 
                 for (ResourcesDesc rescDesc : resources) {
-                    if (localMatches(locale, rescDesc.getLocales())
+                    boolean hasUsableLocale = false;
+                    for (Match match : Match.values()) {
+                        hasUsableLocale |= localeMatches(locale, rescDesc.getLocales(), match);
+                    }
+                    if (hasUsableLocale
                             && stringMatches(os, rescDesc.getOS())
                             && stringMatches(arch, rescDesc.getArch()))
                         result.addAll(rescDesc.getResources(launchType));
@@ -408,6 +459,7 @@ public class JNLPFile {
                 return result;
             }
 
+            @Override
             public void addResource(Object resource) {
                 // todo: honor the current locale, os, arch values
                 sharedResources.addResource(resource);
@@ -433,7 +485,11 @@ public class JNLPFile {
     public ResourcesDesc[] getResourcesDescs(final Locale locale, final String os, final String arch) {
         List<ResourcesDesc> matchingResources = new ArrayList<ResourcesDesc>();
         for (ResourcesDesc rescDesc: resources) {
-            if (localMatches(locale, rescDesc.getLocales())
+            boolean hasUsableLocale = false;
+            for (Match match : Match.values()) {
+                hasUsableLocale |= localeMatches(locale, rescDesc.getLocales(), match);
+            }
+            if (hasUsableLocale
                     && stringMatches(os, rescDesc.getOS())
                     && stringMatches(arch, rescDesc.getArch())) {
                 matchingResources.add(rescDesc);
@@ -546,28 +602,48 @@ public class JNLPFile {
      *
      * @param requested the local
      * @param available the available locales
+     * @param precision the depth with which to match locales. 1 checks only
+     * language, 2 checks language and country, 3 checks language, country and
+     * variant for matches. Passing 0 will always return true.
      * @return true if requested matches any of available, or if
      * available is empty or null.
      */
-    private boolean localMatches(Locale requested, Locale available[]) {
-        if (available == null || available.length == 0)
-            return true;
+    public boolean localeMatches(Locale requested, Locale available[], Match matchLevel) {
 
-        for (int i = 0; i < available.length; i++) {
-            String language = requested.getLanguage(); // "" but never null
-            String country = requested.getCountry();
-            String variant = requested.getVariant();
+        if (matchLevel == Match.GENERALIZED)
+            return available == null || available.length == 0;
 
-            if (!"".equals(language) && !language.equalsIgnoreCase(available[i].getLanguage()))
-                continue;
-            if (!"".equals(country) && !country.equalsIgnoreCase(available[i].getCountry()))
-                continue;
-            if (!"".equals(variant) && !variant.equalsIgnoreCase(available[i].getVariant()))
-                continue;
+        String language = requested.getLanguage(); // "" but never null
+        String country = requested.getCountry();
+        String variant = requested.getVariant();
 
-            return true;
+        for (Locale locale : available) {
+            switch (matchLevel) {
+                case LANG:
+                    if (!language.isEmpty()
+                            && language.equals(locale.getLanguage())
+                            && locale.getCountry().isEmpty()
+                            && locale.getVariant().isEmpty())
+                        return true;
+                    break;
+                case LANG_COUNTRY:
+                    if (!language.isEmpty()
+                            && language.equals(locale.getLanguage())
+                            && !country.isEmpty()
+                            && country.equals(locale.getCountry())
+                            && locale.getVariant().isEmpty())
+                        return true;
+                    break;
+                case LANG_COUNTRY_VARIANT:
+                    if (language.equals(locale.getLanguage())
+                            && country.equals(locale.getCountry())
+                            && variant.equals(locale.getVariant()))
+                        return true;
+                    break;
+                default:
+                    break;
+            }
         }
-
         return false;
     }
 
@@ -612,14 +688,15 @@ public class JNLPFile {
             codeBase = parser.getCodeBase();
             sourceLocation = parser.getFileLocation() != null ? parser.getFileLocation() : location;
             info = parser.getInfo(root);
+            parser.checkForInformation();
             update = parser.getUpdate(root);
             resources = parser.getResources(root, false); // false == not a j2se/java resources section
             launchType = parser.getLauncher(root);
             component = parser.getComponent(root);
             security = parser.getSecurity(root);
-            
+
             checkForSpecialProperties();
-            
+
         } catch (ParseException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -729,7 +806,7 @@ public class JNLPFile {
     /**
      * Returns a boolean after determining if a signed JNLP warning should be
      * displayed in the 'More Information' panel.
-     * 
+     *
      * @return true if a warning should be displayed; otherwise false
      */
     public boolean requiresSignedJNLPWarning() {
@@ -742,5 +819,4 @@ public class JNLPFile {
     public void setSignedJNLPAsMissing() {
         missingSignedJNLP = true;
     }
-
 }

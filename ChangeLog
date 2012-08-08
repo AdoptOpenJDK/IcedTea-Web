@@ -1,3 +1,38 @@
+2012-08-08  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Fix PR955: regression: SweetHome3D fails to run
+	* NEWS: Added entry for PR955
+	* netx/net/sourceforge/jnlp/JNLPFile.java: New enum Match that represents
+	the level of precision to use when matching locales.
+	(localMatches): Renamed to localeMatches, added matchLevel paramater
+	and updated conditionals to handle the level of precision specified by it.
+	(getVendor): New method that returns an information's vendor text.
+	(getInformation): Added override methods for getTitle and getVendor
+	that are used by the anonymous class to filter by locale. All three
+	methods now go through all levels of precision to search for the best
+	fitted locale.
+	(getResources), (getResourcesDescs): Updated to check if any level of
+	precision matches when searching for locales.
+	(parse): Added call to checkForTitleVendor.
+	* netx/net/sourceforge/jnlp/Parser.java
+	(checkForTitleVendor): New method to check for availability of localized
+	title and vendor from the information tags. Throws ParseException.
+	(getInfo): Replace loop with foreach loop.
+	(getInformationDesc): Remove check for present title and vendor.
+	(getLocale): Variant returned can now use everything after the eigth
+	element of the locale's string.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Update missing title and vendor messages to mention localization.
+	* tests/reproducers/simple/InformationTitleVendorParser/testcases/InformationTitleVendorParserTest.java:
+	Update output string as per new changes to Messages internationalizations.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java:
+	New unit test that checks the localesMatches method in JNLPFile.
+	* tests/netx/unit/net/sourceforge/jnlp/MockJNLPFile.java:
+	New class used to create a mock JNLPFile object.
+	* tests/netx/unit/net/sourceforge/jnlp/ParserTest.java:
+	New unit test that checks that the return of getTitle and getVendor
+	have localized information.
+
 2012-08-07  Thomas Meyer  <thomas@m3y3r.de>
 
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: only export NP_GetMIMEDescription,

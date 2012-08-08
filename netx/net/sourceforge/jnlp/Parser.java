@@ -1,5 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
-// Copyright (C) 2009 Red Hat, Inc.
+// Copyright (C) 2012 Red Hat, Inc.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ import java.util.*;
 //import gd.xml.tiny.*;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.nanoxml.*;
 
 /**
@@ -425,6 +426,35 @@ class Parser {
     //
 
     /**
+     * Make sure a title and vendor are present and nonempty and localized as
+     * best matching as possible for the JVM's current locale. Fallback to a
+     * generalized title and vendor otherwise. If none is found, throw an exception.
+     *
+     * Additionally prints homepage, description, title and vendor to stdout
+     * if in Debug mode.
+     * @throws RequiredElementException
+     */
+    void checkForInformation() throws RequiredElementException {
+        if (JNLPRuntime.isDebug()) {
+            System.out.println("Homepage: " + file.getInformation().getHomepage());
+            System.out.println("Description: " + file.getInformation().getDescription());
+        }
+
+        String title = file.getTitle();
+        String vendor = file.getVendor();
+
+        if (title == null || title.trim().isEmpty())
+            throw new MissingTitleException();
+        else if (JNLPRuntime.isDebug())
+            System.out.println("Acceptable title tag found, contains: " + title);
+
+        if (vendor == null || vendor.trim().isEmpty())
+            throw new MissingVendorException();
+        else if (JNLPRuntime.isDebug())
+            System.out.println("Acceptable vendor tag found, contains: " + vendor);
+    }
+
+    /**
      * Returns all of the information elements under the specified
      * node.
      *
@@ -438,11 +468,12 @@ class Parser {
 
         // ensure that there are at least one information section present
         if (info.length == 0)
-            throw new ParseException(R("PNoInfoElement"));
+            throw new MissingInformationException();
 
         // create objects from the info sections
-        for (int i = 0; i < info.length; i++)
-            result.add(getInformationDesc(info[i]));
+        for (Node infoNode : info) {
+            result.add(getInformationDesc(infoNode));
+        }
 
         return result;
     }
@@ -503,11 +534,6 @@ class Parser {
 
             child = child.getNextSibling();
         }
-
-        if (info.getTitle() == null || info.getTitle().trim().isEmpty())
-            throw new ParseException(R("PNoTitleElement"));
-        if (info.getVendor() == null || info.getVendor().trim().isEmpty())
-            throw new ParseException(R("PNoVendorElement"));
 
         return info;
     }
@@ -896,7 +922,7 @@ class Parser {
 
         String language = localeStr.substring(0, 2);
         String country = (localeStr.length() < 5) ? "" : localeStr.substring(3, 5);
-        String variant = (localeStr.length() < 7) ? "" : localeStr.substring(6, 8);
+        String variant = (localeStr.length() > 7) ? localeStr.substring(6) : "";
 
         // null is not allowed n locale but "" is
         return new Locale(language, country, variant);
