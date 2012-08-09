@@ -1189,6 +1189,69 @@ plugin_in_pipe_callback (GIOChannel* source,
   return keep_installed;
 }
 
+static
+void consume_plugin_message(gchar* message) {
+  // internal plugin related message
+  gchar** parts = g_strsplit (message, " ", 5);
+  if (g_str_has_prefix(parts[1], "PluginProxyInfo"))
+  {
+    gchar* proxy;
+    uint32_t len;
+
+    gchar* decoded_url = (gchar*) calloc(strlen(parts[4]) + 1, sizeof(gchar));
+    IcedTeaPluginUtilities::decodeURL(parts[4], &decoded_url);
+    PLUGIN_DEBUG("parts[0]=%s, parts[1]=%s, reference, parts[3]=%s, parts[4]=%s -- decoded_url=%s\n", parts[0], parts[1], parts[3], parts[4], decoded_url);
+
+    gchar* proxy_info;
+
+#if MOZILLA_VERSION_COLLAPSED < 1090100
+	proxy = (char*) malloc(sizeof(char)*2048);
+#endif
+
+    proxy_info = g_strconcat ("plugin PluginProxyInfo reference ", parts[3], " ", NULL);
+    if (get_proxy_info(decoded_url, &proxy, &len) == NPERR_NO_ERROR)
+      {
+        proxy_info = g_strconcat (proxy_info, proxy, NULL);
+      }
+
+    PLUGIN_DEBUG("Proxy info: %s\n", proxy_info);
+    plugin_send_message_to_appletviewer(proxy_info);
+
+    free(decoded_url);
+    decoded_url = NULL;
+    g_free(proxy_info);
+    proxy_info = NULL;
+
+#if MOZILLA_VERSION_COLLAPSED < 1090100
+	g_free(proxy);
+	proxy = NULL;
+#endif
+
+  } else if (g_str_has_prefix(parts[1], "PluginCookieInfo"))
+  {
+    gchar* decoded_url = (gchar*) calloc(strlen(parts[4])+1, sizeof(gchar));
+    IcedTeaPluginUtilities::decodeURL(parts[4], &decoded_url);
+
+    gchar* cookie_info = g_strconcat ("plugin PluginCookieInfo reference ", parts[3], " ", NULL);
+    gchar* cookie_string;
+    uint32_t len;
+    if (get_cookie_info(decoded_url, &cookie_string, &len) == NPERR_NO_ERROR)
+    {
+        cookie_info = g_strconcat (cookie_info, cookie_string, NULL);
+    }
+
+    PLUGIN_DEBUG("Cookie info: %s\n", cookie_info);
+    plugin_send_message_to_appletviewer(cookie_info);
+
+    free(decoded_url);
+    decoded_url = NULL;
+    g_free(cookie_info);
+    cookie_info = NULL;
+  }
+  g_strfreev (parts);
+  parts = NULL;
+}
+
 void consume_message(gchar* message) {
 
 	PLUGIN_DEBUG ("  PIPE: plugin read: %s\n", message);
@@ -1251,65 +1314,7 @@ void consume_message(gchar* message) {
     }
   else if (g_str_has_prefix (message, "plugin "))
     {
-      // internal plugin related message
-      gchar** parts = g_strsplit (message, " ", 5);
-      if (g_str_has_prefix(parts[1], "PluginProxyInfo"))
-      {
-        gchar* proxy;
-        uint32_t len;
-
-        gchar* decoded_url = (gchar*) calloc(strlen(parts[4]) + 1, sizeof(gchar));
-        IcedTeaPluginUtilities::decodeURL(parts[4], &decoded_url);
-        PLUGIN_DEBUG("parts[0]=%s, parts[1]=%s, reference, parts[3]=%s, parts[4]=%s -- decoded_url=%s\n", parts[0], parts[1], parts[3], parts[4], decoded_url);
-
-        gchar* proxy_info;
-
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-	proxy = (char*) malloc(sizeof(char)*2048);
-#endif
-
-        proxy_info = g_strconcat ("plugin PluginProxyInfo reference ", parts[3], " ", NULL);
-        if (get_proxy_info(decoded_url, &proxy, &len) == NPERR_NO_ERROR)
-          {
-            proxy_info = g_strconcat (proxy_info, proxy, NULL);
-          }
-
-        PLUGIN_DEBUG("Proxy info: %s\n", proxy_info);
-        plugin_send_message_to_appletviewer(proxy_info);
-
-        free(decoded_url);
-        decoded_url = NULL;
-        g_free(proxy_info);
-        proxy_info = NULL;
-
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-	g_free(proxy);
-	proxy = NULL;
-#endif
-
-      } else if (g_str_has_prefix(parts[1], "PluginCookieInfo"))
-      {
-        gchar* decoded_url = (gchar*) calloc(strlen(parts[4])+1, sizeof(gchar));
-        IcedTeaPluginUtilities::decodeURL(parts[4], &decoded_url);
-
-        gchar* cookie_info = g_strconcat ("plugin PluginCookieInfo reference ", parts[3], " ", NULL);
-        gchar* cookie_string;
-        uint32_t len;
-        if (get_cookie_info(decoded_url, &cookie_string, &len) == NPERR_NO_ERROR)
-        {
-            cookie_info = g_strconcat (cookie_info, cookie_string, NULL);
-        }
-
-        PLUGIN_DEBUG("Cookie info: %s\n", cookie_info);
-        plugin_send_message_to_appletviewer(cookie_info);
-
-        free(decoded_url);
-        decoded_url = NULL;
-        g_free(cookie_info);
-        cookie_info = NULL;
-      }
-      g_strfreev (parts);
-      parts = NULL;
+        consume_plugin_message(message);
     }
   else
     {
