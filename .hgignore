@@ -7,4 +7,3 @@ install-sh
 missing
 config.guess
 config.sub
-bin/
