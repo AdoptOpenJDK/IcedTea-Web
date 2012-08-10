@@ -1,3 +1,11 @@
+2012-08-10  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(consume_plugin_message): New, called by consume_message, handles
+	cookie and proxy info retrieval, and setting cookie info
+	(consume_message): Call consume_plugin_message for "plugin ..."
+	messages
+
 2012-08-08  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Fix PR955: regression: SweetHome3D fails to run
