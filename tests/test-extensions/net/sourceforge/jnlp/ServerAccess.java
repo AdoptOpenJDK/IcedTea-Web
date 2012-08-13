@@ -625,7 +625,7 @@ public class ServerAccess {
     }
 
     public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
-        return executeProcess(otherargs, null, stdoutl, stderrl, null);
+        return executeProcessUponURL(toBeExecuted, otherargs, u, stdoutl, stderrl, null);
     }
     public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
         Assert.assertNotNull(u);

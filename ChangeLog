@@ -1,5 +1,13 @@
 2012-08-13  Jiri Vanek  <jvanek@redhat.com>
 
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	(executeProcessUponURL)Fixed wrong call in previous commit which was
+	causing null process name.
+	* tests/reproducers/simple/AppletTest/testcases/AppletTestTests.java:
+	Removed unused import.
+
+2012-08-13  Jiri Vanek  <jvanek@redhat.com>
+
 	Reproducers of PR955
 	* tests/reproducers/simple/LocalisedInformationElement/resources/LocalisedInformationElement1.jnlp:
 	* tests/reproducers/simple/LocalisedInformationElement/resources/LocalisedInformationElement2.jnlp:
