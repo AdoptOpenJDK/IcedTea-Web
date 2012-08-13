@@ -54,9 +54,7 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import net.sourceforge.jnlp.browsertesting.Browser;
 import net.sourceforge.jnlp.browsertesting.BrowserFactory;
 import net.sourceforge.jnlp.browsertesting.Browsers;
@@ -504,7 +502,7 @@ public class ServerAccess {
         return executeJavawsHeadless(null, resource);
     }
     public ProcessResult executeJavawsHeadless(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
-        return executeJavawsHeadless(null, resource,stdoutl,stderrl);
+        return executeJavawsHeadless(null, resource,stdoutl,stderrl,null);
     }
      
     /**
@@ -517,15 +515,19 @@ public class ServerAccess {
      * @throws Exception
      */
     public ProcessResult executeJavawsHeadless(List<String> otherargs, String resource) throws Exception {
-         return executeJavawsHeadless(otherargs, resource,null,null);
+         return executeJavawsHeadless(otherargs, resource,null,null,null);
      }
-    public ProcessResult executeJavawsHeadless(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+    public ProcessResult executeJavawsHeadless(List<String> otherargs, String resource, String[] vars) throws Exception {
+         return executeJavawsHeadless(otherargs, resource,null,null,vars);
+     }
+
+    public ProcessResult executeJavawsHeadless(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
         if (otherargs == null) {
             otherargs = new ArrayList<String>(1);
         }
         List<String> headlesList = new ArrayList<String>(otherargs);
         headlesList.add(HEADLES_OPTION);
-        return executeJavaws(headlesList, resource,stdoutl,stderrl);
+        return executeJavaws(headlesList, resource,stdoutl,stderrl,vars);
     }
 
 
@@ -562,6 +564,9 @@ public class ServerAccess {
     }
     public ProcessResult executeJavaws(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
         return executeProcessUponURL(getJavawsLocation(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl);
+    }
+    public ProcessResult executeJavaws(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
+        return executeProcessUponURL(getJavawsLocation(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl,vars);
     }
 
     public ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
@@ -620,6 +625,9 @@ public class ServerAccess {
     }
 
     public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+        return executeProcess(otherargs, null, stdoutl, stderrl, null);
+    }
+    public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
         Assert.assertNotNull(u);
         Assert.assertNotNull(toBeExecuted);
         Assert.assertTrue(toBeExecuted.trim().length() > 1);
@@ -629,7 +637,7 @@ public class ServerAccess {
         List<String> urledArgs = new ArrayList<String>(otherargs);
         urledArgs.add(0, toBeExecuted);
         urledArgs.add(u.toString());
-        return executeProcess(urledArgs, stdoutl, stderrl);
+        return executeProcess(urledArgs, stdoutl, stderrl,vars);
     }
 
      public static ProcessResult executeProcess(final List<String> args) throws Exception {
@@ -637,6 +645,9 @@ public class ServerAccess {
      }
       public static ProcessResult executeProcess(final List<String> args,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
          return  executeProcess(args, null,stdoutl,stderrl);
+     }
+      public static ProcessResult executeProcess(final List<String> args,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
+         return  executeProcess(args, null,stdoutl,stderrl,vars);
      }
     /**
      * utility method to lunch process, get its stdout/stderr, its return value and to kill it if running to long (@see PROCESS_TIMEOUT)
@@ -767,7 +778,11 @@ public class ServerAccess {
     }
 
     public static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
-        ThreadedProcess t = new ThreadedProcess(args, dir);
+        return executeProcess(args, dir, stdoutl, stderrl,null);
+
+    }
+    public static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl,String[] vars) throws Exception {
+        ThreadedProcess t = new ThreadedProcess(args, dir,vars);
         if (PROCESS_LOG) {
             String connectionMesaage = createConnectionMessage(t);
             log(connectionMesaage, true, true);

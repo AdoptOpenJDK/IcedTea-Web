@@ -51,6 +51,7 @@ class ThreadedProcess extends Thread {
     List<String> args;
     Integer exitCode;
     Boolean running;
+    String[] variables;
     File dir;
     Throwable deadlyException = null;
     /*
@@ -75,14 +76,35 @@ class ThreadedProcess extends Thread {
         return exitCode;
     }
 
+    public void setVariables(String[] variables) {
+        this.variables = variables;
+    }
+
+    public String[] getVariables() {
+        return variables;
+    }
+
+
+
     public ThreadedProcess(List<String> args) {
         this.args = args;
     }
 
     public ThreadedProcess(List<String> args, File dir) {
-        this.args = args;
+        this(args);
         this.dir = dir;
     }
+
+    public ThreadedProcess(List<String> args,String[] vars) {
+        this(args);
+        this.variables = vars;
+    }
+    
+     public ThreadedProcess(List<String> args, File dir,String[] vars) {
+        this(args,dir);
+        this.variables = vars;
+    }
+
 
     public String getCommandLine() {
         String commandLine = "unknown command";
@@ -110,9 +132,13 @@ class ThreadedProcess extends Thread {
             running = true;
             Runtime r = Runtime.getRuntime();
             if (dir == null) {
-                p = r.exec(args.toArray(new String[0]));
+                if (variables == null) {
+                    p = r.exec(args.toArray(new String[0]));
+                } else {
+                    p = r.exec(args.toArray(new String[0]), variables);
+                }
             } else {
-                p = r.exec(args.toArray(new String[0]), new String[0], dir);
+                p = r.exec(args.toArray(new String[0]), variables, dir);
             }
             try {
                 exitCode = p.waitFor();

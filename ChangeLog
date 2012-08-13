@@ -1,3 +1,22 @@
+2012-08-13  Jiri Vanek  <jvanek@redhat.com>
+
+	Reproducers of PR955
+	* tests/reproducers/simple/LocalisedInformationElement/resources/LocalisedInformationElement1.jnlp:
+	* tests/reproducers/simple/LocalisedInformationElement/resources/LocalisedInformationElement2.jnlp:
+	* tests/reproducers/simple/LocalisedInformationElement/resources/LocalisedInformationElement3.jnlp:
+	* tests/reproducers/simple/LocalisedInformationElement/resources/LocalisedInformationElement4.jnlp:
+	Test jnlp files with various combinations of locales, reproducers of PR955.
+	* tests/reproducers/simple/LocalisedInformationElement/resources/LocalisedInformationElement_noLoc.jnlp
+	Jnlp file with which is not affected by PR955 and is helping to catch error in LOCALE changing hack
+	* tests/reproducers/simple/LocalisedInformationElement/srcs/LocalisedInformationElement.java:
+	Reproducer main class, after loading prints out default locale.
+	* tests/reproducers/simple/LocalisedInformationElement/testcases/LocalisedInformationElementTest.java:
+	Testcases launching above jnlps under various locales.
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	Added set of methods allowing passing of custom variables to ThreadedProcess.
+	* tests/test-extensions/net/sourceforge/jnlp/ThreadedProcess.java:
+	Added processing of custom variables. 
+
 2012-08-10  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/IcedTeaNPPlugin.cc
