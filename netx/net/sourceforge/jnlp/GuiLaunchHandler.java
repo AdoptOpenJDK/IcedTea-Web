@@ -117,7 +117,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
                     SwingUtilities.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
-                            splashScreen = new JNLPSplashScreen(resourceTracker, null, null);
+                            splashScreen = new JNLPSplashScreen(resourceTracker, file);
                         }
                     });
                 } catch (InterruptedException ie) {

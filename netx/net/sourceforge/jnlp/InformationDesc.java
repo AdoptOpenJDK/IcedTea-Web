@@ -34,7 +34,8 @@ public class InformationDesc {
     // specification name.
 
     /** one-line description */
-    public static final Object ONE_LINE = "oneline";
+    /**http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html**/
+    public static final Object ONE_LINE = "one-line";
 
     /** short description */
     public static final Object SHORT = "short";
@@ -110,11 +111,22 @@ public class InformationDesc {
      * Information.TOOLTIP, Information.DEFAULT
      */
     public String getDescription(Object kind) {
-        String result = (String) getItem("description-" + kind);
+        String result = getDescriptionStrict(kind);
         if (result == null)
             return (String) getItem("description-" + DEFAULT);
         else
             return result;
+    }
+
+      /**
+     * Returns the application's description of the specified type.
+     *
+     * @param kind one of Information.SHORT, Information.ONE_LINE,
+     * Information.TOOLTIP, Information.DEFAULT
+     */
+    public String getDescriptionStrict(Object kind) {
+        return (String) getItem("description-" + kind);
+        
     }
 
     /**

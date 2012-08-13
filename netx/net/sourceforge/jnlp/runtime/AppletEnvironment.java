@@ -27,6 +27,7 @@ import java.io.*;
 import javax.swing.*;
 
 import net.sourceforge.jnlp.*;
+import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.util.*;
 
 /**
@@ -128,6 +129,15 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     public Container getAppletFrame() {
         // TODO: rename this method to getAppletContainer ?
         return cont;
+    }
+
+     /**
+     * container must be SplashContoler
+     * 
+     */
+    public SplashController getSplashControler() {
+        
+        return (SplashController)cont;
     }
 
     /**

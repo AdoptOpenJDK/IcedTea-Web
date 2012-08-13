@@ -1,3 +1,91 @@
+2012-08-06  Jiri Vanek  <jvanek@redhat.com>
+
+	Added splashscreen implementation
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: calling JNLPSplashScreen
+	constructor with file ratehr then null.
+	* netx/net/sourceforge/jnlp/InformationDesc.java:  ONE_LINE changed from
+	"oneline" to "one-line", added citation why. (getDescriptionStrict) new
+	method returning exact value or null without fall-back.
+	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java: Added header, default
+	values and useless string replaced by JnlpFile.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Added SPLASH
+	family of keys.
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: (getSplashControler)
+	new method returning its SplashControler.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: Constants (name) and
+	(version) made public.
+	* netx/net/sourceforge/jnlp/splashscreen/SplashController.java: New interface
+	for each class which wants its splasshcreen controlled by SplashUtils.
+	* netx/net/sourceforge/jnlp/splashscreen/SplashErrorPanel.java: New interface
+	for each class which wants to serve as error-showing splashscreen.
+	* netx/net/sourceforge/jnlp/splashscreen/SplashPanel.java:  New interface
+	for each class which wants to serve as splashscreen.
+	* netx/net/sourceforge/jnlp/splashscreen/SplashUtils.java: Factory methods
+	for simplified splashscreens creation.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/DefaultErrorSplashScreen2012.java:
+	Full implementation of SplashErrorPanel to be used as default error 
+	splashscreen.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/DefaultSplashScreen2012.java:
+	Full implementation of SplashPanel to be used as default splashscreen.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/DefaultSplashScreens2012Commons.java:
+	Class for gathering same logic in DefaultErrorSplashScreen2012 and
+	DefaultSplashScreen2012.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainter.java:
+	Class responsible for paint main graphic in DefaultSplashScreen2012.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/ControlCurve.java:
+	Painting forefather for primitives drawing curves.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/Cubic.java:
+	Class with cubic calculation.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/ErrorPainter.java:
+	Class responsible for paint main graphic in DefaultErrorSplashScreen2012.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/MovingText.java:
+	Class responsible for metal-shining web label.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/NatCubic.java:
+	Painting primitive for drawing cubic-splines.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/NatCubicClosed.java:
+	Painting primitive for drawing self-closed cubic-splines.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextOutlineRenderer.java:
+	Class for rendering text from given texture,
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextWithWaterLevel.java:
+	Class for rendering Iced label slowly filled with watter
+	* netx/net/sourceforge/jnlp/splashscreen/parts/BasicComponentErrorSplashScreen.java:
+	Common forefather for all error splashscreens which would like to be an
+	component too.
+	* netx/net/sourceforge/jnlp/splashscreen/parts/BasicComponentSplashScreen.java:
+	Common forefather for all splashscreens which would like to be an component too.
+	* netx/net/sourceforge/jnlp/splashscreen/parts/DescriptionInfoItem.java:
+	Description item of InformationElement
+	* netx/net/sourceforge/jnlp/splashscreen/parts/InfoItem.java:
+	Individual items in InformationElement
+	* netx/net/sourceforge/jnlp/splashscreen/parts/InformationElement.java:
+	Wrapper around jnlp's information element.
+	* netx/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialog.java:
+	Custom error dialogue with direct access to exception and icedtea-web page
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/ErrorSplashScreenTest.java:
+	Test for final composition of ErrorSplashScreen2012, including main method
+	for manual testing
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/SplashScreenTest.java:
+	Test for final composition of SplashScreen2012, including main method
+	for manual testing
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/ErrorSplashUtilsTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainterTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/ControlCurveTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/CubicTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/ErrorPainterTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/MovingTextTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/NatCubicClosedTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/NatCubicTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/SplinesDefsTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextOutlineRendererTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextWithWaterLevelTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/parts/BasicComponentErrorSplashScreenTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/parts/BasicComponentSplashScreenTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/parts/DescriptionInfoItemTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/parts/InfoItemTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/parts/InformationElementTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialogTest.java:
+	Unit-test classes always testing the class with corresponding name
+
 2012-08-13  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:

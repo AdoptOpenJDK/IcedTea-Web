@@ -53,8 +53,8 @@ public final class Boot implements PrivilegedAction<Void> {
     // todo: decide whether a spawned netx (external launch)
     // should inherit the same options as this instance (store argv?)
 
-    private static final String name = Boot.class.getPackage().getImplementationTitle();
-    private static final String version = Boot.class.getPackage().getImplementationVersion();
+    public static final String name = Boot.class.getPackage().getImplementationTitle();
+    public static final String version = Boot.class.getPackage().getImplementationVersion();
 
     /** the text to display before launching the about link */
     private static final String aboutMessage = ""
