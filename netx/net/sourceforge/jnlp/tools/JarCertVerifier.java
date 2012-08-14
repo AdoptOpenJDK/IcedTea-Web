@@ -456,7 +456,7 @@ public class JarCertVerifier implements CertVerifier {
      * . META-INF/*.DSA
      * . META-INF/*.RSA
      */
-    static private boolean isMetaInfFile(String name) {
+    static boolean isMetaInfFile(String name) {
         String ucName = name.toUpperCase();
         return ucName.startsWith(META_INF);
     }

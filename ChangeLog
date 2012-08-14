@@ -1,3 +1,11 @@
+2012-08-14  Adam Domurad  <adomurad@redhat.com>
+
+	Unit test for method in JCV, isMetaInfFile()
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: 
+	Made isMetaInfFile package-private for testing purposes.
+	* tests/netx/unit/net/sourceforge/jnlp/tools/JarCertVerifierTest.java:
+	New, tests isMetaInfFile
+
 2012-08-06  Jiri Vanek  <jvanek@redhat.com>
 
 	Added splashscreen implementation
