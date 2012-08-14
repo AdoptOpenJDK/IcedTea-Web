@@ -1,5 +1,22 @@
 2012-08-14  Adam Domurad  <adomurad@redhat.com>
 
+	Reproducer for allowing unsigned content in META-INF/ folder. 
+	Derives from ReadPropertiesSigned test's signed jar.
+	* tests/reproducers/custom/UnsignedContentInMETAINF/resources/UnsignedContentInMETAINF.jnlp:
+	New, runs a modified version of ReadPropertiesSigned.jar (UnsignedContentInMETAINF.jar)
+	* tests/reproducers/custom/UnsignedContentInMETAINF/srcs/META-INF/unsigned_file_in_metainf: 
+	New, placed into a modified version of ReadPropertiesSigned.jar 
+	(UnsignedContentInMETAINF.jar) so that there is unsigned content in the
+	META-INF/ folder.
+	* tests/reproducers/custom/UnsignedContentInMETAINF/srcs/Makefile:
+	New, creates a modified version of ReadPropertiesSigned.jar, named 
+	UnsignedContentInMETAINF.jar, and places unsigned content inside its 
+	META-INF/ folder
+	* tests/reproducers/custom/UnsignedContentInMETAINF/testcases/UnsignedContentInMETAINF.java: 
+	Test driver for jnlp file
+
+2012-08-14  Adam Domurad  <adomurad@redhat.com>
+
 	Unit test for method in JCV, isMetaInfFile()
 	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: 
 	Made isMetaInfFile package-private for testing purposes.
