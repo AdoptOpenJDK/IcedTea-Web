@@ -1286,7 +1286,11 @@ public class JNLPClassLoader extends URLClassLoader {
                             JarFile jarFile = new JarFile(localFile.getAbsolutePath());
                             Manifest mf = jarFile.getManifest();
 
-                            if (file instanceof PluginBridge) {
+                            // Only check classpath if this is the plugin and there is no jnlp_href usage.
+                            // Note that this is different from proprietary plugin behaviour.
+                            // If jnlp_href is used, the app should be treated similarly to when
+                            // it is run from javaws as a webstart.
+                            if (file instanceof PluginBridge && !((PluginBridge) file).useJNLPHref()) {
                                 classpaths.addAll(getClassPathsFromManifest(mf, jar.getLocation().getPath()));
                             }
 

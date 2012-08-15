@@ -1,3 +1,21 @@
+2012-08-14  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Classpaths in jars' manifests are only considered when the applet is run
+	without using jnlp_href and a JNLP file.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java (activateJars):
+	Add conditional check for use of jnlp_href.
+	* tests/reproducers/signed/Classpath.Manifest.Test.Helper/srcs/CheckForClasspath.java:
+	Applet whose jar is stored in a subdir under the test engine server.
+	* tests/reproducers/signed/ClasspathManifestTest/resources/ClasspathManifestAppletTest.html:
+	* tests/reproducers/signed/ClasspathManifestTest/resources/ClasspathManifestAppletTest.jnlp:
+	* tests/reproducers/signed/ClasspathManifestTest/resources/ClasspathManifestApplicationTest.jnlp:
+	* tests/reproducers/signed/ClasspathManifestTest/resources/ClasspathManifestJNLPHrefTest.html:
+	* tests/reproducers/signed/ClasspathManifestTest/srcs/ClasspathManifest.java:
+	* tests/reproducers/signed/ClasspathManifestTest/srcs/META-INF/MANIFEST.MF:
+	* tests/reproducers/signed/ClasspathManifestTest/testcases/ClasspathManifestTest.java:
+	Test if manifest entry is searched for classpath only when in the plugin
+	is run without using jnlp_href.
+
 2012-08-14  Adam Domurad  <adomurad@redhat.com>
 
 	Reproducer for allowing unsigned content in META-INF/ folder. 
