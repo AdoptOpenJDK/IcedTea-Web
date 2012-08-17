@@ -985,6 +985,21 @@ get_cookie_info(const char* siteAddr, char** cookieString, uint32_t* len)
   return NPERR_NO_ERROR;
 }
 
+static NPError
+set_cookie_info(const char* siteAddr, const char* cookieString, uint32_t len)
+{
+  // Only attempt to perform this operation if there is a valid plugin instance
+  if (g_hash_table_size(instance_to_id_map) > 0 && browser_functions.getvalueforurl)
+  {
+      // We arbitrarily use the first valid instance we can grab
+      // For an explanation of the logic behind this, see get_cookie_info
+      gpointer instance = getFirstInTableInstance(instance_to_id_map);
+      return browser_functions.setvalueforurl((NPP) instance, NPNURLVCookie, siteAddr, cookieString, len);
+  }
+
+  return NPERR_GENERIC_ERROR;;
+}
+
 // HELPER FUNCTIONS
 
 static void
@@ -1247,7 +1262,37 @@ void consume_plugin_message(gchar* message) {
     decoded_url = NULL;
     g_free(cookie_info);
     cookie_info = NULL;
+  } else if (g_str_has_prefix(parts[1], "PluginSetCookie"))
+  {
+    // Message structure: plugin PluginSetCookie reference -1 <url> <cookie>
+    gchar** cookie_parts = g_strsplit (message, " ", 6);
+
+    if (g_strv_length(cookie_parts) < 6)
+    {
+       g_strfreev (parts);
+       g_strfreev (cookie_parts);
+       return; // Defensive, message _should_ be properly formatted
+    }
+
+    gchar* decoded_url = (gchar*) calloc(strlen(cookie_parts[4])+1, sizeof(gchar));
+    IcedTeaPluginUtilities::decodeURL(cookie_parts[4], &decoded_url);
+
+    gchar* cookie_string = cookie_parts[5];
+    uint32_t len = strlen(cookie_string);
+    if (set_cookie_info(decoded_url, cookie_string, len) == NPERR_NO_ERROR)
+    {
+  	  PLUGIN_DEBUG("Setting cookie for URL %s to %s\n", decoded_url, cookie_string);
+    } else
+    {
+  	  PLUGIN_DEBUG("Not able to set cookie for URL %s to %s\n", decoded_url, cookie_string);
+    }
+
+    free(decoded_url);
+    decoded_url = NULL;
+    g_strfreev (cookie_parts);
+    cookie_parts = NULL;
   }
+
   g_strfreev (parts);
   parts = NULL;
 }

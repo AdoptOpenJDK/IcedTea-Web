@@ -118,6 +118,9 @@ public class PluginMain {
 
             // Streams set. Start processing.
             streamHandler.startProcessing();
+
+            setCookieHandler(streamHandler);
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Something very bad happened. I don't know what to do, so I am going to exit :(");
@@ -199,8 +202,10 @@ public class PluginMain {
         }
         // override the proxy selector set by JNLPRuntime
         ProxySelector.setDefault(new PluginProxySelector());
+    }
 
-        CookieManager ckManager = new PluginCookieManager();
+    private static void setCookieHandler(PluginStreamHandler streamHandler) {
+        CookieManager ckManager = new PluginCookieManager(streamHandler);
         CookieHandler.setDefault(ckManager);
     }
 }

@@ -45,7 +45,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.jndi.toolkit.url.UrlUtil;
+
 public class PluginCookieManager extends CookieManager {
+    private PluginStreamHandler streamHandler;
+
+    public PluginCookieManager(PluginStreamHandler streamHandler) {
+        this.streamHandler = streamHandler;
+    }
+
+    @Override
     public Map<String, List<String>> get(URI uri,
             Map<String, List<String>> requestHeaders) throws IOException {
         // pre-condition check
@@ -83,5 +92,22 @@ public class PluginCookieManager extends CookieManager {
             return true;
 
         return false;
+    }
+
+    @Override
+    public void put(URI uri,
+            Map<String, List<String>> responseHeaders) throws IOException {
+        super.put(uri, responseHeaders);
+
+        for (Map.Entry<String, List<String>> headerEntry : responseHeaders.entrySet()) {
+            String type = headerEntry.getKey();
+            if ("Set-Cookie".equalsIgnoreCase(type) || "Set-Cookie2".equalsIgnoreCase(type)) {
+                List<String> cookies = headerEntry.getValue();
+                for (String cookie : cookies) {
+                    streamHandler.write("plugin PluginSetCookie reference -1 " + UrlUtil.encode(uri.toString(), "UTF-8") + " " + cookie);
+                }
+            }
+
+        }
     }
 }
