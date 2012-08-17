@@ -1,3 +1,8 @@
+2012-08-18  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: added 
+	VERBOSE_OPTION constant with -verbose value for javaws launching.
+
 2012-08-17  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/reproducers/simple/deadlocktest/testcases/DeadLockTestTest.java:
