@@ -548,7 +548,7 @@ public class ServerAccess {
         return executeBrowser(getBrowserParams(), resource);
     }
     public ProcessResult executeBrowser(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
-        return executeBrowser(getBrowserParams(), resource,stderrl,stdoutl);
+        return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
     }
 
     /**

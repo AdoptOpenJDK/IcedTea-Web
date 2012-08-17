@@ -84,12 +84,12 @@ public class DeadLockTestTest {
         assertDeadlockTestLaunched(pr);
         List<String> after = countJavaInstances();
         ServerAccess.logOutputReprint("java2 " + jnlp + " : " + after.size());
+        killDiff(before, after);
         String ss = "This process is hanging more than 30s. Should be killed";
         Assert.assertFalse("stdout should not contains: " + ss + ", but did", pr.stdout.contains(ss));
-//        Assert.assertTrue(pr.stderr.contains("xception"));, exception is thrown by engine,not by application
-        Assert.assertTrue("testDeadLockTestTerminated should be terminated, but wasn't", pr.wasTerminated);
-        Assert.assertNull("Killed process must have null return value. Have not - ", pr.returnValue);
-        killDiff(before, after);
+//        as we are tryng to terminate process as harmless as possible those two are no longer valid in all cases
+//        Assert.assertTrue("testDeadLockTestTerminated should be terminated, but wasn't", pr.wasTerminated);
+//        Assert.assertNull("Killed process must have null return value. Have not - ", pr.returnValue);
         List<String> afterKill = countJavaInstances();
         ServerAccess.logOutputReprint("java3 " + jnlp + " : " + afterKill.size());
         Assert.assertEquals("assert that just old javas remians", 0, (before.size() - afterKill.size()));

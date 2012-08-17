@@ -1,3 +1,12 @@
+2012-08-17  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/reproducers/simple/deadlocktest/testcases/DeadLockTestTest.java:
+	(testDeadLockTestTerminatedBody) removed tests for killed-process and
+	termination of remaining javas put on correct place.
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	(executeBrowser)  stout and stderr listeners forwarded to next method in
+	correct order.
+
 2012-08-14  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Classpaths in jars' manifests are only considered when the applet is run
