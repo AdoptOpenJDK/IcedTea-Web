@@ -1,3 +1,45 @@
+2012-08-17  Adam Domurad  <adomurad@redhat.com>
+
+	Fixes PR588, cookies set in the java cookie jar are now stored properly
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(set_cookie_info): New, uses setvalueforurl
+	(consume_plugin_message): Additional message added allowing 
+	set_cookie_info to be used from the java side.
+	* plugin/icedteanp/java/sun/applet/PluginCookieManager.java: Now
+	overrides put method, results in set_cookie_info calls in C++
+	* plugin/icedteanp/java/sun/applet/PluginMain.java: Passes
+	PluginStreamHandler to PluginCookieManager to allow C++ side
+	communication
+
+2012-08-17  Adam Domurad  <adomurad@redhat.com>
+
+	Reproducers for PR588, sets persistent and session cookies in the 
+	cookie jar and tries to read them with various means.
+	* tests/reproducers/signed/SavingCookies/resources/CheckCookie.html:
+	Print the cookie store contents
+	* tests/reproducers/signed/SavingCookies/resources/CheckCookieAndGotoClear.html:
+	Print the cookie store contents, and then go to 
+	ClearPersistentCookie.html with showDocument
+	* tests/reproducers/signed/SavingCookies/resources/ClearPersistentCookie.html:
+	Clear the test cookie so it does not interfere with further tests
+	* tests/reproducers/signed/SavingCookies/resources/SavePersistentCookie.html:
+	Create a persistent cookie
+	* tests/reproducers/signed/SavingCookies/resources/SavePersistentCookieAndGotoCheck.html:
+	Create a persistent cookie and check it with showDocument
+	* tests/reproducers/signed/SavingCookies/resources/SaveSessionCookie.html:
+	Create a session cookie
+	* tests/reproducers/signed/SavingCookies/resources/SaveSessionCookieAndGotoCheck.html:
+	Create a session cookie and check it with showDocument
+	* tests/reproducers/signed/SavingCookies/srcs/CheckingCookies.java:
+	Checks the contents of the cookie store.
+	Depending on the test, this may go to another page upon completion.
+	* tests/reproducers/signed/SavingCookies/srcs/SavingCookies.java:
+	Store cookies in the java cookie store. Depending on the test, this may
+	go to another page upon completion.
+	* tests/reproducers/signed/SavingCookies/testcases/SavingCookiesTests.java
+	Test driver for testing persistent and session cookies in different 
+	ways
+
 2012-08-18  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: added 
