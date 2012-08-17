@@ -1,3 +1,20 @@
+2012-08-18  Jiri Vanek  <jvanek@redhat.com>
+
+	added encodings reproducer (PR1108)
+	* tests/reproducers/simple/encodingTestsĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ: new
+	reproducer
+	* tests/reproducers/simple/encodingTestsĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ/srcs/encodingTest.java:
+	main class/main applet class and method of new encodingTestsĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ.jar
+	* tests/reproducers/simple/encodingTestsĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ/testcases/encodingTestTest.java:
+	testcases for jnlps of this reproducers
+	* tests/reproducers/simple/encodingTestsĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ/resources:
+	four utf-8 and four iso-8859-2 jnlp files and one utf-8 and one 
+	iso-8859-2 html files 
+	* tests/reproducers/simple/simpletest1/srcs/simpletest1.java: now prints
+	 its args out
+	* tests/test-extensions-tests/net/sourceforge/jnlp/ResourcesTest.java:
+	correctly swaped error and output listener in its test
+
 2012-08-17  Adam Domurad  <adomurad@redhat.com>
 
 	Fixes PR588, cookies set in the java cookie jar are now stored properly

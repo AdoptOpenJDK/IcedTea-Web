@@ -1,4 +1,7 @@
-/* SimpleTest1.java
+
+import java.applet.Applet;
+
+/* EncodingTest.java
 Copyright (C) 2011 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -35,14 +38,53 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-public class SimpleTest1{
+public class EncodingTest  extends Applet {
+
 
     public static void main(String[] args){
-        System.out.println("Good simple javaws exapmle");
+        System.out.println("Encoded jar decoded correctly");
         for (int i = 0; i < args.length; i++) {
             String string = args[i];
             System.out.println(string);
-
         }
+    }
+    private class Killer extends Thread {
+
+        public int n = 2000;
+
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(n);
+                System.out.println("Aplet killing himself after " + n + " ms of life");
+                System.exit(0);
+            } catch (Exception ex) {
+            }
+        }
+    }
+    private Killer killer;
+
+    @Override
+    public void init() {
+        System.out.println("applet was initialised");
+        killer = new Killer();
+    }
+
+    @Override
+    public void start() {
+        System.out.println("applet was started");
+        System.out.println(getParameter("key1"));
+        killer.start();
+        System.out.println("killer was started");
+    }
+
+    @Override
+    public void stop() {
+        System.out.println("applet was stopped");
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("applet will be destroyed");
     }
 }

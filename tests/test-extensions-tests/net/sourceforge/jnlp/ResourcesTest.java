@@ -298,7 +298,7 @@ public class ResourcesTest extends  BrowserTest{
                 e2.append(s).append("\n");
             }
         };
-       ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html",le,lo);
+       ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html",lo,le);
         server.setCurrentBrowser(BrowserFactory.getFactory().getFirst().getID());
         Assert.assertNotNull(server.getCurrentBrowsers());
         Assert.assertNotNull(server.getCurrentBrowser());
