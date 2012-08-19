@@ -7,6 +7,9 @@
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
 	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java:
 	Fix javadoc warnings.
+	* plugin/icedteanp/java/sun/applet/PluginObjectStore.java (contains):
+	Fix a small bug that prevents the only user of this method
+	(PluginAppletSecurity line 1064) to work correctly.
 
 2012-08-18  Jiri Vanek  <jvanek@redhat.com>
 

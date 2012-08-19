@@ -45,9 +45,9 @@ import java.util.Map;
 enum PluginObjectStore {
     INSTANCE;
 
-    private HashMap<Integer, Object> objects = new HashMap<Integer, Object>();
-    private HashMap<Integer, Integer> counts = new HashMap<Integer, Integer>();
-    private HashMap<Object, Integer> identifiers = new HashMap<Object, Integer>();
+    private final Map<Integer, Object> objects = new HashMap<Integer, Object>();
+    private final Map<Integer, Integer> counts = new HashMap<Integer, Integer>();
+    private final Map<Object, Integer> identifiers = new HashMap<Object, Integer>();
     private final Object lock = new Object();
 
     private boolean wrapped = false;
@@ -64,20 +64,22 @@ enum PluginObjectStore {
     }
 
     public Integer getIdentifier(Object object) {
+        if (object == null)
+            return 0;
+
         synchronized(lock) {
-            if (object == null)
-                return 0;
             return identifiers.get(object);
         }
     }
 
     public boolean contains(Object object) {
-        synchronized(lock) {
-            if (object == null)
+        if (object != null) {
+            synchronized(lock) {
                 return identifiers.containsKey(object);
-
-            return false;
+            }
         }
+        return false;
+
     }
 
     public boolean contains(int identifier) {
