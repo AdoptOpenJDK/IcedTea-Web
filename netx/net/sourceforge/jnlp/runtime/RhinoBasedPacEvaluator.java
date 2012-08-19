@@ -59,7 +59,7 @@ import org.mozilla.javascript.Scriptable;
  * Represents a Proxy Auto Config file. This object can be used to evaluate the
  * proxy file to find the proxy for a given url.
  *
- * @see http://en.wikipedia.org/wiki/Proxy_auto-config#The_PAC_file
+ * @see "http://en.wikipedia.org/wiki/Proxy_auto-config#The_PAC_file"
  */
 public class RhinoBasedPacEvaluator implements PacEvaluator {
 

@@ -1,3 +1,13 @@
+2012-08-19  Thomas Meyer  <thomas@m3y3r.de>
+
+	* netx/net/sourceforge/jnlp/JNLPFile.java:
+	* netx/net/sourceforge/jnlp/LaunchHandler.java:
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java:
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java:
+	Fix javadoc warnings.
+
 2012-08-18  Jiri Vanek  <jvanek@redhat.com>
 
 	added encodings reproducer (PR1108)

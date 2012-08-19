@@ -211,7 +211,7 @@ public class PluginBridge extends JNLPFile {
     }
 
     /**
-     * {@inheritdoc }
+     * {@inheritDoc }
      */
     @Override
     public DownloadOptions getDownloadOptionsForJar(JARDesc jar) {

@@ -207,7 +207,8 @@ public class JNLPClassLoader extends URLClassLoader {
      * Create a new JNLPClassLoader from the specified file.
      *
      * @param file the JNLP file
-     * @param name of the application's main class
+     * @param policy the UpdatePolicy for this class loader
+     * @param mainName name of the application's main class
      */
     protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());

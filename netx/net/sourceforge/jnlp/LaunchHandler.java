@@ -61,7 +61,7 @@ public interface LaunchHandler {
      * but do not have everything required. This is a nice point to show the
      * splash screen.
      *
-     * @param application the application instance that is starting
+     * @param file the JNLP file of the instance that is starting
      */
     public void launchInitialized(JNLPFile file);
 

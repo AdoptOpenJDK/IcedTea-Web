@@ -780,7 +780,7 @@ public class JNLPFile {
      * jars it finds through getResourcesDescs(). If ever the implementation
      * of that function should change to return copies of JARDescs objects,
      * then the "jar == aJar" comparison below should change accordingly.
-     * @param jar: the jar whose download options to get.
+     * @param jar the jar whose download options to get.
      * @return the download options.
      */
     public DownloadOptions getDownloadOptionsForJar(JARDesc jar) {

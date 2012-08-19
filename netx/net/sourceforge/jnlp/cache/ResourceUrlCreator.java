@@ -58,7 +58,7 @@ public class ResourceUrlCreator {
      * Returns a list of URLs that the resources might be downloadable from.
      * The Resources may not be downloadable from any of them. The returned order is the order
      * the urls should be attempted in.
-     * @return
+     * @return a list of URLs that the resources might be downloadable from
      */
     public List<URL> getUrls() {
         List<URL> urls = new LinkedList<URL>();
