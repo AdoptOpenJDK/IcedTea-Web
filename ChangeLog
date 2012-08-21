@@ -1,5 +1,13 @@
 2012-08-21  Jiri Vanek  <jvanek@redhat.com>
 
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	(sigInt), (sigKill), (sigTerm) new methods for various killing of
+	processes by kill.
+	(kill) new method, launching kill process.
+	(destroyProcess	) is now calling sigInt instead of unwrapped sigTerm.
+
+2012-08-21  Jiri Vanek  <jvanek@redhat.com>
+
 	* launcher/javaws.in: java is now launched by exec
 
 2012-08-19  Thomas Meyer  <thomas@m3y3r.de>

@@ -166,18 +166,36 @@ class ProcessAssasin extends Thread {
             Field f = p.getClass().getDeclaredField("pid");
             f.setAccessible(true);
             String pid = (f.get(p)).toString();
-            List<String> ll=new ArrayList<String>(4);
-            ll.add("kill");
-            ll.add("-s");
-            ll.add("SIGTERM");
-            ll.add(pid);
-            ServerAccess.executeProcess(ll);//sync, but  acctually release
-            //before affected application close
-            Thread.sleep(1000);
+            sigInt(pid);
+            //sigTerm(pid);
+            //sigKill(pid);
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         } finally {
             p.destroy();
         }
+    }
+
+    public static void sigInt(String pid) throws Exception {
+        kill(pid, "SIGINT");
+    }
+
+    public static void sigKill(String pid) throws Exception {
+        kill(pid, "SIGKILL");
+    }
+
+    public static void sigTerm(String pid) throws Exception {
+        kill(pid, "SIGTERM");
+    }
+
+    public static void kill(String pid,String signal) throws InterruptedException, Exception {
+        List<String> ll = new ArrayList<String>(4);
+        ll.add("kill");
+        ll.add("-s");
+        ll.add(signal);
+        ll.add(pid);
+        ServerAccess.executeProcess(ll); //sync, but  acctually release
+        //before affected application close
+        Thread.sleep(1000);
     }
 }
