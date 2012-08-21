@@ -59,6 +59,6 @@ while [ "$j" -lt "${#ARGS[@]}" ]; do
   k=$((k+1))
 done
 
-"${COMMAND[@]}"
+exec -a "javaws" "${COMMAND[@]}"
 
 exit $?

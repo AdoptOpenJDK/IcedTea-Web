@@ -1,3 +1,7 @@
+2012-08-21  Jiri Vanek  <jvanek@redhat.com>
+
+	* launcher/javaws.in: java is now launched by exec
+
 2012-08-19  Thomas Meyer  <thomas@m3y3r.de>
 
 	* netx/net/sourceforge/jnlp/JNLPFile.java:
