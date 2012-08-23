@@ -1,3 +1,30 @@
+2012-08-22  Jiri Vanek  <jvanek@redhat.com>
+
+	Added tests for PR905 - parameters in jnlp/html application/applet resources
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarUrl.html:
+	html file to launch applet, requested archive jar have parameter
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarUrl1.jnlp:
+	jnlp file to launch application, requested archive jar have parameter
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarUrl2.jnlp:
+	jnlp file to launch application, requested jnlp have parameter
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarUrlSigned.html:
+	html file to launch signed applet, requested archive jar have parameter
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarUrlSigned1.jnlp:
+	jnlp file to launch signed application, requested archive jar have parameter
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarUrlSigned2.jnlp:
+	jnlp file to launch signed application, requested jnlp have parameter
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarAppletUrl2.jnlp
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarAppletUrl.jnlp
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarAppletUrlSigned2.jnlp
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarAppletUrlSigned.jnlp
+	variations launching applets from jnlp
+	* tests/reproducers/simple/ParametrizedJarUrl/testcases/ParametrizedJarUrlTests.java:
+	testaceses of above ParametrizedJarUrl/jnlps+htmls namely - (parametrizedAppletTestSignedTest)
+	, (testParametrizedJarUrl2), (testParametrizedJarUrlSigned2): passing
+	calls /partially/ with parameter. Those test are passing.
+	(parametrizedAppletTestSignedFirefoxTest) call with parameter upon signed
+	applet in browser, failing and so is representing PR905 
+
 2012-08-21  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
