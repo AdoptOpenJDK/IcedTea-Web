@@ -69,6 +69,7 @@ import net.sourceforge.jnlp.JNLPMatcher;
 import net.sourceforge.jnlp.JNLPMatcherException;
 import net.sourceforge.jnlp.LaunchDesc;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ResourcesDesc;
@@ -1701,6 +1702,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Find the class in this loader or any of its extension loaders.
      */
+    @Override
     protected Class findClass(String name) throws ClassNotFoundException {
         for (int i = 0; i < loaders.length; i++) {
             try {
@@ -1718,6 +1720,8 @@ public class JNLPClassLoader extends URLClassLoader {
             } catch (ClassNotFoundException ex) {
             } catch (ClassFormatError cfe) {
             } catch (PrivilegedActionException pae) {
+            } catch (NullJnlpFileException ex) {
+                throw new ClassNotFoundException(this.mainClass + " in main classloader ", ex);
             }
         }
 
@@ -2233,7 +2237,10 @@ public class JNLPClassLoader extends URLClassLoader {
                         }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
             } catch (PrivilegedActionException pae) {
                 notFoundResources.put(name, super.getURLs());
-                throw new ClassNotFoundException("Could not find class " + name);
+                throw new ClassNotFoundException("Could not find class " + name, pae);
+            } catch (NullJnlpFileException njf) {
+                notFoundResources.put(name, super.getURLs());
+                throw new ClassNotFoundException("Could not find class " + name, njf);
             }
         }
 
@@ -2297,7 +2304,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 }
                             }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
                 } catch (PrivilegedActionException pae) {
-                }
+                } 
 
                 if (url == null) {
                     notFoundResources.put(name, super.getURLs());

@@ -1,5 +1,5 @@
 /* CodeBaseClassLoaderTest.java
-   Copyright (C) 2012 Red Hat, Inc.
+Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -33,41 +33,83 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
-*/
-
+ */
 package net.sourceforge.jnlp.runtime;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Locale;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.ParseException;
+import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.CodeBaseClassLoader;
 import net.sourceforge.jnlp.annotations.Bug;
+import org.junit.AfterClass;
+import org.junit.Assert;
 
 import org.junit.Test;
 
 public class CodeBaseClassLoaderTest {
 
-    @Bug(id={"PR895",
-            "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
-            "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
-    @Test
-    public void testResourceLoadSuccessCaching() throws LaunchException, ClassNotFoundException, IOException, ParseException {
-        final URL JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
-        final URL CODEBASE_URL = new URL("http://icedtea.classpath.org/netx/");
+    private static final URL JAR_URL;
+    private static final URL CODEBASE_URL;
 
+    static {
+        try {
+            JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
+            CODEBASE_URL = new URL("http://icedtea.classpath.org/netx/");
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    private static final String isWSA = "isWebstartApplication";
+
+    static void setStaticField(Field field, Object newValue) throws Exception {
+        field.setAccessible(true);
+        field.set(null, newValue);
+    }
+
+    private void setWSA() throws Exception {
+        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), true);
+    }
+
+    private void setApplet() throws Exception {
+        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), false);
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), false);
+
+
+    }
+
+    @Bug(id = {"PR895",
+        "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
+        "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
+    @Test
+    public void testResourceLoadSuccessCachingApplication() throws Exception {
+        setWSA();
+        //we are testing new resource not in cache
+        testResourceLoadSuccessCaching("Main.class");
+    }
+
+    @Test
+    public void testResourceLoadSuccessCachingApplet() throws Exception {
+        setApplet();
+        //so new resource again not in cache
+        testResourceLoadSuccessCaching("HTMLPanel.java");
+    }
+
+    public void testResourceLoadSuccessCaching(String r) throws Exception {
         JNLPFile dummyJnlpFile = new JNLPFile() {
+
             @Override
             public ResourcesDesc getResources() {
                 return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
@@ -80,39 +122,47 @@ public class CodeBaseClassLoaderTest {
 
             @Override
             public SecurityDesc getSecurity() {
-                return new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, null);
+                return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
             }
         };
-
         JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);
         CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[] { JAR_URL, CODEBASE_URL }, parent);
 
         long startTime, stopTime;
 
         startTime = System.nanoTime();
-        classLoader.findResource("net/sourceforge/jnlp/about/Main.class");
+        classLoader.findResource("net/sourceforge/jnlp/about/"+r);
         stopTime = System.nanoTime();
         long timeOnFirstTry = stopTime - startTime;
-        ServerAccess.logErrorReprint(""+timeOnFirstTry);
+        ServerAccess.logErrorReprint("" + timeOnFirstTry);
 
         startTime = System.nanoTime();
-        classLoader.findResource("net/sourceforge/jnlp/about/Main.class");
+        classLoader.findResource("net/sourceforge/jnlp/about/"+r);
         stopTime = System.nanoTime();
         long timeOnSecondTry = stopTime - startTime;
-        ServerAccess.logErrorReprint(""+timeOnSecondTry);
+        ServerAccess.logErrorReprint("" + timeOnSecondTry);
 
         assertTrue(timeOnSecondTry < (timeOnFirstTry / 10));
     }
 
-    @Bug(id={"PR895",
-            "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
-            "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
+    @Bug(id = {"PR895",
+        "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
+        "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
     @Test
-    public void testResourceLoadFailureCaching() throws LaunchException, ClassNotFoundException, IOException, ParseException {
-        final URL JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
-        final URL CODEBASE_URL = new URL("http://icedtea.classpath.org/netx/");
+    public void testResourceLoadFailureCachingApplication() throws Exception {
+        setWSA();
+        testResourceLoadFailureCaching();
+    }
 
+    @Test
+    public void testResourceLoadFailureCachingApplet() throws Exception {
+        setApplet();
+        testResourceLoadFailureCaching();
+    }
+
+    public void testResourceLoadFailureCaching() throws Exception {
         JNLPFile dummyJnlpFile = new JNLPFile() {
+
             @Override
             public ResourcesDesc getResources() {
                 return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
@@ -125,7 +175,7 @@ public class CodeBaseClassLoaderTest {
 
             @Override
             public SecurityDesc getSecurity() {
-                return new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, null);
+                return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
             }
         };
 
@@ -138,23 +188,32 @@ public class CodeBaseClassLoaderTest {
         classLoader.findResource("net/sourceforge/jnlp/about/Main_FOO_.class");
         stopTime = System.nanoTime();
         long timeOnFirstTry = stopTime - startTime;
-        ServerAccess.logErrorReprint(""+timeOnFirstTry);
+        ServerAccess.logErrorReprint("" + timeOnFirstTry);
 
         startTime = System.nanoTime();
         classLoader.findResource("net/sourceforge/jnlp/about/Main_FOO_.class");
         stopTime = System.nanoTime();
         long timeOnSecondTry = stopTime - startTime;
-        ServerAccess.logErrorReprint(""+timeOnSecondTry);
+        ServerAccess.logErrorReprint("" + timeOnSecondTry);
 
         assertTrue(timeOnSecondTry < (timeOnFirstTry / 10));
     }
 
     @Test
-    public void testParentClassLoaderIsAskedForClasses() throws MalformedURLException, LaunchException {
-        final URL JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
-        final URL CODEBASE_URL = new URL("http://icedtea.classpath.org/netx/");
+    public void testParentClassLoaderIsAskedForClassesApplication() throws Exception {
+        setWSA();
+        testParentClassLoaderIsAskedForClasses();
+    }
 
+    @Test
+    public void testParentClassLoaderIsAskedForClassesApplet() throws Exception {
+        setApplet();
+        testResourceLoadFailureCaching();
+    }
+
+    public void testParentClassLoaderIsAskedForClasses() throws Exception {
         JNLPFile dummyJnlpFile = new JNLPFile() {
+
             @Override
             public ResourcesDesc getResources() {
                 return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
@@ -167,13 +226,14 @@ public class CodeBaseClassLoaderTest {
 
             @Override
             public SecurityDesc getSecurity() {
-                return new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, null);
+                return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
             }
         };
 
         final boolean[] parentWasInvoked = new boolean[1];
 
         JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null) {
+
             @Override
             protected Class<?> findClass(String name) throws ClassNotFoundException {
                 parentWasInvoked[0] = true;
@@ -188,4 +248,89 @@ public class CodeBaseClassLoaderTest {
 
         assertTrue(parentWasInvoked[0]);
     }
+
+    @Test
+    public void testNullFileSecurityDescApplication() throws Exception {
+        setWSA();
+        testNullFileSecurityDesc();
+    }
+
+    @Test
+    public void testNullFileSecurityDescApplet() throws Exception {
+        setApplet();
+        testNullFileSecurityDesc();
+    }
+
+    public void testNullFileSecurityDesc() throws Exception {
+        JNLPFile dummyJnlpFile = new JNLPFile() {
+
+            @Override
+            public ResourcesDesc getResources() {
+                return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
+            }
+
+            @Override
+            public URL getCodeBase() {
+                return CODEBASE_URL;
+            }
+
+            @Override
+            public SecurityDesc getSecurity() {
+                return new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, null);
+            }
+        };
+
+        JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);
+        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[] { JAR_URL, CODEBASE_URL }, parent);
+
+        Exception ex = null;
+        try {
+            classLoader.findClass("foo");
+        } catch (Exception exx) {
+            ex = exx;
+            ServerAccess.logException(ex);
+        }
+        Assert.assertNotNull(ex);
+        Assert.assertTrue(ex instanceof ClassNotFoundException);
+
+
+        //search dor resources is not relvant to null jnlp file for applets
+        ex = null;
+        URL res=null;
+        try {
+            //not cached
+            res=classLoader.findResource("net/sourceforge/jnlp/about/resources/notes.html");
+        } catch (Exception exx) {
+            ex = exx;
+            ServerAccess.logException(ex);
+        }
+        if (JNLPRuntime.isWebstartApplication()) {
+            Assert.assertNull(res);
+            Assert.assertNotNull(ex);
+            Assert.assertTrue(ex instanceof NullJnlpFileException);
+        } else {
+            Assert.assertNull(ex);
+            Assert.assertNotNull(res);
+        }
+
+        ex = null;
+        res=null;
+        try {
+            //now cached
+            res=classLoader.findResource("net/sourceforge/jnlp/about/resources/notes.html");
+        } catch (Exception exx) {
+            ex = exx;
+            ServerAccess.logException(ex);
+        }
+        if (JNLPRuntime.isWebstartApplication()) {
+            Assert.assertNotNull(ex);
+            Assert.assertTrue(ex instanceof NullJnlpFileException);
+            Assert.assertNull(res);
+        } else {
+            Assert.assertNull(ex);
+            Assert.assertNotNull(res);
+        }
+    }
+
+
 }

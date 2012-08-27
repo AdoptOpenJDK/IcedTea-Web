@@ -233,10 +233,16 @@ public class SecurityDesc {
         if (grantAwtPermissions) {
             permissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
         }
-
-        if (file.isApplication())
-            for (int i = 0; i < jnlpRIAPermissions.length; i++)
-                permissions.add(jnlpRIAPermissions[i]);
+        if (JNLPRuntime.isWebstartApplication()) {
+            if (file == null) {
+                throw new NullJnlpFileException("Can not return sandbox permissions, file is null");
+            }
+            if (file.isApplication()) {
+                for (int i = 0; i < jnlpRIAPermissions.length; i++) {
+                    permissions.add(jnlpRIAPermissions[i]);
+                }
+            }
+        }
 
         if (downloadHost != null && downloadHost.length() > 0)
             permissions.add(new SocketPermission(downloadHost,

@@ -1,3 +1,19 @@
+2012-08-27  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed long term failing unit-test, fixed NPE from ClassLoader
+	* netx/net/sourceforge/jnlp/NullJnlpFileException.java: new class to
+	distinguish plain NPE from null jnlp file.
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: (getSandBoxPermissions) 
+	added throw of NullJnlpFileException in case of null jnlp file.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (findClass)
+	added Override annotation,  add catch of NullJnlpFileException and 
+	re-throw of  CNF exception.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
+	(testResourceLoadSuccessCaching) (testResourceLoadFailureCaching)
+	(testParentClassLoaderIsAskedForClasses) - internal JNLPFile's
+	(getSecurity) null in SecurityDesc constructorrepalced by this.
+	(testNullFileSecurityDesc) new test to ensure NPE in null JNLPFile case. 
+
 2012-08-22  Jiri Vanek  <jvanek@redhat.com>
 
 	Added tests for PR905 - parameters in jnlp/html application/applet resources
