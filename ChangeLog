@@ -1,3 +1,15 @@
+2012-08-27  Adam Domurad  <adomurad@redhat.com>
+
+	Tests custom policy definition in such a way that has been known to
+	cause ClassCircularityError's. Reproducer for PR1145.
+	* tests/reproducers/signed/CustomPolicy/resources/CustomPolicy.jnlp:
+	* tests/reproducers/signed/CustomPolicy/srcs/CustomPolicy.java:
+	Sets custom policy and performs a privileged operation with no given
+	privileges.
+	* tests/reproducers/signed/CustomPolicy/testcases/CustomPolicyTests.java:
+	Tests that an access control exception was caught, and that the program
+	exits correctly.
+
 2012-08-27  Deepak Bhole <dbhole@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
