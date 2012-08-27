@@ -2154,6 +2154,8 @@ public class JNLPClassLoader extends URLClassLoader {
             return context; // If context already has all permissions, don't bother
         } catch (AccessControlException ace) {
             // continue below
+        } catch (ClassCircularityError cce) {
+            // continue below
         }
 
         // Since this is for class-loading, technically any class from one jar

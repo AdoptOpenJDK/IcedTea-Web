@@ -1,3 +1,9 @@
+2012-08-27  Deepak Bhole <dbhole@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getAccessControlContextForClassLoading): Catch ClassCircularityErrors and
+	ignore them (thus denying permission to caller).
+
 2012-08-27  Jiri Vanek  <jvanek@redhat.com>
 
 	Added tests for PR822 - multiple signatures on classpath
