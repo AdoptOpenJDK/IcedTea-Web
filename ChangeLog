@@ -1,5 +1,27 @@
 2012-08-27  Jiri Vanek  <jvanek@redhat.com>
 
+	Added tests for PR822 - multiple signatures on classpath
+	* Makefile.am: listed signed2 directory
+	* tests/reproducers/signed2/MultipleSignaturesTest/resources/MultipleSignaturesTest.html:
+	* tests/reproducers/signed2/MultipleSignaturesTest/resources/MultipleSignaturesTest1.jnlp:
+	* tests/reproducers/signed2/MultipleSignaturesTest/resources/MultipleSignaturesTest1_requesting.jnlp:
+	* tests/reproducers/signed2/MultipleSignaturesTest/resources/MultipleSignaturesTest2.jnlp:
+	* tests/reproducers/signed2/MultipleSignaturesTestSamePackage/resources/MultipleSignaturesTest1_SamePackage.jnlp:
+	* tests/reproducers/signed2/MultipleSignaturesTestSamePackage/resources/MultipleSignaturesTest1_SamePackage_requesting.jnlp:
+	* tests/reproducers/signed2/MultipleSignaturesTestSamePackage/resources/MultipleSignaturesTest2_SamePackage.jnlp:
+	* tests/reproducers/signed2/MultipleSignaturesTestSamePackage/resources/MultipleSignaturesTest_SamePackage.html:
+	various variations of multiple signtarues jnlp/html, in/out package, same/different/ signature
+	* tests/reproducers/signed2/MultipleSignaturesTestSamePackage/srcs/MultipleSignaturesTestSamePackage.java:	
+	simple class just with call to second jar
+	* tests/reproducers/signed2/MultipleSignaturesTest/srcs/somecrazytestpackage/MultipleSignaturesTest.java:
+	simple class just with call to second jar, but in package
+	* tests/reproducers/signed2/MultipleSignaturesTest/testcases/MultipleSignaturesTestTests.java:
+	* tests/reproducers/signed2/MultipleSignaturesTestSamePackage/testcases/MultipleSignaturesTestTestsSamePackage.java
+	various testcases tro above resources
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: "-verbose " fixed to "-verbose"
+
+2012-08-27  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed long term failing unit-test, fixed NPE from ClassLoader
 	* netx/net/sourceforge/jnlp/NullJnlpFileException.java: new class to
 	distinguish plain NPE from null jnlp file.

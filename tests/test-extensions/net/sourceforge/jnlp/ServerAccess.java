@@ -156,7 +156,7 @@ public class ServerAccess {
         return port;
     }
     public static final  String HEADLES_OPTION="-headless";
-    public static final  String VERBOSE_OPTION="-verbose ";
+    public static final  String VERBOSE_OPTION="-verbose";
 
     /**
      * we would like to have an singleton instance ASAP
