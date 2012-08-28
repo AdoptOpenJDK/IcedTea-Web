@@ -1,0 +1,2 @@
+This reproducer encapsulates PR920.
+A LinkageError occurs, complaining of duplicate class definition, when an extended class outside of a jar references a common class with its parent class. The common class attempts to load twice.

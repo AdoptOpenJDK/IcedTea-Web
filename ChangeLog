@@ -1,4 +1,25 @@
-2012-08-20  Adam Domurad  <adomurad@redhat.com>
+2012-08-27  Adam Domurad  <adomurad@redhat.com>
+
+	Reproduces problem behind PR920, class is in a jar is loaded twice when
+	used by both a class within the jar, and also used by a class outside 
+	the jar extending that class.
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/README: 
+	Describes test
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/resources/AppletExtendsFromOutsideJar.html:
+	Runs applet with main class outside jar
+	* A tests/reproducers/custom/AppletExtendsFromOutsideJar/srcs/AppletReferenceInSameJar.java:
+	References class Referenced inside same jar
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/srcs/AppletReferenceOutOfJar.java:
+	References class Referenced outside the jar
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/srcs/Makefile:
+	Packages Reference, AppletReferenceInSameJar into a jar, 
+	AppletReferenceOutOfJar outside it
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/srcs/Referenced.java:
+	Class that is referenced twice, loaded twice in failing behaviour
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/testcases/AppletExtendsFromOutsideJarTests.java:
+	Drives AppletExtendsFromOutsideJar.html
+
+2012-08-27  Adam Domurad  <adomurad@redhat.com>
 
 	Tests whether a main class can be found in a jar specified in
 	META-INF/INDEX.LIST. This test is done with both signed and unsigned
