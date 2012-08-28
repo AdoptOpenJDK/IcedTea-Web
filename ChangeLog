@@ -1,3 +1,19 @@
+2012-08-20  Adam Domurad  <adomurad@redhat.com>
+
+	Tests whether a main class can be found in a jar specified in
+	META-INF/INDEX.LIST. This test is done with both signed and unsigned
+	jars. The failure with signed jars encapsulates PR1112.
+	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/resources/AdditionalJarsInMetaInfIndexListSigned.jnlp:
+	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/resources/AdditionalJarsInMetaInfIndexListUnsigned.jnlp:
+	JNLP files for the signed and unsigned varions of the test
+	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/srcs/LoadedViaMetaInfIndexList.java:
+	Main class that is within a jar loaded via
+	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/srcs/Makefile:
+	Prepares a jar with INDEX.LIST pointing to another jar that has the
+	main-class. Copies of these jars and made and signed.
+ 	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/testcases/AdditionalJarsInMetaInfIndexListTests.java:
+	Test driver, tests if main-class has run.
+
 2012-08-27  Adam Domurad  <adomurad@redhat.com>
 
 	Tests custom policy definition in such a way that has been known to

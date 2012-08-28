@@ -1,5 +1,7 @@
 # Source directories
 
+export TOP_BUILD_DIR = $(abs_top_builddir)
+
 export NETX_DIR = $(abs_top_builddir)/netx.build
 export NETX_SRCDIR = $(abs_top_srcdir)/netx
 export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
