@@ -1,5 +1,13 @@
 2012-08-27  Adam Domurad  <adomurad@redhat.com>
 
+	Fixes PR920, duplicate loading of classes in certain cases 
+	* NEWS: Added entry: Fixes PR920
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Remove 
+	recursive/non-recursive distinction. Add parent JNLPClassLoader to 
+	parent chain. 
+
+2012-08-27  Adam Domurad  <adomurad@redhat.com>
+
 	Reproduces problem behind PR920, class is in a jar is loaded twice when
 	used by both a class within the jar, and also used by a class outside 
 	the jar extending that class.
