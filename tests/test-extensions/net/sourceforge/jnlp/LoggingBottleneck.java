@@ -201,15 +201,18 @@ public class LoggingBottleneck {
     private void stdout(String idded) throws IOException {
         DEFAULT_STDOUT_WRITER.write(idded);
         DEFAULT_STDOUT_WRITER.newLine();
+        DEFAULT_STDOUT_WRITER.flush();
     }
 
     private void stderr(String idded) throws IOException {
         DEFAULT_STDERR_WRITER.write(idded);
         DEFAULT_STDERR_WRITER.newLine();
+        DEFAULT_STDERR_WRITER.flush();
     }
 
     private void stdeall(String idded) throws IOException {
         DEFAULT_STDLOGS_WRITER.write(idded);
         DEFAULT_STDLOGS_WRITER.newLine();
+        DEFAULT_STDLOGS_WRITER.flush();
     }
 }

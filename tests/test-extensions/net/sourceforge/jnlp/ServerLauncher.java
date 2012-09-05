@@ -56,6 +56,7 @@ public class ServerLauncher implements Runnable {
     private boolean running;
     private final Integer port;
     private final File dir;
+    private ServerSocket serverSocket;
 
     public String getServerName() {
         return serverName;
@@ -99,9 +100,9 @@ public class ServerLauncher implements Runnable {
     public void run() {
         running = true;
         try {
-            ServerSocket s = new ServerSocket(port);
+            serverSocket = new ServerSocket(port);
             while (running) {
-                new TinyHttpdImpl(s.accept(), dir, port);
+                new TinyHttpdImpl(serverSocket.accept(), dir, port);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,10 +112,27 @@ public class ServerLauncher implements Runnable {
     }
 
     public URL getUrl(String resource) throws MalformedURLException {
+        if (resource == null) {
+            resource = "";
+        }
+        if (resource.trim().length() > 0 && !resource.startsWith("/")) {
+            resource = "/" + resource;
+        }
         return new URL("http", getServerName(), getPort(), resource);
     }
 
     public URL getUrl() throws MalformedURLException {
         return getUrl("");
+    }
+
+    public void stop() {
+        this.running = false;
+        if (serverSocket != null) {
+            try {
+                serverSocket.close();
+            } catch (Exception ex) {
+                ServerAccess.logException(ex);
+            }
+        }
     }
 }

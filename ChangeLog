@@ -1,5 +1,23 @@
 2012-09-05  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixing several errors which were causing incorrect behaviour causing
+	correct reproduction of PR905
+	* tests/reproducers/simple/ParametrizedJarUrl/resources/ParametrizedJarUrlSigned.htm
+	Using different jar for reproducing
+	* tests/reproducers/simple/ParametrizedJarUrl/testcases/ParametrizedJarUrlTests.java
+	Added tests for hardcoded codebase (same and different)
+	enhanced original PR905 reproducers
+	* tests/test-extensions/net/sourceforge/jnlp/LoggingBottleneck.java:
+	added flush for logs
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: cleaned
+	and enhanced getUrl* methods.
+	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java: delegated
+	socket
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: fixed
+	processing of question mark. 
+
+2012-09-05  Jiri Vanek  <jvanek@redhat.com>
+
 	* tests/reproducers/signed/CountingAppletSigned/srcs/CountingAppletSigned.java:
 	Signed applet painting to canvas and periodically printing out counted messages
 	* tests/reproducers/signed2/AppletTestSigned2/srcs/AppletTestSigned2:

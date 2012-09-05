@@ -585,16 +585,24 @@ public class ServerAccess {
     }
 
     /**
-     * Ctreate resource on http, on 'localhost' on port on which this instance is running
+     * Ctreate resource on http, on 'localhost' on port on which this cached instance is running
      * @param resource
      * @return
      * @throws MalformedURLException
      */
     public URL getUrlUponThisInstance(String resource) throws MalformedURLException {
-        if (!resource.startsWith("/")) {
-            resource = "/" + resource;
-        }
-        return new URL("http", server.getServerName(), getPort(), resource);
+        getInstance();
+       return getUrlUponInstance(server,resource);
+    }
+
+    /**
+     * Ctreate resource on http, on 'localhost' on port on which this instance is running
+     * @param resource
+     * @return
+     * @throws MalformedURLException
+     */
+    public static URL getUrlUponInstance(ServerLauncher instance,String resource) throws MalformedURLException {
+       return instance.getUrl(resource);
     }
 
     /**

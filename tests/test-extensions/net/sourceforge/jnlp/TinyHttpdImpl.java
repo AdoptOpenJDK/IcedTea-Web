@@ -99,8 +99,9 @@ class TinyHttpdImpl extends Thread {
                         }
                         ServerAccess.logNoReprint("Getting: " + p);
                         p = URLDecoder.decode(p, "UTF-8");
-                        ServerAccess.logNoReprint("Serving: " + p);
+                        p=p.replaceAll("\\?.*", "");
                         p = (".".concat((p.endsWith("/")) ? p.concat("index.html") : p)).replace('/', File.separatorChar);
+                        ServerAccess.logNoReprint("Serving: " + p);
                         File pp = new File(dir, p);
                         int l = (int) pp.length();
                         byte[] b = new byte[l];
@@ -115,7 +116,7 @@ class TinyHttpdImpl extends Thread {
                         } else if (p.toLowerCase().endsWith(".jar")) {
                             content = ct + "application/x-jar\n";
                         }
-                        o.writeBytes("HTTP/1.0 200 OK\nConten" + "t-Length:" + l + "\n" + content + "\n");
+                        o.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + l + "\n" + content + "\n");
                         if (op.startsWith(XSX)) {
                             byte[][] bb = splitArray(b, 10);
                             for (int j = 0; j < bb.length; j++) {
