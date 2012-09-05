@@ -1,8 +1,11 @@
 
 import java.applet.Applet;
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
-/* SimpleTest2.java
-Copyright (C) 2011 Red Hat, Inc.
+/* CountingApplet1.java
+Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -37,22 +40,61 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
+public class CountingApplet2 extends Applet {
 
-public class SimpleTest2 extends Applet{
-
-    public static void main(String[] args)  {
-      throw new RuntimeException("Correct exception");
+    public static void main(String[] args) throws InterruptedException {
+        Integer counter = null;
+        if (args.length > 0) {
+            counter = new Integer(args[0]);
+        }
+        int i = 0;
+        while (true) {
+            System.out.println("counting... " + i);
+            if (counter != null && i == counter.intValue()) {
+                System.exit(-i);
+            }
+            i++;
+            Thread.sleep(1000);
+        }
     }
 
     @Override
     public void init() {
         System.out.println("applet was initialised");
+        final CountingApplet2 self = this;
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                self.setLayout(new BorderLayout());
+                self.add(new JLabel("C2"));
+                self.validateTree();
+                self.repaint();
+            }
+        });
     }
 
     @Override
     public void start() {
         System.out.println("applet was started");
-        main(null);
+        String s = getParameter("kill");
+        final String[] params;
+        if (s != null) {
+            params = new String[]{s};
+        } else {
+            params = new String[0];
+        }
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    main(params);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -64,5 +106,4 @@ public class SimpleTest2 extends Applet{
     public void destroy() {
         System.out.println("applet will be destroyed");
     }
-
 }

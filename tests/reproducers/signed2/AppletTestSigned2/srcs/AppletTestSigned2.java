@@ -1,8 +1,5 @@
-
-import java.applet.Applet;
-
-/* SimpleTest2.java
-Copyright (C) 2011 Red Hat, Inc.
+/* AppletTestSigned2.java
+Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -38,31 +35,28 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-public class SimpleTest2 extends Applet{
+import java.applet.Applet;
 
-    public static void main(String[] args)  {
-      throw new RuntimeException("Correct exception");
-    }
+public class AppletTestSigned2 extends Applet {
+
 
     @Override
     public void init() {
-        System.out.println("applet was initialised");
-    }
+        System.out.println("AppletTestSigned2 was initialised");
+       }
 
     @Override
     public void start() {
-        System.out.println("applet was started");
-        main(null);
+        System.out.println("AppletTestSigned2 was started");
     }
 
     @Override
     public void stop() {
-        System.out.println("applet was stopped");
+        System.out.println("AppletTestSigned2 was stopped");
     }
 
     @Override
     public void destroy() {
-        System.out.println("applet will be destroyed");
+        System.out.println("AppletTestSigned2 will be destroyed");
     }
-
 }

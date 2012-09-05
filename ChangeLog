@@ -1,3 +1,31 @@
+2012-09-05  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/reproducers/signed/CountingAppletSigned/srcs/CountingAppletSigned.java:
+	Signed applet painting to canvas and periodically printing out counted messages
+	* tests/reproducers/signed2/AppletTestSigned2/srcs/AppletTestSigned2:
+	Second simple signed applet for testing two different simple ones parallel
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1E_x_2s.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1_x_1.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1_x_2.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1_x_2E.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1_x_2e.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1_x_2sk.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1e_x_2s.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1k_x_2.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1s_x_2.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1s_x_2s.html:
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1s_x_2ss.html:
+	Various combinations of plain, signed, crashing, exception throwing and
+	exiting applets on single web-page
+	* tests/reproducers/simple/CountingApplet1/srcs/CountingApplet1.java:
+	Simple applet painting to canvas and periodically printing out counted messages
+	* tests/reproducers/simple/CountingApplet1/testcases/ParallelAppletsTest.java:
+	testcases launching above html files.
+	* tests/reproducers/simple/CountingApplet2/srcs/CountingApplet2.java:
+	Second simple applet painting to canvas and periodically printing out counted messages
+	* tests/reproducers/simple/simpletest2/srcs/SimpleTest2.java: Enhanced
+	exception throwing reproducer. 
+
 2012-09-04  Jiri Vanek  <Jvanek@redhat.com>
             Danesh Dadachanji  <ddadacha@redhat.com>
 
