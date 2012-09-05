@@ -1,3 +1,25 @@
+2012-09-04  Jiri Vanek  <Jvanek@redhat.com>
+            Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Single instance support for jnlp-href and tests
+	* netx/net/sourceforge/jnlp/services/XSingleInstanceService.java:
+	(initializeSingleInstance) fixed code for catching running instance
+	(checkSingleInstanceRunning) Added handling of parameters.
+	* netx/net/sourceforge/jnlp/Launcher.java: (launchApplication),
+	(launchApplet) 	Added debug output that instance is already running.
+	(getApplet) added check for services and debug output
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added
+	(LSingleInstanceExists) entry for exception.
+	tests/reproducers/simple/SingleInstanceServiceTest/resources/SingleInstanceTest.jnlp
+	* tests/reproducers/simple/SingleInstanceServiceTest/resources/SingleInstanceTestWS.jnlp:
+	* tests/reproducers/simple/SingleInstanceServiceTest/resources/SingleInstanceTest_clasical.html:
+	* tests/reproducers/simple/SingleInstanceServiceTest/resources/SingleInstanceTest_jnlpHref.html:
+	Applet and application in jnlp or html launching files.
+	* tests/reproducers/simple/SingleInstanceServiceTest/srcs/SingleInstanceChecker.java
+	SingleInstance implementing applet/application
+	* tests/reproducers/simple/SingleInstanceServiceTest/testcases/SingleInstanceTest.java
+	Testfile for launching for above jnlps/htmls as testcases.	
+
 2012-08-27  Adam Domurad  <adomurad@redhat.com>
 
 	Fixes PR920, duplicate loading of classes in certain cases 

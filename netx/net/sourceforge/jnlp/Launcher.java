@@ -536,6 +536,9 @@ public class Launcher {
             try {
                 ServiceUtil.checkExistingSingleInstance(file);
             } catch (InstanceExistsException e) {
+                if (JNLPRuntime.isDebug()) {
+                    System.out.println("Single instance application is already running.");
+                }
                 return null;
             }
 
@@ -653,11 +656,17 @@ public class Launcher {
             throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplet"), R("LNotAppletInfo")));
 
         try {
+            ServiceUtil.checkExistingSingleInstance(file);
             AppletInstance applet = createApplet(file, enableCodeBase, cont);
             applet.initialize();
 
             applet.getAppletEnvironment().startApplet(); // this should be a direct call to applet instance
             return applet;
+        } catch (InstanceExistsException ieex) {
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("Single instance applet is already running.");
+            }
+            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")));
         } catch (LaunchException lex) {
             throw launchError(lex);
         } catch (Exception ex) {
@@ -673,9 +682,17 @@ public class Launcher {
             throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplet"), R("LNotAppletInfo")));
 
         try {
+            ServiceUtil.checkExistingSingleInstance(file);
+
             AppletInstance applet = createApplet(file, enableCodeBase, cont);
             applet.initialize();
             return applet;
+
+        } catch (InstanceExistsException ieex) {
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("Single instance applet is already running.");
+            }
+            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")));
         } catch (LaunchException lex) {
             throw launchError(lex);
         } catch (Exception ex) {
@@ -688,6 +705,8 @@ public class Launcher {
      * a thread in the application's thread group.
      */
     protected ApplicationInstance launchInstaller(JNLPFile file) throws LaunchException {
+        // TODO Check for an existing single instance once implemented.
+        // ServiceUtil.checkExistingSingleInstance(file);
         throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCNotSupported"), R("LNoInstallers"), R("LNoInstallersInfo")));
     }
 
