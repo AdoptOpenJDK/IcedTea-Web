@@ -585,14 +585,14 @@ public class ServerAccess {
     }
 
     /**
-     * Ctreate resource on http, on 'localhost' on port on which this cached instance is running
+     * Create resource on http, on 'localhost' on port on which this cached instance is running
      * @param resource
      * @return
      * @throws MalformedURLException
      */
     public URL getUrlUponThisInstance(String resource) throws MalformedURLException {
         getInstance();
-       return getUrlUponInstance(server,resource);
+        return getUrlUponInstance(server, resource);
     }
 
     /**

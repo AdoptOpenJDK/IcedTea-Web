@@ -65,7 +65,7 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         ServerLauncher server2 = ServerAccess.getIndependentInstance();
         String originalResourceName = "ParametrizedJarUrlSigned.html";
         String newResourceName = "ParametrizedJarUrlSigned_COPY2.html";
-        createCodeBAse(originalResourceName, newResourceName, server2.getUrl(""));
+        createCodeBase(originalResourceName, newResourceName, server2.getUrl(""));
         //set codebase to second server
         ProcessResult pr = server.executeBrowser(newResourceName);
         server2.stop();
@@ -78,12 +78,12 @@ public class ParametrizedJarUrlTests extends BrowserTest{
     public void parametrizedAppletTestSignedBrowserTest_hardcodedCodeBase() throws Exception {
         String originalResourceName = "ParametrizedJarUrlSigned.html";
         String newResourceName = "ParametrizedJarUrlSigned_COPY1.html";
-        createCodeBAse(originalResourceName, newResourceName, server.getUrl(""));
+        createCodeBase(originalResourceName, newResourceName, server.getUrl(""));
         ProcessResult pr = server.executeBrowser(newResourceName);
         evaluateSignedApplet(pr);
     }
 
-    private void createCodeBAse(String originalResourceName, String newResourceName, URL codebase) throws MalformedURLException, IOException {
+    private void createCodeBase(String originalResourceName, String newResourceName, URL codebase) throws MalformedURLException, IOException {
         String originalContent = ServerAccess.getContentOfStream(new FileInputStream(new File(server.getDir(), originalResourceName)));
         String nwContent = originalContent.replaceAll("codebase=\".\"", "codebase=\"" + codebase + "\"");
         ServerAccess.saveFile(nwContent, new File(server.getDir(), newResourceName));
@@ -149,7 +149,7 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         Assert.assertTrue("AppletTestSigned stdout should contain " + s1 + " but didn't", pr.stdout.contains(s1));
         String s2 = "value2";
         Assert.assertTrue("AppletTestSigned stdout should contain " + s2 + " but didn't", pr.stdout.contains(s2));
-//        to strict!
+//        too strict!
 //        String s4 = "AppletTestSigned was stopped";
 //        Assert.assertFalse("AppletTestSigned stdout shouldn't contains " + s4 + " but did", pr.stdout.contains(s4));
 //        String s5 = "AppletTestSigned will be destroyed";

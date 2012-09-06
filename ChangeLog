@@ -1,3 +1,13 @@
+2012-09-06  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixing several typos from previous push
+	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java:
+	(getUrlUponThisInstance) Javadoc, replaced Ctreate with Create.
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: (run)
+	Fixed indentation.
+	* tests/reproducers/simple/ParametrizedJarUrl/testcases/ParametrizedJarUrlTests.java:
+	Refactored createCodeBAse to createCodeBase.
+	
 2012-09-05  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixing several errors which were causing incorrect behaviour causing

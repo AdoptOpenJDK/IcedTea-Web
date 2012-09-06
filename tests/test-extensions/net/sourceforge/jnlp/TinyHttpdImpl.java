@@ -99,7 +99,7 @@ class TinyHttpdImpl extends Thread {
                         }
                         ServerAccess.logNoReprint("Getting: " + p);
                         p = URLDecoder.decode(p, "UTF-8");
-                        p=p.replaceAll("\\?.*", "");
+                        p = p.replaceAll("\\?.*", "");
                         p = (".".concat((p.endsWith("/")) ? p.concat("index.html") : p)).replace('/', File.separatorChar);
                         ServerAccess.logNoReprint("Serving: " + p);
                         File pp = new File(dir, p);
