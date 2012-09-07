@@ -1,3 +1,35 @@
+2012-09-07  Saad Mohammad  <smohammad@redhat.com>
+
+	Added signed jnlp tests for applications with multiple jar resources.
+	* tests/reproducers/signed/MultiJar-NoSignedJnlp/resources/MainJarWithoutSignedJnlp.jnlp:
+	Launching jnlp file that's main jar does not have a signed jnlp file, but
+	other jar resources do.
+	* tests/reproducers/signed/MultiJar-NoSignedJnlp/srcs/SimpleApplication.java:
+	A class that uses reflection to access resources from different jars.
+	* tests/reproducers/signed/MultiJar-SignedJnlpApplication/resources/MainJarWithMatchingSignedJnlpApplication.jnlp:
+	Launching jnlp file that's main jar matches the signed jnlp application
+	file.
+	* tests/reproducers/signed/MultiJar-SignedJnlpApplication/resources/MainJarWithUnmatchingSignedJnlpApplication.jnlp:
+	Launching jnlp file that's main jar does not match the signed jnlp
+	application file.
+	* tests/reproducers/signed/MultiJar-SignedJnlpApplication/srcs/JNLP-INF/APPLICATION.jnlp:
+	Signed JNLP application file for MultiJar-SignedJnlpApplication.
+	* tests/reproducers/signed/MultiJar-SignedJnlpApplication/srcs/SignedJnlpApplication.java:
+	A class that uses reflection to access resources from different jars.
+	* tests/reproducers/signed/MultiJar-SignedJnlpApplication/testcases/MultiJarSignedJnlpTest.java:
+	Testcase that tests the launch and validation of signed jnlp files for
+	application that have multiple jar resources.
+	* tests/reproducers/signed/MultiJar-SignedJnlpTemplate/resources/MainJarWithMatchingSignedJnlpTemplate.jnlp:
+	Launching jnlp file that's main jar matches the signed jnlp application
+	template file.
+	* tests/reproducers/signed/MultiJar-SignedJnlpTemplate/resources/MainJarWithUnmatchingSignedJnlpTemplate.jnlp:
+	Launching jnlp file that's main jar does not match the signed jnlp
+	application template file.
+	* tests/reproducers/signed/MultiJar-SignedJnlpTemplate/srcs/JNLP-INF/APPLICATION_TEMPLATE.jnlp:
+	Signed JNLP application template file for MultiJar-SignedJnlpTemplate.jar
+	* tests/reproducers/signed/MultiJar-SignedJnlpTemplate/srcs/SignedJnlpTemplate.java:
+	A class that uses reflection to access resources from different jars.
+
 2012-09-07  Jiri Vanek  <jvanek@redhat.com>
 
 	Added strict test
