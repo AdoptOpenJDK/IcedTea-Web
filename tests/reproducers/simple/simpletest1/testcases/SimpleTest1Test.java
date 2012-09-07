@@ -35,7 +35,14 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import org.junit.Assert;
 
@@ -44,18 +51,63 @@ import org.junit.Test;
 public class SimpleTest1Test {
 
     private static ServerAccess server = new ServerAccess();
+    private static final List<String> strict = Arrays.asList(new String[]{"-strict", ServerAccess.VERBOSE_OPTION});
 
-  
+    private void checkLaunched(ProcessResult pr) {
+        checkLaunched(pr, false);
+    }
+
+    private void checkLaunched(ProcessResult pr, boolean negate) {
+        String s = "Good simple javaws exapmle";
+        if (negate) {
+            Assert.assertFalse("testSimpletest1lunchOk stdout should NOT contains " + s + " bud did", pr.stdout.contains(s));
+        } else {
+            Assert.assertTrue("testSimpletest1lunchOk stdout should contains " + s + " bud didn't", pr.stdout.contains(s));
+        }
+        String ss = "xception";
+        if (negate) {
+            Assert.assertTrue("testSimpletest1lunchOk stderr should contains " + ss + " but didn't", pr.stderr.contains(ss));
+        } else {
+            Assert.assertFalse("testSimpletest1lunchOk stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
+        }
+        Assert.assertFalse(pr.wasTerminated);
+        Assert.assertEquals((Integer) 0, pr.returnValue);
+    }
 
     @Test
     public void testSimpletest1lunchOk() throws Exception {
-        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/simpletest1.jnlp");
-        String s="Good simple javaws exapmle";
-        Assert.assertTrue("testSimpletest1lunchOk stdout should contains "+s+" bud didn't",pr.stdout.contains(s));
-        String ss="xception";
-        Assert.assertFalse("testSimpletest1lunchOk stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
-        Assert.assertFalse(pr.wasTerminated);
-        Assert.assertEquals((Integer)0, pr.returnValue);
+        ProcessResult pr = server.executeJavawsHeadless(null, "/simpletest1.jnlp");
+        checkLaunched(pr);
     }
 
- }
+    @Test
+    public void testSimpletest1lunchNotOkJnlpStrict() throws Exception {
+        ProcessResult pr = server.executeJavawsHeadless(strict, "/simpletest1.jnlp");
+        checkLaunched(pr, true);
+    }
+
+    @Test
+    public void testSimpletest1lunchOkStrictJnlp() throws Exception {
+        String originalResourceName = "simpletest1.jnlp";
+        String newResourceName = "simpletest1_strict.jnlp";
+        createStrictFile(originalResourceName, newResourceName, server.getUrl(""));
+        ProcessResult pr = server.executeJavawsHeadless(null, "/" + newResourceName);
+        checkLaunched(pr);
+    }
+
+    @Test
+    public void testSimpletest1lunchOkStrictJnlpStrict() throws Exception {
+        String originalResourceName = "simpletest1.jnlp";
+        String newResourceName = "simpletest1_strict.jnlp";
+        createStrictFile(originalResourceName, newResourceName, server.getUrl(""));
+        ProcessResult pr = server.executeJavawsHeadless(strict, "/" + newResourceName);
+        checkLaunched(pr);
+    }
+
+    private void createStrictFile(String originalResourceName, String newResourceName, URL codebase) throws MalformedURLException, IOException {
+        String originalContent = ServerAccess.getContentOfStream(new FileInputStream(new File(server.getDir(), originalResourceName)));
+        String nwContent1 = originalContent.replaceAll("href=\""+originalResourceName+"\"", "href=\""+newResourceName+"\"");
+        String nwContent = nwContent1.replaceAll("codebase=\".\"", "codebase=\"" + codebase + "\"");
+        ServerAccess.saveFile(nwContent, new File(server.getDir(), newResourceName));
+    }
+}

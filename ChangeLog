@@ -1,3 +1,18 @@
+2012-09-07  Jiri Vanek  <jvanek@redhat.com>
+
+	Added strict test
+	* tests/reproducers/simple/simpletest1/testcases/SimpleTest1Test.java:
+	Removed deprecated ServerAccess.ProcessResult
+	(testSimpletest1lunchOk) extracted asserting code
+	(checkLaunched) family of methods to evaluate output of application
+	(createStrictFile) method to prepare file which will pass strict checking
+	(testSimpletest1lunchOkStrictJnlp) new test, ensuring that even strict
+	file can be read without strict option
+	(testSimpletest1lunchNotOkJnlpStrict) new test ensuring that strictly
+	read no-strict file will fail
+	(testSimpletest1lunchOkStrictJnlpStrict) new test ensuring that strictly
+	read strict file will pass 
+
 2012-09-06  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixing several typos from previous push
