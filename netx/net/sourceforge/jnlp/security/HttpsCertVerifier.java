@@ -59,7 +59,6 @@ import sun.security.x509.X500Name;
 
 public class HttpsCertVerifier implements CertVerifier {
 
-    private VariableX509TrustManager tm;
     private X509Certificate[] chain;
     private String authType;
     private String hostName;
@@ -67,11 +66,9 @@ public class HttpsCertVerifier implements CertVerifier {
     private boolean hostMatched;
     private ArrayList<String> details = new ArrayList<String>();
 
-    public HttpsCertVerifier(VariableX509TrustManager tm,
-                             X509Certificate[] chain, String authType,
+    public HttpsCertVerifier(X509Certificate[] chain, String authType,
                              boolean isTrusted, boolean hostMatched,
                              String hostName) {
-        this.tm = tm;
         this.chain = chain;
         this.authType = authType;
         this.hostName = hostName;

@@ -715,9 +715,12 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
   AC_MSG_RESULT(${JAVA})
   AC_SUBST(JAVA)
   JAVA_VERSION=`$JAVA -version 2>&1 | sed -n '1s/@<:@^"@:>@*"\(.*\)"$/\1/p'`
-  case "${JAVA_VERSION}" in
-    1.7*) VERSION_DEFS='-DHAVE_JAVA7';;
-  esac
+  HAVE_JAVA7=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.7) print "yes"}'`
+  if  ! test -z "$HAVE_JAVA7" ; then
+    VERSION_DEFS='-DHAVE_JAVA7'
+  fi
+
+  AM_CONDITIONAL([HAVE_JAVA7], test x"${HAVE_JAVA7}" = "xyes" )
   AC_SUBST(VERSION_DEFS)
 ])
 

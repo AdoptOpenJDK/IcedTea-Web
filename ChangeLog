@@ -1,3 +1,33 @@
+2012-09-17  Deepak Bhole <dbhole@redhat.com>
+
+	PR1161: X509VariableTrustManager does not work correctly with OpenJDK7
+	* Makefile.am: If building with JDK 6, don't build
+	VariableX509TrustManagerJDK7.
+	* NEWS: Updated.
+	* acinclude.m4: In addition to setting VERSION_DEFS, also set HAVE_JAVA7
+	if building with JDK7.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java (initialize): Use new
+	getSSLSocketTrustManager() method to get the trust manager.
+	(getSSLSocketTrustManager): New method. Depending on runtime JRE version,
+	returns the appropriate trust manager.
+	* netx/net/sourceforge/jnlp/security/HttpsCertVerifier.java: Removed
+	unused tm variable.
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java: No
+	longer extends com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager.
+	(checkClientTrusted): Renamed to checkTrustClient and removed overloaded
+	implementations.
+	(checkServerTrusted): Renamed to checkTrustServer. Also, modified to
+	accept socket and engine (may be null). Assume that CN is mismatched by
+	default, rather than matched. If explicitly trusted, bypass other checks,
+	including CN mismatch.
+	(checkAllManagers): Modified to accept socket and engine. Modified to work
+	for both JDK6 and JDK7.
+	(getAcceptedIssuers): Make protected (called by others in package).
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManagerJDK6.java:
+	New class -- X509TrustManager for JDK6.
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManagerJDK7.java:
+	New class -- X509TrustManager for JDK7.
+
 2012-09-07  Saad Mohammad  <smohammad@redhat.com>
 
 	Added signed jnlp tests for applications with multiple jar resources.

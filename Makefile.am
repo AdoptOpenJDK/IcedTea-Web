@@ -348,6 +348,9 @@ netx-source-files.txt:
 if !WITH_RHINO
 	sed -i '/RhinoBasedPacEvaluator/ d' $@
 endif
+if !HAVE_JAVA7
+	sed -i '/VariableX509TrustManagerJDK7/ d' $@
+endif
 
 stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
 	mkdir -p $(NETX_DIR)

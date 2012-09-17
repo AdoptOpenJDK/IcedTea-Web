@@ -37,6 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.Socket;
 import java.security.AccessController;
 import java.security.KeyStore;
 import java.security.PrivilegedAction;
@@ -47,17 +50,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import sun.security.util.HostnameChecker;
 import sun.security.validator.ValidatorException;
-
-import com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-
-import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 
 /**
  * This class implements an X509 Trust Manager. The certificates it trusts are
@@ -65,7 +67,7 @@ import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
  * different certificates that are not in the keystore.
  */
 
-final public class VariableX509TrustManager extends X509ExtendedTrustManager {
+final public class VariableX509TrustManager {
 
     /** TrustManagers containing trusted CAs */
     private X509TrustManager[] caTrustManagers = null;
@@ -164,8 +166,8 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
     /**
      * Check if client is trusted (no support for custom here, only system/user)
      */
-    public void checkClientTrusted(X509Certificate[] chain, String authType,
-                                   String hostName, String algorithm)
+    public void checkTrustClient(X509Certificate[] chain, String authType,
+                                   String hostName)
             throws CertificateException {
 
         boolean trusted = false;
@@ -186,99 +188,125 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
         throw savedException;
     }
 
-    public void checkClientTrusted(X509Certificate[] chain, String authType)
-            throws CertificateException {
-        checkClientTrusted(chain, authType, null, null);
-    }
-
-    public void checkServerTrusted(X509Certificate[] chain, String authType,
-                                   String hostName, String algorithm)
-            throws CertificateException {
-        checkServerTrusted(chain, authType, hostName, false);
-    }
-
-    public void checkServerTrusted(X509Certificate[] chain, String authType)
-            throws CertificateException {
-        checkServerTrusted(chain, authType, null, null);
-    }
-
     /**
-     * Check if the server is trusted
+     * Check if the server is trusted.
+     *
+     * First, existing stores are checked to see if the certificate is trusted.
+     * Next, if the certificate is not explicitly trusted by the user, a host
+     * name check is performed. The user is them prompted as needed.
      *
      * @param chain The cert chain
      * @param authType The auth type algorithm
-     * @param checkOnly Whether to "check only" i.e. no user prompt, or to prompt for permission
+     * @param hostName The expected hostName that the server should have
+     * @param socket The SSLSocket in use (may be null)
+     * @param ending The SSLEngine in use (may be null)
      */
-    public synchronized void checkServerTrusted(X509Certificate[] chain,
+    public synchronized void checkTrustServer(X509Certificate[] chain,
                              String authType, String hostName,
-                             boolean checkOnly) throws CertificateException {
+                             SSLSocket socket, SSLEngine engine) throws CertificateException {
         CertificateException ce = null;
         boolean trusted = true;
-        boolean CNMatched = true;
+        boolean CNMatched = false;
 
+        // Check trust stores
         try {
-            checkAllManagers(chain, authType);
+            checkAllManagers(chain, authType, socket, engine);
         } catch (CertificateException e) {
             trusted = false;
             ce = e;
         }
 
         // If the certificate is not explicitly trusted, we
-        // need to prompt the user
+        // check host match
         if (!isExplicitlyTrusted(chain, authType)) {
-
-            if (hostName == null) {
-                CNMatched = false;
-            } else {
+            if (hostName != null) {
                 try {
                     HostnameChecker checker = HostnameChecker
                             .getInstance(HostnameChecker.TYPE_TLS);
 
-                    checker.match(hostName, chain[0]); // only need to match @ 0 for
-                                                       // CN
+                    checker.match(hostName, chain[0]); // only need to match @ 0 for CN
 
+                    CNMatched = true;
                 } catch (CertificateException e) {
-                    CNMatched = false;
                     ce = e;
                 }
             }
+        } else {
+            // If it is explicitly trusted, just return right away.
+            return;
         }
 
+        // If it is (not explicitly trusted) AND
+        // ((it is not in store) OR (there is a host mismatch))
         if (!trusted || !CNMatched) {
-            if (checkOnly) {
-                throw ce;
-            } else {
-                if (!isTemporarilyUntrusted(chain[0])) {
-                    boolean b = askUser(chain, authType, trusted, CNMatched, hostName);
+            if (!isTemporarilyUntrusted(chain[0])) {
+                boolean b = askUser(chain, authType, trusted, CNMatched, hostName);
 
-                    if (b) {
-                        temporarilyTrust(chain[0]);
-                    } else {
-                        temporarilyUntrust(chain[0]);
-                    }
+                if (b) {
+                    temporarilyTrust(chain[0]);
+                    return;
+                } else {
+                    temporarilyUntrust(chain[0]);
                 }
-
-                checkAllManagers(chain, authType);
             }
+
+            throw ce;
         }
     }
 
     /**
-     * Check system, user and custom trust manager
+     * Check system, user and custom trust manager.
+     *
+     * This method is intended to work with both, JRE6 and JRE7. If socket
+     * and engine are null, it assumes that the call is for JRE6 (i.e. not
+     * javax.net.ssl.X509ExtendedTrustManager which is Java 7 specific). If
+     * either of those are not null, it will assume that the caTrustManagers
+     * are javax.net.ssl.X509ExtendedTrustManager instances and will
+     * invoke their check methods.
+     *
+     * @param chain The certificate chain
+     * @param authType The authentication type
+     * @param socket the SSLSocket being used for the connection
+     * @param engine the SSLEngine being used for the connection
      */
-    private void checkAllManagers(X509Certificate[] chain, String authType) throws CertificateException {
+    private void checkAllManagers(X509Certificate[] chain, String authType, Socket socket, SSLEngine engine) throws CertificateException {
+
         // first try CA TrustManagers
         boolean trusted = false;
         ValidatorException savedException = null;
         for (int i = 0; i < caTrustManagers.length; i++) {
             try {
-                caTrustManagers[i].checkServerTrusted(chain, authType);
+                if (socket == null && engine == null) {
+                    caTrustManagers[i].checkServerTrusted(chain, authType);
+                } else {
+
+                    try {
+                        Class<?> x509ETMClass = Class.forName("javax.net.ssl.X509ExtendedTrustManager");
+                        if (engine == null) {
+                            Method mcheckServerTrusted = x509ETMClass.getDeclaredMethod("checkServerTrusted", X509Certificate[].class, String.class, Socket.class);
+                            mcheckServerTrusted.invoke(caTrustManagers[i], chain, authType, socket);
+                        } else {
+                            Method mcheckServerTrusted = x509ETMClass.getDeclaredMethod("checkServerTrusted", X509Certificate[].class, String.class, SSLEngine.class);
+                            mcheckServerTrusted.invoke(caTrustManagers[i], chain, authType, engine);
+                        }
+                    } catch (NoSuchMethodException nsme) {
+                        throw new ValidatorException(nsme.getMessage());
+                    } catch (InvocationTargetException ite) {
+                        throw new ValidatorException(ite.getMessage());
+                    } catch (IllegalAccessException iae) {
+                        throw new ValidatorException(iae.getMessage());
+                    } catch (ClassNotFoundException cnfe) {
+                        throw new ValidatorException(cnfe.getMessage());
+                    }
+                }
+
                 trusted = true;
                 break;
             } catch (ValidatorException caex) {
                 savedException = caex;
             }
         }
+
         if (trusted) {
             return;
         }
@@ -332,7 +360,7 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
         return explicitlyTrusted;
     }
 
-    public X509Certificate[] getAcceptedIssuers() {
+    protected X509Certificate[] getAcceptedIssuers() {
         List<X509Certificate> issuers = new ArrayList<X509Certificate>();
 
         for (int i = 0; i < caTrustManagers.length; i++) {
@@ -394,7 +422,7 @@ final public class VariableX509TrustManager extends X509ExtendedTrustManager {
             public Boolean run() {
                 return SecurityDialogs.showCertWarningDialog(
                         AccessType.UNVERIFIED, null,
-                        new HttpsCertVerifier(trustManager, chain, authType,
+                        new HttpsCertVerifier(chain, authType,
                                               isTrusted, hostMatched,
                                               hostName));
             }

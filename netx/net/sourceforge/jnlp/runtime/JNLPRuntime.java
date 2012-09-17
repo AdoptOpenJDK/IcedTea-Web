@@ -16,38 +16,59 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import java.io.*;
+import java.awt.EventQueue;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
 import java.net.ProxySelector;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.awt.*;
-import java.text.*;
-import java.util.*;
+import java.security.AllPermission;
+import java.security.KeyStore;
+import java.security.Policy;
+import java.security.Security;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.text.MessageFormat;
 import java.util.List;
-import java.security.*;
-import javax.jnlp.*;
+import java.util.ResourceBundle;
+
+import javax.jnlp.ServiceManager;
 import javax.naming.ConfigurationException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 
-import sun.net.www.protocol.jar.URLJarFile;
-
-import net.sourceforge.jnlp.*;
+import net.sourceforge.jnlp.DefaultLaunchHandler;
+import net.sourceforge.jnlp.GuiLaunchHandler;
+import net.sourceforge.jnlp.LaunchHandler;
+import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
-import net.sourceforge.jnlp.cache.*;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.DefaultDownloadIndicator;
+import net.sourceforge.jnlp.cache.DownloadIndicator;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.security.VariableX509TrustManager;
-import net.sourceforge.jnlp.services.*;
-import net.sourceforge.jnlp.util.*;
+import net.sourceforge.jnlp.services.XServiceManagerStub;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.TeeOutputStream;
+import sun.net.www.protocol.jar.URLJarFile;
 
 /**
  * Configure and access the runtime environment.  This class
@@ -223,7 +244,7 @@ public class JNLPRuntime {
             KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS);
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(ks, KeyStores.getPassword());
-            TrustManager[] trust = new TrustManager[] { VariableX509TrustManager.getInstance() };
+            TrustManager[] trust = new TrustManager[] { getSSLSocketTrustManager() };
             context.init(kmf.getKeyManagers(), trust, null);
             sslSocketFactory = context.getSocketFactory();
 
@@ -245,6 +266,52 @@ public class JNLPRuntime {
 
         initialized = true;
 
+    }
+
+    /**
+     * Returns a TrustManager ideal for the running VM.
+     *
+     * @return TrustManager the trust manager to use for verifying https certificates
+     */
+    private static TrustManager getSSLSocketTrustManager() throws
+                                ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
+
+        try {
+
+            Class<?> trustManagerClass;
+            Constructor<?> tmCtor = null;
+
+            if (System.getProperty("java.version").startsWith("1.6")) { // Java 6
+                try {
+                    trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
+                 } catch (ClassNotFoundException cnfe) {
+                     System.err.println("Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
+                     return null;
+                 }
+            } else { // Java 7 or more (technically could be <= 1.5 but <= 1.5 is unsupported)
+                try {
+                    trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
+                 } catch (ClassNotFoundException cnfe) {
+                     System.err.println("Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
+                     return null;
+                 }
+            }
+
+            Constructor<?>[] tmCtors = trustManagerClass.getDeclaredConstructors();
+            tmCtor = tmCtors[0];
+
+            for (Constructor<?> ctor : tmCtors) {
+                if (tmCtor.getGenericParameterTypes().length == 0) {
+                    tmCtor = ctor;
+                    break;
+                }
+            }
+
+            return (TrustManager) tmCtor.newInstance();
+        } catch (RuntimeException e) {
+            System.err.println("Unable to load JDK-specific TrustManager. Was this version of IcedTea-Web compiled with JDK6?");
+            throw e;
+        }
     }
 
     /**
