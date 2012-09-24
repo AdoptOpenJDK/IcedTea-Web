@@ -84,15 +84,24 @@ public class AppletTestSignedTests extends BrowserTest {
 
     @Test
     @TestInBrowsers(testIn = {Browsers.all})
-    public void AppletTestSignedFirefoxTest() throws Exception {
+    public void AppletTestSignedFirefoxTestXslowX() throws Exception {
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
-            ProcessResult pr = server.executeBrowser("/AppletTestSigned.html");
+            ProcessResult pr = server.executeBrowser("/AppletTestSigned2.html");
             evaluateSignedApplet(pr, false);
-            Assert.assertTrue(pr.wasTerminated);
+            //Assert.assertTrue(pr.wasTerminated);
             //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null
         } finally {
             ServerAccess.PROCESS_TIMEOUT = 20 * 1000; //back to normal
         }
+    }
+
+    @Test
+    @TestInBrowsers(testIn = {Browsers.all})
+    public void AppletTestSignedFirefoxTest() throws Exception {
+        ProcessResult pr = server.executeBrowser("/AppletTestSigned.html", ServerAccess.AutoClose.CLOSE_ON_BOTH);
+        evaluateSignedApplet(pr, false);
+        //Assert.assertTrue(pr.wasTerminated);
+        //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null
     }
 }

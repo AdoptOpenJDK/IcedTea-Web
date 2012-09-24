@@ -98,6 +98,11 @@ class ProcessAssasin extends Thread {
         return skipInstedOfDesroy;
     }
 
+    void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+
     @Override
     public void run() {
         long startTime = System.nanoTime() / ServerAccess.NANO_TIME_DELIMITER;

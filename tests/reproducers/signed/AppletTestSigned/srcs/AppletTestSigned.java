@@ -48,6 +48,7 @@ public class AppletTestSigned extends Applet {
             try {
                 Thread.sleep(n);
                 System.out.println("AppletTestSigned killing himself after " + n + " ms of life");
+                System.out.println("*** APPLET FINISHED ***");
                 System.exit(0);
             } catch (Exception ex) {
             }

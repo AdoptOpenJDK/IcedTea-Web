@@ -1,20 +1,20 @@
-<!--
+/* StringBasedClosingListener.java
+Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
-IcedTea is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+IcedTea is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 2.
 
-IcedTea is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
+IcedTea is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with IcedTea; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+along with IcedTea; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
@@ -33,14 +33,35 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
+ */
+package net.sourceforge.jnlp.closinglisteners;
 
- -->
-<html><head></head><body bgcolor="red">
-<p>
-  <applet code="AppletTestSigned.class" archive="AppletTestSigned.jar" codebase="." width="100" height="100">
-    <param name="key1" value="value1">
-    <param name="key2" value="#value2">
-  </applet>
-</p>
-</body>
-</html>
+import net.sourceforge.jnlp.ClosingListener;
+
+public  class StringBasedClosingListener extends ClosingListener {
+
+    private  final String condition;
+
+    public StringBasedClosingListener(String condition) {
+        this.condition = condition;
+    }
+
+    @Override
+    public void charReaded(char ch) {
+
+    }
+
+    @Override
+    public void lineReaded(String s) {
+           if (s.contains(condition)){
+           terminate();
+       }
+    }
+
+
+    public String getCondition() {
+        return condition;
+    }
+
+
+}

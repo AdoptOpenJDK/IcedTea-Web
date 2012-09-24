@@ -1,4 +1,31 @@
 2012-09-24  Jiri Vanek <jvanek@redhat.com>
+
+	* tests/reproducers/signed/AppletTestSigned/resources/AppletTestSigned.html:
+	removed unnecessary XslowX
+	* tests/reproducers/signed/AppletTestSigned/resources/AppletTestSigned2.html:
+	aded missing XslowX
+	* tests/reproducers/signed/AppletTestSigned/srcs/AppletTestSigned.java:
+	added standard closing sentence
+	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java:
+	used auto*clsoing listeners
+	* tests/test-extensions/net/sourceforge/jnlp/ClosingListener.java:
+	interface for identifying closing listeners
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	added possibility to set timeout n the fly
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	(executeBrowser) added shortcut for autoclosing listeners,
+	(setUpClosingListener) method for setting properties of ClosingListener
+	(executeBrowser) add logic to handle ClosingListeners
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/AutoAllClosingListener.java:
+	listener closing  on "APPLET FINISHED" string
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/AutoErrorClosingListener.java:
+	listener closing on "xception" match
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/AutoOkClosingListener.java:
+	listener closing on both xception and finished string.
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/StringBasedClosingListener.java:
+	Base forefather for Auto*ClosingListener 
+
+2012-09-24  Jiri Vanek <jvanek@redhat.com>
             Jana Fabrikova <jfabriko@redhat.com>
 
 	Reproducers are now correctly compiled against liveconect(plugin.jar)

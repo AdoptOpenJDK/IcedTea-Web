@@ -1,5 +1,5 @@
 /* ServerAccess.java
-Copyright (C) 2011 Red Hat, Inc.
+Copyright (C) 2011, 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -58,6 +58,8 @@ import java.util.List;
 import net.sourceforge.jnlp.browsertesting.Browser;
 import net.sourceforge.jnlp.browsertesting.BrowserFactory;
 import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import org.junit.Assert;
 
 /**
@@ -76,6 +78,11 @@ import org.junit.Assert;
  *
  */
 public class ServerAccess {
+
+    public static enum AutoClose {
+
+        CLOSE_ON_EXCEPTION, CLOSE_ON_CORRECT_END, CLOSE_ON_BOTH
+    }
 
     public static final long NANO_TIME_DELIMITER=1000000l;
     /**
@@ -545,6 +552,20 @@ public class ServerAccess {
     public ProcessResult executeJavaws(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
         return executeJavaws(null, resource,stdoutl,stderrl);
     }
+
+    public net.sourceforge.jnlp.ProcessResult executeBrowser(String string, AutoClose autoClose) throws Exception {
+        ClosingListener errClosing = null;
+        ClosingListener outClosing = null;
+        if (autoClose == AutoClose.CLOSE_ON_BOTH || autoClose == AutoClose.CLOSE_ON_EXCEPTION){
+            errClosing=new AutoErrorClosingListener();
+        }
+        if (autoClose == AutoClose.CLOSE_ON_BOTH || autoClose == AutoClose.CLOSE_ON_CORRECT_END){
+            outClosing=new AutoOkClosingListener();
+        }
+        return executeBrowser(string, outClosing, errClosing);
+    }
+    
+
     public ProcessResult executeBrowser(String resource) throws Exception {
         return executeBrowser(getBrowserParams(), resource);
     }
@@ -797,6 +818,8 @@ public class ServerAccess {
             log(connectionMesaage, true, true);
         }
         ProcessAssasin pa = new ProcessAssasin(t, PROCESS_TIMEOUT);
+        setUpClosingListener(stdoutl, pa, t);
+        setUpClosingListener(stderrl, pa, t);
         pa.start();
         t.start();
         while (t.getP() == null && t.deadlyException == null) {
@@ -832,6 +855,13 @@ public class ServerAccess {
             log(pr.stderr, false, true);
         }
         return pr;
+    }
+
+     private static void setUpClosingListener(ContentReaderListener listener, ProcessAssasin pa, ThreadedProcess t) {
+        if (listener != null && (listener instanceof ClosingListener)) {
+            ((ClosingListener) listener).setAssasin(pa);
+            ((ClosingListener) listener).setProcess(t);
+        }
     }
 
     /**
