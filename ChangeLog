@@ -1,3 +1,11 @@
+2012-09-24  Jiri Vanek <jvanek@redhat.com>
+            Jana Fabrikova <jfabriko@redhat.com>
+
+	Reproducers are now correctly compiled against liveconect(plugin.jar)
+	* Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp)
+	added one more dependency: stamps/liveconnect-dist.stamp
+	added one more directory on cp: $(abs_top_builddir)/liveconnect 
+
 2012-09-17  Deepak Bhole <dbhole@redhat.com>
 
 	PR1161: X509VariableTrustManager does not work correctly with OpenJDK7

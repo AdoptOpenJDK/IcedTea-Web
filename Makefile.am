@@ -535,7 +535,7 @@ stamps/junit-jnlp-dist-signed.stamp:
 	mkdir -p stamps && \
 	touch $@
 
-stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
+stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs stamps/liveconnect-dist.stamp
 	types=($(ALL_NONCUSTOM_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
@@ -549,7 +549,7 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs
 	      cd "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/" ; \
 	      srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
 	      notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
-	      $(BOOT_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar -d "$(JNLP_TESTS_DIR)/$$dir/" $$srcFiles ; \
+	      $(BOOT_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect -d "$(JNLP_TESTS_DIR)/$$dir/" $$srcFiles ; \
 	      if [ -n "$$notSrcFiles" ] ; then \
 	        cp -R --parents $$notSrcFiles "$(JNLP_TESTS_DIR)/$$dir/" ; \
 	      fi ; \
