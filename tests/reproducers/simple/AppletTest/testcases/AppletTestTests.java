@@ -35,6 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
+import net.sourceforge.jnlp.closinglisteners.CountingClosingListener;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
@@ -47,6 +48,24 @@ import org.junit.Test;
 
 public class AppletTestTests extends BrowserTest {
 
+    private final String s7 = "Aplet killing himself after 2000 ms of life";
+    private final String ss = "xception";
+    private final String s2 = "value2";
+    private final String s1 = "value1";
+    private final String s0 = "applet was started";
+    private final String s3 = "applet was initialised";
+
+    private class CountingClosingListenerImpl extends CountingClosingListener {
+
+        @Override
+        protected boolean isAlowedToFinish(String s) {
+            if (s.contains(ss)) {
+                return true;
+            }
+            return (s.contains(s0) && s.contains(s1) && s.contains(s2) && s.contains(s3) && s.contains(s7));
+        }
+    }
+
     @Test
     @TestInBrowsers(testIn = {Browsers.googleChrome})
     @NeedsDisplay
@@ -55,7 +74,7 @@ public class AppletTestTests extends BrowserTest {
         try {
             //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
             //just verify loging is recording browser
-            ProcessResult pr1 = server.executeBrowser("/appletAutoTests.html");
+            ProcessResult pr1 = server.executeBrowser("/appletAutoTests2.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
             if (pr1.process == null) {
                 Assert.assertTrue("If proces was null here, then google-chrome had to not exist, and so "
                         + ServerAccess.UNSET_BROWSER
@@ -64,12 +83,12 @@ public class AppletTestTests extends BrowserTest {
                         pr1.deadlyException.getMessage().contains(ServerAccess.UNSET_BROWSER));
                 return;
             }
-            evaluateApplet(pr1,false);
+            evaluateApplet(pr1, false);
             Assert.assertTrue(pr1.wasTerminated);
             //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
             // just verify loging is recording browser
-            ServerAccess.ProcessResult pr = server.executeBrowser("/appletAutoTests.html");
-            evaluateApplet(pr,false);
+            ServerAccess.ProcessResult pr = server.executeBrowser("/appletAutoTests2.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
+            evaluateApplet(pr, false);
             Assert.assertTrue(pr.wasTerminated);
         } finally {
             ServerAccess.PROCESS_TIMEOUT = 20 * 1000; //back to normal
@@ -80,30 +99,24 @@ public class AppletTestTests extends BrowserTest {
     @NeedsDisplay
     public void AppletTest() throws Exception {
         ProcessResult pr = server.executeJavawsHeadless(null, "/AppletTest.jnlp");
-        evaluateApplet(pr,true);
+        evaluateApplet(pr, true);
         Assert.assertFalse(pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 
     private void evaluateApplet(ProcessResult pr, boolean javawsApplet) {
-        String s3 = "applet was initialised";
         Assert.assertTrue("AppletTest stdout should contains " + s3 + " bud didn't", pr.stdout.contains(s3));
-        String s0 = "applet was started";
         Assert.assertTrue("AppletTest stdout should contains " + s0 + " bud didn't", pr.stdout.contains(s0));
-        String s1 = "value1";
         Assert.assertTrue("AppletTest stdout should contains " + s1 + " bud didn't", pr.stdout.contains(s1));
-        String s2 = "value2";
         Assert.assertTrue("AppletTest stdout should contains " + s2 + " bud didn't", pr.stdout.contains(s2));
-        String ss = "xception";
         Assert.assertFalse("AppletTest stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
-        String s7 = "Aplet killing himself after 2000 ms of life";
         Assert.assertTrue("AppletTest stdout should contains " + s7 + " bud didn't", pr.stdout.contains(s7));
         if (!javawsApplet) {
             /*this is working correctly in most browser, but not in all. temporarily disabling
-        String s4 = "applet was stopped";
-        Assert.assertTrue("AppletTest stdout should contains " + s4 + " bud did't", pr.stdout.contains(s4));
-        String s5 = "applet will be destroyed";
-        Assert.assertTrue("AppletTest stdout should contains " + s5 + " bud did't", pr.stdout.contains(s5));
+            String s4 = "applet was stopped";
+            Assert.assertTrue("AppletTest stdout should contain " + s4 + " bud did't", pr.stdout.contains(s4));
+            String s5 = "applet will be destroyed";
+            Assert.assertTrue("AppletTest stdout should contain " + s5 + " bud did't", pr.stdout.contains(s5));
              */
         }
     }
@@ -116,8 +129,8 @@ public class AppletTestTests extends BrowserTest {
         //just verify loging is recordingb rowser
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
-            ProcessResult pr = server.executeBrowser("/appletAutoTests2.html");
-            evaluateApplet(pr,false);
+            ProcessResult pr = server.executeBrowser("/appletAutoTests2.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
+            evaluateApplet(pr, false);
             Assert.assertTrue(pr.wasTerminated);
             //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null
         } finally {
@@ -132,9 +145,9 @@ public class AppletTestTests extends BrowserTest {
         //just verify loging is recording browser
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
-            ProcessResult pr = server.executeBrowser("/appletAutoTests.html");
+            ProcessResult pr = server.executeBrowser("/appletAutoTests.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
             pr.process.destroy();
-            evaluateApplet(pr,false);
+            evaluateApplet(pr, false);
             Assert.assertTrue(pr.wasTerminated);
             //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null
         } finally {

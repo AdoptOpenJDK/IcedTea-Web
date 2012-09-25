@@ -1,13 +1,31 @@
+2012-09-25  Jiri Vanek <jvanek@redhat.com>
+
+	Added rules listeners
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/CountingClosingListener.java:
+	Base class for closing listeners which is containing complete output in
+	each time.
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/Rule.java:
+	Class with rule definition for RulesFolowingClosingListener
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/RulesFolowingClosingListener.java:
+	ClosingListener consisted from rules which all have to match for close action
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/StringRule.java:
+	Implementation of rule based on string
+	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java:
+	* tests/reproducers/simple/AppletTest/testcases/AppletTestTests.java:
+	Refactored to use Above iisteners.
+
+
 2012-09-24  Jiri Vanek <jvanek@redhat.com>
 
+	Added basic closing listener implementation
 	* tests/reproducers/signed/AppletTestSigned/resources/AppletTestSigned.html:
 	removed unnecessary XslowX
 	* tests/reproducers/signed/AppletTestSigned/resources/AppletTestSigned2.html:
-	aded missing XslowX
+	added missing XslowX
 	* tests/reproducers/signed/AppletTestSigned/srcs/AppletTestSigned.java:
 	added standard closing sentence
 	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java:
-	used auto*clsoing listeners
+	used auto*closing listeners
 	* tests/test-extensions/net/sourceforge/jnlp/ClosingListener.java:
 	interface for identifying closing listeners
 	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:

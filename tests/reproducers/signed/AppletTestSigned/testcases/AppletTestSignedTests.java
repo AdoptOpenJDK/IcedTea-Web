@@ -43,6 +43,9 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.closinglisteners.Rule;
+import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+import static net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener.*;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -50,8 +53,22 @@ import org.junit.Test;
 public class AppletTestSignedTests extends BrowserTest {
 
     private final List<String> l = Collections.unmodifiableList(Arrays.asList(new String[]{"-Xtrustall"}));
+    private static final String ss = "xception";
+    private static final String s0 = "AppletTestSigned was started";
+    private static final String s1 = "value1";
+    private static final String s2 = "value2";
+    private static final String s3 = "AppletTestSigned was initialised";
+    private static final String s7 = "AppletTestSigned killing himself after 2000 ms of life";
+    private static final ContainsRule exceptionRule = new ContainsRule(ss);
+    private static final ContainsRule startedRule = new ContainsRule(s0);
+    private static final ContainsRule variable1Rule = new ContainsRule(s1);
+    private static final ContainsRule variable2Rule = new ContainsRule(s2);
+    private static final ContainsRule initialisedRule = new ContainsRule(s3);
+    private static final ContainsRule killedRule = new ContainsRule(s7);
+    private static final RulesFolowingClosingListener okListener=new RulesFolowingClosingListener(startedRule, variable1Rule, variable2Rule, initialisedRule, killedRule);
+    private static final RulesFolowingClosingListener errorListener=new RulesFolowingClosingListener(exceptionRule);
 
-    @Test
+   // @Test
     public void AppletTestSignedTest() throws Exception {
         ProcessResult pr = server.executeJavawsHeadless(l, "/AppletTestSigned.jnlp");
         evaluateSignedApplet(pr, true);
@@ -60,18 +77,12 @@ public class AppletTestSignedTests extends BrowserTest {
     }
 
     private void evaluateSignedApplet(ProcessResult pr, boolean javawsApplet) {
-        String s3 = "AppletTestSigned was initialised";
-        Assert.assertTrue("AppletTestSigned stdout should contain " + s3 + " but didn't", pr.stdout.contains(s3));
-        String s0 = "AppletTestSigned was started";
-        Assert.assertTrue("AppletTestSigned stdout should contain " + s0 + " but didn't", pr.stdout.contains(s0));
-        String s1 = "value1";
-        Assert.assertTrue("AppletTestSigned stdout should contain " + s1 + " but didn't", pr.stdout.contains(s1));
-        String s2 = "value2";
-        Assert.assertTrue("AppletTestSigned stdout should contain " + s2 + " but didn't", pr.stdout.contains(s2));
-        String ss = "xception";
-        Assert.assertFalse("AppletTestSigned stderr should not contain " + ss + " but did", pr.stderr.contains(ss));
-        String s7 = "AppletTestSigned killing himself after 2000 ms of life";
-        Assert.assertTrue("AppletTestSigned stdout should contain " + s7 + " but didn't", pr.stdout.contains(s7));
+        Assert.assertTrue("AppletTestSigned stdout " + initialisedRule.toPassingString() + " but didn't", initialisedRule.evaluate(pr.stdout));
+        Assert.assertTrue("AppletTestSigned stdout " + startedRule.toPassingString() + " but didn't", startedRule.evaluate(pr.stdout));
+        Assert.assertTrue("AppletTestSigned stdout " + variable1Rule.toPassingString() + " but didn't", variable1Rule.evaluate(pr.stdout));
+        Assert.assertTrue("AppletTestSigned stdout " + variable2Rule.toPassingString() + " but didn't", variable2Rule.evaluate(pr.stdout));
+        Assert.assertFalse("AppletTestSigned stderr " + exceptionRule.toFailingString() + " but did", exceptionRule.evaluate(pr.stderr));
+        Assert.assertTrue("AppletTestSigned stdout " + killedRule.toPassingString() + " but didn't", killedRule.evaluate(pr.stdout));
         if (!javawsApplet) {
             /*this is working correctly in most browser, but not in all. temporarily disabling
             String s4 = "AppletTestSigned was stopped";
@@ -87,7 +98,7 @@ public class AppletTestSignedTests extends BrowserTest {
     public void AppletTestSignedFirefoxTestXslowX() throws Exception {
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
-            ProcessResult pr = server.executeBrowser("/AppletTestSigned2.html");
+            ProcessResult pr = server.executeBrowser("/AppletTestSigned2.html", okListener, errorListener);
             evaluateSignedApplet(pr, false);
             //Assert.assertTrue(pr.wasTerminated);
             //Assert.assertEquals((Integer) 0, pr.returnValue); due to destroy is null
