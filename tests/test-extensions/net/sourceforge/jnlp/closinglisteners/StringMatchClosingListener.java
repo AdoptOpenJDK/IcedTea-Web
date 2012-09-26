@@ -34,9 +34,9 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
+package net.sourceforge.jnlp.closinglisteners;
 
 import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
-
 
 public class StringMatchClosingListener extends StringBasedClosingListener {
 
