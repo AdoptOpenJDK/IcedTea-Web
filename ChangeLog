@@ -1,3 +1,8 @@
+2012-10-02  Martin Olsson  <martin@minimum.se>
+	
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Typo fix.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: Typo fix.
+
 2012-09-26  Jana Fabrikova  <jfabriko@redhat.com>
 
         * tests/test-extensions/net/sourceforge/jnlp/closinglisteners/StringMatchClosingListener.java:

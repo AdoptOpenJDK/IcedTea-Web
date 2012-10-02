@@ -313,7 +313,7 @@ gpointer getFirstInTableInstance(GHashTable* table)
 
 // Creates a new icedtea np plugin instance.  This function creates a
 // ITNPPluginData* and stores it in instance->pdata.  The following
-// ITNPPluginData fiels are initialized: instance_id, in_pipe_name,
+// ITNPPluginData fields are initialized: instance_id, in_pipe_name,
 // in_from_appletviewer, in_watch_source, out_pipe_name,
 // out_to_appletviewer, out_watch_source, appletviewer_mutex, owner,
 // appletviewer_alive.  In addition two pipe files are created.  All
