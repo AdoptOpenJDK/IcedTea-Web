@@ -1,3 +1,8 @@
+2012-10-03 Jana Fabrikova <jfabriko@redhat.com>
+	* tests/reproducers/simple/JSToJGet:
+	adding a new reproducer for the first LiveConnect
+        test (Tests for getting members from Java side.) 
+
 2012-10-02  Martin Olsson  <martin@minimum.se>
 	
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: Typo fix.
