@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en-US">
+  <head>
+    <title>JavaScript to Java LiveConnect - Get values from applet</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <script language="JavaScript" src="JSToJ_auxiliary.js"></script>
+    <script language="JavaScript" src="JSToJava_Get.js"></script>
+
+  </head>
+  <body>
+
+    <h2> The JSToJGet html page</h2> 
+
+    <applet code="JSToJGet" width="1000" height="100" id="jstojGetApplet" MAYSCRIPT>
+        <param name="jnlp_href" value="jstoj-get.jnlp">
+    </applet>
+
+    <div id="messageDiv"></div>
+
+    <script type="text/javascript">
+      var urlArgs = document.URL.split("?");
+      var testid = urlArgs[1];
+
+      if( testid != null ){
+          document.getElementById( 'jstojGetApplet' ).setStatusLabel(testid);
+          appendMessageDiv(testid+"... ");
+      }else{
+          document.getElementById( 'jstojGetApplet' ).setStatusLabel("url without ?");
+          appendMessageDiv("no url arguments...");
+      }
+      switch(testid){
+        case "int":
+            test_get_int();
+            break;
+        case "double":
+            test_get_double();
+            break;
+        case "float":
+            test_get_float();
+            break;
+        case "long":
+            test_get_long();
+            break;
+        case "boolean":
+            test_get_boolean();
+            break;
+        case "char":
+            test_get_char();
+            break;
+        case "byte":
+            test_get_byte();
+            break;
+        case "intArrayElement":
+            test_get_intArrayElement();
+            break;
+        case "intArrayBeyond":
+            test_get_intArrayBeyond();
+            break;
+        case "regularString":
+            test_get_regularString();
+            break;
+        case "specialCharsString":
+            test_get_specialCharsString();
+            break;
+        case "null":
+            test_get_null();
+            break;
+        case "Integer":
+            test_get_Integer();
+            break;
+        case "Double":
+            test_get_Double();
+            break;
+        case "Float":
+            test_get_Float();
+            break;
+        case "Long":
+            test_get_Long();
+            break;
+        case "Boolean":
+            test_get_Boolean();
+            break;
+        case "Character":
+            test_get_Character();
+            break;
+        case "Byte":
+            test_get_Byte();
+            break;
+        case "DoubleArrayElement":
+            test_get_DoubleArrayElement();
+            break;
+        case "DoubleFullArray":
+            test_get_DoubleFullArray();
+            break;
+        default:
+            appletStdOutLn('jstojGetApplet', "No argument in URL! Should be e.g. JSToJGet.html?int");           
+            document.getElementById( 'jstojGetApplet' ).setStatusLabel("Not a valid argument in URL! Should be e.g. JSToJGet.html?int");             
+            break;
+    }
+    afterTestsMessage('jstojGetApplet');
+    </script>
+
+  </body>
+</html>
