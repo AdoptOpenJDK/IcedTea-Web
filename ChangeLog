@@ -1,7 +1,8 @@
-2012-10-03 Jana Fabrikova <jfabriko@redhat.com>
+2012-10-03 Jana Fabrikova  <jfabriko@redhat.com>
+
 	* tests/reproducers/simple/JSToJGet:
-	adding a new reproducer for the first LiveConnect
-        test (Tests for getting members from Java side.) 
+	Added a new reproducer for the first LiveConnect
+	test - getting members from Java side. 
 
 2012-10-02  Martin Olsson  <martin@minimum.se>
 	
@@ -11,7 +12,7 @@
 2012-09-26  Jana Fabrikova  <jfabriko@redhat.com>
 
         * tests/test-extensions/net/sourceforge/jnlp/closinglisteners/StringMatchClosingListener.java:
-        Added forgotten package name
+        Added forgotten package name.
 
 2012-09-25  Jiri Vanek <jvanek@redhat.com>
 
