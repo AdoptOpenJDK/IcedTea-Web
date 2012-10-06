@@ -1494,17 +1494,7 @@ public class JNLPClassLoader extends URLClassLoader {
             Class result = null;
 
             if (loaders[i] == this) {
-                final String fName = name;
-                try {
-                    result = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<Class<?>>() {
-                                public Class<?> run() {
-                                    return JNLPClassLoader.super.findLoadedClass(fName);
-                                }
-                            }, getAccessControlContextForClassLoading());
-                } catch (PrivilegedActionException pae) {
-                    result = null;
-                }
+                result = JNLPClassLoader.super.findLoadedClass(name);
             } else {
                 result = loaders[i].findLoadedClassAll(name);
             }
@@ -2153,8 +2143,6 @@ public class JNLPClassLoader extends URLClassLoader {
             context.checkPermission(new AllPermission());
             return context; // If context already has all permissions, don't bother
         } catch (AccessControlException ace) {
-            // continue below
-        } catch (ClassCircularityError cce) {
             // continue below
         }
 
