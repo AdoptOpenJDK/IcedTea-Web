@@ -48,27 +48,6 @@ import org.junit.Test;
 
 public class JSToJGetTest extends BrowserTest {
 
-    public String[] testNames = { "int", "double", "float", "long", "boolean",
-            "char", "byte", "intArrayElement", "intArrayBeyond",
-            "regularString", "specialCharsString", "null", "Integer", "Double",
-            "Float", "Long", "Boolean", "Character", "Byte",
-            "DoubleArrayElement", "DoubleFullArray" };
-
-    public String[] outputStrings = { "Test no. 1 - (int)",
-            "Test no. 2 - (double)", "Test no. 3 - (float)",
-            "Test no. 4 - (long)", "Test no. 5 - (boolean)",
-            "Test no. 6 - (char)", "Test no. 7 - (byte)",
-            "Test no. 8 - (int[] - element access)",
-            "Test no. 9 - (int[] - beyond length)",
-            "Test no.10 - (regular string)",
-            "Test no.11 - (string with special characters)",
-            "Test no.12 - (null)", "Test no.13 - (Integer)",
-            "Test no.14 - (Double)", "Test no.15 - (Float)",
-            "Test no.16 - (Long)", "Test no.17 - (Boolean)",
-            "Test no.18 - (Character)", "Test no.19 - (Byte)",
-            "Test no.20 - (Double[] - element access)",
-            "Test no.21 - (Double[] - full array)" };
-
     public String passStr = " - passed.";
     public String failValStr = " - failed, value mismatch.";
     public String failTypeStr = " - failed, type mismatch.";
@@ -93,7 +72,7 @@ public class JSToJGetTest extends BrowserTest {
         }
     }
 
-    private void evaluateStdoutContents(int index, ProcessResult pr) {
+    private void evaluateStdoutContents(String testStr, ProcessResult pr) {
         // Assert that the applet was initialized.
         Assert.assertTrue("JSToJGetTest stdout should contain \"" + initStr
                 + "\" but it didn't.", pr.stdout.contains(initStr));
@@ -103,9 +82,9 @@ public class JSToJGetTest extends BrowserTest {
                 + "\" but it didn't.", pr.stdout.contains(setupStr));
 
         // Assert that the tests have passed.
-        String s0 = outputStrings[index] + passStr;
-        String s1 = outputStrings[index] + failValStr;
-        String s2 = outputStrings[index] + failTypeStr;
+        String s0 = testStr + passStr;
+        String s1 = testStr + failValStr;
+        String s2 = testStr + failTypeStr;
         String s3 = "Error on Java side";
 
         int ind0 = pr.stdout.indexOf(s0);
@@ -119,7 +98,7 @@ public class JSToJGetTest extends BrowserTest {
             indBegin = 0;
         }
 
-        String failStr = "JSToJGet " + outputStrings[index]
+        String failStr = "JSToJGet " + testStr
                 + ": \"passed\" not found in the applet stdout, which is: "
                 + pr.stdout.substring(indBegin, pr.stdout.length());
 
@@ -138,7 +117,7 @@ public class JSToJGetTest extends BrowserTest {
         }
 
         if (ind3 != -1) {
-            failStr = "JSToJGet: " + outputStrings[index]
+            failStr = "JSToJGet: " + testStr
                     + pr.stdout.substring(ind3, pr.stdout.length());
         }
 
@@ -149,13 +128,13 @@ public class JSToJGetTest extends BrowserTest {
 
     }
 
-    private void genericJSToJavaGetTestMethod(int index) throws Exception {
+    private void jsToJavaGetTest(String urlEnd, String testStr) throws Exception {
 
-        String strURL = "/JSToJGet.html?" + testNames[index];
+        String strURL = "/JSToJGet.html?" + urlEnd;
         ProcessResult pr = server.executeBrowser(strURL,
                 new CountingClosingListenerImpl(),
                 new CountingClosingListenerImpl());
-        evaluateStdoutContents(index, pr);
+        evaluateStdoutContents(testStr, pr);
 
     }
 
@@ -163,147 +142,147 @@ public class JSToJGetTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_int_Test() throws Exception {
-        genericJSToJavaGetTestMethod(0);
+    	jsToJavaGetTest("int", "Test no. 1 - (int)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_double_Test() throws Exception {
-        genericJSToJavaGetTestMethod(1);
+        jsToJavaGetTest("double", "Test no. 2 - (double)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_float_Test() throws Exception {
-        genericJSToJavaGetTestMethod(2);
+        jsToJavaGetTest("float", "Test no. 3 - (float)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_long_Test() throws Exception {
-        genericJSToJavaGetTestMethod(3);
+        jsToJavaGetTest("long", "Test no. 4 - (long)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_boolean_Test() throws Exception {
-        genericJSToJavaGetTestMethod(4);
+        jsToJavaGetTest("boolean", "Test no. 5 - (boolean)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_char_Test() throws Exception {
-        genericJSToJavaGetTestMethod(5);
+        jsToJavaGetTest("char", "Test no. 6 - (char)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_byte_Test() throws Exception {
-        genericJSToJavaGetTestMethod(6);
+        jsToJavaGetTest("byte", "Test no. 7 - (byte)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_intArrayElement_Test() throws Exception {
-        genericJSToJavaGetTestMethod(7);
+        jsToJavaGetTest("intArrayElement", "Test no. 8 - (int[] - element access)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_intArrayBeyond_Test() throws Exception {
-        genericJSToJavaGetTestMethod(8);
+        jsToJavaGetTest("intArrayBeyond", "Test no. 9 - (int[] - beyond length)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_regularString_Test() throws Exception {
-        genericJSToJavaGetTestMethod(9);
+        jsToJavaGetTest("regularString", "Test no.10 - (regular string)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_specialCharsString_Test() throws Exception {
-        genericJSToJavaGetTestMethod(10);
+        jsToJavaGetTest("specialCharsString", "Test no.11 - (string with special characters)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_null_Test() throws Exception {
-        genericJSToJavaGetTestMethod(11);
+        jsToJavaGetTest("null", "Test no.12 - (null)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_Integer_Test() throws Exception {
-        genericJSToJavaGetTestMethod(12);
+        jsToJavaGetTest("Integer", "Test no.13 - (Integer)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_Double_Test() throws Exception {
-        genericJSToJavaGetTestMethod(13);
+        jsToJavaGetTest("Double", "Test no.14 - (Double)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_Float_Test() throws Exception {
-        genericJSToJavaGetTestMethod(14);
+        jsToJavaGetTest("Float", "Test no.15 - (Float)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_Long_Test() throws Exception {
-        genericJSToJavaGetTestMethod(15);
+        jsToJavaGetTest("Long", "Test no.16 - (Long)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_Boolean_Test() throws Exception {
-        genericJSToJavaGetTestMethod(16);
+        jsToJavaGetTest("Boolean", "Test no.17 - (Boolean)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_Character_Test() throws Exception {
-        genericJSToJavaGetTestMethod(17);
+        jsToJavaGetTest("Character", "Test no.18 - (Character)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_Byte_Test() throws Exception {
-        genericJSToJavaGetTestMethod(18);
+        jsToJavaGetTest("Byte", "Test no.19 - (Byte)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_DoubleArrayElement_Test() throws Exception {
-        genericJSToJavaGetTestMethod(19);
+        jsToJavaGetTest("DoubleArrayElement", "Test no.20 - (Double[] - element access)");
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_DoubleFullArray_Test() throws Exception {
-        genericJSToJavaGetTestMethod(20);
+        jsToJavaGetTest("DoubleFullArray", "Test no.21 - (Double[] - full array)");
     }
 
 }
