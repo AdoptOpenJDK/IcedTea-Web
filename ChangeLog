@@ -1,3 +1,10 @@
+2012-10-16  Adam Domurad  <adomurad@redhat.com>
+
+	* tests/reproducers/simple/AppletTakesLastParam/srcs/AppletTakesLastParam.java:
+	Add 'standard' applet closing message.
+	* tests/reproducers/simple/AppletTakesLastParam/testcases/AppletTakesLastParamTests.java:
+	Clean-up code and add automatic applet closing on finish.
+
 2012-10-15  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:

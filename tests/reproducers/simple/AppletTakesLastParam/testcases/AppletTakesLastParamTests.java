@@ -1,4 +1,4 @@
-/* AppletTestTests.java
+/* AppletTakesLastParamTests.java
 Copyright (C) 2011 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -35,8 +35,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
+import net.sourceforge.jnlp.ProcessResult;
+import net.sourceforge.jnlp.ServerAccess.AutoClose;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
@@ -45,24 +45,25 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class AppletTakesLastParamTests extends BrowserTest {
+    private void evaluate(ProcessResult pr) {
+        String firstParam = "value1";
+        String secondParam = "value2";
 
-    @Test
-    public void AppletTest() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavaws(null, "/appletTakesLastParam.jnlp");
-        evaluateApplet(pr);
-    }
-
-    private void evaluateApplet(ProcessResult pr) {
-        String s0 = "value1";
-        Assert.assertTrue("AppletTakesLastParam stdout should not contain " + s0 + " but did.", !pr.stdout.contains(s0));
-        String s1 = "value2";
-        Assert.assertTrue("AppletTakesLastParam stdout should contain " + s1 + " but did not.", pr.stdout.contains(s1));
+        Assert.assertFalse("AppletTakesLastParam stdout should not contain " + firstParam + " but did.", 
+                pr.stdout.contains(firstParam));
+        Assert.assertTrue("AppletTakesLastParam stdout should contain " + secondParam + " but did not.", 
+                pr.stdout.contains(secondParam));
     }
 
     @Test
     @TestInBrowsers(testIn = {Browsers.one})
-    public void AppletInFirefoxTest() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("/appletTakesLastParam.html");
-        evaluateApplet(pr);
+    public void appletTakesLastParam() throws Exception {
+        ProcessResult pr = server.executeBrowser("/appletTakesLastParam.html", AutoClose.CLOSE_ON_BOTH);
+        evaluate(pr);
+    }
+    @Test
+    public void jnlpTakesLastParam() throws Exception {
+        ProcessResult pr = server.executeJavaws("/appletTakesLastParam.jnlp");
+        evaluate(pr);
     }
 }

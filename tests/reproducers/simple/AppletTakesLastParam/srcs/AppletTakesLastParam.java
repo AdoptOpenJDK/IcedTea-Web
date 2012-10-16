@@ -38,26 +38,11 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 public class AppletTakesLastParam extends Applet {
-
-    private class Killer extends Thread {
-
-        public int n = 2000;
-
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(n);
-                System.out.println("Applet killing itself after " + n + " ms");
-                System.exit(0);
-            } catch (Exception ex) {
-            }
-        }
-    }
-    private Killer killer = new Killer();
-
-    @Override
     public void init() {
         System.out.println(getParameter("param"));
-        killer.start();
+        System.out.println("*** APPLET FINISHED ***");
+
+        // Exits JNLP-launched applets, throws exception on normal applet:
+        System.exit(0);
     }
 }
