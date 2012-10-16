@@ -35,7 +35,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
+import net.sourceforge.jnlp.ProcessResult;
+import net.sourceforge.jnlp.ServerAccess.AutoClose;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
@@ -48,18 +49,18 @@ import org.junit.Test;
 public class AppletBaseURLTest extends BrowserTest{
 
     private void evaluateApplet(ProcessResult pr, String baseName) {
-        String s8 = "(?s).*Codebase is http://localhost:[0-9]{5}/ for this applet(?s).*";
-        Assert.assertTrue("AppletBaseURL stdout should match" + s8 + " but didn't", pr.stdout.matches(s8));
-        String s9 = "(?s).*Document base is http://localhost:[0-9]{5}/" + baseName + " for this applet(?s).*";
-        Assert.assertTrue("AppletBaseURL stdout should match" + s9 + " but didn't", pr.stdout.matches(s9));
-        String ss = "xception";
-        Assert.assertFalse("AppletBaseURL stderr should not contain" + ss + " but did", pr.stderr.contains(ss));
+        String codebaseRule = "(?s).*Codebase is http://localhost:[0-9]{5}/ for this applet(?s).*";
+        Assert.assertTrue("AppletBaseURL stdout should match" + codebaseRule + " but didn't", 
+                pr.stdout.matches(codebaseRule));
+        String documentbaseRule = "(?s).*Document base is http://localhost:[0-9]{5}/" + baseName + " for this applet(?s).*";
+        Assert.assertTrue("AppletBaseURL stdout should match" + documentbaseRule + " but didn't", 
+                pr.stdout.matches(documentbaseRule));
     }
 
     @NeedsDisplay
     @Test
     public void AppletWebstartBaseURLTest() throws Exception {
-        ProcessResult pr = server.executeJavaws(null, "/AppletBaseURLTest.jnlp");
+        ProcessResult pr = server.executeJavaws("/AppletBaseURLTest.jnlp");
         evaluateApplet(pr, "");
         Assert.assertFalse(pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
@@ -70,7 +71,7 @@ public class AppletBaseURLTest extends BrowserTest{
     @Test
     @TestInBrowsers(testIn={Browsers.one})
     public void AppletInFirefoxTest() throws Exception {
-        ProcessResult pr = server.executeBrowser("/AppletBaseURLTest.html");
+        ProcessResult pr = server.executeBrowser("/AppletBaseURLTest.html", AutoClose.CLOSE_ON_BOTH);
         pr.process.destroy();
         evaluateApplet(pr, "AppletBaseURLTest.html");
         Assert.assertTrue(pr.wasTerminated);
@@ -81,7 +82,7 @@ public class AppletBaseURLTest extends BrowserTest{
     @Test
     @TestInBrowsers(testIn={Browsers.one})
     public void AppletWithJNLPHrefTest() throws Exception {
-        ProcessResult pr = server.executeBrowser("/AppletJNLPHrefBaseURLTest.html");
+        ProcessResult pr = server.executeBrowser("/AppletJNLPHrefBaseURLTest.html", AutoClose.CLOSE_ON_BOTH);
         pr.process.destroy();
         evaluateApplet(pr, "AppletJNLPHrefBaseURLTest.html");
         Assert.assertTrue(pr.wasTerminated);

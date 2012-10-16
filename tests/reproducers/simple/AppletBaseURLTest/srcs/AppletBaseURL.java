@@ -37,28 +37,13 @@ exception statement from your version.
 
 import java.applet.Applet;
 public class AppletBaseURL extends Applet {
-
-    private class Killer extends Thread {
-
-        public int n = 1000;
-
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(n);
-                System.out.println("Aplet killing himself after " + n + " ms of life");
-                System.exit(0);
-            } catch (Exception ex) {
-            }
-        }
-    }
-    private Killer killer;
-
     @Override
     public void init() {
         System.out.println("Document base is " + getDocumentBase() + " for this applet");
         System.out.println("Codebase is " + getCodeBase() + " for this applet");
-        killer = new Killer();
-        killer.start();
+        System.out.println("*** APPLET FINISHED ***");
+
+        // Exits JNLP-launched applets, throws exception on normal applet:
+        System.exit(0);
     }
 }
