@@ -30,6 +30,17 @@
 
 2012-10-19  Adam Domurad  <adomurad@redhat.com>
 
+	Fixes JCV#isTriviallySigned(). Reproducer 'EmptySignedJar' passes 
+	again.
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: Remove 
+	problematic 'triviallySigned' variable and instead determine 
+	whether triviallySigned on the fly. Consider jars with 0 signable 
+	entries as SIGNED_OK.
+	* tests/netx/unit/net/sourceforge/jnlp/tools/JarCertVerifierTest.java:
+	Update no-signers unit test.
+
+2012-10-19  Adam Domurad  <adomurad@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/AppVerifier.java: Use interface 
 	types for declared types where applicable.
 	* netx/net/sourceforge/jnlp/security/PluginAppVerifier.java: Same.

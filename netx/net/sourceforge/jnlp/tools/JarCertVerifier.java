@@ -105,14 +105,13 @@ public class JarCertVerifier implements CertVerifier {
         appVerifier = verifier;
     }
 
-    /** Whether a signable entry was found within jars (jars with content more than just META-INF/*) */
-    private boolean triviallySigned = false;
-
     /**
-     * Return true if there are signable entries in the jars, otherwise false
+     * Return true if there are no signable entries in the jar.
+     * This will return false if any of verified jars have content more than just META-INF/.
      */
     public boolean isTriviallySigned() {
-        return triviallySigned;
+        return getTotalJarEntries(jarSignableEntries) <= 0
+                && certs.size() <= 0;
     }
 
     public boolean getAlreadyTrustPublisher() {
@@ -178,7 +177,7 @@ public class JarCertVerifier implements CertVerifier {
      */
     // FIXME: Change javadoc once applets do not need entire jars signed.
     public boolean isFullySigned() {
-        if (triviallySigned)
+        if (isTriviallySigned())
             return true;
         boolean fullySigned = appVerifier.isFullySigned(certs,
                 jarSignableEntries);
@@ -236,7 +235,6 @@ public class JarCertVerifier implements CertVerifier {
                 }
 
                 VerifyResult result = verifyJar(localFile);
-                triviallySigned = false;
 
                 if (result == VerifyResult.UNSIGNED) {
                     unverifiedJars.add(localFile);
@@ -244,8 +242,6 @@ public class JarCertVerifier implements CertVerifier {
                     verifiedJars.add(localFile);
                 } else if (result == VerifyResult.SIGNED_OK) {
                     verifiedJars.add(localFile);
-                    triviallySigned = getTotalJarEntries(jarSignableEntries) <= 0
-                            && certs.size() <= 0;
                 }
             } catch (Exception e) {
                 // We may catch exceptions from using verifyJar()
@@ -399,7 +395,12 @@ public class JarCertVerifier implements CertVerifier {
         // Every signable entry of this jar needs to be signed by at least
         // one signer for the jar to be considered successfully signed.
         VerifyResult result = null;
-        if (allEntriesSignedBySingleCert) {
+
+        if (numSignableEntriesInJar == 0) {
+            // Allow jars with no signable entries to simply be considered signed.
+            // There should be no security risk in doing so.
+            result = VerifyResult.SIGNED_OK;
+        } else if (allEntriesSignedBySingleCert) {
 
             // We need to find at least one signer without any issues.
             for (CertPath entryCertPath : jarSignCount.keySet()) {

@@ -121,8 +121,8 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("META-INF/MANIFEST.MF"));
         VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
-        Assert.assertEquals("No signable entry (only dirs/manifests) should be considered unsigned.",
-                VerifyResult.UNSIGNED, result);
+        Assert.assertEquals("No signable entry (only dirs/manifests) should be considered trivially signed.",
+                VerifyResult.SIGNED_OK, result);
         Assert.assertEquals("No signable entry (only dirs/manifests) means no signers in the verifier.",
                 0, jcv.getCertsList().size());
     }
