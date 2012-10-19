@@ -40,7 +40,6 @@ package net.sourceforge.jnlp.security;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.security.cert.CertPath;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.sourceforge.jnlp.JNLPFile;
@@ -53,8 +52,8 @@ public class JNLPAppVerifier implements AppVerifier {
 
     @Override
     public boolean hasAlreadyTrustedPublisher(
-            HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars) {
+            Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars) {
         int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(signedJars);
         for (CertInformation certInfo : certs.values()) {
             Map<String, Integer> certSignedJars = certInfo.getSignedJars();
@@ -68,8 +67,8 @@ public class JNLPAppVerifier implements AppVerifier {
     }
 
     @Override
-    public boolean hasRootInCacerts(HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars) {
+    public boolean hasRootInCacerts(Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars) {
         int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(signedJars);
         for (CertInformation certInfo : certs.values()) {
             Map<String, Integer> certSignedJars = certInfo.getSignedJars();
@@ -83,8 +82,8 @@ public class JNLPAppVerifier implements AppVerifier {
     }
 
     @Override
-    public boolean isFullySigned(HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars) {
+    public boolean isFullySigned(Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars) {
         int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(signedJars);
         for (CertPath cPath : certs.keySet()) {
             // If this cert has signed everything, return true

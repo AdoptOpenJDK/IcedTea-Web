@@ -38,7 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.security;
 
 import java.security.cert.CertPath;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
@@ -58,8 +58,8 @@ public interface AppVerifier {
      * @return True if the app trusts its publishers.
      */
     public boolean hasAlreadyTrustedPublisher(
-            HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars);
+            Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars);
 
     /**
      * Checks if the app has signer(s) whose certs along their chains are in CA certs.
@@ -68,8 +68,8 @@ public interface AppVerifier {
      * signed entries each one has.
      * @return True if the app has a root in the CA certs store.
      */
-    public boolean hasRootInCacerts(HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars);
+    public boolean hasRootInCacerts(Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars);
 
     /**
      * Checks if the app's jars are covered by the provided certificates, enough
@@ -79,8 +79,8 @@ public interface AppVerifier {
      * signed entries each one has.
      * @return
      */
-    public boolean isFullySigned(HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars);
+    public boolean isFullySigned(Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars);
 
     /**
      * Prompt the user with requests for trusting the certificates used by this app

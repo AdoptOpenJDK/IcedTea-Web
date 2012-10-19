@@ -78,19 +78,19 @@ public class JarCertVerifier implements CertVerifier {
     }
 
     /** All of the jar files that were verified for signing */
-    private ArrayList<String> verifiedJars = new ArrayList<String>();
+    private List<String> verifiedJars = new ArrayList<String>();
 
     /** All of the jar files that were not verified */
-    private ArrayList<String> unverifiedJars = new ArrayList<String>();
+    private List<String> unverifiedJars = new ArrayList<String>();
 
     /** The certificates used for jar verification linked to their respective information */
-    private HashMap<CertPath, CertInformation> certs = new HashMap<CertPath, CertInformation>();
+    private Map<CertPath, CertInformation> certs = new HashMap<CertPath, CertInformation>();
 
     /** Temporary cert path hack to be used to keep track of which one a UI dialog is using */
     private CertPath currentlyUsed;
 
     /** Absolute location to jars and the number of entries which are possibly signable */
-    private HashMap<String, Integer> jarSignableEntries = new HashMap<String, Integer>();
+    private Map<String, Integer> jarSignableEntries = new HashMap<String, Integer>();
 
     /** The application verifier to use by this instance */
     private AppVerifier appVerifier;
@@ -152,9 +152,9 @@ public class JarCertVerifier implements CertVerifier {
     /**
      * Get a list of the cert paths of all signers across the app.
      * 
-     * @return ArrayList of CertPath vars representing each of the signers present on any jar.
+     * @return List of CertPath vars representing each of the signers present on any jar.
      */
-    public ArrayList<CertPath> getCertsList() {
+    public List<CertPath> getCertsList() {
         return new ArrayList<CertPath>(certs.keySet());
     }
 
@@ -321,7 +321,7 @@ public class JarCertVerifier implements CertVerifier {
     VerifyResult verifyJarEntryCerts(String jarName, boolean jarHasManifest,
             Vector<JarEntry> entries) throws Exception {
         // Contains number of entries the cert with this CertPath has signed.
-        HashMap<CertPath, Integer> jarSignCount = new HashMap<CertPath, Integer>();
+        Map<CertPath, Integer> jarSignCount = new HashMap<CertPath, Integer>();
         int numSignableEntriesInJar = 0;
 
         // Record current time just before checking the jar begins.

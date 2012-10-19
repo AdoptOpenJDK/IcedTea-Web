@@ -41,7 +41,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.security.cert.CertPath;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
@@ -53,8 +54,8 @@ public class PluginAppVerifier implements AppVerifier {
 
     @Override
     public boolean hasAlreadyTrustedPublisher(
-            HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars) {
+            Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars) {
 
         boolean allPublishersTrusted = true;
 
@@ -77,8 +78,8 @@ public class PluginAppVerifier implements AppVerifier {
     }
 
     @Override
-    public boolean hasRootInCacerts(HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars) {
+    public boolean hasRootInCacerts(Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars) {
 
         boolean allRootCAsTrusted = true;
 
@@ -101,8 +102,8 @@ public class PluginAppVerifier implements AppVerifier {
     }
 
     @Override
-    public boolean isFullySigned(HashMap<CertPath, CertInformation> certs,
-            HashMap<String, Integer> signedJars) {
+    public boolean isFullySigned(Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars) {
 
         boolean isFullySigned = true;
 
@@ -127,8 +128,8 @@ public class PluginAppVerifier implements AppVerifier {
     @Override
     public void checkTrustWithUser(JarCertVerifier jcv, JNLPFile file)
             throws LaunchException {
-        ArrayList<CertPath> certPaths = buildCertPathsList(jcv);
-        ArrayList<CertPath> alreadyApprovedByUser = new ArrayList<CertPath>();
+        List<CertPath> certPaths = buildCertPathsList(jcv);
+        List<CertPath> alreadyApprovedByUser = new ArrayList<CertPath>();
         for (String jarName : jcv.getJarSignableEntries().keySet()) {
             boolean trustFoundOrApproved = false;
             for (CertPath cPathApproved : alreadyApprovedByUser) {
@@ -190,9 +191,9 @@ public class PluginAppVerifier implements AppVerifier {
      *   3. Roots in the CA store but have signing issues
      *   4. Everything else
      */
-    public ArrayList<CertPath> buildCertPathsList(JarCertVerifier jcv) {
-        ArrayList<CertPath> certPathsList = jcv.getCertsList();
-        ArrayList<CertPath> returnList = new ArrayList<CertPath>();
+    public List<CertPath> buildCertPathsList(JarCertVerifier jcv) {
+        List<CertPath> certPathsList = jcv.getCertsList();
+        List<CertPath> returnList = new ArrayList<CertPath>();
 
         for (CertPath cPath : certPathsList) {
             if (!returnList.contains(cPath)

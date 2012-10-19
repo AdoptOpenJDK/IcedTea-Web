@@ -35,6 +35,13 @@
 	* netx/net/sourceforge/jnlp/security/PluginAppVerifier.java: Same.
 	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: Same.
 
+2012-10-19  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/AppVerifier.java: Use interface 
+	types for declared types where applicable.
+	* netx/net/sourceforge/jnlp/security/PluginAppVerifier.java: Same.
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: Same.
+
 2012-10-19  Danesh Dadachanji  <ddadacha@redhat.com>
 
 	Rework JarCertVerifier certificate management to handle multiple
