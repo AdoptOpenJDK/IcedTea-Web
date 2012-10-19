@@ -317,7 +317,11 @@ public class JNLPClassLoader extends URLClassLoader {
              *
              */
             if (!file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS) && !signing) {
-                throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedJarWithSecurity"), R("LUnsignedJarWithSecurityInfo"));
+                if (jcv.allJarsSigned()) {
+                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedJNLPAppDifferentCerts"), R("LSignedJNLPAppDifferentCertsInfo"));
+                } else {
+                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedJarWithSecurity"), R("LUnsignedJarWithSecurityInfo"));
+                }
             } else if (signing == true) {
                 this.security = file.getSecurity();
             } else {
