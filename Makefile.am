@@ -14,19 +14,21 @@ export TESTS_SRCDIR=$(abs_top_srcdir)/tests
 export TESTS_DIR=$(abs_top_builddir)/tests.build
 
 export NETX_UNIT_TEST_SRCDIR=$(TESTS_SRCDIR)/netx/unit
-export NETX_UNIT_TEST_DIR=$(TESTS_DIR)/netx/unit
+export NETX_TEST_DIR=$(TESTS_DIR)/netx
+export NETX_UNIT_TEST_DIR=$(NETX_TEST_DIR)/unit
 
 export JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
 export JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
 
 
-export JNLP_TESTS_ENGINE_SRCDIR=$(TESTS_SRCDIR)/test-extensions
-export JNLP_TESTS_ENGINE_TESTS_SRCDIR=$(TESTS_SRCDIR)/test-extensions-tests
-export JNLP_TESTS_SRCDIR=$(TESTS_SRCDIR)/reproducers
-export JNLP_TESTS_ENGINE_DIR=$(TESTS_DIR)/jnlp_testsengine
-export JNLP_TESTS_ENGINE_TESTS_DIR=$(TESTS_DIR)/netx/jnlp_testsengine_tests
-export JNLP_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/jnlp_test_server
-export JNLP_TESTS_DIR=$(TESTS_DIR)/jnlp_tests
+export TEST_EXTENSIONS_SRCDIR=$(TESTS_SRCDIR)/test-extensions
+export TEST_EXTENSIONS_TESTS_SRCDIR=$(TESTS_SRCDIR)/test-extensions-tests
+export REPRODUCERS_TESTS_SRCDIR=$(TESTS_SRCDIR)/reproducers
+export TEST_EXTENSIONS_DIR=$(TESTS_DIR)/test-extensions
+export TEST_EXTENSIONS_COMPATIBILITY_SYMLINK=$(TESTS_DIR)/netx/jnlp_testsengine
+export TEST_EXTENSIONS_TESTS_DIR=$(TESTS_DIR)/test-extensions-tests
+export REPRODUCERS_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/reproducers_test_server_deploydir
+export REPRODUCERS_BUILD_DIR=$(TESTS_DIR)/reproducers.classes
 export PRIVATE_KEYSTORE_NAME=teststore.ks
 export PRIVATE_KEYSTORE_PASS=123456789
 export EXPORTED_TEST_CERT_PREFIX=icedteatests
@@ -157,7 +159,7 @@ export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.de
  itweb-settings.desktop.in $(top_srcdir)/tests
 
 # reproducers `D`shortcuts
-export DTEST_SERVER=-Dtest.server.dir=$(JNLP_TESTS_SERVER_DEPLOYDIR)
+export DTEST_SERVER=-Dtest.server.dir=$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)
 export DJAVAWS_BUILD=-Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws)
 export DBROWSERS=-Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA):$(MIDORI):$(EPIPHANY)
 export REPRODUCERS_DPARAMETERS= $(DTEST_SERVER) $(DJAVAWS_BUILD) $(DBROWSERS) $(BROWSER_TESTS_MODIFICATION)
@@ -504,31 +506,31 @@ stamps/check-pac-functions.stamp: stamps/bootstrap-directory.stamp
 junit-runner-source-files.txt:
 	find $(JUNIT_RUNNER_SRCDIR) -name '*.java' | sort > $@
 
-$(JUNIT_RUNNER_JAR): junit-runner-source-files.txt stamps/netx-dist-tests-compile.stamp
+$(JUNIT_RUNNER_JAR): junit-runner-source-files.txt stamps/test-extensions-compile.stamp
 	mkdir -p $(JUNIT_RUNNER_DIR) && \
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	  -d $(JUNIT_RUNNER_DIR) \
-	  -classpath $(JUNIT_JAR):$(JNLP_TESTS_ENGINE_DIR) \
+	  -classpath $(JUNIT_JAR):$(TEST_EXTENSIONS_DIR) \
 	  @junit-runner-source-files.txt && \
 	$(BOOT_DIR)/bin/jar cf $@  -C $(JUNIT_RUNNER_DIR) .
 
 stamps/junit-jnlp-dist-dirs: junit-jnlp-dist-simple.txt stamps/junit-jnlp-dist-signed.stamp junit-jnlp-dist-custom.txt
-	mkdir -p $(JNLP_TESTS_SERVER_DEPLOYDIR)
-	mkdir -p $(JNLP_TESTS_DIR)
+	mkdir -p $(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)
+	mkdir -p $(REPRODUCERS_BUILD_DIR)
 	touch $@
 
 junit-jnlp-dist-custom.txt:
-	cd $(JNLP_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/ ; \
+	cd $(REPRODUCERS_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/ ; \
 	find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/$@
 
 junit-jnlp-dist-simple.txt:
-	cd $(JNLP_TESTS_SRCDIR)/simple/ ; \
+	cd $(REPRODUCERS_TESTS_SRCDIR)/simple/ ; \
 	find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/$@
 
 stamps/junit-jnlp-dist-signed.stamp: 
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
-	  pushd $(JNLP_TESTS_SRCDIR)/$$which/ ; \
+	  pushd $(REPRODUCERS_TESTS_SRCDIR)/$$which/ ; \
 	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/junit-jnlp-dist-$$which.txt ; \
 	  popd ; \
 	done ; \
@@ -543,22 +545,22 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    echo "processing: $$dir" ; \
-	    mkdir -p "$(JNLP_TESTS_DIR)/$$dir" ; \
-	    if [ -e "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/" ]; then \
+	    mkdir -p "$(REPRODUCERS_BUILD_DIR)/$$dir" ; \
+	    if [ -e "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/srcs/" ]; then \
 	      d=`pwd` ; \
-	      cd "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/srcs/" ; \
+	      cd "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/srcs/" ; \
 	      srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
 	      notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
-	      $(BOOT_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect -d "$(JNLP_TESTS_DIR)/$$dir/" $$srcFiles ; \
+	      $(BOOT_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect -d "$(REPRODUCERS_BUILD_DIR)/$$dir/" $$srcFiles ; \
 	      if [ -n "$$notSrcFiles" ] ; then \
-	        cp -R --parents $$notSrcFiles "$(JNLP_TESTS_DIR)/$$dir/" ; \
+	        cp -R --parents $$notSrcFiles "$(REPRODUCERS_BUILD_DIR)/$$dir/" ; \
 	      fi ; \
-	      cd "$(JNLP_TESTS_DIR)/$$dir/" ; \
+	      cd "$(REPRODUCERS_BUILD_DIR)/$$dir/" ; \
 	      if [ -f $(META_MANIFEST) ]; \
 	      then \
-	        $(BOOT_DIR)/bin/jar cfm "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" $(META_MANIFEST) * ; \
+	        $(BOOT_DIR)/bin/jar cfm "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" $(META_MANIFEST) * ; \
 	      else \
-	        $(BOOT_DIR)/bin/jar cf "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" * ; \
+	        $(BOOT_DIR)/bin/jar cf "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" * ; \
 	      fi; \
 	      cd "$$d" ; \
 	    fi; \
@@ -577,14 +579,14 @@ stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepa
 	  signedReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
 	    IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${signedReproducers[@]}" ; do \
-	   $(BOOT_DIR)/bin/jarsigner -keystore $$keystore -storepass $(PRIVATE_KEYSTORE_PASS) -keypass $(PRIVATE_KEYSTORE_PASS)  "$(JNLP_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$tcaw ; \
+	   $(BOOT_DIR)/bin/jarsigner -keystore $$keystore -storepass $(PRIVATE_KEYSTORE_PASS) -keypass $(PRIVATE_KEYSTORE_PASS)  "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$tcaw ; \
 	  done ; \
 	done ; \
 	mkdir -p stamps && \
 	touch $@
 
 stamps/change-dots-to-paths.stamp: stamps/netx-dist-tests-sign-some-reproducers.stamp
-	pushd  $(JNLP_TESTS_SERVER_DEPLOYDIR); \
+	pushd  $(REPRODUCERS_TESTS_SERVER_DEPLOYDIR); \
 	types=($(ALL_NONCUSTOM_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
@@ -645,33 +647,34 @@ netx-dist-tests-remove-cert-from-public:
 	done ;
 	-rm -rf stamps/netx-dist-tests-import-cert-to-public
 
-netx-dist-tests-source-files.txt:
-	find $(JNLP_TESTS_ENGINE_SRCDIR) -name '*.java' | sort > $@
+test-extensions-source-files.txt:
+	find $(TEST_EXTENSIONS_SRCDIR) -name '*.java' | sort > $@
 
-stamps/netx-dist-tests-compile.stamp: stamps/netx.stamp \
- stamps/junit-jnlp-dist-dirs netx-dist-tests-source-files.txt
-	mkdir -p $(JNLP_TESTS_ENGINE_DIR);
+stamps/test-extensions-compile.stamp: stamps/junit-jnlp-dist-dirs test-extensions-source-files.txt
+	mkdir -p $(TEST_EXTENSIONS_DIR);
+	mkdir -p $(NETX_TEST_DIR);
+	ln -s $(TEST_EXTENSIONS_DIR) $(TEST_EXTENSIONS_COMPATIBILITY_SYMLINK);
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	 -d $(JNLP_TESTS_ENGINE_DIR) \
+	 -d $(TEST_EXTENSIONS_DIR) \
 	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar \
-	 @netx-dist-tests-source-files.txt && \
+	 @test-extensions-source-files.txt && \
 	mkdir -p stamps && \
 	touch $@
 
-netx-dist-tests-tests-source-files.txt:
-	find $(JNLP_TESTS_ENGINE_TESTS_SRCDIR) -name '*.java' | sort > $@
+test-extensions-tests-source-files.txt:
+	find $(TEST_EXTENSIONS_TESTS_SRCDIR) -name '*.java' | sort > $@
 
-stamps/netx-dist-tests-tests-compile.stamp: stamps/junit-jnlp-dist-dirs netx-dist-tests-tests-source-files.txt  stamps/netx-dist-tests-compile.stamp
-	mkdir -p $(JNLP_TESTS_ENGINE_TESTS_DIR);
+stamps/test-extensions-tests-compile.stamp: stamps/junit-jnlp-dist-dirs test-extensions-tests-source-files.txt  stamps/test-extensions-compile.stamp
+	mkdir -p $(TEST_EXTENSIONS_TESTS_DIR);
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	 -d $(JNLP_TESTS_ENGINE_TESTS_DIR) \
-	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
-	 @netx-dist-tests-tests-source-files.txt && \
+	 -d $(TEST_EXTENSIONS_TESTS_DIR) \
+	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
+	 @test-extensions-tests-source-files.txt && \
 	mkdir -p stamps && \
 	touch $@
 
-stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-jnlp-dist-dirs \
- netx-dist-tests-source-files.txt stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-tests-compile.stamp
+stamps/compile-reproducers-testcases.stamp: stamps/netx.stamp stamps/junit-jnlp-dist-dirs \
+ test-extensions-source-files.txt stamps/test-extensions-compile.stamp stamps/test-extensions-tests-compile.stamp
 	types=($(ALL_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
@@ -679,22 +682,22 @@ stamps/netx-dist-tests-compile-testcases.stamp: stamps/netx.stamp stamps/junit-j
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	      -d $(JNLP_TESTS_ENGINE_TESTS_DIR) \
-	      -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
-	    "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/"* ; \
+	      -d $(TEST_EXTENSIONS_TESTS_DIR) \
+	      -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
+	    "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases/"* ; \
 	  done ; \
 	done ; \
 	mkdir -p stamps && \
 	touch $@
 
-stamps/netx-dist-tests-copy-resources.stamp: stamps/junit-jnlp-dist-dirs
+stamps/copy-reproducers-resources.stamp: stamps/junit-jnlp-dist-dirs
 	types=($(ALL_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
-	    cp -R "$(JNLP_TESTS_SRCDIR)/$$which/$$dir/resources/"*  $(JNLP_TESTS_SERVER_DEPLOYDIR)/ ; \
+	    cp -R "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/resources/"*  $(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/ ; \
 	  done ; \
 	done ; \
 	mkdir -p stamps && \
@@ -702,7 +705,7 @@ stamps/netx-dist-tests-copy-resources.stamp: stamps/junit-jnlp-dist-dirs
 
 $(REPRODUCERS_CLASS_NAMES): $(REPRODUCERS_CLASS_WHITELIST)
 	whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
-	cd $(JNLP_TESTS_ENGINE_TESTS_DIR) ; \
+	cd $(TEST_EXTENSIONS_TESTS_DIR) ; \
 	class_names= ; \
 	for test in `find -type f` ; do \
 	  class_name=`echo $$test | sed -e 's|\.class$$||' -e 's|^\./||'` ; \
@@ -727,27 +730,27 @@ $(REPRODUCERS_CLASS_NAMES): $(REPRODUCERS_CLASS_WHITELIST)
 stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
  javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop \
  stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
- stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/netx-dist-tests-copy-resources.stamp\
+ stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp\
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES) stamps/process-custom-reproducers.stamp
-	cd $(JNLP_TESTS_ENGINE_DIR) ; \
+	cd $(TEST_EXTENSIONS_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(JNLP_TESTS_ENGINE_TESTS_DIR) \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_TESTS_DIR) \
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
 if WITH_XSLTPROC
-	$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(JNLP_TESTS_ENGINE_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
-	$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(JNLP_TESTS_ENGINE_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
+	$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(TEST_EXTENSIONS_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
+	$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(TEST_EXTENSIONS_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
 endif
 	touch $@
 
 stamps/process-custom-reproducers.stamp: stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
- stamps/netx-dist-tests-compile.stamp stamps/netx-dist-tests-compile-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/netx-dist-tests-copy-resources.stamp\
+ stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp\
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES)
 	. $(abs_top_srcdir)/NEW_LINE_IFS ; \
 	customReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-custom.txt `); \
 	IFS="$$IFS_BACKUP" ; \
 	for dir in "$${customReproducers[@]}" ; do \
-	  pushd $(JNLP_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/$$dir/srcs; \
+	  pushd $(REPRODUCERS_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/$$dir/srcs; \
 	  $(MAKE) prepare-reproducer ; \
 	  popd ; \
 	done ; \
@@ -759,7 +762,7 @@ clean-custom-reproducers: junit-jnlp-dist-custom.txt
 	customReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-custom.txt `); \
 	IFS="$$IFS_BACKUP" ; \
 	for dir in "$${customReproducers[@]}" ; do \
-	  pushd $(JNLP_TESTS_SRCDIR)/custom/$$dir/srcs; \
+	  pushd $(REPRODUCERS_TESTS_SRCDIR)/custom/$$dir/srcs; \
 	  $(MAKE) clean-reproducer ; \
 	  popd ; \
 	done ; \
@@ -875,11 +878,11 @@ netx-unit-tests-source-files.txt:
 	find $(NETX_UNIT_TEST_SRCDIR) -name '*.java' | sort > $@
 
 stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
- netx-unit-tests-source-files.txt stamps/netx-dist-tests-compile.stamp
+ netx-unit-tests-source-files.txt stamps/test-extensions-compile.stamp
 	mkdir -p $(NETX_UNIT_TEST_DIR) && \
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	 -d $(NETX_UNIT_TEST_DIR) \
-	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(JNLP_TESTS_ENGINE_DIR) \
+	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
 	 @netx-unit-tests-source-files.txt && \
 	mkdir -p stamps && \
 	touch $@
@@ -909,7 +912,7 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	done ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(JNLP_TESTS_ENGINE_DIR):. \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):. \
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names 
 if WITH_XSLTPROC
 	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html
@@ -944,7 +947,7 @@ if WITH_EMMA
 	 -cp $(BOOT_DIR)/jre/lib/jsse.jar \
 	 -cp $(BOOT_DIR)/jre/lib/resources.jar \
 	 -cp $(RHINO_RUNTIME) \
-	 -cp $(JNLP_TESTS_ENGINE_DIR) \
+	 -cp $(TEST_EXTENSIONS_DIR) \
 	 -cp . \
 	 -ix "-org.junit.*" \
 	 -ix "-junit.*" \
@@ -965,7 +968,7 @@ stamps/run-reproducers-test-code-coverage.stamp: stamps/run-netx-dist-tests.stam
 if WITH_EMMA
 	cd $(TESTS_DIR) ; \
 	for file in $(EMMA_MODIFIED_FILES) ; do \
-	  mv $(JNLP_TESTS_ENGINE_DIR)/$$file $(JNLP_TESTS_ENGINE_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
+	  mv $(TEST_EXTENSIONS_DIR)/$$file $(TEST_EXTENSIONS_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
 	done ;\
 	echo "backuping javaws and netx.jar in $(DESTDIR)" ; \
 	netx_backup=$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx_backup.jar ; \
@@ -993,11 +996,11 @@ if WITH_EMMA
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    testcases_srcs[k]="-sp" ; \
 	    k=$$((k+1)) ; \
-	    testcases_srcs[k]="$(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/" ; \
+	    testcases_srcs[k]="$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases/" ; \
 	    k=$$((k+1)) ; \
 	    done ; \
 	  done ; \
-	cd $(JNLP_TESTS_ENGINE_DIR) ; \
+	cd $(TEST_EXTENSIONS_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	$(BOOT_DIR)/bin/java  \
 	 $(EMMA_JAVA_ARGS) \
@@ -1012,24 +1015,24 @@ if WITH_EMMA
 	   -cp $(BOOT_DIR)/jre/lib/resources.jar \
 	   -cp $(RHINO_RUNTIME) \
 	   -cp . \
-	   -cp $(JNLP_TESTS_ENGINE_TESTS_DIR) \
+	   -cp $(TEST_EXTENSIONS_TESTS_DIR) \
 	   -ix "-org.junit.*" \
 	   -ix "-junit.*" \
 	   CommandLine $$class_names ; \
-	mv $(JNLP_TESTS_ENGINE_DIR)/coverage.ec $(JNLP_TESTS_ENGINE_DIR)/coverageX.ec ; \
-	mv $(JNLP_TESTS_ENGINE_DIR)/coverage.es $(JNLP_TESTS_ENGINE_DIR)/coverageX.es ; \
+	mv $(TEST_EXTENSIONS_DIR)/coverage.ec $(TEST_EXTENSIONS_DIR)/coverageX.ec ; \
+	mv $(TEST_EXTENSIONS_DIR)/coverage.es $(TEST_EXTENSIONS_DIR)/coverageX.es ; \
 	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(EMMA_JAR) emma merge \
 	  -in $(TESTS_DIR)/coverage.em \
-	  -in $(JNLP_TESTS_ENGINE_DIR)/coverageX.ec \
-	  -in $(JNLP_TESTS_ENGINE_DIR)/coverageX.es ; \
+	  -in $(TEST_EXTENSIONS_DIR)/coverageX.ec \
+	  -in $(TEST_EXTENSIONS_DIR)/coverageX.es ; \
 	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(EMMA_JAR)  -Demma.report.html.out.encoding=UTF-8 emma report \
 	  -Dreport.html.out.encoding=UTF-8 \
-	  -in $(JNLP_TESTS_ENGINE_DIR)/coverage.es  \
+	  -in $(TEST_EXTENSIONS_DIR)/coverage.es  \
 	  -sp $(NETX_SRCDIR) \
 	  -sp $(NETX_UNIT_TEST_SRCDIR) \
 	  -sp $(JUNIT_RUNNER_SRCDIR) \
-	  -sp $(JNLP_TESTS_ENGINE_SRCDIR) \
-	  -sp $(JNLP_TESTS_ENGINE_TESTS_SRCDIR) \
+	  -sp $(TEST_EXTENSIONS_SRCDIR) \
+	  -sp $(TEST_EXTENSIONS_TESTS_SRCDIR) \
 	  -r html \
 	  -r xml \
 	  "$${testcases_srcs[@]}" ; \
@@ -1039,10 +1042,10 @@ if WITH_EMMA
 	mv $$javaws_backup $(DESTDIR)$(bindir)/$(javaws);  \
 	mv $$netx_backup $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar ; \
 	for file in $(EMMA_MODIFIED_FILES) ; do \
-	  mv $(JNLP_TESTS_ENGINE_DIR)/$$file  $(JNLP_TESTS_ENGINE_DIR)/"$$file""$(EMMA_SUFFIX)" ; \
-	  mv $(JNLP_TESTS_ENGINE_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)"  $(JNLP_TESTS_ENGINE_DIR)/$$file ; \
+	  mv $(TEST_EXTENSIONS_DIR)/$$file  $(TEST_EXTENSIONS_DIR)/"$$file""$(EMMA_SUFFIX)" ; \
+	  mv $(TEST_EXTENSIONS_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)"  $(TEST_EXTENSIONS_DIR)/$$file ; \
 	done ;\
-	rm $(JNLP_TESTS_ENGINE_DIR)/coverage.txt ; 
+	rm $(TEST_EXTENSIONS_DIR)/coverage.txt ; 
 else
 	echo "Sorry, coverage report cant be run without emma installed. Try install emma or specify with-emma value" ;
 	exit 5
@@ -1061,13 +1064,13 @@ if WITH_EMMA
 	  for dir in "$${simpleReproducers[@]}" ; do \
 	    testcases_srcs[k]="-sp" ; \
 	    k=$$((k+1)) ; \
-	    testcases_srcs[k]="$(JNLP_TESTS_SRCDIR)/$$which/$$dir/testcases/" ; \
+	    testcases_srcs[k]="$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases/" ; \
 	    k=$$((k+1)) ; \
 	  done ; \
 	done ; \
 	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(EMMA_JAR) emma merge \
 	 -in $(NETX_UNIT_TEST_DIR)/coverage.es \
-	 -in $(JNLP_TESTS_ENGINE_DIR)/coverage.es ; \
+	 -in $(TEST_EXTENSIONS_DIR)/coverage.es ; \
 	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(EMMA_JAR)  -Demma.report.html.out.encoding=UTF-8 emma report \
 	 -Dreport.html.out.encoding=UTF-8 \
 	 -in $(TESTS_DIR)/coverage.es \
@@ -1075,8 +1078,8 @@ if WITH_EMMA
 	 -sp $(NETX_SRCDIR) \
 	 -sp $(NETX_UNIT_TEST_SRCDIR) \
 	 -sp $(JUNIT_RUNNER_SRCDIR) \
-	 -sp $(JNLP_TESTS_ENGINE_SRCDIR) \
-	 -sp $(JNLP_TESTS_ENGINE_TESTS_SRCDIR) \
+	 -sp $(TEST_EXTENSIONS_SRCDIR) \
+	 -sp $(TEST_EXTENSIONS_TESTS_SRCDIR) \
 	 "$${testcases_srcs[@]}" \
 	 -r html \
 	 -r xml ; 
@@ -1108,17 +1111,19 @@ clean_tests_reports:
 	rm -f  $(TESTS_DIR)/*.html
 
 clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public clean-custom-reproducers
-	rm -f netx-dist-tests-source-files.txt
-	rm -rf $(JNLP_TESTS_ENGINE_TESTS_DIR)
-	rm -rf $(JNLP_TESTS_DIR)
-	rm -rf $(JNLP_TESTS_SERVER_DEPLOYDIR)
-	rm -rf $(JNLP_TESTS_ENGINE_DIR)
+	rm -f test-extensions-source-files.txt
+	rm -f test-extensions-tests-source-files.txt
+	rm -f $(TEST_EXTENSIONS_COMPATIBILITY_SYMLINK)
+	rm -rf $(TEST_EXTENSIONS_TESTS_DIR)
+	rm -rf $(REPRODUCERS_BUILD_DIR)
+	rm -rf $(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)
+	rm -rf $(TEST_EXTENSIONS_DIR)
 	rm -f stamps/junit-jnlp-dist-dirs
-	rm -f stamps/netx-dist-tests-compile.stamp
-	rm -f stamps/netx-dist-tests-tests-compile.stamp
+	rm -f stamps/test-extensions-compile.stamp
+	rm -f stamps/test-extensions-tests-compile.stamp
 	rm -f stamps/netx-dist-tests-prepare-reproducers.stamp
-	rm -f stamps/netx-dist-tests-compile-testcases.stamp
-	rm -f stamps/netx-dist-tests-copy-resources.stamp
+	rm -f stamps/compile-reproducers-testcases.stamp
+	rm -f stamps/copy-reproducers-resources.stamp
 	rm -f stamps/netx-dist-tests-sign-some-reproducers.stamp
 	rm -f stamps/change-dots-to-paths.stamp
 	rm -f junit-jnlp-dist-simple.txt
@@ -1148,10 +1153,10 @@ clean-unit-test-code-coverage:
 
 clean-reproducers-test-code-coverage:
 	if [ -e stamps/run-reproducers-test-code-coverage.stamp ]; then \
-	 rm -rf $(JNLP_TESTS_ENGINE_DIR)/coverage ; \
-	 rm -f $(JNLP_TESTS_ENGINE_DIR)/coverage.xml ; \
-	 rm -f $(JNLP_TESTS_ENGINE_DIR)/coverage.es ; \
-	 rm -f $(JNLP_TESTS_ENGINE_DIR)/tests-output_withEmma.xml ; \
+	 rm -rf $(TEST_EXTENSIONS_DIR)/coverage ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/coverage.xml ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/coverage.es ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/tests-output_withEmma.xml ; \
 	 rm -f stamps/run-reproducers-test-code-coverage.stamp ; \
 	fi
 

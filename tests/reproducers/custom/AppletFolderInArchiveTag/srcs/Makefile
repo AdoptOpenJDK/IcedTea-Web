@@ -1,7 +1,7 @@
 TESTNAME=AppletFolderInArchiveTag
 ARCHIVE_TEST_FOLDER=archive_tag_folder_test
-JAVAC_CLASSPATH=$(JNLP_TESTS_ENGINE_DIR):$(NETX_DIR)/lib/classes.jar
-DEPLOY_SUBDIR=$(JNLP_TESTS_SERVER_DEPLOYDIR)/$(ARCHIVE_TEST_FOLDER)
+JAVAC_CLASSPATH=$(TEST_EXTENSIONS_DIR):$(NETX_DIR)/lib/classes.jar
+DEPLOY_SUBDIR=$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$(ARCHIVE_TEST_FOLDER)
 INDEX_HTML_BODY="<html><body><h1>Required to recognize folder structure</h1></body></html>"
 
 prepare-reproducer:

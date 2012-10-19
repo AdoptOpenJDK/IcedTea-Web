@@ -1,3 +1,28 @@
+2012-10-19  Jiri Vanek <jvanek@redhat.com>
+
+	Renamed reproducers-related variables and targets
+	* Makefile.am: 
+	NETX_TEST_DIR - new parent directory variable for tests
+	NETX_UNIT_TEST_DIR - is now using this variable
+	JNLP_TESTS_ENGINE_SRCDIR -> TEST_EXTENSIONS_SRCDIR
+	JNLP_TESTS_ENGINE_TESTS_SRCDIR -> TEST_EXTENSIONS_TESTS_SRCDIR
+	JNLP_TESTS_SRCDIR -> REPRODUCERS_TESTS_SRCDIR
+	JNLP_TESTS_ENGINE_DIR -> TEST_EXTENSIONS_DIR
+	JNLP_TESTS_ENGINE_TESTS_DIR -> TEST_EXTENSIONS_TESTS_DIR
+	new variable TEST_EXTENSIONS_COMPATIBILITY_SYMLINK still pointing to $(TESTS_DIR)/netx/jnlp_testsengine
+	$(TESTS_DIR)/jnlp_testsengine now points to $(TESTS_DIR)/test-extensions
+	JNLP_TESTS_SERVER_DEPLOYDIR -> REPRODUCERS_TESTS_SERVER_DEPLOYDIR
+	JNLP_TESTS_DIR -> REPRODUCERS_BUILD_DIR
+	netx-dist-tests-source-files.txt -> test-extensions-source-files.txt
+	stamps/netx-dist-tests-compile.stamp -> stamps/test-extensions-compile.stamp
+	stamps/netx-dist-tests-tests-compile.stamp -> stamps/test-extensions-tests-compile.stamp
+	stamps/netx-dist-tests-compile-testcases.stamp -> stamps/compile-reproducers-testcases.stamp
+	stamps/netx-dist-tests-copy-resources.stamp -> stamps/copy-reproducers-resources.stamp
+	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/srcs/Makefile: and
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/srcs/Makefile: and
+	* tests/reproducers/custom/AppletFolderInArchiveTag/srcs/Makefile: and
+	* tests/reproducers/custom/UnsignedContentInMETAINF/srcs/Makefile: following above renaming
+
 2012-10-16  Adam Domurad  <adomurad@redhat.com>
 
 	* tests/reproducers/simple/AppletTakesLastParam/srcs/AppletTakesLastParam.java:
