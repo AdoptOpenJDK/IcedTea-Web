@@ -50,6 +50,7 @@ exception statement from your version.
     <jar href="SimpletestSigned1.jar"/>
   </resources>
   <application-desc main-class="somecrazytestpackage.MultipleSignaturesTest">
+    <argument>SimpletestSigned1</argument> 
   </application-desc>
   <security>
     <all-permissions/>

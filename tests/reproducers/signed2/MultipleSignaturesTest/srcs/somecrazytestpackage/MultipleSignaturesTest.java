@@ -42,22 +42,25 @@ exception statement from your version.
  */
 public class MultipleSignaturesTest extends Applet {
 
+	//Ignored when class being called is SimpletestSigned1, used with ReadPropertiesSigned
+	private static final String SYSTEM_PROPERTY = "user.home";
+
     public static void main(String[] args) {
-        executeForeignMethodCaught();
+        executeForeignMethodCaught(args[0]);
     }
 
-    public static void executeForeignMethodCaught() {
+    public static void executeForeignMethodCaught(String classname) {
         try {
-            executeForeignMethod();
+            executeForeignMethod(classname);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static void executeForeignMethod() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-        Class clazz = Class.forName("SimpletestSigned1");
+    public static void executeForeignMethod(String classname) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+        Class<?> clazz = Class.forName(classname);
         Method mainMethod = clazz.getDeclaredMethod("main", String[].class);
-        mainMethod.invoke(clazz.newInstance(), (Object) null);
+        mainMethod.invoke(clazz.newInstance(), (Object) new String[] {SYSTEM_PROPERTY});
     }
 
     private class Killer extends Thread {
@@ -85,6 +88,7 @@ public class MultipleSignaturesTest extends Applet {
     public void start() {
         killer.start();
         System.out.println("killer was started");
-        main(null);
+        main(new String[]{getParameter("mainclass")});
+        System.out.println("*** APPLET FINISHED ***");
     }
 }

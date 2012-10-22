@@ -30,6 +30,33 @@
 
 2012-10-19  Adam Domurad  <adomurad@redhat.com>
 
+	Revised multiple signatures test to check for new message. Added more 
+	accurate reproducer for PR822.
+	* tests/reproducers/signed2/MultipleSignaturesTest/srcs/somecrazytestpackage/MultipleSignaturesTest.java:
+	Made class take a classname parameter so different out-of-package
+	classes could be executed.
+	* tests/reproducers/signed2/MultipleSignaturesTest/resources/MultipleSignaturesTest.html: 
+	Added main-class parameter.
+	* tests/reproducers/signed2/MultipleSignaturesTest/resources/MultipleSignaturesTest1.jnlp:
+	Same.
+	* tests/reproducers/signed2/MultipleSignaturesTest/resources/MultipleSignaturesTest1_requesting.jnlp:
+	Same.
+	* tests/reproducers/signed2/MultipleSignaturesTest/resources/MultipleSignaturesTest2.jnlp:
+	Same.
+	* tests/reproducers/signed2/MultipleSignaturesTest/testcases/MultipleSignaturesTestTests.java
+	(multipleSignaturesTestHtmlAppletUsesPermissions): New, tests if fully 
+	signed HTML applets with varied signers can (as they should) execute 
+	with full permissions. Reproduces PR822.
+	(multipleSignaturesTestJnlpApplicationRequesting): Check for 
+	mismatching signers JNLP failure message. Remove known-to-fail & 
+	inaccurate bug annotation.
+	* tests/reproducers/signed2/MultipleSignaturesTestSamePackage/testcases/MultipleSignaturesTestTestsSamePackage.java
+	(multipleSignaturesTestSamePackageJnlpApplicationRequesting): Check for 
+	mismatching signers JNLP failure message. Remove known-to-fail & 
+	inaccurate bug annotation.
+
+2012-10-19  Adam Domurad  <adomurad@redhat.com>
+
 	Reproduces PR822: Applets fail to load if jars have different signers.
 	Tests for applets & JNLPs with multiple signers per jar.
 	* tests/reproducers/signed/ReadPropertiesSigned/srcs/ReadPropertiesSigned.java:

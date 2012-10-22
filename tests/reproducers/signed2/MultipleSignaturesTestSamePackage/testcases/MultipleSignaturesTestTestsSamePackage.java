@@ -40,7 +40,6 @@ import java.util.List;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
-import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
@@ -49,10 +48,10 @@ import org.junit.Assert;
 
 import org.junit.Test;
 
-@Bug(id={"PR822"})
 public class MultipleSignaturesTestTestsSamePackage  extends BrowserTest{
 
     public static final String secExcRegex =  "(?s).*java.lang.SecurityException: .* signer information does not match signer information of other classes in the same package.*";
+    public static final String launchExcDiffCerts =  "Fatal: Application Error: The JNLP application is not fully signed by a single cert.";
     public static final List<String> v = Arrays.asList(new String[] {ServerAccess.VERBOSE_OPTION});
     private static final String GSJE= "Good simple javaws exapmle";
 
@@ -100,18 +99,11 @@ public class MultipleSignaturesTestTestsSamePackage  extends BrowserTest{
     }
 
     @Test
-    @Bug(id={"PR822"})
-    @KnownToFail
     public void multipleSignaturesTestSamePackageJnlpApplicationRequesting() throws Exception {
         ProcessResult pr = server.executeJavawsHeadless(null, "/MultipleSignaturesTest1_SamePackage_requesting.jnlp");
         String s = GSJE;
-        Assert.assertFalse("stdout should NOT contains `"+s+"`, but did",pr.stdout.contains(s));
-        String cc = "xception";
-        Assert.assertTrue("stderr should contains `" + cc + "`, but did not", pr.stderr.contains(cc));
-        //this is really wrong. Aplication shoud die with secExcRegex exception
-        //but not with Application Error: Cannot grant permissions to unsigned jars. Application requested security permissions, but jars are not signed.
-        //as it is now
-        Assert.assertTrue("stderr should match " + secExcRegex + "`, but did not", pr.stderr.matches(secExcRegex));
+        Assert.assertFalse("stdout should NOT contain `"+s+"`, but did", pr.stdout.contains(s));
+        Assert.assertTrue("stderr should contain `" + launchExcDiffCerts + "`, but did not", pr.stderr.contains(launchExcDiffCerts));
     }
    
 }

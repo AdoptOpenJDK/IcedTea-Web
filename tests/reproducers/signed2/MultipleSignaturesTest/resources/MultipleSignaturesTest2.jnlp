@@ -55,5 +55,6 @@ exception statement from your version.
       main-class="somecrazytestpackage.MultipleSignaturesTest"
       width="100"
       height="100">
+ 	 <param name="mainclass" value="SimpletestSigned1" />
     </applet-desc>
 </jnlp>
