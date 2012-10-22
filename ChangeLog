@@ -1,3 +1,8 @@
+2012-10-19  Adam Domurad  <adomurad@redhat.com>
+
+	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/testcases/AdditionalJarsInMetaInfIndexListTests.java
+	(SignedMetaInfIndexListTest): Add @KnownToFail annotation 
+
 2012-10-19  Jiri Vanek <jvanek@redhat.com>
 
 	Renamed reproducers-related variables and targets

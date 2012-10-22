@@ -44,6 +44,7 @@ import java.util.List;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 
 import org.junit.Test;
@@ -55,6 +56,7 @@ public class AdditionalJarsInMetaInfIndexListTests extends BrowserTest {
     private static final String CORRECT_EXEC = "Program Executed Correctly.";
 
     @Test
+    @KnownToFail
     @Bug(id = "PR1112")
     public void SignedMetaInfIndexListTest() throws Exception {
         ProcessResult pr = server.executeJavawsHeadless("/AdditionalJarsInMetaInfIndexListSigned.jnlp");
