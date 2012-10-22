@@ -96,7 +96,7 @@ public class CertWarningPane extends SecurityDialogPanel {
     private void addComponents() {
         AccessType type = parent.getAccessType();
         JNLPFile file = parent.getFile();
-        Certificate c = parent.getCertVerifier().getPublisher();
+        Certificate c = parent.getCertVerifier().getPublisher(null);
 
         String name = "";
         String publisher = "";
@@ -253,7 +253,7 @@ public class CertWarningPane extends SecurityDialogPanel {
             if (alwaysTrust != null && alwaysTrust.isSelected()) {
                 try {
                     KeyStore ks = KeyStores.getKeyStore(Level.USER, Type.CERTS);
-                    X509Certificate c = (X509Certificate) parent.getCertVerifier().getPublisher();
+                    X509Certificate c = (X509Certificate) parent.getCertVerifier().getPublisher(null);
                     CertificateUtils.addToKeyStore(c, ks);
                     File keyStoreFile = new File(KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS));
                     if (!keyStoreFile.isFile()) {

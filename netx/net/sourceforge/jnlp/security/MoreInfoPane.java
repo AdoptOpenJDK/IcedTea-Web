@@ -44,7 +44,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -73,7 +73,7 @@ public class MoreInfoPane extends SecurityDialogPanel {
      * Constructs the GUI components of this panel
      */
     private void addComponents() {
-        ArrayList<String> details = certVerifier.getDetails();
+        List<String> details = certVerifier.getDetails(null);
 
         // Show signed JNLP warning if the signed main jar does not have a
         // signed JNLP file and the launching JNLP file contains special properties

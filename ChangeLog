@@ -28,6 +28,76 @@
 	* tests/reproducers/custom/AppletFolderInArchiveTag/srcs/Makefile: and
 	* tests/reproducers/custom/UnsignedContentInMETAINF/srcs/Makefile: following above renaming
 
+2012-10-19  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/AppVerifier.java: Use interface 
+	types for declared types where applicable.
+	* netx/net/sourceforge/jnlp/security/PluginAppVerifier.java: Same.
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: Same.
+
+2012-10-19  Danesh Dadachanji  <ddadacha@redhat.com>
+
+	Rework JarCertVerifier certificate management to handle multiple
+	certificates and use different algorithms to verify JNLPs and Applets.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Removed SHasUnsignedEntry.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	Set JCV instance to final but uninitialized.
+	(JNLPClassLoader): Initialized JCV with runtime dependent verifier.
+	(addNewJar), (initializeResources), (verifySignedJNLP):
+	Replaced use of local JarCertVerifier variable with the instance  variable.
+	Added calls to isFullySigned wherever signer verification is done.
+	(activateJars): No longer verifies nested jars. These receive the same
+	security permissions as their parent jar, regardless of the nested
+	jar's signing.
+	(checkTrustWithUser): Removed JCV param, reimplemented to wrap around
+	JCV's checkTrustWithUser method.
+	(verifyJars): Removed.
+	* netx/net/sourceforge/jnlp/security/AppVerifier.java:
+	New strategy pattern interface that specifies verification methods
+	required regardless of the runtime.
+	* netx/net/sourceforge/jnlp/security/JNLPAppVerifier.java:
+	* netx/net/sourceforge/jnlp/security/PluginAppVerifier.java:
+	New strategy pattern classes used to determine which algorithms to use
+	depending on the runtime.
+	* netx/net/sourceforge/jnlp/security/CertVerifier.java:
+	Added CertPath param to all the methods.
+	(noSigningIssues): Removed.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java:
+	* netx/net/sourceforge/jnlp/security/CertsInfoPane.java:
+	* netx/net/sourceforge/jnlp/security/MoreInfoPane.java:
+	Updated calls to the verifier's methods with the new CertPath param. All
+	are set to null so far.
+	* netx/net/sourceforge/jnlp/security/HttpsCertVerifier.java:
+	Added CertPath param to all the methods. It's mostly ignored though.
+	* netx/net/sourceforge/jnlp/tools/CertInformation.java:
+	New class to represent all the information about a signer with
+	with respect to all of the entries it has signed for the app.
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java:
+	Completely reworked to use CertInformation and AppVerifier functionality.
+	(getCertPath), (getCertInformation), (checkTrustWithUser),
+	(getJarSignableEntries), (getTotalJarEntries): New method.
+	(noSigningIssues), (anyJarsSigned): Removed.
+	(verifyResult): Renamed enum to VerifyResult
+	(JarCertVerifier): New constructor used to set AppVerifier instance.
+	(getAlreadyTrustPublisher), (getRootInCacerts): Now uses strategy pattern.
+	(hasSigningIssues), (getDetails), (checkTrustedCerts), (checkCertUsage):
+	Now uses cert info class.
+	(getCerts): Renamed to getCertsList.
+	(isFullySignedByASingleCert): renamed to isFullySigned and to use
+	the strategy pattern.
+	(add): New public method that resets some instance vars and
+	calls verifyJars.
+	(verifyJars): Modifier changed to private, above method should be used.
+	Also skips jars that have been verified before.
+	(verifyJar): Removed actual verification code, only reads jars into the JVM.
+	(verifyJarEntryCerts): New method. Does actual verification of jars.
+	(getPublisher), (getRoot): Use hacky currentlyUsed variable as the signer.
+	* tests/netx/unit/net/sourceforge/jnlp/tools/JarCertVerifierTest.java:
+	Unit test JCV's verifyJarEntryCerts method.
+	* tests/test-extensions/net/sourceforge/jnlp/tools/CodeSignerCreator.java:
+	Unit test helper that creates CodeSigner instances. 
+
 2012-10-16  Adam Domurad  <adomurad@redhat.com>
 
 	* tests/reproducers/simple/AppletTakesLastParam/srcs/AppletTakesLastParam.java:

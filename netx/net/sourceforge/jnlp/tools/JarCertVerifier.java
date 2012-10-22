@@ -25,25 +25,41 @@
 
 package net.sourceforge.jnlp.tools;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
-import java.io.*;
-import java.util.*;
-import java.util.jar.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.CodeSigner;
+import java.security.KeyStore;
+import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.security.cert.CertPath;
-import java.security.*;
-import sun.security.x509.*;
-import sun.security.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
-import net.sourceforge.jnlp.*;
-import net.sourceforge.jnlp.cache.*;
-import net.sourceforge.jnlp.security.*;
+import net.sourceforge.jnlp.JARDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.CertificateUtils;
+import net.sourceforge.jnlp.security.KeyStores;
+import sun.security.util.DerInputStream;
+import sun.security.util.DerValue;
+import sun.security.x509.NetscapeCertTypeExtension;
 
 /**
- * <p>The jar certificate verifier utility.
- *
+ * <p>
+ * The jar certificate verifier utility.
+ * 
  * @author Roland Schemers
  * @author Jan Luehe
  */
@@ -55,53 +71,39 @@ public class JarCertVerifier implements CertVerifier {
     // prefix for new signature-related files in META-INF directory
     private static final String SIG_PREFIX = META_INF + "SIG-";
 
-    private static final long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L; //milliseconds
+    private static final long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L; // milliseconds
 
-    static enum verifyResult {
+    static enum VerifyResult {
         UNSIGNED, SIGNED_OK, SIGNED_NOT_OK
     }
 
-    // signer's certificate chain (when composing)
-    X509Certificate[] certChain;
+    /** All of the jar files that were verified for signing */
+    private ArrayList<String> verifiedJars = new ArrayList<String>();
 
-    boolean verbose = false; // verbose output when signing/verifying
-    boolean showcerts = false; // show certs when verifying
+    /** All of the jar files that were not verified */
+    private ArrayList<String> unverifiedJars = new ArrayList<String>();
 
-    private boolean hasExpiredCert = false;
-    private boolean hasExpiringCert = false;
-    private boolean notYetValidCert = false;
+    /** The certificates used for jar verification linked to their respective information */
+    private HashMap<CertPath, CertInformation> certs = new HashMap<CertPath, CertInformation>();
 
-    private boolean badKeyUsage = false;
-    private boolean badExtendedKeyUsage = false;
-    private boolean badNetscapeCertType = false;
+    /** Temporary cert path hack to be used to keep track of which one a UI dialog is using */
+    private CertPath currentlyUsed;
 
-    private boolean alreadyTrustPublisher = false;
-    private boolean rootInCacerts = false;
+    /** Absolute location to jars and the number of entries which are possibly signable */
+    private HashMap<String, Integer> jarSignableEntries = new HashMap<String, Integer>();
+
+    /** The application verifier to use by this instance */
+    private AppVerifier appVerifier;
 
     /**
-     * The single certPath used in this JarSiging. We're only keeping
-     * track of one here, since in practice there's only one signer
-     * for a JNLP Application.
+     * Create a new jar certificate verifier utility that uses the provided verifier for its strategy pattern.
+     * 
+     * @param verifier
+     *            The application verifier to be used by the new instance.
      */
-    private CertPath certPath = null;
-
-    private boolean noSigningIssues = true;
-
-    private boolean anyJarsSigned = false;
-
-    /** all of the jar files that were verified */
-    private ArrayList<String> verifiedJars = null;
-
-    /** all of the jar files that were not verified */
-    private ArrayList<String> unverifiedJars = null;
-
-    /** the certificates used for jar verification */
-    private HashMap<CertPath, Integer> certs = new HashMap<CertPath, Integer>();
-
-    /** details of this signing */
-    private ArrayList<String> details = new ArrayList<String>();
-
-    private int totalSignableEntries = 0;
+    public JarCertVerifier(AppVerifier verifier) {
+        appVerifier = verifier;
+    }
 
     /** Whether a signable entry was found within jars (jars with content more than just META-INF/*) */
     private boolean triviallySigned = false;
@@ -113,88 +115,107 @@ public class JarCertVerifier implements CertVerifier {
         return triviallySigned;
     }
 
-    /* (non-Javadoc)
-     * @see net.sourceforge.jnlp.tools.CertVerifier2#getAlreadyTrustPublisher()
-     */
     public boolean getAlreadyTrustPublisher() {
-        return alreadyTrustPublisher;
+        boolean allPublishersTrusted = appVerifier.hasAlreadyTrustedPublisher(
+                certs, jarSignableEntries);
+        if (JNLPRuntime.isDebug()) {
+            System.out.println("App already has trusted publisher: "
+                    + allPublishersTrusted);
+        }
+        return allPublishersTrusted;
     }
 
-    /* (non-Javadoc)
-     * @see net.sourceforge.jnlp.tools.CertVerifier2#getRootInCacerts()
-     */
     public boolean getRootInCacerts() {
-        return rootInCacerts;
+        boolean allRootCAsTrusted = appVerifier.hasRootInCacerts(certs,
+                jarSignableEntries);
+        if (JNLPRuntime.isDebug()) {
+            System.out.println("App has trusted root CA: " + allRootCAsTrusted);
+        }
+        return allRootCAsTrusted;
     }
 
-    public CertPath getCertPath() {
-        return certPath;
+    public CertPath getCertPath(CertPath cPath) { // Parameter ignored.
+        return currentlyUsed;
     }
 
-    /* (non-Javadoc)
-     * @see net.sourceforge.jnlp.tools.CertVerifier2#hasSigningIssues()
+    public boolean hasSigningIssues(CertPath certPath) {
+        return certs.get(certPath).hasSigningIssues();
+    }
+
+    public List<String> getDetails(CertPath certPath) {
+        if (certPath != null) {
+            currentlyUsed = certPath;
+        }
+        return certs.get(currentlyUsed).getDetailsAsStrings();
+    }
+
+    /**
+     * Get a list of the cert paths of all signers across the app.
+     * 
+     * @return ArrayList of CertPath vars representing each of the signers present on any jar.
      */
-    public boolean hasSigningIssues() {
-        return hasExpiredCert || notYetValidCert || badKeyUsage
-                || badExtendedKeyUsage || badNetscapeCertType;
-    }
-
-    /* (non-Javadoc)
-     * @see net.sourceforge.jnlp.tools.CertVerifier2#noSigningIssues()
-     */
-    public boolean noSigningIssues() {
-        return noSigningIssues;
-    }
-
-    public boolean anyJarsSigned() {
-        return anyJarsSigned;
-    }
-
-    /* (non-Javadoc)
-     * @see net.sourceforge.jnlp.tools.CertVerifier2#getDetails()
-     */
-    public ArrayList<String> getDetails() {
-        return details;
-    }
-
-    /* (non-Javadoc)
-     * @see net.sourceforge.jnlp.tools.CertVerifier2#getCerts()
-     */
-    public ArrayList<CertPath> getCerts() {
+    public ArrayList<CertPath> getCertsList() {
         return new ArrayList<CertPath>(certs.keySet());
     }
 
     /**
-     * Returns whether or not all entries have a common signer.
-     *  
-     * It is possible to create jars where only some entries are signed. In 
-     * such cases, we should not prompt the user to accept anything, as the whole 
-     * application must be treated as unsigned. This method should be called by a 
-     * caller before it is about to ask the user to accept a cert and determine 
-     * whether the application is trusted or not.
-     *  
-     * @return Whether or not all entries have a common signer
+     * Find the information the specified cert path has with respect to this application.
+     * 
+     * @return All the information the path has with this app.
      */
-    public boolean isFullySignedByASingleCert() {
-
-        if (triviallySigned)
-            return true;
-
-        for (CertPath cPath : certs.keySet()) {
-            // If this cert has signed everything, return true
-            if (certs.get(cPath) == totalSignableEntries)
-                return true;
-        }
-
-        // No cert found that signed all entries. Return false.
-        return false;
+    public CertInformation getCertInformation(CertPath cPath) {
+        return certs.get(cPath);
     }
 
-    public void verifyJars(List<JARDesc> jars, ResourceTracker tracker)
-            throws Exception {
+    /**
+     * Returns whether or not the app is considered completely signed.
+     * 
+     * An app using a JNLP is considered signed if all of the entries of its jars are signed by at least one common signer.
+     * 
+     * An applet on the other hand only needs to have each individual jar be fully signed by a signer. The signers can differ between jars.
+     * 
+     * @return Whether or not the app is considered signed.
+     */
+    // FIXME: Change javadoc once applets do not need entire jars signed.
+    public boolean isFullySigned() {
+        if (triviallySigned)
+            return true;
+        boolean fullySigned = appVerifier.isFullySigned(certs,
+                jarSignableEntries);
+        if (JNLPRuntime.isDebug()) {
+            System.out.println("App already has trusted publisher: "
+                    + fullySigned);
+        }
+        return fullySigned;
+    }
 
-        verifiedJars = new ArrayList<String>();
-        unverifiedJars = new ArrayList<String>();
+    /**
+     * Update the verifier to consider new jars when verifying.
+     * 
+     * @param jars
+     *            List of new jars to be verified.
+     * @param tracker
+     *            Resource tracker used to obtain the the jars from cache
+     * @throws Exception
+     *             Caused by issues with obtaining the jars' entries or interacting with the tracker.
+     */
+    public void add(List<JARDesc> jars, ResourceTracker tracker)
+            throws Exception {
+        verifyJars(jars, tracker);
+    }
+
+    /**
+     * Verify the jars provided and update the state of this instance to match the new information.
+     * 
+     * @param jars
+     *            List of new jars to be verified.
+     * @param tracker
+     *            Resource tracker used to obtain the the jars from cache
+     * @throws Exception
+     *             Caused by issues with obtaining the jars' entries or interacting with the tracker.
+     */
+    private void verifyJars(List<JARDesc> jars, ResourceTracker tracker)
+            throws Exception {
 
         for (JARDesc jar : jars) {
 
@@ -209,17 +230,22 @@ public class JarCertVerifier implements CertVerifier {
                 }
 
                 String localFile = jarFile.getAbsolutePath();
-                verifyResult result = verifyJar(localFile);
+                if (verifiedJars.contains(localFile)
+                        || unverifiedJars.contains(localFile)) {
+                    continue;
+                }
+
+                VerifyResult result = verifyJar(localFile);
                 triviallySigned = false;
 
-                if (result == verifyResult.UNSIGNED) {
+                if (result == VerifyResult.UNSIGNED) {
                     unverifiedJars.add(localFile);
-                } else if (result == verifyResult.SIGNED_NOT_OK) {
-                    noSigningIssues = false;
+                } else if (result == VerifyResult.SIGNED_NOT_OK) {
                     verifiedJars.add(localFile);
-                } else if (result == verifyResult.SIGNED_OK) {
+                } else if (result == VerifyResult.SIGNED_OK) {
                     verifiedJars.add(localFile);
-                    triviallySigned = totalSignableEntries <= 0 && certs.size() <= 0;
+                    triviallySigned = getTotalJarEntries(jarSignableEntries) <= 0
+                            && certs.size() <= 0;
                 }
             } catch (Exception e) {
                 // We may catch exceptions from using verifyJar()
@@ -228,26 +254,20 @@ public class JarCertVerifier implements CertVerifier {
             }
         }
 
-        //we really only want the first certPath
-        for (CertPath cPath : certs.keySet()) {
-
-            if (certs.get(cPath) != totalSignableEntries)
-                continue;
-            else
-                certPath = cPath;
-
-            // check if the certs added above are in the trusted path
-            checkTrustedCerts();
-
-            if (alreadyTrustPublisher || rootInCacerts)
-                break;
-        }
-
+        for (CertPath certPath : certs.keySet())
+            checkTrustedCerts(certPath);
     }
 
-    private verifyResult verifyJar(String jarName) throws Exception {
-        boolean anySigned = false;
-        boolean hasUnsignedEntry = false;
+    /**
+     * Checks through all the jar entries of jarName for signers, storing all the common ones in the certs hash map.
+     * 
+     * @param jarName
+     *            The absolute path to the jar file.
+     * @return The return of {@link JarCertVerifier#verifyJarEntryCerts} using the entries found in the jar located at jarName.
+     * @throws Exception
+     *             Will be thrown if there are any problems with the jar.
+     */
+    private VerifyResult verifyJar(String jarName) throws Exception {
         JarFile jarFile = null;
 
         try {
@@ -262,10 +282,9 @@ public class JarCertVerifier implements CertVerifier {
 
                 InputStream is = jarFile.getInputStream(je);
                 try {
-                    int n;
-                    while ((n = is.read(buffer, 0, buffer.length)) != -1) {
+                    while (is.read(buffer, 0, buffer.length) != -1) {
                         // we just read. this will throw a SecurityException
-                        // if  a signature/digest check fails.
+                        // if a signature/digest check fails.
                     }
                 } finally {
                     if (is != null) {
@@ -273,95 +292,9 @@ public class JarCertVerifier implements CertVerifier {
                     }
                 }
             }
+            return verifyJarEntryCerts(jarName, jarFile.getManifest() != null,
+                    entriesVec);
 
-            if (jarFile.getManifest() != null) {
-                if (verbose)
-                    System.out.println();
-
-                long now = System.currentTimeMillis();
-
-                for (JarEntry je : entriesVec) {
-                    String name = je.getName();
-                    CodeSigner[] signers = je.getCodeSigners();
-                    boolean isSigned = (signers != null);
-                    anySigned |= isSigned;
-
-                    boolean shouldHaveSignature = !je.isDirectory()
-                                                && !isMetaInfFile(name);
-
-                    hasUnsignedEntry |= shouldHaveSignature &&  !isSigned;
-
-                    if (shouldHaveSignature)
-                        totalSignableEntries++;
-
-                    if (shouldHaveSignature && isSigned) {
-                        for (int i = 0; i < signers.length; i++) {
-                            CertPath certPath = signers[i].getSignerCertPath();
-                            if (!certs.containsKey(certPath))
-                                certs.put(certPath, 1);
-                            else
-                                certs.put(certPath, certs.get(certPath) + 1);
-
-                            Certificate cert = signers[i].getSignerCertPath()
-                                    .getCertificates().get(0);
-                            if (cert instanceof X509Certificate) {
-                                checkCertUsage((X509Certificate) cert, null);
-                                if (!showcerts) {
-                                    long notBefore = ((X509Certificate) cert)
-                                                     .getNotBefore().getTime();
-                                    long notAfter = ((X509Certificate) cert)
-                                                    .getNotAfter().getTime();
-
-                                    if (now < notBefore) {
-                                        notYetValidCert = true;
-                                    }
-
-                                    if (notAfter < now) {
-                                        hasExpiredCert = true;
-                                    } else if (notAfter < now + SIX_MONTHS) {
-                                        hasExpiringCert = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } //while e has more elements
-            } else { //if man not null
-
-                // Else increment totalEntries by 1 so that unsigned jars with 
-                // no manifests can't sneak in
-                totalSignableEntries++;
-            }
-
-            //Alert the user if any of the following are true.
-            if (!anySigned) {
-                return verifyResult.UNSIGNED;
-            } else {
-                anyJarsSigned = true;
-
-                //warnings
-                if (hasUnsignedEntry || hasExpiredCert || hasExpiringCert ||
-                        badKeyUsage || badExtendedKeyUsage || badNetscapeCertType ||
-                        notYetValidCert) {
-
-                    addToDetails(R("SRunWithoutRestrictions"));
-
-                    if (badKeyUsage)
-                        addToDetails(R("SBadKeyUsage"));
-                    if (badExtendedKeyUsage)
-                        addToDetails(R("SBadExtendedKeyUsage"));
-                    if (badNetscapeCertType)
-                        addToDetails(R("SBadNetscapeCertType"));
-                    if (hasUnsignedEntry)
-                        addToDetails(R("SHasUnsignedEntry"));
-                    if (hasExpiredCert)
-                        addToDetails(R("SHasExpiredCert"));
-                    if (hasExpiringCert)
-                        addToDetails(R("SHasExpiringCert"));
-                    if (notYetValidCert)
-                        addToDetails(R("SNotYetValidCert"));
-                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -370,51 +303,175 @@ public class JarCertVerifier implements CertVerifier {
                 jarFile.close();
             }
         }
-
-        //anySigned does not guarantee that all files were signed.
-        return (anySigned && !(hasUnsignedEntry || hasExpiredCert
-                              || badKeyUsage || badExtendedKeyUsage || badNetscapeCertType || notYetValidCert)) ? verifyResult.SIGNED_OK : verifyResult.SIGNED_NOT_OK;
     }
 
     /**
-     * Checks the user's trusted.certs file and the cacerts file to see
-     * if a publisher's and/or CA's certificate exists there.
+     * Checks through all the jar entries for signers, storing all the common ones in the certs hash map.
+     * 
+     * @param jarName
+     *            The absolute path to the jar file.
+     * @param jarHasManifest
+     *            Whether or not the associated jar has a manifest.
+     * @param entries
+     *            The list of entries in the associated jar.
+     * @return If there is at least one signable entry that is not signed by a common signer, return UNSIGNED. Otherwise every signable entry is signed by at least one common signer. If the signer has no issues, return SIGNED_OK. If there are any signing issues, return SIGNED_NOT_OK.
+     * @throws Exception
+     *             Will be thrown if there are issues with entries.
      */
-    private void checkTrustedCerts() throws Exception {
-        if (certPath != null) {
-            try {
-                X509Certificate publisher = (X509Certificate) getPublisher();
-                KeyStore[] certKeyStores = KeyStores.getCertKeyStores();
-                alreadyTrustPublisher = CertificateUtils.inKeyStores(publisher, certKeyStores);
-                X509Certificate root = (X509Certificate) getRoot();
-                KeyStore[] caKeyStores = KeyStores.getCAKeyStores();
-                // Check entire cert path for a trusted CA
-                for (Certificate c : certPath.getCertificates()) {
-                	if ((rootInCacerts = CertificateUtils.inKeyStores(
-                            (X509Certificate) c, caKeyStores))) {
-                        break;
+    VerifyResult verifyJarEntryCerts(String jarName, boolean jarHasManifest,
+            Vector<JarEntry> entries) throws Exception {
+        // Contains number of entries the cert with this CertPath has signed.
+        HashMap<CertPath, Integer> jarSignCount = new HashMap<CertPath, Integer>();
+        int numSignableEntriesInJar = 0;
+
+        // Record current time just before checking the jar begins.
+        long now = System.currentTimeMillis();
+        if (jarHasManifest) {
+
+            for (JarEntry je : entries) {
+                String name = je.getName();
+                CodeSigner[] signers = je.getCodeSigners();
+                boolean isSigned = (signers != null);
+
+                boolean shouldHaveSignature = !je.isDirectory()
+                        && !isMetaInfFile(name);
+
+                if (shouldHaveSignature) {
+                    numSignableEntriesInJar++;
+                }
+
+                if (shouldHaveSignature && isSigned) {
+                    for (int i = 0; i < signers.length; i++) {
+                        CertPath certPath = signers[i].getSignerCertPath();
+
+                        if (!jarSignCount.containsKey(certPath))
+                            jarSignCount.put(certPath, 1);
+                        else
+                            jarSignCount.put(certPath,
+                                    jarSignCount.get(certPath) + 1);
                     }
                 }
-            } catch (Exception e) {
-                // TODO: Warn user about not being able to
-                // look through their cacerts/trusted.certs
-                // file depending on exception.
-                throw e;
-            }
+            } // while e has more elements
+        } else { // if manifest is null
 
-            if (!rootInCacerts)
-                addToDetails(R("SUntrustedCertificate"));
-            else
-                addToDetails(R("STrustedCertificate"));
+            // Else increment total entries by 1 so that unsigned jars with
+            // no manifests can't sneak in
+            numSignableEntriesInJar++;
         }
+
+        jarSignableEntries.put(jarName, numSignableEntriesInJar);
+
+        // Find all signers that have signed every signable entry in this jar.
+        boolean allEntriesSignedBySingleCert = false;
+        for (CertPath certPath : jarSignCount.keySet()) {
+            if (jarSignCount.get(certPath) == numSignableEntriesInJar) {
+                allEntriesSignedBySingleCert = true;
+
+                boolean wasPreviouslyVerified = certs.containsKey(certPath);
+                if (!wasPreviouslyVerified)
+                    certs.put(certPath, new CertInformation());
+
+                CertInformation certInfo = certs.get(certPath);
+                if (wasPreviouslyVerified)
+                    certInfo.resetForReverification();
+
+                certInfo.setNumJarEntriesSigned(jarName,
+                        numSignableEntriesInJar);
+
+                Certificate cert = certPath.getCertificates().get(0);
+                if (cert instanceof X509Certificate) {
+                    checkCertUsage(certPath, (X509Certificate) cert, null);
+                    long notBefore = ((X509Certificate) cert).getNotBefore().getTime();
+                    long notAfter = ((X509Certificate) cert).getNotAfter().getTime();
+                    if (now < notBefore) {
+                        certInfo.setNotYetValidCert();
+                    }
+
+                    if (notAfter < now) {
+                        certInfo.setHasExpiredCert();
+                    } else if (notAfter < now + SIX_MONTHS) {
+                        certInfo.setHasExpiringCert();
+                    }
+                }
+            }
+        }
+
+        // Every signable entry of this jar needs to be signed by at least
+        // one signer for the jar to be considered successfully signed.
+        VerifyResult result = null;
+        if (allEntriesSignedBySingleCert) {
+
+            // We need to find at least one signer without any issues.
+            for (CertPath entryCertPath : jarSignCount.keySet()) {
+                if (certs.containsKey(entryCertPath)
+                        && !hasSigningIssues(entryCertPath)) {
+                    result = VerifyResult.SIGNED_OK;
+                    break;
+                }
+            }
+            if (result == null) {
+                // All signers had issues
+                result = VerifyResult.SIGNED_NOT_OK;
+            }
+        } else {
+            result = VerifyResult.UNSIGNED;
+        }
+
+        if (JNLPRuntime.isDebug()) {
+            System.out.println("Jar found at " + jarName
+                    + "has been verified as " + result);
+        }
+        return result;
     }
 
-    /* (non-Javadoc)
-     * @see net.sourceforge.jnlp.tools.CertVerifier2#getPublisher()
+    /**
+     * Checks the user's trusted.certs file and the cacerts file to see if a
+     * publisher's and/or CA's certificate exists there.
+     *
+     * @param certPath
+     *            The cert path of the signer being checked for trust.
      */
-    public Certificate getPublisher() {
-        if (certPath != null) {
-            List<? extends Certificate> certList = certPath.getCertificates();
+    private void checkTrustedCerts(CertPath certPath) throws Exception {
+        CertInformation info = certs.get(certPath);
+        try {
+            X509Certificate publisher = (X509Certificate) getPublisher(certPath);
+            KeyStore[] certKeyStores = KeyStores.getCertKeyStores();
+            if (CertificateUtils.inKeyStores(publisher, certKeyStores))
+                info.setAlreadyTrustPublisher();
+            KeyStore[] caKeyStores = KeyStores.getCAKeyStores();
+            // Check entire cert path for a trusted CA
+            for (Certificate c : certPath.getCertificates()) {
+                if (CertificateUtils.inKeyStores((X509Certificate) c,
+                        caKeyStores)) {
+                    info.setRootInCacerts();
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            // TODO: Warn user about not being able to
+            // look through their cacerts/trusted.certs
+            // file depending on exception.
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("WARNING: Unable to read through cert store files.");
+            }
+            throw e;
+        }
+
+        // Otherwise a parent cert was not found to be trusted.
+        info.setUntrusted();
+    }
+
+    public void setCurrentlyUsedCertPath(CertPath cPath) {
+        currentlyUsed = cPath;
+    }
+
+    public Certificate getPublisher(CertPath cPath) {
+        if (cPath != null) {
+            currentlyUsed = cPath;
+        }
+        if (currentlyUsed != null) {
+            List<? extends Certificate> certList = currentlyUsed
+                    .getCertificates();
             if (certList.size() > 0) {
                 return certList.get(0);
             } else {
@@ -425,12 +482,13 @@ public class JarCertVerifier implements CertVerifier {
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.sourceforge.jnlp.tools.CertVerifier2#getRoot()
-     */
-    public Certificate getRoot() {
-        if (certPath != null) {
-            List<? extends Certificate> certList = certPath.getCertificates();
+    public Certificate getRoot(CertPath cPath) {
+        if (cPath != null) {
+            currentlyUsed = cPath;
+        }
+        if (currentlyUsed != null) {
+            List<? extends Certificate> certList = currentlyUsed
+                    .getCertificates();
             if (certList.size() > 0) {
                 return certList.get(certList.size() - 1);
             } else {
@@ -441,20 +499,10 @@ public class JarCertVerifier implements CertVerifier {
         }
     }
 
-    private void addToDetails(String detail) {
-        if (!details.contains(detail))
-            details.add(detail);
-    }
-
     /**
      * Returns whether a file is in META-INF, and thus does not require signing.
-     *
-     * Signature-related files under META-INF include:
-     * . META-INF/MANIFEST.MF
-     * . META-INF/SIG-*
-     * . META-INF/*.SF
-     * . META-INF/*.DSA
-     * . META-INF/*.RSA
+     * 
+     * Signature-related files under META-INF include: . META-INF/MANIFEST.MF . META-INF/SIG-* . META-INF/*.SF . META-INF/*.DSA . META-INF/*.RSA
      */
     static boolean isMetaInfFile(String name) {
         String ucName = name.toUpperCase();
@@ -463,15 +511,19 @@ public class JarCertVerifier implements CertVerifier {
 
     /**
      * Check if userCert is designed to be a code signer
-     * @param userCert the certificate to be examined
-     * @param bad 3 booleans to show if the KeyUsage, ExtendedKeyUsage,
-     *            NetscapeCertType has codeSigning flag turned on.
-     *            If null, the class field badKeyUsage, badExtendedKeyUsage,
+     * 
+     * @param userCert
+     *            the certificate to be examined
+     * @param bad
+     *            3 booleans to show if the KeyUsage, ExtendedKeyUsage, 
+     *            NetscapeCertType has codeSigning flag turned on. If null, 
+     *            the class field badKeyUsage, badExtendedKeyUsage, 
      *            badNetscapeCertType will be set.
-     *
-     * Required for verifyJar()
+     * 
+     *            Required for verifyJar()
      */
-    void checkCertUsage(X509Certificate userCert, boolean[] bad) {
+    void checkCertUsage(CertPath certPath, X509Certificate userCert,
+            boolean[] bad) {
 
         // Can act as a signer?
         // 1. if KeyUsage, then [0] should be true
@@ -489,7 +541,7 @@ public class JarCertVerifier implements CertVerifier {
                 if (bad != null) {
                     bad[0] = true;
                 } else {
-                    badKeyUsage = true;
+                    certs.get(certPath).setBadKeyUsage();
                 }
             }
         }
@@ -502,7 +554,7 @@ public class JarCertVerifier implements CertVerifier {
                     if (bad != null) {
                         bad[1] = true;
                     } else {
-                        badExtendedKeyUsage = true;
+                        certs.get(certPath).setBadExtendedKeyUsage();
                     }
                 }
             }
@@ -512,24 +564,24 @@ public class JarCertVerifier implements CertVerifier {
 
         try {
             // OID_NETSCAPE_CERT_TYPE
-            byte[] netscapeEx = userCert.getExtensionValue
-                                ("2.16.840.1.113730.1.1");
+            byte[] netscapeEx = userCert
+                    .getExtensionValue("2.16.840.1.113730.1.1");
             if (netscapeEx != null) {
                 DerInputStream in = new DerInputStream(netscapeEx);
                 byte[] encoded = in.getOctetString();
                 encoded = new DerValue(encoded).getUnalignedBitString()
                         .toByteArray();
 
-                NetscapeCertTypeExtension extn =
-                        new NetscapeCertTypeExtension(encoded);
+                NetscapeCertTypeExtension extn = new NetscapeCertTypeExtension(
+                        encoded);
 
-                Boolean val = (Boolean) extn.get(
-                                  NetscapeCertTypeExtension.OBJECT_SIGNING);
+                Boolean val = (Boolean) extn
+                        .get(NetscapeCertTypeExtension.OBJECT_SIGNING);
                 if (!val) {
                     if (bad != null) {
                         bad[2] = true;
                     } else {
-                        badNetscapeCertType = true;
+                        certs.get(certPath).setBadNetscapeCertType();
                     }
                 }
             }
@@ -540,11 +592,31 @@ public class JarCertVerifier implements CertVerifier {
 
     /**
      * Returns if all jars are signed.
-     *
+     * 
      * @return True if all jars are signed, false if there are one or more unsigned jars
      */
     public boolean allJarsSigned() {
         return this.unverifiedJars.size() == 0;
     }
 
+    public void checkTrustWithUser(JNLPFile file) throws LaunchException {
+        appVerifier.checkTrustWithUser(this, file);
+    }
+
+    public Map<String, Integer> getJarSignableEntries() {
+        return Collections.unmodifiableMap(jarSignableEntries);
+    }
+
+    /**
+     * Get the total number of entries in the provided map.
+     * 
+     * @return The number of entries.
+     */
+    public static int getTotalJarEntries(Map<String, Integer> map) {
+        int sum = 0;
+        for (int value : map.values()) {
+            sum += value;
+        }
+        return sum;
+    }
 }

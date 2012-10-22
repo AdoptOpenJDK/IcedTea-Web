@@ -79,8 +79,10 @@ import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.JNLPAppVerifier;
+import net.sourceforge.jnlp.security.PluginAppVerifier;
 import net.sourceforge.jnlp.security.SecurityDialogs;
-import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.FileUtils;
 import sun.misc.JarIndex;
@@ -153,14 +155,8 @@ public class JNLPClassLoader extends URLClassLoader {
     /** all jars not yet part of classloader or active */
     private List<JARDesc> available = new ArrayList<JARDesc>();
 
-    /** all of the jar files that were verified */
-    private ArrayList<String> verifiedJars = null;
-
-    /** all of the jar files that were not verified */
-    private ArrayList<String> unverifiedJars = null;
-
     /** the jar cert verifier tool to verify our jars */
-    private JarCertVerifier jcv = null;
+    private final JarCertVerifier jcv;
 
     private boolean signing = false;
 
@@ -222,6 +218,16 @@ public class JNLPClassLoader extends URLClassLoader {
         this.resources = file.getResources();
 
         this.mainClass = mainName;
+
+        AppVerifier verifier;
+
+        if (file instanceof PluginBridge && !((PluginBridge)file).useJNLPHref()) {
+            verifier = new PluginAppVerifier();
+        } else {
+            verifier = new JNLPAppVerifier();
+        }
+
+        jcv = new JarCertVerifier(verifier);
 
         // initialize extensions
         initializeExtensions();
@@ -604,10 +610,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
         if (JNLPRuntime.isVerifying()) {
 
-            JarCertVerifier jcv;
-
             try {
-                jcv = verifyJars(initialJars);
+                jcv.add(initialJars, tracker);
             } catch (Exception e) {
                 //we caught an Exception from the JarCertVerifier class.
                 //Note: one of these exceptions could be from not being able
@@ -618,7 +622,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
 
             //Case when at least one jar has some signing
-            if (jcv.anyJarsSigned() && jcv.isFullySignedByASingleCert()) {
+            if (jcv.isFullySigned()) {
                 signing = true;
 
                 if (!jcv.allJarsSigned() &&
@@ -650,10 +654,10 @@ public class JNLPClassLoader extends URLClassLoader {
                 // If main jar was found, but a signed JNLP file was not located
                 if (!isSignedJNLP && foundMainJar) 
                     file.setSignedJNLPAsMissing();
-                
+
                 //user does not trust this publisher
-                if (!jcv.getAlreadyTrustPublisher() && !jcv.isTriviallySigned()) {
-                    checkTrustWithUser(jcv);
+                if (!jcv.isTriviallySigned()) {
+                    checkTrustWithUser();
                 } else {
                     /**
                      * If the user trusts this publisher (i.e. the publisher's certificate
@@ -864,7 +868,6 @@ public class JNLPClassLoader extends URLClassLoader {
     private void verifySignedJNLP(JARDesc jarDesc, JarFile jarFile)
             throws LaunchException {
 
-        JarCertVerifier signer = new JarCertVerifier();
         List<JARDesc> desc = new ArrayList<JARDesc>();
         desc.add(jarDesc);
 
@@ -875,9 +878,9 @@ public class JNLPClassLoader extends URLClassLoader {
         InputStreamReader jnlpReader = null;
 
         try {
-            signer.verifyJars(desc, tracker);
-
-            if (signer.allJarsSigned()) { // If the jar is signed
+            // NOTE: verification should have happened by now. In other words,
+            // calling jcv.verifyJars(desc, tracker) here should have no affect.
+            if (jcv.isFullySigned()) {
 
                 Enumeration<JarEntry> entries = jarFile.entries();
                 JarEntry je;
@@ -961,7 +964,7 @@ public class JNLPClassLoader extends URLClassLoader {
             /*
              * After this exception is caught, it is escaped. If an exception is
              * thrown while handling the jar file, (mainly for
-             * JarCertVerifier.verifyJars) it assumes the jar file is unsigned and
+             * JarCertVerifier.add) it assumes the jar file is unsigned and
              * skip the check for a signed JNLP file
              */
             
@@ -991,28 +994,18 @@ public class JNLPClassLoader extends URLClassLoader {
                 e.printStackTrace(System.err);
             }
     }
-    
-    private void checkTrustWithUser(JarCertVerifier jcv) throws LaunchException {
+
+    /**
+     * Prompt the user for trust on all the signers that require approval.
+     * @throws LaunchException if the user does not approve every dialog prompt.
+     */
+    private void checkTrustWithUser() throws LaunchException {
         if (JNLPRuntime.isTrustAll()){
             return;
         }
-        if (!jcv.getRootInCacerts()) { //root cert is not in cacerts
-            boolean b = SecurityDialogs.showCertWarningDialog(
-                    AccessType.UNVERIFIED, file, jcv);
-            if (!b)
-                throw new LaunchException(null, null, R("LSFatal"),
-                        R("LCLaunching"), R("LNotVerified"), "");
-        } else if (jcv.getRootInCacerts()) { //root cert is in cacerts
-            boolean b = false;
-            if (jcv.noSigningIssues())
-                b = SecurityDialogs.showCertWarningDialog(
-                        AccessType.VERIFIED, file, jcv);
-            else if (!jcv.noSigningIssues())
-                b = SecurityDialogs.showCertWarningDialog(
-                        AccessType.SIGNING_ERROR, file, jcv);
-            if (!b)
-                throw new LaunchException(null, null, R("LSFatal"),
-                        R("LCLaunching"), R("LCancelOnUserRequest"), "");
+
+        if (jcv.isFullySigned() && !jcv.getAlreadyTrustPublisher()) {
+            jcv.checkTrustWithUser(file);
         }
     }
 
@@ -1226,15 +1219,25 @@ public class JNLPClassLoader extends URLClassLoader {
                                         continue;
                                     }
 
-                                    JarCertVerifier signer = new JarCertVerifier();
-                                    List<JARDesc> jars = new ArrayList<JARDesc>();
-                                    JARDesc jarDesc = new JARDesc(new File(extractedJarLocation).toURL(), null, null, false, false, false, false);
-                                    jars.add(jarDesc);
                                     tracker.addResource(new File(extractedJarLocation).toURL(), null, null, null);
-                                    signer.verifyJars(jars, tracker);
 
-                                    if (signer.anyJarsSigned() && !signer.getAlreadyTrustPublisher()) {
-                                        checkTrustWithUser(signer);
+                                    URL codebase = file.getCodeBase();
+                                    if (codebase == null) {
+                                        //FIXME: codebase should be the codebase of the Main Jar not
+                                        //the location. Although, it still works in the current state.
+                                        codebase = file.getResources().getMainJAR().getLocation();
+                                    }
+
+                                    SecurityDesc jarSecurity = null;
+                                    if (jcv.isFullySigned()) {
+                                        // Already trust application, nested jar should be given
+                                        jarSecurity = new SecurityDesc(file,
+                                                SecurityDesc.ALL_PERMISSIONS,
+                                                codebase.getHost());
+                                    } else {
+                                        jarSecurity = new SecurityDesc(file,
+                                                SecurityDesc.SANDBOX_PERMISSIONS,
+                                                codebase.getHost());
                                     }
 
                                     try {
@@ -1243,25 +1246,6 @@ public class JNLPClassLoader extends URLClassLoader {
                                         URL fakeRemote = new URL(jar.getLocation().toString() + "!" + je.getName());
                                         CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
                                         addURL(fakeRemote);
-
-                                        SecurityDesc jarSecurity = file.getSecurity();
-
-                                        if (file instanceof PluginBridge) {
-
-                                            URL codebase = null;
-
-                                            if (file.getCodeBase() != null) {
-                                                codebase = file.getCodeBase();
-                                            } else {
-                                                //Fixme: codebase should be the codebase of the Main Jar not
-                                                //the location. Although, it still works in the current state.
-                                                codebase = file.getResources().getMainJAR().getLocation();
-                                            }
-
-                                            jarSecurity = new SecurityDesc(file,
-                                                    SecurityDesc.ALL_PERMISSIONS,
-                                                    codebase.getHost());
-                                        }
 
                                         jarLocationSecurityMap.put(fakeRemote, jarSecurity);
 
@@ -1475,18 +1459,6 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-         * Verifies code signing of jars to be used.
-         *
-         * @param jars the jars to be verified.
-         */
-    private JarCertVerifier verifyJars(List<JARDesc> jars) throws Exception {
-
-        jcv = new JarCertVerifier();
-        jcv.verifyJars(jars, tracker);
-        return jcv;
-    }
-
-    /**
      * Find the loaded class in this loader or any of its extension loaders.
      */
     protected Class findLoadedClassAll(String name) {
@@ -1642,7 +1614,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
             // Verify if needed
 
-            final JarCertVerifier signer = new JarCertVerifier();
             final List<JARDesc> jars = new ArrayList<JARDesc>();
             jars.add(desc);
 
@@ -1654,14 +1625,12 @@ public class JNLPClassLoader extends URLClassLoader {
 
             AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
                 public Void run() throws Exception {
-                    signer.verifyJars(jars, tracker);
+                    jcv.add(jars, tracker);
 
-                    if (signer.anyJarsSigned() && !signer.getAlreadyTrustPublisher()) {
-                        checkTrustWithUser(signer);
-                    }
+                    checkTrustWithUser();
 
                     final SecurityDesc security;
-                    if (signer.anyJarsSigned()) {
+                    if (jcv.isFullySigned()) {
                         security = new SecurityDesc(file,
                                 SecurityDesc.ALL_PERMISSIONS,
                                 file.getCodeBase().getHost());

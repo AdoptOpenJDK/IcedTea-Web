@@ -1,5 +1,5 @@
 /* CertVerifier.java
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -39,10 +39,10 @@ package net.sourceforge.jnlp.security;
 
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
- * An interface that provides various details about a certificate
+ * An interface that provides various details about certificates of an app.
  */
 
 public interface CertVerifier {
@@ -58,36 +58,30 @@ public interface CertVerifier {
     public boolean getRootInCacerts();
 
     /**
-     * Return if there are signing issues with the certificate(s) being veried
+     * Return if there are signing issues with the certificate being verified
      */
-    public boolean hasSigningIssues();
+    public boolean hasSigningIssues(CertPath certPath);
 
     /**
-     * Return if there are no signing issues with this cert (!hasSigningIssues())
+     * Get the details regarding issue with this certificate
      */
-    public boolean noSigningIssues();
+    public List<String> getDetails(CertPath certPath);
 
     /**
-     * Get the details regarding issue(s) with this certificate
-     */
-    public ArrayList<String> getDetails();
-
-    /**
-     * Return a valid certificate path to this certificate(s) being verified
+     * Return a valid certificate path to this certificate being verified
      * @return The CertPath
      */
-    public CertPath getCertPath();
+    public CertPath getCertPath(CertPath certPath);
 
     /**
      * Returns the application's publisher's certificate.
      */
-    public abstract Certificate getPublisher();
+    public abstract Certificate getPublisher(CertPath certPath);
 
     /**
      * Returns the application's root's certificate. This
-     * may return the same certificate as getPublisher() in
+     * may return the same certificate as getPublisher(CertPath certPath) in
      * the event that the application is self signed.
      */
-    public abstract Certificate getRoot();
-
+    public abstract Certificate getRoot(CertPath certPath);
 }

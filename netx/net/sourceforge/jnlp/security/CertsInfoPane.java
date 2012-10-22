@@ -84,7 +84,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
      * Builds the JTree out of CertPaths.
      */
     void buildTree() {
-        certPath = parent.getCertVerifier().getCertPath();
+        certPath = parent.getCertVerifier().getCertPath(null);
         X509Certificate firstCert =
                         ((X509Certificate) certPath.getCertificates().get(0));
         String subjectString =
