@@ -30,6 +30,31 @@
 
 2012-10-19  Adam Domurad  <adomurad@redhat.com>
 
+	Reproduces PR822: Applets fail to load if jars have different signers.
+	Tests for applets & JNLPs with multiple signers per jar.
+	* tests/reproducers/signed/ReadPropertiesSigned/srcs/ReadPropertiesSigned.java:
+	Modified to end with standard applet finish message.
+	* tests/reproducers/simple/ReadProperties/srcs/ReadProperties.java:
+	* tests/reproducers/custom/MultipleSignaturesPerJar/README: Explains
+	dependence on ReadPropertiesSigned.
+	* tests/reproducers/custom/MultipleSignaturesPerJar/resources/MultipleSignaturesPerJarMatching.html:
+	HTML applet test with a common signer.
+	* tests/reproducers/custom/MultipleSignaturesPerJar/resources/MultipleSignaturesPerJarMatching.jnlp:	
+	JNLP test with a common signer.
+	* tests/reproducers/custom/MultipleSignaturesPerJar/resources/MultipleSignaturesPerJarMismatching.html:
+	HTML applet test without a common signer.
+	* tests/reproducers/custom/MultipleSignaturesPerJar/resources/MultipleSignaturesPerJarMismatching.jnlp:
+	JNLP test without a common signer.
+	* tests/reproducers/custom/MultipleSignaturesPerJar/srcs/Makefile:
+	Custom makefile used to sign a jar with multiple signers.
+	* tests/reproducers/custom/MultipleSignaturesPerJar/srcs/somecrazytestpackage/MultipleSignaturesPerJarMain.java:
+	Accesses ReadPropertiesSigned from another package with different 
+	signers.
+	* tests/reproducers/custom/MultipleSignaturesPerJar/testcases/MultipleSignaturesPerJarTests.java:
+	Test driver.
+
+2012-10-19  Adam Domurad  <adomurad@redhat.com>
+
 	New message for signer mismatch in JNLP applications.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Added 
 	message 'The JNLP application is not fully signed by a single cert.'
