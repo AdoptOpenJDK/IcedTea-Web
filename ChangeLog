@@ -1,3 +1,9 @@
+2012-10-23  Jiri Vanek <jvanek@redhat.com>
+
+	KnownToFail texts are now bold in html report
+	* tests/report-styles/jreport.xsl: all text outputs of
+	test="@known-to-fail=true" conditions are marked with <b>.
+
 2012-10-19  Adam Domurad  <adomurad@redhat.com>
 
 	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/testcases/AdditionalJarsInMetaInfIndexListTests.java

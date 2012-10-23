@@ -261,10 +261,10 @@ If there is no need for linking, please use value "none" for this variable
            <xsl:when test="@known-to-fail">
              <xsl:choose>
                <xsl:when test="@known-to-fail=true">
-                 <xsl:text>" - WARNING This test is known to fail, but have passed!</xsl:text>
+                 <b><xsl:text>" - WARNING This test is known to fail, but have passed!</xsl:text></b>
                </xsl:when>
                <xsl:otherwise>
-                 <xsl:text> - This test is known to fail</xsl:text>
+                 <b><xsl:text> - This test is known to fail</xsl:text></b>
                </xsl:otherwise>
              </xsl:choose>
            </xsl:when>
@@ -276,7 +276,7 @@ If there is no need for linking, please use value "none" for this variable
         FAILED (<xsl:value-of select="@time"/>s) 
          <xsl:choose>
            <xsl:when test="@known-to-fail">
-             <xsl:text> - This test is known to fail</xsl:text>
+             <b><xsl:text> - This test is known to fail</xsl:text></b>
            </xsl:when>
          </xsl:choose>
          </div>
