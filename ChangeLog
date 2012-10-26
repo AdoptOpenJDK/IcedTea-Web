@@ -1,3 +1,43 @@
+2012-10-26  Jiri Vanek <jvanek@redhat.com>
+
+	Added clipboard reproducers (PR708)
+	* tests/reproducers/signed/ClipboardContentSigned/resources/ClipboardContentSignedCopy1.jnlp:
+	Jnlp to invoke manual copying to clipboard on signed app, please note
+	the delayed death of application
+	* tests/reproducers/signed/ClipboardContentSigned/resources/ClipboardContentSignedCopy2.jnlp:
+	Jnlp to invoke jtextfield like copying  signed app, please note the
+	delayed death of application
+	* tests/reproducers/signed/ClipboardContentSigned/resources/ClipboardContentSignedPaste1.jnlp:
+	Jnlp to invoke manual pasting on signed application
+	* tests/reproducers/signed/ClipboardContentSigned/resources/ClipboardContentSignedPaste2.jnlp:
+	Jnlp to invoke jtextfield like pasting on signed application
+	* tests/reproducers/signed/ClipboardContentSigned/srcs/ClipboardContentSigned.java:
+	Application which is trying to access clipboard by various ways.
+	* tests/reproducers/signed/ClipboardContentSigned/testcases/ClipboardContentSignedTests.java:
+	Automated tests for four above jnlps.
+	* tests/reproducers/simple/ClipboardContent/resources/ClipboardContentCopy1.jnlp:
+	Jnlp to invoke manual copying to clipboard on unsigned app, please note
+	the delayed death of application
+	* tests/reproducers/simple/ClipboardContent/resources/ClipboardContentCopy2.jnlp:
+	Jnlp to invoke jtextfield like copying  unsigned app, please note the
+	delayed death of application
+	* tests/reproducers/simple/ClipboardContent/resources/ClipboardContentPaste1.jnlp:
+	Jnlp to invoke manual pasting on unsigned application
+	* tests/reproducers/simple/ClipboardContent/resources/ClipboardContentPaste2.jnlp:
+	Jnlp to invoke jtextfield like pasting on unsigned application
+	* tests/reproducers/simple/ClipboardContent/srcs/ClipboardContent.java:
+	Application which is trying to access clipboard by various ways.
+	* tests/reproducers/simple/ClipboardContent/testcases/ClipboardContentTests.java:
+	Automated tests for first and third of above four jnlps. The tests of
+	second and fourth is disabled due to necessary manual interaction 
+	* tests/test-extensions/net/sourceforge/jnlp/tools/WaitingForStringProcess.java:
+	Utility class for process waiting for some string for another string
+	* tests/test-extensions/net/sourceforge/jnlp/tools/ClipboardHelpers.java
+	Utility class for copying/pasting text to/from clipboard
+	* tests/test-extensions/net/sourceforge/jnlp/tools/AsyncJavaws.java
+	Utility class for launching javaws in separate thread.
+
+
 2012-10-23  Jiri Vanek <jvanek@redhat.com>
 
 	KnownToFail texts are now bold in html report
@@ -217,8 +257,8 @@
 
 2012-09-26  Jana Fabrikova  <jfabriko@redhat.com>
 
-        * tests/test-extensions/net/sourceforge/jnlp/closinglisteners/StringMatchClosingListener.java:
-        Added forgotten package name.
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/StringMatchClosingListener.java:
+	Added forgotten package name.
 
 2012-09-25  Jiri Vanek <jvanek@redhat.com>
 
