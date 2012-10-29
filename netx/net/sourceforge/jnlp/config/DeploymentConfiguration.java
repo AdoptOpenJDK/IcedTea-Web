@@ -209,6 +209,12 @@ public final class DeploymentConfiguration {
             sm.checkRead(userFile.toString());
         }
 
+        File systemConfigFile = findSystemConfigFile();
+
+        load(systemConfigFile, userFile, fixIssues);
+    }
+
+    void load(File systemConfigFile, File userFile, boolean fixIssues) throws ConfigurationException {
         Map<String, Setting<String>> initialProperties = Defaults.getDefaults();
 
         Map<String, Setting<String>> systemProperties = null;
@@ -218,7 +224,6 @@ public final class DeploymentConfiguration {
          * there is a system-level deployment.poperties file
          */
 
-        File systemConfigFile = findSystemConfigFile();
         if (systemConfigFile != null) {
             if (loadSystemConfiguration(systemConfigFile)) {
                 if (JNLPRuntime.isDebug()) {
@@ -254,6 +259,21 @@ public final class DeploymentConfiguration {
         }
 
         currentConfiguration = initialProperties;
+    }
+
+    /**
+     * Copies the current configuration into the target
+     */
+    public void copyTo(Properties target) {
+        Set<String> names = getAllPropertyNames();
+
+        for (String name : names) {
+            String value = getProperty(name);
+            // for Properties, missing and null are identical
+            if (value != null) {
+                target.setProperty(name, value);
+            }
+        }
     }
 
     /**

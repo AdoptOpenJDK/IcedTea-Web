@@ -1,3 +1,15 @@
+2012-10-29  Omair Majid  <omajid@redhat.com>
+
+	PR1186
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
+	(load(boolean)): Delegate to load(File,File,boolean).
+	(load(File,File,boolean)): New method.
+	(copyTo): New method.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	(initialize): Copy configuration to system properties.
+	* tests/netx/unit/net/sourceforge/jnlp/config/DeploymentConfigurationTest.java:
+	New File.
+
 2012-10-29  Jana Fabrikova <jfabriko@redhat.com>
 
 	* tests/reproducers/simple/JSToJSet 

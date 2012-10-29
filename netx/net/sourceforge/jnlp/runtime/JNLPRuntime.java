@@ -184,6 +184,7 @@ public class JNLPRuntime {
 
         try {
             config.load();
+            config.copyTo(System.getProperties());
         } catch (ConfigurationException e) {
             /* exit if there is a fatal exception loading the configuration */
             if (isApplication) {
