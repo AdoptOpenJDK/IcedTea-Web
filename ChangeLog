@@ -1,5 +1,12 @@
 2012-10-29  Omair Majid  <omajid@redhat.com>
 
+	* tests/reproducers/signed/DeploymentPropertiesAreExposed/resources/DeploymentPropertiesAreExposed.jnlp,
+	* tests/reproducers/signed/DeploymentPropertiesAreExposed/srcs/Test.java,
+	* tests/reproducers/signed/DeploymentPropertiesAreExposed/testcases/DeploymentPropertiesAreExposedTest.java:
+	New files.
+
+2012-10-29  Omair Majid  <omajid@redhat.com>
+
 	PR1186
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
 	(load(boolean)): Delegate to load(File,File,boolean).
