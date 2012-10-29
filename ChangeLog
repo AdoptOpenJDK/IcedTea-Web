@@ -1,3 +1,8 @@
+2012-10-29  Jana Fabrikova <jfabriko@redhat.com>
+
+	* tests/reproducers/simple/JSToJSet 
+	Added reproducer for testing LiveConnect - setting Java members from JavaScript side
+
 2012-10-26  Jiri Vanek <jvanek@redhat.com>
 
 	Added clipboard reproducers (PR708)
