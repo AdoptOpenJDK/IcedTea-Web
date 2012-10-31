@@ -66,12 +66,12 @@ public class JSToJSetTest extends BrowserTest {
     
     private void evaluateStdoutContents(String expectedStdout, ProcessResult pr) {
         // Assert that the applet was initialized.
-        Assert.assertTrue("JSToJSetTest stdout should contain \"" + initStr
-                + "\" but it didn't.", pr.stdout.contains(initStr));
+        Assert.assertTrue("JSToJSet: the stdout should contain " + initStr
+                + ", but it didnt.", pr.stdout.contains(initStr));
 
         // Assert that the values set by JavaScript are ok
-        Assert.assertTrue("The output should include: "+expectedStdout+", but is: "+pr.stdout,
-                pr.stdout.contains(expectedStdout));
+        Assert.assertTrue("JSToJSet: the output should include: "+expectedStdout+", but it didnt.",
+        		pr.stdout.contains(expectedStdout));
 
     }
 
@@ -83,23 +83,23 @@ public class JSToJSetTest extends BrowserTest {
     }
     
     private void jsToJavaSetSpecialTest(String fieldStr, String valueStr, int testType) throws Exception {
-        String strURL = "/JSToJSet.html?";
-        String expectedStdout = "";
-        switch( testType ){
+    	String strURL = "/JSToJSet.html?";
+    	String expectedStdout = "";
+    	switch( testType ){
         case 0://array element
-            strURL += fieldStr + ";" + valueStr;
-            expectedStdout = "New array value is: "+valueStr;
+        	strURL += fieldStr + ";" + valueStr;
+        	expectedStdout = "New array value is: "+valueStr;
             break;
         case 1://whole array, set 1st element
-            strURL += fieldStr + ";[" + valueStr;
-            expectedStdout = "New array value is: "+valueStr;
-            break;
+        	strURL += fieldStr + ";[" + valueStr;
+        	expectedStdout = "New array value is: "+valueStr;
+    		break;
         case 2://char et al - to be set at JS side
-            strURL += fieldStr + ";JavaScript";
-            expectedStdout = "New value is: "+valueStr;
+        	strURL += fieldStr + ";JavaScript";
+        	expectedStdout = "New value is: "+valueStr;
             break;
         default:
-            break;        
+            break;    	
         }
          
         ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());

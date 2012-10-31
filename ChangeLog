@@ -1,3 +1,10 @@
+2012-10-31 Jana Fabrikova <jfabriko@redhat.com>
+
+	*tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:
+	Modifying the testcase output to a simpler text.
+	*tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java:
+	Modifying the testcase output to a simpler text.
+
 2012-10-29  Omair Majid  <omajid@redhat.com>
 
 	* tests/reproducers/signed/DeploymentPropertiesAreExposed/resources/DeploymentPropertiesAreExposed.jnlp,

@@ -74,12 +74,12 @@ public class JSToJGetTest extends BrowserTest {
 
     private void evaluateStdoutContents(String testStr, ProcessResult pr) {
         // Assert that the applet was initialized.
-        Assert.assertTrue("JSToJGetTest stdout should contain \"" + initStr
-                + "\" but it didn't.", pr.stdout.contains(initStr));
+        Assert.assertTrue("JSToJGetTest stdout should contain " + initStr
+                + " but it didnt.", pr.stdout.contains(initStr));
 
         // Assert that the applet was set up for the GM tests.
-        Assert.assertTrue("JSToJGetTest stdout should contain \"" + setupStr
-                + "\" but it didn't.", pr.stdout.contains(setupStr));
+        Assert.assertTrue("JSToJGetTest stdout should contain " + setupStr
+                + " but it didnt.", pr.stdout.contains(setupStr));
 
         // Assert that the tests have passed.
         String s0 = testStr + passStr;
@@ -99,26 +99,24 @@ public class JSToJGetTest extends BrowserTest {
         }
 
         String failStr = "JSToJGet " + testStr
-                + ": \"passed\" not found in the applet stdout, which is: "
-                + pr.stdout.substring(indBegin, pr.stdout.length());
+                + ": passed not found in the applet stdout.";
 
         if (ind1 != -1) {
             // int inde = pr.stdout.indexOf(expStr);
             // int indf = pr.stdout.indexOf(foundStr);
-            int indend = pr.stdout.indexOf(endStr);
-            failStr = pr.stdout.substring(ind1, indend + endStr.length());
+            // int indend = pr.stdout.indexOf(endStr);
+            failStr = "JSToJGet: value mismatch in "+testStr;
         }
 
         if (ind2 != -1) {
             // int inde = pr.stdout.indexOf(expStr);
             // int indf = pr.stdout.indexOf(foundStr);
-            int indend = pr.stdout.indexOf(endStr);
-            failStr = pr.stdout.substring(ind2, indend + endStr.length());
+            // int indend = pr.stdout.indexOf(endStr);
+            failStr = "JSToJGet: type mismatch in "+testStr;
         }
 
         if (ind3 != -1) {
-            failStr = "JSToJGet: " + testStr
-                    + pr.stdout.substring(ind3, pr.stdout.length());
+            failStr = "JSToJGet: an error occured during " + testStr;
         }
 
         Assert.assertTrue(failStr, (ind3 == -1));// no error on Java side
