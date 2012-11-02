@@ -5,6 +5,7 @@ LAUNCHER_BOOTCLASSPATH=@LAUNCHER_BOOTCLASSPATH@
 LAUNCHER_FLAGS=-Xms8m
 CLASSNAME=net.sourceforge.jnlp.runtime.Boot
 BINARY_LOCATION=@JAVAWS_BIN_LOCATION@
+SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
 PROGRAM_NAME=javaws
 CP=@JRE@/lib/rt.jar
 
@@ -15,6 +16,10 @@ COMMAND=()
 i=0
 j=0
 
+SPLASH="false"
+if [ "x$ICEDTEA_WEB_SPLASH" = "x" ] ; then
+SPLASH="true"
+fi;
 while [ "$#" -gt "0" ]; do
   case "$1" in
     -J*)
@@ -24,6 +29,9 @@ while [ "$#" -gt "0" ]; do
     *)
       ARGS[$j]="$1"
       j=$((j+1))
+      if [ "$1" = "-headless" ] ; then
+        SPLASH="false"
+      fi
       ;;
   esac
   shift
@@ -32,6 +40,10 @@ done
 k=0
 COMMAND[k]="${JAVA}"
 k=$((k+1))
+if [ "$SPLASH" = "true" ] ; then
+COMMAND[k]="-splash:${SPLASH_LOCATION}"
+k=$((k+1))
+fi;
 COMMAND[k]="${LAUNCHER_BOOTCLASSPATH}"
 k=$((k+1))
 COMMAND[k]="${LAUNCHER_FLAGS}"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Red Hat, Inc.
+ * Copyright 2012 Red Hat, Inc.
  * This file is part of IcedTea, http://icedtea.classpath.org
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
@@ -22,7 +22,6 @@
 
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.AppletLog;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -32,6 +31,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import net.sourceforge.jnlp.splashscreen.SplashController;
+import net.sourceforge.jnlp.splashscreen.SplashPanel;
 
 import sun.applet.AppletViewerPanel;
 import sun.awt.SunToolkit;
@@ -42,10 +43,11 @@ import sun.awt.SunToolkit;
  *
  * @author      Francis Kung <fkung@redhat.com>
  */
-public class NetxPanel extends AppletViewerPanel {
+public class NetxPanel extends AppletViewerPanel implements SplashController {
     private PluginBridge bridge = null;
     private boolean exitOnFailure = true;
     private AppletInstance appInst = null;
+    private SplashController splashController;
     private boolean appletAlive;
     private final String uKey;
 
@@ -232,4 +234,32 @@ public class NetxPanel extends AppletViewerPanel {
             SunToolkit.createNewAppContext();
         }
     }
+
+    
+   
+
+    public void setAppletViewerFrame(SplashController framePanel) {
+        splashController=framePanel;
+    }
+
+    @Override
+    public void removeSplash() {
+        splashController.removeSplash();
+    }
+
+    @Override
+    public void replaceSplash(SplashPanel r) {
+        splashController.replaceSplash(r);
+    }
+
+    @Override
+    public int getSplashWidth() {
+        return splashController.getSplashWidth();
+    }
+
+    @Override
+    public int getSplashHeigth() {
+        return splashController.getSplashHeigth();
+    }
+
 }

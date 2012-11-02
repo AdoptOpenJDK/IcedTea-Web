@@ -9,6 +9,7 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.4 (2012-XX-XX):
+* Splash screen for javaws and plugin
 * Security updates
   - CVE-2012-3422, RH840592: Potential read from an uninitialized memory location
   - CVE-2012-3423, RH841345: Incorrect handling of not 0-terminated strings

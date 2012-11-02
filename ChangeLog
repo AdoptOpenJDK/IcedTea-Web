@@ -1,3 +1,40 @@
+2012-11-02  Jiri Vanek <jvanek@redhat.com>
+
+	Splashscreen integrated to javaws and plugin
+	*  Makefile.am: (edit_launcher_script) added JAVAWS_SPLASH_LOCATION 
+	substitution for installed javaws_splash.png.
+	(install-exec-loca) added installation of javaws_splash.png.
+	* NEWS: mentioned splashscreen
+	* launcher/javaws.in: added SPLASH_LOCATION, as path to image with "java"
+	splash which s then shown until internal vector one appear.
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: splashScreen made volatile,
+	(launchInitialized) splashscreen is created and shown
+	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java: (setSplashImageURL)
+	splash bg image is loaded from given url or default is used if not found
+	or not specified by jnlp/applet. (correctSize) width is calculated from
+	bg image or default is used when no image set. Splash is centered to
+	primary monitor.
+	* netx/net/sourceforge/jnlp/Launcher.java: (launchApplet) and
+	(launchApplication) enriched by handling of splashs.
+	(launchError) overloaded and is now handling forwarding of errors to
+	splash. All relevant calls of launchError enriched by  appletInstance.
+	* netx/net/sourceforge/jnlp/NetxPanel.java: is now implementing
+	SplashController.This is done by setting and wrapping of splashController
+	variable.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: is now handling 
+	splashscreen for applets in browsers.
+	(framePanel) is now providing panel to be processed (PluginAppletViewer)
+	is now invoking SplashCreator. (replaceSplash) new method which replace 
+	splashscreen with error splashscreen. (removeSplash) new method to remove
+	splash when loading is done. (update) is added to call paint directly
+	(SplashCreator) new internal runnable to create splash
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1_x_2.html:
+	second jar made XslowX to track two FIXME introduced in this patch -
+	Launcher's createApplet and PluginAppletViewer's framePanel.
+	* netx/javaws_splash.png: Binary image to be shown before java is launched
+	* tests/reproducers/simple/simpletest1/resources/netxPlugin.png: Binary image
+	to ne used for testing custom splashscreens
+
 2012-10-31 Jana Fabrikova <jfabriko@redhat.com>
 
 	*tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:

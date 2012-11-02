@@ -1,5 +1,5 @@
 /* GuiLaunchHandler.java
-   Copyright (C) 2011 Red Hat, Inc.
+   Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -54,7 +54,7 @@ import net.sourceforge.jnlp.util.BasicExceptionDialog;
  */
 public class GuiLaunchHandler extends AbstractLaunchHandler {
 
-    private JNLPSplashScreen splashScreen = null;
+    private volatile JNLPSplashScreen splashScreen = null;
     private final Object mutex = new Object();
     private UpdatePolicy policy = UpdatePolicy.ALWAYS;
 
@@ -80,10 +80,11 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
     }
 
     private void closeSplashScreen() {
-        synchronized(mutex) {
+        synchronized (mutex) {
             if (splashScreen != null) {
                 if (splashScreen.isSplashScreenValid()) {
                     splashScreen.setVisible(false);
+                    splashScreen.stopAnimation();
                 }
                 splashScreen.dispose();
             }
@@ -102,40 +103,56 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
 
     @Override
     public void launchInitialized(final JNLPFile file) {
-        
+
         int preferredWidth = 500;
         int preferredHeight = 400;
 
         final URL splashImageURL = file.getInformation().getIconLocation(
                 IconDesc.SPLASH, preferredWidth, preferredHeight);
 
+        final ResourceTracker resourceTracker = new ResourceTracker(true);
         if (splashImageURL != null) {
-            final ResourceTracker resourceTracker = new ResourceTracker(true);
             resourceTracker.addResource(splashImageURL, file.getFileVersion(), null, policy);
-            synchronized(mutex) {
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            splashScreen = new JNLPSplashScreen(resourceTracker, file);
-                        }
-                    });
-                } catch (InterruptedException ie) {
-                    // Wait till splash screen is created
-                    while (splashScreen == null);
-                } catch (InvocationTargetException ite) {
-                    ite.printStackTrace();
-                }
-
-                splashScreen.setSplashImageURL(splashImageURL);
-            }
         }
-        
+        synchronized (mutex) {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        splashScreen = new JNLPSplashScreen(resourceTracker, file);
+                    }
+                });
+            } catch (InterruptedException ie) {
+                // Wait till splash screen is created
+                while (splashScreen == null);
+            } catch (InvocationTargetException ite) {
+                ite.printStackTrace();
+            }
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        splashScreen.setSplashImageURL(splashImageURL);
+                    }
+                });
+            } catch (InterruptedException ie) {
+                // Wait till splash screen is created
+                while (!splashScreen.isSplashImageLoaded());
+            } catch (InvocationTargetException ite) {
+                ite.printStackTrace();
+            }
+
+
+        }
+
         SwingUtilities.invokeLater(new Runnable() {
+
             @Override
             public void run() {
-                if (splashImageURL != null) {
-                    synchronized(mutex) {
+                if (splashScreen != null) {
+                    synchronized (mutex) {
                         if (splashScreen.isSplashScreenValid()) {
                             splashScreen.setVisible(true);
                         }

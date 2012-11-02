@@ -76,6 +76,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
+import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -93,10 +94,8 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Vector;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -115,6 +114,11 @@ import sun.awt.X11.XEmbeddedFrame;
 import sun.misc.Ref;
 
 import com.sun.jndi.toolkit.url.UrlUtil;
+import java.util.Hashtable;
+import java.util.Vector;
+import net.sourceforge.jnlp.splashscreen.SplashController;
+import net.sourceforge.jnlp.splashscreen.SplashPanel;
+import net.sourceforge.jnlp.splashscreen.SplashUtils;
 
 /**
  * Lets us construct one using unix-style one shot behaviors
@@ -141,11 +145,15 @@ class PluginAppletPanelFactory {
         // isn't the case, the awt eventqueue thread's context classloader
         // won't be set to a JNLPClassLoader, and when an applet class needs
         // to be loaded from the awt eventqueue, it won't be found.
+        final int width = Integer.parseInt(atts.get("width"));
+        final int height = Integer.parseInt(atts.get("height"));
         Thread panelInit = new Thread(panel.getThreadGroup(), new Runnable() {
             @Override public void run() {
                 panel.createNewAppContext();
                 // create the frame.
-                PluginAppletViewer.framePanel(identifier, handle, panel);
+                PluginDebug.debug("X and Y are: " + width + " " + height);
+                panel.setAppletViewerFrame(PluginAppletViewer.framePanel(identifier,handle, width, height, panel));
+
                 panel.init();
                 // Start the applet
                 initEventQueue(panel);
@@ -185,7 +193,7 @@ class PluginAppletPanelFactory {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
-                    panel.getParent().setSize(Integer.valueOf(atts.get("width")), Integer.valueOf(atts.get("height")));
+                    panel.getParent().setSize(width, height);
                 }
             });
         } catch (InvocationTargetException ite) {
@@ -197,6 +205,8 @@ class PluginAppletPanelFactory {
             PluginDebug.debug("Unable to resize panel: ");
             ie.printStackTrace();
         }
+
+        panel.removeSplash();
 
         AppletSecurityContextManager.getSecurityContext(0).associateSrc(panel.getAppletClassLoader(), doc);
         AppletSecurityContextManager.getSecurityContext(0).associateInstance(identifier, panel.getAppletClassLoader());
@@ -271,7 +281,7 @@ class PluginAppletPanelFactory {
 // FIXME: declare JSProxy implementation
 @SuppressWarnings("serial")
 public class PluginAppletViewer extends XEmbeddedFrame
-        implements AppletContext, Printable {
+        implements AppletContext, Printable, SplashController {
 
     /**
      *  Enumerates the current status of an applet
@@ -323,26 +333,36 @@ public class PluginAppletViewer extends XEmbeddedFrame
     private Image bufFrameImg;
     private Graphics bufFrameImgGraphics;
 
+
+    private SplashPanel splashPanel;
+ 
     /**
      * Null constructor to allow instantiation via newInstance()
      */
     public PluginAppletViewer() {
     }
 
-    public static void framePanel(int identifier, long handle, NetxPanel panel) {
+    //FIXME - when multiple applets are on one page, this method is visited simultaneously
+    //and then appelts creates in little bit strange manner. This issue is visible with
+    //randomly showing/notshowing spalshscreens.
+    //See also Launcher.createApplet
+    public static PluginAppletViewer framePanel(int identifier,long handle, int width, int height, NetxPanel panel) {
 
         PluginDebug.debug("Framing ", panel);
-
-        // SecurityManager MUST be set, and only privileged code may call reFrame()
+ 
+        // SecurityManager MUST be set, and only privileged code may call framePanel()
         System.getSecurityManager().checkPermission(new AllPermission());
 
         PluginAppletViewer appletFrame = new PluginAppletViewer(handle, identifier, panel);
-
-        appletFrame.add("Center", panel);
-        appletFrame.pack();
-
+        
         appletFrame.appletEventListener = new AppletEventListener(appletFrame, appletFrame);
         panel.addAppletListener(appletFrame.appletEventListener);
+         // Clear references, if any
+        if (applets.containsKey(identifier)) {
+            PluginAppletViewer oldFrame = applets.get(identifier);            
+            oldFrame.remove(panel);
+            panel.removeAppletListener(oldFrame.appletEventListener);
+        }
 
         appletsLock.lock();
         applets.put(identifier, appletFrame);
@@ -350,6 +370,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         appletsLock.unlock();
 
         PluginDebug.debug(panel, " framed");
+               return appletFrame;
     }
 
     /**
@@ -383,8 +404,87 @@ public class PluginAppletViewer extends XEmbeddedFrame
         };
 
         addWindowListener(windowEventListener);
+        final AppletPanel fPanel = panel;
+        try {
+            SwingUtilities.invokeAndWait(new SplashCreator(fPanel));
+        } catch (Exception e) {
+            e.printStackTrace(); // Not much we can do other than  print
+        }
 
     }
+
+    public void replaceSplash(final SplashPanel newSplash) {
+        if (splashPanel == null) {
+            return;
+        }
+        if (newSplash == null) {
+            removeSplash();
+            return;
+        }
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+
+                public void run() {
+                    splashPanel.getSplashComponent().setVisible(false);
+                    splashPanel.stopAnimation();
+                    remove(splashPanel.getSplashComponent());
+                    newSplash.setPercentage(splashPanel.getPercentage());
+                    newSplash.setSplashWidth(splashPanel.getSplashWidth());
+                    newSplash.setSplashHeight(splashPanel.getSplashHeight());
+                    newSplash.adjustForSize();
+                    splashPanel = newSplash;
+                    add("Center", splashPanel.getSplashComponent());
+                    pack();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace(); // Not much we can do other than print
+        }
+    }
+
+    @Override
+    public void removeSplash() {
+        if (splashPanel == null) {
+            return;
+        }
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+
+                public void run() {
+                    splashPanel.getSplashComponent().setVisible(false);
+                    splashPanel.stopAnimation();
+                    remove(splashPanel.getSplashComponent());
+                    splashPanel = null;
+                    remove(panel);
+                    // Re-add the applet to notify container
+                    add(panel);
+                    panel.setVisible(true);
+                    pack();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace(); // Not much we can do other than print
+        }
+    }
+
+    @Override
+    public int getSplashWidth() {
+        if (splashPanel != null) {
+            return splashPanel.getSplashWidth();
+        } else {
+            return -1;
+        }
+    }
+
+    @Override
+    public int getSplashHeigth() {
+        if (splashPanel != null) {
+            return splashPanel.getSplashHeight();
+        } else {
+            return -1;
+        }
+    }
+   
 
     private static class AppletEventListener implements AppletListener {
         final Frame frame;
@@ -401,7 +501,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
             panelLock.lock();
             panelLive.signalAll();
             panelLock.unlock();
-
             switch (evt.getID()) {
                 case AppletPanel.APPLET_RESIZE: {
                     if (src != null) {
@@ -434,6 +533,23 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
                     updateStatus(appletViewer.identifier, PAV_INIT_STATUS.INIT_COMPLETE);
 
+                    break;
+                }
+                case AppletPanel.APPLET_START: {
+                    if (src.status != AppletPanel.APPLET_INIT && src.status != AppletPanel.APPLET_STOP) {
+                        String s="Applet started, but but reached invalid state";
+                        PluginDebug.debug(s);
+                        SplashPanel sp=SplashUtils.getErrorSplashScreen(appletViewer.panel.getWidth(), appletViewer.panel.getHeight(), new Exception(s));
+                        appletViewer.replaceSplash(sp);
+                    }
+
+                    break;
+                }
+                case AppletPanel.APPLET_ERROR: {
+                    String s="Undefined error causing applet not to staart appeared";
+                    PluginDebug.debug(s);
+                        SplashPanel sp=SplashUtils.getErrorSplashScreen(appletViewer.panel.getWidth(), appletViewer.panel.getHeight(), new Exception(s));
+                        appletViewer.replaceSplash(sp);
                     break;
                 }
             }
@@ -517,6 +633,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 waitForAppletInit(applets.get(identifier).panel);
 
                 // Should we proceed with reframing?
+                 PluginDebug.debug("Init complete");
+
                 if (updateStatus(identifier, PAV_INIT_STATUS.REFRAME_COMPLETE).equals(PAV_INIT_STATUS.INACTIVE)) {
                     destroyApplet(identifier);
                     return;
@@ -655,6 +773,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
      * @param panel the instance to wait for.
      */
     public static void waitForAppletInit(NetxPanel panel) {
+
+        PluginDebug.debug("Waiting for applet init");
 
         // Wait till initialization finishes
         long maxTimeToSleep = APPLET_TIMEOUT;
@@ -2103,7 +2223,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
      * the parent class's update() just does a couple of checks (both of
      * which are accounted for) and then calls paint anyway.
      */
-    public void update(Graphics g) {
+    public void paint(Graphics g) {
 
         // If the image or the graphics don't exist, create new ones
         if (bufFrameImg == null || bufFrameImgGraphics == null) {
@@ -2112,12 +2232,20 @@ public class PluginAppletViewer extends XEmbeddedFrame
         }
 
         // Paint off-screen
-        paint(bufFrameImgGraphics);
+        for (Component c: this.getComponents()) {
+                c.paint(bufFrameImgGraphics);
+        }
 
         // Draw the painted image
         g.drawImage(bufFrameImg, 0, 0, this);
     }
-
+    
+    
+    @Override
+    public void update(Graphics g) {
+        paint(g);
+    }
+  
     /**
      * Waits on a given condition queue until timeout.
      *
@@ -2150,5 +2278,26 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         // Return the difference
         return System.nanoTime() - sleepStart;
+    }
+
+    private class SplashCreator implements Runnable {
+
+        private final AppletPanel fPanel;
+
+        public SplashCreator(AppletPanel fPanel) {
+            this.fPanel = fPanel;
+        }
+
+        public void run() {
+            add("Center", fPanel);
+            fPanel.setVisible(false);
+            splashPanel = SplashUtils.getSplashScreen(fPanel.getWidth(), fPanel.getHeight());
+            if (splashPanel != null) {
+                splashPanel.startAnimation();
+                PluginDebug.debug("Added splash " + splashPanel);
+                add("Center", splashPanel.getSplashComponent());
+            }
+            pack();
+        }
     }
 }

@@ -43,19 +43,16 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.net.URL;
-
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
-
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
+import net.sourceforge.jnlp.util.ImageResources;
 
 public class JNLPSplashScreen extends JDialog {
 
@@ -68,6 +65,7 @@ public class JNLPSplashScreen extends JDialog {
     public static final  int DEF_WIDTH=635;
     public static final  int DEF_HEIGHT=480;
     private SplashPanel componetSplash;
+    private boolean splashImageLoaded=false;
 
     public JNLPSplashScreen(ResourceTracker resourceTracker, final JNLPFile file) {
 
@@ -78,61 +76,86 @@ public class JNLPSplashScreen extends JDialog {
         // JNLP file.
 
         this.resourceTracker = resourceTracker;
-
-        this.file=file;    
+        this.file=file;
 
     }
 
     public void setSplashImageURL(URL url) {
-        splashImageUrl = url;
-        splashImage = null;
+        splashImageLoaded = false;
         try {
-            splashImage = ImageIO.read(resourceTracker
-                    .getCacheFile(splashImageUrl));
-            if (splashImage == null) {
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println("Error loading splash image: " + url);
+            if (url != null) {
+                splashImageUrl = url;
+                splashImage = null;
+                try {
+                    splashImage = ImageIO.read(resourceTracker.getCacheFile(splashImageUrl));
+                    if (splashImage == null) {
+                        if (JNLPRuntime.isDebug()) {
+                            System.err.println("Error loading splash image: " + url);
+                        }
+                    }
+                } catch (IOException e) {
+                    if (JNLPRuntime.isDebug()) {
+                        System.err.println("Error loading splash image: " + url);
+                    }
+                    splashImage = null;
+                } catch (IllegalArgumentException argumentException) {
+                    if (JNLPRuntime.isDebug()) {
+                        System.err.println("Error loading splash image: " + url);
+                    }
+                    splashImage = null;
                 }
-                return;
             }
-        } catch (IOException e) {
-            if (JNLPRuntime.isDebug()) {
-                System.err.println("Error loading splash image: " + url);
-            }
-            splashImage = null;
-            return;
-        } catch (IllegalArgumentException argumentException) {
-            if (JNLPRuntime.isDebug()) {
-                System.err.println("Error loading splash image: " + url);
-            }
-            splashImage = null;
-            return;
-        }
 
-        correctSize();
+            if (splashImage == null) {
+                this.setLayout(new BorderLayout());
+                SplashPanel splash = SplashUtils.getSplashScreen(DEF_WIDTH, DEF_HEIGHT);
+                if (splash != null) {
+                    splash.startAnimation();
+                    splash.setInformationElement(InformationElement.createFromJNLP(file));
+                    this.add(splash.getSplashComponent());
+                    this.componetSplash = splash;
+                }
+            }
+            correctSize();
+        } finally {
+            splashImageLoaded = true;
+        }
     }
 
+    public boolean isSplashImageLoaded() {
+        return splashImageLoaded;
+    }
+
+
     public boolean isSplashScreenValid() {
-        return (splashImage != null);
+        return (splashImage != null) || (componetSplash != null);
     }
 
     private void correctSize() {
-
-        Insets insets = getInsets();
-        int minimumWidth = splashImage.getWidth(null) + insets.left
-                + insets.right;
-        int minimumHeight = splashImage.getHeight(null) + insets.top
-                + insets.bottom;
-        setMinimumSize(new Dimension(minimumWidth, minimumHeight));
-
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation((screenSize.width - minimumWidth) / 2,
-                (screenSize.height - minimumHeight) / 2);
+        int minimumWidth = DEF_WIDTH;
+        int minimumHeight = DEF_HEIGHT;
+        if (splashImage != null) {
+            Insets insets = getInsets();
+            minimumWidth = splashImage.getWidth(null) + insets.left
+                    + insets.right;
+            minimumHeight = splashImage.getHeight(null) + insets.top
+                    + insets.bottom;
+        }
+        setMinimumSize(new Dimension(0, 0));
+        setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        setSize(new Dimension(minimumWidth, minimumHeight));
+        setPreferredSize(new Dimension(minimumWidth, minimumHeight));
+        // Centering to middle of Toolkit.getDefaultToolkit().getScreenSize()
+        // centers to the middle of all monitors. Let's center to the middle
+        // of the primary monitor instead.
+        // TODO center on the 'current' monitor to meet user expectation
+        setLocationRelativeTo(null);
     }
 
     @Override
     public void paint(Graphics g) {
         if (splashImage == null) {
+            super.paint(g);
             return;
         }
 
@@ -140,5 +163,13 @@ public class JNLPSplashScreen extends JDialog {
         Graphics2D g2 = (Graphics2D) g;
         g2.drawImage(splashImage, getInsets().left, getInsets().top, null);
 
+    }
+
+    public boolean isCustomSplashscreen() {
+       return (componetSplash!=null);
+    }
+
+    public void stopAnimation() {
+        if (isCustomSplashscreen()) componetSplash.stopAnimation();
     }
 }

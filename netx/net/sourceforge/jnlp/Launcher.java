@@ -20,6 +20,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.applet.Applet;
 import java.awt.Container;
+import java.awt.SplashScreen;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -42,6 +43,8 @@ import net.sourceforge.jnlp.services.ServiceUtil;
 
 import javax.swing.SwingUtilities;
 import javax.swing.text.html.parser.ParserDelegator;
+import net.sourceforge.jnlp.runtime.AppletEnvironment;
+import net.sourceforge.jnlp.splashscreen.SplashUtils;
 
 import sun.awt.SunToolkit;
 
@@ -543,6 +546,12 @@ public class Launcher {
             }
 
             if (JNLPRuntime.getForksAllowed() && file.needsNewVM()) {
+                if (!JNLPRuntime.isHeadless()){
+                    SplashScreen sp = SplashScreen.getSplashScreen();
+                    if (sp!=null) {
+                        sp.close();
+                    }
+                }
                 List<String> netxArguments = new LinkedList<String>();
                 netxArguments.add("-Xnofork");
                 netxArguments.addAll(JNLPRuntime.getInitialArguments());
@@ -652,25 +661,42 @@ public class Launcher {
      * @param enableCodeBase whether to add the codebase URL to the classloader
      */
     protected ApplicationInstance launchApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
-        if (!file.isApplet())
+        if (!file.isApplet()) {
             throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplet"), R("LNotAppletInfo")));
-
+        }
+      
+        if (JNLPRuntime.getForksAllowed() && file.needsNewVM()) {
+            if (!JNLPRuntime.isHeadless()) {
+                SplashScreen sp = SplashScreen.getSplashScreen();
+                if (sp != null) {
+                    sp.close();
+                }
+            }
+        }
+        if (handler != null) {
+            handler.launchInitialized(file);
+        }
+        
+        AppletInstance applet = null;
         try {
             ServiceUtil.checkExistingSingleInstance(file);
-            AppletInstance applet = createApplet(file, enableCodeBase, cont);
+            applet = createApplet(file, enableCodeBase, cont);
             applet.initialize();
-
             applet.getAppletEnvironment().startApplet(); // this should be a direct call to applet instance
             return applet;
         } catch (InstanceExistsException ieex) {
             if (JNLPRuntime.isDebug()) {
                 System.out.println("Single instance applet is already running.");
             }
-            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")));
+            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")), applet);
         } catch (LaunchException lex) {
-            throw launchError(lex);
+            throw launchError(lex, applet);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")));
+            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")), applet);
+        }finally{
+            if (handler != null) {
+                handler.launchStarting(applet);
+            }
         }
     }
 
@@ -678,13 +704,13 @@ public class Launcher {
      * Gets an ApplicationInstance, but does not launch the applet.
      */
     protected ApplicationInstance getApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
-        if (!file.isApplet())
+        if (!file.isApplet()) {
             throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplet"), R("LNotAppletInfo")));
-
+        }
+        AppletInstance applet = null;
         try {
             ServiceUtil.checkExistingSingleInstance(file);
-
-            AppletInstance applet = createApplet(file, enableCodeBase, cont);
+            applet = createApplet(file, enableCodeBase, cont);
             applet.initialize();
             return applet;
 
@@ -692,11 +718,11 @@ public class Launcher {
             if (JNLPRuntime.isDebug()) {
                 System.out.println("Single instance applet is already running.");
             }
-            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")));
+            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")), applet);
         } catch (LaunchException lex) {
-            throw launchError(lex);
+            throw launchError(lex, applet);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")));
+            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")), applet);
         }
     }
 
@@ -715,8 +741,13 @@ public class Launcher {
      *
      * @param enableCodeBase whether to add the code base URL to the classloader
      */
-    protected AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
-        try {
+     //FIXME - when multiple applets are on one page, this method is visited simultaneously
+    //and then appelts creates in little bit strange manner. This issue is visible with
+    //randomly showing/notshowing spalshscreens.
+    //See also PluginAppletViewer.framePanel
+    protected  AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
+         AppletInstance appletInstance = null;
+         try {
             JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy);
 
             if (enableCodeBase) {
@@ -730,7 +761,6 @@ public class Launcher {
             // appletInstance is needed by ServiceManager when looking up 
             // services. This could potentially be done in applet constructor
             // so initialize appletInstance before creating applet.
-            AppletInstance appletInstance;
             if (cont == null)
                 appletInstance = new AppletInstance(file, group, loader, null);
             else
@@ -751,7 +781,7 @@ public class Launcher {
 
             return appletInstance;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplet"), R("LInitAppletInfo")));
+            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplet"), R("LInitAppletInfo")), appletInstance);
         }
     }
 
@@ -822,6 +852,13 @@ public class Launcher {
      * caller.
      */
     private LaunchException launchError(LaunchException ex) {
+        return launchError(ex, null);
+    }
+    
+    private LaunchException launchError(LaunchException ex, AppletInstance applet) {
+        if (applet != null) {
+            SplashUtils.showErrorCaught(ex, applet);
+        }
         if (handler != null)
             handler.launchError(ex);
 
@@ -861,7 +898,7 @@ public class Launcher {
         new ParserDelegator();
     }
 
-    /**
+       /**
      * This runnable is used to call the appropriate launch method
      * for the application, applet, or installer in its thread group.
      */
