@@ -1,4 +1,15 @@
 2012-11-02  Jiri Vanek <jvanek@redhat.com>
+            Alexandr Kolouch  <skolnag@gmail.com>
+
+	Added cz_CS locales with test
+	* AUTHORS: added translator, mr. Kolouch
+	* NEWS: mentioned localization
+	* netx/net/sourceforge/jnlp/resources/Messages_cs_CZ.properties: file
+	itself with translation
+	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java:
+	Test which is testing whether and how locales are applied.
+
+2012-11-02  Jiri Vanek <jvanek@redhat.com>
 
 	Splashscreen integrated to javaws and plugin
 	*  Makefile.am: (edit_launcher_script) added JAVAWS_SPLASH_LOCATION 
