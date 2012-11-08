@@ -106,6 +106,11 @@ public class JNLPClassLoader extends URLClassLoader {
     final public static String TEMPLATE = "JNLP-INF/APPLICATION_TEMPLATE.JNLP";
     final public static String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
     
+    /** Actions to specify how cache is to be managed **/
+    public static enum DownloadAction {
+        DOWNLOAD_TO_CACHE, REMOVE_FROM_CACHE, CHECK_CACHE
+    }
+
     /** True if the application has a signed JNLP File */
     private boolean isSignedJNLP = false;
     
@@ -1588,13 +1593,22 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param desc the JARDesc for the new jar
      */
     private void addNewJar(final JARDesc desc) {
+        this.addNewJar(desc, JNLPRuntime.getDefaultUpdatePolicy());
+    }
+
+    /**
+     * Adds a new JARDesc into this classloader.
+     * @param desc the JARDesc for the new jar
+     * @param updatePolicy the UpdatePolicy for the resource
+     */
+    private void addNewJar(final JARDesc desc, UpdatePolicy updatePolicy) {
 
         available.add(desc);
 
         tracker.addResource(desc.getLocation(),
                 desc.getVersion(),
                 null,
-                JNLPRuntime.getDefaultUpdatePolicy()
+                updatePolicy
                 );
 
         // Give read permissions to the cached jar file
@@ -2075,6 +2089,108 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
+     * Returns all loaders that this loader uses, including itself
+     */
+    JNLPClassLoader[] getLoaders() {
+        return loaders;
+    }
+
+    /**
+     * Remove jars from the file system.
+     *
+     * @param jars Jars marked for removal.
+     */
+    void removeJars(JARDesc[] jars) {
+
+        for (JARDesc eachJar : jars) {
+            try {
+                tracker.removeResource(eachJar.getLocation());
+            } catch (Exception e) {
+                if (JNLPRuntime.isDebug()) {
+                    System.err.println(e.getMessage());
+                    System.err.println("Failed to remove resource from tracker, continuing..");
+                }
+            }
+
+            File cachedFile = CacheUtil.getCacheFile(eachJar.getLocation(), null);
+            String directoryUrl = CacheUtil.getCacheParentDirectory(cachedFile.getAbsolutePath());
+
+            File directory = new File(directoryUrl);
+
+            if (JNLPRuntime.isDebug())
+                System.out.println("Deleting cached file: " + cachedFile.getAbsolutePath());
+
+            cachedFile.delete();
+
+            if (JNLPRuntime.isDebug())
+                System.out.println("Deleting cached directory: " + directory.getAbsolutePath());
+
+            directory.delete();
+        }
+    }
+
+    /**
+     * Downloads and initializes jars into this loader.
+     *
+     * @param ref Path of the launch or extension JNLP File containing the
+     * resource. If null, main JNLP's file location will be used instead.
+     * @param part The name of the path.
+     * @throws LaunchException
+     */
+    void initializeNewJarDownload(URL ref, String part, Version version) {
+        JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
+
+        for (JARDesc eachJar : jars) {
+            if (JNLPRuntime.isDebug())
+                System.out.println("Downloading and initializing jar: " + eachJar.getLocation().toString());
+
+            this.addNewJar(eachJar, UpdatePolicy.FORCE);
+        }
+    }
+
+    /**
+     * Manages DownloadService jars which are not mentioned in the JNLP file
+     * @param ref Path to the resource.
+     * @param version The version of resource. If null, no version is specified.
+     * @param action The action to perform with the resource. Either DOWNLOADTOCACHE, REMOVEFROMCACHE, or CHECKCACHE.
+     * @return true if CHECKCACHE and the resource is cached.
+     */
+    boolean manageExternalJars(URL ref, String version, DownloadAction action) {
+        boolean approved = false;
+        JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByResourceUrl(this, ref, version);
+        Version resourceVersion = (version == null) ? null : new Version(version);
+
+        if (foundLoader != null)
+            approved = true;
+
+        else if (ref.toString().startsWith(file.getCodeBase().toString()))
+            approved = true;
+        else if (SecurityDesc.ALL_PERMISSIONS.equals(security.getSecurityType()))
+            approved = true;
+
+        if (approved) {
+            if (foundLoader == null)
+                foundLoader = this;
+
+            if (action == DownloadAction.DOWNLOAD_TO_CACHE) {
+                JARDesc jarToCache = new JARDesc(ref, resourceVersion, null, false, true, false, true);
+                if (JNLPRuntime.isDebug())
+                    System.out.println("Downloading and initializing jar: " + ref.toString());
+
+                foundLoader.addNewJar(jarToCache, UpdatePolicy.FORCE);
+
+            } else if (action == DownloadAction.REMOVE_FROM_CACHE) {
+                JARDesc[] jarToRemove = { new JARDesc(ref, resourceVersion, null, false, true, false, true) };
+                foundLoader.removeJars(jarToRemove);
+
+            } else if (action == DownloadAction.CHECK_CACHE) {
+                return CacheUtil.isCached(ref, resourceVersion);
+            }
+        }
+        return false;
+    }
+
+    /**
      * Decrements loader use count by 1
      * 
      * If count reaches 0, loader is removed from list of available loaders
@@ -2266,4 +2382,6 @@ public class JNLPClassLoader extends URLClassLoader {
             return null;
         }
     }
+
+
 }

@@ -367,6 +367,25 @@ public class CacheUtil {
     }
 
     /**
+     * Returns the parent directory of the cached resource.
+     * @param path The path of the cached resource directory.
+     */
+    public static String getCacheParentDirectory(String filePath) {
+        String path = filePath;
+        String tempPath = "";
+
+        while(path.startsWith(cacheDir) && !path.equals(cacheDir)){
+                tempPath = new File(path).getParent();
+
+                if (tempPath.equals(cacheDir))
+                    break;
+
+                path = tempPath;
+        }
+        return path;
+    }
+
+    /**
      * This will create a new entry for the cache item. It is however not
      * initialized but any future calls to getCacheFile with the source and
      * version given to here, will cause it to return this item.

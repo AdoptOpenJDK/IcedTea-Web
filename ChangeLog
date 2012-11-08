@@ -1,3 +1,38 @@
+2012-11-08  Saad Mohammad  <smohammad@redhat.com>
+
+	Core implementation of DownloadService.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java (getCacheParentDirectory):
+	Returns the parent directory of the cached resource.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(getLoaders): Returns all loaders that this loader uses, including
+	itself
+	(addNewJar): Adds a new jar to the classloader with specified
+	UpdatePolicy.
+	(removeJars): Remove jars from the filesystem.
+	(initializeNewJarDownload): Downloads and initializes jars into the
+	current loader.
+	(manageExternalJars): Manages jars which are not mentioned in the
+	JNLP file.
+	* netx/net/sourceforge/jnlp/runtime/LocateJnlpClassLoader.java:
+	(getLoaderByJnlpFile): Returns the classloader of the jnlp file
+	specified.
+	(getLoaderByResourceUrl): Returns the classloader that contains the
+	specified jar.
+	* netx/net/sourceforge/jnlp/runtime/ManageJnlpResources.java:
+	(findJars): Returns jars from the JNLP file with the specified
+	partname.
+	(removeCachedJars): Removes jar from cache.
+	(downloadJars): Downloads jars identified by part name.
+	(loadExternalResouceToCache): Download and initalize resources which
+	are not mentioned in the jnlp file.
+	(removeExternalCachedResource): Removes resources from cache which
+	are not mentioned in the jnlp file.
+	(isExternalResourceCached): Determines if the resource that is not
+	mentioned in the jnlp file is cached and returns a boolean with the
+	result.
+	* netx/net/sourceforge/jnlp/services/XDownloadService.java:
+	Core implementation of DownloadService.
+
 2012-11-02  Jiri Vanek <jvanek@redhat.com>
             Alexandr Kolouch  <skolnag@gmail.com>
 
