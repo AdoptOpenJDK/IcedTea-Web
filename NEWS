@@ -14,6 +14,8 @@ New in release 1.4 (2012-XX-XX):
 * Security updates
   - CVE-2012-3422, RH840592: Potential read from an uninitialized memory location
   - CVE-2012-3423, RH841345: Incorrect handling of not 0-terminated strings
+* NetX
+  - PR1027: DownloadService is not supported by IcedTea-Web
 * Plugin
   - PR1106: Buffer overflow in plugin table-
 * Common

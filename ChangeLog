@@ -1,5 +1,10 @@
 2012-11-08  Saad Mohammad  <smohammad@redhat.com>
 
+	* NEWS: Added entry for PR1027 - DownloadService is not supported by
+	IcedTea-Web.
+
+2012-11-08  Saad Mohammad  <smohammad@redhat.com>
+
 	Added reproducer for DownloadService.
 	* tests/reproducers/signed/DownloadService/resources/DownloadService.jnlp:
 	Launching jnlp file that contains extension jnlp and jars marked with part names.
