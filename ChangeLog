@@ -1,5 +1,17 @@
 2012-11-08  Saad Mohammad  <smohammad@redhat.com>
 
+	Added reproducer for DownloadService.
+	* tests/reproducers/signed/DownloadService/resources/DownloadService.jnlp:
+	Launching jnlp file that contains extension jnlp and jars marked with part names.
+	* tests/reproducers/signed/DownloadService/resources/DownloadServiceExtension.jnlp:
+	DownloadService extension jnlp file with jars marked with part names.
+	* tests/reproducers/signed/DownloadService/srcs/DownloadServiceRunner.java:
+	A simple class that uses DownloadService to complete tasks and outputs the results.
+	* tests/reproducers/signed/DownloadService/testcases/DownloadServiceTest.java:
+	Testcase for DownloadService.
+
+2012-11-08  Saad Mohammad  <smohammad@redhat.com>
+
 	Core implementation of DownloadService.
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java (getCacheParentDirectory):
 	Returns the parent directory of the cached resource.
