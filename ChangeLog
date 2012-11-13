@@ -1,5 +1,16 @@
 2012-11-13  Saad Mohammad  <smohammad@redhat.com>
 
+	Added unit tests for PR1166.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java:
+	Tests the JNLPFile constructor that accepts an InputStream and an alternative codebase.
+	* tests/netx/unit/net/sourceforge/jnlp/ParserTest.java:
+	Tests if the constructor handles the alternative codebase parameter correctly.
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java:
+	Tests if BASE64 strings are decoded correctly and if PluginBridge is constructed with an
+	embedded jnlp.
+
+2012-11-13  Saad Mohammad  <smohammad@redhat.com>
+
 	Added reproducer for PR1166.
 	* tests/reproducers/simple/EmbeddedJnlpInApplet/resources/EmbeddedJnlp.jnlp:
 	Launching jnlp file that is used by jnlp_href in applet tag

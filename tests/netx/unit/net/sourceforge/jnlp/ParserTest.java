@@ -38,6 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp;
 
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -1354,5 +1355,61 @@ public class ParserTest {
                 "Generalized_V", file.getVendor());
 
         parser.checkForInformation();
+    }
+
+    @Test
+    public void testOverwrittenCodebaseWithValidJnlpCodebase() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n" +
+                "<jnlp spec=\"1.5+\"\n" +
+                "href=\"EmbeddedJnlpFile.jnlp\"\n" +
+                "codebase=\"http://www.redhat.com/\"\n" +
+                ">\n" +
+                "</jnlp>";
+
+        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
+
+        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        Parser parser = new Parser(file, null, root, false, false, overwrittenCodebase);
+
+        Assert.assertEquals("http://www.redhat.com/", parser.getCodeBase().toExternalForm());
+    }
+
+    @Test
+    public void testOverwrittenCodebaseWithInvalidJnlpCodebase() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n" +
+                "<jnlp spec=\"1.5+\"\n" +
+                "href=\"EmbeddedJnlpFile.jnlp\"\n" +
+                "codebase=\"this codebase is incorrect\"\n" +
+                ">\n" +
+                "</jnlp>";
+
+        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
+
+        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        Parser parser = new Parser(file, null, root, false, false, overwrittenCodebase);
+
+        Assert.assertEquals(overwrittenCodebase.toExternalForm(), parser.getCodeBase().toExternalForm());
+    }
+
+    @Test
+    public void testOverwrittenCodebaseWithNoJnlpCodebase() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n" +
+                "<jnlp spec=\"1.5+\"\n" +
+                "href=\"EmbeddedJnlpFile.jnlp\"\n" +
+                ">\n" +
+                "</jnlp>";
+
+        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
+
+        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        Parser parser = new Parser(file, null, root, false, false, overwrittenCodebase);
+
+        Assert.assertEquals(overwrittenCodebase.toExternalForm(), parser.getCodeBase().toExternalForm());
     }
 }

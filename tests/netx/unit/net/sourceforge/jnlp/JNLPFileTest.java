@@ -37,6 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
 
 import net.sourceforge.jnlp.JNLPFile.Match;
@@ -102,5 +106,46 @@ public class JNLPFileTest {
         Locale[] mismatchAvailable = { new Locale("fr", "FR", "utf16") };
         Assert.assertFalse("Locales list should not match generalized case but did.",
                 file.localeMatches(jvmLocale, mismatchAvailable, Match.GENERALIZED));
+    }
+
+    @Test
+    public void testCodebaseConstructorWithInputstreamAndCodebase() throws Exception {
+        String jnlpContext = "<?xml version=\"1.0\"?>\n" +
+                "<jnlp spec=\"1.5+\"\n" +
+                "href=\"EmbeddedJnlpFile.jnlp\"\n" +
+                "codebase=\"http://icedtea.claspath.org\"\n" +
+                ">\n" +
+                "" +
+                "<information>\n" +
+                "<title>Sample Test</title>\n" +
+                "<vendor>RedHat</vendor>\n" +
+                "<offline-allowed/>\n" +
+                "</information>\n" +
+                "\n" +
+                "<resources>\n" +
+                "<j2se version='1.6+' />\n" +
+                "<jar href='EmbeddedJnlpJarOne.jar' main='true'/>\n" +
+                "<jar href='EmbeddedJnlpJarTwo.jar' main='true'/>\n" +
+                "</resources>\n" +
+                "\n" +
+                "<applet-desc\n" +
+                "documentBase=\".\"\n" +
+                "name=\"redhat.embeddedjnlp\"\n" +
+                "main-class=\"redhat.embeddedjnlp\"\n" +
+                "width=\"0\"\n" +
+                "height=\"0\"\n" +
+                "/>\n" +
+                "</jnlp>";
+
+        URL codeBase = new URL("http://www.redhat.com/");
+        ;
+        InputStream is = new ByteArrayInputStream(jnlpContext.getBytes());
+
+        JNLPFile jnlpFile = new JNLPFile(is, codeBase, false);
+
+        Assert.assertEquals("http://icedtea.claspath.org/", jnlpFile.getCodeBase().toExternalForm());
+        Assert.assertEquals("redhat.embeddedjnlp", jnlpFile.getApplet().getMainClass());
+        Assert.assertEquals("Sample Test", jnlpFile.getTitle());
+        Assert.assertEquals(2, jnlpFile.getResources().getJARs().length);
     }
 }
