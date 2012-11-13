@@ -1,3 +1,19 @@
+2012-11-13  Saad Mohammad  <smohammad@redhat.com>
+
+	Added reproducer for PR1166.
+	* tests/reproducers/simple/EmbeddedJnlpInApplet/resources/EmbeddedJnlp.jnlp:
+	Launching jnlp file that is used by jnlp_href in applet tag
+	* tests/reproducers/simple/EmbeddedJnlpInApplet/resources/EmbeddedJnlpInAppletNoCodebase.html:
+	Applet with an embedded jnlp file with no codebase specified
+	* tests/reproducers/simple/EmbeddedJnlpInApplet/resources/EmbeddedJnlpInAppletWithDotCodebase.html:
+	Applet with an embedded jnlp file with codebase set as a 'dot'
+	* tests/reproducers/simple/EmbeddedJnlpInApplet/resources/JnlpInApplet.html:
+	Applet with jnlp_href file.
+	* tests/reproducers/simple/EmbeddedJnlpInApplet/srcs/EmbeddedJnlp.java:
+	Simple class that outputs strings.
+	* tests/reproducers/simple/EmbeddedJnlpInApplet/testcases/EmbeddedJnlpInAppletTest.java:
+	Testcase that tests embedded jnlps in html pages.
+
 2012-11-08  Saad Mohammad  <smohammad@redhat.com>
 
 	* NEWS: Added entry for PR1027 - DownloadService is not supported by
