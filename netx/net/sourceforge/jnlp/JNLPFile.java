@@ -251,7 +251,20 @@ public class JNLPFile {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(InputStream input, boolean strict) throws ParseException {
-        parse(Parser.getRootNode(input), strict, null, null);
+        this(input, null, strict);
+    }
+
+    /**
+     * Create a JNLPFile from an input stream.
+     *
+     * @param input input stream of JNLP file.
+     * @param codebase codebase to use if not specified in JNLP file..
+     * @param strict whether to enforce the spec rules
+     * @throws IOException if an IO exception occurred
+     * @throws ParseException if the JNLP file was invalid
+     */
+    public JNLPFile(InputStream input, URL codebase, boolean strict) throws ParseException {
+        parse(Parser.getRootNode(input), strict, null, codebase);
     }
 
     /**

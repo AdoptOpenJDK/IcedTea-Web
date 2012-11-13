@@ -1,5 +1,20 @@
 2012-11-13  Saad Mohammad  <smohammad@redhat.com>
 
+	Fix PR1166: Embedded JNLP File is not supported in applet tag.
+	* configure.ac: Checks for sun.misc.BASE64Decoder.
+	* NEWS: Added entry for PR1166.
+	* netx/net/sourceforge/jnlp/JNLPFile.java (JNLPFile):
+	New constructor which accepts inputstream of jnlp file and a
+	specified codebase.
+	* netx/net/sourceforge/jnlp/Parser.java (Parser): If parsing of
+	codebase fails, it will overwrite the codebase with the one passed
+	in through parameters.
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	(PluginBridge) Supports embedded jnlp file.
+	(decodeBase64String) Decodes Base64 strings to byte array.
+
+2012-11-13  Saad Mohammad  <smohammad@redhat.com>
+
 	Added unit tests for PR1166.
 	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java:
 	Tests the JNLPFile constructor that accepts an InputStream and an alternative codebase.

@@ -143,9 +143,16 @@ class Parser {
 
         // JNLP tag information
         this.spec = getVersion(root, "spec", "1.0+");
-        this.codebase = addSlash(getURL(root, "codebase", base));
-        if (this.codebase == null) // We only override it if it is not specified.
+
+        try {
+            this.codebase = addSlash(getURL(root, "codebase", base));
+        } catch (ParseException e) {
+            //If parsing fails, continue by overriding the codebase with the one passed in
+        }
+
+        if (this.codebase == null) // Codebase is overwritten if codebase was not specified in file or if parsing of it failed
             this.codebase = codebase;
+
         this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
         fileLocation = getURL(root, "href", this.base);
 

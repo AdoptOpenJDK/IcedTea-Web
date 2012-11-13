@@ -18,6 +18,7 @@ New in release 1.4 (2012-XX-XX):
   - PR1027: DownloadService is not supported by IcedTea-Web
 * Plugin
   - PR1106: Buffer overflow in plugin table-
+  - PR1166: Embedded JNLP File is not supported in applet tag
 * Common
   - PR1049: Extension jnlp's signed jar with the content of only META-INF/* is considered
   - PR955: regression: SweetHome3D fails to run

@@ -22,7 +22,10 @@
 
 package net.sourceforge.jnlp;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.HashSet;
@@ -31,6 +34,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+
+import sun.misc.BASE64Decoder;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -96,7 +101,18 @@ public class PluginBridge extends JNLPFile {
                 // Use codeBase as the context for the URL. If jnlp_href's
                 // value is a complete URL, it will replace codeBase's context.
                 URL jnlp = new URL(codeBase, atts.get("jnlp_href"));
-                JNLPFile jnlpFile = jnlpCreator.create(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), codeBase);
+                JNLPFile jnlpFile = null;
+
+                if (atts.containsKey("jnlp_embedded")) {
+                    InputStream jnlpInputStream = new ByteArrayInputStream(decodeBase64String(atts.get("jnlp_embedded")));
+                    jnlpFile = new JNLPFile(jnlpInputStream, codeBase, false);
+                } else {
+                    jnlpFile = jnlpCreator.create(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), codeBase);
+                }
+
+                if (jnlpFile.isApplet())
+                    main = jnlpFile.getApplet().getMainClass();
+
                 Map<String, String> jnlpParams = jnlpFile.getApplet().getParameters();
                 info = jnlpFile.info;
 
@@ -348,5 +364,13 @@ public class PluginBridge extends JNLPFile {
 
     public boolean isInstaller() {
         return false;
+    }
+
+    /**
+     * Returns the decoded BASE64 string
+     */
+    static byte[] decodeBase64String(String encodedString) throws IOException {
+        BASE64Decoder base64 = new BASE64Decoder();
+        return base64.decodeBuffer(encodedString);
     }
 }
