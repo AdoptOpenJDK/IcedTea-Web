@@ -1,3 +1,15 @@
+2012-11-13  Adam Domurad  <adomurad@redhat.com>
+
+	Reproducer for PR1198, JSObject#eval creates invalid JS object.
+	* tests/reproducers/simple/JSObjectFromEval/resources/JSObjectFromEval.html:
+	Loads applet + JS for test
+	* tests/reproducers/simple/JSObjectFromEval/resources/JSObjectFromEval.js:
+	Calls java code to test JSObject#eval
+	* tests/reproducers/simple/JSObjectFromEval/srcs/JSObjectFromEval.java:
+	Provides java<->JS wrappers for JSObject methods
+	* tests/reproducers/simple/JSObjectFromEval/testcases/JSObjectFromEvalTest.java:
+	Tests if JSObject#eval creates valid JSObject.
+
 2012-11-13  Saad Mohammad  <smohammad@redhat.com>
 
 	Fix PR1166: Embedded JNLP File is not supported in applet tag.
