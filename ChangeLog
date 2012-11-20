@@ -1,4 +1,4 @@
-2012-11-02  Jiri Vanek <jvanek@redhat.com>
+2012-11-20  Jiri Vanek <jvanek@redhat.com>
 
 	*  Makefile.am: (stamps/run-netx-dist-tests.stamp)  and
 	(stamps/run-netx-unit-tests.stamp) Swapped logs and report xslt operations
