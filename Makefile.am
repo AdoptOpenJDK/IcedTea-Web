@@ -740,8 +740,8 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
 if WITH_XSLTPROC
-	$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(TEST_EXTENSIONS_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
 	$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(TEST_EXTENSIONS_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
+	$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(TEST_EXTENSIONS_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
 endif
 	touch $@
 
@@ -917,8 +917,8 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):. \
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names 
 if WITH_XSLTPROC
-	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html
 	$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
+	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html
 endif
 	mkdir -p stamps && \
 	touch $@
