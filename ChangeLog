@@ -1,3 +1,9 @@
+2012-11-20  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:
+	added @KnownToFail annotations to the tests, which are showing 
+	unimplemented/broken features of js-plugin communication. 
+
 2012-11-13  Adam Domurad  <adomurad@redhat.com>
 
 	Reproducer for PR1198, JSObject#eval creates invalid JS object.

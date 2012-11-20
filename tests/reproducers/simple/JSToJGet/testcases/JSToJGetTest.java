@@ -42,6 +42,7 @@ import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.CountingClosingListener;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -140,7 +141,7 @@ public class JSToJGetTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJGet_int_Test() throws Exception {
-    	jsToJavaGetTest("int", "Test no. 1 - (int)");
+        jsToJavaGetTest("int", "Test no. 1 - (int)");
     }
 
     @Test
@@ -223,6 +224,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_Integer_Test() throws Exception {
         jsToJavaGetTest("Integer", "Test no.13 - (Integer)");
     }
@@ -230,6 +232,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_Double_Test() throws Exception {
         jsToJavaGetTest("Double", "Test no.14 - (Double)");
     }
@@ -237,6 +240,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_Float_Test() throws Exception {
         jsToJavaGetTest("Float", "Test no.15 - (Float)");
     }
@@ -244,6 +248,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_Long_Test() throws Exception {
         jsToJavaGetTest("Long", "Test no.16 - (Long)");
     }
@@ -251,6 +256,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_Boolean_Test() throws Exception {
         jsToJavaGetTest("Boolean", "Test no.17 - (Boolean)");
     }
@@ -258,6 +264,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_Character_Test() throws Exception {
         jsToJavaGetTest("Character", "Test no.18 - (Character)");
     }
@@ -265,6 +272,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_Byte_Test() throws Exception {
         jsToJavaGetTest("Byte", "Test no.19 - (Byte)");
     }
@@ -272,6 +280,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_DoubleArrayElement_Test() throws Exception {
         jsToJavaGetTest("DoubleArrayElement", "Test no.20 - (Double[] - element access)");
     }
@@ -279,6 +288,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_DoubleFullArray_Test() throws Exception {
         jsToJavaGetTest("DoubleFullArray", "Test no.21 - (Double[] - full array)");
     }
