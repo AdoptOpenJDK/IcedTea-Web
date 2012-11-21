@@ -1210,7 +1210,7 @@ void consume_plugin_message(gchar* message) {
   gchar** parts = g_strsplit (message, " ", 5);
   if (g_str_has_prefix(parts[1], "PluginProxyInfo"))
   {
-    gchar* proxy;
+    gchar* proxy = NULL;
     uint32_t len;
 
     gchar* decoded_url = (gchar*) calloc(strlen(parts[4]) + 1, sizeof(gchar));
@@ -1220,7 +1220,7 @@ void consume_plugin_message(gchar* message) {
     gchar* proxy_info;
 
 #if MOZILLA_VERSION_COLLAPSED < 1090100
-	proxy = (char*) malloc(sizeof(char)*2048);
+	proxy = (gchar*) g_malloc(sizeof(char)*2048);
 #endif
 
     proxy_info = g_strconcat ("plugin PluginProxyInfo reference ", parts[3], " ", NULL);
@@ -1237,10 +1237,8 @@ void consume_plugin_message(gchar* message) {
     g_free(proxy_info);
     proxy_info = NULL;
 
-#if MOZILLA_VERSION_COLLAPSED < 1090100
 	g_free(proxy);
 	proxy = NULL;
-#endif
 
   } else if (g_str_has_prefix(parts[1], "PluginCookieInfo"))
   {
@@ -1248,7 +1246,7 @@ void consume_plugin_message(gchar* message) {
     IcedTeaPluginUtilities::decodeURL(parts[4], &decoded_url);
 
     gchar* cookie_info = g_strconcat ("plugin PluginCookieInfo reference ", parts[3], " ", NULL);
-    gchar* cookie_string;
+    gchar* cookie_string = NULL;
     uint32_t len;
     if (get_cookie_info(decoded_url, &cookie_string, &len) == NPERR_NO_ERROR)
     {
@@ -1262,6 +1260,8 @@ void consume_plugin_message(gchar* message) {
     decoded_url = NULL;
     g_free(cookie_info);
     cookie_info = NULL;
+    g_free(cookie_string);
+    cookie_string = NULL;
   } else if (g_str_has_prefix(parts[1], "PluginSetCookie"))
   {
     // Message structure: plugin PluginSetCookie reference -1 <url> <cookie>

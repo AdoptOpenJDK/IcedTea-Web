@@ -1,3 +1,8 @@
+2012-11-21  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(consume_plugin_message): Free two buffers returned from NPN_GetValueForURL function.
+
 2012-11-20  Jiri Vanek <jvanek@redhat.com>
 
 	*  Makefile.am: (stamps/run-netx-dist-tests.stamp)  and
