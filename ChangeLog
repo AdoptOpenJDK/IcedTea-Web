@@ -1,5 +1,55 @@
 2012-11-21  Adam Domurad  <adomurad@redhat.com>
 
+	Add the source code to UnitTest++ into the project.
+	* tests/UnitTest++/COPYING: Part of UnitTest++
+	* tests/UnitTest++/Makefile: Part of UnitTest++
+	* tests/UnitTest++/README: Part of UnitTest++
+	* tests/UnitTest++/src/AssertException.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/AssertException.h: Part of UnitTest++
+	* tests/UnitTest++/src/CheckMacros.h: Part of UnitTest++
+	* tests/UnitTest++/src/Checks.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/Checks.h: Part of UnitTest++
+	* tests/UnitTest++/src/Config.h: Part of UnitTest++
+	* tests/UnitTest++/src/CurrentTest.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/CurrentTest.h: Part of UnitTest++
+	* tests/UnitTest++/src/DeferredTestReporter.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/DeferredTestReporter.h: Part of UnitTest++
+	* tests/UnitTest++/src/DeferredTestResult.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/DeferredTestResult.h: Part of UnitTest++
+	* tests/UnitTest++/src/ExecuteTest.h: Part of UnitTest++
+	* tests/UnitTest++/src/MemoryOutStream.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/MemoryOutStream.h: Part of UnitTest++
+	* tests/UnitTest++/src/Posix/SignalTranslator.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/Posix/SignalTranslator.h: Part of UnitTest++
+	* tests/UnitTest++/src/Posix/TimeHelpers.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/Posix/TimeHelpers.h: Part of UnitTest++
+	* tests/UnitTest++/src/ReportAssert.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/ReportAssert.h: Part of UnitTest++
+	* tests/UnitTest++/src/Test.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/Test.h: Part of UnitTest++
+	* tests/UnitTest++/src/TestDetails.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/TestDetails.h: Part of UnitTest++
+	* tests/UnitTest++/src/TestList.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/TestList.h: Part of UnitTest++
+	* tests/UnitTest++/src/TestMacros.h: Part of UnitTest++
+	* tests/UnitTest++/src/TestReporter.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/TestReporter.h: Part of UnitTest++
+	* tests/UnitTest++/src/TestReporterStdout.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/TestReporterStdout.h: Part of UnitTest++
+	* tests/UnitTest++/src/TestResults.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/TestResults.h: Part of UnitTest++
+	* tests/UnitTest++/src/TestRunner.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/TestRunner.h: Part of UnitTest++
+	* tests/UnitTest++/src/TestSuite.h: Part of UnitTest++
+	* tests/UnitTest++/src/TimeConstraint.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/TimeConstraint.h: Part of UnitTest++
+	* tests/UnitTest++/src/TimeHelpers.h: Part of UnitTest++
+	* tests/UnitTest++/src/UnitTest++.h: Part of UnitTest++
+	* tests/UnitTest++/src/XmlTestReporter.cpp: Part of UnitTest++
+	* tests/UnitTest++/src/XmlTestReporter.h: Part of UnitTest++
+
+2012-11-21  Adam Domurad  <adomurad@redhat.com>
+
 	* plugin/icedteanp/IcedTeaNPPlugin.cc
 	(consume_plugin_message): Free two buffers returned from NPN_GetValueForURL function.
 
