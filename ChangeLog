@@ -1,5 +1,9 @@
 2012-11-21  Adam Domurad  <adomurad@redhat.com>
 
+	* Makefile.am: Fix new clean targets not cleaning properly
+
+2012-11-21  Adam Domurad  <adomurad@redhat.com>
+
 	Support for C++ unit testing with UnitTest++ for IcedTeaWeb.
 	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: New, contains tests
 	for utility functions.

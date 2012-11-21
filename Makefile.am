@@ -310,10 +310,11 @@ $(CPP_UNITTEST_FRAMEWORK_LIB): $(CPP_UNITTEST_FRAMEWORK_SRCDIR)
 	popd
 
 clean-unittest++:
-	rm $(CPP_UNITTEST_FRAMEWORK_BUILDDIR)/*.o
-	rm $(CPP_UNITTEST_FRAMEWORK_LIB)
-	rmdir $(CPP_UNITTEST_FRAMEWORK_BUILDDIR)
-	rmdir $(CPP_UNITTEST_DIR) &> /dev/null
+	rm -f $(CPP_UNITTEST_FRAMEWORK_BUILDDIR)/*.o
+	rm -f $(CPP_UNITTEST_FRAMEWORK_LIB)
+	if [ -e $(CPP_UNITTEST_FRAMEWORK_BUILDDIR) ] ; then \
+		rmdir $(CPP_UNITTEST_FRAMEWORK_BUILDDIR) ; \
+	fi
 
 stamps/cpp-unit-tests-compile.stamp: $(CPP_UNITTEST_FRAMEWORK_LIB) $(CPP_UNITTEST_SRCDIR) $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS))
 	mkdir -p $(CPP_UNITTEST_DIR) && \
@@ -354,10 +355,9 @@ $(CPP_UNITTEST_EXECUTABLE): $(CPP_UNITTEST_FRAMEWORK_LIB) stamps/cpp-unit-tests-
 	  $(BUILT_CPP_UNIT_TEST_FRAMEWORK) -o $@
 
 clean-cpp-unit-tests: 
-	rm stamps/cpp-unit-tests-compile.stamp &> /dev/null 
-	rm $(CPP_UNITTEST_EXECUTABLE)
-	rm $(CPP_UNITTEST_DIR)/*.o
-	rmdir $(CPP_UNITTEST_DIR) &> /dev/null
+	rm -f stamps/cpp-unit-tests-compile.stamp
+	rm -f $(CPP_UNITTEST_EXECUTABLE)
+	rm -f $(CPP_UNITTEST_DIR)/*.o
 
 run-cpp-unit-tests: $(CPP_UNITTEST_EXECUTABLE)
 	$(CPP_UNITTEST_EXECUTABLE)
@@ -571,6 +571,9 @@ clean-plugin-docs:
 # ==========================
 
 clean-tests: clean-netx-tests clean-cpp-unit-tests clean-unittest++
+	if [ -e $(CPP_UNITTEST_DIR) ] ; then \
+		rmdir $(CPP_UNITTEST_DIR) ; \
+	fi
 	if [ -e $(TESTS_DIR) ]; then \
 		rmdir $(TESTS_DIR) ; \
 	fi
