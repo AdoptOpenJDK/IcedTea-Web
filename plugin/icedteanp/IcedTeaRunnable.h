@@ -42,6 +42,9 @@ exception statement from your version. */
 #define MOZILLA 1
 #if MOZILLA
 
+#include <string>
+#include <npapi.h>
+
 #if MOZILLA_VERSION_COLLAPSED < 1090100
 #include <nsIRunnable.h>
 #include <string>

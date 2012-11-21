@@ -1,5 +1,18 @@
 2012-11-21  Adam Domurad  <adomurad@redhat.com>
 
+	Support for C++ unit testing with UnitTest++ for IcedTeaWeb.
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: New, contains tests
+	for utility functions.
+	* tests/cpp-unit-tests/main.cc: New, contains unit test runner.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: Remove incorrect circular 
+	include dependency
+	* plugin/icedteanp/IcedTeaRunnable.h: Add includes necessary for 
+	self-sustaining header.
+	* Makefile.am: Add targets for unit test compilation and running, 
+	eg 'make run-cpp-unit-tests'.
+
+2012-11-21  Adam Domurad  <adomurad@redhat.com>
+
 	Add the source code to UnitTest++ into the project.
 	* tests/UnitTest++/COPYING: Part of UnitTest++
 	* tests/UnitTest++/Makefile: Part of UnitTest++

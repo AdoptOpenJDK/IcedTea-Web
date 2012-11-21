@@ -25,6 +25,9 @@ export TEST_EXTENSIONS_SRCDIR=$(TESTS_SRCDIR)/test-extensions
 export TEST_EXTENSIONS_TESTS_SRCDIR=$(TESTS_SRCDIR)/test-extensions-tests
 export REPRODUCERS_TESTS_SRCDIR=$(TESTS_SRCDIR)/reproducers
 export TEST_EXTENSIONS_DIR=$(TESTS_DIR)/test-extensions
+export CPP_UNITTEST_FRAMEWORK_SRCDIR=$(TESTS_SRCDIR)/UnitTest++
+export CPP_UNITTEST_SRCDIR=$(TESTS_SRCDIR)/cpp-unit-tests
+export CPP_UNITTEST_DIR=$(TESTS_DIR)/cpp-unit-tests
 export TEST_EXTENSIONS_COMPATIBILITY_SYMLINK=$(TESTS_DIR)/netx/jnlp_testsengine
 export TEST_EXTENSIONS_TESTS_DIR=$(TESTS_DIR)/test-extensions-tests
 export REPRODUCERS_TESTS_SERVER_DEPLOYDIR=$(TESTS_DIR)/reproducers_test_server_deploydir
@@ -61,6 +64,10 @@ export MOZILLA_GLOBAL32_PLUGINDIR=/usr/lib/mozilla/plugins
 export OPERA_GLOBAL64_PLUGINDIR=/usr/lib64/opera/plugins
 export OPERA_GLOBAL32_PLUGINDIR=/usr/lib/opera/plugins
 export BUILT_PLUGIN_LIBRARY=IcedTeaPlugin.so
+export CPP_UNITTEST_FRAMEWORK_BUILDDIR=$(CPP_UNITTEST_DIR)/UnitTest++
+export CPP_UNITTEST_FRAMEWORK_LIB_NAME=libUnitTest++.a
+export CPP_UNITTEST_FRAMEWORK_LIB=$(CPP_UNITTEST_FRAMEWORK_BUILDDIR)/$(CPP_UNITTEST_FRAMEWORK_LIB_NAME)
+export CPP_UNITTEST_EXECUTABLE=$(CPP_UNITTEST_DIR)/IcedTeaPluginUnitTests
 export MOZILLA_LOCAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origU
 export MOZILLA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origMG
 export OPERA_GLOBAL_BACKUP_FILE=${HOME}/$(PLUGIN_LINK_NAME).origOG
@@ -288,6 +295,75 @@ $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY): $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJEC
 	  $(MOZILLA_LIBS) \
 	  -shared -o $@
 
+# Start of CPP Unit test targets
+
+# Note that UnitTest++ has its own makefile, however this is avoided because it creates an in-source build.
+$(CPP_UNITTEST_FRAMEWORK_LIB): $(CPP_UNITTEST_FRAMEWORK_SRCDIR)
+	mkdir -p $(CPP_UNITTEST_FRAMEWORK_BUILDDIR) && \
+	pushd $(CPP_UNITTEST_FRAMEWORK_SRCDIR) && \
+	for cppfile in $$(find $(CPP_UNITTEST_FRAMEWORK_SRCDIR) -name '*.cpp') ; \
+	do \
+	  objfile="$(CPP_UNITTEST_FRAMEWORK_BUILDDIR)/$$(basename $${cppfile%.cpp}).o" ; \
+	  $(CXX) $(CXXFLAGS) -c $$cppfile -o $$objfile || exit 1 ; \
+	done ; \
+	ar cr $(CPP_UNITTEST_FRAMEWORK_LIB) $(CPP_UNITTEST_FRAMEWORK_BUILDDIR)/*.o ; \
+	popd
+
+clean-unittest++:
+	rm $(CPP_UNITTEST_FRAMEWORK_BUILDDIR)/*.o
+	rm $(CPP_UNITTEST_FRAMEWORK_LIB)
+	rmdir $(CPP_UNITTEST_FRAMEWORK_BUILDDIR)
+	rmdir $(CPP_UNITTEST_DIR) &> /dev/null
+
+stamps/cpp-unit-tests-compile.stamp: $(CPP_UNITTEST_FRAMEWORK_LIB) $(CPP_UNITTEST_SRCDIR) $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS))
+	mkdir -p $(CPP_UNITTEST_DIR) && \
+	pushd $(CPP_UNITTEST_SRCDIR) && \
+	for cppfile in $$(find $(CPP_UNITTEST_SRCDIR) -name '*.cc') ; \
+	do \
+	objfile="$(CPP_UNITTEST_DIR)/$$(basename $${cppfile%.cc}).o" ; \
+	echo "Compiling $$cppfile to $$objfile"; \
+	$(CXX) $(CXXFLAGS) \
+	   $(DEFS) $(VERSION_DEFS) \
+	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
+	  -DPLUGIN_NAME="\"IcedTea-Web Plugin\"" \
+	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
+	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
+	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
+	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
+	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
+	  $(GLIB_CFLAGS) \
+	  $(GTK_CFLAGS) \
+	  $(MOZILLA_CFLAGS) \
+	  "-I$(CPP_UNITTEST_FRAMEWORK_SRCDIR)/src" \
+	  "-I$(PLUGIN_SRCDIR)" \
+	  -o $$objfile -c $$cppfile || exit 1 ; \
+	done ; \
+	popd ; \
+	mkdir -p stamps ; \
+	touch $@
+
+$(CPP_UNITTEST_EXECUTABLE): $(CPP_UNITTEST_FRAMEWORK_LIB) stamps/cpp-unit-tests-compile.stamp 
+	cd $(CPP_UNITTEST_DIR) && \
+	$(CXX) $(CXXFLAGS) \
+	  $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS)) \
+	  $(CPP_UNITTEST_DIR)/*.o \
+	  $(GLIB_LIBS) \
+	  $(GTK_LIBS) \
+	  $(MOZILLA_LIBS) \
+	  $(CPP_UNITTEST_FRAMEWORK_LIB)\
+	  $(BUILT_CPP_UNIT_TEST_FRAMEWORK) -o $@
+
+clean-cpp-unit-tests: 
+	rm stamps/cpp-unit-tests-compile.stamp &> /dev/null 
+	rm $(CPP_UNITTEST_EXECUTABLE)
+	rm $(CPP_UNITTEST_DIR)/*.o
+	rmdir $(CPP_UNITTEST_DIR) &> /dev/null
+
+run-cpp-unit-tests: $(CPP_UNITTEST_EXECUTABLE)
+	$(CPP_UNITTEST_EXECUTABLE)
+
+# End of CPP Unit test targets
+
 clean-IcedTeaPlugin:
 	rm -f $(PLUGIN_DIR)/*.o
 	rm -f $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY)
@@ -494,7 +570,7 @@ clean-plugin-docs:
 # check
 # ==========================
 
-clean-tests: clean-netx-tests
+clean-tests: clean-netx-tests clean-cpp-unit-tests clean-unittest++
 	if [ -e $(TESTS_DIR) ]; then \
 		rmdir $(TESTS_DIR) ; \
 	fi
