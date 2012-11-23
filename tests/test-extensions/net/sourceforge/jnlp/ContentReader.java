@@ -34,23 +34,25 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-
 package net.sourceforge.jnlp;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Class to read content of stdout/stderr of process, and to cooperate with its running/terminated/finished statuses.
+ * Class to read content of stdout/stderr of process, and to cooperate with its
+ * running/terminated/finished statuses.
  */
 class ContentReader implements Runnable {
 
     StringBuilder sb = new StringBuilder();
     private final InputStream is;
     private boolean done;
-    ContentReaderListener listener;
+    final List<ContentReaderListener> listeners = new ArrayList(1);
 
     public String getContent() {
         return sb.toString();
@@ -62,15 +64,24 @@ class ContentReader implements Runnable {
 
     public ContentReader(InputStream is, ContentReaderListener l) throws IOException {
         this.is = is;
-        this.listener = l;
+        if (l != null) {
+            this.listeners.add(l);
+        }
     }
 
-    public void setListener(ContentReaderListener listener) {
-        this.listener = listener;
+    public ContentReader(InputStream is, List<ContentReaderListener> l) throws IOException {
+        this.is = is;
+        if (l != null) {
+            this.listeners.addAll(l);
+        }
     }
 
-    public ContentReaderListener getListener() {
-        return listener;
+    public void addListener(ContentReaderListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public List<ContentReaderListener> getListener() {
+        return listeners;
     }
 
     /**
@@ -96,8 +107,12 @@ class ContentReader implements Runnable {
             while (true) {
                 int s = br.read();
                 if (s < 0) {
-                    if (line.length() > 0 && listener != null) {
-                        listener.lineReaded(line.toString());
+                    if (line.length() > 0 && listeners != null) {
+                        for (ContentReaderListener listener : listeners) {
+                            if (listener != null) {
+                                listener.lineReaded(line.toString());
+                            }
+                        }
                     }
                     break;
                 }
@@ -105,21 +120,31 @@ class ContentReader implements Runnable {
                 sb.append(ch);
                 line.append(ch);
                 if (ch == '\n') {
-                    if (listener != null) {
-                        listener.lineReaded(line.toString());
+                    if (listeners != null) {
+                        for (ContentReaderListener listener : listeners) {
+                            if (listener != null) {
+                                listener.lineReaded(line.toString());
+                            }
+                        }
                     }
                     line = new StringBuilder();
                 }
-                if (listener != null) {
-                    listener.charReaded(ch);
+                if (listeners != null) {
+                    for (ContentReaderListener listener : listeners) {
+                        if (listener != null) {
+                            listener.charReaded(ch);
+                        }
+                    }
                 }
             }
-            //do not want to bother output with terminations
-            //mostly compaling when assassin kill the process about StreamClosed
-            //do not want to bother output with terminations
-            //mostly compaling when assassin kill the process about StreamClosed
-        } catch (Exception ex) {
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
+        //do not want to bother output with terminations
+        //mostly compaling when assassin kill the process about StreamClosed
+        catch (Exception ex) {
             // logException(ex);
+            //ex.printStackTrace();
         } finally {
             try {
                 is.close();

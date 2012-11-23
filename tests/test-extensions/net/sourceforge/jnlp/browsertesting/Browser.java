@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * interface which represents individual browsers
  */
-public interface Browser {
+public interface Browser extends ReactingProcess{
     public String getDefaultBin();
     public String getDefaultPluginExpectedLocation();
     public String getBin();
@@ -51,6 +51,5 @@ public interface Browser {
     public Browsers getID();
     public List<String> getComaptibilitySwitches();
     public List<String> getDefaultSwitches();
-
 
 }

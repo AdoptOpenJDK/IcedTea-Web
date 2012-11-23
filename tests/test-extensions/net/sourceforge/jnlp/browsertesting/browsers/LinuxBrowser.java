@@ -92,6 +92,25 @@ public abstract class LinuxBrowser implements Browser{
         }
     }
 
+    @Override
+    public void beforeProcess(String s) {
+        
+    }
+
+    @Override
+    public void afterProcess(String s) {
+       
+    }
+
+    @Override
+    public void beforeKill(String s) {
+
+    }
+
+    @Override
+    public void afterKill(String s) {
+       
+    }
 
     
 }

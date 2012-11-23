@@ -1,4 +1,4 @@
-/* Midory.java
+/* ReactingProcess.java
 Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -35,21 +35,29 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp.browsertesting.browsers;
+package net.sourceforge.jnlp.browsertesting;
 
-import net.sourceforge.jnlp.browsertesting.Browsers;
 
-public class Midory extends MozillaFamilyLinuxBrowser {
+/**
+ * interface which represents process which can react to events during its lifetime.
+ */
+public interface ReactingProcess {
+    /**
+     * called before process is launched
+     */
+    public void beforeProcess(String s);
+    /**
+     * called after process is finished or killed
+     */ 
+    public void afterProcess(String s);
+    /**
+     * called after before process is timeouted and is going to be killed
+     */
+    public void beforeKill(String s);
+    /**
+     * called after process have been killed
+     */
+    public void afterKill(String s);
 
-    public Midory(String bin) {
-        super(bin);
-    }
 
-    @Override
-    public Browsers getID() {
-        return Browsers.midori;
-    }
-
-     
-    
 }

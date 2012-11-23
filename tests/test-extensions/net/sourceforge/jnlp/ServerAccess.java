@@ -592,17 +592,27 @@ public class ServerAccess {
     }
 
     public ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
-        return executeProcessUponURL(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource));
-    }
-    public ProcessResult executeBrowser(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
-        return executeProcessUponURL(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl);
+        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), null, null, null);
+        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
+        return rpw.execute();
     }
 
-     public ProcessResult executeBrowser(Browser b,List<String> otherargs, String resource) throws Exception {
-        return executeProcessUponURL(b.getBin(), otherargs, getUrlUponThisInstance(resource));
+    public ProcessResult executeBrowser(List<String> otherargs, String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
+        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
+        return rpw.execute();
     }
-    public ProcessResult executeBrowser(Browser b,List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
-        return executeProcessUponURL(b.getBin(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl);
+
+    public ProcessResult executeBrowser(Browser b, List<String> otherargs, String resource) throws Exception {
+        ProcessWrapper rpw = new ProcessWrapper(b.getBin(), otherargs, getUrlUponThisInstance(resource), null, null, null);
+        rpw.setReactingProcess(b);
+        return rpw.execute();
+    }
+
+    public ProcessResult executeBrowser(Browser b, List<String> otherargs, String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+        ProcessWrapper rpw = new ProcessWrapper(b.getBin(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
+        rpw.setReactingProcess(b);
+        return rpw.execute();
     }
 
     /**
@@ -651,23 +661,15 @@ public class ServerAccess {
      * @throws Exception
      */
     public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u) throws Exception {
-        return executeProcessUponURL(toBeExecuted, otherargs, u,null,null);
+        return new ProcessWrapper(toBeExecuted, otherargs, u, null, null, null).execute();
     }
 
-    public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
-        return executeProcessUponURL(toBeExecuted, otherargs, u, stdoutl, stderrl, null);
+    public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+        return new ProcessWrapper(toBeExecuted, otherargs, u, stdoutl, stderrl, null).execute();
     }
-    public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
-        Assert.assertNotNull(u);
-        Assert.assertNotNull(toBeExecuted);
-        Assert.assertTrue(toBeExecuted.trim().length() > 1);
-        if (otherargs == null) {
-            otherargs = new ArrayList<String>(1);
-        }
-        List<String> urledArgs = new ArrayList<String>(otherargs);
-        urledArgs.add(0, toBeExecuted);
-        urledArgs.add(u.toString());
-        return executeProcess(urledArgs, stdoutl, stderrl,vars);
+
+    public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) throws Exception {
+        return new ProcessWrapper(toBeExecuted, otherargs, u, stdoutl, stderrl, vars).execute();
     }
 
      public static ProcessResult executeProcess(final List<String> args) throws Exception {
@@ -699,10 +701,6 @@ public class ServerAccess {
         return executeProcess(args, dir, null, null);
     }
 
-    private static String createConnectionMessage(ThreadedProcess t) {
-        return "Connecting " + t.getCommandLine();
-    }
-
     /**
      * Proceed message s to logging with request to reprint to System.err
      * @param s
@@ -727,7 +725,7 @@ public class ServerAccess {
         log(s, false, false);
     }
 
-    private static void log(String message, boolean printToOut, boolean printToErr) {
+    static void log(String message, boolean printToOut, boolean printToErr) {
         String idded;
         StackTraceElement ste = getTestMethod();
         String fullId = ste.getClassName() + "." + ste.getMethodName();
@@ -772,26 +770,30 @@ public class ServerAccess {
 
     private static StackTraceElement getTestMethod(StackTraceElement[] stack) {
         //0 is always thread
-        //1 is net.sourceforge.jnlp.ServerAccess
+        //1 is net.sourceforge.jnlp.*
+        //we need to get out of all  of classes from this package or pick last of it
         StackTraceElement result = stack[1];
         String baseClass = stack[1].getClassName();
         int i = 2;
         for (; i < stack.length; i++) {
             result = stack[i];//at least moving up
-            if(stack[i].getClassName().contains("$")){
+            if (stack[i].getClassName().contains("$")) {
                 continue;
             }
-            if (!baseClass.equals(stack[i].getClassName())) {
+            //probablky it is necessary to get out of net.sourceforge.jnlp.
+            //package where are right now all test-extensions
+            //for now keeping exactly the three clases helping yo  acces the log
+            if (!stack[i].getClassName().startsWith("net.sourceforge.jnlp.")) {
                 break;
             }
         }
         //if nothing left in stack then we have been in ServerAccess already
         //so the target method is the highest form it and better to return it
         //rather then die to ArrayOutOfBounds
-        if(i >= stack.length){
+        if (i >= stack.length) {
             return result;
         }
-        //now we are out of net.sourceforge.jnlp.ServerAccess
+        //now we are out of net.sourceforge.jnlp.*
         //method we need (the test)  is highest from following class
         baseClass = stack[i].getClassName();
         for (; i < stack.length; i++) {
@@ -811,57 +813,8 @@ public class ServerAccess {
         return executeProcess(args, dir, stdoutl, stderrl,null);
 
     }
-    public static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl,String[] vars) throws Exception {
-        ThreadedProcess t = new ThreadedProcess(args, dir,vars);
-        if (PROCESS_LOG) {
-            String connectionMesaage = createConnectionMessage(t);
-            log(connectionMesaage, true, true);
-        }
-        ProcessAssasin pa = new ProcessAssasin(t, PROCESS_TIMEOUT);
-        setUpClosingListener(stdoutl, pa, t);
-        setUpClosingListener(stderrl, pa, t);
-        pa.start();
-        t.start();
-        while (t.getP() == null && t.deadlyException == null) {
-            Thread.sleep(100);
-        }
-        if (t.deadlyException != null) {
-            pa.setCanRun(false);
-            return new ProcessResult("", "", null, true, Integer.MIN_VALUE, t.deadlyException);
-        }
-        ContentReader crs = new ContentReader(t.getP().getInputStream(),stdoutl);
-        ContentReader cre = new ContentReader(t.getP().getErrorStream(),stderrl);
-
-        OutputStream out = t.getP().getOutputStream();
-        if (out != null) {
-            out.close();
-        }
-
-        new Thread(crs).start();
-        new Thread(cre).start();
-        while (t.isRunning()) {
-            Thread.sleep(100);
-        }
-
-        while (!t.isDestoyed()) {
-            Thread.sleep(100);
-        }
-        pa.setCanRun(false);
-        // ServerAccess.logOutputReprint(t.getP().exitValue()); when process is killed, this throws exception
-
-        ProcessResult pr=new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode(), null);
-        if (PROCESS_LOG) {
-            log(pr.stdout, true, false);
-            log(pr.stderr, false, true);
-        }
-        return pr;
-    }
-
-     private static void setUpClosingListener(ContentReaderListener listener, ProcessAssasin pa, ThreadedProcess t) {
-        if (listener != null && (listener instanceof ClosingListener)) {
-            ((ClosingListener) listener).setAssasin(pa);
-            ((ClosingListener) listener).setProcess(t);
-        }
+    public static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) throws Exception {
+        return new ProcessWrapper(args, dir, stdoutl, stderrl, vars).execute();
     }
 
     /**

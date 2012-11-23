@@ -34,22 +34,27 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-
 package net.sourceforge.jnlp.browsertesting.browsers;
 
+import java.util.Arrays;
+import java.util.List;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 
 public class Epiphany extends MozillaFamilyLinuxBrowser {
+
+    String[] cs = {"-new-tab"};
 
     public Epiphany(String bin) {
         super(bin);
     }
 
     @Override
+    public List<String> getComaptibilitySwitches() {
+        return Arrays.asList(cs);
+    }
+
+    @Override
     public Browsers getID() {
         return Browsers.epiphany;
     }
-
-
-    
 }

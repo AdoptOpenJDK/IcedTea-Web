@@ -39,24 +39,32 @@ package net.sourceforge.jnlp;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import net.sourceforge.jnlp.browsertesting.ReactingProcess;
 
 /**
- * class which timeout any ThreadedProcess. This killing of 'thread with process' replaced not working process.destroy().
+ * class which timeout any ThreadedProcess. This killing of 'thread with
+ * process' replaced not working process.destroy().
  */
-class ProcessAssasin extends Thread {
+public class ProcessAssasin extends Thread {
 
     long timeout;
     private final ThreadedProcess p;
     //false == is disabled:(
     private boolean canRun = true;
     private boolean wasTerminated = false;
+    //signifies that assasin have been summoned
+    private volatile boolean killing = false;
+    //signifies that assasin have done its job
+    private volatile boolean killed = false;
     /**
-     * if this is true, then process is not destroyed after timeout, but just left to its own destiny.
-     * Its stdout/err is no longer recorded, and it is leaking system resources until it dies by itself
-     * The contorl is returned to main thread with all informations recorded  untill now.
-     * You will be able to listen to std out from listeners still
+     * if this is true, then process is not destroyed after timeout, but just
+     * left to its own destiny. Its stdout/err is no longer recorded, and it is
+     * leaking system resources until it dies by itself The contorl is returned
+     * to main thread with all informations recorded untill now. You will be
+     * able to listen to std out from listeners still
      */
     private boolean skipInstedOfDesroy = false;
+    private ReactingProcess reactingProcess;
 
     public ProcessAssasin(ThreadedProcess p, long timeout) {
         this.p = (p);
@@ -123,7 +131,7 @@ class ProcessAssasin extends Thread {
                             if (p.getP() != null) {
                                 try {
                                     if (!skipInstedOfDesroy) {
-                                        destroyProcess(p);
+                                        destroyProcess();
                                     }
                                 } catch (Throwable ex) {
                                     if (p.deadlyException == null) {
@@ -165,12 +173,34 @@ class ProcessAssasin extends Thread {
         }
     }
 
-    public static void destroyProcess(ThreadedProcess pp) {
+    public void destroyProcess() {
+        try {
+            killing = true;
+            destroyProcess(p, reactingProcess);
+        } finally {
+            killed = true;
+        }
+    }
+
+    public boolean haveKilled() {
+        return killed;
+    }
+
+    public boolean isKilling() {
+        return killing;
+    }
+
+
+
+    public static void destroyProcess(ThreadedProcess pp, ReactingProcess reactingProcess) {
         Process p = pp.getP();
         try {
             Field f = p.getClass().getDeclaredField("pid");
             f.setAccessible(true);
             String pid = (f.get(p)).toString();
+            if (reactingProcess != null) {
+                reactingProcess.beforeKill(pid);
+            };
             sigInt(pid);
             //sigTerm(pid);
             //sigKill(pid);
@@ -178,6 +208,9 @@ class ProcessAssasin extends Thread {
             ServerAccess.logException(ex);
         } finally {
             p.destroy();
+            if (reactingProcess != null) {
+                reactingProcess.afterKill("");
+            };
         }
     }
 
@@ -193,7 +226,7 @@ class ProcessAssasin extends Thread {
         kill(pid, "SIGTERM");
     }
 
-    public static void kill(String pid,String signal) throws InterruptedException, Exception {
+    public static void kill(String pid, String signal) throws InterruptedException, Exception {
         List<String> ll = new ArrayList<String>(4);
         ll.add("kill");
         ll.add("-s");
@@ -203,4 +236,31 @@ class ProcessAssasin extends Thread {
         //before affected application close
         Thread.sleep(1000);
     }
+
+    void setReactingProcess(ReactingProcess reactingProcess) {
+        this.reactingProcess = reactingProcess;
+    }
+
+    public static void closeWindow(String pid) throws Exception {
+        List<String> ll = new ArrayList<String>(2);
+        ll.add(ServerAccess.getInstance().getDir().getParent() + "/softkiller");
+        ll.add(pid);
+        ServerAccess.executeProcess(ll); //sync, but  acctually release
+        //before affected application "close"
+        Thread.sleep(100);
+
+    }
+
+    public static void closeWindows(String s) throws Exception {
+        closeWindows(s, 10);
+    }
+    
+    public static void closeWindows(String s, int count) throws Exception {
+        //each close closes just one tab...
+        for (int i = 0; i < count; i++) {
+            ProcessAssasin.closeWindow(s);
+        }
+    }
+
+
 }

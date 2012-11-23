@@ -45,7 +45,7 @@ import java.util.List;
  * wrapper around Runtime.getRuntime().exec(...) which ensures that process is run inside its own, by us controlled, thread.
  * Process builder caused some unexpected and weird behavior :/
  */
-class ThreadedProcess extends Thread {
+public class ThreadedProcess extends Thread {
 
     Process p = null;
     List<String> args;
@@ -59,6 +59,7 @@ class ThreadedProcess extends Thread {
      * check DeadLockTestTest.testDeadLockTestTerminated2
      */
     private boolean destoyed = false;
+    private ProcessAssasin assasin;
 
     public boolean isDestoyed() {
         return destoyed;
@@ -143,6 +144,9 @@ class ThreadedProcess extends Thread {
             try {
                 exitCode = p.waitFor();
                 Thread.sleep(500); //this is giving to fast done proecesses's e/o readers time to read all. I would like to know better solution :-/
+                while(assasin.isKilling() && !assasin.haveKilled()){
+                    Thread.sleep(100);
+                };
             } finally {
                 destoyed = true;
             }
@@ -162,5 +166,9 @@ class ThreadedProcess extends Thread {
         } finally {
             running = false;
         }
+    }
+
+    void setAssasin(ProcessAssasin pa) {
+        this.assasin=pa;
     }
 }

@@ -1,3 +1,34 @@
+2012-11-23  Jiri Vanek <jvanek@redhat.com>
+
+	Firefox session-backup and stubs for softkiller, multiple listeners,
+	processes handling moved to separate class.
+	* tests/reproducers/simple/AppletTest/testcases/AppletTestTests.java:
+	Removed unwanted assert on termination
+	* tests/test-extensions/net/sourceforge/jnlp/ContentReader.java:
+	Added support for multiple listeners.
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	(destroyProcess()), non static wrapper around  former (destroyProcess
+	(process)), introducing marks that process is being killed, added setter 
+	for reactigProcess.
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessWrapper.java:
+	Wrapper around former ServerAccess.executeProcess set of methods.
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: all
+	executeProcess/Javaws/Browser are now just api compatibility methods
+	around ProcessWrapper.
+	(executeProcess) main method moved to ProcessWrapper.execute.
+	* tests/test-extensions/net/sourceforge/jnlp/ThreadedProcess.java:
+	made public and synchronized with ProcessAssasin's (destroyProcess)
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/Browser.java
+	is now implementing ReactingProcess
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/ReactingProcess.java:
+	new interface for communication with main events of ThreadedProcess lifecycle.
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Firefox.java:
+	is containing singleton of FirefoxProfilesOperator (FPO) and is responding to  
+	(beforeProcess) by FPO's (backupingProfiles), to (beforeKill) by calling
+	ProcessAssasin's (closeWindows), and to (afterKill) by FPO's (restoreProfiles)
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/firefox/FirefoxProfilesOperator.java:
+	New class to backup and restore firefox profiles.	
+
 2012-11-21  Adam Domurad  <adomurad@redhat.com>
 
 	* Makefile.am: Fix new clean targets not cleaning properly

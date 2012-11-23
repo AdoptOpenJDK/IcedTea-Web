@@ -34,20 +34,23 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-
 package net.sourceforge.jnlp.browsertesting.browsers;
 
 import java.util.Arrays;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessAssasin;
+import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 
 public class Firefox extends MozillaFamilyLinuxBrowser {
+
+    private static final FirefoxProfilesOperator firefoxProfilesOperatorSingleton = new FirefoxProfilesOperator();
 
     public Firefox(String bin) {
         super(bin);
     }
-
-    String[] cs={"-new-tab"};
+    String[] cs = {"-new-tab"};
 
     @Override
     public Browsers getID() {
@@ -59,8 +62,35 @@ public class Firefox extends MozillaFamilyLinuxBrowser {
         return Arrays.asList(cs);
     }
 
+    @Override
+    public void beforeProcess(String s) {
+        try {
+            firefoxProfilesOperatorSingleton.backupProfiles(); //assuming firefox is not in  safemode already
+        } catch (Exception ex) {
+            throw new RuntimeException("Firefox profile backup failed", ex);
+        }
+    }
 
+    @Override
+    public void afterProcess(String s) {
+    }
 
+    @Override
+    public void beforeKill(String s) {
+        try {
+            //ProcessAssasin.closeWindows(s);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
-    
+    @Override
+    public void afterKill(String s) {
+        try {
+            firefoxProfilesOperatorSingleton.restoreProfiles();
+        } catch (Exception ex) {
+            throw new RuntimeException("Firefox profile restoration failed", ex);
+        }
+
+    }
 }
