@@ -1,5 +1,9 @@
 2012-11-27  Jiri Vanek <jvanek@redhat.com>
 
+	* AUTHORS: added Jan Kmetko as current SplashScreen artwork author
+
+2012-11-27  Jiri Vanek <jvanek@redhat.com>
+
 	Fixed epiphany switch
 	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Epiphany.java: 
 	-new-tab fixed to --new-tab
