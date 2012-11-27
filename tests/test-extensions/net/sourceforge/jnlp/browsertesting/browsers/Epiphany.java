@@ -42,7 +42,7 @@ import net.sourceforge.jnlp.browsertesting.Browsers;
 
 public class Epiphany extends MozillaFamilyLinuxBrowser {
 
-    String[] cs = {"-new-tab"};
+    String[] cs = {"--new-tab"};
 
     public Epiphany(String bin) {
         super(bin);

@@ -1,3 +1,9 @@
+2012-11-27  Jiri Vanek <jvanek@redhat.com>
+
+	Fixed epiphany switch
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Epiphany.java: 
+	-new-tab fixed to --new-tab
+
 2012-11-23  Jiri Vanek <jvanek@redhat.com>
 
 	Firefox session-backup and stubs for softkiller, multiple listeners,
