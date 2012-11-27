@@ -114,6 +114,7 @@ import sun.awt.X11.XEmbeddedFrame;
 import sun.misc.Ref;
 
 import com.sun.jndi.toolkit.url.UrlUtil;
+import java.awt.BorderLayout;
 import java.util.Hashtable;
 import java.util.Vector;
 import net.sourceforge.jnlp.splashscreen.SplashController;
@@ -453,9 +454,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 public void run() {
                     splashPanel.getSplashComponent().setVisible(false);
                     splashPanel.stopAnimation();
-                    remove(splashPanel.getSplashComponent());
+                    removeAll();
+                    setLayout(new BorderLayout());
+                    //remove(splashPanel.getSplashComponent());
                     splashPanel = null;
-                    remove(panel);
+                    //remove(panel);
                     // Re-add the applet to notify container
                     add(panel);
                     panel.setVisible(true);

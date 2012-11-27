@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
+import net.sourceforge.jnlp.splashscreen.SplashUtils;
 
 import sun.applet.AppletViewerPanel;
 import sun.awt.SunToolkit;
@@ -178,6 +179,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
         } catch (Exception e) {
             this.appletAlive = false;
             e.printStackTrace();
+            replaceSplash(SplashUtils.getErrorSplashScreen(getWidth(), getHeight(), e));
         }
     }
 

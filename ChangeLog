@@ -1,5 +1,16 @@
 2012-11-27  Jiri Vanek <jvanek@redhat.com>
 
+	Better error reporting from applets
+	* netx/net/sourceforge/jnlp/NetxPanel.java: (init) ErrorSplash is shown
+	if fatal exception is cough
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: (replaceSpalsh)
+	is rather removing all then just its previous version
+	* tests/reproducers/simple/AppletTest/srcs/AppletErrorTest.java:
+	* tests/reproducers/simple/AppletTest/resources/errorAppletAutoTests.html
+	Testcase for manual testing of various exceptions from applet 
+
+2012-11-27  Jiri Vanek <jvanek@redhat.com>
+
 	* AUTHORS: added Jan Kmetko as current SplashScreen artwork author
 
 2012-11-27  Jiri Vanek <jvanek@redhat.com>
