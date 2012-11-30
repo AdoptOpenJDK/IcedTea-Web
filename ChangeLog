@@ -1,3 +1,14 @@
+2012-11-30  Adam Domurad  <adomurad@redhat.com>
+
+	Added a simple mechanism for mocking functions in the browser function
+	table. Can be expanded as needed.
+	* tests/cpp-unit-tests/main.cc: Call setup function, warn on browser 
+	function based memory leak.
+	* tests/cpp-unit-tests/browser_mock.cc: New, implements simple 
+	error-checking mocks of browser callbacks.
+	* tests/cpp-unit-tests/browser_mock.h: New, interface to mocking 
+	functions.
+
 2012-11-27  Jiri Vanek <jvanek@redhat.com>
 
 	Better error reporting from applets

@@ -42,6 +42,8 @@
 #include <UnitTest++.h>
 #include <TestReporter.h>
 
+#include "browser_mock.h"
+
 using namespace UnitTest;
 
 class IcedteaWebUnitTestReporter: public TestReporter {
@@ -54,6 +56,7 @@ public:
     }
 
     virtual void ReportTestStart(const TestDetails& test) {
+        browsermock_clear_state();
         did_finish_correctly = true;
     }
 
@@ -68,6 +71,11 @@ public:
 
     virtual void ReportTestFinish(const TestDetails& details,
             float secondsElapsed) {
+
+        if (browsermock_unfreed_allocations() > 0) {
+            printf("*** WARNING: Memory leak! %d more NPAPI allocations than frees!\n",
+                    browsermock_unfreed_allocations());
+        }
 
         if (did_finish_correctly) {
             printf("Passed: %s\n", details.testName);
@@ -99,7 +107,9 @@ static int run_icedtea_web_unit_tests() {
 }
 
 int main() {
-    return run_icedtea_web_unit_tests();
+    browsermock_setup_functions();
+
+    int exitcode = run_icedtea_web_unit_tests();
+
+    return exitcode;
 }
-
-
