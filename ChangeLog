@@ -1,5 +1,16 @@
 2012-11-30  Adam Domurad  <adomurad@redhat.com>
 
+	Breaks up IcedTeaPluginUtilities::javaResultToNPVariant into multiple,
+	more manageable parts.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Make three helper functions
+	for the different cases. Two new helper functions for converting from 
+	std::string to NPString and NPVariant.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: Two new helper functions.
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: Tests for the new
+	NPString and NPVariant from std::string functions.
+
+2012-11-30  Adam Domurad  <adomurad@redhat.com>
+
 	Added a simple mechanism for mocking functions in the browser function
 	table. Can be expanded as needed.
 	* tests/cpp-unit-tests/main.cc: Call setup function, warn on browser 

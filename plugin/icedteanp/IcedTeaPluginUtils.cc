@@ -715,116 +715,124 @@ IcedTeaPluginUtilities::NPVariantToString(NPVariant variant, std::string* result
   }
 }
 
-bool
-IcedTeaPluginUtilities::javaResultToNPVariant(NPP instance,
-                                              std::string* java_value,
-                                              NPVariant* variant)
+/**
+ * Convert either a void, boolean, or a number
+ */
+static void
+javaPrimitiveResultToNPVariant(const std::string& value, NPVariant* variant)
 {
-    JavaRequestProcessor java_request = JavaRequestProcessor();
-    JavaResultData* java_result;
-
-    if (java_value->find("literalreturn") == 0)
+    if (value == "void")
     {
-        // 'literalreturn ' == 14 to skip
-        std::string value = java_value->substr(14);
+        PLUGIN_DEBUG("Method call returned void\n");
+        VOID_TO_NPVARIANT(*variant);
+    } else if (value == "null")
+    {
+        PLUGIN_DEBUG("Method call returned null\n");
+        NULL_TO_NPVARIANT(*variant);
+    } else if (value == "true")
+    {
+        PLUGIN_DEBUG("Method call returned a boolean (true)\n");
+        BOOLEAN_TO_NPVARIANT(true, *variant);
+    } else if (value == "false")
+    {
+        PLUGIN_DEBUG("Method call returned a boolean (false)\n");
+        BOOLEAN_TO_NPVARIANT(false, *variant);
+    } else
+    {
+        double d = strtod(value.c_str(), NULL);
 
-        // VOID/BOOLEAN/NUMBER
-
-        if (value == "void")
+        // See if it is convertible to int
+        if (value.find(".") != std::string::npos || d < -(0x7fffffffL - 1L) || d > 0x7fffffffL)
         {
-            PLUGIN_DEBUG("Method call returned void\n");
-            VOID_TO_NPVARIANT(*variant);
-        } else if (value == "null")
-        {
-            PLUGIN_DEBUG("Method call returned null\n");
-            NULL_TO_NPVARIANT(*variant);
-        }else if (value == "true")
-        {
-            PLUGIN_DEBUG("Method call returned a boolean (true)\n");
-            BOOLEAN_TO_NPVARIANT(true, *variant);
-        } else if (value == "false")
-        {
-            PLUGIN_DEBUG("Method call returned a boolean (false)\n");
-            BOOLEAN_TO_NPVARIANT(false, *variant);
+            PLUGIN_DEBUG("Method call returned a double %f\n", d);
+            DOUBLE_TO_NPVARIANT(d, *variant);
         } else
         {
-            double d = strtod(value.c_str(), NULL);
-
-            // See if it is convertible to int
-            if (value.find(".") != std::string::npos ||
-                d < -(0x7fffffffL - 1L) ||
-                d > 0x7fffffffL)
-            {
-                PLUGIN_DEBUG("Method call returned a double %f\n", d);
-                DOUBLE_TO_NPVARIANT(d, *variant);
-            } else
-            {
-                int32_t i = (int32_t) d;
-                PLUGIN_DEBUG("Method call returned an int %d\n", i);
-                INT32_TO_NPVARIANT(i, *variant);
-            }
+            int32_t i = (int32_t) d;
+            PLUGIN_DEBUG("Method call returned an int %d\n", i);
+            INT32_TO_NPVARIANT(i, *variant);
         }
-    } else {
-        // Else this is a complex java object
+    }
+}
 
-        // To keep code a little bit cleaner, we create variables with proper descriptive names
-        std::string return_obj_instance_id = std::string();
-        std::string return_obj_class_id = std::string();
-        std::string return_obj_class_name = std::string();
-        return_obj_instance_id.append(*java_value);
+static bool
+javaStringResultToNPVariant(const std::string& jobject_id, NPVariant* variant)
+{
+    JavaRequestProcessor jrequest_processor;
+    JavaResultData* jstring_result = jrequest_processor.getString(jobject_id);
 
-        // Find out the class name first, because string is a special case
-        java_result = java_request.getClassName(return_obj_instance_id);
+    if (jstring_result->error_occurred)
+    {
+        return false;
+    }
 
-        if (java_result->error_occurred)
+    std::string str = *jstring_result->return_string;
+
+    PLUGIN_DEBUG( "Method call returned a string:\"%s\"\n", str.c_str());
+
+    *variant = IcedTeaPluginUtilities::NPVariantStringCopy(str);
+
+    return true;
+}
+
+static bool
+javaObjectResultToNPVariant(NPP instance, const std::string& jobject_id, NPVariant* variant)
+{
+    // Reference the class object so we can construct an NPObject with it and the instance
+
+    JavaRequestProcessor jrequest_processor;
+    JavaResultData* jclass_result = jrequest_processor.getClassID(jobject_id);
+
+    if (jclass_result->error_occurred)
+    {
+        return false;
+    }
+
+    std::string jclass_id = *jclass_result->return_string;
+
+    NPObject* obj;
+    if (jclass_id.at(0) == '[') // array
+    {
+        obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(instance, jclass_id,
+                jobject_id, true);
+    } else
+    {
+        obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(instance, jclass_id,
+                jobject_id, false);
+    }
+
+    OBJECT_TO_NPVARIANT(obj, *variant);
+
+    return true;
+}
+
+bool
+IcedTeaPluginUtilities::javaResultToNPVariant(NPP instance,
+        std::string* java_value, NPVariant* variant)
+{
+    int literal_n = sizeof("literalreturn"); // Accounts for one space char
+    if (strncmp("literalreturn ", java_value->c_str(), literal_n) == 0)
+    {
+        javaPrimitiveResultToNPVariant(java_value->substr(literal_n), variant);
+    } else
+    {
+        std::string jobject_id = *java_value;
+
+        JavaRequestProcessor jrequest_processor;
+        JavaResultData* jclassname_result = jrequest_processor.getClassName(jobject_id);
+
+        if (jclassname_result->error_occurred)
         {
             return false;
         }
 
-        return_obj_class_name.append(*(java_result->return_string));
-
-        if (return_obj_class_name == "java.lang.String")
+        // Special-case for NPString if string
+        if (*jclassname_result->return_string == "java.lang.String")
         {
-            // String is a special case as NPVariant can handle it directly
-            java_result = java_request.getString(return_obj_instance_id);
-
-            if (java_result->error_occurred)
-            {
-                return false;
-            }
-
-            // needs to be on the heap
-            NPUTF8* return_str = (NPUTF8*) malloc(sizeof(NPUTF8)*java_result->return_string->size() + 1);
-            strcpy(return_str, java_result->return_string->c_str());
-
-            PLUGIN_DEBUG("Method call returned a string: \"%s\"\n", return_str);
-            STRINGZ_TO_NPVARIANT(return_str, *variant);
-
-        } else {
-
-            // Else this is a regular class. Reference the class object so
-            // we can construct an NPObject with it and the instance
-            java_result = java_request.getClassID(return_obj_instance_id);
-
-            if (java_result->error_occurred)
-            {
-                return false;
-            }
-
-            return_obj_class_id.append(*(java_result->return_string));
-
-            NPObject* obj;
-
-            if (return_obj_class_name.find('[') == 0) // array
-                obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(
-                                instance,
-                                return_obj_class_id, return_obj_instance_id, true);
-            else
-                obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(
-                                                instance,
-                                                return_obj_class_id, return_obj_instance_id, false);
-
-            OBJECT_TO_NPVARIANT(obj, *variant);
+            return javaStringResultToNPVariant(jobject_id, variant);
+        } else // Else this needs a java object wrapper
+        {
+            return javaObjectResultToNPVariant(instance, jobject_id, variant);
         }
     }
 
@@ -916,6 +924,25 @@ IcedTeaPluginUtilities::NPVariantAsString(NPVariant variant)
  * @param func The function to post
  * @param data Arguments to *func
  */
+NPString IcedTeaPluginUtilities::NPStringCopy(const std::string& result) {
+    char* utf8 = (char*)browser_functions.memalloc(result.size() + 1);
+    strncpy(utf8, result.c_str(), result.size() + 1);
+
+    NPString npstr = {utf8, result.size()};
+    return npstr;
+}
+
+NPVariant IcedTeaPluginUtilities::NPVariantStringCopy(const std::string& result) {
+    NPString npstr = NPStringCopy(result);
+    NPVariant npvar;
+#if MOZILLA_VERSION_COLLAPSED < 1090200
+    STRINGN_TO_NPVARIANT(npstr.utf8characters, npstr.utf8length, npvar);
+#else
+    STRINGN_TO_NPVARIANT(npstr.UTF8Characters, npstr.UTF8Length, npvar);
+#endif
+    return npvar;
+}
+
 void
 IcedTeaPluginUtilities::callAndWaitForResult(NPP instance, void (*func) (void *), AsyncCallThreadData* data)
 {

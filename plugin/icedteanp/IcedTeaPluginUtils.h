@@ -211,6 +211,12 @@ class IcedTeaPluginUtilities
     	/* Copies a variant data type into a C++ string */
     	static std::string NPVariantAsString(NPVariant variant);
 
+        /* This must be freed with browserfunctions.memfree */
+        static NPString NPStringCopy(const std::string& result);
+
+        /* This must be freed with browserfunctions.releasevariantvalue */
+        static NPVariant NPVariantStringCopy(const std::string& result);
+
     	/* Frees the given vector and the strings that its contents point to */
     	static void freeStringPtrVector(std::vector<std::string*>* v);
 
@@ -242,7 +248,7 @@ class IcedTeaPluginUtilities
 
     	static void printNPVariant(NPVariant variant);
 
-    	static void NPVariantToString(NPVariant variant, std::string* result);
+        static void NPVariantToString(NPVariant variant, std::string* result);
 
         static bool javaResultToNPVariant(NPP instance,
                                           std::string* java_result,

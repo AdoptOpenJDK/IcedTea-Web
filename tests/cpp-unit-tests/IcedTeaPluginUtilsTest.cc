@@ -37,7 +37,11 @@
 #include <UnitTest++.h>
 
 #include <npapi.h>
+
+#include "browser_mock.h"
+
 #include "IcedTeaPluginUtils.h"
+#include "IcedTeaNPPlugin.h"
 
 TEST(NPVariantAsString) {
     NPVariant var;
@@ -45,4 +49,36 @@ TEST(NPVariantAsString) {
 
     std::string cppstr = IcedTeaPluginUtilities::NPVariantAsString(var);
     CHECK(cppstr == "test");
+
+}
+
+TEST(NPStringCopy) {
+    std::string cppstr = "test";
+    NPString npstr = IcedTeaPluginUtilities::NPStringCopy(cppstr);
+
+    CHECK_EQUAL(4, npstr.UTF8Length);
+    CHECK_EQUAL("test", npstr.UTF8Characters);
+
+    // NPAPI states that browser allocation function should be used for NPString/NPVariant
+    CHECK_EQUAL(1, browsermock_unfreed_allocations());
+
+    browser_functions.memfree((void*) npstr.UTF8Characters);
+
+    CHECK_EQUAL(0, browsermock_unfreed_allocations());
+}
+
+TEST(NPVariantStringCopy) {
+    std::string cppstr = "test";
+    NPVariant npvar = IcedTeaPluginUtilities::NPVariantStringCopy(cppstr);
+
+    CHECK_EQUAL(NPVariantType_String, npvar.type);
+
+    CHECK_EQUAL(4, npvar.value.stringValue.UTF8Length);
+    CHECK_EQUAL("test", npvar.value.stringValue.UTF8Characters);
+
+    CHECK_EQUAL(1, browsermock_unfreed_allocations());
+
+    browser_functions.memfree((void*) npvar.value.stringValue.UTF8Characters);
+
+    CHECK_EQUAL(0, browsermock_unfreed_allocations());
 }
