@@ -117,7 +117,7 @@ public class LoggingBottleneck {
                 String testName = testLog.getKey();
                 String testLogs = testLog.getValue().toString();
                 w.write("<" + TESTLOG_ELEMENT + " " + TESTMETHOD_ATTRIBUTE + "=\"" + testName + "\" " + FULLID_ATTRIBUTE + "=\"" + className + "." + testName + "\"  >");
-                w.write(testLogs);
+                w.write(clearChars(testLogs));
                 w.write("</" + TESTLOG_ELEMENT + ">");
             }
             w.write("</" + CLASSLOG_ELEMENT + ">");
@@ -214,5 +214,25 @@ public class LoggingBottleneck {
         DEFAULT_STDLOGS_WRITER.write(idded);
         DEFAULT_STDLOGS_WRITER.newLine();
         DEFAULT_STDLOGS_WRITER.flush();
+    }
+    
+    public static String clearChars(String ss) {
+        StringBuilder s = new StringBuilder(ss);
+        for (int i = 0; i < s.length(); i++) {
+            char q = s.charAt(i);
+            if (q == '\n') {
+                continue;
+            }
+            if (q == '\t') {
+                continue;
+            }
+            int iq = (int) q;
+            if ((iq <= 31 || iq > 65533)||(iq >= 64976 && iq <= 65007)) {
+                s.setCharAt(i, 'I');
+                s.insert(i + 1, "NVALID_CHAR_" + iq);
+                i--;
+            }
+        }
+        return s.toString();
     }
 }

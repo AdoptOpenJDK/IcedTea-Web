@@ -783,8 +783,27 @@ public class ServerAccess {
             //probablky it is necessary to get out of net.sourceforge.jnlp.
             //package where are right now all test-extensions
             //for now keeping exactly the three clases helping yo  acces the log
-            if (!stack[i].getClassName().startsWith("net.sourceforge.jnlp.")) {
-                break;
+            try {
+                Class clazz = Class.forName(stack[i].getClassName());
+                String path = null;
+                try {
+                    path = clazz.getProtectionDomain().getCodeSource().getLocation().getPath();
+                } catch (NullPointerException ex) {
+                    //silently ignoring and continuing with null path
+                }
+                if (path != null && path.contains("/tests.build/")) {
+                    if (!path.contains("/test-extensions/")) {
+                        break;
+                    }
+                } else {
+                    //running from ide 
+                    if (!stack[i].getClassName().startsWith("net.sourceforge.jnlp.")) {
+                        break;
+                    }
+                }
+            } catch (ClassNotFoundException ex) {
+                ///should not happen, searching  only for already loaded class
+                ex.printStackTrace();
             }
         }
         //if nothing left in stack then we have been in ServerAccess already
@@ -793,7 +812,7 @@ public class ServerAccess {
         if (i >= stack.length) {
             return result;
         }
-        //now we are out of net.sourceforge.jnlp.*
+        //now we are out of test-extensions
         //method we need (the test)  is highest from following class
         baseClass = stack[i].getClassName();
         for (; i < stack.length; i++) {
