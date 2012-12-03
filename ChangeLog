@@ -1,3 +1,13 @@
+2012-12-03  Pavel Tisnovsky  <ptisnovs@redhat.com>
+
+	* Makefile.am: Added new target for compiling softkiller.
+	* tests/softkiller/softkiller.c:
+	Added browser softkiller.
+	* tests/softkiller/Makefile:
+	Added makefile used to build and clean browser softkiller.
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Firefox.java:
+	Uncommented code used to close windows.
+
 2012-11-30  Adam Domurad  <adomurad@redhat.com>
 
 	Breaks up IcedTeaPluginUtilities::javaResultToNPVariant into multiple,

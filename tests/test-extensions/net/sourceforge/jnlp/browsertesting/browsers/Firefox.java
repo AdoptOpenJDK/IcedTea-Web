@@ -78,7 +78,7 @@ public class Firefox extends MozillaFamilyLinuxBrowser {
     @Override
     public void beforeKill(String s) {
         try {
-            //ProcessAssasin.closeWindows(s);
+            ProcessAssasin.closeWindows(s);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
