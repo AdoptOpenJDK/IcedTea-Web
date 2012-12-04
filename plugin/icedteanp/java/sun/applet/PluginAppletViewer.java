@@ -65,6 +65,8 @@ package sun.applet;
 import java.applet.Applet;
 import java.applet.AppletContext;
 import java.applet.AudioClip;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
@@ -75,14 +77,11 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.SocketPermission;
 import java.net.URI;
 import java.net.URL;
@@ -90,17 +89,15 @@ import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -109,173 +106,15 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.NetxPanel;
 import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.splashscreen.SplashController;
+import net.sourceforge.jnlp.splashscreen.SplashPanel;
+import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 import sun.awt.X11.XEmbeddedFrame;
 import sun.misc.Ref;
 
 import com.sun.jndi.toolkit.url.UrlUtil;
-import java.awt.BorderLayout;
-import java.util.Hashtable;
-import java.util.Vector;
-import net.sourceforge.jnlp.splashscreen.SplashController;
-import net.sourceforge.jnlp.splashscreen.SplashPanel;
-import net.sourceforge.jnlp.splashscreen.SplashUtils;
-
-/**
- * Lets us construct one using unix-style one shot behaviors
- */
-
-class PluginAppletPanelFactory {
-
-    public AppletPanel createPanel(PluginStreamHandler streamhandler,
-                                   final int identifier,
-                                   final long handle,
-                                   final URL doc,
-                                   final PluginParameters params) {
-        final NetxPanel panel = AccessController.doPrivileged(new PrivilegedAction<NetxPanel>() {
-            public NetxPanel run() {
-                NetxPanel panel = new NetxPanel(doc, params, false);
-                NetxPanel.debug("Using NetX panel");
-                PluginDebug.debug(params.toString());
-                return panel;
-            }
-        });
-
-        // Framing the panel needs to happen in a thread whose thread group
-        // is the same as the threadgroup of the applet thread. If this
-        // isn't the case, the awt eventqueue thread's context classloader
-        // won't be set to a JNLPClassLoader, and when an applet class needs
-        // to be loaded from the awt eventqueue, it won't be found.
-        Thread panelInit = new Thread(panel.getThreadGroup(), new Runnable() {
-            @Override public void run() {
-                panel.createNewAppContext();
-                // create the frame.
-                PluginDebug.debug("X and Y are: " + params.getWidth() + " " + params.getHeight());
-                panel.setAppletViewerFrame(PluginAppletViewer.framePanel(identifier, handle,
-                        params.getWidth(), params.getHeight(), panel));
-
-                panel.init();
-                // Start the applet
-                initEventQueue(panel);
-            }
-        }, "NetXPanel initializer");
-
-        panelInit.start();
-        while(panelInit.isAlive()) {
-            try {
-                panelInit.join();
-            } catch (InterruptedException e) {
-            }
-        }
-
-        // Wait for the panel to initialize
-        PluginAppletViewer.waitForAppletInit(panel);
-
-        Applet a = panel.getApplet();
-
-        // Still null?
-        if (a == null) {
-            streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError: " + "Initialization timed out");
-            return null;
-        }
-
-        PluginDebug.debug("Applet ", a.getClass(), " initialized");
-        streamhandler.write("instance " + identifier + " reference 0 initialized");
-
-        /* AppletViewerPanel sometimes doesn't set size right initially. This 
-         * causes the parent frame to be the default (10x10) size.
-         *  
-         * Normally it goes unnoticed since browsers like Firefox make a resize 
-         * call after init. However some browsers (e.g. Midori) don't.
-         * 
-         * We therefore manually set the parent to the right size.
-         */
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    panel.getParent().setSize(params.getWidth(), params.getHeight());
-                }
-            });
-        } catch (InvocationTargetException ite) {
-            // Not being able to resize is non-fatal
-            PluginDebug.debug("Unable to resize panel: ");
-            ite.printStackTrace();
-        } catch (InterruptedException ie) {
-            // Not being able to resize is non-fatal
-            PluginDebug.debug("Unable to resize panel: ");
-            ie.printStackTrace();
-        }
-
-        panel.removeSplash();
-
-        AppletSecurityContextManager.getSecurityContext(0).associateSrc(panel.getAppletClassLoader(), doc);
-        AppletSecurityContextManager.getSecurityContext(0).associateInstance(identifier, panel.getAppletClassLoader());
-
-        return panel;
-    }
-
-    public boolean isStandalone() {
-        return false;
-    }
-
-    /**
-     * Send the initial set of events to the appletviewer event queue.
-     * On start-up the current behaviour is to load the applet and call
-     * Applet.init() and Applet.start().
-     */
-    private void initEventQueue(AppletPanel panel) {
-        // appletviewer.send.event is an undocumented and unsupported system
-        // property which is used exclusively for testing purposes.
-        PrivilegedAction<String> pa = new PrivilegedAction<String>() {
-            public String run() {
-                return System.getProperty("appletviewer.send.event");
-            }
-        };
-        String eventList = AccessController.doPrivileged(pa);
-
-        if (eventList == null) {
-            // Add the standard events onto the event queue.
-            panel.sendEvent(AppletPanel.APPLET_LOAD);
-            panel.sendEvent(AppletPanel.APPLET_INIT);
-            panel.sendEvent(AppletPanel.APPLET_START);
-        } else {
-            // We're testing AppletViewer.  Force the specified set of events
-            // onto the event queue, wait for the events to be processed, and
-            // exit.
-
-            // The list of events that will be executed is provided as a
-            // ","-separated list.  No error-checking will be done on the list.
-            String[] events = eventList.split(",");
-
-            for (String event : events) {
-                PluginDebug.debug("Adding event to queue: ", event);
-                if ("dispose".equals(event))
-                    panel.sendEvent(AppletPanel.APPLET_DISPOSE);
-                else if ("load".equals(event))
-                    panel.sendEvent(AppletPanel.APPLET_LOAD);
-                else if ("init".equals(event))
-                    panel.sendEvent(AppletPanel.APPLET_INIT);
-                else if ("start".equals(event))
-                    panel.sendEvent(AppletPanel.APPLET_START);
-                else if ("stop".equals(event))
-                    panel.sendEvent(AppletPanel.APPLET_STOP);
-                else if ("destroy".equals(event))
-                    panel.sendEvent(AppletPanel.APPLET_DESTROY);
-                else if ("quit".equals(event))
-                    panel.sendEvent(AppletPanel.APPLET_QUIT);
-                else if ("error".equals(event))
-                    panel.sendEvent(AppletPanel.APPLET_ERROR);
-                else
-                    // non-fatal error if we get an unrecognized event
-                    PluginDebug.debug("Unrecognized event name: ", event);
-            }
-
-            while (!panel.emptyEventQueue())
-                ;
-        }
-    }
-}
 
 /*
  */
@@ -567,6 +406,87 @@ public class PluginAppletViewer extends XEmbeddedFrame
         requestFactory = rf;
     }
 
+    private static void handleInitializationMessage(int identifier, String message) throws IOException {
+
+        // If there is a key for this status, it means it
+        // was either initialized before, or destroy has been
+        // processed. Stop moving further.
+        if (updateStatus(identifier, PAV_INIT_STATUS.PRE_INIT) != null)
+            return;
+
+        // Extract the information from the message
+        String[] msgParts = new String[4];
+        for (int i = 0; i < 3; i++) {
+            int spaceLocation = message.indexOf(' ');
+            int nextSpaceLocation = message.indexOf(' ', spaceLocation + 1);
+            msgParts[i] = message.substring(spaceLocation + 1, nextSpaceLocation);
+            message = message.substring(nextSpaceLocation + 1);
+        }
+
+        long handle = Long.parseLong(msgParts[0]);
+        String width = msgParts[1];
+        String height = msgParts[2];
+
+        int spaceLocation = message.indexOf(' ', "tag".length() + 1);
+        String documentBase =
+                UrlUtil.decode(message.substring("tag".length() + 1, spaceLocation));
+        String paramString = message.substring(spaceLocation + 1);
+
+        PluginDebug.debug("Handle = ", handle, "\n",
+                            "Width = ", width, "\n",
+                            "Height = ", height, "\n",
+                            "DocumentBase = ", documentBase, "\n",
+                            "Params = ", paramString);
+
+        PluginAppletPanelFactory factory = new PluginAppletPanelFactory();
+        AppletMessageHandler amh = new AppletMessageHandler("appletviewer");
+        URL url = new URL(documentBase);
+        URLConnection conn = url.openConnection();
+        /* The original URL may have been redirected - this
+         * sets it to whatever URL/codebase we ended up getting
+         */
+        url = conn.getURL();
+
+        PluginParameters params = new PluginParameterParser().parse(width, height, paramString);
+
+        // Let user know we are starting up
+        streamhandler.write("instance " + identifier + " status " + amh.getMessage("status.start"));
+        factory.createPanel(streamhandler, identifier, handle, url, params);
+
+        long maxTimeToSleep = APPLET_TIMEOUT;
+        appletsLock.lock();
+        try {
+            while (!applets.containsKey(identifier) &&
+                    maxTimeToSleep > 0) { // Map is populated only by reFrame
+                maxTimeToSleep -= waitTillTimeout(appletsLock, appletAdded,
+                                                  maxTimeToSleep);
+            }
+        }
+        finally {
+            appletsLock.unlock();
+        }
+
+        // If wait exceeded maxWait, we timed out. Throw an exception
+        if (maxTimeToSleep <= 0)  {
+            // Caught in handleMessage
+            throw new RuntimeException("Applet initialization timeout");
+        }
+
+        // We should not try to destroy an applet during
+        // initialization. It may cause an inconsistent state,
+        // which would bad if it's a trusted applet that
+        // read/writes to files
+        waitForAppletInit(applets.get(identifier).panel);
+
+        // Should we proceed with reframing?
+         PluginDebug.debug("Init complete");
+
+        if (updateStatus(identifier, PAV_INIT_STATUS.REFRAME_COMPLETE).equals(PAV_INIT_STATUS.INACTIVE)) {
+            destroyApplet(identifier);
+            return;
+        }
+    }
+
     /**
      * Handle an incoming message from the plugin.
      */
@@ -576,83 +496,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         try {
             if (message.startsWith("handle")) {
-
-                // If there is a key for this status, it means it
-                // was either initialized before, or destroy has been
-                // processed. Stop moving further.
-                if (updateStatus(identifier, PAV_INIT_STATUS.PRE_INIT) != null)
-                    return;
-
-                // Extract the information from the message
-                String[] msgParts = new String[4];
-                for (int i = 0; i < 3; i++) {
-                    int spaceLocation = message.indexOf(' ');
-                    int nextSpaceLocation = message.indexOf(' ', spaceLocation + 1);
-                    msgParts[i] = message.substring(spaceLocation + 1, nextSpaceLocation);
-                    message = message.substring(nextSpaceLocation + 1);
-                }
-
-                long handle = Long.parseLong(msgParts[0]);
-                String width = msgParts[1];
-                String height = msgParts[2];
-
-                int spaceLocation = message.indexOf(' ', "tag".length() + 1);
-                String documentBase =
-                        UrlUtil.decode(message.substring("tag".length() + 1, spaceLocation));
-                String paramString = message.substring(spaceLocation + 1);
-
-                PluginDebug.debug("Handle = ", handle, "\n",
-                                    "Width = ", width, "\n",
-                                    "Height = ", height, "\n",
-                                    "DocumentBase = ", documentBase, "\n",
-                                    "Params = ", paramString);
-
-                PluginAppletPanelFactory factory = new PluginAppletPanelFactory();
-                AppletMessageHandler amh = new AppletMessageHandler("appletviewer");
-                URL url = new URL(documentBase);
-                URLConnection conn = url.openConnection();
-                /* The original URL may have been redirected - this
-                 * sets it to whatever URL/codebase we ended up getting
-                 */
-                url = conn.getURL();
-
-                PluginParameters params = new PluginParameterParser().parse(width, height, paramString);
-
-                // Let user know we are starting up
-                streamhandler.write("instance " + identifier + " status " + amh.getMessage("status.start"));
-                factory.createPanel(streamhandler, identifier, handle, url, params);
-
-                long maxTimeToSleep = APPLET_TIMEOUT;
-                appletsLock.lock();
-                try {
-                    while (!applets.containsKey(identifier) &&
-                            maxTimeToSleep > 0) { // Map is populated only by reFrame
-                        maxTimeToSleep -= waitTillTimeout(appletsLock, appletAdded,
-                                                          maxTimeToSleep);
-                    }
-                }
-                finally {
-                    appletsLock.unlock();
-                }
-
-                // If wait exceeded maxWait, we timed out. Throw an exception
-                if (maxTimeToSleep <= 0)
-                    throw new Exception("Applet initialization timeout");
-
-                // We should not try to destroy an applet during
-                // initialization. It may cause an inconsistent state,
-                // which would bad if it's a trusted applet that
-                // read/writes to files
-                waitForAppletInit(applets.get(identifier).panel);
-
-                // Should we proceed with reframing?
-                 PluginDebug.debug("Init complete");
-
-                if (updateStatus(identifier, PAV_INIT_STATUS.REFRAME_COMPLETE).equals(PAV_INIT_STATUS.INACTIVE)) {
-                    destroyApplet(identifier);
-                    return;
-                }
-
+                handleInitializationMessage(identifier, message);
             } else if (message.startsWith("destroy")) {
 
                 // Set it inactive, and try to do cleanup is applicable

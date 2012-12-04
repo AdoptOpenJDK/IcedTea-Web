@@ -1,5 +1,14 @@
 2012-12-04  Adam Domurad  <adomurad@redhat.com>
 
+	PluginAppletViewer refactoring.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(handleInitializationMessage): New, extracts initialization logic
+	from PluginAppletViewer.handleMessage.
+	* plugin/icedteanp/java/sun/applet/PluginAppletPanelFactory.java: Moved
+	into own file.
+
+2012-12-04  Adam Domurad  <adomurad@redhat.com>
+
 	Remove the applet/embed/object tag parser from ITW. Send the applet
 	parameters directly from the C++.
 	* Makefile.am: Allow unit-testing for classes in plugin.jar.
