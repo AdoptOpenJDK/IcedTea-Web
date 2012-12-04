@@ -34,51 +34,60 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
 
+/******************************************************************************
+ * Unit tests for functions related to sending applet parameters              *
+ * (key value pairs).                                                         *
+ ******************************************************************************/
+
 #include <UnitTest++.h>
 
-#include <npapi.h>
-
-#include "browser_mock.h"
-
-#include "IcedTeaPluginUtils.h"
 #include "IcedTeaNPPlugin.h"
 
-TEST(NPVariantAsString) {
-    NPVariant var;
-    STRINGZ_TO_NPVARIANT("test", var);
 
-    std::string cppstr = IcedTeaPluginUtilities::NPVariantAsString(var);
-    CHECK_EQUAL("test", cppstr);
+/* Not normally exposed */
+std::string escape_parameter_string(const char* to_encode);
 
+TEST(escape_parameter_string) {
+	CHECK_EQUAL("\\n", escape_parameter_string("\n"));
+	CHECK_EQUAL("\\\\", escape_parameter_string("\\"));
+	CHECK_EQUAL("\\:", escape_parameter_string(";"));
+
+	CHECK_EQUAL(std::string("test") + "\\n" + "\\\\" + "\\:",
+			escape_parameter_string("test\n\\;"));
 }
 
-TEST(NPStringCopy) {
-    std::string cppstr = "test";
-    NPString npstr = IcedTeaPluginUtilities::NPStringCopy(cppstr);
+/* Not normally exposed */
+std::string plugin_parameters_string(int argc, char* argn[], char* argv[]);
 
-    CHECK_EQUAL(4, npstr.UTF8Length);
-    CHECK_EQUAL("test", npstr.UTF8Characters);
+TEST(plugin_parameters_string) {
 
-    // NPAPI states that browser allocation function should be used for NPString/NPVariant
-    CHECK_EQUAL(1, browsermock_unfreed_allocations());
+	/* test empty */{
+		const char* argn[] = { "" };
+		const char* argv[] = { "" };
+		CHECK_EQUAL("",
+				plugin_parameters_string(0, (char**)argn, (char**)argv));
+	}
 
-    browser_functions.memfree((void*) npstr.UTF8Characters);
+	/* test simple key & value */{
+		const char* argn[] = { "key" };
+		const char* argv[] = { "value" };
+		CHECK_EQUAL("key;value;",
+				plugin_parameters_string(1, (char**)argn, (char**)argv));
+	}
 
-    CHECK_EQUAL(0, browsermock_unfreed_allocations());
+	/* test key & value characters that require escaping */{
+		const char* argn[] = { "key\\" };
+		const char* argv[] = { "value;" };
+		CHECK_EQUAL("key\\\\;value\\:;",
+				plugin_parameters_string(1, (char**)argn, (char**)argv));
+	}
+
+	/* multiple key & value pairs that require escaping*/{
+		const char* argn[] = { "key1\\", "key2\\" };
+		const char* argv[] = { "value1;", "value2;" };
+		CHECK_EQUAL("key1\\\\;value1\\:;key2\\\\;value2\\:;",
+				plugin_parameters_string(2, (char**)argn, (char**)argv));
+	}
 }
 
-TEST(NPVariantStringCopy) {
-    std::string cppstr = "test";
-    NPVariant npvar = IcedTeaPluginUtilities::NPVariantStringCopy(cppstr);
 
-    CHECK_EQUAL(NPVariantType_String, npvar.type);
-
-    CHECK_EQUAL(4, npvar.value.stringValue.UTF8Length);
-    CHECK_EQUAL("test", npvar.value.stringValue.UTF8Characters);
-
-    CHECK_EQUAL(1, browsermock_unfreed_allocations());
-
-    browser_functions.memfree((void*) npvar.value.stringValue.UTF8Characters);
-
-    CHECK_EQUAL(0, browsermock_unfreed_allocations());
-}

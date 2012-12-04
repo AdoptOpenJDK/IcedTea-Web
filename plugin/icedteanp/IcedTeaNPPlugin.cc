@@ -229,8 +229,7 @@ static gboolean plugin_out_pipe_callback (GIOChannel* source,
                                           GIOCondition condition,
                                           gpointer plugin_data);
 static NPError plugin_start_appletviewer (ITNPPluginData* data);
-static gchar* plugin_create_applet_tag (int16_t argc, char* argn[],
-                                        char* argv[]);
+std::string plugin_parameters_string (int argc, char* argn[], char* argv[]);
 static void plugin_stop_appletviewer ();
 // Uninitialize ITNPPluginData structure
 static void plugin_data_destroy (NPP instance);
@@ -347,7 +346,6 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 
   gchar* documentbase = NULL;
   gchar* read_message = NULL;
-  gchar* applet_tag = NULL;
   gchar* cookie_info = NULL;
 
   NPObject* npPluginObj = NULL;
@@ -395,11 +393,10 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
   documentbase = plugin_get_documentbase (instance);
   if (documentbase && argc != 0)
     {
-      // Send applet tag message to appletviewer.
-      applet_tag = plugin_create_applet_tag (argc, argn, argv);
+      // Send parameters to appletviewer.
+      std::string params_string = plugin_parameters_string(argc, argn, argv);
 
-      data->applet_tag = (gchar*) malloc(strlen(applet_tag)*sizeof(gchar) + strlen(documentbase)*sizeof(gchar) + 32);
-      g_sprintf(data->applet_tag, "tag %s %s", documentbase, applet_tag);
+      data->parameters_string =  g_strdup_printf("tag %s %s", documentbase, params_string.c_str());
 
       data->is_applet_instance = true;
     }
@@ -424,33 +421,7 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 
   instance->pdata = data;
 
-  goto cleanup_done;
-
- cleanup_appletviewer_mutex:
-  g_mutex_free (data->appletviewer_mutex);
-  data->appletviewer_mutex = NULL;
-
-  // cleanup_instance_string:
-  g_free (data->instance_id);
-  data->instance_id = NULL;
-
-  // cleanup applet tag:
-  g_free (data->applet_tag);
-  data->applet_tag = NULL;
-
-  // cleanup_data:
-  // Eliminate back-pointer to plugin instance.
-  data->owner = NULL;
-  (*browser_functions.memfree) (data);
-  data = NULL;
-
-  // Initialization failed so return a NULL pointer for the browser
-  // data.
-  instance->pdata = NULL;
-
  cleanup_done:
-  g_free (applet_tag);
-  applet_tag = NULL;
   g_free (read_message);
   read_message = NULL;
   g_free (documentbase);
@@ -834,7 +805,7 @@ ITNP_SetWindow (NPP instance, NPWindow* window)
       // Now we have everything. Send this data to the Java side
       plugin_send_initialization_message(
     		  data->instance_id, (gulong) data->window_handle,
-    		  data->window_width, data->window_height, data->applet_tag);
+    		  data->window_width, data->window_height, data->parameters_string);
 
       g_mutex_unlock (data->appletviewer_mutex);
 
@@ -1694,159 +1665,67 @@ plugin_start_appletviewer (ITNPPluginData* data)
   return error;
 }
 
+
 /*
- * Replaces certain characters (\r, \n, etc) with HTML escape equivalents.
- *
- * Return string is allocated on the heap. Caller assumes responsibility 
- * for freeing the memory via free()
+ * Escape characters for passing to Java.
+ * "\n" for new line, "\\" for "\", "\:" for ";"
  */
-static char*
-encode_string(char* to_encode)
-{
+std::string
+escape_parameter_string(const char* to_encode) {
+  std::string encoded;
 
-  // Do nothing for an empty string
-  if (to_encode == '\0')
-      return to_encode;
-
-  // worst case scenario -> all characters are newlines or
-  // returns, each of which translates to 5 substitutions
-  char* encoded = (char*) calloc(((strlen(to_encode)*5)+1), sizeof(char));
-
-  strcpy(encoded, "");
-
-  for (int i=0; i < strlen(to_encode); i++)
+  if (to_encode == NULL)
   {
-      if (to_encode[i] == '\r')
-          encoded = strcat(encoded, "&#13;");
-      else if (to_encode[i] == '\n')
-          encoded = strcat(encoded, "&#10;");
-      else if (to_encode[i] == '>')
-          encoded = strcat(encoded, "&gt;");
-      else if (to_encode[i] == '<')
-          encoded = strcat(encoded, "&lt;");
-      else if (to_encode[i] == '&')
-          encoded = strcat(encoded, "&amp;");
-      else if (to_encode[i] == '"')
-          encoded = strcat(encoded, "&quot;");
+      return encoded;
+  }
+
+  size_t length = strlen(to_encode);
+  for (int i = 0; i < length; i++)
+  {
+      if (to_encode[i] == '\n')
+          encoded += "\\n";
+      else if (to_encode[i] == '\\')
+    	  encoded += "\\\\";
+      else if (to_encode[i] == ';')
+    	  encoded += "\\:";
       else
-      {
-           char* orig_char = (char*) calloc(2, sizeof(char));
-           orig_char[0] = to_encode[i];
-           orig_char[1] = '\0';
- 
-           strcat(encoded, orig_char);
- 
-           free(orig_char);
-           orig_char = NULL;
-      }
+          encoded += to_encode[i];
   }
 
   return encoded;
 }
 
-// Build up the applet tag string that we'll send to the applet
-// viewer.
-static gchar*
-plugin_create_applet_tag (int16_t argc, char* argn[], char* argv[])
+/*
+ * Build a string containing an encoded list of parameters to send to the applet viewer.
+ * The parameters are separated as 'key1;value1;key2;value2;'. As well, they are
+ * separated and escaped as:
+ * "\n" for new line, "\\" for "\", "\:" for ";"
+ */
+std::string
+plugin_parameters_string (int argc, char* argn[], char* argv[])
 {
-  PLUGIN_DEBUG ("plugin_create_applet_tag\n");
+  PLUGIN_DEBUG ("plugin_parameters_string\n");
 
-  gchar* applet_tag = g_strdup ("<EMBED ");
-  gchar* parameters = g_strdup ("");
+  std::string parameters;
 
-  for (int16_t i = 0; i < argc; i++)
+  for (int i = 0; i < argc; i++)
+  {
+    if (argv[i] != NULL)
     {
-      gchar* argn_escaped = encode_string(argn[i]);
-      gchar* argv_escaped = encode_string(argv[i]);
+        std::string name_escaped = escape_parameter_string(argn[i]);
+        std::string value_escaped = escape_parameter_string(argv[i]);
 
-      if (!g_ascii_strcasecmp (argn_escaped, "code"))
-        {
-          gchar* code = g_strdup_printf ("CODE=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, code, NULL);
-          g_free (code);
-          code = NULL;
+        //Encode parameters and send as 'key1;value1;key2;value2;' etc
+        parameters += name_escaped;
+        parameters += ';';
+        parameters += value_escaped;
+        parameters += ';';
     }
-      else if (!g_ascii_strcasecmp (argn_escaped, "java_code"))
-    {
-          gchar* java_code = g_strdup_printf ("JAVA_CODE=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, java_code, NULL);
-          g_free (java_code);
-          java_code = NULL;
-    }
-      else if (!g_ascii_strcasecmp (argn_escaped, "codebase"))
-    {
-          gchar* codebase = g_strdup_printf ("CODEBASE=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, codebase, NULL);
-          g_free (codebase);
-          codebase = NULL;
-    }
-      else if (!g_ascii_strcasecmp (argn_escaped, "java_codebase"))
-    {
-          gchar* java_codebase = g_strdup_printf ("JAVA_CODEBASE=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, java_codebase, NULL);
-          g_free (java_codebase);
-          java_codebase = NULL;
-    }
-      else if (!g_ascii_strcasecmp (argn_escaped, "classid"))
-    {
-          gchar* classid = g_strdup_printf ("CLASSID=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, classid, NULL);
-          g_free (classid);
-          classid = NULL;
-    }
-      else if (!g_ascii_strcasecmp (argn_escaped, "archive"))
-    {
-          gchar* archive = g_strdup_printf ("ARCHIVE=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, archive, NULL);
-          g_free (archive);
-          archive = NULL;
-    }
-      else if (!g_ascii_strcasecmp (argn_escaped, "java_archive"))
-    {
-          gchar* java_archive = g_strdup_printf ("JAVA_ARCHIVE=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, java_archive, NULL);
-          g_free (java_archive);
-          java_archive = NULL;
-    }
-      else if (!g_ascii_strcasecmp (argn_escaped, "width"))
-    {
-          gchar* width = g_strdup_printf ("width=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, width, NULL);
-          g_free (width);
-          width = NULL;
-    }
-      else if (!g_ascii_strcasecmp (argn_escaped, "height"))
-    {
-          gchar* height = g_strdup_printf ("height=\"%s\" ", argv_escaped);
-          applet_tag = g_strconcat (applet_tag, height, NULL);
-          g_free (height);
-          height = NULL;
-    }
-      else
-        {
+  }
 
-          if (argv_escaped != '\0')
-            {
-              parameters = g_strconcat (parameters, "<PARAM NAME=\"", argn_escaped,
-                                        "\" VALUE=\"", argv_escaped, "\">", NULL);
-            }
-        }
+  PLUGIN_DEBUG ("plugin_parameters_string return\n");
 
-      free(argn_escaped);
-      free(argv_escaped);
-
-      argn_escaped = NULL;
-      argv_escaped = NULL;
-    }
-
-  applet_tag = g_strconcat (applet_tag, ">", parameters, "</EMBED>", NULL);
-
-  g_free (parameters);
-  parameters = NULL;
-
-  PLUGIN_DEBUG ("plugin_create_applet_tag return\n");
-
-  return applet_tag;
+  return parameters;
 }
 
 // plugin_send_message_to_appletviewer must be called while holding
@@ -2057,8 +1936,8 @@ plugin_data_destroy (NPP instance)
   tofree->instance_id = NULL;
 
   // cleanup applet tag
-  g_free (tofree->applet_tag);
-  tofree->applet_tag = NULL;
+  g_free (tofree->parameters_string);
+  tofree->parameters_string = NULL;
 
   g_free(tofree->source);
   tofree->source = NULL;
@@ -2537,7 +2416,7 @@ get_scriptable_object(NPP instance)
         // a 0 handle
         if (!data->window_handle)
         {
-            plugin_send_initialization_message(data->instance_id, 0, 0, 0, data->applet_tag);
+            plugin_send_initialization_message(data->instance_id, 0, 0, 0, data->parameters_string);
         }
 
         java_result = java_request.getAppletObjectInstance(id_str);

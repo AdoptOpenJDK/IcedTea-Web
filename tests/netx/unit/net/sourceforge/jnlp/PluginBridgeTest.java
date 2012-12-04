@@ -29,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Hashtable;
 import java.util.List;
 import junit.framework.Assert;
@@ -64,14 +65,20 @@ public class PluginBridgeTest {
         }
     }
 
+    static private PluginParameters createValidParamObject() {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("code", ""); // Avoids an exception being thrown
+        return new PluginParameters(params);
+    }
+
     @Test
     public void testAbsoluteJNLPHref() throws MalformedURLException, Exception {
         URL codeBase = new URL("http://undesired.absolute.codebase.com");
         String absoluteLocation = "http://absolute.href.com/test.jnlp";
-        Hashtable<String, String> atts = new Hashtable<String, String>();
-        atts.put("jnlp_href", absoluteLocation);
+        PluginParameters params = createValidParamObject();
+        params.put("jnlp_href", absoluteLocation);
         MockJNLPCreator mockCreator = new MockJNLPCreator();
-        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, atts, "", mockCreator);
+        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
         assertEquals(absoluteLocation, mockCreator.getJNLPHref().toExternalForm());
     }
 
@@ -79,12 +86,12 @@ public class PluginBridgeTest {
     public void testRelativeJNLPHref() throws MalformedURLException, Exception {
         URL codeBase = new URL("http://desired.absolute.codebase.com/");
         String relativeLocation = "sub/dir/test.jnlp";
-        Hashtable<String, String> atts = new Hashtable<String, String>();
-        atts.put("jnlp_href", relativeLocation);
+        PluginParameters params = createValidParamObject();
+        params.put("jnlp_href", relativeLocation);
         MockJNLPCreator mockCreator = new MockJNLPCreator();
-        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, atts, "", mockCreator);
+        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
         assertEquals(codeBase.toExternalForm() + relativeLocation,
-                     mockCreator.getJNLPHref().toExternalForm());
+                mockCreator.getJNLPHref().toExternalForm());
     }
 
     @Test
@@ -92,12 +99,12 @@ public class PluginBridgeTest {
         String desiredDomain = "http://desired.absolute.codebase.com";
         URL codeBase = new URL(desiredDomain + "/undesired/sub/dir");
         String relativeLocation = "/app/test/test.jnlp";
-        Hashtable<String, String> atts = new Hashtable<String, String>();
-        atts.put("jnlp_href", relativeLocation);
+        PluginParameters params = createValidParamObject();
+        params.put("jnlp_href", relativeLocation);
         MockJNLPCreator mockCreator = new MockJNLPCreator();
-        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, atts, "", mockCreator);
+        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
         assertEquals(desiredDomain + relativeLocation,
-                     mockCreator.getJNLPHref().toExternalForm());
+                mockCreator.getJNLPHref().toExternalForm());
     }
 
     @Test
@@ -166,12 +173,12 @@ public class PluginBridgeTest {
                 "ICAgICAgLz4NCiAgICAgICAgICAgIDwvam5scD4=";
 
         MockJNLPCreator mockCreator = new MockJNLPCreator();
-        Hashtable<String, String> atts = new Hashtable<String, String>();
-        atts.put("jnlp_href", relativeLocation);
-        atts.put("jnlp_embedded", jnlpFileEncoded);
+        PluginParameters params = createValidParamObject();
+        params.put("jnlp_href", relativeLocation);
+        params.put("jnlp_embedded", jnlpFileEncoded);
 
         String jnlpCodebase = "http://www.redhat.com";
-        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, atts, "", mockCreator);
+        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
         JARDesc[] jars = pb.getResources().getJARs();
 
         //Check if there are two jars cached
@@ -239,11 +246,11 @@ public class PluginBridgeTest {
                 "ICAgICAgICAgICAgPC9qbmxwPg==";
 
         MockJNLPCreator mockCreator = new MockJNLPCreator();
-        Hashtable<String, String> atts = new Hashtable<String, String>();
-        atts.put("jnlp_href", relativeLocation);
-        atts.put("jnlp_embedded", jnlpFileEncoded);
+        PluginParameters params = createValidParamObject();
+        params.put("jnlp_href", relativeLocation);
+        params.put("jnlp_embedded", jnlpFileEncoded);
 
-        PluginBridge pb = new PluginBridge(overwrittenCodebase, null, "", "", 0, 0, atts, "", mockCreator);
+        PluginBridge pb = new PluginBridge(overwrittenCodebase, null, "", "", 0, 0, params, mockCreator);
         JARDesc[] jars = pb.getResources().getJARs();
 
         //Check if there are two jars cached
@@ -268,12 +275,12 @@ public class PluginBridgeTest {
         String jnlpFileEncoded = "thisContextIsInvalid";
 
         MockJNLPCreator mockCreator = new MockJNLPCreator();
-        Hashtable<String, String> atts = new Hashtable<String, String>();
-        atts.put("jnlp_href", relativeLocation);
-        atts.put("jnlp_embedded", jnlpFileEncoded);
+        PluginParameters params = createValidParamObject();
+        params.put("jnlp_href", relativeLocation);
+        params.put("jnlp_embedded", jnlpFileEncoded);
 
         try {
-            new PluginBridge(overwrittenCodebase, null, "", "", 0, 0, atts, "", mockCreator);
+            new PluginBridge(overwrittenCodebase, null, "", "", 0, 0, params, mockCreator);
         } catch (Exception e) {
             return;
         }

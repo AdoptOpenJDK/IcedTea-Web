@@ -45,26 +45,23 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  */
 public class PluginBridge extends JNLPFile {
 
-    private String name;
+    private PluginParameters params;
     private Set<String> jars = new HashSet<String>();
     //Folders can be added to the code-base through the archive tag
     private List<String> codeBaseFolders = new ArrayList<String>();
     private String[] cacheJars = new String[0];
     private String[] cacheExJars = new String[0];
-    private Map<String, String> atts;
     private boolean usePack;
     private boolean useVersion;
-    private boolean codeBaseLookup;
     private boolean useJNLPHref;
 
     /**
      * Creates a new PluginBridge using a default JNLPCreator.
      */
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
-                        int width, int height, Map<String, String> atts,
-                        String uKey)
+                        int width, int height, PluginParameters params)
             throws Exception {
-        this(codebase, documentBase, jar, main, width, height, atts, uKey, new JNLPCreator());
+        this(codebase, documentBase, jar, main, width, height, params, new JNLPCreator());
     }
 
     /**
@@ -86,25 +83,24 @@ public class PluginBridge extends JNLPFile {
     }
 
     public PluginBridge(URL codebase, URL documentBase, String archive, String main,
-                        int width, int height, Map<String, String> atts,
-                        String uKey, JNLPCreator jnlpCreator)
+                        int width, int height, PluginParameters params, JNLPCreator jnlpCreator)
             throws Exception {
         specVersion = new Version("1.0");
         fileVersion = new Version("1.1");
         this.codeBase = codebase;
         this.sourceLocation = documentBase;
-        this.atts = atts;
+        this.params = params;
 
-        if (atts.containsKey("jnlp_href")) {
+        if (params.getJNLPHref() != null) {
             useJNLPHref = true;
             try {
                 // Use codeBase as the context for the URL. If jnlp_href's
                 // value is a complete URL, it will replace codeBase's context.
-                URL jnlp = new URL(codeBase, atts.get("jnlp_href"));
+                URL jnlp = new URL(codeBase, params.getJNLPHref());
                 JNLPFile jnlpFile = null;
 
-                if (atts.containsKey("jnlp_embedded")) {
-                    InputStream jnlpInputStream = new ByteArrayInputStream(decodeBase64String(atts.get("jnlp_embedded")));
+                if (params.getJNLPEmbedded() != null) {
+                    InputStream jnlpInputStream = new ByteArrayInputStream(decodeBase64String(params.getJNLPEmbedded()));
                     jnlpFile = new JNLPFile(jnlpInputStream, codeBase, false);
                 } else {
                     jnlpFile = jnlpCreator.create(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), codeBase);
@@ -118,7 +114,7 @@ public class PluginBridge extends JNLPFile {
 
                 // Change the parameter name to lowercase to follow conventions.
                 for (Map.Entry<String, String> entry : jnlpParams.entrySet()) {
-                    this.atts.put(entry.getKey().toLowerCase(), entry.getValue());
+                    this.params.put(entry.getKey().toLowerCase(), entry.getValue());
                 }
                 JARDesc[] jarDescs = jnlpFile.getResources().getJARs();
                 for (JARDesc jarDesc : jarDescs) {
@@ -128,7 +124,7 @@ public class PluginBridge extends JNLPFile {
             } catch (MalformedURLException e) {
                 // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
                 // it is the site developer who should ensure that file exist.
-                System.err.println("Unable to get JNLP file at: " + atts.get("jnlp_href")
+                System.err.println("Unable to get JNLP file at: " + params.getJNLPHref()
                         + " with context of URL as: " + codeBase.toExternalForm());
             }
         } else {
@@ -138,14 +134,14 @@ public class PluginBridge extends JNLPFile {
         }
 
         // also, see if cache_archive is specified
-        String cacheArchive = atts.get("cache_archive");
-        if (cacheArchive != null && cacheArchive.length() > 0) {
+        String cacheArchive = params.getCacheArchive();
+        if (!cacheArchive.isEmpty()) {
 
             String[] versions = new String[0];
 
             // are there accompanying versions?
-            String cacheVersion = atts.get("cache_version");
-            if (cacheVersion != null) {
+            String cacheVersion = params.getCacheVersion();
+            if (!cacheVersion.isEmpty()) {
                 versions = cacheVersion.split(",");
             }
 
@@ -162,8 +158,8 @@ public class PluginBridge extends JNLPFile {
             }
         }
 
-        String cacheArchiveEx = atts.get("cache_archive_ex");
-        if (cacheArchiveEx != null && cacheArchiveEx.length() > 0) {
+        String cacheArchiveEx = params.getCacheArchiveEx();
+        if (!cacheArchiveEx.isEmpty()) {
             cacheExJars = cacheArchiveEx.split(",");
         }
 
@@ -178,19 +174,13 @@ public class PluginBridge extends JNLPFile {
             }
         }
 
-        name = atts.get("name");
-        if (name == null)
-            name = "Applet";
-        else
-            name = name + " applet";
-
         if (main.endsWith(".class"))
             main = main.substring(0, main.length() - 6);
 
         // the class name should be of the form foo.bar.Baz not foo/bar/Baz
         String mainClass = main.replace('/', '.');
-        launchType = new AppletDesc(name, mainClass, documentBase, width,
-                                    height, atts);
+        launchType = new AppletDesc(params.getAppletTitle(), mainClass, documentBase, width,
+                                    height, params.getUnmodifiableMap());
 
         if (main.endsWith(".class")) //single class file only
             security = new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS,
@@ -198,11 +188,11 @@ public class PluginBridge extends JNLPFile {
         else
             security = null;
 
-        this.uniqueKey = uKey;
+        this.uniqueKey = params.getUniqueKey();
         usePack = false;
         useVersion = false;
-        String jargs = atts.get("java_arguments");
-        if (jargs != null) {
+        String jargs = params.getJavaArguments();
+        if (!jargs.isEmpty()) {
             for (String s : jargs.split(" ")) {
                 String[] parts = s.trim().split("=");
                 if (parts.length == 2 && Boolean.valueOf(parts[1])) {
@@ -214,12 +204,10 @@ public class PluginBridge extends JNLPFile {
                 }
             }
         }
-        String cbl = atts.get("codebase_lookup");
-        codeBaseLookup = cbl == null || (Boolean.valueOf(cbl));
     }
 
     public boolean codeBaseLookup() {
-    	return codeBaseLookup;
+    	return params.useCodebaseLookup();
     }
 
     public boolean useJNLPHref() {
@@ -235,7 +223,7 @@ public class PluginBridge extends JNLPFile {
     }
 
     public String getTitle() {
-        return name;
+        return params.getAppletTitle();
     }
 
     public ResourcesDesc getResources(final Locale locale, final String os,
@@ -258,9 +246,7 @@ public class PluginBridge extends JNLPFile {
                         }
 
                         boolean cacheable = true;
-
-                        String cacheOption = atts.get("cache_option");
-                        if (cacheOption != null && cacheOption.equalsIgnoreCase("no"))
+                        if (params.getCacheOption().equalsIgnoreCase("no"))
                             cacheable = false;
 
                         for (String cacheJar : cacheJars) {

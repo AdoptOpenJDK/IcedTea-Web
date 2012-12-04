@@ -27,7 +27,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -45,12 +44,12 @@ import sun.awt.SunToolkit;
  * @author      Francis Kung <fkung@redhat.com>
  */
 public class NetxPanel extends AppletViewerPanel implements SplashController {
+    private final PluginParameters parameters;
     private PluginBridge bridge = null;
     private boolean exitOnFailure = true;
     private AppletInstance appInst = null;
     private SplashController splashController;
     private boolean appletAlive;
-    private final String uKey;
 
     // We use this so that we can create exactly one thread group
     // for all panels with the same uKey.
@@ -68,51 +67,24 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
     private static final ConcurrentMap<String, Boolean> appContextCreated =
         new ConcurrentHashMap<String, Boolean>();
 
-    public NetxPanel(URL documentURL, Hashtable<String, String> atts) {
-        super(documentURL, atts);
+    public NetxPanel(URL documentURL, PluginParameters params) {
+        super(documentURL, params.getUnderlyingHashtable());
 
-        /* According to http://download.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/applet-compatibility.html, 
-         * classloaders are shared iff these properties match:
-         * codebase, cache_archive, java_archive, archive
-         * 
-         * To achieve this, we create the uniquekey based on those 4 values,
-         * always in the same order. The initial "<NAME>=" parts ensure a 
-         * bad tag cannot trick the loader into getting shared with another.
-         */
+        this.parameters = params;
 
-        // Firefox sometimes skips the codebase if it is default  -- ".", 
-        // so set it that way if absent
-        String codebaseAttr =      atts.get("codebase") != null ?
-                                   atts.get("codebase") : ".";
-
-        String cache_archiveAttr = atts.get("cache_archive") != null ? 
-                                   atts.get("cache_archive") : "";
-
-        String java_archiveAttr =  atts.get("java_archive") != null ? 
-                                   atts.get("java_archive") : "";
-
-        String archiveAttr =       atts.get("archive") != null ? 
-                                   atts.get("archive") : "";
-
-        this.uKey = "codebase=" + codebaseAttr +
-                    "cache_archive=" + cache_archiveAttr + 
-                    "java_archive=" + java_archiveAttr + 
-                    "archive=" +  archiveAttr;
-
-        // when this was being done (incorrectly) in Launcher, the call was
-        // new AppThreadGroup(mainGroup, file.getTitle());
+        String uniqueKey = params.getUniqueKey();
         synchronized(TGMapMutex) {
-            if (!uKeyToTG.containsKey(this.uKey)) {
+            if (!uKeyToTG.containsKey(uniqueKey)) {
                 ThreadGroup tg = new ThreadGroup(Launcher.mainGroup, this.documentURL.toString());
-                uKeyToTG.put(this.uKey, tg);
+                uKeyToTG.put(uniqueKey, tg);
             }
         }
     }
 
     // overloaded constructor, called when initialized via plugin
-    public NetxPanel(URL documentURL, Hashtable<String, String> atts,
+    public NetxPanel(URL documentURL, PluginParameters params,
                      boolean exitOnFailure) {
-        this(documentURL, atts);
+        this(documentURL, params);
         this.exitOnFailure = exitOnFailure;
         this.appletAlive = true;
     }
@@ -129,6 +101,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
 
     //Overriding to use Netx classloader. You might need to relax visibility
     //in sun.applet.AppletPanel for runLoader().
+    @Override
     protected void runLoader() {
 
         try {
@@ -138,7 +111,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
                                 getCode(),
                                 getWidth(),
                                 getHeight(),
-                                atts, uKey);
+                                parameters);
 
             doInit = true;
             dispatchAppletEvent(APPLET_LOADING, null);
@@ -188,6 +161,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
      * the applet
      */
     // Reminder: Relax visibility in sun.applet.AppletPanel
+    @Override
     protected synchronized void createAppletThread() {
         // initialize JNLPRuntime in the main threadgroup
         synchronized (JNLPRuntime.initMutex) {
@@ -208,8 +182,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
     }
 
     public void updateSizeInAtts(int height, int width) {
-        this.atts.put("height", Integer.toString(height));
-        this.atts.put("width", Integer.toString(width));
+        parameters.updateSize(width, height);
     }
 
     public ClassLoader getAppletClassLoader() {
@@ -222,7 +195,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
 
     public ThreadGroup getThreadGroup() {
         synchronized(TGMapMutex) {
-            return uKeyToTG.get(uKey);
+            return uKeyToTG.get(parameters.getUniqueKey());
         }
     }
 
@@ -232,7 +205,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
         }
         // only create a new context if one hasn't already been created for the
         // applets with this unique key.
-        if (null == appContextCreated.putIfAbsent(uKey, Boolean.TRUE)) {
+        if (null == appContextCreated.putIfAbsent(parameters.getUniqueKey(), Boolean.TRUE)) {
             SunToolkit.createNewAppContext();
         }
     }

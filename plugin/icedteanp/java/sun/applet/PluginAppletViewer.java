@@ -70,7 +70,6 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -87,6 +86,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.SocketPermission;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.PrivilegedAction;
@@ -107,6 +107,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.NetxPanel;
+import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
@@ -129,14 +130,14 @@ class PluginAppletPanelFactory {
 
     public AppletPanel createPanel(PluginStreamHandler streamhandler,
                                    final int identifier,
-                                   final long handle, int x, int y,
+                                   final long handle,
                                    final URL doc,
-                                   final Hashtable<String, String> atts) {
+                                   final PluginParameters params) {
         final NetxPanel panel = AccessController.doPrivileged(new PrivilegedAction<NetxPanel>() {
             public NetxPanel run() {
-                NetxPanel panel = new NetxPanel(doc, atts, false);
+                NetxPanel panel = new NetxPanel(doc, params, false);
                 NetxPanel.debug("Using NetX panel");
-                PluginDebug.debug(atts.toString());
+                PluginDebug.debug(params.toString());
                 return panel;
             }
         });
@@ -146,14 +147,13 @@ class PluginAppletPanelFactory {
         // isn't the case, the awt eventqueue thread's context classloader
         // won't be set to a JNLPClassLoader, and when an applet class needs
         // to be loaded from the awt eventqueue, it won't be found.
-        final int width = Integer.parseInt(atts.get("width"));
-        final int height = Integer.parseInt(atts.get("height"));
         Thread panelInit = new Thread(panel.getThreadGroup(), new Runnable() {
             @Override public void run() {
                 panel.createNewAppContext();
                 // create the frame.
-                PluginDebug.debug("X and Y are: " + width + " " + height);
-                panel.setAppletViewerFrame(PluginAppletViewer.framePanel(identifier,handle, width, height, panel));
+                PluginDebug.debug("X and Y are: " + params.getWidth() + " " + params.getHeight());
+                panel.setAppletViewerFrame(PluginAppletViewer.framePanel(identifier, handle,
+                        params.getWidth(), params.getHeight(), panel));
 
                 panel.init();
                 // Start the applet
@@ -194,7 +194,7 @@ class PluginAppletPanelFactory {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
-                    panel.getParent().setSize(width, height);
+                    panel.getParent().setSize(params.getWidth(), params.getHeight());
                 }
             });
         } catch (InvocationTargetException ite) {
@@ -599,18 +599,28 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 int spaceLocation = message.indexOf(' ', "tag".length() + 1);
                 String documentBase =
                         UrlUtil.decode(message.substring("tag".length() + 1, spaceLocation));
-                String tag = message.substring(spaceLocation + 1);
+                String paramString = message.substring(spaceLocation + 1);
 
                 PluginDebug.debug("Handle = ", handle, "\n",
                                     "Width = ", width, "\n",
                                     "Height = ", height, "\n",
                                     "DocumentBase = ", documentBase, "\n",
-                                    "Tag = ", tag);
+                                    "Params = ", paramString);
 
-                PluginAppletViewer.parse
-                                        (identifier, handle, width, height,
-                                                new StringReader(tag),
-                                                new URL(documentBase));
+                PluginAppletPanelFactory factory = new PluginAppletPanelFactory();
+                AppletMessageHandler amh = new AppletMessageHandler("appletviewer");
+                URL url = new URL(documentBase);
+                URLConnection conn = url.openConnection();
+                /* The original URL may have been redirected - this
+                 * sets it to whatever URL/codebase we ended up getting
+                 */
+                url = conn.getURL();
+
+                PluginParameters params = new PluginParameterParser().parse(width, height, paramString);
+
+                // Let user know we are starting up
+                streamhandler.write("instance " + identifier + " status " + amh.getMessage("status.start"));
+                factory.createPanel(streamhandler, identifier, handle, url, params);
 
                 long maxTimeToSleep = APPLET_TIMEOUT;
                 appletsLock.lock();
@@ -1546,24 +1556,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
     }
 
     /**
-     * Decodes the string (converts html escapes into proper characters)
-     *
-     * @param toDecode The string to decode
-     * @return The decoded string
-     */
-    public static String decodeString(String toDecode) {
-
-        toDecode = toDecode.replace("&gt;", ">");
-        toDecode = toDecode.replace("&lt;", "<");
-        toDecode = toDecode.replace("&amp;", "&");
-        toDecode = toDecode.replace("&#10;", "\n");
-        toDecode = toDecode.replace("&#13;", "\r");
-        toDecode = toDecode.replace("&quot;", "\"");
-
-        return toDecode;
-    }
-
-    /**
      * System parameters.
      */
     static Hashtable<String, String> systemParam = new Hashtable<String, String>();
@@ -1580,76 +1572,14 @@ public class PluginAppletViewer extends XEmbeddedFrame
     }
 
     /**
-     * Print the HTML tag.
-     */
-    public static void printTag(PrintStream out, Hashtable<String, String> atts) {
-        out.print("<applet");
-
-        String v = atts.get("codebase");
-        if (v != null) {
-            out.print(" codebase=\"" + v + "\"");
-        }
-
-        v = atts.get("code");
-        if (v == null) {
-            v = "applet.class";
-        }
-        out.print(" code=\"" + v + "\"");
-        v = atts.get("width");
-        if (v == null) {
-            v = "150";
-        }
-        out.print(" width=" + v);
-
-        v = atts.get("height");
-        if (v == null) {
-            v = "100";
-        }
-        out.print(" height=" + v);
-
-        v = atts.get("name");
-        if (v != null) {
-            out.print(" name=\"" + v + "\"");
-        }
-        out.println(">");
-
-        // A very slow sorting algorithm
-        int len = atts.size();
-        String params[] = new String[len];
-        len = 0;
-        for (Enumeration<String> e = atts.keys(); e.hasMoreElements();) {
-            String param = e.nextElement();
-            int i = 0;
-            for (; i < len; i++) {
-                if (params[i].compareTo(param) >= 0) {
-                    break;
-                }
-            }
-            System.arraycopy(params, i, params, i + 1, len - i);
-            params[i] = param;
-            len++;
-        }
-
-        for (int i = 0; i < len; i++) {
-            String param = params[i];
-            if (systemParam.get(param) == null) {
-                out.println("<param name=" + param +
-                        " value=\"" + atts.get(param) + "\">");
-            }
-        }
-        out.println("</applet>");
-    }
-
-    /**
      * Make sure the atrributes are uptodate.
      */
     public void updateAtts() {
         Dimension d = panel.getSize();
         Insets in = panel.getInsets();
-        panel.atts.put("width",
-                       Integer.valueOf(d.width - (in.left + in.right)).toString());
-        panel.atts.put("height",
-                       Integer.valueOf(d.height - (in.top + in.bottom)).toString());
+        int width = d.width - (in.left + in.right);
+        int height = d.height - (in.top + in.bottom);
+        panel.updateSizeInAtts(height, width);
     }
 
     /**
@@ -1796,412 +1726,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
         return appletPanels.size();
     }
 
-    /**
-     * Scan spaces.
-     */
-    public static void skipSpace(int[] c, Reader in) throws IOException {
-        while ((c[0] >= 0) &&
-                ((c[0] == ' ') || (c[0] == '\t') || (c[0] == '\n') || (c[0] == '\r'))) {
-            c[0] = in.read();
-        }
-    }
-
-    /**
-     * Scan identifier
-     */
-    public static String scanIdentifier(int[] c, Reader in) throws IOException {
-        StringBuilder buf = new StringBuilder();
-
-        if (c[0] == '!') {
-            // Technically, we should be scanning for '!--' but we are reading
-            // from a stream, and there is no way to peek ahead. That said,
-            // a ! at this point can only mean comment here afaik, so we
-            // should be okay
-            skipComment(c, in);
-            return "";
-        }
-
-        while (true) {
-            if (((c[0] >= 'a') && (c[0] <= 'z')) ||
-                    ((c[0] >= 'A') && (c[0] <= 'Z')) ||
-                    ((c[0] >= '0') && (c[0] <= '9')) || (c[0] == '_')) {
-                buf.append((char) c[0]);
-                c[0] = in.read();
-            } else {
-                return buf.toString();
-            }
-        }
-    }
-
-    public static void skipComment(int[] c, Reader in) throws IOException {
-        StringBuilder buf = new StringBuilder();
-        boolean commentHeaderPassed = false;
-        c[0] = in.read();
-        buf.append((char) c[0]);
-
-        while (true) {
-            if (c[0] == '-' && (c[0] = in.read()) == '-') {
-                buf.append((char) c[0]);
-                if (commentHeaderPassed) {
-                    // -- encountered ... is > next?
-                    if ((c[0] = in.read()) == '>') {
-                        buf.append((char) c[0]);
-
-                        PluginDebug.debug("Comment skipped: ", buf.toString());
-
-                        // comment skipped.
-                        return;
-                    }
-                } else {
-                    // first -- is part of <!-- ... , just mark that we have passed it
-                    commentHeaderPassed = true;
-                }
-
-            } else if (commentHeaderPassed == false) {
-                buf.append((char) c[0]);
-                PluginDebug.debug("Warning: Attempted to skip comment, but this tag does not appear to be a comment: ", buf.toString());
-                return;
-            }
-
-            c[0] = in.read();
-            buf.append((char) c[0]);
-        }
-    }
-
-    /**
-     * Scan tag
-     */
-    public static Hashtable<String, String> scanTag(int[] c, Reader in) throws IOException {
-        Hashtable<String, String> atts = new Hashtable<String, String>();
-        skipSpace(c, in);
-        while (c[0] >= 0 && c[0] != '>') {
-            String att = decodeString(scanIdentifier(c, in));
-            String val = "";
-            skipSpace(c, in);
-            if (c[0] == '=') {
-                int quote = -1;
-                c[0] = in.read();
-                skipSpace(c, in);
-                if ((c[0] == '\'') || (c[0] == '\"')) {
-                    quote = c[0];
-                    c[0] = in.read();
-                }
-                StringBuilder buf = new StringBuilder();
-                while ((c[0] > 0) &&
-                        (((quote < 0) && (c[0] != ' ') && (c[0] != '\t') &&
-                                (c[0] != '\n') && (c[0] != '\r') && (c[0] != '>'))
-                         || ((quote >= 0) && (c[0] != quote)))) {
-                    buf.append((char) c[0]);
-                    c[0] = in.read();
-                }
-                if (c[0] == quote) {
-                    c[0] = in.read();
-                }
-                skipSpace(c, in);
-                val = decodeString(buf.toString());
-            }
-
-            PluginDebug.debug("PUT ", att, " = '", val, "'");
-            atts.put(att.toLowerCase(java.util.Locale.ENGLISH), val);
-
-            while (true) {
-                if ((c[0] == '>') || (c[0] < 0) ||
-                        ((c[0] >= 'a') && (c[0] <= 'z')) ||
-                        ((c[0] >= 'A') && (c[0] <= 'Z')) ||
-                        ((c[0] >= '0') && (c[0] <= '9')) || (c[0] == '_'))
-                    break;
-                c[0] = in.read();
-            }
-            //skipSpace(in);
-        }
-        return atts;
-    }
-
-    // private static final == inline
-    private static final boolean isInt(Object o) {
-        boolean isInt = false;
-        try {
-            Integer.parseInt((String) o);
-            isInt = true;
-        } catch (Exception e) {
-            // don't care
-        }
-
-        return isInt;
-    }
-
-    /* values used for placement of AppletViewer's frames */
-    private static int x = 0;
-    private static int y = 0;
-    private static final int XDELTA = 30;
-    private static final int YDELTA = XDELTA;
-
-    static String encoding = null;
-
-    /**
-     * Scan an html file for <applet> tags
-     */
-    public static void parse(int identifier, long handle, String width, String height, Reader in, URL url, String enc)
-            throws IOException {
-        encoding = enc;
-        parse(identifier, handle, width, height, in, url, System.out, new PluginAppletPanelFactory());
-    }
-
-    public static void parse(int identifier, long handle, String width, String height, Reader in, URL url)
-            throws PrivilegedActionException {
-
-        final int fIdentifier = identifier;
-        final long fHandle = handle;
-        final String fWidth = width;
-        final String fHeight = height;
-        final Reader fIn = in;
-        final URL fUrl = url;
-        AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
-            public Void run() throws IOException {
-                parse(fIdentifier, fHandle, fWidth, fHeight, fIn, fUrl,
-                        System.out, new PluginAppletPanelFactory());
-                return null;
-            }
-        });
-    }
-
-    @SuppressWarnings("unused")
-    public static void parse(int identifier, long handle, String width,
-                 String height, Reader in, URL url,
-                              PrintStream statusMsgStream,
-                              PluginAppletPanelFactory factory)
-            throws IOException {
-        boolean isObjectTag = false;
-        boolean objectTagAlreadyParsed = false;
-
-        // The current character
-        // FIXME: This is an evil hack to force pass-by-reference.. the
-        // parsing code needs to be rewritten from scratch to prevent such
-        //a need
-        int[] c = new int[1];
-
-        // warning messages
-        String requiresNameWarning = amh.getMessage("parse.warning.requiresname");
-        String paramOutsideWarning = amh.getMessage("parse.warning.paramoutside");
-        String appletRequiresCodeWarning = amh.getMessage("parse.warning.applet.requirescode");
-        String appletRequiresHeightWarning = amh.getMessage("parse.warning.applet.requiresheight");
-        String appletRequiresWidthWarning = amh.getMessage("parse.warning.applet.requireswidth");
-        String objectRequiresCodeWarning = amh.getMessage("parse.warning.object.requirescode");
-        String objectRequiresHeightWarning = amh.getMessage("parse.warning.object.requiresheight");
-        String objectRequiresWidthWarning = amh.getMessage("parse.warning.object.requireswidth");
-        String embedRequiresCodeWarning = amh.getMessage("parse.warning.embed.requirescode");
-        String embedRequiresHeightWarning = amh.getMessage("parse.warning.embed.requiresheight");
-        String embedRequiresWidthWarning = amh.getMessage("parse.warning.embed.requireswidth");
-        String appNotLongerSupportedWarning = amh.getMessage("parse.warning.appnotLongersupported");
-
-        java.net.URLConnection conn = url.openConnection();
-        /* The original URL may have been redirected - this
-         * sets it to whatever URL/codebase we ended up getting
-         */
-        url = conn.getURL();
-
-        int ydisp = 1;
-        Hashtable<String, String> atts = null;
-
-        while (true) {
-            c[0] = in.read();
-            if (c[0] == -1)
-                break;
-
-            if (c[0] == '<') {
-                c[0] = in.read();
-                if (c[0] == '/') {
-                    c[0] = in.read();
-                    String nm = scanIdentifier(c, in);
-                    if (nm.equalsIgnoreCase("applet") ||
-                             nm.equalsIgnoreCase("object") ||
-                             nm.equalsIgnoreCase("embed")) {
-
-                        // We can't test for a code tag until </OBJECT>
-                        // because it is a parameter, not an attribute.
-                        if (isObjectTag) {
-                            if (atts.get("code") == null && atts.get("object") == null) {
-                                statusMsgStream.println(objectRequiresCodeWarning);
-                                atts = null;
-                            }
-                        }
-
-                        if (atts != null) {
-                            // XXX 5/18 In general this code just simply
-                            // shouldn't be part of parsing.  It's presence
-                            // causes things to be a little too much of a
-                            // hack.
-
-                            // Let user know we are starting up
-                            streamhandler.write("instance " + identifier + " status " + amh.getMessage("status.start"));
-                            factory.createPanel(streamhandler, identifier, handle, x, y, url, atts);
-
-                            x += XDELTA;
-                            y += YDELTA;
-                            // make sure we don't go too far!
-                            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-                            if ((x > d.width - 300) || (y > d.height - 300)) {
-                                x = 0;
-                                y = 2 * ydisp * YDELTA;
-                                ydisp++;
-                            }
-                        }
-                        atts = null;
-                        isObjectTag = false;
-                    }
-                } else {
-                    String nm = scanIdentifier(c, in);
-                    if (nm.equalsIgnoreCase("param")) {
-                        Hashtable<String, String> t = scanTag(c, in);
-                        String att = t.get("name");
-
-                        if (att == null) {
-                            statusMsgStream.println(requiresNameWarning);
-                        } else {
-                            String val = t.get("value");
-                            if (val == null) {
-                                statusMsgStream.println(requiresNameWarning);
-                            } else {
-                                PluginDebug.debug("PUT ", att, " = ", val);
-                                atts.put(att.toLowerCase(), val);
-                            }
-                        }
-                    } else if (nm.equalsIgnoreCase("applet")) {
-                        atts = scanTag(c, in);
-
-                        // If there is a classid and no code tag present, transform it to code tag
-                        if (atts.get("code") == null && atts.get("classid") != null
-                                && !(atts.get("classid")).startsWith("clsid:")) {
-                            atts.put("code", atts.get("classid"));
-                        }
-
-                        // remove java: from code tag
-                        if (atts.get("code") != null && (atts.get("code")).startsWith("java:")) {
-                            atts.put("code", (atts.get("code")).substring(5));
-                        }
-
-                        if (atts.get("code") == null && atts.get("object") == null) {
-                            statusMsgStream.println(appletRequiresCodeWarning);
-                            atts = null;
-                        }
-
-                        if (atts.get("width") == null || !isInt(atts.get("width"))) {
-                            atts.put("width", width);
-                        }
-
-                        if (atts.get("height") == null || !isInt(atts.get("height"))) {
-                            atts.put("height", height);
-                        }
-                    } else if (nm.equalsIgnoreCase("object")) {
-                        isObjectTag = true;
-
-                        // Once code is set, additional nested objects are ignored
-                        if (!objectTagAlreadyParsed) {
-                            objectTagAlreadyParsed = true;
-                            atts = scanTag(c, in);
-                        }
-
-                        // If there is a classid and no code tag present, transform it to code tag
-                        if (atts.get("code") == null && atts.get("classid") != null
-                                && !(atts.get("classid")).startsWith("clsid:")) {
-                            atts.put("code", atts.get("classid"));
-                        }
-
-                        // remove java: from code tag
-                        if (atts.get("code") != null && (atts.get("code")).startsWith("java:")) {
-                            atts.put("code", (atts.get("code")).substring(5));
-                        }
-
-                        // java_* aliases override older names:
-                        // http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/using_tags.html#in-ie
-                        if (atts.get("java_code") != null) {
-                            atts.put("code", (atts.get("java_code")));
-                        }
-
-                        if (atts.containsKey("code")) {
-                            objectTagAlreadyParsed = true;
-                        }
-
-                        if (atts.get("java_codebase") != null) {
-                            atts.put("codebase", (atts.get("java_codebase")));
-                        }
-
-                        if (atts.get("java_archive") != null) {
-                            atts.put("archive", (atts.get("java_archive")));
-                        }
-
-                        if (atts.get("java_object") != null) {
-                            atts.put("object", (atts.get("java_object")));
-                        }
-
-                        if (atts.get("java_type") != null) {
-                            atts.put("type", (atts.get("java_type")));
-                        }
-
-                        if (atts.get("width") == null || !isInt(atts.get("width"))) {
-                            atts.put("width", width);
-                        }
-
-                        if (atts.get("height") == null || !isInt(atts.get("height"))) {
-                            atts.put("height", height);
-                        }
-                    } else if (nm.equalsIgnoreCase("embed")) {
-                        atts = scanTag(c, in);
-
-                        // If there is a classid and no code tag present, transform it to code tag
-                        if (atts.get("code") == null && atts.get("classid") != null
-                                && !(atts.get("classid")).startsWith("clsid:")) {
-                            atts.put("code", atts.get("classid"));
-                        }
-
-                        // remove java: from code tag
-                        if (atts.get("code") != null && (atts.get("code")).startsWith("java:")) {
-                            atts.put("code", (atts.get("code")).substring(5));
-                        }
-
-                        // java_* aliases override older names:
-                        // http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/using_tags.html#in-nav
-                        if (atts.get("java_code") != null) {
-                            atts.put("code", (atts.get("java_code")));
-                        }
-
-                        if (atts.get("java_codebase") != null) {
-                            atts.put("codebase", (atts.get("java_codebase")));
-                        }
-
-                        if (atts.get("java_archive") != null) {
-                            atts.put("archive", (atts.get("java_archive")));
-                        }
-
-                        if (atts.get("java_object") != null) {
-                            atts.put("object", (atts.get("java_object")));
-                        }
-
-                        if (atts.get("java_type") != null) {
-                            atts.put("type", (atts.get("java_type")));
-                        }
-
-                        if (atts.get("code") == null && atts.get("object") == null) {
-                            statusMsgStream.println(embedRequiresCodeWarning);
-                            atts = null;
-                        }
-
-                        if (atts.get("width") == null || !isInt(atts.get("width"))) {
-                            atts.put("width", width);
-                        }
-
-                        if (atts.get("height") == null || !isInt(atts.get("height"))) {
-                            atts.put("height", height);
-                        }
-
-                    }
-                }
-            }
-        }
-        in.close();
-    }
-
-    private static AppletMessageHandler amh = new AppletMessageHandler("appletviewer");
 
     private static void checkConnect(URL url) {
         SecurityManager security = System.getSecurityManager();

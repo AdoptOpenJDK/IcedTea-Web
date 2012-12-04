@@ -1,3 +1,38 @@
+2012-12-04  Adam Domurad  <adomurad@redhat.com>
+
+	Remove the applet/embed/object tag parser from ITW. Send the applet
+	parameters directly from the C++.
+	* Makefile.am: Allow unit-testing for classes in plugin.jar.
+	* netx/net/sourceforge/jnlp/NetxPanel.java: Use PluginParameters for 
+	attribute lookup
+	* netx/net/sourceforge/jnlp/PluginBridge.java: Use PluginParameters 
+	for attribute lookup
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Add message
+	for missing code/object attributes.
+	* netx/net/sourceforge/jnlp/resources/Messages_cs_CZ.properties: Same.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Send escaped parameter
+	name/values instead of applet tag. Remove some dead code.
+	* plugin/icedteanp/IcedTeaNPPlugin.h: Rename applet_tag ->
+	parameters_string.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: Extract
+	parsing code into its own class.
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: Use CHECK_EQUALS
+	instead of CHECK.
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: Update 
+	unit tests due to constructor changes.
+	* netx/net/sourceforge/jnlp/PluginParameterException.java: New, thrown
+	when code/object attributes are missing.
+	* netx/net/sourceforge/jnlp/PluginParameters.java: New, Hashtable
+	wrapper that handles plugin attribute/parameter lookups.
+	* plugin/icedteanp/java/sun/applet/PluginParameterParser.java: New,
+	creates PluginParameters from escaped name/values.
+	* tests/cpp-unit-tests/PluginParametersTest.cc: New, C++ Unit tests for
+	plugin parameter related functions
+	* tests/netx/unit/net/sourceforge/jnlp/PluginParametersTest.java: New, 
+	unit tests for PluginParameters class.
+	* tests/netx/unit/sun/applet/PluginParameterParserTest.java: New, unit
+	tests for PluginParameterParser class.
+
 2012-11-03  Jiri Vanek <jvanek@redhat.com>
 
 	Fixed logging bottleneck
