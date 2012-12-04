@@ -1,5 +1,10 @@
 2012-12-04  Adam Domurad  <adomurad@redhat.com>
 
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	"An serious exception have occured" -> "A serious exception occurred"
+
+2012-12-04  Adam Domurad  <adomurad@redhat.com>
+
 	PluginAppletViewer refactoring.
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
 	(handleInitializationMessage): New, extracts initialization logic
