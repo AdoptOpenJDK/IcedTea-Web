@@ -378,6 +378,12 @@ public class Defaults {
                         DeploymentConfiguration.KEY_UPDATE_TIMEOUT,
                         BasicValueValidators.getRangedIntegerValidator(0, 10000),
                         String.valueOf(500)
+                },
+                //JVM arguments for plugin
+                {
+                        DeploymentConfiguration.KEY_PLUGIN_JVM_ARGUMENTS,
+                        null,
+                        null
                 }
         };
 

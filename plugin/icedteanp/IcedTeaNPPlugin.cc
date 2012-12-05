@@ -242,6 +242,8 @@ static void appletviewer_monitor(GPid pid, gint status, gpointer data);
 void plugin_send_initialization_message(char* instance, gulong handle,
                                                int width, int height,
                                                char* url);
+/* Returns JVM options set in itw-settings */
+static std::vector<std::string*>* get_jvm_args();
 
 // Global instance counter.
 // Mutex to protect plugin_instance_counter.
@@ -1588,48 +1590,60 @@ plugin_start_appletviewer (ITNPPluginData* data)
   PLUGIN_DEBUG ("plugin_start_appletviewer\n");
   NPError error = NPERR_NO_ERROR;
 
-  gchar** command_line;
-  gchar** environment;
+  std::vector<std::string> command_line;
+  gchar** environment = NULL;
+  std::vector<std::string*>* jvm_args = get_jvm_args();
 
-  int cmd_num = 0;
   if (plugin_debug)
   {
-      command_line = (gchar**) malloc(sizeof(gchar*)*11);
-      command_line[cmd_num++] = g_strdup(appletviewer_executable);
-      command_line[cmd_num++] = g_strdup(PLUGIN_BOOTCLASSPATH);
-      // set the classpath to avoid using the default (cwd).
-      command_line[cmd_num++] = g_strdup("-classpath");
-      command_line[cmd_num++] = g_strdup_printf("%s/lib/rt.jar", ICEDTEA_WEB_JRE);
-      command_line[cmd_num++] = g_strdup("-Xdebug");
-      command_line[cmd_num++] = g_strdup("-Xnoagent");
-      if (plugin_debug_suspend)
-      {
-          command_line[cmd_num++] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y");
-      } else
-      {
-          command_line[cmd_num++] = g_strdup("-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n");
-      }
-      command_line[cmd_num++] = g_strdup("sun.applet.PluginMain");
-      command_line[cmd_num++] = g_strdup(out_pipe_name);
-      command_line[cmd_num++] = g_strdup(in_pipe_name);
-      command_line[cmd_num] = NULL;
+    command_line.push_back(appletviewer_executable);
+
+    //Add JVM args to command_line
+    for (int i = 0; i < jvm_args->size(); i++)
+    {
+      command_line.push_back(*jvm_args->at(i));
+    }
+
+    command_line.push_back(PLUGIN_BOOTCLASSPATH);
+    // set the classpath to avoid using the default (cwd).
+    command_line.push_back("-classpath");
+    command_line.push_back(ICEDTEA_WEB_JRE "/lib/rt.jar");
+    command_line.push_back("-Xdebug");
+    command_line.push_back("-Xnoagent");
+
+    //Debug flags
+    std::string debug_flags = "-Xrunjdwp:transport=dt_socket,address=8787,server=y,";
+    debug_flags += plugin_debug_suspend ? "suspend=y" : "suspend=n";
+    command_line.push_back(debug_flags);
+
+    command_line.push_back("sun.applet.PluginMain");
+    command_line.push_back(out_pipe_name);
+    command_line.push_back(in_pipe_name);
   } else
   {
-      command_line = (gchar**) malloc(sizeof(gchar*)*8);
-      command_line[cmd_num++] = g_strdup(appletviewer_executable);
-      command_line[cmd_num++] = g_strdup(PLUGIN_BOOTCLASSPATH);
-      command_line[cmd_num++] = g_strdup("-classpath");
-      command_line[cmd_num++] = g_strdup_printf("%s/lib/rt.jar", ICEDTEA_WEB_JRE);
-      command_line[cmd_num++] = g_strdup("sun.applet.PluginMain");
-      command_line[cmd_num++] = g_strdup(out_pipe_name);
-      command_line[cmd_num++] = g_strdup(in_pipe_name);
-      command_line[cmd_num] = NULL;
+    command_line.push_back(std::string(appletviewer_executable));
+
+    //Add JVM args to command_line
+    for (int i = 0; i < jvm_args->size(); i++)
+    {
+      command_line.push_back(*jvm_args->at(i));
+    }
+
+    command_line.push_back(PLUGIN_BOOTCLASSPATH);
+    command_line.push_back("-classpath");
+    command_line.push_back(ICEDTEA_WEB_JRE "/lib/rt.jar");
+    command_line.push_back("sun.applet.PluginMain");
+    command_line.push_back(out_pipe_name);
+    command_line.push_back(in_pipe_name);
+
   }
 
   environment = plugin_filter_environment();
+  std::vector<gchar*> vector_gchar = IcedTeaPluginUtilities::vectorStringToVectorGchar(&command_line);
+  gchar **command_line_args = &vector_gchar[0];
 
-  if (!g_spawn_async (NULL, command_line, environment,
-		      (GSpawnFlags) G_SPAWN_DO_NOT_REAP_CHILD,
+  if (!g_spawn_async (NULL, command_line_args, environment,
+                     (GSpawnFlags) G_SPAWN_DO_NOT_REAP_CHILD,
                       NULL, NULL, &appletviewer_pid, &channel_error))
     {
       if (channel_error)
@@ -1644,15 +1658,11 @@ plugin_start_appletviewer (ITNPPluginData* data)
       error = NPERR_GENERIC_ERROR;
     }
 
-  g_strfreev (environment);
-
-  for (int i = 0; i < cmd_num; i++) {
-    g_free (command_line[i]);
-    command_line[i] = NULL;
-  }
-
-  g_free(command_line);
-  command_line = NULL;
+  //Free memory
+  g_strfreev(environment);
+  IcedTeaPluginUtilities::freeStringPtrVector(jvm_args);
+  jvm_args = NULL;
+  command_line_args = NULL;
 
   if (appletviewer_pid)
     {
@@ -1663,6 +1673,53 @@ plugin_start_appletviewer (ITNPPluginData* data)
 
   PLUGIN_DEBUG ("plugin_start_appletviewer return\n");
   return error;
+}
+
+/*
+ * Returns JVM options set in itw-settings
+ */
+static std::vector<std::string*>*
+get_jvm_args()
+{
+  std::vector < std::string> commands;
+  gchar *output = NULL;
+  std::vector<std::string*>* tokenOutput = NULL;
+
+  commands.push_back(appletviewer_executable);
+  commands.push_back(PLUGIN_BOOTCLASSPATH);
+  commands.push_back("-classpath");
+  commands.push_back(ICEDTEA_WEB_JRE "/lib/rt.jar");
+  commands.push_back("net.sourceforge.jnlp.controlpanel.CommandLine");
+  commands.push_back("get");
+  commands.push_back("deployment.plugin.jvm.arguments");
+
+  std::vector<gchar*> vector_gchar = IcedTeaPluginUtilities::vectorStringToVectorGchar(&commands);
+  gchar **command_line_args = &vector_gchar[0];
+
+  if (!g_spawn_sync(NULL, command_line_args, NULL,
+      (GSpawnFlags) G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL, &output, NULL, NULL,
+      &channel_error))
+  {
+    PLUGIN_ERROR("Failed to get JVM arguments set for plugin.");
+    output = NULL;
+  }
+
+  tokenOutput = IcedTeaPluginUtilities::strSplit(output, " \n");
+
+  //If deployment.plugin.jvm.arguments is undefined, the output will simply be 'null'
+  //We remove this so it's not mistakenly used as a jvm argument.
+  if (!tokenOutput->empty() && *tokenOutput->at(0) =="null")
+  {
+    delete tokenOutput->at(0);
+    tokenOutput->erase(tokenOutput->begin());
+  }
+
+  //Free memory
+  g_free(output);
+  output = NULL;
+  command_line_args = NULL;
+
+  return tokenOutput;
 }
 
 

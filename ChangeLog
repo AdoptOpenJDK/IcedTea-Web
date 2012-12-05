@@ -1,3 +1,29 @@
+2012-12-05  Saad Mohammad  <smohammad@redhat.com>
+
+	Added new option in itw-settings which allows users to set JVM
+	arguments when plugin is initialized.
+	* netx/net/sourceforge/jnlp/config/Defaults.java (getDefaults):
+	Added defaults for DeploymentConfiguration.KEY_PLUGIN_JVM_ARGUMENTS.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
+	Added new property (KEY_PLUGIN_JVM_ARGUMENTS) which stores the value of
+	JVM plugin arguments.
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:
+	(createMainSettingsPanel): Added JVM settings to the list of tabs.
+	(createJVMSettingsPanel): Returns a new JVMPanel object.
+	* netx/net/sourceforge/jnlp/controlpanel/JVMPanel.java:
+	JVM settings panel.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Added a new items (CPJVMPluginArguments, CPHeadJVMSettings,
+	CPTabJVMSettings).
+	* plugin/icedteanp/IcedTeaNPPlugin.cc:
+	(plugin_start_appletviewer): Adds JVM arguments to the commands line list.
+	(get_jvm_args): Returns JVM arguments set in itw-settings.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc:
+	(IcedTeaPluginUtilities::vectorStringToVectorGchar): New helper method
+	which returns a vector of gchar* from the vector of strings passed.
+	* plugin/icedteanp/IcedTeaPluginUtils.h:
+	Declaration of IcedTeaPluginUtilities::vectorStringToVectorGchar.
+
 2012-12-05  Pavel Tisnovsky  <ptisnovs@redhat.com>
 
 	* Makefile.am: Avoid warning message printed in clean target if

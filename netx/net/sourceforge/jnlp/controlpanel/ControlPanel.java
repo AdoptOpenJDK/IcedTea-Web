@@ -226,6 +226,7 @@ public class ControlPanel extends JFrame {
                 // new SettingsPanel(Translator.R("CPTabClassLoader"), createClassLoaderSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabDebugging"), createDebugSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabDesktopIntegration"), createDesktopSettingsPanel()),
+                new SettingsPanel(Translator.R("CPTabJVMSettings"), createJVMSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabNetwork"), createNetworkSettingsPanel()),
                 // TODO: This is commented out since this is not implemented yet
                 // new SettingsPanel(Translator.R("CPTabRuntimes"), createRuntimesSettingsPanel()),
@@ -317,6 +318,10 @@ public class ControlPanel extends JFrame {
 
     private JPanel createSecuritySettingsPanel() {
         return new SecuritySettingsPanel(this.config);
+    }
+
+    private JPanel createJVMSettingsPanel() {
+        return new JVMPanel(this.config);
     }
 
     /**

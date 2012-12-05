@@ -1005,6 +1005,24 @@ IcedTeaPluginUtilities::postPluginThreadAsyncCall(NPP instance, void (*func) (vo
 }
 
 /**
+ * Returns a vector of gchar* pointing to the elements of the vector string passed in.
+ * @param stringVec The vector of strings reference.
+ */
+std::vector<gchar*>
+IcedTeaPluginUtilities::vectorStringToVectorGchar(const std::vector<std::string>* stringVec)
+{
+  std::vector<gchar*> charVec;
+
+  for (int i = 0; i < stringVec->size(); i++)
+  {
+    gchar* element = (gchar*) stringVec->at(i).c_str(); //cast from const char
+    charVec.push_back(element);
+  }
+  charVec.push_back(NULL);
+  return charVec;
+}
+
+/**
  * Runs through the async call wait queue and executes all calls
  *
  * @param param Ignored -- required to conform to NPN_PluginThreadAsynCall API

@@ -158,6 +158,11 @@ public final class DeploymentConfiguration {
     public static final String KEY_BROWSER_PATH = "deployment.browser.path";
     public static final String KEY_UPDATE_TIMEOUT = "deployment.javaws.update.timeout";
 
+    /*
+     * JVM arguments for plugin
+     */
+    public static final String KEY_PLUGIN_JVM_ARGUMENTS= "deployment.plugin.jvm.arguments";
+
     public enum ConfigType {
         System, User
     }

@@ -274,6 +274,9 @@ class IcedTeaPluginUtilities
 
     	static void decodeURL(const char* url, char** decoded_url);
 
+    	/* Returns a vector of gchar* pointing to the elements of the vector string passed in*/
+    	static std::vector<gchar*> vectorStringToVectorGchar(const std::vector<std::string>* stringVec);
+
     	/* Posts call in async queue and waits till execution completes */
     	static void callAndWaitForResult(NPP instance, void (*func) (void *), AsyncCallThreadData* data);
 };
