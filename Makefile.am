@@ -1198,7 +1198,7 @@ clean_tests_reports:
 	rm -f  $(TESTS_DIR)/*.html
 
 clean-$(SOFTKILLER):
-	rm  $(TESTS_DIR)/softkiller
+	rm -f $(TESTS_DIR)/softkiller
  
 clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public clean-custom-reproducers clean-$(SOFTKILLER)
 	rm -f test-extensions-source-files.txt
