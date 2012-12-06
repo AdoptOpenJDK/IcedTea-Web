@@ -1,3 +1,8 @@
+2012-12-06  Adam Domurad  <adomurad@redhat.com>
+
+	* Makefile.am: Fix targets stamps/netx-unit-tests-compile.stamp and 
+	stamps/run-netx-unit-tests.stamp to not rely on installed directory.
+
 2012-12-05  Saad Mohammad  <smohammad@redhat.com>
 
 	Added new option in itw-settings which allows users to set JVM

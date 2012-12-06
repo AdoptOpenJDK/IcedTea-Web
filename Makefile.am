@@ -969,7 +969,7 @@ stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
 	mkdir -p $(NETX_UNIT_TEST_DIR) && \
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	 -d $(NETX_UNIT_TEST_DIR) \
-	 -classpath $(JUNIT_JAR):$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar:$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
+	 -classpath $(JUNIT_JAR):$(abs_top_builddir)/liveconnect/lib/classes.jar:$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
 	 @netx-unit-tests-source-files.txt && \
 	mkdir -p stamps && \
 	touch $@
@@ -999,7 +999,7 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	done ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):. \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):. \
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names 
 if WITH_XSLTPROC
 	$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
