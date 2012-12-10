@@ -1,3 +1,10 @@
+2012-12-10  Saad Mohammad  <smohammad@redhat.com>
+
+	Fix PR1189: Icedtea-plugin requires code attribute when using jnlp_href.
+	* netx/net/sourceforge/jnlp/PluginParameters.java (PluginParameters):
+	Updated if condition to prevent PluginParameterException from being thrown
+	if applet tag contains jnlp_href but is missing code/object parameters.
+
 2012-12-06  Adam Domurad  <adomurad@redhat.com>
 
 	* Makefile.am: Fix targets stamps/netx-unit-tests-compile.stamp and 
