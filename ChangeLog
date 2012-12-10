@@ -1,5 +1,17 @@
 2012-12-10  Saad Mohammad  <smohammad@redhat.com>
 
+	Add reproducer for PR1189.
+	* tests/reproducers/simple/AppletTagWithMissingCodeAttribute/resources/AppletTagWithMissingCodeAttribute.html:
+	Simple webpage which contains an applet tag with no code attribute.
+	* tests/reproducers/simple/AppletTagWithMissingCodeAttribute/resources/AppletTagWithMissingCodeAttribute.jnlp:
+	Jnlp file that is used by the webpages using jnlp_href.
+	* tests/reproducers/simple/AppletTagWithMissingCodeAttribute/testcases/AppletTagWithMissingCodeAttribute.java:
+	Testcase that tests applets without code attribute in html pages.
+	* tests/reproducers/simple/SimpleApplet/srcs/SimpleApplet.java:
+	Simple applet class that outputs a string.
+
+2012-12-10  Saad Mohammad  <smohammad@redhat.com>
+
 	Fix PR1189: Icedtea-plugin requires code attribute when using jnlp_href.
 	* netx/net/sourceforge/jnlp/PluginParameters.java (PluginParameters):
 	Updated if condition to prevent PluginParameterException from being thrown
