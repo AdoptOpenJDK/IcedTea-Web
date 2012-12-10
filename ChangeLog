@@ -1,5 +1,14 @@
 2012-12-10  Saad Mohammad  <smohammad@redhat.com>
 
+	Add unit tests for PR1189.
+	* tests/netx/unit/net/sourceforge/jnlp/PluginParametersTest.java:
+	(testConstructorWithNoCodeAndObjectParam): Initialize PluginParameters
+	without code/object parameters.
+	(testConstructorWithOnlyJnlpHrefParam): Initialize PluginParameters with
+	jnlp_href but no code/object parameters.
+
+2012-12-10  Saad Mohammad  <smohammad@redhat.com>
+
 	Add reproducer for PR1189.
 	* tests/reproducers/simple/AppletTagWithMissingCodeAttribute/resources/AppletTagWithMissingCodeAttribute.html:
 	Simple webpage which contains an applet tag with no code attribute.

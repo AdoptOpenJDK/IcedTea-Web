@@ -111,4 +111,24 @@ public class PluginParametersTest {
 
     }
 
+    /**
+     * Initialize PluginParameters without code/object parameters
+     */
+    @Test(expected = PluginParameterException.class)
+    public void testConstructorWithNoCodeAndObjectParam() {
+        Map<String, String> rawParams = new HashMap<String, String>();
+        rawParams.put("classid", "clsid:classidValue");
+        new PluginParameters(rawParams);
+    }
+
+    /**
+     * Initialize PluginParameters with jnlp_href but no code/object parameters
+     */
+    @Test
+    public void testConstructorWithOnlyJnlpHrefParam() {
+        Map<String, String> rawParams = new HashMap<String, String>();
+        rawParams.put("jnlp_href", "applet.jnlp");
+        PluginParameters pluginParam = new PluginParameters(rawParams);
+        assertEquals("applet.jnlp", pluginParam.getJNLPHref());
+    }
 }
