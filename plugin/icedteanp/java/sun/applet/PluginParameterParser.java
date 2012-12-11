@@ -46,7 +46,6 @@ class PluginParameterParser {
     static Map<String, String> parseEscapedKeyValuePairs(String keyvalString) {
         // Split on ';', ensuring empty strings at end are kept
         String[] strs = keyvalString.split(KEY_VALUE_DELIMITER, -1 /* Keep empty strings */);
-        System.out.println("Split array: " + Arrays.toString(strs));
 
         Map<String, String> attributes = new HashMap<String, String>();
 

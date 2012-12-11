@@ -1,3 +1,8 @@
+2012-12-11  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginParameterParser.java: 
+	Remove left-in System.out
+
 2012-12-10  Saad Mohammad  <smohammad@redhat.com>
 
 	Add unit tests for PR1189.
