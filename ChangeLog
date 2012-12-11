@@ -1,3 +1,35 @@
+2012-12-11  Jiri Vanek <jvanek@redhat.com>
+
+	Added jacoco code coverage support
+	* Makefile.am: (JACOCO_*) bunch of new variables encapsulating jacoco
+	files. (PLUGIN_COVERAGE_BOOTCLASSPATH) classpath to be used in plugin
+	instead of normal one in coverage mode. (COVERABLE_PLUGIN_DIR) for
+	compiling plugin with agent on. (jacoco-operator-source-files.txt) for
+	storing files of reporting tool. All XSLTPROC command were done as non-fatal
+	(stamps/compile-jacoco-operator.stamp) for compiling report operator.
+	(stamps/run-unit-test-code-coverage-jacoco.stam) for cover unittests
+	Set of (COVERABLE_PLUGIN_*) targets to compile plugin with agent on.
+	(stamps/build-fake-plugin.stamp) top level target for fake plugin.
+	(stamps/run-reproducers-test-code-coverage-jacoco.stamp) target for
+	cover reproducers. (run-test-code-coverage-jacoco) for merged coverage
+	(clean-unit-test-code-coverage-jacoco) and
+	(clean-reproducers-test-code-coverage-jacoco) and 
+	(clean-test-code-coverage-jacoco) and 
+	(clean-test-code-coverage-tools-jacoco) cleaning targets.
+	(run-reproducers-test-code-coverage-jacoco) and
+	(run-unit-test-code-coverage-jacoco) as top level aliases.
+	* configure.ac: added check for jacoco library and asm library
+	* plugin/icedteanp/IcedTeaNPPlugin.cc removed duplicate code
+	(plugin_start_appletviewe) removed duplicated code and added handling of
+	java agent if defined.
+	* tests/jacoco-operator/org/jacoco/operator/Main.java : New class,
+	comamndline tool for merging results and for generating reports.
+	* tests/jacoco-operator/org/jacoco/operator/MergeTask.java: New class.
+	Utility class responsible for merging exec results to one exec file.
+	* tests/jacoco-operator/org/jacoco/operator/ReportGenerator: New class.
+	Utility method for gathering sources and builds and outputing xml and
+	html reports.
+
 2012-12-11  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginParameterParser.java: 

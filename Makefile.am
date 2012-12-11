@@ -20,6 +20,8 @@ export NETX_UNIT_TEST_DIR=$(NETX_TEST_DIR)/unit
 export JUNIT_RUNNER_DIR=$(TESTS_DIR)/junit-runner
 export JUNIT_RUNNER_SRCDIR=$(TESTS_SRCDIR)/junit-runner
 
+export JACOCO_OPERATOR_DIR=$(TESTS_DIR)/jacoco-operator
+export JACOCO_OPERATOR_SRCDIR=$(TESTS_SRCDIR)/jacoco-operator
 
 export TEST_EXTENSIONS_SRCDIR=$(TESTS_SRCDIR)/test-extensions
 export TEST_EXTENSIONS_TESTS_SRCDIR=$(TESTS_SRCDIR)/test-extensions-tests
@@ -56,6 +58,22 @@ export CUSTOM_REPRODUCERS=custom
 export ALL_NONCUSTOM_REPRODUCERS=$(SIMPLE_REPRODUCERS) $(SIGNED_REPRODUCERS)
 export ALL_REPRODUCERS=$(ALL_NONCUSTOM_REPRODUCERS) $(CUSTOM_REPRODUCERS)
 
+export JACOCO_PATH:=$(shell dirname "$(JACOCO_JAR)")
+export JACOCO_AGENT=org.jacoco.agent.jar
+export JACOCO_ANT=org.jacoco.ant.jar
+export JACOCO_REPORT=org.jacoco.report.jar
+export JACOCO_AGENTRT=org.jacoco.agent.rt.jar
+export JACOCO_CORE=org.jacoco.core.jar
+export JACOCO_JAVAWS_RESULTS=$(TEST_EXTENSIONS_DIR)/jacoco_javaws.exec
+export JACOCO_PLUGIN_RESULTS=$(TEST_EXTENSIONS_DIR)/jacoco_plugin.exec
+export JACOCO_CLASSPATH=$(JACOCO_PATH)/$(JACOCO_CORE):$(JACOCO_PATH)/$(JACOCO_AGENT):$(JACOCO_PATH)/$(JACOCO_REPORT):$(JACOCO_PATH)/$(JACOCO_AGENTRT):$(JACOCO_PATH)/$(JACOCO_ANT):$(ASM_JAR)
+export JACOCO_AGENT_SWITCH_BODY=-javaagent:$(JACOCO_PATH)/$(JACOCO_AGENTRT)
+export JACOCO_BASE_EXCLUDE=org.junit.*:junit.*
+export JACOCO_ADVANCED_EXCLUDE=:*jacoco*:java.lang.*:java.reflect.*:java.util.*:sun.reflect.*
+export JACOCO_AGENT_SWITCH="$(JACOCO_AGENT_SWITCH_BODY)=excludes=$(JACOCO_BASE_EXCLUDE)"
+export JACOCO_AGENT_JAVAWS_SWITCH=\"$(JACOCO_AGENT_SWITCH_BODY)=excludes=$(JACOCO_BASE_EXCLUDE)$(JACOCO_ADVANCED_EXCLUDE),xboot=true,destfile=$(JACOCO_JAVAWS_RESULTS)\"
+export JACOCO_AGENT_PLUGIN_SWITCH=\"$(JACOCO_AGENT_SWITCH_BODY)=excludes=$(JACOCO_BASE_EXCLUDE)$(JACOCO_ADVANCED_EXCLUDE),xboot=true,destfile=$(JACOCO_PLUGIN_RESULTS)\"
+export JACOCO_OPERATOR_EXEC=$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -cp $(JACOCO_OPERATOR_DIR):$(JACOCO_CLASSPATH):. org.jacoco.operator.Main
 
 # linking variables
 export PLUGIN_LINK_NAME=libjavaplugin.so
@@ -103,6 +121,7 @@ export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) 
 #
 export LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
 export PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
+export PLUGIN_COVERAGE_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME):$(JACOCO_CLASSPATH)"'
 
 # Fake update version to work with the Deployment Toolkit script used by Oracle
 # http://download.oracle.com/javase/tutorial/deployment/deploymentInDepth/depltoolkit_index.html
@@ -128,6 +147,8 @@ export PLUGIN_SRCDIR=$(abs_top_srcdir)/plugin/icedteanp
 export LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
 export ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) stamps/liveconnect-dist.stamp
 export PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
+#this is for plugin testcoverage
+export COVERABLE_PLUGIN_DIR=$(TESTS_DIR)/icedteanp-build-with-jacoco
 endif
 
 if CP_SUPPORTS_REFLINK
@@ -588,6 +609,9 @@ stamps/check-pac-functions.stamp: stamps/bootstrap-directory.stamp
 junit-runner-source-files.txt:
 	find $(JUNIT_RUNNER_SRCDIR) -name '*.java' | sort > $@
 
+jacoco-operator-source-files.txt:
+	find $(JACOCO_OPERATOR_SRCDIR) -name '*.java' | sort > $@
+
 $(JUNIT_RUNNER_JAR): junit-runner-source-files.txt stamps/test-extensions-compile.stamp
 	mkdir -p $(JUNIT_RUNNER_DIR) && \
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
@@ -825,8 +849,8 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
 if WITH_XSLTPROC
-	$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(TEST_EXTENSIONS_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
-	$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(TEST_EXTENSIONS_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
+	-$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(TEST_EXTENSIONS_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
+	-$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(TEST_EXTENSIONS_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
 endif
 	touch $@
 
@@ -1002,8 +1026,8 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):. \
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names 
 if WITH_XSLTPROC
-	$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
-	$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html
+	-$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
+	-$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html
 endif
 	mkdir -p stamps && \
 	touch $@
@@ -1045,6 +1069,53 @@ if WITH_EMMA
 	done ;
 else 
 	echo "Sorry, coverage report cant be run without emma installed. Try install emma or specify with-emma value" ;
+	exit 5
+endif 
+	touch $@
+
+stamps/compile-jacoco-operator.stamp: jacoco-operator-source-files.txt
+if WITH_JACOCO	
+	mkdir -p $(JACOCO_OPERATOR_DIR) && \
+	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	  -d $(JACOCO_OPERATOR_DIR) \
+	  -classpath $(JACOCO_CLASSPATH) \
+	  @jacoco-operator-source-files.txt ;
+else 
+	echo "Sorry, jacoco coverage report generator  cant be compiled without jacoco installed. Try installing jacoco or specify with-jacoco value" ;
+	exit 5
+endif 
+	touch $@
+
+
+#warning,  during this target tests.build/netx/unit/tests-output.xml is backup and rewriten (but not coresponding html file)
+#xml results run with jacoco agent however, can be wrong, co the new tests-output.xml is then renamed and orginal one restored
+stamps/run-unit-test-code-coverage-jacoco.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_RUNNER_JAR)  \
+ $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)  $(UNIT_CLASS_NAMES) stamps/compile-jacoco-operator.stamp
+if WITH_JACOCO
+	filename=" " ; \
+	cd $(NETX_UNIT_TEST_SRCDIR) ; \
+	for file in `find . -type f \! -iname "*.java"`; do\
+		filename=`echo $$file `; \
+		cp --parents $$filename $(NETX_UNIT_TEST_DIR) ; \
+	done ; \
+	cd $(NETX_UNIT_TEST_DIR) ; \
+	for file in $(EMMA_MODIFIED_FILES) ; do \
+	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
+	done ;\
+	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):.  \
+	  $(BOOT_DIR)/bin/java $(JACOCO_AGENT_SWITCH) -Xbootclasspath:$(RUNTIME)  CommandLine $$class_names ; \
+	for file in $(EMMA_MODIFIED_FILES) ; do \
+	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_SUFFIX)" ; \
+	  mv $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)"  $(NETX_UNIT_TEST_DIR)/$$file ; \
+	done ; \
+	$(JACOCO_OPERATOR_EXEC) \
+	  report --die-soon --html-output coverage --xml-output coverage.xml --input-file jacoco.exec \
+	  --input-srcs  $(NETX_SRCDIR) $(PLUGIN_SRCDIR)/java $(NETX_UNIT_TEST_SRCDIR) $(JUNIT_RUNNER_SRCDIR) $(TEST_EXTENSIONS_SRCDIR) \
+	  --input-builds $(NETX_DIR)/lib/classes.jar $(abs_top_builddir)/liveconnect/lib/classes.jar $(NETX_UNIT_TEST_DIR) $(JUNIT_RUNNER_JAR)  $(TEST_EXTENSIONS_DIR) \
+	  --title "IcedTea-Web unit-tests codecoverage" ;
+else 
+	echo "Sorry, coverage report cant be run without jacoco installed. Try installing jacoco or specify with-jacoco value" ;
 	exit 5
 endif 
 	touch $@
@@ -1139,7 +1210,145 @@ else
 endif
 	touch $@
 
-run-test-code-coverage: run-unit-test-code-coverage run-reproducers-test-code-coverage
+$(COVERABLE_PLUGIN_DIR):
+	mkdir -p $(COVERABLE_PLUGIN_DIR);
+	
+$(COVERABLE_PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
+	cd $(COVERABLE_PLUGIN_DIR) && \
+	$(CXX) $(CXXFLAGS) \
+	   $(DEFS) $(VERSION_DEFS) \
+	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
+	  -DPLUGIN_NAME="\"IcedTea-Web Plugin with jacoco coverage agent\"" \
+	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
+	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
+	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
+	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
+	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_COVERAGE_BOOTCLASSPATH) \
+	  -DCOVERAGE_AGENT=$(JACOCO_AGENT_PLUGIN_SWITCH) \
+	  $(GLIB_CFLAGS) \
+	  $(GTK_CFLAGS) \
+	  $(MOZILLA_CFLAGS) \
+	  -fvisibility=hidden \
+	  -fPIC -o $@ -c $<
+
+$(COVERABLE_PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY): $(addprefix $(COVERABLE_PLUGIN_DIR)/,$(PLUGIN_OBJECTS))
+	cd $(COVERABLE_PLUGIN_DIR) && \
+	$(CXX) $(CXXFLAGS) \
+	  $(PLUGIN_OBJECTS) \
+	  $(GLIB_LIBS) \
+	  $(GTK_LIBS) \
+	  $(MOZILLA_LIBS) \
+	  -shared -o $@
+
+stamps/build-fake-plugin.stamp:  $(COVERABLE_PLUGIN_DIR)  $(addprefix $(PLUGIN_SRCDIR)/,$(PLUGIN_SRC)) $(addprefix $(COVERABLE_PLUGIN_DIR)/,$(PLUGIN_OBJECTS)) stamps/liveconnect-dist.stamp  $(COVERABLE_PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY)
+	touch $@
+
+#warning,  during this target tests.build/netx/jnlp_testsengine/tests-output.xml is backup and rewriten (but not coresponding html file)
+#xml results run with jacoco agent, however, can be wrong, co the new tests-output.xml is then renamed and orginal one restored
+stamps/run-reproducers-test-code-coverage-jacoco.stamp: stamps/run-netx-dist-tests.stamp $(REPRODUCERS_CLASS_NAMES) \
+stamps/compile-jacoco-operator.stamp stamps/build-fake-plugin.stamp
+if WITH_JACOCO
+	cd $(TESTS_DIR) ; \
+	for file in $(EMMA_MODIFIED_FILES) ; do \
+	  mv $(TEST_EXTENSIONS_DIR)/$$file $(TEST_EXTENSIONS_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
+	done ;\
+	echo "backuping javaws in $(DESTDIR)$(bindir)" ; \
+	javaws_backup=$(DESTDIR)$(bindir)/javaws_backup ; \
+	mv $(DESTDIR)$(bindir)/javaws $$javaws_backup ;  \
+	echo "patching $(javaws)" ; \
+	nw_bootclasspath="$(LAUNCHER_BOOTCLASSPATH):$(JACOCO_CLASSPATH)" ; \
+	cat $$javaws_backup | sed "s|COMMAND.k.=\"..JAVA.\"|COMMAND[k]=\"\\$$\\{JAVA\\}\" ;  k=1 ; COMMAND[k]=$(JACOCO_AGENT_JAVAWS_SWITCH)|" | sed "s,$(LAUNCHER_BOOTCLASSPATH),$$nw_bootclasspath," > $(DESTDIR)$(bindir)/$(javaws) ; \
+	chmod 777 $(DESTDIR)$(bindir)/$(javaws) ; \
+	echo "backuping plugin in $(DESTDIR)/$(libdir)$(BUILT_PLUGIN_LIBRARY)" ; \
+	plugin_backup=$(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)_backup ; \
+	mv $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) $$plugin_backup ;  \
+	echo "fakeing plugin" ; \
+	cp $(COVERABLE_PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) ; \
+	testcases_srcs=( ) ; \
+	k=0 ; \
+	types=($(ALL_REPRODUCERS)); \
+	for which in "$${types[@]}" ; do \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
+	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
+	  for dir in "$${simpleReproducers[@]}" ; do \
+	    testcases_srcs[k]="$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases/" ; \
+	    k=$$((k+1)) ; \
+	    done ; \
+	  done ; \
+	cd $(TEST_EXTENSIONS_DIR) ; \
+	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):$(TEST_EXTENSIONS_TESTS_DIR) \
+	  $(BOOT_DIR)/bin/java $(JACOCO_AGENT_SWITCH) $(REPRODUCERS_DPARAMETERS) \
+	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names ; \
+	if [ -f $(JACOCO_JAVAWS_RESULTS) ] ; then \
+	  jacoco_javaws_results=$(JACOCO_JAVAWS_RESULTS) ; \
+	  $(JACOCO_OPERATOR_EXEC) \
+	    report --die-soon --html-output coverage-javaws --xml-output coverage-javaws.xml --input-file $(JACOCO_JAVAWS_RESULTS) \
+	    --input-srcs  $(NETX_SRCDIR) \
+	    --input-builds $(NETX_DIR)/lib/classes.jar \
+	    --title "IcedTea-Web javaws reproducers codecoverage" ; \
+	fi; \
+	if [ -f $(JACOCO_PLUGIN_RESULTS) ] ; then \
+	  jacoco_plugin_results=$(JACOCO_PLUGIN_RESULTS) ; \
+	  $(JACOCO_OPERATOR_EXEC) \
+	    report --die-soon --html-output coverage-plugin --xml-output coverage-plugin.xml --input-file $(JACOCO_PLUGIN_RESULTS) \
+	    --input-srcs  $(NETX_SRCDIR) $(PLUGIN_SRCDIR)/java \
+	    --input-builds $(NETX_DIR)/lib/classes.jar $(abs_top_builddir)/liveconnect/lib/classes.jar \
+	    --title "IcedTea-Web plugin reproducers codecoverage" ; \
+	fi; \
+	$(JACOCO_OPERATOR_EXEC) \
+	  merge --die-soon --input-files jacoco.exec $$jacoco_javaws_results $$jacoco_plugin_results  --output-file jacoco-merged-reproducers.exec ; \
+	$(JACOCO_OPERATOR_EXEC) \
+	  report --html-output coverage --xml-output coverage.xml --input-file jacoco-merged-reproducers.exec \
+	  --input-srcs  $(NETX_SRCDIR) $(PLUGIN_SRCDIR)/java  $(JUNIT_RUNNER_SRCDIR) $(TEST_EXTENSIONS_SRCDIR) $(TEST_EXTENSIONS_TESTS_SRCDIR) "$${testcases_srcs[@]}" \
+	  --input-builds $(NETX_DIR)/lib/classes.jar $(abs_top_builddir)/liveconnect/lib/classes.jar  $(JUNIT_RUNNER_JAR)  $(TEST_EXTENSIONS_DIR) $(TEST_EXTENSIONS_TESTS_DIR) \
+	  --title "IcedTea-Web reproducers-tests codecoverage" ; \
+	echo "restoring javaws in $(DESTDIR)$(bindir)" ; \
+	rm -f $(DESTDIR)$(bindir)/$(javaws);  \
+	mv $$javaws_backup $(DESTDIR)$(bindir)/$(javaws);  \
+	echo "restoring  plugin in $(DESTDIR)/$(libdir)$(BUILT_PLUGIN_LIBRARY)" ; \
+	mv $$plugin_backup $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) ; \
+	for file in $(EMMA_MODIFIED_FILES) ; do \
+	  mv $(TEST_EXTENSIONS_DIR)/$$file  $(TEST_EXTENSIONS_DIR)/"$$file""$(EMMA_SUFFIX)" ; \
+	  mv $(TEST_EXTENSIONS_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)"  $(TEST_EXTENSIONS_DIR)/$$file ; \
+	done ;
+else
+	echo "Sorry, coverage report cant be run without jacoco installed. Try installing jacoco or specify with-jacoco value" ;
+	exit 5
+endif
+	touch $@
+
+run-test-code-coverage-jacoco: stamps/run-unit-test-code-coverage-jacoco.stamp stamps/run-reproducers-test-code-coverage-jacoco.stamp
+if WITH_JACOCO
+	cd $(TESTS_DIR) ; \
+	k=0 ; \
+	types=($(ALL_REPRODUCERS)); \
+	for which in "$${types[@]}" ; do \
+	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
+	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
+	  IFS="$$IFS_BACKUP" ; \
+	  for dir in "$${simpleReproducers[@]}" ; do \
+	    testcases_srcs[k]="$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases/" ; \
+	    k=$$((k+1)) ; \
+	    done ; \
+	  done ; \
+	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
+	$(JACOCO_OPERATOR_EXEC) \
+	  merge --die-soon --input-files $(TEST_EXTENSIONS_DIR)/jacoco-merged-reproducers.exec $(NETX_UNIT_TEST_DIR)/jacoco.exec  --output-file  jacoco-merged.exec; \
+	$(JACOCO_OPERATOR_EXEC) \
+	  report --html-output coverage --xml-output coverage.xml --input-file jacoco-merged.exec \
+	  --input-srcs  $(NETX_SRCDIR) $(PLUGIN_SRCDIR)/java  $(JUNIT_RUNNER_SRCDIR) $(TEST_EXTENSIONS_SRCDIR) $(TEST_EXTENSIONS_TESTS_SRCDIR) "$${testcases_srcs[@]}" \
+	  --input-builds $(NETX_DIR)/lib/classes.jar $(abs_top_builddir)/liveconnect/lib/classes.jar  $(JUNIT_RUNNER_JAR)  $(TEST_EXTENSIONS_DIR) $(TEST_EXTENSIONS_TESTS_DIR) \
+	  --input-srcs  $(NETX_UNIT_TEST_SRCDIR)  \
+	  --input-builds $(NETX_UNIT_TEST_DIR)  \
+	  --title "IcedTea-Web complete codecoverage" ; 
+else
+	echo "Sorry, coverage report cant be run without jacoco installed. Try installing jacoco or specify with-jacoco value" ;
+	exit 5
+endif
+
+run-test-code-coverage: stamps/run-unit-test-code-coverage.stamps stamps/run-reproducers-test-code-coverage.stamps
 if WITH_EMMA
 	cd $(TESTS_DIR) ; \
 	k=0 ; \
@@ -1175,7 +1384,7 @@ else
 	exit 5
 endif
 
-clean-netx-tests: clean-netx-unit-tests clean-junit-runner clean-netx-dist-tests clean-test-code-coverage
+clean-netx-tests: clean-netx-unit-tests clean-junit-runner clean-netx-dist-tests clean-test-code-coverage-jacoco clean-test-code-coverage
 	if [ -e $(TESTS_DIR)/netx ]; then \
 	  rmdir $(TESTS_DIR)/netx ; \
 	fi
@@ -1257,6 +1466,43 @@ clean-test-code-coverage: clean-unit-test-code-coverage clean-reproducers-test-c
 	  rm -f $(TESTS_DIR)/coverage.es  ; \
 	  rm -f $(TESTS_DIR)/coverage.em ; \
 	fi
+
+clean-unit-test-code-coverage-jacoco:
+	if [ -e stamps/run-unit-test-code-coverage-jacoco.stamp ]; then \
+	  rm -rf $(NETX_UNIT_TEST_DIR)/coverage ; \
+	  rm -f $(NETX_UNIT_TEST_DIR)/coverage.xml ; \
+	  rm -f $(NETX_UNIT_TEST_DIR)/jacoco.exec ; \
+	  rm -f $(NETX_UNIT_TEST_DIR)/tests-output_withEmma.xml ; \
+	  rm -f stamps/run-unit-test-code-coverage-jacoco.stamp ; \
+	fi	
+
+clean-reproducers-test-code-coverage-jacoco:
+	if [ -e stamps/run-reproducers-test-code-coverage-jacoco.stamp ]; then \
+	 rm -rf $(TEST_EXTENSIONS_DIR)/coverage-javaws ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/coverage-javaws.xml ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/jacoco_javaws.exec ; \
+	 rm -rf $(TEST_EXTENSIONS_DIR)/coverage-plugin ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/coverage-plugin.xml ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/jacoco_plugin.exec ; \
+	 rm -rf $(TEST_EXTENSIONS_DIR)/coverage ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/coverage.xml ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/jacoco-merged-reproducers.exec ; \
+	 rm -f $(TEST_EXTENSIONS_DIR)/tests-output_withEmma.xml ; \
+	 rm -f stamps/run-reproducers-test-code-coverage-jacoco.stamp ; \
+	fi
+
+clean-test-code-coverage-jacoco: clean-unit-test-code-coverage-jacoco clean-reproducers-test-code-coverage-jacoco clean-test-code-coverage-tools-jacoco
+	if [ -e $(TESTS_DIR)/coverage.xml ]; then \
+	  rm -rf $(TESTS_DIR)/coverage  ; \
+	  rm -f $(TESTS_DIR)/jacoco-merged.exec; \
+	fi
+
+clean-test-code-coverage-tools-jacoco:
+	rm -rf  $(JACOCO_OPERATOR_DIR)
+	rm -rf  $(COVERABLE_PLUGIN_DIR)
+	rm -f stamps/compile-jacoco-operator.stamp;
+	rm -f jacoco-operator-source-files.txt
+	rm -f stamps/build-fake-plugin.stamp
 
 
 # plugin tests
@@ -1377,3 +1623,7 @@ run-netx-dist-tests: stamps/run-netx-dist-tests.stamp
 run-unit-test-code-coverage: stamps/run-unit-test-code-coverage.stamp
 
 run-reproducers-test-code-coverage: stamps/run-reproducers-test-code-coverage.stamp
+
+run-unit-test-code-coverage-jacoco: stamps/run-unit-test-code-coverage-jacoco.stamp
+
+run-reproducers-test-code-coverage-jacoco: stamps/run-reproducers-test-code-coverage-jacoco.stamp

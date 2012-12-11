@@ -1594,20 +1594,28 @@ plugin_start_appletviewer (ITNPPluginData* data)
   gchar** environment = NULL;
   std::vector<std::string*>* jvm_args = get_jvm_args();
 
+  // Construct command line parameters
+
+  command_line.push_back(appletviewer_executable);
+
+  //Add JVM args to command_line
+  for (int i = 0; i < jvm_args->size(); i++)
+  {
+    command_line.push_back(*jvm_args->at(i));
+  }
+
+  command_line.push_back(PLUGIN_BOOTCLASSPATH);
+  // set the classpath to avoid using the default (cwd).
+  command_line.push_back("-classpath");
+  command_line.push_back(ICEDTEA_WEB_JRE "/lib/rt.jar");
+
+  // Enable coverage agent if we are running instrumented plugin
+#ifdef COVERAGE_AGENT
+  command_line.push_back(COVERAGE_AGENT);
+#endif
+
   if (plugin_debug)
   {
-    command_line.push_back(appletviewer_executable);
-
-    //Add JVM args to command_line
-    for (int i = 0; i < jvm_args->size(); i++)
-    {
-      command_line.push_back(*jvm_args->at(i));
-    }
-
-    command_line.push_back(PLUGIN_BOOTCLASSPATH);
-    // set the classpath to avoid using the default (cwd).
-    command_line.push_back("-classpath");
-    command_line.push_back(ICEDTEA_WEB_JRE "/lib/rt.jar");
     command_line.push_back("-Xdebug");
     command_line.push_back("-Xnoagent");
 
@@ -1615,28 +1623,13 @@ plugin_start_appletviewer (ITNPPluginData* data)
     std::string debug_flags = "-Xrunjdwp:transport=dt_socket,address=8787,server=y,";
     debug_flags += plugin_debug_suspend ? "suspend=y" : "suspend=n";
     command_line.push_back(debug_flags);
-
-    command_line.push_back("sun.applet.PluginMain");
-    command_line.push_back(out_pipe_name);
-    command_line.push_back(in_pipe_name);
-  } else
-  {
-    command_line.push_back(std::string(appletviewer_executable));
-
-    //Add JVM args to command_line
-    for (int i = 0; i < jvm_args->size(); i++)
-    {
-      command_line.push_back(*jvm_args->at(i));
-    }
-
-    command_line.push_back(PLUGIN_BOOTCLASSPATH);
-    command_line.push_back("-classpath");
-    command_line.push_back(ICEDTEA_WEB_JRE "/lib/rt.jar");
-    command_line.push_back("sun.applet.PluginMain");
-    command_line.push_back(out_pipe_name);
-    command_line.push_back(in_pipe_name);
-
   }
+
+  command_line.push_back("sun.applet.PluginMain");
+  command_line.push_back(out_pipe_name);
+  command_line.push_back(in_pipe_name);
+
+  // Finished command line parameters
 
   environment = plugin_filter_environment();
   std::vector<gchar*> vector_gchar = IcedTeaPluginUtilities::vectorStringToVectorGchar(&command_line);

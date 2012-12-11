@@ -106,6 +106,10 @@ IT_FIND_OPTIONAL_JAR([junit], JUNIT,
     [/usr/share/java/junit4.jar /usr/share/junit-4/lib/junit.jar])
 IT_FIND_OPTIONAL_JAR([emma], EMMA,
     [/usr/share/java/emma.jar])
+IT_FIND_OPTIONAL_JAR([jacoco], JACOCO,
+    [/usr/share/java/jacoco/org.jacoco.core.jar])
+IT_FIND_OPTIONAL_JAR([asm], ASM,
+    [/usr/share/java/objectweb-asm4/asm-all-4.0.jar /usr/share/java/objectweb-asm/asm-all.jar])
 
 AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
 AC_CONFIG_FILES([build.properties])
