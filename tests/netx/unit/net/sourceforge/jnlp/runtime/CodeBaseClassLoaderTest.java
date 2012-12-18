@@ -68,6 +68,34 @@ public class CodeBaseClassLoaderTest {
             throw new RuntimeException(ex);
         }
     }
+
+    private class DummyJNLPFile extends JNLPFile {
+
+        final boolean haveSecurity;
+
+        public DummyJNLPFile(boolean haveSecurity) {
+            this.haveSecurity = haveSecurity;
+        }
+
+        @Override
+        public ResourcesDesc getResources() {
+            return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
+        }
+
+        @Override
+        public URL getCodeBase() {
+            return CODEBASE_URL;
+        }
+
+        @Override
+        public SecurityDesc getSecurity() {
+            if (haveSecurity) {
+                return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
+            } else {
+                return new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, null);
+            }
+        }
+    };
     private static final String isWSA = "isWebstartApplication";
 
     static void setStaticField(Field field, Object newValue) throws Exception {
@@ -94,55 +122,74 @@ public class CodeBaseClassLoaderTest {
         "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
         "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
     @Test
+    public void testClassResourceLoadSuccessCachingApplication() throws Exception {
+        setWSA();
+        //we are testing new resource not in cache
+        testResourceCaching("net/sourceforge/jnlp/about/Main.class");
+    }
+
+    @Test
+    public void testClassResourceLoadSuccessCachingApplet() throws Exception {
+        setApplet();
+        //so new resource again not in cache
+        testResourceCaching("net/sourceforge/jnlp/about/Main.class");
+    }
+
+    @Test
     public void testResourceLoadSuccessCachingApplication() throws Exception {
         setWSA();
         //we are testing new resource not in cache
-        testResourceLoadSuccessCaching("Main.class");
+        testResourceCaching("net/sourceforge/jnlp/about/resources/about.html");
     }
 
     @Test
     public void testResourceLoadSuccessCachingApplet() throws Exception {
         setApplet();
         //so new resource again not in cache
-        testResourceLoadSuccessCaching("HTMLPanel.java");
+        testResourceCaching("net/sourceforge/jnlp/about/resources/about.html");
     }
 
-    public void testResourceLoadSuccessCaching(String r) throws Exception {
-        JNLPFile dummyJnlpFile = new JNLPFile() {
+    public void testResourceCaching(String r) throws Exception {
+        testResourceCaching(r, true);
+    }
 
-            @Override
-            public ResourcesDesc getResources() {
-                return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
-            }
+    public void testResourceCaching(String r, boolean shouldExists) throws Exception {
+        JNLPFile dummyJnlpFile = new DummyJNLPFile(true);
 
-            @Override
-            public URL getCodeBase() {
-                return CODEBASE_URL;
-            }
-
-            @Override
-            public SecurityDesc getSecurity() {
-                return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
-            }
-        };
         JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);
-        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[] { JAR_URL, CODEBASE_URL }, parent);
+        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[]{JAR_URL, CODEBASE_URL}, parent);
 
+        int level = 10;
+        if (shouldExists) {
+            //for found the "caching" is by internal logic.Always faster, but who knows how...
+            //to keep the test stabile keep the difference minimal
+            level = 1;
+        }
         long startTime, stopTime;
 
         startTime = System.nanoTime();
-        classLoader.findResource("net/sourceforge/jnlp/about/"+r);
+        URL u1 = classLoader.findResource(r);
+        if (shouldExists) {
+            Assert.assertNotNull(u1);
+        } else {
+            Assert.assertNull(u1);
+        }
         stopTime = System.nanoTime();
         long timeOnFirstTry = stopTime - startTime;
         ServerAccess.logErrorReprint("" + timeOnFirstTry);
 
         startTime = System.nanoTime();
-        classLoader.findResource("net/sourceforge/jnlp/about/"+r);
+        URL u2 = classLoader.findResource(r);
+        if (shouldExists) {
+            Assert.assertNotNull(u1);
+        } else {
+            Assert.assertNull(u2);
+        }
         stopTime = System.nanoTime();
         long timeOnSecondTry = stopTime - startTime;
         ServerAccess.logErrorReprint("" + timeOnSecondTry);
 
-        assertTrue(timeOnSecondTry < (timeOnFirstTry / 10));
+        assertTrue(timeOnSecondTry < (timeOnFirstTry / level));
     }
 
     @Bug(id = {"PR895",
@@ -151,52 +198,13 @@ public class CodeBaseClassLoaderTest {
     @Test
     public void testResourceLoadFailureCachingApplication() throws Exception {
         setWSA();
-        testResourceLoadFailureCaching();
+        testResourceCaching("net/sourceforge/jnlp/about/Main_FOO_.class", false);
     }
 
     @Test
     public void testResourceLoadFailureCachingApplet() throws Exception {
         setApplet();
-        testResourceLoadFailureCaching();
-    }
-
-    public void testResourceLoadFailureCaching() throws Exception {
-        JNLPFile dummyJnlpFile = new JNLPFile() {
-
-            @Override
-            public ResourcesDesc getResources() {
-                return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
-            }
-
-            @Override
-            public URL getCodeBase() {
-                return CODEBASE_URL;
-            }
-
-            @Override
-            public SecurityDesc getSecurity() {
-                return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
-            }
-        };
-
-        JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);
-        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[] { JAR_URL, CODEBASE_URL }, parent);
-
-        long startTime, stopTime;
-
-        startTime = System.nanoTime();
-        classLoader.findResource("net/sourceforge/jnlp/about/Main_FOO_.class");
-        stopTime = System.nanoTime();
-        long timeOnFirstTry = stopTime - startTime;
-        ServerAccess.logErrorReprint("" + timeOnFirstTry);
-
-        startTime = System.nanoTime();
-        classLoader.findResource("net/sourceforge/jnlp/about/Main_FOO_.class");
-        stopTime = System.nanoTime();
-        long timeOnSecondTry = stopTime - startTime;
-        ServerAccess.logErrorReprint("" + timeOnSecondTry);
-
-        assertTrue(timeOnSecondTry < (timeOnFirstTry / 10));
+        testResourceCaching("net/sourceforge/jnlp/about/Main_FOO_.class", false);
     }
 
     @Test
@@ -208,27 +216,11 @@ public class CodeBaseClassLoaderTest {
     @Test
     public void testParentClassLoaderIsAskedForClassesApplet() throws Exception {
         setApplet();
-        testResourceLoadFailureCaching();
+        testParentClassLoaderIsAskedForClasses();
     }
 
     public void testParentClassLoaderIsAskedForClasses() throws Exception {
-        JNLPFile dummyJnlpFile = new JNLPFile() {
-
-            @Override
-            public ResourcesDesc getResources() {
-                return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
-            }
-
-            @Override
-            public URL getCodeBase() {
-                return CODEBASE_URL;
-            }
-
-            @Override
-            public SecurityDesc getSecurity() {
-                return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
-            }
-        };
+        JNLPFile dummyJnlpFile = new DummyJNLPFile(true);
 
         final boolean[] parentWasInvoked = new boolean[1];
 
@@ -240,7 +232,7 @@ public class CodeBaseClassLoaderTest {
                 throw new ClassNotFoundException(name);
             }
         };
-        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[] { JAR_URL, CODEBASE_URL }, parent);
+        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[]{JAR_URL, CODEBASE_URL}, parent);
         try {
             classLoader.findClass("foo");
             assertFalse("should not happen", true);
@@ -262,26 +254,10 @@ public class CodeBaseClassLoaderTest {
     }
 
     public void testNullFileSecurityDesc() throws Exception {
-        JNLPFile dummyJnlpFile = new JNLPFile() {
-
-            @Override
-            public ResourcesDesc getResources() {
-                return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
-            }
-
-            @Override
-            public URL getCodeBase() {
-                return CODEBASE_URL;
-            }
-
-            @Override
-            public SecurityDesc getSecurity() {
-                return new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, null);
-            }
-        };
+        JNLPFile dummyJnlpFile = new DummyJNLPFile(false);
 
         JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);
-        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[] { JAR_URL, CODEBASE_URL }, parent);
+        CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[]{JAR_URL, CODEBASE_URL}, parent);
 
         Exception ex = null;
         try {
@@ -296,10 +272,10 @@ public class CodeBaseClassLoaderTest {
 
         //search dor resources is not relvant to null jnlp file for applets
         ex = null;
-        URL res=null;
+        URL res = null;
         try {
             //not cached
-            res=classLoader.findResource("net/sourceforge/jnlp/about/resources/notes.html");
+            res = classLoader.findResource("net/sourceforge/jnlp/about/resources/notes.html");
         } catch (Exception exx) {
             ex = exx;
             ServerAccess.logException(ex);
@@ -314,10 +290,10 @@ public class CodeBaseClassLoaderTest {
         }
 
         ex = null;
-        res=null;
+        res = null;
         try {
             //now cached
-            res=classLoader.findResource("net/sourceforge/jnlp/about/resources/notes.html");
+            res = classLoader.findResource("net/sourceforge/jnlp/about/resources/notes.html");
         } catch (Exception exx) {
             ex = exx;
             ServerAccess.logException(ex);
@@ -331,6 +307,4 @@ public class CodeBaseClassLoaderTest {
             Assert.assertNotNull(res);
         }
     }
-
-
 }

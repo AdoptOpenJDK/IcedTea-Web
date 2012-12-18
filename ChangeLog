@@ -1,3 +1,16 @@
+2012-12-18  Jiri Vanek <jvanek@redhat.com>
+
+	Cleaned unit-tests:
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
+	(DummyJNLPFile) class extracted from its anonymous members to private
+	named member. Get rid of repeated methods (testResourceLoad*Caching) and
+	replace it by (testResourceCaching) with parameter of full name and boolean
+	keeping its expected existence and branching null assert on it. Added tests
+	(testClassResourceLoadSuccessCachingApplication) and
+	(testClassResourceLoadSuccessCachingApplet). (testResourceCaching) made 
+	less vulnerable by found classes and more precise. All resources paths 
+	fixed and clarified (to be found or not)
+
 2012-12-18  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* /tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
