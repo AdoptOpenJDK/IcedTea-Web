@@ -1,3 +1,21 @@
+2012-12-18  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* /tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	Added several new versions of method (executeBrowser) with lists 
+	of ContentReaderListeners as arguments.
+	* /tests/test-extensions/net/sourceforge/jnlp/ProcessWrapper.java:
+	Added new versions of the (constructor of ProcessWrapper) and methods 
+	(addStdOutListeners) and (addStdErrListeners) for adding
+	ContentReaderListeners using List<ContentReaderListener>
+	instead of one ContentReaderListener as argument.
+	Added a new version of (constructor of ProcessWrapper) with 
+	less arguments that is used instead of calling the constructor
+	with several arguments passed as null, thus causing ambiguity. 
+	* /tests/reproducers/simple/SingeInstanceServiceTest/testcases/SingleInstanceTest.java: 
+	Modified the call of (executeBrowser) method with null arguments
+	into a call of new method without the null arguments
+	-getting rid of an ambiguous call.
+
 2012-12-11  Jiri Vanek <jvanek@redhat.com>
 
 	Added jacoco code coverage support

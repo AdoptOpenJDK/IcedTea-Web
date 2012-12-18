@@ -109,7 +109,7 @@ public class SingleInstanceTest extends BrowserTest {
             try {
                 boolean isJavawsTest = isJnlp(launchFile);
                 pr = isJavawsTest ? server.executeJavawsHeadless(launchFile, null, null)
-                        : server.executeBrowser(launchFile, null, null);
+                        : server.executeBrowser(launchFile);
             } catch (Exception ex) {
                 ServerAccess.logException(ex);
             } finally {

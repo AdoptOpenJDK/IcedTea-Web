@@ -64,7 +64,7 @@ public class ProcessWrapper {
     public ProcessWrapper() {
     }
 
-    public ProcessWrapper(String toBeExecuted, List<String> otherargs, URL u, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) throws Exception {
+    public ProcessWrapper(String toBeExecuted, List<String> otherargs, URL u){
         Assert.assertNotNull(u);
         Assert.assertNotNull(toBeExecuted);
         Assert.assertTrue(toBeExecuted.trim().length() > 1);
@@ -75,10 +75,22 @@ public class ProcessWrapper {
         urledArgs.add(0, toBeExecuted);
         urledArgs.add(u.toString());
         this.args = urledArgs;
+        this.vars=null;
+    }
+
+    public ProcessWrapper(String toBeExecuted, List<String> otherargs, URL u, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) throws Exception {
+        this(toBeExecuted, otherargs, u);
         this.addStdOutListener(stdoutl);
         this.addStdErrListener(stderrl);
         this.vars=vars;
     
+    }
+
+    public ProcessWrapper(String toBeExecuted, List<String> otherargs, URL u, List<ContentReaderListener> stdoutl, List<ContentReaderListener> stderrl, String[] vars) throws Exception {
+        this(toBeExecuted, otherargs, u); 
+        this.addStdOutListeners(stdoutl);
+        this.addStdErrListeners(stderrl);
+        this.vars=vars;    
     }
 
     ProcessWrapper(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) {
@@ -86,6 +98,14 @@ public class ProcessWrapper {
         this.dir = dir;
         this.addStdOutListener(stdoutl);
         this.addStdErrListener(stderrl);
+        this.vars = vars;
+    }
+
+    public ProcessWrapper(final List<String> args, File dir, List<ContentReaderListener> stdoutl, List<ContentReaderListener> stderrl, String[] vars) {
+        this.args = args;
+        this.dir = dir;
+        this.addStdOutListeners(stdoutl);
+        this.addStdErrListeners(stderrl);
         this.vars = vars;
     }
 
@@ -102,6 +122,22 @@ public class ProcessWrapper {
             return;
         }
         stderrl.add(l);
+
+    }
+
+    public final void addStdOutListeners(List<ContentReaderListener> l) {
+        if (l == null) {
+            return;
+        }
+        stdoutl.addAll(l);
+
+    }
+
+    public final void addStdErrListeners(List<ContentReaderListener> l) {
+        if (l == null) {
+            return;
+        }
+        stderrl.addAll(l);
 
     }
 

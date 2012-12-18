@@ -573,6 +573,10 @@ public class ServerAccess {
         return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
     }
 
+    public ProcessResult executeBrowser(String resource, List<ContentReaderListener> stdoutl, List<ContentReaderListener> stderrl) throws Exception {
+        return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
+    }
+
     /**
      *  wrapping method to executeProcess (eg: javaws arg arg http://localhost:port/resource)
      * will execute default javaws (@see JAVAWS_BUILD_BIN) upon default url upon cached server (@see SERVER_NAME @see getPort(), @see getInstance()))
@@ -592,7 +596,7 @@ public class ServerAccess {
     }
 
     public ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
-        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), null, null, null);
+        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource));
         rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
         return rpw.execute();
     }
@@ -603,13 +607,25 @@ public class ServerAccess {
         return rpw.execute();
     }
 
+    public ProcessResult executeBrowser(List<String> otherargs,    String resource, List<ContentReaderListener> stdoutl, List<ContentReaderListener> stderrl) throws Exception {
+        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
+        rpw.setReactingProcess(getCurrentBrowser());// current browser may be null, but it does not matter
+        return rpw.execute();
+    }
+
     public ProcessResult executeBrowser(Browser b, List<String> otherargs, String resource) throws Exception {
-        ProcessWrapper rpw = new ProcessWrapper(b.getBin(), otherargs, getUrlUponThisInstance(resource), null, null, null);
+        ProcessWrapper rpw = new ProcessWrapper(b.getBin(), otherargs, getUrlUponThisInstance(resource));
         rpw.setReactingProcess(b);
         return rpw.execute();
     }
 
     public ProcessResult executeBrowser(Browser b, List<String> otherargs, String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+        ProcessWrapper rpw = new ProcessWrapper(b.getBin(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
+        rpw.setReactingProcess(b);
+        return rpw.execute();
+    }
+
+    public ProcessResult executeBrowser(Browser b, List<String> otherargs, String resource, List<ContentReaderListener> stdoutl, List<ContentReaderListener> stderrl) throws Exception {
         ProcessWrapper rpw = new ProcessWrapper(b.getBin(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
         rpw.setReactingProcess(b);
         return rpw.execute();
@@ -661,7 +677,7 @@ public class ServerAccess {
      * @throws Exception
      */
     public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u) throws Exception {
-        return new ProcessWrapper(toBeExecuted, otherargs, u, null, null, null).execute();
+        return new ProcessWrapper(toBeExecuted, otherargs, u).execute();
     }
 
     public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
