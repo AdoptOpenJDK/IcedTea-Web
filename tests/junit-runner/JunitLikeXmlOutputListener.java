@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.sourceforge.jnlp.annotations.Remote;
 
 
 import org.junit.internal.JUnitSystem;
@@ -49,6 +50,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
     private static final String BUGS = "bugs";
     private static final String BUG = "bug";
     private static final String K2F = "known-to-fail";
+    private static final String REMOTE = "remote";
     private static final String TEST_NAME_ATTRIBUTE = "name";
     private static final String TEST_TIME_ATTRIBUTE = "time";
     private static final String TEST_IGNORED_ATTRIBUTE = "ignored";
@@ -172,6 +174,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
         double testTimeSeconds = ((double) testTime) / 1000d;
         testDone(description, testTime, testTimeSeconds, false);
     }
+    
 
     private void testDone(Description description, long testTime, double testTimeSeconds, boolean ignored) throws Exception {
         Class testClass = null;
@@ -197,16 +200,14 @@ public class JunitLikeXmlOutputListener extends RunListener {
         if (ignored){
             testcaseAtts.put(TEST_IGNORED_ATTRIBUTE, Boolean.TRUE.toString());
         }
-        KnownToFail k2f=null;
-        try {
-            if (testClass != null && testMethod != null) {
-                k2f = testMethod.getAnnotation(KnownToFail.class);
-                if (k2f != null) {
-                    testcaseAtts.put(K2F, Boolean.TRUE.toString());
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        KnownToFail k2f = LessVerboseTextListener.getAnnotation(testClass, testMethod.getName(), KnownToFail.class);
+        Remote remote =  LessVerboseTextListener.getAnnotation(testClass, testMethod.getName(), Remote.class);
+        if (k2f != null) {
+            testcaseAtts.put(K2F, Boolean.TRUE.toString());
+        }
+        if (remote != null) {
+            testcaseAtts.put(REMOTE, Boolean.TRUE.toString());
+
         }
         openElement(TEST_ELEMENT, testcaseAtts);
         if (testFailed != null) {

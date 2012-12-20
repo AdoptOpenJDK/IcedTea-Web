@@ -50,6 +50,7 @@ import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.CodeBaseClassLoader;
 import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.Remote;
 import org.junit.AfterClass;
 import org.junit.Assert;
 
@@ -122,6 +123,7 @@ public class CodeBaseClassLoaderTest {
         "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
         "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
     @Test
+    @Remote
     public void testClassResourceLoadSuccessCachingApplication() throws Exception {
         setWSA();
         //we are testing new resource not in cache
@@ -129,6 +131,7 @@ public class CodeBaseClassLoaderTest {
     }
 
     @Test
+    @Remote
     public void testClassResourceLoadSuccessCachingApplet() throws Exception {
         setApplet();
         //so new resource again not in cache
@@ -136,6 +139,7 @@ public class CodeBaseClassLoaderTest {
     }
 
     @Test
+    @Remote
     public void testResourceLoadSuccessCachingApplication() throws Exception {
         setWSA();
         //we are testing new resource not in cache
@@ -143,6 +147,7 @@ public class CodeBaseClassLoaderTest {
     }
 
     @Test
+    @Remote
     public void testResourceLoadSuccessCachingApplet() throws Exception {
         setApplet();
         //so new resource again not in cache
@@ -196,6 +201,7 @@ public class CodeBaseClassLoaderTest {
         "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017626.html",
         "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-March/017667.html"})
     @Test
+    @Remote
     public void testResourceLoadFailureCachingApplication() throws Exception {
         setWSA();
         testResourceCaching("net/sourceforge/jnlp/about/Main_FOO_.class", false);
@@ -208,12 +214,14 @@ public class CodeBaseClassLoaderTest {
     }
 
     @Test
+    @Remote
     public void testParentClassLoaderIsAskedForClassesApplication() throws Exception {
         setWSA();
         testParentClassLoaderIsAskedForClasses();
     }
 
     @Test
+    @Remote
     public void testParentClassLoaderIsAskedForClassesApplet() throws Exception {
         setApplet();
         testParentClassLoaderIsAskedForClasses();
@@ -248,6 +256,7 @@ public class CodeBaseClassLoaderTest {
     }
 
     @Test
+    @Remote
     public void testNullFileSecurityDescApplet() throws Exception {
         setApplet();
         testNullFileSecurityDesc();

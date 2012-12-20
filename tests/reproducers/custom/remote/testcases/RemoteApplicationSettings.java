@@ -1,0 +1,231 @@
+/* RemoteApplicationTests.java
+ Copyright (C) 2011 Red Hat, Inc.
+
+ This file is part of IcedTea.
+
+ IcedTea is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, version 2.
+
+ IcedTea is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with IcedTea; see the file COPYING.  If not, write to
+ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301 USA.
+
+ Linking this library statically or dynamically with other modules is
+ making a combined work based on this library.  Thus, the terms and
+ conditions of the GNU General Public License cover the whole
+ combination.
+
+ As a special exception, the copyright holders of this library give you
+ permission to link this library with independent modules to produce an
+ executable, regardless of the license terms of these independent
+ modules, and to copy and distribute the resulting executable under
+ terms of your choice, provided that you also meet, for each linked
+ independent module, the terms and conditions of the license of that
+ module.  An independent module is a module which is not derived from
+ or based on this library.  If you modify this library, you may extend
+ this exception to your version of the library, but you are not
+ obligated to do so.  If you do not wish to do so, delete this
+ exception statement from your version.
+ */
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import net.sourceforge.jnlp.ProcessResult;
+import org.junit.Assert;
+import org.junit.Test;
+
+;
+
+public class RemoteApplicationSettings {
+
+    public static final String mustEmpty = "must be empty, was not";
+    public static final String stdout = "Stdout";
+    public static final String stderr = "Stderr";
+    public static final String stdoutEmpty = stdout + " " + mustEmpty;
+    public static final String stderrEmpty = stderr + " " + mustEmpty;
+
+    public static URL createCatchedUrl(String r) {
+        try {
+            return new URL(r);
+        } catch (MalformedURLException mex) {
+            throw new RuntimeException(mex);
+        }
+    }
+
+    public interface RemoteApplicationTestcaseSettings {
+
+        public URL getUrl();
+
+        public void evaluate(ProcessResult pr);
+    }
+
+    public static abstract class StringBasedURL implements RemoteApplicationTestcaseSettings {
+
+        URL u;
+
+        @Override
+        public URL getUrl() {
+            return u;
+        }
+
+        public StringBasedURL(String r) {
+            this.u = createCatchedUrl(r);
+        }
+    }
+
+    public static class FourierTransform extends StringBasedURL {
+
+        public FourierTransform() {
+            super("http://www.cs.brown.edu/exploratories/freeSoftware/repository/edu/brown/cs/exploratories/applets/fft1DApp/1d_fast_fourier_transform_java_jnlp.jnlp");
+        }
+
+        @Override
+        public void evaluate(ProcessResult pr) {
+            Assert.assertTrue(stdoutEmpty, pr.stdout.length() == 0);
+            Assert.assertTrue(pr.stderr.length() == 0 || pr.stderr.contains(IllegalStateException.class.getName()));
+
+        }
+    }
+
+    public static class OrawebCernCh extends StringBasedURL {
+
+        public OrawebCernCh() {
+            super("https://oraweb.cern.ch/pls/atlasintegration/docs/EMDH_atlas.jnlp");
+        }
+
+        @Override
+        public void evaluate(ProcessResult pr) {
+            Assert.assertTrue(stdoutEmpty, pr.stdout.length() == 0);
+            Assert.assertTrue(pr.stderr.length() == 0 || pr.stderr.contains("Cannot grant permissions to unsigned jars. Application requested security permissions, but jars are not signed"));
+
+        }
+    }
+
+    public static class GnattProject extends StringBasedURL {
+
+        public GnattProject() {
+            super("http://ganttproject.googlecode.com/svn/webstart/ganttproject-2.0.10/ganttproject-2.0.10.jnlp");
+        }
+
+        @Override
+        public void evaluate(ProcessResult pr) {
+            Assert.assertTrue(stdout, pr.stdout.length() == 0);
+            Assert.assertTrue(pr.stderr.contains("Splash closed"));
+            Assert.assertFalse(pr.stderr.contains("Exception"));
+
+        }
+    }
+
+    public static class GeoGebra extends StringBasedURL {
+
+        public GeoGebra() {
+            super("http://www.geogebra.org/webstart/geogebra.jnlp");
+        }
+
+        @Override
+        public void evaluate(ProcessResult pr) {
+            Assert.assertTrue(pr.stdout.length() > 0);
+            Assert.assertTrue(pr.stderr.length() > 0);
+            Assert.assertFalse(pr.stderr.contains("Exception"));
+            Assert.assertFalse(pr.stdout.contains("Exception"));
+
+        }
+    }
+
+    public abstract static class NoOutputs extends StringBasedURL {
+
+        public NoOutputs(String r) {
+            super(r);
+        }
+
+        @Override
+        public void evaluate(ProcessResult pr) {
+            Assert.assertTrue(stdoutEmpty, pr.stdout.length() == 0);
+            Assert.assertTrue(stderrEmpty, pr.stderr.length() == 0);
+
+        }
+    }
+
+    public static class Arbores extends NoOutputs {
+
+        public Arbores() {
+            super("http://www.arbores.ca/AnnuityCalc.jnlp");
+        }
+    }
+
+    public static class PhetSims extends NoOutputs {
+
+        public PhetSims() {
+            super("http://phetsims.colorado.edu/sims/circuit-construction-kit/circuit-construction-kit-dc_en.jnlp");
+        }
+    }
+
+    public static class TopCoder extends NoOutputs {
+
+        public TopCoder() {
+            super("http://www.topcoder.com/contest/arena/ContestAppletProd.jnlp");
+        }
+    }
+
+    public static class SunSwingDemo extends NoOutputs {
+
+        public SunSwingDemo() throws MalformedURLException {
+            super("http://java.sun.com/docs/books/tutorialJWS/uiswing/events/ex6/ComponentEventDemo.jnlp");
+        }
+    }
+
+    public static class ArboresDeposit extends NoOutputs {
+
+        public ArboresDeposit() throws MalformedURLException {
+            super("http://www.arbores.ca/Deposit.jnlp");
+        }
+    }
+
+    public static class AviationWeather extends NoOutputs {
+
+        public AviationWeather() {
+            super("http://aviationweather.gov/static/adds/java/fpt/fpt.jnlp");
+        }
+    }
+
+    public static class FuseSwing extends NoOutputs {
+
+        public FuseSwing() {
+            super("http://www.progx.org/users/Gfx/apps/fuse-swing-demo.jnlp");
+        }
+    }
+
+    @Test
+    public void remoteApplicationSettingsAreWorking() throws Exception {
+        RemoteApplicationTestcaseSettings s5 = new FourierTransform();
+        Assert.assertNotNull(s5.getUrl());
+        RemoteApplicationTestcaseSettings s4 = new Arbores();
+        Assert.assertNotNull(s4.getUrl());
+        RemoteApplicationTestcaseSettings s3 = new PhetSims();
+        Assert.assertNotNull(s3.getUrl());
+        RemoteApplicationTestcaseSettings s2 = new TopCoder();
+        Assert.assertNotNull(s2.getUrl());
+        RemoteApplicationTestcaseSettings s1 = new SunSwingDemo();
+        Assert.assertNotNull(s1.getUrl());
+        RemoteApplicationTestcaseSettings s6 = new ArboresDeposit();
+        Assert.assertNotNull(s6.getUrl());
+        RemoteApplicationTestcaseSettings s7 = new OrawebCernCh();
+        Assert.assertNotNull(s7.getUrl());
+        RemoteApplicationTestcaseSettings s8 = new AviationWeather();
+        Assert.assertNotNull(s8.getUrl());
+        RemoteApplicationTestcaseSettings s9 = new FuseSwing();
+        Assert.assertNotNull(s9.getUrl());
+        RemoteApplicationTestcaseSettings s10 = new GnattProject();
+        Assert.assertNotNull(s10.getUrl());
+        RemoteApplicationTestcaseSettings s11 = new GeoGebra();
+        Assert.assertNotNull(s11.getUrl());
+
+    }
+}

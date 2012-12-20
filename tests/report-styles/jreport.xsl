@@ -268,6 +268,11 @@ If there is no need for linking, please use value "none" for this variable
                </xsl:otherwise>
              </xsl:choose>
            </xsl:when>
+          </xsl:choose>
+          <xsl:choose>
+           <xsl:when test="@remote">
+             <i><xsl:text> - This test is running remote content, note that failures may be caused by broken taget application or connection</xsl:text></i>
+           </xsl:when>
          </xsl:choose>
          </div>
             </xsl:when>
@@ -277,6 +282,11 @@ If there is no need for linking, please use value "none" for this variable
          <xsl:choose>
            <xsl:when test="@known-to-fail">
              <b><xsl:text> - This test is known to fail</xsl:text></b>
+           </xsl:when>
+         </xsl:choose>
+         <xsl:choose>
+           <xsl:when test="@remote">
+             <i><xsl:text> - This test is running remote content, note that failures may be caused by broken taget application or connection</xsl:text></i>
            </xsl:when>
          </xsl:choose>
          </div>
