@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.cache;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import org.junit.Assert;
 import org.junit.Test;
@@ -61,22 +62,23 @@ public class ResourceTrackerTest {
         }
     }
 
-    private static URL normalizeUrl(URL uRL) throws MalformedURLException, UnsupportedEncodingException {
+    private static URL normalizeUrl(URL uRL) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
         return ResourceTracker.normalizeUrl(uRL, false);
     }
-    public static final int CHANGE_BORDER = 7;
+    public static final int CHANGE_BORDER = 6;
 
     public static URL[] getUrls() throws MalformedURLException {
         URL[] u = {
             /*constant*/
             null,
-            new URL("http://localhost:44321/Spaces%20Can%20Be%20Everyw%2Fhere1.jnlp"),
             new URL("file:///home/jvanek/Desktop/icedtea-web/tests.build/jnlp_test_server/Spaces%20can%20be%20everywhere2.jnlp"),
-            new URL("http://localhost/Spaces+Can+Be+Everywhere1.jnlp"),
             new URL("http://localhost:44321/SpacesCanBeEverywhere1.jnlp"),
             new URL("http:///SpacesCanBeEverywhere1.jnlp"),
             new URL("file://localhost/home/jvanek/Desktop/icedtea-web/tests.build/jnlp_test_server/Spaces can be everywhere2.jnlp"),
+            new URL("http://localhost:44321/testpage.jnlp?applicationID=25"),
             /*changing*/
+            new URL("http://localhost:44321/Spaces%20Can%20Be%20Everyw%2Fhere1.jnlp"),
+            new URL("http://localhost/Spaces+Can+Be+Everywhere1.jnlp"),
             new URL("http://localhost/SpacesC anBeEverywhere1.jnlp?a=5&b=10#df"),
             new URL("http:///oook.jnlp?a=5&b=ahoj šš dd#df"),
             new URL("http://localhost/Spacesěčšžšřýžčřú can !@^*(){}[].jnlp?a=5&ahoj šš dd#df"),
@@ -85,7 +87,7 @@ public class ResourceTrackerTest {
         return u;
     }
 
-    public static URL[] getNormalizedUrls() throws MalformedURLException, UnsupportedEncodingException {
+    public static URL[] getNormalizedUrls() throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
         URL[] u = getUrls();
 
         URL[] n = new URL[u.length];
