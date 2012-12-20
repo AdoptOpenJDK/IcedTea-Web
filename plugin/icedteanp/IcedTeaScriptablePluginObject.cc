@@ -197,7 +197,7 @@ IcedTeaScriptableJavaPackageObject::getPackageName()
 void
 IcedTeaScriptableJavaPackageObject::deAllocate(NPObject *npobj)
 {
-    browser_functions.releaseobject(npobj);
+    delete (IcedTeaScriptableJavaPackageObject*)npobj;
 }
 
 void
@@ -489,7 +489,7 @@ IcedTeaScriptableJavaObject::setIsArray(bool isArray)
 void
 IcedTeaScriptableJavaObject::deAllocate(NPObject *npobj)
 {
-	browser_functions.releaseobject(npobj);
+    delete (IcedTeaScriptableJavaObject*)npobj;
 }
 
 void
