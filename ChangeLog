@@ -1,4 +1,19 @@
-2012-12-18  Jiri Vanek <jvanek@redhat.com>
+2012-12-20  Adam Domurad  <adomurad@redhat.com>
+
+	* tests/cpp-unit-tests/browser_mock.cc
+	(mock_retainobject): New, mocks behaviour of NPAPI retainobject
+	(mock_releaseobject): New, mocks behaviour of NPAPI releaseobject
+	* tests/cpp-unit-tests/main.cc: Add warning of memory leak based on 
+	operator-new.
+	* tests/cpp-unit-tests/IcedTeaScriptablePluginObjectTest.cc: New, tests
+	for memory leak in (IcedTeaScriptableJavaObject::deAllocate) and
+	(IcedTeaScriptableJavaPackageObject::deAllocate)
+	* tests/cpp-unit-tests/checked_allocations.h: Defines set that does not
+	use operator-new, to prevent recursion in overloaded operator-new
+	* tests/cpp-unit-tests/checked_allocations.cc: Operator new overload 
+	that has allocation-set for querying live allocations.
+
+2012-12-20  Jiri Vanek <jvanek@redhat.com>
 
 	Added and applied Remote annotation, added Remote tests:
 	* tests/report-styles/jreport.xsl: and
@@ -13,9 +28,7 @@
 	launcher for remote tests.
 	* tests/test-extensions/net/sourceforge/jnlp/annotations/Remote.java:
 	Implementation of Remote annotation
-	
 
-	
 2012-12-18  Jiri Vanek <jvanek@redhat.com>
 
 	Cleaned unit-tests:

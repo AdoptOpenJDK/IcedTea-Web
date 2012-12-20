@@ -43,8 +43,18 @@
 #include <TestReporter.h>
 
 #include "browser_mock.h"
+#include "checked_allocations.h"
 
 using namespace UnitTest;
+
+static std::string full_testname(const TestDetails& details) {
+    std::string suite = details.suiteName;
+    if (suite == "DefaultSuite") {
+        return details.testName;
+    } else {
+        return suite + "." + details.testName;
+    }
+}
 
 class IcedteaWebUnitTestReporter: public TestReporter {
 public:
@@ -57,13 +67,15 @@ public:
 
     virtual void ReportTestStart(const TestDetails& test) {
         browsermock_clear_state();
+        pretest_allocs = cpp_unfreed_allocations();
         did_finish_correctly = true;
     }
 
     virtual void ReportFailure(const TestDetails& details,
             char const* failure) {
+        std::string testname = full_testname(details);
 
-        printf("FAILED: %s line %d (%s)\n", details.testName,
+        printf("FAILED: %s line %d (%s)\n", testname.c_str(),
                 details.lineNumber, failure);
 
         did_finish_correctly = false;
@@ -72,13 +84,20 @@ public:
     virtual void ReportTestFinish(const TestDetails& details,
             float secondsElapsed) {
 
+        int posttest_allocs = cpp_unfreed_allocations();
+
         if (browsermock_unfreed_allocations() > 0) {
             printf("*** WARNING: Memory leak! %d more NPAPI allocations than frees!\n",
                     browsermock_unfreed_allocations());
         }
+        if (posttest_allocs > pretest_allocs) {
+            printf("*** WARNING: Memory leak! %d more operator 'new' allocations than 'delete's!\n",
+                    posttest_allocs - pretest_allocs);
+        }
 
         if (did_finish_correctly) {
-            printf("Passed: %s\n", details.testName);
+            std::string testname = full_testname(details);
+            printf("Passed: %s\n", testname.c_str());
         }
     }
 
@@ -95,6 +114,7 @@ public:
     }
 
 private:
+    int pretest_allocs;
     bool did_finish_correctly;
 };
 

@@ -34,64 +34,33 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
 
-// Browser mock functions. Add more as needed.
+#include <UnitTest++.h>
 
-#include <cstring>
-#include "checked_allocations.h"
-
-#include "UnitTest++.h"
+#include <npapi.h>
 
 #include "browser_mock.h"
+#include "checked_allocations.h"
 
-#include "IcedTeaNPPlugin.h"
+#include "IcedTeaScriptablePluginObject.h"
 
-static AllocationSet __allocations;
+SUITE(IcedTeaScriptableJavaObject) {
+    TEST(deallocate) {
+        int pre_allocations = cpp_unfreed_allocations();
+        IcedTeaScriptableJavaObject* obj = new IcedTeaScriptableJavaObject(NULL);
+        IcedTeaScriptableJavaObject::deAllocate(obj);
+        int post_allocations = cpp_unfreed_allocations();
 
-// It is expected that these will only run during a unit test
-static void* mock_memalloc(uint32_t size) {
-    void* mem = malloc(size);
-    __allocations.insert(mem);
-    return mem;
-}
-
-static void mock_memfree(void* ptr) {
-    if (__allocations.erase(ptr)) {
-        free(ptr);
-    } else {
-        printf("Attempt to free memory with browserfunctions.memfree that was not allocated by the browser!\n");
-        CHECK(false);
+        CHECK(pre_allocations == post_allocations);
     }
 }
 
-static NPObject* mock_retainobject(NPObject* obj) {
-    obj->referenceCount++;
-    return obj;
-}
+SUITE(IcedTeaScriptableJavaPackageObject) {
+    TEST(deallocate) {
+        int pre_allocations = cpp_unfreed_allocations();
+        IcedTeaScriptableJavaPackageObject* obj = new IcedTeaScriptableJavaPackageObject(NULL);
+        IcedTeaScriptableJavaPackageObject::deAllocate(obj);
+        int post_allocations = cpp_unfreed_allocations();
 
-static void mock_releaseobject(NPObject* obj) {
-    if (--(obj->referenceCount) == 0) {
-        if (obj->_class->deallocate) {
-            obj->_class->deallocate(obj);
-        } else {
-            free(obj);
-        }
+        CHECK(pre_allocations == post_allocations);
     }
-}
-
-void browsermock_setup_functions() {
-    memset(&browser_functions, 0, sizeof(NPNetscapeFuncs));
-
-    browser_functions.memalloc = &mock_memalloc;
-    browser_functions.memfree = &mock_memfree;
-
-    browser_functions.retainobject = &mock_retainobject;
-    browser_functions.releaseobject= &mock_releaseobject;
-}
-
-void browsermock_clear_state() {
-    __allocations.clear();
-}
-
-int browsermock_unfreed_allocations() {
-    return __allocations.size();
 }

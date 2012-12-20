@@ -34,64 +34,44 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
 
-// Browser mock functions. Add more as needed.
+//  Overrides global 'new' operator with one that does error checking.
 
-#include <cstring>
+#include <new>
+
+#include <UnitTest++.h>
 #include "checked_allocations.h"
 
-#include "UnitTest++.h"
+// We keep a set of allocations, that, for obvious reasons, does not itself use the 'new' operator.
+static AllocationSet* __allocations = NULL;
 
-#include "browser_mock.h"
+// Override global definition of new and delete!
+void* operator new(size_t size) throw (std::bad_alloc) {
+    if (!__allocations) {
+        // This uses placement-new, which calls the constructor on a specific memory location
+        // This is needed because we cannot call 'new' in this context, nor can we rely on static-initialization
+        // for the set to occur before any call to 'new'!
+        void* memory = malloc(sizeof(AllocationSet));
+        __allocations = new (memory) AllocationSet();
+    }
 
-#include "IcedTeaNPPlugin.h"
-
-static AllocationSet __allocations;
-
-// It is expected that these will only run during a unit test
-static void* mock_memalloc(uint32_t size) {
     void* mem = malloc(size);
-    __allocations.insert(mem);
+    if (mem == 0) {
+        throw std::bad_alloc(); // ANSI/ISO compliant behavior
+    }
+    __allocations->insert(mem);
     return mem;
 }
 
-static void mock_memfree(void* ptr) {
-    if (__allocations.erase(ptr)) {
+void operator delete(void* ptr) throw () {
+    if (__allocations->erase(ptr)) {
         free(ptr);
     } else {
-        printf("Attempt to free memory with browserfunctions.memfree that was not allocated by the browser!\n");
+        printf(
+                "Attempt to free memory with operator 'delete' that was not allocated by 'new'!\n");
         CHECK(false);
     }
 }
 
-static NPObject* mock_retainobject(NPObject* obj) {
-    obj->referenceCount++;
-    return obj;
-}
-
-static void mock_releaseobject(NPObject* obj) {
-    if (--(obj->referenceCount) == 0) {
-        if (obj->_class->deallocate) {
-            obj->_class->deallocate(obj);
-        } else {
-            free(obj);
-        }
-    }
-}
-
-void browsermock_setup_functions() {
-    memset(&browser_functions, 0, sizeof(NPNetscapeFuncs));
-
-    browser_functions.memalloc = &mock_memalloc;
-    browser_functions.memfree = &mock_memfree;
-
-    browser_functions.retainobject = &mock_retainobject;
-    browser_functions.releaseobject= &mock_releaseobject;
-}
-
-void browsermock_clear_state() {
-    __allocations.clear();
-}
-
-int browsermock_unfreed_allocations() {
-    return __allocations.size();
+int cpp_unfreed_allocations() {
+    return __allocations->size();
 }

@@ -34,64 +34,21 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
 
-// Browser mock functions. Add more as needed.
+//  Overrides global 'new' operator with one that does error checking.
 
-#include <cstring>
-#include "checked_allocations.h"
+#ifndef CHECKED_ALLOCATIONS_H_
+#define CHECKED_ALLOCATIONS_H_
 
-#include "UnitTest++.h"
+#include <set>
+#include <cstdio>
+#include <exception>
+#include <memory>
+#include <cstdlib>
+#include <ext/malloc_allocator.h> //GNU extension
 
-#include "browser_mock.h"
+// Plays nice with custom-defined operator new
+typedef std::set<void*, std::less<void*>, __gnu_cxx::malloc_allocator<void*> > AllocationSet;
 
-#include "IcedTeaNPPlugin.h"
+int cpp_unfreed_allocations();
 
-static AllocationSet __allocations;
-
-// It is expected that these will only run during a unit test
-static void* mock_memalloc(uint32_t size) {
-    void* mem = malloc(size);
-    __allocations.insert(mem);
-    return mem;
-}
-
-static void mock_memfree(void* ptr) {
-    if (__allocations.erase(ptr)) {
-        free(ptr);
-    } else {
-        printf("Attempt to free memory with browserfunctions.memfree that was not allocated by the browser!\n");
-        CHECK(false);
-    }
-}
-
-static NPObject* mock_retainobject(NPObject* obj) {
-    obj->referenceCount++;
-    return obj;
-}
-
-static void mock_releaseobject(NPObject* obj) {
-    if (--(obj->referenceCount) == 0) {
-        if (obj->_class->deallocate) {
-            obj->_class->deallocate(obj);
-        } else {
-            free(obj);
-        }
-    }
-}
-
-void browsermock_setup_functions() {
-    memset(&browser_functions, 0, sizeof(NPNetscapeFuncs));
-
-    browser_functions.memalloc = &mock_memalloc;
-    browser_functions.memfree = &mock_memfree;
-
-    browser_functions.retainobject = &mock_retainobject;
-    browser_functions.releaseobject= &mock_releaseobject;
-}
-
-void browsermock_clear_state() {
-    __allocations.clear();
-}
-
-int browsermock_unfreed_allocations() {
-    return __allocations.size();
-}
+#endif /* CHECKED_ALLOCATIONS_H_ */
