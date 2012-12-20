@@ -27,10 +27,11 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -1143,115 +1144,29 @@ public class ResourceTracker {
         }
     };
 
-    private static String normalizeChunk(String base, boolean debug) throws UnsupportedEncodingException {
-        if (base == null) {
-            return base;
-        }
-        if ("".equals(base)) {
-            return base;
-        }
-        String result = base;
-        String ssE = URLDecoder.decode(base, UTF8);
-        //            System.out.println("*" + base + "*");
-        //            System.out.println("-" + ssE + "-");
-        if (base.equals(ssE)) {
-            result = URLEncoder.encode(base, UTF8);
-            if (debug) {
-                System.out.println(base + " chunk needs to be encoded => " + result);
-            }
-        } else {
-            if (debug) {
-                System.out.println(base + " chunk already encoded");
-            }
-        }
-        return result;
-    }
-
-    public static URL normalizeUrl(URL u, boolean debug) throws MalformedURLException, UnsupportedEncodingException {
+    public static URL normalizeUrl(URL u, boolean debug) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
         if (u == null) {
             return null;
         }
         String protocol = u.getProtocol();
+
         if (protocol == null || "file".equals(protocol)) {
             return u;
         }
-        String file = u.getPath();
-        if (file == null) {
+
+        if (u.getPath() == null) {
             return u;
         }
-        String host = u.getHost();
-        String ref = u.getRef();
-        int port = u.getPort();
-        String query = u.getQuery();
-        String[] qq = {};
-        if (query != null) {
-            qq = query.split(QUERY_DELIMITER);
-        }
-        String[] ss = file.split(PATH_DELIMITER);
-        int normalized = 0;
-        if (debug) {
-            System.out.println("normalizing path " + file + " in " + u.toString());
-        }
-        for (int i = 0; i < ss.length; i++) {
-            String base = ss[i];
-            String r = normalizeChunk(base, debug);
-            if (!r.equals(ss[i])) {
-                normalized++;
-            }
-            ss[i] = r;
-        }
-        if (debug) {
-            System.out.println("normalizing query " + query + " in " + u.toString());
-        }
-        for (int i = 0; i < qq.length; i++) {
-            String base = qq[i];
-            String r = normalizeChunk(base, debug);
-            if (!r.equals(qq[i])) {
-                normalized++;
-            }
-            qq[i] = r;
-        }
-        if (normalized == 0) {
-            if (debug) {
-                System.out.println("Nothing was normalized in this url");
-            }
-            return u;
-        } else {
-            if (debug) {
-                System.out.println(normalized + " chunks normalized, rejoining url");
-            }
-        }
-        StringBuilder composed = new StringBuilder("");
-        for (int i = 0; i < ss.length; i++) {
-            String string = ss[i];
-            if (ss.length <= 1 || (string != null && !"".equals(string))) {
-                composed.append(PATH_DELIMITER_MARK).append(string);
-            }
-        }
-        String composed1 = composed.toString();
-        if (query != null && !query.trim().equals("")) {
-            composed.append(QUERY_MARK);
-            for (int i = 0; i < qq.length; i++) {
-                String string = qq[i];
-                if ((string != null && !"".equals(string))) {
-                    composed.append(string);
-                    if (i != qq.length - 1) {
-                        composed.append(QUERY_DELIMITER_MARK);
-                    }
-                }
-            }
-        }
-        String composed2 = composed.substring(composed1.length() - 1);
-        if (ref != null && !ref.trim().equals("")) {
-            composed.append(HREF_MARK).append(ref);
-        }
 
-        URL result = new URL(protocol, host, port, composed.toString());
+        //Decode the URL before encoding
+        URL decodedURL = new URL(URLDecoder.decode(u.toString(), UTF8));
 
-        if (debug) {
-            System.out.println("normalized `" + composed1 + "` and `" + composed2 + "` in " + result.toString());
-        }
-        return result;
+        //Create URI with the decoded URL
+        URI uri = new URI(decodedURL.getProtocol(), null, decodedURL.getHost(), decodedURL.getPort(), decodedURL.getPath(), decodedURL.getQuery(), null);
 
+        //Returns the encoded URL
+        URL encodedURL = new URL(uri.toASCIIString());
+
+        return encodedURL;
     }
 }

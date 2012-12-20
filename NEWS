@@ -28,6 +28,7 @@ New in release 1.4 (2012-XX-XX):
   - PR1161: X509VariableTrustManager does not work correctly with OpenJDK7
   - PR822: Applets fail to load if jars have different signers
   - PR1186: System.getProperty("deployment.user.security.trusted.cacerts") is null
+  - PR909: The Java applet at http://de.gosupermodel.com/games/wardrobegame.jsp fails
 
 New in release 1.3 (2012-XX-XX):
 * NetX
