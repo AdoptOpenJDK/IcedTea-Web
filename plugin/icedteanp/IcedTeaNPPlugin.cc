@@ -154,10 +154,10 @@ static NS_DEFINE_IID (kIPluginTagInfo2IID, NS_IPLUGINTAGINFO2_IID);
 #endif
 
 // Data directory for plugin.
-static gchar* data_directory = NULL;
+static std::string data_directory;
 
 // Fully-qualified appletviewer executable.
-static gchar* appletviewer_executable = NULL;
+static const char* appletviewer_executable = ICEDTEA_WEB_JRE "/bin/java";
 
 // Applet viewer input channel (needs to be static because it is used in plugin_in_pipe_callback)
 static GIOChannel* in_from_appletviewer = NULL;
@@ -243,7 +243,7 @@ void plugin_send_initialization_message(char* instance, gulong handle,
                                                int width, int height,
                                                char* url);
 /* Returns JVM options set in itw-settings */
-static std::vector<std::string*>* get_jvm_args();
+std::vector<std::string*>* get_jvm_args();
 
 // Global instance counter.
 // Mutex to protect plugin_instance_counter.
@@ -469,7 +469,7 @@ void start_jvm_if_needed()
 
   // in_pipe_name
   in_pipe_name = g_strdup_printf ("%s/%d-icedteanp-appletviewer-to-plugin",
-                                         data_directory, getpid());
+                                         data_directory.c_str(), getpid());
   if (!in_pipe_name)
     {
       PLUGIN_ERROR ("Failed to create input pipe name.");
@@ -496,7 +496,7 @@ void start_jvm_if_needed()
 
   // out_pipe_name
   out_pipe_name = g_strdup_printf ("%s/%d-icedteanp-plugin-to-appletviewer",
-                                         data_directory, getpid());
+                                         data_directory.c_str(), getpid());
 
   if (!out_pipe_name)
     {
@@ -1671,7 +1671,7 @@ plugin_start_appletviewer (ITNPPluginData* data)
 /*
  * Returns JVM options set in itw-settings
  */
-static std::vector<std::string*>*
+std::vector<std::string*>*
 get_jvm_args()
 {
   std::vector < std::string> commands;
@@ -1695,6 +1695,7 @@ get_jvm_args()
   {
     PLUGIN_ERROR("Failed to get JVM arguments set for plugin.");
     output = NULL;
+    return NULL;
   }
 
   tokenOutput = IcedTeaPluginUtilities::strSplit(output, " \n");
@@ -2146,91 +2147,67 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   if (initialized)
     return NPERR_NO_ERROR;
 
+  NPError np_error = NPERR_NO_ERROR;
+
   // Make sure the plugin data directory exists, creating it if
   // necessary.
-  data_directory = g_strconcat (P_tmpdir, NULL);
-  if (!data_directory)
-    {
-      PLUGIN_ERROR ("Failed to create data directory name.");
-      return NPERR_OUT_OF_MEMORY_ERROR;
-    }
-  NPError np_error = NPERR_NO_ERROR;
-  gchar* filename = NULL;
 
-  // If P_tmpdir does not exist, try /tmp directly
-
-  if (!g_file_test (data_directory,
+  const char* tmpdir_env = getenv("TMPDIR");
+  if (tmpdir_env != NULL && g_file_test (tmpdir_env,
                     (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
     {
-      int file_error = 0;
-
-      data_directory = g_strconcat ("/tmp", NULL);
-        if (!data_directory)
-          {
-            PLUGIN_ERROR ("Failed to create data directory name.");
-            return NPERR_OUT_OF_MEMORY_ERROR;
-          }
-
+      data_directory = tmpdir_env;
+    }
+  else if (g_file_test (P_tmpdir,
+                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+    {
+      data_directory = P_tmpdir;
+    }
+  else
+    {
+      // If TMPDIR and P_tmpdir do not exist, try /tmp directly
+      data_directory = "/tmp";
     }
 
-  data_directory = g_strconcat (data_directory, "/icedteaplugin-", getenv("USER"), NULL);
-
-  if (!data_directory)
-  {
-      PLUGIN_ERROR ("Failed to create data directory name.");
-      return NPERR_OUT_OF_MEMORY_ERROR;
-  }
+  data_directory += "/icedteaplugin-";
+  if (getenv("USER") != NULL)
+      data_directory += getenv("USER");
 
   // Now create a icedteaplugin subdir
-  if (!g_file_test (data_directory,
+  if (!g_file_test (data_directory.c_str(),
                     (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
     {
       int file_error = 0;
 
-      file_error = g_mkdir (data_directory, 0700);
+      file_error = g_mkdir (data_directory.c_str(), 0700);
       if (file_error != 0)
         {
           PLUGIN_ERROR_THREE ("Failed to create data directory",
-                          data_directory,
+                          data_directory.c_str(),
                           strerror (errno));
-          np_error = NPERR_GENERIC_ERROR;
-          goto cleanup_data_directory;
+          return NPERR_GENERIC_ERROR;
         }
     }
 
 
-  // If data directory doesn't exit by this point, bail
-  if (!g_file_test (data_directory,
+  // If data directory doesn't exist by this point, bail
+  if (!g_file_test (data_directory.c_str(),
                     (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
     {
       PLUGIN_ERROR_THREE ("Temp directory does not exist: ",
-                          data_directory,
+                          data_directory.c_str(),
                           strerror (errno));
-
-      np_error = NPERR_GENERIC_ERROR;
-            goto cleanup_data_directory;
-
+      return NPERR_GENERIC_ERROR;
     }
 
   // Set appletviewer_executable.
-  filename = g_strdup(ICEDTEA_WEB_JRE);
-  appletviewer_executable = g_strdup_printf ("%s/bin/java",
-                                             filename);
   PLUGIN_DEBUG("Executing java at %s\n", appletviewer_executable);
-  if (!appletviewer_executable)
-    {
-      PLUGIN_ERROR ("Failed to create appletviewer executable name.");
-      np_error = NPERR_OUT_OF_MEMORY_ERROR;
-      goto cleanup_filename;
-    }
-
   np_error = plugin_test_appletviewer ();
   if (np_error != NPERR_NO_ERROR)
     {
       plugin_display_failure_dialog ();
-      goto cleanup_appletviewer_executable;
+      return np_error;
     }
-  g_free (filename);
 
   initialized = true;
 
@@ -2266,30 +2243,6 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   PLUGIN_DEBUG ("NP_Initialize return\n");
 
   return NPERR_NO_ERROR;
-
- cleanup_appletviewer_executable:
-  if (appletviewer_executable)
-    {
-      g_free (appletviewer_executable);
-      appletviewer_executable = NULL;
-    }
-
- cleanup_filename:
-  if (filename)
-    {
-      g_free (filename);
-      filename = NULL;
-    }
-
- cleanup_data_directory:
-  if (data_directory)
-    {
-      g_free (data_directory);
-      data_directory = NULL;
-    }
-
-
-  return np_error;
 }
 
 // Returns a string describing the MIME type that this plugin
@@ -2356,18 +2309,6 @@ NP_Shutdown (void)
     {
       g_mutex_free (plugin_instance_mutex);
       plugin_instance_mutex = NULL;
-    }
-
-  if (data_directory)
-    {
-      g_free (data_directory);
-      data_directory = NULL;
-    }
-
-  if (appletviewer_executable)
-    {
-      g_free (appletviewer_executable);
-      appletviewer_executable = NULL;
     }
 
   // stop the appletviewer
