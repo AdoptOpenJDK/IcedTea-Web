@@ -188,7 +188,15 @@ public class RemoteApplicationSettings {
         }
     }
 
-    public static class AviationWeather extends NoOutputs {
+    public static class AviationWeather extends StringBasedURL {
+
+        @Override
+        public void evaluate(ProcessResult pr) {
+            Assert.assertTrue(stdoutEmpty, pr.stdout.length() == 0);
+            Assert.assertTrue(pr.stderr.length() == 0 || (pr.stderr.contains("Cannot read File Manager history data file,")
+                    && pr.stderr.contains("FileMgr will be initialized with default options")));
+
+        }
 
         public AviationWeather() {
             super("http://aviationweather.gov/static/adds/java/fpt/fpt.jnlp");

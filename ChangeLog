@@ -1,3 +1,10 @@
+2012-12-21  Jiri Vanek <jvanek@redhat.com>
+
+	Forgotten condition for AviationWeather first run:
+	* tests/reproducers/custom/remote/testcases/RemoteApplicationSettings.java:
+	(AviationWeather) added condition for first run when creation of
+	FileManager is written to stderr.
+
 2012-12-20  Saad Mohammad  <smohammad@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:
