@@ -1,3 +1,13 @@
+2012-12-21  Jiri Vanek  <jvanek@redhat.com>
+
+	Minor fix for possible NPE (non fatal) during splashscreen creation
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	* netx/net/sourceforge/jnlp/resources/Messages_cs_CZ.properties:
+	Added messages for user (SPLASHdefaultHomepage)
+	(SPLASHerrorInInformation)(SPLASHmissingInformation).
+	* netx/net/sourceforge/jnlp/splashscreen/parts/InformationElement.java
+	(createFromJNLP) catch of NPE replaced by conditions with proper messages.
+
 2012-12-21  Jiri Vanek <jvanek@redhat.com>
 
 	Forgotten condition for AviationWeather first run:

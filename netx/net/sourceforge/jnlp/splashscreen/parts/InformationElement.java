@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.Translator;
 
 /**
  * This class is wrapper arround <information> tag which should
@@ -193,12 +194,31 @@ public class InformationElement {
     }
 
     public static InformationElement createFromJNLP(JNLPFile file) {
-        if (file == null) {
-            return null;
-        }
         try {
+            if (file == null) {
+                String message = Translator.R(InfoItem.SPLASH + "errorInInformation");
+                InformationElement ie = new InformationElement();
+                ie.setHomepage("");
+                ie.setTitle(message);
+                ie.setvendor("");
+                ie.addDescription(message);
+                return ie;
+            }
+            if (file.getInformation() == null) {
+                String message = Translator.R(InfoItem.SPLASH + "missingInformation");
+                InformationElement ie = new InformationElement();
+                ie.setHomepage("");
+                ie.setTitle(message);
+                ie.setvendor("");
+                ie.addDescription(message);
+                return ie;
+            }
             InformationElement ie = new InformationElement();
-            ie.setHomepage(file.getInformation().getHomepage().toString());
+            String homePage = Translator.R(InfoItem.SPLASH + "defaultHomepage");
+            if (file.getInformation().getHomepage() != null) {
+                homePage = file.getInformation().getHomepage().toString();
+            }
+            ie.setHomepage(homePage);
             ie.setTitle(file.getInformation().getTitle());
             ie.setvendor(file.getInformation().getVendor());
             ie.addDescription(file.getInformation().getDescriptionStrict((String) (InformationDesc.DEFAULT)));
@@ -208,7 +228,13 @@ public class InformationElement {
             return ie;
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            String message = Translator.R(InfoItem.SPLASH + "errorInInformation");
+            InformationElement ie = new InformationElement();
+            ie.setHomepage("");
+            ie.setTitle(message);
+            ie.setvendor("");
+            ie.addDescription(ex.getMessage());
+            return ie;
         }
     }
 }
