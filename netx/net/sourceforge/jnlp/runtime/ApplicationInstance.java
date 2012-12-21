@@ -171,6 +171,9 @@ public class ApplicationInstance {
      * @return true if a desktop shortcut should be created
      */
     private boolean shouldCreateShortcut(ShortcutDesc sd) {
+        if (JNLPRuntime.isTrustAll()) {
+            return true;
+        }
         String currentSetting = JNLPRuntime.getConfiguration()
                 .getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT);
         boolean createShortcut = false;

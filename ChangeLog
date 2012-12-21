@@ -1,5 +1,11 @@
 2012-12-21  Jiri Vanek  <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java
+	(shouldCreateShortcut) added handling of xtrustall during asking for
+	desktop icon creation
+
+2012-12-21  Jiri Vanek  <jvanek@redhat.com>
+
 	Minor fix for possible NPE (non fatal) during splashscreen creation
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
 	* netx/net/sourceforge/jnlp/resources/Messages_cs_CZ.properties:
