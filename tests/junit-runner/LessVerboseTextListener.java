@@ -136,7 +136,7 @@ public class LessVerboseTextListener extends RunListener {
         try {
             Remote rem = getRemote(description);
             if (rem != null) {
-                writer.println(" - This test is running remote content, note that failures may be caused by broken taget application or connection");
+                writer.println(" - This test is running remote content, note that failures may be caused by broken target application or connection");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
