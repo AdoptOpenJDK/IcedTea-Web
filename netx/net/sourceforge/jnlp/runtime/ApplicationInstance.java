@@ -172,7 +172,7 @@ public class ApplicationInstance {
      */
     private boolean shouldCreateShortcut(ShortcutDesc sd) {
         if (JNLPRuntime.isTrustAll()) {
-            return true;
+            return (sd != null && sd.onDesktop());
         }
         String currentSetting = JNLPRuntime.getConfiguration()
                 .getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT);
