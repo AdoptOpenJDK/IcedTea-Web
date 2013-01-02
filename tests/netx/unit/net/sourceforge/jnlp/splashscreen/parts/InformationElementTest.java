@@ -221,7 +221,7 @@ public class InformationElementTest {
     public void createFromJNLP() throws UnsupportedEncodingException, ParseException {
         JNLPFile jnlpFile0 = null;
         InformationElement ie0 = InformationElement.createFromJNLP(jnlpFile0);
-        Assert.assertNull(ie0);
+        Assert.assertNotNull(ie0);
         String exJnlp1 = "<jnlp>this is invalid jnlp<jnlp>";
         Exception ex = null;
         JNLPFile jnlpFile1 = null;

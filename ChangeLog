@@ -1,3 +1,10 @@
+2013-01-02  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed unittest for InformationElement.
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/parts/InformationElementTest.java:
+	(createFromJNLP) now asserts NotNull instead of IsNull as result of
+	"Minor fix for possible NPE (non fatal) during splashscreen creation"
+
 2012-12-21  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: Remove need for 'goto' in 
