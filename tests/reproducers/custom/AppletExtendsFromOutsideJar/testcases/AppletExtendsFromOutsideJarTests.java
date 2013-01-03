@@ -36,6 +36,7 @@ exception statement from your version.
  */
 
 import net.sourceforge.jnlp.ProcessResult;
+import net.sourceforge.jnlp.ServerAccess.AutoClose;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
@@ -55,7 +56,7 @@ public class AppletExtendsFromOutsideJarTests extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.one })
     @Bug(id = "PR920")
     public void testClassInAppletFolder() throws Exception {
-        ProcessResult pr = server.executeBrowser("/AppletExtendsFromOutsideJar.html");
+        ProcessResult pr = server.executeBrowser("/AppletExtendsFromOutsideJar.html", AutoClose.CLOSE_ON_BOTH);
 
         Assert.assertFalse("Linkage error should not occur but did!", pr.stderr.contains(LINKAGE_ERROR_OCCURRENCE));
         Assert.assertTrue("Expected '" + APPLET_RUNNING + "', stdout was: " + pr.stdout, pr.stdout.contains(APPLET_RUNNING));

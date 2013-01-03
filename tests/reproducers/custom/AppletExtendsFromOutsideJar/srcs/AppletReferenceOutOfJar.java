@@ -42,6 +42,7 @@ public class AppletReferenceOutOfJar extends AppletReferenceInSameJar {
 	Referenced outOfJarReference = new Referenced();
 
 	public void init() {
-		System.out.println("My simple applet is running.");
+        System.out.println("My simple applet is running.");
+        System.out.println("*** APPLET FINISHED ***");
 	}
 }

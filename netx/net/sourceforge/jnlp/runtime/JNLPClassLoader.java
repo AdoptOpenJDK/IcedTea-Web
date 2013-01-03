@@ -1704,7 +1704,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // Try codebase loader
         if (codeBaseLoader != null)
-            return codeBaseLoader.findClass(name);
+            return codeBaseLoader.findClassNonRecursive(name);
 
         // All else failed. Throw CNFE
         throw new ClassNotFoundException(name);
@@ -2287,8 +2287,7 @@ public class JNLPClassLoader extends URLClassLoader {
             super.addURL(url); 
         }
 
-        @Override
-        public Class<?> findClass(String name) throws ClassNotFoundException {
+        Class<?> findClassNonRecursive(String name) throws ClassNotFoundException {
             // If we have searched this path before, don't try again
             if (Arrays.equals(super.getURLs(), notFoundResources.get(name)))
                 throw new ClassNotFoundException(name);
@@ -2308,6 +2307,12 @@ public class JNLPClassLoader extends URLClassLoader {
                 notFoundResources.put(name, super.getURLs());
                 throw new ClassNotFoundException("Could not find class " + name, njf);
             }
+        }
+
+        @Override
+        public Class<?> findClass(String name) throws ClassNotFoundException {
+            // Calls JNLPClassLoader#findClass which may call into this.findClassNonRecursive
+            return getParentJNLPClassLoader().findClass(name);
         }
 
         /**

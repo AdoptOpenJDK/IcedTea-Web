@@ -1,3 +1,16 @@
+2013-01-03  Adam Domurad  <adomurad@redhat.com>
+
+	Fix breakage in unit test CodeBaseClassLoaderTest.testParentClassLoaderIsAskedForClassesApplication
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(CodeBaseClassLoader#findClassNonRecursive): New, call into
+	URLClassLoader#findClass
+	(CodeBaseClassLoader#findClass): Delegate JNLPClassLoader#findClass
+	(JNLPClassLoader#findClass): Call CodeBaseClassLoader#findClassNonRecursive
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/srcs/AppletReferenceOutOfJar.java
+	(init): Add applet finish message.
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/testcases/AppletExtendsFromOutsideJarTests.java
+	(testClassInAppletFolder): Close quickly on applet finish message.
+
 2013-01-02  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed unittest for InformationElement.
