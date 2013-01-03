@@ -232,7 +232,7 @@ public class InformationElementTest {
         }
         Assert.assertNotNull(ex);
         InformationElement ie1 = InformationElement.createFromJNLP(jnlpFile1);
-        Assert.assertNull(ie1);
+        Assert.assertNotNull(ie1);
 
         //title, vendor and homepage are obligatory.. not so much to test
         String exJnlp2 = testJnlpheader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + testJnlpFooter;
