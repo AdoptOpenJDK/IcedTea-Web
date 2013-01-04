@@ -1014,9 +1014,10 @@ public class PluginAppletViewer extends XEmbeddedFrame
     }
 
     public static void setMember(long internal, String name, Object value) {
-        System.err.println("Setting to class " + value.getClass() + ":" + value.getClass().isPrimitive());
-        AppletSecurityContextManager.getSecurityContext(0).store(name);
-        int nameID = AppletSecurityContextManager.getSecurityContext(0).getIdentifier(name);
+        PluginDebug.debug("Setting to class " + value.getClass() + ":" + value.getClass().isPrimitive());
+        PluginAppletSecurityContext securityContext = AppletSecurityContextManager.getSecurityContext(0);
+        securityContext.store(name);
+        int nameID = securityContext.getIdentifier(name);
         Long reference = getRequestIdentifier();
 
         // work on a copy of value, as we don't want to be manipulating
@@ -1072,7 +1073,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     // FIXME: handle long index as well.
     public static void setSlot(long internal, int index, Object value) {
-        AppletSecurityContextManager.getSecurityContext(0).store(value);
+        PluginAppletSecurityContext securityContext = AppletSecurityContextManager.getSecurityContext(0);
+        securityContext.store(value);
         Long reference = getRequestIdentifier();
 
         // work on a copy of value, as we don't want to be manipulating

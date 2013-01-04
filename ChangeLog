@@ -1,3 +1,14 @@
+2013-01-04  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java:
+	Code-formatting fixes and cosmetic changes.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	Same.
+	* tests/reproducers/simple/JSObjectFromEval/srcs/JSObjectFromEval.java:
+	Same.
+	* tests/reproducers/simple/JSObjectFromEval/testcases/JSObjectFromEvalTest.java:
+	Same.
+
 2013-01-03  Adam Domurad  <adomurad@redhat.com>
 
 	Fix breakage in unit test CodeBaseClassLoaderTest.testParentClassLoaderIsAskedForClassesApplication

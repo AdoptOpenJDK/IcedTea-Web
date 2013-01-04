@@ -53,13 +53,16 @@ import java.security.Permissions;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import netscape.javascript.JSObject;
 import netscape.javascript.JSObjectCreatePermission;
+import netscape.javascript.JSUtil;
 
 class Signature {
     private String signature;
@@ -489,9 +492,7 @@ public class PluginAppletSecurityContext {
                 final Object fValue = MethodOverloadResolver.getCostAndCastedObject(value, f.getType())[1];
 
                 AccessControlContext acc = callContext != null ? callContext : getClosedAccessControlContext();
-                checkPermission(src,
-                                                message.startsWith("SetStaticField") ? (Class) o : o.getClass(),
-                                                acc);
+                checkPermission(src, message.startsWith("SetStaticField") ? (Class) o : o.getClass(), acc);
 
                 Object ret = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                     public Object run() {
@@ -514,8 +515,9 @@ public class PluginAppletSecurityContext {
                 Integer arrayID = parseCall(args[1], null, Integer.class);
                 Integer index = parseCall(args[2], null, Integer.class);
 
-                Object ret = Array.get(store.getObject(arrayID), index);
-                Class retClass = store.getObject(arrayID).getClass().getComponentType(); // prevent auto-boxing influence
+                Object array = store.getObject(arrayID);
+                Object ret = Array.get(array, index);
+                Class<?> retClass = array.getClass().getComponentType(); // prevent auto-boxing influence
 
                 if (ret == null) {
                     write(reference, "GetObjectArrayElement literalreturn null");

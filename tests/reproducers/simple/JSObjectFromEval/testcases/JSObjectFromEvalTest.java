@@ -37,10 +37,11 @@ exception statement from your version.
 
 import static org.junit.Assert.assertTrue;
 
+import net.sourceforge.jnlp.annotations.KnownToFail;
+
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess.AutoClose;
 import net.sourceforge.jnlp.annotations.Bug;
-import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
@@ -51,40 +52,38 @@ import org.junit.Test;
 
 public class JSObjectFromEvalTest extends BrowserTest {
 
-	private static final String END_STRING = AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING;
+    private static final String END_STRING = AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING;
 
-	private static final String JAVA_CREATE = "Java create\n";
-	private static final String JS_CREATE = "JS create\n";
-	private static final String JAVA_SET = "Java set\n";
-	private static final String PASSED_INTEGER = "setJSMember: passed 'java.lang.Integer'\n";
-	private static final String CORRECT_VALUE = "obj.test = 0";
+    private static final String JAVA_CREATE = "Java create\n";
+    private static final String JS_CREATE = "JS create\n";
+    private static final String JAVA_SET = "Java set\n";
+    private static final String CORRECT_VALUE = "obj.test = 0";
 
-	@Test
-	@TestInBrowsers(testIn = { Browsers.all })
-	@NeedsDisplay
-	@Bug(id = { "PR1198" })
-	@KnownToFail
-	public void testJSObjectSetMemberIsSet() throws Exception {
-		ProcessResult pr = server.executeBrowser("/JSObjectFromEval.html",
-				AutoClose.CLOSE_ON_BOTH);
+    @Test
+    @TestInBrowsers(testIn = { Browsers.all })
+    @NeedsDisplay
+    @KnownToFail
+    @Bug(id = { "PR1198" })
+    public void testJSObjectSetMemberIsSet() throws Exception {
+        ProcessResult pr = server.executeBrowser("/JSObjectFromEval.html",
+                AutoClose.CLOSE_ON_BOTH);
 
-		String expectedJSCreateOutput = JS_CREATE + JAVA_SET + PASSED_INTEGER
-				+ CORRECT_VALUE;
-		String expectedJavaCreateOutput = JAVA_CREATE + JAVA_SET
-				+ PASSED_INTEGER + CORRECT_VALUE;
+        String expectedJSCreateOutput = JS_CREATE + JAVA_SET + CORRECT_VALUE;
+        String expectedJavaCreateOutput = JAVA_CREATE + JAVA_SET
+                + CORRECT_VALUE;
 
-		// No reason JS create should fail, this is mostly a sanity check:
-		assertTrue("stdout should contain 'JS create [...] " + CORRECT_VALUE
-				+ "' but did not.", pr.stdout.contains(expectedJSCreateOutput));
+        // No reason JS create should fail, this is mostly a sanity check:
+        assertTrue("stdout should contain 'JS create [...] " + CORRECT_VALUE
+                + "' but did not.", pr.stdout.contains(expectedJSCreateOutput));
 
-		// Demonstrates PR1198:
-		assertTrue("stdout should contain 'Java create [...] " + CORRECT_VALUE
-				+ "' but did not.",
-				pr.stdout.contains(expectedJavaCreateOutput));
+        // Demonstrates PR1198:
+        assertTrue("stdout should contain 'Java create [...] " + CORRECT_VALUE
+                + "' but did not.",
+                pr.stdout.contains(expectedJavaCreateOutput));
 
-		// Make sure we got to the end of the script
-		assertTrue("stdout should contain '" + END_STRING + "' but did not.",
-				pr.stdout.contains(END_STRING));
-	}
+        // Make sure we got to the end of the script
+        assertTrue("stdout should contain '" + END_STRING + "' but did not.",
+                pr.stdout.contains(END_STRING));
+    }
 
 }

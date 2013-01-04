@@ -55,8 +55,6 @@ public class JSObjectFromEval extends Applet {
 	}
 
 	public void setJSMember(JSObject js, String memb, Object val) {
-		String typeName = val.getClass().getName();
-		System.out.println("setJSMember: passed '" + typeName + "'");
 		js.setMember(memb, val);
 	}
 }
