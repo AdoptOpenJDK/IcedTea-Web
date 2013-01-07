@@ -1,3 +1,8 @@
+2013-01-07  Deepak Bhole <dbhole@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Converted to
+	Unix format.
+
 2013-01-04  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java:
