@@ -1,3 +1,11 @@
+2013-01-09  Jiri Vanek  <jvanek@redhat.com>
+
+	Logging methods made synchronized
+	* tests/test-extensions/net/sourceforge/jnlp/LoggingBottleneck.java:
+	(processLogs) (getDefaultLoggingBottleneck) (writeXmlLog) (addToXmlLog)
+	(modifyMethodWithForBrowser) (setLoggedBrowser) (logIntoPlaintextLog)
+	made synchronised
+
 2013-01-07  Deepak Bhole <dbhole@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Converted to
