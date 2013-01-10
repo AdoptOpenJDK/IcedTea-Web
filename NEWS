@@ -16,6 +16,7 @@ New in release 1.4 (2012-XX-XX):
   - CVE-2012-3423, RH841345: Incorrect handling of not 0-terminated strings
 * NetX
   - PR1027: DownloadService is not supported by IcedTea-Web
+  - PR725: JNLP applications will prompt for creating desktop shortcuts every time they are run
 * Plugin
   - PR1106: Buffer overflow in plugin table-
   - PR1166: Embedded JNLP File is not supported in applet tag

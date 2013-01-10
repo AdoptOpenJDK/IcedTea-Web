@@ -1,5 +1,25 @@
 2013-01-09  Jiri Vanek  <jvanek@redhat.com>
 
+	First part of fix of recreating desktop icon
+	* NEWS: mentioned PR725
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java:
+	(addMenuAndDesktopEntries)added check for already existing icon
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: Added methods for
+	digging the already existing icon from system
+	(getShortcutTmpFile) tmpfile fo generating the desktop icon
+	(getDesktopIconName) for getting filename from application title
+	(findFreedesktopOrgDesktopPathCatch) public method to find final desktop file
+	(findFreedesktopOrgDesktopPath)  to get into ~/.config/user-dirs.dirs
+	(getFreedesktopOrgDesktopPathFrom) to find XDG_DESKTOP_DIR value
+	(filterQuotes) to handle simple quotations
+	(evaluateLinuxVariables) to handle possible variables in XDG_DESKTOP_DIR
+	value	
+	* tests/netx/unit/net/sourceforge/jnlp/util/XDesktopEntryTest.java:
+	New tests focused on parsing of desktop location from stream (variables
+	and quotations)
+
+2013-01-09  Jiri Vanek  <jvanek@redhat.com>
+
 	Logging methods made synchronized
 	* tests/test-extensions/net/sourceforge/jnlp/LoggingBottleneck.java:
 	(processLogs) (getDefaultLoggingBottleneck) (writeXmlLog) (addToXmlLog)

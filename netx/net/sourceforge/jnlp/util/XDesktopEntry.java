@@ -16,16 +16,25 @@
 
 package net.sourceforge.jnlp.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -78,7 +87,7 @@ public class XDesktopEntry {
 
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
-        fileContents += "Name=" + sanitize(file.getTitle()) + "\n";
+        fileContents += "Name=" + getDesktopIconName() + "\n";
         fileContents += "GenericName=Java Web Start Application\n";
         fileContents += "Comment=" + sanitize(file.getInformation().getDescription()) + "\n";
         fileContents += "Type=Application\n";
@@ -122,6 +131,12 @@ public class XDesktopEntry {
         return iconSize;
     }
 
+    public File getShortcutTmpFile() {
+        String userTmp = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_TMP_DIR);
+        File shortcutFile = new File(userTmp + File.separator + FileUtils.sanitizeFileName(file.getTitle()) + ".desktop");
+        return shortcutFile;
+    }
+
     /**
      * Set the icon size to use for the desktop shortcut
      *
@@ -148,9 +163,7 @@ public class XDesktopEntry {
      * Install this XDesktopEntry into the user's desktop as a launcher
      */
     private void installDesktopLauncher() {
-        File shortcutFile = new File(JNLPRuntime.getConfiguration()
-                .getProperty(DeploymentConfiguration.KEY_USER_TMP_DIR)
-                + File.separator + FileUtils.sanitizeFileName(file.getTitle()) + ".desktop");
+        File shortcutFile = getShortcutTmpFile();
         try {
 
             if (!shortcutFile.getParentFile().isDirectory() && !shortcutFile.getParentFile().mkdirs()) {
@@ -234,4 +247,102 @@ public class XDesktopEntry {
         }
     }
 
+    public String getDesktopIconName() {
+        return sanitize(file.getTitle());
+    }
+
+    public File getLinuxDesktopIconFile() {
+        return new File(findFreedesktopOrgDesktopPathCatch() + "/" + getDesktopIconName() + ".desktop");
+    }
+
+    private static String findFreedesktopOrgDesktopPathCatch() {
+        try {
+            return findFreedesktopOrgDesktopPath();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return System.getProperty("user.home") + "/Desktop/";
+        }
+    }
+
+    /**
+     * Instead of having all this parsing of user-dirs.dirs and replacing
+     * variables we can execute `echo $(xdg-user-dir DESKTOP)` and it will do
+     * all the job in case approaches below become failing
+     *
+     * @return variables (if declared) and quotation marks (unless escaped) free
+     * path
+     * @throws IOException if no file do not exists or key with desktop do not
+     * exists
+     */
+    private static String findFreedesktopOrgDesktopPath() throws IOException {
+        File userDirs = new File(System.getProperty("user.home") + "/.config/user-dirs.dirs");
+        if (!userDirs.exists()) {
+            return System.getProperty("user.home") + "/Desktop/";
+        }
+        return getFreedesktopOrgDesktopPathFrom(userDirs);
+    }
+
+    private static String getFreedesktopOrgDesktopPathFrom(File userDirs) throws IOException {
+        BufferedReader r = new BufferedReader(new FileReader(userDirs));
+        try {
+            return getFreedesktopOrgDesktopPathFrom(r);
+        } finally {
+            r.close();
+        }
+
+    }
+    static final String XDG_DESKTOP_DIR = "XDG_DESKTOP_DIR";
+
+    static String getFreedesktopOrgDesktopPathFrom(BufferedReader r) throws IOException {
+        while (true) {
+            String s = r.readLine();
+            if (s == null) {
+                throw new IOException("End of user-dirs found, but no " + XDG_DESKTOP_DIR + " key found");
+            }
+            s = s.trim();
+            if (s.startsWith(XDG_DESKTOP_DIR)) {
+                if (!s.contains("=")) {
+                    throw new IOException(XDG_DESKTOP_DIR + " has no value");
+                }
+                String[] keyAndValue = s.split("=");
+                keyAndValue[1] = keyAndValue[1].trim();
+                String filteredQuotes = filterQuotes(keyAndValue[1]);
+                return evaluateLinuxVariables(filteredQuotes);
+            }
+        }
+    }
+    private static final String MIC = "MAGIC_QUOTIN_ITW_CONSTANT_FOR_DUMMIES";
+
+    private static String filterQuotes(String string) {
+        //get rid of " but not of 
+        String s = string.replaceAll("\\\\\"", MIC);
+        s = s.replaceAll("\"", "");
+        s = s.replaceAll(MIC, "\\\"");
+        return s;
+    }
+
+    private static String evaluateLinuxVariables(String orig) {
+        return evaluateLinuxVariables(orig, System.getenv());
+    }
+
+    private static String evaluateLinuxVariables(String orig, Map<String, String> variables) {
+        Set<Entry<String, String>> env = variables.entrySet();
+        List<Entry<String, String>> envVariables = new ArrayList<Entry<String, String>>(env);
+        Collections.sort(envVariables, new Comparator<Entry<String, String>>() {
+            @Override
+            public int compare(Entry<String, String> o1, Entry<String, String> o2) {
+                return o2.getKey().length() - o1.getKey().length();
+            }
+        });
+        while (true) {
+            String before = orig;
+            for (Entry<String, String> entry : envVariables) {
+                orig = orig.replaceAll("\\$" + entry.getKey(), entry.getValue());
+            }
+            if (before.equals(orig)) {
+                return orig;
+            }
+        }
+
+    }
 }

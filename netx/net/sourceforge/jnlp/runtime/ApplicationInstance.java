@@ -17,6 +17,7 @@
 package net.sourceforge.jnlp.runtime;
 
 import java.awt.Window;
+import java.io.File;
 import java.net.URL;
 import java.security.AccessControlContext;
 import java.security.AccessController;
@@ -146,7 +147,14 @@ public class ApplicationInstance {
     private void addMenuAndDesktopEntries() {
         XDesktopEntry entry = new XDesktopEntry(file);
         ShortcutDesc sd = file.getInformation().getShortcut();
-
+        File possibleDesktopFile = entry.getLinuxDesktopIconFile();
+        if (possibleDesktopFile.exists()) {
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("ApplicationInstance.addMenuAndDesktopEntries(): file - "
+                        + possibleDesktopFile.getAbsolutePath() + " already exists. Not proceeding with desktop additions");
+            }
+            return;
+        }
         if (shouldCreateShortcut(sd)) {
             entry.createDesktopShortcut();
         }
