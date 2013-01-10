@@ -1,5 +1,19 @@
 2013-01-10  Jiri Vanek  <jvanek@redhat.com>
 
+	Download indicator made compact for more then one jar
+	* NEWS: mentioned this feature
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java:
+	(DownloadPanel) inner class were rewritten to support collapsed/detailed
+	for more then one jar in queue. 
+	(frame) window is recreated each time state is changed (preventing errors
+	on some X configurations) and is positioned to lower left corner of
+	active screen.
+	* netx/net/sourceforge/jnlp/resources/hideDownloadDetails.png
+	* adding netx/net/sourceforge/jnlp/resources/showDownloadDetails.pn h
+	Icons for "to collapsed state" and  "to detailed state"
+
+2013-01-10  Jiri Vanek  <jvanek@redhat.com>
+
 	All IcedTea-Web dialogues are centered to middle of active screen
 	* NEWS: mentioned this feature
 	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java:
