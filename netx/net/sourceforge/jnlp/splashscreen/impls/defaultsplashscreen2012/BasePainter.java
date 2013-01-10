@@ -58,6 +58,7 @@ import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.parts.BasicComponentSplashScreen;
 import net.sourceforge.jnlp.splashscreen.parts.InfoItem;
 import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
+import net.sourceforge.jnlp.util.ScreenFinder;
 
 public class BasePainter implements Observer {
 
@@ -281,7 +282,7 @@ public class BasePainter implements Observer {
                 showInfo = false;
             }
         }
-        if (Math.min(h, w) < Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 10) {
+        if (Math.min(h, w) < ScreenFinder.getCurrentScreenSizeWithoutBounds().getHeight() / 10) {
             showNiceTexts = false;
         } else {
             showNiceTexts = true;

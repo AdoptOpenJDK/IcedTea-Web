@@ -1,3 +1,17 @@
+2013-01-10  Jiri Vanek  <jvanek@redhat.com>
+
+	All IcedTea-Web dialogues are centered to middle of active screen
+	* NEWS: mentioned this feature
+	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java:
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java:
+	* netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java:
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java:
+	* netx/net/sourceforge/jnlp/security/viewer/CertificateViewer.java:
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainter.java:
+	Dialogues in above classes made centering to active screen
+	* netx/net/sourceforge/jnlp/util/ScreenFinder.java: New file, utility
+	class which can find active monitor and center dialogue into it.
+
 2013-01-09  Jiri Vanek  <jvanek@redhat.com>
 
 	First part of fix of recreating desktop icon

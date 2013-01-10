@@ -31,6 +31,7 @@ import javax.swing.JDialog;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.ScreenFinder;
 
 /**
  * This class will provide a visual way of viewing cache.
@@ -113,9 +114,6 @@ public class CacheViewer extends JDialog {
      * Center the dialog box.
      */
     private void centerDialog() {
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension dialogSize = getSize();
-
-        setLocation((screen.width - dialogSize.width) / 2, (screen.height - dialogSize.height) / 2);
+        ScreenFinder.centerWindowsToCurrentScreen(this);
     }
 }

@@ -52,6 +52,7 @@ import java.security.cert.X509Certificate;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import java.util.List;
+import net.sourceforge.jnlp.util.ScreenFinder;
 
 /**
  * Provides methods for showing security warning dialogs for a wide range of
@@ -312,11 +313,7 @@ public class SecurityDialog extends JDialog {
     }
 
     private static void centerDialog(JDialog dialog) {
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension dialogSize = dialog.getSize();
-
-        dialog.setLocation((screen.width - dialogSize.width) / 2,
-                        (screen.height - dialogSize.height) / 2);
+        ScreenFinder.centerWindowsToCurrentScreen(dialog);
     }
 
     private void selectDefaultButton() {

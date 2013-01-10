@@ -43,6 +43,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.URL;
 import javax.imageio.ImageIO;
@@ -53,6 +54,7 @@ import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
 import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.ScreenFinder;
 
 public class JNLPSplashScreen extends JDialog {
 
@@ -145,11 +147,7 @@ public class JNLPSplashScreen extends JDialog {
         setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         setSize(new Dimension(minimumWidth, minimumHeight));
         setPreferredSize(new Dimension(minimumWidth, minimumHeight));
-        // Centering to middle of Toolkit.getDefaultToolkit().getScreenSize()
-        // centers to the middle of all monitors. Let's center to the middle
-        // of the primary monitor instead.
-        // TODO center on the 'current' monitor to meet user expectation
-        setLocationRelativeTo(null);
+        ScreenFinder.centerWindowsToCurrentScreen(this);
     }
 
     @Override
