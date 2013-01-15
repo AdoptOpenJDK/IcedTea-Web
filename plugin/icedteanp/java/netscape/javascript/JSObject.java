@@ -100,6 +100,16 @@ public final class JSObject {
     }
 
     /**
+     * Package-private method used through JSUtil#getJSObjectInternalReference.
+     * We make this package-private to avoid polluting the public interface.
+     * @return the internal identifier
+     */
+    long getInternalReference() {
+        AccessController.getContext().checkPermission(new JSObjectUnboxPermission());
+        return internal;
+    }
+
+    /**
      * it is illegal to construct a JSObject manually
      */
     public JSObject(int jsobj_addr) {

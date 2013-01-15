@@ -321,6 +321,83 @@ public class PluginAppletSecurityContext {
         return map;
     }
 
+    private static long privilegedJSObjectUnbox(final JSObject js) {
+        return AccessController.doPrivileged(new PrivilegedAction<Long>() {
+            public Long run() {  
+                return JSUtil.getJSObjectInternalReference(js); 
+            }
+        });
+    }
+
+    /**
+     * Create a string that identifies a Java object precisely, for passing to 
+     * Javascript.
+     * 
+     * For builtin value types, a 'literalreturn' prefix is used and the object 
+     * is passed with a string representation.
+     * 
+     * For JSObject's, a 'jsobject' prefix is used and the object is passed 
+     * with the JSObject's internal identifier.
+     * 
+     * For other Java objects, an object store reference is used.
+     * 
+     * @param obj the object for which to create an identifier
+     * @param type the type to use for representation decisions
+     * @param unboxPrimitives whether to treat boxed primitives as value types
+     * @return an identifier string
+     */
+    public String toObjectIDString(Object obj, Class<?> type, boolean unboxPrimitives) {
+
+        /* Void (can occur from declared return type), pass special "void" string: */
+        if (type == Void.TYPE) {
+            return "literalreturn void";
+        }
+
+        /* Null, pass special "null" string: */
+        if (obj == null) {
+            return "literalreturn null";
+        }
+
+        /* Primitive, accurately represented by its toString() form: */
+        boolean returnAsString = ( type == Boolean.TYPE
+                                || type == Byte.TYPE 
+                                || type == Short.TYPE 
+                                || type == Integer.TYPE 
+                                || type == Long.TYPE );
+        if (unboxPrimitives) {
+            returnAsString = ( returnAsString 
+                            || type == Boolean.class
+                            || type == Byte.class
+                            || type == Short.class
+                            || type == Integer.class 
+                            || type == Long.class);
+        }
+        if (returnAsString) {
+            return "literalreturn " + obj.toString();
+        } 
+
+        /* Floating point number, we ensure we give enough precision: */
+        if ( type == Float.TYPE || type == Double.TYPE || 
+                ( unboxPrimitives && (type == Float.class || type == Double.class) )) {
+            return "literalreturn " + String.format("%308.308e", obj);
+        }
+
+        /* Character that should be returned as number: */
+        if (type == Character.TYPE || (unboxPrimitives && type == Character.class)) {
+            return "literalreturn " + (int) (Character) obj;
+        }
+
+        /* JSObject, unwrap underlying Javascript reference: */
+        if (type == netscape.javascript.JSObject.class) {
+            long reference = privilegedJSObjectUnbox((JSObject)obj);
+            return "jsobject " + Long.toString(reference);
+        }
+
+        /* Other kind of object, track this object and return our reference: */
+        store.reference(obj);
+        return store.getIdentifier(obj).toString();
+    }
+
     public void handleMessage(int reference, String src, AccessControlContext callContext, String message) {
 
         startTime = new java.util.Date().getTime();
@@ -429,56 +506,16 @@ public class PluginAppletSecurityContext {
                 if (ret instanceof Throwable)
                     throw (Throwable) ret;
 
-                if (ret == null) {
-                    write(reference, "GetStaticField literalreturn null");
-                } else if (f.getType() == Boolean.TYPE
-                        || f.getType() == Byte.TYPE
-                        || f.getType() == Short.TYPE
-                        || f.getType() == Integer.TYPE
-                        || f.getType() == Long.TYPE) {
-                    write(reference, "GetStaticField literalreturn " + ret);
-                } else if (f.getType() == Float.TYPE
-                                || f.getType() == Double.TYPE) {
-                    write(reference, "GetStaticField literalreturn " + String.format("%308.308e", ret));
-                } else if (f.getType() == Character.TYPE) {
-                    write(reference, "GetStaticField literalreturn " + (int) (Character) ret);
-                } else {
-                    // Track returned object.
-                    store.reference(ret);
-                    write(reference, "GetStaticField " + store.getIdentifier(ret));
-                }
+                String objIDStr = toObjectIDString(ret, f.getType(), false /*do not unbox primitives*/);
+                write(reference, "GetStaticField " + objIDStr);
             } else if (message.startsWith("GetValue")) {
                 String[] args = message.split(" ");
                 Integer index = parseCall(args[1], null, Integer.class);
 
                 Object ret = store.getObject(index);
 
-                if (ret == null) {
-                    write(reference, "GetValue literalreturn null");
-                } else if (ret.getClass() == Boolean.TYPE
-                        || ret.getClass() == Boolean.class
-                        || ret.getClass() == Byte.TYPE
-                        || ret.getClass() == Byte.class
-                        || ret.getClass() == Short.TYPE
-                        || ret.getClass() == Short.class
-                        || ret.getClass() == Integer.TYPE
-                        || ret.getClass() == Integer.class
-                        || ret.getClass() == Long.TYPE
-                        || ret.getClass() == Long.class) {
-                    write(reference, "GetValue literalreturn " + ret);
-                } else if (ret.getClass() == Float.TYPE
-                        || ret.getClass() == Float.class
-                        || ret.getClass() == Double.TYPE
-                        || ret.getClass() == Double.class) {
-                    write(reference, "GetValue literalreturn " + String.format("%308.308e", ret));
-                } else if (ret.getClass() == Character.TYPE
-                        || ret.getClass() == Character.class) {
-                    write(reference, "GetValue literalreturn " + (int) (Character) ret);
-                } else {
-                    // Track returned object.
-                    store.reference(ret);
-                    write(reference, "GetValue " + store.getIdentifier(ret));
-                }
+                String objIDStr = toObjectIDString(ret, ret.getClass(), true /*unbox primitives*/);
+                write(reference, "GetValue " + objIDStr);
             } else if (message.startsWith("SetStaticField") ||
                                    message.startsWith("SetField")) {
                 String[] args = message.split(" ");
@@ -519,24 +556,8 @@ public class PluginAppletSecurityContext {
                 Object ret = Array.get(array, index);
                 Class<?> retClass = array.getClass().getComponentType(); // prevent auto-boxing influence
 
-                if (ret == null) {
-                    write(reference, "GetObjectArrayElement literalreturn null");
-                } else if (retClass == Boolean.TYPE
-                        || retClass == Byte.TYPE
-                        || retClass == Short.TYPE
-                        || retClass == Integer.TYPE
-                        || retClass == Long.TYPE) {
-                    write(reference, "GetObjectArrayElement literalreturn " + ret);
-                } else if (retClass == Float.TYPE
-                                || retClass == Double.TYPE) {
-                    write(reference, "GetObjectArrayElement literalreturn " + String.format("%308.308e", ret));
-                } else if (retClass == Character.TYPE) {
-                    write(reference, "GetObjectArrayElement literalreturn " + (int) (Character) ret);
-                } else {
-                    // Track returned object.
-                    store.reference(ret);
-                    write(reference, "GetObjectArrayElement " + store.getIdentifier(ret));
-                }
+                String objIDStr = toObjectIDString(ret, retClass, false /*do not unbox primitives*/);
+                write(reference, "GetObjectArrayElement " + objIDStr);
 
             } else if (message.startsWith("SetObjectArrayElement")) {
                 String[] args = message.split(" ");
@@ -586,25 +607,8 @@ public class PluginAppletSecurityContext {
                 if (ret instanceof Throwable)
                     throw (Throwable) ret;
 
-                if (ret == null) {
-                    write(reference, "GetField literalreturn null");
-                } else if (f.getType() == Boolean.TYPE
-                        || f.getType() == Byte.TYPE
-                        || f.getType() == Short.TYPE
-                        || f.getType() == Integer.TYPE
-                        || f.getType() == Long.TYPE) {
-                    write(reference, "GetField literalreturn " + ret);
-                } else if (f.getType() == Float.TYPE
-                                || f.getType() == Double.TYPE) {
-                    write(reference, "GetField literalreturn " + String.format("%308.308e", ret));
-                } else if (f.getType() == Character.TYPE) {
-                    write(reference, "GetField literalreturn " + (int) (Character) ret);
-                } else {
-                    // Track returned object.
-                    store.reference(ret);
-                    write(reference, "GetField " + store.getIdentifier(ret));
-                }
-
+                String objIDStr = toObjectIDString(ret, f.getType(), false /*do not unbox primitives*/);
+                write(reference, "GetField " + objIDStr);
             } else if (message.startsWith("GetObjectClass")) {
                 int oid = Integer.parseInt(message.substring("GetObjectClass"
                                                 .length() + 1));
@@ -690,27 +694,8 @@ public class PluginAppletSecurityContext {
                                                 , collapsedArgs, " and that returned: ", ret
                                                 , " of type ", retO);
 
-                if (m.getReturnType().equals(java.lang.Void.class) ||
-                                    m.getReturnType().equals(java.lang.Void.TYPE)) {
-                    write(reference, "CallMethod literalreturn void");
-                } else if (ret == null) {
-                    write(reference, "CallMethod literalreturn null");
-                } else if (m.getReturnType() == Boolean.TYPE
-                                                || m.getReturnType() == Byte.TYPE
-                                                || m.getReturnType() == Short.TYPE
-                                                || m.getReturnType() == Integer.TYPE
-                                                || m.getReturnType() == Long.TYPE) {
-                    write(reference, "CallMethod literalreturn " + ret);
-                } else if (m.getReturnType() == Float.TYPE
-                                || m.getReturnType() == Double.TYPE) {
-                    write(reference, "CallMethod literalreturn " + String.format("%308.308e", ret));
-                } else if (m.getReturnType() == Character.TYPE) {
-                    write(reference, "CallMethod literalreturn " + (int) (Character) ret);
-                } else {
-                    // Track returned object.
-                    store.reference(ret);
-                    write(reference, "CallMethod " + store.getIdentifier(ret));
-                }
+                String objIDStr = toObjectIDString(ret, m.getReturnType(), false /*do not unbox primitives*/);
+                write(reference, "CallMethod " + objIDStr);
             } else if (message.startsWith("GetSuperclass")) {
                 String[] args = message.split(" ");
                 Integer classID = parseCall(args[1], null, Integer.class);
@@ -778,10 +763,7 @@ public class PluginAppletSecurityContext {
                 buf = new StringBuffer(b.length * 2);
                 buf.append(b.length);
                 for (int i = 0; i < b.length; i++)
-                    buf
-                                                        .append(" "
-                                                                        + Integer
-                                                                                        .toString(((int) b[i]) & 0x0ff, 16));
+                    buf.append(" " + Integer.toString(((int) b[i]) & 0x0ff, 16));
 
                 write(reference, "GetStringUTFChars " + buf);
             } else if (message.startsWith("GetStringChars")) {
@@ -797,10 +779,7 @@ public class PluginAppletSecurityContext {
                 buf = new StringBuffer(b.length * 2);
                 buf.append(b.length);
                 for (int i = 0; i < b.length; i++)
-                    buf
-                                                        .append(" "
-                                                                        + Integer
-                                                                                        .toString(((int) b[i]) & 0x0ff, 16));
+                    buf.append(" " + Integer.toString(((int) b[i]) & 0x0ff, 16));
 
                 PluginDebug.debug("Java: GetStringChars: ", o);
                 PluginDebug.debug("  String BYTES: ", buf);
@@ -817,10 +796,7 @@ public class PluginAppletSecurityContext {
                 buf = new StringBuffer(b.length * 2);
                 buf.append(b.length);
                 for (int i = 0; i < b.length; i++)
-                    buf
-                            .append(" "
-                                    + Integer
-                                            .toString(((int) b[i]) & 0x0ff, 16));
+                    buf.append(" " + Integer.toString(((int) b[i]) & 0x0ff, 16));
 
                 write(reference, "GetToStringValue " + buf);
             } else if (message.startsWith("NewArray")) {

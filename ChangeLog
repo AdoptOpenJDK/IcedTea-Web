@@ -1,3 +1,32 @@
+2013-01-15  Adam Domurad  <adomurad@redhat.com>
+
+	Fix PR1198: JSObject passed incorrectly to Javascript
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc: Pass extra data for
+	'jsobject' object result messages.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: Same.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Add special casing of 
+	javascript references passed from java.
+	* plugin/icedteanp/java/netscape/javascript/JSObjectUnboxPermission.java:
+	New permission for unboxing a JSObject's internal reference.
+	* plugin/icedteanp/java/netscape/javascript/JSObject.java
+	(getInternalReference): New, package-private, retrieves internal
+	reference (Must have proper permission).
+	* plugin/icedteanp/java/netscape/javascript/JSUtil.java
+	(getJSObjectInternalReference) New, utility for accessing 
+	JSObject#getInternalReference from outside the package.
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java:
+	(toObjectIDString): New, creates a string that precisely identifies a 
+	Java object.
+	(handleMessage): Replace a lot of duplicated functionality with 
+	'toObjectIDString'.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: Replace 
+	duplicated functionality with 'toObjectIDString'.
+	* tests/reproducers/simple/JSObjectFromEval/srcs/JSObjectFromEval.java:
+	Don't print out type passed (differs from browser to browser).
+	* tests/reproducers/simple/JSObjectFromEval/testcases/JSObjectFromEvalTest.java:
+	Don't check type passed (differs from browser to browser). Remove 
+	known-to-fail. Reformat.
+
 2013-01-10  Jiri Vanek  <jvanek@redhat.com>
 
 	Download indicator made compact for more then one jar

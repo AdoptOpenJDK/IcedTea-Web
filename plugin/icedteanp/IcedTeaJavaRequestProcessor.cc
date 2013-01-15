@@ -131,7 +131,7 @@ JavaRequestProcessor::newMessageOnBus(const char* message)
 			           !message_parts->at(4)->find("GetObjectArrayElement"))
 			{
 
-			    if (!message_parts->at(5)->find("literalreturn"))
+			    if (!message_parts->at(5)->find("literalreturn") || !message_parts->at(5)->find("jsobject"))
                 {
 			        // literal returns don't have a corresponding jni id
 			        result->return_identifier = 0;

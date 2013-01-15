@@ -413,7 +413,7 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
     member = (NPVariant*) (IcedTeaPluginUtilities::stringToJSID(*(message_parts->at(5))));
     propertyNameID = *(message_parts->at(6));
 
-    if (*(message_parts->at(7)) == "literalreturn")
+    if (*(message_parts->at(7)) == "literalreturn" || *(message_parts->at(7)) == "jsobject" )
     {
         value.append(*(message_parts->at(7)));
         value.append(" ");

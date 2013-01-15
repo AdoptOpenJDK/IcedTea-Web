@@ -776,6 +776,14 @@ javaStringResultToNPVariant(const std::string& jobject_id, NPVariant* variant)
 }
 
 static bool
+javaJSObjectResultToNPVariant(const std::string& js_id, NPVariant* variant)
+{
+    NPVariant* result_variant = (NPVariant*) IcedTeaPluginUtilities::stringToJSID(js_id);
+    *variant = *result_variant;
+    return true;
+}
+
+static bool
 javaObjectResultToNPVariant(NPP instance, const std::string& jobject_id, NPVariant* variant)
 {
     // Reference the class object so we can construct an NPObject with it and the instance
@@ -811,9 +819,14 @@ IcedTeaPluginUtilities::javaResultToNPVariant(NPP instance,
         std::string* java_value, NPVariant* variant)
 {
     int literal_n = sizeof("literalreturn"); // Accounts for one space char
+    int jsobject_n = sizeof("jsobject"); // Accounts for one space char
+
     if (strncmp("literalreturn ", java_value->c_str(), literal_n) == 0)
     {
         javaPrimitiveResultToNPVariant(java_value->substr(literal_n), variant);
+    } else if (strncmp("jsobject ", java_value->c_str(), jsobject_n) == 0)
+    {
+        javaJSObjectResultToNPVariant(java_value->substr(jsobject_n), variant);
     } else
     {
         std::string jobject_id = *java_value;

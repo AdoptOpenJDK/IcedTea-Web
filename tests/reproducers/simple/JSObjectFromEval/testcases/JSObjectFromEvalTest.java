@@ -37,8 +37,6 @@ exception statement from your version.
 
 import static org.junit.Assert.assertTrue;
 
-import net.sourceforge.jnlp.annotations.KnownToFail;
-
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess.AutoClose;
 import net.sourceforge.jnlp.annotations.Bug;
@@ -62,7 +60,6 @@ public class JSObjectFromEvalTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    @KnownToFail
     @Bug(id = { "PR1198" })
     public void testJSObjectSetMemberIsSet() throws Exception {
         ProcessResult pr = server.executeBrowser("/JSObjectFromEval.html",

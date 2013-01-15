@@ -1022,36 +1022,13 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         // work on a copy of value, as we don't want to be manipulating
         // complex objects
-        String valueToSetTo;
-        if (value instanceof java.lang.Byte ||
-                value instanceof java.lang.Character ||
-                value instanceof java.lang.Short ||
-                value instanceof java.lang.Integer ||
-                value instanceof java.lang.Long ||
-                value instanceof java.lang.Float ||
-                value instanceof java.lang.Double ||
-                value instanceof java.lang.Boolean) {
-
-            valueToSetTo = "literalreturn " + value.toString();
-
-            // Character -> Str results in str value.. we need int value as
-            // per specs.
-            if (value instanceof java.lang.Character) {
-                valueToSetTo = "literalreturn " + (int) ((java.lang.Character) value).charValue();
-            } else if (value instanceof Float ||
-                        value instanceof Double) {
-                valueToSetTo = "literalreturn " + String.format("%308.308e", value);
-            }
-
-        } else {
-            AppletSecurityContextManager.getSecurityContext(0).store(value);
-            valueToSetTo = Integer.toString(AppletSecurityContextManager.getSecurityContext(0).getIdentifier(value));
-        }
+        String objIDStr = securityContext.toObjectIDString(value,
+                value.getClass(), true /* unbox primitives */);
 
         // Prefix with dummy instance for convenience.
         PluginCallRequest request = requestFactory.getPluginCallRequest("void",
                 "instance " + 0 + " reference " + reference + " SetMember " +
-                        internal + " " + nameID + " " + valueToSetTo, reference);
+                        internal + " " + nameID + " " + objIDStr, reference);
 
         streamhandler.postCallRequest(request);
         streamhandler.write(request.getMessage());
@@ -1077,38 +1054,13 @@ public class PluginAppletViewer extends XEmbeddedFrame
         securityContext.store(value);
         Long reference = getRequestIdentifier();
 
-        // work on a copy of value, as we don't want to be manipulating
-        // complex objects
-        String valueToSetTo;
-        if (value instanceof java.lang.Byte ||
-                value instanceof java.lang.Character ||
-                value instanceof java.lang.Short ||
-                value instanceof java.lang.Integer ||
-                value instanceof java.lang.Long ||
-                value instanceof java.lang.Float ||
-                value instanceof java.lang.Double ||
-                value instanceof java.lang.Boolean) {
-
-            valueToSetTo = "literalreturn " + value.toString();
-
-            // Character -> Str results in str value.. we need int value as
-            // per specs.
-            if (value instanceof java.lang.Character) {
-                valueToSetTo = "literalreturn " + (int) ((java.lang.Character) value).charValue();
-            } else if (value instanceof Float ||
-                        value instanceof Double) {
-                valueToSetTo = "literalreturn " + String.format("%308.308e", value);
-            }
-
-        } else {
-            AppletSecurityContextManager.getSecurityContext(0).store(value);
-            valueToSetTo = Integer.toString(AppletSecurityContextManager.getSecurityContext(0).getIdentifier(value));
-        }
+        String objIDStr = securityContext.toObjectIDString(value,
+                value.getClass(), true /* unbox primitives */);
 
         // Prefix with dummy instance for convenience.
         PluginCallRequest request = requestFactory.getPluginCallRequest("void",
                 "instance " + 0 + " reference " + reference + " SetSlot " +
-                        internal + " " + index + " " + valueToSetTo, reference);
+                        internal + " " + index + " " + objIDStr, reference);
 
         streamhandler.postCallRequest(request);
         streamhandler.write(request.getMessage());

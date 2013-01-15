@@ -24,6 +24,7 @@ New in release 1.4 (2012-XX-XX):
   - PR1166: Embedded JNLP File is not supported in applet tag
   - PR1217: Add command line arguments for plugins
   - PR1189: Icedtea-plugin requires code attribute when using jnlp_href
+  - PR1198: JSObject is not passed to javascript correctly
 * Common
   - PR1049: Extension jnlp's signed jar with the content of only META-INF/* is considered
   - PR955: regression: SweetHome3D fails to run

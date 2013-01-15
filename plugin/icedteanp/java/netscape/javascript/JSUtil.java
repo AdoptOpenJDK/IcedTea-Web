@@ -57,4 +57,16 @@ public class JSUtil {
 
         return captureStream.toString();
     }
+
+    /**
+     * Uses package-private method JSObject.getInternalReference.
+     * This is package-private to avoid polluting the public interface.
+     * @param js JSObject to unbox
+     * @return the internal reference stored by the JSObject
+     */
+    public static long getJSObjectInternalReference(JSObject js) {
+        // NB: permission is checked in JSObject
+        return js.getInternalReference();
+    }
+
 }
