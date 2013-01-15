@@ -238,18 +238,23 @@ public class PluginAppletSecurityContext {
 
     long startTime = 0;
 
-    public PluginAppletSecurityContext(int identifier) {
+    /* Package-private constructor that allows for bypassing security manager installation.
+     * This is useful for testing. Note that while the public constructor should be used otherwise,
+     * the security installation can't be bypassed if it has already occurred.*/
+    PluginAppletSecurityContext(int identifier, boolean ensureSecurityContext) {
         this.identifier = identifier;
 
-        // We need a security manager.. and since there is a good chance that
-        // an applet will be loaded at some point, we should make it the SM
-        // that JNLPRuntime will try to install
-        if (System.getSecurityManager() == null) {
-            JNLPRuntime.initialize(/* isApplication */false);
-            JNLPRuntime.setDefaultLaunchHandler(new DefaultLaunchHandler(System.err));
-        }
+        if (ensureSecurityContext) {
+            // We need a security manager.. and since there is a good chance that
+            // an applet will be loaded at some point, we should make it the SM
+            // that JNLPRuntime will try to install
+            if (System.getSecurityManager() == null) {
+                JNLPRuntime.initialize(/* isApplication */false);
+                JNLPRuntime.setDefaultLaunchHandler(new DefaultLaunchHandler(System.err));
+            }
 
-        JNLPRuntime.disableExit();
+            JNLPRuntime.disableExit();
+        }
 
         URL u = null;
         try {
@@ -259,6 +264,10 @@ public class PluginAppletSecurityContext {
         }
 
         this.classLoaders.put(liveconnectLoader, u);
+    }
+
+    public PluginAppletSecurityContext(int identifier) {
+        this(identifier, true);
     }
 
     private static <V> V parseCall(String s, ClassLoader cl, Class<V> c) {

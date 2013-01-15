@@ -1,5 +1,18 @@
 2013-01-15  Adam Domurad  <adomurad@redhat.com>
 
+	Unit test for PluginAppletSecurityContext#toObjectIDString. Make 
+	PluginAppletSecurityContext more unit-testable.
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java: 
+	Don't initialize security manager in constructor. Fix a few Java->JS 
+	corner cases.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java: Create testing-only
+	constructor for bypassing initialization of SecurityManager.
+	* tests/netx/unit/sun/applet/PluginAppletSecurityContextTest.java:
+	Unit test for all the corner cases of converting a Java object to a
+	string that can be precisely identified.
+
+2013-01-15  Adam Domurad  <adomurad@redhat.com>
+
 	Fix PR1198: JSObject passed incorrectly to Javascript
 	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc: Pass extra data for
 	'jsobject' object result messages.
