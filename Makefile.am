@@ -303,7 +303,6 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
 	  $(GLIB_CFLAGS) \
-	  $(GTK_CFLAGS) \
 	  $(MOZILLA_CFLAGS) \
   	  -fvisibility=hidden \
 	  -fPIC -o $@ -c $<
@@ -313,7 +312,6 @@ $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY): $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJEC
 	$(CXX) $(CXXFLAGS) \
 	  $(PLUGIN_OBJECTS) \
 	  $(GLIB_LIBS) \
-	  $(GTK_LIBS) \
 	  $(MOZILLA_LIBS) \
 	  -shared -o $@
 
@@ -355,7 +353,6 @@ stamps/cpp-unit-tests-compile.stamp: $(CPP_UNITTEST_FRAMEWORK_LIB) $(CPP_UNITTES
 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
 	  $(GLIB_CFLAGS) \
-	  $(GTK_CFLAGS) \
 	  $(MOZILLA_CFLAGS) \
 	  "-I$(CPP_UNITTEST_FRAMEWORK_SRCDIR)/src" \
 	  "-I$(PLUGIN_SRCDIR)" \
@@ -371,7 +368,6 @@ $(CPP_UNITTEST_EXECUTABLE): $(CPP_UNITTEST_FRAMEWORK_LIB) stamps/cpp-unit-tests-
 	  $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS)) \
 	  $(CPP_UNITTEST_DIR)/*.o \
 	  $(GLIB_LIBS) \
-	  $(GTK_LIBS) \
 	  $(MOZILLA_LIBS) \
 	  $(CPP_UNITTEST_FRAMEWORK_LIB)\
 	  $(BUILT_CPP_UNIT_TEST_FRAMEWORK) -o $@
@@ -1226,7 +1222,6 @@ $(COVERABLE_PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_COVERAGE_BOOTCLASSPATH) \
 	  -DCOVERAGE_AGENT=$(JACOCO_AGENT_PLUGIN_SWITCH) \
 	  $(GLIB_CFLAGS) \
-	  $(GTK_CFLAGS) \
 	  $(MOZILLA_CFLAGS) \
 	  -fvisibility=hidden \
 	  -fPIC -o $@ -c $<
@@ -1236,7 +1231,6 @@ $(COVERABLE_PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY): $(addprefix $(COVERABLE_PLUGIN_
 	$(CXX) $(CXXFLAGS) \
 	  $(PLUGIN_OBJECTS) \
 	  $(GLIB_LIBS) \
-	  $(GTK_LIBS) \
 	  $(MOZILLA_LIBS) \
 	  -shared -o $@
 

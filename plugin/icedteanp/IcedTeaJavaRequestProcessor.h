@@ -41,6 +41,7 @@ exception statement from your version. */
 
 #include <errno.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <vector>
 
 #include "IcedTeaNPPlugin.h"

@@ -218,8 +218,6 @@ typedef union
 static void plugin_data_new (ITNPPluginData** data);
 // Retrieve the current document's documentbase.
 static gchar* plugin_get_documentbase (NPP instance);
-// Notify the user that the appletviewer is not installed correctly.
-static void plugin_display_failure_dialog ();
 // Callback used to monitor input pipe status.
 static gboolean plugin_in_pipe_callback (GIOChannel* source,
                                          GIOCondition condition,
@@ -1099,30 +1097,6 @@ plugin_get_documentbase (NPP instance)
   return documentbase_copy;
 }
 #endif
-
-// This function displays an error message if the appletviewer has not
-// been installed correctly.
-static void
-plugin_display_failure_dialog ()
-{
-  GtkWidget* dialog = NULL;
-
-  PLUGIN_DEBUG ("plugin_display_failure_dialog\n");
-
-  dialog = gtk_message_dialog_new (NULL,
-                                   GTK_DIALOG_DESTROY_WITH_PARENT,
-                                   GTK_MESSAGE_ERROR,
-                                   GTK_BUTTONS_CLOSE,
-                                   FAILURE_MESSAGE,
-                                   appletviewer_executable);
-  gtk_widget_show_all (dialog);
-  gtk_dialog_run (GTK_DIALOG (dialog));
-  gtk_widget_destroy (dialog);
-
-  PLUGIN_DEBUG ("plugin_display_failure_dialog return\n");
-}
-
-
 
 // plugin_in_pipe_callback is called when data is available on the
 // input pipe, or when the appletviewer crashes or is killed.  It may
@@ -2205,7 +2179,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   np_error = plugin_test_appletviewer ();
   if (np_error != NPERR_NO_ERROR)
     {
-      plugin_display_failure_dialog ();
+      fprintf(stderr, "Unable to find java executable %s\n", appletviewer_executable);
       return np_error;
     }
 

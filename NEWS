@@ -25,6 +25,7 @@ New in release 1.4 (2012-XX-XX):
   - PR1217: Add command line arguments for plugins
   - PR1189: Icedtea-plugin requires code attribute when using jnlp_href
   - PR1198: JSObject is not passed to javascript correctly
+  - PR1260: IcedTea-Web should not rely on GTK
 * Common
   - PR1049: Extension jnlp's signed jar with the content of only META-INF/* is considered
   - PR955: regression: SweetHome3D fails to run

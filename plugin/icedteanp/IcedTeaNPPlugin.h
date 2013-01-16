@@ -51,9 +51,6 @@ exception statement from your version. */
 #include <glib.h>
 #include <glib/gstdio.h>
 
-// GTK includes.
-#include <gtk/gtk.h>
-
 #include "IcedTeaPluginUtils.h"
 #include "IcedTeaPluginRequestProcessor.h"
 

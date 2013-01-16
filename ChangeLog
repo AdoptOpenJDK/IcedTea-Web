@@ -1,3 +1,14 @@
+2013-01-16  Deepak Bhole <dbhole@redhat.com>
+
+	PR1260: IcedTea-Web should not rely on GTK
+	* Makefile.am: Remove GTK includes and links
+	* acinclude.m4: Remove check for GTK libs
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.h: Removed gtk.h include
+	and added unistd include (for usleep) which gtk.h brought in before
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Remove GTK dialog shown when java
+	is not found
+	* plugin/icedteanp/IcedTeaNPPlugin.h: Removed gtk.h include
+
 2013-01-16  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed set of paths to asm
