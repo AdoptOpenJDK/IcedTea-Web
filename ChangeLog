@@ -1,3 +1,9 @@
+2013-01-16  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed set of paths to asm
+	* configure.ac: (IT_FIND_OPTIONAL_JAR([asm], ASM,) path enhanced by
+	objectweb-asm4/asm-all.jar. 
+
 2013-01-15  Adam Domurad  <adomurad@redhat.com>
 
 	Unit test for PluginAppletSecurityContext#toObjectIDString. Make 
