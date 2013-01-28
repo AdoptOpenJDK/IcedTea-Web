@@ -139,8 +139,6 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             // won't make it to the applet, whereas using sun.applet.AppletClassLoader
             // works just fine.
 
-            dispatchAppletEvent(APPLET_LOADING_COMPLETED, null);
-
             if (applet != null) {
                 // Stick it in the frame
                 applet.setStub(this);
@@ -153,6 +151,12 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             this.appletAlive = false;
             e.printStackTrace();
             replaceSplash(SplashUtils.getErrorSplashScreen(getWidth(), getHeight(), e));
+        } finally {
+            // PR1157: This needs to occur even in the case of an exception
+            // so that the applet's event listeners are signaled.
+            // Once PluginAppletViewer.AppletEventListener is signaled PluginAppletViewer it can properly stop waiting
+            // in PluginAppletViewer.waitForAppletInit
+            dispatchAppletEvent(APPLET_LOADING_COMPLETED, null);
         }
     }
 

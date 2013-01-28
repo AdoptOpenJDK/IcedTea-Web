@@ -26,6 +26,7 @@ New in release 1.4 (2012-XX-XX):
   - PR1189: Icedtea-plugin requires code attribute when using jnlp_href
   - PR1198: JSObject is not passed to javascript correctly
   - PR1260: IcedTea-Web should not rely on GTK
+  - PR1157: Applets can hang browser after fatal exception
 * Common
   - PR1049: Extension jnlp's signed jar with the content of only META-INF/* is considered
   - PR955: regression: SweetHome3D fails to run
