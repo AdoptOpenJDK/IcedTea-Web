@@ -1,3 +1,21 @@
+2013-01-30  Adam Domurad  <adomurad@redhat.com>
+
+	Fix for PR1292: Javaws does not resolve versioned jar names with 
+	periods correctly
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java
+	(getUrl): Fix versioning of jar names that have periods, eg 
+	'foo.bar.jar'. Make method static for testing.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceUrlCreatorTest.java:
+	New, test version & pack URL encoding.
+	* tests/reproducers/simple/VersionedJar__V1/resources/VersionedJarDisabled.jnlp:
+	New, tries to use versioned jar with versioning not turned on.
+	* tests/reproducers/simple/VersionedJar__V1/resources/VersionedJarEnabled.jnlp:
+	New, tries to use versioned jar with versioning turned on.
+	* tests/reproducers/simple/VersionedJar__V1/srcs/VersionedJar.java:
+	New, prints simple message.
+	* tests/reproducers/simple/VersionedJar__V1/testcases/VersionedJarTest.java:
+	New, tests if VersionedJar has ran only with versioning turned on.
+
 2013-01-30  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialog.java:

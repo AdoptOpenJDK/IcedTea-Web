@@ -102,9 +102,9 @@ public class ResourceUrlCreator {
      * @param resource the resource
      * @param usePack whether the URL should point to the pack200 file
      * @param useVersion whether the URL should be modified to include the version
-     * @return a URL for the resource or null if an appropraite URL can not be found
+     * @return a URL for the resource or null if an appropriate URL can not be found
      */
-    protected URL getUrl(Resource resource, boolean usePack, boolean useVersion) {
+    static URL getUrl(Resource resource, boolean usePack, boolean useVersion) {
         if (!(usePack || useVersion)) {
             throw new IllegalArgumentException("either pack200 or version required");
         }
@@ -116,10 +116,21 @@ public class ResourceUrlCreator {
         }
         String filename = location.substring(lastSlash + 1);
         if (useVersion && resource.requestVersion != null) {
-            String parts[] = filename.split("\\.", 2);
-            String name = parts[0];
-            String extension = parts[1];
-            filename = name + "__V" + resource.requestVersion + "." + extension;
+            // With 'useVersion', j2-commons-cli.jar becomes, for example, j2-commons-cli__V1.0.jar
+            String parts[] = filename.split("\\.", -1 /* Keep blank strings*/);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < parts.length; i++) {
+                sb.append(parts[i]);
+                // Append __V<number> before last '.'
+                if (i == parts.length -2) {
+                    sb.append("__V" + resource.requestVersion);
+                }
+                sb.append('.');
+            }
+            sb.setLength(sb.length() - 1); // remove last '.'
+
+            filename = sb.toString();
         }
         if (usePack) {
             filename = filename + ".pack.gz";

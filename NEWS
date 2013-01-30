@@ -19,6 +19,7 @@ New in release 1.4 (2012-XX-XX):
 * NetX
   - PR1027: DownloadService is not supported by IcedTea-Web
   - PR725: JNLP applications will prompt for creating desktop shortcuts every time they are run
+  - PR1292: Javaws does not resolve versioned jar names with periods correctly
 * Plugin
   - PR1106: Buffer overflow in plugin table-
   - PR1166: Embedded JNLP File is not supported in applet tag
