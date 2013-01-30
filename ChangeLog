@@ -1,5 +1,11 @@
 2013-01-30  Jiri Vanek  <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialog.java:
+	Iteration over launchExceptionChain done by pointer/get instead by iterator
+	to prevent ConcurrentModificationException. 
+
+2013-01-30  Jiri Vanek  <jvanek@redhat.com>
+
 	Splashscreen error report made more detailed by stored LaunchErrors
 	* netx/net/sourceforge/jnlp/LaunchException.java: (LaunchExceptionWithStamp)
 	new inner class for storing timestamp togetehr with error.

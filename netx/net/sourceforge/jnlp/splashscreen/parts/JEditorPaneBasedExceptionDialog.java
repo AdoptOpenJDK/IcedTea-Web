@@ -387,10 +387,9 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
     private static String getChainAsString(List<LaunchException.LaunchExceptionWithStamp> launchExceptionChain, boolean formatTime) {
         String s = "";
         if (launchExceptionChain != null) {
-            int i = 0;
-            for (LaunchException.LaunchExceptionWithStamp launchException : launchExceptionChain) {
-                i++;
-                s = s + i + ") at " + formatTime(launchException.getStamp(), formatTime) + "\n" + getExceptionStackTraceAsString(launchException.getEx());
+            for (int i = 0; i < launchExceptionChain.size(); i++) {
+                LaunchException.LaunchExceptionWithStamp launchException = launchExceptionChain.get(i);
+                s = s + (i+1) + ") at " + formatTime(launchException.getStamp(), formatTime) + "\n" + getExceptionStackTraceAsString(launchException.getEx());
             }
         }
         return s;
