@@ -1,3 +1,19 @@
+2013-01-30  Jiri Vanek  <jvanek@redhat.com>
+
+	Splashscreen error report made more detailed by stored LaunchErrors
+	* netx/net/sourceforge/jnlp/LaunchException.java: (LaunchExceptionWithStamp)
+	new inner class for storing timestamp togetehr with error.
+	(launchExceptionChain) new static list to capture LaunchErrors during
+	runtime.
+	* /netx/net/sourceforge/jnlp/resources/Messages.properties: 
+	* netx/net/sourceforge/jnlp/resources/Messages_cs_CZ.properties:
+	Added explanation string
+	* netx/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialog.java:
+	Is now displaying launchExceptionChain in its error report and is copying 
+	it to clipboard.
+	* tests/unit/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialogTest.java:
+	(getTextTest) adapted calls of getText for new Date.
+
 2013-01-28 Adam Domurad  <adomurad@redhat.com>
 
 	Fix PR1157: Applets can hang browser after fatal exception

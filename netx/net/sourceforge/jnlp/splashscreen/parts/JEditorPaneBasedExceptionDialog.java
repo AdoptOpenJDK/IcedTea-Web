@@ -42,6 +42,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -60,6 +62,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.Translator;
 
 public class JEditorPaneBasedExceptionDialog extends JDialog implements HyperlinkListener {
@@ -78,15 +81,19 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
     // End of components declaration
     private final String message;
     private final Throwable exception;
+    private final Date shown;
+    private final String anotherInfo;
 
     /** Creates new form JEditorPaneBasedExceptionDialog */
     public JEditorPaneBasedExceptionDialog(java.awt.Frame parent, boolean modal, Throwable ex, InformationElement information, String anotherInfo) {
         super(parent, modal);
+        shown = new Date();
         initComponents();
         htmlErrorAndHelpPanel.setContentType("text/html");
         htmlErrorAndHelpPanel.setEditable(false);
+        this.anotherInfo=anotherInfo;
         List<String> l = infoElementToList(information);
-        this.message = getText(ex, l, anotherInfo);
+        this.message = getText(ex, l, anotherInfo, shown);
         this.exception = ex;
         if (exception == null) {
             closeAndCopyButton.setVisible(false);
@@ -199,7 +206,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
     private void copyAndCloseButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (exception != null) {
             try {
-                StringSelection data = new StringSelection(getExceptionStackTraceAsString(exception));
+                StringSelection data = new StringSelection(anotherInfo+"\n"+shown.toString()+"\n"+getExceptionStackTraceAsString(exception)+addPlainChain());
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(data, data);
             } catch (Exception ex) {
@@ -241,7 +248,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
         });
     }
 
-    static String getText(Throwable ex, List<String> l, String anotherInfo) {
+    static String getText(Throwable ex, List<String> l, String anotherInfo,Date shown) {
         StringBuilder s = new StringBuilder("<html><body>");
         String info = "<p>"
                 + Translator.R(InfoItem.SPLASH + "mainL1", createLink())
@@ -258,9 +265,11 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                     + Translator.R(InfoItem.SPLASH + "mainL4")
                     + " </p>\n"
                     + info + formatListInfoList(l) + formatInfo(anotherInfo)
+                    +"<br>"+DateFormat.getInstance().format(shown)+"<br>"
                     + "<p>"
                     + Translator.R(InfoItem.SPLASH + "exWas")
-                    + " <br/>\n" + "<pre>" + getExceptionStackTraceAsString(ex) + "</pre>";
+                    + " <br/>\n" + "<pre>" + getExceptionStackTraceAsString(ex) + "</pre>"
+                    + addChain();
 
 
         } else {
@@ -354,4 +363,47 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
     }
 
 
+    private static String addChain() {
+        if (LaunchException.getLaunchExceptionChain().isEmpty()) {
+            return "";
+        }
+        return Translator.R(InfoItem.SPLASH + "chainWas")
+                + " <br/>\n" + "<pre>" + getChainAsString(true) + "</pre>";
+
+    }
+
+    private static String addPlainChain() {
+        if (LaunchException.getLaunchExceptionChain().isEmpty()) {
+            return "";
+        }
+        return "\n Chain: \n" + getChainAsString(false);
+
+    }
+
+    private static String getChainAsString(boolean formatTime) {
+        return getChainAsString(LaunchException.getLaunchExceptionChain(), formatTime);
+    }
+
+    private static String getChainAsString(List<LaunchException.LaunchExceptionWithStamp> launchExceptionChain, boolean formatTime) {
+        String s = "";
+        if (launchExceptionChain != null) {
+            int i = 0;
+            for (LaunchException.LaunchExceptionWithStamp launchException : launchExceptionChain) {
+                i++;
+                s = s + i + ") at " + formatTime(launchException.getStamp(), formatTime) + "\n" + getExceptionStackTraceAsString(launchException.getEx());
+            }
+        }
+        return s;
+    }
+
+    private static String formatTime(Date dateTime, boolean formatTime) {
+        if (dateTime == null) {
+            return "unknown time";
+        }
+        if (formatTime) {
+            return DateFormat.getInstance().format(dateTime);
+        } else {
+            return dateTime.toString();
+        }
+    }
 }

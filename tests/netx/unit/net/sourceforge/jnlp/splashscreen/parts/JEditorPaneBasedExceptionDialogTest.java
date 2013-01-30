@@ -40,6 +40,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import net.sourceforge.jnlp.runtime.Translator;
 import org.junit.Assert;
@@ -107,10 +108,10 @@ public class JEditorPaneBasedExceptionDialogTest {
 
     @Test
     public void getTextTest() {
-        String s1 = JEditorPaneBasedExceptionDialog.getText(ex, l, ai);
-        String s2 = JEditorPaneBasedExceptionDialog.getText(ex, l, null);
-        String s3 = JEditorPaneBasedExceptionDialog.getText(ex, null, ai);
-        String s4 = JEditorPaneBasedExceptionDialog.getText(null, l, ai);
+        String s1 = JEditorPaneBasedExceptionDialog.getText(ex, l, ai, new Date());
+        String s2 = JEditorPaneBasedExceptionDialog.getText(ex, l, null, new Date());
+        String s3 = JEditorPaneBasedExceptionDialog.getText(ex, null, ai, new Date());
+        String s4 = JEditorPaneBasedExceptionDialog.getText(null, l, ai, new Date());
         assertHtml(s1);
         assertHtml(s2);
         assertHtml(s3);

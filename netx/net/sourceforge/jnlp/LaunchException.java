@@ -16,6 +16,11 @@
 
 package net.sourceforge.jnlp;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Thrown when a JNLP application, applet, or installer could not
  * be created.
@@ -24,6 +29,29 @@ package net.sourceforge.jnlp;
  * @version $Revision: 1.9 $
  */
 public class LaunchException extends Exception {
+
+
+    public static class LaunchExceptionWithStamp{
+        private final LaunchException ex;
+        private final Date stamp;
+
+        private LaunchExceptionWithStamp(LaunchException ex) {
+            this.ex=ex;
+            this.stamp=new Date();
+        }
+
+        public LaunchException getEx() {
+            return ex;
+        }
+
+        public Date getStamp() {
+            return stamp;
+        }
+
+
+
+    }
+    private static final List<LaunchExceptionWithStamp> launchExceptionChain = Collections.synchronizedList(new LinkedList<LaunchExceptionWithStamp>());
 
     private static final long serialVersionUID = 7283827853612357423L;
 
@@ -54,6 +82,7 @@ public class LaunchException extends Exception {
         this.summary = summary;
         this.description = description;
         this.severity = severity;
+        saveLaunchException(this);
     }
 
     /**
@@ -61,6 +90,7 @@ public class LaunchException extends Exception {
      */
     public LaunchException(Throwable cause) {
         super(cause);
+        saveLaunchException(this);
     }
 
     /**
@@ -68,6 +98,7 @@ public class LaunchException extends Exception {
      */
     public LaunchException(String message, Throwable cause) {
         super(message, cause);
+        saveLaunchException(this);
     }
 
     /**
@@ -78,6 +109,7 @@ public class LaunchException extends Exception {
      */
     public LaunchException(String message) {
         super(message);
+        saveLaunchException(this);
     }
 
     /**
@@ -116,5 +148,16 @@ public class LaunchException extends Exception {
     public String getSeverity() {
         return severity;
     }
+
+    private synchronized void saveLaunchException(LaunchException ex) {
+        launchExceptionChain.add(new LaunchExceptionWithStamp(ex));
+
+    }
+
+    public synchronized static List<LaunchExceptionWithStamp> getLaunchExceptionChain() {
+        return launchExceptionChain;
+    }
+    
+    
 
 }
