@@ -59,7 +59,7 @@ public class ParallelAppletsTest extends BrowserTest {
     @TestInBrowsers(testIn = {Browsers.one})
     @NeedsDisplay
     public void testParallelAppletsTest1x2E() throws Exception {
-        ProcessResult pr = server.executeBrowser("ParallelAppletsTest_1_x_2E.html");
+        ProcessResult pr = server.executeBrowser("ParallelAppletsTest_1_x_2EE.html");
         checkExactCounts(1, 10, pr);
         checkNotInitialised(pr);
 

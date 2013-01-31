@@ -1,3 +1,13 @@
+2013-01-31  Jiri Vanek  <jvanek@redhat.com>
+
+	Renamed conflict file for case insensitive systems
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1_x_2E.html:
+	Renamed to  ParallelAppletsTest_1_x_2EE.html
+	* tests/reproducers/simple/CountingApplet1/resources/ParallelAppletsTest_1_x_2EE.html:
+	new file.
+	* tests/reproducers/simple/CountingApplet1/testcases/ParallelAppletsTest.java:
+	(testParallelAppletsTest1x2E) adapted to renaming
+
 2013-01-30  Jiri Vanek  <jvanek@redhat.com>
 
 	Add unit tests for locales and locales fixed
