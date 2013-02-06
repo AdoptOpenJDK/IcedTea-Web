@@ -56,7 +56,6 @@ public class JSToJGetTest extends BrowserTest {
     public String foundStr = "] found:[";
     public String endStr = "].";
 
-    private final String exceptionStr = "xception";
     private final String initStr = "JSToJGet applet initialized.";
     private final String setupStr = "JSToJGet applet set up for GET tests.";
     private final String afterStr = "afterTests";
@@ -65,9 +64,6 @@ public class JSToJGetTest extends BrowserTest {
 
         @Override
         protected boolean isAlowedToFinish(String s) {
-            if (s.contains(exceptionStr)) {
-                return true;
-            }
             return (s.contains(initStr) && s.contains(setupStr) && s
                     .contains(afterStr));
         }
@@ -86,12 +82,10 @@ public class JSToJGetTest extends BrowserTest {
         String s0 = testStr + passStr;
         String s1 = testStr + failValStr;
         String s2 = testStr + failTypeStr;
-        String s3 = "Error on Java side";
 
         int ind0 = pr.stdout.indexOf(s0);
         int ind1 = pr.stdout.indexOf(s1);
         int ind2 = pr.stdout.indexOf(s2);
-        int ind3 = pr.stdout.indexOf(s3);
         int indBegin = pr.stdout.indexOf(setupStr);
         if (indBegin != -1) {
             indBegin += setupStr.length();
@@ -116,11 +110,6 @@ public class JSToJGetTest extends BrowserTest {
             failStr = "JSToJGet: type mismatch in "+testStr;
         }
 
-        if (ind3 != -1) {
-            failStr = "JSToJGet: an error occured during " + testStr;
-        }
-
-        Assert.assertTrue(failStr, (ind3 == -1));// no error on Java side
         Assert.assertTrue(failStr, (ind1 == -1));// no value mismatch
         Assert.assertTrue(failStr, (ind2 == -1));// no type mismatch
         Assert.assertTrue(failStr, (ind0 != -1));// test passed
@@ -288,9 +277,14 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    @KnownToFail
     public void AppletJSToJGet_DoubleFullArray_Test() throws Exception {
         jsToJavaGetTest("DoubleFullArray", "Test no.21 - (Double[] - full array)");
     }
 
+    @Test
+    @TestInBrowsers(testIn = { Browsers.all })
+    @NeedsDisplay
+    public void AppletJSToJGet_JSObject_Test() throws Exception {
+        jsToJavaGetTest("JSObject", "Test no.22 - (JSObject)");
+    }
 }

@@ -1,5 +1,7 @@
-import java.applet.*;
-import java.awt.*;
+import java.applet.Applet;
+import java.awt.Label;
+import java.awt.BorderLayout;
+import netscape.javascript.JSObject;
 
 public class JSToJGet extends Applet {
 
@@ -27,8 +29,21 @@ public class JSToJGet extends Applet {
 
     public char[] ca = new char[3];
     public Character[] Ca = new Character[3];
+    public JSObject jso;
 
     private Label statusLabel;
+
+    public void start(){
+        JSObject win = JSObject.getWindow(this);
+        jso = (JSObject) win.getMember("document");
+        jso.setMember("key1","value1");
+        ia[4] = 1024;
+        Da1[9] = D;
+
+        String setupStr = "JSToJGet applet set up for GET tests.";
+        System.out.println(setupStr);
+        statusLabel.setText(setupStr);
+    }
 
     public void init() {
         setLayout(new BorderLayout());
@@ -37,14 +52,6 @@ public class JSToJGet extends Applet {
         String initStr = "JSToJGet applet initialized.";
         System.out.println(initStr);
         statusLabel.setText(initStr);
-
-        ia[4] = 1024;
-        Da1[9] = D;
-
-        String setupStr = "JSToJGet applet set up for GET tests.";
-        System.out.println(setupStr);
-        statusLabel.setText(setupStr);
-
     }
 
     // auxiliary method for setting the statusLabel text:

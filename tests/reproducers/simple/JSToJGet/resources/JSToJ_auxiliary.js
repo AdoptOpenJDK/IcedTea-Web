@@ -1,18 +1,7 @@
 /*
 JSToJ_auxiliary.js
-This file contains auxiliary JavaScript functions for LiveConnect tests output,
-the following reproducers have this file as a common resource:
-- JSToJGet
-- JSToJSet
-- JSToJFuncParam
-- JSToJFuncReturn
-- JSToJFuncResol
-- JSToJTypeConv
-- JToJSGet
-- JToJSSet
-- JToJSFuncParam
-- JToJSFuncReturn
-- JToJSEval
+This file contains auxiliary JavaScript functions for LiveConnect tests output
+it is used by JSToJGet reproducer.
 */
 
 function check(actual, expected, expectedtype, testid, appletName ) {

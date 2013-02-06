@@ -245,5 +245,17 @@ function test_get_DoubleFullArray(){
         appendMessageDiv(e);
     }
 }
+
+function test_get_JSObject(){
+    var appletName = 'jstojGetApplet';
+    try{
+        var javao = new Object(document.getElementById(appletName).jso);
+        check(javao.key1, "value1",  "string", "22 - (JSObject)", appletName);
+    }catch(e){
+        appletStdOut( appletName, e );
+        appendMessageDiv(e);
+    }
+
+}
     
 

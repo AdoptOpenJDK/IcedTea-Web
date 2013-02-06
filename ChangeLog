@@ -1,3 +1,18 @@
+2013-02-06  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* /tests/reproducers/simple/JSToJGet/resources/JSToJGet.html:
+	adding 1 testcase reading applets variable of type JSObject from JS
+	* /tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:
+	adding 1 testcase reading applets variable of type JSObject from JS,
+	small changes to evaluation of the applet's stdout methods, removing
+	KnownToFail anotation from (AppletJSToJGet_DoubleFullArray_Test) method
+	* /tests/reproducers/simple/JSToJGet/resources/JSToJ_auxiliary.js:
+	removing parts of comment that are no longer true
+	* /tests/reproducers/simple/JSToJGet/resources/JSToJava_Get.js:
+	adding (test_get_JSObject) function also to the JS part of test
+	* /tests/reproducers/simple/JSToJGet/srcs/JSToJGet.java:
+	adding the JSObject variable to the applet
+
 2013-02-06  Adam Domurad <adomurad@redhat.com>
 
 	Name threads for easier debugging/tooling. Remove 2 erroneous
