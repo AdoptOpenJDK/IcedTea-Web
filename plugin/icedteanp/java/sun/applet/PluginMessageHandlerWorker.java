@@ -50,6 +50,7 @@ class PluginMessageHandlerWorker extends Thread {
                 PluginMessageConsumer consumer,
                 PluginStreamHandler streamHandler, int id,
                 boolean isPriorityWorker) {
+        super("PluginMessageHandlerWorker" + id);
 
         this.id = id;
         this.streamHandler = streamHandler;

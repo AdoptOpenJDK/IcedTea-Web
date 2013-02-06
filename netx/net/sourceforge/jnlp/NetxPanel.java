@@ -181,7 +181,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             }
         }
 
-        handler = new Thread(getThreadGroup(), this);
+        handler = new Thread(getThreadGroup(), this, "NetxPanelThread@" + this.documentURL);
         handler.start();
     }
 

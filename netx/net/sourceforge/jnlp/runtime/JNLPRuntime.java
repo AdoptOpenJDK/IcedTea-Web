@@ -738,7 +738,7 @@ public class JNLPRuntime {
             e.printStackTrace();
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        Runtime.getRuntime().addShutdownHook(new Thread("JNLPRuntimeShutdownHookThread") {
             public void run() {
                 markNetxStopped();
                 CacheUtil.cleanCache();

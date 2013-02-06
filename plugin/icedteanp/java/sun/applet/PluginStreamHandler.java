@@ -1,4 +1,4 @@
-/* VoidPluginCallRequest -- represent Java-to-JavaScript requests
+/*
    Copyright (C) 2008  Red Hat
 
 This file is part of IcedTea.
@@ -81,7 +81,7 @@ public class PluginStreamHandler {
 
     public void startProcessing() {
 
-        Thread listenerThread = new Thread() {
+        Thread listenerThread = new Thread("PluginStreamHandlerListenerThread") {
 
             public void run() {
 

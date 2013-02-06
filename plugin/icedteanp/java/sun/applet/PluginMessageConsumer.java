@@ -1,4 +1,4 @@
-/* VoidPluginCallRequest -- represent Java-to-JavaScript requests
+/* 
    Copyright (C) 2008  Red Hat
 
 This file is part of IcedTea.
@@ -130,6 +130,10 @@ class PluginMessageConsumer {
     }
 
     protected class ConsumerThread extends Thread {
+
+        public ConsumerThread() {
+            super("PluginMessageConsumer.ConsumerThread");
+        }
 
         /**
          * Scans the readQueue for priority messages and brings them to the front

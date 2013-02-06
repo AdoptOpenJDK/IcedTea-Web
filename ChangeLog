@@ -1,3 +1,20 @@
+2013-02-06  Adam Domurad <adomurad@redhat.com>
+
+	Name threads for easier debugging/tooling. Remove 2 erroneous
+	VoidPluginCallRequest header comments.
+	* netx/net/sourceforge/jnlp/NetxPanel.java:
+	Provide name for thread that calls (run).
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	Provide name for shutdown hook thread.
+	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java:
+	Remove erroneous VoidPluginCallRequest comment. Provide name for
+	ConsumerThread thread.
+	* plugin/icedteanp/java/sun/applet/PluginMessageHandlerWorker.java:
+	Provide name for worker thread.
+	* plugin/icedteanp/java/sun/applet/PluginStreamHandler.java:
+	Remove erroneous VoidPluginCallRequest comment. Provide name for
+	stream listener thread.
+
 2013-02-03  Jiri Vanek  <jvanek@redhat.com>
 
 	Another renamed conflict file for case insensitive systems
