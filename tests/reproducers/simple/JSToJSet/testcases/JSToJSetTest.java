@@ -40,18 +40,25 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.CountingClosingListener;
+import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import org.junit.Assert;
 
 import org.junit.Test;
 
+@Bug( id = { "PR1298" })
 public class JSToJSetTest extends BrowserTest {
 
     private final String exceptionStr = "xception";
     private final String errorStr = "rror";
     private final String initStr = "JSToJSet applet initialized.";
     private final String afterStr = "afterTests";
+
+    public enum TestType{
+        ARRAY_ELEMENT, WHOLE_ARRAY, NORMAL_VALUE
+    }
         
     private class CountingClosingListenerImpl extends CountingClosingListener {
 
@@ -71,7 +78,7 @@ public class JSToJSetTest extends BrowserTest {
 
         // Assert that the values set by JavaScript are ok
         Assert.assertTrue("JSToJSet: the output should include: "+expectedStdout+", but it didnt.",
-        		pr.stdout.contains(expectedStdout));
+        pr.stdout.contains(expectedStdout));
 
     }
 
@@ -82,24 +89,24 @@ public class JSToJSetTest extends BrowserTest {
         evaluateStdoutContents(expectedStdout, pr);
     }
     
-    private void jsToJavaSetSpecialTest(String fieldStr, String valueStr, int testType) throws Exception {
-    	String strURL = "/JSToJSet.html?";
-    	String expectedStdout = "";
-    	switch( testType ){
-        case 0://array element
-        	strURL += fieldStr + ";" + valueStr;
-        	expectedStdout = "New array value is: "+valueStr;
+    private void jsToJavaSetSpecialTest(String fieldStr, String valueStr, TestType testType) throws Exception {
+        String strURL = "/JSToJSet.html?";
+        String expectedStdout = "";
+        switch( testType ){
+        case ARRAY_ELEMENT://array element
+            strURL += fieldStr + ";" + valueStr;
+            expectedStdout = "New array value is: "+valueStr;
             break;
-        case 1://whole array, set 1st element
-        	strURL += fieldStr + ";[" + valueStr;
-        	expectedStdout = "New array value is: "+valueStr;
-    		break;
-        case 2://char et al - to be set at JS side
-        	strURL += fieldStr + ";JavaScript";
-        	expectedStdout = "New value is: "+valueStr;
+        case WHOLE_ARRAY://whole array, set 1st element
+            strURL += fieldStr + ";[" + valueStr;
+            expectedStdout = "New array value is: "+valueStr;
+            break;
+        case NORMAL_VALUE://char et al - to be set at JS side
+            strURL += fieldStr + ";JavaScript";
+            expectedStdout = "New value is: "+valueStr;
             break;
         default:
-            break;    	
+            break;
         }
          
         ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
@@ -145,7 +152,7 @@ public class JSToJSetTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJSet_char_Test() throws Exception {
-        jsToJavaSetSpecialTest("_char", "a", 2);
+        jsToJavaSetSpecialTest("_char", "a", TestType.NORMAL_VALUE);
     }
 
     @Test
@@ -158,8 +165,10 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
+    @Bug( id = {"PR1298"})
     public void AppletJSToJSet_intArrayElement_Test() throws Exception {
-        jsToJavaSetSpecialTest("_intArray[0]", "1", 0);
+        jsToJavaSetSpecialTest("_intArray[0]", "1", TestType.ARRAY_ELEMENT);
     }
 
     @Test
@@ -173,7 +182,7 @@ public class JSToJSetTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJSet_specialCharsString_Test() throws Exception {
-        jsToJavaSetSpecialTest("_specialString", "𠁎〒£$ǣ€𝍖", 2);
+        jsToJavaSetSpecialTest("_specialString", "𠁎〒£$ǣ€𝍖", TestType.NORMAL_VALUE);
     }
 
     @Test
@@ -222,7 +231,7 @@ public class JSToJSetTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJSet_Character_Test() throws Exception {
-        jsToJavaSetSpecialTest("_Character", "A", 2);
+        jsToJavaSetSpecialTest("_Character", "A", TestType.NORMAL_VALUE);
     }
 
     @Test
@@ -235,15 +244,23 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
+    @Bug( id = {"PR1298"})
     public void AppletJSToJSet_DoubleArrayElement_Test() throws Exception {
-        jsToJavaSetSpecialTest("_DoubleArray[0]", "1.1", 0);
+        jsToJavaSetSpecialTest("_DoubleArray[0]", "1.1", TestType.ARRAY_ELEMENT);
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJSet_DoubleFullArray_Test() throws Exception {
-        jsToJavaSetSpecialTest("_DoubleArray2", "0.1", 1);
+        jsToJavaSetSpecialTest("_DoubleArray2", "0.1", TestType.WHOLE_ARRAY);
     }
 
+    @Test
+    @TestInBrowsers(testIn = { Browsers.all })
+    @NeedsDisplay
+    public void AppletJSToJSet_JSObject_Test() throws Exception {
+        jsToJavaSetSpecialTest("_JSObject", "100, red", TestType.NORMAL_VALUE);
+    }
 }

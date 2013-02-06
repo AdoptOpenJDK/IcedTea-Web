@@ -1,3 +1,9 @@
+//dummy javascript class whose instance is passed as JSObject parameter:
+function JSCar(mph,color){
+    this.mph = mph;
+    this.color = color;
+}
+
 function doSetTests( ){
 
     var urlArgs = document.URL.split("?");
@@ -18,12 +24,16 @@ function doSetTests( ){
         if( field === "_specialString"){
             value = "𠁎〒£$ǣ€𝍖";
         } 
+
+        if( field === "_JSObject"){
+            value =  new JSCar(100,"red");
+        }
+
     }else if(value.indexOf('[') != -1){
 
         var elem = value.substring(1);
         value = new Array();
         eval('value[0] = elem');
-
     }
 
     eval('applet.' + field + '= value');

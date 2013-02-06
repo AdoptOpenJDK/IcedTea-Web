@@ -1,7 +1,7 @@
-import java.applet.*;
-import java.awt.*;
+import java.applet.Applet;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import netscape.javascript.JSObject;
 
 public class JSToJSet extends Applet {
 
@@ -27,6 +27,7 @@ public class JSToJSet extends Applet {
     public Double[] _DoubleArray2;
     public char[] _charArray = new char[1];
     public Character[] _CharacterArray = new Character[1];
+    public JSObject _JSObject;
 
     public void init() {
         String initStr = "JSToJSet applet initialized.";
@@ -36,7 +37,12 @@ public class JSToJSet extends Applet {
     public void printNewValueAndFinish(String fieldname) throws Exception {
         Field field = getClass().getDeclaredField(fieldname);
         Object value = field.get(this);
-        if (value != null && value.getClass().isArray()) {
+   
+        if( fieldname.equals("_JSObject") ){
+            Integer mph = (Integer)_JSObject.getMember("mph");
+            String color = (String)_JSObject.getMember("color");
+            System.out.println("New value is: "+mph+", "+color);
+        }else if (value != null && value.getClass().isArray()) {
             System.out.println("New array value is: " + Array.get(value, 0));
         } else {
             System.out.println("New value is: " + value);

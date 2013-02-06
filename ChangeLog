@@ -1,5 +1,19 @@
 2013-02-06  Jana Fabrikova  <jfabriko@redhat.com>
 
+	* /tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java:
+	adding 1 testcase setting applets variable of type JSObject from JS,
+	adding KnownToFail anotation and @Bug annotation with id=PR1298 to
+	(AppletJSToJSet_intArrayElement_Test) and
+	(AppletJSToJSet_DoubleArrayElement_Test) methods
+	* /tests/reproducers/simple/JSToJSet/resources/JSToJava_Set.js:
+	adding the JSObject case to (doSetTests) function
+	* /tests/reproducers/simple/JSToJSet/srcs/JSToJSet.java:
+	adding the JSObject variable to the applet and modifying
+	(printNewValueAndFinish) method in order to output new values
+	of JSObject variable
+
+2013-02-06  Jana Fabrikova  <jfabriko@redhat.com>
+
 	* /tests/reproducers/simple/JSToJGet/resources/JSToJGet.html:
 	adding 1 testcase reading applets variable of type JSObject from JS
 	* /tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:
