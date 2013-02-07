@@ -1,3 +1,10 @@
+2013-02-07  Adam Domurad  <adomurad@redhat.com>
+
+	Ensure applet destruction cannot in the middle of initialization. 
+	* netx/net/sourceforge/jnlp/NetxPanel.java
+	(destroyApplet): wait for applet initialization
+	missing
+
 2013-02-06  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* /tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java:

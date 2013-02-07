@@ -587,6 +587,10 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     private static synchronized void destroyApplet(int identifier) {
 
+        // We should not try to destroy an applet during
+        // initialization. It may cause an inconsistent state.
+        waitForAppletInit( applets.get(identifier).panel );
+
         PluginDebug.debug("DestroyApplet called for ", identifier);
 
         PAV_INIT_STATUS prev = updateStatus(identifier, PAV_INIT_STATUS.DESTROYED);
