@@ -1,0 +1,415 @@
+diff --git a/tests/reproducers/simple/JSToJFuncParam/resources/JSToJFuncParam.html b/tests/reproducers/simple/JSToJFuncParam/resources/JSToJFuncParam.html
+new file mode 100644
+--- /dev/null
++++ b/tests/reproducers/simple/JSToJFuncParam/resources/JSToJFuncParam.html
+@@ -0,0 +1,23 @@
++<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
++<html lang="en-US">
++  <head>
++    <title>JavaScript to Java LiveConnect -  function parameter conversion</title>
++    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
++
++    <script language="JavaScript" src="JSToJava_FuncParam.js"></script>
++
++  </head>
++  <body>
++
++ <h2> The JSToJFuncParam html page</h2>
++
++    <applet code="JSToJFuncParam" width="1000" height="100" name="JSToJFuncParam" id="jstojFuncParamApplet" MAYSCRIPT>
++      <param name="jnlp_href" value="jstoj-funcparam.jnlp">
++    </applet>
++
++    <script language="javascript">
++        doFuncParamTests();
++    </script>
++
++  </body>
++</html>
+diff --git a/tests/reproducers/simple/JSToJFuncParam/resources/JSToJava_FuncParam.js b/tests/reproducers/simple/JSToJFuncParam/resources/JSToJava_FuncParam.js
+new file mode 100644
+--- /dev/null
++++ b/tests/reproducers/simple/JSToJFuncParam/resources/JSToJava_FuncParam.js
+@@ -0,0 +1,18 @@
++//dummy javascript class whose instance is passed as JSObject parameter:
++function JSCar(mph,color){
++    this.mph = mph;
++    this.color = color;
++}
++
++//the main routine used for all tests:
++function doFuncParamTests( ){
++
++    var urlArgs = document.URL.split("?");
++    var testParams = urlArgs[1].split(";");
++    var applet = document.getElementById('jstojFuncParamApplet');
++    var func = testParams[0];
++    var value = decodeURIComponent(testParams[1]);
++
++    eval('applet.' + func + '(' + value + ')');
++    applet.writeAfterTest();
++}
+diff --git a/tests/reproducers/simple/JSToJFuncParam/resources/jstoj-funcparam.jnlp b/tests/reproducers/simple/JSToJFuncParam/resources/jstoj-funcparam.jnlp
+new file mode 100644
+--- /dev/null
++++ b/tests/reproducers/simple/JSToJFuncParam/resources/jstoj-funcparam.jnlp
+@@ -0,0 +1,23 @@
++
++<?xml version="1.0" encoding="UTF-8"?>
++<jnlp spec="1.0+" codebase="" href="jstoj-funcparam.jnlp">
++    <information>
++        <title>JavaScript to Java LiveConnect - FuncParam</title>
++        <vendor>IcedTea</vendor>
++        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
++        <description>LiveConnect - tests for function parameter conversion when calling Java from JS.</description>
++    </information>
++    <resources>
++        <!-- Application Resources -->
++        <j2se version="1.6+"
++              href="http://java.sun.com/products/autodl/j2se"/>
++        <jar href="JSToJFuncParam.jar" main="true" />
++
++    </resources>
++    <applet-desc
++         name="JS to J FuncParam"
++         main-class="JSToJFuncParam"
++         width="1000"
++         height="100">
++     </applet-desc>
++</jnlp>
+diff --git a/tests/reproducers/simple/JSToJFuncParam/srcs/JSToJFuncParam.java b/tests/reproducers/simple/JSToJFuncParam/srcs/JSToJFuncParam.java
+new file mode 100644
+--- /dev/null
++++ b/tests/reproducers/simple/JSToJFuncParam/srcs/JSToJFuncParam.java
+@@ -0,0 +1,114 @@
++import java.applet.Applet;
++import java.util.Arrays;
++import netscape.javascript.JSObject;
++
++public class JSToJFuncParam extends Applet {
++
++    public void init() {
++        String initStr = "JSToJFuncParam applet initialized.";
++        System.out.println(initStr);
++    }
++
++    public void intParam(int i) {
++        System.out.println("intParam "+i);
++    }
++
++    public void doubleParam(double d) {
++        System.out.println("doubleParam "+d);
++    }
++
++    public void floatParam(float f) {
++        System.out.println("floatParam "+f);
++    }
++
++    public void longParam(long l) {
++        System.out.println("longParam "+l);
++    }
++
++    public void booleanParam(boolean b) {
++        System.out.println("booleanParam "+b);
++    }
++
++    public void charParam(char c) {
++        System.out.println("charParam "+c);
++    }
++
++    public void byteParam(byte b) {
++        System.out.println("byteParam "+b);
++    }
++
++    public void charArrayParam(char[] ca) {
++        System.out.println("charArrayParam "+Arrays.toString(ca));
++    }
++
++    public void StringParam(String s) {
++        System.out.println("StringParam "+s);
++    }
++
++    public void IntegerParam(Integer p) {
++        System.out.println("IntegerParam "+p);
++    }
++
++    public void DoubleParam(Double p) {
++        System.out.println("DoubleParam "+p);
++    }
++
++    public void FloatParam(Float p) {
++        System.out.println("FloatParam "+p);
++    }
++
++    public void LongParam(Long p) {
++        System.out.println("LongParam "+p);
++    }
++
++    public void BooleanParam(Boolean p) {
++        System.out.println("BooleanParam "+p);
++    }
++
++    public void CharacterParam(Character p) {
++        System.out.println("CharacterParam "+p);
++    }
++
++    public void ByteParam(Byte p) {
++        System.out.println("ByteParam "+p);
++    }
++
++    public void StringIntMixedParam(String[] s) {
++        System.out.println("StringIntMixedParam "+Arrays.toString(s));
++    }
++
++    public void DummyObjectArrayParam(DummyObject[] ca) {
++        System.out.println("DummyObjectArrayParam "+Arrays.toString(ca));
++    }
++
++    public void JSObjectParam(JSObject car){
++        Integer mph = (Integer)car.getMember("mph");
++        String color = (String)car.getMember("color");
++
++        System.out.println("JSObjectParam "+mph+", "+color);
++    }
++
++    public void writeAfterTest(){
++        System.out.println("afterTests");
++    }
++
++    public class DummyObject {
++        private String str;
++
++        public DummyObject(String s) {
++            this.str = s;
++        }
++
++        public void setStr(String s) {
++            this.str = s;
++        }
++
++        public String toString() {
++           return str;
++        }
++    }
++
++    public DummyObject getNewDummyObject(String str){
++        return new DummyObject(str);
++    }
++}
+diff --git a/tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java b/tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java
+new file mode 100644
+--- /dev/null
++++ b/tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java
+@@ -0,0 +1,212 @@
++/* JSToJFuncParamTest.java
++Copyright (C) 2012 Red Hat, Inc.
++
++This file is part of IcedTea.
++
++IcedTea is free software; you can redistribute it and/or
++modify it under the terms of the GNU General Public License as published by
++the Free Software Foundation, version 2.
++
++IcedTea is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with IcedTea; see the file COPYING.  If not, write to
++the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++02110-1301 USA.
++
++Linking this library statically or dynamically with other modules is
++making a combined work based on this library.  Thus, the terms and
++conditions of the GNU General Public License cover the whole
++combination.
++
++As a special exception, the copyright holders of this library give you
++permission to link this library with independent modules to produce an
++executable, regardless of the license terms of these independent
++modules, and to copy and distribute the resulting executable under
++terms of your choice, provided that you also meet, for each linked
++independent module, the terms and conditions of the license of that
++module.  An independent module is a module which is not derived from
++or based on this library.  If you modify this library, you may extend
++this exception to your version of the library, but you are not
++obligated to do so.  If you do not wish to do so, delete this
++exception statement from your version.
++ */
++
++import net.sourceforge.jnlp.ProcessResult;
++import net.sourceforge.jnlp.ServerAccess;
++import net.sourceforge.jnlp.browsertesting.BrowserTest;
++import net.sourceforge.jnlp.browsertesting.Browsers;
++import net.sourceforge.jnlp.closinglisteners.CountingClosingListener;
++import net.sourceforge.jnlp.annotations.NeedsDisplay;
++import net.sourceforge.jnlp.annotations.TestInBrowsers;
++import org.junit.Assert;
++
++import org.junit.Test;
++
++public class JSToJFuncParamTest extends BrowserTest {
++
++    private final String initStr = "JSToJFuncParam applet initialized.";
++    private final String afterStr = "afterTests";
++
++    private class CountingClosingListenerImpl extends CountingClosingListener {
++
++            @Override
++            protected boolean isAlowedToFinish(String s) {
++                return (s.contains(initStr) && s.contains(afterStr));
++            }
++    }
++
++    private void evaluateStdoutContents(String expectedStdout, ProcessResult pr) {
++        // Assert that the applet was initialized.
++        Assert.assertTrue("JSToJFuncParam: the stdout should contain " + initStr
++                + ", but it didnt.", pr.stdout.contains(initStr));
++
++        // Assert that the values set by JavaScript are ok
++        Assert.assertTrue("JSToJFuncParam: the output should include: "+expectedStdout+", but it didnt.", pr.stdout.contains(expectedStdout));
++
++    }
++
++    private void jsToJavaFuncParamTest(String funcStr, String paramStr, String expectedVal) throws Exception {
++        String strURL = "/JSToJFuncParam.html?" + funcStr + ";" + paramStr;
++        ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
++        String expectedStdout = funcStr + " " + expectedVal;
++        evaluateStdoutContents(expectedStdout, pr);
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_int_Test() throws Exception {
++        jsToJavaFuncParamTest("intParam", "1", "1");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_double_Test() throws Exception {
++        jsToJavaFuncParamTest("doubleParam", "1.1", "1.1");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_float_Test() throws Exception {
++        jsToJavaFuncParamTest("floatParam", "1.1", "1.1");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_long_Test() throws Exception {
++        jsToJavaFuncParamTest("longParam", "10000", "10000");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_boolean_Test() throws Exception {
++        jsToJavaFuncParamTest("booleanParam", "true", "true");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_char_Test() throws Exception {
++        jsToJavaFuncParamTest("charParam", "97", "a");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_byte_Test() throws Exception {
++        jsToJavaFuncParamTest("byteParam", "10", "10");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_charArray_Test() throws Exception {
++        jsToJavaFuncParamTest("charArrayParam", "[97,98,99]", "[a, b, c]");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_String_Test() throws Exception {
++        jsToJavaFuncParamTest("StringParam", "\"test\"", "test");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_Integer_Test() throws Exception {
++        jsToJavaFuncParamTest("IntegerParam", "1", "1");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_Double_Test() throws Exception {
++        jsToJavaFuncParamTest("DoubleParam", "1.1", "1.1");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_Float_Test() throws Exception {
++        jsToJavaFuncParamTest("FloatParam", "1.1", "1.1");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_Long_Test() throws Exception {
++        jsToJavaFuncParamTest("LongParam", "10000", "10000");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_Boolean_Test() throws Exception {
++        jsToJavaFuncParamTest("BooleanParam", "true", "true");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_Character_Test() throws Exception {
++        jsToJavaFuncParamTest("CharacterParam", "new applet.Packages.java.lang.Character(65)", "A");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_Byte_Test() throws Exception {
++        jsToJavaFuncParamTest("ByteParam", "10", "10");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_StringIntMixed_Test() throws Exception {
++        jsToJavaFuncParamTest("StringIntMixedParam", "[\"test\",123]", "[test, 123]");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_DummyObjectArray_Test() throws Exception {
++        jsToJavaFuncParamTest("DummyObjectArrayParam", "[applet.getNewDummyObject(\"Dummy1\"),applet.getNewDummyObject(\"Dummy2\")]", "[Dummy1, Dummy2]");
++    }
++
++    @Test
++    @TestInBrowsers(testIn = { Browsers.all })
++    @NeedsDisplay
++    public void AppletJSToJFuncParam_JSObject_Test() throws Exception {
++        jsToJavaFuncParamTest("JSObjectParam", "new JSCar(100,\"red\")", "100, red");
++    }
++
++}

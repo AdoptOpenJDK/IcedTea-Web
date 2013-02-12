@@ -1,0 +1,23 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="" href="jstoj-funcparam.jnlp">
+    <information>
+        <title>JavaScript to Java LiveConnect - FuncParam</title>
+        <vendor>IcedTea</vendor>
+        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
+        <description>LiveConnect - tests for function parameter conversion when calling Java from JS.</description>
+    </information>
+    <resources>
+        <!-- Application Resources -->
+        <j2se version="1.6+"
+              href="http://java.sun.com/products/autodl/j2se"/>
+        <jar href="JSToJFuncParam.jar" main="true" />
+
+    </resources>
+    <applet-desc
+         name="JS to J FuncParam"
+         main-class="JSToJFuncParam"
+         width="1000"
+         height="100">
+     </applet-desc>
+</jnlp>

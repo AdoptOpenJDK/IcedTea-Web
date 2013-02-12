@@ -1,3 +1,19 @@
+2013-02-12  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* /tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java:
+	adding 19 testcases - 18 based on the interactive Liveconnect JS->Java
+	function parameter tests, 1 additional testcase for passing parameters
+	of type JSObject (from JS to Java)
+	* /tests/reproducers/simple/JSToJFuncParam/srcs/JSToJFuncParam.java:
+	the applet whose methods are invoked from JS during the tests
+	* /tests/reproducers/simple/JSToJFuncParam/resources/JSToJava_FuncParam.js:
+	the JavaScript code for calling the applet methods from JS
+	* /tests/reproducers/simple/JSToJFuncParam/resources/jstoj-funcparam.jnlp:
+	JNLP file for displaying applet in the HTML page
+	* /tests/reproducers/simple/JSToJFuncParam/resources/JSToJFuncParam.html:
+	the html page with java applet embedded, displayed in browser during
+	the tests
+
 2013-02-12 Jana Fabrikova <jfabriko@redhat.com>
 
 	* /tests/reproducers/simple/JSToJTypeConv/testcases/JSToJTypeConvTest.java:
