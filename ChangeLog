@@ -1,3 +1,19 @@
+2013-02-12 Jana Fabrikova <jfabriko@redhat.com>
+
+	* /tests/reproducers/simple/JSToJTypeConv/testcases/JSToJTypeConvTest.java:
+	adding 50 testcases based on the interactive Liveconnect
+	JS->Java type conversion tests and 4 testcases for setting
+	java boolean and Boolean variables to nonempty strings
+	* /tests/reproducers/simple/JSToJTypeConv/srcs/JSToJTypeConv.java:
+	the applet whose variables are set from JS during the tests
+	* /tests/reproducers/simple/JSToJTypeConv/resources/JSToJava_TypeConv.js:
+	the JavaScript code for setting the applet variables from JS
+	* /tests/reproducers/simple/JSToJTypeConv/resources/jstoj-typeconv.jnlp:
+	JNLP file for displaying applet in the html page
+	* /tests/reproducers/simple/JSToJTypeConv/resources/JSToJTypeConv.html:
+	the html page with java applet embedded, displayed in browser
+	during the tests 
+
 2013-02-07  Adam Domurad  <adomurad@redhat.com>
 
 	Ensure applet destruction cannot in the middle of initialization. 
