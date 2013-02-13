@@ -1,3 +1,19 @@
+2013-02-13  Jiri Vanek  <jvanek@redhat.com>
+
+	Added test for hanging firefox by LaunchException and Improved AddShutdownHookTest
+	* tests/reproducers/simple/AddShutdownHook/resources/AddShutdownHook.html:
+	new file to launch applet with RuntimeException as result.
+	* tests/reproducers/simple/AddShutdownHook/resources/AddShutdownHook_wrong.html:
+	new file to launch applet with LaunchException as result.
+	* tests/reproducers/simple/AddShutdownHook/srcs/AddShutdownHook.java: is
+	now also applet.
+	* tests/reproducers/simple/AddShutdownHook/testcases/AddShutdownHookTest.java:
+	Added test (AddShutdownHookApplet)for applet, removed duplicate code by rules.
+	* tests/reproducers/simple/AddShutdownHook/testcases/HangFirefoxTests.java:
+	New test set which is launching exception throwing applet, and after exception
+	is thrown then it tries jsut stdou-ing applet. Second applet have to be
+	launched. 
+
 2013-02-12  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* /tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java:

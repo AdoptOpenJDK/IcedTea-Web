@@ -42,7 +42,11 @@ import net.sourceforge.jnlp.browsertesting.Browsers;
 
 public class Epiphany extends MozillaFamilyLinuxBrowser {
 
-    String[] cs = {"--new-tab"};
+    //the --sm-client-disable is hack which fixed  separate calls to epiphany
+    //without this, the second tab is never open :(
+    //with this, also no tab, but at least new window in same process. So ok for testsuite.
+    //may fall to --new-tab  with some fix on this issue again
+    String[] cs = {"--sm-client-disable"};
 
     public Epiphany(String bin) {
         super(bin);
