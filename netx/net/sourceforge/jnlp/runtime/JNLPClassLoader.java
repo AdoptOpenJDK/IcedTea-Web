@@ -17,6 +17,10 @@ package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import java.util.concurrent.locks.ReentrantLock;
+
+import java.util.concurrent.locks.Lock;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -114,9 +118,12 @@ public class JNLPClassLoader extends URLClassLoader {
     /** True if the application has a signed JNLP File */
     private boolean isSignedJNLP = false;
     
-    /** map from JNLPFile url to shared classloader */
-    private static Map<String, JNLPClassLoader> urlToLoader =
-            new HashMap<String, JNLPClassLoader>(); // never garbage collected!
+    /** map from JNLPFile unique key to shared classloader */
+    private static Map<String, JNLPClassLoader> uniqueKeyToLoader = new ConcurrentHashMap<String, JNLPClassLoader>();
+
+    /** map from JNLPFile unique key to lock, the lock is needed to enforce correct 
+     * initialization of applets that share a unique key*/
+    private static Map<String, ReentrantLock> uniqueKeyToLock = new HashMap<String, ReentrantLock>();
 
     /** the directory for native code */
     private File nativeDir = null; // if set, some native code exists
@@ -338,6 +345,26 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
+     * Gets the lock for a given unique key, creating one if it does not yet exist.
+     * This operation is atomic & thread-safe.
+     * 
+     * @param file the file whose unique key should be used
+     * @return the lock
+     */
+    private static ReentrantLock getUniqueKeyLock(String uniqueKey) {
+        synchronized (uniqueKeyToLock) {
+            ReentrantLock storedLock = uniqueKeyToLock.get(uniqueKey);
+
+            if (storedLock == null) {
+                storedLock = new ReentrantLock();
+                uniqueKeyToLock.put(uniqueKey, storedLock);
+            }
+
+            return storedLock;
+        }
+    }
+
+    /**
      * Returns a JNLP classloader for the specified JNLP file.
      *
      * @param file the file to load classes for
@@ -359,11 +386,8 @@ public class JNLPClassLoader extends URLClassLoader {
         JNLPClassLoader loader = null;
         String uniqueKey = file.getUniqueKey();
 
-        if (uniqueKey != null)
-            baseLoader = urlToLoader.get(uniqueKey);
-
-        try {
-
+        synchronized ( getUniqueKeyLock(uniqueKey) ) {
+            baseLoader = uniqueKeyToLoader.get(uniqueKey);
 
             // A null baseloader implies that no loader has been created 
             // for this codebase/jnlp yet. Create one.
@@ -375,7 +399,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 // New loader init may have caused extentions to create a
                 // loader for this unique key. Check.
-                JNLPClassLoader extLoader = urlToLoader.get(uniqueKey);
+                JNLPClassLoader extLoader = uniqueKeyToLoader.get(uniqueKey);
 
                 if (extLoader != null && extLoader != loader) {
                     if (loader.signing && !extLoader.signing)
@@ -404,16 +428,12 @@ public class JNLPClassLoader extends URLClassLoader {
                 loader = baseLoader;
             }
 
-        } catch (LaunchException e) {
-            throw e;
-        }
+            // loaders are mapped to a unique key. Only extensions and parent
+            // share a key, so it is safe to always share based on it
 
-        // loaders are mapped to a unique key. Only extensions and parent
-        // share a key, so it is safe to always share based on it
-        
-        loader.incrementLoaderUseCount();
-        synchronized(urlToLoader) {
-            urlToLoader.put(uniqueKey, loader);
+            loader.incrementLoaderUseCount();
+
+            uniqueKeyToLoader.put(uniqueKey, loader);
         }
 
         return loader;
@@ -430,12 +450,17 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version, UpdatePolicy policy, String mainName)
             throws IOException, ParseException, LaunchException {
-        JNLPClassLoader loader = urlToLoader.get(uniqueKey);
 
-        if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
-            JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, false, policy);
+        JNLPClassLoader loader;
 
-            loader = getInstance(jnlpFile, policy, mainName);
+        synchronized ( getUniqueKeyLock(uniqueKey) ) {
+            loader = uniqueKeyToLoader.get(uniqueKey);
+
+            if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
+                JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, false, policy);
+
+                loader = getInstance(jnlpFile, policy, mainName);
+            }
         }
 
         return loader;
@@ -2079,13 +2104,16 @@ public class JNLPClassLoader extends URLClassLoader {
      * 
      * @throws SecurityException if caller is not trusted
      */
-    private synchronized void incrementLoaderUseCount() {
-        
+    private void incrementLoaderUseCount() {
+
         // For use by trusted code only
         if (System.getSecurityManager() != null)
             System.getSecurityManager().checkPermission(new AllPermission());
-        
-        useCount++;
+
+        // NB: There will only ever be one class-loader per unique-key
+        synchronized ( getUniqueKeyLock(file.getUniqueKey()) ){
+            useCount++;
+        }
     }
 
     /**
@@ -2197,17 +2225,20 @@ public class JNLPClassLoader extends URLClassLoader {
      * 
      * @throws SecurityException if caller is not trusted
      */
-    public synchronized void decrementLoaderUseCount() {
+    public void decrementLoaderUseCount() {
 
         // For use by trusted code only
         if (System.getSecurityManager() != null)
             System.getSecurityManager().checkPermission(new AllPermission());
 
-        useCount--;
+        String uniqueKey = file.getUniqueKey();
 
-        if (useCount <= 0) {
-            synchronized(urlToLoader) {
-                urlToLoader.remove(file.getUniqueKey());
+        // NB: There will only ever be one class-loader per unique-key
+        synchronized ( getUniqueKeyLock(uniqueKey) ) {
+            useCount--;
+
+            if (useCount <= 0) {
+                uniqueKeyToLoader.remove(uniqueKey);
             }
         }
     }

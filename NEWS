@@ -28,6 +28,7 @@ New in release 1.4 (2012-XX-XX):
   - PR1198: JSObject is not passed to javascript correctly
   - PR1260: IcedTea-Web should not rely on GTK
   - PR1157: Applets can hang browser after fatal exception
+  - PR580: http://www.horaoficial.cl/ loads improperly
 * Common
   - PR1049: Extension jnlp's signed jar with the content of only META-INF/* is considered
   - PR955: regression: SweetHome3D fails to run

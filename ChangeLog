@@ -1,3 +1,17 @@
+2013-02-13  Adam Domurad  <adomurad@redhat.com>
+
+	Fix PR580: http://www.horaoficial.cl/ loads improperly. Applets that
+	must share a class-loader now load sequentially.
+	* NEWS:
+	Mention the fix.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getUniqueKeyLock): New, atomically grabs or creates a lock for the
+	unique key.
+	(getInstance): Ensure classloader initialization is locked by unique
+	key.
+	(decrementLoaderUseCount): Ensure classloader deinitialization is
+	locked by unique key, get rid of no-longer used locks. 
+
 2013-02-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Added test for hanging firefox by LaunchException and Improved AddShutdownHookTest
