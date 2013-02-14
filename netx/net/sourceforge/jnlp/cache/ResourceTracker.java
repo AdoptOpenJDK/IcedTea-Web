@@ -35,7 +35,9 @@ import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
@@ -47,6 +49,7 @@ import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.event.DownloadEvent;
 import net.sourceforge.jnlp.event.DownloadListener;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
 /**
@@ -567,7 +570,7 @@ public class ResourceTracker {
         if (threads < maxThreads) {
             threads++;
 
-            Thread thread = new Thread(new Downloader());
+            Thread thread = new Thread(new Downloader(), "DownloaderThread" + threads);
             thread.start();
         }
     }
@@ -793,6 +796,12 @@ public class ResourceTracker {
 
             // connect
             URL finalLocation = findBestUrl(resource);
+
+            if (finalLocation == null) {
+                System.err.println("Attempted to download " + resource.location + ", but failed to connect!");
+                throw new NullPointerException("finalLocation == null"); // Caught below
+            }
+
             resource.setDownloadLocation(finalLocation);
             URLConnection connection = finalLocation.openConnection(); // this won't change so should be okay unsynchronized
             connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
@@ -851,12 +860,44 @@ public class ResourceTracker {
             entry.unlock();
         }
     }
+    /**
+     * Connects to the given URL, and grabs a response code if the URL uses
+     * the HTTP protocol, or returns an arbitrary valid HTTP response code.
+     * 
+     * @return the response code if HTTP connection, or HttpURLConnection.HTTP_OK if not.
+     * @throws IOException
+     */
+    private static int getUrlResponseCode(URL url, Map<String, String> requestProperties, String requestMethod) throws IOException {
+        URLConnection connection = url.openConnection();
+
+        for (Map.Entry<String, String> property : requestProperties.entrySet()){
+            connection.addRequestProperty(property.getKey(), property.getValue());
+        }
+
+        if (connection instanceof HttpURLConnection) {
+            HttpURLConnection httpConnection = (HttpURLConnection)connection;
+            httpConnection.setRequestMethod(requestMethod);
+
+            int responseCode = httpConnection.getResponseCode();
+
+            /* Fully consuming current request helps with connection re-use 
+             * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
+            StreamUtils.consumeAndCloseInputStream(httpConnection.getInputStream());
+
+            return responseCode;
+        }
+
+        return HttpURLConnection.HTTP_OK /* return a valid response code */;
+    }
+
 
     /**
-     * Returns the best URL to use for downloading the resource
+     * Returns the 'best' valid URL for the given resource.
+     * This first adjusts the file name to take into account file versioning
+     * and packing, if possible.
      *
      * @param resource the resource
-     * @return a URL or null
+     * @return the best URL, or null if all failed to resolve
      */
     private URL findBestUrl(Resource resource) {
         DownloadOptions options = downloadOptions.get(resource);
@@ -869,29 +910,37 @@ public class ResourceTracker {
             System.err.println("All possible urls for " +
                     resource.toString() + " : " + urls);
         }
-        URL bestUrl = null;
+
         for (URL url : urls) {
             try {
-                URLConnection connection = url.openConnection();
-                connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
-                if (connection instanceof HttpURLConnection) {
-                    HttpURLConnection con = (HttpURLConnection)connection;
-                    int responseCode = con.getResponseCode();
-                    if (responseCode == -1 || responseCode < 200 || responseCode >= 300) {
-                        continue;
+                Map<String, String> requestProperties = new HashMap<String, String>();
+                requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
+
+                int responseCode = getUrlResponseCode(url, requestProperties, "HEAD");
+
+                if (responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED ) {
+                    System.err.println("NOTE: The server does not appear to support HEAD requests, falling back to GET requests.");
+                    /* Fallback: use GET request in the rare case the server does not support HEAD requests */
+                    responseCode = getUrlResponseCode(url, requestProperties, "GET");
+                }
+
+                /* Check if within valid response code range */
+                if (responseCode >= 200 && responseCode < 300) {
+                    if (JNLPRuntime.isDebug()) {
+                        System.err.println("best url for " + resource.toString() + " is " + url.toString());
                     }
+                    return url; /* This is the best URL */
                 }
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println("best url for " + resource.toString() + " is " + url.toString());
-                }
-                bestUrl = url;
-                break;
             } catch (IOException e) {
-                // continue
+                // continue to next candidate
+                if (JNLPRuntime.isDebug()) {
+                    System.err.println("While processing " + url.toString() + " for resource " + resource.toString() + " got " + e);
+                }
             }
         }
 
-        return bestUrl;
+        /* No valid URL, return null */
+        return null;
     }
 
     /**

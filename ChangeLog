@@ -1,5 +1,18 @@
 2013-02-14  Adam Domurad  <adomurad@redhat.com>
 
+	PR835: javaws leaks connections
+	Uses HEAD requests if possible for testing URLs. Adds name to download
+	threads.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
+	(startThread): Add name to download thread
+	(getResourceUrlResponseCode): Get or fake an HTTP response code.
+	(findBestUrl): Use getResourceUrlResponseCode to first try a HEAD
+	request. Fall-back to GET rquest.
+	* netx/net/sourceforge/jnlp/utils/StreamUtils.java:
+	New file, contains utility for consuming input stream.
+
+2013-02-14  Adam Domurad  <adomurad@redhat.com>
+
 	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java:
 	Support HEAD requests.
 
