@@ -89,7 +89,11 @@ class TinyHttpdImpl extends Thread {
                     if (s.length() < 1) {
                         break;
                     }
-                    if (s.startsWith("GET")) {
+
+                    boolean isGetRequest = s.startsWith("GET");
+                    boolean isHeadRequest = s.startsWith("HEAD");
+
+                    if (isGetRequest || isHeadRequest ) {
                         StringTokenizer t = new StringTokenizer(s, " ");
                         t.nextToken();
                         String op = t.nextToken();
@@ -117,6 +121,11 @@ class TinyHttpdImpl extends Thread {
                             content = ct + "application/x-jar\n";
                         }
                         o.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + l + "\n" + content + "\n");
+
+                        if (isHeadRequest) {
+                            continue; // Skip sending body
+                        }
+
                         if (op.startsWith(XSX)) {
                             byte[][] bb = splitArray(b, 10);
                             for (int j = 0; j < bb.length; j++) {
