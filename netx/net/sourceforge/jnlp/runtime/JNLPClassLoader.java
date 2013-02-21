@@ -1144,7 +1144,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
 
             // Class from host X should be allowed to connect to host X
-            if (cs.getLocation().getHost().length() > 0)
+            if (cs.getLocation() != null && cs.getLocation().getHost().length() > 0)
                 result.add(new SocketPermission(cs.getLocation().getHost(),
                         "connect, accept"));
 

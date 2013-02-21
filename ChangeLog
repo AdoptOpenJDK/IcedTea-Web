@@ -1,3 +1,9 @@
+2013-02-21  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getPermissions): avoid potential NPE if code source location is
+	missing
+
 2013-02-14  Adam Domurad  <adomurad@redhat.com>
 
 	PR835: javaws leaks connections
