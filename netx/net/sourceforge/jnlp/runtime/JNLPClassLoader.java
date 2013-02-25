@@ -365,6 +365,43 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
+     * Creates a fully initialized JNLP classloader for the specified JNLPFile, 
+     * to be used as an applet/application's classloader.
+     * In contrast, JNLP classloaders can also be constructed simply to merge 
+     * its resources into another classloader.
+     *
+     * @param file the file to load classes for
+     * @param policy the update policy to use when downloading resources
+     * @param mainName Overrides the main class name of the application
+     */
+    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName) throws LaunchException {
+        String uniqueKey = file.getUniqueKey();
+        JNLPClassLoader baseLoader = uniqueKeyToLoader.get(uniqueKey);
+        JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName);
+
+        // New loader init may have caused extentions to create a
+        // loader for this unique key. Check.
+        JNLPClassLoader extLoader = uniqueKeyToLoader.get(uniqueKey);
+
+        if (extLoader != null && extLoader != loader) {
+            if (loader.signing && !extLoader.signing)
+                if (!SecurityDialogs.showNotAllSignedWarningDialog(file))
+                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
+
+            loader.merge(extLoader);
+            extLoader.decrementLoaderUseCount(); // loader urls have been merged, ext loader is no longer used
+        }
+
+        // loader is now current + ext. But we also need to think of
+        // the baseLoader
+        if (baseLoader != null && baseLoader != loader) {
+           loader.merge(baseLoader);
+        }
+
+        return loader;
+    }
+
+    /**
      * Returns a JNLP classloader for the specified JNLP file.
      *
      * @param file the file to load classes for
@@ -395,27 +432,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     (file.isApplication() && 
                      !baseLoader.getJNLPFile().getFileLocation().equals(file.getFileLocation()))) {
 
-                loader = new JNLPClassLoader(file, policy, mainName);
-
-                // New loader init may have caused extentions to create a
-                // loader for this unique key. Check.
-                JNLPClassLoader extLoader = uniqueKeyToLoader.get(uniqueKey);
-
-                if (extLoader != null && extLoader != loader) {
-                    if (loader.signing && !extLoader.signing)
-                        if (!SecurityDialogs.showNotAllSignedWarningDialog(file))
-                            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
-
-                    loader.merge(extLoader);
-                    extLoader.decrementLoaderUseCount(); // loader urls have been merged, ext loader is no longer used
-                }
-
-                // loader is now current + ext. But we also need to think of
-                // the baseLoader
-                if (baseLoader != null && baseLoader != loader) {
-                   loader.merge(baseLoader);
-                }
-
+                loader = createInstance(file, policy, mainName);
             } else {
                 // if key is same and locations match, this is the loader we want
                 if (!file.isApplication()) {

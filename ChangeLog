@@ -1,3 +1,10 @@
+2013-02-25  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(createInstance): Extract initialization logic from 'getInstance' into 
+	new 'createInstace' method.
+	(getInstance): Call newly introduced createInstance method.
+
 2013-02-25  Jiri Vanek  <jvanek@redhat.com>
 
 	Removed unused legacy-launcher sources
