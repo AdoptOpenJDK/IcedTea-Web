@@ -1,3 +1,26 @@
+2013-02-25  Jiri Vanek  <jvanek@redhat.com>
+
+	Removed unused legacy-launcher sources
+	* launcher/java.c:
+	* launcher/java.h:
+	* launcher/java_md.c:
+	* launcher/java_md.h:
+	* launcher/jli_util.c:
+	* launcher/jli_util.h:
+	* launcher/jni.h:
+	* launcher/jni_md.h:
+	* launcher/jvm.h:
+	* launcher/jvm_md.h:
+	* launcher/manifest_info.h:
+	* launcher/parse_manifest.c:
+	* launcher/splashscreen.h:
+	* launcher/splashscreen_stubs.c:
+	* launcher/version_comp.c:
+	* launcher/version_comp.h:
+	* launcher/wildcard.c:
+	* launcher/wildcard.h:
+	Happily removed
+
 2013-02-21  Adam Domurad  <adomurad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
