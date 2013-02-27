@@ -41,6 +41,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -230,7 +231,10 @@ public class ControlPanel extends JFrame {
                 new SettingsPanel(Translator.R("CPTabNetwork"), createNetworkSettingsPanel()),
                 // TODO: This is commented out since this is not implemented yet
                 // new SettingsPanel(Translator.R("CPTabRuntimes"), createRuntimesSettingsPanel()),
-                new SettingsPanel(Translator.R("CPTabSecurity"), createSecuritySettingsPanel()), };
+                new SettingsPanel(Translator.R("CPTabSecurity"), createSecuritySettingsPanel()),
+                //todo refactor to work with tmp file and apply as asu designed it
+                new SettingsPanel(Translator.R("APPEXTSECControlPanelExtendedAppletSecurityTitle"), new UnsignedAppletsTrustingListPanel(DeploymentConfiguration.getAppletTrustGlobalSettingsPath(),DeploymentConfiguration.getAppletTrustUserSettingsPath(), this.config) )
+        };
 
         // Add panels.
         final JPanel settingsPanel = new JPanel(new CardLayout());
@@ -360,6 +364,7 @@ public class ControlPanel extends JFrame {
             config.save();
         } catch (IOException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e);
         }
     }
 

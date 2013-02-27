@@ -42,6 +42,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 
 import net.sourceforge.jnlp.ShortcutDesc;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
@@ -384,6 +385,12 @@ public class Defaults {
                         DeploymentConfiguration.KEY_PLUGIN_JVM_ARGUMENTS,
                         null,
                         null
+                },
+               //unsigned applet security level
+                {
+                DeploymentConfiguration.KEY_SECURITY_LEVEL,
+                new SecurityValueValidator(),
+                null
                 }
         };
 

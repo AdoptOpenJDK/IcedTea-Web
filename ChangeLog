@@ -1,3 +1,56 @@
+2013-02-27  Jiri Vanek  <jvanek@redhat.com>
+
+	Added backend and settings for extended applet security
+	* netx/net/sourceforge/jnlp/config/Defaults.java: deployment.security.level
+	added to defaults with its validator
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: Added
+	deployment.security.level (KEY_SECURITY_LEVEL)key and
+	.appletTrustSettings (APPLET_TRUST_SETTINGS)filename with getters
+	* netx/net/sourceforge/jnlp/config/SecurityValueValidator.java:
+	Simple validator  for value of deployment.security.level based on parsing
+	in AppletSecurityLevel.fromString
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:
+	Incorporated UnsignedAppletsTrustingListPanel panel
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java:
+	Backend for main tables in UnsignedAppletsTrustingListPanel
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	GUI for manipulate the deployment.security.level values and content of
+	.appletTrustSettings files
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Added keys and values for new; user visible, strings
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/AppletSecurityLevel.java:
+	Object representation of deployment.security.level value
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/AppletStartupSecuritySettings.java:
+	Entrance singleton for current deployment.security.level policy and records.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExecuteUnsignedApplet.java:
+	Object representation of action upon record in .appletTrustSettings
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionEntry.java:
+	Object representation of one item in .appletTrustSettings
+	.appletTrustSettings  by itw (except settings part)
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionStorage.java
+	Minimal set of functionality requested for accessing the  
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UrlRegEx.java
+	Simple class which should help to distinguish between plain String
+	and String  keeping UrlRegex	
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
+	Extended implementation of UnsignedAppletActionStorageImpl which have
+	additional "for settings" functionality
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	Object representation of.appletTrustSettings file. It Should be multi-thread/app safe and 
+	should be always actual. Based on LockingReaderWriter.
+	* netx/net/sourceforge/jnlp/util/lockingfile/LockedFile.java:
+	Utility class with functionality to lock file in muti-app/thread environment
+	* netx/net/sourceforge/jnlp/util/lockingfile/LockingReaderWriter.java:	
+	Utility class with functionality to lock file during reading/writing
+	 in muti-app/thread environment
+	* netx/net/sourceforge/jnlp/util/lockingfile/StorageIoException.java:
+	Wrapper for common, but rare IOException extending RuntimeExceptionaround 
+	for LockingReaderWriter to avoid numerous declarations.
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java:
+	Tests of main methods in UnsignedAppletActionStorageImplTest focused on matching
+	* tests/netx/unit/net/sourceforge/jnlp/util/lockingfile/LockingReaderWriterTest.java:
+	Tests of multithread read/write to LockingReaderWriter
+
 2013-02-25  Adam Domurad  <adomurad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:

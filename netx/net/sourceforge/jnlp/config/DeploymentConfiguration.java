@@ -51,6 +51,7 @@ public final class DeploymentConfiguration {
     public static final String DEPLOYMENT_DIR = ".icedtea";
     public static final String DEPLOYMENT_CONFIG = "deployment.config";
     public static final String DEPLOYMENT_PROPERTIES = "deployment.properties";
+    public static final String APPLET_TRUST_SETTINGS = ".appletTrustSettings";
 
     public static final String DEPLOYMENT_COMMENT = "Netx deployment configuration";
 
@@ -104,6 +105,9 @@ public final class DeploymentConfiguration {
 
     /** Boolean. Only show security prompts to user if true */
     public static final String KEY_SECURITY_PROMPT_USER = "deployment.security.askgrantdialog.show";
+
+    //enum of AppletSecurityLevel in result
+    public static final String KEY_SECURITY_LEVEL = "deployment.security.level";
 
     public static final String KEY_SECURITY_TRUSTED_POLICY = "deployment.security.trusted.policy";
 
@@ -194,6 +198,17 @@ public final class DeploymentConfiguration {
      */
     public void load() throws ConfigurationException {
         load(true);
+    }
+
+    public static File getAppletTrustUserSettingsPath() {
+        return new File(System.getProperty("user.home") + File.separator + DEPLOYMENT_DIR
+                + File.separator + APPLET_TRUST_SETTINGS);
+    }
+
+     public static File getAppletTrustGlobalSettingsPath() {
+       return new File(File.separator + "etc" + File.separator + ".java" + File.separator
+                + "deployment" + File.separator + APPLET_TRUST_SETTINGS);
+        
     }
 
     /**
