@@ -45,7 +45,10 @@ class SecurityValueValidator implements ValueValidator {
     @Override
     public void validate(Object value) throws IllegalArgumentException {
         if (value == null) {
-            throw new IllegalArgumentException("Value can't be null");
+            // null is correct, it means it is not user set
+            // and so default shoudl be used whatever it is
+            // returning to prevent NPE in fromString
+            return;
         }
         if (value instanceof AppletSecurityLevel) {
             //??
