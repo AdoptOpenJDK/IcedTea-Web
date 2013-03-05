@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -55,4 +56,19 @@ public class StreamUtils {
         in.close();
     }
 
+    /***
+     * Closes a stream, without throwing IOException.
+     * In case of IOException, prints the stack trace to System.err.
+     * 
+     * @param stream the stream that will be closed
+     */
+    public static void closeSilently (Closeable stream) {
+        if (stream != null) {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                e.printStackTrace(System.err);
+            }
+        }
+    }
 }

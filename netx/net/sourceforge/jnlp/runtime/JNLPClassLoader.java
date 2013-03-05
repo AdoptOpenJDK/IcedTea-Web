@@ -89,6 +89,7 @@ import net.sourceforge.jnlp.security.PluginAppVerifier;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.StreamUtils;
 import sun.misc.JarIndex;
 
 /**
@@ -1022,28 +1023,14 @@ public class JNLPClassLoader extends URLClassLoader {
         } finally {
 
             //Close all streams
-            closeStream(inStream);
-            closeStream(inputReader);
-            closeStream(fr);
-            closeStream(jnlpReader);
+            StreamUtils.closeSilently(inStream);
+            StreamUtils.closeSilently(inputReader);
+            StreamUtils.closeSilently(fr);
+            StreamUtils.closeSilently(jnlpReader);
         }
 
         if (JNLPRuntime.isDebug())
             System.err.println("Ending check for signed JNLP file...");
-    }
-
-    /***
-     * Closes a stream
-     * 
-     * @param stream the stream that will be closed
-     */
-    private void closeStream (Closeable stream) {
-        if (stream != null)
-            try {
-                stream.close();
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
-            }
     }
 
     /**

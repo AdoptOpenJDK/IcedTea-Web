@@ -1,3 +1,11 @@
+2013-03-05  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(closeStream): Remove.
+	(verifySignedJNLP): Make use of StreamUtils instead.
+	* netx/net/sourceforge/jnlp/utils/StreamUtils.java
+	(closeSilently): New method.
+
 2013-02-28  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/config/SecurityValueValidator.java: modifed
