@@ -36,7 +36,9 @@
 package net.sourceforge.jnlp.resources;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -49,61 +51,137 @@ import org.junit.Test;
 
 public class MessagesPropertiesTest {
 
-    public static final String mainFile = "Messages";
-    public static final String[] secondaryCountries = new String[]{"cs"};
-    public static final String[] secondaryLanguages = new String[]{"CZ"};
-    public static ResourceBundle main;
-    public static ResourceBundle[] secondary = new ResourceBundle[secondaryCountries.length];
+    private final static class LocalesIdentifier {
+        
+        public static final LocalesIdentifier DEFAULT = new LocalesIdentifier("","");
+        public static final LocalesIdentifier CZ_CS = new LocalesIdentifier("CZ","cs");
+        public static final LocalesIdentifier DE = new LocalesIdentifier("de");
+        //public static final LocalesIdentifier DE_DE = new LocalesIdentifier("DE","de");
+        
+        public static final String mainFileName = "Messages";
+        public static final String pckg = "net.sourceforge.jnlp.resources";
+        private final String country;
+        private final String language;
+        private final Locale locale;
+        private final ResourceBundle bundle;
+
+        public LocalesIdentifier(String country, String language) {
+            this.country = country;
+            this.language = language;
+            if (getCountry().equals("") && getLanguage().equals("")){
+                locale = new Locale("unknown_so_default", "unknown_so_default");
+            } else {
+                //get default by non existing language and country
+            locale = new Locale(language, country);
+            }
+            bundle = ResourceBundle.getBundle(pckg+"." + mainFileName, locale);
+        }
+
+        public LocalesIdentifier(String language) {
+            this.country = null;
+            this.language = language;
+            locale = new Locale(language);
+            bundle = ResourceBundle.getBundle(pckg+"." + mainFileName, locale);
+        }
+
+        public String getCountry() {
+            if (country == null) {
+                return "";
+            }
+            return country.trim();
+        }
+
+        public String getLanguage() {
+            if (language == null) {
+                return "";
+            }
+            return language.trim();
+        }
+
+        public ResourceBundle getBundle() {
+            return bundle;
+        }
+
+        public Locale getLocale() {
+            return locale;
+        }
+        
+        
+
+        public String getId() {
+            if (getLanguage().equals("")) {
+                return getCountry();
+            }
+            if (getCountry().equals("")) {
+                return getLanguage();
+            }
+            return getLanguage() + "_" + getCountry();
+        }
+        
+          public String getIdentifier() {
+            if (getId().equals("")) {
+                return "default";
+            }
+            return getId();
+        }
+
+        @Override
+        public String toString() {
+            return pckg+"."+mainFileName+"_"+getId();
+        }
+
+
+        
+     
+        
+        
+    }
+   
+    public static LocalesIdentifier main;
+    public static LocalesIdentifier[] secondary;
 
     @BeforeClass
     public static void loadResourceBoundels() {
-        assertTrue("length of countries and languages must be same", secondaryCountries.length == secondaryLanguages.length);
         //get default by non existing language and country
-        main = ResourceBundle.getBundle("net.sourceforge.jnlp.resources." + mainFile, new Locale("dfgdfg", "gvff"));
-        secondary = new ResourceBundle[secondaryCountries.length];
+        main = LocalesIdentifier.DEFAULT;
         assertNotNull(main);
-        for (int i = 0; i < secondaryCountries.length; i++) {
-            String country = secondaryCountries[i];
-            String language = secondaryLanguages[i];
-            secondary[i] = ResourceBundle.getBundle("net.sourceforge.jnlp.resources." + mainFile, new Locale(country, language));
+        secondary= new LocalesIdentifier[] {LocalesIdentifier.CZ_CS,LocalesIdentifier.DE};
+        assertNotNull(secondary);
+        for (int i = 0; i < secondary.length; i++) {
             assertNotNull(secondary[i]);
+         
         }
     }
 
     @Test
     public void allResourcesAreReallyDifferent() {
-        List<String> ids = new ArrayList<String>(secondary.length + 1);
-        ids.add("default");
-        List<ResourceBundle> bundles = new ArrayList<ResourceBundle>(secondary.length + 1);
+        List<LocalesIdentifier> bundles = new ArrayList<LocalesIdentifier>(secondary.length + 1);
+        String detailResults="";
         bundles.add(main);
         int errors = 0;
-        for (int i = 0; i < secondaryCountries.length; i++) {
-            String country = secondaryCountries[i];
-            String language = secondaryLanguages[i];
-            ids.add(country + "_" + language);
-            bundles.add(secondary[i]);
-
-        }
+        bundles.addAll(Arrays.asList(secondary));
         for (int i = 0; i < bundles.size(); i++) {
-            ResourceBundle resourceBundle1 = bundles.get(i);
-            String id1 = ids.get(i);
-            Enumeration<String> keys1 = resourceBundle1.getKeys();
+            LocalesIdentifier resourceBundle1 = bundles.get(i);
+            Enumeration<String> keys1 = resourceBundle1.getBundle().getKeys();
             for (int j = 0; j < bundles.size(); j++) {
-                if (i == j) {
+                LocalesIdentifier resourceBundle2 = bundles.get(j);
+                if (resourceBundle1.getLanguage().equals(resourceBundle2.getLanguage())) {
+                    //do not compare same language groups
+                    allLog("Skipping same language " + resourceBundle1.getLocale() + " x " + resourceBundle2.getLocale() + " (should be " + resourceBundle1.getIdentifier() + " x " + resourceBundle2.getIdentifier() + ")");
                     break;
                 }
-                ResourceBundle resourceBundle2 = bundles.get(j);
-                String id2 = ids.get(j);
-                outLog("Checking for same items between " + resourceBundle1.getLocale() + " x " + resourceBundle2.getLocale() + " (should be " + id1 + " x " + id2 + ")");
-                errLog("Checking for same items between " + resourceBundle1.getLocale() + " x " + resourceBundle2.getLocale() + " (should be " + id1 + " x " + id2 + ")");
+                allLog("Checking for same items between " + resourceBundle1.getLocale() + " x " + resourceBundle2.getLocale() + " (should be " + resourceBundle1.getIdentifier() + " x " + resourceBundle2.getIdentifier() + ")");
                 int localErrors=0;
                 while (keys1.hasMoreElements()) {
                     String key = (String) keys1.nextElement();
-                    String val1 = getMissingResourceAsEmpty(resourceBundle1, key);
-                    String val2 = getMissingResourceAsEmpty(resourceBundle2, key);
+                    String val1 = getMissingResourceAsEmpty(resourceBundle1.getBundle(), key);
+                    String val2 = getMissingResourceAsEmpty(resourceBundle2.getBundle(), key);
                     outLog("\""+val1+"\" x \""+val2);
                     if (val1.trim().equalsIgnoreCase(val2.trim())) {
-                        if (val1.trim().length() <= 5 /*"ok", "", ...*/ || val1.toLowerCase().contains("://") /*urls...*/) {
+                        if (val1.trim().length() <= 5 /* short words like"ok", "", ...*/
+                                || val1.toLowerCase().contains("://") /*urls...*/
+                                || !val1.trim().contains(" ") /*one word*/
+                                || val1.replaceAll("\\{\\d\\}", "").trim().length()<5 /*only vars and short words*/) {
                             errLog("Warning! Items equals for: " + key + " = " + val1 + " but are in allowed subset");
                         } else {
                             errors++;
@@ -112,11 +190,14 @@ public class MessagesPropertiesTest {
                         }
                     }
                 }
-                errLog(localErrors+" errors allResourcesAreReallyDifferent fo "+id2+" x "+id1);
+                if (localErrors > 0){
+                    detailResults+=resourceBundle1.getIdentifier()+" x "+resourceBundle2.getIdentifier()+": "+localErrors+";";
+                }
+                errLog(localErrors+" errors allResourcesAreReallyDifferent fo "+resourceBundle1.getIdentifier()+" x "+resourceBundle2.getIdentifier());
 
             }
         }
-        assertTrue("Several - " + errors + " - items are same in  bundles. See error logs for details", errors == 0);
+        assertTrue("Several - " + errors + " - items are same in  bundles. See error logs for details: "+detailResults, errors == 0);
     }
 
     private String getMissingResourceAsEmpty(ResourceBundle res, String key) {
@@ -129,20 +210,18 @@ public class MessagesPropertiesTest {
 
     @Test
     //it is not critical that some localisations are missing, however good to know    
+    //and actually this test sis covered by allResourcesAreReallyDifferent, because fallback is geting default value for unknnow localisation
     public void warnForNotLocalisedStrings() {
         int errors = 0;
-        Enumeration<String> keys = main.getKeys();
+        Enumeration<String> keys = main.getBundle().getKeys();
         for (int i = 0; i < secondary.length; i++) {
             int localErrors = 0;
-            ResourceBundle sec = secondary[i];
-            String country = secondaryCountries[i];
-            String language = secondaryLanguages[i];
-            String id = country + "_" + language;
-            outLog("Checking for missing  strings in " + sec.getLocale() + " (should be " + id + ") compared with default");
-            errLog("Checking for missing  strings in " + sec.getLocale() + " (should be " + id + ") compared with default");
+            ResourceBundle sec = secondary[i].getBundle();
+            String id = secondary[i].getIdentifier();
+            allLog("Checking for missing  strings in " + sec.getLocale() + " (should be " + id + ") compared with default");
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
-                String val1 = getMissingResourceAsEmpty(main, key);
+                String val1 = getMissingResourceAsEmpty(main.getBundle(), key);
                 String val2 = getMissingResourceAsEmpty(sec, key);
                 outLog("\""+val1+"\" x \""+val2);
                 if (val1.trim().isEmpty()) {
@@ -165,24 +244,15 @@ public class MessagesPropertiesTest {
     
     @Test
     public void noEmptyResources() {
-        List<String> ids = new ArrayList<String>(secondary.length + 1);
-        ids.add("default");
-        List<ResourceBundle> bundles = new ArrayList<ResourceBundle>(secondary.length + 1);
+         List<LocalesIdentifier> bundles = new ArrayList<LocalesIdentifier>(secondary.length + 1);
         bundles.add(main);
         int errors = 0;
-        for (int i = 0; i < secondaryCountries.length; i++) {
-            String country = secondaryCountries[i];
-            String language = secondaryLanguages[i];
-            ids.add(country + "_" + language);
-            bundles.add(secondary[i]);
-
-        }
+        bundles.addAll(Arrays.asList(secondary));
         for (int i = 0; i < bundles.size(); i++) {
-            ResourceBundle resourceBundle = bundles.get(i);
-            String id = ids.get(i);
+            ResourceBundle resourceBundle = bundles.get(i).getBundle();
+            String id = bundles.get(i).getIdentifier();
             Enumeration<String> keys = resourceBundle.getKeys();
-                outLog("Checking for empty items in " + resourceBundle.getLocale() + "  (should be " + id + ")");
-                errLog("Checking for empty items in " + resourceBundle.getLocale() + "  (should be " + id + ")");
+                allLog("Checking for empty items in " + resourceBundle.getLocale() + "  (should be " + id + ")");
                 int localErrors=0;
                 while (keys.hasMoreElements()) {
                     String key = (String) keys.nextElement();
@@ -207,16 +277,14 @@ public class MessagesPropertiesTest {
         int errors = 0;
         for (int i = 0; i < secondary.length; i++) {
             int localErrors = 0;
-            ResourceBundle sec = secondary[i];
+            ResourceBundle sec = secondary[i].getBundle();
             Enumeration<String> keys = sec.getKeys();
-            String country = secondaryCountries[i];
-            String language = secondaryLanguages[i];
-            String id = country + "_" + language;
+            String id = secondary[i].getId();
             outLog("Checking for redundant keys in " + sec.getLocale() + " (should be " + id + ") compared with default");
             errLog("Checking for redundant keys in " + sec.getLocale() + " (should be " + id + ") compared with default");
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
-                String val2 = getMissingResourceAsEmpty(main, key);
+                String val2 = getMissingResourceAsEmpty(main.getBundle(), key);
                 String val1 = getMissingResourceAsEmpty(sec, key);
                 outLog("\""+val1+"\" x \""+val2);
                     if (val2.trim().isEmpty() && !val1.trim().isEmpty()){
@@ -234,7 +302,13 @@ public class MessagesPropertiesTest {
     
 
 
+    private void allLog(String string) {
+        outLog(string);
+        errLog(string);
+    }
     private void errLog(String string) {
+        //used quite often :)
+        //System.out.println(string);
         ServerAccess.logErrorReprint(string);
     }
 

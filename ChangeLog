@@ -1,4 +1,13 @@
 2012-13-03  Jiri Vanek <jvanek@redhat.com>
+
+	Added tests for German i18n
+	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java:
+	Enhanced to test also German localization .
+	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java:
+	Enhanced to handle de messages and be prepared for locales with one language
+	but different nations.
+
+2012-13-03  Jiri Vanek <jvanek@redhat.com>
             Jacob Wisor  <gitne@excite.co.jp>
 
 	Added initial German localization

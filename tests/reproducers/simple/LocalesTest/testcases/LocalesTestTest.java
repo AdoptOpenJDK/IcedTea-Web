@@ -110,6 +110,11 @@ public class LocalesTestTest {
         return l;
     }
 
+     private ResourceBundle getPropertiesDe() throws IOException {
+        return getProperties("_de");
+    }
+     
+    
     public ResourceBundle getPropertiesCz() throws IOException {
         return getProperties("_cs_CZ");
 
@@ -132,7 +137,8 @@ public class LocalesTestTest {
         String[] l = getChangeLocalesForSubproces("en_US.UTF-8");
         ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
         assertEnglish(pr.stdout);
-        assertNotCzh(pr.stdout);
+        assertNotCz(pr.stdout);
+        assertNotDe(pr.stdout);
     }
 
     @Test
@@ -140,8 +146,9 @@ public class LocalesTestTest {
         String[] l = getChangeLocalesForSubproces("cs_CZ");
         ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
         assertNotEnglish(pr.stdout);
-        assertNotCzh(pr.stdout);
-        iteratePropertiesForAproxCz(pr.stdout);
+        assertNotCz(pr.stdout);
+        assertNotDe(pr.stdout);
+        iteratePropertiesForAproxCzCs(pr.stdout);
     }
 
     @Test
@@ -149,16 +156,71 @@ public class LocalesTestTest {
         String[] l = getChangeLocalesForSubproces("cs_CZ.UTF-8");
         ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
         assertNotEnglish(pr.stdout);
+        assertNotDe(pr.stdout);
         assertCz(pr.stdout);
-        iteratePropertiesForAproxCz(pr.stdout);
+        iteratePropertiesForAproxCzCs(pr.stdout);
+    }
+    
+     @Test
+    public void testLocalesDeDe() throws Exception {
+        String[] l = getChangeLocalesForSubproces("de_DE");
+        ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
+        assertNotEnglish(pr.stdout);
+        assertNotCz(pr.stdout);
+        iteratePropertiesForAproxDe(pr.stdout);
     }
 
+    @Test
+    public void testLocalesDeDeUtf() throws Exception {
+        String[] l = getChangeLocalesForSubproces("de_DE.UTF-8");
+        ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
+        assertNotEnglish(pr.stdout);
+        assertNotCz(pr.stdout);
+        assertDe(pr.stdout);
+        iteratePropertiesForAproxDe(pr.stdout);
+    }
+   
+    
+       @Test
+    public void testLocalesDe_unknowButValidDeLocale() throws Exception {
+        String[] l = getChangeLocalesForSubproces("de_LU");
+        ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
+        assertNotEnglish(pr.stdout);
+        assertNotCz(pr.stdout);
+        iteratePropertiesForAproxDe(pr.stdout);
+    }
+
+    @Test
+    public void testLocalesDeUtf_unknowButValidDeLocale() throws Exception {
+        String[] l = getChangeLocalesForSubproces("de_LU.UTF-8");
+        ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
+        assertNotEnglish(pr.stdout);
+        assertNotCz(pr.stdout);
+        assertDe(pr.stdout);
+        iteratePropertiesForAproxDe(pr.stdout);
+    }
+    
+    
+    
+       @Test
+    public void testLocalesDe_globalDe() throws Exception {
+        String[] l = getChangeLocalesForSubproces("deutsch");
+        ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
+        assertNotEnglish(pr.stdout);
+        assertNotCz(pr.stdout);
+        iteratePropertiesForAproxDe(pr.stdout);
+    }
+
+   
+    
+    
     @Test
     public void testLocalesInvalid() throws Exception {
         String[] l = getChangeLocalesForSubproces("ax_BU");
         ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
         assertEnglish(pr.stdout);
-        assertNotCzh(pr.stdout);
+        assertNotCz(pr.stdout);
+        assertNotDe(pr.stdout);
     }
 
     private void assertEnglish(String s) throws IOException {
@@ -175,11 +237,23 @@ public class LocalesTestTest {
         ResourceBundle props = getPropertiesCz();
         iteratePropertiesFor(props, s, true, "czech");
     }
+    
+     private void assertDe(String s) throws IOException {
+        ResourceBundle props = getPropertiesDe();
+        iteratePropertiesFor(props, s, true, "de");
+    }
+     
 
-    private void assertNotCzh(String s) throws IOException {
+    private void assertNotCz(String s) throws IOException {
         ResourceBundle props = getPropertiesCz();
         iteratePropertiesFor(props, s, false, "czech");
     }
+    
+     private void assertNotDe(String s) throws IOException {
+        ResourceBundle props = getPropertiesDe();
+        iteratePropertiesFor(props, s, false, "de");
+    }
+
 
     /**
      * This method is iterating all keys defined in this class, geting their value in given
@@ -216,10 +290,11 @@ public class LocalesTestTest {
      * given output match/matchnot (depends on value of assertTrue) this string,
      *
      * @param outputToBeChecked
+     * @param props  bundle with strings
+     * @param  reg  regexter with rules how to handle national characters
      * @throws IOException
      */
-    private void iteratePropertiesForAproxCz(String outputToBeChecked) throws IOException {
-        ResourceBundle props = getPropertiesCz();
+    private void iteratePropertiesForAprox(String outputToBeChecked, ResourceBundle props, Regexer reg) throws IOException {
         int keysFound = 0;
         for (int i = 0; i < keys.length; i++) {
             String string = keys[i];
@@ -227,55 +302,91 @@ public class LocalesTestTest {
             if (value == null) {
                 continue;
             }
-            value = regexIt(value);
+            value = reg.regexIt(value);
             keysFound++;
             {
-                Assert.assertTrue("Output must match cz text, failed on " + string, outputToBeChecked.matches(value));
+                Assert.assertTrue("Output must match "+reg.getId() +" text, failed on " + string, outputToBeChecked.matches(value));
             }
         }
         Assert.assertTrue("At least one key must be found, was not", keysFound > 0);
     }
-    String[] czEvil = {
-        "á",
-        "č",
-        "ď",
-        "ě",
-        "é",
-        "í",
-        "ň",
-        "ó",
-        "ř",
-        "š",
-        "ť",
-        "ú",
-        "ů",
-        "ý",
-        "ž",
-        "[",
-        "]",
-        "(",
-        ")"};
 
-    /**
-     * This method transforms given string to asci-only regex, replacing groups of
-     * czech characters (defined by czEvil variable) by .+
-     *
-     * @param value
-     * @return
-     */
-    private String regexIt(String value) {
-        return regexIt(value, czEvil);
+    private void iteratePropertiesForAproxCzCs(String stdout) throws IOException {
+        iteratePropertiesForAprox(stdout, getPropertiesCz(), Regexer.cz);
     }
+    private void iteratePropertiesForAproxDe(String stdout) throws IOException {
+        iteratePropertiesForAprox(stdout, getPropertiesDe(), Regexer.de);
+    }
+    
+       
+    
+    private static final class Regexer {
 
-    private static String regexIt(String value, String[] map) {
-        for (int i = 0; i < map.length; i++) {
-            String string = map[i];
-            value = value.replace(string, ".");
-            value = value.replace(string.toUpperCase(), ".");
+        private static final String[] czEvil = {
+            "á",
+            "č",
+            "ď",
+            "ě",
+            "é",
+            "í",
+            "ň",
+            "ó",
+            "ř",
+            "š",
+            "ť",
+            "ú",
+            "ů",
+            "ý",
+            "ž",
+            "[",
+            "]",
+            "(",
+            ")"};
+        private static final String[] deEvil = {
+            "ä",
+            "ö",
+            "ß",
+            "ü",
+            "[",
+            "]",
+            "(",
+            ")"};
+        
+        private static final Regexer cz = new Regexer(czEvil,"cz");        
+        private static final Regexer de = new Regexer(deEvil,"de");
+        
+        private final String[] map;
+        private final String id;
+
+        public Regexer(String[] map, String id) {
+            this.map = map;
+            this.id = id;
         }
 
-        value = value.replaceAll("\\.+", ".+");
-        value = "(?s).*" + value + ".*";
-        return value;
+        public String getId() {
+            return id;
+        }
+        
+        
+        
+
+        /**
+         * This method transforms given string to asci-only regex, replacing
+         * groups of national characters (defined by array variable) by .+
+         *
+         * @param value
+         * @return
+         */
+        public String regexIt(String value) {
+            for (int i = 0; i < map.length; i++) {
+                String string = map[i];
+                value = value.replace(string, ".");
+                value = value.replace(string.toUpperCase(), ".");
+            }
+
+            value = value.replaceAll("\\.+", ".+");
+            value = "(?s).*" + value + ".*";
+            return value;
+        }
     }
 }
