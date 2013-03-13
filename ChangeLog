@@ -1,4 +1,9 @@
 2012-13-03  Jiri Vanek <jvanek@redhat.com>
+
+	* NEWS: mentioned de translation
+	* AUTHORS: added Jacob Wisor
+
+2012-13-03  Jiri Vanek <jvanek@redhat.com>
             Jacob Wisor  <gitne@excite.co.jp>
 
 	Fixed strange sentences in default locales bundle.

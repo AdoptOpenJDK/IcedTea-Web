@@ -10,6 +10,7 @@ CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.4 (2012-XX-XX):
 * Added cs_CZ localisation
+* Added de localisation
 * Splash screen for javaws and plugin
 * All IcedTea-Web dialogues are centered to middle of active screen
 * Download indicator made compact for more then one jar
