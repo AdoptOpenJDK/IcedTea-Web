@@ -1,4 +1,10 @@
 2012-13-03  Jiri Vanek <jvanek@redhat.com>
+            Jacob Wisor  <gitne@excite.co.jp>
+
+	Fixed strange sentences in default locales bundle.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+
+2012-13-03  Jiri Vanek <jvanek@redhat.com>
 
 	Added tests for German i18n
 	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java:
