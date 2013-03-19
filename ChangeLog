@@ -1,3 +1,9 @@
+2013-19-03  Adam Domurad  <adomurad@redhat.com>
+
+	* Makefile.am
+	(CPP_UNITTEST_EXECUTABLE): Add -lrt & -lpthread flags, which do not
+	seem to be brought in on all systems.
+
 2012-13-03  Jiri Vanek <jvanek@redhat.com>
 
 	* NEWS: mentioned de translation
