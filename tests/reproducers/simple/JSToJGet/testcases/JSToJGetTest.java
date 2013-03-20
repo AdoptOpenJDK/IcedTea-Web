@@ -49,6 +49,9 @@ import org.junit.Test;
 
 public class JSToJGetTest extends BrowserTest {
 
+    //the JS<->J tests tend to make Opera unusable
+    public final boolean doNotRunInOpera = true;
+
     public String passStr = " - passed.";
     public String failValStr = " - failed, value mismatch.";
     public String failTypeStr = " - failed, type mismatch.";
@@ -117,6 +120,12 @@ public class JSToJGetTest extends BrowserTest {
     }
 
     private void jsToJavaGetTest(String urlEnd, String testStr) throws Exception {
+
+        if( doNotRunInOpera){
+            if(server.getCurrentBrowser().getID() == Browsers.opera){
+                return;
+            }
+        }
 
         String strURL = "/JSToJGet.html?" + urlEnd;
         ProcessResult pr = server.executeBrowser(strURL,

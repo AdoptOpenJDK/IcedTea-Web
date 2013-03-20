@@ -48,6 +48,9 @@ import org.junit.Test;
 
 public class JSToJTypeConvTest extends BrowserTest {
 
+    //the JS<->J tests tend to make Opera unusable
+    public final boolean doNotRunInOpera = true;
+
     private final String initStr = "JSToJTypeConv applet initialized.";
     private final String afterStr = "afterTests";
 
@@ -81,6 +84,13 @@ public class JSToJTypeConvTest extends BrowserTest {
     }
 
     private void jsToJavaTypeConvTest(String fieldStr, String valueStr, String[] expectedValueAndOutputs) throws Exception {
+
+        if( doNotRunInOpera){
+            if(server.getCurrentBrowser().getID() == Browsers.opera){
+                return;
+            }
+        }
+
         String strURL = "/JSToJTypeConv.html?" + fieldStr + ";" + valueStr;
         ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
         String[] expectedStdouts = expectedValueAndOutputs;

@@ -1,3 +1,17 @@
+2013-03-20  Jana Fabrikova <jfabriko@redhat.com>
+
+	* tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:
+	adding few lines for not running test in Opera
+
+	* tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java:
+	adding few lines for not running test in Opera
+
+	* tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java:
+	adding few lines for not running test in Opera
+
+	* tests/reproducers/simple/JSToJTypeConv/testcases/JSToJTypeConvTest.java:
+	adding few lines for not running test in Opera
+
 2012-20-03  Jiri Vanek <jvanek@redhat.com>
 
 	All occurences of hardcoded paths to java repalced by call of functions

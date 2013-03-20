@@ -48,6 +48,9 @@ import org.junit.Test;
 
 public class JSToJFuncParamTest extends BrowserTest {
 
+    //the JS<->J tests tend to make Opera unusable
+    public final boolean doNotRunInOpera = true;
+
     private final String initStr = "JSToJFuncParam applet initialized.";
     private final String afterStr = "afterTests";
 
@@ -70,6 +73,13 @@ public class JSToJFuncParamTest extends BrowserTest {
     }
 
     private void jsToJavaFuncParamTest(String funcStr, String paramStr, String expectedVal) throws Exception {
+
+        if( doNotRunInOpera){
+            if(server.getCurrentBrowser().getID() == Browsers.opera){
+                return;
+            }
+        }
+
         String strURL = "/JSToJFuncParam.html?" + funcStr + ";" + paramStr;
         ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
         String expectedStdout = funcStr + " " + expectedVal;
@@ -207,6 +217,20 @@ public class JSToJFuncParamTest extends BrowserTest {
     @NeedsDisplay
     public void AppletJSToJFuncParam_JSObject_Test() throws Exception {
         jsToJavaFuncParamTest("JSObjectParam", "new JSCar(100,\"red\")", "100, red");
+    }
+
+    @Test
+    @TestInBrowsers(testIn = { Browsers.all })
+    @NeedsDisplay
+    public void AppletJSToJFuncParam_booleanFalseStr_Test() throws Exception {
+        jsToJavaFuncParamTest("booleanParam", "false", "true");
+    }
+
+    @Test
+    @TestInBrowsers(testIn = { Browsers.all })
+    @NeedsDisplay
+    public void AppletJSToJFuncParam_BooleanFalseStr_Test() throws Exception {
+        jsToJavaFuncParamTest("BooleanParam", "false", "true");
     }
 
 }

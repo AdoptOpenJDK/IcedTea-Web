@@ -51,6 +51,9 @@ import org.junit.Test;
 @Bug( id = { "PR1298" })
 public class JSToJSetTest extends BrowserTest {
 
+    //the JS<->J tests tend to make Opera unusable
+    public final boolean doNotRunInOpera = true;
+
     private final String exceptionStr = "xception";
     private final String errorStr = "rror";
     private final String initStr = "JSToJSet applet initialized.";
@@ -83,6 +86,13 @@ public class JSToJSetTest extends BrowserTest {
     }
 
     private void jsToJavaSetNormalTest(String fieldStr, String valueStr) throws Exception {
+
+        if( doNotRunInOpera){
+            if(server.getCurrentBrowser().getID() == Browsers.opera){
+                return;
+            }
+        }
+
         String strURL = "/JSToJSet.html?" + fieldStr + ";" + valueStr;
         ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
         String expectedStdout = "New value is: " + valueStr;
@@ -90,6 +100,14 @@ public class JSToJSetTest extends BrowserTest {
     }
     
     private void jsToJavaSetSpecialTest(String fieldStr, String valueStr, TestType testType) throws Exception {
+
+        if( doNotRunInOpera){
+            Browsers b = server.getCurrentBrowser().getID();
+            if(b == Browsers.opera){
+                return;
+            }
+        }
+
         String strURL = "/JSToJSet.html?";
         String expectedStdout = "";
         switch( testType ){
