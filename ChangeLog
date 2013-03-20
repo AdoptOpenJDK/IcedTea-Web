@@ -2,13 +2,10 @@
 
 	* tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:
 	adding few lines for not running test in Opera
-
 	* tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java:
 	adding few lines for not running test in Opera
-
 	* tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java:
 	adding few lines for not running test in Opera
-
 	* tests/reproducers/simple/JSToJTypeConv/testcases/JSToJTypeConvTest.java:
 	adding few lines for not running test in Opera
 
