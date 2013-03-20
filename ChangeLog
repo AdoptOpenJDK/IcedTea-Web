@@ -12,7 +12,7 @@
 	* tests/reproducers/simple/JSToJTypeConv/testcases/JSToJTypeConvTest.java:
 	adding few lines for not running test in Opera
 
-2012-20-03  Jiri Vanek <jvanek@redhat.com>
+2013-03-20  Jiri Vanek <jvanek@redhat.com>
 
 	All occurences of hardcoded paths to java repalced by call of functions
 	* plugin/icedteanp/IcedTeaNPPlugin.cc:  (appletviewer_executable) renamed
@@ -21,24 +21,24 @@
 	(get_plugin_executable) and (string get_plugin_rt_jar) new functions, 
 	returniong the default variables for now.
 
-2013-19-03  Adam Domurad  <adomurad@redhat.com>
+2013-03-19  Adam Domurad  <adomurad@redhat.com>
 
 	* Makefile.am
 	(CPP_UNITTEST_EXECUTABLE): Add -lrt & -lpthread flags, which do not
 	seem to be brought in on all systems.
 
-2012-13-03  Jiri Vanek <jvanek@redhat.com>
+2013-03-13  Jiri Vanek <jvanek@redhat.com>
 
 	* NEWS: mentioned de translation
 	* AUTHORS: added Jacob Wisor
 
-2012-13-03  Jiri Vanek <jvanek@redhat.com>
+2013-03-13  Jiri Vanek <jvanek@redhat.com>
             Jacob Wisor  <gitne@excite.co.jp>
 
 	Fixed strange sentences in default locales bundle.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
 
-2012-13-03  Jiri Vanek <jvanek@redhat.com>
+2013-03-13  Jiri Vanek <jvanek@redhat.com>
 
 	Added tests for German i18n
 	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java:
@@ -47,7 +47,7 @@
 	Enhanced to handle de messages and be prepared for locales with one language
 	but different nations.
 
-2012-13-03  Jiri Vanek <jvanek@redhat.com>
+2013-03-13  Jiri Vanek <jvanek@redhat.com>
             Jacob Wisor  <gitne@excite.co.jp>
 
 	Added initial German localization
