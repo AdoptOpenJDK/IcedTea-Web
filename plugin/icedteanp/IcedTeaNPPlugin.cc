@@ -43,6 +43,7 @@ exception statement from your version. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -156,8 +157,9 @@ static NS_DEFINE_IID (kIPluginTagInfo2IID, NS_IPLUGINTAGINFO2_IID);
 // Data directory for plugin.
 static std::string data_directory;
 
-// Fully-qualified appletviewer executable.
-static const char* appletviewer_executable = ICEDTEA_WEB_JRE "/bin/java";
+// Fully-qualified appletviewer default  executable and rt.jar
+static const char* appletviewer_default_executable = ICEDTEA_WEB_JRE "/bin/java";
+static const char* appletviewer_default_rtjar = ICEDTEA_WEB_JRE "/lib/rt.jar";
 
 // Applet viewer input channel (needs to be static because it is used in plugin_in_pipe_callback)
 static GIOChannel* in_from_appletviewer = NULL;
@@ -283,6 +285,16 @@ g_strcmp0(char *str1, char *str2)
 
 
 #endif
+
+static std::string get_plugin_executable(){
+      return std::string (appletviewer_default_executable);
+      
+}
+
+static std::string get_plugin_rt_jar(){
+      return std::string (appletviewer_default_rtjar);
+      
+}
 
 
 /* 
@@ -1517,13 +1529,14 @@ plugin_filter_environment(void)
 static NPError
 plugin_test_appletviewer ()
 {
-  PLUGIN_DEBUG ("plugin_test_appletviewer: %s\n", appletviewer_executable);
+
+  PLUGIN_DEBUG ("plugin_test_appletviewer: %s\n", get_plugin_executable().c_str());
   NPError error = NPERR_NO_ERROR;
 
   gchar* command_line[3] = { NULL, NULL, NULL };
   gchar** environment;
 
-  command_line[0] = g_strdup (appletviewer_executable);
+  command_line[0] = g_strdup (get_plugin_executable().c_str());
   command_line[1] = g_strdup("-version");
   command_line[2] = NULL;
 
@@ -1570,7 +1583,7 @@ plugin_start_appletviewer (ITNPPluginData* data)
 
   // Construct command line parameters
 
-  command_line.push_back(appletviewer_executable);
+  command_line.push_back(get_plugin_executable());
 
   //Add JVM args to command_line
   for (int i = 0; i < jvm_args->size(); i++)
@@ -1581,7 +1594,7 @@ plugin_start_appletviewer (ITNPPluginData* data)
   command_line.push_back(PLUGIN_BOOTCLASSPATH);
   // set the classpath to avoid using the default (cwd).
   command_line.push_back("-classpath");
-  command_line.push_back(ICEDTEA_WEB_JRE "/lib/rt.jar");
+  command_line.push_back(get_plugin_rt_jar());
 
   // Enable coverage agent if we are running instrumented plugin
 #ifdef COVERAGE_AGENT
@@ -1652,10 +1665,10 @@ get_jvm_args()
   gchar *output = NULL;
   std::vector<std::string*>* tokenOutput = NULL;
 
-  commands.push_back(appletviewer_executable);
+  commands.push_back(get_plugin_executable());
   commands.push_back(PLUGIN_BOOTCLASSPATH);
   commands.push_back("-classpath");
-  commands.push_back(ICEDTEA_WEB_JRE "/lib/rt.jar");
+  commands.push_back(get_plugin_rt_jar());
   commands.push_back("net.sourceforge.jnlp.controlpanel.CommandLine");
   commands.push_back("get");
   commands.push_back("deployment.plugin.jvm.arguments");
@@ -2175,11 +2188,11 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
     }
 
   // Set appletviewer_executable.
-  PLUGIN_DEBUG("Executing java at %s\n", appletviewer_executable);
+  PLUGIN_DEBUG("Executing java at %s\n", get_plugin_executable().c_str());
   np_error = plugin_test_appletviewer ();
   if (np_error != NPERR_NO_ERROR)
     {
-      fprintf(stderr, "Unable to find java executable %s\n", appletviewer_executable);
+      fprintf(stderr, "Unable to find java executable %s\n", get_plugin_executable().c_str());
       return np_error;
     }
 
@@ -2191,7 +2204,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
 
   plugin_instance_mutex = g_mutex_new ();
 
-  PLUGIN_DEBUG ("NP_Initialize: using %s\n", appletviewer_executable);
+  PLUGIN_DEBUG ("NP_Initialize: using %s\n", get_plugin_executable().c_str());
 
   plugin_req_proc = new PluginRequestProcessor();
   java_req_proc = new JavaMessageSender();
