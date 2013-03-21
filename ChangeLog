@@ -1,3 +1,12 @@
+2013-03-21  Jiri Vanek <jvanek@redhat.com>
+
+	Launchers made aware of custom set JRE
+	* launcher/itweb-settings.in:
+	* launcher/javaws.in:
+	are now scanning ~/.icedtea/deployment.properties and 
+	/etc/.java/.deploy/deployment.properties for deployment.jre.dir property.
+	If found, then its java and rt.jar are used to launch applications.
+
 2013-03-20  Jana Fabrikova <jfabriko@redhat.com>
 
 	* tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java:

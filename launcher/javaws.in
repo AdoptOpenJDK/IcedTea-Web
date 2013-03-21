@@ -9,6 +9,16 @@ SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
 PROGRAM_NAME=javaws
 CP=@JRE@/lib/rt.jar
 
+CUSTOM_JRE_REGEX="^deployment.jre.dir *= *"
+CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" ~/.icedtea/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+if [ "x$CUSTOM_JRE" = "x" ] ; then
+  CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" /etc/.java/.deploy/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+fi;
+if [ "x$CUSTOM_JRE" != "x" ] ; then
+  JAVA=$CUSTOM_JRE/bin/java
+  CP=$CUSTOM_JRE/lib/rt.jar
+fi;
+
 JAVA_ARGS=( )
 ARGS=( )
 COMMAND=()

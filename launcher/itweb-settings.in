@@ -7,6 +7,15 @@ CLASSNAME=net.sourceforge.jnlp.controlpanel.CommandLine
 BINARY_LOCATION=@ITWEB_SETTINGS_BIN_LOCATION@
 PROGRAM_NAME=itweb-settings
 
+CUSTOM_JRE_REGEX="^deployment.jre.dir *= *"
+CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" ~/.icedtea/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+if [ "x$CUSTOM_JRE" = "x" ] ; then
+  CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" /etc/.java/.deploy/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+fi;
+if [ "x$CUSTOM_JRE" != "x" ] ; then
+  JAVA=$CUSTOM_JRE/bin/java
+fi;
+
 ${JAVA} ${LAUNCHER_BOOTCLASSPATH} ${LAUNCHER_FLAGS} \
   -Dicedtea-web.bin.name=${PROGRAM_NAME} \
   -Dicedtea-web.bin.location=${BINARY_LOCATION} \
