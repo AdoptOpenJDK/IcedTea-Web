@@ -1,3 +1,8 @@
+2013-03-22  Adam Domurad <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(findClass): Print stacktrace for ClassFormatError
+
 2013-03-22  Jiri Vanek <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:

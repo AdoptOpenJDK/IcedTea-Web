@@ -1725,6 +1725,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             } catch (ClassNotFoundException ex) {
             } catch (ClassFormatError cfe) {
+                cfe.printStackTrace();
             } catch (PrivilegedActionException pae) {
             } catch (NullJnlpFileException ex) {
                 throw new ClassNotFoundException(this.mainClass + " in main classloader ", ex);
