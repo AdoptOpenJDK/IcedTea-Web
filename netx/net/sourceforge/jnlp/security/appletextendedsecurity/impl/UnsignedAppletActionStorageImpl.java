@@ -180,7 +180,11 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             result = result && codeBase.matches(unsignedAppletActionEntry.getCodeBase().getRegEx());
         }
         if (archives != null) {
-            result = result && compareArchives(archives, unsignedAppletActionEntry.getArchives());
+            List<String> saved = unsignedAppletActionEntry.getArchives();
+            if (saved == null || saved.isEmpty()) {
+                return result;
+            }
+            result = result && compareArchives(archives, saved);
         }
         return result;
     }

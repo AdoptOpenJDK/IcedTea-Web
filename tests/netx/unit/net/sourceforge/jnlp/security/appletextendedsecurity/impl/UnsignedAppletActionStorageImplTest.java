@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import net.sourceforge.jnlp.ServerAccess;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -61,9 +62,28 @@ public class UnsignedAppletActionStorageImplTest {
         f4 = File.createTempFile("itwMatching", "testFile4");
         ServerAccess.saveFile("A 123456 .* .* jar1,jar2", f1);
         ServerAccess.saveFile("A 123456 .* \\Qbla\\E jar1,jar2", f2);
+        ServerAccess.saveFile(""
+                + "A 1 \\Qhttp://jmol.sourceforge.net/demo/atoms/\\E \\Qhttp://jmol.sourceforge.net/jmol/\\E JmolApplet0.jar\n"
+                + "A 1363278653454 \\Qhttp://www.walter-fendt.de/ph14e\\E.* \\Qhttp://www.walter-fendt.de\\E.*\n"
+                + "n 1363281783104 \\Qhttp://www.walter-fendt.de/ph14e/inclplane.htm\\E \\Qhttp://www.walter-fendt.de/ph14_jar/\\E Ph14English.jar,SchiefeEbene.jar"
+                + "", f3);
     }
 
-    @Test
+     @AfterClass
+    public static void removeTestFiles() throws IOException {
+         f1.delete();
+         f2.delete();
+         f3.delete();
+     }
+
+
+     @Test
+    public void wildcards1() {
+        UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(f3);
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("http://www.walter-fendt.de/ph14e/inclplane.htm", "http://www.walter-fendt.de/ph14_jar/", Arrays.asList(new String[]{"Ph14English.jar","SchiefeEbene.jar"}));
+         System.out.println(r1.toString());
+     }
+     @Test
     public void allMatchingDocAndCode() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(f1);
         UnsignedAppletActionEntry r1 = i1.getMatchingItem("bla", "blaBla", Arrays.asList(new String[]{"jar1", "jar2"}));

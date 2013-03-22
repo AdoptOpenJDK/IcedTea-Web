@@ -1,3 +1,10 @@
+2013-03-22  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	(isMatching) is now ignring archives if empty.
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java:
+	tests adapted and enriched for new archives processing.
+
 2013-03-21  Jiri Vanek <jvanek@redhat.com>
 
 	Launchers made aware of custom set JRE
