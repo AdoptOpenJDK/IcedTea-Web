@@ -15,6 +15,10 @@ public class PluginParameterParserTest {
         assertFalse(PluginParameterParser.isInt("1.0"));
         assertFalse(PluginParameterParser.isInt("abc"));
         assertTrue(PluginParameterParser.isInt("1"));
+
+        /* Numbers that overflow or underflow can cause problems if we 
+         * consider them valid, and pass them to parseInt: */
+        assertFalse(PluginParameterParser.isInt("4294967295"));
     }
 
     @Test

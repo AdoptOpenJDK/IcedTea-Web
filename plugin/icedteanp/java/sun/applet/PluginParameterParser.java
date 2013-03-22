@@ -60,7 +60,12 @@ class PluginParameterParser {
     }
 
     static boolean isInt(String s) {
-        return s.matches("^-?\\d+$");
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch(NumberFormatException e) {
+            return false;
+        }
     }
 
     /**
