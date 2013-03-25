@@ -1,0 +1,23 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="" href="javascript-set.jnlp">
+    <information>
+        <title>Java to JavaScript LiveConnect - Set</title>
+        <vendor>IcedTea</vendor>
+        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
+        <description>LiveConnect - tests for setting JS values from Java.</description>
+    </information>
+    <resources>
+        <!-- Application Resources -->
+        <j2se version="1.6+"
+              href="http://java.sun.com/products/autodl/j2se"/>
+        <jar href="JavascriptSet.jar" main="true" />
+
+    </resources>
+    <applet-desc 
+         name="J to JS Set"
+         main-class="JavascriptSet"
+         width="1000"
+         height="100">
+     </applet-desc>
+</jnlp>

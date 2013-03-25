@@ -1,5 +1,18 @@
 2013-03-25  Jana Fabrikova <jfabriko@redhat.com>
 
+	* tests/reproducers/simple/JavascriptSet/testcases/JavascriptSetTest.java
+	adding 21 testcases for testing setting javascript variables from java
+	* tests/reproducers/simple/JavascriptSet/resources/JavascriptSet.html
+	the html page for displaying browser tests
+	* tests/reproducers/simple/JavascriptSet/resources/Javascript_Set.js
+	auxiliary javascript functions
+	* tests/reproducers/simple/JavascriptSet/resources/javascript-set.jnlp
+	jnlp file for embedding applet in the html page
+	* tests/reproducers/simple/JavascriptSet/srcs/JavascriptSet.java
+	the applet that sets javascript variables
+
+2013-03-25  Jana Fabrikova <jfabriko@redhat.com>
+
 	* tests/reproducers/simple/JavascriptGet/testcases/JavascriptGetTest.java
 	adding 7 new testcases for reading JS values from Java
 	* tests/reproducers/simple/JavascriptGet/resources/JavascriptGet.html
