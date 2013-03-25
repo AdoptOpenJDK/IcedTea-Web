@@ -1,3 +1,15 @@
+2013-03-25  Jana Fabrikova <jfabriko@redhat.com>
+
+	* tests/reproducers/simple/JavascriptFuncParam/testcases/JavascriptFuncParamTest.java
+	adding 19 testcases for calling javascript functions from java with
+	parameters of various types
+	* tests/reproducers/simple/JavascriptFuncParam/resources/JavascriptFuncParam.html
+	the html page for displaying browser tests
+	* tests/reproducers/simple/JavascriptFuncParam/resources/javascript-funcparam.jnlp
+	jnlp file for embedding the applet in html page
+	* tests/reproducers/simple/JavascriptFuncParam/srcs/JavascriptFuncParam.java
+	the applet that calls functions from javascript
+
 2013-03-22  Adam Domurad <adomurad@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginParameterParser.java
