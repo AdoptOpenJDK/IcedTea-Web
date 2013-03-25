@@ -1,5 +1,19 @@
 2013-03-25  Jana Fabrikova <jfabriko@redhat.com>
 
+	* tests/reproducers/simple/JavascriptFuncReturn/testcases/JavascriptFuncReturnTest.java
+	adding 5 testcases for testing calling javascript functions with
+	various return types from java
+	* tests/reproducers/simple/JavascriptFuncReturn/resources/JavascriptFuncReturn.html
+	the html page for displaying browser tests
+	* tests/reproducers/simple/JavascriptFuncReturn/resources/Javascript_FuncReturn.js
+	auxiliary javascript functions
+	* tests/reproducers/simple/JavascriptFuncReturn/resources/javascript-funcreturn.jnlp
+	jnlp file for embedding applet in the html page
+	* tests/reproducers/simple/JavascriptFuncReturn/srcs/JavascriptFuncReturn.java
+	the applet that calls javascript functions
+
+2013-03-25  Jana Fabrikova <jfabriko@redhat.com>
+
 	* tests/reproducers/simple/JavascriptSet/testcases/JavascriptSetTest.java
 	adding 21 testcases for testing setting javascript variables from java
 	* tests/reproducers/simple/JavascriptSet/resources/JavascriptSet.html
