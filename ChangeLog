@@ -1,5 +1,18 @@
 2013-03-25  Jana Fabrikova <jfabriko@redhat.com>
 
+	* tests/reproducers/simple/JavascriptGet/testcases/JavascriptGetTest.java
+	adding 7 new testcases for reading JS values from Java
+	* tests/reproducers/simple/JavascriptGet/resources/JavascriptGet.html
+	the html page for displaying browser tests
+	* tests/reproducers/simple/JavascriptGet/resources/Javascript_Get.js
+	auxiliary javascript functions
+	* tests/reproducers/simple/JavascriptGet/resources/javascript-get.jnlp
+	jnlp file for embedding the applet in the html page
+	* tests/reproducers/simple/JavascriptGet/srcs/JavascriptGet.java
+	the applet that reads values from javascript
+
+2013-03-25  Jana Fabrikova <jfabriko@redhat.com>
+
 	* tests/reproducers/simple/JavascriptFuncParam/testcases/JavascriptFuncParamTest.java
 	adding 19 testcases for calling javascript functions from java with
 	parameters of various types
