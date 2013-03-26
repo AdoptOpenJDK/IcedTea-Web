@@ -1,3 +1,35 @@
+2013-03-26  Adam Domurad  <adomurad@redhat.com>
+
+	Integration of unsigned applet confirmation dialogue.
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(getArchiveJars): New, returns archive jars as list
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Confirmation messages added to properties file
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(getInstance): Initialization refactored into createInstance
+	(createInstance): New, checks if unsigned applet is allowed,
+	initializes classloader.
+	(initializeResources): Don't consider no-jar applets signed.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java
+	(showUnsignedWarningDialog): Creates message with
+	DialogType.UNSIGNED_WARNING
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java
+	(installPanel): Add case for DialogType.UNSIGNED_WARNING
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionStorage.java:
+	Expose locking members from interface
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(handleInitializationMessage): Do nothing if applets have been
+	disabled.
+	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningDialog.java:
+	New, security dialog that asks for unsigned applet confirmation.
+	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningPanel.java:
+	Implements the dialog contents for unsigned applet confirmation.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	Updates and checks applet confirmation storage, creates warning dialog
+	if required.
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java:
+	New, tests relative & normalized path creation helpers.
+
 2013-03-26  Jiri Vanek <jvanek@redhat.com>
 
 	Path validator fixed to be correctly multiplatform

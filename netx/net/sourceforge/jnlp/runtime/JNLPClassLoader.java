@@ -63,6 +63,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.ApplicationDesc;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -380,6 +381,13 @@ public class JNLPClassLoader extends URLClassLoader {
         JNLPClassLoader baseLoader = uniqueKeyToLoader.get(uniqueKey);
         JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName);
 
+        // If security level is 'high' or greater, we must check if the user allows unsigned applets 
+        // when the JNLPClassLoader is created. We do so here, because doing so in the constructor 
+        // causes unwanted side-effects for some applets
+        if (!loader.getSigning() && file instanceof PluginBridge) {
+            UnsignedAppletTrustConfirmation.checkUnsignedWithUserIfRequired((PluginBridge)file);
+        }
+
         // New loader init may have caused extentions to create a
         // loader for this unique key. Check.
         JNLPClassLoader extLoader = uniqueKeyToLoader.get(uniqueKey);
@@ -596,9 +604,9 @@ public class JNLPClassLoader extends URLClassLoader {
 
         JARDesc jars[] = resources.getJARs();
 
-        if (jars == null || jars.length == 0) {
+        if (jars.length == 0) {
 
-            boolean allSigned = true;
+            boolean allSigned = (loaders.length > 1) /* has extensions */;
             for (int i = 1; i < loaders.length; i++) {
                 if (!loaders[i].getSigning()) {
                     allSigned = false;
@@ -681,7 +689,6 @@ public class JNLPClassLoader extends URLClassLoader {
                                     !SecurityDialogs.showNotAllSignedWarningDialog(file))
                     throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
 
-
                 // Check for main class in the downloaded jars, and check/verify signed JNLP fill
                 checkForMain(initialJars);
 
@@ -718,9 +725,9 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             } else {
 
+                // Otherwise this jar is simply unsigned -- make sure to ask
+                // for permission on certain actions
                 signing = false;
-                //otherwise this jar is simply unsigned -- make sure to ask
-                //for permission on certain actions
             }
         }
 

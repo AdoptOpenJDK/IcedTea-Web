@@ -37,7 +37,6 @@ package net.sourceforge.jnlp.security.appletextendedsecurity;
 
 import java.util.List;
 
-
 /**
  * This is abstract access to white/blacklist created from some permanent storage.
  * 
@@ -53,9 +52,9 @@ public interface UnsignedAppletActionStorage {
 
     /**
      * This methods iterates through records in
-     * DeploymentConfiguration.getAppletTrustSettingsPath(), and is mathing
-     * regexes saved here against params. so parameters here are NOR tegexes,
-     * but are matched against saved regexes
+     * DeploymentConfiguration.getAppletTrustSettingsPath(), and is matching
+     * regexes saved here against params. So parameters here are NOT regexes,
+     * but are matched against saved regexes.
      *
      * Null or empty values are dangerously ignored, user, be aware of it. eg:
      * match only codeBase will be null someCodeBase null null match only
@@ -122,4 +121,14 @@ public interface UnsignedAppletActionStorage {
      * @param item
      */
     public void update(final UnsignedAppletActionEntry item);
+
+    /**
+     * Lock the storage, if necessary. If no ownership issues arise, can be a no-op.
+     */
+    public void lock();
+
+    /**
+     * Unlock the storage, if necessary. If no ownership issues arise, can be a no-op.
+     */
+    public void unlock();
 }

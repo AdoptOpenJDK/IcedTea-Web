@@ -206,6 +206,10 @@ public class PluginBridge extends JNLPFile {
         }
     }
 
+    public List<String> getArchiveJars() {
+        return new ArrayList<String>(jars);
+    }
+
     public boolean codeBaseLookup() {
     	return params.useCodebaseLookup();
     }

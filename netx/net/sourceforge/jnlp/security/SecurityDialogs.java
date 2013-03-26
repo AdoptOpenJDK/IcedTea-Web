@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
+
 import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -70,6 +72,7 @@ public class SecurityDialogs {
         SINGLE_CERT_INFO,
         ACCESS_WARNING,
         NOTALLSIGNED_WARNING,
+        UNSIGNED_WARNING,   /* requires confirmation with 'high-security' setting */
         APPLET_WARNING,
         AUTHENTICATION,
     }
@@ -86,6 +89,7 @@ public class SecurityDialogs {
         VERIFIED,
         UNVERIFIED,
         NOTALLSIGNED,
+        UNSIGNED,           /* requires confirmation with 'high-security' setting */
         SIGNING_ERROR
     }
 
@@ -170,6 +174,26 @@ public class SecurityDialogs {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Shows a warning dialog for when a plugin applet is unsigned.
+     * This is used with 'high-security' setting.
+     *
+     * @return true if permission was granted by the user, false otherwise.
+     */
+    public static ExecuteUnsignedApplet showUnsignedWarningDialog(JNLPFile file) {
+
+        if (!shouldPromptUser()) {
+            return ExecuteUnsignedApplet.NO;
+        }
+
+        final SecurityDialogMessage message = new SecurityDialogMessage();
+        message.dialogType = DialogType.UNSIGNED_WARNING;
+        message.accessType = AccessType.UNSIGNED;
+        message.file = file;
+
+        return (ExecuteUnsignedApplet)getUserResponse(message);
     }
 
     /**

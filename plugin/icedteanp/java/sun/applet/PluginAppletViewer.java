@@ -62,6 +62,8 @@ exception statement from your version. */
 
 package sun.applet;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.applet.Applet;
 import java.applet.AppletContext;
 import java.applet.AudioClip;
@@ -103,9 +105,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.SwingUtilities;
 
+import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NetxPanel;
 import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
@@ -406,7 +412,12 @@ public class PluginAppletViewer extends XEmbeddedFrame
         requestFactory = rf;
     }
 
-    private static void handleInitializationMessage(int identifier, String message) throws IOException {
+    private static void handleInitializationMessage(int identifier, String message) throws IOException, LaunchException {
+
+        /* The user has specified via a global setting that applets should not be run.*/
+        if (AppletStartupSecuritySettings.getInstance().getSecurityLevel() == AppletSecurityLevel.DENY_ALL) {
+            throw new LaunchException(null, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletPolicyDenied"));
+        }
 
         // If there is a key for this status, it means it
         // was either initialized before, or destroy has been

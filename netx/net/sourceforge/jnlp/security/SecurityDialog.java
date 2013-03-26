@@ -38,6 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.security;
 
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
@@ -306,6 +307,8 @@ public class SecurityDialog extends JDialog {
             panel = new AppletWarningPane(this, this.certVerifier);
         else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
             panel = new NotAllSignedWarningPane(this);
+        else if (dialogType == DialogType.UNSIGNED_WARNING) // Only necessary for applets on 'high security' or above
+            panel = new UnsignedAppletTrustWarningDialog(this, (PluginBridge)file);
         else if (dialogType == DialogType.AUTHENTICATION)
             panel = new PasswordAuthenticationPane(this, extras);
 
