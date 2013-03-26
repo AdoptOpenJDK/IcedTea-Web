@@ -1,3 +1,12 @@
+2013-03-26  Jiri Vanek <jvanek@redhat.com>
+
+	Path validator fixed to be correctly multiplatform
+	* netx/net/sourceforge/jnlp/config/BasicValueValidators.java :
+	(FilePathValidator) now check absolute file by File.isAbsolute() instead
+	of by plain "/".
+	* tests/netx/unit/net/sourceforge/jnlp/config/BasicValueValidatorsTests.java :
+	New file to test new functionality.
+
 2013-03-25  Jana Fabrikova <jfabriko@redhat.com>
 
 	* tests/reproducers/simple/JavascriptFuncReturn/testcases/JavascriptFuncReturnTest.java

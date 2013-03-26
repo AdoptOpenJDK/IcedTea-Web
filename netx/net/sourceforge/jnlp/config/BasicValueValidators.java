@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config;
 
+import java.io.File;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.net.URL;
@@ -86,8 +87,9 @@ public class BasicValueValidators {
      * Checks if a value is a valid file path (not a valid file!). The actual
      * file may or may not exist
      */
-    private static class FilePathValidator implements ValueValidator {
-
+    //package private for testing purposes
+    static class FilePathValidator implements ValueValidator {
+        
         @Override
         public void validate(Object value) throws IllegalArgumentException {
             if (value == null) {
@@ -97,13 +99,15 @@ public class BasicValueValidators {
             Object possibleValue = value;
 
             if (!(possibleValue instanceof String)) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Value should be string!");
             }
 
             String possibleFile = (String) possibleValue;
-            if (!(possibleFile.startsWith("/"))) {
-                throw new IllegalArgumentException();
-            }
+            
+                boolean absolute = new File(possibleFile).isAbsolute();
+                if (!absolute) {
+                    throw new IllegalArgumentException("File must be absolute");
+                }
 
         }
 
