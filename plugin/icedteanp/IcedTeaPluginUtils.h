@@ -279,6 +279,11 @@ class IcedTeaPluginUtilities
 
     	/* Posts call in async queue and waits till execution completes */
     	static void callAndWaitForResult(NPP instance, void (*func) (void *), AsyncCallThreadData* data);
+
+        /*cutting whitespaces from end and start of string*/
+        static void trim(std::string& str);
+        static bool file_exists(std::string filename);
+
 };
 
 /*
@@ -344,5 +349,7 @@ class MessageBus
            after this function returns) */
         void post(const char* message);
 };
+
+
 
 #endif // __ICEDTEAPLUGINUTILS_H__

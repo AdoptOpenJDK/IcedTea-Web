@@ -284,11 +284,11 @@ if ENABLE_PLUGIN
 
 PLUGIN_SRC=IcedTeaNPPlugin.cc IcedTeaScriptablePluginObject.cc \
         IcedTeaJavaRequestProcessor.cc IcedTeaPluginRequestProcessor.cc \
-		IcedTeaPluginUtils.cc
+		IcedTeaPluginUtils.cc IcedTeaParseProperties.cc
 
 PLUGIN_OBJECTS=IcedTeaNPPlugin.o IcedTeaScriptablePluginObject.o \
         IcedTeaJavaRequestProcessor.o IcedTeaPluginRequestProcessor.o \
-		IcedTeaPluginUtils.o
+		IcedTeaPluginUtils.o IcedTeaParseProperties.o
 
 $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	mkdir -p $(PLUGIN_DIR) && \

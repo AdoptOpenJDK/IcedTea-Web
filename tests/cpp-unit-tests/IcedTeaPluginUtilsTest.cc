@@ -42,6 +42,10 @@
 
 #include "IcedTeaPluginUtils.h"
 #include "IcedTeaNPPlugin.h"
+#include <fstream>
+
+extern void trim(std::string& str);
+extern bool file_exists(std::string filename);
 
 TEST(NPVariantAsString) {
     NPVariant var;
@@ -81,4 +85,40 @@ TEST(NPVariantStringCopy) {
     browser_functions.memfree((void*) npvar.value.stringValue.UTF8Characters);
 
     CHECK_EQUAL(0, browsermock_unfreed_allocations());
+}
+
+TEST(trim) {
+	std::string toBeTrimmed = std::string(" testX ");
+	IcedTeaPluginUtilities::trim (toBeTrimmed);
+	CHECK_EQUAL("testX", toBeTrimmed);
+	
+	std::string toBeTrimmed2 = std::string(" \t testX\n");
+	IcedTeaPluginUtilities::trim (toBeTrimmed2);
+	CHECK_EQUAL("testX", toBeTrimmed2);
+
+	std::string toBeTrimmed3 = std::string(" \t \n te \n stX\n");
+	IcedTeaPluginUtilities::trim (toBeTrimmed3);
+	CHECK_EQUAL("te \n stX", toBeTrimmed3);
+}
+
+
+/* Creates a temporary file with the specified contents */
+static std::string temporary_file(const std::string& contents) {
+	std::string path = tmpnam(NULL); /* POSIX function, fine for test suite */
+	std::ofstream myfile;
+	myfile.open (path.c_str());
+	myfile << contents;
+	myfile.close();
+	return path;
+}
+
+
+TEST(file_exists) {
+	std::string f1 = temporary_file("dummy content");
+	bool a = IcedTeaPluginUtilities::file_exists(f1);
+	CHECK_EQUAL(a, true);
+	
+	remove(f1.c_str());
+	bool b = IcedTeaPluginUtilities::file_exists(f1);
+	CHECK_EQUAL(b, false);
 }

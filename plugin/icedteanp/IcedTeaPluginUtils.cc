@@ -39,6 +39,7 @@ exception statement from your version. */
 #include "IcedTeaNPPlugin.h"
 #include "IcedTeaScriptablePluginObject.h"
 #include "IcedTeaPluginUtils.h"
+#include <fstream>
 
 /**
  * Misc. utility functions used by the plugin
@@ -1068,6 +1069,21 @@ processAsyncCallQueue(void* param /* ignored */)
     } while(1);
 }
 
+void IcedTeaPluginUtilities::trim(std::string& str) {
+	size_t start = str.find_first_not_of(" \t\n"), end = str.find_last_not_of(" \t\n");
+	if (start == std::string::npos) {
+        	return;
+	}
+	str = str.substr(start, end - start + 1);
+}
+
+bool IcedTeaPluginUtilities::file_exists(std::string filename)
+{
+    std::ifstream infile(filename.c_str());
+    return infile.good();
+}
+
+
 /******************************************
  * Begin JavaMessageSender implementation *
  ******************************************
@@ -1203,3 +1219,4 @@ MessageBus::post(const char* message)
 
     PLUGIN_DEBUG("%p unlocked...\n", &msg_queue_mutex);
 }
+

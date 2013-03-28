@@ -1,3 +1,18 @@
+2013-03-22  Jiri Vanek <jvanek@redhat.com>
+
+	Added code to parse properties and to find correct configuration files
+	from c++ part of plugin
+	* Makefile.am: IcedTeaParseProperties.cc added to be compiled with rest
+	of plugin
+	* plugin/icedteanp/IcedTeaParseProperties.cc: new file, contains implementation
+	for searching for config files and to read  value from them
+	* plugin/icedteanp/IcedTeaParseProperties.h:  public api for "library"
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: 
+	* plugin/icedteanp/IcedTeaPluginUtils.h: added new methods (trim) and
+	(file_exists)
+	* tests/cpp-unit-tests/IcedTeaParsePropertiesTest.cc: tests for library methods
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: added tests for new methods
+	
 2013-03-26  Adam Domurad  <adomurad@redhat.com>
 
 	Integration of unsigned applet confirmation dialogue.
