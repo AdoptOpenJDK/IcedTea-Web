@@ -116,23 +116,35 @@ class PluginMessageConsumer {
         return null;
     }
 
-    public void notifyWorkerIsFree(PluginMessageHandlerWorker worker) {
-        consumerThread.interrupt();
-    }
-
     public void queue(String message) {
         synchronized (readQueue) {
             readQueue.addLast(message);
         }
 
         // Wake that lazy consumer thread
-        consumerThread.interrupt();
+        consumerThread.notifyHasWork();
     }
 
     protected class ConsumerThread extends Thread {
 
         public ConsumerThread() {
             super("PluginMessageConsumer.ConsumerThread");
+        }
+
+        // Notify that either work is ready to do, or a worker is available
+        public synchronized void notifyHasWork() {
+            notifyAll();
+        }
+
+        // Wait a bit until either work is ready to do, or a worker is available
+        public synchronized void waitForWork() {
+            try {
+                // Do not wait indefinitely to avoid the potential of deadlock
+                wait(1000);
+            } catch (InterruptedException e) {
+                // Should not typically occur
+                e.printStackTrace();
+            }
         }
 
         /**
@@ -194,13 +206,10 @@ class PluginMessageConsumer {
                     }
 
                     worker.setmessage(message);
-                    worker.interrupt();
+                    worker.notifyHasWork();
 
                 } else {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ie) {
-                    }
+                    waitForWork();
                 }
             }
         }

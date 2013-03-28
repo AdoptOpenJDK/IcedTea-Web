@@ -13,6 +13,24 @@
 	* tests/cpp-unit-tests/IcedTeaParsePropertiesTest.cc: tests for library methods
 	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: added tests for new methods
 	
+2013-03-28  Adam Domurad  <adomurad@redhat.com>
+
+	Don't interrupt worker/consumer threads (can prevent shutdown code from
+	executing); instead use Object wait/notify methods.
+	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java
+	(notifyHasWork): Replacement for thread interruption
+	(waitForWork): Replacement for thread sleeping
+	(run): Use waitForWork instead of Thread.sleep
+	(notifyWorkerIsFree): Removed -- misleading method.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(message): Make volatile, as it should have always been.
+	(notifyHasWork): Replacement for thread interruption
+	(waitForWork): Replacement for thread sleeping
+	(run): Use waitForWork instead of Thread.sleep
+	(getPermissions): avoid potential NPE if code source location is
+	missing
+	(free): Remove reference to notifyWorkerIsFree. 
+
 2013-03-26  Adam Domurad  <adomurad@redhat.com>
 
 	Integration of unsigned applet confirmation dialogue.
