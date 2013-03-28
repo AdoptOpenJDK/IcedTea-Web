@@ -37,9 +37,26 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
+import net.sourceforge.jnlp.cache.ResourceTracker;
+
 public class UrlUtils {
+
+    public static URL normalizeUrlAndStripParams(URL url) {
+        try {
+            String[] urlParts = url.toString().split("\\?");
+            URL strippedUrl = new URL(urlParts[0]); 
+            return ResourceTracker.normalizeUrl(strippedUrl, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
 
     public static boolean isLocalFile(URL url) {
 

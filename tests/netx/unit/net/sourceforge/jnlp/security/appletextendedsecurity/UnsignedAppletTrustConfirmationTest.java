@@ -36,24 +36,4 @@ public class UnsignedAppletTrustConfirmationTest {
         assertEquals(toList("test .jar"), 
                 UnsignedAppletTrustConfirmation.toRelativePaths(toList("http://example.com/test .jar"), "http://example.com/"));
     }
-
-    @Test
-    public void testNormalizeUrlAndStripParams() throws Exception {
-        /* Test that URL is normalized (encoded if not already encoded, leading whitespace trimmed, etc) */
-        assertEquals("http://example.com/%20test%20test",
-                UnsignedAppletTrustConfirmation.normalizeUrlAndStripParams(new URL("http://example.com/ test%20test  ")).toString());
-        /* Test that a URL without '?' is left unchanged */
-        assertEquals("http://example.com/test",
-                UnsignedAppletTrustConfirmation.normalizeUrlAndStripParams(new URL("http://example.com/test")).toString());
-        /* Test that parts of a URL that come after '?' are stripped */
-        assertEquals("http://example.com/test",
-                UnsignedAppletTrustConfirmation.normalizeUrlAndStripParams(new URL("http://example.com/test?test=test")).toString());
-        /* Test that everything after the first '?' is stripped */
-        assertEquals("http://example.com/test",
-                UnsignedAppletTrustConfirmation.normalizeUrlAndStripParams(new URL("http://example.com/test?http://example.com/?test")).toString());
-
-        /* Test normalization + stripping */
-        assertEquals("http://example.com/%20test%20test",
-                UnsignedAppletTrustConfirmation.normalizeUrlAndStripParams(new URL("http://www.example.com/ test%20test  ?test=test")).toString());
-    }
 }

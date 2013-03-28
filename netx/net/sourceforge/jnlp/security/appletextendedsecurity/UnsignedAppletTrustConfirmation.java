@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.cache.ResourceTracker;
@@ -96,22 +98,9 @@ public class UnsignedAppletTrustConfirmation {
 
     private static UnsignedAppletActionEntry getMatchingItem(UnsignedAppletActionStorage actionStorage, PluginBridge file) {
         return actionStorage.getMatchingItem(
-                normalizeUrlAndStripParams(file.getSourceLocation()).toString(), 
-                normalizeUrlAndStripParams(file.getCodeBase()).toString(), 
+                UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation()).toString(), 
+                UrlUtils.normalizeUrlAndStripParams(file.getCodeBase()).toString(), 
                 toRelativePaths(file.getArchiveJars(), file.getCodeBase().toString()));
-    }
-
-    static URL normalizeUrlAndStripParams(URL url) {
-        try {
-            String[] urlParts = url.toString().split("\\?");
-            URL strippedUrl = new URL(urlParts[0]); 
-            return ResourceTracker.normalizeUrl(strippedUrl, false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return url;
     }
 
     /* Extract the archives as relative paths */
@@ -142,8 +131,8 @@ public class UnsignedAppletTrustConfirmation {
                 return;
             }
 
-            URL codebase = normalizeUrlAndStripParams(file.getCodeBase());
-            URL documentbase = normalizeUrlAndStripParams(file.getSourceLocation());
+            URL codebase = UrlUtils.normalizeUrlAndStripParams(file.getCodeBase());
+            URL documentbase = UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation());
 
             /* Else, create a new entry */
             UrlRegEx codebaseRegex = new UrlRegEx("\\Q" + codebase + "\\E");

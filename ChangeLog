@@ -1,3 +1,16 @@
+2013-03-28  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java
+	(normalizeUrlAndStripParams): Moved.
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java
+	(normalizeUrlAndStripParams): New, moved from
+	UnsignedAppletTrustConfirmation.
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java
+	(testNormalizeUrlAndStripParams): Moved.
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java:
+	New, has (testNormalizeUrlAndStripParams) from
+	UnsignedAppletTrustConfirmationTest.
+
 2013-03-22  Jiri Vanek <jvanek@redhat.com>
 
 	Added code to parse properties and to find correct configuration files
