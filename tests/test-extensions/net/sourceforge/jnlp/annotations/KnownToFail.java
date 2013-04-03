@@ -41,6 +41,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 
 /**
  * <p>
@@ -52,10 +53,15 @@ import java.lang.annotation.Target;
  * This annotation is meant for adding tests for bugs before the fix is
  * implemented.
  * </p>
+ * <p>
+ * The meaning of optional parameter failsIn is either a list of 
+ * browsers where the test fails, or a default value - an empty array {},
+ * default value means that the test fails always.
+ * </p>
  */
 
 @Target({ElementType.METHOD,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface KnownToFail {
-    
+    public Browsers[] failsIn() default {}; 
 }

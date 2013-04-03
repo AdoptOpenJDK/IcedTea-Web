@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.Remote;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 
 import org.junit.internal.JUnitSystem;
 import org.junit.runner.Description;
@@ -74,7 +75,22 @@ public class LessVerboseTextListener extends RunListener {
     private void printK2F(PrintStream writer, Boolean failed, Description description) {
         try {
             KnownToFail k2f = getK2F(description);
-            if (k2f != null) {
+            boolean thisTestIsK2F = false;
+            if (k2f != null){
+                //determine if k2f in the current browser
+                Browsers[] br = k2f.failsIn();
+                if(0 == br.length){ //@KnownToFail with default optional parameter failsIn={}
+                    thisTestIsK2F = true;
+                }else{
+                    for(Browsers b : br){
+                        if(description.toString().contains(b.toString())){
+                            thisTestIsK2F = true;
+                        }
+                    }
+                }
+            }
+
+            if( thisTestIsK2F ){
                 totalK2F++;
                 if (failed != null) {
                     if (failed) {

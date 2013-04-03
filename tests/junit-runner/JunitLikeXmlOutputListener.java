@@ -20,10 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.Remote;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 
 
 import org.junit.internal.JUnitSystem;
@@ -201,17 +203,30 @@ public class JunitLikeXmlOutputListener extends RunListener {
             testcaseAtts.put(TEST_IGNORED_ATTRIBUTE, Boolean.TRUE.toString());
         }
         KnownToFail k2f = LessVerboseTextListener.getAnnotation(testClass, testMethod.getName(), KnownToFail.class);
+        boolean thisTestIsK2F = false;
         Remote remote =  LessVerboseTextListener.getAnnotation(testClass, testMethod.getName(), Remote.class);
         if (k2f != null) {
-            testcaseAtts.put(K2F, Boolean.TRUE.toString());
+            //determine if k2f in the current browser
+            //??
+            Browsers[] br = k2f.failsIn();
+            if(0 == br.length){//the KnownToFail annotation without optional parameter
+                thisTestIsK2F = true;
+            }else{
+                for(Browsers b : br){
+                    if(description.toString().contains(b.toString())){
+                        thisTestIsK2F = true;
+                    }
+                }
+            }
         }
+        if( thisTestIsK2F ) testcaseAtts.put(K2F, Boolean.TRUE.toString());
         if (remote != null) {
             testcaseAtts.put(REMOTE, Boolean.TRUE.toString());
 
         }
         openElement(TEST_ELEMENT, testcaseAtts);
         if (testFailed != null) {
-            if (k2f != null) {
+            if (thisTestIsK2F) {
                 failedK2F++;
             }
             Map<String, String> errorAtts = new HashMap<String, String>(3);
@@ -226,7 +241,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
 
             writeElement(TEST_ERROR_ELEMENT, testFailed.getTrace(), errorAtts);
         } else {
-            if (k2f != null) {
+            if (thisTestIsK2F) {
                 if (ignored) {
                     ignoredK2F++;
                 } else {
@@ -265,25 +280,25 @@ public class JunitLikeXmlOutputListener extends RunListener {
             classStats.put(description.getClassName(), classStat);
         }
         classStat.total++;
-        if (k2f != null) {
+        if (thisTestIsK2F) {
             classStat.totalK2F++;
         }
         classStat.time += testTime;
         if (testFailed == null) {
             if (ignored) {
                 classStat.ignored++;
-                if (k2f != null) {
+                if (thisTestIsK2F) {
                     classStat.ignoredK2F++;
                 }
             } else {
                 classStat.passed++;
-                if (k2f != null) {
+                if (thisTestIsK2F) {
                     classStat.passedK2F++;
                 }
             }
         } else {
             classStat.failed++;
-            if (k2f != null) {
+            if (thisTestIsK2F) {
                 classStat.failedK2F++;
             }
         }
