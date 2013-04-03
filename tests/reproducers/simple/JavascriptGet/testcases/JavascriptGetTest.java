@@ -118,7 +118,7 @@ public class JavascriptGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    //@KnownToFail(failsIn={Browsers.midori, Browsers.epiphany, Browsers.google-chrome, Browsers.chromium-browser})
+    @KnownToFail(failsIn={Browsers.midori, Browsers.epiphany, Browsers.googleChrome, Browsers.chromiumBrowser})
     public void AppletJToJSGet_1DArray_Test() throws Exception {
         javaToJSGetTest("jjsRead1DArray", "[1,2,3]", "[1, 2, 3]");
     }
@@ -126,7 +126,7 @@ public class JavascriptGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    //@KnownToFail(failsIn={Browsers.midori, Browsers.epiphany, Browsers.google-chrome, Browsers.chromium-browser})
+    @KnownToFail(failsIn={Browsers.midori, Browsers.epiphany, Browsers.googleChrome, Browsers.chromiumBrowser})
     public void AppletJToJSGet_2DArray_Test() throws Exception {
         javaToJSGetTest("jjsRead2DArray", "[[1,2],[3,4]]","[[1, 2], [3, 4]]");
     }

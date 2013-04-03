@@ -226,7 +226,7 @@ public class JavascriptFuncParamTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    //@KnownToFail(failsIn={Browsers.google-chrome, Browsers.chromium-browser})
+    @KnownToFail(failsIn={Browsers.googleChrome, Browsers.chromiumBrowser})
     public void AppletJToJSFuncParam_JSObject_Test() throws Exception {
         javaToJSFuncParamTest("jjsCallJSObjectParam");
     }

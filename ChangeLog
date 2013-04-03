@@ -1,4 +1,14 @@
-2013-04-03 Jana Fabrikova <jfabriko@redhat.com>
+2013-04-03  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* /test/reproducers/simple/JavascriptFuncParam/testcases/JavascriptFuncParamTest.java:
+	added annotation KnownToFail in googleChrome and chromiumBrowser to
+	the method (AppletJToJSFuncParam_JSObject_Test)
+	* /test/reproducers/simple/JavascriptGet/testcases/JavascriptGetTest.java:
+	added annotation KnownToFail in midori, epiphany, googleChrome 
+	and chromiumBrowser to the methods (AppletJToJSGet_1DArray_Test)
+	and (AppletJToJSGet_2DArray_Test)
+
+2013-04-03  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* /tests/test-extensions/net/sourceforge/jnlp/annotations/KnownToFailInBrowsers.java:
 	the implementation of new annotation, which has an array of
