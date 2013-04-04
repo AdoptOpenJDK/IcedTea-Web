@@ -28,7 +28,7 @@
 	current browser are detected in addition to the tests that are
 	k2f in all browsers
 	* /tests/junit-runner/LessVerboseTextListener.java:
-	added method (getK2FinB) reading the annotion,
+	added method (getK2FinB) reading the annotation,
 	in method (printK2F) the testcases that are known to fail in
 	current browser are detected in addition to the tests that are
 	k2f in all browsers
