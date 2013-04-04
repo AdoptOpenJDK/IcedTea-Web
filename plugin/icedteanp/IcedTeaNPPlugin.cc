@@ -48,6 +48,9 @@ exception statement from your version. */
 #include <sys/types.h>
 #include <unistd.h>
 
+//IcedTea-plugin includes
+#include "IcedTeaPluginUtils.h"
+#include "IcedTeaParseProperties.h"
 // Liveconnect extension
 #include "IcedTeaScriptablePluginObject.h"
 #include "IcedTeaNPPlugin.h"
@@ -73,6 +76,7 @@ exception statement from your version. */
 #include <nsStringAPI.h>
 #include <nsServiceManagerUtils.h>
 #endif
+
 
 // Error reporting macros.
 #define PLUGIN_ERROR(message)                                       \
@@ -287,13 +291,29 @@ g_strcmp0(char *str1, char *str2)
 #endif
 
 static std::string get_plugin_executable(){
-      return std::string (appletviewer_default_executable);
-      
+      std::string custom_jre;
+      bool custom_jre_defined = find_custom_jre(custom_jre);
+      if (custom_jre_defined) {
+            if (IcedTeaPluginUtilities::file_exists(custom_jre+"/bin/java")){
+                  return custom_jre+"/bin/java";
+            } else {
+                 fprintf(stderr, "Your custom jre (/bin/java check) %s is not valid. Please fix %s in your %s. In attempt to run using default one. \n", custom_jre.c_str(), custom_jre_key.c_str(), default_file_ITW_deploy_props_name.c_str());
+            }
+      }
+      return appletviewer_default_executable;      
 }
 
 static std::string get_plugin_rt_jar(){
-      return std::string (appletviewer_default_rtjar);
-      
+      std::string custom_jre;
+      bool custom_jre_defined = find_custom_jre(custom_jre);
+      if (custom_jre_defined) {
+            if (IcedTeaPluginUtilities::file_exists(custom_jre+"/lib/rt.jar")){
+                  return custom_jre+"/lib/rt.jar";
+            } else {
+                  fprintf(stderr, "Your custom jre (/lib/rt.jar check) %s is not valid. Please fix %s in your %s. In attempt to run using default one. \n", custom_jre.c_str(), custom_jre_key.c_str(), default_file_ITW_deploy_props_name.c_str());
+            }
+      }
+      return appletviewer_default_rtjar;      
 }
 
 

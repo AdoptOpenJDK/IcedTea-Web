@@ -1,3 +1,13 @@
+2013-04-04  Jiri Vanek <jvanek@redhat.com>
+
+	Plugin is now honoring the custom jre
+	* launcher/itweb-settings.in :
+	* launcher/javaws.in:
+	In case that custom jre do not exists, complains, and use default rather
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: (get_plugin_executable) and
+	(get_plugin_rt_jar) now tries to return custom values before returning the 
+	default one.
+
 2013-04-03  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* /test/reproducers/simple/JavascriptFuncParam/testcases/JavascriptFuncParamTest.java:
