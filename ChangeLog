@@ -1,3 +1,8 @@
+2013-04-08  Jiri Vanek <jvanek@redhat.com>
+
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Epiphany.java:
+	Removed good --sm-client-disable switch. No longer supported by epiphany
+
 2013-04-04  Jiri Vanek <jvanek@redhat.com>
 
 	Plugin is now honoring the custom jre
