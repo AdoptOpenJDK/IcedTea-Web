@@ -1,5 +1,22 @@
 2013-04-10  Jana Fabrikova  <jfabriko@redhat.com>
 
+	* /tests/reproducers/simple/JSToJFuncResol/testcases/JSToJFuncResolTest.java:
+	adding 11 testcases based on the interactive Liveconnect JS->Java
+	overloaded function resolution tests, tests with JSObject were already
+	included
+	* /tests/reproducers/simple/JSToJFuncResol/srcs/JSToJFuncResol.java:
+	the applet whose methods are invoked from JS during the tests
+	* /tests/reproducers/simple/JSToJFuncResol/resources/JSToJava_FuncResol.js:
+	the JavaScript code for calling the applet methods from JS
+	* /tests/reproducers/simple/JSToJFuncResol/resources/jstoj-funcresol.jnlp:
+	java network launch protocol file for displaying applet in the html
+	page
+	* /tests/reproducers/simple/JSToJFuncResol/resources/JSToJFuncResol.html:
+	the html page with java applet embedded, displayed in browser during
+	the tests
+
+2013-04-10  Jana Fabrikova  <jfabriko@redhat.com>
+
 	* /tests/reproducers/simple/JToJSFuncReturn/testcases/JToJSFuncReturnTest.java:
 	adding 5 testcases based on the interactive Liveconnect JS->Java
 	function return type tests
