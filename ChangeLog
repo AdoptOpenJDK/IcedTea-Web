@@ -1,3 +1,17 @@
+2013-04-10  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* /tests/reproducers/simple/JToJSFuncReturn/testcases/JToJSFuncReturnTest.java:
+	adding 5 testcases based on the interactive Liveconnect JS->Java
+	function return type tests
+	* /tests/reproducers/simple/JToJSFuncReturn/srcs/JToJSFuncReturn.java:
+	the applet that calls JS functions
+	* tests/reproducers/simple/JToJSFuncReturn/resources/JToJS_FuncReturn.js:
+	auxiliary JavaScript code
+	* /tests/reproducers/simple/JToJSFuncReturn/resources/jtojs-funcreturn.jnlp:
+	jnlp file for displaying applet in the html page
+	* /tests/reproducers/simple/JToJSFuncReturn/resources/JToJSFuncReturn.html:
+	the html page where the applet calling JS functions is embedded
+
 2013-04-08  Jiri Vanek <jvanek@redhat.com>
 
 	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Epiphany.java:
