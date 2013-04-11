@@ -51,6 +51,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.security.SecurityDialogs;
+import net.sourceforge.jnlp.security.UnsignedAppletTrustWarningPanel.UnsignedWarningAction;
 
 public class UnsignedAppletTrustConfirmation {
     static private final boolean DEBUG = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
@@ -116,9 +117,9 @@ public class UnsignedAppletTrustConfirmation {
         return fileNames;
     }
 
-    private static void updateAppletAction(PluginBridge file, ExecuteUnsignedApplet behaviour) {
-
+    private static void updateAppletAction(PluginBridge file, ExecuteUnsignedApplet behaviour, boolean rememberForCodeBase) {
         UnsignedAppletActionStorage userActionStorage = securitySettings.getUnsignedAppletActionCustomStorage();
+
         userActionStorage.lock(); // We should ensure this operation is atomic
         try {
             UnsignedAppletActionEntry oldEntry = getMatchingItem(userActionStorage, file);
@@ -136,14 +137,22 @@ public class UnsignedAppletTrustConfirmation {
 
             /* Else, create a new entry */
             UrlRegEx codebaseRegex = new UrlRegEx("\\Q" + codebase + "\\E");
-            UrlRegEx documentbaseRegex = new UrlRegEx("\\Q" + documentbase + "\\E");
+            UrlRegEx documentbaseRegex = new UrlRegEx(".*"); // Match any from codebase
+            List<String> archiveMatches = null; // Match any from codebase
+
+            if (!rememberForCodeBase) { 
+                documentbaseRegex = new UrlRegEx("\\Q" + documentbase + "\\E"); // Match only this applet
+                archiveMatches = toRelativePaths(file.getArchiveJars(), file.getCodeBase().toString()); // Match only this applet
+            }
 
             UnsignedAppletActionEntry entry = new UnsignedAppletActionEntry(
                     behaviour, 
                     new Date(),
                     documentbaseRegex, 
-                    codebaseRegex, 
-                    toRelativePaths(file.getArchiveJars(), file.getCodeBase().toString()));
+                    codebaseRegex,
+                    archiveMatches
+            );
+
             userActionStorage.add(entry);
         } finally {
             userActionStorage.unlock();
@@ -179,15 +188,16 @@ public class UnsignedAppletTrustConfirmation {
             appletOK = false;
         } else {
             // No remembered decision, prompt the user
-            ExecuteUnsignedApplet decidedAction = SecurityDialogs.showUnsignedWarningDialog(file);
+            UnsignedWarningAction warningResponse = SecurityDialogs.showUnsignedWarningDialog(file);
+            ExecuteUnsignedApplet executeAction = warningResponse.getAction();
 
-            appletOK = (decidedAction == ExecuteUnsignedApplet.YES || decidedAction == ExecuteUnsignedApplet.ALWAYS);
+            appletOK = (executeAction == ExecuteUnsignedApplet.YES || executeAction == ExecuteUnsignedApplet.ALWAYS);
 
-            if (decidedAction != null) {
-                updateAppletAction(file, decidedAction);
+            if (executeAction != null) {
+                updateAppletAction(file, executeAction, warningResponse.rememberForCodeBase());
             }
 
-            debug("Decided action for unsigned applet at " + file.getCodeBase() +" was " + decidedAction);
+            debug("Decided action for unsigned applet at " + file.getCodeBase() +" was " + executeAction);
         }
 
         if (!appletOK) {

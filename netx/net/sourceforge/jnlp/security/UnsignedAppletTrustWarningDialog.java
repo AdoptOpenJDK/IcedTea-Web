@@ -37,8 +37,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.security;
 
 import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.security.UnsignedAppletTrustWarningPanel.UnsignedWarningAction;
 import net.sourceforge.jnlp.security.UnsignedAppletTrustWarningPanel.ActionChoiceListener;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
 
 /**
  * A panel that confirms that the user is OK with unsigned code running.
@@ -52,7 +52,7 @@ public class UnsignedAppletTrustWarningDialog extends SecurityDialogPanel {
         add(new UnsignedAppletTrustWarningPanel(file,
                 new ActionChoiceListener() {
                     @Override
-                    public void actionChosen(ExecuteUnsignedApplet action) {
+                    public void actionChosen(UnsignedWarningAction action) {
                         parent.setValue(action);
                         parent.dispose();
                     }

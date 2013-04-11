@@ -43,19 +43,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 
-import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
@@ -63,10 +65,31 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustC
 public class UnsignedAppletTrustWarningPanel extends JPanel {
 
     /*
+     * Details of decided action.
+     */
+    public static class UnsignedWarningAction {
+        private ExecuteUnsignedApplet action;
+        private boolean applyToCodeBase;
+
+        public UnsignedWarningAction(ExecuteUnsignedApplet action,
+                boolean applyToCodeBase) {
+            this.action = action;
+            this.applyToCodeBase = applyToCodeBase;
+        }
+
+        public ExecuteUnsignedApplet getAction() {
+            return action;
+        }
+        public boolean rememberForCodeBase() {
+            return applyToCodeBase;
+        }
+    }
+
+    /*
      * Callback for when action is decided.
      */
     public static interface ActionChoiceListener {
-        void actionChosen(ExecuteUnsignedApplet action);
+        void actionChosen(UnsignedWarningAction action);
     }
 
     private final int PANE_WIDTH = 500;
@@ -79,6 +102,8 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
     private JButton allowButton;
     private JButton rejectButton;
     private JCheckBox permanencyCheckBox;
+    private JRadioButton applyToAppletButton;
+    private JRadioButton applyToCodeBaseButton;
 
     private PluginBridge file;
 
@@ -128,7 +153,7 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
 
     private void setupInfoPanel() {
         String infoLabelText = R("SUnsignedDetail", file.getCodeBase());
-        ExecuteUnsignedApplet rememberedAction = UnsignedAppletTrustConfirmation.getStoredAction((PluginBridge)file);
+        ExecuteUnsignedApplet rememberedAction = UnsignedAppletTrustConfirmation.getStoredAction(file);
         int panelHeight = INFO_PANEL_HEIGHT;
         if (rememberedAction == ExecuteUnsignedApplet.YES) {
             infoLabelText += "<br>" + R("SUnsignedAllowedBefore");
@@ -158,13 +183,32 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
         add(questionPanel);
     }
 
+    private JPanel createMatchOptionsPanel() {
+        JPanel matchOptionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        ButtonGroup group = new ButtonGroup();
+        applyToAppletButton = new JRadioButton(R("SRememberAppletOnly"));
+        applyToAppletButton.setSelected(true);
+        applyToAppletButton.setEnabled(false); // Start disabled until 'Remember this option' is selected
+
+        applyToCodeBaseButton = new JRadioButton(R("SRememberCodebase"));
+        applyToCodeBaseButton.setEnabled(false);
+
+        group.add(applyToAppletButton);
+        group.add(applyToCodeBaseButton);
+
+        matchOptionsPanel.add(applyToAppletButton);
+        matchOptionsPanel.add(applyToCodeBaseButton);
+
+        return matchOptionsPanel;
+    }
+
     private JPanel createCheckBoxPanel() {
         JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
         permanencyCheckBox = new JCheckBox(htmlWrap(R("SRememberOption")));
+        permanencyCheckBox.addActionListener(permanencyListener());
         checkBoxPanel.add(permanencyCheckBox);
-
-        checkBoxPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         return checkBoxPanel;
     }
@@ -189,8 +233,12 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
     // Set up 'Remember Option' checkbox & Proceed/Cancel buttons
     private void setupButtonAndCheckBoxPanel() {
         JPanel outerPanel = new JPanel(new BorderLayout());
+        JPanel rememberPanel = new JPanel(new GridLayout(2 /*rows*/, 1 /*column*/));
+        rememberPanel.add(createCheckBoxPanel());
+        rememberPanel.add(createMatchOptionsPanel());
+        rememberPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        outerPanel.add(createCheckBoxPanel(), BorderLayout.WEST);
+        outerPanel.add(rememberPanel, BorderLayout.WEST);
         outerPanel.add(createButtonPanel(), BorderLayout.EAST);
 
         add(outerPanel);
@@ -208,6 +256,16 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
         setupButtonAndCheckBoxPanel();
     }
 
+    // Toggles whether 'match applet' or 'match codebase' options are greyed out
+    private ActionListener permanencyListener() {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                applyToAppletButton.setEnabled(permanencyCheckBox.isSelected());
+                applyToCodeBaseButton.setEnabled(permanencyCheckBox.isSelected());
+            }
+        };
+    }
     // Sets action depending on allowApplet + checkbox state
     private ActionListener chosenActionSetter(final boolean allowApplet) {
         return new ActionListener() {
@@ -221,7 +279,8 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
                     action = permanencyCheckBox.isSelected() ? ExecuteUnsignedApplet.NEVER : ExecuteUnsignedApplet.NO;
                 }
 
-                actionChoiceListener.actionChosen(action);
+                boolean applyToCodeBase = applyToCodeBaseButton.isSelected();
+                actionChoiceListener.actionChosen(new UnsignedWarningAction(action, applyToCodeBase));
             }
         };
     }
