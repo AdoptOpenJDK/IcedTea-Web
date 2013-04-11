@@ -55,28 +55,6 @@ exception statement from your version. */
 #include "IcedTeaScriptablePluginObject.h"
 #include "IcedTeaNPPlugin.h"
 
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-// Documentbase retrieval includes.
-#include <nsIPluginInstance.h>
-#include <nsIPluginInstancePeer.h>
-#include <nsIPluginTagInfo2.h>
-
-// API's into Mozilla
-#include <nsCOMPtr.h>
-#include <nsICookieService.h>
-#include <nsIDNSRecord.h>
-#include <nsIDNSService.h>
-#include <nsINetUtil.h>
-#include <nsIProxyInfo.h>
-#include <nsIProtocolProxyService.h>
-#include <nsIScriptSecurityManager.h>
-#include <nsIIOService.h>
-#include <nsIURI.h>
-#include <nsNetCID.h>
-#include <nsStringAPI.h>
-#include <nsServiceManagerUtils.h>
-#endif
-
 
 // Error reporting macros.
 #define PLUGIN_ERROR(message)                                       \
@@ -153,11 +131,6 @@ exception statement from your version. */
 #define FAILURE_MESSAGE "icedteanp plugin error: Failed to run %s." \
   "  For more detail rerun \"firefox -g\" in a terminal window."
 
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-// Documentbase retrieval required definition.
-static NS_DEFINE_IID (kIPluginTagInfo2IID, NS_IPLUGINTAGINFO2_IID);
-#endif
-
 // Data directory for plugin.
 static std::string data_directory;
 
@@ -210,14 +183,6 @@ PluginRequestProcessor* plugin_req_proc;
 // Sends messages to Java over the bus
 JavaMessageSender* java_req_proc;
 
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-// Documentbase retrieval type-punning union.
-typedef union
-{
-  void** void_field;
-  nsIPluginTagInfo2** info_field;
-} info_union;
-#endif
 
 // Static instance helper functions.
 // Have the browser allocate a new ITNPPluginData structure.
@@ -933,38 +898,6 @@ get_cookie_info(const char* siteAddr, char** cookieString, uint32_t* len)
   {
     return NPERR_GENERIC_ERROR;
   }
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-  nsresult rv;
-  nsCOMPtr<nsIScriptSecurityManager> sec_man =
-    do_GetService(NS_SCRIPTSECURITYMANAGER_CONTRACTID, &rv);
-
-  if (!sec_man) {
-    return NPERR_GENERIC_ERROR;
-  }
-
-  nsCOMPtr<nsIIOService> io_svc = do_GetService("@mozilla.org/network/io-service;1", &rv);
-
-  if (NS_FAILED(rv) || !io_svc) {
-    return NPERR_GENERIC_ERROR;
-  }
-
-  nsCOMPtr<nsIURI> uri;
-  io_svc->NewURI(nsCString(siteAddr), NULL, NULL, getter_AddRefs(uri));
-
-  nsCOMPtr<nsICookieService> cookie_svc = do_GetService("@mozilla.org/cookieService;1", &rv);
-
-  if (NS_FAILED(rv) || !cookie_svc) {
-    return NPERR_GENERIC_ERROR;
-  }
-
-  rv = cookie_svc->GetCookieString(uri, NULL, cookieString);
-
-  if (NS_FAILED(rv) || !*cookieString) {
-    return NPERR_GENERIC_ERROR;
-  }
-
-#else
-
   // getvalueforurl needs an NPP instance. Quite frankly, there is no easy way
   // to know which instance needs the information, as applets on Java side can
   // be multi-threaded and the thread making a proxy.cookie request cannot be
@@ -982,8 +915,6 @@ get_cookie_info(const char* siteAddr, char** cookieString, uint32_t* len)
   {
       return NPERR_GENERIC_ERROR;
   }
-
-#endif
 
   return NPERR_NO_ERROR;
 }
@@ -1025,71 +956,7 @@ plugin_data_new (ITNPPluginData** data)
 // Documentbase retrieval.  This function gets the current document's
 // documentbase.  This function relies on browser-private data so it
 // will only work when the plugin is loaded in a Mozilla-based
-// browser.  We could not find a way to retrieve the documentbase
-// using the original Netscape plugin API so we use the XPCOM API
-// instead.
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-static gchar*
-plugin_get_documentbase (NPP instance)
-{
-  PLUGIN_DEBUG ("plugin_get_documentbase\n");
-
-  nsIPluginInstance* xpcom_instance = NULL;
-  nsIPluginInstancePeer* peer = NULL;
-  nsresult result = 0;
-  nsIPluginTagInfo2* pluginTagInfo2 = NULL;
-  info_union u = { NULL };
-  char const* documentbase = NULL;
-  gchar* documentbase_copy = NULL;
-
-  xpcom_instance = (nsIPluginInstance*) (instance->ndata);
-  if (!xpcom_instance)
-    {
-      PLUGIN_ERROR ("xpcom_instance is NULL.");
-      goto cleanup_done;
-    }
-
-  xpcom_instance->GetPeer (&peer);
-  if (!peer)
-    {
-      PLUGIN_ERROR ("peer is NULL.");
-      goto cleanup_done;
-    }
-
-  u.info_field = &pluginTagInfo2;
-
-  result = peer->QueryInterface (kIPluginTagInfo2IID,
-                                 u.void_field);
-  if (result || !pluginTagInfo2)
-    {
-      PLUGIN_ERROR ("pluginTagInfo2 retrieval failed.");
-      goto cleanup_peer;
-    }
-
-  pluginTagInfo2->GetDocumentBase (&documentbase);
-
-  if (!documentbase)
-    {
-      // NULL => dummy instantiation for LiveConnect
-      goto cleanup_plugintaginfo2;
-    }
-
-  documentbase_copy = g_strdup (documentbase);
-
-  // Release references.
- cleanup_plugintaginfo2:
-  NS_RELEASE (pluginTagInfo2);
-
- cleanup_peer:
-  NS_RELEASE (peer);
-
- cleanup_done:
-  PLUGIN_DEBUG ("plugin_get_documentbase return\n");
-
-  PLUGIN_DEBUG("plugin_get_documentbase returning: %s\n", documentbase_copy);
-  return documentbase_copy;
-}
-#else
+// browser.
 static gchar*
 plugin_get_documentbase (NPP instance)
 {
@@ -1128,7 +995,6 @@ plugin_get_documentbase (NPP instance)
 
   return documentbase_copy;
 }
-#endif
 
 // plugin_in_pipe_callback is called when data is available on the
 // input pipe, or when the appletviewer crashes or is killed.  It may
@@ -1198,10 +1064,6 @@ void consume_plugin_message(gchar* message) {
 
     gchar* proxy_info;
 
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-	proxy = (gchar*) g_malloc(sizeof(char)*2048);
-#endif
-
     proxy_info = g_strconcat ("plugin PluginProxyInfo reference ", parts[3], " ", NULL);
     if (get_proxy_info(decoded_url, &proxy, &len) == NPERR_NO_ERROR)
       {
@@ -1216,8 +1078,8 @@ void consume_plugin_message(gchar* message) {
     g_free(proxy_info);
     proxy_info = NULL;
 
-	g_free(proxy);
-	proxy = NULL;
+    g_free(proxy);
+    proxy = NULL;
 
   } else if (g_str_has_prefix(parts[1], "PluginCookieInfo"))
   {
@@ -1369,76 +1231,6 @@ get_proxy_info(const char* siteAddr, char** proxy, uint32_t* len)
   {
 	  return NPERR_GENERIC_ERROR;
   }
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-  nsresult rv;
-
-  // Initialize service variables
-  nsCOMPtr<nsIProtocolProxyService> proxy_svc = do_GetService("@mozilla.org/network/protocol-proxy-service;1", &rv);
-
-  if (!proxy_svc) {
-      printf("Cannot initialize proxy service\n");
-      return NPERR_GENERIC_ERROR;
-  }
-
-  nsCOMPtr<nsIIOService> io_svc = do_GetService("@mozilla.org/network/io-service;1", &rv);
-
-  if (NS_FAILED(rv) || !io_svc) {
-    printf("Cannot initialize io service\n");
-    return NPERR_GENERIC_ERROR;
-  }
-
-  // uri which needs to be accessed
-  nsCOMPtr<nsIURI> uri;
-  io_svc->NewURI(nsCString(siteAddr), NULL, NULL, getter_AddRefs(uri));
-
-  // find the proxy address if any
-  nsCOMPtr<nsIProxyInfo> info;
-  proxy_svc->Resolve(uri, 0, getter_AddRefs(info));
-
-  // if there is no proxy found, return immediately
-  if (!info) {
-     PLUGIN_DEBUG("%s does not need a proxy\n", siteAddr);
-     return NPERR_GENERIC_ERROR;
-  }
-
-  // if proxy info is available, extract it
-  nsCString phost;
-  PRInt32 pport;
-  nsCString ptype;
-
-  info->GetHost(phost);
-  info->GetPort(&pport);
-  info->GetType(ptype);
-
-  // resolve the proxy address to an IP
-  nsCOMPtr<nsIDNSService> dns_svc = do_GetService("@mozilla.org/network/dns-service;1", &rv);
-
-  if (!dns_svc) {
-      printf("Cannot initialize DNS service\n");
-      return NPERR_GENERIC_ERROR;
-  }
-
-  nsCOMPtr<nsIDNSRecord> record;
-  dns_svc->Resolve(phost, 0U, getter_AddRefs(record));
-
-  // TODO: Add support for multiple ips
-  nsDependentCString ipAddr;
-  record->GetNextAddrAsString(ipAddr);
-
-  if (!strcmp(ptype.get(), "http"))
-  {
-      snprintf(*proxy, sizeof(char)*1024, "%s %s:%d", "PROXY", ipAddr.get(), pport);
-  } else
-  {
-      snprintf(*proxy, sizeof(char)*1024, "%s %s:%d", "SOCKS", ipAddr.get(), pport);
-  }
-
-  *len = strlen(*proxy);
-
-  PLUGIN_DEBUG("Proxy info for %s: %s\n", siteAddr, *proxy);
-
-#else
-
   if (browser_functions.getvalueforurl)
   {
 
@@ -1449,7 +1241,6 @@ get_proxy_info(const char* siteAddr, char** proxy, uint32_t* len)
   {
       return NPERR_GENERIC_ERROR;
   }
-#endif
 
   return NPERR_NO_ERROR;
 }
@@ -2012,11 +1803,7 @@ plugin_data_destroy (NPP instance)
 static bool
 initialize_browser_functions(const NPNetscapeFuncs* browserTable)
 {
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-#define NPNETSCAPEFUNCS_LAST_FIELD_USED (browserTable->pluginthreadasynccall)
-#else
 #define NPNETSCAPEFUNCS_LAST_FIELD_USED (browserTable->setvalueforurl)
-#endif
 
   //Determine the size in bytes, as a difference of the address past the last used field
   //And the browser table address
@@ -2058,20 +1845,6 @@ initialize_plugin_table(NPPluginFuncs* pluginTable)
 
   pluginTable->version = (NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR;
   pluginTable->size = sizeof (NPPluginFuncs);
-
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-  pluginTable->newp = NewNPP_NewProc (ITNP_New);
-  pluginTable->destroy = NewNPP_DestroyProc (ITNP_Destroy);
-  pluginTable->setwindow = NewNPP_SetWindowProc (ITNP_SetWindow);
-  pluginTable->newstream = NewNPP_NewStreamProc (ITNP_NewStream);
-  pluginTable->destroystream = NewNPP_DestroyStreamProc (ITNP_DestroyStream);
-  pluginTable->asfile = NewNPP_StreamAsFileProc (ITNP_StreamAsFile);
-  pluginTable->writeready = NewNPP_WriteReadyProc (ITNP_WriteReady);
-  pluginTable->write = NewNPP_WriteProc (ITNP_Write);
-  pluginTable->print = NewNPP_PrintProc (ITNP_Print);
-  pluginTable->urlnotify = NewNPP_URLNotifyProc (ITNP_URLNotify);
-  pluginTable->getvalue = NewNPP_GetValueProc (ITNP_GetValue);
-#else
   pluginTable->newp = NPP_NewProcPtr (ITNP_New);
   pluginTable->destroy = NPP_DestroyProcPtr (ITNP_Destroy);
   pluginTable->setwindow = NPP_SetWindowProcPtr (ITNP_SetWindow);
@@ -2083,7 +1856,6 @@ initialize_plugin_table(NPPluginFuncs* pluginTable)
   pluginTable->print = NPP_PrintProcPtr (ITNP_Print);
   pluginTable->urlnotify = NPP_URLNotifyProcPtr (ITNP_URLNotify);
   pluginTable->getvalue = NPP_GetValueProcPtr (ITNP_GetValue);
-#endif
 
   return true;
 }

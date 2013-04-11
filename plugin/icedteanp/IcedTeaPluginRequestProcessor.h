@@ -46,13 +46,7 @@ exception statement from your version. */
 #include <time.h>
 
 #include <npapi.h>
-
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-#include <npupp.h>
-#else
-#include <npapi.h>
 #include <npruntime.h>
-#endif
 
 #include "IcedTeaPluginUtils.h"
 #include "IcedTeaJavaRequestProcessor.h"

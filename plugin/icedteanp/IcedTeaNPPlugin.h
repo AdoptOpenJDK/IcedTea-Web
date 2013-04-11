@@ -39,13 +39,9 @@ exception statement from your version. */
 #ifndef __ICEDTEANPPLUGIN_H__
 #define	__ICEDTEANPPLUGIN_H__
 
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-#include <nsThreadUtils.h>
-#else
 #include <npapi.h>
 #include <npruntime.h>
 #include <npfunctions.h>
-#endif
 
 // GLib includes.
 #include <glib.h>

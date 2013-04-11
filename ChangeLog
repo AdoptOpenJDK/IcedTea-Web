@@ -1,5 +1,18 @@
 2013-04-11  Adam Domurad  <adomurad@redhat.com>
 
+	Remove legacy support for the old version of NPAPI.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Remove if directives for old 
+	version of NPAPI.
+	* plugin/icedteanp/IcedTeaNPPlugin.h: Same
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: Same
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.h: Same
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Same
+	* plugin/icedteanp/IcedTeaPluginUtils.h: Same
+	* plugin/icedteanp/IcedTeaRunnable.h: Same
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.h: Same
+
+2013-04-11  Adam Domurad  <adomurad@redhat.com>
+
 	Allow remembering applet confirmation for whole codebase.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
 	Added SRememberAppletOnly, SRememberCodebase messages

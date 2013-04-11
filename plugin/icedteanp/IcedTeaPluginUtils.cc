@@ -920,15 +920,9 @@ IcedTeaPluginUtilities::decodeURL(const gchar* url, gchar** decoded_url)
 std::string
 IcedTeaPluginUtilities::NPVariantAsString(NPVariant variant)
 {
-#if MOZILLA_VERSION_COLLAPSED < 1090200
-  return std::string(
-    NPVARIANT_TO_STRING(variant).utf8characters,
-    NPVARIANT_TO_STRING(variant).utf8length);
-#else
   return std::string(
     NPVARIANT_TO_STRING(variant).UTF8Characters,
     NPVARIANT_TO_STRING(variant).UTF8Length);
-#endif
 }
 
 /**
@@ -949,11 +943,7 @@ NPString IcedTeaPluginUtilities::NPStringCopy(const std::string& result) {
 NPVariant IcedTeaPluginUtilities::NPVariantStringCopy(const std::string& result) {
     NPString npstr = NPStringCopy(result);
     NPVariant npvar;
-#if MOZILLA_VERSION_COLLAPSED < 1090200
-    STRINGN_TO_NPVARIANT(npstr.utf8characters, npstr.utf8length, npvar);
-#else
     STRINGN_TO_NPVARIANT(npstr.UTF8Characters, npstr.UTF8Length, npvar);
-#endif
     return npvar;
 }
 

@@ -57,13 +57,7 @@ exception statement from your version. */
 
 #include <npapi.h>
 #include <glib.h>
-
-#if MOZILLA_VERSION_COLLAPSED < 1090100
-#include <npupp.h>
-#else
-#include <npapi.h>
 #include <npruntime.h>
-#endif
 
 #define PLUGIN_DEBUG(...) \
   do                                                          \
