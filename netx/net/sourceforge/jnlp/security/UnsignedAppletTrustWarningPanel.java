@@ -98,7 +98,7 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
     private final int PANE_WIDTH = 500;
 
     private final int TOP_PANEL_HEIGHT = 60;
-    private final int INFO_PANEL_HEIGHT = 100;
+    private final int INFO_PANEL_HEIGHT = 140;
     private final int INFO_PANEL_HINT_HEIGHT = 25;
     private final int QUESTION_PANEL_HEIGHT = 35;
 
@@ -156,7 +156,7 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
     }
 
     private void setupInfoPanel() {
-        String infoLabelText = R("SUnsignedDetail", file.getCodeBase());
+        String infoLabelText = R("SUnsignedDetail", file.getCodeBase(), file.getSourceLocation());
         ExecuteUnsignedApplet rememberedAction = UnsignedAppletTrustConfirmation.getStoredAction(file);
         int panelHeight = INFO_PANEL_HEIGHT;
         if (rememberedAction == ExecuteUnsignedApplet.YES) {
@@ -182,7 +182,7 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
         questionPanel.add(new JLabel(htmlWrap(R("SUnsignedQuestion"))), BorderLayout.EAST);
 
         questionPanel.setPreferredSize(new Dimension(PANE_WIDTH, QUESTION_PANEL_HEIGHT));
-        questionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        questionPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
         add(questionPanel);
     }
@@ -195,7 +195,7 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
         applyToAppletButton.setSelected(true);
         applyToAppletButton.setEnabled(false); // Start disabled until 'Remember this option' is selected
 
-        applyToCodeBaseButton = new JRadioButton(R("SRememberCodebase"));
+        applyToCodeBaseButton = new JRadioButton(htmlWrap(R("SRememberCodebase", file.getCodeBase())));
         applyToCodeBaseButton.setEnabled(false);
 
         group.add(applyToAppletButton);
@@ -208,7 +208,7 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
     }
 
     private JPanel createCheckBoxPanel() {
-        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         permanencyCheckBox = new JCheckBox(htmlWrap(R("SRememberOption")));
         permanencyCheckBox.addActionListener(permanencyListener());
@@ -240,7 +240,7 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
         buttonPanel.add(rejectButton);
         buttonPanel.add(helpButton);
 
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
         return buttonPanel;
     }
