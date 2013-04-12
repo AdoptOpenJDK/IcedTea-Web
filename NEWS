@@ -9,11 +9,13 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.4 (2012-XX-XX):
-* Added cs_CZ localisation
-* Added de localisation
+* Added cs_CZ localization
+* Added de localization
 * Splash screen for javaws and plugin
+* Better error reporting for plugin via Error-splash-screen
 * All IcedTea-Web dialogues are centered to middle of active screen
 * Download indicator made compact for more then one jar
+* User can select its own JVM via itw-settings and deploy.properties.
 * Security updates
   - CVE-2012-3422, RH840592: Potential read from an uninitialized memory location
   - CVE-2012-3423, RH841345: Incorrect handling of not 0-terminated strings

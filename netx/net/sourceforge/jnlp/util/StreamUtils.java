@@ -37,9 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class StreamUtils {
 
@@ -70,5 +72,22 @@ public class StreamUtils {
                 e.printStackTrace(System.err);
             }
         }
+    }
+    
+    
+    public static String readStreamAsString(InputStream stream) throws IOException {
+        InputStreamReader is = new InputStreamReader(stream);
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = new BufferedReader(is);
+        while (true) {
+            String read = br.readLine();
+            if (read == null) {
+                break;
+            }
+            sb.append(read);
+
+        }
+
+        return sb.toString();
     }
 }

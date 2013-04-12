@@ -391,6 +391,12 @@ public class Defaults {
                 DeploymentConfiguration.KEY_SECURITY_LEVEL,
                 new SecurityValueValidator(),
                 null
+                },
+                //JVM executable for itw
+                {
+                        DeploymentConfiguration.KEY_JRE_DIR,
+                        null,
+                        null
                 }
         };
 

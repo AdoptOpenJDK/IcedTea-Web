@@ -176,6 +176,39 @@ public final class FileUtils {
             }
         }
 
+        if (JNLPRuntime.isWindows()) {
+            // remove all permissions
+            if (!tempFile.setExecutable(false, false)) {
+                System.err.println(R("RRemoveXPermFailed", tempFile));
+            }
+            if (!tempFile.setReadable(false, false)) {
+                System.err.println(R("RRemoveRPermFailed", tempFile));
+            }
+            if (!tempFile.setWritable(false, false)) {
+                System.err.println(R("RRemoveWPermFailed", tempFile));
+            }
+
+            // allow owner to read
+            if (!tempFile.setReadable(true, true)) {
+                System.err.println(R("RGetRPermFailed", tempFile));
+            }
+
+            // allow owner to write
+            if (writableByOwner && !tempFile.setWritable(true, true)) {
+                System.err.println(R("RGetWPermFailed", tempFile));
+            }
+
+            // allow owner to enter directories
+            if (isDir && !tempFile.setExecutable(true, true)) {
+                System.err.println(R("RGetXPermFailed", tempFile));
+            }
+            // rename this file. Unless the file is moved/renamed, any program that
+            // opened the file right after it was created might still be able to
+            // read the data.
+            if (!tempFile.renameTo(file)) {
+                System.err.println(R("RCantRename", tempFile, file));
+            }
+        } else {
         // remove all permissions
         if (!tempFile.setExecutable(false, false)) {
             throw new IOException(R("RRemoveXPermFailed", tempFile));
@@ -201,13 +234,15 @@ public final class FileUtils {
         if (isDir && !tempFile.setExecutable(true, true)) {
             throw new IOException(R("RGetXPermFailed", tempFile));
         }
-
+        
         // rename this file. Unless the file is moved/renamed, any program that
         // opened the file right after it was created might still be able to
         // read the data.
         if (!tempFile.renameTo(file)) {
             throw new IOException(R("RCantRename", tempFile, file));
         }
+        }
+        
 
     }
 

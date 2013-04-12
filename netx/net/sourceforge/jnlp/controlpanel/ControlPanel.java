@@ -53,6 +53,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.controlpanel.JVMPanel.JvmValidationResult;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
@@ -66,6 +67,7 @@ import net.sourceforge.jnlp.util.ImageResources;
  * 
  */
 public class ControlPanel extends JFrame {
+    private JVMPanel jvmPanel;
 
     /**
      * Class for keeping track of the panels and their associated text.
@@ -157,6 +159,21 @@ public class ControlPanel extends JFrame {
         topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         return topPanel;
     }
+    
+    private int validateJdk() {
+        String s = ControlPanel.this.config.getProperty(DeploymentConfiguration.KEY_JRE_DIR);
+        JvmValidationResult validationResult = JVMPanel.validateJvm(s);
+        if (validationResult.id == JvmValidationResult.STATE.NOT_DIR
+                || validationResult.id == JvmValidationResult.STATE.NOT_VALID_DIR
+                || validationResult.id == JvmValidationResult.STATE.NOT_VALID_JDK) {
+            return JOptionPane.showConfirmDialog(ControlPanel.this,
+                    "<html>"+Translator.R("CPJVMNotokMessage1", s)+"<br>"
+                    + validationResult.formattedText+"<br>"
+                    + Translator.R("CPJVMNotokMessage2", DeploymentConfiguration.KEY_JRE_DIR, DeploymentConfiguration.USER_DEPLOYMENT_PROPERTIES_FILE)+"</html>",
+                    Translator.R("CPJVMconfirmInvalidJdkTitle"),JOptionPane.OK_CANCEL_OPTION);
+        }
+        return JOptionPane.OK_OPTION;
+    }
 
     /**
      * Creates the "ok" "apply" and "cancel" buttons.
@@ -173,6 +190,10 @@ public class ControlPanel extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ControlPanel.this.saveConfiguration();
+                int validationResult = validateJdk();
+                if (validationResult!= JOptionPane.OK_OPTION){
+                    return;
+                }
                 ControlPanel.this.dispose();
             }
         });
@@ -183,6 +204,15 @@ public class ControlPanel extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ControlPanel.this.saveConfiguration();
+                int validationResult = validateJdk();
+                if (validationResult != JOptionPane.OK_OPTION) {
+                    int i = JOptionPane.showConfirmDialog(ControlPanel.this,
+                            Translator.R("CPJVMconfirmReset"),
+                            Translator.R("CPJVMconfirmReset"), JOptionPane.OK_CANCEL_OPTION);
+                    if (i == JOptionPane.OK_OPTION) {
+                        jvmPanel.resetTestFieldArgumentsExec();
+                    }
+                }
             }
         });
         buttons.add(applyButton);
@@ -219,7 +249,7 @@ public class ControlPanel extends JFrame {
      * @return A panel with all the components in place.
      */
     private JPanel createMainSettingsPanel() {
-
+        jvmPanel =  (JVMPanel) createJVMSettingsPanel();
         SettingsPanel[] panels = new SettingsPanel[] { new SettingsPanel(Translator.R("CPTabAbout"), createAboutPanel()),
                 new SettingsPanel(Translator.R("CPTabCache"), createCacheSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabCertificate"), createCertificatesSettingsPanel()),
@@ -227,7 +257,7 @@ public class ControlPanel extends JFrame {
                 // new SettingsPanel(Translator.R("CPTabClassLoader"), createClassLoaderSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabDebugging"), createDebugSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabDesktopIntegration"), createDesktopSettingsPanel()),
-                new SettingsPanel(Translator.R("CPTabJVMSettings"), createJVMSettingsPanel()),
+                new SettingsPanel(Translator.R("CPTabJVMSettings"),jvmPanel),
                 new SettingsPanel(Translator.R("CPTabNetwork"), createNetworkSettingsPanel()),
                 // TODO: This is commented out since this is not implemented yet
                 // new SettingsPanel(Translator.R("CPTabRuntimes"), createRuntimesSettingsPanel()),

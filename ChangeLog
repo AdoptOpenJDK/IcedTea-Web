@@ -1,3 +1,23 @@
+2013-04-12  Jiri Vanek <jvanek@redhat.com>
+
+	Added dialogue to allow setting of custom JRE
+	* launcher/itweb-settings.in: and
+	* launcher/javaws.in: check for custom jre less strict
+	* netx/net/sourceforge/jnlp/config/Defaults.java:made aware of 
+	deployment.jre.dir constant
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: added\
+	KEY_JRE_DIR= "deployment.jre.dir" constant, user file occurrences extracted
+	to USER_DEPLOYMENT_PROPERTIES_FILE. 
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: used validation
+	of jdk when saving properties
+	* netx/net/sourceforge/jnlp/controlpanel/JVMPanel.java: added text-field
+	to set JVM directory, friendly with logic and validation.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added messages
+	to JVM selection and validation.
+	* netx/net/sourceforge/jnlp/util/StreamUtils.java: (readStreamAsString)
+	new utility method.
+	* NEWS: mentioned select-able  JVM
+
 2013-04-11  Adam Domurad  <adomurad@redhat.com>
 
 	Remove legacy support for the old version of NPAPI.

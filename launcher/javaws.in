@@ -16,7 +16,7 @@ if [ "x$CUSTOM_JRE" = "x" ] ; then
   CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" /etc/.java/.deploy/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
 fi;
 if [ "x$CUSTOM_JRE" != "x" ] ; then
-  if [ -d  "$CUSTOM_JRE" -a -f "$CUSTOM_JRE/bin/java" -a -f "$CUSTOM_JRE/lib/rt.jar" ] ; then
+  if [ -e  "$CUSTOM_JRE" -a -e "$CUSTOM_JRE/bin/java" -a -e "$CUSTOM_JRE/lib/rt.jar" ] ; then
     JAVA=$CUSTOM_JRE/bin/java
     CP=$CUSTOM_JRE/lib/rt.jar
   else
