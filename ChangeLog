@@ -1,5 +1,10 @@
 2013-04-12  Adam Domurad  <adomurad@redhat.com>
 
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExtendedAppletSecurityHelp.java:
+	Clean-up generated code.
+
+2013-04-12  Adam Domurad  <adomurad@redhat.com>
+
 	Present more information in unsigned applet confirmation.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties
 	(SRememberCodebase): Add codebase parameter.

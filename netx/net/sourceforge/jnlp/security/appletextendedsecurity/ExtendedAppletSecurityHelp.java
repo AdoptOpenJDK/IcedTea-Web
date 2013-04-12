@@ -84,7 +84,7 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
 
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        scrollPane = new javax.swing.JScrollPane();
         mainHtmlPane = new javax.swing.JEditorPane();
         mainPanel = new javax.swing.JPanel();
         niceSeparator = new javax.swing.JSeparator();
@@ -97,23 +97,23 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.Y_AXIS));
         mainHtmlPane.setContentType("text/html");
         mainHtmlPane.setEditable(false);
-        jScrollPane1.setViewportView(mainHtmlPane);
-        getContentPane().add(jScrollPane1);
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(mainPanel);
-        mainPanel.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        scrollPane.setViewportView(mainHtmlPane);
+        getContentPane().add(scrollPane);
+        javax.swing.GroupLayout mainLayout = new javax.swing.GroupLayout(mainPanel);
+        mainPanel.setLayout(mainLayout);
+        mainLayout.setHorizontalGroup(
+                mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGap(0, 485, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(mainLayout.createSequentialGroup()
                 .addGap(0, 217, Short.MAX_VALUE)
                 .addComponent(niceSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 218, Short.MAX_VALUE))));
-        jPanel4Layout.setVerticalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        mainLayout.setVerticalGroup(
+                mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGap(0, 10, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(mainLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(niceSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))));
@@ -124,14 +124,14 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
         homeButton.setText(Translator.R("SPLASHHome"));
         homeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                goToIntroSection(evt);
             }
         });
         navigationPanel.add(homeButton);
         homeAndDialogueButton.setText(Translator.R("APPEXTSEChelpHomeDialogue"));
         homeAndDialogueButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                goToDialogueSection(evt);
             }
         });
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -149,14 +149,12 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
         pack();
     }
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+    private void goToIntroSection(java.awt.event.ActionEvent evt) {
         mainHtmlPane.setText(Translator.R("APPEXTSEChelp"));
         mainHtmlPane.setCaretPosition(1);
     }
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+    private void goToDialogueSection(java.awt.event.ActionEvent evt) {
         mainHtmlPane.setText(Translator.R("APPEXTSEChelp"));
         mainHtmlPane.scrollToReference("dialogue");
     }
@@ -177,6 +175,6 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
     private JPanel navigationPanel;
     private JPanel closePanel;
     private JPanel mainPanel;
-    private JScrollPane jScrollPane1;
+    private JScrollPane scrollPane;
     private JSeparator niceSeparator;
 }
