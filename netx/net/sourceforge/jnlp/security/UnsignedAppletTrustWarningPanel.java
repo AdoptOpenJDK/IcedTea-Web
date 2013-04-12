@@ -53,6 +53,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -60,7 +61,9 @@ import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.util.ScreenFinder;
 
 public class UnsignedAppletTrustWarningPanel extends JPanel {
 
@@ -101,6 +104,7 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
 
     private JButton allowButton;
     private JButton rejectButton;
+    private JButton helpButton;
     private JCheckBox permanencyCheckBox;
     private JRadioButton applyToAppletButton;
     private JRadioButton applyToCodeBaseButton;
@@ -218,12 +222,23 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
 
         allowButton = new JButton(R("ButProceed"));
         rejectButton = new JButton(R("ButCancel"));
+        helpButton = new JButton(R("APPEXTSECguiPanelHelpButton"));
 
         allowButton.addActionListener(chosenActionSetter(true));
         rejectButton.addActionListener(chosenActionSetter(false));
 
+        helpButton.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new ExtendedAppletSecurityHelp(null, false,"dialogue");
+                ScreenFinder.centerWindowsToCurrentScreen(d);
+                d.setVisible(true);
+            }
+        });
+
         buttonPanel.add(allowButton);
         buttonPanel.add(rejectButton);
+        buttonPanel.add(helpButton);
 
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 

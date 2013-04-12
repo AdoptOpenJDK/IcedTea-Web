@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -76,9 +77,11 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
 import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageExtendedImpl;
+import net.sourceforge.jnlp.util.ScreenFinder;
 
 public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
@@ -681,6 +684,9 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
     }
 
     private void helpButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        JDialog d = new ExtendedAppletSecurityHelp(null, false);
+        ScreenFinder.centerWindowsToCurrentScreen(d);
+        d.setVisible(true);
     }
 
     private void setButtons(boolean b) {
