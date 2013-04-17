@@ -87,7 +87,7 @@ import sun.net.www.protocol.jar.URLJarFile;
  * @version $Revision: 1.19 $
  */
 public class JNLPRuntime {
-
+    
     static {
         loadResources();
     }
@@ -142,8 +142,16 @@ public class JNLPRuntime {
     /** set to false to indicate another JVM should not be spawned, even if necessary */
     private static boolean forksAllowed = true;
 
-    /** all security dialogs will be consumed and pretented as beeing verified by user and allowed.*/
+    /** all security dialogs will be consumed and pretented as being verified by user and allowed.*/
     private static boolean trustAll=false;
+    /** 
+     * Header is not checked and so eg. gifar exploit is possible
+     * @see http://en.wikipedia.org/wiki/Gifar for this kind of attack.
+     * However if jar file is a bit corrupted, then it sometimes can work so 
+     * this switch can disable the header check.
+     * 
+     */
+    private static boolean ignoreHeaders=false;
 
     /** contains the arguments passed to the jnlp runtime */
     private static List<String> initialArguments;
@@ -775,5 +783,15 @@ public class JNLPRuntime {
     public static boolean isTrustAll() {
         return trustAll;
     }
+
+    public static boolean isIgnoreHeaders() {
+        return ignoreHeaders;
+    }
+
+    public static void setIgnoreHeaders(boolean ignoreHeaders) {
+        JNLPRuntime.ignoreHeaders = ignoreHeaders;
+    }
+    
+    
 
 }

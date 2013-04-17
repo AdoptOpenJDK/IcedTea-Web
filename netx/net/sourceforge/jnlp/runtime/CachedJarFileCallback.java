@@ -49,7 +49,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarFile;
+import net.sourceforge.jnlp.util.JarFile;
 
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -81,7 +81,7 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
     }
 
     @Override
-    public JarFile retrieve(URL url) throws IOException {
+    public java.util.jar.JarFile retrieve(URL url) throws IOException {
         URL localUrl = mapping.get(url);
 
         if (localUrl == null) {
@@ -122,8 +122,8 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
     /*
      * This method is a copy of URLJarFile.retrieve() without the callback check.
      */
-    private JarFile cacheJarFile(URL url) throws IOException {
-        JarFile result = null;
+    private  java.util.jar.JarFile cacheJarFile(URL url) throws IOException {
+        java.util.jar.JarFile result = null;
 
         final int BUF_SIZE = 2048;
 
@@ -132,9 +132,9 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
 
         try {
             result =
-                    AccessController.doPrivileged(new PrivilegedExceptionAction<JarFile>() {
+                    AccessController.doPrivileged(new PrivilegedExceptionAction<java.util.jar.JarFile>() {
                         @Override
-                        public JarFile run() throws IOException {
+                        public java.util.jar.JarFile run() throws IOException {
                             OutputStream out = null;
                             File tmpFile = null;
                             try {

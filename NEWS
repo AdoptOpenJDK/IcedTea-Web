@@ -18,6 +18,7 @@ New in release 1.4 (2012-XX-XX):
 * User can select its own JVM via itw-settings and deploy.properties.
 * Added extended applets security settings and dialogue
 * Security updates
+  - CVE-2013-1927, RH884705: fixed gifar vulnerabilit
   - CVE-2012-3422, RH840592: Potential read from an uninitialized memory location
   - CVE-2012-3423, RH841345: Incorrect handling of not 0-terminated strings
 * NetX

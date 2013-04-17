@@ -60,7 +60,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import net.sourceforge.jnlp.util.JarFile;
 import java.util.jar.Manifest;
 
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
@@ -678,7 +678,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 //to read the cacerts or trusted.certs files.
                 e.printStackTrace();
                 throw new LaunchException(null, null, R("LSFatal"),
-                                        R("LCInit"), R("LFatalVerification"), R("LFatalVerificationInfo"));
+                                        R("LCInit"), R("LFatalVerification"), R("LFatalVerificationInfo") + ": " +e.getMessage());
             }
 
             //Case when at least one jar has some signing

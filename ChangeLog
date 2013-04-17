@@ -1,5 +1,43 @@
 2013-04-17  Jiri Vanek <jvanek@redhat.com>
 
+	Fixed gifar vulnereability with automated testcase
+	* netx/net/sourceforge/jnlp/util/JarFile.java: IcedTea-Web replacement for 
+	java.util.jar.JarFile.java with capability to verify if the jar starts as jar
+	and not as something else (eg gif)
+	* netx/net/sourceforge/jnlp/Launcher.java: migrated to new JarFile
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added
+	BXignoreheaders key with description to new -Xignoreheaders switch
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: added switch Xignoreheaders
+	to allow to disable the header verification.
+	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java:
+	migrated to new JarFile
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: improved
+	reporting of  new JarFile exceptions
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: new field 
+	ignoreHeaders, informing about new JarFile whether to verify or not verify
+	headers. By default verifying, so have value of false. 
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: migrated to new JarFile
+	* netx/net/sourceforge/jnlp/util/InvalidJarHeaderException.java: new
+	not-checked exception to signify that jar is corrupted on headers level. 
+	* tests/reproducers/custom/GifarCreator/srcs/Makefile:  makefile to 
+	join gif and jar to create gifar
+	* tests/reproducers/signed/GifarBase/resources/gifarView_hacked.html: 
+	html with hacked gifar
+	* tests/reproducers/signed/GifarBase/resources/gifarView_ok.html: 
+	html with valid gifs and jars
+	* tests/reproducers/signed/GifarBase/resources/gifar_applet.jnlp: 
+	jnlp applet constructed from hacked gifar
+	* tests/reproducers/signed/GifarBase/resources/gifar_application.jnlp: 
+	jnlp application constructed from hacked gifar
+	* tests/reproducers/signed/GifarBase/srcs/GifarMain.java: 
+	Main method of reproducer
+	* tests/reproducers/signed/GifarBase/testcases/GifarTestcases.java: 
+	Testing methods
+	* tests/reproducers/signed/GifarBase/resources/happyNonAnimated.gif:
+	binary file, image, gif, used to create hacked gifars	
+
+2013-04-17  Jiri Vanek <jvanek@redhat.com>
+
 	removed java call to obtain jvm args for plugin
 	* /plugin/icedteanp/IcedTeaNPPlugin.cc: (get_jvm_args)
 	Java call replaced by call to recently added read_deploy_property_value

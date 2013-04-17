@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import net.sourceforge.jnlp.util.JarFile;
 
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;

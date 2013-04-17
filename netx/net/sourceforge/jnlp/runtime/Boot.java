@@ -102,6 +102,7 @@ public final class Boot implements PrivilegedAction<Void> {
             + "  -strict               " + R("BOStrict") + "\n"
             + "  -Xnofork              " + R("BXnofork") + "\n"
             + "  -Xclearcache          " + R("BXclearcache") + "\n"
+            + "  -Xignoreheaders       " + R("BXignoreheaders") + "\n"
             + "  -help                 " + R("BOHelp") + "\n";
 
     private static final String doubleArgs = "-basedir -jnlp -arg -param -property -update";
@@ -158,6 +159,9 @@ public final class Boot implements PrivilegedAction<Void> {
         }
         if (null != getOption("-Xtrustall")) {
             JNLPRuntime.setTrustAll(true);
+        }
+        if (null != getOption("-Xignoreheaders")) {
+            JNLPRuntime.setIgnoreHeaders(true);
         }
 
         JNLPRuntime.setInitialArgments(Arrays.asList(argsIn));
