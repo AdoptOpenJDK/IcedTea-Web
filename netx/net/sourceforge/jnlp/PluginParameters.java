@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
@@ -95,10 +96,6 @@ public class PluginParameters {
         } else {
             return name + " applet";
         }
-    }
-
-    public String getCodebase() {
-        return getDefaulted("codebase", ".");
     }
 
     public boolean useCodebaseLookup() {
@@ -164,7 +161,7 @@ public class PluginParameters {
         parameters.put("height", Integer.toString(height));
     }
 
-    public String getUniqueKey() {
+    public String getUniqueKey(URL codebase) {
         /* According to http://download.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/applet-compatibility.html, 
         * classloaders are shared iff these properties match:
         * codebase, cache_archive, java_archive, archive
@@ -173,8 +170,9 @@ public class PluginParameters {
         * always in the same order. The initial "<NAME>=" parts ensure a 
         * bad tag cannot trick the loader into getting shared with another.
         */
-        return "codebase=" + getCodebase() + "cache_archive=" + getCacheArchive() +
-                "java_archive=" + getJavaArchive() + "archive=" + getArchive();
+        return "codebase=" + codebase.toExternalForm() + "cache_archive="
+                + getCacheArchive() + "java_archive=" + getJavaArchive()
+                + "archive=" + getArchive();
     }
 
     /**

@@ -72,7 +72,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
 
         this.parameters = params;
 
-        String uniqueKey = params.getUniqueKey();
+        String uniqueKey = params.getUniqueKey(getCodeBase());
         synchronized(TGMapMutex) {
             if (!uKeyToTG.containsKey(uniqueKey)) {
                 ThreadGroup tg = new ThreadGroup(Launcher.mainGroup, this.documentURL.toString());
@@ -199,7 +199,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
 
     public ThreadGroup getThreadGroup() {
         synchronized(TGMapMutex) {
-            return uKeyToTG.get(parameters.getUniqueKey());
+            return uKeyToTG.get(parameters.getUniqueKey(getCodeBase()));
         }
     }
 
@@ -209,7 +209,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
         }
         // only create a new context if one hasn't already been created for the
         // applets with this unique key.
-        if (null == appContextCreated.putIfAbsent(parameters.getUniqueKey(), Boolean.TRUE)) {
+        if (null == appContextCreated.putIfAbsent(parameters.getUniqueKey(getCodeBase()), Boolean.TRUE)) {
             SunToolkit.createNewAppContext();
         }
     }

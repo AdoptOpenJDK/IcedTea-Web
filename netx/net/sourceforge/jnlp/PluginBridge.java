@@ -188,7 +188,7 @@ public class PluginBridge extends JNLPFile {
         else
             security = null;
 
-        this.uniqueKey = params.getUniqueKey();
+        this.uniqueKey = params.getUniqueKey(codebase);
         usePack = false;
         useVersion = false;
         String jargs = params.getJavaArguments();
