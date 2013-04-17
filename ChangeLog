@@ -1,3 +1,10 @@
+2013-04-17  Jiri Vanek <jvanek@redhat.com>
+
+	removed java call to obtain jvm args for plugin
+	* /plugin/icedteanp/IcedTeaNPPlugin.cc: (get_jvm_args)
+	Java call replaced by call to recently added read_deploy_property_value
+	function. 
+
 2013-04-12  Adam Domurad  <adomurad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExtendedAppletSecurityHelp.java:

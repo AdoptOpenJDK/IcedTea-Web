@@ -1472,45 +1472,13 @@ plugin_start_appletviewer (ITNPPluginData* data)
 std::vector<std::string*>*
 get_jvm_args()
 {
-  std::vector < std::string> commands;
-  gchar *output = NULL;
+  std::string output;
   std::vector<std::string*>* tokenOutput = NULL;
-
-  commands.push_back(get_plugin_executable());
-  commands.push_back(PLUGIN_BOOTCLASSPATH);
-  commands.push_back("-classpath");
-  commands.push_back(get_plugin_rt_jar());
-  commands.push_back("net.sourceforge.jnlp.controlpanel.CommandLine");
-  commands.push_back("get");
-  commands.push_back("deployment.plugin.jvm.arguments");
-
-  std::vector<gchar*> vector_gchar = IcedTeaPluginUtilities::vectorStringToVectorGchar(&commands);
-  gchar **command_line_args = &vector_gchar[0];
-
-  if (!g_spawn_sync(NULL, command_line_args, NULL,
-      (GSpawnFlags) G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL, &output, NULL, NULL,
-      &channel_error))
-  {
-    PLUGIN_ERROR("Failed to get JVM arguments set for plugin.");
-    output = NULL;
-    return NULL;
+  bool args_defined = read_deploy_property_value("deployment.plugin.jvm.arguments", output);
+  if (!args_defined){
+    return new std::vector<std::string*>();
   }
-
-  tokenOutput = IcedTeaPluginUtilities::strSplit(output, " \n");
-
-  //If deployment.plugin.jvm.arguments is undefined, the output will simply be 'null'
-  //We remove this so it's not mistakenly used as a jvm argument.
-  if (!tokenOutput->empty() && *tokenOutput->at(0) =="null")
-  {
-    delete tokenOutput->at(0);
-    tokenOutput->erase(tokenOutput->begin());
-  }
-
-  //Free memory
-  g_free(output);
-  output = NULL;
-  command_line_args = NULL;
-
+  tokenOutput = IcedTeaPluginUtilities::strSplit(output.c_str(), " \n");
   return tokenOutput;
 }
 
