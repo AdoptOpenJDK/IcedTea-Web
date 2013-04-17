@@ -1,15 +1,36 @@
+2013-04-17  Jiri Vanek <jvanek@redhat.com>
+
+	Added various self-describing tests for codebase
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet-reader1-writer1.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet-reader1-writer2.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet-reader1.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet-reader2.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet-writer1.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet-writer2.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet2-reader1-writer1.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet2-reader1-writer2.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet2-reader1.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet2-reader2.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet2-writer1.html
+	* tests/reproducers/simple/AppletSharedClassLoader/resources/LaunchSharedClassLoaderApplet2-writer2.html
+	* tests/reproducers/simple/AppletSharedClassLoader/srcs/SharedClassLoaderApplet1.java
+	* tests/reproducers/simple/AppletSharedClassLoader/srcs/SharedClassLoaderApplet2.java
+	* tests/reproducers/simple/AppletSharedClassLoader/srcs/SharedSecret.java
+	* tests/reproducers/simple/AppletSharedClassLoader/testcases/SharedClassLoaderApplet_WrittenCompleteCodeBaseTest.java
+	* tests/reproducers/simple/AppletSharedClassLoader/testcases/SharedClassLoaderApplet_WrittenPartialStubCodeBaseTest.java
+	* tests/reproducers/simple/AppletSharedClassLoader/testcases/SharedClassLoaderApplet_dotCodeBaseTest.java
+
 2013-04-17 Adam Domurad  <adomurad@redhat.com>
            Jiri Vanek <jvanek@redhat.com>
 
-    CVE-2013-1926, RH916774: Class-loader incorrectly shared for applets with
-    same relative-path.
-    * netx/net/sourceforge/jnlp/PluginParameters.java
-    (getCodeBase): Removed
-    (getUniqueKey): Now takes absolute codebase
-    * netx/net/sourceforge/jnlp/NetxPanel.java: Pass absolute codebase in
-    getUniqueKey calls.
-    * netx/net/sourceforge/jnlp/PluginBridge.java: Same.
-
+	CVE-2013-1926, RH916774: Class-loader incorrectly shared for applets with
+	same relative-path.
+	* netx/net/sourceforge/jnlp/PluginParameters.java
+	(getCodeBase): Removed
+	(getUniqueKey): Now takes absolute codebase
+	* netx/net/sourceforge/jnlp/NetxPanel.java: Pass absolute codebase in
+	getUniqueKey calls.
+	* netx/net/sourceforge/jnlp/PluginBridge.java: Same.
 
 2013-04-17  Jiri Vanek <jvanek@redhat.com>
 

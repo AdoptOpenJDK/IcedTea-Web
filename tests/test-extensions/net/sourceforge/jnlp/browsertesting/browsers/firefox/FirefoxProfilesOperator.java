@@ -125,7 +125,7 @@ public class FirefoxProfilesOperator {
         }
     }
 
-    private static void copyFile(File from, File to) throws IOException {
+    public static void copyFile(File from, File to) throws IOException {
         FileInputStream is = new FileInputStream(from);
         FileOutputStream fos = new FileOutputStream(to);
         FileChannel f = is.getChannel();
@@ -138,7 +138,7 @@ public class FirefoxProfilesOperator {
         }
     }
 
-    private static void deleteRecursively(File f) throws IOException {
+    public static void deleteRecursively(File f) throws IOException {
         if (f.isDirectory()) {
             for (File c : f.listFiles()) {
                 deleteRecursively(c);
@@ -151,7 +151,7 @@ public class FirefoxProfilesOperator {
         }
     }
 
-    private static void copyRecursively(File srcFileDir, File destDir) throws IOException {
+    public static void copyRecursively(File srcFileDir, File destDir) throws IOException {
         if (srcFileDir.isDirectory()) {
             File nwDest = new File(destDir, srcFileDir.getName());
             nwDest.mkdir();
