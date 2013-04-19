@@ -138,8 +138,10 @@ public class ServerAccess {
             System.exit(0);
         } else {
             int port = 44321;
-            if (args.length > 0) {
-                port=new Integer(args[0]);
+            if (args.length > 0 && args[0].equalsIgnoreCase("randomport")) {
+                port = findFreePort();
+            } else if (args.length > 0) {
+                port = new Integer(args[0]);
             }
             getIndependentInstance(port);
             while (true) {

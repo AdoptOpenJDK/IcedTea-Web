@@ -641,7 +641,7 @@ stamps/junit-jnlp-dist-signed.stamp:
 	mkdir -p stamps && \
 	touch $@
 
-stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs stamps/liveconnect-dist.stamp
+stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs stamps/liveconnect-dist.stamp stamps/netx-dist.stamp stamps/plugin.stamp
 	types=($(ALL_NONCUSTOM_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
 	  . $(abs_top_srcdir)/NEW_LINE_IFS ; \
@@ -754,7 +754,7 @@ netx-dist-tests-remove-cert-from-public:
 test-extensions-source-files.txt:
 	find $(TEST_EXTENSIONS_SRCDIR) -name '*.java' | sort > $@
 
-stamps/test-extensions-compile.stamp: stamps/junit-jnlp-dist-dirs test-extensions-source-files.txt
+stamps/test-extensions-compile.stamp: stamps/netx-dist.stamp stamps/plugin.stamp stamps/junit-jnlp-dist-dirs test-extensions-source-files.txt
 	mkdir -p $(TEST_EXTENSIONS_DIR);
 	mkdir -p $(NETX_TEST_DIR);
 	ln -s $(TEST_EXTENSIONS_DIR) $(TEST_EXTENSIONS_COMPATIBILITY_SYMLINK);
@@ -777,7 +777,7 @@ stamps/test-extensions-tests-compile.stamp: stamps/junit-jnlp-dist-dirs test-ext
 	mkdir -p stamps && \
 	touch $@
 
-stamps/compile-reproducers-testcases.stamp: stamps/netx.stamp stamps/junit-jnlp-dist-dirs \
+stamps/compile-reproducers-testcases.stamp: stamps/netx-dist.stamp stamps/plugin.stamp stamps/junit-jnlp-dist-dirs \
  test-extensions-source-files.txt stamps/test-extensions-compile.stamp stamps/test-extensions-tests-compile.stamp
 	types=($(ALL_REPRODUCERS)); \
 	for which in "$${types[@]}" ; do \
@@ -1379,6 +1379,20 @@ else
 	echo "Sorry, coverage report cant be run without emma installed. Try install emma or specify with-emma value" ;
 	exit 5
 endif
+
+run-test-server-on-44321: stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
+ stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp
+	cd $(TEST_EXTENSIONS_DIR) ; \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_TESTS_DIR) \
+	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
+	 -Xbootclasspath:$(RUNTIME) net.sourceforge.jnlp.ServerAccess 
+
+run-test-server-on-random-port: stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
+ stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp
+	cd $(TEST_EXTENSIONS_DIR) ; \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_TESTS_DIR) \
+	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
+	 -Xbootclasspath:$(RUNTIME) net.sourceforge.jnlp.ServerAccess randomport
 
 clean-netx-tests: clean-netx-unit-tests clean-junit-runner clean-netx-dist-tests clean-test-code-coverage-jacoco clean-test-code-coverage
 	if [ -e $(TESTS_DIR)/netx ]; then \

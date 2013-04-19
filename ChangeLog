@@ -1,3 +1,15 @@
+2013-04-19  Jiri Vanek <jvanek@redhat.com>
+
+	testing server allowed from makefile
+	* Makefile.am:
+	(stamps/netx-dist-tests-prepare-reproducers.stamp) added stamps/netx-dist.stamp stamps/plugin.stamp dependence
+	(stamps/test-extensions-compile.stamp) added stamps/netx-dist.stamp stamps/plugin.stamp dependence
+	(stamps/compile-reproducers-testcases.stamp) added stamps/plugin.stamp  dependence
+	(run-test-server-on-44321) new target, starts server in deploy dir, on port 44321
+	(run-test-server-on-random-port) new target, starts server in deploy dir, on random port
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: (main)
+	added better access to random port
+
 2013-04-17  Jiri Vanek <jvanek@redhat.com>
 
 	Added various self-describing tests for codebase
