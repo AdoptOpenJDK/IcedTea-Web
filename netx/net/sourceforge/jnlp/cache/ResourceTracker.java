@@ -50,6 +50,7 @@ import net.sourceforge.jnlp.event.DownloadEvent;
 import net.sourceforge.jnlp.event.DownloadListener;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
 /**
@@ -114,15 +115,6 @@ public class ResourceTracker {
     private static final int DOWNLOADED = Resource.DOWNLOADED;
     private static final int ERROR = Resource.ERROR;
     private static final int STARTED = Resource.STARTED;
-
-    // normalization of url
-    private static final char PATH_DELIMITER_MARK = '/';
-    private static final String PATH_DELIMITER = "" + PATH_DELIMITER_MARK;
-    private static final char QUERY_DELIMITER_MARK = '&';
-    private static final String QUERY_DELIMITER = "" + QUERY_DELIMITER_MARK;
-    private static final char QUERY_MARK = '?';
-    private static final char HREF_MARK = '#';
-    private static final String UTF8 = "utf-8";
 
     /** max threads */
     private static final int maxThreads = 5;
@@ -190,7 +182,7 @@ public class ResourceTracker {
         if (location == null)
             throw new IllegalResourceDescriptorException("location==null");
         try {
-            location = normalizeUrl(location, JNLPRuntime.isDebug());
+            location = UrlUtils.normalizeUrl(location);
         } catch (Exception ex) {
             System.err.println("Normalization of " + location.toString() + " have failed");
             ex.printStackTrace();
@@ -1195,30 +1187,4 @@ public class ResourceTracker {
             // selectNextResource();
         }
     };
-
-    public static URL normalizeUrl(URL u, boolean debug) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
-        if (u == null) {
-            return null;
-        }
-        String protocol = u.getProtocol();
-
-        if (protocol == null || "file".equals(protocol)) {
-            return u;
-        }
-
-        if (u.getPath() == null) {
-            return u;
-        }
-
-        //Decode the URL before encoding
-        URL decodedURL = new URL(URLDecoder.decode(u.toString(), UTF8));
-
-        //Create URI with the decoded URL
-        URI uri = new URI(decodedURL.getProtocol(), null, decodedURL.getHost(), decodedURL.getPort(), decodedURL.getPath(), decodedURL.getQuery(), null);
-
-        //Returns the encoded URL
-        URL encodedURL = new URL(uri.toASCIIString());
-
-        return encodedURL;
-    }
 }

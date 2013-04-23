@@ -18,25 +18,38 @@ package net.sourceforge.jnlp.cache;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilePermission;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.security.*;
-import javax.jnlp.*;
 
-import net.sourceforge.jnlp.*;
+import javax.jnlp.DownloadServiceListener;
+
+import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.*;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.UrlUtils;
 
 /**
  * Provides static methods to interact with the cache, download
@@ -72,8 +85,8 @@ public class CacheUtil {
             return true;
         }
         try {
-            URL nu1 = ResourceTracker.normalizeUrl(u1, false);
-            URL nu2 = ResourceTracker.normalizeUrl(u2, false);
+            URL nu1 = UrlUtils.normalizeUrl(u1);
+            URL nu2 = UrlUtils.normalizeUrl(u2);
             if (notNullUrlEquals(nu1, nu2)) {
                 return true;
             }

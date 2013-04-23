@@ -40,6 +40,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import net.sourceforge.jnlp.util.UrlUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -62,9 +65,6 @@ public class ResourceTrackerTest {
         }
     }
 
-    private static URL normalizeUrl(URL uRL) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
-        return ResourceTracker.normalizeUrl(uRL, false);
-    }
     public static final int CHANGE_BORDER = 6;
 
     public static URL[] getUrls() throws MalformedURLException {
@@ -92,7 +92,7 @@ public class ResourceTrackerTest {
 
         URL[] n = new URL[u.length];
         for (int i = 0; i < n.length; i++) {
-            n[i] = normalizeUrl(u[i]);
+            n[i] = UrlUtils.normalizeUrl(u[i]);
         }
         return n;
 

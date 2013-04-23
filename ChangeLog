@@ -1,5 +1,17 @@
 2013-04-23  Adam Domurad  <adomurad@redhat.com>
 
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: Remove no
+	longer used constants. Remove (normalizeUrl). Update calls.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: Expand imports.
+	Update calls.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	Ensure file://-protocol URLs are encoded.
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: Add (normalizeUrl),
+	and related utility methods. Allow for optionally encoding file://
+	URLs. 
+
+2013-04-23  Adam Domurad  <adomurad@redhat.com>
+
 	Ensure document-base is properly encoded.
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
 	(getCacheFile): Use URL#toUri().getPath() instead of URL#getFile().

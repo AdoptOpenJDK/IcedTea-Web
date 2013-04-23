@@ -99,8 +99,8 @@ public class UnsignedAppletTrustConfirmation {
 
     private static UnsignedAppletActionEntry getMatchingItem(UnsignedAppletActionStorage actionStorage, PluginBridge file) {
         return actionStorage.getMatchingItem(
-                UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation()).toString(), 
-                UrlUtils.normalizeUrlAndStripParams(file.getCodeBase()).toString(), 
+                UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */).toString(), 
+                UrlUtils.normalizeUrlAndStripParams(file.getCodeBase(), true /* encode local files */).toString(), 
                 toRelativePaths(file.getArchiveJars(), file.getCodeBase().toString()));
     }
 
@@ -132,8 +132,8 @@ public class UnsignedAppletTrustConfirmation {
                 return;
             }
 
-            URL codebase = UrlUtils.normalizeUrlAndStripParams(file.getCodeBase());
-            URL documentbase = UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation());
+            URL codebase = UrlUtils.normalizeUrlAndStripParams(file.getCodeBase(), true /* encode local files */);
+            URL documentbase = UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */);
 
             /* Else, create a new entry */
             UrlRegEx codebaseRegex = new UrlRegEx("\\Q" + codebase + "\\E");
