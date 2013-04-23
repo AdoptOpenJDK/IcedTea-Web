@@ -1,5 +1,15 @@
 2013-04-23  Adam Domurad  <adomurad@redhat.com>
 
+	Reproducer for URL parameters (eg ?a=b) in document-base.
+	* tests/reproducers/simple/URLParametersInDocumentBase/resources/URLParametersInDocumentBase.html:
+	Page that loads applet.
+	* tests/reproducers/simple/URLParametersInDocumentBase/srcs/URLParametersInDocumentBase.java:
+	Applet that prints code-base & document-base.
+	* tests/reproducers/simple/URLParametersInDocumentBase/testcases/URLParametersInDocumentBaseTests.java:
+	Test-driver. 
+
+2013-04-23  Adam Domurad  <adomurad@redhat.com>
+
 	* netx/net/sourceforge/jnlp/NetxPanel.java
 	(exitOnFailure): Remove always-false field.
 	(NetxPanel): Remove overloaded constructor
