@@ -862,6 +862,8 @@ public class JNLPClassLoader extends URLClassLoader {
                         break;
                     }
                 }
+
+                jarFile.close();
             } catch (IOException e) {
                 /*
                  * After this exception is caught, it is escaped. This will skip
@@ -884,12 +886,15 @@ public class JNLPClassLoader extends URLClassLoader {
         File f = tracker.getCacheFile(location);
 
         if( f != null) {
+            JarFile mainJar = null;
             try {
-                JarFile mainJar = new JarFile(f);
+                mainJar = new JarFile(f);
                 mainClass = mainJar.getManifest().
                         getMainAttributes().getValue("Main-Class");
             } catch (IOException ioe) {
                 mainClass = null;
+            } finally {
+                StreamUtils.closeSilently(mainJar);
             }
         }
 
@@ -1305,6 +1310,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 jarEntries.add(je.getName());
                             }
 
+                            jarFile.close();
                         }
 
                         addURL(jar.getLocation());
@@ -1328,6 +1334,8 @@ public class JNLPClassLoader extends URLClassLoader {
                             JarIndex index = JarIndex.getJarIndex(jarFile, null);
                             if (index != null)
                                 jarIndexes.add(index);
+
+                            jarFile.close();
                         } else {
                             CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), jar.getLocation());
                         }
@@ -1401,6 +1409,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                      new FileOutputStream(outFile));
 
             }
+            jarFile.close();
         } catch (IOException ex) {
             if (JNLPRuntime.isDebug())
                 ex.printStackTrace();
