@@ -556,7 +556,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param jar the jar to check
      * @return true if file exists AND is an invalid jar, false otherwise
      */
-    private boolean isInvalidJar(JARDesc jar){
+    boolean isInvalidJar(JARDesc jar){
         File cacheFile = tracker.getCacheFile(jar.getLocation());
         if (cacheFile == null)
             return false;//File cannot be retrieved, do not claim it is an invalid jar
@@ -792,7 +792,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param jars Jars that are checked to see if they contain the main class
      * @throws LaunchException Thrown if the signed JNLP file, within the main jar, fails to be verified or does not match
      */
-    private void checkForMain(List<JARDesc> jars) throws LaunchException {
+    void checkForMain(List<JARDesc> jars) throws LaunchException {
 
         // Check launch info
         if (mainClass == null) {
@@ -878,7 +878,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param location The JAR location
      * @return the main class name, null if there isn't one of if there was an error
      */
-    private String getMainClassName(URL location) {
+    String getMainClassName(URL location) {
 
         String mainClass = null;
         File f = tracker.getCacheFile(location);

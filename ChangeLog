@@ -1,5 +1,16 @@
 2013-04-23  Adam Domurad  <adomurad@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
+	New, JNLPClassLoader unit tests for (checkForMain), (getMainClassName),
+	(activateNativeJar), and (isInvalidJar). Checks for file descriptor
+	leaks.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(isInvalidJar): Change to default visibility for testing purposes.
+	(checkForMain): Same.
+	(getMainClassName): Same. 
+
+2013-04-23  Adam Domurad  <adomurad@redhat.com>
+
 	Rewrite of MethodOverloadResolver with detailed unittests.
 	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java:
 	Rewritten to reduce duplicated code, fix very subtle bugs in
