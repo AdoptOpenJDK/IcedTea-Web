@@ -1,3 +1,10 @@
+2013-04-23  Omair Majid  <omajid@redhat.com>
+
+	PR1299
+	* NEWS: Update with fix
+	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java
+	(initFromBrowserConfig): Fix typo in socks proxy setting key.
+
 2013-04-19  Jiri Vanek <jvanek@redhat.com>
 
 	testing server allowed from makefile

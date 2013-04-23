@@ -146,7 +146,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
         browserHttpsProxyPort = stringToPort(prefs.get("network.proxy.ssl_port"));
         browserFtpProxyHost = prefs.get("network.proxy.ftp");
         browserFtpProxyPort = stringToPort(prefs.get("network.proxy.ftp_port"));
-        browserSocks4ProxyHost = prefs.get("networking.proxy.socks");
+        browserSocks4ProxyHost = prefs.get("network.proxy.socks");
         browserSocks4ProxyPort = stringToPort(prefs.get("network.proxy.socks_port"));
     }
 
