@@ -398,7 +398,7 @@ public class ResourceTracker {
                 return resource.localFile;
 
             if (location.getProtocol().equalsIgnoreCase("file")) {
-                File file = new File(location.getFile());
+                File file = new File(location.toURI().getPath());
                 if (file.exists())
                     return file;
             }
@@ -409,6 +409,9 @@ public class ResourceTracker {
                 ex.printStackTrace();
 
             return null; // need an error exception to throw
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

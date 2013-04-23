@@ -439,8 +439,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         String height = msgParts[2];
 
         int spaceLocation = message.indexOf(' ', "tag".length() + 1);
-        String documentBase =
-                UrlUtil.decode(message.substring("tag".length() + 1, spaceLocation));
+        String documentBase = message.substring("tag".length() + 1, spaceLocation);
         String paramString = message.substring(spaceLocation + 1);
 
         PluginDebug.debug("Handle = ", handle, "\n",

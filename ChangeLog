@@ -1,5 +1,13 @@
 2013-04-23  Adam Domurad  <adomurad@redhat.com>
 
+	Ensure document-base is properly encoded.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+	(getCacheFile): Use URL#toUri().getPath() instead of URL#getFile().
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(handleInitializationMessage): Don't decode document-base.
+
+2013-04-23  Adam Domurad  <adomurad@redhat.com>
+
 	Reproducer for URL parameters (eg ?a=b) in document-base.
 	* tests/reproducers/simple/URLParametersInDocumentBase/resources/URLParametersInDocumentBase.html:
 	Page that loads applet.
