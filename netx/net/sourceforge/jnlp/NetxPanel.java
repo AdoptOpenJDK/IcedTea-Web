@@ -46,7 +46,6 @@ import sun.awt.SunToolkit;
 public class NetxPanel extends AppletViewerPanel implements SplashController {
     private final PluginParameters parameters;
     private PluginBridge bridge = null;
-    private boolean exitOnFailure = true;
     private AppletInstance appInst = null;
     private SplashController splashController;
     private boolean appletAlive;
@@ -79,13 +78,6 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
                 uKeyToTG.put(uniqueKey, tg);
             }
         }
-    }
-
-    // overloaded constructor, called when initialized via plugin
-    public NetxPanel(URL documentURL, PluginParameters params,
-                     boolean exitOnFailure) {
-        this(documentURL, params);
-        this.exitOnFailure = exitOnFailure;
         this.appletAlive = true;
     }
 
@@ -117,27 +109,11 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             dispatchAppletEvent(APPLET_LOADING, null);
             status = APPLET_LOAD;
 
-            Launcher l = new Launcher(exitOnFailure);
+            Launcher l = new Launcher(false);
 
-            try {
-                appInst = (AppletInstance) l.launch(bridge, this);
-            } catch (LaunchException e) {
-                // Assume user has indicated he does not trust the
-                // applet.
-                if (exitOnFailure)
-                    System.exit(1);
-            }
+            // May throw LaunchException:
+            appInst = (AppletInstance) l.launch(bridge, this);
             applet = appInst.getApplet();
-
-            //On the other hand, if you create an applet this way, it'll work
-            //fine. Note that you might to open visibility in sun.applet.AppletPanel
-            //for this to work (the loader field, and getClassLoader).
-            //loader = getClassLoader(getCodeBase(), getClassLoaderCacheKey());
-            //applet = createApplet(loader);
-
-            // This shows that when using NetX's JNLPClassLoader, keyboard input
-            // won't make it to the applet, whereas using sun.applet.AppletClassLoader
-            // works just fine.
 
             if (applet != null) {
                 // Stick it in the frame
@@ -149,12 +125,13 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             }
         } catch (Exception e) {
             this.appletAlive = false;
+            status = APPLET_ERROR;
             e.printStackTrace();
             replaceSplash(SplashUtils.getErrorSplashScreen(getWidth(), getHeight(), e));
         } finally {
             // PR1157: This needs to occur even in the case of an exception
             // so that the applet's event listeners are signaled.
-            // Once PluginAppletViewer.AppletEventListener is signaled PluginAppletViewer it can properly stop waiting
+            // Once PluginAppletViewer.AppletEventListener is signaled PluginAppletViewer can properly stop waiting
             // in PluginAppletViewer.waitForAppletInit
             dispatchAppletEvent(APPLET_LOADING_COMPLETED, null);
         }

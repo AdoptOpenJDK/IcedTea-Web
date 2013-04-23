@@ -1,5 +1,16 @@
 2013-04-23  Adam Domurad  <adomurad@redhat.com>
 
+	* netx/net/sourceforge/jnlp/NetxPanel.java
+	(exitOnFailure): Remove always-false field.
+	(NetxPanel): Remove overloaded constructor
+	(runLoader): Do not swallow LaunchException's. Remove dead
+	exitOnFailure code-path. Set applet status to APPLET_ERROR on
+	exception.
+	* plugin/icedteanp/java/sun/applet/PluginAppletPanelFactory.java
+	(createPanel): Update call to NetxPanel constructor.
+
+2013-04-23  Adam Domurad  <adomurad@redhat.com>
+
 	* tests/reproducers/signed/AppContextHasJNLPClassLoader/resources/AppContextHasJNLPClassLoader.html:
 	Test AppContext context classloader from HTML applet
 	* tests/reproducers/signed/AppContextHasJNLPClassLoader/resources/AppContextHasJNLPClassLoader.jnlp:

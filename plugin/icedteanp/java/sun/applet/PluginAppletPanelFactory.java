@@ -85,7 +85,7 @@ class PluginAppletPanelFactory {
                                    final PluginParameters params) {
         final NetxPanel panel = AccessController.doPrivileged(new PrivilegedAction<NetxPanel>() {
             public NetxPanel run() {
-                NetxPanel panel = new NetxPanel(doc, params, false);
+                NetxPanel panel = new NetxPanel(doc, params);
                 NetxPanel.debug("Using NetX panel");
                 PluginDebug.debug(params.toString());
                 return panel;
