@@ -1,5 +1,19 @@
 2013-04-23  Adam Domurad  <adomurad@redhat.com>
 
+	* tests/reproducers/signed/AppContextHasJNLPClassLoader/resources/AppContextHasJNLPClassLoader.html:
+	Test AppContext context classloader from HTML applet
+	* tests/reproducers/signed/AppContextHasJNLPClassLoader/resources/AppContextHasJNLPClassLoader.jnlp:
+	Test AppContext context classloader from JNLP application
+	* tests/reproducers/signed/AppContextHasJNLPClassLoader/resources/AppContextHasJNLPClassLoaderForJNLPApplet.jnlp:
+	Test AppContext context classloader from JNLP applet
+	* tests/reproducers/signed/AppContextHasJNLPClassLoader/srcs/AppContextHasJNLPClassLoader.java:
+	Print out context classloader for thread & AppContext, for
+	current thread & Swing thread.
+	* tests/reproducers/signed/AppContextHasJNLPClassLoader/testcases/AppContextHasJNLPClassLoaderTest.java:
+	Test runner for AppContextHasJNLPClassLoader
+
+2013-04-23  Adam Domurad  <adomurad@redhat.com>
+
 	Ensure JarFile handles do not leak.
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
 	Ensure close is called for each JarFile.
