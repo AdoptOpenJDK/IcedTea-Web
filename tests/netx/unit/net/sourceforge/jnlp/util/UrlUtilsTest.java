@@ -27,4 +27,40 @@ public class UrlUtilsTest {
         assertEquals("http://example.com/%20test%20test",
                 UrlUtils.normalizeUrlAndStripParams(new URL("http://example.com/ test%20test  ?test=test")).toString());
     }
+
+    @Test
+    public void testDecodeUrlQuietly() throws Exception {
+        // This is a wrapper over URLDecoder.decode, simple test suffices
+        assertEquals("http://example.com/ test test",
+                UrlUtils.decodeUrlQuietly(new URL("http://example.com/%20test%20test")).toString());
+    }
+
+    @Test
+    public void testNormalizeUrl() throws Exception {
+        boolean[] encodeFileUrlPossiblities = {false, true};
+
+        // encodeFileUrl flag should have no effect on non-file URLs, but let's be sure.
+        for (boolean encodeFileUrl : encodeFileUrlPossiblities ) {
+            // Test URL with no previous encoding
+            assertEquals("http://example.com/%20test",
+                    UrlUtils.normalizeUrl(new URL("http://example.com/ test"), encodeFileUrl).toString());
+            // Test partially encoded URL with trailing spaces
+            assertEquals("http://example.com/%20test%20test",
+                    UrlUtils.normalizeUrl(new URL("http://example.com/ test%20test  "), encodeFileUrl).toString());
+        }
+
+        // Test file URL with file URL encoding turned off
+        assertFalse("file://example/%20test".equals(
+                  UrlUtils.normalizeUrl(new URL("file://example/ test"), false).toString()));
+
+        // Test file URL with file URL encoding turned on
+        assertEquals("file://example/%20test",
+                  UrlUtils.normalizeUrl(new URL("file://example/ test"), true).toString());
+    }
+    @Test
+    public void testNormalizeUrlQuietly() throws Exception {
+        // This is a wrapper over UrlUtils.normalizeUrl(), simple test suffices
+        assertEquals("http://example.com/%20test%20test",
+                UrlUtils.normalizeUrl(new URL("http://example.com/ test%20test  ")).toString());
+    }
 }
