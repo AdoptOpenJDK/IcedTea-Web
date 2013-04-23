@@ -535,7 +535,7 @@ public class PluginAppletSecurityContext {
                 final Object o = store.getObject(classOrObjectID);
                 final Field f = (Field) store.getObject(fieldID);
 
-                final Object fValue = MethodOverloadResolver.getCostAndCastedObject(value, f.getType())[1];
+                final Object fValue = MethodOverloadResolver.getCostAndCastedObject(value, f.getType()).getCastedObject();
 
                 AccessControlContext acc = callContext != null ? callContext : getClosedAccessControlContext();
                 checkPermission(src, message.startsWith("SetStaticField") ? (Class) o : o.getClass(), acc);
@@ -577,7 +577,7 @@ public class PluginAppletSecurityContext {
                 Object value = store.getObject(objectID);
 
                 // Cast the object to appropriate type before insertion
-                value = MethodOverloadResolver.getCostAndCastedObject(value, store.getObject(arrayID).getClass().getComponentType())[1];
+                value = MethodOverloadResolver.getCostAndCastedObject(value, store.getObject(arrayID).getClass().getComponentType()).getCastedObject();
 
                 Array.set(store.getObject(arrayID), index, value);
 
@@ -640,36 +640,26 @@ public class PluginAppletSecurityContext {
                     c = (Class<?>) store.getObject(objectID);
                 }
 
-                // length -3 to discard first 3, + 2 for holding object
-                // and method name
-                Object[] arguments = new Object[args.length - 1];
-                arguments[0] = c;
-                arguments[1] = methodName;
-                for (int i = 0; i < args.length - 3; i++) {
-                    arguments[i + 2] = store.getObject(parseCall(args[3 + i], null, Integer.class));
-                    PluginDebug.debug("GOT ARG: ", arguments[i + 2]);
+                // Discard first 3 parts of message
+                Object[] arguments = new Object[args.length - 3];
+                for (int i = 0; i < arguments.length; i++) {
+                    arguments[i] = store.getObject(parseCall(args[3 + i], null, Integer.class));
+                    PluginDebug.debug("GOT ARG: ", arguments[i]);
                 }
 
-                Object[] matchingMethodAndArgs = MethodOverloadResolver.getMatchingMethod(arguments);
+                MethodOverloadResolver.ResolvedMethod rm = 
+                        MethodOverloadResolver.getBestMatchMethod(c, methodName, arguments);
 
-                if (matchingMethodAndArgs == null) {
+                if (rm == null) {
                     write(reference, "Error: No suitable method named " + methodName + " with matching args found");
                     return;
                 }
 
-                final Method m = (Method) matchingMethodAndArgs[0];
-                Object[] castedArgs = new Object[matchingMethodAndArgs.length - 1];
-                for (int i = 0; i < castedArgs.length; i++) {
-                    castedArgs[i] = matchingMethodAndArgs[i + 1];
-                }
-
-                String collapsedArgs = "";
-                for (Object arg : castedArgs) {
-                    collapsedArgs += " " + arg;
-                }
+                final Method m = rm.getMethod();
+                final Object[] castedArgs = rm.getCastedParameters();
 
                 PluginDebug.debug("Calling method ", m, " on object ", o
-                                                , " (", c, ") with ", collapsedArgs);
+                                                , " (", c, ") with ", Arrays.toString(castedArgs));
 
                 AccessControlContext acc = callContext != null ? callContext : getClosedAccessControlContext();
                 checkPermission(src, c, acc);
@@ -699,9 +689,9 @@ public class PluginAppletSecurityContext {
                     retO = m.getReturnType().toString();
                 }
 
-                PluginDebug.debug("Calling ", m, " on ", o, " with "
-                                                , collapsedArgs, " and that returned: ", ret
-                                                , " of type ", retO);
+                PluginDebug.debug("Calling ", m, " on ", o, " with ", 
+                        Arrays.toString(castedArgs), " and that returned: ", ret,
+                        " of type ", retO);
 
                 String objIDStr = toObjectIDString(ret, m.getReturnType(), false /*do not unbox primitives*/);
                 write(reference, "CallMethod " + objIDStr);
@@ -944,42 +934,30 @@ public class PluginAppletSecurityContext {
             } else if (message.startsWith("NewObject")) {
                 String[] args = message.split(" ");
                 Integer classID = parseCall(args[1], null, Integer.class);
-                Class c = (Class) store.getObject(classID);
-                final Constructor cons;
-                final Object[] fArguments;
+                Class<?> c = (Class<?>) store.getObject(classID);
 
-                Object[] arguments = new Object[args.length - 1];
-                arguments[0] = c;
-                for (int i = 0; i < args.length - 2; i++) {
-                    arguments[i + 1] = store.getObject(parseCall(args[2 + i],
+                // Discard first 2 parts of message
+                Object[] arguments = new Object[args.length - 2];
+                for (int i = 0; i < arguments.length; i++) {
+                    arguments[i] = store.getObject(parseCall(args[2 + i],
                             null, Integer.class));
-                    PluginDebug.debug("GOT ARG: ", arguments[i + 1]);
+                    PluginDebug.debug("GOT ARG: ", arguments[i]);
                 }
 
-                Object[] matchingConstructorAndArgs = MethodOverloadResolver
-                        .getMatchingConstructor(arguments);
+                MethodOverloadResolver.ResolvedMethod resolvedConstructor = 
+                        MethodOverloadResolver.getBestMatchConstructor(c, arguments);
 
-                if (matchingConstructorAndArgs == null) {
+                if (resolvedConstructor == null) {
                     write(reference,
                             "Error: No suitable constructor with matching args found");
                     return;
                 }
 
-                Object[] castedArgs = new Object[matchingConstructorAndArgs.length - 1];
-                for (int i = 0; i < castedArgs.length; i++) {
-                    castedArgs[i] = matchingConstructorAndArgs[i + 1];
-                }
-
-                cons = (Constructor) matchingConstructorAndArgs[0];
-                fArguments = castedArgs;
-
-                String collapsedArgs = "";
-                for (Object arg : fArguments) {
-                    collapsedArgs += " " + arg.toString();
-                }
+                final Constructor<?> cons = resolvedConstructor.getConstructor();
+                final Object[] castedArgs = resolvedConstructor.getCastedParameters();
 
                 PluginDebug.debug("Calling constructor on class ", c,
-                                   " with ", collapsedArgs);
+                                   " with ", Arrays.toString(castedArgs));
 
                 AccessControlContext acc = callContext != null ? callContext : getClosedAccessControlContext();
                 checkPermission(src, c, acc);
@@ -987,7 +965,7 @@ public class PluginAppletSecurityContext {
                 Object ret = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                     public Object run() {
                         try {
-                            return cons.newInstance(fArguments);
+                            return cons.newInstance(castedArgs);
                         } catch (Throwable t) {
                             return t;
                         }

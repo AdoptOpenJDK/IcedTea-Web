@@ -1,3 +1,17 @@
+2013-04-23  Adam Domurad  <adomurad@redhat.com>
+
+	Rewrite of MethodOverloadResolver with detailed unittests.
+	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java:
+	Rewritten to reduce duplicated code, fix very subtle bugs in
+	never-tested codepaths, obey spec properly. Introduced new helper types
+	where Object[] arrays with special-meaning positions were passed
+	around.
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java:
+	Updated to work with newly introduced types / refactored overload
+	resolver.
+	* tests/netx/unit/sun/applet/MethodOverloadResolverTest.java: In-depth
+	unit tests of hairy details of method overloading in JS<->Java.
+
 2013-04-23  Omair Majid  <omajid@redhat.com>
 
 	PR1299
