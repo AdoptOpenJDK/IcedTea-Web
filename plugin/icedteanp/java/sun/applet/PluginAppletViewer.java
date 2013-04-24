@@ -1495,8 +1495,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 if (cl instanceof JNLPClassLoader.CodeBaseClassLoader)
                     cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
 
-                ThreadGroup tg = ((JNLPClassLoader) cl).getApplication().getThreadGroup();
-
                 appletShutdown(p);
                 appletPanels.removeElement(p);
                 
