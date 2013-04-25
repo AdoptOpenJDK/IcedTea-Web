@@ -1,4 +1,10 @@
-2013-04-19  Jiri Vanek <jvanek@redhat.com>
+2013-04-25  Jiri Vanek <jvanek@redhat.com>	
+
+	Locking disabled on windows machines
+	* netx/net/sourceforge/jnlp/util/lockingfile/LockedFile.java:
+	(lock) and (unlock) are no-op on windows.
+
+2013-04-25  Jiri Vanek <jvanek@redhat.com>
 
 	Splashscreen now strip commit id from released versions
 	*  netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainter.java:
@@ -6,8 +12,7 @@
 	(drawBase) now using stripCommitFromVersion before printing drawing version
 	to splashscreen
 	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainterTest.java:
-	(stripCommitFromVersion) new test for 
-	
+	(stripCommitFromVersion) new test for 	
 
 2013-04-24  Adam Domurad  <adomurad@redhat.com>
 

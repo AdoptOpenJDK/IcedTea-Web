@@ -44,6 +44,7 @@ import java.nio.channels.FileLock;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /*
  * Process & thread locked access to a file. Creates file if it does not already exist.
@@ -112,6 +113,9 @@ public class LockedFile {
      * Lock access to the file. Lock is reentrant.
      */
     public void lock() throws IOException {
+        if (JNLPRuntime.isWindows()) {
+            return;
+        }
         // Create if does not already exist, cannot lock non-existing file
         if (!isReadOnly()) {
             this.file.createNewFile();
@@ -136,6 +140,9 @@ public class LockedFile {
      * Unlock access to the file. Lock is reentrant.
      */
     public void unlock() throws IOException {
+        if (JNLPRuntime.isWindows()) {
+            return;
+        }
         boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
         try {
             if (releaseProcessLock) {
