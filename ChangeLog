@@ -1,5 +1,10 @@
 2013-04-25  Adam Domurad  <adomurad@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/AsyncCallTest.java: Unit tests for
+	AsyncCall test extension.
+
+2013-04-25  Adam Domurad  <adomurad@redhat.com>
+
 	Tests & test extensions for mocking the plugin input & output pipes.
 	* Makefile.am
 	(stamps/test-extensions-compile.stamp): Make plugin classes available
