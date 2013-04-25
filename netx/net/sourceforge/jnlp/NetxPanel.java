@@ -39,7 +39,7 @@ import sun.awt.SunToolkit;
 
 /**
  * This panel calls into netx to run an applet, and pipes the display
- * into a panel from gcjwebplugin.
+ * into a panel from the icedtea-web browser plugin.
  *
  * @author      Francis Kung <fkung@redhat.com>
  */
@@ -48,7 +48,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
     private PluginBridge bridge = null;
     private AppletInstance appInst = null;
     private SplashController splashController;
-    private boolean appletAlive;
+    private volatile boolean initialized;
 
     // We use this so that we can create exactly one thread group
     // for all panels with the same uKey.
@@ -70,6 +70,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
         super(documentURL, params.getUnderlyingHashtable());
 
         this.parameters = params;
+        this.initialized = false;
 
         String uniqueKey = params.getUniqueKey(getCodeBase());
         synchronized(TGMapMutex) {
@@ -78,7 +79,6 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
                 uKeyToTG.put(uniqueKey, tg);
             }
         }
-        this.appletAlive = true;
     }
 
     @Override
@@ -124,7 +124,6 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
                 validate();
             }
         } catch (Exception e) {
-            this.appletAlive = false;
             status = APPLET_ERROR;
             e.printStackTrace();
             replaceSplash(SplashUtils.getErrorSplashScreen(getWidth(), getHeight(), e));
@@ -133,6 +132,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             // so that the applet's event listeners are signaled.
             // Once PluginAppletViewer.AppletEventListener is signaled PluginAppletViewer can properly stop waiting
             // in PluginAppletViewer.waitForAppletInit
+            this.initialized = true;
             dispatchAppletEvent(APPLET_LOADING_COMPLETED, null);
         }
     }
@@ -170,8 +170,8 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
         return appInst.getClassLoader();
     }
 
-    public boolean isAlive() {
-        return handler != null && handler.isAlive() && this.appletAlive;
+    public boolean isInitialized() {
+        return initialized;
     }
 
     public ThreadGroup getThreadGroup() {
@@ -190,9 +190,6 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             SunToolkit.createNewAppContext();
         }
     }
-
-    
-   
 
     public void setAppletViewerFrame(SplashController framePanel) {
         splashController=framePanel;

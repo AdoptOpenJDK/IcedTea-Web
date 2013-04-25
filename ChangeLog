@@ -1,5 +1,19 @@
 2013-04-25  Adam Domurad  <adomurad@redhat.com>
 
+	Fix a dead-lock that can cause (namely) Firefox to hang.
+	* netx/net/sourceforge/jnlp/NetxPanel.java
+	(appletAlive): Remove flag.
+	(isAlive): Remove getter.
+	(initialized): New, explicit initialization flag.
+	(isInitialized): New, getter.
+	(runLoader): Set initialization flag when done (whether errored or not).
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(waitForAppletInit): Wait on initialization flag from NetxPanel.
+	(handleMessage): Remove redundant waiting for init. Respond properly to
+	GetJavaObject in case of error/time-out.
+
+2013-04-25  Adam Domurad  <adomurad@redhat.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/AsyncCallTest.java: Unit tests for
 	AsyncCall test extension.
 

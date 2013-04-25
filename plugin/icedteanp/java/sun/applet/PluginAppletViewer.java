@@ -652,8 +652,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         panelLock.lock();
         try {
-            while (panel.getApplet() == null &&
-                    panel.isAlive() &&
+            while (!panel.isInitialized() && 
                     maxTimeToSleep > 0) {
                 PluginDebug.debug("Waiting for applet panel ", panel, " to initialize...");
                 maxTimeToSleep -= waitTillTimeout(panelLock, panelLive, maxTimeToSleep);
@@ -731,37 +730,16 @@ public class PluginAppletViewer extends XEmbeddedFrame
             // object should belong to?
             Object o;
 
-            // First, wait for panel to instantiate
-            // Next, wait for panel to come alive
-            long maxTimeToSleep = APPLET_TIMEOUT;
-            panelLock.lock();
-            try {
-                while (panel == null || !panel.isAlive()) {
-                    maxTimeToSleep -= waitTillTimeout(panelLock, panelLive,
-                                                      maxTimeToSleep);
-
-                    /* we already waited till timeout, give up here directly,
-                     *  instead of waiting 180s again in below waitForAppletInit()
-                     */
-                    if(maxTimeToSleep < 0) {
-                        streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError: " + "Initialization timed out");
-                        return;
-                    }
-                }
-            }
-            finally {
-                panelLock.unlock();
-            }
-
             // Wait for the panel to initialize
             // (happens in a separate thread)
             waitForAppletInit(panel);
 
-            PluginDebug.debug(panel, " -- ", panel.getApplet(), " -- ", panel.isAlive());
+            PluginDebug.debug(panel, " -- ", panel.getApplet(), " -- initialized: ", panel.isInitialized());
 
             // Still null?
             if (panel.getApplet() == null) {
-                streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError: " + "Initialization timed out");
+                streamhandler.write("instance " + identifier + " reference " + -1 + " fatalError: " + "Initialization failed");
+                streamhandler.write("context 0 reference " + reference + " Error");
                 return;
             }
 
