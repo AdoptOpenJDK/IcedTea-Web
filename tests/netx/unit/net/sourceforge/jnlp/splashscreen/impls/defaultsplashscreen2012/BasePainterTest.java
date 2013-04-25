@@ -105,4 +105,22 @@ public class BasePainterTest {
 
 
     }
+
+    @Test
+    public void stripCommitFromVersion() {
+        Assert.assertEquals("1.4", BasePainter.stripCommitFromVersion("1.4"));
+        Assert.assertEquals("1.4.2", BasePainter.stripCommitFromVersion("1.4.2"));
+        Assert.assertEquals("1.4pre", BasePainter.stripCommitFromVersion("1.4pre"));
+        Assert.assertEquals("1.4", BasePainter.stripCommitFromVersion("1.4+657tgkhyu4iy5"));
+        Assert.assertEquals("1.4.2", BasePainter.stripCommitFromVersion("1.4.2+887tgjh07tftvhjj"));
+        Assert.assertEquals("1.4pre+0977tyugg", BasePainter.stripCommitFromVersion("1.4pre+0977tyugg"));
+
+        Assert.assertEquals("1.4pre+", BasePainter.stripCommitFromVersion("1.4pre+"));
+        Assert.assertEquals("1.4pre+foo+", BasePainter.stripCommitFromVersion("1.4pre+foo+"));
+        Assert.assertEquals("1.4pre+foo+bar", BasePainter.stripCommitFromVersion("1.4pre+foo+bar"));
+        
+        Assert.assertEquals("1.4", BasePainter.stripCommitFromVersion("1.4+"));
+        Assert.assertEquals("1.4", BasePainter.stripCommitFromVersion("1.4+foo+"));
+        Assert.assertEquals("1.4", BasePainter.stripCommitFromVersion("1.4+foo+bar"));
+    }
 }

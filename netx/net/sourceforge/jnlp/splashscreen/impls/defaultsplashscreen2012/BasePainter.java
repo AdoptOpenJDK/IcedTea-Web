@@ -371,6 +371,17 @@ public class BasePainter implements Observer {
         return tt;
     }
 
+    static String stripCommitFromVersion(String version) {
+        if (version.contains("pre+")) {
+            return version;
+        }
+        int i = version.indexOf("+");
+        if (i < 0) {
+            return version;
+        }
+        return version.substring(0, version.indexOf("+"));
+    }
+
     private final class MovingTextRunner extends Observable implements Runnable {
 
         private static final int MAX_ANIMATION_VALUE = 10000;
@@ -499,11 +510,12 @@ public class BasePainter implements Observer {
         g2d.setColor(plainTextColor);
         FontMetrics fm = g2d.getFontMetrics();
         if (version != null) {
-            int y = master.getSplashWidth() - fm.stringWidth(version + " ");
+            String niceVersion=stripCommitFromVersion(version);
+            int y = master.getSplashWidth() - fm.stringWidth(niceVersion + " ");
             if (y < 0) {
                 y = 0;
             }
-            g2d.drawString(version, y, fm.getHeight());
+            g2d.drawString(niceVersion, y, fm.getHeight());
         }
         return fm;
     }
