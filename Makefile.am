@@ -760,7 +760,7 @@ stamps/test-extensions-compile.stamp: stamps/netx-dist.stamp stamps/plugin.stamp
 	ln -s $(TEST_EXTENSIONS_DIR) $(TEST_EXTENSIONS_COMPATIBILITY_SYMLINK);
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	 -d $(TEST_EXTENSIONS_DIR) \
-	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar \
+	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar \
 	 @test-extensions-source-files.txt && \
 	mkdir -p stamps && \
 	touch $@

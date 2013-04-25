@@ -62,8 +62,7 @@ public class PluginStreamHandler {
     private volatile boolean shuttingDown = false;
 
 
-    public PluginStreamHandler(InputStream inputstream, OutputStream outputstream)
-            throws MalformedURLException, IOException {
+    public PluginStreamHandler(InputStream inputstream, OutputStream outputstream) {
 
         PluginDebug.debug("Current context CL=", Thread.currentThread().getContextClassLoader());
 

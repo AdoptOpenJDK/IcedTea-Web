@@ -1,3 +1,16 @@
+2013-04-25  Adam Domurad  <adomurad@redhat.com>
+
+	Tests & test extensions for mocking the plugin input & output pipes.
+	* Makefile.am
+	(stamps/test-extensions-compile.stamp): Make plugin classes available
+	to test extensions
+	* tests/test-extensions/net/sourceforge/jnlp/AsyncCall.java: New, helper 
+	for doing asynchronous calls with an optional timeout.
+	* tests/netx/unit/sun/applet/PluginAppletViewerTest.java: New, uses
+	PluginPipeMock to test the javascript requests to the plugin.
+	* tests/test-extensions/sun/applet/mock/PluginPipeMock.java: New, helper
+	for getting the plugin requests and mocking the replies. 
+
 2013-04-25  Jiri Vanek <jvanek@redhat.com>	
 
 	Locking disabled on windows machines
