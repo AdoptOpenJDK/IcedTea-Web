@@ -1,5 +1,10 @@
 2013-04-25  Adam Domurad  <adomurad@redhat.com>
 
+	Add accidentally not included files from "Tests & test extensions for
+	mocking the plugin input & output pipes."
+
+2013-04-25  Adam Domurad  <adomurad@redhat.com>
+
 	Fix a dead-lock that can cause (namely) Firefox to hang.
 	* netx/net/sourceforge/jnlp/NetxPanel.java
 	(appletAlive): Remove flag.
