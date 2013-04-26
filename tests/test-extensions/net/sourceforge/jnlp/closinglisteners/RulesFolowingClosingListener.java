@@ -184,6 +184,10 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
         addRules(l);
     }
 
+    public List<Rule> getRules() {
+        return rules;
+    }
+
     public void setRules(List<Rule> rules) {
         if (rules == null) {
             throw new NullPointerException("rules cant be null");

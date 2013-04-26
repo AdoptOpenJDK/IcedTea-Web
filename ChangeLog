@@ -1,3 +1,27 @@
+2013-04-26  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* /tests/test-extensions/net/sourceforge/jnlp/closinglisteners/RulesFolowingClosingListener.java:
+	added a getter method getRules 
+	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
+	the most important class of AWTFramework, combines closing listener and
+	possibility to use mouse and keyboard for input to tests
+	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTFrameworkException.java:
+	exception that is raised in the framework whenever programmer did not
+	provide enough information
+	* tests/test-extensions/net/sourceforge/jnlp/awt/awtactions/KeyboardActions.java:
+	class with utility keyboard methods
+	* tests/test-extensions/net/sourceforge/jnlp/awt/awtactions/MouseActions.java:
+	class with utility mouse methods
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ComponentFinder.java:
+	class for finding components in a screenshot
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ComponentNotFoundException.java:
+	exception that can be raised if an important component could not be found
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ImageSeeker.java:
+	class for general image searching
+	* tests/reproducers/simple/AWTCommonResourcesOnly/resources/marker.png:
+	reproducer with resources only, contains the default icon marking
+	applets
+
 2013-04-26  Adam Domurad  <adomurad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
