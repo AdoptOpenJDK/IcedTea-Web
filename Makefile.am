@@ -367,8 +367,8 @@ $(CPP_UNITTEST_EXECUTABLE): $(CPP_UNITTEST_FRAMEWORK_LIB) stamps/cpp-unit-tests-
 	$(CXX) $(CXXFLAGS) \
 	  $(addprefix $(PLUGIN_DIR)/,$(PLUGIN_OBJECTS)) \
 	  $(CPP_UNITTEST_DIR)/*.o \
-	  -lrt \ 
-	  -lpthread \ 
+	  -lrt \
+	  -lpthread \
 	  $(GLIB_LIBS) \
 	  $(MOZILLA_LIBS) \
 	  $(CPP_UNITTEST_FRAMEWORK_LIB)\
