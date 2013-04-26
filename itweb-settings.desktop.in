@@ -2,9 +2,11 @@
 Name=IcedTea-Web Control Panel
 Name[de]=IcedTea-Web Systemsteuerung
 Name[pl]=Panel sterowania IcedTea-Web
+Name[cs]=Ovládací panel IcedTea-Web
 Comment=Configure IcedTea-Web (javaws and plugin)
 Comment[de]=Konfiguriert IcedTea-Web (javaws und Plug-in)
 Comment[pl]=Konfiguruj IcedTea-Web (javaws i wtyczkę)
+Comment[cs]=Konfigurace aplikace IcedTea-Web (javaws a zásuvný modul)
 Exec=PATH_TO_ITWEB_SETTINGS
 Icon=javaws
 Terminal=false
