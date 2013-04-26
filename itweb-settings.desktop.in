@@ -1,8 +1,13 @@
 [Desktop Entry]
-Name=IcedTea Web Control Panel
-Comment=Configure IcedTea Web (javaws and plugin)
+Name=IcedTea-Web Control Panel
+Name[de]=IcedTea-Web Systemsteuerung
+Name[pl]=Panel sterowania IcedTea-Web
+Comment=Configure IcedTea-Web (javaws and plugin)
+Comment[de]=Konfiguriert IcedTea-Web (javaws und Plug-in)
+Comment[pl]=Konfiguruj IcedTea-Web (javaws i wtyczkę)
 Exec=PATH_TO_ITWEB_SETTINGS
 Icon=javaws
 Terminal=false
 Type=Application
 Categories=Settings;
+Keywords=IcedTea;IcedTea-Web;java;javaws;web;start;webstart;jnlp;

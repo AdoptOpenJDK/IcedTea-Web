@@ -1,4 +1,11 @@
 2013-04-26  Jiri Vanek  <jvanek@redhat.com>
+            Jacob Wisor  <gitne@excite.co.jp>
+
+	Added DE and PL localization of itw-settings Xdesktop configuration file
+	* itweb-settings.desktop.in: added Name[de], Name[pl], Comment[de], Comment[pl]
+	keys with values. Added Keywords key with values.
+
+2013-04-26  Jiri Vanek  <jvanek@redhat.com>
 
 	Silenced unittests
 	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java: and
