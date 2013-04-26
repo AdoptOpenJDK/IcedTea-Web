@@ -1,6 +1,13 @@
 2013-04-26  Jiri Vanek  <jvanek@redhat.com>
             Alexandr Kolouch  <skolnag@gmail.com>
 
+	Improved and completed CZ localisation
+	* netx/net/sourceforge/jnlp/resources/Messages_cs_CZ.properties:
+	Added missing items, some fixes
+
+2013-04-26  Jiri Vanek  <jvanek@redhat.com>
+            Alexandr Kolouch  <skolnag@gmail.com>
+
 	Added CZ  localization of itw-settings Xdesktop configuration file
 	* itweb-settings.desktop.in: added Name[cs] and Name[cs] keys with values. 
 
