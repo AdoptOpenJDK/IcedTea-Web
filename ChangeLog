@@ -1,3 +1,12 @@
+2013-04-26  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+	(getCacheFile): Use decodeUrlAsFile instead of toURI().getPath().
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java
+	(decodeUrlAsFile): New, tolerates ill-formed URLs.
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java:
+	(testDecodeUrlAsFile): Test for (decodeUrlAsFile) 
+
 2013-04-26  Jiri Vanek  <jvanek@redhat.com>
             Jacob Wisor  <gitne@excite.co.jp>
 

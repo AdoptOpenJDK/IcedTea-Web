@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -134,4 +135,8 @@ public class UrlUtils {
         return normalizeUrlQuietly(url, false);
     }
 
+    /* Decode a URL as a file, being tolerant of URLs with mixed encoded & decoded portions. */
+    public static File decodeUrlAsFile(URL url) {
+        return new File(decodeUrlQuietly(url).getFile());
+    }
 }

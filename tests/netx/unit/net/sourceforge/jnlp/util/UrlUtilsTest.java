@@ -1,9 +1,11 @@
 package net.sourceforge.jnlp.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
+import java.io.File;
 import java.net.URL;
-    
+
 import org.junit.Test;
 
 public class UrlUtilsTest {
@@ -57,10 +59,24 @@ public class UrlUtilsTest {
         assertEquals("file://example/%20test",
                   UrlUtils.normalizeUrl(new URL("file://example/ test"), true).toString());
     }
+
     @Test
     public void testNormalizeUrlQuietly() throws Exception {
         // This is a wrapper over UrlUtils.normalizeUrl(), simple test suffices
         assertEquals("http://example.com/%20test%20test",
                 UrlUtils.normalizeUrl(new URL("http://example.com/ test%20test  ")).toString());
+    }
+
+    @Test
+    public void testDecodeUrlAsFile() throws Exception {
+        String[] testPaths = {"/simple", "/ with spaces", "/with /multiple=/ odd characters?"};
+
+        for (String testPath : testPaths) {
+            File testFile = new File(testPath);
+            URL notEncodedUrl = testFile.toURL();
+            URL encodedUrl = testFile.toURI().toURL();
+            assertEquals(testFile, UrlUtils.decodeUrlAsFile(notEncodedUrl));
+            assertEquals(testFile, UrlUtils.decodeUrlAsFile(encodedUrl));
+        }
     }
 }
