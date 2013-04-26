@@ -119,7 +119,7 @@ public class ServerAccess {
      * this flag is indicating whether output of executeProcess should be logged. By default true.
      */
     public static boolean PROCESS_LOG = true;
-    public static boolean LOGS_REPRINT = true;
+    public static boolean LOGS_REPRINT = false;
 
     private Browser currentBrowser;
     public static final String UNSET_BROWSER="unset_browser";
