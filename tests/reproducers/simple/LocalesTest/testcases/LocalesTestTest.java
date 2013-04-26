@@ -61,7 +61,6 @@ public class LocalesTestTest {
         "BOArg",
         "BOParam",
         "BOProperty",
-        "BOUpdate",
         "BOLicense",
         "BOVerbose",
         "BOAbout",
@@ -120,6 +119,11 @@ public class LocalesTestTest {
 
     }
 
+     public ResourceBundle getPropertiesPl() throws IOException {
+        return getProperties("_pl");
+
+    }
+
     public ResourceBundle getPropertiesEn() throws IOException {
         return getProperties("");
 
@@ -139,6 +143,7 @@ public class LocalesTestTest {
         assertEnglish(pr.stdout);
         assertNotCz(pr.stdout);
         assertNotDe(pr.stdout);
+        assertNotPl(pr.stdout);
     }
 
     @Test
@@ -148,6 +153,7 @@ public class LocalesTestTest {
         assertNotEnglish(pr.stdout);
         assertNotCz(pr.stdout);
         assertNotDe(pr.stdout);
+        assertNotPl(pr.stdout);
         iteratePropertiesForAproxCzCs(pr.stdout);
     }
 
@@ -158,7 +164,29 @@ public class LocalesTestTest {
         assertNotEnglish(pr.stdout);
         assertNotDe(pr.stdout);
         assertCz(pr.stdout);
+        assertNotPl(pr.stdout);
         iteratePropertiesForAproxCzCs(pr.stdout);
+    }
+
+     @Test
+    public void testLocalesPlPL() throws Exception {
+        String[] l = getChangeLocalesForSubproces("pl_PL");
+        ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
+        assertNotEnglish(pr.stdout);
+        assertNotCz(pr.stdout);
+        assertNotDe(pr.stdout);
+        iteratePropertiesForAproxPl(pr.stdout);
+    }
+
+    @Test
+    public void testLocalesPlPLUtf() throws Exception {
+        String[] l = getChangeLocalesForSubproces("pl_PL.UTF-8");
+        ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
+        assertNotEnglish(pr.stdout);
+        assertNotDe(pr.stdout);
+        assertNotCz(pr.stdout);
+        assertPl(pr.stdout);
+        iteratePropertiesForAproxPl(pr.stdout);
     }
     
      @Test
@@ -167,6 +195,7 @@ public class LocalesTestTest {
         ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
         assertNotEnglish(pr.stdout);
         assertNotCz(pr.stdout);
+        assertNotPl(pr.stdout);
         iteratePropertiesForAproxDe(pr.stdout);
     }
 
@@ -177,6 +206,7 @@ public class LocalesTestTest {
         assertNotEnglish(pr.stdout);
         assertNotCz(pr.stdout);
         assertDe(pr.stdout);
+        assertNotPl(pr.stdout);
         iteratePropertiesForAproxDe(pr.stdout);
     }
    
@@ -187,6 +217,7 @@ public class LocalesTestTest {
         ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
         assertNotEnglish(pr.stdout);
         assertNotCz(pr.stdout);
+        assertNotPl(pr.stdout);
         iteratePropertiesForAproxDe(pr.stdout);
     }
 
@@ -197,6 +228,7 @@ public class LocalesTestTest {
         assertNotEnglish(pr.stdout);
         assertNotCz(pr.stdout);
         assertDe(pr.stdout);
+        assertNotPl(pr.stdout);
         iteratePropertiesForAproxDe(pr.stdout);
     }
     
@@ -208,6 +240,7 @@ public class LocalesTestTest {
         ProcessResult pr = ServerAccess.executeProcess(javaws, null, null, l);
         assertNotEnglish(pr.stdout);
         assertNotCz(pr.stdout);
+        assertNotPl(pr.stdout);
         iteratePropertiesForAproxDe(pr.stdout);
     }
 
@@ -221,6 +254,7 @@ public class LocalesTestTest {
         assertEnglish(pr.stdout);
         assertNotCz(pr.stdout);
         assertNotDe(pr.stdout);
+        assertNotPl(pr.stdout);
     }
 
     private void assertEnglish(String s) throws IOException {
@@ -237,6 +271,11 @@ public class LocalesTestTest {
         ResourceBundle props = getPropertiesCz();
         iteratePropertiesFor(props, s, true, "czech");
     }
+
+    private void assertPl(String s) throws IOException {
+        ResourceBundle props = getPropertiesPl();
+        iteratePropertiesFor(props, s, true, "polish");
+    }
     
      private void assertDe(String s) throws IOException {
         ResourceBundle props = getPropertiesDe();
@@ -247,6 +286,11 @@ public class LocalesTestTest {
     private void assertNotCz(String s) throws IOException {
         ResourceBundle props = getPropertiesCz();
         iteratePropertiesFor(props, s, false, "czech");
+    }
+
+      private void assertNotPl(String s) throws IOException {
+        ResourceBundle props = getPropertiesPl();
+        iteratePropertiesFor(props, s, false, "polish");
     }
     
      private void assertNotDe(String s) throws IOException {
@@ -317,6 +361,10 @@ public class LocalesTestTest {
     private void iteratePropertiesForAproxDe(String stdout) throws IOException {
         iteratePropertiesForAprox(stdout, getPropertiesDe(), Regexer.de);
     }
+
+     private void iteratePropertiesForAproxPl(String stdout) throws IOException {
+        iteratePropertiesForAprox(stdout, getPropertiesPl(), Regexer.pl);
+    }
     
        
     
@@ -351,9 +399,26 @@ public class LocalesTestTest {
             "]",
             "(",
             ")"};
+
+           private static final String[] plEvil = {
+            "ó",
+            "ą",
+            "ę",
+            "ó",
+            "ł",
+            "ć",
+            "ś",
+            "ź",
+            "ż",
+            "ń",
+            "[",
+            "]",
+            "(",
+            ")"};
         
         private static final Regexer cz = new Regexer(czEvil,"cz");        
         private static final Regexer de = new Regexer(deEvil,"de");
+        private static final Regexer pl = new Regexer(plEvil,"pl");
         
         private final String[] map;
         private final String id;

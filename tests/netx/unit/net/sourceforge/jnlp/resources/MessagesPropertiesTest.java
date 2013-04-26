@@ -56,6 +56,7 @@ public class MessagesPropertiesTest {
         public static final LocalesIdentifier DEFAULT = new LocalesIdentifier("","");
         public static final LocalesIdentifier CZ_CS = new LocalesIdentifier("CZ","cs");
         public static final LocalesIdentifier DE = new LocalesIdentifier("de");
+        public static final LocalesIdentifier PL = new LocalesIdentifier("pl");
         //public static final LocalesIdentifier DE_DE = new LocalesIdentifier("DE","de");
         
         public static final String mainFileName = "Messages";
@@ -145,7 +146,7 @@ public class MessagesPropertiesTest {
         //get default by non existing language and country
         main = LocalesIdentifier.DEFAULT;
         assertNotNull(main);
-        secondary= new LocalesIdentifier[] {LocalesIdentifier.CZ_CS,LocalesIdentifier.DE};
+        secondary= new LocalesIdentifier[] {LocalesIdentifier.CZ_CS,LocalesIdentifier.DE,LocalesIdentifier.PL};
         assertNotNull(secondary);
         for (int i = 0; i < secondary.length; i++) {
             assertNotNull(secondary[i]);
@@ -308,7 +309,7 @@ public class MessagesPropertiesTest {
     }
     private void errLog(String string) {
         //used quite often :)
-        //System.out.println(string);
+        System.out.println(string);
         ServerAccess.logErrorReprint(string);
     }
 
