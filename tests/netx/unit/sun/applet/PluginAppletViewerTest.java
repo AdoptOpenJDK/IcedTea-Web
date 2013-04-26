@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.Callable;
 
 import net.sourceforge.jnlp.AsyncCall;
+import net.sourceforge.jnlp.ServerAccess;
 
 import org.junit.After;
 import org.junit.Before;
@@ -173,8 +174,8 @@ public class PluginAppletViewerTest {
      * reference number
      */
     private static int parseAndCheckJSMessage(String message, int messageLength,
-            String messageType, int contextObjectID) {
-        System.out.println(message);
+        String messageType, int contextObjectID) {
+        ServerAccess.logOutputReprint(message);
         String[] parts = message.split(" ");
         assertEquals(messageLength, parts.length);
 

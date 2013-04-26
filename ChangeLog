@@ -1,3 +1,35 @@
+2013-04-26  Jiri Vanek  <jvanek@redhat.com>
+
+	Silenced unittests
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java: and
+	* tests/netx/unit/sun/applet/PluginAppletViewerTest.java:
+        System.out.println replaced by ServerAccess.logOutputReprint
+	
+2013-04-26  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed compilation under jdk6
+	* netx/net/sourceforge/jnlp/util/JarFile.java:
+	is now implementing Closeable
+
+2013-04-26  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed regressed unittest and "cause"
+	* /netx/net/sourceforge/jnlp/NullJnlpFileException.java:
+	fixed header
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: (SecurityDesc) is now 
+	throwing NullJnlpFileException in case of null jnlp file.
+	* tests/netx/unit/net/sourceforge/jnlp/ParserBasic.java: is now using
+	correct DummyJnlpFile
+	* tests/netx/unit/net/sourceforge/jnlp/SecurityDescTest.java: new testfile.
+	(testNotNullJnlpFile) (testNullJnlpFile) testing the behavior for null 
+	jnlp file and for existing jnlpfile.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
+	(DummyJnlpFile) extracted to test-extensions and have removed incorrect have security
+	(testNullFileSecurityDescApplet) and (testNullFileSecurityDesc) is now expecting 
+	NullJnlpFileException instead of results
+	* tests/test-extensions/net/sourceforge/jnlp/mock/DummyJNLPFile.java: new 
+	reusable dummy jnlp file	
+
 2013-04-25  Adam Domurad  <adomurad@redhat.com>
 
 	Add accidentally not included files from "Tests & test extensions for

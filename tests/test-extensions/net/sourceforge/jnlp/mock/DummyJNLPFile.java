@@ -1,5 +1,3 @@
-package net.sourceforge.jnlp;
-
 /* 
 Copyright (C) 2012 Red Hat, Inc.
 
@@ -36,15 +34,44 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
+package net.sourceforge.jnlp.mock;
 
-public class NullJnlpFileException extends NullPointerException {
+import java.net.URL;
+import java.util.Locale;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.ResourcesDesc;
+import net.sourceforge.jnlp.SecurityDesc;
 
-    public NullJnlpFileException() {
-        super();
+
+public class DummyJNLPFile extends JNLPFile {
+    
+    
+    public static final URL JAR_URL;
+    public static final URL CODEBASE_URL;
+
+    static {
+        try {
+            JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
+            CODEBASE_URL = new URL("http://icedtea.classpath.org/netx/");
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
-    public NullJnlpFileException(String s) {
-        super(s);
+
+    @Override
+    public ResourcesDesc getResources() {
+        return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
     }
 
+    @Override
+    public URL getCodeBase() {
+        return CODEBASE_URL;
+    }
+
+    @Override
+    public SecurityDesc getSecurity() {
+        return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
+    }
+    
 }

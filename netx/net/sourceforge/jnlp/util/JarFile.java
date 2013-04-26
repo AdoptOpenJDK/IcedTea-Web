@@ -36,14 +36,16 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-public class JarFile extends java.util.jar.JarFile {
+//in jdk6 java.util.jar.JarFile is not Closeable - fixing
+//overwritening  class can add duplicate occurence of interface so this should be perfectly safe
+public class JarFile extends java.util.jar.JarFile implements Closeable{
 
     public JarFile(String name) throws IOException {
        super(name);

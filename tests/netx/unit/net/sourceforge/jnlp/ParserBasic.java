@@ -40,6 +40,8 @@ package net.sourceforge.jnlp;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
+import net.sourceforge.jnlp.runtime.CodeBaseClassLoaderTest;
+import net.sourceforge.jnlp.mock.DummyJNLPFile;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -61,7 +63,7 @@ public class ParserBasic {
         }
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/basic.jnlp");
         root = Parser.getRootNode(jnlpStream);
-        parser = new Parser(null, null, root, false, false);
+        parser = new Parser(new DummyJNLPFile(), null, root, false, false);
     }
 
     @Test

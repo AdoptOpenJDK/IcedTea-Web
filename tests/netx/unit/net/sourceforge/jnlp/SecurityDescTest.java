@@ -1,5 +1,3 @@
-package net.sourceforge.jnlp;
-
 /* 
 Copyright (C) 2012 Red Hat, Inc.
 
@@ -36,15 +34,37 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
+package net.sourceforge.jnlp;
 
-public class NullJnlpFileException extends NullPointerException {
+import net.sourceforge.jnlp.mock.DummyJNLPFile;
+import org.junit.Assert;
+import org.junit.Test;
 
-    public NullJnlpFileException() {
-        super();
+public class SecurityDescTest {
+
+    @Test
+    public void testNotNullJnlpFile() {
+        Throwable t = null;
+        try {
+            SecurityDesc securityDesc = new SecurityDesc(new DummyJNLPFile(), SecurityDesc.SANDBOX_PERMISSIONS, "hey!");
+        } catch (Exception ex) {
+            t = ex;
+        }
+        Assert.assertNull("securityDesc should not throw exception", t);
+
+
     }
 
-    public NullJnlpFileException(String s) {
-        super(s);
-    }
+    @Test
+    public void testNullJnlpFile() {
+        Exception ex = null;
+        try {
+            SecurityDesc securityDesc = new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, "hey!");
+        } catch (Exception eex) {
+            ex = eex;
+        }
+        Assert.assertNotNull("Exception should not be null", ex);
+        Assert.assertTrue("Exception should be " + NullJnlpFileException.class.getName(), ex instanceof NullJnlpFileException);
 
+    }
 }

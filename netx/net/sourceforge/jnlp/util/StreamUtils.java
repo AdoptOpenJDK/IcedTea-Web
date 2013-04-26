@@ -73,8 +73,8 @@ public class StreamUtils {
             }
         }
     }
-    
-    
+
+
     public static String readStreamAsString(InputStream stream) throws IOException {
         InputStreamReader is = new InputStreamReader(stream);
         StringBuilder sb = new StringBuilder();

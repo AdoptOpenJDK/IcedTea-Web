@@ -81,7 +81,7 @@ public class UnsignedAppletActionStorageImplTest {
     public void wildcards1() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(f3);
         UnsignedAppletActionEntry r1 = i1.getMatchingItem("http://www.walter-fendt.de/ph14e/inclplane.htm", "http://www.walter-fendt.de/ph14_jar/", Arrays.asList(new String[]{"Ph14English.jar","SchiefeEbene.jar"}));
-         System.out.println(r1.toString());
+        ServerAccess.logOutputReprint(r1.toString());
      }
      @Test
     public void allMatchingDocAndCode() {

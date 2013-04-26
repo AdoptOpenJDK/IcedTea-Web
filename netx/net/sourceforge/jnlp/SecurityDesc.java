@@ -149,6 +149,9 @@ public class SecurityDesc {
      * @param downloadHost the download host (can always connect to)
      */
     public SecurityDesc(JNLPFile file, Object type, String downloadHost) {
+        if (file == null) {
+            throw new NullJnlpFileException();
+        }
         this.file = file;
         this.type = type;
         this.downloadHost = downloadHost;
