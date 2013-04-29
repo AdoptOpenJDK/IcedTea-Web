@@ -309,7 +309,7 @@ public class MessagesPropertiesTest {
     }
     private void errLog(String string) {
         //used quite often :)
-        System.out.println(string);
+        //System.out.println(string);
         ServerAccess.logErrorReprint(string);
     }
 
