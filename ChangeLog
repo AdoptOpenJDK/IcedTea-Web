@@ -1,3 +1,13 @@
+2013-04-29  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
+	fixing method (captureScreenAndFindAppletByIconTryKTimes),
+	which should not throw AWTFrameworkException
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ComponentFinder.java:
+	fixing the return values of several search methods
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ImageSeeker.java:
+	fixing the return values of several search methods
+
 2013-04-26  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* /tests/test-extensions/net/sourceforge/jnlp/closinglisteners/RulesFolowingClosingListener.java:
