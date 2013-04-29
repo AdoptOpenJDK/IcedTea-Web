@@ -346,14 +346,9 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @param height
      * @param K
      * @throws ComponentNotFoundException
-     * @throws AWTFrameworkException
      */
-    public void captureScreenAndFindAppletByIconTryKTimes(BufferedImage icon, Rectangle iconPosition, int width, int height, int K) throws ComponentNotFoundException, AWTFrameworkException {
+    public void captureScreenAndFindAppletByIconTryKTimes(BufferedImage icon, Rectangle iconPosition, int width, int height, int K) throws ComponentNotFoundException {
   
-        if(!markerGiven){
-            throw new AWTFrameworkException("AWTFramework cannot find applet without marker!");
-        }
-
         int count = 0;
         appletFound = false;
         while ((count < K) && !appletFound) {

@@ -73,12 +73,15 @@ public class ImageSeeker
                     result.width = marker.getWidth();
                 }else{
                     ok = true;
-                }
-                
+                }                
             }
         }
         
-        return result;
+        if(found){
+            return result;
+        }else{
+            return null;
+        }
     }
     
     public static Rectangle findBlurredImage(BufferedImage marker, BufferedImage testImage, double minCorrelation){
@@ -119,7 +122,7 @@ public class ImageSeeker
         if(bestCorrelation > minCorrelation){
             return new Rectangle(bestX, bestY, marker.getWidth(), marker.getHeight());
         }else{
-            return new Rectangle(0,0,0,0);
+            return null;
         }
         
     }
