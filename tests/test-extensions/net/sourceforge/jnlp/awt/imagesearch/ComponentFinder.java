@@ -39,6 +39,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.awt.imagesearch;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -86,10 +87,9 @@ public class ComponentFinder {
 
     
     /**
-     * method findWindowByIcon finds the application area assuming there is a
+     * Method findWindowByIcon finds the application area assuming there is a
      * given icon in given position on the application window 
-     * (the left upper corner by default) the dimension of the window has to 
-     * be given
+     * the dimension of the window has to be given.
      * 
      * @param icon
      * @param iconPosition
@@ -98,25 +98,25 @@ public class ComponentFinder {
      * @param screenshot
      * @return Rectangle rectangle where the applet resides
      */
-    public static Rectangle findWindowByIcon(BufferedImage icon, Rectangle iconPosition, int windowWidth, int windowHeight, BufferedImage screenshot) {
+    public static Rectangle findWindowByIcon(BufferedImage icon, Point iconPosition, int windowWidth, int windowHeight, BufferedImage screenshot) {
         Rectangle r = ImageSeeker.findExactImage(icon, screenshot);
         if( ImageSeeker.isRectangleValid(r)){
-            return windowPositionFromIconPosition(r, iconPosition, windowWidth, windowHeight);
+            return windowPositionFromIconPosition(r.getLocation(), iconPosition, windowWidth, windowHeight);
         }else{
             return null;
         }
     }
 
-    public static Rectangle findWindowByIconBlurred(BufferedImage icon, Rectangle iconPosition, int windowWidth, int windowHeight, BufferedImage screenshot, double minCorrelation) {
+    public static Rectangle findWindowByIconBlurred(BufferedImage icon, Point iconPosition, int windowWidth, int windowHeight, BufferedImage screenshot, double minCorrelation) {
         Rectangle r = ImageSeeker.findBlurredImage(icon, screenshot, minCorrelation);
         if( ImageSeeker.isRectangleValid(r)){
-            return windowPositionFromIconPosition(r, iconPosition, windowWidth, windowHeight);
+            return windowPositionFromIconPosition(r.getLocation(), iconPosition, windowWidth, windowHeight);
         }else{
             return null;
         }    
     }
     
-    public static Rectangle windowPositionFromIconPosition(Rectangle iconAbsolute, Rectangle iconRelative, int windowWidth, int windowHeight){
+    public static Rectangle windowPositionFromIconPosition(Point iconAbsolute, Point iconRelative, int windowWidth, int windowHeight){
         return new Rectangle( iconAbsolute.x - iconRelative.x, iconAbsolute.y - iconRelative.y,
                             windowWidth, windowHeight);
     }

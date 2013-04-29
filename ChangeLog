@@ -1,6 +1,15 @@
 2013-04-29  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
+	refactoring Point instead of Rectangle as icon position as
+	markerPosition
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ComponentFinder.java:
+	refactoring Point instead of Rectangle as icon position in several
+	search methods
+
+2013-04-29  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
 	fixing method (captureScreenAndFindAppletByIconTryKTimes),
 	which should not throw AWTFrameworkException
 	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ComponentFinder.java:

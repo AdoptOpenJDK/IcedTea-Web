@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.awt;
 
 import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -62,7 +63,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     private String initStr = "";        
     private Color appletColor;
     private BufferedImage marker;
-    private Rectangle markerPosition;
+    private Point markerPosition;
     private int appletHeight;
     private int appletWidth;
     private int tryKTimes = DEFAULT_K;
@@ -132,7 +133,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @param appletHeight
      */
    
-    public AWTHelper(BufferedImage icon, Rectangle iconPosition, int appletWidth, int appletHeight){
+    public AWTHelper(BufferedImage icon, Point iconPosition, int appletWidth, int appletHeight){
         this();
         this.marker = icon;
         this.markerPosition = iconPosition;
@@ -143,7 +144,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
         this.appletDimensionGiven = true;
     }
     
-    public AWTHelper(String initString, BufferedImage icon, Rectangle iconPosition, int appletWidth, int appletHeight) throws AWTException{
+    public AWTHelper(String initString, BufferedImage icon, Point iconPosition, int appletWidth, int appletHeight) throws AWTException{
         this(icon, iconPosition, appletWidth, appletHeight);
         
         this.initStr = initString;
@@ -160,16 +161,17 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      */
     public AWTHelper(int appletWidth, int appletHeight){
         this();
+        
         String test_server_dir_path = System.getProperty("test.server.dir");
 
         try {
             this.marker = ImageIO.read(new File(test_server_dir_path + "/marker.png"));
-            this.markerPosition = new Rectangle(0,0,marker.getWidth(),marker.getHeight());
+            this.markerPosition = new Point(0,0);
             this.markerGiven = true;
         } catch (IOException e) {
             throw new RuntimeException("AWTHelper could not read marker.png.",e);
         }
-        
+                
         this.appletWidth = appletWidth;
         this.appletHeight = appletHeight;
         this.appletDimensionGiven = true;
@@ -297,7 +299,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
         this.initStrGiven = true;
     }
        
-    public void setMarker(BufferedImage marker, Rectangle markerPosition) {
+    public void setMarker(BufferedImage marker, Point markerPosition) {
         this.marker = marker;
         this.markerPosition = markerPosition;
         this.markerGiven = true;
@@ -347,7 +349,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @param K
      * @throws ComponentNotFoundException
      */
-    public void captureScreenAndFindAppletByIconTryKTimes(BufferedImage icon, Rectangle iconPosition, int width, int height, int K) throws ComponentNotFoundException {
+    public void captureScreenAndFindAppletByIconTryKTimes(BufferedImage icon, Point iconPosition, int width, int height, int K) throws ComponentNotFoundException {
   
         int count = 0;
         appletFound = false;
@@ -551,4 +553,4 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     public void typeKey(int key) {
         KeyboardActions.typeKey(this.robot, key);
     }
-}
+ }
