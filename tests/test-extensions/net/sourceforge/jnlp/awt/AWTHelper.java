@@ -354,23 +354,41 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
         int count = 0;
         appletFound = false;
         while ((count < K) && !appletFound) {
-                robot.delay(defaultWaitForApplet);
-                screenshot = robot.createScreenCapture( new Rectangle( Toolkit.getDefaultToolkit().getScreenSize() ) );
-                screenshotTaken = true;
-                actionArea = ComponentFinder.findWindowByIcon(icon, iconPosition, width, height, screenshot);
-                if (ImageSeeker.isRectangleValid(actionArea)) {
-                    appletFound = true;
-                }
-                count++;
+            robot.delay(defaultWaitForApplet);
+            try {
+                screenshot = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+                initialiseOnScreenshot(icon, iconPosition, width, height, screenshot);
+            } catch (ComponentNotFoundException ex) {
+                //keeping silent and try more-times
+            }
+            count++;
         }
 
         if (ImageSeeker.isRectangleValid(actionArea)) {
             appletFound = true;
         } else {
-            throw new ComponentNotFoundException("Applet not found in the screenshot!");
+            throw new ComponentNotFoundException("Object not found in the screenshot!");
         }
 
     }
+    
+    public void initialiseOnScreenshot(BufferedImage icon, Point iconPosition, int width, int height, BufferedImage screenshot) throws ComponentNotFoundException {
+        Rectangle r = ComponentFinder.findWindowByIcon(icon, iconPosition, width, height, screenshot);
+        initialiseOnScreenshotAndArea(screenshot, r);
+        
+    }
+    
+    public void initialiseOnScreenshotAndArea(BufferedImage screenshot, Rectangle actionArea) throws ComponentNotFoundException {
+        this.screenshot = screenshot;
+        screenshotTaken = true;
+        this.actionArea = actionArea;
+        if (ImageSeeker.isRectangleValid(actionArea)) {
+            appletFound = true;
+        } else {
+            throw new ComponentNotFoundException("set invalid area!");
+        }
+    }
+
     
     /**
      * auxiliary method writeAppletScreen for writing Buffered image into png

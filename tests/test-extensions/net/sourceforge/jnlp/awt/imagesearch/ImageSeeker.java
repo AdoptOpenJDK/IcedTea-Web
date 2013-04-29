@@ -50,17 +50,28 @@ public class ImageSeeker
         return findExactImage(marker, screen, new Rectangle(0,0,screen.getWidth(), screen.getHeight()));
     }
     
-    public static Rectangle findExactImage(BufferedImage marker, BufferedImage screen, Rectangle actionArea){
-        Rectangle result = new Rectangle(0,0,0,0);
+    public static Rectangle findExactImage(BufferedImage marker /*usually small*/, BufferedImage screen, Rectangle actionArea) {
+        Rectangle result = new Rectangle(0, 0, 0, 0);
         boolean found = false;
         boolean ok = true;
-        
-        for(int x = actionArea.x; (x < (actionArea.x + actionArea.width - marker.getWidth()) ) && !found; x++){
-            for(int y= actionArea.y; (y < (actionArea.y + actionArea.height - marker.getHeight()) ) && !found; y++){
-                
-                for(int mx = 0; (mx < marker.getWidth()) && ok; mx++){
-                    for(int my = 0; (my < marker.getHeight()) && ok; my++){
-                        if(marker.getRGB(mx, my) != screen.getRGB(x+mx,y+my)){
+        //to filter out values with alpha
+        boolean[][] mask = getMask(marker);
+        //accessing those too often, copying
+        int[][] markerPixels = getPixels(marker);
+        int mw = marker.getWidth();
+        int mh = marker.getHeight();
+        for (int y = actionArea.y; (y < (actionArea.y + actionArea.height - marker.getHeight())) && !found; y++) {
+            for (int x = actionArea.x; (x < (actionArea.x + actionArea.width - marker.getWidth())) && !found; x++) {
+
+
+                for (int my = 0; (my < mh) && ok; my++) {
+                    for (int mx = 0; (mx < mw) && ok; mx++) {
+
+                        //ignore masked (having alpha) values
+                        if (!mask[mx][my]) {
+                            continue;
+                        }
+                        if (markerPixels[mx][my] != screen.getRGB(x + mx, y + my)) {
                             ok = false;
                         }
                     }
@@ -325,4 +336,52 @@ public class ImageSeeker
         return (r.width != 0)&&(r.height != 0)&&(r.x != Integer.MIN_VALUE)&&(r.y != Integer.MIN_VALUE);
     }
 
+    public static BufferedImage getMaskImage(BufferedImage icon) {
+        int w = icon.getWidth();
+        int h = icon.getHeight();
+        boolean[][] b = getMask(icon);
+        BufferedImage mask = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_BINARY);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                if (b[x][y]) {
+                    mask.setRGB(x, y, Color.white.getRGB());
+                } else {
+                    mask.setRGB(x, y, Color.black.getRGB());
+                }
+            }
+        }
+        return mask;
+    }
+
+    public static boolean[][] getMask(BufferedImage icon) {
+        int w = icon.getWidth();
+        int h = icon.getHeight();
+        boolean[][] r = new boolean[w][h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int i = icon.getRGB(x, y);
+                int alpha = (i >> 24) & 0xff;
+                if (alpha == 255) {
+                    r[x][y] = true;
+                } else {
+                    r[x][y] = false;
+                }
+            }
+        }
+        return r;
+    }
+
+    public static int[][] getPixels(BufferedImage icon) {
+        int w = icon.getWidth();
+        int h = icon.getHeight();
+        int[][] r = new int[w][h];
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                int i = icon.getRGB(x, y);
+                //remove mask? not yet...
+                r[x][y] = i;
+            }
+        }
+        return r;
+    }
 }

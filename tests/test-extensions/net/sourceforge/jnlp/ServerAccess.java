@@ -598,7 +598,11 @@ public class ServerAccess {
     }
 
     public ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
-        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource));
+        return executeBrowser(otherargs, getUrlUponThisInstance(resource));        
+    }
+    
+     public ProcessResult executeBrowser(List<String> otherargs, URL url) throws Exception {
+        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, url);
         rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
         return rpw.execute();
     }

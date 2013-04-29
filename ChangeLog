@@ -1,3 +1,23 @@
+2013-04-29  Jiri Vanek  <jvanek@redhat.com>
+
+	More granular initialization of AwtHelper
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: added 
+	(executeBrowser) which can work upon fully constructed url
+	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
+	(captureScreenAndFindAppletByIconTryKTimes) split to three:
+	(captureScreenAndFindAppletByIconTryKTimes) - unchanged, now using following
+	(initialiseOnScreenshot) initialize from given buffered image, creating area
+	(initialiseOnScreenshotAndArea) initialize from two given buffered images
+
+2013-04-29  Jiri Vanek  <jvanek@redhat.com>
+
+	Improved performance of scanning images, added masking of images
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ImageSeeker.java:
+	(findExactImage) now using masks and is iterating over rows
+	(getMaskImage) new method to visualize mask
+	(getMask)  new method to create mask
+	(getPixels) method to extract pixels from image to int array
+
 2013-04-29  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
