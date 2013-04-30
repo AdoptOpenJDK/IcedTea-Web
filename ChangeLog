@@ -1,3 +1,10 @@
+2013-04-30  Adam Domurad  <adomurad@redhat.com>
+
+	* tests/netx/unit/sun/applet/MethodOverloadResolverTest.java: Add missing
+	copyright header.
+	* tests/netx/unit/sun/applet/PluginAppletSecurityContextTest.java: Same.
+	* tests/netx/unit/sun/applet/PluginParameterParserTest.java: Same.
+
 2013-04-29  Jiri Vanek  <jvanek@redhat.com>
 
 	More granular initialization of AwtHelper
