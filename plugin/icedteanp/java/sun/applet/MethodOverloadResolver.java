@@ -44,8 +44,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import netscape.javascript.JSObject;
-
 /*
  * This class resolved overloaded methods in Java objects using a cost
  * based-approach described here:
@@ -65,7 +63,6 @@ public class MethodOverloadResolver {
     static final int CLASS_SUPERCLASS_COST = 6;
 
     static final int CLASS_STRING_COST = 7;
-    static final int JSOBJECT_TO_ARRAY_COST = CLASS_STRING_COST;
     static final int ARRAY_CAST_COST = 8;
 
     /* A method signature with its casted parameters
@@ -198,10 +195,10 @@ public class MethodOverloadResolver {
 
                 castedArgs[i] = castedObj;
 
-                Class<?> castedObjClass = castedObj == null ? null : castedObj.getClass();
-                boolean castedObjIsPrim = castedObj == null ? false : castedObj.getClass().isPrimitive();
-
                 if (PluginDebug.DEBUG) { /* avoid toString if not needed */
+                    Class<?> castedObjClass = castedObj == null ? null : castedObj.getClass();
+                    boolean castedObjIsPrim = castedObj == null ? false : castedObj.getClass().isPrimitive();
+
                     PluginDebug.debug("Param " + i + " of method " + candidate
                             + " has cost " + weightedCast.getCost()
                             + " original param type " + suppliedParamClass
@@ -338,12 +335,6 @@ public class MethodOverloadResolver {
         // Any java value to String
         if (paramTypeClass.equals(String.class)) {
             return new WeightedCast(CLASS_STRING_COST, suppliedParam.toString());
-        }
-
-        // JSObject to Java array
-        if (suppliedParam instanceof JSObject
-                && paramTypeClass.isArray()) {
-            return new WeightedCast(JSOBJECT_TO_ARRAY_COST, suppliedParam);
         }
 
         return null;

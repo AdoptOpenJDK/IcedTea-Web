@@ -1,3 +1,9 @@
+2013-05-02  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java
+	(getCostAndCastedObject): Remove code that had no effect before refactoring.
+	(getBestOverloadMatch): Move debug-only code to debug if-block.
+
 2013-05-02  Jiri Vanek  <jvanek@redhat.com>
 
 	Added various tests related to portalbank.no fixes
