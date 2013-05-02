@@ -843,7 +843,7 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar sta
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES) stamps/process-custom-reproducers.stamp
 	cd $(TEST_EXTENSIONS_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_TESTS_DIR) \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_TESTS_DIR):$(TEST_EXTENSIONS_SRCDIR) \
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
 if WITH_XSLTPROC
@@ -1021,7 +1021,7 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	done ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):. \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):.:$(TEST_EXTENSIONS_SRCDIR) \
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names 
 if WITH_XSLTPROC
 	-$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
@@ -1057,6 +1057,7 @@ if WITH_EMMA
 	 -cp $(BOOT_DIR)/jre/lib/resources.jar \
 	 -cp $(RHINO_RUNTIME) \
 	 -cp $(TEST_EXTENSIONS_DIR) \
+	 -cp $(TEST_EXTENSIONS_SRCDIR) \
 	 -cp . \
 	 -ix "-org.junit.*" \
 	 -ix "-junit.*" \
@@ -1101,7 +1102,7 @@ if WITH_JACOCO
 	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
 	done ;\
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):.  \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):.:$(TEST_EXTENSIONS_SRCDIR)  \
 	  $(BOOT_DIR)/bin/java $(JACOCO_AGENT_SWITCH) -Xbootclasspath:$(RUNTIME)  CommandLine $$class_names ; \
 	for file in $(EMMA_MODIFIED_FILES) ; do \
 	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_SUFFIX)" ; \
@@ -1171,6 +1172,7 @@ if WITH_EMMA
 	   -cp $(BOOT_DIR)/jre/lib/resources.jar \
 	   -cp $(RHINO_RUNTIME) \
 	   -cp . \
+	   -cp $(TEST_EXTENSIONS_SRCDIR) \
 	   -cp $(TEST_EXTENSIONS_TESTS_DIR) \
 	   -ix "-org.junit.*" \
 	   -ix "-junit.*" \
@@ -1274,7 +1276,7 @@ if WITH_JACOCO
 	  done ; \
 	cd $(TEST_EXTENSIONS_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):$(TEST_EXTENSIONS_TESTS_DIR) \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):$(TEST_EXTENSIONS_TESTS_DIR):$(TEST_EXTENSIONS_SRCDIR) \
 	  $(BOOT_DIR)/bin/java $(JACOCO_AGENT_SWITCH) $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names ; \
 	if [ -f $(JACOCO_JAVAWS_RESULTS) ] ; then \

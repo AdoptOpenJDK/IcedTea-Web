@@ -42,8 +42,19 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class ComponentFinder {
+    public static final BufferedImage defaultIcon;
+
+    static{
+        try {
+            defaultIcon = ImageIO.read(ComponentFinder.class.getClassLoader().getResource("net/sourceforge/jnlp/awt/imagesearch/marker.png"));
+        } catch (IOException e) {
+            throw new RuntimeException("ComponentFinder - problem initializing defaultIcon",e);
+        }
+    }
     
     /**
      * method findColoredRectangle determines coordinates of a rectangle colored

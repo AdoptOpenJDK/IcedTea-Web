@@ -1,3 +1,37 @@
+2013-05-02  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* Makefile.am:
+	the directory $(TEST_EXTENSIONS_SRCDIR) (i.e. test/test-extensions)
+	added on classpath for running reproducers, unit tests, and test code
+	coverage for reproducers and unittests using emma and jacoco, that is
+	for the following 6 targets:
+	(stamps/run-netx-dist-tests.stamp)
+	(stamps/run-netx-unit-tests.stamp)
+	(stamps/run-unit-test-code-coverage.stamp) with EMMA
+	(stamps/run-unit-test-code-coverage-jacoco.stamp)
+	(stamps/run-reproducers-test-code-coverage.stamp) with EMMA
+	(stamps/run-reproducers-test-code-coverage-jacoco.stamp)
+	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
+	modifying the constructor, the default icon is taken from
+	ComponentFinder instead of loading from file
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ComponentFinder.java:
+	added a block of initialization code - the default icon
+	* tests/netx/unit/net/sourceforge/jnlp/awt/imagesearch/ComponentFinderTest.java:
+	unit test for the initialization code in ComponentFinder
+	* tests/reproducers/simple/AWTCommonResourcesOnly/resources/marker.png:
+	second copy of the default icon in a reproducer with resources only
+	* tests/reproducers/simple/JavawsAWTRobotUsageSample/resources/javaws-awtrobot-usage-sample.jnlp:
+	jnlp file for displaying the applet
+	* tests/reproducers/simple/JavawsAWTRobotUsageSample/srcs/JavawsAWTRobotUsageSample.java:
+	the applet
+	* tests/reproducers/simple/JavawsAWTRobotUsageSample/testcases/JavawsAWTRobotUsageSampleTest.java:
+	adding 6 testcases testing clicking with different mouse
+	buttons on the applet
+	* tests/test-extensions-tests/net/sourceforge/jnlp/awt/imagesearch/ComponentFinderTest.java:
+	unit test for the initialization code in ComponentFinder
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/marker.png:
+	first copy of the default icon, will be on classpath
+
 2013-04-30  Adam Domurad  <adomurad@redhat.com>
 
 	* tests/netx/unit/sun/applet/MethodOverloadResolverTest.java: Add missing

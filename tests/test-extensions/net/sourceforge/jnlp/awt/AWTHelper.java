@@ -164,13 +164,9 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
         
         String test_server_dir_path = System.getProperty("test.server.dir");
 
-        try {
-            this.marker = ImageIO.read(new File(test_server_dir_path + "/marker.png"));
-            this.markerPosition = new Point(0,0);
-            this.markerGiven = true;
-        } catch (IOException e) {
-            throw new RuntimeException("AWTHelper could not read marker.png.",e);
-        }
+        this.marker = ComponentFinder.defaultIcon;
+        this.markerPosition = new Point(0,0);
+        this.markerGiven = true;
                 
         this.appletWidth = appletWidth;
         this.appletHeight = appletHeight;
