@@ -788,7 +788,15 @@ stamps/compile-reproducers-testcases.stamp: stamps/netx-dist.stamp stamps/plugin
 	    $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	      -d $(TEST_EXTENSIONS_TESTS_DIR) \
 	      -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
-	    "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases/"* ; \
+	    "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases/"*.java ; \
+	    if [ -d "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases" ]; then \
+	        pushd "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases" ; \
+	        NONJAVA_RESOURCES=`ls | grep -v ".*\\.java$$"` ; \
+	        if [ -n "$$NONJAVA_RESOURCES" ]; then \
+	            cp $$NONJAVA_RESOURCES $(TEST_EXTENSIONS_TESTS_DIR)/ ; \
+	        fi ; \
+	        popd ; \
+	    fi ; \
 	  done ; \
 	done ; \
 	mkdir -p stamps && \

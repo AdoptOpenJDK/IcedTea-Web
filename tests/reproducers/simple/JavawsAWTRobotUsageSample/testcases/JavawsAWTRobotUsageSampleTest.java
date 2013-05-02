@@ -55,10 +55,11 @@ import net.sourceforge.jnlp.closinglisteners.Rule;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class JavawsAWTRobotUsageSampleTest extends BrowserTest {
+public class JavawsAWTRobotUsageSampleTest {
+
+    public static final ServerAccess server = new ServerAccess();
 
     private final String initStr = "JavawsAWTRobotUsageSample is ready for awt tests!";
-    
     private static final Color APPLET_COLOR = new Color(230, 230, 250); // lavender
     private static final Color BUTTON_COLOR1 = new Color(32, 178, 170); // light sea green
     

@@ -1,3 +1,22 @@
+2013-05-02  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* Makefile.am:
+	Change in processing the goal
+	(stamps/compile-reproducers-testcases.stamp)
+	All .java files from reproducers testcases directory are
+	compiled, all non-java files are copied into the
+	TEST_EXTENSIONS_TESTS_DIR, i.e.
+	tests.build/test-extensions-tests directory
+	* tests/reproducers/simple/JavawsAWTRobotFindsButton/resources/javaws-awtrobot-finds-button.jnlp:
+	jnlp file for displaying the applet
+	* tests/reproducers/simple/JavawsAWTRobotFindsButton/srcs/JavawsAWTRobotFindsButton.java:
+	the applet used in the reproducer
+	* tests/reproducers/simple/JavawsAWTRobotFindsButton/testcases/JavawsAWTRobotFindsButtonTest.java:
+	adding 2 tests: that an icon is loaded, and that the button is
+	identified from the given icon and clicked by awt robot
+	* tests/reproducers/simple/JavawsAWTRobotFindsButton/testcases/buttonA.png:
+	the icon of the wanted button
+
 2013-04-26  Jiri Vanek  <jvanek@redhat.com>
             Jacob Wisor  <gitne@excite.co.jp>
 
