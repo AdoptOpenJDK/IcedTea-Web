@@ -1,5 +1,12 @@
 2013-05-02  Jana Fabrikova  <jfabriko@redhat.com>
 
+	* tests/reproducers/simple/JavawsAWTRobotUsageSample/resources/AppletAWTRobotUsageSample.html:
+	new resource, html page for displaying the applet in browser
+	* tests/reproducers/simple/JavawsAWTRobotUsageSample/testcases/AppletAWTRobotUsageSampleTest.java:
+	new testcase with 6 browser tests
+
+2013-05-02  Jana Fabrikova  <jfabriko@redhat.com>
+
 	* Makefile.am:
 	Change in processing the goal
 	(stamps/compile-reproducers-testcases.stamp)
