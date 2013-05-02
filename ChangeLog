@@ -1,5 +1,14 @@
 2013-05-02  Adam Domurad  <adomurad@redhat.com>
 
+	Introduce PluginPipeMock utility methods.
+	* tests/test-extensions/sun/applet/PluginPipeMockUtil.java: New,
+	enapsulates PluginPipeMock initialization, cleanup. As well, contains
+	utility methods.
+	* tests/netx/unit/sun/applet/PluginAppletViewerTest.java: Use
+	newly introduced utility methods.
+
+2013-05-02  Adam Domurad  <adomurad@redhat.com>
+
 	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java
 	(getBestOverloadMatch): Return null if a valid method was not found.
 	* tests/netx/unit/sun/applet/MethodOverloadResolverTest.java

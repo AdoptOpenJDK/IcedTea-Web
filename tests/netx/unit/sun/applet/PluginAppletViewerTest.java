@@ -1,6 +1,46 @@
+/*
+Copyright (C) 2013 Red Hat, Inc.
+
+This file is part of IcedTea.
+
+IcedTea is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 2.
+
+IcedTea is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with IcedTea; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version.
+ */
+
 package sun.applet;
 
 import static org.junit.Assert.assertEquals;
+
+import static sun.applet.PluginPipeMockUtil.getPluginStoreId;
+import static sun.applet.PluginPipeMockUtil.getPluginStoreObject;
 
 import java.util.concurrent.Callable;
 
@@ -12,6 +52,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import sun.applet.mock.PluginPipeMock;
+import sun.applet.PluginPipeMockUtil;
 
 public class PluginAppletViewerTest {
 
@@ -19,52 +60,15 @@ public class PluginAppletViewerTest {
      *                          Test setup                                    *
      **************************************************************************/
 
-    ThreadGroup spawnedForTestThreadGroup; // Set up before each test
     PluginPipeMock pipeMock; // Set up before each test
-
-    /* By providing custom implementations of the input stream & output stream used by PluginStreamHandler,
-     * we are able to mock the C++-side of the plugin. We do this by sending the messages the Java-side expects
-     * to receive. Additionally, we able to test that the Java-side sends the correct requests.
-     * See PluginPipeMock for more details.
-     */
-    private void installPipeMock() {
-        AppletSecurityContextManager.addContext(0, new PluginAppletSecurityContext(0, false /* no security */));
-
-        pipeMock = new PluginPipeMock();
-
-        PluginStreamHandler streamHandler = new PluginStreamHandler(pipeMock.getResponseInputStream(), pipeMock.getRequestOutputStream());
-        PluginAppletViewer.setStreamhandler(streamHandler);
-        PluginAppletViewer.setPluginCallRequestFactory(new PluginCallRequestFactory());
-
-        streamHandler.startProcessing();
-    }
-
-    /* Call installPipeMock, wrapping the threads it creates in a ThreadGroup.
-     * This allows us to stop the message handling threads we spawn, while normally
-     * this would be difficult as they are meant to be alive at all times.
-     */
     @Before
     public void setupMockedMessageHandling() throws Exception {
-        spawnedForTestThreadGroup = new ThreadGroup("PluginAppletViewerTestThreadGroup") {
-            public void uncaughtException(Thread t, Throwable e) {
-                // Silent death for plugin message handler threads
-            }
-        };
-        // Do set-up in a thread so we can pass along our thread-group, used for clean-up.
-        Thread initThread = new Thread(spawnedForTestThreadGroup, "InstallPipeMockThread") {
-            @Override
-            public void run() {
-                installPipeMock();
-            }
-        };
-        initThread.start();
-        initThread.join();
+        pipeMock = PluginPipeMockUtil.setupMockedMessageHandling();
     }
 
     @After
-    @SuppressWarnings("deprecation") // 'stop' must be used, 'interrupt' is too gentle.
     public void cleanUpMessageHandlingThreads() throws Exception {
-        spawnedForTestThreadGroup.stop();
+        PluginPipeMockUtil.cleanUpMockedMessageHandling(pipeMock);
     }
 
     /**************************************************************************
@@ -89,7 +93,7 @@ public class PluginAppletViewerTest {
         Object expectedReturn = new Object();
         pipeMock.sendResponse("context 0 reference " 
                 + parseAndCheckJSCall(message, jsObjectID, callName, arguments)
-                + " JavaScriptCall " + storeObject(expectedReturn));
+                + " JavaScriptCall " + getPluginStoreId(expectedReturn));
 
         assertEquals(expectedReturn, call.join());
     }
@@ -110,7 +114,7 @@ public class PluginAppletViewerTest {
         Object expectedReturn = new Object();
         pipeMock.sendResponse("context 0 reference " 
                 + parseAndCheckJSEval(message, jsObjectID, callName)
-                + " JavaScriptEval " + storeObject(expectedReturn));
+                + " JavaScriptEval " + getPluginStoreId(expectedReturn));
 
         assertEquals(expectedReturn, call.join());
     }
@@ -147,7 +151,7 @@ public class PluginAppletViewerTest {
         String expectedReturn = "testreturn";
         pipeMock.sendResponse("context 0 reference " 
                 + parseAndCheckJSToString(message, jsObjectID)
-                + " JavaScriptToString " + storeObject(expectedReturn));
+                + " JavaScriptToString " + getPluginStoreId(expectedReturn));
 
         assertEquals(expectedReturn, call.join());
     }
@@ -155,19 +159,6 @@ public class PluginAppletViewerTest {
    /**************************************************************************
     *                          Test utilities                                *
     **************************************************************************/
-
-    /*
-     * Helpers for manipulating the object mapping using to refer to objects in
-     * the plugin
-     */
-    private static Object getStoredObject(int id) {
-        return PluginObjectStore.getInstance().getObject(id);
-    }
-
-    private static int storeObject(Object obj) {
-        PluginObjectStore.getInstance().reference(obj);
-        return PluginObjectStore.getInstance().getIdentifier(obj);
-    }
 
     /*
      * Asserts that the message is a valid javascript request and returns the
@@ -200,11 +191,11 @@ public class PluginAppletViewerTest {
         int reference = parseAndCheckJSMessage(message, expectedLength, messageType, contextObjectID);
 
         String[] parts = message.split(" ");
-        assertEquals(stringArg, getStoredObject(Integer.parseInt(parts[6])));
+        assertEquals(stringArg, getPluginStoreObject(Integer.parseInt(parts[6])));
 
         for (int i = 0; i < arguments.length; i++) {
             int objectID = Integer.parseInt(parts[7+i]);
-            assertEquals(arguments[i], getStoredObject(objectID));
+            assertEquals(arguments[i], getPluginStoreObject(objectID));
         }
 
         return reference;
