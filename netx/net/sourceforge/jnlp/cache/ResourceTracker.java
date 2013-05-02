@@ -916,7 +916,7 @@ public class ResourceTracker {
                          }
                      }else {
                          if (JNLPRuntime.isDebug()) {
-                             System.out.println("best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
+                             System.err.println("best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
                          }
                          return url; /* This is the best URL */
                      } 
