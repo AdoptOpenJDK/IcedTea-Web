@@ -1995,11 +1995,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
 // Returns a string describing the MIME type that this plugin
 // handles.
 __attribute__ ((visibility ("default")))
-#ifdef LEGACY_XULRUNNERAPI
-  char* 
-#else
-  const char* 
-#endif
+const char*
 NP_GetMIMEDescription ()
 {
   PLUGIN_DEBUG ("NP_GetMIMEDescription\n");

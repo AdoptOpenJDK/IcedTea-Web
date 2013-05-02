@@ -27,6 +27,11 @@
 
 2013-05-02  Adam Domurad  <adomurad@redhat.com>
 
+	* plugin/icedteanp/IcedTeaNPPlugin.cc:
+	Remove only occurence of LEGACY_XULRUNNERAPI
+
+2013-05-02  Adam Domurad  <adomurad@redhat.com>
+
 	Introduce PluginPipeMock utility methods.
 	* tests/test-extensions/sun/applet/PluginPipeMockUtil.java: New,
 	enapsulates PluginPipeMock initialization, cleanup. As well, contains
