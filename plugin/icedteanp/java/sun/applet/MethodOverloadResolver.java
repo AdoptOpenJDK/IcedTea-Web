@@ -227,6 +227,10 @@ public class MethodOverloadResolver {
             PluginDebug.debug("*** Warning: Ambiguous overload of ", c.getClass(), "#", cheapestMethod, "!");
         }
 
+        if (cheapestMethod == null) {
+            return null;
+        }
+
         return new ResolvedMethod(lowestCost, cheapestMethod, cheapestArgs);
     }
 

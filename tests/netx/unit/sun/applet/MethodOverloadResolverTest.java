@@ -272,16 +272,33 @@ public class MethodOverloadResolverTest {
         return objects.toArray( new Object[0]);
     }
 
-    static private void assertExpectedOverload(Object[] params,
+    // Takes {class, method, arguments...} bundled in one array
+    static private ResolvedMethod getResolvedMethod(Object[] methodAndParams) { 
+        /* Copy over argument portion (class and method are bundled in same array for convenience) */
+        Class<?> c = (Class<?>)methodAndParams[0];
+        String methodName = (String)methodAndParams[1];
+        /* Copy over argument portion (class and method are bundled in same array for convenience) */
+        Object[] params = Arrays.copyOfRange(methodAndParams, 2, methodAndParams.length);
+
+        return MethodOverloadResolver.getBestMatchMethod(c, methodName, params);
+    }
+
+    /* Assert that the overload completed properly by simply providing a type signature*/
+    static private void assertExpectedOverload(Object[] methodAndParams,
             String expectedSignature, int expectedCost) {
-        Class<?> c = (Class<?>)params[0];
-        String methodName = (String)params[1];
-        Object[] args = Arrays.copyOfRange(params, 2, params.length);
 
-        ResolvedMethod result = MethodOverloadResolver.getBestMatchMethod(c, methodName, args);
-
+        ResolvedMethod result = getResolvedMethod(methodAndParams);
         // Check signature array as string for convenience
         assertEquals(expectedSignature, simpleSignature(result.getAccessibleObject()));
+        assertEquals(expectedCost, result.getCost());
+    }
+
+    /* Assert that the overload completed by providing the expected objects */
+    static private void assertExpectedOverload(Object[] methodAndParams,  
+            Object[] expectedCasts, int expectedCost) {
+
+        ResolvedMethod result = getResolvedMethod(methodAndParams);
+        assertArrayEquals(expectedCasts, result.getCastedParameters());
         assertEquals(expectedCost, result.getCost());
     }
 
@@ -290,7 +307,6 @@ public class MethodOverloadResolverTest {
     @Test
     public void testMultipleArgResolve() {
 
-        @SuppressWarnings("unused")
         abstract class MultipleArg {
             public abstract void testmethod(String s, int i);
             public abstract void testmethod(String s, Integer i);
@@ -318,7 +334,6 @@ public class MethodOverloadResolverTest {
     @Test
     public void testBoxedNumberResolve() {
 
-        @SuppressWarnings("unused")
         abstract class BoxedNumber {
             public abstract void testmethod(Number n);
             public abstract void testmethod(Integer i);
@@ -336,7 +351,6 @@ public class MethodOverloadResolverTest {
     @Test
     public void testPrimitivesResolve() {
 
-        @SuppressWarnings("unused")
         abstract class Primitives {
             public abstract void testmethod(int i);
             public abstract void testmethod(long l);
@@ -365,7 +379,6 @@ public class MethodOverloadResolverTest {
     @Test
     public void testComplexResolve() {
 
-        @SuppressWarnings("unused")
         abstract class Complex {
             public abstract void testmethod(float f);
             public abstract void testmethod(String s);
@@ -417,4 +430,58 @@ public class MethodOverloadResolverTest {
                 "FooChild", MethodOverloadResolver.CLASS_SUPERCLASS_COST);
     }
 
+    /*
+     * Test that arrays are casted to strings by using Javascript rules.
+     * Notably, commas have no spacing, and null values are printed as empty strings.
+     */
+    @Test
+    public void testArrayToStringResolve() {
+        abstract class ArrayAsStringResolve {
+            public abstract void testmethod(String stringRepr);
+        }
+
+        final Object[] asStringExpectedResult = {"foo,,bar"};
+
+        assertExpectedOverload(
+                args( ArrayAsStringResolve.class, (Object) new String[] {"foo", null, "bar"}), 
+                asStringExpectedResult, MethodOverloadResolver.ARRAY_CAST_COST);
+    }
+
+    /*
+     * Test that arrays are casted to other arrays by recursively invoking the 
+     * casting rules on each element. 
+     */
+    @Test 
+    public void testArrayToArrayResolve() {
+
+        abstract class IntArrayResolve {
+            public abstract void testmethod(int[] intArray);
+        }
+
+        // Note that currently, the only array actually received from the Javascript side is
+        // a String[] array, but this may change.
+        final Object[] intArrayExpectedResult = {new int[] {0, 1, 2}};
+
+        assertExpectedOverload(
+                args(IntArrayResolve.class, (Object) new String[] {null, "1", "2.1"}), 
+                intArrayExpectedResult, MethodOverloadResolver.ARRAY_CAST_COST);
+
+        assertExpectedOverload(
+                args(IntArrayResolve.class, new int[] {0, 1, 2}), 
+                intArrayExpectedResult, MethodOverloadResolver.ARRAY_CAST_COST);
+
+        assertExpectedOverload(
+                args(IntArrayResolve.class, new double[] {0, 1, 2.1}), 
+                intArrayExpectedResult, MethodOverloadResolver.ARRAY_CAST_COST);
+
+        abstract class NestedArrayResolve {
+            public abstract void testmethod(int[][] nestedArray);
+        }
+
+        final Object[] nestedArrayExpectedResult = { new int[][] { {1,1}, {2,2} } };
+
+        assertExpectedOverload(
+                args(NestedArrayResolve.class, (Object) new String[][] { {"1", "1"}, {"2", "2"} }), 
+                nestedArrayExpectedResult, MethodOverloadResolver.ARRAY_CAST_COST);
+    }
 }

@@ -1,6 +1,17 @@
 2013-05-02  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java
+	(getBestOverloadMatch): Return null if a valid method was not found.
+	* tests/netx/unit/sun/applet/MethodOverloadResolverTest.java
+	(getResolvedMethod): New, gets ResolvedMethod from array of bundled class,
+	string, and parameters
+	(assertExpectedOverload): New variant that tests exact received values
+	(testArrayToStringResolve): Tests array conversion to String
+	(testArrayToArrayResolve): Tests array conversion to other arrays
+
+2013-05-02  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java
 	(getCostAndCastedObject): Remove code that had no effect before refactoring.
 	(getBestOverloadMatch): Move debug-only code to debug if-block.
 
