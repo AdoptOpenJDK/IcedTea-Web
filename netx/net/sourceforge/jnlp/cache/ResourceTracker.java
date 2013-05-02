@@ -24,14 +24,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -49,7 +45,7 @@ import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.event.DownloadEvent;
 import net.sourceforge.jnlp.event.DownloadListener;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.HttpUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
@@ -118,6 +114,9 @@ public class ResourceTracker {
 
     /** max threads */
     private static final int maxThreads = 5;
+    
+    /** methods used to try individual URLs when choosing best*/
+    private static final String[] requestMethods = {"HEAD", "GET"};
 
     /** running threads */
     private static int threads = 0;
@@ -859,7 +858,7 @@ public class ResourceTracker {
      * @return the response code if HTTP connection, or HttpURLConnection.HTTP_OK if not.
      * @throws IOException
      */
-    private static int getUrlResponseCode(URL url, Map<String, String> requestProperties, String requestMethod) throws IOException {
+     static int getUrlResponseCode(URL url, Map<String, String> requestProperties, String requestMethod) throws IOException {
         URLConnection connection = url.openConnection();
 
         for (Map.Entry<String, String> property : requestProperties.entrySet()){
@@ -874,7 +873,7 @@ public class ResourceTracker {
 
             /* Fully consuming current request helps with connection re-use 
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
-            StreamUtils.consumeAndCloseInputStream(httpConnection.getInputStream());
+            HttpUtils.consumeAndCloseConnectionSilently(httpConnection);
 
             return responseCode;
         }
@@ -891,7 +890,7 @@ public class ResourceTracker {
      * @param resource the resource
      * @return the best URL, or null if all failed to resolve
      */
-    private URL findBestUrl(Resource resource) {
+     URL findBestUrl(Resource resource) {
         DownloadOptions options = downloadOptions.get(resource);
         if (options == null) {
             options = new DownloadOptions(false, false);
@@ -903,33 +902,33 @@ public class ResourceTracker {
                     resource.toString() + " : " + urls);
         }
 
-        for (URL url : urls) {
-            try {
-                Map<String, String> requestProperties = new HashMap<String, String>();
-                requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
+         for (String requestMethod : requestMethods) {
+             for (URL url : urls) {
+                 try {
+                     Map<String, String> requestProperties = new HashMap<String, String>();
+                     requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
 
-                int responseCode = getUrlResponseCode(url, requestProperties, "HEAD");
+                     int responseCode = getUrlResponseCode(url, requestProperties, requestMethod);
 
-                if (responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED ) {
-                    System.err.println("NOTE: The server does not appear to support HEAD requests, falling back to GET requests.");
-                    /* Fallback: use GET request in the rare case the server does not support HEAD requests */
-                    responseCode = getUrlResponseCode(url, requestProperties, "GET");
-                }
-
-                /* Check if within valid response code range */
-                if (responseCode >= 200 && responseCode < 300) {
-                    if (JNLPRuntime.isDebug()) {
-                        System.err.println("best url for " + resource.toString() + " is " + url.toString());
-                    }
-                    return url; /* This is the best URL */
-                }
-            } catch (IOException e) {
-                // continue to next candidate
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println("While processing " + url.toString() + " for resource " + resource.toString() + " got " + e);
-                }
-            }
-        }
+                     if (responseCode < 200 || responseCode >= 300) {
+                         if (JNLPRuntime.isDebug()) {
+                             System.err.println("For "+resource.toString()+" the server returned " + responseCode + " code for "+requestMethod+" request for " + url.toExternalForm());
+                         }
+                     }else {
+                         if (JNLPRuntime.isDebug()) {
+                             System.out.println("best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
+                         }
+                         return url; /* This is the best URL */
+                     } 
+                 } catch (IOException e) {
+                     // continue to next candidate
+                     if (JNLPRuntime.isDebug()) {
+                         System.err.println("While processing " + url.toString() + " by " + requestMethod + " for resource " + resource.toString() + " got " + e + ": ");
+                         e.printStackTrace();
+                     }
+                 }
+             }
+         }
 
         /* No valid URL, return null */
         return null;

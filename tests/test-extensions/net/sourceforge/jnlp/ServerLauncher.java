@@ -57,7 +57,18 @@ public class ServerLauncher implements Runnable {
     private final Integer port;
     private final File dir;
     private ServerSocket serverSocket;
+    private boolean supportingHeadRequest = true;
 
+    public void setSupportingHeadRequest(boolean supportsHead) {
+        this.supportingHeadRequest = supportsHead;
+    }
+
+    public boolean isSupportingHeadRequest() {
+        return supportingHeadRequest;
+    }
+
+    
+    
     public String getServerName() {
         return serverName;
     }
@@ -102,10 +113,12 @@ public class ServerLauncher implements Runnable {
         try {
             serverSocket = new ServerSocket(port);
             while (running) {
-                new TinyHttpdImpl(serverSocket.accept(), dir, port);
+                TinyHttpdImpl server = new TinyHttpdImpl(serverSocket.accept(), dir, port,false);
+                server.setSupportingHeadRequest(isSupportingHeadRequest());
+                server.start();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            ServerAccess.logException(e);
         } finally {
             running = false;
         }

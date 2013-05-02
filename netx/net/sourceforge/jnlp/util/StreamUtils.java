@@ -45,19 +45,6 @@ import java.io.InputStreamReader;
 
 public class StreamUtils {
 
-    /**
-     * Ensure a stream is fully read, required for correct behaviour in some
-     * APIs, namely HttpURLConnection.
-     * @throws IOException 
-     */
-    public static void consumeAndCloseInputStream(InputStream in) throws IOException {
-        byte[] throwAwayBuffer = new byte[256];
-        while (in.read(throwAwayBuffer) > 0) {
-            /* ignore contents */
-        }
-        in.close();
-    }
-
     /***
      * Closes a stream, without throwing IOException.
      * In case of IOException, prints the stack trace to System.err.

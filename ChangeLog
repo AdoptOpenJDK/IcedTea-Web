@@ -1,5 +1,38 @@
 2013-05-02  Jiri Vanek  <jvanek@redhat.com>
 
+	Added various tests related to portalbank.no fixes
+	* netx/net/sourceforge/jnlp/cache/Resource.java: added fixme to warn
+	before wrong url comparator
+	* netx/net/sourceforge/jnlp/Version.java: removed useless main. Its
+	purpose moved to new
+	* tests/netx/unit/net/sourceforge/jnlp/VersionTest: some small tests to
+	version class
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:
+	added tests to	(getUrlResponseCode) and (findBestUrl)
+	* tests/netx/unit/net/sourceforge/jnlp/util/HttpUtilsTest.java: added tests for
+	(consumeAndCloseConnectionSilently) and (consumeAndCloseConnection)
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest: added license header
+	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java: and
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: added
+	support for simulation of not working HEAD request.
+
+2013-05-02  Jiri Vanek  <jvanek@redhat.com>
+
+	Fix for portalbank.no (trying get after failed head requests)
+	* net/sourceforge/jnlp/cache/ResourceTracker : (findBestUrl)
+	now trying GET after each error request of HEAD type. Changed and
+	added debug messages. (getUrlResponseCode) closing of stream
+	moved to separate method HttpUtils.consumeAndCloseConnectionSilently
+	* net/sourceforge/jnlp/util/HttpUtils.java: new file designed  for
+	http utils. Now contains (consumeAndCloseConnection) and
+	(consumeAndCloseConnectionSilently) which calls consumeAndCloseConnection
+	but do not rethrow exception
+	* netx/net/sourceforge/jnlp/util/StreamUtils.java: removed
+	(consumeAndCloseInputStream) now improved and moved to HttpUtils
+
+
+2013-05-02  Jiri Vanek  <jvanek@redhat.com>
+
 	Renamed cz locales to be more general
 	* netx/net/sourceforge/jnlp/resources/Messages_cs_CZ.properties: renamed to
 	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: new file

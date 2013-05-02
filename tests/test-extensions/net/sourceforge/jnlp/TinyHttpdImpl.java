@@ -42,6 +42,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URLDecoder;
@@ -55,24 +56,40 @@ import java.util.StringTokenizer;
  * When resource starts with XslowX prefix, then resouce (without XslowX)
  * is returned, but its delivery is delayed
  */
-class TinyHttpdImpl extends Thread {
+public class TinyHttpdImpl extends Thread {
 
     Socket c;
     private final File dir;
     private final int port;
     private boolean canRun = true;
     private static final String XSX = "/XslowX";
-
+    private boolean supportingHeadRequest = true;
+    
     public TinyHttpdImpl(Socket s, File f, int port) {
+        this(s, f, port, true);
+    }
+    public TinyHttpdImpl(Socket s, File f, int port, boolean start) {
         c = s;
         this.dir = f;
         this.port = port;
-        start();
+        if (start){
+            start();
+        }
     }
 
     public void setCanRun(boolean canRun) {
         this.canRun = canRun;
     }
+
+    public void setSupportingHeadRequest(boolean supportsHead) {
+        this.supportingHeadRequest = supportsHead;
+    }
+
+    public boolean isSupportingHeadRequest() {
+        return supportingHeadRequest;
+    }
+    
+    
 
     public int getPort() {
         return port;
@@ -92,6 +109,11 @@ class TinyHttpdImpl extends Thread {
 
                     boolean isGetRequest = s.startsWith("GET");
                     boolean isHeadRequest = s.startsWith("HEAD");
+                    
+                    if (isHeadRequest && !isSupportingHeadRequest()){
+                        o.writeBytes("HTTP/1.0 "+HttpURLConnection.HTTP_NOT_IMPLEMENTED+" Not Implemented\n");
+                        continue;
+                    }
 
                     if (isGetRequest || isHeadRequest ) {
                         StringTokenizer t = new StringTokenizer(s, " ");
@@ -120,7 +142,7 @@ class TinyHttpdImpl extends Thread {
                         } else if (p.toLowerCase().endsWith(".jar")) {
                             content = ct + "application/x-jar\n";
                         }
-                        o.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + l + "\n" + content + "\n");
+                        o.writeBytes("HTTP/1.0 "+HttpURLConnection.HTTP_OK+" OK\nContent-Length:" + l + "\n" + content + "\n");
 
                         if (isHeadRequest) {
                             continue; // Skip sending body
