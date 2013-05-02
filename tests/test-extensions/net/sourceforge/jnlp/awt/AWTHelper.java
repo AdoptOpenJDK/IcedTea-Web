@@ -60,7 +60,7 @@ import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 public abstract class AWTHelper extends RulesFolowingClosingListener implements Runnable{
 
     //attributes possibly set by user
-    private String initStr = "";        
+    private String initStr = null;        
     private Color appletColor;
     private BufferedImage marker;
     private Point markerPosition;
@@ -75,7 +75,6 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     private BufferedImage screenshot;
     private Robot robot;
     private boolean appletFound = false;
-    private boolean initStrGiven = false; //impossible to find in the output if not given
     private boolean appletColorGiven = false; //impossible to search for color difference if not given
     private boolean markerGiven = false; //impossible to find the applet if marker not given
     private boolean appletDimensionGiven = false;
@@ -117,7 +116,6 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
         this();
         
         this.initStr = initStr;
-        this.initStrGiven = true;
     }
     
     /**
@@ -148,7 +146,6 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
         this(icon, iconPosition, appletWidth, appletHeight);
         
         this.initStr = initString;
-        this.initStrGiven = true;
     }
     
     /**
@@ -176,7 +173,6 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     public AWTHelper(String initString, int appletWidth, int appletHeight){
         this(appletWidth, appletHeight);
         this.initStr = initString;
-        this.initStrGiven = true;
     }
     
     /**
@@ -194,6 +190,8 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * override of method charReaded (from RulesFolowingClosingListener)
      * 
      * waiting for the applet, when applet is ready run action thread
+     * (if initStr==null, do not check and do not call run)
+     * 
      * when all the wanted strings are in the stdout, applet can be closed
      * 
      * @param ch 
@@ -202,7 +200,8 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     public void charReaded(char ch) {
         sb.append(ch);
         //is applet ready to start clicking?
-        if (initStrGiven && !actionStarted && appletIsReady(sb.toString())) {
+        //check and run applet only if initStr is not null
+        if ((initStr != null) && !actionStarted && appletIsReady(sb.toString())) {
             try{
                 actionStarted = true; 
                 this.findAndActivateApplet();
@@ -241,20 +240,41 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @return
      */
     public Rule getInitStrAsRule(){
-        return new ContainsRule(this.initStr);
+    	if( initStr != null ){
+            return new ContainsRule(this.initStr);
+    	}else{
+    		return new Rule(){
+
+				@Override
+				public void setRule(Object rule) {
+				}
+
+				@Override
+				public boolean evaluate(Object upon) {
+					return true;
+				}
+
+				@Override
+				public String toPassingString() {
+					return "nothing to check, initStr is null";
+				}
+
+				@Override
+				public String toFailingString() {
+					return "nothing to check, initStr is null";
+				}
+    			
+    		} ;
+    	}
     }
     
     //boolean controls getters
     protected boolean appletIsReady(String content) {
-        return (content.contains(initStr));
+        return this.getInitStrAsRule().evaluate(content);
     }
     
     public boolean isActionStarted() {
         return actionStarted;
-    }
-    
-    public boolean isInitStrGiven(){
-        return initStrGiven;
     }
     
     public boolean isAppletColorGiven(){
@@ -292,7 +312,6 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
 
     public void setInitStr(String initStr) {
         this.initStr = initStr;
-        this.initStrGiven = true;
     }
        
     public void setMarker(BufferedImage marker, Point markerPosition) {

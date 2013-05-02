@@ -1,3 +1,13 @@
+2013-05-02  Jana Fabrikova  <jfabriko@redhat.com>
+
+	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
+	refactoring - removing initStrGiven variable - now it only
+	matters if the initStr is null or not. Modifying the following
+	two methods: (charReaded) - if initStr is null the run method
+	can not be started from charReaded and the presence of initStr
+	is not checked in stdout. Method (getInitStrAsRule) returns rule
+	that is always true if initStr is null.
+
 2013-05-02  Jiri Vanek  <jvanek@redhat.com>
 
 	Renamed cz locales to be more general
