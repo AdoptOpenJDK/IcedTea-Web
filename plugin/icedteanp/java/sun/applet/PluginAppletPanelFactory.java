@@ -112,12 +112,13 @@ class PluginAppletPanelFactory {
         }, "NetXPanel initializer");
 
         panelInit.start();
-        while(panelInit.isAlive()) {
-            try {
-                panelInit.join();
-            } catch (InterruptedException e) {
-            }
+        try {
+            panelInit.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        setAppletViewerSize(panel, params.getWidth(), params.getHeight());
 
         // Wait for the panel to initialize
         PluginAppletViewer.waitForAppletInit(panel);
@@ -133,30 +134,6 @@ class PluginAppletPanelFactory {
         PluginDebug.debug("Applet ", a.getClass(), " initialized");
         streamhandler.write("instance " + identifier + " reference 0 initialized");
 
-        /* AppletViewerPanel sometimes doesn't set size right initially. This 
-         * causes the parent frame to be the default (10x10) size.
-         *  
-         * Normally it goes unnoticed since browsers like Firefox make a resize 
-         * call after init. However some browsers (e.g. Midori) don't.
-         * 
-         * We therefore manually set the parent to the right size.
-         */
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    panel.getParent().setSize(params.getWidth(), params.getHeight());
-                }
-            });
-        } catch (InvocationTargetException ite) {
-            // Not being able to resize is non-fatal
-            PluginDebug.debug("Unable to resize panel: ");
-            ite.printStackTrace();
-        } catch (InterruptedException ie) {
-            // Not being able to resize is non-fatal
-            PluginDebug.debug("Unable to resize panel: ");
-            ie.printStackTrace();
-        }
-
         panel.removeSplash();
 
         AppletSecurityContextManager.getSecurityContext(0).associateSrc(panel.getAppletClassLoader(), doc);
@@ -165,10 +142,32 @@ class PluginAppletPanelFactory {
         return panel;
     }
 
-    public boolean isStandalone() {
-        return false;
+    /* AppletViewerPanel sometimes doesn't set size right initially. This 
+     * causes the parent frame to be the default (10x10) size.
+     *  
+     * Normally it goes unnoticed since browsers like Firefox make a resize 
+     * call after init. However some browsers (e.g. Midori) don't.
+     * 
+     * We therefore manually set the parent to the right size.
+     */
+    static private void setAppletViewerSize(final AppletPanel panel,
+            final int width, final int height) {
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    panel.getParent().setSize(width, height);
+                }
+            });
+        } catch (InvocationTargetException e) {
+            // Not being able to resize is non-fatal
+            PluginDebug.debug("Unable to resize panel: ");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // Not being able to resize is non-fatal
+            PluginDebug.debug("Unable to resize panel: ");
+            e.printStackTrace();
+        }
     }
-
     /**
      * Send the initial set of events to the appletviewer event queue.
      * On start-up the current behaviour is to load the applet and call

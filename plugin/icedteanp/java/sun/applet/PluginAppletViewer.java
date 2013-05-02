@@ -188,11 +188,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     public PluginAppletViewer() {
     }
 
-    //FIXME - when multiple applets are on one page, this method is visited simultaneously
-    //and then appelts creates in little bit strange manner. This issue is visible with
-    //randomly showing/notshowing spalshscreens.
-    //See also Launcher.createApplet
-    public static PluginAppletViewer framePanel(int identifier,long handle, int width, int height, NetxPanel panel) {
+    public static PluginAppletViewer framePanel(int identifier, long handle, int width, int height, NetxPanel panel) {
 
         PluginDebug.debug("Framing ", panel);
  
@@ -200,6 +196,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         System.getSecurityManager().checkPermission(new AllPermission());
 
         PluginAppletViewer appletFrame = new PluginAppletViewer(handle, identifier, panel);
+        appletFrame.setSize(width, height);
         
         appletFrame.appletEventListener = new AppletEventListener(appletFrame, appletFrame);
         panel.addAppletListener(appletFrame.appletEventListener);
@@ -216,7 +213,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         appletsLock.unlock();
 
         PluginDebug.debug(panel, " framed");
-               return appletFrame;
+        return appletFrame;
     }
 
     /**
@@ -332,7 +329,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
             return -1;
         }
     }
-   
 
     private static class AppletEventListener implements AppletListener {
         final Frame frame;

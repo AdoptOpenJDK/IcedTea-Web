@@ -27,6 +27,16 @@
 
 2013-05-02  Adam Domurad  <adomurad@redhat.com>
 
+	Ensure that PluginAppletviewer is resized in case of error.
+	This fixes most of the cases of the error splash screen
+	not appearing.
+	* plugin/icedteanp/java/sun/applet/PluginAppletPanelFactory.java
+	(createPanel): Resize earlier, before erroring out.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(PluginAppletViewer): Set size, remove fixme.
+
+2013-05-02  Adam Domurad  <adomurad@redhat.com>
+
 	* plugin/icedteanp/IcedTeaNPPlugin.cc:
 	Remove only occurence of LEGACY_XULRUNNERAPI
 
