@@ -115,7 +115,7 @@ public class LocalesTestTest {
      
     
     public ResourceBundle getPropertiesCz() throws IOException {
-        return getProperties("_cs_CZ");
+        return getProperties("_cs");
 
     }
 

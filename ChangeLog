@@ -1,3 +1,12 @@
+2013-05-02  Jiri Vanek  <jvanek@redhat.com>
+
+	Renamed cz locales to be more general
+	* netx/net/sourceforge/jnlp/resources/Messages_cs_CZ.properties: renamed to
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: new file
+	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java:
+	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java
+	Adapted  to new cz locales filename.
+
 2013-05-02  Jana Fabrikova  <jfabriko@redhat.com>
 
 	* Makefile.am:
