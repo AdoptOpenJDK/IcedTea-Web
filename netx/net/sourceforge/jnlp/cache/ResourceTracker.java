@@ -912,9 +912,9 @@ public class ResourceTracker {
 
                      if (responseCode < 200 || responseCode >= 300) {
                          if (JNLPRuntime.isDebug()) {
-                             System.err.println("For "+resource.toString()+" the server returned " + responseCode + " code for "+requestMethod+" request for " + url.toExternalForm());
+                             System.err.println("For " + resource.toString() + " the server returned " + responseCode + " code for " + requestMethod + " request for " + url.toExternalForm());
                          }
-                     }else {
+                     } else {
                          if (JNLPRuntime.isDebug()) {
                              System.err.println("best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
                          }
