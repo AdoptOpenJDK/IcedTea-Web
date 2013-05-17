@@ -665,18 +665,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         if (message.startsWith("width")) {
 
             // Wait for panel to come alive
-            long maxTimeToSleep = APPLET_TIMEOUT;
-            statusLock.lock();
-            try {
-                while (!status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE) &&
-                        maxTimeToSleep > 0) {
-                    maxTimeToSleep -= waitTillTimeout(statusLock, initComplete,
-                                                      maxTimeToSleep);
-                }
-            }
-            finally {
-                statusLock.unlock();
-            }
+            waitForAppletInit(panel);
 
             // 0 => width, 1=> width_value, 2 => height, 3=> height_value
             String[] dimMsg = message.split(" ");

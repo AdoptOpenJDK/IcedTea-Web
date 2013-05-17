@@ -1,3 +1,9 @@
+2013-05-17  Adam Domurad  <adomurad@redhat.com>
+
+	Fix PR854: Resizing an applet several times causes 100% CPU load
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(handleMessage): Replace buggy initialization wait.
+
 2013-05-14  Jiri Vanek  <jvanek@redhat.com>
             Jacob Wisor  <gitne@excite.co.jp>
 
