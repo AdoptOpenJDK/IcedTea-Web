@@ -181,7 +181,23 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
 
     private SplashPanel splashPanel;
- 
+    
+    private static long REQUEST_TIMEOUT=60000;//60s
+
+    private static void waitForRequestCompletion(PluginCallRequest request) {
+        try {
+            if (!request.isDone()) {
+                request.wait(REQUEST_TIMEOUT);
+            }
+            if (!request.isDone()) {
+                // Do not wait indefinitely to avoid the potential of deadlock
+                throw new RuntimeException("Possible deadlock, releasing");
+            }
+        } catch (InterruptedException ex) {
+            throw new RuntimeException("Interrupted waiting for call request.", ex);
+        }
+    }
+
     /**
      * Null constructor to allow instantiation via newInstance()
      */
@@ -1290,18 +1306,13 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         streamhandler.postCallRequest(request);
         streamhandler.write(request.getMessage());
-        try {
-            PluginDebug.debug("wait ToString request 1");
-            synchronized (request) {
-                PluginDebug.debug("wait ToString request 2");
-                while (request.isDone() == false)
-                    request.wait();
-                PluginDebug.debug("wait ToString request 3");
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted waiting for call request.",
-                                        e);
+        PluginDebug.debug("wait ToString request 1");
+        synchronized (request) {
+            PluginDebug.debug("wait ToString request 2");
+            waitForRequestCompletion(request);
+            PluginDebug.debug("wait ToString request 3");
         }
+
         PluginDebug.debug(" ToString DONE");
         return (String) request.getObject();
     }

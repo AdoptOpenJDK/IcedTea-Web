@@ -1,3 +1,19 @@
+2013-05-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed possible deadlock for applet->js->applet call
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	(REQUEST_TIMEOUT) new constant, 60s, to define timeout of  applet->js call
+	(waitForRequestCompletion) new method waiting to request to be done with 
+	timeout of REQUEST_TIMEOUT.
+	(javascriptToString) using the waitForRequestCompletion instead of plain
+	wait()
+	* tests/reproducers/simple/AppletJsAppletDeadlock/resources/AppletJsAppletDeadlock.html
+	and
+	* tests/reproducers/simple/AppletJsAppletDeadlock/srcs/AppletJsAppletDeadlock.java
+	reproducer
+	* tests/reproducers/simple/AppletJsAppletDeadlock/testcases/AppletJsAppletDeadlockTest.java
+	testcase
+
 2013-05-17  Adam Domurad  <adomurad@redhat.com>
 
 	Fix PR854: Resizing an applet several times causes 100% CPU load
