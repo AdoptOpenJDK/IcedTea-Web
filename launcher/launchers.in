@@ -3,10 +3,10 @@
 JAVA=@JAVA@
 LAUNCHER_BOOTCLASSPATH=@LAUNCHER_BOOTCLASSPATH@
 LAUNCHER_FLAGS=-Xms8m
-CLASSNAME=net.sourceforge.jnlp.runtime.Boot
-BINARY_LOCATION=@JAVAWS_BIN_LOCATION@
+CLASSNAME=@MAIN_CLASS@
+BINARY_LOCATION=@BIN_LOCATION@
 SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
-PROGRAM_NAME=javaws
+PROGRAM_NAME=@PROGRAM_NAME@
 CP=@JRE@/lib/rt.jar
 
 PROPERTY_NAME=deployment.jre.dir
@@ -86,6 +86,6 @@ while [ "$j" -lt "${#ARGS[@]}" ]; do
   k=$((k+1))
 done
 
-exec -a "javaws" "${COMMAND[@]}"
+exec -a "$PROGRAM_NAME" "${COMMAND[@]}"
 
 exit $?

@@ -205,12 +205,13 @@ itweb_settings:= $(shell echo itweb-settings | sed '@program_transform_name@')
 # the launcher needs to know $(bindir) and $(datadir) which can be different at
 # make-time from configure-time
 edit_launcher_script = sed \
-  -e 's|[@]LAUNCHER_BOOTCLASSPATH[@]|$(LAUNCHER_BOOTCLASSPATH)|g' \
-  -e 's|[@]JAVAWS_BIN_LOCATION[@]|$(bindir)/$(javaws)|g' \
-  -e 's|[@]JAVAWS_SPLASH_LOCATION[@]|$(datadir)/$(PACKAGE_NAME)/javaws_splash.png|g' \
-  -e 's|[@]ITWEB_SETTINGS_BIN_LOCATION[@]|$(bindir)/$(itweb_settings)|g' \
-  -e 's|[@]JAVA[@]|$(JAVA)|g' \
-  -e 's|[@]JRE[@]|$(SYSTEM_JRE_DIR)|g'
+  -e "s|[@]LAUNCHER_BOOTCLASSPATH[@]|$(LAUNCHER_BOOTCLASSPATH)|g" \
+  -e "s|[@]JAVAWS_SPLASH_LOCATION[@]|$(datadir)/$(PACKAGE_NAME)/javaws_splash.png|g" \
+  -e "s|[@]JAVA[@]|$(JAVA)|g" \
+  -e "s|[@]JRE[@]|$(SYSTEM_JRE_DIR)|g" \
+  -e "s|[@]MAIN_CLASS[@]|$${MAIN_CLASS}|g" \
+  -e "s|[@]BIN_LOCATION[@]|$${BIN_LOCATION}|g" \
+  -e "s|[@]PROGRAM_NAME[@]|$${PROGRAM_NAME}|g"
 
 # Top-Level Targets
 # =================
@@ -519,12 +520,18 @@ clean-extra:
 extra-lib/about.jar: stamps/extra-class-files.stamp
 	$(BOOT_DIR)/bin/jar cf $@ -C extra-lib net ;
 
-launcher.build/$(javaws): launcher/javaws.in
+launcher.build/$(javaws): launcher/launchers.in
 	mkdir -p launcher.build
+	MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ;\
+	BIN_LOCATION=$(bindir)/$(javaws) ;\
+	PROGRAM_NAME=$(javaws) ;\
 	$(edit_launcher_script) < $< > $@
 
-launcher.build/$(itweb_settings): launcher/itweb-settings.in
+launcher.build/$(itweb_settings): launcher/launchers.in
 	mkdir -p launcher.build
+	MAIN_CLASS=net.sourceforge.jnlp.controlpanel.CommandLine ;\
+	BIN_LOCATION=$(bindir)/$(itweb_settings) ;\
+	PROGRAM_NAME=$(itweb_settings) ;\
 	$(edit_launcher_script) < $< > $@
 
 clean-launchers:

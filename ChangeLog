@@ -1,5 +1,19 @@
 2013-05-20  Jiri Vanek  <jvanek@redhat.com>
 
+	Synchronized launchers to be from one source
+	* Makefile.am: (edit_launcher_script) is now accepting variables
+	(launcher.build/$(javaws)) no depends on launcher/launchers.in instead of
+	launcher/javaws.in and is filling the variables for javaws
+	(launcher.build/$(itweb_settings)) no depends on launcher/launchers.in instead of
+	launcher/itweb_settings.in and is filling the variables for itweb_settings
+	* launcher/itweb-settings.in: removed
+	* launcher/javaws.in: removed
+	* launcher/launchers.in: new file, substitution of removed (itweb-settings.in)
+	and javaws.in. Mostly based on javaws.in, just (CLASSNAME) and (PROGRAM_NAME)
+	and (BINARY_LOCATION) were made more general.
+
+2013-05-20  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed possible deadlock for applet->js->applet call
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
 	(REQUEST_TIMEOUT) new constant, 60s, to define timeout of  applet->js call
