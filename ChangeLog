@@ -1,5 +1,13 @@
 2013-05-29  Adam Domurad  <adomurad@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
+	Moved & renamed inner MockedOneJarJNLPFile to top-level 
+	DummyJNLPFileWithJar class.
+	* tests/test-extensions/net/sourceforge/jnlp/mock/DummyJNLPFileWithJar.java:
+	Moved & renamed from JNLPClassLoaderTest.MockedOneJarJNLPFile. 
+
+2013-05-29  Adam Domurad  <adomurad@redhat.com>
+
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
 	"A serious exception occurred" -> "An exception occurred"
 

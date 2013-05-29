@@ -42,25 +42,20 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JARDesc;
-import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.ResourcesDesc;
-import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.util.StreamUtils;
 
 import org.junit.Test;
@@ -123,49 +118,10 @@ public class JNLPClassLoaderTest {
         return createTempJar(jarName, "");
     }
 
-    /* Create a JARDesc for the given URL location */
-    static private JARDesc makeJarDesc(URL jarLocation) {
-        return new JARDesc(jarLocation, new Version("1"), null, false,false, false,false);
-    }
-
-    /* A mocked dummy JNLP file with a single JAR. */
-    private class MockedOneJarJNLPFile extends JNLPFile {
-        URL codeBase, jarLocation;
-        JARDesc jarDesc;
-
-        MockedOneJarJNLPFile(File jarFile) throws MalformedURLException {
-            codeBase = jarFile.getParentFile().toURI().toURL();
-            jarLocation = jarFile.toURI().toURL();
-            jarDesc = makeJarDesc(jarLocation); 
-            info = new ArrayList<InformationDesc>();
-        }
-
-        @Override
-        public ResourcesDesc getResources() {
-            ResourcesDesc resources = new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
-            resources.addResource(jarDesc);
-            return resources;
-        }
-        @Override
-        public ResourcesDesc[] getResourcesDescs(final Locale locale, final String os, final String arch) {
-            return new ResourcesDesc[] { getResources() };
-        }
-
-        @Override
-        public URL getCodeBase() {
-            return codeBase;
-        }
-
-        @Override
-        public SecurityDesc getSecurity() {
-            return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
-        }
-    };
-
     /* Note: Only does file leak testing for now. */
     @Test
     public void constructorFileLeakTest() throws Exception {
-        final MockedOneJarJNLPFile jnlpFile = new MockedOneJarJNLPFile(createTempJar("test.jar"));
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar"));
 
         assertNoFileLeak( new Runnable () {
             @Override
@@ -183,7 +139,7 @@ public class JNLPClassLoaderTest {
      * However, it is tricky without it erroring-out. */
     @Test
     public void isInvalidJarTest() throws Exception {
-        final MockedOneJarJNLPFile jnlpFile = new MockedOneJarJNLPFile(createTempJar("test.jar"));
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar"));
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
         assertNoFileLeak( new Runnable () {
@@ -198,7 +154,7 @@ public class JNLPClassLoaderTest {
     /* Note: Only does file leak testing for now, but more testing could be added. */
     @Test
     public void activateNativeFileLeakTest() throws Exception {
-        final MockedOneJarJNLPFile jnlpFile = new MockedOneJarJNLPFile(createTempJar("test.jar"));
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar"));
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
         assertNoFileLeak( new Runnable () {
@@ -212,7 +168,7 @@ public class JNLPClassLoaderTest {
     @Test
     public void getMainClassNameTest() throws Exception {
         /* Test with main-class */{
-            final MockedOneJarJNLPFile jnlpFile = new MockedOneJarJNLPFile(createTempJar("test.jar", "Main-Class: DummyClass\n"));
+            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar", "Main-Class: DummyClass\n"));
             final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
             assertNoFileLeak(new Runnable() {
@@ -223,7 +179,7 @@ public class JNLPClassLoaderTest {
             });
         }
         /* Test with-out main-class */{
-            final MockedOneJarJNLPFile jnlpFile = new MockedOneJarJNLPFile(createTempJar("test.jar", ""));
+            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar", ""));
             final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
             assertNoFileLeak(new Runnable() {
@@ -246,7 +202,7 @@ public class JNLPClassLoaderTest {
     /* Note: Although it does a basic check, this mainly checks for file-descriptor leak */
     @Test
     public void checkForMainFileLeakTest() throws Exception {
-        final MockedOneJarJNLPFile jnlpFile = new MockedOneJarJNLPFile(createTempJar("test.jar", ""));
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar", ""));
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
         assertNoFileLeak(new Runnable() {
             @Override
