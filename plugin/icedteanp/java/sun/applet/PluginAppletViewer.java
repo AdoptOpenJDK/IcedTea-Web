@@ -677,53 +677,62 @@ public class PluginAppletViewer extends XEmbeddedFrame
         PluginDebug.debug("Applet panel ", panel, " initialized");
     }
 
+    /* Resizes an applet panel, waiting for the applet to initialze. 
+     * Should be done asynchronously to avoid the chance of deadlock. */
+    private void resizeAppletPanel(final int width, final int height) {
+        // Wait for panel to come alive
+        waitForAppletInit(panel);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                panel.updateSizeInAtts(height, width);
+
+                setSize(width, height);
+
+                // There is a rather odd drawing bug whereby resizing
+                // the panel makes no difference on initial call
+                // because the panel thinks that it is already the
+                // right size. Validation has no effect there either.
+                // So we work around by setting size to 1, validating,
+                // and then setting to the right size and validating
+                // again. This is not very efficient, and there is
+                // probably a better way -- but resizing happens
+                // quite infrequently, so for now this is how we do it
+
+                panel.setSize(1, 1);
+                panel.validate();
+
+                panel.setSize(width, height);
+                panel.validate();
+
+                panel.applet.resize(width, height);
+                panel.applet.validate();
+            }
+        });
+    }
+
     public void handleMessage(int reference, String message) {
         if (message.startsWith("width")) {
-
-            // Wait for panel to come alive
-            waitForAppletInit(panel);
 
             // 0 => width, 1=> width_value, 2 => height, 3=> height_value
             String[] dimMsg = message.split(" ");
 
-            final int height = Integer.parseInt(dimMsg[3]);
             final int width = Integer.parseInt(dimMsg[1]);
+            final int height = Integer.parseInt(dimMsg[3]);
 
-            panel.updateSizeInAtts(height, width);
+            /* Resize the applet asynchronously, to avoid the chance of 
+             * deadlock while waiting for the applet to initialize. 
+             * 
+             * In general, worker threads should spawn new threads for any blocking operations. */
+            Thread resizeAppletThread = new Thread("resizeAppletThread") {
+                @Override
+                public void run() {
+                    resizeAppletPanel(width, height);
+                }
+            };
 
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() {
-
-                        setSize(width, height);
-
-                        // There is a rather odd drawing bug whereby resizing
-                        // the panel makes no difference on initial call
-                        // because the panel thinks that it is already the
-                        // right size. Validation has no effect there either.
-                        // So we work around by setting size to 1, validating,
-                        // and then setting to the right size and validating
-                        // again. This is not very efficient, and there is
-                        // probably a better way -- but resizing happens
-                        // quite infrequently, so for now this is how we do it
-
-                        panel.setSize(1, 1);
-                        panel.validate();
-
-                        panel.setSize(width, height);
-                        panel.validate();
-
-                        panel.applet.resize(width, height);
-                        panel.applet.validate();
-                    }
-                });
-            } catch (InterruptedException e) {
-                // do nothing
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                // do nothing
-                e.printStackTrace();
-            }
+            /* Let it eventually complete */
+            resizeAppletThread.start();
 
         } else if (message.startsWith("GetJavaObject")) {
 

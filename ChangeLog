@@ -1,5 +1,10 @@
 2013-06-03  Adam Domurad  <adomurad@redhat.com>
 
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	Handle resizing more robustly by not blocking worker thread 
+
+2013-06-03  Adam Domurad  <adomurad@redhat.com>
+
 	* netx/net/sourceforge/jnlp/util/StreamUtils.java
 	(copyStream): New, copies input stream to output stream
 	* tests/netx/unit/net/sourceforge/jnlp/cache/NativeLibraryStorageTest.java:
