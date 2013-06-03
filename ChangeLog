@@ -1,3 +1,10 @@
+2013-06-03  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/NativeLibraryStorage.java: New,
+	stores and searches for native library files that are loaded from jars.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Move code
+	that handled native jar caching to NativeLibraryStorage. 
+
 2013-05-29  Adam Domurad  <adomurad@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:

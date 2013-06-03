@@ -82,6 +82,7 @@ import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
+import net.sourceforge.jnlp.cache.NativeLibraryStorage;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.security.AppVerifier;
@@ -127,11 +128,8 @@ public class JNLPClassLoader extends URLClassLoader {
      * initialization of applets that share a unique key*/
     private static Map<String, ReentrantLock> uniqueKeyToLock = new HashMap<String, ReentrantLock>();
 
-    /** the directory for native code */
-    private File nativeDir = null; // if set, some native code exists
-
-    /** a list of directories that contain native libraries */
-    private List<File> nativeDirectories = Collections.synchronizedList(new LinkedList<File>());
+    /** Provides a search path & temporary storage for native code */
+    private NativeLibraryStorage nativeLibraryStorage;
 
     /** security context */
     private AccessControlContext acc = AccessController.getContext();
@@ -231,6 +229,8 @@ public class JNLPClassLoader extends URLClassLoader {
         this.updatePolicy = policy;
         this.resources = file.getResources();
 
+        this.nativeLibraryStorage = new NativeLibraryStorage(tracker);
+
         this.mainClass = mainName;
 
         AppVerifier verifier;
@@ -270,21 +270,7 @@ public class JNLPClassLoader extends URLClassLoader {
                  * there is one). Other classloaders (parent, peers) will all
                  * cleanup things they created
                  */
-                if (nativeDir != null) {
-                    if (JNLPRuntime.isDebug()) {
-                        System.out.println("Cleaning up native directory" + nativeDir.getAbsolutePath());
-                    }
-                    try {
-                        FileUtils.recursiveDelete(nativeDir,
-                                new File(System.getProperty("java.io.tmpdir")));
-                    } catch (IOException e) {
-                        /*
-                         * failed to delete a file in tmpdir, no big deal (not
-                         * to mention that the VM is shutting down at this
-                         * point so no much we can do)
-                         */
-                    }
-                }
+                nativeLibraryStorage.cleanupTemporaryFolder();
             }
         });
     }
@@ -1349,7 +1335,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     }
 
                     // some programs place a native library in any jar
-                    activateNative(jar);
+                    nativeLibraryStorage.addSearchJar(jar.getLocation());
                 }
 
                 return null;
@@ -1360,114 +1346,14 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Search for and enable any native code contained in a JAR by copying the
-     * native files into the filesystem. Called in the security context of the
-     * classloader.
-     */
-    protected void activateNative(JARDesc jar) {
-        if (JNLPRuntime.isDebug())
-            System.out.println("Activate native: " + jar.getLocation());
-
-        File localFile = tracker.getCacheFile(jar.getLocation());
-        if (localFile == null)
-            return;
-
-        String[] librarySuffixes = { ".so", ".dylib", ".jnilib", ".framework", ".dll" };
-
-        try {
-            JarFile jarFile = new JarFile(localFile, false);
-            Enumeration<JarEntry> entries = jarFile.entries();
-
-            while (entries.hasMoreElements()) {
-                JarEntry e = entries.nextElement();
-
-                if (e.isDirectory()) {
-                    continue;
-                }
-
-                String name = new File(e.getName()).getName();
-                boolean isLibrary = false;
-
-                for (String suffix : librarySuffixes) {
-                    if (name.endsWith(suffix)) {
-                        isLibrary = true;
-                        break;
-                    }
-                }
-                if (!isLibrary) {
-                    continue;
-                }
-
-                if (nativeDir == null)
-                    nativeDir = getNativeDir();
-
-                File outFile = new File(nativeDir, name);
-                if (!outFile.isFile()) {
-                    FileUtils.createRestrictedFile(outFile, true);
-                }
-                CacheUtil.streamCopy(jarFile.getInputStream(e),
-                                     new FileOutputStream(outFile));
-
-            }
-            jarFile.close();
-        } catch (IOException ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Return the base directory to store native code files in.
-     * This method does not need to return the same directory across
-     * calls.
-     */
-    protected File getNativeDir() {
-        final int rand = (int)((Math.random()*2 - 1) * Integer.MAX_VALUE);
-        nativeDir = new File(System.getProperty("java.io.tmpdir")
-                             + File.separator + "netx-native-"
-                             + (rand & 0xFFFF));
-        File parent = nativeDir.getParentFile();
-        if (!parent.isDirectory() && !parent.mkdirs()) {
-            return null;
-        }
-
-        try {
-            FileUtils.createRestrictedDirectory(nativeDir);
-            // add this new native directory to the search path
-            addNativeDirectory(nativeDir);
-            return nativeDir;
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Adds the {@link File} to the search path of this {@link JNLPClassLoader}
-     * when trying to find a native library
-     */
-    protected void addNativeDirectory(File nativeDirectory) {
-        nativeDirectories.add(nativeDirectory);
-    }
-
-    /**
-     * Returns a list of all directories in the search path of the current classloader
-     * when it tires to find a native library.
-     * @return a list of directories in the search path for native libraries
-     */
-    protected List<File> getNativeDirectories() {
-        return nativeDirectories;
-    }
-
-    /**
      * Return the absolute path to the native library.
      */
     protected String findLibrary(String lib) {
         String syslib = System.mapLibraryName(lib);
+        File libFile = nativeLibraryStorage.findLibrary(syslib);
 
-        for (File dir : getNativeDirectories()) {
-            File target = new File(dir, syslib);
-            if (target.exists())
-                return target.toString();
+        if (libFile != null) {
+            return libFile.toString();
         }
 
         String result = super.findLibrary(lib);
@@ -2044,8 +1930,9 @@ public class JNLPClassLoader extends URLClassLoader {
         addToCodeBaseLoader(extLoader.file.getCodeBase());
 
         // native search paths
-        for (File nativeDirectory : extLoader.getNativeDirectories())
-            addNativeDirectory(nativeDirectory);
+        for (File nativeDirectory : extLoader.nativeLibraryStorage.getSearchDirectories()) {
+            nativeLibraryStorage.addSearchDirectory(nativeDirectory);
+        }
 
         // security descriptors
         for (URL key : extLoader.jarLocationSecurityMap.keySet()) {

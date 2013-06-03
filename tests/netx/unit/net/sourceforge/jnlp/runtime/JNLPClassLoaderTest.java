@@ -150,20 +150,6 @@ public class JNLPClassLoaderTest {
         });
 
     }
-
-    /* Note: Only does file leak testing for now, but more testing could be added. */
-    @Test
-    public void activateNativeFileLeakTest() throws Exception {
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar"));
-        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
-
-        assertNoFileLeak( new Runnable () {
-            @Override
-            public void run() {
-                    classLoader.activateNative(jnlpFile.jarDesc);
-            }
-        });
-    }
     
     @Test
     public void getMainClassNameTest() throws Exception {
