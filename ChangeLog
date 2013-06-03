@@ -1,5 +1,17 @@
 2013-06-03  Adam Domurad  <adomurad@redhat.com>
 
+	* netx/net/sourceforge/jnlp/util/StreamUtils.java
+	(copyStream): New, copies input stream to output stream
+	* tests/netx/unit/net/sourceforge/jnlp/cache/NativeLibraryStorageTest.java:
+	New, tests lookup of native libraries from folders and jars.
+	* tests/test-extensions/net/sourceforge/jnlp/util/FileTestUtils.java:
+	New, contains utilities for testing open file descriptors, creating temporary
+	directories, and creating jars.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
+	Replace jar creation methods with ones from FileTestUtils. 
+
+2013-06-03  Adam Domurad  <adomurad@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/NativeLibraryStorage.java: New,
 	stores and searches for native library files that are loaded from jars.
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Move code

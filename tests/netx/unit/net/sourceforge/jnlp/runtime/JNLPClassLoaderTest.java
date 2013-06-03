@@ -36,92 +36,34 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import static net.sourceforge.jnlp.util.FileTestUtils.assertNoFileLeak;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
-import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
-import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.FileTestUtils;
 
 import org.junit.Test;
 
 public class JNLPClassLoaderTest {
 
-    /* Get the open file-descriptor count for the process.
-     * Note that this is specific to Unix-like operating systems.
-     * As well, it relies on */
-    static public long getOpenFileDescriptorCount() {
-        MBeanServer beanServer = ManagementFactory.getPlatformMBeanServer();
-        try {
-            return (Long) beanServer.getAttribute(
-                    new ObjectName("java.lang:type=OperatingSystem"), 
-                    "OpenFileDescriptorCount"
-            );
-        } catch (Exception e) {
-            // Effectively disables leak tests
-            ServerAccess.logErrorReprint("Warning: Cannot get file descriptors for this platform!");
-            return 0;
-        }
-    }
-
-    /* Check the amount of file descriptors before and after a Runnable */
-    static private void assertNoFileLeak(Runnable runnable) {
-        long filesOpenBefore = getOpenFileDescriptorCount();
-        runnable.run();
-        long filesLeaked = getOpenFileDescriptorCount() - filesOpenBefore;
-        assertEquals(0, filesLeaked);
-    }
-
-    static private String cleanExec(File directory, String... command) throws Exception {
-        Process p = Runtime.getRuntime().exec(command, new String[]{}, directory);
-
-        String stdOut = StreamUtils.readStreamAsString(p.getInputStream());
-        String stdErr = StreamUtils.readStreamAsString(p.getErrorStream());
-
-        ServerAccess.logNoReprint("Running " + Arrays.toString(command));
-        ServerAccess.logNoReprint("Standard output was: \n" + stdOut);
-        ServerAccess.logNoReprint("Standard error was: \n" + stdErr);
-
-        p.getInputStream().close();
-        p.getErrorStream().close();
-        p.getOutputStream().close();
-
-        return stdOut;
-
-    }
-
-    /* Creates a jar in a temporary directory, with the given name & manifest contents. */
-    static private File createTempJar(String jarName, String manifestContents) throws Exception {
-        File dir = new File(cleanExec(null /* current working dir */, "mktemp", "-d"));
-        cleanExec(dir, "/bin/bash", "-c", "echo '" + manifestContents + "' > Manifest.txt");
-        cleanExec(dir, "jar", "-cfm", jarName, "Manifest.txt");
-        return new File(dir.getAbsolutePath() + "/" + jarName);
-    }
-
-    /* Creates a jar in a temporary directory, with the given name & an empty manifest. */
-    static private File createTempJar(String jarName) throws Exception {
-        return createTempJar(jarName, "");
-    }
-
     /* Note: Only does file leak testing for now. */
     @Test
     public void constructorFileLeakTest() throws Exception {
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar"));
+        File tempDirectory = FileTestUtils.createTempDirectory();
+        File jarLocation = new File(tempDirectory, "test.jar");
+        FileTestUtils.createJarWithContents(jarLocation /* no contents*/);
+
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
 
         assertNoFileLeak( new Runnable () {
             @Override
@@ -139,7 +81,11 @@ public class JNLPClassLoaderTest {
      * However, it is tricky without it erroring-out. */
     @Test
     public void isInvalidJarTest() throws Exception {
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar"));
+        File tempDirectory = FileTestUtils.createTempDirectory();
+        File jarLocation = new File(tempDirectory, "test.jar");
+        FileTestUtils.createJarWithContents(jarLocation /* no contents*/);
+
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
         assertNoFileLeak( new Runnable () {
@@ -148,13 +94,19 @@ public class JNLPClassLoaderTest {
                     assertFalse(classLoader.isInvalidJar(jnlpFile.jarDesc));
             }
         });
-
     }
     
     @Test
     public void getMainClassNameTest() throws Exception {
-        /* Test with main-class */{
-            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar", "Main-Class: DummyClass\n"));
+        File tempDirectory = FileTestUtils.createTempDirectory();
+        File jarLocation = new File(tempDirectory, "test.jar");
+
+        /* Test with main-class in manifest */ {
+            Manifest manifest = new Manifest();
+            manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass");
+            FileTestUtils.createJarWithContents(jarLocation, manifest);
+
+            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
             final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
             assertNoFileLeak(new Runnable() {
@@ -164,8 +116,10 @@ public class JNLPClassLoaderTest {
                 }
             });
         }
-        /* Test with-out main-class */{
-            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar", ""));
+        /* Test with-out any main-class specified */ {
+            FileTestUtils.createJarWithContents(jarLocation /* No contents */);
+
+            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
             final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
             assertNoFileLeak(new Runnable() {
@@ -188,7 +142,11 @@ public class JNLPClassLoaderTest {
     /* Note: Although it does a basic check, this mainly checks for file-descriptor leak */
     @Test
     public void checkForMainFileLeakTest() throws Exception {
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(createTempJar("test.jar", ""));
+        File tempDirectory = FileTestUtils.createTempDirectory();
+        File jarLocation = new File(tempDirectory, "test.jar");
+        FileTestUtils.createJarWithContents(jarLocation /* No contents */);
+
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
         assertNoFileLeak(new Runnable() {
             @Override

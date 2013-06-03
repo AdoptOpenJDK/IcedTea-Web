@@ -76,6 +76,8 @@ public class NativeLibraryStorage {
         return null;
     }
 
+    public static final String[] NATIVE_LIBRARY_EXTENSIONS = { ".so", ".dylib", ".jnilib", ".framework", ".dll" };
+
     /**
      * Search for and enable any native code contained in a JAR by copying the
      * native files into the filesystem. Called in the security context of the
@@ -88,8 +90,6 @@ public class NativeLibraryStorage {
         File localFile = tracker.getCacheFile(jarLocation);
         if (localFile == null)
             return;
-
-        String[] librarySuffixes = { ".so", ".dylib", ".jnilib", ".framework", ".dll" };
 
         try {
             JarFile jarFile = new JarFile(localFile, false);
@@ -105,7 +105,7 @@ public class NativeLibraryStorage {
                 String name = new File(e.getName()).getName();
                 boolean isLibrary = false;
 
-                for (String suffix : librarySuffixes) {
+                for (String suffix : NATIVE_LIBRARY_EXTENSIONS) {
                     if (name.endsWith(suffix)) {
                         isLibrary = true;
                         break;
@@ -132,7 +132,7 @@ public class NativeLibraryStorage {
         }
     }
 
-    private void ensureNativeStoreDirectory() {
+    void ensureNativeStoreDirectory() {
         if (jarEntryDirectory == null) {
             jarEntryDirectory = createNativeStoreDirectory();
             addSearchDirectory(jarEntryDirectory);
