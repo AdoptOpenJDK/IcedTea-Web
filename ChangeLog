@@ -1,3 +1,9 @@
+2013-06-04  Adam Domurad  <adomurad@redhat.com>
+
+	Remove unused files.
+	* plugin/icedteanp/IcedTeaRunnable.cc: Removed.
+	* plugin/icedteanp/IcedTeaRunnable.h: Removed. 
+
 2013-06-03  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
