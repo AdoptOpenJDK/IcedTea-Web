@@ -1,3 +1,16 @@
+2013-06-05  Adam Domurad  <adomurad@redhat.com>
+
+	Fix PR1465
+	* NEWS: Bug fix note
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java
+	(isValidRFC2396Url): New, tests if valid URL by RFC2396 rules
+	(normalizeUrl): Don't normalize if valid by RFC2396
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:
+	Adapt which URLs we expect to change when normalizing URLs
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java: 
+	(testIsValidRFC2396Url): New, tests isValidRFC2396Url
+	(testNormalizeUrl): Add new test with valid RFC2396 URL
+
 2013-06-04  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:

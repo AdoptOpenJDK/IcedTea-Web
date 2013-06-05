@@ -80,7 +80,7 @@ public class ResourceTrackerTest {
             Assert.assertFalse("url " + i + " must be normalized (and so not equals) too normalized url " + i, u[i].equals(n[i]));
         }
     }
-    public static final int CHANGE_BORDER = 6;
+    public static final int CHANGE_BORDER = 8;
 
     public static URL[] getUrls() throws MalformedURLException {
         URL[] u = {
@@ -91,9 +91,9 @@ public class ResourceTrackerTest {
             new URL("http:///SpacesCanBeEverywhere1.jnlp"),
             new URL("file://localhost/home/jvanek/Desktop/icedtea-web/tests.build/jnlp_test_server/Spaces can be everywhere2.jnlp"),
             new URL("http://localhost:44321/testpage.jnlp?applicationID=25"),
-            /*changing*/
             new URL("http://localhost:44321/Spaces%20Can%20Be%20Everyw%2Fhere1.jnlp"),
             new URL("http://localhost/Spaces+Can+Be+Everywhere1.jnlp"),
+            /*changing*/
             new URL("http://localhost/SpacesC anBeEverywhere1.jnlp?a=5&b=10#df"),
             new URL("http:///oook.jnlp?a=5&b=ahoj šš dd#df"),
             new URL("http://localhost/Spacesěčšžšřýžčřú can !@^*(){}[].jnlp?a=5&ahoj šš dd#df"),

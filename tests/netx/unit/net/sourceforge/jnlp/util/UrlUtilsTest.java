@@ -39,8 +39,11 @@ package net.sourceforge.jnlp.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Test;
@@ -95,6 +98,27 @@ public class UrlUtilsTest {
         // Test file URL with file URL encoding turned on
         assertEquals("file://example/%20test",
                   UrlUtils.normalizeUrl(new URL("file://example/ test"), true).toString());
+
+        // PR1465: Test that RFC2396-compliant URLs are not touched
+        // Example taken from bug report: http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1465
+        String rfc2396Valid = "https://example.com/,DSID=64c19c5b657df383835706571a7c7216,DanaInfo=example.com,CT=java+JICAComponents/JICA-sicaN.jar";
+        assertEquals(rfc2396Valid,
+                UrlUtils.normalizeUrl(new URL(rfc2396Valid)).toString());
+    }
+
+    @Test
+    public void testIsValidRFC2396Url() throws Exception {
+        String rfc2396Valid = "https://example.com/,foo=bar+baz/JICA-sicaN.jar";
+        assertTrue(UrlUtils.isValidRFC2396Url(new URL(rfc2396Valid)));
+
+        // These should invalidate the URL
+        // See http://www.ietf.org/rfc/rfc2396.txt (2.4.3. Excluded US-ASCII Characters)
+        char[] invalidCharacters = {'<', '>', '%', '"', };
+        for (char chr : invalidCharacters) {
+            assertFalse("validation failed with '" + chr + "'",UrlUtils.isValidRFC2396Url(new URL(rfc2396Valid + chr)));
+        }
+        //special test for space inisde. Space at the end can be trimmed
+        assertFalse("validation failed with '" + ' ' + "'",UrlUtils.isValidRFC2396Url(new URL("https://example.com/,foo=bar+ba z/JICA-sicaN.jar")));
     }
 
     @Test

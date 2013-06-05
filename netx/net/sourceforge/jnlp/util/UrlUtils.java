@@ -86,16 +86,29 @@ public class UrlUtils {
         }
     }
 
+    /* Use the URI syntax check of 'toURI' to see if it matches RFC2396.
+     * See http://www.ietf.org/rfc/rfc2396.txt */
+    public static boolean isValidRFC2396Url(URL url) {
+        try {
+            url.toURI();
+            return true;
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
     /* Ensure a URL is properly percent-encoded.
      * Certain usages require local-file URLs to be encoded, eg for code-base & document-base. */
     public static URL normalizeUrl(URL url, boolean encodeFileUrls) throws MalformedURLException, UnsupportedEncodingException, URISyntaxException {
         if (url == null) {
             return null;
         }
+
         String protocol = url.getProtocol();
         boolean shouldEncode = (encodeFileUrls || !"file".equals(protocol));
 
-        if (protocol == null || !shouldEncode || url.getPath() == null) {
+        // PR1465: We should not call 'URLDecoder.decode' on RFC2396-compliant URLs
+        if (protocol == null || !shouldEncode || url.getPath() == null || isValidRFC2396Url(url)) {
             return url;
         }
 
