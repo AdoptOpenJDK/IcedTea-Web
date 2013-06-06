@@ -1,4 +1,4 @@
-/* AppletTestTests.java
+/* 
 Copyright (C) 2011 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -153,5 +153,30 @@ public class AppletTestTests extends BrowserTest {
         } finally {
             ServerAccess.PROCESS_TIMEOUT = 20 * 1000; //back to normal
         }
+    }
+    
+    
+    @Test
+    @TestInBrowsers(testIn = {Browsers.one})
+    @NeedsDisplay
+    public void appletZeroWH() throws Exception {
+        ProcessResult pr = server.executeBrowser("/appletZeroWH.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
+        evaluateApplet(pr, false);
+    }
+    
+    @Test
+    @TestInBrowsers(testIn = {Browsers.one})
+    @NeedsDisplay
+    public void appletZeroW() throws Exception {
+        ProcessResult pr = server.executeBrowser("/appletZeroW.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
+        evaluateApplet(pr, false);
+    }
+    
+    @Test
+    @TestInBrowsers(testIn = {Browsers.one})
+    @NeedsDisplay
+    public void appletZeroH() throws Exception {
+        ProcessResult pr = server.executeBrowser("/appletZeroH.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
+        evaluateApplet(pr, false);
     }
 }

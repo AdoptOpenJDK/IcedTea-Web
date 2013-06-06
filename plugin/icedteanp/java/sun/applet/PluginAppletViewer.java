@@ -1547,7 +1547,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         // If the image or the graphics don't exist, create new ones
         if (bufFrameImg == null || bufFrameImgGraphics == null) {
-            bufFrameImg = createImage(getWidth(), getHeight());
+            // although invisible applets do not have right to paint
+            // we rather paint to 1x1 to be sure all callbacks  will be completed
+            bufFrameImg = createImage(Math.max(1, getWidth()), Math.max(1, getHeight()));
             bufFrameImgGraphics = bufFrameImg.getGraphics();
         }
 

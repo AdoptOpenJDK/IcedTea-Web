@@ -1,4 +1,20 @@
 2013-06-06  Jiri Vanek  <jvanek@redhat.com>
+
+	Silenced deployment.properties and zero size applet exceptions with tests
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
+	(findSystemConfigFile) and (loadProperties) now prints already cough exception
+	only in debug mode 
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: (paint) 
+	now paints into 1 x 1 applet instead of 0 x 0 in case of 0 x 0 applet
+	* tests/reproducers/simple/AppletTest/resources/appletZeroH.html: new file
+	* tests/reproducers/simple/AppletTest/resources/appletZeroW.html: new file
+	* tests/reproducers/simple/AppletTest/resources/appletZeroWH.html: new file
+	- testing launchers with zero as width, height or both
+	* tests/reproducers/simple/AppletTest/testcases/AppletTestTests.java:
+	added launchers and evaluations for three new htmls - (appletZeroWH)
+	(appletZeroW) (appletZeroH)
+
+2013-06-06  Jiri Vanek  <jvanek@redhat.com>
 	Jacob Wisor  <gitne@excite.co.jp>
 
 	Enhanced manifest

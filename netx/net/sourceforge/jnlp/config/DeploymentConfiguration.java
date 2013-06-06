@@ -427,7 +427,9 @@ public final class DeploymentConfiguration {
                 jrePath = jreSetting.getValue();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if (JNLPRuntime.isDebug()){
+                ex.printStackTrace();
+            }
         }
 
         File jreFile;
@@ -530,6 +532,9 @@ public final class DeploymentConfiguration {
         try {
             return parsePropertiesFile(file);
         } catch (IOException e) {
+            if (JNLPRuntime.isDebug()){
+                e.printStackTrace();
+            }
             return null;
         }
     }
