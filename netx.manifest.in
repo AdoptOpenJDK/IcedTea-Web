@@ -1,2 +1,8 @@
 Implementation-Title: @PACKAGE_NAME@
 Implementation-Version: @FULL_VERSION@
+Implementation-URL: @PACKAGE_URL@
+Implementation-Vendor: IcedTea
+Specification-Title: JSR56: Java Network Launching Protocol and API
+Specification-URL: http://jcp.org/aboutJava/communityprocess/mrel/jsr056
+Specification-Vendor: Java Community Process
+Specification-Version: 6.0

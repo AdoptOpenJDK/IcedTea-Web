@@ -1,3 +1,11 @@
+2013-06-06  Jiri Vanek  <jvanek@redhat.com>
+	Jacob Wisor  <gitne@excite.co.jp>
+
+	Enhanced manifest
+	* netx.manifest.in: added Implementation-URL, Implementation-Vendor,
+	Specification-Title, Specification-URL, Specification-Vendor and
+	Specification-Version entries 
+
 2013-06-05  Adam Domurad  <adomurad@redhat.com>
 
 	Fix PR1465
