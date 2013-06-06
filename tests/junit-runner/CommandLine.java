@@ -26,10 +26,9 @@ public class CommandLine extends JUnitCore {
 
     public static void runMainAndExit(JUnitSystem system, String... args) {
         new CommandLine().runMain(system, args);
-        system.exit(0);
+        System.exit(0);
     }
 
-    @Override
     public Result runMain(JUnitSystem system, String... args) {
         List<Class<?>> classes = new ArrayList<Class<?>>();
         List<Failure> missingClasses = new ArrayList<Failure>();

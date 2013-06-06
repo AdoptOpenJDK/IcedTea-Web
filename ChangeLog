@@ -1,5 +1,11 @@
 2013-06-06  Jiri Vanek  <jvanek@redhat.com>
 
+	Made all tests running wit junit4.10 and higher
+	* tests/junit-runner/CommandLine.java: (runMain) is no longer overriding
+	and (runMainAndExit) is now calling System.exit rather then system.exit
+
+2013-06-06  Jiri Vanek  <jvanek@redhat.com>
+
 	Silenced deployment.properties and zero size applet exceptions with tests
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
 	(findSystemConfigFile) and (loadProperties) now prints already cough exception
