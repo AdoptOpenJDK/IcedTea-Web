@@ -217,6 +217,34 @@ public class ServerAccessTest {
         Assert.assertArrayEquals(b2, bb[1]);
         Assert.assertArrayEquals(b3, bb[2]);
     }
+    
+    @Test
+    public void stripHttpPathParamTest() {
+    	String[] testBaseUrls = {
+    			"http://foo.com/bar",
+    			"localhost:8080",
+    			"https://bar.co.uk/site;para/baz?u=param1&v=param2"
+    	};
+
+    	String[] testJarNames = {
+    			"jar",
+    			"foo.jar",
+    			"bar;baz.jar",
+    			"nom.jar;",
+    			"rhat.jar.pack.gz;tag"
+    	};
+
+    	for (String url : testBaseUrls) {
+    		for (String jar : testJarNames) {
+    			String newUrl = TinyHttpdImpl.stripHttpPathParams(url),
+    					newJar = TinyHttpdImpl.stripHttpPathParams(jar),
+    					path = newUrl + "/" + newJar;
+    			Assert.assertTrue("Base URL should not have been modified: " + url + " => " + newUrl, newUrl.equals(url));
+    			Assert.assertTrue("JAR name should not be altered other than removing path param: " + jar + " => " + newJar, jar.startsWith(newJar));
+    			Assert.assertTrue("New path should be a substring of old path: " + path + " => " + url + "/" + jar, (url + "/" + jar).startsWith(path));
+    		}
+    	}
+    }
 
     private void printArrays(byte[][] bb) {
         System.out.println("[][] l=" + bb.length);

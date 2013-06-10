@@ -1,4 +1,22 @@
 2013-06-06  Jiri Vanek  <jvanek@redhat.com>
+        Andrew Azores  <aazores@redhat.com>
+
+	Handled semicolon in internal server
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java:
+	added stripHttpPathParams method to remove semicolon-delimited "tags"
+	from end of JAR URLs
+	* tests/test-extensions-tests/net/sourceforge/jnlp/ServerAccessTest.java:
+	added test case for new method in TinyHttpdImpl
+	* tests/reproducers/simple/StripHttpPathParams/resources/StripHttpPathParams.html:
+	browser-launched applet test case for reproducer
+	* tests/reproducers/simple/StripHttpPathParams/resources/StripHttpPathParams.jnlp:
+	JNLP test case for reproducer
+	* tests/reproducers/simple/StripHttpPathParams/srcs/StripHttpPathParams.java:
+	reproducer
+	* tests/reproducers/simple/StripHttpPathParams/testcases/StripHttpPathParamsTest.java: 
+	Testcase to above reproducer
+
+2013-06-06  Jiri Vanek  <jvanek@redhat.com>
 
 	Made all tests running wit junit4.10 and higher
 	* tests/junit-runner/CommandLine.java: (runMain) is no longer overriding

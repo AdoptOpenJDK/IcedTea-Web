@@ -127,6 +127,7 @@ public class TinyHttpdImpl extends Thread {
                         p = URLDecoder.decode(p, "UTF-8");
                         p = p.replaceAll("\\?.*", "");
                         p = (".".concat((p.endsWith("/")) ? p.concat("index.html") : p)).replace('/', File.separatorChar);
+                        p = stripHttpPathParams(p);
                         ServerAccess.logNoReprint("Serving: " + p);
                         File pp = new File(dir, p);
                         int l = (int) pp.length();
@@ -202,5 +203,28 @@ public class TinyHttpdImpl extends Thread {
             rest--;
         }
         return array;
+    }
+    
+    /**
+     * This function removes the HTTP Path Parameter from a given JAR URL, assuming that the
+     * path param delimiter is a semicolon
+     * @param url - the URL from which to remove the path parameter
+     * @return the URL with the path parameter removed
+     */
+    public static String stripHttpPathParams(String url) {
+    	if (url == null) {
+    		return null;
+    	}
+    	
+    	// If JNLP specifies JAR URL with .JAR extension (as it should), then look for any semicolons
+    	// after this position. If one is found, remove it and any following characters.
+    	int fileExtension = url.toUpperCase().lastIndexOf(".JAR");
+    	if (fileExtension != -1) {
+    		int firstSemiColon = url.indexOf(';', fileExtension);
+    		if (firstSemiColon != -1) {    			
+    			url = url.substring(0, firstSemiColon);
+    		}
+    	}
+    	return url;
     }
 }
