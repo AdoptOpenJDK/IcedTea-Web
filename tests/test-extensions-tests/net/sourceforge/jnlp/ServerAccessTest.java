@@ -39,6 +39,8 @@ package net.sourceforge.jnlp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
+import java.net.URLDecoder;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -216,6 +218,42 @@ public class ServerAccessTest {
         Assert.assertArrayEquals(b1, bb[0]);
         Assert.assertArrayEquals(b2, bb[1]);
         Assert.assertArrayEquals(b3, bb[2]);
+    }
+
+    private static final String[] filePathTestUrls = {
+            "/foo.html",
+            "/foo/",
+            "/foo/bar.jar",
+            "/foo/bar.jar;path_param",
+            "/foo/bar.jar%3Bpath_param",
+            "/foo/bar?query=string&red=hat"
+    };
+
+    @Test
+    public void urlToFilePathTest() throws Exception {
+        for (String url : filePathTestUrls) {
+            String newUrl = TinyHttpdImpl.urlToFilePath(url);
+
+            Assert.assertFalse("File path should not contain query string: " + newUrl, newUrl.contains("?"));
+            Assert.assertTrue("File path should be relative: " + newUrl, newUrl.startsWith("./"));
+            Assert.assertFalse("File path should not contain \"/XslowX\":" + newUrl,
+                    newUrl.toLowerCase().contains("/XslowX".toLowerCase()));
+
+            if (url.endsWith("/")) {
+                Assert.assertTrue(newUrl.endsWith("/index.html"));
+            }
+        }
+    }
+
+    @Test
+    public void urlToFilePathUrlDecodeTest() throws Exception {
+        // This test may fail with strange original URLs, eg those containing the substring "%253B",
+        // which can be decoded into "%3B", then decoded again into ';'.
+
+        for (String url : filePathTestUrls) {
+            String newUrl = TinyHttpdImpl.urlToFilePath(url);
+            Assert.assertEquals(newUrl, URLDecoder.decode(newUrl, "UTF-8"));
+        }
     }
     
     @Test

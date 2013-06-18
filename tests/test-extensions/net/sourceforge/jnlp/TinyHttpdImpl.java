@@ -42,6 +42,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.SocketException;
@@ -124,10 +125,7 @@ public class TinyHttpdImpl extends Thread {
                             p = p.replace(XSX, "/");
                         }
                         ServerAccess.logNoReprint("Getting: " + p);
-                        p = URLDecoder.decode(p, "UTF-8");
-                        p = p.replaceAll("\\?.*", "");
-                        p = (".".concat((p.endsWith("/")) ? p.concat("index.html") : p)).replace('/', File.separatorChar);
-                        p = stripHttpPathParams(p);
+                        p = urlToFilePath(p);
                         ServerAccess.logNoReprint("Serving: " + p);
                         File pp = new File(dir, p);
                         int l = (int) pp.length();
@@ -205,6 +203,28 @@ public class TinyHttpdImpl extends Thread {
         return array;
     }
     
+    /**
+    * This function transforms a request URL into a path to a file which the server
+    * will return to the requester.
+    * @param url - the request URL
+    * @return a String representation of the local path to the file
+    * @throws UnsupportedEncodingException
+    */
+    public static String urlToFilePath(String url) throws UnsupportedEncodingException {
+        url = URLDecoder.decode(url, "UTF-8"); // Decode URL encoded charaters, eg "%3B" b    ecomes ';'
+        if (url.startsWith(XSX)) {
+            url = url.replace(XSX, "/");
+        }
+        url = url.replaceAll("\\?.*", ""); // Remove query string from URL
+        url = ".".concat(url); // Change path into relative path
+        if (url.endsWith("/")) {
+            url += "index.html";
+        }
+        url = url.replace('/', File.separatorChar); // If running on Windows, replace '/'     in path with "\\"
+        url = stripHttpPathParams(url);
+        return url;
+    }
+
     /**
      * This function removes the HTTP Path Parameter from a given JAR URL, assuming that the
      * path param delimiter is a semicolon

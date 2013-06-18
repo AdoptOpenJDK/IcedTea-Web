@@ -1,3 +1,10 @@
+2013-06-18  Andrew Azores  <aazores@redhat.com>
+
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java:
+	extracted some lines out of run() into new method urlToFilePath()
+	* tests/test-extensions-tests/net/sourceforge/jnlp/ServerAccessTest.java:
+	unit tests added for new urlToFilePath()
+
 2013-06-06  Jiri Vanek  <jvanek@redhat.com>
         Andrew Azores  <aazores@redhat.com>
 
