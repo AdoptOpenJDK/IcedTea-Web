@@ -234,7 +234,7 @@ public class JNLPRuntime {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            // ignore it
+            e.printStackTrace();
         }
 
         doMainAppContextHacks();

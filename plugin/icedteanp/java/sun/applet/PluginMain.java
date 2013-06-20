@@ -72,6 +72,8 @@ import java.net.CookieManager;
 import java.net.ProxySelector;
 import java.util.Enumeration;
 import java.util.Properties;
+import sun.awt.AppContext;
+import sun.awt.SunToolkit;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -94,6 +96,9 @@ public class PluginMain {
      */
     public static void main(String args[])
             throws IOException {
+        if (AppContext.getAppContext() == null) {
+            SunToolkit.createNewAppContext();
+        }
         if (args.length != 2 || !(new File(args[0]).exists()) || !(new File(args[1]).exists())) {
             System.err.println("Invalid pipe names provided. Refusing to proceed.");
             System.exit(1);

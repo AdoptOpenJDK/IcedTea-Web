@@ -35,6 +35,8 @@ import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.security.viewer.CertificateViewer;
 import net.sourceforge.jnlp.services.ServiceUtil;
+import sun.awt.AppContext;
+import sun.awt.SunToolkit;
 
 /**
  * This is the main entry point for the JNLP client.  The main
@@ -113,6 +115,9 @@ public final class Boot implements PrivilegedAction<Void> {
      * Launch the JNLP file specified by the command-line arguments.
      */
     public static void main(String[] argsIn) {
+        if (AppContext.getAppContext() == null) {
+            SunToolkit.createNewAppContext();
+        }
         args = argsIn;
 
         if (null != getOption("-viewer")) {

@@ -1,3 +1,13 @@
+2013-06-20  Jiri Vanek <jvanek@redhat.com>
+
+	Made it work with OpenJDK build 25
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: (main) 
+	Application context created as soon as possible
+	* plugin/icedteanp/java/sun/applet/PluginMain.java:(main)
+	Application context created as soon as possible
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Do not consume
+	exception after setLookAndFeel.
+
 2013-06-18  Andrew Azores  <aazores@redhat.com>
 
 	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java:
