@@ -1,5 +1,11 @@
 2013-06-20  Jiri Vanek <jvanek@redhat.com>
 
+	Removed out-of date support for jdk 1.5  and older
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: removed memories to Boot13
+	* netx/net/sourceforge/jnlp/runtime/Boot13.java: removed
+	
+2013-06-20  Jiri Vanek <jvanek@redhat.com>
+
 	Made it work with OpenJDK build 25
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: (main) 
 	Application context created as soon as possible

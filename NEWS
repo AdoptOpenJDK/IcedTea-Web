@@ -9,6 +9,7 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.5 (2013-XX-XX):
+* JDK older then 1.5 no longer supported
 * NetX
   - PR1465 - java.io.FileNotFoundException while trying to download a JAR file
 * Plugin

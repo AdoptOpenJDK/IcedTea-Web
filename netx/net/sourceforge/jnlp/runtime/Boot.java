@@ -171,9 +171,6 @@ public final class Boot implements PrivilegedAction<Void> {
 
         JNLPRuntime.setInitialArgments(Arrays.asList(argsIn));
 
-        // do in a privileged action to clear the security context of
-        // the Boot13 class, which doesn't have any privileges in
-        // JRE1.3; JRE1.4 works without Boot13 or this PrivilegedAction.
         AccessController.doPrivileged(new Boot());
 
     }
