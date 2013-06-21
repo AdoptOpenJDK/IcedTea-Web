@@ -2175,11 +2175,11 @@ get_scriptable_object(NPP instance)
 
         applet_class_id.append(*(java_result->return_string));
 
-        obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(instance, applet_class_id, instance_id, false);
+        obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, applet_class_id, instance_id, false);
 
     } else
     {
-        obj = IcedTeaScriptablePluginObject::get_scriptable_java_package_object(instance, "");
+        obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(instance, "");
     }
 
 	return obj;

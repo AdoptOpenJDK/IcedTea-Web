@@ -53,13 +53,6 @@ SUITE(IcedTeaScriptablePluginObject) {
         delete obj;
         CHECK(leak_detector.memory_leaks() == 0);
     }
-
-    TEST(get_scriptable_java_object) {
-        MemoryLeakDetector leak_detector;
-        NPObject* obj = IcedTeaScriptablePluginObject::get_scriptable_java_package_object(&dummy_npp, "DummyPackage");
-        browser_functions.releaseobject(obj);
-        CHECK(leak_detector.memory_leaks() == 0);
-    }
 }
 
 SUITE(IcedTeaScriptableJavaObject) {
@@ -67,6 +60,23 @@ SUITE(IcedTeaScriptableJavaObject) {
         MemoryLeakDetector leak_detector;
         IcedTeaScriptableJavaObject* obj = new IcedTeaScriptableJavaObject(&dummy_npp);
         IcedTeaScriptableJavaObject::deAllocate(obj);
+        CHECK(leak_detector.memory_leaks() == 0);
+    }
+
+    TEST(get_scriptable_java_object) {
+        MemoryLeakDetector leak_detector;
+
+        NPObject* first_obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
+        browser_functions.releaseobject(first_obj);
+
+        /* After the first call, the object should be cached in the object map */
+        NPObject* second_obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
+
+        /* Objects should be the same, because of caching  */
+        CHECK(first_obj == second_obj);
+
+        browser_functions.releaseobject(second_obj);
+
         CHECK(leak_detector.memory_leaks() == 0);
     }
 }
@@ -81,18 +91,8 @@ SUITE(IcedTeaScriptableJavaPackageObject) {
 
     TEST(get_scriptable_java_object) {
         MemoryLeakDetector leak_detector;
-
-        NPObject* first_obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
-        browser_functions.releaseobject(first_obj);
-
-        /* After the first call, the object should be cached in the object map */
-        NPObject* second_obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
-
-        /* Objects should be the same, because of caching  */
-        CHECK(first_obj == second_obj);
-
-        browser_functions.releaseobject(second_obj);
-
+        NPObject* obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(&dummy_npp, "DummyPackage");
+        browser_functions.releaseobject(obj);
         CHECK(leak_detector.memory_leaks() == 0);
     }
 }

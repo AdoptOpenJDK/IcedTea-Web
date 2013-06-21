@@ -822,11 +822,11 @@ javaObjectResultToNPVariant(NPP instance, const std::string& jobject_id, NPVaria
     NPObject* obj;
     if (jclass_id.at(0) == '[') // array
     {
-        obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(instance, jclass_id,
+        obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, jclass_id,
                 jobject_id, true);
     } else
     {
-        obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(instance, jclass_id,
+        obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, jclass_id,
                 jobject_id, false);
     }
 

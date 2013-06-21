@@ -87,7 +87,6 @@ class IcedTeaScriptablePluginObject: public NPObject
         static bool construct(NPObject *npobj, const NPVariant *args,
                 uint32_t argCount, NPVariant *result);
 
-        static NPObject* get_scriptable_java_package_object(NPP instance, const NPUTF8* name);
 };
 
 NPObject* allocate_scriptable_jp_object(NPP npp, NPClass *aClass);
@@ -136,10 +135,7 @@ class IcedTeaScriptableJavaPackageObject: public NPObject
         static bool construct(NPObject *npobj, const NPVariant *args,
                 uint32_t argCount, NPVariant *result);
 
-        static NPObject* get_scriptable_java_object(NPP instance,
-                                                    std::string class_id,
-                                                    std::string instance_id,
-                                                    bool isArray);
+        static NPObject* get_scriptable_java_package_object(NPP instance, const NPUTF8* name);
 
         static bool is_valid_java_object(NPObject* object_ptr);
 };
@@ -199,6 +195,11 @@ class IcedTeaScriptableJavaObject: public NPObject
 
         static bool construct(NPObject *npobj, const NPVariant *args,
                 uint32_t argCount, NPVariant *result);
+
+        static NPObject* get_scriptable_java_object(NPP instance,
+                                                    std::string class_id,
+                                                    std::string instance_id,
+                                                    bool isArray);
 };
 
 /* Creates and retains a scriptable java object (intended to be called asynch.) */

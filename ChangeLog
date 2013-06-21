@@ -1,5 +1,15 @@
 2013-06-21  Adam Domurad  <adomurad@redhat.com>
 
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc:
+	Move 'get_scriptable_java_package_object' and
+	'get_scriptable_java_object' into their correct respective classes.
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.h: Same.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Update references.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Same.
+	* tests/cpp-unit-tests/IcedTeaScriptablePluginObjectTest.cc: Same.
+
+2013-06-21  Adam Domurad  <adomurad@redhat.com>
+
 	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc
 	(IcedTeaScriptablePluginObject::get_scriptable_java_package_object): Fix
 	memory leak due to allocated NPClass.

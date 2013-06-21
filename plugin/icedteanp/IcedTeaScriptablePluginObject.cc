@@ -94,7 +94,7 @@ IcedTeaScriptablePluginObject::getProperty(NPObject *npobj, NPIdentifier name, N
 	// Package request?
 	if (!strcmp(browser_functions.utf8fromidentifier(name), "java"))
 	{
-		//NPObject* obj = IcedTeaScriptablePluginObject::get_scriptable_java_package_object(getInstanceFromMemberPtr(npobj), name);
+		//NPObject* obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(getInstanceFromMemberPtr(npobj), name);
 		//OBJECT_TO_NPVARIANT(obj, *result);
 
 		//printf ("Filling variant %p with object %p\n", result);
@@ -159,7 +159,7 @@ scriptable_plugin_object_class() {
 }
 
 NPObject*
-IcedTeaScriptablePluginObject::get_scriptable_java_package_object(NPP instance, const NPUTF8* name)
+IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(NPP instance, const NPUTF8* name)
 {
     /* Shared NPClass instance for IcedTeaScriptablePluginObject */
     static NPClass np_class = scriptable_plugin_object_class();
@@ -308,14 +308,14 @@ IcedTeaScriptableJavaPackageObject::getProperty(NPObject *npobj, NPIdentifier na
 	if (isPropertyClass)
 	{
 		PLUGIN_DEBUG("Returning package object\n");
-		obj = IcedTeaScriptablePluginObject::get_scriptable_java_package_object(
+		obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(
                                   IcedTeaPluginUtilities::getInstanceFromMemberPtr(npobj),
                                   property_name.c_str());
 	}
 	else
 	{
 		PLUGIN_DEBUG("Returning Java object\n");
-		obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(
+		obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(
 		                IcedTeaPluginUtilities::getInstanceFromMemberPtr(npobj),
 		                *(java_result->return_string), "0", false);
 	}
@@ -382,7 +382,7 @@ scriptable_java_package_object_class() {
 }
 
 NPObject*
-IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(NPP instance,
+IcedTeaScriptableJavaObject::get_scriptable_java_object(NPP instance,
                                     std::string class_id,
                                     std::string instance_id,
                                     bool isArray)
@@ -393,7 +393,7 @@ IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(NPP instance,
     std::string obj_key = class_id + ":" + instance_id;
 
     PLUGIN_DEBUG("get_scriptable_java_object searching for %s...\n", obj_key.c_str());
-    NPObject* scriptable_object = IcedTeaPluginUtilities::getNPObjectFromJavaKey(obj_key);
+    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) IcedTeaPluginUtilities::getNPObjectFromJavaKey(obj_key);
 
     if (scriptable_object != NULL)
     {
@@ -403,7 +403,7 @@ IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(NPP instance,
     }
 
     // try to create normally
-    scriptable_object = browser_functions.createobject(instance, &np_class);
+    scriptable_object = (IcedTeaScriptableJavaObject*)browser_functions.createobject(instance, &np_class);
 
     // didn't work? try creating asynch
     if (!scriptable_object)
@@ -426,11 +426,11 @@ IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(NPP instance,
 
     PLUGIN_DEBUG("Constructed new Java Object with classid=%s, instanceid=%s, isArray=%d and scriptable_object=%p\n", class_id.c_str(), instance_id.c_str(), isArray, scriptable_object);
 
-	((IcedTeaScriptableJavaObject*) scriptable_object)->setClassIdentifier(class_id);
-    ((IcedTeaScriptableJavaObject*) scriptable_object)->setIsArray(isArray);
+    scriptable_object->setClassIdentifier(class_id);
+    scriptable_object->setIsArray(isArray);
 
 	if (instance_id != "0")
-	    ((IcedTeaScriptableJavaObject*) scriptable_object)->setInstanceIdentifier(instance_id);
+	    scriptable_object->setInstanceIdentifier(instance_id);
 
 	IcedTeaPluginUtilities::storeInstanceID(scriptable_object, instance);
 	IcedTeaPluginUtilities::storeObjectMapping(obj_key, scriptable_object);
@@ -709,7 +709,7 @@ IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name, NPV
 
             if (!strcmp(browser_functions.utf8fromidentifier(name), "Packages"))
             {
-                NPObject* pkgObject = IcedTeaScriptablePluginObject::get_scriptable_java_package_object(instance, "");
+                NPObject* pkgObject = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(instance, "");
                 OBJECT_TO_NPVARIANT(pkgObject, *result);
                 return true;
             }
@@ -890,7 +890,7 @@ IcedTeaScriptableJavaObject::construct(NPObject *npobj, const NPVariant *args, u
     std::string return_obj_class_id = class_id;
     return_obj_instance_id.append(*(java_result->return_string));
 
-    obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(
+    obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(
                                 IcedTeaPluginUtilities::getInstanceFromMemberPtr(npobj),
                                 return_obj_class_id, return_obj_instance_id, false);
 
