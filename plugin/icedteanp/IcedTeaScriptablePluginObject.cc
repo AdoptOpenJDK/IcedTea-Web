@@ -139,35 +139,39 @@ allocate_scriptable_jp_object(NPP npp, NPClass *aClass)
     return new IcedTeaScriptableJavaPackageObject(npp);
 }
 
+static NPClass
+scriptable_plugin_object_class() {
+    NPClass np_class;
+    np_class.structVersion = NP_CLASS_STRUCT_VERSION;
+    np_class.allocate = allocate_scriptable_jp_object;
+    np_class.deallocate = IcedTeaScriptableJavaPackageObject::deAllocate;
+    np_class.invalidate = IcedTeaScriptableJavaPackageObject::invalidate;
+    np_class.hasMethod = IcedTeaScriptableJavaPackageObject::hasMethod;
+    np_class.invoke = IcedTeaScriptableJavaPackageObject::invoke;
+    np_class.invokeDefault = IcedTeaScriptableJavaPackageObject::invokeDefault;
+    np_class.hasProperty = IcedTeaScriptableJavaPackageObject::hasProperty;
+    np_class.getProperty = IcedTeaScriptableJavaPackageObject::getProperty;
+    np_class.setProperty = IcedTeaScriptableJavaPackageObject::setProperty;
+    np_class.removeProperty = IcedTeaScriptableJavaPackageObject::removeProperty;
+    np_class.enumerate = IcedTeaScriptableJavaPackageObject::enumerate;
+    np_class.construct = IcedTeaScriptableJavaPackageObject::construct;
+    return np_class;
+}
+
 NPObject*
 IcedTeaScriptablePluginObject::get_scriptable_java_package_object(NPP instance, const NPUTF8* name)
 {
+    /* Shared NPClass instance for IcedTeaScriptablePluginObject */
+    static NPClass np_class = scriptable_plugin_object_class();
 
-	NPObject* scriptable_object;
-
-	NPClass* np_class = new NPClass();
-	np_class->structVersion = NP_CLASS_STRUCT_VERSION;
-	np_class->allocate = allocate_scriptable_jp_object;
-	np_class->deallocate = IcedTeaScriptableJavaPackageObject::deAllocate;
-	np_class->invalidate = IcedTeaScriptableJavaPackageObject::invalidate;
-	np_class->hasMethod = IcedTeaScriptableJavaPackageObject::hasMethod;
-	np_class->invoke = IcedTeaScriptableJavaPackageObject::invoke;
-	np_class->invokeDefault = IcedTeaScriptableJavaPackageObject::invokeDefault;
-	np_class->hasProperty = IcedTeaScriptableJavaPackageObject::hasProperty;
-	np_class->getProperty = IcedTeaScriptableJavaPackageObject::getProperty;
-	np_class->setProperty = IcedTeaScriptableJavaPackageObject::setProperty;
-	np_class->removeProperty = IcedTeaScriptableJavaPackageObject::removeProperty;
-	np_class->enumerate = IcedTeaScriptableJavaPackageObject::enumerate;
-	np_class->construct = IcedTeaScriptableJavaPackageObject::construct;
-
-	scriptable_object = browser_functions.createobject(instance, np_class);
-	PLUGIN_DEBUG("Returning new scriptable package class: %p from instance %p with name %s\n", scriptable_object, instance, name);
+    NPObject* scriptable_object = browser_functions.createobject(instance, &np_class);
+    PLUGIN_DEBUG("Returning new scriptable package class: %p from instance %p with name %s\n", scriptable_object, instance, name);
 
     ((IcedTeaScriptableJavaPackageObject*) scriptable_object)->setPackageName(name);
 
     IcedTeaPluginUtilities::storeInstanceID(scriptable_object, instance);
 
-	return scriptable_object;
+    return scriptable_object;
 }
 
 IcedTeaScriptableJavaPackageObject::IcedTeaScriptableJavaPackageObject(NPP instance)
@@ -357,21 +361,39 @@ allocate_scriptable_java_object(NPP npp, NPClass *aClass)
     return new IcedTeaScriptableJavaObject(npp);
 }
 
+
+static NPClass
+scriptable_java_package_object_class() {
+    NPClass np_class;
+    np_class.structVersion = NP_CLASS_STRUCT_VERSION;
+    np_class.allocate = allocate_scriptable_java_object;
+    np_class.deallocate = IcedTeaScriptableJavaObject::deAllocate;
+    np_class.invalidate = IcedTeaScriptableJavaObject::invalidate;
+    np_class.hasMethod = IcedTeaScriptableJavaObject::hasMethod;
+    np_class.invoke = IcedTeaScriptableJavaObject::invoke;
+    np_class.invokeDefault = IcedTeaScriptableJavaObject::invokeDefault;
+    np_class.hasProperty = IcedTeaScriptableJavaObject::hasProperty;
+    np_class.getProperty = IcedTeaScriptableJavaObject::getProperty;
+    np_class.setProperty = IcedTeaScriptableJavaObject::setProperty;
+    np_class.removeProperty = IcedTeaScriptableJavaObject::removeProperty;
+    np_class.enumerate = IcedTeaScriptableJavaObject::enumerate;
+    np_class.construct = IcedTeaScriptableJavaObject::construct;
+    return np_class;
+}
+
 NPObject*
 IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(NPP instance,
                                     std::string class_id,
                                     std::string instance_id,
                                     bool isArray)
 {
-    NPObject* scriptable_object;
+    /* Shared NPClass instance for IcedTeaScriptablePluginObject */
+    static NPClass np_class = scriptable_java_package_object_class();
 
-    std::string obj_key = std::string();
-    obj_key += class_id;
-    obj_key += ":";
-    obj_key += instance_id;
+    std::string obj_key = class_id + ":" + instance_id;
 
     PLUGIN_DEBUG("get_scriptable_java_object searching for %s...\n", obj_key.c_str());
-    scriptable_object = IcedTeaPluginUtilities::getNPObjectFromJavaKey(obj_key);
+    NPObject* scriptable_object = IcedTeaPluginUtilities::getNPObjectFromJavaKey(obj_key);
 
     if (scriptable_object != NULL)
     {
@@ -380,24 +402,8 @@ IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(NPP instance,
         return scriptable_object;
     }
 
-
-	NPClass* np_class = new NPClass();
-	np_class->structVersion = NP_CLASS_STRUCT_VERSION;
-	np_class->allocate = allocate_scriptable_java_object;
-	np_class->deallocate = IcedTeaScriptableJavaObject::deAllocate;
-	np_class->invalidate = IcedTeaScriptableJavaObject::invalidate;
-	np_class->hasMethod = IcedTeaScriptableJavaObject::hasMethod;
-	np_class->invoke = IcedTeaScriptableJavaObject::invoke;
-	np_class->invokeDefault = IcedTeaScriptableJavaObject::invokeDefault;
-	np_class->hasProperty = IcedTeaScriptableJavaObject::hasProperty;
-	np_class->getProperty = IcedTeaScriptableJavaObject::getProperty;
-	np_class->setProperty = IcedTeaScriptableJavaObject::setProperty;
-	np_class->removeProperty = IcedTeaScriptableJavaObject::removeProperty;
-	np_class->enumerate = IcedTeaScriptableJavaObject::enumerate;
-	np_class->construct = IcedTeaScriptableJavaObject::construct;
-
-	// try to create normally
-    scriptable_object =  browser_functions.createobject(instance, np_class);
+    // try to create normally
+    scriptable_object = browser_functions.createobject(instance, &np_class);
 
     // didn't work? try creating asynch
     if (!scriptable_object)
@@ -408,7 +414,7 @@ IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(NPP instance,
         thread_data.result = std::string();
 
         thread_data.parameters.push_back(instance);
-        thread_data.parameters.push_back(np_class);
+        thread_data.parameters.push_back(&np_class);
         thread_data.parameters.push_back(&scriptable_object);
 
         IcedTeaPluginUtilities::callAndWaitForResult(instance, &_createAndRetainJavaObject, &thread_data);

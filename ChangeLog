@@ -1,5 +1,13 @@
 2013-06-21  Adam Domurad  <adomurad@redhat.com>
 
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc
+	(IcedTeaScriptablePluginObject::get_scriptable_java_package_object): Fix
+	memory leak due to allocated NPClass.
+	(IcedTeaScriptableJavaPackageObject::get_scriptable_java_object):
+	Same. 
+
+2013-06-21  Adam Domurad  <adomurad@redhat.com>
+
 	* plugin/icedteanp/IcedTeaPluginUtils.cc: Add global state clearing
 	utility functions.
 	* plugin/icedteanp/IcedTeaPluginUtils.h: Same.
