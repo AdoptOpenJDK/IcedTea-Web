@@ -142,64 +142,64 @@ class IcedTeaScriptableJavaPackageObject: public NPObject
 
 class IcedTeaScriptableJavaObject: public NPObject
 {
+private:
+    NPP instance;
+    bool is_object_array;
+    /* These may be empty if 'is_applet_instance' is true
+     * and the object has not yet been used */
+    std::string class_id, instance_id;
+public:
+    IcedTeaScriptableJavaObject(NPP instance) {
+        this->instance = instance;
+        is_object_array = false;
+    }
+    static void deAllocate(NPObject *npobj) {
+        delete (IcedTeaScriptableJavaObject*)npobj;
+    }
+    std::string getInstanceID() {
+        return instance_id;
+    }
+    std::string getClassID() {
+        return class_id;
+    }
+    std::string objectKey() {
+        return getClassID() + ":" + getInstanceID();
+    }
+    static void invalidate(NPObject *npobj) {
+        IcedTeaPluginUtilities::removeInstanceID(npobj);
+        IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
+        IcedTeaPluginUtilities::removeObjectMapping(scriptable_object->objectKey());
+    }
+    static bool hasMethod(NPObject *npobj, NPIdentifier name);
+    static bool invoke(NPObject *npobj, NPIdentifier name,
+            const NPVariant *args, uint32_t argCount, NPVariant *result);
+    static bool invokeDefault(NPObject *npobj, const NPVariant *args,
+            uint32_t argCount, NPVariant *result) {
+        printf ("** Unimplemented: IcedTeaScriptableJavaObject::invokeDefault %p\n", npobj);
+        return false;
+    }
+    static bool hasProperty(NPObject *npobj, NPIdentifier name);
+    static bool getProperty(NPObject *npobj, NPIdentifier name,
+            NPVariant *result);
+    static bool setProperty(NPObject *npobj, NPIdentifier name,
+            const NPVariant *value);
 
-    private:
-    	NPP instance;
-    	bool isObjectArray;
-    	std::string* class_id;
-    	std::string* instance_id;
-
-    public:
-    	IcedTeaScriptableJavaObject(NPP instance);
-
-    	~IcedTeaScriptableJavaObject();
-
-    	void setClassIdentifier(std::string class_id);
-
-    	void setInstanceIdentifier(std::string instance_id);
-
-    	void setIsArray(bool isArray);
-
-    	std::string getClassID() { return *class_id; }
-
-    	std::string getInstanceID() { return *instance_id; }
-
-    	NPP getInstance() { return instance; }
-
-    	bool isArray() { return isObjectArray; }
-
-        static void deAllocate(NPObject *npobj);
-
-        static void invalidate(NPObject *npobj);
-
-        static bool hasMethod(NPObject *npobj, NPIdentifier name);
-
-        static bool invoke(NPObject *npobj, NPIdentifier name,
-                const NPVariant *args, uint32_t argCount, NPVariant *result);
-
-        static bool invokeDefault(NPObject *npobj, const NPVariant *args,
-                uint32_t argCount, NPVariant *result);
-
-        static bool hasProperty(NPObject *npobj, NPIdentifier name);
-
-        static bool getProperty(NPObject *npobj, NPIdentifier name,
-                NPVariant *result);
-
-        static bool setProperty(NPObject *npobj, NPIdentifier name,
-                const NPVariant *value);
-
-        static bool removeProperty(NPObject *npobj, NPIdentifier name);
-
-        static bool enumerate(NPObject *npobj, NPIdentifier **value,
-                uint32_t *count);
-
-        static bool construct(NPObject *npobj, const NPVariant *args,
-                uint32_t argCount, NPVariant *result);
-
-        static NPObject* get_scriptable_java_object(NPP instance,
-                                                    std::string class_id,
-                                                    std::string instance_id,
-                                                    bool isArray);
+    static bool removeProperty(NPObject *npobj, NPIdentifier name) {
+        printf ("** Unimplemented: IcedTeaScriptableJavaObject::removeProperty %p\n", npobj);
+        return false;
+    }
+    static bool enumerate(NPObject *npobj, NPIdentifier **value,
+            uint32_t *count) {
+        printf ("** Unimplemented: IcedTeaScriptableJavaObject::enumerate %p\n", npobj);
+        return false;
+    }
+    static bool construct(NPObject *npobj, const NPVariant *args,
+            uint32_t argCount, NPVariant *result);
+     /* Creates and retains a scriptable java object (intended to be called asynch.) */
+    static NPObject* get_scriptable_java_object(NPP instance,
+                                                std::string class_id,
+                                                std::string instance_id,
+                                                bool isArray);
 };
 
 /* Creates and retains a scriptable java object (intended to be called asynch.) */

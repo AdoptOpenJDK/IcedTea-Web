@@ -1,5 +1,11 @@
 2013-06-21  Adam Domurad  <adomurad@redhat.com>
 
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: Simplify 
+	IcedTeaScriptableJavaObject
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.h: Same
+
+2013-06-21  Adam Domurad  <adomurad@redhat.com>
+
 	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc:
 	Move 'get_scriptable_java_package_object' and
 	'get_scriptable_java_object' into their correct respective classes.
