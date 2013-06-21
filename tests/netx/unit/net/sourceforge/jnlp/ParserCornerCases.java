@@ -50,6 +50,7 @@ import org.junit.Test;
 
 /** Test various corner cases of the parser */
 public class ParserCornerCases {
+    private static final ParserSettings defaultParser = new ParserSettings(false, true,true);
 
     @Test
     public void testCdata() throws ParseException, XMLParseException, IOException {
@@ -63,7 +64,7 @@ public class ParserCornerCases {
         Assert.assertTrue(target.getContent().contains("DOCTYPE"));
         Assert.assertTrue(target.getContent().contains("<entry key=\"key\">value</entry>"));
 
-        Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
         Assert.assertEquals("argument", node.getNodeName());
         String contents = node.getNodeValue();
         Assert.assertTrue(contents.contains("xml"));
@@ -90,7 +91,7 @@ public class ParserCornerCases {
         Assert.assertTrue(target.getContent().contains("DOCTYPE"));
         Assert.assertTrue(target.getContent().contains("<entry key=\"key\">value</entry>"));
 
-        Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
         node = node.getFirstChild().getFirstChild();
         Assert.assertEquals("argument", node.getNodeName());
         String contents = node.getNodeValue();
@@ -126,42 +127,25 @@ public class ParserCornerCases {
     @Test
     public void testUnsupportedSpecNumber() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='11.11'></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
-        Parser parser = new Parser(null, null, root, false, false);
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Parser parser = new Parser(null, null, root, defaultParser);
         Assert.assertEquals("11.11", parser.getSpecVersion().toString());
     }
 
     @Test
     public void testApplicationAndComponent() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp><application-desc/><component-desc/></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
-        Parser parser = new Parser(null, null, root, false, false);
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Parser parser = new Parser(null, null, root, defaultParser);
         Assert.assertNotNull(parser.getLauncher(root));
     }
 
     @Test
     public void testCommentInElements() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='1.0' <!-- comment -->> </jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
-        Parser p = new Parser(null, null, root, false, false);
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Parser p = new Parser(null, null, root, defaultParser);
         Assert.assertEquals("1.0", p.getSpecVersion().toString());
-    }
-
-    @Test
-    public void testCommentInElements2() throws ParseException {
-        String malformedJnlp = "<?xml?><jnlp <!-- comment --> spec='1.0'> </jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
-        Parser p = new Parser(null, null, root, false, false);
-        Assert.assertEquals("1.0", p.getSpecVersion().toString());
-    }
-
-    @Test
-    @KnownToFail
-    public void testCommentInAttributes() throws ParseException {
-        String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
-        Parser p = new Parser(null, null, root, false, false);
-        Assert.assertEquals("<!-- something -->", p.getSpecVersion().toString());
     }
 
     @Test
@@ -171,8 +155,8 @@ public class ParserCornerCases {
                 "<vendor>IcedTea</vendor><description>" +
                 "<!-- outer <!-- inner --> -->" +
                 "</description></information></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
-        Parser p = new Parser(null, null, root, false, false);
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Parser p = new Parser(null, null, root, defaultParser);
         Assert.assertEquals(" -->", p.getInfo(root).get(0).getDescription());
     }
 
@@ -186,8 +170,42 @@ public class ParserCornerCases {
                 " -->\n" +
                 "  <information/>" +
                 "</jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
-        Parser p = new Parser(null, null, root, false, false);
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Parser p = new Parser(null, null, root, defaultParser);
     }
 
+
+    @Test
+    public void testCommentInElements2() throws ParseException {
+        String malformedJnlp = "<?xml?><jnlp <!-- comment --> spec='1.0'> </jnlp>";
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,true));
+        Parser p = new Parser(null, null, root, defaultParser);
+        //defaultis used
+        Assert.assertEquals("1.0+", p.getSpecVersion().toString());
+    }
+
+     @Test
+    public void testCommentInElements2_malformedOff() throws ParseException {
+        String malformedJnlp = "<?xml?><jnlp <!-- comment --> spec='1.0'> </jnlp>";
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,false));
+        Parser p = new Parser(null, null, root, defaultParser);
+        Assert.assertEquals("1.0", p.getSpecVersion().toString());
+    }
+    @Test
+    public void testCommentInAttributes() throws ParseException {
+        String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,true));
+        Parser p = new Parser(null, null, root, defaultParser);
+        Assert.assertEquals("<!-- something -->", p.getSpecVersion().toString());
+    }
+
+
+     @Test
+    public void testCommentInAttributes_malformedOff() throws ParseException {
+        String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
+        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,false));
+        Parser p = new Parser(null, null, root, defaultParser);
+        //defaultis used
+        Assert.assertEquals("1.0+", p.getSpecVersion().toString());
+    }
 }

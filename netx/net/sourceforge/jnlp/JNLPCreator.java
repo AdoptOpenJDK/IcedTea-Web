@@ -28,8 +28,8 @@ import java.net.URL;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 
 public class JNLPCreator {
-    public JNLPFile create(URL location, Version version, boolean strict,
+    public JNLPFile create(URL location, Version version, ParserSettings settings,
             UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
-        return new JNLPFile(location, version, strict, policy, forceCodebase);
+        return new JNLPFile(location, version, settings, policy, forceCodebase);
     }
 }

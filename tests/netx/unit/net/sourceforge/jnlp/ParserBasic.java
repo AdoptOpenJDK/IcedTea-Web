@@ -61,9 +61,10 @@ public class ParserBasic {
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
+        ParserSettings defaultParser = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/basic.jnlp");
-        root = Parser.getRootNode(jnlpStream);
-        parser = new Parser(new DummyJNLPFile(), null, root, false, false);
+        root = Parser.getRootNode(jnlpStream, defaultParser);
+        parser = new Parser(new DummyJNLPFile(), null, root, defaultParser);
     }
 
     @Test

@@ -477,12 +477,12 @@ public class Launcher {
         try {
             JNLPFile file = null;
 
-            file = new JNLPFile(location, parserSettings.isStrict());
+            file = new JNLPFile(location, parserSettings);
 
             if (fromSource) {
                 // Launches the jnlp file where this file originated.
                 if (file.getSourceLocation() != null) {
-                    file = new JNLPFile(file.getSourceLocation(), parserSettings.isStrict());
+                    file = new JNLPFile(file.getSourceLocation(), parserSettings);
                 }
             }
             return file;
@@ -504,9 +504,11 @@ public class Launcher {
             JNLPFile file = null;
 
             try {
-                file = new JNLPFile(location, (Version) null, true, updatePolicy); // strict
+                ParserSettings settings = new ParserSettings(true, true, false);
+                file = new JNLPFile(location, (Version) null, settings, updatePolicy); // strict
             } catch (ParseException ex) {
-                file = new JNLPFile(location, (Version) null, false, updatePolicy);
+                ParserSettings settings = new ParserSettings(false, true, true);
+                file = new JNLPFile(location, (Version) null, settings, updatePolicy);
 
                 // only here if strict failed but lax did not fail
                 LaunchException lex =

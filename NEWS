@@ -9,9 +9,12 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.5 (2013-XX-XX):
+* IcedTea-Web now using tagsoup as default (tagsoup dependence) sanitizer for input
 * JDK older then 1.5 no longer supported
 * NetX
   - PR1465 - java.io.FileNotFoundException while trying to download a JAR file
+  - Netx can now parse malformed jnlp files using tagsoup
+  - PR1026 - Apps fail to run because of the nanoxml parser's strict XML validation
 * Plugin
   - PR854: Resizing an applet several times causes 100% CPU load
 

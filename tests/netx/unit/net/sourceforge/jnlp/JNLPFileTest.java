@@ -138,10 +138,10 @@ public class JNLPFileTest {
                 "</jnlp>";
 
         URL codeBase = new URL("http://www.redhat.com/");
-        ;
+
         InputStream is = new ByteArrayInputStream(jnlpContext.getBytes());
 
-        JNLPFile jnlpFile = new JNLPFile(is, codeBase, false);
+        JNLPFile jnlpFile = new JNLPFile(is, codeBase, new ParserSettings(false,false,false));
 
         Assert.assertEquals("http://icedtea.claspath.org/", jnlpFile.getCodeBase().toExternalForm());
         Assert.assertEquals("redhat.embeddedjnlp", jnlpFile.getApplet().getMainClass());

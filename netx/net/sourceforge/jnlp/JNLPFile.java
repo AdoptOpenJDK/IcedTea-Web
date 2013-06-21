@@ -67,6 +67,9 @@ public class JNLPFile {
     /** the network location of this JNLP file */
     protected URL fileLocation;
 
+    /** the ParserSettings which were used to parse this file */
+    protected ParserSettings parserSettings = null;
+
     /** A key that uniquely identifies connected instances (main jnlp+ext) */
     protected String uniqueKey = null;
 
@@ -145,7 +148,7 @@ public class JNLPFile {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location) throws IOException, ParseException {
-        this(location, false); // not strict
+        this(location, new ParserSettings());
     }
 
     /**
@@ -153,12 +156,12 @@ public class JNLPFile {
      * default policy.
      *
      * @param location the location of the JNLP file
-     * @param strict whether to enforce the spec when
+     * @param settings the parser settings to use while parsing the file
      * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, boolean strict) throws IOException, ParseException {
-        this(location, (Version) null, strict);
+    public JNLPFile(URL location, ParserSettings settings) throws IOException, ParseException {
+        this(location, (Version) null, settings);
     }
 
     /**
@@ -167,12 +170,12 @@ public class JNLPFile {
      *
      * @param location the location of the JNLP file
      * @param version the version of the JNLP file
-     * @param strict whether to enforce the spec when
+     * @param settings the parser settings to use while parsing the file
      * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, Version version, boolean strict) throws IOException, ParseException {
-        this(location, version, strict, JNLPRuntime.getDefaultUpdatePolicy());
+    public JNLPFile(URL location, Version version, ParserSettings settings) throws IOException, ParseException {
+        this(location, version, settings, JNLPRuntime.getDefaultUpdatePolicy());
     }
 
     /**
@@ -186,8 +189,8 @@ public class JNLPFile {
      * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, Version version, boolean strict, UpdatePolicy policy) throws IOException, ParseException {
-        this(location, version, strict, policy, null);
+    public JNLPFile(URL location, Version version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
+	this(location, version, settings, policy, null);
     }
 
     /**
@@ -196,15 +199,16 @@ public class JNLPFile {
      *
      * @param location the location of the JNLP file
      * @param version the version of the JNLP file
-     * @param strict whether to enforce the spec when
+     * @param settings the parser settings to use while parsing the file
      * @param policy the update policy
      * @param forceCodebase codebase to use if not specified in JNLP file.
      * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    protected JNLPFile(URL location, Version version, boolean strict, UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
-        Node root = Parser.getRootNode(openURL(location, version, policy));
-        parse(root, strict, location, forceCodebase);
+    protected JNLPFile(URL location, Version version, ParserSettings settings, UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
+        InputStream input = openURL(location, version, policy);
+        this.parserSettings = settings;
+        parse(input, location, forceCodebase);
 
         //Downloads the original jnlp file into the cache if possible
         //(i.e. If the jnlp file being launched exist locally, but it
@@ -231,13 +235,13 @@ public class JNLPFile {
      * @param location the location of the JNLP file
      * @param uniqueKey A string that uniquely identifies connected instances
      * @param version the version of the JNLP file
-     * @param strict whether to enforce the spec when
+     * @param settings the parser settings to use while parsing the file
      * @param policy the update policy
      * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, String uniqueKey, Version version, boolean strict, UpdatePolicy policy) throws IOException, ParseException {
-        this(location, version, strict, policy);
+    public JNLPFile(URL location, String uniqueKey, Version version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
+        this(location, version, settings, policy);
         this.uniqueKey = uniqueKey;
 
         if (JNLPRuntime.isDebug())
@@ -250,8 +254,9 @@ public class JNLPFile {
      * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(InputStream input, boolean strict) throws ParseException {
-        this(input, null, strict);
+    public JNLPFile(InputStream input, ParserSettings settings) throws ParseException {
+        this.parserSettings = settings;
+        parse(input, null, null);
     }
 
     /**
@@ -263,22 +268,11 @@ public class JNLPFile {
      * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(InputStream input, URL codebase, boolean strict) throws ParseException {
-        parse(Parser.getRootNode(input), strict, null, codebase);
+    public JNLPFile(InputStream input, URL codebase, ParserSettings settings) throws ParseException {
+        this.parserSettings = settings;
+        parse(input, null, codebase);
     }
 
-    /**
-     * Create a JNLPFile from a character stream.
-     *
-     * @param input the stream
-     * @param strict whether to enforce the spec when
-     * @throws IOException if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    private JNLPFile(Reader input, boolean strict) throws ParseException {
-        // todo: now that we are using NanoXML we can use a Reader
-        //parse(Parser.getRootNode(input), strict, null);
-    }
 
     /**
      * Open the jnlp file URL from the cache if there, otherwise
@@ -335,6 +329,13 @@ public class JNLPFile {
      */
     public String getUniqueKey() {
         return uniqueKey;
+    }
+
+    /**
+     * Returns the ParserSettings that was used to parse this file
+     */
+    public ParserSettings getParserSettings() {
+        return parserSettings;
     }
 
     /**
@@ -685,15 +686,16 @@ public class JNLPFile {
      * from the constructor.
      *
      * @param root the root node
-     * @param strict whether to enforce the spec when
+     * @param settings the parser settings to use while parsing the file
      * @param location the file location or null
      */
-    private void parse(Node root, boolean strict, URL location, URL forceCodebase) throws ParseException {
+    private void parse(InputStream input, URL location, URL forceCodebase) throws ParseException {
         try {
             //if (location != null)
             //  location = new URL(location, "."); // remove filename
 
-            Parser parser = new Parser(this, location, root, strict, true, forceCodebase); // true == allow extensions
+            Node root = Parser.getRootNode(input, parserSettings);
+            Parser parser = new Parser(this, location, root, parserSettings, forceCodebase); // true == allow extensions
 
             // JNLP tag information
             specVersion = parser.getSpecVersion();

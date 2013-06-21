@@ -76,6 +76,7 @@ import net.sourceforge.jnlp.LaunchDesc;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.ParseException;
+import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.SecurityDesc;
@@ -460,7 +461,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
      */
-    public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version, UpdatePolicy policy, String mainName)
+    public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version,ParserSettings settings, UpdatePolicy policy, String mainName)
             throws IOException, ParseException, LaunchException {
 
         JNLPClassLoader loader;
@@ -469,7 +470,7 @@ public class JNLPClassLoader extends URLClassLoader {
             loader = uniqueKeyToLoader.get(uniqueKey);
 
             if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
-                JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, false, policy);
+                JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, settings, policy);
 
                 loader = getInstance(jnlpFile, policy, mainName);
             }
@@ -504,7 +505,7 @@ public class JNLPClassLoader extends URLClassLoader {
         for (int i = 0; i < ext.length; i++) {
             try {
                 String uniqueKey = this.getJNLPFile().getUniqueKey();
-                JNLPClassLoader loader = getInstance(ext[i].getLocation(), uniqueKey, ext[i].getVersion(), updatePolicy, mainClass);
+                JNLPClassLoader loader = getInstance(ext[i].getLocation(), uniqueKey, ext[i].getVersion(), file.getParserSettings(), updatePolicy, mainClass);
                 loaderList.add(loader);
             } catch (Exception ex) {
                 ex.printStackTrace();

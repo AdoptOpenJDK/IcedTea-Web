@@ -35,7 +35,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-
 package net.sourceforge.jnlp;
 
 /**
@@ -46,16 +45,34 @@ package net.sourceforge.jnlp;
 public class ParserSettings {
 
     private final boolean isStrict;
+    private final boolean extensionAllowed;
+    private final boolean malformedXmlAllowed;
 
+    /** Create a new ParserSettings with the defautl parser settings */
     public ParserSettings() {
-        isStrict = false;
+        this(false, true, true);
     }
 
-    public ParserSettings(boolean strict) {
-        isStrict = strict;
+    /** Create a new ParserSettings object */
+    public ParserSettings(boolean strict, boolean extensionAllowed, boolean malformedXmlAllowed) {
+        this.isStrict = strict;
+        this.extensionAllowed = extensionAllowed;
+        this.malformedXmlAllowed = malformedXmlAllowed;
     }
 
+    /** @return true if extensions to the spec are allowed */
+    public boolean isExtensionAllowed() {
+        return extensionAllowed;
+    }
+
+    /** @return true if parsing malformed xml is allowed */
+    public boolean isMalformedXmlAllowed() {
+        return malformedXmlAllowed;
+    }
+
+    /** @return true if strict parsing mode is to be used */
     public boolean isStrict() {
         return isStrict;
     }
+
 }

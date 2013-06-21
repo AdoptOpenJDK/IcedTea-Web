@@ -111,6 +111,8 @@ IT_FIND_OPTIONAL_JAR([jacoco], JACOCO,
 IT_FIND_OPTIONAL_JAR([asm], ASM,
     [/usr/share/java/objectweb-asm4/asm-all.jar /usr/share/java/objectweb-asm4/asm-all-4.0.jar /usr/share/java/objectweb-asm/asm-all.jar])
 
+IT_CHECK_FOR_TAGSOUP
+
 AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
 AC_CONFIG_FILES([build.properties])
 

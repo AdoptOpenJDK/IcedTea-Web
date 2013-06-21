@@ -102,6 +102,7 @@ public final class Boot implements PrivilegedAction<Void> {
             + "  -noupdate             " + R("BONoupdate") + "\n"
             + "  -headless             " + R("BOHeadless") + "\n"
             + "  -strict               " + R("BOStrict") + "\n"
+            + "  -xml                  " + R("BOXml") + "\n"
             + "  -Xnofork              " + R("BXnofork") + "\n"
             + "  -Xclearcache          " + R("BXclearcache") + "\n"
             + "  -Xignoreheaders       " + R("BXignoreheaders") + "\n"
@@ -197,9 +198,18 @@ public final class Boot implements PrivilegedAction<Void> {
         extra.put("arguments", getOptions("-arg"));
         extra.put("parameters", getOptions("-param"));
         extra.put("properties", getOptions("-property"));
+        boolean strict = false;
+        boolean malformedXmlAllowed = true;
 
-        boolean strict = (null != getOption("-strict"));
-        ParserSettings settings = new ParserSettings(strict);
+        if (null != getOption("-strict")) {
+            strict = true;
+        }
+
+        if (null != getOption("-xml")) {
+            malformedXmlAllowed = false;
+        }
+
+        ParserSettings settings = new ParserSettings(strict, true, malformedXmlAllowed);
 
         try {
             Launcher launcher = new Launcher(false);

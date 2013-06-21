@@ -48,7 +48,8 @@ public class PluginBridgeTest {
             return JNLPHref;
         }
 
-        public JNLPFile create(URL location, Version version, boolean strict,
+        @Override
+        public JNLPFile create(URL location, Version version, ParserSettings settings,
                 UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
             JNLPHref = location;
             return new MockJNLPFile();
@@ -195,6 +196,8 @@ public class PluginBridgeTest {
     }
 
     @Test
+    //http://docs.oracle.com/javase/6/docs/technotes/guides/jweb/applet/codebase_determination.html
+    //example 3
     public void testEmbeddedJnlpWithInvalidCodebase() throws Exception {
         URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
         String relativeLocation = "/EmbeddedJnlpFile.jnlp";

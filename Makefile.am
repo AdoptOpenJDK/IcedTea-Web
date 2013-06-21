@@ -119,9 +119,9 @@ export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) 
 #    IllegalAccessException
 #  - we want full privileges
 #
-export LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME)"
-export PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME)"'
-export PLUGIN_COVERAGE_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME):$(JACOCO_CLASSPATH)"'
+export LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME):$(TAGSOUP_JAR)"
+export PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME):$(TAGSOUP_JAR)"'
+export PLUGIN_COVERAGE_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME):$(JACOCO_CLASSPATH):$(TAGSOUP_JAR)"'
 
 # Fake update version to work with the Deployment Toolkit script used by Oracle
 # http://download.oracle.com/javase/tutorial/deployment/deploymentInDepth/depltoolkit_index.html
@@ -138,7 +138,15 @@ export NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
 	net.sourceforge.jnlp.security.viewer net.sourceforge.jnlp.services \
 	net.sourceforge.jnlp.tools net.sourceforge.jnlp.util
 
+NETX_EXCLUDE_SRCS=
+
 # Conditional defintions
+if HAVE_TAGSOUP
+NETX_CLASSPATH_ARG=-classpath $(TAGSOUP_JAR)
+else
+NETX_EXCLUDE_SRCS+=net.sourceforge.jnlp.MalformedXMLParser.java
+endif
+
 if ENABLE_PLUGIN
 export ICEDTEAPLUGIN_CLEAN = clean-IcedTeaPlugin
 export LIVECONNECT_DIR = netscape sun/applet
@@ -415,6 +423,7 @@ stamps/liveconnect.stamp: liveconnect-source-files.txt stamps/netx.stamp
 	  $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	      -d $(abs_top_builddir)/liveconnect \
 	      -bootclasspath $(NETX_DIR):$(RUNTIME) \
+	      $(NETX_CLASSPATH_ARG) \
 	      -sourcepath $(LIVECONNECT_SRCS) \
 	      @liveconnect-source-files.txt ; \
 	fi
@@ -445,7 +454,11 @@ clean-liveconnect:
 # a patch applied to sun.plugin.AppletViewerPanel and generated sources
 
 netx-source-files.txt:
-	find $(NETX_SRCDIR) -name '*.java' | sort > $@
+	find $(NETX_SRCDIR) -name '*.java' | sort > $@ ; \
+	for src in $(NETX_EXCLUDE_SRCS) ; \
+	do \
+	  sed -i "/$${src}/ d" $@ ; \
+	done
 if !WITH_RHINO
 	sed -i '/RhinoBasedPacEvaluator/ d' $@
 endif
@@ -459,6 +472,7 @@ stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
 	    -d $(NETX_DIR) \
 	    -sourcepath $(NETX_SRCDIR) \
 	    -bootclasspath $(RUNTIME) \
+	    $(NETX_CLASSPATH_ARG) \
 	    @netx-source-files.txt
 	(cd $(NETX_RESOURCE_DIR); \
 	 for files in $$(find . -type f); \
@@ -1006,7 +1020,7 @@ stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
 	mkdir -p $(NETX_UNIT_TEST_DIR) && \
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	 -d $(NETX_UNIT_TEST_DIR) \
-	 -classpath $(JUNIT_JAR):$(abs_top_builddir)/liveconnect/lib/classes.jar:$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
+	 -classpath $(JUNIT_JAR):$(abs_top_builddir)/liveconnect/lib/classes.jar:$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR):$(TAGSOUP_JAR) \
 	 @netx-unit-tests-source-files.txt && \
 	mkdir -p stamps && \
 	touch $@
@@ -1036,7 +1050,7 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	done ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):.:$(TEST_EXTENSIONS_SRCDIR) \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):.:$(TEST_EXTENSIONS_SRCDIR):$(TAGSOUP_JAR) \
 	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names 
 if WITH_XSLTPROC
 	-$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
@@ -1073,6 +1087,9 @@ if WITH_EMMA
 	 -cp $(RHINO_RUNTIME) \
 	 -cp $(TEST_EXTENSIONS_DIR) \
 	 -cp $(TEST_EXTENSIONS_SRCDIR) \
+if HAVE_TAGSOUP
+	 -cp $(TAGSOUP_JAR) \
+endif
 	 -cp . \
 	 -ix "-org.junit.*" \
 	 -ix "-junit.*" \
@@ -1117,7 +1134,7 @@ if WITH_JACOCO
 	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
 	done ;\
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):.:$(TEST_EXTENSIONS_SRCDIR)  \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):.:$(TEST_EXTENSIONS_SRCDIR):$(TAGSOUP_JAR)  \
 	  $(BOOT_DIR)/bin/java $(JACOCO_AGENT_SWITCH) -Xbootclasspath:$(RUNTIME)  CommandLine $$class_names ; \
 	for file in $(EMMA_MODIFIED_FILES) ; do \
 	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_SUFFIX)" ; \

@@ -1,5 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
-// Copyright (C) 2012 Red Hat, Inc.
+// Copyright (C) 2009-2013 Red Hat, Inc.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,16 +20,14 @@ package net.sourceforge.jnlp;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.*;
 import java.util.*;
-//import javax.xml.parsers.*; // commented to use right Node
-//import org.w3c.dom.*;       // class for using Tiny XML | NanoXML
-//import org.xml.sax.*;
-//import gd.xml.tiny.*;
+
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.nanoxml.*;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile.
@@ -106,12 +104,11 @@ class Parser {
      * @param file the (uninitialized) file reference
      * @param base if codebase is not specified, a default base for relative URLs
      * @param root the root node
-     * @param strict whether to enforce strict compliance with the JNLP spec
-     * @param allowExtensions whether to allow extensions to the JNLP spec
+     * @param settings the parser settings to use when parsing the JNLP file
      * @throws ParseException if the JNLP file is invalid
      */
-    public Parser(JNLPFile file, URL base, Node root, boolean strict, boolean allowExtensions) throws ParseException {
-	this(file, base, root, strict, allowExtensions, null);
+    public Parser(JNLPFile file, URL base, Node root, ParserSettings settings) throws ParseException {
+	this(file, base, root, settings, null);
     }
 
     /**
@@ -126,16 +123,15 @@ class Parser {
      * @param file the (uninitialized) file reference
      * @param base if codebase is not specified, a default base for relative URLs
      * @param root the root node
-     * @param strict whether to enforce strict compliance with the JNLP spec
-     * @param allowExtensions whether to allow extensions to the JNLP spec
+     * @param settings the parser settings to use when parsing the JNLP file
      * @param codebase codebase to use if we did not parse one from JNLP file.
      * @throws ParseException if the JNLP file is invalid
      */
-    public Parser(JNLPFile file, URL base, Node root, boolean strict, boolean allowExtensions, URL codebase) throws ParseException {
+    public Parser(JNLPFile file, URL base, Node root, ParserSettings settings, URL codebase) throws ParseException {
         this.file = file;
         this.root = root;
-        this.strict = strict;
-        this.allowExtensions = allowExtensions;
+        this.strict = settings.isStrict();
+        this.allowExtensions = settings.isExtensionAllowed();
 
         // ensure it's a JNLP node
         if (root == null || !root.getNodeName().equals("jnlp"))
@@ -1265,116 +1261,33 @@ class Parser {
      *
      * @throws ParseException if the JNLP file is invalid
      */
-    public static Node getRootNode(InputStream input) throws ParseException {
+    public static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
+        String className = null;
+        if (settings.isMalformedXmlAllowed()) {
+            className = "net.sourceforge.jnlp.MalformedXMLParser";
+        } else {
+            className = "net.sourceforge.jnlp.XMLParser";
+        }
+
         try {
-            /* SAX
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setErrorHandler(errorHandler);
-
-            Document doc = builder.parse(input);
-            return doc.getDocumentElement();
-            */
-
-            /* TINY
-            Node document = new Node(TinyParser.parseXML(input));
-            Node jnlpNode = getChildNode(document, "jnlp"); // skip comments
-            */
-
-            //A BufferedInputStream is used to allow marking and reseting
-            //of a stream.
-            BufferedInputStream bs = new BufferedInputStream(input);
-
-            /* NANO */
-            final XMLElement xml = new XMLElement();
-            final PipedInputStream pin = new PipedInputStream();
-            final PipedOutputStream pout = new PipedOutputStream(pin);
-            final InputStreamReader isr = new InputStreamReader(bs, getEncoding(bs));
-            // Clean the jnlp xml file of all comments before passing
-            // it to the parser.
-            new Thread(
-                    new Runnable() {
-                        public void run() {
-                            (new XMLElement()).sanitizeInput(isr, pout);
-                            try {
-                                pout.close();
-                            } catch (IOException ioe) {
-                                ioe.printStackTrace();
-                            }
-                        }
-                    }).start();
-            xml.parseFromReader(new InputStreamReader(pin));
-            Node jnlpNode = new Node(xml);
-            return jnlpNode;
-        } catch (Exception ex) {
-            throw new ParseException(R("PBadXML"), ex);
-        }
-    }
-
-    /**
-     * Returns the name of the encoding used in this InputStream.
-     *
-     * @param input the InputStream
-     * @return a String representation of encoding
-     */
-    private static String getEncoding(InputStream input) throws IOException {
-        //Fixme: This only recognizes UTF-8, UTF-16, and
-        //UTF-32, which is enough to parse the prolog portion of xml to
-        //find out the exact encoding (if it exists). The reason being
-        //there could be other encodings, such as ISO 8859 which is 8-bits
-        //but it supports latin characters.
-        //So what needs to be done is to parse the prolog and retrieve
-        //the exact encoding from it.
-
-        int[] s = new int[4];
-        String encoding = "UTF-8";
-
-        //Determine what the first four bytes are and store
-        //them into an int array.
-        input.mark(4);
-        for (int i = 0; i < 4; i++) {
-            s[i] = input.read();
-        }
-        input.reset();
-
-        //Set the encoding base on what the first four bytes of the
-        //inputstream turn out to be (following the information from
-        //www.w3.org/TR/REC-xml/#sec-guessing).
-        if (s[0] == 255) {
-            if (s[1] == 254) {
-                if (s[2] != 0 || s[3] != 0) {
-                    encoding = "UnicodeLittle";
-                } else {
-                    encoding = "X-UTF-32LE-BOM";
-                }
+            Class<?> klass = null;
+            try {
+                klass = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                klass = Class.forName("net.sourceforge.jnlp.XMLParser");
             }
-        } else if (s[0] == 254 && s[1] == 255 && (s[2] != 0 ||
-                s[3] != 0)) {
-            encoding = "UTF-16";
+            Object instance = klass.newInstance();
+            Method m = klass.getMethod("getRootNode", InputStream.class);
 
-        } else if (s[0] == 0 && s[1] == 0 && s[2] == 254 &&
-                s[3] == 255) {
-            encoding = "X-UTF-32BE-BOM";
-
-        } else if (s[0] == 0 && s[1] == 0 && s[2] == 0 &&
-                s[3] == 60) {
-            encoding = "UTF-32BE";
-
-        } else if (s[0] == 60 && s[1] == 0 && s[2] == 0 &&
-                s[3] == 0) {
-            encoding = "UTF-32LE";
-
-        } else if (s[0] == 0 && s[1] == 60 && s[2] == 0 &&
-                s[3] == 63) {
-            encoding = "UTF-16BE";
-        } else if (s[0] == 60 && s[1] == 0 && s[2] == 63 &&
-                s[3] == 0) {
-            encoding = "UTF-16LE";
+            return (Node) m.invoke(instance, input);
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof ParseException) {
+                throw (ParseException)(e.getCause());
+            }
+            throw new ParseException(R("PBadXML"), e);
+        } catch (Exception e) {
+            throw new ParseException(R("PBadXML"), e);
         }
-
-        return encoding;
     }
 
 }

@@ -51,6 +51,7 @@ import org.junit.Test;
 public class ParserMalformedXml {
 
     private static String originalJnlp = null;
+    private static ParserSettings lenientParserSettings = new ParserSettings(false, true, true);
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -71,28 +72,38 @@ public class ParserMalformedXml {
     @Test
     public void testMissingXmlDecleration() throws ParseException {
         String malformedJnlp = originalJnlp.replaceFirst("<\\?xml.*\\?>", "");
-        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
+        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), lenientParserSettings);
     }
 
     @Test
     @KnownToFail
     public void testMalformedArguments() throws ParseException {
         String malformedJnlp = originalJnlp.replace("arg2</argument", "arg2<argument");
-        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
+        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), lenientParserSettings);
     }
 
     @Test
-    @KnownToFail
     public void testTagNotClosed() throws ParseException {
         String malformedJnlp = originalJnlp.replace("</jnlp>", "<jnlp>");
-        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
+        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), lenientParserSettings);
     }
 
     @Test
-    @KnownToFail
     public void testUnquotedAttributes() throws ParseException {
         String malformedJnlp = originalJnlp.replace("'jnlp.jnlp'", "jnlp.jnlp");
-        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
+        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), lenientParserSettings);
+    }
+
+    @Test(expected = ParseException.class)
+    public void testTagNotClosedNoTagSoup() throws ParseException {
+        String malformedJnlp = originalJnlp.replace("</jnlp>", "<jnlp>");
+        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true, false));
+    }
+
+    @Test(expected = ParseException.class)
+    public void testUnquotedAttributesNoTagSoup() throws ParseException {
+        String malformedJnlp = originalJnlp.replace("'jnlp.jnlp'", "jnlp.jnlp");
+        Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true, false));
     }
 
 }

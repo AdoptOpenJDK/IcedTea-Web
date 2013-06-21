@@ -403,6 +403,31 @@ then
 fi
 ])
 
+AC_DEFUN_ONCE([IT_CHECK_FOR_TAGSOUP],
+[
+  AC_MSG_CHECKING([for tagsoup])
+  AC_ARG_WITH([tagsoup],
+             [AS_HELP_STRING([--with-tagsoup],
+                             [tagsoup.jar])],
+             [
+                TAGSOUP_JAR=${withval}
+             ],
+             [
+                TAGSOUP_JAR=
+             ])
+  if test -z "${TAGSOUP_JAR}"; then
+    for dir in /usr/share/java /usr/local/share/java ; do
+      if test -f $dir/tagsoup.jar; then
+        TAGSOUP_JAR=$dir/tagsoup.jar
+	    break
+      fi
+    done
+  fi
+  AC_MSG_RESULT(${TAGSOUP_JAR})
+  AC_SUBST(TAGSOUP_JAR)
+  AM_CONDITIONAL([HAVE_TAGSOUP], [test x$TAGSOUP_JAR != xno])
+])
+
 dnl Generic macro to check for a Java class
 dnl Takes the name of the class as an argument.  The macro name
 dnl is usually the name of the class with '.'

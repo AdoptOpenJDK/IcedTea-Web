@@ -96,14 +96,15 @@ public class PluginBridge extends JNLPFile {
             try {
                 // Use codeBase as the context for the URL. If jnlp_href's
                 // value is a complete URL, it will replace codeBase's context.
+                ParserSettings defaultSettings = new ParserSettings();
                 URL jnlp = new URL(codeBase, params.getJNLPHref());
                 JNLPFile jnlpFile = null;
 
                 if (params.getJNLPEmbedded() != null) {
                     InputStream jnlpInputStream = new ByteArrayInputStream(decodeBase64String(params.getJNLPEmbedded()));
-                    jnlpFile = new JNLPFile(jnlpInputStream, codeBase, false);
+                    jnlpFile = new JNLPFile(jnlpInputStream, codeBase, defaultSettings);
                 } else {
-                    jnlpFile = jnlpCreator.create(jnlp, null, false, JNLPRuntime.getDefaultUpdatePolicy(), codeBase);
+                    jnlpFile = jnlpCreator.create(jnlp, null, defaultSettings, JNLPRuntime.getDefaultUpdatePolicy(), codeBase);
                 }
 
                 if (jnlpFile.isApplet())

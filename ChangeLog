@@ -1,3 +1,33 @@
+2013-06-21  Jiri Vanek <jvanek@redhat.com>
+        Adam Domurad  <adomurad@redhat.com>
+        Omair Majid  <omajid@redhat.com>
+
+	Added tagsup (optional dependence) as sanitizer for (possibly) invalid xml files
+	* Makefile.am: (LAUNCHER_BOOTCLASSPATH) (PLUGIN_BOOTCLASSPATH) (NETX_CLASSPATH_ARG)
+	(PLUGIN_COVERAGE_BOOTCLASSPATH)	enriched for TAGSOUP_JAR
+	* acinclude.m4: (IT_CHECK_FOR_TAGSOUP) new macro
+	* configure.ac: used  this new macro
+	* tests/netx/unit/net/sourceforge/jnlp/ParserBasic.java:
+	* netx/net/sourceforge/jnlp/JNLPCreator.java: (create)
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	* /netx/net/sourceforge/jnlp/JNLPFile.java:  (JNLPFile) construcotrs
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	* netx/net/sourceforge/jnlp/Launcher.java: (main)
+	all adapted to take ParserSettings instead of individual parameters
+	* netx/net/sourceforge/jnlp/MalformedXMLParser.java: new file, bridge
+	between tagsoup and our parser
+	* netx/net/sourceforge/jnlp/XmlParser.java: new file, bridge to old parser
+	* netx/net/sourceforge/jnlp/Parser.java: refactored to be able both with
+	* netx/net/sourceforge/jnlp/ParserSettings.java: reworked to serve as 
+	gatherer for various individual parser flags
+	* netx/net/sourceforge/jnlp/resources/Messages.propertie: (BOXml)
+	new key describing -xml  switch
+	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCases.java:
+	* tests/netx/unit/net/sourceforge/jnlp/ParserMalformedXml.java:
+	* tests/netx/unit/net/sourceforge/jnlp/ParserTest.java:
+	Tests adapted to newest state (both for included/excluded tagsoup) and
+	new (testTagNotClosedNoTagSoup) (testUnquotedAttributesNoTagSoup)
+
 2013-06-20  Jiri Vanek <jvanek@redhat.com>
 
 	Removed out-of date support for jdk 1.5  and older
