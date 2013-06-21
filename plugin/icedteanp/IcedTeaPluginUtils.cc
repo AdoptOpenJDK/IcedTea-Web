@@ -498,6 +498,14 @@ IcedTeaPluginUtilities::removeInstanceID(void* member_ptr)
     instance_map->erase(member_ptr);
 }
 
+/* Clear instance_map. Useful for tests. */
+void
+IcedTeaPluginUtilities::clearInstanceIDs()
+{
+    delete instance_map;
+    instance_map = new std::map<void*, NPP>();
+}
+
 /**
  * Removes all mappings to a given instance, and all associated objects
  */
@@ -601,6 +609,18 @@ IcedTeaPluginUtilities::removeObjectMapping(std::string key)
 {
     PLUGIN_DEBUG("Removing key %s from object map\n", key.c_str());
     object_map->erase(key);
+}
+
+/* Clear object_map. Useful for tests. */
+void
+IcedTeaPluginUtilities::clearObjectMapping()
+{
+    std::map<std::string, NPObject*>::iterator iter = object_map->begin();
+    for (; iter != object_map->end(); ++iter) {
+        browser_functions.releaseobject(iter->second);
+    }
+    delete object_map;
+    object_map = new std::map<std::string, NPObject*>();
 }
 
 /*

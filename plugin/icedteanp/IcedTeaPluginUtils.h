@@ -252,15 +252,21 @@ class IcedTeaPluginUtilities
 
     	static void storeInstanceID(void* member_ptr, NPP instance);
 
-    	static void	removeInstanceID(void* member_ptr);
+    	static void removeInstanceID(void* member_ptr);
 
-        static NPP getInstanceFromMemberPtr(void* member_ptr);
+    	/* Clear object_map. Useful for tests. */
+    	static void clearInstanceIDs();
+
+    	static NPP getInstanceFromMemberPtr(void* member_ptr);
 
     	static NPObject* getNPObjectFromJavaKey(std::string key);
 
     	static void storeObjectMapping(std::string key, NPObject* object);
 
     	static void removeObjectMapping(std::string key);
+
+    	/* Clear object_map. Useful for tests. */
+    	static void clearObjectMapping();
 
     	static void invalidateInstance(NPP instance);
 

@@ -44,9 +44,6 @@
 #include "IcedTeaNPPlugin.h"
 #include <fstream>
 
-extern void trim(std::string& str);
-extern bool file_exists(std::string filename);
-
 TEST(NPVariantAsString) {
     NPVariant var;
     STRINGZ_TO_NPVARIANT("test", var);

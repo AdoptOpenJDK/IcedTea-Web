@@ -73,9 +73,21 @@ static void mock_releaseobject(NPObject* obj) {
         if (obj->_class->deallocate) {
             obj->_class->deallocate(obj);
         } else {
-            free(obj);
+            mock_memfree(obj);
         }
     }
+}
+
+static NPObject* mock_createobject(NPP instance, NPClass* np_class) {
+	NPObject* obj;
+	if (np_class->allocate) {
+		obj = np_class->allocate(instance, np_class);
+	} else {
+		obj = (NPObject*) mock_memalloc(sizeof(NPObject));
+	}
+	obj->referenceCount = 1;
+	obj->_class = np_class;
+	return obj;
 }
 
 void browsermock_setup_functions() {
@@ -84,6 +96,7 @@ void browsermock_setup_functions() {
     browser_functions.memalloc = &mock_memalloc;
     browser_functions.memfree = &mock_memfree;
 
+    browser_functions.createobject = &mock_createobject;
     browser_functions.retainobject = &mock_retainobject;
     browser_functions.releaseobject= &mock_releaseobject;
 }

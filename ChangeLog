@@ -1,3 +1,17 @@
+2013-06-21  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Add global state clearing
+	utility functions.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: Same.
+	* tests/cpp-unit-tests/IcedTeaScriptablePluginObjectTest.cc: Test
+	scriptable object creation and destruction.
+	* tests/cpp-unit-tests/browser_mock.cc
+	(mock_createobject): New, mocks NPAPI 'createobject'.
+	* tests/cpp-unit-tests/MemoryLeakDetector.h: New, memory leak detection
+	utility class.
+	* tests/cpp-unit-tests/main.cc
+	(ReportTestFinish): Print which tests resulted in memory leaks. 
+
 2013-06-21  Jiri Vanek <jvanek@redhat.com>
         Adam Domurad  <adomurad@redhat.com>
         Omair Majid  <omajid@redhat.com>

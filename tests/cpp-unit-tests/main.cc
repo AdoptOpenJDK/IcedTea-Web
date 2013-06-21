@@ -85,18 +85,18 @@ public:
             float secondsElapsed) {
 
         int posttest_allocs = cpp_unfreed_allocations();
+        std::string testname = full_testname(details);
 
         if (browsermock_unfreed_allocations() > 0) {
-            printf("*** WARNING: Memory leak! %d more NPAPI allocations than frees!\n",
-                    browsermock_unfreed_allocations());
+            printf("*** WARNING: %s has a memory leak! %d more NPAPI allocations than frees!\n",
+                    testname.c_str(), browsermock_unfreed_allocations());
         }
         if (posttest_allocs > pretest_allocs) {
-            printf("*** WARNING: Memory leak! %d more operator 'new' allocations than 'delete's!\n",
-                    posttest_allocs - pretest_allocs);
+            printf("*** WARNING: %s has a memory leak! %d more operator 'new' allocations than 'delete's!\n",
+                    testname.c_str(), posttest_allocs - pretest_allocs);
         }
 
         if (did_finish_correctly) {
-            std::string testname = full_testname(details);
             printf("Passed: %s\n", testname.c_str());
         }
     }

@@ -39,28 +39,60 @@
 #include <npapi.h>
 
 #include "browser_mock.h"
-#include "checked_allocations.h"
+#include "MemoryLeakDetector.h"
 
 #include "IcedTeaScriptablePluginObject.h"
+#include "IcedTeaPluginUtils.h"
+
+static NPP_t dummy_npp = {0,0};
+
+SUITE(IcedTeaScriptablePluginObject) {
+    TEST(destructor) {
+        MemoryLeakDetector leak_detector;
+        IcedTeaScriptablePluginObject* obj = new IcedTeaScriptablePluginObject(&dummy_npp);
+        delete obj;
+        CHECK(leak_detector.memory_leaks() == 0);
+    }
+
+    TEST(get_scriptable_java_object) {
+        MemoryLeakDetector leak_detector;
+        NPObject* obj = IcedTeaScriptablePluginObject::get_scriptable_java_package_object(&dummy_npp, "DummyPackage");
+        browser_functions.releaseobject(obj);
+        CHECK(leak_detector.memory_leaks() == 0);
+    }
+}
 
 SUITE(IcedTeaScriptableJavaObject) {
     TEST(deallocate) {
-        int pre_allocations = cpp_unfreed_allocations();
-        IcedTeaScriptableJavaObject* obj = new IcedTeaScriptableJavaObject(NULL);
+        MemoryLeakDetector leak_detector;
+        IcedTeaScriptableJavaObject* obj = new IcedTeaScriptableJavaObject(&dummy_npp);
         IcedTeaScriptableJavaObject::deAllocate(obj);
-        int post_allocations = cpp_unfreed_allocations();
-
-        CHECK(pre_allocations == post_allocations);
+        CHECK(leak_detector.memory_leaks() == 0);
     }
 }
 
 SUITE(IcedTeaScriptableJavaPackageObject) {
     TEST(deallocate) {
-        int pre_allocations = cpp_unfreed_allocations();
-        IcedTeaScriptableJavaPackageObject* obj = new IcedTeaScriptableJavaPackageObject(NULL);
+        MemoryLeakDetector leak_detector;
+        IcedTeaScriptableJavaPackageObject* obj = new IcedTeaScriptableJavaPackageObject(&dummy_npp);
         IcedTeaScriptableJavaPackageObject::deAllocate(obj);
-        int post_allocations = cpp_unfreed_allocations();
+        CHECK(leak_detector.memory_leaks() == 0);
+    }
 
-        CHECK(pre_allocations == post_allocations);
+    TEST(get_scriptable_java_object) {
+        MemoryLeakDetector leak_detector;
+
+        NPObject* first_obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
+        browser_functions.releaseobject(first_obj);
+
+        /* After the first call, the object should be cached in the object map */
+        NPObject* second_obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
+
+        /* Objects should be the same, because of caching  */
+        CHECK(first_obj == second_obj);
+
+        browser_functions.releaseobject(second_obj);
+
+        CHECK(leak_detector.memory_leaks() == 0);
     }
 }
