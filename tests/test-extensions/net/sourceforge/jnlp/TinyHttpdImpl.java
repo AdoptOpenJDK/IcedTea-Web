@@ -115,8 +115,15 @@ public class TinyHttpdImpl extends Thread {
                         o.writeBytes("HTTP/1.0 "+HttpURLConnection.HTTP_NOT_IMPLEMENTED+" Not Implemented\n");
                         continue;
                     }
-
+                    
+                    String request = "unknown";
                     if (isGetRequest || isHeadRequest ) {
+                        if (isGetRequest){
+                             request = "GET";
+                        }
+                        if (isHeadRequest){
+                             request = "HEAD";
+                        }
                         StringTokenizer t = new StringTokenizer(s, " ");
                         t.nextToken();
                         String op = t.nextToken();
@@ -124,9 +131,9 @@ public class TinyHttpdImpl extends Thread {
                         if (p.startsWith(XSX)) {
                             p = p.replace(XSX, "/");
                         }
-                        ServerAccess.logNoReprint("Getting: " + p);
+                        ServerAccess.logOutputReprint("Getting- " + request + ": " + p);
                         p = urlToFilePath(p);
-                        ServerAccess.logNoReprint("Serving: " + p);
+                        ServerAccess.logOutputReprint("Serving- " + request + ": " + p);
                         File pp = new File(dir, p);
                         int l = (int) pp.length();
                         byte[] b = new byte[l];

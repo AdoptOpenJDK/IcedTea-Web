@@ -260,30 +260,18 @@ public class Launcher {
         return tg.getApplication();
     }
 
-    /**
-     * Launches a JNLP file by calling the launch method for the
-     * appropriate file type.
-     *
-     * @param location the URL of the JNLP file to launch
-     * @throws LaunchException if there was an exception
-     * @return the application instance
-     */
-    public ApplicationInstance launch(URL location) throws LaunchException {
-        return launch(toFile(location));
-    }
 
     /**
      * Launches a JNLP file by calling the launch method for the
      * appropriate file type.
      *
      * @param location the URL of the JNLP file to launch
-     * @param fromSource if true, the JNLP file will be re-read from the source
      * location to get the pristine version
      * @throws LaunchException if there was an exception
      * @return the application instance
      */
-    public ApplicationInstance launch(URL location, boolean fromSource) throws LaunchException {
-        return launch(fromUrl(location, fromSource));
+    public ApplicationInstance launch(URL location) throws LaunchException {
+        return launch(fromUrl(location));
     }
 
     /**
@@ -372,28 +360,7 @@ public class Launcher {
         }
     }
 
-    /**
-     * Launches a JNLP file by calling the launch method for the
-     * appropriate file type in a different thread.
-     *
-     * @param file the JNLP file to launch
-     */
-    public void launchBackground(JNLPFile file) {
-        BgRunner runner = new BgRunner(file, null);
-        new Thread(runner).start();
-    }
-
-    /**
-     * Launches the JNLP file at the specified location in the
-     * background by calling the launch method for its file type.
-     *
-     * @param location the location of the JNLP file
-     */
-    public void launchBackground(URL location) {
-        BgRunner runner = new BgRunner(null, location);
-        new Thread(runner).start();
-    }
-
+  
     /**
      * Launches the JNLP file in a new JVM instance.  The launched
      * application's output is sent to the system out and it's
@@ -473,62 +440,36 @@ public class Launcher {
     /**
      * Returns the JNLPFile for the URL, with error handling.
      */
-    private JNLPFile fromUrl(URL location, boolean fromSource) throws LaunchException {
+    private JNLPFile fromUrl(URL location) throws LaunchException {
         try {
             JNLPFile file = null;
 
             file = new JNLPFile(location, parserSettings);
+            
+            boolean isLocal = false;
+            boolean haveHref = false;
+            if ("file".equalsIgnoreCase(location.getProtocol()) && new File(location.getFile()).exists()) {
+                isLocal = true;
+            }
+            if (file.getSourceLocation() != null) {
+                haveHref = true;
+            }
 
-            if (fromSource) {
-                // Launches the jnlp file where this file originated.
-                if (file.getSourceLocation() != null) {
-                    file = new JNLPFile(file.getSourceLocation(), parserSettings);
-                }
+            if (isLocal && haveHref) {
+                file = new JNLPFile(file.getSourceLocation(), parserSettings);
             }
             return file;
         } catch (Exception ex) {
-            if (ex instanceof LaunchException)
+            if (ex instanceof LaunchException) {
                 throw (LaunchException) ex; // already sent to handler when first thrown
-            else
+            } else {
                 // IO and Parse
                 throw launchError(new LaunchException(null, ex, R("LSFatal"), R("LCReadError"), R("LCantRead"), R("LCantReadInfo")));
-        }
-    }
-
-    /**
-     * Returns the JNLPFile for the URL, with error handling.
-     */
-    @Deprecated
-    private JNLPFile toFile(URL location) throws LaunchException {
-        try {
-            JNLPFile file = null;
-
-            try {
-                ParserSettings settings = new ParserSettings(true, true, false);
-                file = new JNLPFile(location, (Version) null, settings, updatePolicy); // strict
-            } catch (ParseException ex) {
-                ParserSettings settings = new ParserSettings(false, true, true);
-                file = new JNLPFile(location, (Version) null, settings, updatePolicy);
-
-                // only here if strict failed but lax did not fail
-                LaunchException lex =
-                        launchWarning(new LaunchException(file, ex, R("LSMinor"), R("LCFileFormat"), R("LNotToSpec"), R("LNotToSpecInfo")));
-
-                if (lex != null)
-                    throw lex;
             }
-
-            return file;
-        } catch (Exception ex) {
-            if (ex instanceof LaunchException)
-                throw (LaunchException) ex; // already sent to handler when first thrown
-            else
-                // IO and Parse
-                throw launchError(new LaunchException(null, ex, R("LSFatal"), R("LCReadError"), R("LCantRead"), R("LCantReadInfo")));
         }
     }
 
-    /**
+   /**
      * Launches a JNLP application.  This method should be called
      * from a thread in the application's thread group.
      */
@@ -973,31 +914,6 @@ public class Launcher {
 
     };
 
-    /**
-     * This runnable is used by the <code>launchBackground</code>
-     * methods to launch a JNLP file from a separate thread.
-     */
-    private class BgRunner implements Runnable {
-        private JNLPFile file;
-        private URL location;
-
-        BgRunner(JNLPFile file, URL location) {
-            this.file = file;
-            this.location = location;
-        }
-
-        public void run() {
-            try {
-                if (file != null)
-                    launch(file);
-                if (location != null)
-                    launch(location);
-            } catch (LaunchException ex) {
-                // launch method communicates error conditions to the
-                // handler if it exists, otherwise we don't care because
-                // there's nothing that can be done about the exception.
-            }
-        }
-    };
+ 
 
 }

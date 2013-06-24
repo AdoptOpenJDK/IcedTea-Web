@@ -215,7 +215,7 @@ public final class Boot implements PrivilegedAction<Void> {
             Launcher launcher = new Launcher(false);
             launcher.setParserSettings(settings);
             launcher.setInformationToMerge(extra);
-            launcher.launch(getFileLocation(), true);
+            launcher.launch(getFileLocation());
         } catch (LaunchException ex) {
             // default handler prints this
         } catch (Exception ex) {

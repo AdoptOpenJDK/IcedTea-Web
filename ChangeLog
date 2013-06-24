@@ -1,3 +1,21 @@
+2013-06-24  Jiri Vanek <jvanek@redhat.com>
+
+	JNLP file is now re-downloading only if is local and have href
+	* /netx/net/sourceforge/jnlp/Launcher.java: (launch) api cleared 
+	from (fromSource). (fromUrl) removed always re-downloading code and
+	replaced by conditional. (launchBackground), (toFile), (BgRunner)
+	removed.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: following new (launch)
+	* tests/reproducers/simple/GeneratedId/srcs/GeneratedId.java: just
+	arguments reprinting application
+	* tests/reproducers/simple/GeneratedId/testcases/GeneratedIdTest.java
+	various tests based on href/no href x local/remote jnlp files
+	* tests/reproducers/simple/GeneratedId/resources/GeneratedId.jnlp: base
+	simple jnlp with someId argument
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: reprinting
+	the get/head correctly and with echo
+	* NEWS: mentioned PR1473	
+
 2013-06-21  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: Simplify 
