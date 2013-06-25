@@ -425,7 +425,7 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_TAGSOUP],
   fi
   AC_MSG_RESULT(${TAGSOUP_JAR})
   AC_SUBST(TAGSOUP_JAR)
-  AM_CONDITIONAL([HAVE_TAGSOUP], [test x$TAGSOUP_JAR != xno])
+  AM_CONDITIONAL([HAVE_TAGSOUP], [test x$TAGSOUP_JAR != xno -a x$TAGSOUP_JAR != x ])
 ])
 
 dnl Generic macro to check for a Java class
