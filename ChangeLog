@@ -1,3 +1,8 @@
+2013-06-28  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java
+	(handleMessage): Fix potential NPE on 'GetValue'
+
 2013-06-25  Jiri Vanek <jvanek@redhat.com>
 
 	* acinclude.m4: (IT_CHECK_FOR_TAGSOUP) is now correctly setting

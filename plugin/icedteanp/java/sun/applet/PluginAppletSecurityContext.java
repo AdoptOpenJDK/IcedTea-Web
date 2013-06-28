@@ -522,8 +522,9 @@ public class PluginAppletSecurityContext {
                 Integer index = parseCall(args[1], null, Integer.class);
 
                 Object ret = store.getObject(index);
+                Class<?> retClass = ret != null ? ret.getClass() : null;
 
-                String objIDStr = toObjectIDString(ret, ret.getClass(), true /*unbox primitives*/);
+                String objIDStr = toObjectIDString(ret, retClass, true /*unbox primitives*/);
                 write(reference, "GetValue " + objIDStr);
             } else if (message.startsWith("SetStaticField") ||
                                    message.startsWith("SetField")) {
