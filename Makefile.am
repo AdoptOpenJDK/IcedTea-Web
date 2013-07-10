@@ -5,8 +5,6 @@ export TOP_BUILD_DIR = $(abs_top_builddir)
 export NETX_DIR = $(abs_top_builddir)/netx.build
 export NETX_SRCDIR = $(abs_top_srcdir)/netx
 export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
-export NETX_EXTRA_DIR=$(abs_top_srcdir)/extra/net/sourceforge/javaws/about/resources
-export NETX_EXTRA_DIST_DIR=$(abs_top_builddir)/extra-lib/net/sourceforge/javaws/about/resources
 
 export REPORT_STYLES_DIRNAME=report-styles
 
@@ -132,6 +130,7 @@ export JDK_UPDATE_VERSION=50
 export PLUGIN_TEST_SRCS = $(abs_top_srcdir)/plugin/tests/LiveConnect/*.java
 
 export NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
+	net.sourceforge.jnlp.about \
 	net.sourceforge.jnlp.cache net.sourceforge.jnlp.config \
 	net.sourceforge.jnlp.controlpanel net.sourceforge.jnlp.event \
 	net.sourceforge.jnlp.runtime net.sourceforge.jnlp.security \
@@ -192,9 +191,6 @@ endif
 
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
-export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in extra launcher \
- itweb-settings.desktop.in $(top_srcdir)/tests
-
 # reproducers `D`shortcuts
 export DTEST_SERVER=-Dtest.server.dir=$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)
 export DJAVAWS_BUILD=-Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws)
@@ -224,12 +220,12 @@ edit_launcher_script = sed \
 # Top-Level Targets
 # =================
 
-all-local: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
+all-local: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
  javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop
 
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
-clean-local: clean-netx clean-plugin clean-liveconnect clean-extra  \
+clean-local: clean-netx clean-plugin clean-liveconnect \
  clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-tests clean-bootstrap-directory
 	if [ -e stamps ] ; then \
 	  rmdir stamps ; \
@@ -249,13 +245,11 @@ endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
-	${INSTALL_DATA} extra-lib/about.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
 
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(mandir)/man1
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(mandir)/man1
-	${INSTALL_DATA} $(NETX_RESOURCE_DIR)/about.jnlp $(DESTDIR)$(datarootdir)/$(PACKAGE_NAME)
 if ENABLE_DOCS
 	${mkinstalldirs} $(DESTDIR)$(htmldir)
 	(cd ${abs_top_builddir}/docs/netx; \
@@ -276,8 +270,6 @@ uninstall-local:
 	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jnlp
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/about.jar
 	rm -f $(DESTDIR)$(mandir)/man1/javaws.1
 	rm -f $(DESTDIR)$(bindir)/$(javaws)
 	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
@@ -466,7 +458,74 @@ if !HAVE_JAVA7
 	sed -i '/VariableX509TrustManagerJDK7/ d' $@
 endif
 
-stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp
+stamps/netx-html-gen.stamp:
+	(cd $$NETX_SRCDIR/..; \
+	mkdir -p html-gen; \
+	cp AUTHORS NEWS COPYING ChangeLog html-gen/; \
+	cd html-gen/; \
+	for FILE in NEWS AUTHORS COPYING ChangeLog; \
+	do \
+	sed -r \
+		-e "s/\t/    /g" $(: Convert tabs into four spaces) \
+		-e "s/\&/\&amp;/g" $(: "&" -> "&amp;") \
+		-e "s/  /\&ensp;\&ensp;/g" $(: Double-spaces into HTML whitespace for formatting) \
+		-e "s/</\&lt;/g" $(: "<" -> "&lt;") \
+		-e "s/>/\&gt;/g" $(: ">" -> "&gt;") \
+		-e 's/(\&lt;)?(https?:\/\/[^ ]*)(\&gt;| |$$)/\1<a href="\2">\2<\/a>\3/i' $(: Creates hyperlinks from http/https URLs) \
+		-e 's/\&lt;(.*@.*)\&gt;/\&lt;<a href="mailto:\1\?subject=IcedTea-Web">\1<\/a>\&gt;/i' $(: Create mailto links from email addresses formatted as <email@example.com>) \
+		-e "s/$$/<br>/g" $(: "\n" -> "<br>") \
+	"./$$FILE" > "./$$FILE.html"; \
+	done; \
+	sed -i '4i <center>' AUTHORS.html; \
+	sed -i '5i <br><img src="jamIcon.jpg" alt="Jam Icon" width="87" height="84"><br><br>' AUTHORS.html; $(: Insert jamIcon into AUTHORS.html and center the authors list)\
+	echo "</center>" >> AUTHORS.html; \
+	for FILE in NEWS.html ChangeLog.html; \
+	do \
+		mv $$FILE "$$FILE.old"; \
+		COUNTER=0; \
+		while read LINE; \
+		do \
+			BOLD=1; \
+			if [[ $$FILE == "NEWS.html" ]]; \
+			then \
+				if [[ $$LINE =~ New\ in\ release* ]]; \
+				then \
+					BOLD=0; \
+					COUNTER=$$(( $$COUNTER + 1 )); \
+				fi; \
+				if [[ $$COUNTER -gt 2 ]]; $(: Cut to two releases)\
+				then \
+					break; \
+				fi; \
+			else \
+				if [[ $$LINE =~ .*\&lt\;.*\@.*\&gt\; ]]; $(: Matches eg <aazores@redhat.com>, after HTML-escaping)\
+				then \
+					BOLD=0; \
+				fi; \
+				if [[ $$LINE =~ [0-9]{4}-[0-9]{2}-[0-9]{2}* ]]; $(: Matches eg 2013-07-01)\
+				then \
+					COUNTER=$$(( $$COUNTER + 1 )); \
+				fi; \
+				if [[ $$COUNTER -gt 10 ]]; $(: Cut to ten changesets)\
+				then \
+					break; \
+				fi; \
+			fi; \
+			if [[ $$BOLD -eq 0 ]]; $(: Highlight "New In Release" in News, and author name lines in ChangeLog) \
+			then \
+				echo "<b>$$LINE</b>" >> $$FILE; \
+			else \
+				echo "$$LINE" >> $$FILE; \
+			fi; \
+		done < "$$FILE.old"; \
+		rm $$FILE.old; \
+	done)
+	${INSTALL_DATA} $(NETX_SRCDIR)/../html-gen/*.html $(NETX_RESOURCE_DIR)
+	rm -r $(NETX_SRCDIR)/../html-gen/
+	mkdir -p stamps
+	touch $@
+
+stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp stamps/netx-html-gen.stamp
 	mkdir -p $(NETX_DIR)
 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	    -d $(NETX_DIR) \
@@ -503,36 +562,12 @@ clean-netx:
 	rm -f stamps/netx-dist.stamp
 	rm -f netx-source-files.txt
 	rm -f stamps/netx.stamp
+	rm -f stamps/netx-html-gen.stamp
+	rm -f $(NETX_RESOURCE_DIR)/{NEWS,AUTHORS,COPYING,ChangeLog}.html
 
 clean-desktop-files:
 	rm -f javaws.desktop
 	rm -f itweb-settings.desktop
-
-# extras -- used to create about.jar for javaws.
-extra-source-files.txt:
-	find $(abs_top_srcdir)/extra -name '*.java' | sort > $@
-
-stamps/extra-class-files.stamp: extra-source-files.txt stamps/netx.stamp
-	mkdir -p extra-lib
-	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) -d extra-lib \
-          -sourcepath $(abs_top_srcdir)/extra -cp netx.build \
-          -bootclasspath $(RUNTIME) @extra-source-files.txt
-	(cd $(NETX_EXTRA_DIR); \
-	 for files in $$(find . -type f); \
-	 do \
-	   ${INSTALL_DATA} -D $${files} \
-	   $(NETX_EXTRA_DIST_DIR)/$${files}; \
-	 done)
-	mkdir -p stamps
-	touch $@
-
-clean-extra:
-	rm -rf extra-lib
-	rm -f stamps/extra-class-files.stamp
-	rm -f extra-source-files.txt
-
-extra-lib/about.jar: stamps/extra-class-files.stamp
-	$(BOOT_DIR)/bin/jar cf $@ -C extra-lib net ;
 
 launcher.build/$(javaws): launcher/launchers.in
 	mkdir -p launcher.build
@@ -865,7 +900,7 @@ $(TESTS_DIR)/$(SOFTKILLER):
 	$(MAKE) ; \
 	mv $(SOFTKILLER) $(TESTS_DIR)/
 
-stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
+stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
  javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop \
  stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public $(TESTS_DIR)/softkiller \
  stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp\
@@ -910,7 +945,7 @@ clean-custom-reproducers: junit-jnlp-dist-custom.txt
 #although this targets will indeed create symbolic links to enable 
 #icedtea-web plugin inside browser it is intended for testing purposes
 if ENABLE_PLUGIN
-stamps/user-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp \
+stamps/user-links.stamp: stamps/netx-dist.stamp stamps/plugin.stamp \
  launcher.build/$(javaws) stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) 
 	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	  if [ -e $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ] ; then \
@@ -940,7 +975,7 @@ restore-user-links:
 	  rm -f stamps/user-links.stamp ; \
 	fi
 
-stamps/global-links.stamp: stamps/netx-dist.stamp extra-lib/about.jar stamps/plugin.stamp launcher.build/$(javaws) \
+stamps/global-links.stamp: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
  stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
 	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	    dir="$(MOZILLA_GLOBAL32_PLUGINDIR)"  ; \

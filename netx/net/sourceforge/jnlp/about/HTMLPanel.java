@@ -35,25 +35,50 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.javaws.about;
+package net.sourceforge.jnlp.about;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JEditorPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 public class HTMLPanel extends JPanel {
 
-	JEditorPane pane;
-	
-	public HTMLPanel(URL url) throws IOException {
-		super(new BorderLayout());
-		pane = new JEditorPane(url);
-		pane.setEditable(false);
-		JScrollPane scroller = new JScrollPane(pane);
-		add(scroller, BorderLayout.CENTER);
-	}
+    private String id;
+
+    public HTMLPanel(URL url, String identifier) throws IOException {
+        super(new BorderLayout());
+        id = identifier;
+        JEditorPane pane = new JEditorPane(url);
+        pane.setContentType("text/html");
+        pane.setEditable(false);
+        pane.addHyperlinkListener(new UrlHyperlinkListener());
+        JScrollPane scroller = new JScrollPane(pane);
+        this.add(scroller, BorderLayout.CENTER);
+    }
+
+    public String getIdentifier() {
+        return id;
+    }
+
+    private class UrlHyperlinkListener implements HyperlinkListener {
+        @Override
+        public void hyperlinkUpdate(HyperlinkEvent event) {
+            if (Desktop.isDesktopSupported() && event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                try {
+                    Desktop.getDesktop().browse(event.getURL().toURI());
+                } catch (URISyntaxException ex) {
+                } catch (IOException ex) {
+                }
+            }
+        }
+    }
+
 }

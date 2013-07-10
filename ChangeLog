@@ -1,3 +1,36 @@
+2013-06-06  Jiri Vanek  <jvanek@redhat.com>
+            Andrew Azores  <aazores@redhat.com>
+
+	New about dialogue
+	* Makefile.am (stamps/netx-html-gen): removed logic for extras.jar, added
+	new stamp to create HTML for AboutDialog
+	* netx/net/sourceforge/jnlp/about/AboutDialog.java: Moved out of extras into
+	netx and renamed from Main. New Swing layout and uses HTML files
+	generated in Makefile.
+	* netx/net/sourceforge/jnlp/about/HTMLPanel.java: Moved out of
+	extras into netx. Added ability to click hyperlinks.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java
+	(main, getAboutFile, getJNLPFile, itwInfoMessage): changed way of launching
+	About dialog to using new static display method rather than JNLP launch.
+	Removed methods relating to JNLP launch. More informative and nicely
+	formatted -headless information.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties
+	(BAboutITW, BFileInfoAuthors, BFileInfoCopying, BFileInfoNews): added new
+	messages for javaws -about -headless launch
+	* netx/net/sourceforge/jnlp/resources/about.html: moved out of extras
+	into netx. Added more content, changed formatting.
+	* netx/net/sourceforge/jnlp/resources/about.jnlp: removed, no longer needed
+	* netx/net/sourceforge/jnlp/resources/itw_logo.png: new image for About
+	dialog. Modified version of javaws_splash.png
+	* netx/net/sourceforge/jnlp/resources/jamIcon.jpg: moved out of extras
+	into netx
+	* extra/net/sourceforge/javaws/about/HTMLPanel.java: moved into netx
+	* extra/net/sourceforge/javaws/about/Main.java: same
+	* extra/net/sourceforge/javaws/about/resources/about.html: same
+	* extra/net/sourceforge/javaws/about/resources/jamIcon.jpg: same
+	* extra/net/sourceforge/javaws/about/resources/applications.html: removed
+	* extra/net/sourceforge/javaws/about/resources/notes.html: removed 
+
 2013-06-28  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java

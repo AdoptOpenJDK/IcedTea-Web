@@ -19,6 +19,7 @@ package net.sourceforge.jnlp.runtime;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -31,6 +32,7 @@ import java.util.Map;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.security.viewer.CertificateViewer;
@@ -58,12 +60,6 @@ public final class Boot implements PrivilegedAction<Void> {
     public static final String name = Boot.class.getPackage().getImplementationTitle();
     public static final String version = Boot.class.getPackage().getImplementationVersion();
 
-    /** the text to display before launching the about link */
-    private static final String aboutMessage = ""
-            + name + " " + version
-            + "\n"
-            + R("BLaunchAbout");
-
     private static final String miniLicense = "\n"
             + "   netx - an open-source JNLP client.\n"
             + "   Copyright (C) 2001-2003 Jon A. Maxwell (JAM)\n"
@@ -82,6 +78,17 @@ public final class Boot implements PrivilegedAction<Void> {
             + "   License along with this library; if not, write to the Free Software\n"
             + "   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\n"
             + "\n";
+
+    private static final String itwInfoMessage = ""
+            + name + " " + version
+            + "\n\n*  "
+            + R("BAboutITW")
+            + "\n*  "
+            + R("BFileInfoAuthors")
+            + "\n*  "
+            + R("BFileInfoNews")
+            + "\n*  "
+            + R("BFileInfoCopying");
 
     private static final String helpMessage = "\n"
             + "Usage:   " + R("BOUsage") + "\n"
@@ -143,8 +150,21 @@ public final class Boot implements PrivilegedAction<Void> {
             System.exit(0);
         }
 
-        if (null != getOption("-about"))
-            System.out.println(aboutMessage);
+        if (null != getOption("-about")) {
+                System.out.println(itwInfoMessage);
+            if (null != getOption("-headless")) {
+                System.exit(0);
+            } else {
+                System.out.println(R("BLaunchAbout"));
+                try {
+                    AboutDialog.display();
+                    return;
+                } catch (IOException e) {
+                    System.out.println(R("BLaunchAboutFailure"));
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
         if (null != getOption("-verbose"))
             JNLPRuntime.setDebug(true);
@@ -234,48 +254,12 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     /**
-     * Returns the location of the about.jnlp file or null if this file
-     * does not exist.
-     */
-    private static String getAboutFile() {
-        ClassLoader cl = Boot.class.getClassLoader();
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-        try {
-                    //extracts full path to about.jnlp
-            String s = cl.getResource("net/sourceforge/jnlp/runtime/Boot.class").toString();
-            s=s.substring(0,s.indexOf("!"));
-            s=s.substring(s.indexOf(":")+1);
-            s=s.substring(s.indexOf(":")+1);
-            s="file://"+s.replace("netx.jar","about.jnlp");
-            if (JNLPRuntime.isDebug()){
-                System.out.println("Using " + s + " as about.jnlp URL");
-            }
-
-            return s;
-         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * Returns the url of file to open; does not return if no file was
      * specified, or if the file location was invalid.
      */
     private static URL getFileLocation() {
 
         String location = getJNLPFile();
-
-        // override -jnlp with aboutFile
-        if (getOption("-about") != null) {
-            location = getAboutFile();
-            if (location == null)
-                fatalError(R("RNoAboutJnlp"));
-        } else {
-            location = getJNLPFile();
-        }
 
         if (location == null) {
             System.out.println(helpMessage);
