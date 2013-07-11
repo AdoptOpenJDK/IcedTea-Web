@@ -462,64 +462,9 @@ stamps/netx-html-gen.stamp:
 	(cd $$NETX_SRCDIR/..; \
 	mkdir -p html-gen; \
 	cp AUTHORS NEWS COPYING ChangeLog html-gen/; \
-	cd html-gen/; \
-	for FILE in NEWS AUTHORS COPYING ChangeLog; \
-	do \
-	sed -r \
-		-e "s/\t/    /g" $(: Convert tabs into four spaces) \
-		-e "s/\&/\&amp;/g" $(: "&" -> "&amp;") \
-		-e "s/  /\&ensp;\&ensp;/g" $(: Double-spaces into HTML whitespace for formatting) \
-		-e "s/</\&lt;/g" $(: "<" -> "&lt;") \
-		-e "s/>/\&gt;/g" $(: ">" -> "&gt;") \
-		-e 's/(\&lt;)?(https?:\/\/[^ ]*)(\&gt;| |$$)/\1<a href="\2">\2<\/a>\3/i' $(: Creates hyperlinks from http/https URLs) \
-		-e 's/\&lt;(.*@.*)\&gt;/\&lt;<a href="mailto:\1\?subject=IcedTea-Web">\1<\/a>\&gt;/i' $(: Create mailto links from email addresses formatted as <email@example.com>) \
-		-e "s/$$/<br>/g" $(: "\n" -> "<br>") \
-	"./$$FILE" > "./$$FILE.html"; \
-	done; \
-	sed -i '4i <center>' AUTHORS.html; \
-	sed -i '5i <br><img src="jamIcon.jpg" alt="Jam Icon" width="87" height="84"><br><br>' AUTHORS.html; $(: Insert jamIcon into AUTHORS.html and center the authors list)\
-	echo "</center>" >> AUTHORS.html; \
-	for FILE in NEWS.html ChangeLog.html; \
-	do \
-		mv $$FILE "$$FILE.old"; \
-		COUNTER=0; \
-		while read LINE; \
-		do \
-			BOLD=1; \
-			if [[ $$FILE == "NEWS.html" ]]; \
-			then \
-				if [[ $$LINE =~ New\ in\ release* ]]; \
-				then \
-					BOLD=0; \
-					COUNTER=$$(( $$COUNTER + 1 )); \
-				fi; \
-				if [[ $$COUNTER -gt 2 ]]; $(: Cut to two releases)\
-				then \
-					break; \
-				fi; \
-			else \
-				if [[ $$LINE =~ .*\&lt\;.*\@.*\&gt\; ]]; $(: Matches eg <aazores@redhat.com>, after HTML-escaping)\
-				then \
-					BOLD=0; \
-				fi; \
-				if [[ $$LINE =~ [0-9]{4}-[0-9]{2}-[0-9]{2}* ]]; $(: Matches eg 2013-07-01)\
-				then \
-					COUNTER=$$(( $$COUNTER + 1 )); \
-				fi; \
-				if [[ $$COUNTER -gt 10 ]]; $(: Cut to ten changesets)\
-				then \
-					break; \
-				fi; \
-			fi; \
-			if [[ $$BOLD -eq 0 ]]; $(: Highlight "New In Release" in News, and author name lines in ChangeLog) \
-			then \
-				echo "<b>$$LINE</b>" >> $$FILE; \
-			else \
-				echo "$$LINE" >> $$FILE; \
-			fi; \
-		done < "$$FILE.old"; \
-		rm $$FILE.old; \
-	done)
+	export HTML_GEN_DEBUG=true; \
+	bash html-gen.sh; \
+	unset HTML_GEN_DEBUG)
 	${INSTALL_DATA} $(NETX_SRCDIR)/../html-gen/*.html $(NETX_RESOURCE_DIR)
 	rm -r $(NETX_SRCDIR)/../html-gen/
 	mkdir -p stamps

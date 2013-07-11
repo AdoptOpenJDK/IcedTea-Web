@@ -1,4 +1,12 @@
-2013-06-06  Jiri Vanek  <jvanek@redhat.com>
+2013-07-11  Andrew Azores <aazores@redhat.com>
+
+	* Makefile.am (stamps/html-gen): moved plaintext-to-HTML logic into new
+	shell script
+	* html-gen.sh: contains plaintext-to-HTML logic previously found in
+	Makefile.am. Added a sed expression to cause ChangeLog file listing
+	entries to be underlined.
+
+2013-07-06  Jiri Vanek  <jvanek@redhat.com>
             Andrew Azores  <aazores@redhat.com>
 
 	New about dialogue
