@@ -16,6 +16,7 @@ New in release 1.5 (2013-XX-XX):
   - Netx can now parse malformed jnlp files using tagsoup
   - PR1026 - Apps fail to run because of the nanoxml parser's strict XML validation
   - PR1473 - javaws should not depend on name of local file
+  - Redesigned About dialogue layout and contents
 * Plugin
   - PR854: Resizing an applet several times causes 100% CPU load
 

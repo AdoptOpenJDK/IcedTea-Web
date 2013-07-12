@@ -84,7 +84,7 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
 
         aboutPanel = new HTMLPanel(res_about, R("AboutDialogueTabAbout"));
         authorsPanel = new HTMLPanel(res_authors, R("AboutDialogueTabAuthors"));
-        newsPanel = new HTMLPanel(res_news, R("News"));
+        newsPanel = new HTMLPanel(res_news, R("AboutDialogueTabNews"));
         changelogPanel = new HTMLPanel(res_changelog, R("AboutDialogueTabChangelog"));
         copyingPanel = new HTMLPanel(res_copying, R("AboutDialogueTabGPLv2"));
 

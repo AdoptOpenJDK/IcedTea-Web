@@ -1,5 +1,11 @@
 2013-07-11  Andrew Azores <aazores@redhat.com>
 
+	* NEWS: added entry regarding new About Dialogue
+	* netx/net/sourceforge/jnlp/about/AboutDialog.java: fixed localization of
+	label on News tab
+
+2013-07-11  Andrew Azores <aazores@redhat.com>
+
 	* Makefile.am (stamps/html-gen): moved plaintext-to-HTML logic into new
 	shell script
 	* html-gen.sh: contains plaintext-to-HTML logic previously found in
