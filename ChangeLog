@@ -1,3 +1,17 @@
+2013-07-17  Jiri Vanek  <jvanek@redhat.com>
+	Jacob Wisor  <gitne@excite.co.jp>
+
+	added some missing de and pl strings
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	fixed about dialogue comment
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties:
+	removed keystore comment
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties:
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties:
+	added  AboutDialogueTabAbout AboutDialogueTabAuthors
+	AboutDialogueTabChangelog AboutDialogueTabNews  AboutDialogueTabGPLv2
+	localizations
+
 2013-07-11  Andrew Azores <aazores@redhat.com>
 
 	* NEWS: added entry regarding new About Dialogue
