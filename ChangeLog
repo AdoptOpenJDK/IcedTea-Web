@@ -1,3 +1,18 @@
+2013-07-13  Jiri Vanek  <jvanek@redhat.com>
+
+	About dialogue made accessible from plugin
+	* netx/net/sourceforge/jnlp/about/AboutDialog.java: (frame) re-declared
+	to be Dialogue instead of JFrame and allowed to be modal if necessary.
+	Caption internationalized.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/DefaultSplashScreens2012Commons.java:
+	Added listener for upper right caption to show AboutDialog
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainter.java:
+	(drawBase) if enough space, adding about "button"
+	* netx/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialog.java:
+	added about button
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/SplashScreenTest.java:
+	minor modifications related to this change 
+
 2013-07-17  Jiri Vanek  <jvanek@redhat.com>
 
 	about dialogue now available from itw-settings

@@ -42,6 +42,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
+import net.sourceforge.jnlp.about.AboutDialog;
 
 import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.BasePainter;
 import net.sourceforge.jnlp.splashscreen.parts.BasicComponentSplashScreen;
@@ -61,6 +62,19 @@ public final class DefaultSplashScreens2012Commons {
             public void mouseClicked(MouseEvent e) {
                 painter.increaseAnimationPosition();
                 parent.repaint();
+            }
+        });
+        parent.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getY() < painter.getAboutOfset().y && e.getX() > (painter.getAboutOfset().x)) {
+                    try {
+                        AboutDialog.display();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
         });
         // Add a new listener for resizes

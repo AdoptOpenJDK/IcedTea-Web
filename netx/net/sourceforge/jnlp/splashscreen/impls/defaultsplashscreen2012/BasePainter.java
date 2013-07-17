@@ -36,13 +36,16 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
+import java.awt.BasicStroke;
 import net.sourceforge.jnlp.splashscreen.impls.*;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
@@ -54,6 +57,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.SwingUtilities;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.parts.BasicComponentSplashScreen;
 import net.sourceforge.jnlp.splashscreen.parts.InfoItem;
@@ -115,6 +119,14 @@ public class BasePainter implements Observer {
     protected TextWithWaterLevel twl;
     protected TextWithWaterLevel oldTwl;
     protected boolean canWave = true;
+    private Point aboutOfset = new Point();
+    
+    private final static float dash1[] = {10.0f};
+    private final static BasicStroke dashed =
+        new BasicStroke(1.0f,
+                        BasicStroke.CAP_BUTT,
+                        BasicStroke.JOIN_MITER,
+                        10.0f, dash1, 0.0f);
 
     protected void paintNiceTexts(Graphics2D g2d) {
         //the only animated stuff
@@ -510,11 +522,22 @@ public class BasePainter implements Observer {
         g2d.setColor(plainTextColor);
         FontMetrics fm = g2d.getFontMetrics();
         if (version != null) {
-            String niceVersion=stripCommitFromVersion(version);
+            String aboutPrefix = Translator.R("AboutDialogueTabAbout") + ": ";
+            int aboutPrefixWidth = fm.stringWidth(aboutPrefix);
+            String niceVersion = stripCommitFromVersion(version);
             int y = master.getSplashWidth() - fm.stringWidth(niceVersion + " ");
             if (y < 0) {
                 y = 0;
             }
+            if (y > aboutPrefixWidth) {
+                niceVersion = aboutPrefix + niceVersion;
+                y -= aboutPrefixWidth;
+            }
+            aboutOfset = new Point(y, fm.getHeight());
+            Stroke backup = g2d.getStroke();
+            g2d.setStroke(dashed);
+            g2d.drawRect(aboutOfset.x-1,1, master.getSplashWidth()-aboutOfset.x-1, aboutOfset.y+1);
+            g2d.setStroke(backup);
             g2d.drawString(niceVersion, y, fm.getHeight());
         }
         return fm;
@@ -550,4 +573,16 @@ public class BasePainter implements Observer {
             ex.printStackTrace();
         }
     }
+
+    public BasicComponentSplashScreen getMaster() {
+        return master;
+    }
+
+    public Point getAboutOfset() {
+        return aboutOfset;
+    }
+
+
+
+    
 }

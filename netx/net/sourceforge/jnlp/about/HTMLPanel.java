@@ -56,7 +56,13 @@ public class HTMLPanel extends JPanel {
     public HTMLPanel(URL url, String identifier) throws IOException {
         super(new BorderLayout());
         id = identifier;
-        JEditorPane pane = new JEditorPane(url);
+        JEditorPane pane = new JEditorPane();
+        try{
+             pane = new JEditorPane(url);
+        } catch(Exception ex){
+            //no need to have invalid url fatal
+            ex.printStackTrace();
+        }
         pane.setContentType("text/html");
         pane.setEditable(false);
         pane.addHyperlinkListener(new UrlHyperlinkListener());

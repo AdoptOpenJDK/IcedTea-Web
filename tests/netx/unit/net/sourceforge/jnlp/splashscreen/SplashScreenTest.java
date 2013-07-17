@@ -74,8 +74,8 @@ public class SplashScreenTest extends JDialog {
         ie.setvendor("IcedTea-Web team");
         ie.addDescription("Testing null description");
         ie.addDescription("tsting twoline des ...break\ncription of kind short", InfoItem.descriptionKindShort);
-        //panel.setInformationElement(ie);
-        //panel.setVersion("1.2-re45fdg");
+        panel.setInformationElement(ie);
+        panel.setVersion("1.2-re45fdg");
         setLayout(new BorderLayout());
         getContentPane().add(panel.getSplashComponent(), BorderLayout.CENTER);
 
@@ -159,7 +159,7 @@ public class SplashScreenTest extends JDialog {
         panel.startAnimation();
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(10000);
         } catch (Exception e) {
         }
         //not needed
@@ -169,7 +169,10 @@ public class SplashScreenTest extends JDialog {
             app.remove(panel.getSplashComponent());
             r.setPercentage(panel.getPercentage());
             r.adjustForSize();
+            r.setLoadingException(new RuntimeException(":)"));
             panel = r;
+            panel.setVersion("1.2-re45fdg");
+
             app.add(panel.getSplashComponent());
             app.validateTree();
             //app.pack();

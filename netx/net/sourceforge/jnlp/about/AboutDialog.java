@@ -40,6 +40,7 @@ package net.sourceforge.jnlp.about;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -48,7 +49,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -64,17 +65,17 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
     private static final String copying_url = "/net/sourceforge/jnlp/resources/COPYING.html";
     private static final String news_url = "/net/sourceforge/jnlp/resources/NEWS.html";
 
-    private JFrame frame;
+    private JDialog frame;
     private JPanel contentPane;
     private HTMLPanel aboutPanel, authorsPanel, newsPanel, changelogPanel, copyingPanel;
     private JButton aboutButton, authorsButton, newsButton, changelogButton, copyingButton;
 
-    public AboutDialog() throws IOException {
+    public AboutDialog(boolean modal) throws IOException {
         super(new GridBagLayout());
 
-        frame = new JFrame("About IcedTea-Web");
+        frame = new JDialog((Frame)null, R("AboutDialogueTabAbout") + " IcedTea-Web", modal);
         frame.setContentPane(this);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         URL res_about = getClass().getResource(about_url);
         URL res_authors = getClass().getResource(authors_url);
@@ -186,7 +187,10 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
     }
 
     public static void display() throws IOException {
-        SwingUtilities.invokeLater(new AboutDialog());
+        display(false);
+    }
+    public static void display(boolean modal) throws IOException {
+        SwingUtilities.invokeLater(new AboutDialog(modal));
     }
 
 }
