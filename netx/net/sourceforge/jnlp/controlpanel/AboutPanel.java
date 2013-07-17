@@ -22,9 +22,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import net.sourceforge.jnlp.about.AboutDialog;
 
 import net.sourceforge.jnlp.runtime.Translator;
 
@@ -43,7 +48,17 @@ public class AboutPanel extends NamedBorderPanel {
 
         JLabel logo = new JLabel();
         JLabel aboutLabel = new JLabel("<html>" + Translator.R("CPAboutInfo") + "</html>");
-
+        JButton aboutButton = new JButton(Translator.R("AboutDialogueTabAbout"));
+        aboutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    AboutDialog.display();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
         c.fill = GridBagConstraints.BOTH;
         c.gridy = 0;
         c.gridx = 0;
@@ -53,11 +68,20 @@ public class AboutPanel extends NamedBorderPanel {
         c.gridx = 1;
         c.weightx = 1;
         add(aboutLabel, c);
-
+        c.fill = GridBagConstraints.NONE;
+        c.weighty = 0;
+        c.weightx = 0;
+        c.gridy++;
+        c.gridx=1;
+        add(aboutButton, c);
         /* Keep all the elements at the top of the panel (Extra padding) */
+        c.fill = GridBagConstraints.BOTH;
         Component filler = Box.createRigidArea(new Dimension(1, 1));
         c.weighty = 1;
         c.gridy++;
         add(filler, c);
+        
+        
+        
     }
 }
