@@ -453,6 +453,7 @@ public class CommandLine {
      * @param args the command line arguments to this program
      */
     public static void main(String[] args) throws Exception {
+        DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
         if (args.length == 0) {
             ControlPanel.main(new String[] {});
         } else {

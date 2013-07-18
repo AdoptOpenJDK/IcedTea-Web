@@ -60,6 +60,7 @@ import net.sourceforge.jnlp.browsertesting.BrowserFactory;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Assert;
 
 /**
@@ -417,23 +418,8 @@ public class ServerAccess {
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static String getContentOfStream(InputStream is,String encoding) throws IOException {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding));
-            StringBuilder sb = new StringBuilder();
-            while (true) {
-                String s = br.readLine();
-                if (s == null) {
-                    break;
-                }
-                sb.append(s).append("\n");
-
-            }
-            return sb.toString();
-        } finally {
-            is.close();
-        }
-
+    public static String getContentOfStream(InputStream is, String encoding) throws IOException {
+        return FileUtils.getContentOfStream(is, encoding);
     }
 
     /**
@@ -444,8 +430,7 @@ public class ServerAccess {
      * @throws IOException if connection can't be established or resource does not exist
      */
     public static String getContentOfStream(InputStream is) throws IOException {
-        return getContentOfStream(is, "UTF-8");
-
+        return FileUtils.getContentOfStream(is);
     }
 
     /**
@@ -491,13 +476,10 @@ public class ServerAccess {
      * @throws IOException
      */
     public static void saveFile(String content, File f) throws IOException {
-        saveFile(content, f, "utf-8");
+        FileUtils.saveFile(content, f);
     }
     public static void saveFile(String content, File f,String encoding) throws IOException {
-        Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f),encoding));
-        output.write(content);
-        output.flush();
-        output.close();
+        FileUtils.saveFile(content, f, encoding);
     }
 
     /**

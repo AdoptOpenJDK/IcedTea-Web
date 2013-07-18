@@ -37,7 +37,7 @@ export PRIVATE_KEYSTORE_PASS=123456789
 export EXPORTED_TEST_CERT_PREFIX=icedteatests
 export EXPORTED_TEST_CERT_SUFFIX=crt
 export TEST_CERT_ALIAS=icedteaweb
-export PUBLIC_KEYSTORE=${HOME}/.icedtea/security/trusted.certs
+export PUBLIC_KEYSTORE_STUB=icedtea-web/security/trusted.certs
 export PUBLIC_KEYSTORE_PASS=changeit
 export SOFTKILLER=softkiller
 
@@ -727,8 +727,13 @@ stamps/change-dots-to-paths.stamp: stamps/netx-dist-tests-sign-some-reproducers.
 #with depending to not stamped target we always have to rerun reproducers targets
 stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
 	-types=($(SIGNED_REPRODUCERS)) ; \
+	PUBLIC_KEYSTORE=$$XDG_CONFIG_HOME ; \
+	if test "x$$PUBLIC_KEYSTORE" = x; then \
+	  PUBLIC_KEYSTORE=${HOME}/.config ; \
+	fi ;\
+	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
 	for which in "$${types[@]}" ; do \
-	  $(BOOT_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $(PUBLIC_KEYSTORE) -storepass $(PUBLIC_KEYSTORE_PASS) ; \
+	  $(BOOT_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
@@ -739,16 +744,26 @@ stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
 
 stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	types=($(SIGNED_REPRODUCERS)) ; \
+	PUBLIC_KEYSTORE=$$XDG_CONFIG_HOME ; \
+	if test "x$$PUBLIC_KEYSTORE" = x; then \
+	  PUBLIC_KEYSTORE=${HOME}/.config ; \
+	fi ;\
+	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
 	for which in "$${types[@]}" ; do \
-	  yes | $(BOOT_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS)_$$which -keystore $(PUBLIC_KEYSTORE) -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) ;\
+	  yes | $(BOOT_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) ;\
 	done ;
 	mkdir -p stamps && \
 	touch $@
 
 netx-dist-tests-remove-cert-from-public:
 	-types=($(SIGNED_REPRODUCERS)) ; \
+	PUBLIC_KEYSTORE=$$XDG_CONFIG_HOME ; \
+	if test "x$$PUBLIC_KEYSTORE" = x; then \
+	  PUBLIC_KEYSTORE=${HOME}/.config ; \
+	fi ;\
+	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
 	for which in "$${types[@]}" ; do \
-	  $(BOOT_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $(PUBLIC_KEYSTORE) -storepass $(PUBLIC_KEYSTORE_PASS) ; \
+	  $(BOOT_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
 	-rm -rf stamps/netx-dist-tests-import-cert-to-public
 

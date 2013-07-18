@@ -62,7 +62,7 @@ import net.sourceforge.jnlp.util.PropertiesFile;
  * @author Andrew Su (asu@redhat.com, andrew.su@utoronto.ca)
  * 
  */
-enum CacheLRUWrapper {
+public enum CacheLRUWrapper {
     INSTANCE;
 
     private int lockCount = 0;
@@ -80,9 +80,10 @@ enum CacheLRUWrapper {
      * accessed) followed by folder of item. value = path to file.
      */
     private PropertiesFile cacheOrder = new PropertiesFile(
-            new File(cacheDir + File.separator + "recently_used"));
+            new File(cacheDir + File.separator + CACHE_INDEX_FILE_NAME));
+    public static final String CACHE_INDEX_FILE_NAME = "recently_used";
 
-    private CacheLRUWrapper(){
+    private CacheLRUWrapper() {
         File f = cacheOrder.getStoreFile();
         if (!f.exists()) {
             try {

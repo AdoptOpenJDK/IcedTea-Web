@@ -55,7 +55,7 @@ public class CacheLRUWrapperTest {
             .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR)).getPath();
 
     // does no DeploymentConfiguration exist for this file name? 
-    private final String cacheIndexFileName = "recently_used";
+    private final String cacheIndexFileName = CacheLRUWrapper.CACHE_INDEX_FILE_NAME;
 
     private final int noEntriesCacheFile = 1000;
 

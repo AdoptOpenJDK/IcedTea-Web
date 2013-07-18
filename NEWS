@@ -11,6 +11,7 @@ CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 New in release 1.5 (2013-XX-XX):
 * IcedTea-Web now using tagsoup as default (tagsoup dependence) sanitizer for input
 * JDK older then 1.5 no longer supported
+* IcedTea-Web is now following XDG .config and .cache specification(RH947647)
 * NetX
   - PR1465 - java.io.FileNotFoundException while trying to download a JAR file
   - Netx can now parse malformed jnlp files using tagsoup

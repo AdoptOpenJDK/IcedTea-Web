@@ -64,8 +64,12 @@ public class ProcessWrapper {
     public ProcessWrapper() {
     }
 
-    public ProcessWrapper(String toBeExecuted, List<String> otherargs, URL u){
-        Assert.assertNotNull(u);
+    public ProcessWrapper(String toBeExecuted, List<String> otherargs, URL u) {
+        this(toBeExecuted, otherargs, u.toString());
+    }
+
+    public ProcessWrapper(String toBeExecuted, List<String> otherargs, String s) {
+        Assert.assertNotNull(s);
         Assert.assertNotNull(toBeExecuted);
         Assert.assertTrue(toBeExecuted.trim().length() > 1);
         if (otherargs == null) {
@@ -73,7 +77,7 @@ public class ProcessWrapper {
         }
         List<String> urledArgs = new ArrayList(otherargs);
         urledArgs.add(0, toBeExecuted);
-        urledArgs.add(u.toString());
+        urledArgs.add(s);
         this.args = urledArgs;
         this.vars=null;
     }

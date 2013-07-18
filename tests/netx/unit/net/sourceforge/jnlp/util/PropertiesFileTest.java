@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -61,7 +62,7 @@ public class PropertiesFileTest {
             .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR)).getPath();
 
     // does no DeploymentConfiguration exist for this file name? 
-    private final String cacheIndexFileName = "recently_used";
+    private final String cacheIndexFileName = CacheLRUWrapper.CACHE_INDEX_FILE_NAME;
 
     private final PropertiesFile cacheIndexFile = new PropertiesFile(new File(cacheDir + File.separatorChar + cacheIndexFileName));
     private final int noEntriesCacheFile = 1000;

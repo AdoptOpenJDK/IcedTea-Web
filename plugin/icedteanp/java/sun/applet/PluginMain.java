@@ -103,7 +103,7 @@ public class PluginMain {
             System.err.println("Invalid pipe names provided. Refusing to proceed.");
             System.exit(1);
         }
-
+        DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
         try {
             PluginStreamHandler streamHandler = connect(args[0], args[1]);
             boolean redirectStreams = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");

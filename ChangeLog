@@ -1,4 +1,40 @@
-2013-07-13  Jiri Vanek  <jvanek@redhat.com>
+2013-07-18  Jiri Vanek  <jvanek@redhat.com>
+
+	IcedTea-Web is now following XDG .config and .cache specification(RH947647)
+	* tests/reproducers/simple/simpletest1/testcases/XDGspecificationTests.java
+	new file, test if XDG specification and trasnfer to it are followed correctly, 
+	* NEWS: mentioned new feature
+	* Makefile.am: (PUBLIC_KEYSTORE) repalced by (PUBLIC_KEYSTORE_STUB) which
+	is now holding only internal part of path.(exported-test-certs)
+	(netx-dist-tests-import-cert-to-public) (netx-dist-tests-remove-cert-from-public)
+	are now resolving XDG variable and setting real path of PUBLIC_KEYSTORE
+	by resolved value and (PUBLIC_KEYSTORE)	
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: changed to be public
+	and recently_used strign extracted to (CACHE_INDEX_FILE_NAME) constant
+	* netx/net/sourceforge/jnlp/config/Defaults.java: is now resovling and 
+	propagating XDG_CONFIG/CACHE_HOME  specification. (USER_HOME) repalced by 
+	(USER_CACHE_HOME) and (USER_CONFIG_HOME).
+	(move14AndOlderFilesTo15Structure) new method responsible for moving
+	of old data to new locations. 	(move14AndOlderFilesTo15StructureCatched) 
+	the same but with catch block
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/util/PropertiesFileTest.java:
+	are now using (CACHE_INDEX_FILE_NAME)
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java: (main)
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: (main)
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: (main)
+	* plugin/icedteanp/java/sun/applet/PluginMain.java: (main)
+	are now calling DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched
+	asap.
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: various file manipulation 
+	methods moved inside here from test-extensions - (saveFile) (getContentOfStream)
+	(loadFileAsString) - to avoid duplications
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessWrapper.java: for puposes of
+	new test added constructor with string instead of URL
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: see FileUtils.java
+	
+2013-07-17  Jiri Vanek  <jvanek@redhat.com>
 
 	About dialogue made accessible from plugin
 	* netx/net/sourceforge/jnlp/about/AboutDialog.java: (frame) re-declared

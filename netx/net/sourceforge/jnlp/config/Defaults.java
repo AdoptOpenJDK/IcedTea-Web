@@ -51,28 +51,43 @@ import net.sourceforge.jnlp.runtime.JNLPProxySelector;
  * This class stores the default configuration
  */
 public class Defaults {
+    
+    final static String SYSTEM_HOME = System.getProperty("java.home");
+    final static String SYSTEM_SECURITY = SYSTEM_HOME + File.separator + "lib" + File.separator + "security";
+    final static String USER_CONFIG_HOME;
+    final static String USER_CACHE_HOME;
+    final static String USER_SECURITY;
+    final static String LOCKS_DIR = System.getProperty("java.io.tmpdir") + File.separator
+            + System.getProperty("user.name") + File.separator + "netx" + File.separator
+            + "locks";
+    final static File userFile;
+
+    static {
+        String configHome = System.getProperty("user.home") + File.separator + DeploymentConfiguration.DEPLOYMENT_CONFIG_DIR;
+        String cacheHome = System.getProperty("user.home") + File.separator + DeploymentConfiguration.DEPLOYMENT_CACHE_DIR;
+        String XDG_CONFIG_HOME = System.getenv("XDG_CONFIG_HOME");
+        String XDG_CACHE_HOME = System.getenv("XDG_CACHE_HOME");
+        if (XDG_CONFIG_HOME != null) {
+            configHome = XDG_CONFIG_HOME + File.separator + DeploymentConfiguration.DEPLOYMENT_SUBDIR_DIR;
+        }
+        if (XDG_CACHE_HOME != null) {
+            cacheHome = XDG_CACHE_HOME + File.separator + DeploymentConfiguration.DEPLOYMENT_SUBDIR_DIR;
+        }
+        USER_CONFIG_HOME = configHome;
+        USER_CACHE_HOME = cacheHome;
+        USER_SECURITY = USER_CONFIG_HOME + File.separator + "security";
+        userFile = new File(USER_CONFIG_HOME + File.separator + DeploymentConfiguration.DEPLOYMENT_PROPERTIES);
+    }
 
     /**
      * Get the default settings for deployment
      */
     public static Map<String, Setting<String>> getDefaults() {
-        File userFile = new File(System.getProperty("user.home") + File.separator + DeploymentConfiguration.DEPLOYMENT_DIR
-                + File.separator + DeploymentConfiguration.DEPLOYMENT_PROPERTIES);
-
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkRead(userFile.toString());
         }
 
-        final String SYSTEM_HOME = System.getProperty("java.home");
-        final String SYSTEM_SECURITY = SYSTEM_HOME + File.separator + "lib" + File.separator + "security";
-
-        final String USER_HOME = System.getProperty("user.home") + File.separator + DeploymentConfiguration.DEPLOYMENT_DIR;
-        final String USER_SECURITY = USER_HOME + File.separator + "security";
-
-        final String LOCKS_DIR = System.getProperty("java.io.tmpdir") + File.separator
-                + System.getProperty("user.name") + File.separator + "netx" + File.separator
-                + "locks";
 
         /*
          * This is more or less a straight copy from the deployment
@@ -90,12 +105,12 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_USER_CACHE_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_HOME + File.separator + "cache"
+                        USER_CACHE_HOME + File.separator + "cache"
                 },
                 {
                         DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_HOME + File.separator + "pcache"
+                        USER_CACHE_HOME + File.separator + "pcache"
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_CACHE_DIR,
@@ -105,12 +120,12 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_USER_LOG_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_HOME + File.separator + "log"
+                        USER_CONFIG_HOME + File.separator + "log"
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TMP_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_HOME + File.separator + "tmp"
+                        USER_CACHE_HOME + File.separator + "tmp"
                 },
                 {
                         DeploymentConfiguration.KEY_USER_LOCKS_DIR,

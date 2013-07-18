@@ -399,6 +399,7 @@ public class ControlPanel extends JFrame {
     }
 
     public static void main(String[] args) throws Exception {
+        DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
         final DeploymentConfiguration config = new DeploymentConfiguration();
         try {
             config.load();

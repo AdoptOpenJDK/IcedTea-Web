@@ -49,6 +49,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import net.sourceforge.jnlp.cache.CacheDirectory;
+import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -202,7 +203,7 @@ public class CachePane extends JPanel {
             }
 
             private void updateRecentlyUsed(File f) {
-                File recentlyUsedFile = new File(location + File.separator + "recently_used");
+                File recentlyUsedFile = new File(location + File.separator + CacheLRUWrapper.CACHE_INDEX_FILE_NAME);
                 PropertiesFile pf = new PropertiesFile(recentlyUsedFile);
                 pf.load();
                 Enumeration<Object> en = pf.keys();

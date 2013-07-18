@@ -36,6 +36,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.naming.ConfigurationException;
+import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -48,8 +49,10 @@ import net.sourceforge.jnlp.util.FileUtils;
  */
 public final class DeploymentConfiguration {
 
-    public static final String DEPLOYMENT_DIR = ".icedtea";
-    public static final String DEPLOYMENT_CONFIG = "deployment.config";
+    public static final String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
+    public static final String DEPLOYMENT_CACHE_DIR = ".cache" + File.separator + DEPLOYMENT_SUBDIR_DIR;
+    public static final String DEPLOYMENT_CONFIG_DIR = ".config" + File.separator + DEPLOYMENT_SUBDIR_DIR;
+    public static final String DEPLOYMENT_CONFIG_FILE = "deployment.config";
     public static final String DEPLOYMENT_PROPERTIES = "deployment.properties";
     public static final String APPLET_TRUST_SETTINGS = ".appletTrustSettings";
 
@@ -181,8 +184,7 @@ public final class DeploymentConfiguration {
     private File userPropertiesFile = null;
     
     /*default user file*/
-    public static final  File USER_DEPLOYMENT_PROPERTIES_FILE = new File(System.getProperty("user.home") + File.separator + DEPLOYMENT_DIR
-                + File.separator + DEPLOYMENT_PROPERTIES);
+    public static final File USER_DEPLOYMENT_PROPERTIES_FILE = new File(Defaults.USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES);
 
     /** the current deployment properties */
     private Map<String, Setting<String>> currentConfiguration;
@@ -206,8 +208,7 @@ public final class DeploymentConfiguration {
     }
 
     public static File getAppletTrustUserSettingsPath() {
-        return new File(System.getProperty("user.home") + File.separator + DEPLOYMENT_DIR
-                + File.separator + APPLET_TRUST_SETTINGS);
+        return new File(Defaults.USER_CONFIG_HOME + File.separator + APPLET_TRUST_SETTINGS);
     }
 
      public static File getAppletTrustGlobalSettingsPath() {
@@ -251,7 +252,7 @@ public final class DeploymentConfiguration {
         if (systemConfigFile != null) {
             if (loadSystemConfiguration(systemConfigFile)) {
                 if (JNLPRuntime.isDebug()) {
-                    System.out.println("System level " + DEPLOYMENT_CONFIG + " is mandatory: " + systemPropertiesMandatory);
+                    System.out.println("System level " + DEPLOYMENT_CONFIG_FILE + " is mandatory: " + systemPropertiesMandatory);
                 }
                 /* Second, read the System level deployment.properties file */
                 systemProperties = loadProperties(ConfigType.System, systemPropertiesFile,
@@ -414,7 +415,7 @@ public final class DeploymentConfiguration {
      */
     private File findSystemConfigFile() {
         File etcFile = new File(File.separator + "etc" + File.separator + ".java" + File.separator
-                + "deployment" + File.separator + DEPLOYMENT_CONFIG);
+                + "deployment" + File.separator + DEPLOYMENT_CONFIG_FILE);
         if (etcFile.isFile()) {
             return etcFile;
         }
@@ -435,10 +436,10 @@ public final class DeploymentConfiguration {
         File jreFile;
         if (jrePath != null) {
             jreFile = new File(jrePath + File.separator + "lib"
-                    + File.separator + DEPLOYMENT_CONFIG);
+                    + File.separator + DEPLOYMENT_CONFIG_FILE);
         } else {
             jreFile = new File(System.getProperty("java.home") + File.separator + "lib"
-                    + File.separator + DEPLOYMENT_CONFIG);
+                    + File.separator + DEPLOYMENT_CONFIG_FILE);
         }
         if (jreFile.isFile()) {
             return jreFile;
@@ -679,6 +680,135 @@ public final class DeploymentConfiguration {
             Setting<String> value = config.get(key);
             out.println("'" + key + "': '" + value.getValue() + "'"
                     + (value.isLocked() ? " [LOCKED]" : ""));
+        }
+    }
+
+    public static void move14AndOlderFilesTo15StructureCatched() {
+        try {
+            move14AndOlderFilesTo15Structure();
+        } catch (Throwable t) {
+            System.err.println("Critical error during converting old files to new. Continuing");
+            t.printStackTrace();
+        }
+
+    }
+
+    private static void move14AndOlderFilesTo15Structure() {
+        int errors = 0;
+        String PRE_15_DEPLOYMENT_DIR = ".icedtea";
+        String LEGACY_USER_HOME = System.getProperty("user.home") + File.separator + PRE_15_DEPLOYMENT_DIR;
+        File legacyUserDir = new File(LEGACY_USER_HOME);
+        if (legacyUserDir.exists()) {
+            System.out.println("Legacy configuration and cache found. Those will be now transported to new locations");
+            System.out.println(Defaults.USER_CONFIG_HOME + " and " + Defaults.USER_CACHE_HOME);
+            System.out.println("You should not see this message next time you run icedtea-web!");
+            System.out.println("Your custom dirs will not be touched and will work");
+            System.out.println("-----------------------------------------------");
+
+            System.out.println("Preparing new directories:");
+            System.out.println(" " + Defaults.USER_CONFIG_HOME);
+            File f1 = new File(Defaults.USER_CONFIG_HOME);
+            errors += resultToStd(f1.mkdirs());
+            System.out.println(" " + Defaults.USER_CACHE_HOME);
+            File f2 = new File(Defaults.USER_CACHE_HOME);
+            errors += resultToStd(f2.mkdirs());
+
+            String legacySecurity = LEGACY_USER_HOME + File.separator + "security";
+            String currentSecurity = Defaults.USER_SECURITY;
+            errors += moveLegacyToCurrent(legacySecurity, currentSecurity);
+
+            String legacyCache = LEGACY_USER_HOME + File.separator + "cache";
+            String currentCache = Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_CACHE_DIR).getDefaultValue();
+            errors += moveLegacyToCurrent(legacyCache, currentCache);
+            System.out.println("Adapting " + CacheLRUWrapper.CACHE_INDEX_FILE_NAME + " to new destination");
+            //replace all legacyCache by currentCache in new recently_used
+            try {
+                File f = new File(currentCache, CacheLRUWrapper.CACHE_INDEX_FILE_NAME);
+                String s = FileUtils.loadFileAsString(f);
+                s = s.replace(legacyCache, currentCache);
+                FileUtils.saveFile(s, f);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                errors++;
+            }
+
+            String legacyPcahceDir = LEGACY_USER_HOME + File.separator + "pcache";
+            String currentPcacheDir = Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR).getDefaultValue();
+            errors += moveLegacyToCurrent(legacyPcahceDir, currentPcacheDir);
+
+            String legacyLogDir = LEGACY_USER_HOME + File.separator + "log";
+            String currentLogDir = Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_LOG_DIR).getDefaultValue();
+            errors += moveLegacyToCurrent(legacyLogDir, currentLogDir);
+
+            String legacyProperties = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES;
+            String currentProperties = Defaults.USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES;
+            errors += moveLegacyToCurrent(legacyProperties, currentProperties);
+
+            String legacyPropertiesOld = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES + ".old";
+            String currentPropertiesOld = Defaults.USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES + ".old";
+            errors += moveLegacyToCurrent(legacyPropertiesOld, currentPropertiesOld);
+
+
+            String legacyAppletTrust = LEGACY_USER_HOME + File.separator + APPLET_TRUST_SETTINGS;
+            String currentAppletTrust = getAppletTrustUserSettingsPath().getAbsolutePath();
+            errors += moveLegacyToCurrent(legacyAppletTrust, currentAppletTrust);
+
+            String legacyTmp = LEGACY_USER_HOME + File.separator + "tmp";
+            String currentTmp = Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_TMP_DIR).getDefaultValue();
+            errors += moveLegacyToCurrent(legacyTmp, currentTmp);
+
+            System.out.println("Removing now empty " + LEGACY_USER_HOME);
+            errors += resultToStd(legacyUserDir.delete());
+
+            if (errors != 0) {
+                System.out.println("There occureed " + errors + " errors");
+                System.out.println("Please double check content of old data in " + LEGACY_USER_HOME + " with ");
+                System.out.println("new " + Defaults.USER_CONFIG_HOME + " and " + Defaults.USER_CACHE_HOME);
+                System.out.println("To disable this check again, please remove " + LEGACY_USER_HOME);
+            }
+
+        } else {
+            if (JNLPRuntime.isDebug()) {
+                System.out.println("System is already following XDG .cache and .config specifications");
+                try {
+                    System.out.println("config: " + Defaults.USER_CONFIG_HOME + " file exists: " + new File(Defaults.USER_CONFIG_HOME).exists());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    System.out.println("cache: " + Defaults.USER_CACHE_HOME + " file exists:" + new File(Defaults.USER_CACHE_HOME));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    private static int moveLegacyToCurrent(String legacy, String current) {
+        System.out.println("Moving " + legacy + " to " + current);
+        File cf = new File(current);
+        File old = new File(legacy);
+        if (cf.exists()) {
+            System.out.println("Warning! Destination " + current + " exists!");
+        }
+        if (old.exists()) {
+            boolean moved = old.renameTo(cf);
+            return resultToStd(moved);
+        } else {
+            System.out.println("Source " + legacy + " do not exists, nothing to do");
+            return 0;
+        }
+
+    }
+
+    private static int resultToStd(boolean securityMove) {
+        if (securityMove) {
+            System.out.println("OK");
+            return 0;
+        } else {
+            System.out.println("ERROR");
+            return 1;
         }
     }
 }

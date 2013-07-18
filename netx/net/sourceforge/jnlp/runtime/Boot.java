@@ -35,6 +35,7 @@ import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.viewer.CertificateViewer;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import sun.awt.AppContext;
@@ -126,6 +127,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (AppContext.getAppContext() == null) {
             SunToolkit.createNewAppContext();
         }
+        DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
         args = argsIn;
 
         if (null != getOption("-viewer")) {

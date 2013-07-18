@@ -9,9 +9,18 @@ SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
 PROGRAM_NAME=@PROGRAM_NAME@
 CP=@JRE@/lib/rt.jar
 
+CONFIG_HOME=$XDG_CONFIG_HOME
+if [ "x$CONFIG_HOME" = "x" ] ; then
+  CONFIG_HOME=~/.config
+fi;
 PROPERTY_NAME=deployment.jre.dir
 CUSTOM_JRE_REGEX="^$PROPERTY_NAME *= *"
-CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" ~/.icedtea/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" $CONFIG_HOME/icedtea-web/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+#now check in legacy one
+if [ "x$CUSTOM_JRE" = "x" ] ; then
+  CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" ~/.icedtea/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+fi;
+#now check in global one
 if [ "x$CUSTOM_JRE" = "x" ] ; then
   CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" /etc/.java/.deploy/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
 fi;

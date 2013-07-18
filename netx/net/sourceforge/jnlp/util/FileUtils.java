@@ -16,12 +16,20 @@
 
 package net.sourceforge.jnlp.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
@@ -368,5 +376,69 @@ public final class FileUtils {
             e.printStackTrace();
         }
         return lock;
+    }
+
+    /**
+     * helping dummy  method to save String as file
+     * 
+     * @param content
+     * @param f
+     * @throws IOException
+     */
+    public static void saveFile(String content, File f) throws IOException {
+        saveFile(content, f, "utf-8");
+    }
+
+    public static void saveFile(String content, File f, String encoding) throws IOException {
+        Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), encoding));
+        output.write(content);
+        output.flush();
+        output.close();
+    }
+
+    /**
+     * utility method which can read from any stream as one long String
+     * 
+     * @param input stream
+     * @return stream as string
+     * @throws IOException if connection can't be established or resource does not exist
+     */
+    public static String getContentOfStream(InputStream is, String encoding) throws IOException {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding));
+            StringBuilder sb = new StringBuilder();
+            while (true) {
+                String s = br.readLine();
+                if (s == null) {
+                    break;
+                }
+                sb.append(s).append("\n");
+
+            }
+            return sb.toString();
+        } finally {
+            is.close();
+        }
+
+    }
+
+    /**
+     * utility method which can read from any stream as one long String
+     *
+     * @param input stream
+     * @return stream as string
+     * @throws IOException if connection can't be established or resource does not exist
+     */
+    public static String getContentOfStream(InputStream is) throws IOException {
+        return getContentOfStream(is, "UTF-8");
+
+    }
+
+    public static String loadFileAsString(File f) throws IOException {
+        return getContentOfStream(new FileInputStream(f));
+    }
+
+    public static String loadFileAsString(File f, String encoding) throws IOException {
+        return getContentOfStream(new FileInputStream(f), encoding);
     }
 }
