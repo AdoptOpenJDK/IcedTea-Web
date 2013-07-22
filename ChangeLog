@@ -1,3 +1,8 @@
+2013-07-22  Andrew Azores <aazores@redhat.com>
+	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java:
+	(getProxiesWithoutCaching) added java.vm.name read permission to fix
+	Rhino parsing and PAC proxy configuration
+
 2013-07-18  Jiri Vanek  <jvanek@redhat.com>
 
 	IcedTea-Web is now following XDG .config and .cache specification(RH947647)
