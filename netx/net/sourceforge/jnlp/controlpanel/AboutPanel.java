@@ -24,13 +24,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import net.sourceforge.jnlp.about.AboutDialog;
 
+import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.runtime.Translator;
 
 /**
@@ -52,11 +51,7 @@ public class AboutPanel extends NamedBorderPanel {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    AboutDialog.display();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+                AboutDialog.display();
             }
         });
         c.fill = GridBagConstraints.BOTH;

@@ -45,7 +45,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.JButton;
@@ -70,7 +69,7 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
     private HTMLPanel aboutPanel, authorsPanel, newsPanel, changelogPanel, copyingPanel;
     private JButton aboutButton, authorsButton, newsButton, changelogButton, copyingButton;
 
-    public AboutDialog(boolean modal) throws IOException {
+    public AboutDialog(boolean modal) {
         super(new GridBagLayout());
 
         frame = new JDialog((Frame)null, R("AboutDialogueTabAbout") + " IcedTea-Web", modal);
@@ -186,10 +185,11 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
         frame.setVisible(true);
     }
 
-    public static void display() throws IOException {
+    public static void display() {
         display(false);
     }
-    public static void display(boolean modal) throws IOException {
+
+    public static void display(boolean modal) {
         SwingUtilities.invokeLater(new AboutDialog(modal));
     }
 

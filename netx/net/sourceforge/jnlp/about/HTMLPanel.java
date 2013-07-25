@@ -53,13 +53,13 @@ public class HTMLPanel extends JPanel {
 
     private String id;
 
-    public HTMLPanel(URL url, String identifier) throws IOException {
+    public HTMLPanel(URL url, String identifier) {
         super(new BorderLayout());
         id = identifier;
         JEditorPane pane = new JEditorPane();
-        try{
+        try {
              pane = new JEditorPane(url);
-        } catch(Exception ex){
+        } catch (IOException ex) {
             //no need to have invalid url fatal
             ex.printStackTrace();
         }

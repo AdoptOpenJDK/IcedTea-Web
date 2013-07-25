@@ -1,3 +1,15 @@
+2013-07-25  Andrew Azores <aazores@redhat.com>
+	* netx/net/sourceforge/jnlp/about/AboutDialog.java (AboutDialog, display):
+	removed "throws IOException"
+	* netx/net/sourceforge/jnlp/about/HTMLPanel.java (HTMLPanel): removed
+	"throws IOException" and changed try/catch to catch IOException rather
+	than Exception
+	* netx/net/sourceforge/jnlp/controlpanel/AboutPanel.java: removed
+	try/catch around AboutDialog.display() call
+	* netx/net/sourceforge/jnlp/runtime/Boot.java (main): same
+	* netx/net/sourceforge/jnlp/splashscreen/impls/DefaultSplashScreens2012Commons.java:
+	same
+
 2013-07-22  Andrew Azores <aazores@redhat.com>
 	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java:
 	(getProxiesWithoutCaching) added java.vm.name read permission to fix

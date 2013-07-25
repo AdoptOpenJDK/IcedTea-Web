@@ -19,7 +19,6 @@ package net.sourceforge.jnlp.runtime;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -158,13 +157,8 @@ public final class Boot implements PrivilegedAction<Void> {
                 System.exit(0);
             } else {
                 System.out.println(R("BLaunchAbout"));
-                try {
-                    AboutDialog.display();
-                    return;
-                } catch (IOException e) {
-                    System.out.println(R("BLaunchAboutFailure"));
-                    throw new RuntimeException(e);
-                }
+                AboutDialog.display();
+                return;
             }
         }
 
