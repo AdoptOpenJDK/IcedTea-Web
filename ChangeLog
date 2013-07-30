@@ -1,4 +1,11 @@
+2013-07-30  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/reproducers/simple/simpletest1/resources/favicon.ico: new file
+	should be served by test server in reproducers run and so prevent FNF exception
+	* ChangeLog: fixed few entries below (added emty line between author and body)
+
 2013-07-25  Andrew Azores <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/about/AboutDialog.java (AboutDialog, display):
 	removed "throws IOException"
 	* netx/net/sourceforge/jnlp/about/HTMLPanel.java (HTMLPanel): removed
@@ -11,6 +18,7 @@
 	same
 
 2013-07-22  Andrew Azores <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java:
 	(getProxiesWithoutCaching) added java.vm.name read permission to fix
 	Rhino parsing and PAC proxy configuration
