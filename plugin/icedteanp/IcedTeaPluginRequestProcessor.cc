@@ -763,7 +763,7 @@ _setMember(void* data)
     else
     	property_identifier = browser_functions.getstringidentifier(property_id->c_str());
 
-    PLUGIN_DEBUG("Setting %s on instance %p, object %p to value %s\n", browser_functions.utf8fromidentifier(property_identifier), instance, member, value->c_str());
+    PLUGIN_DEBUG("Setting %s on instance %p, object %p to value %s\n", IcedTeaPluginUtilities::NPIdentifierAsString(property_identifier).c_str(), instance, member, value->c_str());
 
     IcedTeaPluginUtilities::javaResultToNPVariant(instance, value, &value_variant);
 
@@ -783,6 +783,7 @@ _getMember(void* data)
     std::vector<void*> parameters = ((AsyncCallThreadData*) data)->parameters;
 
     instance = (NPP) parameters.at(0);
+
     parent_ptr = (NPObject*) parameters.at(1);
     std::string*  member_id = (std::string*) parameters.at(2);
     NPIdentifier member_identifier;
@@ -795,11 +796,11 @@ _getMember(void* data)
     	member_identifier = browser_functions.getstringidentifier(member_id->c_str());
 
     // Get the NPVariant corresponding to this member
-    PLUGIN_DEBUG("Looking for %p %p %p (%s)\n", instance, parent_ptr, member_identifier, browser_functions.utf8fromidentifier(member_identifier));
+    PLUGIN_DEBUG("Looking for %p %p %p (%s)\n", instance, parent_ptr, member_identifier, IcedTeaPluginUtilities::NPIdentifierAsString(member_identifier).c_str());
 
     if (!browser_functions.hasproperty(instance, parent_ptr, member_identifier))
     {
-        printf("%s not found!\n", browser_functions.utf8fromidentifier(member_identifier));
+        printf("%s not found!\n", IcedTeaPluginUtilities::NPIdentifierAsString(member_identifier).c_str());
     }
     ((AsyncCallThreadData*) data)->call_successful = browser_functions.getproperty(instance, parent_ptr, member_identifier, member_ptr);
 

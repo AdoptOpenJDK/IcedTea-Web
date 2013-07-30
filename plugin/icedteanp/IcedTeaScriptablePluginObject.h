@@ -63,23 +63,23 @@ class IcedTeaScriptablePluginObject: public NPObject
 
         static void invalidate(NPObject *npobj);
 
-        static bool hasMethod(NPObject *npobj, NPIdentifier name);
+        static bool hasMethod(NPObject *npobj, NPIdentifier name_id);
 
-        static bool invoke(NPObject *npobj, NPIdentifier name,
+        static bool invoke(NPObject *npobj, NPIdentifier name_id,
                 const NPVariant *args, uint32_t argCount, NPVariant *result);
 
         static bool invokeDefault(NPObject *npobj, const NPVariant *args,
                 uint32_t argCount, NPVariant *result);
 
-        static bool hasProperty(NPObject *npobj, NPIdentifier name);
+        static bool hasProperty(NPObject *npobj, NPIdentifier name_id);
 
-        static bool getProperty(NPObject *npobj, NPIdentifier name,
+        static bool getProperty(NPObject *npobj, NPIdentifier name_id,
                 NPVariant *result);
 
-        static bool setProperty(NPObject *npobj, NPIdentifier name,
+        static bool setProperty(NPObject *npobj, NPIdentifier name_id,
                 const NPVariant *value);
 
-        static bool removeProperty(NPObject *npobj, NPIdentifier name);
+        static bool removeProperty(NPObject *npobj, NPIdentifier name_id);
 
         static bool enumerate(NPObject *npobj, NPIdentifier **value,
                 uint32_t *count);
@@ -111,23 +111,23 @@ class IcedTeaScriptableJavaPackageObject: public NPObject
 
         static void invalidate(NPObject *npobj);
 
-        static bool hasMethod(NPObject *npobj, NPIdentifier name);
+        static bool hasMethod(NPObject *npobj, NPIdentifier name_id);
 
-        static bool invoke(NPObject *npobj, NPIdentifier name,
+        static bool invoke(NPObject *npobj, NPIdentifier name_id,
                 const NPVariant *args, uint32_t argCount, NPVariant *result);
 
         static bool invokeDefault(NPObject *npobj, const NPVariant *args,
                 uint32_t argCount, NPVariant *result);
 
-        static bool hasProperty(NPObject *npobj, NPIdentifier name);
+        static bool hasProperty(NPObject *npobj, NPIdentifier name_id);
 
-        static bool getProperty(NPObject *npobj, NPIdentifier name,
+        static bool getProperty(NPObject *npobj, NPIdentifier name_id,
                 NPVariant *result);
 
-        static bool setProperty(NPObject *npobj, NPIdentifier name,
+        static bool setProperty(NPObject *npobj, NPIdentifier name_id,
                 const NPVariant *value);
 
-        static bool removeProperty(NPObject *npobj, NPIdentifier name);
+        static bool removeProperty(NPObject *npobj, NPIdentifier name_id);
 
         static bool enumerate(NPObject *npobj, NPIdentifier **value,
                 uint32_t *count);
@@ -170,21 +170,21 @@ public:
         IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
         IcedTeaPluginUtilities::removeObjectMapping(scriptable_object->objectKey());
     }
-    static bool hasMethod(NPObject *npobj, NPIdentifier name);
-    static bool invoke(NPObject *npobj, NPIdentifier name,
+    static bool hasMethod(NPObject *npobj, NPIdentifier name_id);
+    static bool invoke(NPObject *npobj, NPIdentifier name_id,
             const NPVariant *args, uint32_t argCount, NPVariant *result);
     static bool invokeDefault(NPObject *npobj, const NPVariant *args,
             uint32_t argCount, NPVariant *result) {
         printf ("** Unimplemented: IcedTeaScriptableJavaObject::invokeDefault %p\n", npobj);
         return false;
     }
-    static bool hasProperty(NPObject *npobj, NPIdentifier name);
-    static bool getProperty(NPObject *npobj, NPIdentifier name,
+    static bool hasProperty(NPObject *npobj, NPIdentifier name_id);
+    static bool getProperty(NPObject *npobj, NPIdentifier name_id,
             NPVariant *result);
-    static bool setProperty(NPObject *npobj, NPIdentifier name,
+    static bool setProperty(NPObject *npobj, NPIdentifier name_id,
             const NPVariant *value);
 
-    static bool removeProperty(NPObject *npobj, NPIdentifier name) {
+    static bool removeProperty(NPObject *npobj, NPIdentifier name_id) {
         printf ("** Unimplemented: IcedTeaScriptableJavaObject::removeProperty %p\n", npobj);
         return false;
     }

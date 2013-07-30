@@ -34,15 +34,16 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
 
+#include <fstream>
 #include <UnitTest++.h>
 
 #include <npapi.h>
 
 #include "browser_mock.h"
+#include "MemoryLeakDetector.h"
 
 #include "IcedTeaPluginUtils.h"
 #include "IcedTeaNPPlugin.h"
-#include <fstream>
 
 TEST(NPVariantAsString) {
     NPVariant var;
@@ -82,6 +83,17 @@ TEST(NPVariantStringCopy) {
     browser_functions.memfree((void*) npvar.value.stringValue.UTF8Characters);
 
     CHECK_EQUAL(0, browsermock_unfreed_allocations());
+}
+
+TEST(NPIdentifierAsString) {
+    // NB: Mocked definition of 'utf8fromidentifier' simply reads NPIdentifier as a char* string.
+    const char test_string[] = "foobar";
+    MemoryLeakDetector leak_detector;
+    /* Ensure destruction */{
+        std::string str = IcedTeaPluginUtilities::NPIdentifierAsString((NPIdentifier)test_string);
+        CHECK_EQUAL(test_string, str);
+    }
+    CHECK_EQUAL(0, leak_detector.memory_leaks());
 }
 
 TEST(trim) {

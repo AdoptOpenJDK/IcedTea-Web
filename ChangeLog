@@ -1,3 +1,17 @@
+2013-07-30  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/IcedTeaPluginUtils.cc
+	(NPIdentifierAsString): Leak-free utf8fromidentifier wrapper.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: Same.
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc: Update calls
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: Same.
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: Same.
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.h: Same.
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc
+	(NPIdentifierAsString): New, tests utility function
+	* tests/cpp-unit-tests/browser_mock.cc
+	(mock_utf8fromidentifier): New, mocks NPAPI function
+
 2013-07-30  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/reproducers/simple/simpletest1/resources/favicon.ico: new file

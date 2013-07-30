@@ -211,6 +211,9 @@ class IcedTeaPluginUtilities
         /* This must be freed with browserfunctions.releasevariantvalue */
         static NPVariant NPVariantStringCopy(const std::string& result);
 
+        /* Returns an std::string represented by the given identifier. */
+        static std::string NPIdentifierAsString(NPIdentifier id);
+
     	/* Frees the given vector and the strings that its contents point to */
     	static void freeStringPtrVector(std::vector<std::string*>* v);
 

@@ -59,14 +59,14 @@ IcedTeaScriptablePluginObject::invalidate(NPObject *npobj)
 }
 
 bool
-IcedTeaScriptablePluginObject::hasMethod(NPObject *npobj, NPIdentifier name)
+IcedTeaScriptablePluginObject::hasMethod(NPObject *npobj, NPIdentifier name_id)
 {
 	printf ("** Unimplemented: IcedTeaScriptablePluginObject::hasMethod %p\n", npobj);
 	return false;
 }
 
 bool
-IcedTeaScriptablePluginObject::invoke(NPObject *npobj, NPIdentifier name, const NPVariant *args,
+IcedTeaScriptablePluginObject::invoke(NPObject *npobj, NPIdentifier name_id, const NPVariant *args,
 			uint32_t argCount,NPVariant *result)
 {
 	printf ("** Unimplemented: IcedTeaScriptablePluginObject::invoke %p\n", npobj);
@@ -82,17 +82,17 @@ IcedTeaScriptablePluginObject::invokeDefault(NPObject *npobj, const NPVariant *a
 }
 
 bool
-IcedTeaScriptablePluginObject::hasProperty(NPObject *npobj, NPIdentifier name)
+IcedTeaScriptablePluginObject::hasProperty(NPObject *npobj, NPIdentifier name_id)
 {
 	printf ("** Unimplemented: IcedTeaScriptablePluginObject::hasProperty %p\n", npobj);
 	return false;
 }
 
 bool
-IcedTeaScriptablePluginObject::getProperty(NPObject *npobj, NPIdentifier name, NPVariant *result)
+IcedTeaScriptablePluginObject::getProperty(NPObject *npobj, NPIdentifier name_id, NPVariant *result)
 {
 	// Package request?
-	if (!strcmp(browser_functions.utf8fromidentifier(name), "java"))
+	if (IcedTeaPluginUtilities::NPIdentifierAsString(name_id) == "java")
 	{
 		//NPObject* obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(getInstanceFromMemberPtr(npobj), name);
 		//OBJECT_TO_NPVARIANT(obj, *result);
@@ -104,14 +104,14 @@ IcedTeaScriptablePluginObject::getProperty(NPObject *npobj, NPIdentifier name, N
 }
 
 bool
-IcedTeaScriptablePluginObject::setProperty(NPObject *npobj, NPIdentifier name, const NPVariant *value)
+IcedTeaScriptablePluginObject::setProperty(NPObject *npobj, NPIdentifier name_id, const NPVariant *value)
 {
 	printf ("** Unimplemented: IcedTeaScriptablePluginObject::setProperty %p\n", npobj);
 	return false;
 }
 
 bool
-IcedTeaScriptablePluginObject::removeProperty(NPObject *npobj, NPIdentifier name)
+IcedTeaScriptablePluginObject::removeProperty(NPObject *npobj, NPIdentifier name_id)
 {
 	printf ("** Unimplemented: IcedTeaScriptablePluginObject::removeProperty %p\n", npobj);
 	return false;
@@ -189,13 +189,13 @@ IcedTeaScriptableJavaPackageObject::~IcedTeaScriptableJavaPackageObject()
 void
 IcedTeaScriptableJavaPackageObject::setPackageName(const NPUTF8* name)
 {
-    this->package_name->append(name);
+    this->package_name->assign(name);
 }
 
 std::string
 IcedTeaScriptableJavaPackageObject::getPackageName()
 {
-    return this->package_name->c_str();
+    return *this->package_name;
 }
 
 void
@@ -211,14 +211,14 @@ IcedTeaScriptableJavaPackageObject::invalidate(NPObject *npobj)
 }
 
 bool
-IcedTeaScriptableJavaPackageObject::hasMethod(NPObject *npobj, NPIdentifier name)
+IcedTeaScriptableJavaPackageObject::hasMethod(NPObject *npobj, NPIdentifier name_id)
 {
     // Silly caller. Methods are for objects!
 	return false;
 }
 
 bool
-IcedTeaScriptableJavaPackageObject::invoke(NPObject *npobj, NPIdentifier name, const NPVariant *args,
+IcedTeaScriptableJavaPackageObject::invoke(NPObject *npobj, NPIdentifier name_id, const NPVariant *args,
 			uint32_t argCount,NPVariant *result)
 {
 	printf ("** Unimplemented: IcedTeaScriptableJavaPackageObject::invoke %p\n", npobj);
@@ -234,30 +234,31 @@ IcedTeaScriptableJavaPackageObject::invokeDefault(NPObject *npobj, const NPVaria
 }
 
 bool
-IcedTeaScriptableJavaPackageObject::hasProperty(NPObject *npobj, NPIdentifier name)
+IcedTeaScriptableJavaPackageObject::hasProperty(NPObject *npobj, NPIdentifier name_id)
 {
-	PLUGIN_DEBUG("IcedTeaScriptableJavaPackageObject::hasProperty %s\n", browser_functions.utf8fromidentifier(name));
+	std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
+
+	PLUGIN_DEBUG("IcedTeaScriptableJavaPackageObject::hasProperty %s\n", name.c_str());
 
 	bool hasProperty = false;
 	JavaResultData* java_result;
 	JavaRequestProcessor* java_request = new JavaRequestProcessor();
     NPP instance = IcedTeaPluginUtilities::getInstanceFromMemberPtr(npobj);
     int plugin_instance_id = get_id_from_instance(instance);
+	IcedTeaScriptableJavaPackageObject* scriptable_obj = (IcedTeaScriptableJavaPackageObject*)npobj;
 
-	PLUGIN_DEBUG("Object package name: \"%s\"\n", ((IcedTeaScriptableJavaPackageObject*) npobj)->getPackageName().c_str());
+	PLUGIN_DEBUG("Object package name: \"%s\"\n", scriptable_obj->getPackageName().c_str());
 
 	// "^java" is always a package
-	if (((IcedTeaScriptableJavaPackageObject*) npobj)->getPackageName().length() == 0 &&
-	    (  !strcmp(browser_functions.utf8fromidentifier(name), "java") ||
-	       !strcmp(browser_functions.utf8fromidentifier(name), "javax")))
+	if (scriptable_obj->getPackageName().empty() && (name == "java" || name == "javax"))
 	{
 	    return true;
 	}
 
-	std::string property_name = ((IcedTeaScriptableJavaPackageObject*) npobj)->getPackageName();
-	if (property_name.length() > 0)
+	std::string property_name = scriptable_obj->getPackageName();
+	if (!property_name.empty())
 	    property_name += ".";
-	property_name += browser_functions.utf8fromidentifier(name);
+	property_name += name;
 
 	PLUGIN_DEBUG("Looking for name \"%s\"\n", property_name.c_str());
 
@@ -279,12 +280,13 @@ IcedTeaScriptableJavaPackageObject::hasProperty(NPObject *npobj, NPIdentifier na
 }
 
 bool
-IcedTeaScriptableJavaPackageObject::getProperty(NPObject *npobj, NPIdentifier name, NPVariant *result)
+IcedTeaScriptableJavaPackageObject::getProperty(NPObject *npobj, NPIdentifier name_id, NPVariant *result)
 {
+    std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
 
-	PLUGIN_DEBUG("IcedTeaScriptableJavaPackageObject::getProperty %s\n", browser_functions.utf8fromidentifier(name));
+	PLUGIN_DEBUG("IcedTeaScriptableJavaPackageObject::getProperty %s\n", name.c_str());
 
-	if (!browser_functions.utf8fromidentifier(name))
+	if (!browser_functions.identifierisstring(name_id))
 	    return false;
 
 	bool isPropertyClass = false;
@@ -292,11 +294,12 @@ IcedTeaScriptableJavaPackageObject::getProperty(NPObject *npobj, NPIdentifier na
 	JavaRequestProcessor java_request = JavaRequestProcessor();
     NPP instance = IcedTeaPluginUtilities::getInstanceFromMemberPtr(npobj);
     int plugin_instance_id = get_id_from_instance(instance);
+    IcedTeaScriptableJavaPackageObject* scriptable_obj = (IcedTeaScriptableJavaPackageObject*)npobj;
 
-	std::string property_name = ((IcedTeaScriptableJavaPackageObject*) npobj)->getPackageName();
-	if (property_name.length() > 0)
-	    property_name += ".";
-	property_name += browser_functions.utf8fromidentifier(name);
+    std::string property_name = scriptable_obj->getPackageName();
+    if (!property_name.empty())
+        property_name += ".";
+    property_name += name;
 
 	java_result = java_request.findClass(plugin_instance_id, property_name);
 	isPropertyClass = (java_result->return_identifier == 0);
@@ -326,14 +329,14 @@ IcedTeaScriptableJavaPackageObject::getProperty(NPObject *npobj, NPIdentifier na
 }
 
 bool
-IcedTeaScriptableJavaPackageObject::setProperty(NPObject *npobj, NPIdentifier name, const NPVariant *value)
+IcedTeaScriptableJavaPackageObject::setProperty(NPObject *npobj, NPIdentifier name_id, const NPVariant *value)
 {
 	// Can't be going around setting properties on namespaces.. that's madness!
 	return false;
 }
 
 bool
-IcedTeaScriptableJavaPackageObject::removeProperty(NPObject *npobj, NPIdentifier name)
+IcedTeaScriptableJavaPackageObject::removeProperty(NPObject *npobj, NPIdentifier name_id)
 {
 	printf ("** Unimplemented: IcedTeaScriptableJavaPackageObject::removeProperty %p\n", npobj);
 	return false;
@@ -462,28 +465,26 @@ IcedTeaScriptableJavaPackageObject::is_valid_java_object(NPObject* object_ptr) {
 }
 
 bool
-IcedTeaScriptableJavaObject::hasMethod(NPObject *npobj, NPIdentifier name)
+IcedTeaScriptableJavaObject::hasMethod(NPObject *npobj, NPIdentifier name_id)
 {
-
+    std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
     IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
 
-    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::hasMethod %s (ival=%d)\n", browser_functions.utf8fromidentifier(name), browser_functions.intfromidentifier(name));
+    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::hasMethod %s (ival=%d)\n", name.c_str(), browser_functions.intfromidentifier(name_id));
     bool hasMethod = false;
 
     // If object is an array and requested "method" may be a number, check for it first
     if ( scriptable_object->is_object_array  ||
-         (browser_functions.intfromidentifier(name) < 0))
+         (browser_functions.intfromidentifier(name_id) < 0))
     {
 
-        if (!browser_functions.utf8fromidentifier(name))
+        if (!browser_functions.identifierisstring(name_id))
             return false;
 
         JavaResultData* java_result;
         JavaRequestProcessor java_request = JavaRequestProcessor();
 
-        std::string methodName = browser_functions.utf8fromidentifier(name);
-
-        java_result = java_request.hasMethod(scriptable_object->class_id, methodName);
+        java_result = java_request.hasMethod(scriptable_object->class_id, name);
         hasMethod = java_result->return_identifier != 0;
     }
 
@@ -492,13 +493,13 @@ IcedTeaScriptableJavaObject::hasMethod(NPObject *npobj, NPIdentifier name)
 }
 
 bool
-IcedTeaScriptableJavaObject::invoke(NPObject *npobj, NPIdentifier name, const NPVariant *args,
+IcedTeaScriptableJavaObject::invoke(NPObject *npobj, NPIdentifier name_id, const NPVariant *args,
 			uint32_t argCount, NPVariant *result)
 {
-    NPUTF8* method_name = browser_functions.utf8fromidentifier(name);
+    std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
 
     // Extract arg type array
-    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::invoke %s. Args follow.\n", method_name);
+    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::invoke %s. Args follow.\n", name.c_str());
     for (int i=0; i < argCount; i++)
     {
         IcedTeaPluginUtilities::printNPVariant(args[i]);
@@ -535,13 +536,13 @@ IcedTeaScriptableJavaObject::invoke(NPObject *npobj, NPIdentifier name, const NP
         PLUGIN_DEBUG("Calling static method\n");
         java_result = java_request.callStaticMethod(
                         IcedTeaPluginUtilities::getSourceFromInstance(instance),
-                        scriptable_object->class_id, browser_functions.utf8fromidentifier(name), arg_ids);
+                        scriptable_object->class_id, name, arg_ids);
     } else
     {
         PLUGIN_DEBUG("Calling method normally\n");
         java_result = java_request.callMethod(
                         IcedTeaPluginUtilities::getSourceFromInstance(instance),
-                        scriptable_object->instance_id, browser_functions.utf8fromidentifier(name), arg_ids);
+                        scriptable_object->instance_id, name, arg_ids);
     }
 
     if (java_result->error_occurred)
@@ -558,26 +559,26 @@ IcedTeaScriptableJavaObject::invoke(NPObject *npobj, NPIdentifier name, const NP
 }
 
 bool
-IcedTeaScriptableJavaObject::hasProperty(NPObject *npobj, NPIdentifier name)
+IcedTeaScriptableJavaObject::hasProperty(NPObject *npobj, NPIdentifier name_id)
 {
-    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::hasProperty %s (ival=%d)\n", browser_functions.utf8fromidentifier(name), browser_functions.intfromidentifier(name));
+    std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
+
+    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::hasProperty %s (ival=%d)\n", name.c_str(), browser_functions.intfromidentifier(name_id));
     bool hasProperty = false;
 
     IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*)npobj;
     // If it is an array, only length and indexes are valid
     if (scriptable_object->is_object_array)
     {
-        if (browser_functions.intfromidentifier(name) >= 0 ||
-            !strcmp(browser_functions.utf8fromidentifier(name), "length"))
+        if (browser_functions.intfromidentifier(name_id) >= 0 || name == "length")
             hasProperty = true;
 
     } else
     {
-
-        if (!browser_functions.utf8fromidentifier(name))
+        if (!browser_functions.identifierisstring(name_id))
             return false;
 
-        if (!strcmp(browser_functions.utf8fromidentifier(name), "Packages"))
+        if (name == "Packages")
         {
             hasProperty = true;
         } else {
@@ -585,9 +586,7 @@ IcedTeaScriptableJavaObject::hasProperty(NPObject *npobj, NPIdentifier name)
             JavaResultData* java_result;
             JavaRequestProcessor java_request = JavaRequestProcessor();
 
-            std::string fieldName = browser_functions.utf8fromidentifier(name);
-
-            java_result = java_request.hasField(scriptable_object->class_id, fieldName);
+            java_result = java_request.hasField(scriptable_object->class_id, name);
 
             hasProperty = java_result->return_identifier != 0;
         }
@@ -598,9 +597,11 @@ IcedTeaScriptableJavaObject::hasProperty(NPObject *npobj, NPIdentifier name)
 }
 
 bool
-IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name, NPVariant *result)
+IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name_id, NPVariant *result)
 {
-    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::getProperty %s (ival=%d)\n", browser_functions.utf8fromidentifier(name), browser_functions.intfromidentifier(name));
+    std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
+    bool is_string_id = browser_functions.identifierisstring(name_id);
+    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::getProperty %s (ival=%d)\n", name.c_str(), browser_functions.intfromidentifier(name_id));
 
     JavaResultData* java_result;
     JavaRequestProcessor java_request = JavaRequestProcessor();
@@ -614,13 +615,11 @@ IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name, NPV
     if (instance_id.length() > 0) // Could be an array or a simple object
     {
         // If array and requesting length
-        if ( scriptable_object->is_object_array &&
-             browser_functions.utf8fromidentifier(name) &&
-             !strcmp(browser_functions.utf8fromidentifier(name), "length"))
+        if ( scriptable_object->is_object_array && name == "length")
         {
             java_result = java_request.getArrayLength(instance_id);
         } else if ( scriptable_object->is_object_array &&
-                    browser_functions.intfromidentifier(name) >= 0) // else if array and requesting index
+                    browser_functions.intfromidentifier(name_id) >= 0) // else if array and requesting index
         {
 
             java_result = java_request.getArrayLength(instance_id);
@@ -633,22 +632,23 @@ IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name, NPV
             int length = atoi(java_result->return_string->c_str());
 
             // Access beyond size?
-            if (browser_functions.intfromidentifier(name) >= length)
+            if (browser_functions.intfromidentifier(name_id) >= length)
             {
                 VOID_TO_NPVARIANT(*result);
                 return true;
             }
 
             std::string index = std::string();
-            IcedTeaPluginUtilities::itoa(browser_functions.intfromidentifier(name), &index);
+            IcedTeaPluginUtilities::itoa(browser_functions.intfromidentifier(name_id), &index);
             java_result = java_request.getSlot(instance_id, index);
 
         } else // Everything else
         {
-            if (!browser_functions.utf8fromidentifier(name))
+            if (!is_string_id) {
                 return false;
+            }
 
-            if (!strcmp(browser_functions.utf8fromidentifier(name), "Packages"))
+            if (name == "Packages")
             {
                 NPObject* pkgObject = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(instance, "");
                 OBJECT_TO_NPVARIANT(pkgObject, *result);
@@ -657,17 +657,18 @@ IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name, NPV
 
             java_result = java_request.getField(
                         IcedTeaPluginUtilities::getSourceFromInstance(instance),
-                        class_id, instance_id, browser_functions.utf8fromidentifier(name));
+                        class_id, instance_id, name);
         }
     }
     else
     {
-        if (!browser_functions.utf8fromidentifier(name))
-            return true;
+        if (!is_string_id) {
+            return false;
+        }
 
         java_result = java_request.getStaticField(
                                 IcedTeaPluginUtilities::getSourceFromInstance(instance),
-                                class_id, browser_functions.utf8fromidentifier(name));
+                                class_id, name);
     }
 
     if (java_result->error_occurred)
@@ -680,9 +681,10 @@ IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name, NPV
 }
 
 bool
-IcedTeaScriptableJavaObject::setProperty(NPObject *npobj, NPIdentifier name, const NPVariant *value)
+IcedTeaScriptableJavaObject::setProperty(NPObject *npobj, NPIdentifier name_id, const NPVariant *value)
 {
-    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::setProperty %s (ival=%d) to:\n", browser_functions.utf8fromidentifier(name), browser_functions.intfromidentifier(name));
+    std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
+    PLUGIN_DEBUG("IcedTeaScriptableJavaObject::setProperty %s (ival=%d) to:\n", name.c_str(), browser_functions.intfromidentifier(name_id));
     IcedTeaPluginUtilities::printNPVariant(*value);
 
     JavaResultData* java_result;
@@ -697,14 +699,12 @@ IcedTeaScriptableJavaObject::setProperty(NPObject *npobj, NPIdentifier name, con
     if (instance_id.length() > 0) // Could be an array or a simple object
     {
         // If array
-        if ( scriptable_object->is_object_array &&
-             browser_functions.utf8fromidentifier(name) &&
-             !strcmp(browser_functions.utf8fromidentifier(name), "length"))
+        if (scriptable_object->is_object_array && name == "length")
         {
             printf("ERROR: Array length is not a modifiable property\n");
             return false;
         } else if ( scriptable_object->is_object_array &&
-                    browser_functions.intfromidentifier(name) >= 0) // else if array and requesting index
+                    browser_functions.intfromidentifier(name_id) >= 0) // else if array and requesting index
         {
 
             JavaResultData* java_result = java_request.getArrayLength(instance_id);
@@ -717,13 +717,13 @@ IcedTeaScriptableJavaObject::setProperty(NPObject *npobj, NPIdentifier name, con
             int length = atoi(java_result->return_string->c_str());
 
             // Access beyond size?
-            if (browser_functions.intfromidentifier(name) >= length)
+            if (browser_functions.intfromidentifier(name_id) >= length)
             {
                 return true;
             }
 
             std::string index = std::string();
-            IcedTeaPluginUtilities::itoa(browser_functions.intfromidentifier(name), &index);
+            IcedTeaPluginUtilities::itoa(browser_functions.intfromidentifier(name_id), &index);
 
             std::string value_id = std::string();
             createJavaObjectFromVariant(instance, *value, &value_id);
@@ -737,7 +737,7 @@ IcedTeaScriptableJavaObject::setProperty(NPObject *npobj, NPIdentifier name, con
 
             java_result = java_request.setField(
                         IcedTeaPluginUtilities::getSourceFromInstance(instance),
-                        class_id, instance_id, browser_functions.utf8fromidentifier(name), value_id);
+                        class_id, instance_id, name, value_id);
         }
     }
     else
@@ -747,7 +747,7 @@ IcedTeaScriptableJavaObject::setProperty(NPObject *npobj, NPIdentifier name, con
 
         java_result = java_request.setStaticField(
                                 IcedTeaPluginUtilities::getSourceFromInstance(instance),
-                                class_id, browser_functions.utf8fromidentifier(name), value_id);
+                                class_id, name, value_id);
     }
 
     if (java_result->error_occurred)

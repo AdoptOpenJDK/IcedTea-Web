@@ -1087,6 +1087,18 @@ void IcedTeaPluginUtilities::trim(std::string& str) {
 	str = str.substr(start, end - start + 1);
 }
 
+std::string IcedTeaPluginUtilities::NPIdentifierAsString(NPIdentifier id) {
+    NPUTF8* cstr = browser_functions.utf8fromidentifier(id);
+    if (cstr == NULL) {
+        /* Treat not-existing strings as empty. To tell if it was a valid string,
+         * use browser_functions.identifierisstring. */
+        return std::string();
+    }
+    std::string str = cstr;
+    browser_functions.memfree(cstr);
+    return str;
+}
+
 bool IcedTeaPluginUtilities::file_exists(std::string filename)
 {
     std::ifstream infile(filename.c_str());

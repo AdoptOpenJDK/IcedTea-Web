@@ -90,6 +90,15 @@ static NPObject* mock_createobject(NPP instance, NPClass* np_class) {
 	return obj;
 }
 
+static NPUTF8* mock_utf8fromidentifier(NPIdentifier id) {
+    // Treat NPIdentifier (== void pointer) as a pointer to characters for simplicity
+    const NPUTF8* str = (const NPUTF8*) id;
+    // We expect this string to be freed with 'memfree'
+    NPUTF8* copy = (NPUTF8*) mock_memalloc(strlen(str) + 1);
+    memcpy(copy, str, strlen(str) + 1);
+    return copy;
+}
+
 void browsermock_setup_functions() {
     memset(&browser_functions, 0, sizeof(NPNetscapeFuncs));
 
@@ -98,7 +107,8 @@ void browsermock_setup_functions() {
 
     browser_functions.createobject = &mock_createobject;
     browser_functions.retainobject = &mock_retainobject;
-    browser_functions.releaseobject= &mock_releaseobject;
+    browser_functions.releaseobject = &mock_releaseobject;
+    browser_functions.utf8fromidentifier = &mock_utf8fromidentifier;
 }
 
 void browsermock_clear_state() {
