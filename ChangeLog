@@ -1,3 +1,7 @@
+2013-08-01  Andrew Azores <aazores@redhat.com>
+
+	* .hgignore: ignore generated HTML files (from AboutDialog)
+
 2013-07-30  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/IcedTeaPluginUtils.cc
