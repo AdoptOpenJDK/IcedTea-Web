@@ -1,4 +1,14 @@
-2013-08-01  Andrew Azores <aazores@redhat.com>
+2013-08-12  Andrew Azores  <aazores@redhat.com>
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: refactored
+	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java:
+	TinyHttpdImpl constructor changed, reflecting this here
+	* tests/test-extensions-tests/net/sourceforge/jnlp/ServerAccessTest.java:
+	removed TinyHttpdImpl tests
+	* tests/test-extensions-tests/net/sourceforge/jnlp/TinyHttpdImplTest.java:
+	new unit tests for TinyHttpdImpl and moved old tests out of
+	ServerAccessTest
+
+2013-08-01  Andrew Azores  <aazores@redhat.com>
 
 	* .hgignore: ignore generated HTML files (from AboutDialog)
 
@@ -22,7 +32,7 @@
 	should be served by test server in reproducers run and so prevent FNF exception
 	* ChangeLog: fixed few entries below (added emty line between author and body)
 
-2013-07-25  Andrew Azores <aazores@redhat.com>
+2013-07-25  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/about/AboutDialog.java (AboutDialog, display):
 	removed "throws IOException"
@@ -35,7 +45,7 @@
 	* netx/net/sourceforge/jnlp/splashscreen/impls/DefaultSplashScreens2012Commons.java:
 	same
 
-2013-07-22  Andrew Azores <aazores@redhat.com>
+2013-07-22  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java:
 	(getProxiesWithoutCaching) added java.vm.name read permission to fix

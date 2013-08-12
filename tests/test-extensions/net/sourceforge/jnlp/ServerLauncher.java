@@ -113,7 +113,7 @@ public class ServerLauncher implements Runnable {
         try {
             serverSocket = new ServerSocket(port);
             while (running) {
-                TinyHttpdImpl server = new TinyHttpdImpl(serverSocket.accept(), dir, port,false);
+                TinyHttpdImpl server = new TinyHttpdImpl(serverSocket.accept(), dir, false);
                 server.setSupportingHeadRequest(isSupportingHeadRequest());
                 server.start();
             }

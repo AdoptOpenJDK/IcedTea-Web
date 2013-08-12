@@ -59,21 +59,26 @@ import java.util.StringTokenizer;
  */
 public class TinyHttpdImpl extends Thread {
 
-    Socket c;
-    private final File dir;
-    private final int port;
-    private boolean canRun = true;
+    private static final String CRLF = "\r\n";
+    private static final String HTTP_BAD_REQUEST = "HTTP/1.0 " + HttpURLConnection.HTTP_BAD_REQUEST + " Bad Request" + CRLF;
+    private static final String HTTP_NOT_IMPLEMENTED = "HTTP/1.0 " + HttpURLConnection.HTTP_NOT_IMPLEMENTED + " Not Implemented" + CRLF;
+    private static final String HTTP_NOT_FOUND = "HTTP/1.0 " + HttpURLConnection.HTTP_NOT_FOUND + " Not Found" + CRLF;
+    private static final String HTTP_OK = "HTTP/1.0 " + HttpURLConnection.HTTP_OK + " OK" + CRLF;
     private static final String XSX = "/XslowX";
+
+    private Socket socket;
+    private final File testDir;
+    private boolean canRun = true;
     private boolean supportingHeadRequest = true;
-    
-    public TinyHttpdImpl(Socket s, File f, int port) {
-        this(s, f, port, true);
+
+    public TinyHttpdImpl(Socket socket, File dir) {
+        this(socket, dir, true);
     }
-    public TinyHttpdImpl(Socket s, File f, int port, boolean start) {
-        c = s;
-        this.dir = f;
-        this.port = port;
-        if (start){
+
+    public TinyHttpdImpl(Socket socket, File dir, boolean start) {
+        this.socket = socket;
+        this.testDir = dir;
+        if (start) {
             start();
         }
     }
@@ -87,92 +92,100 @@ public class TinyHttpdImpl extends Thread {
     }
 
     public boolean isSupportingHeadRequest() {
-        return supportingHeadRequest;
+        return this.supportingHeadRequest;
     }
-    
-    
 
     public int getPort() {
-        return port;
+        return this.socket.getPort();
     }
 
     @Override
     public void run() {
         try {
-            BufferedReader i = new BufferedReader(new InputStreamReader(c.getInputStream()));
-            DataOutputStream o = new DataOutputStream(c.getOutputStream());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            DataOutputStream writer = new DataOutputStream(this.socket.getOutputStream());
             try {
                 while (canRun) {
-                    String s = i.readLine();
-                    if (s.length() < 1) {
+                    String line = reader.readLine();
+                    if (line.length() < 1) {
                         break;
                     }
 
-                    boolean isGetRequest = s.startsWith("GET");
-                    boolean isHeadRequest = s.startsWith("HEAD");
-                    
-                    if (isHeadRequest && !isSupportingHeadRequest()){
-                        o.writeBytes("HTTP/1.0 "+HttpURLConnection.HTTP_NOT_IMPLEMENTED+" Not Implemented\n");
+                    StringTokenizer t = new StringTokenizer(line, " ");
+                    String request = t.nextToken();
+
+                    boolean isHeadRequest = request.equals("HEAD");
+                    boolean isGetRequest = request.equals("GET");
+
+                    if (isHeadRequest && !isSupportingHeadRequest()) {
+                        ServerAccess.logOutputReprint("Received HEAD request but not supported");
+                        writer.writeBytes(HTTP_NOT_IMPLEMENTED);
                         continue;
                     }
-                    
-                    String request = "unknown";
-                    if (isGetRequest || isHeadRequest ) {
-                        if (isGetRequest){
-                             request = "GET";
-                        }
-                        if (isHeadRequest){
-                             request = "HEAD";
-                        }
-                        StringTokenizer t = new StringTokenizer(s, " ");
-                        t.nextToken();
-                        String op = t.nextToken();
-                        String p = op;
-                        if (p.startsWith(XSX)) {
-                            p = p.replace(XSX, "/");
-                        }
-                        ServerAccess.logOutputReprint("Getting- " + request + ": " + p);
-                        p = urlToFilePath(p);
-                        ServerAccess.logOutputReprint("Serving- " + request + ": " + p);
-                        File pp = new File(dir, p);
-                        int l = (int) pp.length();
-                        byte[] b = new byte[l];
-                        FileInputStream f = new FileInputStream(pp);
-                        f.read(b);
-                        String content = "";
-                        String ct = "Content-Type: ";
-                        if (p.toLowerCase().endsWith(".jnlp")) {
-                            content = ct + "application/x-java-jnlp-file\n";
-                        } else if (p.toLowerCase().endsWith(".html")) {
-                            content = ct + "text/html\n";
-                        } else if (p.toLowerCase().endsWith(".jar")) {
-                            content = ct + "application/x-jar\n";
-                        }
-                        o.writeBytes("HTTP/1.0 "+HttpURLConnection.HTTP_OK+" OK\nContent-Length:" + l + "\n" + content + "\n");
 
-                        if (isHeadRequest) {
-                            continue; // Skip sending body
-                        }
+                    if (!isHeadRequest && !isGetRequest) {
+                        ServerAccess.logOutputReprint("Received unknown request type " + request);
+                        writer.writeBytes(HTTP_BAD_REQUEST);
+                        continue;
+                    }
 
-                        if (op.startsWith(XSX)) {
-                            byte[][] bb = splitArray(b, 10);
+                    String filePath = t.nextToken();
+                    boolean slowSend = filePath.startsWith(XSX);
+
+                    if (slowSend) {
+                        filePath = filePath.replace(XSX, "/");
+                    }
+
+                    ServerAccess.logOutputReprint("Getting- " + request + ": " + filePath);
+                    filePath = urlToFilePath(filePath);
+
+                    File resource = new File(this.testDir, filePath);
+
+                    if (!(resource.isFile() && resource.canRead())) {
+                        ServerAccess.logOutputReprint("Could not open file " + filePath);
+                        writer.writeBytes(HTTP_NOT_FOUND);
+                        continue;
+                    }
+                    ServerAccess.logOutputReprint("Serving- " + request + ": " + filePath);
+
+                    int resourceLength = (int) resource.length();
+                    byte[] buff = new byte[resourceLength];
+                    FileInputStream fis = new FileInputStream(resource);
+                    fis.read(buff);
+                    fis.close();
+
+                    String contentType = "Content-Type: ";
+                    if (filePath.toLowerCase().endsWith(".jnlp")) {
+                        contentType += "application/x-java-jnlp-file";
+                    } else if (filePath.toLowerCase().endsWith(".jar")) {
+                        contentType += "application/x-jar";
+                    } else {
+                        contentType += "text/html";
+                    }
+                    writer.writeBytes(HTTP_OK + "Content-Length:" + resourceLength + CRLF + contentType + CRLF + CRLF);
+
+                    if (isGetRequest) {
+                        if (slowSend) {
+                            byte[][] bb = splitArray(buff, 10);
                             for (int j = 0; j < bb.length; j++) {
                                 Thread.sleep(2000);
                                 byte[] bs = bb[j];
-                                o.write(bs, 0, bs.length);
+                                writer.write(bs, 0, bs.length);
                             }
                         } else {
-                            o.write(b, 0, l);
+                            writer.write(buff, 0, resourceLength);
                         }
                     }
                 }
             } catch (SocketException e) {
                 ServerAccess.logException(e, false);
             } catch (Exception e) {
-                o.writeBytes("HTTP/1.0 404 ERROR\n\n\n");
+                writer.writeBytes(HTTP_NOT_FOUND);
                 ServerAccess.logException(e, false);
+            } finally {
+                reader.close();
+                writer.close();
             }
-            o.close();
         } catch (Exception e) {
             ServerAccess.logException(e, false);
         }
@@ -209,7 +222,7 @@ public class TinyHttpdImpl extends Thread {
         }
         return array;
     }
-    
+
     /**
     * This function transforms a request URL into a path to a file which the server
     * will return to the requester.
@@ -218,7 +231,7 @@ public class TinyHttpdImpl extends Thread {
     * @throws UnsupportedEncodingException
     */
     public static String urlToFilePath(String url) throws UnsupportedEncodingException {
-        url = URLDecoder.decode(url, "UTF-8"); // Decode URL encoded charaters, eg "%3B" b    ecomes ';'
+        url = URLDecoder.decode(url, "UTF-8"); // Decode URL encoded charaters, eg "%3B" becomes ';'
         if (url.startsWith(XSX)) {
             url = url.replace(XSX, "/");
         }
@@ -227,7 +240,7 @@ public class TinyHttpdImpl extends Thread {
         if (url.endsWith("/")) {
             url += "index.html";
         }
-        url = url.replace('/', File.separatorChar); // If running on Windows, replace '/'     in path with "\\"
+        url = url.replace('/', File.separatorChar); // If running on Windows, replace '/' in path with "\\"
         url = stripHttpPathParams(url);
         return url;
     }
@@ -239,19 +252,19 @@ public class TinyHttpdImpl extends Thread {
      * @return the URL with the path parameter removed
      */
     public static String stripHttpPathParams(String url) {
-    	if (url == null) {
-    		return null;
-    	}
-    	
-    	// If JNLP specifies JAR URL with .JAR extension (as it should), then look for any semicolons
-    	// after this position. If one is found, remove it and any following characters.
-    	int fileExtension = url.toUpperCase().lastIndexOf(".JAR");
-    	if (fileExtension != -1) {
-    		int firstSemiColon = url.indexOf(';', fileExtension);
-    		if (firstSemiColon != -1) {    			
-    			url = url.substring(0, firstSemiColon);
-    		}
-    	}
-    	return url;
+        if (url == null) {
+            return null;
+        }
+
+        // If JNLP specifies JAR URL with .JAR extension (as it should), then look for any semicolons
+        // after this position. If one is found, remove it and any following characters.
+        int fileExtension = url.toUpperCase().lastIndexOf(".JAR");
+        if (fileExtension != -1) {
+            int firstSemiColon = url.indexOf(';', fileExtension);
+            if (firstSemiColon != -1) {
+                url = url.substring(0, firstSemiColon);
+            }
+        }
+        return url;
     }
 }
