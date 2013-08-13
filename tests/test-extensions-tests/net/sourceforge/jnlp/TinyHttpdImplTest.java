@@ -17,7 +17,6 @@ import org.junit.Test;
 public class TinyHttpdImplTest {
 
     private static final String HTTP_OK = "HTTP/1.0 200 OK";
-    private static final String HTTP_400 = "HTTP/1.0 400 Bad Request";
     private static final String HTTP_404 = "HTTP/1.0 404 Not Found";
     private static final String HTTP_501 = "HTTP/1.0 501 Not Implemented";
     private static final String CONTENT_JNLP = "Content-Type: application/x-java-jnlp-file";
@@ -182,13 +181,6 @@ public class TinyHttpdImplTest {
 
         Assert.assertTrue("First request should have been " + HTTP_404, firstRequest.trim().equals(HTTP_404));
         Assert.assertTrue("Second request should have been " + HTTP_OK, secondRequest.contains(HTTP_OK));
-    }
-
-    @Test
-    public void BadMethodTest() throws Exception {
-        String head = getTinyHttpdImplResponse("BADMETHOD", "/simpletest1.jnlp");
-
-        Assert.assertTrue("Status should have been " + HTTP_400, head.trim().equals(HTTP_400));
     }
 
     @Test

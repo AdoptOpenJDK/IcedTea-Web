@@ -60,7 +60,6 @@ import java.util.StringTokenizer;
 public class TinyHttpdImpl extends Thread {
 
     private static final String CRLF = "\r\n";
-    private static final String HTTP_BAD_REQUEST = "HTTP/1.0 " + HttpURLConnection.HTTP_BAD_REQUEST + " Bad Request" + CRLF;
     private static final String HTTP_NOT_IMPLEMENTED = "HTTP/1.0 " + HttpURLConnection.HTTP_NOT_IMPLEMENTED + " Not Implemented" + CRLF;
     private static final String HTTP_NOT_FOUND = "HTTP/1.0 " + HttpURLConnection.HTTP_NOT_FOUND + " Not Found" + CRLF;
     private static final String HTTP_OK = "HTTP/1.0 " + HttpURLConnection.HTTP_OK + " OK" + CRLF;
@@ -125,7 +124,6 @@ public class TinyHttpdImpl extends Thread {
 
                     if (!isHeadRequest && !isGetRequest) {
                         ServerAccess.logOutputReprint("Received unknown request type " + request);
-                        writer.writeBytes(HTTP_BAD_REQUEST);
                         continue;
                     }
 

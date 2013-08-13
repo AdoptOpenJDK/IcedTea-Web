@@ -1,3 +1,9 @@
+2013-08-13  Andrew Azores  <aazores@redhat.com>
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: no longer
+	sends HTTP 400 BAD REQUEST messages
+	* test/test-extensions-tests/net/sourceforge/jnlp/TinyHttpdImplTest.java:
+	removed "bad request" test
+
 2013-08-12  Andrew Azores  <aazores@redhat.com>
 	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: refactored
 	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java:
