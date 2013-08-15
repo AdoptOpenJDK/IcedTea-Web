@@ -214,18 +214,8 @@ public final class Boot implements PrivilegedAction<Void> {
         extra.put("arguments", getOptions("-arg"));
         extra.put("parameters", getOptions("-param"));
         extra.put("properties", getOptions("-property"));
-        boolean strict = false;
-        boolean malformedXmlAllowed = true;
 
-        if (null != getOption("-strict")) {
-            strict = true;
-        }
-
-        if (null != getOption("-xml")) {
-            malformedXmlAllowed = false;
-        }
-
-        ParserSettings settings = new ParserSettings(strict, true, malformedXmlAllowed);
+        ParserSettings settings = ParserSettings.setGlobalParserSettingsFromArgs(args);
 
         try {
             Launcher launcher = new Launcher(false);

@@ -37,12 +37,17 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Contains settings to be used by the Parser while parsing JNLP files.
  *
  * Immutable and therefore thread-safe.
  */
 public class ParserSettings {
+
+    private static ParserSettings globalParserSettings = new ParserSettings();
 
     private final boolean isStrict;
     private final boolean extensionAllowed;
@@ -73,6 +78,34 @@ public class ParserSettings {
     /** @return true if strict parsing mode is to be used */
     public boolean isStrict() {
         return isStrict;
+    }
+
+    /**
+     * Return the global parser settings in use.
+     */
+    public static ParserSettings getGlobalParserSettings() {
+        return globalParserSettings;
+    }
+
+    /**
+     * Set the global ParserSettings to match the given settings.
+     */
+    public static void setGlobalParserSettings(ParserSettings parserSettings) {
+        globalParserSettings = parserSettings;
+    }
+
+    /**
+     * Return the ParserSettings to be used according to arguments specified
+     * at boot on the command line. These settings are also stored so they
+     * can be retrieved at a later time.
+     */
+    public static ParserSettings setGlobalParserSettingsFromArgs(String[] cmdArgs) {
+        List<String> argList = Arrays.asList(cmdArgs);
+        boolean strict = argList.contains("-strict");
+        boolean malformedXmlAllowed = !argList.contains("-xml");
+
+        globalParserSettings = new ParserSettings(strict, true, malformedXmlAllowed);
+        return globalParserSettings;
     }
 
 }

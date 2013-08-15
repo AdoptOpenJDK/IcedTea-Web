@@ -26,18 +26,18 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.List;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import sun.misc.BASE64Decoder;
-
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import sun.misc.BASE64Decoder;
 
 /**
  * Allows reuse of code that expects a JNLPFile object,
@@ -47,6 +47,7 @@ public class PluginBridge extends JNLPFile {
 
     private PluginParameters params;
     private Set<String> jars = new HashSet<String>();
+    private List<ExtensionDesc> extensionJars = new ArrayList<ExtensionDesc>();
     //Folders can be added to the code-base through the archive tag
     private List<String> codeBaseFolders = new ArrayList<String>();
     private String[] cacheJars = new String[0];
@@ -90,6 +91,7 @@ public class PluginBridge extends JNLPFile {
         this.codeBase = codebase;
         this.sourceLocation = documentBase;
         this.params = params;
+        this.parserSettings = ParserSettings.getGlobalParserSettings();
 
         if (params.getJNLPHref() != null) {
             useJNLPHref = true;
@@ -122,6 +124,9 @@ public class PluginBridge extends JNLPFile {
                      String fileName = jarDesc.getLocation().toExternalForm();
                      this.jars.add(fileName);
                  }
+
+                // Store any extensions listed in the JNLP file to be returned later on, namely in getResources()
+                extensionJars = Arrays.asList(jnlpFile.getResources().getExtensions());
             } catch (MalformedURLException e) {
                 // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
                 // it is the site developer who should ensure that file exist.
@@ -308,6 +313,8 @@ public class PluginBridge extends JNLPFile {
                         return result;
                     } catch (MalformedURLException ex) { /* Ignored */
                     }
+                } else if (launchType.equals(ExtensionDesc.class)) {
+                    return (List<T>) extensionJars; // this list is populated when the PluginBridge is first constructed
                 }
                 return sharedResources.getResources(launchType);
             }

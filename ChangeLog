@@ -1,10 +1,42 @@
+2013-08-15  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/ParserSettings.java: (globalParserSettings)
+	static ParserSettings instance to store settings.
+	(setGlobalParserSettingsFromArgs) Determine, store, and return
+	globalParserSettings. (getGlobalParserSettings) return stored
+	ParserSettings
+	* netx/net/sourceforge/jnlp/PluginBridge.java: (extensionJars) stores list
+	of JNLP extensions. (getResources) returns this list
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: minor refactor to use
+	ParserSettings.setGlobalParserSettingsFromArgs()
+
+	* tests/netx/unit/net/sourceforge/jnlp/ParserSettingsTest.java: ensure
+	that ParserSettings.setGlobalParserSettingsFromArgs() works as intended
+
+	* tests/reproducers/custom/ExtensionJnlpsInApplet/testcases/ExtensionJnlpsInAppletTest.java:
+	tests browser launch of HTML file with embedded JNLP applet referencing
+	extension JNLP
+	* tests/reproducers/custom/ExtensionJnlpsInApplet/resources/ExtensionJnlpHelper.jnlp:
+	same
+	* tests/reproducers/custom/ExtensionJnlpsInApplet/resources/ExtensionJnlpTest.html:
+	same
+	* tests/reproducers/custom/ExtensionJnlpsInApplet/resources/ExtensionJnlpTestApplet.jnlp:
+	same
+	* tests/reproducers/custom/ExtensionJnlpsInApplet/srcs/ExtensionJnlpHelper.java:
+	same
+	* tests/reproducers/custom/ExtensionJnlpsInApplet/srcs/ExtensionJnlpTestApplet.java:
+	same
+	* tests/reproducers/custom/ExtensionJnlpsInApplet/srcs/Makefile: same 
+
 2013-08-13  Andrew Azores  <aazores@redhat.com>
+
 	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: no longer
 	sends HTTP 400 BAD REQUEST messages
 	* test/test-extensions-tests/net/sourceforge/jnlp/TinyHttpdImplTest.java:
 	removed "bad request" test
 
 2013-08-12  Andrew Azores  <aazores@redhat.com>
+
 	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: refactored
 	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java:
 	TinyHttpdImpl constructor changed, reflecting this here
