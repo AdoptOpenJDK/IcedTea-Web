@@ -115,6 +115,7 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApple
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
+import netscape.javascript.JSObject;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 import sun.awt.X11.XEmbeddedFrame;
@@ -903,18 +904,19 @@ public class PluginAppletViewer extends XEmbeddedFrame
         return v.elements();
     }
 
-    /**
-     * Ignore.
-     */
     public void showDocument(URL url) {
         PluginDebug.debug("Showing document...");
         showDocument(url, "_self");
     }
 
-    /**
-     * Ignore.
-     */
     public void showDocument(URL url, String target) {
+        // If it is a javascript document, eval on current page.
+        if ("javascript".equals(url.getProtocol())) {
+            // Snip protocol off string
+            String evalString = url.toString().substring("javascript:".length());
+            eval(getWindow(), evalString);
+            return;
+        }
         try {
             Long reference = getRequestIdentifier();
             write("reference " + reference +  " LoadURL " + UrlUtil.encode(url.toString(), "UTF-8") + " " + target);

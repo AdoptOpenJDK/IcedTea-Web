@@ -66,11 +66,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.Authenticator;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.ProxySelector;
+import java.net.URL;
+import java.net.URLStreamHandler;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Properties;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
@@ -91,6 +95,25 @@ public class PluginMain {
     // on whether the property that uses it is necessary/standard.
     private static final String theVersion = System.getProperty("java.version");
 
+    /* Install a handler directly using reflection. This ensures that java doesn't error-out
+     * when javascript is used in a URL. We can then handle these URLs correctly in eg PluginAppletViewer.showDocument().
+     */
+    static private void installDummyJavascriptProtocolHandler() {
+        try {
+            Field handlersField = URL.class.getDeclaredField("handlers");
+            handlersField.setAccessible(true);
+
+            @SuppressWarnings("unchecked")
+            Hashtable<String, URLStreamHandler> handlers = (Hashtable<String,URLStreamHandler>)handlersField.get(null);
+
+            // Place an arbitrary handler, we only need the URL construction to not error-out
+            handlers.put("javascript", new sun.net.www.protocol.http.Handler());
+        } catch (Exception e) {
+            System.err.println("Unable to install 'javascript:' URL protocol handler!");
+            e.printStackTrace();
+        }
+    }
+
     /**
      * The main entry point into AppletViewer.
      */
@@ -99,6 +122,8 @@ public class PluginMain {
         if (AppContext.getAppContext() == null) {
             SunToolkit.createNewAppContext();
         }
+        installDummyJavascriptProtocolHandler();
+
         if (args.length != 2 || !(new File(args[0]).exists()) || !(new File(args[1]).exists())) {
             System.err.println("Invalid pipe names provided. Refusing to proceed.");
             System.exit(1);

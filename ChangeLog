@@ -1,3 +1,18 @@
+2013-08-19  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: Evaluate
+	javascript when it shows up in a 'showDocument' call.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java: Install arbitrary
+	'javascript:' protocol handler.
+	* tests/rproducers/simple/JavascriptURLProtocol/resources/JavascriptProtocol.html:
+	Tests if javascript is run from a test applet using showDocument.
+	* tests/reproducers/simple/JavascriptURLProtocol/resources/JavascriptProtocol.js:
+	Same.
+	* tests/reproducers/simple/JavascriptURLProtocol/srcs/JavascriptProtocol.java:
+	Same.
+	* tests/reproducers/simple/JavascriptURLProtocol/testcases/JavascriptProtocolTest.java:
+	Same. 
+
 2013-08-15  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/ParserSettings.java: (globalParserSettings)
