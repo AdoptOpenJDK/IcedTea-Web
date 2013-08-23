@@ -43,7 +43,9 @@
 #ifndef __BROWSER_MOCK_H__
 #define __BROWSER_MOCK_H__
 
-void browsermock_setup_functions();
+#include <npfunctions.h>
+
+NPNetscapeFuncs browsermock_create_table();
 void browsermock_clear_state();
 int browsermock_unfreed_allocations();
 

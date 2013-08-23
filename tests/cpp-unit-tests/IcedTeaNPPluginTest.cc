@@ -40,7 +40,10 @@
 
 #include <UnitTest++.h>
 
+#include "MemoryLeakDetector.h"
+
 #include "IcedTeaNPPlugin.h"
+#include "IcedTeaScriptablePluginObject.h"
 #include "IcedTeaPluginUtils.h"
 
 TEST(NP_GetMIMEDescription) {
@@ -51,17 +54,36 @@ TEST(NP_GetMIMEDescription) {
 
 /* Not normally exposed */
 std::vector<std::string*>* get_jvm_args();
-extern gchar* in_pipe_name;
-extern gchar* out_pipe_name;
 
 TEST(get_jvm_args) {
-	in_pipe_name = (gchar*)"inpipe";
-	out_pipe_name = (gchar*)"outpipe";
-
 	std::vector<std::string*>* args = get_jvm_args();
 	CHECK(args != NULL);
 
 	IcedTeaPluginUtilities::freeStringPtrVector(args);
+}
+
+
+static IcedTeaScriptableJavaPackageObject* get_scriptable_package_object() {
+    NPP_t instance = { /*Plugin data*/plugin_data_new(), /* Browser data*/0 };
+
+    /* Get the packages object (since instance.pdata->is_applet_instance == false) */
+    NPObject* obj = get_scriptable_object(&instance);
+
+    /* Make sure we got an IcedTeaScriptableJavaPackageObject */
+    CHECK(obj->_class->deallocate == IcedTeaScriptableJavaPackageObject::deAllocate);
+
+    plugin_data_destroy(&instance);
+    return (IcedTeaScriptableJavaPackageObject*)obj;
+}
+
+TEST(get_scriptable_object) {
+    MemoryLeakDetector leak_detector;
+    // We test without an applet context, pending mocking of applet instances.
+    IcedTeaScriptableJavaPackageObject* obj = get_scriptable_package_object(); // Calls get_scriptable_object
+
+    browser_functions.releaseobject(obj);
+
+    CHECK(leak_detector.memory_leaks() == 0);
 }
 
 TEST(NP_GetValue) {

@@ -99,6 +99,13 @@ struct ITNPPluginData
   }
 };
 
+// Have the browser allocate a new ITNPPluginData structure.
+ITNPPluginData* plugin_data_new ();
+void plugin_data_destroy (NPP instance);
+
+NPError initialize_data_directory();
+void start_jvm_if_needed();
+
 // Condition on which the queue processor waits
 extern pthread_cond_t cond_message_available;
 
@@ -143,5 +150,7 @@ NPObject* get_scriptable_object(NPP instance);
 
 /* Creates a new scriptable plugin object and returns it */
 NPObject* allocate_scriptable_object(NPP npp, NPClass *aClass);
+
+NPError plugin_start_appletviewer (ITNPPluginData* data);
 
 #endif	/* __ICEDTEANPPLUGIN_H__ */

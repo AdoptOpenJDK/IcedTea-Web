@@ -1279,7 +1279,6 @@ JavaRequestProcessor::hasPackage(int plugin_instance_id,
 {
 	JavaResultData* java_result;
 	JavaRequestProcessor* java_request = new JavaRequestProcessor();
-	std::string message = std::string();
 	std::string plugin_instance_id_str = std::string();
 	IcedTeaPluginUtilities::itoa(plugin_instance_id, &plugin_instance_id_str);
 
@@ -1288,11 +1287,9 @@ JavaRequestProcessor::hasPackage(int plugin_instance_id,
 	this->instance = 0; // context is always 0 (needed for java-side backwards compat.)
 	this->reference = IcedTeaPluginUtilities::getReference();
 
+	std::string message;
 	IcedTeaPluginUtilities::constructMessagePrefix(0, reference, &message);
-	message.append(" HasPackage ");
-    message.append(plugin_instance_id_str);
-    message.append(" ");
-	message.append(java_result->return_string->c_str());
+	message += " HasPackage " + plugin_instance_id_str + " " + *java_result->return_string;
 
 	postAndWaitForResponse(message);
 

@@ -36,16 +36,25 @@
 
 // Browser mock functions. Add more as needed.
 
+#include <new>
+#include <map>
 #include <cstring>
+
+#include <npapi.h>
+
 #include "checked_allocations.h"
 
 #include "UnitTest++.h"
 
 #include "browser_mock.h"
+#include "browser_mock_npidentifier.h"
 
-#include "IcedTeaNPPlugin.h"
+// 'Browser' global data
 
+// Stores NPAPI allocations
 static AllocationSet __allocations;
+
+// Mocked functions
 
 // It is expected that these will only run during a unit test
 static void* mock_memalloc(uint32_t size) {
@@ -78,6 +87,15 @@ static void mock_releaseobject(NPObject* obj) {
     }
 }
 
+static void mock_releasevariantvalue(NPVariant* variant) {
+    if (variant->type == NPVariantType_String) {
+    /* Only string and object values require freeing */
+        mock_memfree((void*)variant->value.stringValue.UTF8Characters);
+    } else if (variant->type == NPVariantType_Object) {
+        mock_releaseobject(variant->value.objectValue);
+    }
+}
+
 static NPObject* mock_createobject(NPP instance, NPClass* np_class) {
 	NPObject* obj;
 	if (np_class->allocate) {
@@ -90,17 +108,26 @@ static NPObject* mock_createobject(NPP instance, NPClass* np_class) {
 	return obj;
 }
 
-static NPUTF8* mock_utf8fromidentifier(NPIdentifier id) {
-    // Treat NPIdentifier (== void pointer) as a pointer to characters for simplicity
-    const NPUTF8* str = (const NPUTF8*) id;
-    // We expect this string to be freed with 'memfree'
-    NPUTF8* copy = (NPUTF8*) mock_memalloc(strlen(str) + 1);
-    memcpy(copy, str, strlen(str) + 1);
-    return copy;
+static bool mock_getproperty(NPP npp, NPObject* obj, NPIdentifier property_name, NPVariant* result) {
+    if (obj->_class->getProperty) {
+        return obj->_class->getProperty(obj, property_name, result);
+    } else {
+        return false;
+    }
 }
 
-void browsermock_setup_functions() {
+static bool mock_setproperty(NPP npp, NPObject* obj, NPIdentifier property_name, const NPVariant* value) {
+    if (obj->_class->setProperty) {
+        return obj->_class->setProperty(obj, property_name, value);
+    } else {
+        return false;
+    }
+}
+
+NPNetscapeFuncs browsermock_create_table() {
+    NPNetscapeFuncs browser_functions;
     memset(&browser_functions, 0, sizeof(NPNetscapeFuncs));
+    browser_functions.size = sizeof(NPNetscapeFuncs);
 
     browser_functions.memalloc = &mock_memalloc;
     browser_functions.memfree = &mock_memfree;
@@ -108,7 +135,16 @@ void browsermock_setup_functions() {
     browser_functions.createobject = &mock_createobject;
     browser_functions.retainobject = &mock_retainobject;
     browser_functions.releaseobject = &mock_releaseobject;
-    browser_functions.utf8fromidentifier = &mock_utf8fromidentifier;
+    browser_functions.releasevariantvalue = &mock_releasevariantvalue;
+
+    browser_functions.setproperty = &mock_setproperty;
+    browser_functions.getproperty = &mock_getproperty;
+
+    browser_functions.utf8fromidentifier = &browsermock_utf8fromidentifier;
+    browser_functions.getstringidentifier = &browsermock_getstringidentifier;
+    browser_functions.identifierisstring = &browsermock_identifierisstring;
+
+    return browser_functions;
 }
 
 void browsermock_clear_state() {

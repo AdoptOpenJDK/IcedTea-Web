@@ -42,7 +42,11 @@
 #include <UnitTest++.h>
 #include <TestReporter.h>
 
+#include <npfunctions.h>
+
+#include "IcedTeaNPPlugin.h"
 #include "browser_mock.h"
+#include "MemoryLeakDetector.h"
 #include "checked_allocations.h"
 
 using namespace UnitTest;
@@ -56,6 +60,12 @@ static std::string full_testname(const TestDetails& details) {
     }
 }
 
+// Important for testing purposes of eg leaks between tests
+static void reset_global_state() {
+    browsermock_clear_state();
+    MemoryLeakDetector::reset_global_state();
+}
+
 class IcedteaWebUnitTestReporter: public TestReporter {
 public:
 
@@ -66,7 +76,7 @@ public:
     }
 
     virtual void ReportTestStart(const TestDetails& test) {
-        browsermock_clear_state();
+        reset_global_state();
         pretest_allocs = cpp_unfreed_allocations();
         did_finish_correctly = true;
     }
@@ -84,6 +94,7 @@ public:
     virtual void ReportTestFinish(const TestDetails& details,
             float secondsElapsed) {
 
+        reset_global_state();
         int posttest_allocs = cpp_unfreed_allocations();
         std::string testname = full_testname(details);
 
@@ -126,8 +137,20 @@ static int run_icedtea_web_unit_tests() {
             True() /*All tests*/, 0 /*No time limit*/);
 }
 
+/* Spawns the Java-side of the plugin, create request processing threads,
+ * and sets up a mocked 'browser' environment. */
+static void initialize_plugin_components() {
+    NPNetscapeFuncs mocked_browser_functions = browsermock_create_table();
+    NPPluginFuncs unused_plugin_functions;
+    memset(&unused_plugin_functions, 0, sizeof(NPPluginFuncs));
+    unused_plugin_functions.size = sizeof(NPPluginFuncs);
+
+    NP_Initialize (&mocked_browser_functions, &unused_plugin_functions);
+    start_jvm_if_needed();
+}
+
 int main() {
-    browsermock_setup_functions();
+    initialize_plugin_components();
 
     int exitcode = run_icedtea_web_unit_tests();
 

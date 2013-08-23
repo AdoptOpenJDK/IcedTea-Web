@@ -86,11 +86,11 @@ TEST(NPVariantStringCopy) {
 }
 
 TEST(NPIdentifierAsString) {
-    // NB: Mocked definition of 'utf8fromidentifier' simply reads NPIdentifier as a char* string.
     const char test_string[] = "foobar";
     MemoryLeakDetector leak_detector;
     /* Ensure destruction */{
-        std::string str = IcedTeaPluginUtilities::NPIdentifierAsString((NPIdentifier)test_string);
+        std::string str = IcedTeaPluginUtilities::NPIdentifierAsString(
+                browser_functions.getstringidentifier(test_string));
         CHECK_EQUAL(test_string, str);
     }
     CHECK_EQUAL(0, leak_detector.memory_leaks());

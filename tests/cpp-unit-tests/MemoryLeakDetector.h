@@ -42,6 +42,7 @@
 #define MEMORYLEAKDETECTOR_H_
 
 #include <cstdio>
+#include "browser_mock.h"
 #include "checked_allocations.h"
 #include "IcedTeaPluginUtils.h"
 
@@ -69,7 +70,6 @@ public:
         return cpp_leaks + npapi_leaks;
     }
 
-private:
     static void reset_global_state() {
         /* Clears allocations caused by storeInstanceID */
         IcedTeaPluginUtilities::clearInstanceIDs();

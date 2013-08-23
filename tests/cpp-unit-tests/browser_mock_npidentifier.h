@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 Red Hat
+/* Copyright (C) 2013 Red Hat
 
  This file is part of IcedTea.
 
@@ -34,23 +34,24 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
 
-//  Overrides global 'new' operator with one that does error checking.
+/*
+ * browser_mock_npidentifier.h:
+ *  Handles NPAPI functions related to NPIdentifier, NPIdentifier has the following constraints:
+ *  - Unique for each integer & string
+ *  - Should not interfere with leak detection, so use malloc-based allocators (specified by templates) everywhere.
+ */
 
-#ifndef CHECKED_ALLOCATIONS_H_
-#define CHECKED_ALLOCATIONS_H_
+#ifndef __BROWSER_MOCK_NPIDENTIFIER_H__
+#define __BROWSER_MOCK_NPIDENTIFIER_H__
 
 #include <string>
-#include <set>
-#include <cstdio>
-#include <exception>
-#include <memory>
-#include <cstdlib>
-#include <ext/malloc_allocator.h> //GNU extension
+#include <npfunctions.h>
 
-// Classes that play nice with custom-defined operator new by using 'vanilla' malloc
-typedef __gnu_cxx::malloc_allocator<void*> SafeAllocator;
-typedef std::set<void*, std::less<void*>, SafeAllocator> AllocationSet;
+NPIdentifier browsermock_getstringidentifier(const NPUTF8* name);
+NPIdentifier browsermock_getintidentifier(int i);
 
-int cpp_unfreed_allocations();
+bool browsermock_identifierisstring(NPIdentifier identifier);
 
-#endif /* CHECKED_ALLOCATIONS_H_ */
+NPUTF8* browsermock_utf8fromidentifier(NPIdentifier identifier);
+
+#endif // __BROWSER_MOCK_NPIDENTIFIER_H__

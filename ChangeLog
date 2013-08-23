@@ -1,5 +1,39 @@
 2013-08-23  Adam Domurad  <adomurad@redhat.com>
 
+	Spawn Java side during C++ unit tests. Many new tests.
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc
+	(hasPackage): Minor cleanup.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc
+	(initialize_data_directory): New, extracted function.
+	(NP_Initialize): Calls extracted function.
+	* plugin/icedteanp/IcedTeaNPPlugin.h: Expose more functions for
+	testing purposes.
+	* tests/cpp-unit-tests/IcedTeaNPPluginTest.cc
+	(get_scriptable_package_object): Test binding of java package
+	(get_scriptable_java_object): Test binding of java object
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc
+	(NPIdentifierAsString): Update to create npidentifier properly.
+	* tests/cpp-unit-tests/IcedTeaScriptablePluginObjectTest.cc
+	(getProperty): Test loading java.lang.Integer.MAX_VALUE from C++.
+	* tests/cpp-unit-tests/MemoryLeakDetector.h
+	(reset_global_state): Made public
+	* tests/cpp-unit-tests/checked_allocations.h
+	(SafeAllocator): New, typedef for allocator that avoids leak detection.
+	* tests/cpp-unit-tests/browser_mock.cc
+	(browsermock_setup_functions): Renamed to (browsermock_create_table).
+	(browsermock_create_table): Now returns browser table, additional
+	object release and identifier methods added.
+	* tests/cpp-unit-tests/browser_mock.h: Update for rename.
+	* tests/cpp-unit-tests/main.cc: Now clears state via
+	(reset_global_state)
+	* tests/cpp-unit-tests/IcedTeaJavaRequestProcessorTest.cc: New,
+	contains unit tests that cover all of JavaRequestProcessor's methods.
+	* tests/cpp-unit-tests/browser_mock_npidentifier.cc: Allocation-safe
+	npidentifier mocking, adheres to NPAPI spec.
+	* tests/cpp-unit-tests/browser_mock_npidentifier.h: Same.
+
+2013-08-23  Adam Domurad  <adomurad@redhat.com>
+
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: Refactor plugin data creation.
 	* plugin/icedteanp/IcedTeaNPPlugin.h: Same.
 

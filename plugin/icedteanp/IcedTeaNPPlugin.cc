@@ -190,8 +190,6 @@ static pthread_t plugin_request_processor_thread2;
 static pthread_t plugin_request_processor_thread3;
 
 // Static instance helper functions.
-// Have the browser allocate a new ITNPPluginData structure.
-static ITNPPluginData* plugin_data_new ();
 // Retrieve the current document's documentbase.
 static std::string plugin_get_documentbase (NPP instance);
 // Callback used to monitor input pipe status.
@@ -202,16 +200,12 @@ static gboolean plugin_in_pipe_callback (GIOChannel* source,
 static gboolean plugin_out_pipe_callback (GIOChannel* source,
                                           GIOCondition condition,
                                           gpointer plugin_data);
-static NPError plugin_start_appletviewer (ITNPPluginData* data);
 std::string plugin_parameters_string (int argc, char* argn[], char* argv[]);
 static void plugin_stop_appletviewer ();
-// Uninitialize ITNPPluginData structure
-static void plugin_data_destroy (NPP instance);
 
 NPError get_cookie_info(const char* siteAddr, char** cookieString, uint32_t* len);
 NPError get_proxy_info(const char* siteAddr, char** proxy, uint32_t* len);
 void consume_message(gchar* message);
-void start_jvm_if_needed();
 static void appletviewer_monitor(GPid pid, gint status, gpointer data);
 void plugin_send_initialization_message(char* instance, gulong handle,
                                                int width, int height,
@@ -922,7 +916,7 @@ set_cookie_info(const char* siteAddr, const char* cookieString, uint32_t len)
 
 // HELPER FUNCTIONS
 
-static ITNPPluginData*
+ITNPPluginData*
 plugin_data_new ()
 {
   PLUGIN_DEBUG ("plugin_data_new\n");
@@ -1366,7 +1360,7 @@ plugin_test_appletviewer ()
   return error;
 }
 
-static NPError
+NPError
 plugin_start_appletviewer (ITNPPluginData* data)
 {
   PLUGIN_DEBUG ("plugin_start_appletviewer\n");
@@ -1707,7 +1701,7 @@ static void appletviewer_monitor(GPid pid, gint status, gpointer data)
     PLUGIN_DEBUG ("appletviewer_monitor return\n");
 }
 
-static void
+void
 plugin_data_destroy (NPP instance)
 {
   PLUGIN_DEBUG ("plugin_data_destroy\n");
@@ -1792,6 +1786,61 @@ initialize_plugin_table(NPPluginFuncs* pluginTable)
   return true;
 }
 
+// Make sure the plugin data directory exists, creating it if necessary.
+NPError
+initialize_data_directory()
+{
+  const char* tmpdir_env = getenv("TMPDIR");
+  if (tmpdir_env != NULL && g_file_test (tmpdir_env,
+                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+  {
+    data_directory = tmpdir_env;
+  }
+  else if (g_file_test (P_tmpdir,
+                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+  {
+    data_directory = P_tmpdir;
+  }
+  else
+  {
+    // If TMPDIR and P_tmpdir do not exist, try /tmp directly
+    data_directory = "/tmp";
+  }
+
+  data_directory += "/icedteaplugin-";
+  if (getenv("USER") != NULL)
+    data_directory += getenv("USER");
+
+  // Now create a icedteaplugin subdir
+  if (!g_file_test (data_directory.c_str(),
+                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+  {
+    int file_error = 0;
+
+    file_error = g_mkdir (data_directory.c_str(), 0700);
+    if (file_error != 0)
+    {
+      PLUGIN_ERROR_THREE ("Failed to create data directory",
+                          data_directory.c_str(),
+                          strerror (errno));
+      return NPERR_GENERIC_ERROR;
+    }
+  }
+
+
+  // If data directory doesn't exist by this point, bail
+  if (!g_file_test (data_directory.c_str(),
+                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+  {
+    PLUGIN_ERROR_THREE ("Temp directory does not exist: ",
+                        data_directory.c_str(),
+                        strerror (errno));
+    return NPERR_GENERIC_ERROR;
+  }
+
+  return NPERR_NO_ERROR;
+}
+
 // FACTORY FUNCTIONS
 
 // Provides the browser with pointers to the plugin functions that we
@@ -1860,56 +1909,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
 
   NPError np_error = NPERR_NO_ERROR;
 
-  // Make sure the plugin data directory exists, creating it if
-  // necessary.
-
-  const char* tmpdir_env = getenv("TMPDIR");
-  if (tmpdir_env != NULL && g_file_test (tmpdir_env,
-                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
-    {
-      data_directory = tmpdir_env;
-    }
-  else if (g_file_test (P_tmpdir,
-                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
-    {
-      data_directory = P_tmpdir;
-    }
-  else
-    {
-      // If TMPDIR and P_tmpdir do not exist, try /tmp directly
-      data_directory = "/tmp";
-    }
-
-  data_directory += "/icedteaplugin-";
-  if (getenv("USER") != NULL)
-      data_directory += getenv("USER");
-
-  // Now create a icedteaplugin subdir
-  if (!g_file_test (data_directory.c_str(),
-                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
-    {
-      int file_error = 0;
-
-      file_error = g_mkdir (data_directory.c_str(), 0700);
-      if (file_error != 0)
-        {
-          PLUGIN_ERROR_THREE ("Failed to create data directory",
-                          data_directory.c_str(),
-                          strerror (errno));
-          return NPERR_GENERIC_ERROR;
-        }
-    }
-
-
-  // If data directory doesn't exist by this point, bail
-  if (!g_file_test (data_directory.c_str(),
-                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
-    {
-      PLUGIN_ERROR_THREE ("Temp directory does not exist: ",
-                          data_directory.c_str(),
-                          strerror (errno));
-      return NPERR_GENERIC_ERROR;
-    }
+  initialize_data_directory();
 
   // Set appletviewer_executable.
   PLUGIN_DEBUG("Executing java at %s\n", get_plugin_executable().c_str());
