@@ -74,15 +74,30 @@ struct ITNPPluginData
   // The last plugin window height sent to us by the browser.
   guint32 window_height;
   // The source location for this instance
-  gchar* source;
+  std::string source;
   // If this is an actual applet instance, or a dummy instance for static calls
   bool is_applet_instance;
-};
 
-// Queue processing threads
-static pthread_t plugin_request_processor_thread1;
-static pthread_t plugin_request_processor_thread2;
-static pthread_t plugin_request_processor_thread3;
+  ITNPPluginData() {
+      instance_id = NULL;
+      parameters_string = NULL;
+      appletviewer_mutex = NULL;
+      owner = (NPP)NULL;
+      window_handle = NULL;
+      window_width = 0;
+      window_height = 0;
+      is_applet_instance = false;
+  }
+  ~ITNPPluginData() {
+      if (appletviewer_mutex) {
+        g_mutex_free (appletviewer_mutex);
+      }
+      // cleanup_instance_string:
+      g_free (instance_id);
+      // cleanup applet tag
+      g_free (parameters_string);
+  }
+};
 
 // Condition on which the queue processor waits
 extern pthread_cond_t cond_message_available;

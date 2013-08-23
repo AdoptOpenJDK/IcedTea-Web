@@ -47,6 +47,7 @@ exception statement from your version. */
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <new>
 
 //IcedTea-plugin includes
 #include "IcedTeaPluginUtils.h"
@@ -183,12 +184,16 @@ PluginRequestProcessor* plugin_req_proc;
 // Sends messages to Java over the bus
 JavaMessageSender* java_req_proc;
 
+// Queue processing threads
+static pthread_t plugin_request_processor_thread1;
+static pthread_t plugin_request_processor_thread2;
+static pthread_t plugin_request_processor_thread3;
 
 // Static instance helper functions.
 // Have the browser allocate a new ITNPPluginData structure.
-static void plugin_data_new (ITNPPluginData** data);
+static ITNPPluginData* plugin_data_new ();
 // Retrieve the current document's documentbase.
-static gchar* plugin_get_documentbase (NPP instance);
+static std::string plugin_get_documentbase (NPP instance);
 // Callback used to monitor input pipe status.
 static gboolean plugin_in_pipe_callback (GIOChannel* source,
                                          GIOCondition condition,
@@ -337,30 +342,18 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 
   PLUGIN_DEBUG("Got variant %p\n", &member_ptr);
 
-
-  NPError np_error = NPERR_NO_ERROR;
-  ITNPPluginData* data = NULL;
-
-  gchar* documentbase = NULL;
-  gchar* read_message = NULL;
-  gchar* cookie_info = NULL;
-
-  NPObject* npPluginObj = NULL;
-
   if (!instance)
-    {
+  {
       PLUGIN_ERROR ("Browser-provided instance pointer is NULL.");
-      np_error = NPERR_INVALID_INSTANCE_ERROR;
-      goto cleanup_done;
-    }
+      return NPERR_INVALID_INSTANCE_ERROR;
+  }
 
   // data
-  plugin_data_new (&data);
+  ITNPPluginData* data = plugin_data_new ();
   if (data == NULL)
-    {
+  {
       PLUGIN_ERROR ("Failed to allocate plugin data.");
-      np_error = NPERR_OUT_OF_MEMORY_ERROR;
-      goto cleanup_done;
+      return NPERR_OUT_OF_MEMORY_ERROR;
     }
 
   // start the jvm if needed
@@ -386,22 +379,21 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 
   g_mutex_lock (data->appletviewer_mutex);
 
+  std::string documentbase = plugin_get_documentbase (instance);
   // Documentbase retrieval.
-  documentbase = plugin_get_documentbase (instance);
-  if (documentbase && argc != 0)
-    {
+  if (argc != 0)
+  {
       // Send parameters to appletviewer.
       std::string params_string = plugin_parameters_string(argc, argn, argv);
 
-      data->parameters_string =  g_strdup_printf("tag %s %s", documentbase, params_string.c_str());
+      data->parameters_string =  g_strdup_printf("tag %s %s", documentbase.c_str(), params_string.c_str());
 
       data->is_applet_instance = true;
-    }
-
-  if (argc == 0)
-    {
+  }
+  else
+  {
       data->is_applet_instance = false;
-    }
+  }
 
   g_mutex_unlock (data->appletviewer_mutex);
 
@@ -418,12 +410,6 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 
   instance->pdata = data;
 
- cleanup_done:
-  g_free (read_message);
-  read_message = NULL;
-  g_free (documentbase);
-  documentbase = NULL;
-
   // store an identifier for this plugin
   PLUGIN_DEBUG("Mapping id %d and instance %p\n", instance_counter, instance);
   g_hash_table_insert(instance_to_id_map, instance, GINT_TO_POINTER(instance_counter));
@@ -432,7 +418,7 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 
   PLUGIN_DEBUG ("ITNP_New return\n");
 
-  return np_error;
+  return NPERR_NO_ERROR;
 }
 
 // Starts the JVM if it is not already running
@@ -936,19 +922,21 @@ set_cookie_info(const char* siteAddr, const char* cookieString, uint32_t len)
 
 // HELPER FUNCTIONS
 
-static void
-plugin_data_new (ITNPPluginData** data)
+static ITNPPluginData*
+plugin_data_new ()
 {
   PLUGIN_DEBUG ("plugin_data_new\n");
 
-  *data = (ITNPPluginData*)
-    (*browser_functions.memalloc) (sizeof (struct ITNPPluginData));
+  ITNPPluginData* data = (ITNPPluginData*)browser_functions.memalloc(sizeof (struct ITNPPluginData));
 
-  // appletviewer_alive is false until the applet viewer is spawned.
-  if (*data)
-    memset (*data, 0, sizeof (struct ITNPPluginData));
-
+  if (data)
+  {
+      // Call constructor on allocated data
+      new (data) ITNPPluginData();
+  }
   PLUGIN_DEBUG ("plugin_data_new return\n");
+
+  return data;
 }
 
 
@@ -957,13 +945,10 @@ plugin_data_new (ITNPPluginData** data)
 // documentbase.  This function relies on browser-private data so it
 // will only work when the plugin is loaded in a Mozilla-based
 // browser.
-static gchar*
+static std::string
 plugin_get_documentbase (NPP instance)
 {
   PLUGIN_DEBUG ("plugin_get_documentbase\n");
-
-  char const* documentbase = NULL;
-  gchar* documentbase_copy = NULL;
 
   // FIXME: This method is not ideal, but there are no known NPAPI call
   // for this. See thread for more information:
@@ -984,16 +969,15 @@ plugin_get_documentbase (NPP instance)
                                href_id, &href);
 
   std::string href_str = IcedTeaPluginUtilities::NPVariantAsString(href);
-  documentbase_copy = g_strdup (href_str.c_str());
 
   // Release references.
   browser_functions.releasevariantvalue(&href);
   browser_functions.releasevariantvalue(&location);
- cleanup_done:
-  PLUGIN_DEBUG ("plugin_get_documentbase return\n");
-  PLUGIN_DEBUG("plugin_get_documentbase returning: %s\n", documentbase_copy);
 
-  return documentbase_copy;
+  PLUGIN_DEBUG ("plugin_get_documentbase return\n");
+  PLUGIN_DEBUG("plugin_get_documentbase returning: %s\n", href_str.c_str());
+
+  return href_str;
 }
 
 // plugin_in_pipe_callback is called when data is available on the
@@ -1740,30 +1724,10 @@ plugin_data_destroy (NPP instance)
       g_hash_table_remove(id_to_instance_map, id_ptr);
     }
 
-  tofree->window_handle = NULL;
-  tofree->window_height = 0;
-  tofree->window_width = 0;
+  /* Explicitly call destructor */
+  tofree->~ITNPPluginData();
 
-  // cleanup_appletviewer_mutex:
-  g_mutex_free (tofree->appletviewer_mutex);
-  tofree->appletviewer_mutex = NULL;
-
-  // cleanup_instance_string:
-  g_free (tofree->instance_id);
-  tofree->instance_id = NULL;
-
-  // cleanup applet tag
-  g_free (tofree->parameters_string);
-  tofree->parameters_string = NULL;
-
-  g_free(tofree->source);
-  tofree->source = NULL;
-
-  // cleanup_data:
-  // Eliminate back-pointer to plugin instance.
-  tofree->owner = NULL;
   (*browser_functions.memfree) (tofree);
-  tofree = NULL;
 
   PLUGIN_DEBUG ("plugin_data_destroy return\n");
 }

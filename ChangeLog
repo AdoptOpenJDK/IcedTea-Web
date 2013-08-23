@@ -1,3 +1,8 @@
+2013-08-23  Adam Domurad  <adomurad@redhat.com>
+
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Refactor plugin data creation.
+	* plugin/icedteanp/IcedTeaNPPlugin.h: Same.
+
 2013-08-19  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: Evaluate
