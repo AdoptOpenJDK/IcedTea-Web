@@ -1,3 +1,10 @@
+2013-08-29  Omair Majid  <omajid@redhat.com>
+
+	PR1058
+	* netx/net/sourceforge/jnlp/services/XFileOpenService.java
+	(openMultiFileDialog): Create a privileged proxy for each FileContents
+	instance and return an array of them.
+
 2013-08-27  Adam Domurad  <adomurad@redhat.com>
 
 	Do not wait for applet initialization when binding Java applets for NPAPI.
