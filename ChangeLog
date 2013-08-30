@@ -1,5 +1,11 @@
 2013-08-29  Omair Majid  <omajid@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java
+	(testPropertyRestrictions): New method. Check that properties in
+	resources are are combined and filtered as appropriate.
+
+2013-08-29  Omair Majid  <omajid@redhat.com>
+
 	PR1058
 	* netx/net/sourceforge/jnlp/services/XFileOpenService.java
 	(openMultiFileDialog): Create a privileged proxy for each FileContents
