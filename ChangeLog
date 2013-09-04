@@ -1,3 +1,8 @@
+2013-09-04  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java: 
+	Fix applet context being null during applet init & start.
+
 2013-08-29  Omair Majid  <omajid@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java

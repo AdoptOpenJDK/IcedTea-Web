@@ -19,6 +19,7 @@ package net.sourceforge.jnlp;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.applet.Applet;
+import java.applet.AppletStub;
 import java.awt.Container;
 import java.awt.SplashScreen;
 import java.io.File;
@@ -716,6 +717,7 @@ public class Launcher {
             String appletName = file.getApplet().getMainClass();
             Class appletClass = loader.loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
+            applet.setStub((AppletStub)cont);
             // Finish setting up appletInstance.
             appletInstance.setApplet(applet);
             appletInstance.getAppletEnvironment().setApplet(applet);
