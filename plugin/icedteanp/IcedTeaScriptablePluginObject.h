@@ -145,13 +145,20 @@ class IcedTeaScriptableJavaObject: public NPObject
 private:
     NPP instance;
     bool is_object_array;
-    /* These may be empty if 'is_applet_instance' is true
-     * and the object has not yet been used */
+    /* These may be empty if 'initialized' is false */
     std::string class_id, instance_id;
+    bool initialized, initialization_failed;
+
+    /* If we are uninitialized, make a Java request for the applet java class & instance ID for the plugin instance.
+     * Only objects representing an applet will begin uninitialized, to prevent blocking when the browser requests the object.
+     * Returns false on initialization error. */
+    bool tryToInitializeIfApplet();
 public:
     IcedTeaScriptableJavaObject(NPP instance) {
         this->instance = instance;
-        is_object_array = false;
+        this->is_object_array = false;
+        this->initialized = false;
+        this->initialization_failed = false;
     }
     static void deAllocate(NPObject *npobj) {
         delete (IcedTeaScriptableJavaObject*)npobj;
@@ -166,8 +173,12 @@ public:
         return getClassID() + ":" + getInstanceID();
     }
     static void invalidate(NPObject *npobj) {
-        IcedTeaPluginUtilities::removeInstanceID(npobj);
         IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
+        /* Nothing to do if we have not been initialized */
+        if (!scriptable_object->initialized) {
+            return;
+        }
+        IcedTeaPluginUtilities::removeInstanceID(npobj);
         IcedTeaPluginUtilities::removeObjectMapping(scriptable_object->objectKey());
     }
     static bool hasMethod(NPObject *npobj, NPIdentifier name_id);
@@ -195,15 +206,12 @@ public:
     }
     static bool construct(NPObject *npobj, const NPVariant *args,
             uint32_t argCount, NPVariant *result);
-     /* Creates and retains a scriptable java object (intended to be called asynch.) */
-    static NPObject* get_scriptable_java_object(NPP instance,
+
+    static NPObjectRef get_scriptable_applet_object(NPP instance);
+    static NPObjectRef get_scriptable_java_object(NPP instance,
                                                 std::string class_id,
                                                 std::string instance_id,
                                                 bool isArray);
 };
-
-/* Creates and retains a scriptable java object (intended to be called asynch.) */
-
-void _createAndRetainJavaObject(void* data);
 
 #endif /* __ICEDTEASCRIPTABLEPLUGINOBJECT_H_ */

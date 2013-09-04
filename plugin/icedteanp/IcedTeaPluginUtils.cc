@@ -53,7 +53,7 @@ exception statement from your version. */
 int IcedTeaPluginUtilities::reference = -1;
 pthread_mutex_t IcedTeaPluginUtilities::reference_mutex = PTHREAD_MUTEX_INITIALIZER;
 std::map<void*, NPP>* IcedTeaPluginUtilities::instance_map = new std::map<void*, NPP>();
-std::map<std::string, NPObject*>* IcedTeaPluginUtilities::object_map = new std::map<std::string, NPObject*>();
+std::map<std::string, NPObjectRef> IcedTeaPluginUtilities::object_map;
 
 /* Plugin async call queue */
 static std::vector< PluginThreadCall* >* pendingPluginThreadRequests = new std::vector< PluginThreadCall* >();
@@ -433,9 +433,9 @@ void
 IcedTeaPluginUtilities::printStringVector(const char* prefix, std::vector<std::string>* str_vector)
 {
 
-        // This is a CPU intensive function. Run only if debugging
-        if (!plugin_debug)
-            return;
+    // This is a CPU intensive function. Run only if debugging
+    if (!plugin_debug)
+        return;
 
 	std::string* str = new std::string();
 	*str += "{ ";
@@ -561,27 +561,25 @@ IcedTeaPluginUtilities::getInstanceFromMemberPtr(void* member_ptr)
  * @return The associated active NPObject, NULL otherwise
  */
 
-NPObject*
+NPObjectRef
 IcedTeaPluginUtilities::getNPObjectFromJavaKey(std::string key)
 {
-
-    NPObject* object = NULL;
     PLUGIN_DEBUG("getNPObjectFromJavaKey looking for %s\n", key.c_str());
 
-    std::map<std::string, NPObject*>::iterator iterator = object_map->find(key);
+    std::map<std::string, NPObjectRef>::iterator iterator = object_map.find(key);
 
-    if (iterator != object_map->end())
+    if (iterator != object_map.end())
     {
-        NPObject* mapped_object = object_map->find(key)->second;
+        NPObjectRef object = object_map.find(key)->second;
 
-        if (getInstanceFromMemberPtr(mapped_object) != NULL)
+        if (getInstanceFromMemberPtr(object.get()) != NULL)
         {
-            object = mapped_object;
-            PLUGIN_DEBUG("getNPObjectFromJavaKey found %s. NPObject = %p\n", key.c_str(), object);
+            PLUGIN_DEBUG("getNPObjectFromJavaKey found %s. NPObject = %p\n", key.c_str(), object.get());
+            return object;
         }
     }
 
-    return object;
+    return NPObjectRef(NULL);
 }
 
 /**
@@ -592,10 +590,10 @@ IcedTeaPluginUtilities::getNPObjectFromJavaKey(std::string key)
  */
 
 void
-IcedTeaPluginUtilities::storeObjectMapping(std::string key, NPObject* object)
+IcedTeaPluginUtilities::storeObjectMapping(std::string key, NPObjectRef object)
 {
-    PLUGIN_DEBUG("Storing object %p with key %s\n", object, key.c_str());
-    object_map->insert(std::make_pair(key, object));
+    PLUGIN_DEBUG("Storing object %p with key %s\n", object.get(), key.c_str());
+    object_map.insert(std::make_pair(key, object));
 }
 
 /**
@@ -608,19 +606,14 @@ void
 IcedTeaPluginUtilities::removeObjectMapping(std::string key)
 {
     PLUGIN_DEBUG("Removing key %s from object map\n", key.c_str());
-    object_map->erase(key);
+    object_map.erase(key);
 }
 
 /* Clear object_map. Useful for tests. */
 void
 IcedTeaPluginUtilities::clearObjectMapping()
 {
-    std::map<std::string, NPObject*>::iterator iter = object_map->begin();
-    for (; iter != object_map->end(); ++iter) {
-        browser_functions.releaseobject(iter->second);
-    }
-    delete object_map;
-    object_map = new std::map<std::string, NPObject*>();
+    object_map = std::map<std::string, NPObjectRef>();
 }
 
 /*
@@ -633,9 +626,9 @@ IcedTeaPluginUtilities::clearObjectMapping()
 void
 IcedTeaPluginUtilities::printStringPtrVector(const char* prefix, std::vector<std::string*>* str_ptr_vector)
 {
-        // This is a CPU intensive function. Run only if debugging
-        if (!plugin_debug)
-            return;
+    // This is a CPU intensive function. Run only if debugging
+    if (!plugin_debug)
+        return;
 
 	std::string* str = new std::string();
 	*str += "{ ";
@@ -819,18 +812,13 @@ javaObjectResultToNPVariant(NPP instance, const std::string& jobject_id, NPVaria
 
     std::string jclass_id = *jclass_result->return_string;
 
-    NPObject* obj;
-    if (jclass_id.at(0) == '[') // array
-    {
-        obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, jclass_id,
-                jobject_id, true);
-    } else
-    {
-        obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, jclass_id,
-                jobject_id, false);
-    }
+    bool is_array = (jclass_id.at(0) == '[');
+    NPObjectRef object = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, jclass_id,
+                jobject_id, is_array);
 
-    OBJECT_TO_NPVARIANT(obj, *variant);
+    OBJECT_TO_NPVARIANT(object.get(), *variant);
+    /* Retain because we are returning an NPObject* */
+    object.raw_retain();
 
     return true;
 }
@@ -874,12 +862,12 @@ IcedTeaPluginUtilities::javaResultToNPVariant(NPP instance,
 }
 
 bool
-IcedTeaPluginUtilities::isObjectJSArray(NPP instance, NPObject* object)
+IcedTeaPluginUtilities::isObjectJSArray(NPP instance, NPObjectRef object)
 {
 
     NPVariant constructor_v = NPVariant();
     NPIdentifier constructor_id = browser_functions.getstringidentifier("constructor");
-    browser_functions.getproperty(instance, object, constructor_id, &constructor_v);
+    browser_functions.getproperty(instance, object.get(), constructor_id, &constructor_v);
     IcedTeaPluginUtilities::printNPVariant(constructor_v);
 
     // void constructor => not an array
@@ -1087,6 +1075,34 @@ void IcedTeaPluginUtilities::trim(std::string& str) {
 	str = str.substr(start, end - start + 1);
 }
 
+std::string
+IcedTeaPluginUtilities::stringPrintf(const char* fmt, /*variable arguments*/ ...)
+{
+  /* Extract the variable arguments */
+  va_list args;
+  va_start(args, fmt);
+
+  gchar* result = NULL;
+  size_t size;
+
+  /* Format the arguments into a new buffer, held in 'result' */
+  size = g_vasprintf (&result, fmt, args);
+
+  if (result == NULL)
+  {
+    // We are out of memory
+    throw std::bad_alloc();
+  }
+
+  /* Wrap as string and free buffer */
+  std::string str(result, size);
+  g_free(result);
+
+  va_end(args); /* Finish using variable arguments */
+
+  return str;
+}
+
 std::string IcedTeaPluginUtilities::NPIdentifierAsString(NPIdentifier id) {
     NPUTF8* cstr = browser_functions.utf8fromidentifier(id);
     if (cstr == NULL) {
@@ -1242,3 +1258,41 @@ MessageBus::post(const char* message)
     PLUGIN_DEBUG("%p unlocked...\n", &msg_queue_mutex);
 }
 
+void
+NPObjectRef::set(NPObject* new_object)
+{
+    if (new_object != NULL) {
+        /* Increase the new object's reference count */
+        browser_functions.retainobject(new_object);
+    }
+    if (current_object != NULL) {
+        /* Decrease the old object's reference count */
+        browser_functions.releaseobject(current_object);
+    }
+
+    this->current_object = new_object;
+}
+
+NPObjectRef
+NPObjectRef::create(NPP instance, NPClass* np_class)
+{
+    NPObjectRef ref;
+    /* Don't use set(), otherwise we'd double-retain */
+    ref.current_object = browser_functions.createobject(instance, np_class);
+    return ref;
+}
+
+/* Explicit reference counting operations, use only if needed for interoperating with NPObject* */
+void
+NPObjectRef::raw_retain() {
+    if (current_object != NULL) {
+        browser_functions.retainobject(current_object);
+    }
+}
+
+void
+NPObjectRef::raw_release() {
+    if (current_object != NULL) {
+        browser_functions.releaseobject(current_object);
+    }
+}

@@ -6,6 +6,39 @@
 	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java:
 	new unit test for SecurityDialogs#getIntegerReponseAsBoolean()
 
+2013-09-04  Adam Domurad  <adomurad@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java: 
+	Fix applet context being null during applet init & start.
+
+2013-08-29  Omair Majid  <omajid@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java
+	(testPropertyRestrictions): New method. Check that properties in
+	resources are are combined and filtered as appropriate.
+
+2013-08-29  Omair Majid  <omajid@redhat.com>
+
+	PR1058
+	* netx/net/sourceforge/jnlp/services/XFileOpenService.java
+	(openMultiFileDialog): Create a privileged proxy for each FileContents
+	instance and return an array of them.
+
+2013-08-27  Adam Domurad  <adomurad@redhat.com>
+
+	Do not wait for applet initialization when binding Java applets for NPAPI.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: Refactor to use
+	lazy-initialized javascript applet binding.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: Make use of new helper
+	class, introduce (stringPrintf), introduce NPObjectRef.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: Same.
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: Allow
+	IcedTeaScriptableJavaObject to be lazy-initialized, introduce
+	lazy-initializing (get_scriptable_applet_object).
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.h: Same.
+	* tests/cpp-unit-tests/IcedTeaScriptablePluginObjectTest.cc: Adapt
+	test to new helper class.
+
 2013-08-23  Adam Domurad  <adomurad@redhat.com>
 
 	Spawn Java side during C++ unit tests. Many new tests.

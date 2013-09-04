@@ -91,11 +91,12 @@ class XFileOpenService implements FileOpenService {
             if (chosen == JFileChooser.APPROVE_OPTION) {
                 File[] files = chooser.getSelectedFiles();
                 int length = files.length;
-                XFileContents[] xfiles = new XFileContents[length];
-                for (int i = 0; i < length; i++)
-                    xfiles[i] = new XFileContents(files[i]);
-                return (FileContents[]) ServiceUtil.createPrivilegedProxy(
-                           FileContents.class, xfiles);
+                FileContents[] result = new FileContents[length];
+                for (int i = 0; i < length; i++) {
+                    XFileContents xfile = new XFileContents(files[i]);
+                    result[i] = (FileContents) ServiceUtil.createPrivilegedProxy(FileContents.class, xfile);
+                }
+                return result;
             } else {
                 return null;
             }

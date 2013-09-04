@@ -66,16 +66,15 @@ SUITE(IcedTeaScriptableJavaObject) {
     TEST(get_scriptable_java_object) {
         MemoryLeakDetector leak_detector;
 
-        NPObject* first_obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
-        browser_functions.releaseobject(first_obj);
+        /* Ensure freeing*/ {
+            NPObjectRef first_obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
 
-        /* After the first call, the object should be cached in the object map */
-        NPObject* second_obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
+            /* After the first call, the object should be cached in the object map */
+            NPObjectRef second_obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(&dummy_npp, "DummyClass", "DummyInstance", false);
 
-        /* Objects should be the same, because of caching  */
-        CHECK(first_obj == second_obj);
-
-        browser_functions.releaseobject(second_obj);
+            /* Objects should be the same, because of caching  */
+            CHECK(first_obj.get() == second_obj.get());
+        }
 
         CHECK(leak_detector.memory_leaks() == 0);
     }
