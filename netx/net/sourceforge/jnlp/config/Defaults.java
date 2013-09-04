@@ -55,7 +55,7 @@ public class Defaults {
     final static String SYSTEM_HOME = System.getProperty("java.home");
     final static String SYSTEM_SECURITY = SYSTEM_HOME + File.separator + "lib" + File.separator + "security";
     final static String USER_CONFIG_HOME;
-    final static String USER_CACHE_HOME;
+    public final static String USER_CACHE_HOME;
     final static String USER_SECURITY;
     final static String LOCKS_DIR = System.getProperty("java.io.tmpdir") + File.separator
             + System.getProperty("user.name") + File.separator + "netx" + File.separator

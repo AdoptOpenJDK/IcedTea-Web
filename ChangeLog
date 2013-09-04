@@ -1,5 +1,13 @@
 2013-09-04  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/config/Defaults.java: (USER_CACHE_HOME) made
+	public for use in CacheReproducer
+	* tests/reproducers/signed/CacheReproducer/testcases/CacheReproducerTest:
+	updated "could not clear cache" message and cache location. Other minor
+	cleanup
+
+2013-09-04  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
 	(getIntegerResponseAsBoolean) extracted integer response casting/handling
 	logic into new method

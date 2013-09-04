@@ -44,11 +44,13 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.PropertyResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.sourceforge.jnlp.config.Defaults;
 import org.junit.AfterClass;
 import org.junit.Assert;
 
@@ -60,24 +62,37 @@ public class CacheReproducerTest {
     private static final List<String> clear = Arrays.asList(new String[]{server.getJavawsLocation(), "-Xclearcache",  ServerAccess.HEADLES_OPTION});
     private static final List<String> trustedVerboses = Arrays.asList(new String[]{"-Xtrustall", ServerAccess.HEADLES_OPTION,"-verbose"});
     private static final List<String> verbosed = Arrays.asList(new String[]{"-verbose", ServerAccess.HEADLES_OPTION});
-    private static final String home = System.getProperty("user.home");
-    private static final String name = System.getProperty("user.name");
-    private static final String tmp = System.getProperty("java.io.tmpdir");
-    private static final File icedteaDir = new File(home + "/" + ".icedtea");
-    private static final File icedteaCache = new File(icedteaDir, "cache");
-    private static final File icedteaCacheFile = new File(icedteaCache, "recently_used");
-    private static final File netxLock = new File(tmp + "/" + name + "/netx/locks/netx_running");
+
     private static final String lre = "LruCacheException";
     private static final String ioobe = "IndexOutOfBoundsException";
     private static final String corruptRegex = "\\d{13}";
     private static final Pattern corruptPatern = Pattern.compile(corruptRegex);
     private static final String corruptString = "156dsf1562kd5";
 
-     String testS = "#netx file\n"
-                + "#Mon Dec 12 16:20:46 CET 2011\n"
-                + "1323703236508,0=/home/xp13/.icedtea/cache/0/http/localhost/ReadPropertiesBySignedHack.jnlp\n"
-                + "1323703243086,2=/home/xp14/.icedtea/cache/2/http/localhost/ReadProperties.jar\n"
-                + "1323703243082,1=/home/xp15/.icedtea/cache/1/http/localhost/ReadPropertiesBySignedHack.jar";
+    private static final File icedteaCache = new File(Defaults.USER_CACHE_HOME, "cache");
+    private static final File icedteaCacheFile = new File(icedteaCache, "recently_used");
+    private static final File netxLock = new File(System.getProperty("java.io.tmpdir"),
+            System.getProperty("user.name") + File.separator +
+            "netx" + File.separator +
+            "locks" + File.separator +
+            "netx_running");
+
+    private static final String messageResourcePath = "net/sourceforge/jnlp/resources/Messages.properties";
+    private static PropertyResourceBundle messageBundle = null;
+
+    static {
+        try {
+            messageBundle =
+                new PropertyResourceBundle(CacheReproducerTest.class.getClassLoader().getResourceAsStream(messageResourcePath));
+        } catch (IOException e) {
+        }
+    }
+
+    String testS = "#netx file\n"
+               + "#Mon Dec 12 16:20:46 CET 2011\n"
+               + "1323703236508,0=/home/xp13/.icedtea/cache/0/http/localhost/ReadPropertiesBySignedHack.jnlp\n"
+               + "1323703243086,2=/home/xp14/.icedtea/cache/2/http/localhost/ReadProperties.jar\n"
+               + "1323703243082,1=/home/xp15/.icedtea/cache/1/http/localhost/ReadPropertiesBySignedHack.jar";
 
     @Test
     public void cacheIsWorkingTest() throws Exception {
@@ -93,20 +108,19 @@ public class CacheReproducerTest {
         assertCacheIsNotEmpty();
     }
 
-     private class ParallelSimpleTestRunner extends Thread {
-           public boolean b=false;
-            @Override
-            public void run() {
-                try {
-
-                    ServerAccess.ProcessResult pr = runSimpleTest1();
-                    evaluateSimpleTest1OkCache(pr);
-                    b=true;
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
+    private class ParallelSimpleTestRunner extends Thread {
+        public boolean b=false;
+        @Override
+        public void run() {
+            try {
+                ProcessResult pr = runSimpleTest1();
+                evaluateSimpleTest1OkCache(pr);
+                b=true;
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
-        };
+        }
+    }
 
     @Test
     @KnownToFail
@@ -260,7 +274,7 @@ public class CacheReproducerTest {
             @Override
             public void run() {
                 try {
-                    ServerAccess.ProcessResult pr = server.executeJavawsHeadless(verbosed, "/deadlocktest.jnlp");
+                    ProcessResult pr = server.executeJavawsHeadless(verbosed, "/deadlocktest.jnlp");
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -269,12 +283,12 @@ public class CacheReproducerTest {
         t.start();
         Thread.sleep(1000);
         pr = tryToClearcache();
-        String q = "Can not clear cache at this time";
-        Assert.assertTrue("Stderr should contain " + q + ", but did not.", pr.stderr.contains(q));
+
+        String cacheClearError = messageBundle.getString("CCannotClearCache");
+        Assert.assertTrue("Stderr should contain " + cacheClearError + ", but did not.", pr.stderr.contains(cacheClearError));
         assertCacheIsNotEmpty();
     }
 
-     
     //next four tests are designed to ensure, that corrupted cache will not break already loaded cached files
     public static final String CR1 = "CacheReproducer1";
     public static final String CR2 = "CacheReproducer2";
@@ -311,6 +325,7 @@ public class CacheReproducerTest {
     }
 
     @Test
+    @KnownToFail
     public void testAlreadyLoadedCached11() throws Exception {
         testsBody(CR11, 1);
         testsBody(CR11, 2);
@@ -337,7 +352,7 @@ public class CacheReproducerTest {
         if (force) {
             if (netxLock.isFile()) {
                 boolean b = netxLock.delete();
-                junit.framework.Assert.assertTrue(b);
+                Assert.assertTrue(b);
             }
 
         }
@@ -377,7 +392,7 @@ public class CacheReproducerTest {
 
         }
         String sb = breakOne(s, 0);
-        junit.framework.Assert.assertEquals(s, sb);
+        Assert.assertEquals(s, sb);
         for (int x = 1; x <= 3; x++) {
             String[] sx = breakOne(s, x).split("\n");
             for (int i = 0; i < sx.length; i++) {
@@ -426,7 +441,7 @@ public class CacheReproducerTest {
     }
 
     private static String breakPaths(String s) {
-       return s.replaceAll(home+".*", "/ho");
+       return s.replaceAll(System.getProperty("user.home") + ".*", "/ho");
     }
 
     private static void breakCache1() throws IOException {
@@ -447,24 +462,24 @@ public class CacheReproducerTest {
         ServerAccess.saveFile(s, icedteaCacheFile);
     }
 
-    private static ServerAccess.ProcessResult runSimpleTest1() throws Exception {
+    private static ProcessResult runSimpleTest1() throws Exception {
         return runSimpleTest1(verbosed, "simpletest1");
     }
 
-    private static ServerAccess.ProcessResult runSimpleTest1(List<String> args, String s) throws Exception {
-        ServerAccess.ProcessResult pr2 = server.executeJavawsHeadless(args, "/" + s + ".jnlp");
+    private static ProcessResult runSimpleTest1(List<String> args, String s) throws Exception {
+        ProcessResult pr2 = server.executeJavawsHeadless(args, "/" + s + ".jnlp");
         return pr2;
     }
 
-    private static ServerAccess.ProcessResult runSimpleTest1Signed() throws Exception {
+    private static ProcessResult runSimpleTest1Signed() throws Exception {
         return runSimpleTestSigned("SimpletestSigned1");
     }
 
-    private static ServerAccess.ProcessResult runSimpleTestSigned(String id) throws Exception {
+    private static ProcessResult runSimpleTestSigned(String id) throws Exception {
         return runSimpleTest1(trustedVerboses, id);
     }
 
-    private static void evaluateSimpleTest1OkCache(ServerAccess.ProcessResult pr2) throws Exception {
+    private static void evaluateSimpleTest1OkCache(ProcessResult pr2) throws Exception {
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("test stdout should contain " + s + " but didn't", pr2.stdout.contains(s));
         Assert.assertFalse(pr2.wasTerminated);
@@ -472,7 +487,7 @@ public class CacheReproducerTest {
     }
 
     private static ProcessResult tryToClearcache() throws Exception {
-        ServerAccess.ProcessResult pr1 = ServerAccess.executeProcess(clear);
+        ProcessResult pr1 = ServerAccess.executeProcess(clear);
         return pr1;
     }
 }
