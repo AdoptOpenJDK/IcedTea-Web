@@ -132,16 +132,7 @@ public class SecurityDialogs {
 
         Object selectedValue = getUserResponse(message);
 
-        if (selectedValue == null) {
-            return false;
-        } else if (selectedValue instanceof Integer) {
-            if (((Integer) selectedValue).intValue() == 0)
-                return true;
-            else
-                return false;
-        } else {
-            return false;
-        }
+        return getIntegerResponseAsBoolean(selectedValue);
     }
 
     /**
@@ -164,17 +155,7 @@ public class SecurityDialogs {
 
         Object selectedValue = getUserResponse(message);
 
-        if (selectedValue == null) {
-            return false;
-        } else if (selectedValue instanceof Integer) {
-            if (((Integer) selectedValue).intValue() == 0) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
+        return getIntegerResponseAsBoolean(selectedValue);
     }
 
     /**
@@ -224,16 +205,7 @@ public class SecurityDialogs {
 
         Object selectedValue = getUserResponse(message);
 
-        if (selectedValue == null) {
-            return false;
-        } else if (selectedValue instanceof Integer) {
-            if (((Integer) selectedValue).intValue() == 0)
-                return true;
-            else
-                return false;
-        } else {
-            return false;
-        }
+        return getIntegerResponseAsBoolean(selectedValue);
     }
 
     /**
@@ -263,11 +235,7 @@ public class SecurityDialogs {
         message.extras = new Object[] { host, port, prompt, type };
 
         Object response = getUserResponse(message);
-        if (response == null) {
-            return null;
-        } else {
-            return (Object[]) response;
-        }
+        return (Object[]) response;
     }
 
     /**
@@ -286,11 +254,11 @@ public class SecurityDialogs {
         Object selectedValue = getUserResponse(message);
 
         // result 0 = Yes, 1 = No, 2 = Cancel
-        if (selectedValue == null) {
-            return 2;
-        } else if (selectedValue instanceof Integer) {
+        if (selectedValue instanceof Integer) {
+            // If the selected value can be cast to Integer, use that value
             return ((Integer) selectedValue).intValue();
         } else {
+            // Otherwise default to "cancel"
             return 2;
         }
     }
@@ -373,6 +341,21 @@ public class SecurityDialogs {
         }
 
         return message.userResponse;
+    }
+
+    /**
+     * Returns true iff the given Object reference can be cast to Integer and that Integer's
+     * intValue is 0.
+     * @param ref the Integer (hopefully) reference
+     * @return whether the given reference is both an Integer type and has intValue of 0
+     */
+    public static boolean getIntegerResponseAsBoolean(Object ref) {
+        boolean isInteger = ref instanceof Integer;
+        if (isInteger) {
+            Integer i = (Integer) ref;
+            return i.intValue() == 0;
+        }
+        return false;
     }
 
     /**
