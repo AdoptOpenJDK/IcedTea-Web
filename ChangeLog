@@ -1,3 +1,19 @@
+2013-09-09  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPFile.java
+	(getDownloadOptionsForJar): Rename to ...
+	(getDownloadOptions): New method. Look up jnlp.packEnabled and
+	jnlp.versionEnabled in any resources element.
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	(getDownloadOptionsForJar): Rename to ...
+	(getDownloadOptions): New method.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(initializeResources): Invoke file.getDownloadResources.
+	(getDownloadOptionsForJar): Remove.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java
+	(testDownloadOptionsAppliedEverywhere): New method.
+	(testDownloadOptionsFilteredOut): New method.
+
 2013-09-04  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/config/Defaults.java: (USER_CACHE_HOME) made

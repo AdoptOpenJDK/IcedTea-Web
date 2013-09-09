@@ -20,7 +20,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -791,29 +790,17 @@ public class JNLPFile {
     }
 
     /**
-     * XXX: this method does a "==" comparison between the input JARDesc and
-     * jars it finds through getResourcesDescs(). If ever the implementation
-     * of that function should change to return copies of JARDescs objects,
-     * then the "jar == aJar" comparison below should change accordingly.
-     * @param jar the jar whose download options to get.
-     * @return the download options.
+     * @return the download options to use for downloading jars listed in this jnlp file.
      */
-    public DownloadOptions getDownloadOptionsForJar(JARDesc jar) {
+    public DownloadOptions getDownloadOptions() {
         boolean usePack = false;
         boolean useVersion = false;
-        ResourcesDesc[] descs = getResourcesDescs();
-        for (ResourcesDesc desc: descs) {
-            JARDesc[] jars = desc.getJARs();
-            for (JARDesc aJar: jars) {
-                if (jar == aJar) {
-                    if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.packEnabled"))) {
-                        usePack = true;
-                    }
-                    if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.versionEnabled"))) {
-                        useVersion = true;
-                    }
-                }
-            }
+        ResourcesDesc desc = getResources();
+        if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.packEnabled"))) {
+            usePack = true;
+        }
+        if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.versionEnabled"))) {
+            useVersion = true;
         }
         return new DownloadOptions(usePack, useVersion);
     }

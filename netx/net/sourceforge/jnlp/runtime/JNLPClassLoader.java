@@ -626,7 +626,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             tracker.addResource(jars[i].getLocation(),
                                 jars[i].getVersion(),
-                                getDownloadOptionsForJar(jars[i]),
+                                file.getDownloadOptions(),
                                 jars[i].isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE
                                );
         }
@@ -1964,10 +1964,6 @@ public class JNLPClassLoader extends URLClassLoader {
         } else {
             codeBaseLoader.addURL(u);
         }
-    }
-
-    private DownloadOptions getDownloadOptionsForJar(JARDesc jar) {
-        return file.getDownloadOptionsForJar(jar);
     }
 
     /**

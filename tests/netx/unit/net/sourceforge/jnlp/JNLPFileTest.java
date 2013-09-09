@@ -45,6 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import net.sourceforge.jnlp.JNLPFile.Match;
+import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.mock.MockJNLPFile;
 
 import org.junit.Assert;
@@ -207,5 +208,72 @@ public class JNLPFileTest {
         Assert.assertEquals("general", properties.get("general"));
         Assert.assertEquals("os2", properties.get("os"));
         Assert.assertEquals("arch2", properties.get("arch"));
+    }
+
+    @Bug(id={"PR1533"})
+    @Test
+    public void testDownloadOptionsAppliedEverywhere() throws MalformedURLException, ParseException {
+        String os = System.getProperty("os.name");
+        String arch = System.getProperty("os.arch");
+
+        String jnlpContents = "<?xml version='1.0'?>\n" +
+                "<jnlp spec='1.5' href='foo' codebase='bar'>\n" +
+                "  <information>\n" +
+                "    <title>Parsing Test</title>\n" +
+                "    <vendor>IcedTea</vendor>\n" +
+                "    <offline-allowed/>\n" +
+                "  </information>\n" +
+                "  <resources>\n" +
+                "    <property name='jnlp.packEnabled' value='false'/>" +
+                "    <property name='jnlp.versionEnabled' value='false'/>" +
+                "  </resources>\n" +
+                "  <resources os='" + os + "'>" +
+                "    <property name='jnlp.packEnabled' value='true'/>" +
+                "  </resources>\n" +
+                "  <resources arch='" + arch + "'>" +
+                "    <property name='jnlp.versionEnabled' value='true'/>" +
+                "  </resources>\n" +
+                "  <installer-desc/>\n" +
+                "</jnlp>";
+
+        URL codeBase = new URL("http://icedtea.classpath.org");
+        InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
+        JNLPFile jnlpFile = new JNLPFile(is, codeBase, new ParserSettings(false,false,false));
+        DownloadOptions downloadOptions = jnlpFile.getDownloadOptions();
+
+        Assert.assertTrue(downloadOptions.useExplicitPack());
+        Assert.assertTrue(downloadOptions.useExplicitVersion());
+    }
+
+    @Bug(id={"PR1533"})
+    @Test
+    public void testDownloadOptionsFilteredOut() throws MalformedURLException, ParseException {
+         String jnlpContents = "<?xml version='1.0'?>\n" +
+                "<jnlp spec='1.5' href='foo' codebase='bar'>\n" +
+                "  <information>\n" +
+                "    <title>Parsing Test</title>\n" +
+                "    <vendor>IcedTea</vendor>\n" +
+                "    <offline-allowed/>\n" +
+                "  </information>\n" +
+                "  <resources>\n" +
+                "    <property name='jnlp.packEnabled' value='false'/>" +
+                "    <property name='jnlp.versionEnabled' value='false'/>" +
+                "  </resources>\n" +
+                "  <resources os='someOtherOs'>" +
+                "    <property name='jnlp.packEnabled' value='true'/>" +
+                "  </resources>\n" +
+                "  <resources arch='someOtherArch'>" +
+                "    <property name='jnlp.versionEnabled' value='true'/>" +
+                "  </resources>\n" +
+                "  <installer-desc/>\n" +
+                "</jnlp>";
+
+        URL codeBase = new URL("http://icedtea.classpath.org");
+        InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
+        JNLPFile jnlpFile = new JNLPFile(is, codeBase, new ParserSettings(false,false,false));
+        DownloadOptions downloadOptions = jnlpFile.getDownloadOptions();
+
+        Assert.assertFalse(downloadOptions.useExplicitPack());
+        Assert.assertFalse(downloadOptions.useExplicitVersion());
     }
 }
