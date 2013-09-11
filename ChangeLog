@@ -1,3 +1,21 @@
+2013-09-11  Jacob Wisor  <gitne@gmx.de>
+
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java
+	Made temporary files location JFileChooser open at the currently specified location
+	Made temporary files location JFileChooser display a helpful title
+	Removed misleading "All Files" file filter from JFileChooser
+	* netx/net/sourceforge/jnlp/resources/Messages.properties
+	Added new message to resources for JFileChooser's choose button
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties
+	Added new message to resources for JFileChooser's choose button
+	Fixed a few inconsistent messages in resource files
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties
+	Added new message to resources for JFileChooser's choose button
+	Fixed a few inconsistent messages in resource files
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties
+	Added new message to resources for JFileChooser's choose button
+	Fixed a few inconsistent messages in resource files
+
 2013-09-09  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPFile.java

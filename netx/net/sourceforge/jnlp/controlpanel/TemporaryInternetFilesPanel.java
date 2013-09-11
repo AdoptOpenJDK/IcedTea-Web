@@ -109,10 +109,12 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
         bLocation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
+                JFileChooser fileChooser = new JFileChooser(location.getText());
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileChooser.setFileHidingEnabled(false);
-                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                fileChooser.setDialogTitle(Translator.R("TIFPLocationLabel"));
+                if (fileChooser.showDialog(null, Translator.R("TIFPFileChooserChooseButton")) == JFileChooser.APPROVE_OPTION) {
                     // Check if we have permission to write to that location.
                     String result = fileChooser.getSelectedFile().getAbsolutePath();
                     File dirLocation = new File(result);
