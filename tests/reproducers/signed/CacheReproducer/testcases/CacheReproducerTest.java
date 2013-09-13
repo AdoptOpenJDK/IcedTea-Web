@@ -51,6 +51,7 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.config.Defaults;
+import net.sourceforge.jnlp.tools.MessageProperties;
 import org.junit.AfterClass;
 import org.junit.Assert;
 
@@ -76,17 +77,6 @@ public class CacheReproducerTest {
             "netx" + File.separator +
             "locks" + File.separator +
             "netx_running");
-
-    private static final String messageResourcePath = "net/sourceforge/jnlp/resources/Messages.properties";
-    private static PropertyResourceBundle messageBundle = null;
-
-    static {
-        try {
-            messageBundle =
-                new PropertyResourceBundle(CacheReproducerTest.class.getClassLoader().getResourceAsStream(messageResourcePath));
-        } catch (IOException e) {
-        }
-    }
 
     String testS = "#netx file\n"
                + "#Mon Dec 12 16:20:46 CET 2011\n"
@@ -284,7 +274,7 @@ public class CacheReproducerTest {
         Thread.sleep(1000);
         pr = tryToClearcache();
 
-        String cacheClearError = messageBundle.getString("CCannotClearCache");
+        String cacheClearError = MessageProperties.getMessage("CCannotClearCache");
         Assert.assertTrue("Stderr should contain " + cacheClearError + ", but did not.", pr.stderr.contains(cacheClearError));
         assertCacheIsNotEmpty();
     }
@@ -325,7 +315,6 @@ public class CacheReproducerTest {
     }
 
     @Test
-    @KnownToFail
     public void testAlreadyLoadedCached11() throws Exception {
         testsBody(CR11, 1);
         testsBody(CR11, 2);

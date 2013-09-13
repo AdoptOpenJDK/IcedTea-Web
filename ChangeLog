@@ -1,3 +1,12 @@
+2013-09-13  Andrew Azores  <aazores@redhat.com>
+
+	* tests/test-extensions/net/sourceforge/jnlp/tools/MessageProperties.java:
+	new utility class to handle retrieving localized messages for reproducers
+	* tests/reproducers/signed/CacheReproducer/testcases/CacheReproducerTest.java:
+	refactored to use new MessageProperties class
+	* tests/test-extensions-tests/net/sourceforge/jnlp/MessagePropertiesTest.java:
+	tests for new MessageProperties class
+
 2013-09-11  Jacob Wisor  <gitne@gmx.de>
 
 	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java
