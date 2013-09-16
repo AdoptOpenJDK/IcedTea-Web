@@ -120,8 +120,6 @@ public class ResourcesTest extends  BrowserTest{
     @TestInBrowsers(testIn = Browsers.all)
     public void testBrowser3() throws Exception {
         testBrowser(server.getCurrentBrowser());
-
-
     }
 
     @Test
@@ -215,10 +213,6 @@ public class ResourcesTest extends  BrowserTest{
         bf = new BrowserFactory(s);
         expected = 2;
         Assert.assertTrue("Created from  " + s + "there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
-
-
-
-
     }
 
     @Test
@@ -274,13 +268,11 @@ public class ResourcesTest extends  BrowserTest{
 
             @Override
             public void charReaded(char ch) {
-                //ServerAccess.logOutputReprint("OO recieved char: "+ch);
                 o1.append(ch);
             }
 
             @Override
             public void lineReaded(String s) {
-                //ServerAccess.logOutputReprint("OO recieved line: "+s);
                 o2.append(s).append("\n");
             }
         };
@@ -288,30 +280,23 @@ public class ResourcesTest extends  BrowserTest{
 
             @Override
             public void charReaded(char ch) {
-                //ServerAccess.logOutputReprint("EE recieved char: "+ch);
                 e1.append(ch);
             }
 
             @Override
             public void lineReaded(String s) {
-                //ServerAccess.logOutputReprint("EE recieved line: "+s);
                 e2.append(s).append("\n");
             }
         };
        ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html",lo,le);
-        server.setCurrentBrowser(BrowserFactory.getFactory().getFirst().getID());
-        Assert.assertNotNull(server.getCurrentBrowsers());
-        Assert.assertNotNull(server.getCurrentBrowser());
-//        ServerAccess.logOutputReprint("total o");
-//        ServerAccess.logOutputReprint(pr.stdout);
-//        ServerAccess.logOutputReprint("total e");
-//        ServerAccess.logOutputReprint(pr.stderr);
+       server.setCurrentBrowser(BrowserFactory.getFactory().getFirst().getID());
+       Assert.assertNotNull(server.getCurrentBrowsers());
+       Assert.assertNotNull(server.getCurrentBrowser());
        Assert.assertEquals(pr.stdout, o1.toString());
        Assert.assertEquals(pr.stderr, e1.toString());
        //the last \n is mandatory as las tline is flushed also when proces dies
        Assert.assertEquals(pr.stdout.replace("\n", ""), o2.toString().replace("\n", ""));
        Assert.assertEquals(pr.stderr.replace("\n", ""), e2.toString().replace("\n", ""));
-
     }
 
     private void testFullFactory(BrowserFactory bf) {
@@ -324,36 +309,35 @@ public class ResourcesTest extends  BrowserTest{
     }
 
     private void testBrowser(Browser browser) throws IOException {
-        File f1 = null;
+        File defaultPluginDir = null;
         if (browser.getDefaultPluginExpectedLocation() != null) {
-            f1 = new File(browser.getDefaultPluginExpectedLocation());
+            defaultPluginDir = new File(browser.getDefaultPluginExpectedLocation());
         }
-        File f2 = null;
+        if (defaultPluginDir != null) {
+            Assert.assertTrue("browser's plugins  location should exist " + defaultPluginDir.toString() + " for " + browser.getID().toString(), defaultPluginDir.exists());
+        }
+
+        File userPluginDir = null;
         if (browser.getUserDefaultPluginExpectedLocation() != null) {
-            f2 = new File(browser.getUserDefaultPluginExpectedLocation());
+            userPluginDir = new File(browser.getUserDefaultPluginExpectedLocation());
         }
-        if (f1 != null) {
-            Assert.assertTrue("browser's plugins  location should exist " + f1.toString() + " for " + browser.getID().toString(), f1.exists());
-        }
-        if (f2 != null) {
-            Assert.assertTrue("browser's users-plugins  location should exist " + f2.toString() + " for " + browser.getID().toString(), f2.exists());
+        // userPluginDir (~/.mozilla/plugins/) may not exist if user has not installed any Firefox plugins.
+
+        File[] defaultPlugins = new File[0];
+        if (defaultPluginDir != null && defaultPluginDir.isDirectory()) {
+            defaultPlugins = defaultPluginDir.listFiles();
         }
 
-        File[] ff1 = new File[0];
-        if (f1 != null) {
-            ff1 = f1.listFiles();
+        File[] userPlugins = new File[0];
+        if (userPluginDir != null && userPluginDir.isDirectory()) {
+            userPlugins = userPluginDir.listFiles();
         }
 
-        File[] ff2 = new File[0];
-        if (f2 != null) {
-            ff2 = f2.listFiles();
-        }
+        Assert.assertTrue("at least one of browser's plugins  directory should contains at least one file didn't. For " + browser.getID().toString(), defaultPlugins.length + userPlugins.length > 0);
 
-        Assert.assertTrue("at least one of browser's plugins  directory should contains at least one file didn't. For " + browser.getID().toString(), ff1.length + ff2.length > 0);
-
-        ff1 = new File[0];
-        if (f1 != null) {
-            ff1 = f1.listFiles(new FileFilter() {
+        defaultPlugins = new File[0];
+        if (defaultPluginDir != null && defaultPluginDir.isDirectory()) {
+            defaultPlugins = defaultPluginDir.listFiles(new FileFilter() {
 
                 @Override
                 public boolean accept(File pathname) {
@@ -362,9 +346,9 @@ public class ResourcesTest extends  BrowserTest{
             });
         }
 
-        ff2 = new File[0];
-        if (f2 != null) {
-            ff2 = f2.listFiles(new FileFilter() {
+        userPlugins = new File[0];
+        if (userPluginDir != null && userPluginDir.isDirectory()) {
+            userPlugins = userPluginDir.listFiles(new FileFilter() {
 
                 @Override
                 public boolean accept(File pathname) {
@@ -374,16 +358,16 @@ public class ResourcesTest extends  BrowserTest{
         }
 
         Assert.assertTrue("browser's plugins  directories should contains exactly one  " + LinuxBrowser.DEFAULT_PLUGIN_NAME + ", but didnt for " + browser.getID().toString(),
-                ff1.length + ff2.length == 1);
+                defaultPlugins.length + userPlugins.length == 1);
         String currentPath = server.getJavawsFile().getParentFile().getParentFile().getAbsolutePath();
 
-        File[] ff;
-        if (ff1.length == 1) {
-            ff = ff1;
+        File[] plugins;
+        if (defaultPlugins.length == 1) {
+            plugins = defaultPlugins;
         } else {
-            ff = ff2;
+            plugins = userPlugins;
         }
-        String s = ServerAccess.getContentOfStream(new FileInputStream(ff[0]), "ASCII");
+        String s = ServerAccess.getContentOfStream(new FileInputStream(plugins[0]), "ASCII");
         Assert.assertTrue("browser's plugins  shoud points to" + currentPath + ", but  didnt",
                 s.contains(s));
     }

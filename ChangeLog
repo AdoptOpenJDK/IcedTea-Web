@@ -1,3 +1,11 @@
+2013-09-16  Andrew Azores  <aazores@redhat.com>
+
+	Fix ResourcesTest reproducer.
+	* tests/test-extensions-tests/net/sourceforge/jnlp/ResourcesTest.java:
+	fixed formatting, removed commented lines.
+	(testBrowser): assertion that ~/.mozilla/plugins directory exists removed.
+	Renamed (userPluginDir, defaultPluginDir, userPlugins, defaultPlugins)
+
 2013-09-16  Omair Majid  <omajid@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java
