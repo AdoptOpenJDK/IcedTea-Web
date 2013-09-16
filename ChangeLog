@@ -1,3 +1,12 @@
+2013-09-16  Omair Majid  <omajid@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java
+	(toList): Remove.
+	(checkForMainFileLeakTest): Use Arrays.asList.
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java
+	(toList): Remove.
+	(testToRelativePaths): Use Arrays.asList.
+
 2013-09-16  Jiri Vanek  <jvanek@redhat.com>
 
 	* Makefile.am: returned modified (EXTRA_DIST) variable. It is enriched  for

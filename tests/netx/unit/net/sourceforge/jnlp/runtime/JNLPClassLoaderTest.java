@@ -43,6 +43,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -131,14 +132,6 @@ public class JNLPClassLoaderTest {
         }
     }
 
-    static private <T> List<T> toList(T ... parts) {
-        List<T> list = new ArrayList<T>();
-        for (T part : parts) {
-            list.add(part);
-        }
-        return list;
-    }
-
     /* Note: Although it does a basic check, this mainly checks for file-descriptor leak */
     @Test
     public void checkForMainFileLeakTest() throws Exception {
@@ -152,7 +145,7 @@ public class JNLPClassLoaderTest {
             @Override
             public void run() {
                 try {
-                    classLoader.checkForMain(toList(jnlpFile.jarDesc));
+                    classLoader.checkForMain(Arrays.asList(jnlpFile.jarDesc));
                 } catch (LaunchException e) {
                     fail(e.toString());
                 }
