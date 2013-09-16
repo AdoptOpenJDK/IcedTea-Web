@@ -21,6 +21,8 @@ New in release 1.5 (2013-XX-XX):
 * Plugin
   - PR854: Resizing an applet several times causes 100% CPU load
   - PR1271: icedtea-web does not handle 'javascript:'-protocol URLs
+* Security Updates
+  - CVE-2012-4540, RH869040: Heap-based buffer overflow after triggering event attached to applet
 
 New in release 1.4 (2013-XX-XX):
 * Added cs localization

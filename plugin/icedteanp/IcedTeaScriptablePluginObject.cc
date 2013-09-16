@@ -618,10 +618,7 @@ IcedTeaScriptableJavaObject::invoke(NPObject *npobj, NPIdentifier name_id, const
 
     if (java_result->error_occurred)
     {
-        // error message must be allocated on heap
-        char* error_msg = (char*) malloc(java_result->error_msg->length()*sizeof(char));
-        strcpy(error_msg, java_result->error_msg->c_str());
-        browser_functions.setexception(npobj, error_msg);
+        browser_functions.setexception(npobj, java_result->error_msg->c_str());
         return false;
     }
 
@@ -874,11 +871,7 @@ IcedTeaScriptableJavaObject::construct(NPObject *npobj, const NPVariant *args, u
         createJavaObjectFromVariant(instance, args[i], &id);
         if (id == "0")
         {
-            // error message must be allocated on heap
-            char* error_msg = (char*) malloc(1024*sizeof(char));
-            strcpy(error_msg, "Unable to create argument on Java side");
-
-            browser_functions.setexception(npobj, error_msg);
+            browser_functions.setexception(npobj, "Unable to create argument on Java side");
             return false;
         }
 
@@ -892,12 +885,7 @@ IcedTeaScriptableJavaObject::construct(NPObject *npobj, const NPVariant *args, u
 
     if (java_result->error_occurred)
     {
-        // error message must be allocated on heap
-        int length = java_result->error_msg->length();
-        char* error_msg = (char*) malloc((length+1)*sizeof(char));
-        strcpy(error_msg, java_result->error_msg->c_str());
-
-        browser_functions.setexception(npobj, error_msg);
+        browser_functions.setexception(npobj, java_result->error_msg->c_str());
         return false;
     }
 

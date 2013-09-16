@@ -1,3 +1,10 @@
+2013-09-16  Deepak Bhole <dbhole@redhat.com>
+
+	CVE-2012-4540, RH869040: Heap-based buffer overflow after triggering event
+	attached to applet
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: Removed unnecessary
+	heap allocations.
+
 2013-09-13  Andrew Azores  <aazores@redhat.com>
 
 	* tests/test-extensions/net/sourceforge/jnlp/tools/MessageProperties.java:
