@@ -1,3 +1,9 @@
+2013-09-16  Jiri Vanek  <jvanek@redhat.com>
+
+	* Makefile.am: returned modified (EXTRA_DIST) variable. It is enriched  for
+	netx-dist-tests-whitelist and NEW_LINE_IFS to enable reproducers tests
+	in dist tarball.
+
 2013-09-16  Deepak Bhole <dbhole@redhat.com>
 
 	CVE-2012-4540, RH869040: Heap-based buffer overflow after triggering event
