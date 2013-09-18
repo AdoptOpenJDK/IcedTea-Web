@@ -132,10 +132,10 @@ public class JEditorPaneBasedExceptionDialogTest {
         JEditorPaneBasedExceptionDialog d2 = new JEditorPaneBasedExceptionDialog(null, false, ex, ec, null);
         JEditorPaneBasedExceptionDialog d3 = new JEditorPaneBasedExceptionDialog(null, false, ex, null, ai);
         JEditorPaneBasedExceptionDialog d4 = new JEditorPaneBasedExceptionDialog(null, false, null, ec, ai);
-        Assert.assertTrue("message from dialog mus be same as pattern", d1.getMessage().equals(s1));
-        Assert.assertTrue("message from dialog mus be same as pattern", d2.getMessage().equals(s2));
-        Assert.assertTrue("message from dialog mus be same as pattern", d3.getMessage().equals(s3));
-        Assert.assertTrue("message from dialog mus be same as pattern", d4.getMessage().equals(s4));
+        Assert.assertTrue("message from dialog must be same as pattern", d1.getMessage().equals(s1));
+        Assert.assertTrue("message from dialog must be same as pattern", d2.getMessage().equals(s2));
+        Assert.assertTrue("message from dialog must be same as pattern", d3.getMessage().equals(s3));
+        Assert.assertTrue("message from dialog must be same as pattern", d4.getMessage().equals(s4));
 
     }
 
