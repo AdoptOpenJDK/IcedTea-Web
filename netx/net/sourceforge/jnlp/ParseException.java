@@ -30,9 +30,7 @@ public class ParseException extends Exception {
     // todo: add meaningful information, such as the invalid
     // element, parse position, etc.
 
-    /** the original exception */
-    private Throwable cause = null;
-
+   
     /**
      * Create a parse exception with the specified message.
      */
@@ -45,44 +43,7 @@ public class ParseException extends Exception {
      * cause.
      */
     public ParseException(String message, Throwable cause) {
-        super(message);
-
-        // replace with setCause when no longer 1.3 compatible
-        this.cause = cause;
-    }
-
-    /**
-     * Return the cause of the launch exception or null if there
-     * is no cause exception.
-     */
-    public Throwable getCause() {
-        return cause;
-    }
-
-    /**
-     * Print the stack trace and the cause exception (1.3
-     * compatible)
-     */
-    public void printStackTrace(PrintStream stream) {
-        super.printStackTrace(stream);
-
-        if (cause != null) {
-            stream.println("Caused by: ");
-            cause.printStackTrace(stream);
-        }
-    }
-
-    /**
-     * Print the stack trace and the cause exception (1.3
-     * compatible)
-     */
-    public void printStackTrace(PrintWriter stream) {
-        super.printStackTrace(stream);
-
-        if (cause != null) {
-            stream.println("Caused by: ");
-            cause.printStackTrace(stream);
-        }
-    }
+        super(message, cause);
+    }  
 
 }
