@@ -1,3 +1,12 @@
+2013-09-19  Jana Fabrikova  <jfabriko@redhat.com>
+
+	Added text only reports from reproducers and unit tests run
+	* tests/report-styles/textreport.xls:
+	style for generating summary output in summary_reproducers.txt
+	and summary_unit.txt
+	* Makefile.am:
+	added generating the text reports in run-netx-dist-tests goal
+
 2013-09-18  Jiri Vanek  <jvanek@redhat.com>
 
 	Removed java 1.3 comaptible (redundant) code from  ParseException
