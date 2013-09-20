@@ -1,3 +1,14 @@
+2013-09-20  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/InformationDesc.java
+	(InformationDesc): Remove JNLPFile argument.
+	(getJNLPFile): Remove.
+	* netx/net/sourceforge/jnlp/JNLPFile.java
+	(getInformation): Adjust to new InformationDesc constructor.
+	* netx/net/sourceforge/jnlp/Parser.java
+	(getInformation): Likewise.
+	* tests/netx/unit/net/sourceforge/jnlp/InformationDescTest.java: New file.
+
 2013-09-19  Jana Fabrikova  <jfabriko@redhat.com>
 
 	Added text only reports from reproducers and unit tests run

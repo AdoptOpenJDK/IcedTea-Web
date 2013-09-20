@@ -52,17 +52,13 @@ public class InformationDesc {
     /** the data as list of key,value pairs */
     private List<Object> info;
 
-    /** the JNLPFile this information is for */
-    private JNLPFile jnlpFile;
 
     /**
      * Create an information element object.
      *
-     * @param jnlpFile file that the information is for
      * @param locales the locales the information is for
      */
-    public InformationDesc(JNLPFile jnlpFile, Locale locales[]) {
-        this.jnlpFile = jnlpFile;
+    public InformationDesc(Locale locales[]) {
         this.locales = locales;
     }
 
@@ -171,6 +167,8 @@ public class InformationDesc {
             }
         }
 
+        // FIXME if there's no larger icon, choose the closest smaller icon
+        // instead of the first
         if (best == null)
             best = icons[0];
 
@@ -182,13 +180,6 @@ public class InformationDesc {
      */
     public Locale[] getLocales() {
         return locales;
-    }
-
-    /**
-     * Returns the JNLPFile the information is for.
-     */
-    public JNLPFile getJNLPFile() {
-        return jnlpFile;
     }
 
     /**
