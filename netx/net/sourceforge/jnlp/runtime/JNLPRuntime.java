@@ -265,7 +265,7 @@ public class JNLPRuntime {
 
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
-        ProxySelector.setDefault(new BrowserAwareProxySelector());
+        ProxySelector.setDefault(new BrowserAwareProxySelector(config));
 
         // Restrict access to netx classes
         Security.setProperty("package.access", 

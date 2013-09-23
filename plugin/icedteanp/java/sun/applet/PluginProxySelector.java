@@ -43,6 +43,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.util.TimedHashMap;
 
@@ -58,6 +59,10 @@ import net.sourceforge.jnlp.util.TimedHashMap;
 public class PluginProxySelector extends JNLPProxySelector {
 
     private TimedHashMap<String, Proxy> proxyCache = new TimedHashMap<String, Proxy>();
+
+    public PluginProxySelector(DeploymentConfiguration config) {
+        super(config);
+    }
 
     /**
      * Selects the appropriate proxy (or DIRECT connection method) for the given URI

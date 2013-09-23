@@ -36,8 +36,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.naming.ConfigurationException;
-import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 
+import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 
@@ -126,6 +126,8 @@ public final class DeploymentConfiguration {
     /*
      * Networking
      */
+
+    /** the proxy type. possible values are {@code JNLPProxySelector.PROXY_TYPE_*} */
     public static final String KEY_PROXY_TYPE = "deployment.proxy.type";
     public static final String KEY_PROXY_SAME = "deployment.proxy.same";
     public static final String KEY_PROXY_AUTO_CONFIG_URL = "deployment.proxy.auto.config.url";

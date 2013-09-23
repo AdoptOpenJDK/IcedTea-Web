@@ -82,19 +82,14 @@ public abstract class JNLPProxySelector extends ProxySelector {
     // FIXME what is this? where should it be used?
     private String overrideHosts = null;
 
-    /**
-     * Creates a new JNLPProxySelector.
-     */
-    public JNLPProxySelector() {
-        parseConfiguration();
+    public JNLPProxySelector(DeploymentConfiguration config) {
+        parseConfiguration(config);
     }
 
     /**
      * Initialize this ProxySelector by reading the configuration
      */
-    private void parseConfiguration() {
-        DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-
+    private void parseConfiguration(DeploymentConfiguration config) {
         proxyType = Integer.valueOf(config.getProperty(DeploymentConfiguration.KEY_PROXY_TYPE));
 
         String autoConfigString = config.getProperty(DeploymentConfiguration.KEY_PROXY_AUTO_CONFIG_URL);
@@ -240,7 +235,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
                     return true;
                 }
             } else if (scheme.equals("socket")) {
-                String host = uri.getSchemeSpecificPart().split(":")[0];
+                String host = uri.getHost();
 
                 if (bypassLocal && isLocalHost(host)) {
                     return true;
@@ -368,7 +363,8 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * suitable for java.
      * @param pacString a string indicating proxies. For example
      * "PROXY foo.bar:3128; DIRECT"
-     * @return a list of Proxy objects represeting the parsed string.
+     * @return a list of Proxy objects representing the parsed string. In
+     * case of malformed input, an empty list may be returned
      */
     public static List<Proxy> getProxiesFromPacResult(String pacString) {
         List<Proxy> proxies = new ArrayList<Proxy>();

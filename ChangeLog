@@ -1,3 +1,26 @@
+2013-09-23  Omair Majid  <omajid@rehdat.com>
+
+	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java
+	(BrowserAwareProxySelector): Rename to...
+	(BrowserAwareProxySelector(DeploymentConfiguration)): New method.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: Clarify
+	possible values for KEY_PROXY_TYPE.
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java
+	(JNLPProxySelector): Rename to...
+	(JNLPProxySelector(DeploymentConfiguration)): New method.
+	(parseConfiguration): Rename to...
+	(parseConfiguration(DeploymentConfiguration)): New method.
+	(inBypassList): Get host from URI instead of manual hacks.
+	(getProxiesFromPacResult): Clarify return value.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Adjust for new BrowserAwareProxySelector constructor.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java
+	(init): Adjust for new PluginProxySelector constructor.
+	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
+	(PluginProxySelector): New constructor.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPProxySelectorTest.java:
+	New file.
+
 2013-09-20  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/InformationDesc.java

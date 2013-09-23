@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.PacEvaluator;
@@ -92,8 +93,8 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
     /**
      * Create a new instance of this class, reading configuration fropm the browser
      */
-    public BrowserAwareProxySelector() {
-        super();
+    public BrowserAwareProxySelector(DeploymentConfiguration config) {
+        super(config);
         try {
             initFromBrowserConfig();
         } catch (IOException e) {

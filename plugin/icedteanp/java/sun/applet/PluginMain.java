@@ -231,7 +231,7 @@ public class PluginMain {
             Authenticator.setDefault(new JNLPAuthenticator());
         }
         // override the proxy selector set by JNLPRuntime
-        ProxySelector.setDefault(new PluginProxySelector());
+        ProxySelector.setDefault(new PluginProxySelector(JNLPRuntime.getConfiguration()));
     }
 
     private static void setCookieHandler(PluginStreamHandler streamHandler) {
