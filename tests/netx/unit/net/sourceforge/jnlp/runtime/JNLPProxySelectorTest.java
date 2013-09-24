@@ -45,7 +45,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
-import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -116,9 +115,11 @@ public class JNLPProxySelectorTest {
         assertEquals(Proxy.NO_PROXY, result.get(0));
     }
 
+    // TODO implement this
+    @Ignore("Implement this")
     @Test
     public void testLocalProxyBypassListIsIgnoredForNonLocal() {
-
+        fail();
     }
 
     @Test
@@ -210,6 +211,23 @@ public class JNLPProxySelectorTest {
     }
 
     @Test
+    public void testHttpFallsBackToManualSocksProxy() throws URISyntaxException {
+        String SOCKS_HOST = "example.org";
+        int SOCKS_PORT = 42;
+
+        DeploymentConfiguration config = new DeploymentConfiguration();
+        config.setProperty(DeploymentConfiguration.KEY_PROXY_TYPE, String.valueOf(JNLPProxySelector.PROXY_TYPE_MANUAL));
+        config.setProperty(DeploymentConfiguration.KEY_PROXY_SOCKS4_HOST, SOCKS_HOST);
+        config.setProperty(DeploymentConfiguration.KEY_PROXY_SOCKS4_PORT, String.valueOf(SOCKS_PORT));
+
+        JNLPProxySelector selector = new TestProxySelector(config);
+        List<Proxy> result = selector.select(new URI("http://example.org/"));
+
+        assertEquals(1, result.size());
+        assertEquals(new Proxy(Type.SOCKS, new InetSocketAddress(SOCKS_HOST, SOCKS_PORT)), result.get(0));
+    }
+
+    @Test
     public void testManualUnknownProtocolProxy() throws URISyntaxException {
         DeploymentConfiguration config = new DeploymentConfiguration();
         config.setProperty(DeploymentConfiguration.KEY_PROXY_TYPE, String.valueOf(JNLPProxySelector.PROXY_TYPE_MANUAL));
@@ -239,11 +257,6 @@ public class JNLPProxySelectorTest {
 
         assertEquals(1, result.size());
         assertEquals(new Proxy(Type.HTTP, new InetSocketAddress(HTTP_HOST, HTTP_PORT)), result.get(0));
-
-        result = selector.select(new URI("socket://example.org/"));
-
-        assertEquals(1, result.size());
-        assertEquals(new Proxy(Type.SOCKS, new InetSocketAddress(HTTP_HOST, HTTP_PORT)), result.get(0));
     }
 
     @Test

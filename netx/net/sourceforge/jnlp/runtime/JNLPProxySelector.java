@@ -298,27 +298,28 @@ public abstract class JNLPProxySelector extends ProxySelector {
         String scheme = uri.getScheme();
 
         if (sameProxy) {
-            SocketAddress sa = new InetSocketAddress(proxyHttpHost, proxyHttpPort);
-            Proxy proxy;
-            if (scheme.equals("socket")) {
-                proxy = new Proxy(Type.SOCKS, sa);
-            } else {
-                proxy = new Proxy(Type.HTTP, sa);
+            if (proxyHttpHost != null && (scheme.equals("https") || scheme.equals("http") || scheme.equals("ftp"))) {
+                SocketAddress sa = new InetSocketAddress(proxyHttpHost, proxyHttpPort);
+                Proxy proxy = new Proxy(Type.HTTP, sa);
+                proxies.add(proxy);
             }
-            proxies.add(proxy);
-        } else if (scheme.equals("http")) {
+        } else if (scheme.equals("http") && proxyHttpHost != null) {
             SocketAddress sa = new InetSocketAddress(proxyHttpHost, proxyHttpPort);
             proxies.add(new Proxy(Type.HTTP, sa));
-        } else if (scheme.equals("https")) {
+        } else if (scheme.equals("https") && proxyHttpsHost != null) {
             SocketAddress sa = new InetSocketAddress(proxyHttpsHost, proxyHttpsPort);
             proxies.add(new Proxy(Type.HTTP, sa));
-        } else if (scheme.equals("ftp")) {
+        } else if (scheme.equals("ftp") && proxyFtpHost != null) {
             SocketAddress sa = new InetSocketAddress(proxyFtpHost, proxyFtpPort);
             proxies.add(new Proxy(Type.HTTP, sa));
-        } else if (scheme.equals("socket")) {
+        }
+
+        if (proxySocks4Host != null) {
             SocketAddress sa = new InetSocketAddress(proxySocks4Host, proxySocks4Port);
             proxies.add(new Proxy(Type.SOCKS, sa));
-        } else {
+        }
+
+        if (proxies.size() == 0) {
             proxies.add(Proxy.NO_PROXY);
         }
 

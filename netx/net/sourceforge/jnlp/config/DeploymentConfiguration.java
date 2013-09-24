@@ -129,7 +129,10 @@ public final class DeploymentConfiguration {
 
     /** the proxy type. possible values are {@code JNLPProxySelector.PROXY_TYPE_*} */
     public static final String KEY_PROXY_TYPE = "deployment.proxy.type";
+
+    /** Boolean. If true, the http host/port should be used for https and ftp as well */
     public static final String KEY_PROXY_SAME = "deployment.proxy.same";
+
     public static final String KEY_PROXY_AUTO_CONFIG_URL = "deployment.proxy.auto.config.url";
     public static final String KEY_PROXY_BYPASS_LIST = "deployment.proxy.bypass.list";
     public static final String KEY_PROXY_BYPASS_LOCAL = "deployment.proxy.bypass.local";

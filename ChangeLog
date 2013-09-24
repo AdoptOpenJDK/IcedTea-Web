@@ -1,3 +1,16 @@
+2013-09-24  Omair Majid  <omajid@redhat.com>
+
+	PR1474
+	* NEWS: Update with bug.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: Document
+	KEY_PROXY_SAME.
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java
+	(getFromConfiguration): Same proxy is not applicable to SOCKS. Always
+	include SOCKS proxy if available.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPProxySelectorTest.java
+	(testHttpFallsBackToManualSocksProxy): New method.
+	(testManualSameProxy): Remove test for socket protocol.
+
 2013-09-23  Omair Majid  <omajid@rehdat.com>
 
 	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java
