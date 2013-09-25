@@ -37,16 +37,15 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
-import java.io.PrintStream;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public abstract class AbstractLaunchHandler implements LaunchHandler {
 
-    protected final PrintStream outputStream;
+    protected final OutputController logger;
 
-    public AbstractLaunchHandler(PrintStream outputStream) {
-        this.outputStream = outputStream;
+    public AbstractLaunchHandler(OutputController logger) {
+        this.logger = logger;
     }
 
     /**
@@ -63,11 +62,10 @@ public abstract class AbstractLaunchHandler implements LaunchHandler {
         if (ex.getCause() != null) {
             result.append(recursiveDescription(ex.getCause()));
         }
-        outputStream.println(result);
+        logger.log(OutputController.Level.MESSAGE_ALL, result.toString());
 
-        if (JNLPRuntime.isDebug()) {
-            ex.printStackTrace(outputStream);
-        }
+        logger.log(ex);
+        
     }
 
     private String recursiveDescription(Throwable throwable) {

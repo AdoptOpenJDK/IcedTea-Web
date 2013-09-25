@@ -52,9 +52,9 @@ import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.UnsignedAppletTrustWarningPanel.UnsignedWarningAction;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class UnsignedAppletTrustConfirmation {
-    static private final boolean DEBUG = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
 
     private static final AppletStartupSecuritySettings securitySettings = AppletStartupSecuritySettings.getInstance();
 
@@ -158,27 +158,21 @@ public class UnsignedAppletTrustConfirmation {
             userActionStorage.unlock();
         }
     }
-    static private void debug(String logMessage) {
-        if (DEBUG) {
-            System.err.println(logMessage);
-        }
-            
-    }
 
     public static void checkUnsignedWithUserIfRequired(PluginBridge file) throws LaunchException {
 
         if (unsignedAppletsAreForbidden()) {
-            debug("Not running unsigned applet at " + file.getCodeBase() +" because unsigned applets are disallowed by security policy.");
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Not running unsigned applet at " + file.getCodeBase() +" because unsigned applets are disallowed by security policy.");
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletPolicyDenied"));
         }
 
         if (!unsignedConfirmationIsRequired()) {
-            debug("Running unsigned applet at " + file.getCodeBase() +" does not require confirmation according to security policy.");
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running unsigned applet at " + file.getCodeBase() +" does not require confirmation according to security policy.");
             return;
         }
 
         ExecuteUnsignedApplet storedAction = getStoredAction(file);
-        debug("Stored action for unsigned applet at " + file.getCodeBase() +" was " + storedAction);
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Stored action for unsigned applet at " + file.getCodeBase() +" was " + storedAction);
 
         boolean appletOK;
 
@@ -197,7 +191,7 @@ public class UnsignedAppletTrustConfirmation {
                 updateAppletAction(file, executeAction, warningResponse.rememberForCodeBase());
             }
 
-            debug("Decided action for unsigned applet at " + file.getCodeBase() +" was " + executeAction);
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for unsigned applet at " + file.getCodeBase() +" was " + executeAction);
         }
 
         if (!appletOK) {

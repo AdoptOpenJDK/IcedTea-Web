@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -226,15 +227,16 @@ public class Resource {
             this.status |= add;
         }
 
-        if (JNLPRuntime.isDebug())
-            if (status != orig) {
-                System.out.print("Status: " + getStatusString(status));
-                if ((status & ~orig) != 0)
-                    System.out.print(" +(" + getStatusString(status & ~orig) + ")");
-                if ((~status & orig) != 0)
-                    System.out.print(" -(" + getStatusString(~status & orig) + ")");
-                System.out.println(" @ " + location.getPath());
+           if (status != orig) {
+            OutputController.getLogger().log("Status: " + getStatusString(status));
+            if ((status & ~orig) != 0) {
+                OutputController.getLogger().log(" +(" + getStatusString(status & ~orig) + ")");
             }
+            if ((~status & orig) != 0) {
+                OutputController.getLogger().log(" -(" + getStatusString(~status & orig) + ")");
+            }
+            OutputController.getLogger().log(" @ " + location.getPath());
+        }
     }
 
     /**

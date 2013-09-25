@@ -23,6 +23,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Updates the property as it happens.
@@ -94,8 +95,7 @@ public class DocumentAdapter implements DocumentListener {
                 config.setProperty(property, value);
             }
         } catch (BadLocationException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
         }
     }
 

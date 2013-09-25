@@ -55,6 +55,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.StreamUtils;
 
 @SuppressWarnings("serial")
@@ -254,12 +255,12 @@ public class JVMPanel extends NamedBorderPanel {
             processErrorStream = StreamUtils.readStreamAsString(p.getErrorStream());
             processStdOutStream = StreamUtils.readStreamAsString(p.getInputStream());
             r = p.exitValue();
-            System.err.println(processErrorStream);
-            System.out.println(processStdOutStream);
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, processErrorStream);
+            OutputController.getLogger().log(processStdOutStream);
             processErrorStream = processErrorStream.toLowerCase();
             processStdOutStream = processStdOutStream.toLowerCase();
         } catch (Exception ex) {;
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
 
         }
         if (r == null) {

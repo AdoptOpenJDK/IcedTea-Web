@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Maintains information about a CertPath that has signed at least one of the
@@ -163,8 +164,7 @@ public class CertInformation {
      */
     public void setNumJarEntriesSigned(String jarName, int signedEntriesCount) {
         if (signedJars.containsKey(jarName)) {
-            if (JNLPRuntime.isDebug())
-                System.err.println("WARNING: A jar that has already been "
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "WARNING: A jar that has already been "
                         + "verified is being yet again verified: " + jarName);
         } else {
             signedJars.put(jarName, signedEntriesCount);

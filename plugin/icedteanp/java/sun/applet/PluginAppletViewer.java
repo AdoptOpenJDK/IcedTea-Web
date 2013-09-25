@@ -122,6 +122,7 @@ import sun.awt.X11.XEmbeddedFrame;
 import sun.misc.Ref;
 
 import com.sun.jndi.toolkit.url.UrlUtil;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /*
  */
@@ -268,7 +269,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         try {
             SwingUtilities.invokeAndWait(new SplashCreator(fPanel));
         } catch (Exception e) {
-            e.printStackTrace(); // Not much we can do other than  print
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e); // Not much we can do other than  print
         }
 
     }
@@ -298,7 +299,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace(); // Not much we can do other than print
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e); // Not much we can do other than print
         }
     }
 
@@ -325,7 +326,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace(); // Not much we can do other than print
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e); // Not much we can do other than print
         }
     }
 
@@ -550,7 +551,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             }
         } catch (Exception e) {
 
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
 
             // If an exception happened during pre-init, we need to update status
             updateStatus(identifier, PAV_INIT_STATUS.INACTIVE);
@@ -835,8 +836,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 return ref;
             }
         } catch (Exception e) {
-            System.err.println("Error occurred when trying to fetch image:");
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Error occurred when trying to fetch image:");
+            OutputController.getLogger().log(e);
             return null;
         }
     }
@@ -1213,7 +1214,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                             " " + encodedURI, reference);
 
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
             return null;
         }
 
@@ -1255,7 +1256,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             requestURI = UrlUtil.encode(scheme + "://" + uri.getHost() + port + "/" + uri.getPath(), "UTF-8");
         } catch (Exception e) {
             PluginDebug.debug("Cannot construct URL from ", uri.toString(), " ... falling back to DIRECT proxy");
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
             return null;
         }
 

@@ -46,6 +46,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
@@ -73,9 +74,7 @@ public class MalformedXMLParser extends XMLParser {
      */
     @Override
     public Node getRootNode(InputStream input) throws ParseException {
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Using MalformedXMLParser");
-        }
+        OutputController.getLogger().log("Using MalformedXMLParser");
         InputStream xmlInput = xmlizeInputStream(input);
         return super.getRootNode(xmlInput);
     }

@@ -19,6 +19,7 @@ package net.sourceforge.jnlp;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This class reads the output from a launched process and writes it to stdout.
@@ -32,12 +33,22 @@ public class StreamEater extends Thread {
 
     public void run() {
         try {
+            StringBuilder s = new StringBuilder();
             while (true) {
                 int c = stream.read();
-                if (c == -1)
+                if (c == -1){
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, s.toString());
                     break;
-
-                System.out.write(c);
+                } else {
+                    char ch = (char) c;
+                    if (ch == '\n'){
+                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, s.toString());
+                        s = new StringBuilder();
+                    }else {
+                        s.append((char) c);
+                    }
+                }
+                
             }
         } catch (IOException ex) {
         }

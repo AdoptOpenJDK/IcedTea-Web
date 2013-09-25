@@ -42,70 +42,94 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import org.junit.Test;
 
 public class DefaultLaunchHandlerTest {
 
+    private static class LocalLogger extends OutputController {
+
+        private static class AccessibleStream extends PrintStream {
+
+            public AccessibleStream(ByteArrayOutputStream out) {
+                super(out);
+            }
+
+            public ByteArrayOutputStream getOut() {
+                return (ByteArrayOutputStream) out;
+            }
+        }
+
+        LocalLogger() {
+            super(new AccessibleStream(new ByteArrayOutputStream()), new AccessibleStream(new ByteArrayOutputStream()));
+        }
+
+        public String getStream1() {
+            return ((AccessibleStream) (super.getOut())).getOut().toString();
+        }
+
+        public String getStream2() {
+            return ((AccessibleStream) (super.getErr())).getOut().toString();
+        }
+    }
+
     @Test
     public void testBasicLaunch() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DefaultLaunchHandler handler = new DefaultLaunchHandler(new PrintStream(baos));
+        LocalLogger l = new LocalLogger();
+        DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         // all no-ops with no output
         handler.launchInitialized(null);
         handler.launchStarting(null);
         handler.launchCompleted(null);
 
-        String output = baos.toString();
-        assertEquals("", output);
+        assertEquals("", l.getStream1());
+        assertEquals("", l.getStream2());
     }
 
     @Test
     public void testLaunchWarning() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DefaultLaunchHandler handler = new DefaultLaunchHandler(new PrintStream(baos));
+        LocalLogger l = new LocalLogger();
+        DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         LaunchException warning = new LaunchException(null, null,
                 "severe", "warning type", "test warning", "this is a test of the warning");
         boolean continueLaunch = handler.launchWarning(warning);
 
         assertTrue(continueLaunch);
-        String output = baos.toString();
-        assertEquals("netx: warning type: test warning\n", output);
+        assertEquals("netx: warning type: test warning\n", l.getStream1());
     }
 
     @Test
     public void testLaunchError() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DefaultLaunchHandler handler = new DefaultLaunchHandler(new PrintStream(baos));
+        LocalLogger l = new LocalLogger();
+        DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         LaunchException error = new LaunchException(null, null,
                 "severe", "error type", "test error", "this is a test of the error");
         handler.launchError(error);
 
-        String output = baos.toString();
-        assertEquals("netx: error type: test error\n", output);
+        assertEquals("netx: error type: test error\n", l.getStream1());
     }
 
     @Test
     public void testLaunchErrorWithCause() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DefaultLaunchHandler handler = new DefaultLaunchHandler(new PrintStream(baos));
+        LocalLogger l = new LocalLogger();
+        DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         ParseException parse = new ParseException("no information element");
         LaunchException error = new LaunchException(null, parse,
                 "severe", "error type", "test error", "this is a test of the error");
         handler.launchError(error);
 
-        String output = baos.toString();
-        assertEquals("netx: error type: test error (no information element)\n", output);
+        assertEquals("netx: error type: test error (no information element)\n", l.getStream1());
     }
 
     @Test
     public void testLaunchErrorWithNestedCause() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DefaultLaunchHandler handler = new DefaultLaunchHandler(new PrintStream(baos));
+        LocalLogger l = new LocalLogger();
+        DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         ParseException parse = new ParseException("no information element");
         RuntimeException runtime = new RuntimeException("programmer made a mistake", parse);
@@ -113,21 +137,18 @@ public class DefaultLaunchHandlerTest {
                 "severe", "error type", "test error", "this is a test of the error");
         handler.launchError(error);
 
-        String output = baos.toString();
-        assertEquals("netx: error type: test error (programmer made a mistake (no information element))\n", output);
+        assertEquals("netx: error type: test error (programmer made a mistake (no information element))\n", l.getStream1());
     }
-
 
     @Test
     public void testValidationError() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DefaultLaunchHandler handler = new DefaultLaunchHandler(new PrintStream(baos));
+        LocalLogger l = new LocalLogger();
+        DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         LaunchException error = new LaunchException(null, null,
                 "severe", "validation-error type", "test validation-error", "this is a test of a validation error");
         handler.validationError(error);
 
-        String output = baos.toString();
-        assertEquals("netx: validation-error type: test validation-error\n", output);
+        assertEquals("netx: validation-error type: test validation-error\n", l.getStream1());
     }
 }

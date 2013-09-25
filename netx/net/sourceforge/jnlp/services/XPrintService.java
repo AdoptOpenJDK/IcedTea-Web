@@ -47,6 +47,7 @@ import javax.jnlp.*;
 import javax.swing.JOptionPane;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class XPrintService implements PrintService {
 
@@ -84,7 +85,8 @@ public class XPrintService implements PrintService {
                     pj.print();
                     return true;
                 } catch (PrinterException pe) {
-                    System.err.println("Could not print: " + pe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not print: " + pe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, pe);
                     return false;
                 }
             }
@@ -102,7 +104,8 @@ public class XPrintService implements PrintService {
                     pj.print();
                     return true;
                 } catch (PrinterException pe) {
-                    System.err.println("Could not print: " + pe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not print: " + pe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, pe);
                     return false;
                 }
 
@@ -118,6 +121,6 @@ public class XPrintService implements PrintService {
                                 "Unable to find a default printer.",
                                 "Warning",
                                 JOptionPane.WARNING_MESSAGE);
-        System.err.println("Unable to print: Unable to find default printer.");
+        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to print: Unable to find default printer.");
     }
 }

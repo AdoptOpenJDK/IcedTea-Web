@@ -25,15 +25,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.LogConfig;
 
 /**
  * This displays the options related to debugging.
@@ -43,12 +42,17 @@ import net.sourceforge.jnlp.runtime.Translator;
  */
 public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
-    /** List of properties used by this panel */
-    public static String[] properties = { "deployment.trace", // Debugging
-            "deployment.log", // Debugging
-            "deployment.console.startup.mode", // Java Console
+    /** List of properties used by checkboxes in this panel */
+    public static String[] properties = {
+            DeploymentConfiguration.KEY_ENABLE_LOGGING,
+            DeploymentConfiguration.KEY_ENABLE_LOGGING_HEADERS,
+            DeploymentConfiguration.KEY_ENABLE_LOGGING_TOFILE,
+            DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSTREAMS,
+            DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSYSTEMLOG
+            
     };
-    private DeploymentConfiguration config;
+    
+     private DeploymentConfiguration config;
 
     /**
      * Create a new instance of the debugging panel.
@@ -72,8 +76,20 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
         JLabel debuggingDescription = new JLabel("<html>" + Translator.R("CPDebuggingDescription") + "<hr /><br /></html>");
 
-        JCheckBox[] debuggingOptions = { new JCheckBox(Translator.R("DPEnableTracing")),
-                new JCheckBox(Translator.R("DPEnableLogging")), };
+        JCheckBox[] debuggingOptions = { 
+                new JCheckBox(Translator.R("DPEnableLogging")),
+                new JCheckBox(Translator.R("DPEnableHeaders")),
+                new JCheckBox(Translator.R("DPEnableFile")),
+                new JCheckBox(Translator.R("DPEnableStds")),
+                new JCheckBox(Translator.R("DPEnableSyslog"))
+        };
+        String[] hints = { 
+                (Translator.R("DPEnableLoggingHint")),
+                (Translator.R("DPEnableHeadersHint")),
+                (Translator.R("DPEnableFileHint", LogConfig.getLogConfig().getIcedteaLogDir())),
+                (Translator.R("DPEnableStdsHint")),
+                (Translator.R("DPEnableSyslogHint"))
+        };
 
         ComboItem[] javaConsoleItems = { new ComboItem(Translator.R("DPDisable"), "DISABLE"),
                 new ComboItem(Translator.R("DPHide"), "HIDE"),
@@ -81,7 +97,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
         JLabel consoleLabel = new JLabel(Translator.R("DPJavaConsole"));
         JComboBox consoleComboBox = new JComboBox();
-        consoleComboBox.setActionCommand("deployment.console.startup.mode"); // The property this comboBox affects.
+        consoleComboBox.setActionCommand(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE); // The property this comboBox affects.
 
         JPanel consolePanel = new JPanel();
         consolePanel.setLayout(new FlowLayout(FlowLayout.LEADING));
@@ -98,33 +114,33 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
          * Add the items to the panel unless we can not get the values for them.
          */
         for (int i = 0; i < properties.length; i++) {
-            try {
-                String s = config.getProperty(properties[i]);
-                c.gridy = i + 1;
-
-                switch (i) {
-                    case 0:
-                    case 1:
-                        debuggingOptions[i].setSelected(Boolean.parseBoolean(s));
-                        debuggingOptions[i].setActionCommand(properties[i]);
-                        debuggingOptions[i].addItemListener(this);
-                        add(debuggingOptions[i], c);
-                        break;
-                    case 2:
-                        for (int j = 0; j < javaConsoleItems.length; j++) {
-                            consoleComboBox.addItem(javaConsoleItems[j]);
-                            if (config.getProperty("deployment.console.startup.mode").equals(javaConsoleItems[j].getValue()))
-                                consoleComboBox.setSelectedIndex(j);
-                        }
-                        consoleComboBox.addItemListener(this);
-                        add(consolePanel, c);
-                }
-
-            } catch (Exception e) {
-                debuggingOptions[i] = null;
+            String s = config.getProperty(properties[i]);
+            c.gridy++;
+            if (i == 2) {
+                JLabel space = new JLabel("<html>" + Translator.R("CPDebuggingPossibilites") + ":</html>");
+                add(space, c);
+                c.gridy++;
             }
+
+            debuggingOptions[i].setSelected(Boolean.parseBoolean(s));
+            debuggingOptions[i].setActionCommand(properties[i]);
+            debuggingOptions[i].setToolTipText(hints[i]);
+            debuggingOptions[i].addItemListener(this);
+            add(debuggingOptions[i], c);
+
+
         }
 
+        for (int j = 0; j < javaConsoleItems.length; j++) {
+            consoleComboBox.addItem(javaConsoleItems[j]);
+            if (config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE).equals(javaConsoleItems[j].getValue())) {
+                consoleComboBox.setSelectedIndex(j);
+            }
+        }
+        c.gridy++;
+        consoleComboBox.addItemListener(this);
+        add(consolePanel, c);
+        
         // pack the bottom so that it doesn't change size if resized.
         Component filler = Box.createRigidArea(new Dimension(1, 1));
         c.gridy++;

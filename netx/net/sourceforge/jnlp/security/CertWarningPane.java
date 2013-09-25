@@ -70,6 +70,7 @@ import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Provides the panel for using inside a SecurityDialog. These dialogs are
@@ -266,13 +267,11 @@ public class CertWarningPane extends SecurityDialogPanel {
                     } finally {
                         os.close();
                     }
-                    if (JNLPRuntime.isDebug()) {
-                        System.out.println("certificate is now permanently trusted");
-                    }
+                    OutputController.getLogger().log("certificate is now permanently trusted");
                 } catch (Exception ex) {
                     // TODO: Let NetX show a dialog here notifying user
                     // about being unable to add cert to keystore
-                    ex.printStackTrace();
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 }
             }
         }

@@ -28,6 +28,7 @@ import java.util.*;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile.
@@ -58,8 +59,8 @@ class Parser {
             //throw exception;
         }
         public void warning(SAXParseException exception) {
-            System.err.println("XML parse warning:");
-            exception.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "XML parse warning:");
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, exception);
         }
     };
     */
@@ -438,23 +439,19 @@ class Parser {
      * @throws RequiredElementException
      */
     void checkForInformation() throws RequiredElementException {
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Homepage: " + file.getInformation().getHomepage());
-            System.out.println("Description: " + file.getInformation().getDescription());
-        }
+        OutputController.getLogger().log("Homepage: " + file.getInformation().getHomepage());
+        OutputController.getLogger().log("Description: " + file.getInformation().getDescription());
 
         String title = file.getTitle();
         String vendor = file.getVendor();
 
         if (title == null || title.trim().isEmpty())
             throw new MissingTitleException();
-        else if (JNLPRuntime.isDebug())
-            System.out.println("Acceptable title tag found, contains: " + title);
+        else OutputController.getLogger().log("Acceptable title tag found, contains: " + title);
 
         if (vendor == null || vendor.trim().isEmpty())
             throw new MissingVendorException();
-        else if (JNLPRuntime.isDebug())
-            System.out.println("Acceptable vendor tag found, contains: " + vendor);
+        else OutputController.getLogger().log("Acceptable vendor tag found, contains: " + vendor);
     }
 
     /**

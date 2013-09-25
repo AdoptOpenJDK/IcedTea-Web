@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import net.sourceforge.nanoxml.XMLElement;
 
@@ -105,7 +106,7 @@ class XMLParser {
                             try {
                                 pout.close();
                             } catch (IOException ioe) {
-                                ioe.printStackTrace();
+                                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
                             }
                         }
                     }).start();

@@ -45,6 +45,7 @@ import javax.swing.JSeparator;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements HyperlinkListener {
 
@@ -77,7 +78,7 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
                     mainHtmlPane.setPage(event.getURL());
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
             }
         }
     }

@@ -48,6 +48,7 @@ import java.util.Observable;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.splashscreen.parts.BasicComponentSplashScreen;
 import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public final class ErrorPainter extends BasePainter {
 
@@ -231,7 +232,7 @@ public final class ErrorPainter extends BasePainter {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             } finally {
                 canWave = true;
                 errorIsFlying = false;

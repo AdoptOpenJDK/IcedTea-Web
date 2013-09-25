@@ -33,6 +33,7 @@ import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * The BasicService JNLP service.
@@ -180,8 +181,7 @@ class XBasicService implements BasicService {
 
                 return true;
             } catch (IOException ex) {
-                if (JNLPRuntime.isDebug())
-                    ex.printStackTrace();
+                OutputController.getLogger().log(ex);
             }
         }
 
@@ -193,9 +193,7 @@ class XBasicService implements BasicService {
             return;
         initialized = true;
         initializeBrowserCommand();
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("browser is " + command);
-        }
+        OutputController.getLogger().log("browser is " + command);
     }
 
     /**
@@ -228,7 +226,7 @@ class XBasicService implements BasicService {
                     try {
                         config.save();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
                     }
                     break;
                 }
@@ -245,7 +243,7 @@ class XBasicService implements BasicService {
                     try {
                         config.save();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
                     }
                 }
             }
@@ -272,10 +270,10 @@ class XBasicService implements BasicService {
             p.waitFor();
             return (p.exitValue() == 0);
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             return false;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             return false;
         }
     }

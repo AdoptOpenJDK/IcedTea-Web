@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -155,7 +156,7 @@ public class XDesktopEntry {
             cacheIcon();
             installDesktopLauncher();
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 
@@ -195,9 +196,7 @@ public class XDesktopEntry {
 
             String[] execString = new String[] { "xdg-desktop-icon", "install", "--novendor",
                     shortcutFile.getCanonicalPath() };
-            if (JNLPRuntime.isDebug()) {
-                System.err.println("Execing: " + Arrays.toString(execString));
-            }
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Execing: " + Arrays.toString(execString));
             Process installer = Runtime.getRuntime().exec(execString);
             new StreamEater(installer.getInputStream()).start();
             new StreamEater(installer.getErrorStream()).start();
@@ -205,7 +204,7 @@ public class XDesktopEntry {
             try {
                 installer.waitFor();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
 
             if (!shortcutFile.delete()) {
@@ -213,9 +212,9 @@ public class XDesktopEntry {
             }
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 
@@ -241,9 +240,7 @@ public class XDesktopEntry {
 
             this.iconLocation = location.substring("file:".length());
 
-            if (JNLPRuntime.isDebug()) {
-                System.err.println("Cached desktop shortcut icon: " + this.iconLocation);
-            }
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached desktop shortcut icon: " + this.iconLocation);
         }
     }
 
@@ -259,7 +256,7 @@ public class XDesktopEntry {
         try {
             return findFreedesktopOrgDesktopPath();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             return System.getProperty("user.home") + "/Desktop/";
         }
     }

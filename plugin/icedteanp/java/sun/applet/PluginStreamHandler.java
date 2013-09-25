@@ -48,6 +48,8 @@ import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 
 import javax.swing.SwingUtilities;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class PluginStreamHandler {
 
@@ -103,7 +105,7 @@ public class PluginStreamHandler {
                         }
                         AppletSecurityContextManager.dumpStore(0);
                         PluginDebug.debug("APPLETVIEWER: exiting appletviewer");
-                        System.exit(0);
+                        JNLPRuntime.exit(0);
                     }
                 }
             }
@@ -332,10 +334,10 @@ public class PluginStreamHandler {
                 }
                 AppletSecurityContextManager.dumpStore(0);
                 PluginDebug.debug("APPLETVIEWER: exiting appletviewer");
-                System.exit(0);
+                JNLPRuntime.exit(0);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
 
         return message;
@@ -360,13 +362,13 @@ public class PluginStreamHandler {
                 // if we are shutting down, ignore write failures as 
                 // pipe may have closed
                 if (!shuttingDown) {
-                    e.printStackTrace();
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
                 }
 
                 // either ways, if the pipe is broken, there is nothing 
                 // we can do anymore. Don't hang around.
                 PluginDebug.debug("Unable to write to PIPE. APPLETVIEWER exiting");
-                System.exit(1);
+                JNLPRuntime.exit(1);
             }
         }
 

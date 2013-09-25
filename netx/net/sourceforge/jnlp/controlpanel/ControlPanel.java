@@ -58,6 +58,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
 import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This is the control panel for Java. It provides a GUI for modifying the
@@ -149,7 +150,7 @@ public class ControlPanel extends JFrame {
             URL imgUrl = cl.getResource("net/sourceforge/jnlp/resources/netx-icon.png");
             image.setIcon(new ImageIcon(ImageIO.read(imgUrl)));
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -381,7 +382,7 @@ public class ControlPanel extends JFrame {
             JLabel label = new JLabel("Not Implemented", icon, SwingConstants.CENTER);
             notImplementedPanel.add(label);
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
         return notImplementedPanel;
     }
@@ -393,7 +394,7 @@ public class ControlPanel extends JFrame {
         try {
             config.save();
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             JOptionPane.showMessageDialog(this, e);
         }
     }
@@ -410,7 +411,7 @@ public class ControlPanel extends JFrame {
 
             // if configuration is not loaded, we will get NullPointerExceptions
             // everywhere
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         try {

@@ -12,6 +12,7 @@ import java.util.jar.JarFile;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Handles loading and access of native code loading through a JNLP application or applet.
@@ -34,9 +35,7 @@ public class NativeLibraryStorage {
      */
     public void cleanupTemporaryFolder() {
         if (jarEntryDirectory != null) {
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("Cleaning up native directory" + jarEntryDirectory.getAbsolutePath());
-            }
+            OutputController.getLogger().log("Cleaning up native directory" + jarEntryDirectory.getAbsolutePath());
             try {
                 FileUtils.recursiveDelete(jarEntryDirectory,
                         new File(System.getProperty("java.io.tmpdir")));
@@ -84,9 +83,7 @@ public class NativeLibraryStorage {
      * classloader.
      */
     public void addSearchJar(URL jarLocation) {
-        if (JNLPRuntime.isDebug())
-            System.out.println("Activate native: " + jarLocation);
-
+        OutputController.getLogger().log("Activate native: " + jarLocation);
         File localFile = tracker.getCacheFile(jarLocation);
         if (localFile == null)
             return;
@@ -127,8 +124,7 @@ public class NativeLibraryStorage {
 
             jarFile.close();
         } catch (IOException ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
+            OutputController.getLogger().log(ex);
         }
     }
 

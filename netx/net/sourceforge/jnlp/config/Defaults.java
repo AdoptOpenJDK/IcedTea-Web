@@ -341,16 +341,30 @@ public class Defaults {
                         }),
                         DeploymentConfiguration.CONSOLE_HIDE
                 },
-                /* tracing and logging */
-                {
-                        DeploymentConfiguration.KEY_ENABLE_TRACING,
-                        BasicValueValidators.getBooleanValidator(),
-                        String.valueOf(false)
-                },
                 {
                         DeploymentConfiguration.KEY_ENABLE_LOGGING,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(false)
+                },
+                {
+                        DeploymentConfiguration.KEY_ENABLE_LOGGING_HEADERS,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(false)
+                },
+                {
+                        DeploymentConfiguration.KEY_ENABLE_LOGGING_TOFILE,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(false)
+                },
+                {
+                        DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSTREAMS,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(true)
+                },                
+                {
+                        DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSYSTEMLOG,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(true)
                 },
                 /* JNLP association */
                 {

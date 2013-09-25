@@ -54,6 +54,7 @@ import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 public class CachePane extends JPanel {
@@ -164,7 +165,7 @@ public class CachePane extends JPanel {
                         FileUtils.createParentDir(netxRunningFile);
                         FileUtils.createRestrictedFile(netxRunningFile, true);
                     } catch (IOException e1) {
-                        e1.printStackTrace();
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
                     }
                 }
 
@@ -197,7 +198,7 @@ public class CachePane extends JPanel {
                         fl.release();
                         fl.channel().close();
                     } catch (IOException e1) {
-                        e1.printStackTrace();
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
                     }
                 }
             }

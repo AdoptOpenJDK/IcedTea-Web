@@ -44,27 +44,57 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HttpUtilsTest {
     
-    private static PrintStream backedUpStream;
-    private static ByteArrayOutputStream nwErrorStream;
+    private static PrintStream[]  backedUpStream = new PrintStream[4];
+    private static ByteArrayOutputStream currentErrorStream;
      
-    public static void redirectErr() {
-        if (backedUpStream == null) {
-            backedUpStream = System.err;
+      @BeforeClass
+    //keeping silent outputs from launched jvm
+    public static void redirectErr() throws IOException {
+        for (int i = 0; i < backedUpStream.length; i++) {
+            if (backedUpStream[i] == null) {
+                switch (i) {
+                    case 0:
+                        backedUpStream[i] = System.out;
+                        break;
+                    case 1:
+                        backedUpStream[i] = System.err;
+                        break;
+                    case 2:
+                        backedUpStream[i] = OutputController.getLogger().getOut();
+                        break;
+                    case 3:
+                        backedUpStream[i] = OutputController.getLogger().getErr();
+                        break;
+                }
+
+            }
+
         }
-        nwErrorStream = new ByteArrayOutputStream();
-        System.setErr(new PrintStream(nwErrorStream));
+        currentErrorStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(currentErrorStream));
+        System.setErr(new PrintStream(currentErrorStream));
+        OutputController.getLogger().setOut(new PrintStream(currentErrorStream));
+        OutputController.getLogger().setErr(new PrintStream(currentErrorStream));
+
 
     }
 
-    
-    public static void redirectErrBack() throws UnsupportedEncodingException {
-        ServerAccess.logErrorReprint(nwErrorStream.toString("utf-8"));
-        System.setErr(backedUpStream);
+    @AfterClass
+    public static void redirectErrBack() throws IOException {
+        ServerAccess.logErrorReprint(currentErrorStream.toString("utf-8"));
+        System.setOut(backedUpStream[0]);
+        System.setErr(backedUpStream[1]);
+        OutputController.getLogger().setOut(backedUpStream[2]);
+        OutputController.getLogger().setErr(backedUpStream[3]);
+
 
     }
 

@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -55,9 +56,9 @@ public class UrlUtils {
             URL strippedUrl = new URL(urlParts[0]); 
             return normalizeUrl(strippedUrl, encodeFileUrls);
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
         return url;
     }
@@ -81,7 +82,7 @@ public class UrlUtils {
         try {
             return new URL(URLDecoder.decode(url.toString(), UTF8));
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             return url;
         }
     }
@@ -134,11 +135,11 @@ public class UrlUtils {
         try {
             return normalizeUrl(url, encodeFileUrls);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
         return url;
     }

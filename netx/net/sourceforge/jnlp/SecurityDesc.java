@@ -24,6 +24,7 @@ import java.awt.AWTPermission;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * The security element.
@@ -180,7 +181,7 @@ public class SecurityDesc {
                 URI policyUri = new URI("file://" + policyLocation);
                 policy = Policy.getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (Exception e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
         // return the appropriate policy, or null

@@ -44,6 +44,7 @@ import java.security.KeyStore;
 
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class SecurityUtil {
 
@@ -210,7 +211,7 @@ public class SecurityUtil {
                     ks.load(fis, password);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
                 throw e;
             } finally {
                 if (fis != null)

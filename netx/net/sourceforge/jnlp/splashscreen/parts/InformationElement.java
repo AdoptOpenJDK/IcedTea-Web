@@ -45,6 +45,7 @@ import java.util.List;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This class is wrapper arround <information> tag which should
@@ -227,7 +228,7 @@ public class InformationElement {
             ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindToolTip), InfoItem.descriptionKindToolTip);
             return ie;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             String message = Translator.R(InfoItem.SPLASH + "errorInInformation");
             InformationElement ie = new InformationElement();
             ie.setHomepage("");

@@ -47,6 +47,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.nanoxml.XMLElement;
 
 /**
@@ -261,7 +262,7 @@ public final class JNLPMatcher {
             try {
                 stream.close();
             } catch (Exception e) {
-                e.printStackTrace(System.err);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
     }
 
@@ -276,7 +277,7 @@ public final class JNLPMatcher {
             try {
                 stream.close();
             } catch (Exception e) {
-                e.printStackTrace(System.err);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
     }
 }

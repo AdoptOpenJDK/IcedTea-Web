@@ -38,6 +38,7 @@ import net.sourceforge.jnlp.event.ApplicationEvent;
 import net.sourceforge.jnlp.event.ApplicationListener;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 
@@ -149,10 +150,8 @@ public class ApplicationInstance {
         ShortcutDesc sd = file.getInformation().getShortcut();
         File possibleDesktopFile = entry.getLinuxDesktopIconFile();
         if (possibleDesktopFile.exists()) {
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("ApplicationInstance.addMenuAndDesktopEntries(): file - "
-                        + possibleDesktopFile.getAbsolutePath() + " already exists. Not proceeding with desktop additions");
-            }
+            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
+                    + possibleDesktopFile.getAbsolutePath() + " already exists. Not proceeding with desktop additions");
             return;
         }
         if (shouldCreateShortcut(sd)) {
@@ -163,10 +162,8 @@ public class ApplicationInstance {
             /*
              * Sun's WebStart implementation doesnt seem to do anything under GNOME
              */
-            if (JNLPRuntime.isDebug()) {
-                System.err.println("ApplicationInstance.addMenuAndDesktopEntries():"
-                        + " Adding menu entries NOT IMPLEMENTED");
-            }
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "ApplicationInstance.addMenuAndDesktopEntries():"
+                    + " Adding menu entries NOT IMPLEMENTED");
         }
 
     }
@@ -218,7 +215,7 @@ public class ApplicationInstance {
      * Only collectable if classloader and thread group are
      * also collectable so basically is almost never called (an
      * application would have to close its windows and exit its
-     * threads but not call System.exit).
+     * threads but not call JNLPRuntime.exit).
      */
     public void finalize() {
         destroy();
@@ -294,9 +291,7 @@ public class ApplicationInstance {
             Thread threads[] = new Thread[group.activeCount() * 2];
             int nthreads = group.enumerate(threads);
             for (int i = 0; i < nthreads; i++) {
-                if (JNLPRuntime.isDebug())
-                    System.out.println("Interrupt thread: " + threads[i]);
-
+                OutputController.getLogger().log("Interrupt thread: " + threads[i]);
                 threads[i].interrupt();
             }
 
@@ -304,9 +299,7 @@ public class ApplicationInstance {
             Thread.currentThread().yield();
             nthreads = group.enumerate(threads);
             for (int i = 0; i < nthreads; i++) {
-                if (JNLPRuntime.isDebug())
-                    System.out.println("Stop thread: " + threads[i]);
-
+                OutputController.getLogger().log("Stop thread: " + threads[i]);
                 threads[i].stop();
             }
 

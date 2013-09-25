@@ -19,6 +19,7 @@ package net.sourceforge.jnlp.runtime;
 import java.net.*;
 import java.applet.*;
 import javax.sound.sampled.*;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 // based on Deane Richan's AppletAudioClip
 
@@ -47,7 +48,8 @@ public class AppletAudioClip implements AudioClip {
             clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
             clip.open(stream);
         } catch (Exception ex) {
-            System.err.println("Error loading sound:" + location.toString());
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Error loading sound:" + location.toString());
+            OutputController.getLogger().log(ex);
             clip = null;
         }
     }

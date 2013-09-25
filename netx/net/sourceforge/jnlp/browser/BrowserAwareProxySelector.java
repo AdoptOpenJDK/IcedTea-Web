@@ -57,6 +57,7 @@ import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.PacEvaluator;
 import net.sourceforge.jnlp.runtime.PacEvaluatorFactory;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * A ProxySelector which can read proxy settings from a browser's
@@ -98,10 +99,8 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
         try {
             initFromBrowserConfig();
         } catch (IOException e) {
-            if (JNLPRuntime.isDebug()) {
-                e.printStackTrace();
-            }
-            System.err.println(R("RProxyFirefoxNotFound"));
+            OutputController.getLogger().log(e);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RProxyFirefoxNotFound"));
             browserProxyType = PROXY_TYPE_NONE;
         }
     }
@@ -130,7 +129,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 browserAutoConfigUrl = new URL(url);
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         if (browserProxyType == BROWSER_PROXY_TYPE_PAC) {
@@ -209,15 +208,11 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 if (optionDescription == null) {
                     optionDescription = "Unknown";
                 }
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println(R("RProxyFirefoxOptionNotImplemented", browserProxyType, optionDescription));
-                }
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG,R("RProxyFirefoxOptionNotImplemented", browserProxyType, optionDescription));
                 proxies.add(Proxy.NO_PROXY);
         }
 
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Browser selected proxies: " + proxies.toString());
-        }
+        OutputController.getLogger().log("Browser selected proxies: " + proxies.toString());
 
         return proxies;
     }
@@ -237,7 +232,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             String proxiesString = browserProxyAutoConfig.getProxies(uri.toURL());
             proxies.addAll(getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             proxies.add(Proxy.NO_PROXY);
         }
 

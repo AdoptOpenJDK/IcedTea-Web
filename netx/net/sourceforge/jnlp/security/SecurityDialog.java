@@ -53,6 +53,7 @@ import java.security.cert.X509Certificate;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import java.util.List;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.ScreenFinder;
 
 /**
@@ -321,22 +322,18 @@ public class SecurityDialog extends JDialog {
 
     private void selectDefaultButton() {
         if (panel == null) {
-            System.out.println("initial value panel is null");
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "initial value panel is null");
         }
         panel.requestFocusOnDefaultButton();
     }
 
     protected void setValue(Object value) {
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Setting value:" + value);
-        }
+        OutputController.getLogger().log("Setting value:" + value);
         this.value = value;
     }
 
     public Object getValue() {
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Returning value:" + value);
-        }
+        OutputController.getLogger().log("Returning value:" + value);
         return value;
     }
 

@@ -46,6 +46,7 @@ import net.sourceforge.jnlp.event.DownloadEvent;
 import net.sourceforge.jnlp.event.DownloadListener;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.HttpUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
@@ -183,8 +184,8 @@ public class ResourceTracker {
         try {
             location = UrlUtils.normalizeUrl(location);
         } catch (Exception ex) {
-            System.err.println("Normalization of " + location.toString() + " have failed");
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Normalization of " + location.toString() + " have failed");
+            OutputController.getLogger().log(ex);
         }
         Resource resource = Resource.getResource(location, version, updatePolicy);
         boolean downloaded = false;
@@ -258,8 +259,7 @@ public class ResourceTracker {
             CacheEntry entry = new CacheEntry(resource.location, resource.downloadVersion);
 
             if (entry.isCached() && !updatePolicy.shouldUpdate(entry)) {
-                if (JNLPRuntime.isDebug())
-                    System.out.println("not updating: " + resource.location);
+                OutputController.getLogger().log("not updating: " + resource.location);
 
                 synchronized (resource) {
                     resource.localFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion);
@@ -356,8 +356,7 @@ public class ResourceTracker {
                 // TODO: Should be toURI().toURL()
                 return f.toURL();
         } catch (MalformedURLException ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
+            OutputController.getLogger().log(ex);
         }
 
         return location;
@@ -396,9 +395,7 @@ public class ResourceTracker {
 
             return null;
         } catch (InterruptedException ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
-
+            OutputController.getLogger().log(ex);
             return null; // need an error exception to throw
         }
     }
@@ -664,11 +661,8 @@ public class ResourceTracker {
 
             String contentEncoding = con.getContentEncoding();
 
-            if (JNLPRuntime.isDebug()) {
-                System.err.println("Downloading" + resource.location + " using " +
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading" + resource.location + " using " +
                         realLocation + " (encoding : " + contentEncoding + ")");
-
-            }
 
             boolean packgz = "pack200-gzip".equals(contentEncoding) ||
                                 realLocation.getPath().endsWith(".pack.gz");
@@ -759,9 +753,7 @@ public class ResourceTracker {
             }
             resource.fireDownloadEvent(); // fire DOWNLOADED
         } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
-
+            OutputController.getLogger().log(ex);
             resource.changeStatus(0, ERROR);
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
@@ -789,7 +781,7 @@ public class ResourceTracker {
             URL finalLocation = findBestUrl(resource);
 
             if (finalLocation == null) {
-                System.err.println("Attempted to download " + resource.location + ", but failed to connect!");
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Attempted to download " + resource.location + ", but failed to connect!");
                 throw new NullPointerException("finalLocation == null"); // Caught below
             }
 
@@ -839,9 +831,7 @@ public class ResourceTracker {
             if (connection instanceof HttpURLConnection)
                 ((HttpURLConnection) connection).disconnect();
         } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
-
+            OutputController.getLogger().log(ex);
             resource.changeStatus(0, ERROR);
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
@@ -897,11 +887,9 @@ public class ResourceTracker {
         }
 
         List<URL> urls = new ResourceUrlCreator(resource, options).getUrls();
-        if (JNLPRuntime.isDebug()) {
-            System.err.println("All possible urls for " +
-                    resource.toString() + " : " + urls);
-        }
-
+         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "All possible urls for "
+                 + resource.toString() + " : " + urls);
+        
          for (String requestMethod : requestMethods) {
              for (URL url : urls) {
                  try {
@@ -911,21 +899,15 @@ public class ResourceTracker {
                      int responseCode = getUrlResponseCode(url, requestProperties, requestMethod);
 
                      if (responseCode < 200 || responseCode >= 300) {
-                         if (JNLPRuntime.isDebug()) {
-                             System.err.println("For " + resource.toString() + " the server returned " + responseCode + " code for " + requestMethod + " request for " + url.toExternalForm());
-                         }
+                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "For " + resource.toString() + " the server returned " + responseCode + " code for " + requestMethod + " request for " + url.toExternalForm());
                      } else {
-                         if (JNLPRuntime.isDebug()) {
-                             System.err.println("best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
-                         }
+                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
                          return url; /* This is the best URL */
                      } 
                  } catch (IOException e) {
                      // continue to next candidate
-                     if (JNLPRuntime.isDebug()) {
-                         System.err.println("While processing " + url.toString() + " by " + requestMethod + " for resource " + resource.toString() + " got " + e + ": ");
-                         e.printStackTrace();
-                     }
+                     OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "While processing " + url.toString() + " by " + requestMethod + " for resource " + resource.toString() + " got " + e + ": ");
+                     OutputController.getLogger().log(e);
                  }
              }
          }
@@ -1175,8 +1157,7 @@ public class ResourceTracker {
                     });
 
                 } catch (Exception ex) {
-                    if (JNLPRuntime.isDebug())
-                        ex.printStackTrace();
+                    OutputController.getLogger().log(ex);
                 }
             }
             // should have a finally in case some exception is thrown by

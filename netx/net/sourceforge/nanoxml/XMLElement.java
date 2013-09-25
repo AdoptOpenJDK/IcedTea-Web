@@ -34,6 +34,7 @@ import java.io.*;
 import java.util.*;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * XMLElement is a representation of an XML object. The object is able to parse
@@ -1204,11 +1205,11 @@ public class XMLElement {
                     out.flush();
                     if (JNLPRuntime.isDebug()) {
                         if (ch == 10) {
-                            System.out.println();
-                            System.out.print("line: " + newline + " ");
+                            OutputController.getLogger().printOutLn("");
+                            OutputController.getLogger().printOut("line: " + newline + " ");
                             newline++;
                         } else {
-                            System.out.print(ch);
+                            OutputController.getLogger().printOut(ch+"");
                         }
                     }
                     break;
@@ -1235,9 +1236,9 @@ public class XMLElement {
                             out.print('-');
                             this.sanitizeCharReadTooMuch = ch;
                             if (JNLPRuntime.isDebug()) {
-                                System.out.print('<');
-                                System.out.print('!');
-                                System.out.print('-');
+                                OutputController.getLogger().printOut("<");
+                                OutputController.getLogger().printOut("!");
+                                OutputController.getLogger().printOut("-");
                             }
                         }
                     } else {
@@ -1245,8 +1246,8 @@ public class XMLElement {
                         out.print('!');
                         this.sanitizeCharReadTooMuch = ch;
                         if (JNLPRuntime.isDebug()) {
-                            System.out.print('<');
-                            System.out.print('!');
+                              OutputController.getLogger().printOut("<");
+                              OutputController.getLogger().printOut("!");
                         }
                     }
                 }
@@ -1255,11 +1256,11 @@ public class XMLElement {
                     out.print(ch);
                     if (JNLPRuntime.isDebug()) {
                         if (ch == 10) {
-                            System.out.println();
-                            System.out.print("line: " + newline + " ");
+                            OutputController.getLogger().printOutLn("");
+                            OutputController.getLogger().printOut("line: " + newline + " ");
                             newline++;
                         } else {
-                            System.out.print(ch);
+                            OutputController.getLogger().printOut(ch+"");
                         }
                     }
                 }
@@ -1271,7 +1272,7 @@ public class XMLElement {
         } catch (Exception e) {
             // Print the stack trace here -- xml.parseFromReader() will
             // throw the ParseException if something goes wrong.
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 }

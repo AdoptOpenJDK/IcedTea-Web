@@ -61,6 +61,7 @@ import java.util.Random;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
 import sun.security.provider.X509Factory;
 
@@ -77,9 +78,8 @@ public class CertificateUtils {
      */
     public static final void addToKeyStore(File file, KeyStore ks) throws CertificateException,
             IOException, KeyStoreException {
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Importing certificate from " + file + " into " + ks);
-        }
+
+        OutputController.getLogger().log("Importing certificate from " + file + " into " + ks);
 
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
         CertificateFactory cf = CertificateFactory.getInstance("X509");
@@ -100,9 +100,8 @@ public class CertificateUtils {
      */
     public static final void addToKeyStore(X509Certificate cert, KeyStore ks)
             throws KeyStoreException {
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Importing " + cert.getSubjectX500Principal().getName());
-        }
+
+        OutputController.getLogger().log("Importing " + cert.getSubjectX500Principal().getName());
 
         String alias = null;
 
@@ -173,16 +172,13 @@ public class CertificateUtils {
                     String alias = aliases.nextElement();
 
                     if (c.equals(keyStores[i].getCertificate(alias))) {
-                        if (JNLPRuntime.isDebug()) {
-                            System.out.println(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStores[i].hashCode())));
-                        }
-
+                    OutputController.getLogger().log(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStores[i].hashCode())));
                         return true;
                     } // else continue
                 }
 
             } catch (KeyStoreException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
                 // continue
             }
         }

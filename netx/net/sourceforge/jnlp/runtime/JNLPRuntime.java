@@ -67,7 +67,9 @@ import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.security.VariableX509TrustManager;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.TeeOutputStream;
+import net.sourceforge.jnlp.util.logging.LogConfig;
 import sun.net.www.protocol.jar.URLJarFile;
 
 /**
@@ -87,7 +89,7 @@ import sun.net.www.protocol.jar.URLJarFile;
  * @version $Revision: 1.19 $
  */
 public class JNLPRuntime {
-    
+
     static {
         loadResources();
     }
@@ -129,11 +131,12 @@ public class JNLPRuntime {
 
     /** whether debug mode is on */
     private static boolean debug = false;
+    /**
+     * whether plugin debug mode is on
+     */
+    private static Boolean pluginDebug = null;
 
-    /** whether streams should be redirected */
-    private static boolean redirectStreams = false;
-
-    /** mutex to wait on, for initialization */
+   /** mutex to wait on, for initialization */
     public static Object initMutex = new Object();
 
     /** set to true if this is a webstart application. */
@@ -196,14 +199,12 @@ public class JNLPRuntime {
         } catch (ConfigurationException e) {
             /* exit if there is a fatal exception loading the configuration */
             if (isApplication) {
-                System.out.println(getMessage("RConfigurationError"));
-                System.exit(1);
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, getMessage("RConfigurationError"));
+                JNLPRuntime.exit(1);
             }
         }
 
         KeyStores.setConfiguration(config);
-
-        initializeStreams();
 
         isWebstartApplication = isApplication;
 
@@ -220,9 +221,9 @@ public class JNLPRuntime {
 
         if (handler == null) {
             if (headless) {
-                handler = new DefaultLaunchHandler(System.err);
+                handler = new DefaultLaunchHandler(OutputController.getLogger());
             } else {
-                handler = new GuiLaunchHandler(System.err);
+                handler = new GuiLaunchHandler(OutputController.getLogger());
             }
         }
 
@@ -234,7 +235,7 @@ public class JNLPRuntime {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         doMainAppContextHacks();
@@ -259,8 +260,8 @@ public class JNLPRuntime {
 
             HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
         } catch (Exception e) {
-            System.err.println("Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...");
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...");
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         // plug in a custom authenticator and proxy selector
@@ -294,14 +295,14 @@ public class JNLPRuntime {
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                  } catch (ClassNotFoundException cnfe) {
-                     System.err.println("Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
+                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                      return null;
                  }
             } else { // Java 7 or more (technically could be <= 1.5 but <= 1.5 is unsupported)
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
                  } catch (ClassNotFoundException cnfe) {
-                     System.err.println("Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
+                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
                      return null;
                  }
             }
@@ -318,7 +319,8 @@ public class JNLPRuntime {
 
             return (TrustManager) tmCtor.newInstance();
         } catch (RuntimeException e) {
-            System.err.println("Unable to load JDK-specific TrustManager. Was this version of IcedTea-Web compiled with JDK6?");
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to load JDK-specific TrustManager. Was this version of IcedTea-Web compiled with JDK 6 or 7?");
+            OutputController.getLogger().log(e);
             throw e;
         }
     }
@@ -357,37 +359,7 @@ public class JNLPRuntime {
         new ParserDelegator();
     }
 
-    /**
-     * Initializes the standard output and error streams, redirecting them or
-     * duplicating them as required.
-     */
-    private static void initializeStreams() {
-        Boolean enableLogging = Boolean.valueOf(config
-                .getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
-        if (redirectStreams || enableLogging) {
-            String logDir = config.getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
-
-            try {
-                File errFile = new File(logDir, JNLPRuntime.STDERR_FILE);
-                FileUtils.createParentDir(errFile);
-                FileUtils.createRestrictedFile(errFile, true);
-                File outFile = new File(logDir, JNLPRuntime.STDOUT_FILE);
-                FileUtils.createParentDir(outFile);
-                FileUtils.createRestrictedFile(outFile, true);
-
-                if (redirectStreams) {
-                    System.setErr(new PrintStream(new FileOutputStream(errFile)));
-                    System.setOut(new PrintStream(new FileOutputStream(outFile)));
-                } else {
-                    System.setErr(new TeeOutputStream(new FileOutputStream(errFile), System.err));
-                    System.setOut(new TeeOutputStream(new FileOutputStream(outFile), System.out));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
+   
     /**
      * Gets the Configuration associated with this runtime
      * @return a {@link DeploymentConfiguration} object that can be queried to
@@ -513,6 +485,10 @@ public class JNLPRuntime {
      * should be printed.
      */
     public static boolean isDebug() {
+        return isSetDebug() ||  isPluginDebug() || LogConfig.getLogConfig().isEnableLogging();
+    }
+
+     public static boolean isSetDebug() {
         return debug;
     }
 
@@ -527,17 +503,7 @@ public class JNLPRuntime {
         debug = enabled;
     }
 
-    /**
-     * Sets whether the standard output/error streams should be redirected to
-     * the loggging files.
-     *
-     * @throws IllegalStateException if the runtime has already been initialized
-     */
-    public static void setRedirectStreams(boolean redirect) {
-        checkInitialized();
-        redirectStreams = redirect;
-    }
-
+  
     /**
      * Sets the default update policy.
      *
@@ -737,13 +703,11 @@ public class JNLPRuntime {
             }
             
             if (fileLock != null && fileLock.isShared()) {
-                if (JNLPRuntime.isDebug()) {
-                    System.out.println("Acquired shared lock on " +
+                OutputController.getLogger().log("Acquired shared lock on " +
                             netxRunningFile.toString() + " to indicate javaws is running");
-                }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread("JNLPRuntimeShutdownHookThread") {
@@ -766,13 +730,10 @@ public class JNLPRuntime {
             fileLock.release();
             fileLock.channel().close();
             fileLock = null;
-            if (JNLPRuntime.isDebug()) {
-                String file = JNLPRuntime.getConfiguration()
-                        .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE);
-                System.out.println("Release shared lock on " + file);
-            }
+            OutputController.getLogger().log("Release shared lock on " + JNLPRuntime.getConfiguration()
+                        .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(e);
         }
     }
 
@@ -791,7 +752,24 @@ public class JNLPRuntime {
     public static void setIgnoreHeaders(boolean ignoreHeaders) {
         JNLPRuntime.ignoreHeaders = ignoreHeaders;
     }
-    
-    
+
+    public static boolean isPluginDebug() {
+        if (pluginDebug == null) {
+            try {
+                //there are cases when this itself is not allowed by security manager, and so
+                //throws exception. Under some conditions it can couse deadlock
+                pluginDebug = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
+            } catch (Exception ex) {
+                pluginDebug = false;
+                OutputController.getLogger().log(ex);
+            }
+        }
+        return pluginDebug;
+    }
+
+    public static void exit(int i) {
+        OutputController.getLogger().close();
+        System.exit(i);
+    }
 
 }

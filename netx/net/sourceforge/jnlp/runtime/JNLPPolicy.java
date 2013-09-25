@@ -23,6 +23,7 @@ import java.security.*;
 import java.util.Enumeration;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Policy for JNLP environment.  This class delegates to the
@@ -167,11 +168,11 @@ public class JNLPPolicy extends Policy {
                 URI policyUri = new URI(policyLocation);
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             } catch (URISyntaxException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
         return policy;

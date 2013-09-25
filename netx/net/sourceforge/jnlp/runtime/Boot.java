@@ -37,6 +37,7 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.viewer.CertificateViewer;
 import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
@@ -133,30 +134,29 @@ public final class Boot implements PrivilegedAction<Void> {
 
             try {
                 CertificateViewer.main(null);
-                System.exit(0);
+                JNLPRuntime.exit(0);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
 
         }
 
         if (null != getOption("-license")) {
-            System.out.println(miniLicense);
-            System.exit(0);
+            OutputController.getLogger().printOutLn(miniLicense);
+            JNLPRuntime.exit(0);
         }
 
         if (null != getOption("-help")) {
-            System.out.println(helpMessage);
-            System.exit(0);
+            OutputController.getLogger().printOutLn(helpMessage);
+            JNLPRuntime.exit(0);
         }
 
         if (null != getOption("-about")) {
-                System.out.println(itwInfoMessage);
+                OutputController.getLogger().printOutLn(itwInfoMessage);
             if (null != getOption("-headless")) {
-                System.exit(0);
+                JNLPRuntime.exit(0);
             } else {
-                System.out.println(R("BLaunchAbout"));
+                OutputController.getLogger().printOutLn(R("BLaunchAbout"));
                 AboutDialog.display();
                 return;
             }
@@ -225,9 +225,7 @@ public final class Boot implements PrivilegedAction<Void> {
         } catch (LaunchException ex) {
             // default handler prints this
         } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
-
+            OutputController.getLogger().log(ex);
             fatalError(R("RUnexpected", ex.toString(), ex.getStackTrace()[0]));
         }
 
@@ -235,8 +233,8 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     private static void fatalError(String message) {
-        System.err.println("netx: " + message);
-        System.exit(1);
+        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "netx: " + message);
+        JNLPRuntime.exit(1);
     }
 
     /**
@@ -248,12 +246,11 @@ public final class Boot implements PrivilegedAction<Void> {
         String location = getJNLPFile();
 
         if (location == null) {
-            System.out.println(helpMessage);
-            System.exit(1);
+            OutputController.getLogger().printOutLn(helpMessage);
+            JNLPRuntime.exit(1);
         }
 
-        if (JNLPRuntime.isDebug())
-            System.out.println(R("BFileLoc") + ": " + location);
+        OutputController.getLogger().log(R("BFileLoc") + ": " + location);
 
         URL url = null;
 
@@ -264,9 +261,8 @@ public final class Boot implements PrivilegedAction<Void> {
             else
                 url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
         } catch (Exception e) {
+            OutputController.getLogger().log(e);
             fatalError("Invalid jnlp file " + location);
-            if (JNLPRuntime.isDebug())
-                e.printStackTrace();
         }
 
         return url;
@@ -278,8 +274,8 @@ public final class Boot implements PrivilegedAction<Void> {
     private static String getJNLPFile() {
 
         if (args.length == 0) {
-            System.out.println(helpMessage);
-            System.exit(0);
+            OutputController.getLogger().printOutLn(helpMessage);
+            JNLPRuntime.exit(0);
         } else if (args.length == 1) {
             return args[args.length - 1];
         } else {
@@ -289,8 +285,8 @@ public final class Boot implements PrivilegedAction<Void> {
             if (doubleArgs.indexOf(secondLastArg) == -1) {
                 return lastArg;
             } else {
-                System.out.println(helpMessage);
-                System.exit(0);
+                OutputController.getLogger().printOutLn(helpMessage);
+                JNLPRuntime.exit(0);
             }
         }
         return null;

@@ -45,6 +45,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import sun.awt.AppContext;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Handles {@link SecurityDialogMessage}s and shows appropriate security
@@ -72,9 +73,7 @@ public final class SecurityDialogMessageHandler implements Runnable {
      */
     @Override
     public void run() {
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Starting security dialog thread");
-        }
+        OutputController.getLogger().log("Starting security dialog thread");
         while (true) {
             try {
                 SecurityDialogMessage msg = queue.take();
@@ -134,7 +133,7 @@ public final class SecurityDialogMessageHandler implements Runnable {
         try {
             queue.put(message);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 

@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class StreamUtils {
 
     /**
      * Closes a stream, without throwing IOException.
-     * In case of IOException, prints the stack trace to System.err.
+     * In IOException is properly logged and consumed
      * 
      * @param stream the stream that will be closed
      */
@@ -57,7 +58,7 @@ public class StreamUtils {
             try {
                 stream.close();
             } catch (IOException e) {
-                e.printStackTrace(System.err);
+                OutputController.getLogger().log(e);
             }
         }
     }
@@ -77,7 +78,11 @@ public class StreamUtils {
         }
     }
 
-    public static String readStreamAsString(InputStream stream)
+    public static String readStreamAsString(InputStream stream)  throws IOException {
+        return readStreamAsString(stream, false);
+    }
+    
+    public static String readStreamAsString(InputStream stream, boolean includeEndOfLines)
             throws IOException {
         InputStreamReader is = new InputStreamReader(stream);
         StringBuilder sb = new StringBuilder();
@@ -88,6 +93,9 @@ public class StreamUtils {
                 break;
             }
             sb.append(read);
+            if (includeEndOfLines){
+                sb.append('\n');
+            }
 
         }
 

@@ -60,6 +60,7 @@ import java.util.Map;
 
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import netscape.javascript.JSObject;
 import netscape.javascript.JSObjectCreatePermission;
 import netscape.javascript.JSUtil;
@@ -250,7 +251,7 @@ public class PluginAppletSecurityContext {
             // that JNLPRuntime will try to install
             if (System.getSecurityManager() == null) {
                 JNLPRuntime.initialize(/* isApplication */false);
-                JNLPRuntime.setDefaultLaunchHandler(new DefaultLaunchHandler(System.err));
+                JNLPRuntime.setDefaultLaunchHandler(new DefaultLaunchHandler(OutputController.getLogger()));
             }
 
             JNLPRuntime.disableExit();
@@ -260,7 +261,7 @@ public class PluginAppletSecurityContext {
         try {
             u = new URL("file://");
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
 
         this.classLoaders.put(liveconnectLoader, u);
@@ -1058,7 +1059,7 @@ public class PluginAppletSecurityContext {
                 write(reference, "GetClassID " + store.getIdentifier(store.getObject(objectID).getClass()));
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,t);
             String msg = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
 
             // add an identifier string to let javaside know of the type of error
@@ -1182,7 +1183,7 @@ public class PluginAppletSecurityContext {
             store.reference(c);
         } catch (ClassNotFoundException cnfe) {
             // do nothing ... this should never happen
-            cnfe.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,cnfe);
         }
 
         return store.getIdentifier(c);
@@ -1207,7 +1208,7 @@ public class PluginAppletSecurityContext {
             }
         } catch (NoSuchMethodException e) {
             // should never happen
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
 
         return store.getIdentifier(m);
@@ -1221,10 +1222,10 @@ public class PluginAppletSecurityContext {
             f = c.getField(fieldName);
         } catch (SecurityException e) {
             // should never happen
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         } catch (NoSuchFieldException e) {
             // should never happen
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
 
         store.reference(f);

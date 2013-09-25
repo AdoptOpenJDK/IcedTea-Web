@@ -81,6 +81,7 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecuri
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
 import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageExtendedImpl;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.ScreenFinder;
 
 public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
@@ -143,7 +144,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
                     f.add(new UnsignedAppletsTrustingListPanel(ff2, ff1, cc));
                     f.setVisible(true);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 }
             }
         });
@@ -511,7 +512,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
             conf.setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, ((AppletSecurityLevel) mainPolicyComboBox.getSelectedItem()).toChars());
             conf.save();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             JOptionPane.showMessageDialog(this, ex);
         }
     }
@@ -552,7 +553,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelMatchingNote") + "\n" + appletItemsToCaption(i, Translator.R("APPEXTSECguiPanelMatched") + ": "));
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelMatchingError", ex));
         }
 
@@ -569,7 +570,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
         try {
             f = File.createTempFile("appletTable", "validation");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelCanNOtValidate", ex.toString()));
             return;
         }
@@ -600,7 +601,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
             }
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelTableValid"));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelTableInvalid ", ex.toString()));
         } finally {
             f.delete();
@@ -645,7 +646,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
                 break;
             }
         }
-        //System.out.println(+orig+" "+i+" "+nwx+" "+nw+" ");
+        //ItwLogger.getLogger().log(OutputController.Level.ERROR_ALL, orig+" "+i+" "+nwx+" "+nw+" ");
         if (nw != orig) {
             if (orig >= 1) {
                 currentTable.getSelectionModel().setSelectionInterval(orig - 1, orig - 1);
@@ -673,7 +674,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
                 break;
             }
         }
-        // System.out.println(+orig+" "+i+" "+nwx+" "+nw+" ");
+        // OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, orig+" "+i+" "+nwx+" "+nw+" ");
         if (nw != orig) {
             if (orig < currentModel.getRowCount()) {
                 currentTable.getSelectionModel().setSelectionInterval(orig + 1, orig + 1);

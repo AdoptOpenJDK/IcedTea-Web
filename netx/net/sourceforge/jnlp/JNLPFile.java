@@ -31,6 +31,7 @@ import java.util.Locale;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Provides methods to access the information in a Java Network
@@ -223,8 +224,7 @@ public class JNLPFile {
                          ((int)(Math.random()*Integer.MAX_VALUE)) + "-" +
                          location;
 
-        if (JNLPRuntime.isDebug())
-            System.err.println("UNIQUEKEY=" + this.uniqueKey);
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "UNIQUEKEY=" + this.uniqueKey);
     }
 
     /**
@@ -243,8 +243,7 @@ public class JNLPFile {
         this(location, version, settings, policy);
         this.uniqueKey = uniqueKey;
 
-        if (JNLPRuntime.isDebug())
-            System.err.println("UNIQUEKEY (override) =" + this.uniqueKey);
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "UNIQUEKEY (override) =" + this.uniqueKey);
     }
 
     /**
@@ -714,9 +713,7 @@ public class JNLPFile {
         } catch (ParseException ex) {
             throw ex;
         } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
-
+            OutputController.getLogger().log(ex);
             throw new RuntimeException(ex.toString());
         }
     }

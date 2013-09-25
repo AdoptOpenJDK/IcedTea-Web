@@ -20,6 +20,7 @@ import java.applet.*;
 import java.awt.*;
 
 import net.sourceforge.jnlp.*;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Represents a launched application instance created from a JNLP
@@ -56,10 +57,7 @@ public class AppletInstance extends ApplicationInstance {
      */
     public void setApplet(Applet applet) {
         if (this.applet != null) {
-            if (JNLPRuntime.isDebug()) {
-                Exception ex = new IllegalStateException("Applet can only be set once.");
-                ex.printStackTrace();
-            }
+                OutputController.getLogger().log(new IllegalStateException("Applet can only be set once."));
             return;
         }
         this.applet = applet;
@@ -129,8 +127,7 @@ public class AppletInstance extends ApplicationInstance {
             applet.stop();
             applet.destroy();
         } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
+            OutputController.getLogger().log(ex);
         }
 
         environment.destroy();

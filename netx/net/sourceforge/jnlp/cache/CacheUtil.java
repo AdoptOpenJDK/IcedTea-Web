@@ -48,6 +48,7 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -160,8 +161,7 @@ public class CacheUtil {
                 return location.openConnection().getPermission();
             } catch (java.io.IOException ioe) {
                 // should try to figure out the permission
-                if (JNLPRuntime.isDebug())
-                    ioe.printStackTrace();
+                OutputController.getLogger().log(ioe);
             }
         }
 
@@ -178,7 +178,7 @@ public class CacheUtil {
     public static boolean clearCache() {
 
         if (!okToClearCache()) {
-            System.err.println(R("CCannotClearCache"));
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("CCannotClearCache"));
             return false;
         }
 
@@ -187,9 +187,7 @@ public class CacheUtil {
             return false;
         }
 
-        if (JNLPRuntime.isDebug()) {
-            System.err.println("Clearing cache directory: " + cacheDir);
-        }
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Clearing cache directory: " + cacheDir);
         try {
             cacheDir = cacheDir.getCanonicalFile();
             FileUtils.recursiveDelete(cacheDir, cacheDir);
@@ -212,21 +210,14 @@ public class CacheUtil {
                 
                 FileChannel channel = fis.getChannel();
                 if (channel.tryLock() == null) {
-                    if (JNLPRuntime.isDebug()) {
-                        System.out.println("Other instances of netx are running");
-                    }
+                    OutputController.getLogger().log("Other instances of netx are running");
                     return false;
                 }
-
-                if (JNLPRuntime.isDebug()) {
-                    System.out.println("No other instances of netx are running");
-                }
+                OutputController.getLogger().log("No other instances of netx are running");
                 return true;
 
             } else {
-                if (JNLPRuntime.isDebug()) {
-                    System.out.println("No instance file found");
-                }
+                OutputController.getLogger().log("No instance file found");
                 return true;
             }
         } catch (IOException e) {
@@ -259,14 +250,11 @@ public class CacheUtil {
             CacheEntry entry = new CacheEntry(source, version); // could pool this
             boolean result = entry.isCurrent(connection);
 
-            if (JNLPRuntime.isDebug())
-                System.out.println("isCurrent: " + source + " = " + result);
+            OutputController.getLogger().log("isCurrent: " + source + " = " + result);
 
             return result;
         } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
-
+            OutputController.getLogger().log(ex);
             return isCached(source, version); // if can't connect return whether already in cache
         }
     }
@@ -287,8 +275,7 @@ public class CacheUtil {
         CacheEntry entry = new CacheEntry(source, version); // could pool this
         boolean result = entry.isCached();
 
-        if (JNLPRuntime.isDebug())
-            System.out.println("isCached: " + source + " = " + result);
+        OutputController.getLogger().log("isCached: " + source + " = " + result);
 
         return result;
     }
@@ -425,7 +412,7 @@ public class CacheUtil {
                         FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
                         lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
                     } catch (IOException ioe) {
-                        ioe.printStackTrace();
+                       OutputController.getLogger().log(ioe);
                     }
 
                     break;
@@ -568,8 +555,7 @@ public class CacheUtil {
                                   100);
             }
         } catch (InterruptedException ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
+            OutputController.getLogger().log(ex);
         } finally {
             if (listener != null)
                 indicator.disposeListener(listener);
@@ -644,7 +630,7 @@ public class CacheUtil {
                         try {
                             FileUtils.recursiveDelete(f, f);
                         } catch (IOException e1) {
-                            e1.printStackTrace();
+                            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
                         }
                     }
 
@@ -685,7 +671,7 @@ public class CacheUtil {
             propertiesLockPool.put(storeFilePath, FileUtils.getFileLock(storeFilePath, false, true));
         } catch (OverlappingFileLockException e) {
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+           OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 
@@ -704,7 +690,7 @@ public class CacheUtil {
             fl.channel().close();
             propertiesLockPool.remove(storeFile.getPath());
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 }

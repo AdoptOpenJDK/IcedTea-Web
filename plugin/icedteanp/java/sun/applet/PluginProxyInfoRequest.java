@@ -38,6 +38,7 @@ exception statement from your version. */
 package sun.applet;
 
 import java.net.URI;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This class represents a request object for proxy information for a given URI
@@ -68,7 +69,7 @@ public class PluginProxyInfoRequest extends PluginCallRequest {
         } catch (ArrayIndexOutOfBoundsException aioobe) {
             // Nothing.. this is expected if there is no proxy
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
 
         setDone(true);

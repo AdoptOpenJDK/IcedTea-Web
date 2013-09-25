@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.lang.reflect.*;
 
 /**
@@ -107,7 +108,7 @@ public class Reflect {
 
             return m.invoke(object, args);
         } catch (Exception ex) { // eat
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             return null;
         }
     }
@@ -131,7 +132,7 @@ public class Reflect {
                 }
             }
         } catch (Exception ex) { // eat
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
         }
 
         return null;

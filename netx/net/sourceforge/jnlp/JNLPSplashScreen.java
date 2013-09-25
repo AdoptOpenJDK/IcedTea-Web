@@ -54,6 +54,7 @@ import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
 import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.ScreenFinder;
 
 public class JNLPSplashScreen extends JDialog {
@@ -91,19 +92,13 @@ public class JNLPSplashScreen extends JDialog {
                 try {
                     splashImage = ImageIO.read(resourceTracker.getCacheFile(splashImageUrl));
                     if (splashImage == null) {
-                        if (JNLPRuntime.isDebug()) {
-                            System.err.println("Error loading splash image: " + url);
-                        }
+                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Error loading splash image: " + url);
                     }
                 } catch (IOException e) {
-                    if (JNLPRuntime.isDebug()) {
-                        System.err.println("Error loading splash image: " + url);
-                    }
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Error loading splash image: " + url);
                     splashImage = null;
                 } catch (IllegalArgumentException argumentException) {
-                    if (JNLPRuntime.isDebug()) {
-                        System.err.println("Error loading splash image: " + url);
-                    }
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Error loading splash image: " + url);
                     splashImage = null;
                 }
             }

@@ -82,6 +82,7 @@ import sun.awt.SunToolkit;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * The main entry point into PluginAppletViewer.
@@ -109,8 +110,8 @@ public class PluginMain {
             // Place an arbitrary handler, we only need the URL construction to not error-out
             handlers.put("javascript", new sun.net.www.protocol.http.Handler());
         } catch (Exception e) {
-            System.err.println("Unable to install 'javascript:' URL protocol handler!");
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to install 'javascript:' URL protocol handler!");
+            OutputController.getLogger().log(e);
         }
     }
 
@@ -125,16 +126,12 @@ public class PluginMain {
         installDummyJavascriptProtocolHandler();
 
         if (args.length != 2 || !(new File(args[0]).exists()) || !(new File(args[1]).exists())) {
-            System.err.println("Invalid pipe names provided. Refusing to proceed.");
-            System.exit(1);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Invalid pipe names provided. Refusing to proceed.");
+            JNLPRuntime.exit(1);
         }
         DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
         try {
             PluginStreamHandler streamHandler = connect(args[0], args[1]);
-            boolean redirectStreams = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
-
-            // must be called before JNLPRuntime.initialize()
-            JNLPRuntime.setRedirectStreams(redirectStreams);
 
             PluginAppletSecurityContext sc = new PluginAppletSecurityContext(0);
             sc.prePopulateLCClasses();
@@ -152,9 +149,9 @@ public class PluginMain {
             setCookieHandler(streamHandler);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Something very bad happened. I don't know what to do, so I am going to exit :(");
-            System.exit(1);
+            OutputController.getLogger().log(e);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Something very bad happened. I don't know what to do, so I am going to exit :(");
+            JNLPRuntime.exit(1);
         }
     }
 
@@ -168,7 +165,7 @@ public class PluginMain {
             streamHandler = new PluginStreamHandler(new FileInputStream(inPipe), new FileOutputStream(outPipe));
             PluginDebug.debug("Streams initialized");
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,ioe);
         }
         return streamHandler;
     }

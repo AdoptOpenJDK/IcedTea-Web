@@ -58,6 +58,7 @@ import javax.net.ssl.X509TrustManager;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.security.util.HostnameChecker;
 import sun.security.validator.ValidatorException;
 
@@ -110,7 +111,7 @@ final public class VariableX509TrustManager {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         /*
@@ -135,7 +136,7 @@ final public class VariableX509TrustManager {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         /*
@@ -159,7 +160,7 @@ final public class VariableX509TrustManager {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 
@@ -328,7 +329,7 @@ final public class VariableX509TrustManager {
         // finally check temp trusted certs
         if (!temporarilyTrusted.contains(chain[0])) {
             if (savedException == null) {
-                // System.out.println("IMPOSSIBLE!");
+                // OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "IMPOSSIBLE!");
                 throw new ValidatorException(ValidatorException.T_SIGNATURE_ERROR, chain[0]);
             }
             throw savedException;

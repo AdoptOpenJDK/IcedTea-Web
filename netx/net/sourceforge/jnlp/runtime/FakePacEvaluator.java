@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 import java.net.URL;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * A dummy PacEvaluator that always returns "DIRECT"
@@ -46,9 +47,7 @@ import java.net.URL;
 public class FakePacEvaluator implements PacEvaluator {
     @Override
     public String getProxies(URL url) {
-        if (JNLPRuntime.isDebug()) {
-            System.err.println(R("RPRoxyPacNotSupported"));
-        }
+        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RPRoxyPacNotSupported"));
         return "DIRECT";
     }
 }

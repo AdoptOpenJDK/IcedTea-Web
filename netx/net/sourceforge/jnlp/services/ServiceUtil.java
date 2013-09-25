@@ -42,6 +42,7 @@ import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Provides static methods to interact useful for using the JNLP
@@ -172,10 +173,10 @@ public class ServiceUtil {
 
         public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
             if (JNLPRuntime.isDebug()) {
-                System.err.println("call privileged method: " + method.getName());
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "call privileged method: " + method.getName());
                 if (args != null)
                     for (int i = 0; i < args.length; i++)
-                        System.err.println("           arg: " + args[i]);
+                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "           arg: " + args[i]);
             }
 
             PrivilegedExceptionAction<Object> invoker = new PrivilegedExceptionAction<Object>() {
@@ -187,8 +188,7 @@ public class ServiceUtil {
             try {
                 Object result = AccessController.doPrivileged(invoker);
 
-                if (JNLPRuntime.isDebug())
-                    System.err.println("        result: " + result);
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "        result: " + result);
 
                 return result;
             } catch (PrivilegedActionException e) {
@@ -306,11 +306,12 @@ public class ServiceUtil {
             try {
                 c = Class.forName(stack[i].getClassName());
             } catch (Exception e1) {
+                OutputController.getLogger().log(e1);
                 try {
                     c = Class.forName(stack[i].getClassName(), false,
                             app.getClassLoader());
                 } catch (Exception e2) {
-                    System.err.println(e2.getMessage());
+                    OutputController.getLogger().log(e2);
                 }
             }
 

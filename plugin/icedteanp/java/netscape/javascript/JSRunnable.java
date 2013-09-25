@@ -39,6 +39,7 @@
 
 package netscape.javascript;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.applet.PluginDebug;
 
 /**
@@ -66,7 +67,7 @@ public class JSRunnable implements Runnable {
             }
         } catch (Throwable t) {
             PluginDebug.debug(t.toString());
-            t.printStackTrace(System.err);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,t);
         }
     }
 }

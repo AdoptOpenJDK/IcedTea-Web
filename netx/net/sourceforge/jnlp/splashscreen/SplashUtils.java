@@ -41,6 +41,7 @@ import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.splashscreen.impls.*;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class SplashUtils {
 
@@ -77,11 +78,9 @@ public class SplashUtils {
         try {
             showError(ex, appletInstance);
         } catch (Throwable t) {
-            if (JNLPRuntime.isDebug()) {
                 // prinitng this exception is discutable. I have let it in for case that
                 //some retyping will fail
-                t.printStackTrace();
-            }
+                OutputController.getLogger().log(t);
         }
     }
 
@@ -174,7 +173,7 @@ public class SplashUtils {
             pluginSplashEnvironmetVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
             splashEnvironmetVar = System.getenv(ICEDTEA_WEB_SPLASH);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
         }
         SplashPanel sp = null;
         if (SplashReason.JAVAWS.equals(splashReason)) {

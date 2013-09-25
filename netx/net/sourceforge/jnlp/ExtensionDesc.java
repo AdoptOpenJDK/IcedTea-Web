@@ -23,6 +23,7 @@ import java.net.*;
 import java.util.*;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * The extension element.
@@ -122,8 +123,7 @@ public class ExtensionDesc {
         if (file == null) {
             file = new JNLPFile(location);
 
-            if (JNLPRuntime.isDebug())
-                System.out.println("Resolve: " + file.getInformation().getTitle());
+            OutputController.getLogger().log("Resolve: " + file.getInformation().getTitle());
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())

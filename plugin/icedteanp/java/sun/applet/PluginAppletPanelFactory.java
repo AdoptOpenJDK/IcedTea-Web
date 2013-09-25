@@ -71,6 +71,7 @@ import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.NetxPanel;
 import net.sourceforge.jnlp.PluginParameters;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Lets us construct one using unix-style one shot behaviors
@@ -115,7 +116,7 @@ class PluginAppletPanelFactory {
         try {
             panelInit.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
 
         setAppletViewerSize(panel, params.getWidth(), params.getHeight());
@@ -161,11 +162,11 @@ class PluginAppletPanelFactory {
         } catch (InvocationTargetException e) {
             // Not being able to resize is non-fatal
             PluginDebug.debug("Unable to resize panel: ");
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         } catch (InterruptedException e) {
             // Not being able to resize is non-fatal
             PluginDebug.debug("Unable to resize panel: ");
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
     }
     /**

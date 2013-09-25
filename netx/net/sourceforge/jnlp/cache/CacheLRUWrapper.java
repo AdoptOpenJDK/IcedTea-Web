@@ -53,6 +53,7 @@ import java.util.Map.Entry;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 /**
@@ -90,7 +91,7 @@ public enum CacheLRUWrapper {
                 FileUtils.createParentDir(f);
                 FileUtils.createRestrictedFile(f, true);
             } catch (IOException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
     }
@@ -114,12 +115,10 @@ public enum CacheLRUWrapper {
          * clean up possibly corrupted entries
          */
         if (loaded && checkData()) {
-            if (JNLPRuntime.isDebug()) {
-                new LruCacheException().printStackTrace();
-            }
-            System.out.println(R("CFakeCache"));
+            OutputController.getLogger().log(new LruCacheException());
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CFakeCache"));
             store();
-            System.out.println(R("CFakedCache"));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CFakedCache"));
         }
     }
 
@@ -246,7 +245,7 @@ public enum CacheLRUWrapper {
             fl = FileUtils.getFileLock(cacheOrder.getStoreFile().getPath(), false, true);
         } catch (OverlappingFileLockException e) { // if overlap we just increase the count.
         } catch (Exception e) { // We didn't get a lock..
-            e.printStackTrace();
+            OutputController.getLogger().log(e);
         }
         if (fl != null) lockCount++;
     }
@@ -264,7 +263,7 @@ public enum CacheLRUWrapper {
                     fl = null;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(e);
             }
         }
     }

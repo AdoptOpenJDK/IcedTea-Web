@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -146,7 +147,7 @@ public final class FileUtils {
     public static void deleteWithErrMesg(File f, String eMsg) {
         if (f.exists()) {
             if (!f.delete()) {
-                System.err.println(R("RCantDeleteFile", eMsg == null ? f : eMsg));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantDeleteFile", eMsg == null ? f : eMsg));
             }
         }
     }
@@ -187,34 +188,34 @@ public final class FileUtils {
         if (JNLPRuntime.isWindows()) {
             // remove all permissions
             if (!tempFile.setExecutable(false, false)) {
-                System.err.println(R("RRemoveXPermFailed", tempFile));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RRemoveXPermFailed", tempFile));
             }
             if (!tempFile.setReadable(false, false)) {
-                System.err.println(R("RRemoveRPermFailed", tempFile));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RRemoveRPermFailed", tempFile));
             }
             if (!tempFile.setWritable(false, false)) {
-                System.err.println(R("RRemoveWPermFailed", tempFile));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RRemoveWPermFailed", tempFile));
             }
 
             // allow owner to read
             if (!tempFile.setReadable(true, true)) {
-                System.err.println(R("RGetRPermFailed", tempFile));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RGetRPermFailed", tempFile));
             }
 
             // allow owner to write
             if (writableByOwner && !tempFile.setWritable(true, true)) {
-                System.err.println(R("RGetWPermFailed", tempFile));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RGetWPermFailed", tempFile));
             }
 
             // allow owner to enter directories
             if (isDir && !tempFile.setExecutable(true, true)) {
-                System.err.println(R("RGetXPermFailed", tempFile));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RGetXPermFailed", tempFile));
             }
             // rename this file. Unless the file is moved/renamed, any program that
             // opened the file right after it was created might still be able to
             // read the data.
             if (!tempFile.renameTo(file)) {
-                System.err.println(R("RCantRename", tempFile, file));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantRename", tempFile, file));
             }
         } else {
         // remove all permissions
@@ -318,9 +319,7 @@ public final class FileUtils {
      *         outside the base
      */
     public static void recursiveDelete(File file, File base) throws IOException {
-        if (JNLPRuntime.isDebug()) {
-            System.err.println("Deleting: " + file);
-        }
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Deleting: " + file);
 
         if (!(file.getCanonicalPath().startsWith(base.getCanonicalPath()))) {
             throw new IOException("Trying to delete a file outside Netx's basedir: "
@@ -373,7 +372,7 @@ public final class FileUtils {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
         return lock;
     }

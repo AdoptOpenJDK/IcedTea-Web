@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.html.parser.ParserDelegator;
 import net.sourceforge.jnlp.runtime.AppletEnvironment;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import sun.awt.SunToolkit;
 
@@ -77,7 +78,7 @@ public class Launcher {
     /** whether to create an AppContext (if possible) */
     private boolean context = true;
 
-    /** If the application should call System.exit on fatal errors */
+    /** If the application should call JNLPRuntime.exit on fatal errors */
     private boolean exitOnFailure = true;
 
     private ParserSettings parserSettings = new ParserSettings();
@@ -229,10 +230,10 @@ public class Launcher {
                 InetAddress.getByName(file.getSourceLocation().getHost());
 
             } catch (UnknownHostException ue) {
-                System.err.println("File cannot be launched because offline-allowed tag not specified and system currently offline.");
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "File cannot be launched because offline-allowed tag not specified and system currently offline.");
                 return null;
             } catch (Exception e) {
-                System.err.println(e);
+                OutputController.getLogger().log(e);
             }
         }
 
@@ -483,9 +484,7 @@ public class Launcher {
             try {
                 ServiceUtil.checkExistingSingleInstance(file);
             } catch (InstanceExistsException e) {
-                if (JNLPRuntime.isDebug()) {
-                    System.out.println("Single instance application is already running.");
-                }
+                OutputController.getLogger().log("Single instance application is already running.");
                 return null;
             }
 
@@ -544,9 +543,7 @@ public class Launcher {
 
             main.setAccessible(true);
 
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("Invoking main() with args: " + Arrays.toString(args));
-            }
+            OutputController.getLogger().log("Invoking main() with args: " + Arrays.toString(args));
             main.invoke(null, new Object[] { args });
 
             return app;
@@ -580,9 +577,7 @@ public class Launcher {
 
         for (Thread thread : threads) {
             if (thread != null) {
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println("Setting " + classLoader + " as the classloader for thread " + thread.getName());
-                }
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Setting " + classLoader + " as the classloader for thread " + thread.getName());
                 thread.setContextClassLoader(classLoader);
             }
         }
@@ -629,9 +624,7 @@ public class Launcher {
             applet.getAppletEnvironment().startApplet(); // this should be a direct call to applet instance
             return applet;
         } catch (InstanceExistsException ieex) {
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("Single instance applet is already running.");
-            }
+            OutputController.getLogger().log("Single instance applet is already running.");
             throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")), applet);
         } catch (LaunchException lex) {
             throw launchError(lex, applet);
@@ -659,9 +652,7 @@ public class Launcher {
             return applet;
 
         } catch (InstanceExistsException ieex) {
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("Single instance applet is already running.");
-            }
+            OutputController.getLogger().log("Single instance applet is already running.");
             throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")), applet);
         } catch (LaunchException lex) {
             throw launchError(lex, applet);
@@ -898,11 +889,11 @@ public class Launcher {
                                                 R("LNotLaunchableInfo")));
                 }
             } catch (LaunchException ex) {
-                ex.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 exception = ex;
                 // Exit if we can't launch the application.
                 if (exitOnFailure)
-                    System.exit(1);
+                    JNLPRuntime.exit(1);
             }
         }
 

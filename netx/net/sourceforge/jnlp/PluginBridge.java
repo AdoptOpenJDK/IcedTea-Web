@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.misc.BASE64Decoder;
 
 /**
@@ -130,7 +131,7 @@ public class PluginBridge extends JNLPFile {
             } catch (MalformedURLException e) {
                 // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
                 // it is the site developer who should ensure that file exist.
-                System.err.println("Unable to get JNLP file at: " + params.getJNLPHref()
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to get JNLP file at: " + params.getJNLPHref()
                         + " with context of URL as: " + codeBase.toExternalForm());
             }
         } else {
@@ -174,10 +175,8 @@ public class PluginBridge extends JNLPFile {
 
             addArchiveEntries(archives);
 
-            if (JNLPRuntime.isDebug()) {
-                System.err.println("Jar string: " + archive);
-                System.err.println("jars length: " + archives.length);
-            }
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jar string: " + archive);
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "jars length: " + archives.length);
         }
 
         if (main.endsWith(".class"))

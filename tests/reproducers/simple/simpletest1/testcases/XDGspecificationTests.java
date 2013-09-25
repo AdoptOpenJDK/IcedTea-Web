@@ -205,7 +205,6 @@ public class XDGspecificationTests extends BrowserTest {
             Entry<String, String> entry = it.next();
             String v = entry.getValue();
             String s = entry.getKey() + "=" + v;
-            //System.out.println(s);
             if (entry.getKey().equals(XDG_CACHE_HOME) || entry.getKey().equals(XDG_CONFIG_HOME)) {
                 ServerAccess.logOutputReprint("ignoring " + s);
                 c++;
@@ -243,7 +242,6 @@ public class XDGspecificationTests extends BrowserTest {
             Entry<String, String> entry = it.next();
             String v = entry.getValue();
             String s = entry.getKey() + "=" + v;
-            //System.out.println(s);
             if (entry.getKey().equals(XDG_CACHE_HOME)) {
                 ServerAccess.logOutputReprint(entry.getKey() + " was " + v);
                 v = cacheF.getAbsolutePath();

@@ -1,3 +1,128 @@
+2013-09-25  Jiri Vanek  <jvanek@redhat.com>
+
+	Added logging bottleneck
+	* netx/net/sourceforge/jnlp/AbstractLaunchHandler.java: extracted system.out/err
+	and printStackTrace in favour of outputController.log methods. Same all below
+	* netx/net/sourceforge/jnlp/DefaultLaunchHandler.java
+	* netx/net/sourceforge/jnlp/ExtensionDesc.java
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java
+	* netx/net/sourceforge/jnlp/JNLPFile.java
+	* netx/net/sourceforge/jnlp/JNLPMatcher.java
+	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java
+	* netx/net/sourceforge/jnlp/Launcher.java
+	* netx/net/sourceforge/jnlp/MalformedXMLParser.java
+	* netx/net/sourceforge/jnlp/NetxPanel.java
+	* netx/net/sourceforge/jnlp/Parser.java
+	* netx/net/sourceforge/jnlp/PluginBridge.java
+	* netx/net/sourceforge/jnlp/SecurityDesc.java
+	* netx/net/sourceforge/jnlp/StreamEater.java
+	* netx/net/sourceforge/jnlp/XmlParser.java
+	* netx/net/sourceforge/jnlp/about/HTMLPanel.java
+	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java
+	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesFinder.java
+	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesParser.java
+	* netx/net/sourceforge/jnlp/cache/CacheDirectory.java
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java
+	* netx/net/sourceforge/jnlp/cache/NativeLibraryStorage.java
+	* netx/net/sourceforge/jnlp/cache/Resource.java
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+	* netx/net/sourceforge/jnlp/config/Defaults.java
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/DocumentAdapter.java
+	* netx/net/sourceforge/jnlp/controlpanel/JVMPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java
+	* netx/net/sourceforge/jnlp/resources/Messages.properties
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties
+	* netx/net/sourceforge/jnlp/runtime/AppletAudioClip.java
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java
+	* netx/net/sourceforge/jnlp/runtime/AppletInstance.java
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java
+	* netx/net/sourceforge/jnlp/runtime/Boot.java
+	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java
+	* netx/net/sourceforge/jnlp/runtime/FakePacEvaluator.java
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	* netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java
+	* netx/net/sourceforge/jnlp/runtime/PacEvaluatorFactory.java
+	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java
+	* netx/net/sourceforge/jnlp/security/HttpsCertVerifier.java
+	* netx/net/sourceforge/jnlp/security/KeyStores.java
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessageHandler.java
+	* netx/net/sourceforge/jnlp/security/SecurityUtil.java
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExtendedAppletSecurityHelp.java
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java
+	* netx/net/sourceforge/jnlp/services/XBasicService.java
+	* netx/net/sourceforge/jnlp/services/XPersistenceService.java
+	* netx/net/sourceforge/jnlp/services/XPrintService.java
+	* netx/net/sourceforge/jnlp/services/XSingleInstanceService.java
+	* netx/net/sourceforge/jnlp/splashscreen/SplashUtils.java
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainter.java
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/ErrorPainter.java
+	* netx/net/sourceforge/jnlp/splashscreen/parts/InformationElement.java
+	* netx/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialog.java
+	* netx/net/sourceforge/jnlp/tools/CertInformation.java
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java
+	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java
+	* netx/net/sourceforge/jnlp/util/FileUtils.java
+	* netx/net/sourceforge/jnlp/util/HttpUtils.java
+	* netx/net/sourceforge/jnlp/util/ImageResources.java
+	* netx/net/sourceforge/jnlp/util/PropertiesFile.java
+	* netx/net/sourceforge/jnlp/util/Reflect.java
+	* netx/net/sourceforge/jnlp/util/StreamUtils.java
+	* netx/net/sourceforge/jnlp/util/TimedHashMap.java
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java
+	* netx/net/sourceforge/nanoxml/XMLElement.java
+	* plugin/icedteanp/java/netscape/javascript/JSRunnable.java
+	* plugin/icedteanp/java/sun/applet/JavaConsole.java
+	* plugin/icedteanp/java/sun/applet/PluginAppletPanelFactory.java
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	* plugin/icedteanp/java/sun/applet/PluginDebug.java
+	* plugin/icedteanp/java/sun/applet/PluginException.java
+	* plugin/icedteanp/java/sun/applet/PluginMain.java
+	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java
+	* plugin/icedteanp/java/sun/applet/PluginMessageHandlerWorker.java
+	* plugin/icedteanp/java/sun/applet/PluginProxyInfoRequest.java
+	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
+	* plugin/icedteanp/java/sun/applet/PluginStreamHandler.java
+	* tests/netx/unit/net/sourceforge/jnlp/DefaultLaunchHandlerTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/util/HttpUtilsTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/util/XDesktopEntryTest.java
+	* tests/reproducers/simple/simpletest1/testcases/XDGspecificationTests.java
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java
+	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: new file, derived from 
+	AppletLog. Now have responsibility to log to custom file.
+	* netx/net/sourceforge/jnlp/util/logging/LogConfig.java: new file derived from Log
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: new bottleneck for logging
+	* netx/net/sourceforge/jnlp/util/logging/PrintStreamLogger.java: logger to std.streams
+	* netx/net/sourceforge/jnlp/util/logging/SingleStreamLogger.java: interface common to all new loggers
+	* netx/net/sourceforge/jnlp/util/logging/UnixSystemLog.java: not yet implemented  susytem log
+	* netx/net/sourceforge/jnlp/util/logging/WinSystemLog.java: not yet implemented  susytem log
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/FileLogTest.java: new set of tests
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/OutputControllerTest.java: new set of tests
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/PrintStreamLoggerTest.java: new set of tests
+	* netx/net/sourceforge/jnlp/AppletLog.java: removed
+	* netx/net/sourceforge/jnlp/Log.java: rmeoved
+	
+
 2013-09-24  Omair Majid  <omajid@redhat.com>
 
 	PR1474

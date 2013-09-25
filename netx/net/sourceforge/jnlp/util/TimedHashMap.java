@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.util.HashMap;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -82,15 +83,11 @@ public class TimedHashMap<K, V> {
 
             // Item exists. If it has not expired, renew its access time and return it
             if (age <= expiry) {
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println("Returning proxy " + actualMap.get(key) + " from cache for " + key);
-                }
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Returning proxy " + actualMap.get(key) + " from cache for " + key);
                 timeStamps.put(key, System.nanoTime());
                 return actualMap.get(key);
             } else {
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println("Proxy cache for " + key + " has expired (age=" + (age * 1e-9) + " seconds)");
-                }
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Proxy cache for " + key + " has expired (age=" + (age * 1e-9) + " seconds)");
             }
         }
 

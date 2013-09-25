@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package sun.applet;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 class PluginMessageHandlerWorker extends Thread {
 
     private boolean free = true;
@@ -56,7 +58,7 @@ class PluginMessageHandlerWorker extends Thread {
             wait(1000);
         } catch (InterruptedException e) {
             // Should not typically occur
-            e.printStackTrace();
+           OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
     }
 

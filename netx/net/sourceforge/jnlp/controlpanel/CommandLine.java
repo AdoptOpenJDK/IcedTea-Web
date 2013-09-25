@@ -31,6 +31,8 @@ import javax.naming.ConfigurationException;
 import net.sourceforge.jnlp.config.ConfiguratonValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Encapsulates a command line interface to the deployment configuration.
@@ -80,7 +82,8 @@ public class CommandLine {
         try {
             config.load(false);
         } catch (ConfigurationException e) {
-            System.out.println(R("RConfigurationFatal"));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("RConfigurationFatal"));
+            OutputController.getLogger().log(e);
         }
     }
 
@@ -91,10 +94,10 @@ public class CommandLine {
      * @return the result of handling the help command. SUCCESS if no errors occurred.
      */
     public int handleHelpCommand(List<String> args) {
-        System.out.println(R("Usage"));
-        System.out.println("  " + PROGRAM_NAME + " "
+        OutputController.getLogger().printOutLn(R("Usage"));
+        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " "
                 + allCommands.toString().replace(',', '|').replaceAll(" ", "") + " [help]");
-        System.out.println(R("CLHelpDescription", PROGRAM_NAME));
+        OutputController.getLogger().printOutLn(R("CLHelpDescription", PROGRAM_NAME));
         return SUCCESS;
     }
 
@@ -102,9 +105,9 @@ public class CommandLine {
      * Prints help message for the list command
      */
     public void printListHelp() {
-        System.out.println(R("Usage"));
-        System.out.println("  " + PROGRAM_NAME + " list [--details]");
-        System.out.println(R("CLListDescription"));
+        OutputController.getLogger().printOutLn(R("Usage"));
+        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " list [--details]");
+        OutputController.getLogger().printOutLn(R("CLListDescription"));
     }
 
     /**
@@ -134,9 +137,9 @@ public class CommandLine {
         Map<String, Setting<String>> all = config.getRaw();
         for (String key : all.keySet()) {
             Setting<String> value = all.get(key);
-            System.out.println(key + ": " + value.getValue());
+            OutputController.getLogger().printOutLn(key + ": " + value.getValue());
             if (verbose) {
-                System.out.println("\t" + R("CLDescription", value.getDescription()));
+                OutputController.getLogger().printOutLn("\t" + R("CLDescription", value.getDescription()));
             }
         }
         return SUCCESS;
@@ -146,9 +149,9 @@ public class CommandLine {
      * Prints help message for the get command
      */
     public void printGetHelp() {
-        System.out.println(R("Usage"));
-        System.out.println("  " + PROGRAM_NAME + " get property-name");
-        System.out.println(R("CLGetDescription"));
+        OutputController.getLogger().printOutLn(R("Usage"));
+        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " get property-name");
+        OutputController.getLogger().printOutLn(R("CLGetDescription"));
     }
 
     /**
@@ -175,10 +178,10 @@ public class CommandLine {
         String value = null;
         if (all.containsKey(key)) {
             value = all.get(key).getValue();
-            System.out.println(value);
+            OutputController.getLogger().printOutLn(value);
             return SUCCESS;
         } else {
-            System.out.println(R("CLUnknownProperty", key));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", key));
             return ERROR;
         }
     }
@@ -187,9 +190,9 @@ public class CommandLine {
      * Prints the help message for the 'set' command
      */
     public void printSetHelp() {
-        System.out.println(R("Usage"));
-        System.out.println("  " + PROGRAM_NAME + " set property-name value");
-        System.out.println(R("CLSetDescription"));
+        OutputController.getLogger().printOutLn(R("Usage"));
+        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " set property-name value");
+        OutputController.getLogger().printOutLn(R("CLSetDescription"));
     }
 
     /**
@@ -219,20 +222,21 @@ public class CommandLine {
                 try {
                     old.getValidator().validate(value);
                 } catch (IllegalArgumentException e) {
-                    System.out.println(R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()));
+                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()));
+                    OutputController.getLogger().log(e);
                     return ERROR;
                 }
             }
             config.setProperty(key, value);
         } else {
-            System.out.println(R("CLWarningUnknownProperty", key));
+            OutputController.getLogger().printOutLn(R("CLWarningUnknownProperty", key));
             config.setProperty(key, value);
         }
 
         try {
             config.save();
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             return ERROR;
         }
 
@@ -243,9 +247,9 @@ public class CommandLine {
      * Prints a help message for the reset command
      */
     public void printResetHelp() {
-        System.out.println(R("Usage"));
-        System.out.println("  " + PROGRAM_NAME + " reset [all|property-name]");
-        System.out.println(R("CLResetDescription"));
+        OutputController.getLogger().printOutLn(R("Usage"));
+        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " reset [all|property-name]");
+        OutputController.getLogger().printOutLn(R("CLResetDescription"));
     }
 
     /**
@@ -275,7 +279,7 @@ public class CommandLine {
 
         Map<String, Setting<String>> all = config.getRaw();
         if (!resetAll && !all.containsKey(key)) {
-            System.out.println(R("CLUnknownProperty", key));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", key));
             return ERROR;
         }
 
@@ -292,7 +296,7 @@ public class CommandLine {
         try {
             config.save();
         } catch (IOException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             return ERROR;
         }
 
@@ -303,9 +307,9 @@ public class CommandLine {
      * Print a help message for the 'info' command
      */
     public void printInfoHelp() {
-        System.out.println(R("Usage"));
-        System.out.println("  " + PROGRAM_NAME + " info property-name");
-        System.out.println(R("CLInfoDescription"));
+        OutputController.getLogger().printOutLn(R("Usage"));
+        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " info property-name");
+        OutputController.getLogger().printOutLn(R("CLInfoDescription"));
     }
 
     /**
@@ -331,15 +335,15 @@ public class CommandLine {
         String key = args.get(0);
         Setting<String> value = all.get(key);
         if (value == null) {
-            System.out.println(R("CLNoInfo"));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLNoInfo"));
             return ERROR;
         } else {
-            System.out.println(R("CLDescription", value.getDescription()));
-            System.out.println(R("CLValue", value.getValue()));
+            OutputController.getLogger().printOutLn(R("CLDescription", value.getDescription()));
+            OutputController.getLogger().printOutLn(R("CLValue", value.getValue()));
             if (value.getValidator() != null) {
-                System.out.println("\t" + R("VVPossibleValues", value.getValidator().getPossibleValues()));
+                OutputController.getLogger().printOutLn("\t" + R("VVPossibleValues", value.getValidator().getPossibleValues()));
             }
-            System.out.println(R("CLValueSource", value.getSource()));
+            OutputController.getLogger().printOutLn(R("CLValueSource", value.getSource()));
             return SUCCESS;
         }
     }
@@ -348,9 +352,9 @@ public class CommandLine {
      * Prints a help message for the 'check' command
      */
     public void printCheckHelp() {
-        System.out.println(R("Usage"));
-        System.out.println("  " + PROGRAM_NAME + " check");
-        System.out.println(R("CLCheckDescription"));
+        OutputController.getLogger().printOutLn(R("Usage"));
+        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " check");
+        OutputController.getLogger().printOutLn(R("CLCheckDescription"));
     }
 
     /**
@@ -378,17 +382,17 @@ public class CommandLine {
 
         boolean allValid = true;
         for (Setting<String> setting : validator.getIncorrectSetting()) {
-            System.out.println(R("CLIncorrectValue", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues()));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLIncorrectValue", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues()));
             allValid = false;
         }
 
         for (Setting<String> setting : validator.getUnrecognizedSetting()) {
-            System.out.println(R("CLUnknownProperty", setting.getName()));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", setting.getName()));
             allValid = false;
         }
 
         if (allValid) {
-            System.out.println(R("CLNoIssuesFound"));
+            OutputController.getLogger().printOutLn(R("CLNoIssuesFound"));
             return SUCCESS;
         } else {
             return ERROR;
@@ -437,10 +441,10 @@ public class CommandLine {
         } else if (command.equals("check")) {
             val = handleCheckCommand(arguments);
         } else if (allCommands.contains(command)) {
-            System.out.println("INTERNAL ERROR: " + command + " should have been implemented");
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "INTERNAL ERROR: " + command + " should have been implemented");
             val = ERROR;
         } else {
-            System.out.println(R("CLUnknownCommand", command));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownCommand", command));
             handleHelpCommand(new ArrayList<String>());
             val = ERROR;
         }
@@ -460,10 +464,10 @@ public class CommandLine {
             CommandLine cli = new CommandLine();
             int result = cli.handle(args);
 
-            // instead of returning, use System.exit() so we can pass back
+            // instead of returning, use JNLPRuntime.exit() so we can pass back
             // error codes indicating success or failure. Otherwise using
             // this program for scripting will become much more challenging
-            System.exit(result);
+            JNLPRuntime.exit(result);
         }
     }
 }

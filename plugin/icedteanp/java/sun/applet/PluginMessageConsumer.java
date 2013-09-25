@@ -39,6 +39,7 @@ package sun.applet;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 class PluginMessageConsumer {
 
@@ -143,7 +144,7 @@ class PluginMessageConsumer {
                 wait(1000);
             } catch (InterruptedException e) {
                 // Should not typically occur
-                e.printStackTrace();
+               OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
             }
         }
 

@@ -66,6 +66,7 @@ import javax.swing.border.TitledBorder;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * A simple Java console for IcedTeaPlugin
@@ -87,7 +88,7 @@ public class JavaConsole {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
 
         final String logDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
@@ -154,9 +155,9 @@ public class JavaConsole {
         gcButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
-                System.out.print("Performing Garbage Collection....");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Performing Garbage Collection....");
                 System.gc();
-                System.out.println("Done");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Done");
                 printMemoryInfo();
             }
 
@@ -167,9 +168,9 @@ public class JavaConsole {
         finalizersButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
-                System.out.print("Running finalization....");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Running finalization....");
                 Runtime.getRuntime().runFinalization();
-                System.out.println("Done");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Done");
                 printMemoryInfo();
             }
         });
@@ -253,40 +254,40 @@ public class JavaConsole {
 
     protected void printSystemProperties() {
 
-        System.out.println(" ----");
-        System.out.println("System Properties:");
-        System.out.println();
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "System Properties:");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "");
         Properties p = System.getProperties();
         Set<Object> keys = p.keySet();
         for (Object key : keys) {
-            System.out.println(key.toString() + ": " + p.get(key));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, key.toString() + ": " + p.get(key));
         }
 
-        System.out.println(" ----");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
     }
 
     private void printClassLoaders() {
-        System.out.println(" ----");
-        System.out.println("Available Classloaders: ");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Available Classloaders: ");
         Set<String> loaders = PluginAppletSecurityContext.getLoaderInfo().keySet();
         for (String loader : loaders) {
-            System.out.println(loader + "\n"
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, loader + "\n"
                     + "  codebase = "
                     + PluginAppletSecurityContext.getLoaderInfo().get(loader));
         }
-        System.out.println(" ----");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
     }
 
     private void printMemoryInfo() {
-        System.out.println(" ----- ");
-        System.out.println("  Memory Info:");
-        System.out.println("    Max Memory:   "
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----- ");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  Memory Info:");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    Max Memory:   "
                 + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
-        System.out.println("    Total Memory: "
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    Total Memory: "
                 + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
-        System.out.println("    Free Memory:  "
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    Free Memory:  "
                 + String.format("%1$10d", Runtime.getRuntime().freeMemory()));
-        System.out.println(" ----");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
 
     }
 
@@ -294,9 +295,9 @@ public class JavaConsole {
         Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
         Set<Thread> keys = map.keySet();
         for (Thread key : keys) {
-            System.out.println("Thread " + key.getId() + ": " + key.getName());
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Thread " + key.getId() + ": " + key.getName());
             for (StackTraceElement element : map.get(key)) {
-                System.out.println("  " + element);
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  " + element);
             }
 
         }
@@ -355,13 +356,11 @@ public class JavaConsole {
                 }
 
             } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+               OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
                 Thread.currentThread().interrupt();
             }
 

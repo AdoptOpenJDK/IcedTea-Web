@@ -55,6 +55,7 @@ import java.util.StringTokenizer;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * The <code>KeyStores</code> class allows easily accessing the various KeyStores
@@ -141,7 +142,7 @@ public final class KeyStores {
             //to keystore, then this will not be blocker for garbage collection
             keystoresPaths.put(ks.hashCode(),location);
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
         return ks;
     }

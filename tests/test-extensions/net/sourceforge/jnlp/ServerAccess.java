@@ -61,6 +61,7 @@ import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import org.junit.Assert;
 
 /**
@@ -756,16 +757,7 @@ public class ServerAccess {
         logException(t, true);
     }
     public static void logException(Throwable t, boolean print){
-        try{
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        t.printStackTrace(pw);
-        log(sw.toString(), false, print);
-        pw.close();
-        sw.close();
-        }catch(Exception ex){
-           throw new RuntimeException(ex);
-        }
+        log(OutputController.exceptionToString(t), false, print);
     }
 
     private static StackTraceElement getTestMethod() {

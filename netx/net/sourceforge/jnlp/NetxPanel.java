@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentMap;
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import sun.applet.AppletViewerPanel;
 import sun.awt.SunToolkit;
@@ -87,7 +88,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
          * Log any exceptions thrown while loading, initializing, starting,
          * and stopping the applet. 
          */
-        AppletLog.log(t);
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, t); //new logger
         super.showAppletException(t);
     }
 
@@ -125,7 +126,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             }
         } catch (Exception e) {
             status = APPLET_ERROR;
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             replaceSplash(SplashUtils.getErrorSplashScreen(getWidth(), getHeight(), e));
         } finally {
             // PR1157: This needs to occur even in the case of an exception
@@ -148,13 +149,11 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
         synchronized (JNLPRuntime.initMutex) {
             //The custom NetX Policy and SecurityManager are set here.
             if (!JNLPRuntime.isInitialized()) {
-                if (JNLPRuntime.isDebug())
-                    System.out.println("initializing JNLPRuntime...");
+                OutputController.getLogger().log("initializing JNLPRuntime...");
 
                 JNLPRuntime.initialize(false);
             } else {
-                if (JNLPRuntime.isDebug())
-                    System.out.println("JNLPRuntime already initialized");
+                OutputController.getLogger().log("JNLPRuntime already initialized");
             }
         }
 

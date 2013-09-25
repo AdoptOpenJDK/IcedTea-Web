@@ -37,10 +37,12 @@ exception statement from your version. */
 
 package sun.applet;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 public class PluginException extends Exception {
 
     public PluginException(PluginStreamHandler sh, int instance, int reference, Throwable t) {
-        t.printStackTrace();
+        OutputController.getLogger().log(OutputController.Level.ERROR_ALL,t);
         this.setStackTrace(t.getStackTrace());
 
         AppletSecurityContextManager.dumpStore(0);

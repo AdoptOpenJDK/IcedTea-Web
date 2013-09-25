@@ -37,14 +37,13 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -62,12 +61,6 @@ import javax.swing.JTextArea;
  */
 public class BasicExceptionDialog {
 
-    private static String exceptionToString(Exception exception) {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        exception.printStackTrace(printWriter);
-        return stringWriter.toString();
-    }
 
     /**
      * Must be invoked from the Swing EDT.
@@ -75,7 +68,7 @@ public class BasicExceptionDialog {
      * @param exception the exception to indicate
      */
     public static void show(Exception exception) {
-        String detailsText = exceptionToString(exception);
+        String detailsText = OutputController.exceptionToString(exception);
 
         final JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));

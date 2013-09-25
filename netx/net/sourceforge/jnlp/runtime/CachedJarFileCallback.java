@@ -49,6 +49,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.JarFile;
 
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -103,9 +104,8 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
                 // 2) For the plug-in, we want to cache files from class-path so we do it manually
                 returnFile.getManifest().getMainAttributes().putValue("Class-Path", "");
 
-                if (JNLPRuntime.isDebug()) {
-                    System.err.println("Class-Path attribute cleared for " + returnFile.getName());
-                }
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Class-Path attribute cleared for " + returnFile.getName());
+                
 
             } catch (NullPointerException npe) {
                 // Discard NPE here. Maybe there was no manifest, maybe there were no attributes, etc.

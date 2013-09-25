@@ -45,6 +45,7 @@ import java.util.List;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.TimedHashMap;
 
 /**
@@ -107,7 +108,7 @@ public class PluginProxySelector extends JNLPProxySelector {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
         }
 
         proxyList.add(proxy);

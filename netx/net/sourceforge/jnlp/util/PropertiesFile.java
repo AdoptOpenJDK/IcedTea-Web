@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.*;
 import java.util.*;
 
@@ -138,7 +139,7 @@ public class PropertiesFile extends Properties {
                     }
                 }
             } catch (IOException ex) {
-                ex.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             }
         }
 
@@ -164,7 +165,7 @@ public class PropertiesFile extends Properties {
                 if (s != null) s.close();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
         }
     }
 

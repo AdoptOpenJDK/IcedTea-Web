@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -50,7 +51,7 @@ public class HttpUtils {
         try {
             consumeAndCloseConnection(c);
         } catch (IOException ex) {
-            ex.printStackTrace(System.err);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
         }
     }
 

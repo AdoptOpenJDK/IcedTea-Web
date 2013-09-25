@@ -40,6 +40,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public final class CacheDirectory {
 
@@ -93,8 +94,9 @@ public final class CacheDirectory {
             else
                 delete = false;
         }
-        if (delete)
-            System.out.println("Delete -- " + root);
+        if (delete){
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Delete -- " + root);
+        }
         //            root.delete();
         return true;
     }

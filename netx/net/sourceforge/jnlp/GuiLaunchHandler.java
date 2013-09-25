@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
@@ -47,6 +46,7 @@ import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.util.BasicExceptionDialog;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * A {@link LaunchHandler} that gives feedback to the user using GUI elements
@@ -58,7 +58,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
     private final Object mutex = new Object();
     private UpdatePolicy policy = UpdatePolicy.ALWAYS;
 
-    public GuiLaunchHandler(PrintStream outputStream) {
+    public GuiLaunchHandler(OutputController outputStream) {
         super(outputStream);
     }
 
@@ -127,7 +127,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
                 // Wait till splash screen is created
                 while (splashScreen == null);
             } catch (InvocationTargetException ite) {
-                ite.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ite);
             }
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
@@ -141,7 +141,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
                 // Wait till splash screen is created
                 while (!splashScreen.isSplashImageLoaded());
             } catch (InvocationTargetException ite) {
-                ite.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ite);
             }
 
 

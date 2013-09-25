@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * A ProxySelector specific to JNLPs. This proxy uses the deployment
@@ -97,7 +98,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 autoConfigUrl = new URL(autoConfigString);
             } catch (MalformedURLException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
 
@@ -159,7 +160,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 proxyPort = Integer.valueOf(port);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
         return proxyPort;
@@ -170,7 +171,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     @Override
     public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        ioe.printStackTrace();
+        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
     }
 
     /**
@@ -178,15 +179,11 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     @Override
     public List<Proxy> select(URI uri) {
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Selecting proxy for: " + uri);
-        }
-
+        OutputController.getLogger().log("Selecting proxy for: " + uri);
+        
         if (inBypassList(uri)) {
             List<Proxy> proxies = Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("Selected proxies: " + Arrays.toString(proxies.toArray()));
-            }
+            OutputController.getLogger().log("Selected proxies: " + Arrays.toString(proxies.toArray()));
             return proxies;
         }
 
@@ -211,9 +208,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
                 break;
         }
 
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Selected proxies: " + Arrays.toString(proxies.toArray()));
-        }
+        OutputController.getLogger().log("Selected proxies: " + Arrays.toString(proxies.toArray()));
         return proxies;
     }
 
@@ -344,7 +339,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             String proxiesString = pacEvaluator.getProxies(uri.toURL());
             proxies.addAll(getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             proxies.add(Proxy.NO_PROXY);
         }
 
@@ -403,9 +398,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             } else if (token.startsWith("DIRECT")) {
                 proxies.add(Proxy.NO_PROXY);
             } else {
-                if (JNLPRuntime.isDebug()) {
-                    System.out.println("Unrecognized proxy token: " + token);
-                }
+                 OutputController.getLogger().log("Unrecognized proxy token: " + token);
             }
         }
 

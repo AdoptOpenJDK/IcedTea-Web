@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -50,6 +51,7 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -60,7 +62,7 @@ public class ResourceTrackerTest {
 
     public static ServerLauncher testServer;
     public static ServerLauncher testServerWithBrokenHead;
-    private static PrintStream backedUpStream;
+    private static PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
     private static final String nameStub1 = "itw-server";
     private static final String nameStub2 = "test-file";
@@ -112,21 +114,47 @@ public class ResourceTrackerTest {
         return n;
 
     }
-  
+
     @BeforeClass
-    public static void redirectErr() {
-        if (backedUpStream == null) {
-            backedUpStream = System.err;
+    //keeping silent outputs from launched jvm
+    public static void redirectErr() throws IOException {
+        for (int i = 0; i < backedUpStream.length; i++) {
+            if (backedUpStream[i] == null) {
+                switch (i) {
+                    case 0:
+                        backedUpStream[i] = System.out;
+                        break;
+                    case 1:
+                        backedUpStream[i] = System.err;
+                        break;
+                    case 2:
+                        backedUpStream[i] = OutputController.getLogger().getOut();
+                        break;
+                    case 3:
+                        backedUpStream[i] = OutputController.getLogger().getErr();
+                        break;
+                }
+
+            }
+
         }
         currentErrorStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(currentErrorStream));
         System.setErr(new PrintStream(currentErrorStream));
+        OutputController.getLogger().setOut(new PrintStream(currentErrorStream));
+        OutputController.getLogger().setErr(new PrintStream(currentErrorStream));
+
 
     }
 
     @AfterClass
-    public static void redirectErrBack() throws UnsupportedEncodingException {
+    public static void redirectErrBack() throws IOException {
         ServerAccess.logErrorReprint(currentErrorStream.toString("utf-8"));
-        System.setErr(backedUpStream);
+        System.setOut(backedUpStream[0]);
+        System.setErr(backedUpStream[1]);
+        OutputController.getLogger().setOut(backedUpStream[2]);
+        OutputController.getLogger().setErr(backedUpStream[3]);
+
 
     }
 
@@ -141,14 +169,18 @@ public class ResourceTrackerTest {
     }
 
     @BeforeClass
-    public static void startServer() throws IOException {
+    public static void startServer() throws Exception {
+        redirectErr();
         testServer = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
+        redirectErrBack();
     }
 
     @BeforeClass
-    public static void startServer2() throws IOException {
+    public static void startServer2() throws Exception {
+        redirectErr();
         testServerWithBrokenHead = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
         testServerWithBrokenHead.setSupportingHeadRequest(false);
+        redirectErrBack();
     }
 
     @AfterClass
@@ -162,7 +194,7 @@ public class ResourceTrackerTest {
     }
 
     @Test
-    public void getUrlResponseCodeTestWorkingHeadRequest() throws IOException {
+    public void getUrlResponseCodeTestWorkingHeadRequest() throws Exception {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
@@ -177,7 +209,7 @@ public class ResourceTrackerTest {
     }
 
     @Test
-    public void getUrlResponseCodeTestNotWorkingHeadRequest() throws IOException {
+    public void getUrlResponseCodeTestNotWorkingHeadRequest() throws Exception {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
@@ -192,7 +224,7 @@ public class ResourceTrackerTest {
     }
 
     @Test
-    public void getUrlResponseCodeTestGetRequestOnNotWorkingHeadRequest() throws IOException {
+    public void getUrlResponseCodeTestGetRequestOnNotWorkingHeadRequest() throws Exception {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
@@ -207,7 +239,7 @@ public class ResourceTrackerTest {
     }
 
     @Test
-    public void getUrlResponseCodeTestGetRequest() throws IOException {
+    public void getUrlResponseCodeTestGetRequest() throws Exception {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
@@ -222,7 +254,7 @@ public class ResourceTrackerTest {
     }
 
     @Test
-    public void getUrlResponseCodeTestWrongRequest() throws IOException {
+    public void getUrlResponseCodeTestWrongRequest() throws Exception {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
@@ -248,7 +280,7 @@ public class ResourceTrackerTest {
     }
 
     @Test
-    public void findBestUrltest() throws IOException {
+    public void findBestUrltest() throws Exception {
         redirectErr();
         try {
             File fileForServerWithHeader = File.createTempFile(nameStub1, nameStub2);

@@ -37,9 +37,12 @@ exception statement from your version. */
 
 package sun.applet;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 public class PluginDebug {
 
-    static final boolean DEBUG = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
+    static final boolean DEBUG = JNLPRuntime.isPluginDebug();
 
     public static void debug(Object... messageChunks) {
         if (DEBUG) {
@@ -50,7 +53,7 @@ public class PluginDebug {
             for (Object chunk : messageChunks) {
                 b.append(chunk);
             }
-            System.err.println(b.toString());
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, b.toString());
         }
     }
 }

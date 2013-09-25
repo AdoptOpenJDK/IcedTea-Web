@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Finds the file corresponding to firefox's (default) preferences file
@@ -71,9 +72,8 @@ public class FirefoxPreferencesFinder {
             throw new FileNotFoundException(profilesPath);
         }
 
-        if (JNLPRuntime.isDebug()) {
-            System.out.println("Using firefox's profiles file: " + profilesPath);
-        }
+        OutputController.getLogger().log("Using firefox's profiles file: " + profilesPath);
+
         BufferedReader reader = new BufferedReader(new FileReader(profilesPath));
 
         List<String> linesInSection = new ArrayList<String>();
@@ -130,9 +130,7 @@ public class FirefoxPreferencesFinder {
             throw new FileNotFoundException("preferences file");
         } else {
             String fullPath = configPath + path + File.separator + "prefs.js";
-            if (JNLPRuntime.isDebug()) {
-                System.out.println("Found preferences file: " + fullPath);
-            }
+            OutputController.getLogger().log("Found preferences file: " + fullPath);
             return new File(fullPath);
         }
     }

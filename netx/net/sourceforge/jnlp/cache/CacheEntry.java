@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.*;
@@ -121,8 +122,7 @@ public class CacheEntry {
             else
                 return false;
         } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
+            OutputController.getLogger().log(ex);;
 
             return cached; // if can't connect return whether already in cache
         }
@@ -148,8 +148,7 @@ public class CacheEntry {
             else
                 return true;
         } catch (Exception ex) {
-            if (JNLPRuntime.isDebug())
-                ex.printStackTrace();
+            OutputController.getLogger().log(ex);
 
             return false; // should throw?
         }

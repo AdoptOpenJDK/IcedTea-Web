@@ -16,9 +16,9 @@
 
 package net.sourceforge.jnlp;
 
-import java.io.PrintStream;
 
 import net.sourceforge.jnlp.runtime.*;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This default implementation shows prints the exception to
@@ -30,7 +30,7 @@ import net.sourceforge.jnlp.runtime.*;
  */
 public class DefaultLaunchHandler extends AbstractLaunchHandler {
 
-    public DefaultLaunchHandler(PrintStream out) {
+    public DefaultLaunchHandler(OutputController out) {
         super(out);
     }
 

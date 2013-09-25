@@ -65,6 +65,7 @@ import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class JEditorPaneBasedExceptionDialog extends JDialog implements HyperlinkListener {
 
@@ -107,7 +108,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
             Icon icon = new ImageIcon(this.getClass().getResource("/net/sourceforge/jnlp/resources/warning.png"));
             iconLabel.setIcon(icon);
         } catch (Exception lex) {
-            lex.printStackTrace();
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, lex);
         }
         htmlErrorAndHelpPanel.addHyperlinkListener(this);
         homeButton.setVisible(false);
@@ -198,7 +199,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                 try{
                AboutDialog.display(true);
             }catch(Exception ex){
-                ex.printStackTrace();
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 JOptionPane.showConfirmDialog(JEditorPaneBasedExceptionDialog.this, ex);
             }
             }
@@ -228,8 +229,8 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(data, data);
             } catch (Exception ex) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 JOptionPane.showMessageDialog(this, Translator.R(InfoItem.SPLASH + "cantCopyEx"));
-                ex.printStackTrace();
             }
         } else {
             JOptionPane.showMessageDialog(this, Translator.R(InfoItem.SPLASH + "noExRecorded"));
@@ -302,18 +303,14 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
         if (exception == null) {
             return "";
         }
-        StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
+        return OutputController.exceptionToString(exception);
     }
 
     public static String[] getExceptionStackTraceAsStrings(Throwable exception) {
         if (exception == null) {
             return new String[0];
         }
-        StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        return sw.toString().split("\n");
+        return OutputController.exceptionToString(exception).split("\n");
     }
 
     @Override
