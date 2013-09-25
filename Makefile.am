@@ -1449,6 +1449,8 @@ clean-netx-unit-tests: clean_tests_reports
 clean_tests_reports:
 	rm -rf  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME)/
 	rm -f  $(TESTS_DIR)/*.html
+	rm -f $(TESTS_DIR)/summary_unit.txt
+	rm -f $(TESTS_DIR)/summary_reproducers.txt
 
 clean-$(SOFTKILLER):
 	rm -f $(TESTS_DIR)/softkiller
