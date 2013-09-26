@@ -1,3 +1,26 @@
+2013-09-26  Andrew Azores  <aazores@redhat.com>
+
+	Fix for PR1204. Absolute paths in resource URLs are correctly handled when
+	appended to host URLs and URL query strings are not removed.
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java:
+	(getVersionedUrlUsingQuery) renamed to getVersionedUrl, refactored
+	construction of URL
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	(requestPluginProxyInfo) extracted proxy URI logic.
+	(processProxyUri) new method for finding proxy URIs, handles absolute
+	resource paths correctly
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceUrlCreatorTest.java:
+	added tests for ResourceUrlCreator#getVersionedUrl
+	* tests/netx/unit/sun/applet/PluginAppletViewerTest.java: added tests for
+	PluginAppletViewer.processProxyUri
+	* tests/reproducers/simple/AbsolutePathsAndQueryStrings/resources/AbsolutePathsAndQueryStrings.html:
+	new reproducer checks that absolute paths and query strings in resource
+	URLs are properly handled, and caching still works
+	* tests/reproducers/simple/AbsolutePathsAndQueryStrings/resources/AbsolutePathsAndQueryStrings.jnlp:
+	same
+	* tests/reproducers/simple/AbsolutePathsAndQueryStrings/testcases/AbsolutePathsAndQueryStrings.java:
+	same
+
 2013-09-25  Andrew Azores  <aazores@redhat.com>
 
 	* Makefile.am: clean up summary_unit.txt and summary_reproducers.txt for

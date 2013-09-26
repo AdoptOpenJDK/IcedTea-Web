@@ -38,6 +38,8 @@ exception statement from your version. */
 package net.sourceforge.jnlp.cache;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,7 +91,7 @@ public class ResourceUrlCreator {
             }
         }
 
-        url = getVersionedUrlUsingQuery(resource);
+        url = getVersionedUrl(resource);
         urls.add(url);
 
         urls.add(resource.getLocation());
@@ -146,29 +148,29 @@ public class ResourceUrlCreator {
     }
 
     /**
-     * Returns the URL for a resource, relying on HTTP query for getting the
-     * right version
+     * Returns the URL for a resource, including the resource's version number in the query string
      *
      * @param resource the resource to get the url for
      */
-    protected URL getVersionedUrlUsingQuery(Resource resource) {
-        String actualLocation = resource.getLocation().getProtocol() + "://"
-                + resource.getLocation().getHost();
-        if (resource.getLocation().getPort() != -1) {
-            actualLocation += ":" + resource.getLocation().getPort();
-        }
-        actualLocation += resource.getLocation().getPath();
-        if (resource.requestVersion != null
-                && resource.requestVersion.isVersionId()) {
-            actualLocation += "?version-id=" + resource.requestVersion;
-        }
-        URL versionedURL;
+    protected URL getVersionedUrl(Resource resource) {
+        URL resourceUrl = resource.getLocation();
         try {
-            versionedURL = new URL(actualLocation);
+            String query = resourceUrl.getQuery(); // returns null if there was no query string
+            if (resource.requestVersion != null && resource.requestVersion.isVersionId()) {
+                if (query == null) {
+                    query = "";
+                } else {
+                    query += "&";
+                }
+                query += "version-id=" + resource.requestVersion;
+            }
+            URI uri = new URI(resourceUrl.getProtocol(), resourceUrl.getUserInfo(), resourceUrl.getHost(), resourceUrl.getPort(), resourceUrl.getPath(), query, null);
+            return uri.toURL();
         } catch (MalformedURLException e) {
-            return resource.getLocation();
+            return resourceUrl;
+        } catch (URISyntaxException e) {
+            return resourceUrl;
         }
-        return versionedURL;
     }
 
 }

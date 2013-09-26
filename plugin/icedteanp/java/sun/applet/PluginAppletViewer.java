@@ -86,6 +86,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketPermission;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessController;
@@ -1243,17 +1244,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         Long reference = getRequestIdentifier();
 
         try {
-
-            // there is no easy way to get SOCKS proxy info. So, we tell mozilla that we want proxy for
-            // an HTTP uri in case of non http/ftp protocols. If we get back a SOCKS proxy, we can
-            // use that, if we get back an http proxy, we fallback to DIRECT connect
-
-            String scheme = uri.getScheme();
-            String port = uri.getPort() != -1 ? ":" + uri.getPort() : "";
-            if (!uri.getScheme().startsWith("http") && !uri.getScheme().equals("ftp"))
-                scheme = "http";
-
-            requestURI = UrlUtil.encode(scheme + "://" + uri.getHost() + port + "/" + uri.getPath(), "UTF-8");
+            requestURI = convertUriSchemeForProxyQuery(uri);
         } catch (Exception e) {
             PluginDebug.debug("Cannot construct URL from ", uri.toString(), " ... falling back to DIRECT proxy");
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
@@ -1281,6 +1272,21 @@ public class PluginAppletViewer extends XEmbeddedFrame
         }
         PluginDebug.debug(" Call DONE");
         return request.getObject();
+    }
+
+    public static String convertUriSchemeForProxyQuery(URI uri) throws URISyntaxException, UnsupportedEncodingException {
+        // there is no easy way to get SOCKS proxy info. So, we tell mozilla that we want proxy for
+        // an HTTP uri in case of non http/ftp protocols. If we get back a SOCKS proxy, we can
+        // use that, if we get back an http proxy, we fallback to DIRECT connect
+
+        String scheme = uri.getScheme();
+        if (!scheme.startsWith("http") && !scheme.equals("ftp")) {
+            scheme = "http";
+        }
+
+        URI result = new URI(scheme, uri.getUserInfo(), uri.getHost(), uri.getPort(),
+                uri.getPath(), uri.getQuery(), uri.getFragment());
+        return UrlUtil.encode(result.toString(), "UTF-8");
     }
 
     public static void JavaScriptFinalize(long internal) {

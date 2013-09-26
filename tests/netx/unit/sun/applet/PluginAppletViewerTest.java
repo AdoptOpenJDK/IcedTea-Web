@@ -42,7 +42,10 @@ import static org.junit.Assert.assertEquals;
 import static sun.applet.PluginPipeMockUtil.getPluginStoreId;
 import static sun.applet.PluginPipeMockUtil.getPluginStoreObject;
 
+import java.net.URI;
 import java.util.concurrent.Callable;
+
+import junit.framework.Assert;
 
 import net.sourceforge.jnlp.AsyncCall;
 import net.sourceforge.jnlp.ServerAccess;
@@ -154,6 +157,43 @@ public class PluginAppletViewerTest {
                 + " JavaScriptToString " + getPluginStoreId(expectedReturn));
 
         assertEquals(expectedReturn, call.join());
+    }
+
+    @Test
+    public void testConvertUriSchemeForProxyQuery() throws Exception {
+        URI[] testUris = {
+                new URI("http", "foo.com", "/bar", null),
+                new URI("https", "foo.com", "/bar", null),
+                new URI("ftp", "foo.com", "/app/res/pub/channel.jar?i=1234", null),
+                new URI("socket", "foo.co.uk", "/bar/pub/ale.jar", null),
+        };
+
+        for (URI uri : testUris) {
+            URI result = new URI(PluginAppletViewer.convertUriSchemeForProxyQuery(uri));
+            assertQueryForBrowserProxyUsesHttpFallback(uri, result);
+            String hierarchicalPath = result.getAuthority() + result.getPath();
+            assertQueryForBrowserProxyContainsNoDoubleSlashes(hierarchicalPath);
+            assertQueryForBrowserProxyDoesNotChangeQuery(uri, result);
+        }
+    }
+
+    // Test that only HTTP is used as fallback scheme if a protocol other than HTTP(S) or FTP is specified
+    public void assertQueryForBrowserProxyUsesHttpFallback(URI expected, URI result) {
+        if (expected.getScheme().equals("ftp") || expected.getScheme().startsWith("http")) {
+            Assert.assertEquals(expected.getScheme(), result.getScheme());
+        } else {
+            Assert.assertEquals(result.getScheme(), "http");
+        }
+    }
+
+    // Test that absolute resource paths do not result in double-slashes within the URI
+    public void assertQueryForBrowserProxyContainsNoDoubleSlashes(String uri) {
+        Assert.assertFalse(uri.contains("//"));
+    }
+
+    // Test that the query string of the URI is not changed
+    public void assertQueryForBrowserProxyDoesNotChangeQuery(URI expected, URI result) {
+        Assert.assertEquals(expected.getQuery(), result.getQuery());
     }
 
    /**************************************************************************
