@@ -85,7 +85,7 @@ public class PluginProxySelector extends JNLPProxySelector {
 
         // Nothing usable in cache. Fetch info from browser
         Proxy proxy = Proxy.NO_PROXY;
-        Object o = PluginAppletViewer.requestPluginProxyInfo(uri);
+        Object o = getProxyFromRemoteCallToBrowser(uri);
 
         // If the browser returned anything, try to parse it. If anything in the try block fails, the fallback is direct connection
         try {
@@ -116,6 +116,11 @@ public class PluginProxySelector extends JNLPProxySelector {
         PluginDebug.debug("Proxy for ", uri.toString(), " is ", proxy);
 
         return proxyList;
+    }
+
+    /** For tests to override */
+    protected Object getProxyFromRemoteCallToBrowser(URI uri) {
+        return PluginAppletViewer.requestPluginProxyInfo(uri);
     }
 
     /**

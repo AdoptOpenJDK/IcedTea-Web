@@ -1,3 +1,11 @@
+2013-10-01  Omair Majid  <omajid@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
+	(getFromBrowser): Move call to
+	PluginAppletViewer.requestPluginProxyInfo into new method.
+	(getProxyFromRemoteCallToBrowser): New method.
+	* tests/netx/unit/sun/applet/PluginProxySelectorTest.java: New file.
+
 2013-09-26  Andrew Azores  <aazores@redhat.com>
 
 	Fix for PR1204. Absolute paths in resource URLs are correctly handled when
