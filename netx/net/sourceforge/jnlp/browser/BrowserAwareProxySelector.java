@@ -40,13 +40,10 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
-import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URL;
-import java.net.Proxy.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -79,6 +76,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
 
     private int browserProxyType = BROWSER_PROXY_TYPE_NONE;
     private URL browserAutoConfigUrl;
+    /** Whether the http proxy should be used for http, https, ftp and socket protocols */
     private Boolean browserUseSameProxy;
     private String browserHttpProxyHost;
     private int browserHttpProxyPort;
@@ -96,6 +94,9 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      */
     public BrowserAwareProxySelector(DeploymentConfiguration config) {
         super(config);
+    }
+
+    public void initialize() {
         try {
             initFromBrowserConfig();
         } catch (IOException e) {
@@ -110,11 +111,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      */
     private void initFromBrowserConfig() throws IOException {
 
-        File preferencesFile = FirefoxPreferencesFinder.find();
-
-        FirefoxPreferencesParser parser = new FirefoxPreferencesParser(preferencesFile);
-        parser.parse();
-        Map<String, String> prefs = parser.getPreferences();
+        Map<String, String> prefs = parseBrowserPreferences();
 
         String type = prefs.get("network.proxy.type");
         if (type != null) {
@@ -148,6 +145,13 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
         browserFtpProxyPort = stringToPort(prefs.get("network.proxy.ftp_port"));
         browserSocks4ProxyHost = prefs.get("network.proxy.socks");
         browserSocks4ProxyPort = stringToPort(prefs.get("network.proxy.socks_port"));
+    }
+
+    Map<String, String> parseBrowserPreferences() throws IOException {
+        File preferencesFile = FirefoxPreferencesFinder.find();
+        FirefoxPreferencesParser parser = new FirefoxPreferencesParser(preferencesFile);
+        parser.parse();
+        return parser.getPreferences();
     }
 
     /**
@@ -244,36 +248,11 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      * the browser's preferences file.
      */
     private List<Proxy> getFromBrowserConfiguration(URI uri) {
-        List<Proxy> proxies = new ArrayList<Proxy>();
-
-        String scheme = uri.getScheme();
-
-        if (browserUseSameProxy) {
-            SocketAddress sa = new InetSocketAddress(browserHttpProxyHost, browserHttpProxyPort);
-            Proxy proxy;
-            if (scheme.equals("socket")) {
-                proxy = new Proxy(Type.SOCKS, sa);
-            } else {
-                proxy = new Proxy(Type.HTTP, sa);
-            }
-            proxies.add(proxy);
-        } else if (scheme.equals("http")) {
-            SocketAddress sa = new InetSocketAddress(browserHttpProxyHost, browserHttpProxyPort);
-            proxies.add(new Proxy(Type.HTTP, sa));
-        } else if (scheme.equals("https")) {
-            SocketAddress sa = new InetSocketAddress(browserHttpsProxyHost, browserHttpsProxyPort);
-            proxies.add(new Proxy(Type.HTTP, sa));
-        } else if (scheme.equals("ftp")) {
-            SocketAddress sa = new InetSocketAddress(browserFtpProxyHost, browserFtpProxyPort);
-            proxies.add(new Proxy(Type.HTTP, sa));
-        } else if (scheme.equals("socket")) {
-            SocketAddress sa = new InetSocketAddress(browserSocks4ProxyHost, browserSocks4ProxyPort);
-            proxies.add(new Proxy(Type.SOCKS, sa));
-        } else {
-            proxies.add(Proxy.NO_PROXY);
-        }
-
-        return proxies;
+        return getFromArguments(uri, browserUseSameProxy, true,
+                browserHttpsProxyHost, browserHttpsProxyPort,
+                browserHttpProxyHost, browserHttpProxyPort,
+                browserFtpProxyHost, browserFtpProxyPort,
+                browserSocks4ProxyHost, browserSocks4ProxyPort);
     }
 
 }

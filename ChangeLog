@@ -1,5 +1,23 @@
 2013-10-01  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java
+	(BrowserAwareProxySelector): Split off browser-specific work into ..
+	(initialize): New method.
+	(initFromBrowserConfig): Delegate reading browser preferences to ..
+	(parseBrowserPreferences): New method.
+	(getFromBrowserConfiguration): Delegate to
+	JNLPProxySelector.getFromArguments.
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java
+	(getFromConfiguration): Move logic into getFromArguments; delegate to it.
+	(getFromArguments): Renamed from getFromConfiguration. Handle optionally
+	using the http host/port for socket addresses.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Call BrowserAwareProxySelector.initialize.
+	* tests/netx/unit/net/sourceforge/jnlp/browser/BrowserAwareProxySelectorTest.java:
+	New file.
+
+2013-10-01  Omair Majid  <omajid@redhat.com>
+
 	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
 	(getFromBrowser): Move call to
 	PluginAppletViewer.requestPluginProxyInfo into new method.

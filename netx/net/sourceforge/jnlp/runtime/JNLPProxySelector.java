@@ -288,15 +288,42 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * @return a List of Proxy objects
      */
     private List<Proxy> getFromConfiguration(URI uri) {
+        return getFromArguments(uri, sameProxy, false,
+                proxyHttpsHost, proxyHttpsPort,
+                proxyHttpHost, proxyHttpPort,
+                proxyFtpHost, proxyFtpPort,
+                proxySocks4Host, proxySocks4Port);
+    }
+
+    /**
+     * Returns a list of proxies by using the arguments
+     *
+     * @return a List of Proxy objects
+     */
+    protected static List<Proxy> getFromArguments(URI uri,
+            boolean sameProxy, boolean sameProxyIncludesSocket,
+            String proxyHttpsHost, int proxyHttpsPort,
+            String proxyHttpHost, int proxyHttpPort,
+            String proxyFtpHost, int proxyFtpPort,
+            String proxySocks4Host, int proxySocks4Port) {
+
         List<Proxy> proxies = new ArrayList<Proxy>();
 
         String scheme = uri.getScheme();
 
+        boolean socksProxyAdded = false;
+
         if (sameProxy) {
-            if (proxyHttpHost != null && (scheme.equals("https") || scheme.equals("http") || scheme.equals("ftp"))) {
+            if (proxyHttpHost != null) {
                 SocketAddress sa = new InetSocketAddress(proxyHttpHost, proxyHttpPort);
-                Proxy proxy = new Proxy(Type.HTTP, sa);
-                proxies.add(proxy);
+                if ((scheme.equals("https") || scheme.equals("http") || scheme.equals("ftp"))) {
+                    Proxy proxy = new Proxy(Type.HTTP, sa);
+                    proxies.add(proxy);
+                } else if (scheme.equals("socket") && sameProxyIncludesSocket) {
+                    Proxy proxy = new Proxy(Type.SOCKS, sa);
+                    proxies.add(proxy);
+                    socksProxyAdded = true;
+                }
             }
         } else if (scheme.equals("http") && proxyHttpHost != null) {
             SocketAddress sa = new InetSocketAddress(proxyHttpHost, proxyHttpPort);
@@ -309,9 +336,10 @@ public abstract class JNLPProxySelector extends ProxySelector {
             proxies.add(new Proxy(Type.HTTP, sa));
         }
 
-        if (proxySocks4Host != null) {
+        if (!socksProxyAdded && (proxySocks4Host != null)) {
             SocketAddress sa = new InetSocketAddress(proxySocks4Host, proxySocks4Port);
             proxies.add(new Proxy(Type.SOCKS, sa));
+            socksProxyAdded = true;
         }
 
         if (proxies.size() == 0) {
