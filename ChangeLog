@@ -1,3 +1,49 @@
+2013-10-03  Jacob Wisor  <gitne@gmx.de>
+
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
+	Moved JButtons to members.
+	(addComponents): Modified to make use of new NonEditableTableModel.
+	Added ListSelectionListener to propertly handle enabling and disabling of
+	operational	JButtons when selecting a resource from the cache table.
+	Moved inital populating of the cache table to CacheViewer's constructor
+	until after the	CachePane has been instatiated.
+	Added a general purpose Comparator for all non-String columns in the table
+	model.
+	Added a TableCellRenderer with proper localized rendering of "Size" and
+	"Last Modified" columns as well as the content of "Name" and "Path"
+	columns.
+	(createButtonPanel): Moved delete operation into new method
+	invokeDeleteLater(), added mouse cursor busy indicator, and proper handling
+	of enabling and disabling of operational JButtons when pushing the delete
+	button.
+	Moved refresh operation when pushing the refresh button into new method 
+	invokePopulateLater() and added proper handling of enabling and disabling
+	of operational JButtons while refreshing.
+	Replaced closing the cache viewer dialog via JDialog.dispose() when pushing
+	the delete button by a post of the WindowEvent.WINDOW_CLOSING event to
+	the CacheViewer dialog in order	to effectively remove the newly introduced 
+	KeyEventDispatcher.
+	(invokeDeleteLater): New method: Posts an event to the event queue deleting
+	the currently selected resource.
+	(invokePopulateLater): New method: Posts an event to the event queue
+	repopulating the cache table.
+	(populateTable):
+	Added mouse cursor busy indicator.
+	(generateData): Modified cache table's per row data model for proper
+	rendering and sorting to: DirectoryNode, File, String, String, Long, Date.
+	* netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java:
+	(CacheViewer): Added null parameter check.
+	Added a KeyEventDispatcher to enable closing the CacheViewer dialog on a
+	KeyEvent.VK_ESCAPE key event.
+	Replaced closing the cache viewer dialog via JDialog.dispose() by a post
+	of the WindowEvent.WINDOW_CLOSING event to the CacheViewer dialog in order
+	to effectively remove the newly introduced KeyEventDispatcher.
+	* netx/net/sourceforge/jnlp/util/ui/NonEditableTableModel.java:
+	Added a new table model that in effect is a
+	javax.swing.table.DefaultTableModel	except for no cell being editable.
+	* netx/net/sourceforge/jnlp/util/ui/package-info.java:
+	Added new package for UI common and recurrung UI tasks with documentation
+
 2013-10-01  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java
