@@ -1,3 +1,13 @@
+2013-10-03  Andrew Azores  <aazores@redhat.com>
+
+	PR1204 patch regression fix
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java:
+	(getVersionedUrl) fix regression in previous PR1204 patch. Refactor
+	to not take Resource parameter, use instance's field instead.
+	(uriPartToString) new method
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceUrlCreatorTest.java:
+	new tests for ResourceUrlCreator.getVersionedUrl 
+
 2013-10-03  Jacob Wisor  <gitne@gmx.de>
 
 	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
