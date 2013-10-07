@@ -42,20 +42,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.ProcessResult;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import org.junit.Test;
 
 public class DeploymentPropertiesAreExposedTest {
-
 
     @Test
     public void verifyDeploymentConfigrationIsExposedAsSystemProperties() throws Exception {
         ServerAccess server = new ServerAccess();
         List<String> trustCertificates = Arrays.asList(new String[] {"-Xtrustall"});
 
-        ServerAccess.ProcessResult result = server.executeJavawsHeadless(
+        ProcessResult result = server.executeJavawsHeadless(
             trustCertificates, "/DeploymentPropertiesAreExposed.jnlp");
 
-        String expectedRegex = ".*" + File.separator + ".icedtea" + File.separator + "log" + ".*";
+        DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+        config.load();
+        String userLogDir = config.getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
+        String expectedRegex = userLogDir + "/?";
         String actual = result.stdout.trim();
 
         boolean stdOutMatches = actual.matches(expectedRegex);

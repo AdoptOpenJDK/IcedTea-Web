@@ -1,3 +1,9 @@
+2013-10-07  Andrew Azores  <aazores@redhat.com>
+
+	DeploymentConfiguration properties reproducer fix
+	* tests/reproducers/signed/DeploymentPropertiesAreExposed/testcases/DeploymentPropertiesAreExposedTest.java: 
+	update test to reflect changed log directory
+
 2013-10-03  Andrew Azores  <aazores@redhat.com>
 
 	PR1204 patch regression fix
