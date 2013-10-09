@@ -1,3 +1,9 @@
+2013-10-09  Omair Majid  <oamjid@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
+	(computeKey): New method.
+	(getFromBrowser, checkCache): Call computeKey.
+
 2013-10-09  Omair Majid  <omajid@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java

@@ -116,7 +116,7 @@ public class PluginProxySelector extends JNLPProxySelector {
 
                     proxy = new Proxy(type, socketAddr);
 
-                    String uriKey = uri.getScheme() + "://" + uri.getHost();
+                    String uriKey = computeKey(uri);
                     proxyCache.put(uriKey, proxy);
                 } else {
                     PluginDebug.debug("Proxy ", proxyURI, " cannot be used for ", uri, ". Falling back to DIRECT");
@@ -145,13 +145,17 @@ public class PluginProxySelector extends JNLPProxySelector {
      * @return The cached Proxy. null if there is no suitable cached proxy.
      */
     private Proxy checkCache(URI uri) {
-
-        String uriKey = uri.getScheme() + "://" + uri.getHost();
+        String uriKey = computeKey(uri);
         if (proxyCache.get(uriKey) != null) {
             return proxyCache.get(uriKey);
         }
 
         return null;
+    }
+
+    /** Compute a key to use for the proxy cache */
+    private String computeKey(URI uri) {
+        return uri.getScheme() + "://" + uri.getHost();
     }
 
     public static String convertUriSchemeForProxyQuery(URI uri) throws URISyntaxException, UnsupportedEncodingException {
