@@ -37,11 +37,15 @@ exception statement from your version. */
 
 package sun.applet;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sun.jndi.toolkit.url.UrlUtil;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
@@ -84,8 +88,19 @@ public class PluginProxySelector extends JNLPProxySelector {
         }
 
         // Nothing usable in cache. Fetch info from browser
+
+        String requestURI;
+        try {
+            requestURI = convertUriSchemeForProxyQuery(uri);
+        } catch (Exception e) {
+            PluginDebug.debug("Cannot construct URL from ", uri.toString(), " ... falling back to DIRECT proxy");
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
+            proxyList.add(Proxy.NO_PROXY);
+            return proxyList;
+        }
+
         Proxy proxy = Proxy.NO_PROXY;
-        Object o = getProxyFromRemoteCallToBrowser(uri);
+        Object o = getProxyFromRemoteCallToBrowser(requestURI);
 
         // If the browser returned anything, try to parse it. If anything in the try block fails, the fallback is direct connection
         try {
@@ -119,7 +134,7 @@ public class PluginProxySelector extends JNLPProxySelector {
     }
 
     /** For tests to override */
-    protected Object getProxyFromRemoteCallToBrowser(URI uri) {
+    protected Object getProxyFromRemoteCallToBrowser(String uri) {
         return PluginAppletViewer.requestPluginProxyInfo(uri);
     }
 
@@ -139,4 +154,18 @@ public class PluginProxySelector extends JNLPProxySelector {
         return null;
     }
 
+    public static String convertUriSchemeForProxyQuery(URI uri) throws URISyntaxException, UnsupportedEncodingException {
+        // there is no easy way to get SOCKS proxy info. So, we tell mozilla that we want proxy for
+        // an HTTP uri in case of non http/ftp protocols. If we get back a SOCKS proxy, we can
+        // use that, if we get back an http proxy, we fallback to DIRECT connect
+
+        String scheme = uri.getScheme();
+        if (!scheme.startsWith("http") && !scheme.equals("ftp")) {
+            scheme = "http";
+        }
+
+        URI result = new URI(scheme, uri.getUserInfo(), uri.getHost(), uri.getPort(),
+                uri.getPath(), uri.getQuery(), uri.getFragment());
+        return UrlUtil.encode(result.toString(), "UTF-8");
+    }
 }

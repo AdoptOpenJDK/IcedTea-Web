@@ -1,3 +1,18 @@
+2013-10-09  Omair Majid  <omajid@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+	(requestPluginProxyInfo): Accept a String instead of URI.
+	(convertUriSchemeForProxyQuery): Move to ...
+	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
+	(convertUriSchemeForProxyQuery): Here.
+	(getFromBrowser): Call convertUriSchemeForProxyQuery.
+	* tests/netx/unit/sun/applet/PluginAppletViewerTest.java
+	(testConvertUriSchemeForProxyQuery),
+	(assertQueryForBrowserProxyUsesHttpFallback),
+	(assertQueryForBrowserProxyContainsNoDoubleSlashes),
+	(assertQueryForBrowserProxyDoesNotChangeQuery): Move to ...
+	* tests/netx/unit/sun/applet/PluginProxySelectorTest.java: Here.
+
 2013-10-07  Andrew Azores  <aazores@redhat.com>
 
 	DeploymentConfiguration properties reproducer fix
