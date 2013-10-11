@@ -1,3 +1,8 @@
+2013-10-11  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: (initDialog)
+	centerDialog called in init rather than on windowOpened event
+
 2013-10-09  Omair Majid  <oamjid@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
