@@ -205,6 +205,16 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     private int useCount = 0;
 
+    /* This Object is used as a lock on the loadClass(String) method. This method should not
+     * be entered by multiple threads simultaneously. This Object should be used for no other
+     * purpose than synchronizing the body of the loadClass(String) method. The intrinsic instance
+     * lock is not suitable for this purpose or else deadlock may occur.
+     *
+     * See bug RH976833 and the mailing list archive discussion:
+     * http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2013-September/024536.html
+     */
+    private final Object loadClassLock = new Object();
+
     /**
      * Create a new JNLPClassLoader from the specified file.
      *
@@ -1410,88 +1420,89 @@ public class JNLPClassLoader extends URLClassLoader {
      * classloader, or one of the classloaders for the JNLP file's
      * extensions.
      */
-    public synchronized Class<?> loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        synchronized (loadClassLock) {
+            Class<?> result = findLoadedClassAll(name);
 
-        Class<?> result = findLoadedClassAll(name);
-
-        // try parent classloader
-        if (result == null) {
-            try {
-                ClassLoader parent = getParent();
-                if (parent == null)
-                    parent = ClassLoader.getSystemClassLoader();
-
-                return parent.loadClass(name);
-            } catch (ClassNotFoundException ex) {
-            }
-        }
-
-        // filter out 'bad' package names like java, javax
-        // validPackage(name);
-
-        // search this and the extension loaders
-        if (result == null) {
-            try {
-                result = loadClassExt(name);
-            } catch (ClassNotFoundException cnfe) {
-                // Not found in external loader either
-
-                // Look in 'Class-Path' as specified in the manifest file
+            // try parent classloader
+            if (result == null) {
                 try {
-                    for (String classpath: classpaths) {
-                        JARDesc desc;
-                        try {
-                            URL jarUrl = new URL(file.getCodeBase(), classpath);
-                            desc = new JARDesc(jarUrl, null, null, false, true, false, true);
-                        } catch (MalformedURLException mfe) {
-                            throw new ClassNotFoundException(name, mfe);
-                        }
-                        addNewJar(desc);
-                    }
+                    ClassLoader parent = getParent();
+                    if (parent == null)
+                        parent = ClassLoader.getSystemClassLoader();
 
-                    result = loadClassExt(name);
-                    return result;
-                } catch (ClassNotFoundException cnfe1) {
-                    OutputController.getLogger().log(cnfe1);
+                    return parent.loadClass(name);
+                } catch (ClassNotFoundException ex) {
                 }
+            }
 
-                // As a last resort, look in any available indexes
+            // filter out 'bad' package names like java, javax
+            // validPackage(name);
 
-                // Currently this loads jars directly from the site. We cannot cache it because this
-                // call is initiated from within the applet, which does not have disk read/write permissions
-                for (JarIndex index : jarIndexes) {
-                    // Non-generic code in sun.misc.JarIndex
-                    @SuppressWarnings("unchecked")
-                    LinkedList<String> jarList = index.get(name.replace('.', '/'));
+            // search this and the extension loaders
+            if (result == null) {
+                try {
+                    result = loadClassExt(name);
+                } catch (ClassNotFoundException cnfe) {
+                    // Not found in external loader either
 
-                    if (jarList != null) {
-                        for (String jarName : jarList) {
+                    // Look in 'Class-Path' as specified in the manifest file
+                    try {
+                        for (String classpath : classpaths) {
                             JARDesc desc;
                             try {
-                                desc = new JARDesc(new URL(file.getCodeBase(), jarName),
-                                        null, null, false, true, false, true);
+                                URL jarUrl = new URL(file.getCodeBase(), classpath);
+                                desc = new JARDesc(jarUrl, null, null, false, true, false, true);
                             } catch (MalformedURLException mfe) {
-                                throw new ClassNotFoundException(name);
+                                throw new ClassNotFoundException(name, mfe);
                             }
-                            try {
-                                addNewJar(desc);
-                            } catch (Exception e) {
-                                OutputController.getLogger().log(e);
-                            }
+                            addNewJar(desc);
                         }
 
-                        // If it still fails, let it error out
                         result = loadClassExt(name);
+                        return result;
+                    } catch (ClassNotFoundException cnfe1) {
+                        OutputController.getLogger().log(cnfe1);
+                    }
+
+                    // As a last resort, look in any available indexes
+
+                    // Currently this loads jars directly from the site. We cannot cache it because this
+                    // call is initiated from within the applet, which does not have disk read/write permissions
+                    for (JarIndex index : jarIndexes) {
+                        // Non-generic code in sun.misc.JarIndex
+                        @SuppressWarnings("unchecked")
+                        LinkedList<String> jarList = index.get(name.replace('.', '/'));
+
+                        if (jarList != null) {
+                            for (String jarName : jarList) {
+                                JARDesc desc;
+                                try {
+                                    desc = new JARDesc(new URL(file.getCodeBase(), jarName),
+                                            null, null, false, true, false, true);
+                                } catch (MalformedURLException mfe) {
+                                    throw new ClassNotFoundException(name);
+                                }
+                                try {
+                                    addNewJar(desc);
+                                } catch (Exception e) {
+                                    OutputController.getLogger().log(e);
+                                }
+                            }
+
+                            // If it still fails, let it error out
+                            result = loadClassExt(name);
+                        }
                     }
                 }
             }
-        }
 
-        if (result == null) {
-            throw new ClassNotFoundException(name);
-        }
+            if (result == null) {
+                throw new ClassNotFoundException(name);
+            }
 
-        return result;
+            return result;
+        }
     }
 
     /**

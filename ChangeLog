@@ -1,3 +1,21 @@
+2013-10-16  Andrew Azores  <aazores@redhat.com>
+
+	Resolve deadlock issue when multiple applets are loaded simultaneously
+	(RH976833)
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (loadClassLock)
+	private member for locking of loadClass method. (loadClass) synchronizes
+	using new lock rather than instance intrinsic lock to avoid RH976833
+	deadlock
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/testcases/JNLPClassLoaderDeadlockTest.java:
+	new test for multiple applet deadlock condition
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/resources/JNLPClassLoaderDeadlock.html:
+	same
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/srcs/JNLPClassLoaderDeadlock_1.java:
+	same
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/srcs/JNLPClassLoaderDeadlock_2.java:
+	same
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/srcs/Makefile: same
+
 2013-10-11  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: (initDialog)
