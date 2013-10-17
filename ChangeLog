@@ -1,3 +1,14 @@
+2013-10-17  Andrew Azores  <aazores@redhat.com>
+
+	Back out changeset 420d72e5cee7 due to breaking LiveConnect feature.
+	http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2013-October/024919.html
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: undo 420d72e5cee7
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: undo 420d72e5cee7
+	* plugin/icedteanp/IcedTeaPluginUtils.h: undo 420d72e5cee7
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: undo 420d72e5cee7
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.h: undo 420d72e5cee7
+	* tests/cpp-unit-tests/IcedTeaScriptablePluginObjectTest.cc: undo 420d72e5cee7
+
 2013-10-16  Andrew Azores  <aazores@redhat.com>
 
 	Resolve deadlock issue when multiple applets are loaded simultaneously

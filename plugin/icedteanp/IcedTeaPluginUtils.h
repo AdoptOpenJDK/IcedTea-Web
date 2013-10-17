@@ -153,61 +153,6 @@ typedef struct async_call_thread_data
 /* Function to process all pending async calls */
 void processAsyncCallQueue(void*);
 
-/* Reference-counted 'smart pointer' to NPObject */
-class NPObjectRef {
-public:
-    /* Create with browser_functions.createobject.
-     * This ensures the object is not double-retained. */
-    static NPObjectRef create(NPP instance, NPClass* np_class);
-
-    NPObjectRef(NPObject* obj = NULL) {
-        current_object = NULL;
-        set(obj);
-    }
-
-    NPObjectRef(const NPObjectRef& ref) {
-        current_object = NULL;
-        set(ref.current_object);
-    }
-
-    NPObjectRef& operator=(const NPObjectRef& ref) {
-        set(ref.current_object);
-        return *this;
-    }
-
-    ~NPObjectRef() {
-        clear();
-    }
-
-    void set(NPObject* new_object);
-
-    /* Get's the object pointer */
-    NPObject* get() {
-        return current_object;
-    }
-
-    /* Helper for getting object as different type.
-     * NOTE: This cast is unchecked. */
-    template <typename T>
-    T as() {
-        return (T)current_object;
-    }
-
-    /* Explicit reference counting operations, use only if needed for interoperating with NPObject* */
-    void raw_retain();
-    void raw_release();
-
-    bool empty() {
-        return (current_object == NULL);
-    }
-
-    void clear() {
-        set(NULL);
-    }
-private:
-    NPObject* current_object;
-};
-
 class IcedTeaPluginUtilities
 {
 
@@ -220,8 +165,8 @@ class IcedTeaPluginUtilities
         /* Map holding window pointer<->instance relationships */
         static std::map<void*, NPP>* instance_map;
 
-        /* Map holding java-side-obj-key->NPObject relationship. */
-        static std::map<std::string, NPObjectRef> object_map;
+        /* Map holding java-side-obj-key->NPObject relationship  */
+        static std::map<std::string, NPObject*>* object_map;
 
         /* Posts a call in the async call queue */
         static bool postPluginThreadAsyncCall(NPP instance, void (*func) (void *), void* data);
@@ -256,8 +201,6 @@ class IcedTeaPluginUtilities
 
     	/* Converts the given integer to a string */
     	static void itoa(int i, std::string* result);
-
-    	static std::string stringPrintf(const char* fmt, ...);
 
     	/* Copies a variant data type into a C++ string */
     	static std::string NPVariantAsString(NPVariant variant);
@@ -319,9 +262,9 @@ class IcedTeaPluginUtilities
 
     	static NPP getInstanceFromMemberPtr(void* member_ptr);
 
-    	static NPObjectRef getNPObjectFromJavaKey(std::string key);
+    	static NPObject* getNPObjectFromJavaKey(std::string key);
 
-    	static void storeObjectMapping(std::string key, NPObjectRef object);
+    	static void storeObjectMapping(std::string key, NPObject* object);
 
     	static void removeObjectMapping(std::string key);
 
@@ -330,7 +273,7 @@ class IcedTeaPluginUtilities
 
     	static void invalidateInstance(NPP instance);
 
-    	static bool isObjectJSArray(NPP instance, NPObjectRef object);
+    	static bool isObjectJSArray(NPP instance, NPObject* object);
 
     	static void decodeURL(const char* url, char** decoded_url);
 

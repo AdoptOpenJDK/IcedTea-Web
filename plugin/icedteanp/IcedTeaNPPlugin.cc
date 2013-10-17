@@ -2101,6 +2101,14 @@ get_scriptable_object(NPP instance)
 
     if (data->is_applet_instance) // dummy instance/package?
     {
+        JavaRequestProcessor java_request = JavaRequestProcessor();
+        JavaResultData* java_result;
+        std::string instance_id = std::string();
+        std::string applet_class_id = std::string();
+
+        int id = get_id_from_instance(instance);
+        gchar* id_str = g_strdup_printf ("%d", id);
+
         // Some browsers.. (e.g. chromium) don't call NPP_SetWindow
         // for 0x0 plugins and therefore require initialization with
         // a 0 handle
@@ -2109,10 +2117,30 @@ get_scriptable_object(NPP instance)
             plugin_send_initialization_message(data->instance_id, 0, 0, 0, data->parameters_string);
         }
 
-        NPObjectRef applet_object = IcedTeaScriptableJavaObject::get_scriptable_applet_object(instance);
-        /* Retain because we are returning an NPObject* */
-        applet_object.raw_retain();
-        obj = applet_object.get();
+        java_result = java_request.getAppletObjectInstance(id_str);
+
+        g_free(id_str);
+
+        if (java_result->error_occurred)
+        {
+            printf("Error: Unable to fetch applet instance id from Java side.\n");
+            return NULL;
+        }
+
+        instance_id.append(*(java_result->return_string));
+
+        java_result = java_request.getClassID(instance_id);
+
+        if (java_result->error_occurred)
+        {
+            printf("Error: Unable to fetch applet instance id from Java side.\n");
+            return NULL;
+        }
+
+        applet_class_id.append(*(java_result->return_string));
+
+        obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, applet_class_id, instance_id, false);
+
     } else
     {
         obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(instance, "");

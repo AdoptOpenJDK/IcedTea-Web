@@ -306,26 +306,24 @@ IcedTeaScriptableJavaPackageObject::getProperty(NPObject *npobj, NPIdentifier na
 
 	//NPIdentifier property = browser_functions.getstringidentifier(property_name.c_str());
 
-	NPObjectRef object;
+	NPObject* obj;
 
 	if (isPropertyClass)
 	{
 		PLUGIN_DEBUG("Returning package object\n");
-		object = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(
+		obj = IcedTeaScriptableJavaPackageObject::get_scriptable_java_package_object(
                                   IcedTeaPluginUtilities::getInstanceFromMemberPtr(npobj),
                                   property_name.c_str());
 	}
 	else
 	{
 		PLUGIN_DEBUG("Returning Java object\n");
-		object = IcedTeaScriptableJavaObject::get_scriptable_java_object(
+		obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(
 		                IcedTeaPluginUtilities::getInstanceFromMemberPtr(npobj),
 		                *(java_result->return_string), "0", false);
 	}
 
-	OBJECT_TO_NPVARIANT(object.get(), *result);
-	/* Retain because we are returning an NPObject* */
-	object.raw_retain();
+	OBJECT_TO_NPVARIANT(obj, *result);
 
 	return true;
 }
@@ -386,33 +384,32 @@ scriptable_java_package_object_class() {
     return np_class;
 }
 
-/* Creates a scriptable java object (intended to be called asynch.) */
-static void
-create_scriptable_java_object_async(void* data)
-{
-    PLUGIN_DEBUG("Asynchronously creating object ...\n");
-
-    std::vector<void*> parameters = ((AsyncCallThreadData*) data)->parameters;
-    NPP instance = (NPP) parameters.at(0);
-    NPClass* np_class = (NPClass*) parameters.at(1);
-    NPObjectRef* object_ref = (NPObjectRef*) parameters.at(2);
-
-    *object_ref = browser_functions.createobject(instance, np_class);
-
-    ((AsyncCallThreadData*) data)->result_ready = true;
-}
-
-static NPObjectRef
-create_scriptable_java_object(NPP instance)
+NPObject*
+IcedTeaScriptableJavaObject::get_scriptable_java_object(NPP instance,
+                                    std::string class_id,
+                                    std::string instance_id,
+                                    bool isArray)
 {
     /* Shared NPClass instance for IcedTeaScriptablePluginObject */
     static NPClass np_class = scriptable_java_package_object_class();
 
+    std::string obj_key = class_id + ":" + instance_id;
+
+    PLUGIN_DEBUG("get_scriptable_java_object searching for %s...\n", obj_key.c_str());
+    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) IcedTeaPluginUtilities::getNPObjectFromJavaKey(obj_key);
+
+    if (scriptable_object != NULL)
+    {
+        PLUGIN_DEBUG("Returning existing object %p\n", scriptable_object);
+        browser_functions.retainobject(scriptable_object);
+        return scriptable_object;
+    }
+
     // try to create normally
-    NPObjectRef np_object = NPObjectRef::create(instance, &np_class);
+    scriptable_object = (IcedTeaScriptableJavaObject*)browser_functions.createobject(instance, &np_class);
 
     // didn't work? try creating asynch
-    if (np_object.empty())
+    if (!scriptable_object)
     {
         AsyncCallThreadData thread_data = AsyncCallThreadData();
         thread_data.result_ready = false;
@@ -421,104 +418,45 @@ create_scriptable_java_object(NPP instance)
 
         thread_data.parameters.push_back(instance);
         thread_data.parameters.push_back(&np_class);
-        thread_data.parameters.push_back(&np_object);
+        thread_data.parameters.push_back(&scriptable_object);
 
-        IcedTeaPluginUtilities::callAndWaitForResult(instance, &create_scriptable_java_object_async, &thread_data);
-    }
-
-    return np_object;
-}
-
-/* If we are uninitialized, make a Java request for the applet java class & instance ID for the plugin instance.
- * Only objects representing an applet will begin uninitialized, to prevent blocking when the browser requests the object.
- * Returns false on initialization error. */
-bool
-IcedTeaScriptableJavaObject::tryToInitializeIfApplet() {
-    if (initialization_failed || initialized)
+        IcedTeaPluginUtilities::callAndWaitForResult(instance, &_createAndRetainJavaObject, &thread_data);
+    } else
     {
-        return !initialization_failed;
+        // Else retain object and continue
+        browser_functions.retainobject(scriptable_object);
     }
 
-    JavaRequestProcessor java_request;
+    PLUGIN_DEBUG("Constructed new Java Object with classid=%s, instanceid=%s, isArray=%d and scriptable_object=%p\n", class_id.c_str(), instance_id.c_str(), isArray, scriptable_object);
 
-    std::string id = IcedTeaPluginUtilities::stringPrintf("%d", get_id_from_instance(instance));
-
-    /* Try to fetch the specific applet Java instance */
-    JavaResultData* instance_result = java_request.getAppletObjectInstance(id);
-    if (instance_result->error_occurred)
-    {
-        printf("Error: Unable to fetch applet instance id from Java side.\n");
-        initialization_failed = true;
-        return false;
-    }
-    this->instance_id = *instance_result->return_string;
-
-    /* Try to fetch the applet Java class */
-    JavaResultData* class_result = java_request.getClassID(id);
-    if (class_result->error_occurred)
-    {
-        printf("Error: Unable to fetch applet instance id from Java side.\n");
-        initialization_failed = true;
-        return false;
-    }
-    this->class_id = *class_result->return_string;
-
-    std::string obj_key = getClassID() + ":" + getInstanceID();
-    IcedTeaPluginUtilities::storeObjectMapping(obj_key, this);
-
-    printf("Object was initialized at '%s'.\n", obj_key.c_str());
-
-    initialized = true;
-
-    return true;
-}
-
-NPObjectRef
-IcedTeaScriptableJavaObject::get_scriptable_applet_object(NPP instance)
-{
-    PLUGIN_DEBUG("get_scriptable_applet_object creating applet object for %p...\n", instance);
-
-    /* Do not mark as initialized, object will lookup class & instance IDs before use */
-    NPObjectRef object = create_scriptable_java_object(instance);
-    IcedTeaPluginUtilities::storeInstanceID(object.get(), instance);
-    return object;
-}
-
-NPObjectRef
-IcedTeaScriptableJavaObject::get_scriptable_java_object(NPP instance,
-                                    std::string class_id,
-                                    std::string instance_id,
-                                    bool isArray)
-{
-    std::string obj_key = class_id + ":" + instance_id;
-
-    PLUGIN_DEBUG("get_scriptable_java_object searching for %s...\n", obj_key.c_str());
-    NPObjectRef object = IcedTeaPluginUtilities::getNPObjectFromJavaKey(obj_key);
-
-    if (!object.empty())
-    {
-        PLUGIN_DEBUG("Returning existing object %p\n", object.get());
-        return object;
-    }
-
-    object = create_scriptable_java_object(instance);
-    PLUGIN_DEBUG("Constructed new Java Object with classid=%s, instanceid=%s, isArray=%d and scriptable_object=%p\n", class_id.c_str(), instance_id.c_str(), isArray, object.get());
-
-    IcedTeaScriptableJavaObject* scriptable_object = object.as<IcedTeaScriptableJavaObject*>();
     scriptable_object->class_id = class_id;
     scriptable_object->is_object_array = isArray;
-    /* We know the class & instance already at this point, so we are initialized */
-    scriptable_object->initialized = true;
 
-    if (instance_id != "0") {
-        scriptable_object->instance_id = instance_id;
-    }
+	if (instance_id != "0")
+	    scriptable_object->instance_id = instance_id;
 
-    IcedTeaPluginUtilities::storeInstanceID(object.get(), instance);
-    IcedTeaPluginUtilities::storeObjectMapping(obj_key, object.get());
+	IcedTeaPluginUtilities::storeInstanceID(scriptable_object, instance);
+	IcedTeaPluginUtilities::storeObjectMapping(obj_key, scriptable_object);
 
-    PLUGIN_DEBUG("Inserting into object_map key %s->%p\n", obj_key.c_str(), object.get());
-    return object;
+	PLUGIN_DEBUG("Inserting into object_map key %s->%p\n", obj_key.c_str(), scriptable_object);
+	return scriptable_object;
+}
+
+/* Creates and retains a scriptable java object (intended to be called asynch.) */
+void
+_createAndRetainJavaObject(void* data)
+{
+    PLUGIN_DEBUG("Asynchronously creating/retaining object ...\n");
+
+    std::vector<void*> parameters = ((AsyncCallThreadData*) data)->parameters;
+    NPP instance = (NPP) parameters.at(0);
+    NPClass* np_class = (NPClass*) parameters.at(1);
+    NPObject** scriptable_object = (NPObject**) parameters.at(2);
+
+    *scriptable_object = browser_functions.createobject(instance, np_class);
+    browser_functions.retainobject(*scriptable_object);
+
+    ((AsyncCallThreadData*) data)->result_ready = true;
 }
 
 bool
@@ -529,13 +467,8 @@ IcedTeaScriptableJavaPackageObject::is_valid_java_object(NPObject* object_ptr) {
 bool
 IcedTeaScriptableJavaObject::hasMethod(NPObject *npobj, NPIdentifier name_id)
 {
-    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
-    /* If we are an applet object, we may not be initialized yet. */
-    if (!scriptable_object->tryToInitializeIfApplet()) {
-        return false;
-    }
-
     std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
+    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
 
     PLUGIN_DEBUG("IcedTeaScriptableJavaObject::hasMethod %s (ival=%d)\n", name.c_str(), browser_functions.intfromidentifier(name_id));
     bool hasMethod = false;
@@ -563,12 +496,6 @@ bool
 IcedTeaScriptableJavaObject::invoke(NPObject *npobj, NPIdentifier name_id, const NPVariant *args,
 			uint32_t argCount, NPVariant *result)
 {
-    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
-    /* If we are an applet object, we may not be initialized yet. */
-    if (!scriptable_object->tryToInitializeIfApplet()) {
-        return false;
-    }
-
     std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
 
     // Extract arg type array
@@ -580,6 +507,8 @@ IcedTeaScriptableJavaObject::invoke(NPObject *npobj, NPIdentifier name_id, const
 
     JavaResultData* java_result;
     JavaRequestProcessor java_request = JavaRequestProcessor();
+
+    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*)npobj;
 
     std::string instance_id = scriptable_object->instance_id;
     std::string class_id = scriptable_object->class_id;
@@ -629,17 +558,12 @@ IcedTeaScriptableJavaObject::invoke(NPObject *npobj, NPIdentifier name_id, const
 bool
 IcedTeaScriptableJavaObject::hasProperty(NPObject *npobj, NPIdentifier name_id)
 {
-    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
-    /* If we are an applet object, we may not be initialized yet. */
-    if (!scriptable_object->tryToInitializeIfApplet()) {
-        return false;
-    }
-
     std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
 
     PLUGIN_DEBUG("IcedTeaScriptableJavaObject::hasProperty %s (ival=%d)\n", name.c_str(), browser_functions.intfromidentifier(name_id));
     bool hasProperty = false;
 
+    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*)npobj;
     // If it is an array, only length and indexes are valid
     if (scriptable_object->is_object_array)
     {
@@ -672,12 +596,6 @@ IcedTeaScriptableJavaObject::hasProperty(NPObject *npobj, NPIdentifier name_id)
 bool
 IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name_id, NPVariant *result)
 {
-    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
-    /* If we are an applet object, we may not be initialized yet. */
-    if (!scriptable_object->tryToInitializeIfApplet()) {
-        return false;
-    }
-
     std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
     bool is_string_id = browser_functions.identifierisstring(name_id);
     PLUGIN_DEBUG("IcedTeaScriptableJavaObject::getProperty %s (ival=%d)\n", name.c_str(), browser_functions.intfromidentifier(name_id));
@@ -685,11 +603,13 @@ IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name_id, 
     JavaResultData* java_result;
     JavaRequestProcessor java_request = JavaRequestProcessor();
 
+    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*)npobj;
+
     std::string instance_id = scriptable_object->getInstanceID();
     std::string class_id = scriptable_object->getClassID();
     NPP instance = scriptable_object->instance;
 
-    if (!instance_id.empty()) // Could be an array or a simple object
+    if (instance_id.length() > 0) // Could be an array or a simple object
     {
         // If array and requesting length
         if ( scriptable_object->is_object_array && name == "length")
@@ -760,18 +680,13 @@ IcedTeaScriptableJavaObject::getProperty(NPObject *npobj, NPIdentifier name_id, 
 bool
 IcedTeaScriptableJavaObject::setProperty(NPObject *npobj, NPIdentifier name_id, const NPVariant *value)
 {
-    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
-    /* If we are an applet object, we may not be initialized yet. */
-    if (!scriptable_object->tryToInitializeIfApplet()) {
-        return false;
-    }
-
     std::string name = IcedTeaPluginUtilities::NPIdentifierAsString(name_id);
     PLUGIN_DEBUG("IcedTeaScriptableJavaObject::setProperty %s (ival=%d) to:\n", name.c_str(), browser_functions.intfromidentifier(name_id));
     IcedTeaPluginUtilities::printNPVariant(*value);
 
     JavaResultData* java_result;
     JavaRequestProcessor java_request = JavaRequestProcessor();
+    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*)npobj;
 
     std::string instance_id = scriptable_object->getInstanceID();
     std::string class_id = scriptable_object->getClassID();
@@ -845,12 +760,7 @@ bool
 IcedTeaScriptableJavaObject::construct(NPObject *npobj, const NPVariant *args, uint32_t argCount,
 	           NPVariant *result)
 {
-    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*) npobj;
-    /* If we are an applet object, we may not be initialized yet. */
-    if (!scriptable_object->tryToInitializeIfApplet()) {
-        return false;
-    }
-
+    IcedTeaScriptableJavaObject* scriptable_object = (IcedTeaScriptableJavaObject*)npobj;
     // Extract arg type array
     PLUGIN_DEBUG("IcedTeaScriptableJavaObject::construct %s. Args follow.\n", scriptable_object->getClassID().c_str());
     for (int i=0; i < argCount; i++)
@@ -892,13 +802,11 @@ IcedTeaScriptableJavaObject::construct(NPObject *npobj, const NPVariant *args, u
     std::string return_obj_instance_id = *java_result->return_string;
     std::string return_obj_class_id = scriptable_object->class_id;
 
-    NPObjectRef object = IcedTeaScriptableJavaObject::get_scriptable_java_object(
+    NPObject* obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(
                                 IcedTeaPluginUtilities::getInstanceFromMemberPtr(npobj),
                                 return_obj_class_id, return_obj_instance_id, false);
 
-    OBJECT_TO_NPVARIANT(object.get(), *result);
-    /* Retain because we are returning an NPObject* */
-    object.raw_retain();
+    OBJECT_TO_NPVARIANT(obj, *result);
 
     PLUGIN_DEBUG("IcedTeaScriptableJavaObject::construct returning.\n");
     return true;
