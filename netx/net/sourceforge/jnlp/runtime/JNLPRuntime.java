@@ -755,7 +755,7 @@ public class JNLPRuntime {
         JNLPRuntime.ignoreHeaders = ignoreHeaders;
     }
 
-    public static boolean isPluginDebug() {
+    private static boolean isPluginDebug() {
         if (pluginDebug == null) {
             try {
                 //there are cases when this itself is not allowed by security manager, and so

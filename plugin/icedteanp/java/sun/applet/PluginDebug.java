@@ -42,7 +42,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class PluginDebug {
 
-    static final boolean DEBUG = JNLPRuntime.isPluginDebug();
+    static final boolean DEBUG = JNLPRuntime.isDebug();
 
     public static void debug(Object... messageChunks) {
         if (DEBUG) {

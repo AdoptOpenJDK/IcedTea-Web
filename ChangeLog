@@ -1,3 +1,10 @@
+2013-10-20  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: (isPluginDebug)
+	made private to prevent confusion.
+	* plugin/icedteanp/java/sun/applet/PluginDebug.java: (DEBUG) initialized
+	from JNLPRuntime.isDebug instead of incorrect JNLPRuntime.isPluginDebug.
+
 2013-10-17  Andrew Azores  <aazores@redhat.com>
 
 	Back out changeset 420d72e5cee7 due to breaking LiveConnect feature.
