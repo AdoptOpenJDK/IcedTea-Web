@@ -59,6 +59,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import net.sourceforge.jnlp.util.JarFile;
 import java.util.jar.Manifest;
@@ -780,6 +781,47 @@ public class JNLPClassLoader extends URLClassLoader {
         activateJars(initialJars);
     }
     
+     /***
+     * Checks for the jar that contains the attribute. 
+     * 
+     * @param jars Jars that are checked to see if they contain the main class
+     * @param  name attribute to be found
+     * @throws LaunchException Thrown if the signed JNLP file, within the main jar, fails to be verified or does not match
+     */
+    public String checkForAttributeInJars(List<JARDesc> jars, Attributes.Name name) {
+       
+        String result = null;
+        
+        // Check main jar
+        JARDesc mainJarDesc = file.getResources().getMainJAR();
+        result = getManifestAttribute(mainJarDesc.getLocation(), name);
+
+        if (result != null) {
+            return result;
+        }
+        
+        // Check first jar
+        JARDesc firstJarDesc = jars.get(0);
+        result = getManifestAttribute(firstJarDesc.getLocation(),name);
+        
+        if (result != null) {
+            return result;
+        }
+
+        // Still not found? Iterate and set if only 1 was found
+        for (JARDesc jarDesc: jars) {
+            String mainClassInThisJar = getManifestAttribute(jarDesc.getLocation(), name);
+                if (mainClassInThisJar != null) {
+                    if (result == null) { // first main class
+                        result = mainClassInThisJar;
+                    } else { // There is more than one main class. Set to null and break.
+                        result = null;
+                        break;
+                }
+            }
+        }
+        return result;
+    }
     /***
      * Checks for the jar that contains the main class. If the main class was
      * found, it checks to see if the jar is signed and whether it contains a
@@ -802,34 +844,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // The main class may be specified in the manifest
 
-        // Check main jar
         if (mainClass == null) {
-            JARDesc mainJarDesc = file.getResources().getMainJAR();
-            mainClass = getMainClassName(mainJarDesc.getLocation());
-        }
-
-        // Check first jar
-        if (mainClass == null) {
-            JARDesc firstJarDesc = jars.get(0);
-            mainClass = getMainClassName(firstJarDesc.getLocation());
-        }
-
-        // Still not found? Iterate and set if only 1 was found
-        if (mainClass == null) {
-
-            for (JARDesc jarDesc: jars) {
-                String mainClassInThisJar = getMainClassName(jarDesc.getLocation());
-
-                if (mainClassInThisJar != null) {
-
-                    if (mainClass == null) { // first main class
-                        mainClass = mainClassInThisJar;
-                    } else { // There is more than one main class. Set to null and break.
-                        mainClass = null;
-                        break;
-                    }
-                }
-            }
+            mainClass = checkForAttributeInJars(jars, Attributes.Name.MAIN_CLASS);
         }
 
         String desiredJarEntryName = mainClass + ".class";
@@ -877,24 +893,35 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return the main class name, null if there isn't one of if there was an error
      */
     String getMainClassName(URL location) {
+        return getManifestAttribute(location, Attributes.Name.MAIN_CLASS);
+    }
+    
+    
+    /**
+     * Gets the name of the main method if specified in the manifest
+     *
+     * @param location The JAR location
+     * @return the attribute value, null if there isn't one of if there was an error
+     */
+    public String getManifestAttribute(URL location, Attributes.Name  attribute) {
 
-        String mainClass = null;
+        String attributeValue = null;
         File f = tracker.getCacheFile(location);
 
         if( f != null) {
             JarFile mainJar = null;
             try {
                 mainJar = new JarFile(f);
-                mainClass = mainJar.getManifest().
-                        getMainAttributes().getValue("Main-Class");
+                attributeValue = mainJar.getManifest().
+                        getMainAttributes().getValue(attribute);
             } catch (IOException ioe) {
-                mainClass = null;
+                attributeValue = null;
             } finally {
                 StreamUtils.closeSilently(mainJar);
             }
         }
 
-        return mainClass;
+        return attributeValue;
     }
 
     /**

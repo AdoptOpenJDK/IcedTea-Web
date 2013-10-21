@@ -1,3 +1,15 @@
+2013-10-21  Jiri Vanek  <jvanek@redhat.com>
+
+	Logic to extract main class attribute generalized to common methods.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(getMainClassName) is now calling (getManifestAttribute)
+	(getManifestAttribute) new method, extract named attribute from url
+	specified jar. Called by (checkForAttributeInJars)
+	(checkForMain) is now calling (checkForAttributeInJars). Also logic of
+	(checkForAttributeInJars) was taken from here.
+	(checkForAttributeInJars) new method, read specific attribute from
+	application jar(s) in specific order.
+	
 2013-10-20  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: (isPluginDebug)
