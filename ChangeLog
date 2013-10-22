@@ -1,3 +1,10 @@
+2013-10-22  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/util/logging/LogConfig.java
+	(resetLogConfig): New method.
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/OutputControllerTest.java
+	(setUp, tearDown): New method.
+
 2013-10-22  Jiri Vanek  <jvanek@redhat.com>
 
 	More synchronized error/debug methods

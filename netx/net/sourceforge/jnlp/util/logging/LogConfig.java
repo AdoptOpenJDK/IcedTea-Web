@@ -98,6 +98,13 @@ public class LogConfig {
         return logConfig;
     }
 
+    /** For testing only: throw away the previous config */
+    static void resetLogConfig() {
+        if (logConfig != null) {
+            logConfig = new LogConfig();
+        }
+    }
+
     public String getIcedteaLogDir() {
         return icedteaLogDir;
     }

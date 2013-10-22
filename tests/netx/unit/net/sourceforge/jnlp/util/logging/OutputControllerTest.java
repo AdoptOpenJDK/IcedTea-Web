@@ -43,6 +43,8 @@ import java.util.Random;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import net.sourceforge.jnlp.util.StreamUtils;
 import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class OutputControllerTest {
@@ -69,6 +71,16 @@ public class OutputControllerTest {
         public ByteArrayOutputStream getOut() {
             return (ByteArrayOutputStream) out;
         }
+    }
+
+    @Before
+    public void setUp() {
+        LogConfig.resetLogConfig();
+    }
+
+    @After
+    public void tearDown() {
+        LogConfig.resetLogConfig();
     }
 
     @Test
