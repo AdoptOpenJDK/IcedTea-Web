@@ -57,19 +57,6 @@ exception statement from your version. */
 #include "IcedTeaNPPlugin.h"
 
 
-// Error reporting macros.
-#define PLUGIN_ERROR(message)                                       \
-  g_printerr ("%s:%d: thread %p: Error: %s\n", __FILE__, __LINE__,  \
-              g_thread_self (), message)
-
-#define PLUGIN_ERROR_TWO(first, second)                                 \
-  g_printerr ("%s:%d: thread %p: Error: %s: %s\n", __FILE__, __LINE__,  \
-              g_thread_self (), first, second)
-
-#define PLUGIN_ERROR_THREE(first, second, third)                        \
-  g_printerr ("%s:%d: thread %p: Error: %s: %s: %s\n", __FILE__,        \
-              __LINE__, g_thread_self (), first, second, third)
-
 // Plugin information passed to about:plugins.
 #define PLUGIN_FULL_NAME PLUGIN_NAME " (using " PLUGIN_VERSION ")"
 #define PLUGIN_DESC "The <a href=\"" PACKAGE_URL "\">" PLUGIN_NAME "</a> executes Java applets."
@@ -460,7 +447,7 @@ void start_jvm_if_needed()
   PLUGIN_DEBUG ("ITNP_New: creating input fifo: %s\n", in_pipe_name);
   if (mkfifo (in_pipe_name, 0600) == -1 && errno != EEXIST)
     {
-      PLUGIN_ERROR_TWO ("Failed to create input pipe", strerror (errno));
+      PLUGIN_ERROR ("Failed to create input pipe", strerror (errno));
       np_error = NPERR_GENERIC_ERROR;
       goto cleanup_in_pipe_name;
     }
@@ -486,7 +473,7 @@ void start_jvm_if_needed()
   PLUGIN_DEBUG ("ITNP_New: creating output fifo: %s\n", out_pipe_name);
   if (mkfifo (out_pipe_name, 0600) == -1 && errno != EEXIST)
     {
-      PLUGIN_ERROR_TWO ("Failed to create output pipe", strerror (errno));
+      PLUGIN_ERROR ("Failed to create output pipe", strerror (errno));
       np_error = NPERR_GENERIC_ERROR;
       goto cleanup_out_pipe_name;
     }
@@ -508,7 +495,7 @@ void start_jvm_if_needed()
     {
       if (channel_error)
         {
-          PLUGIN_ERROR_TWO ("Failed to create output channel",
+          PLUGIN_ERROR ("Failed to create output channel",
                             channel_error->message);
           g_error_free (channel_error);
           channel_error = NULL;
@@ -535,7 +522,7 @@ void start_jvm_if_needed()
     {
       if (channel_error)
         {
-          PLUGIN_ERROR_TWO ("Failed to create input channel",
+          PLUGIN_ERROR ("Failed to create input channel",
                             channel_error->message);
           g_error_free (channel_error);
           channel_error = NULL;
@@ -998,7 +985,7 @@ plugin_in_pipe_callback (GIOChannel* source,
         {
           if (channel_error)
             {
-              PLUGIN_ERROR_TWO ("Failed to read line from input channel",
+              PLUGIN_ERROR ("Failed to read line from input channel",
                                 channel_error->message);
               g_error_free (channel_error);
               channel_error = NULL;
@@ -1337,7 +1324,7 @@ plugin_test_appletviewer ()
     {
       if (channel_error)
         {
-          PLUGIN_ERROR_TWO ("Failed to spawn applet viewer",
+          PLUGIN_ERROR ("Failed to spawn applet viewer",
                             channel_error->message);
           g_error_free (channel_error);
           channel_error = NULL;
@@ -1417,7 +1404,7 @@ plugin_start_appletviewer (ITNPPluginData* data)
     {
       if (channel_error)
         {
-          PLUGIN_ERROR_TWO ("Failed to spawn applet viewer",
+          PLUGIN_ERROR ("Failed to spawn applet viewer",
                             channel_error->message);
           g_error_free (channel_error);
           channel_error = NULL;
@@ -1548,7 +1535,7 @@ plugin_send_message_to_appletviewer (gchar const* message)
         {
           if (channel_error)
             {
-              PLUGIN_ERROR_TWO ("Failed to write bytes to output channel",
+              PLUGIN_ERROR ("Failed to write bytes to output channel",
                                 channel_error->message);
               g_error_free (channel_error);
               channel_error = NULL;
@@ -1562,7 +1549,7 @@ plugin_send_message_to_appletviewer (gchar const* message)
         {
           if (channel_error)
             {
-              PLUGIN_ERROR_TWO ("Failed to flush bytes to output channel",
+              PLUGIN_ERROR ("Failed to flush bytes to output channel",
                                 channel_error->message);
               g_error_free (channel_error);
               channel_error = NULL;
@@ -1629,7 +1616,7 @@ plugin_stop_appletviewer ()
             {
               if (channel_error)
                 {
-                  PLUGIN_ERROR_TWO ("Failed to write shutdown message to"
+                  PLUGIN_ERROR ("Failed to write shutdown message to"
                                     " appletviewer", channel_error->message);
                   g_error_free (channel_error);
                   channel_error = NULL;
@@ -1643,7 +1630,7 @@ plugin_stop_appletviewer ()
             {
               if (channel_error)
                 {
-                  PLUGIN_ERROR_TWO ("Failed to write shutdown message to"
+                  PLUGIN_ERROR ("Failed to write shutdown message to"
                                     " appletviewer", channel_error->message);
                   g_error_free (channel_error);
                   channel_error = NULL;
@@ -1658,7 +1645,7 @@ plugin_stop_appletviewer ()
             {
               if (channel_error)
                 {
-                  PLUGIN_ERROR_TWO ("Failed to shut down appletviewer"
+                  PLUGIN_ERROR ("Failed to shut down appletviewer"
                                     " output channel", channel_error->message);
                   g_error_free (channel_error);
                   channel_error = NULL;
@@ -1676,7 +1663,7 @@ plugin_stop_appletviewer ()
             {
               if (channel_error)
                 {
-                  PLUGIN_ERROR_TWO ("Failed to shut down appletviewer"
+                  PLUGIN_ERROR ("Failed to shut down appletviewer"
                                     " input channel", channel_error->message);
                   g_error_free (channel_error);
                   channel_error = NULL;
@@ -1820,7 +1807,7 @@ initialize_data_directory()
     file_error = g_mkdir (data_directory.c_str(), 0700);
     if (file_error != 0)
     {
-      PLUGIN_ERROR_THREE ("Failed to create data directory",
+      PLUGIN_ERROR ("Failed to create data directory",
                           data_directory.c_str(),
                           strerror (errno));
       return NPERR_GENERIC_ERROR;
@@ -1832,7 +1819,7 @@ initialize_data_directory()
   if (!g_file_test (data_directory.c_str(),
                     (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
   {
-    PLUGIN_ERROR_THREE ("Temp directory does not exist: ",
+    PLUGIN_ERROR ("Temp directory does not exist: ",
                         data_directory.c_str(),
                         strerror (errno));
     return NPERR_GENERIC_ERROR;
