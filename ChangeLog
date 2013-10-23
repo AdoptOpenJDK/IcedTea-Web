@@ -1,3 +1,10 @@
+2013-10-23  Jiri Vanek  <jvanek@redhat.com>
+
+	C-part of plugin is now also trying to follow XDG
+	* plugin/icedteanp/IcedTeaParseProperties.cc: (user_properties_file) is
+	now using XDG cached dir or its default variant in case that old file do not
+	(should not!) exists
+
 2013-10-22  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/util/logging/LogConfig.java

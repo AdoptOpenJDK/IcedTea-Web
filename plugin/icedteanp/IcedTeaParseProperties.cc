@@ -105,7 +105,20 @@ bool starts_with(string c1, string c2){
 string  user_properties_file(){
 	int myuid = getuid();
 	struct passwd *mypasswd = getpwuid(myuid);
-	return string(mypasswd->pw_dir)+"/.icedtea/"+default_file_ITW_deploy_props_name;
+	// try pre 1.5  file location
+	string old_name = string(mypasswd->pw_dir)+"/.icedtea/"+default_file_ITW_deploy_props_name;
+	//exists? then itw was not yet migrated. Use it
+	if (IcedTeaPluginUtilities::file_exists(old_name)) {
+		PLUGIN_ERROR("IcedTea-Web plugin is using out-dated configuration");
+		return old_name;
+	}
+	//we are probably  on XDG specification now
+	//is specified custom value?
+	if (getenv ("XDG_CONFIG_HOME") != NULL){
+		return string(getenv ("XDG_CONFIG_HOME"))+"/icedtea-web/"+default_file_ITW_deploy_props_name;
+	}
+	//if not then use default
+	return string(mypasswd->pw_dir)+"/.config/icedtea-web/"+default_file_ITW_deploy_props_name;
 }
 
 
