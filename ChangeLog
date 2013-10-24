@@ -1,3 +1,18 @@
+2013-10-24  Andrew Azores  <aazores@redhat.com>
+
+	Fix array index out of bounds due to malformed plugin message (PR539)
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: (_getMember,
+	_getString) append "null" to result when call is unsuccessful
+	* tests/reproducers/simple/JSObjectWithoutToString/resources/JSObjectWithoutToString.html:
+	new test to ensure failed calls to getMember and getString on JSObject do
+	not produce malformed results
+	* tests/reproducers/simple/JSObjectWithoutToString/resources/JSObjectWithoutToString.js:
+	same
+	* tests/reproducers/simple/JSObjectWithoutToString/srcs/JSObjectWithoutToString.java:
+	same
+	* tests/reproducers/simple/JSObjectWithoutToString/testcases/JSObjectWithoutToStringTest.java:
+	same
+
 2013-10-23  Jiri Vanek  <jvanek@redhat.com>
 
 	C-part of plugin is now also trying to follow XDG

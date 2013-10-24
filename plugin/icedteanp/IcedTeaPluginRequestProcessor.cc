@@ -810,7 +810,9 @@ _getMember(void* data)
     {
         createJavaObjectFromVariant(instance, *member_ptr, &member_ptr_str);
         ((AsyncCallThreadData*) data)->result.append(member_ptr_str);
-
+    } else
+    {
+        ((AsyncCallThreadData*) data)->result.append("null");
     }
     ((AsyncCallThreadData*) data)->result_ready = true;
 
@@ -956,6 +958,9 @@ _getString(void* data)
     if (((AsyncCallThreadData*) data)->call_successful)
     {
         createJavaObjectFromVariant(instance, tostring_result, &(((AsyncCallThreadData*) data)->result));
+    } else
+    {
+        ((AsyncCallThreadData*) data)->result.append("null");
     }
     ((AsyncCallThreadData*) data)->result_ready = true;
 
