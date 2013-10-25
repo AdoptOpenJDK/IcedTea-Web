@@ -45,6 +45,8 @@ exception statement from your version. */
 
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <cstring>
 #include <iostream>
@@ -59,24 +61,62 @@ exception statement from your version. */
 #include <glib.h>
 #include <npruntime.h>
 
-#define PLUGIN_DEBUG(...)                                      \
-  do                                                           \
-  {                                                            \
-    if (plugin_debug)                                          \
-    {                                                          \
-      fprintf (stdout, "ITNPP Thread# %ld: ", pthread_self()); \
-      fprintf (stdout, __VA_ARGS__);                           \
-    }                                                          \
+#include "IcedTeaParseProperties.h"
+
+// debugging macro.
+#define initialize_debug()                                                    \
+  do                                                                          \
+  {                                                                           \
+    if (!debug_initiated) {                                                   \
+	  debug_initiated = true;                                                 \
+      plugin_debug = getenv ("ICEDTEAPLUGIN_DEBUG") != NULL || is_debug_on(); \
+      plugin_debug_headers = is_debug_header_on();                            \
+      plugin_debug_to_file = is_logging_to_file();                            \
+      plugin_debug_to_streams = is_logging_to_stds();                         \
+      plugin_debug_to_system = is_logging_to_system();                        \
+    }                                                                         \
+  } while (0) 
+
+
+#define PLUGIN_DEBUG(...)                                          \
+  do                                                               \
+  {                                                                \
+	initialize_debug();                                            \
+    if (plugin_debug)  {                                           \
+      if (plugin_debug_to_streams) {                               \
+	    if (plugin_debug_headers) {                                \
+          char s[1000];                                            \
+          time_t t = time(NULL);                                   \
+          struct tm * p = localtime(&t);                           \
+          strftime(s, 1000, "%a %b %d %H:%M:%S %Z %Y", p);         \
+          const char *userNameforDebug = (getenv("USERNAME") == NULL) ? "unknown user" : getenv("USERNAME");  \
+	      fprintf  (stdout, "[%s][ITW-C-PLUGIN][MESSAGE_DEBUG][%s][%s:%d] ITNPP Thread# %ld: ",               \
+            userNameforDebug, s, __FILE__, __LINE__,  pthread_self());                                        \
+	    }                                                          \
+      fprintf (stdout, __VA_ARGS__);                               \
+	  }                                                            \
+    }                                                              \
   } while (0)
-  
-  // Error reporting macros.
+
+// Error reporting macro.
 #define PLUGIN_ERROR(...)                                   \
-do                                                          \
+  do                                                        \
   {                                                         \
-        fprintf  (stderr, "%s:%d: thread %p: Error: %s\n",  \
-               __FILE__, __LINE__,                          \
-              g_thread_self (), __VA_ARGS__);               \
+	initialize_debug();                                     \
+    if (plugin_debug_to_streams) {                          \
+      if (plugin_debug_headers) {                           \
+        char s[1000];                                       \
+        time_t t = time(NULL);                              \
+        struct tm * p = localtime(&t);                      \
+        strftime(s, 1000, "%A, %B %d %Y", p);               \
+        const char *userNameforDebug = (getenv("USERNAME") == NULL) ? "unknown user" : getenv("USERNAME"); \
+        fprintf  (stderr, "[%s][ITW-C-PLUGIN][ERROR_ALL][%s][%s:%d] thread %p: ",                          \
+          userNameforDebug, s, __FILE__, __LINE__, g_thread_self ());                                      \
+		}                                                   \
+		fprintf  (stderr,  __VA_ARGS__);                    \
+	  }                                                     \
    } while (0)
+
 
 #define CHECK_JAVA_RESULT(result_data)                               \
 {                                                                    \

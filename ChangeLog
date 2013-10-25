@@ -1,5 +1,35 @@
 2013-10-25  Jiri Vanek  <jvanek@redhat.com>
 
+	Plugin debug can now be controlled from itw_settings, in same way java side.
+	For now ICEDTEAPLUGIN_DEBUG on the debug in same way as deployment.log
+	itw-settings property. Individual logging streams are controlled by
+	deployment.log.{headers,file,stdstreams,system} System and file are not yet
+	fully done (same as java side in this moment). Streams are true, all others 
+	false by default.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: initialized variables new bool
+	variables (debug_initiated), (plugin_debug_headers), (plugin_debug_to_file),
+	(plugin_debug_to_system) as false and (plugin_debug_to_streams) as true.
+	* plugin/icedteanp/IcedTeaNPPlugin.h: above variables declared as extern
+	* plugin/icedteanp/IcedTeaParseProperties.cc: initialization of 
+	(default_file_ITW_deploy_props_name) and (custom_jre_key) moved here from
+	IcedTeaNPPlugin.h. New method (read_bool_property) and its more concrete
+	shortcuts (is_debug_on) (is_debug_header_on) (is_logging_to_file)
+	(is_logging_to_stds) (is_logging_to_system) implemented to access properties.
+	* plugin/icedteanp/IcedTeaParseProperties.h: above methods declared.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: (PLUGIN_{ERROR,DEBUG}) methods
+	adapted headers/debug/streams logic as described in title. Headers made more 
+	informative (like java side)
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: 
+	TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on) extended to
+	TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_off).
+	TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off)  extended to
+	TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off_headers_off), and new tests
+	TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_on) 
+	TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off_headers_on) (100x slower then 
+	without headers)
+	
+2013-10-25  Jiri Vanek  <jvanek@redhat.com>
+
 	all output messages redirected to PLUGIN_{DEBUG,ERROR} macros
 	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc: affected
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: affected

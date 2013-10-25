@@ -213,7 +213,12 @@ static gint instance_counter = 1;
 static GPid appletviewer_pid = -1;
 static guint appletviewer_watch_id = -1;
 
+bool debug_initiated = false;
 int plugin_debug = getenv ("ICEDTEAPLUGIN_DEBUG") != NULL;
+bool plugin_debug_headers = false;
+bool plugin_debug_to_file = false ;
+bool plugin_debug_to_streams = true ;
+bool plugin_debug_to_system = false;
 int plugin_debug_suspend = (getenv("ICEDTEAPLUGIN_DEBUG") != NULL) &&
         (strcmp(getenv("ICEDTEAPLUGIN_DEBUG"), "suspend") == 0);
 

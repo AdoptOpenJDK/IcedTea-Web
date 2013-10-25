@@ -115,8 +115,13 @@ extern pthread_t itnp_plugin_thread_id;
 /* Mutex around plugin async call queue ops */
 extern pthread_mutex_t pluginAsyncCallMutex;
 
-// debug switch
+// debug switches
+extern bool debug_initiated;
 extern int plugin_debug;
+extern bool plugin_debug_headers;
+extern bool plugin_debug_to_file;
+extern bool plugin_debug_to_streams;
+extern bool plugin_debug_to_system;
 
 // Browser function table.
 extern NPNetscapeFuncs browser_functions;

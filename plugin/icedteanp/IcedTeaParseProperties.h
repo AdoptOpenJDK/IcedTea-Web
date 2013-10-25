@@ -47,7 +47,12 @@ std::string  user_properties_file();
 bool  find_system_config_file(std::string& dest);
 bool  find_custom_jre(std::string& dest);
 bool  read_deploy_property_value(std::string property, std::string& dest);
+bool  is_debug_on();
+bool  is_debug_header_on();
+bool  is_logging_to_file();
+bool  is_logging_to_stds();
+bool  is_logging_to_system();
 //half public api
-const std::string default_file_ITW_deploy_props_name = "deployment.properties";
-const std::string custom_jre_key = "deployment.jre.dir";
+extern const std::string default_file_ITW_deploy_props_name;
+extern const std::string custom_jre_key;
 //end of public api

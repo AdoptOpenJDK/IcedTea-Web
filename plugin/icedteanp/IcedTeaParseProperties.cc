@@ -50,7 +50,7 @@ exception statement from your version. */
 
 
 #include "IcedTeaPluginUtils.h"
-
+#include "IcedTeaNPPlugin.h"
 #include "IcedTeaParseProperties.h"
 /*
  The public api is nearly impossible to test due to "hardcoded paths"
@@ -75,7 +75,8 @@ bool  read_deploy_property_value(string user_file, string system_file,  bool use
 //for passing two dummy files
 bool  find_custom_jre(string user_file, string main_file,string& dest);
 //end of non-public IcedTeaParseProperties api
-
+const std::string default_file_ITW_deploy_props_name = "deployment.properties";
+const std::string custom_jre_key = "deployment.jre.dir";
 
 void remove_all_spaces(string& str)
 {
@@ -147,6 +148,37 @@ bool find_system_config_file(string& dest){
 	}
 	return find_system_config_file(main_properties_file(), jdest, found, default_java_properties_file(), dest);
 }
+
+
+bool  read_bool_property(string key, bool defaultValue){
+	string value;
+	if (!read_deploy_property_value(key, value)) {
+		return defaultValue;
+	}
+	if (value == "true") {
+		return true;
+	} else {
+		return false;
+	}
+}	
+
+bool  is_debug_on(){
+	return 	read_bool_property("deployment.log",false);
+}
+bool  is_debug_header_on(){
+	return 	read_bool_property("deployment.log.headers",false);
+}
+bool  is_logging_to_file(){
+	return 	read_bool_property("deployment.log.file",false);
+}
+bool  is_logging_to_stds(){
+	return 	read_bool_property("deployment.log.stdstreams",true);
+}
+bool  is_logging_to_system(){
+	return 	read_bool_property("deployment.log.system",true);
+}
+
+
 //abstraction for testing purposes
 bool find_system_config_file(string main_file, string custom_jre_file, bool usecustom_jre, string default_java_file, string& dest){
 	if (IcedTeaPluginUtilities::file_exists(main_file)) {

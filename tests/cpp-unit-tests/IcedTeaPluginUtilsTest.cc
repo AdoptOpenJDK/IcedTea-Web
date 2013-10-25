@@ -181,15 +181,41 @@ void doDebugErrorRun() {
 	fprintf  (stdout, "PLUGIN_ERROR %d\n", time_spent2);
 }
 
-TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on) {
+TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_off) {
 	bool plugin_debug_backup = plugin_debug;
+	bool plugin_debug_headers_backup = plugin_debug_headers;
 	plugin_debug = true;
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
+	plugin_debug_headers = plugin_debug_headers_backup;
 }
-TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off) {
+TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off_headers_off) {
 	bool plugin_debug_backup = plugin_debug;
+	bool plugin_debug_headers_backup = plugin_debug_headers;
 	plugin_debug = false;
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
+	plugin_debug_headers = plugin_debug_headers_backup;
 }
+
+
+TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_on) {
+	bool plugin_debug_backup = plugin_debug;
+	bool plugin_debug_headers_backup = plugin_debug_headers;
+	plugin_debug = true;
+	plugin_debug_headers = true;
+	doDebugErrorRun();
+	plugin_debug = plugin_debug_backup;
+	plugin_debug_headers = plugin_debug_headers_backup;
+}
+
+TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off_headers_on) {
+	bool plugin_debug_backup = plugin_debug;
+	bool plugin_debug_headers_backup = plugin_debug_headers;
+	plugin_debug = false;
+	plugin_debug_headers = true;
+	doDebugErrorRun();
+	plugin_debug = plugin_debug_backup;
+	plugin_debug_headers = plugin_debug_headers_backup;
+}
+
