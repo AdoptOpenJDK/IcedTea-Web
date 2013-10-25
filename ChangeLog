@@ -1,5 +1,20 @@
 2013-10-25  Jiri Vanek  <jvanek@redhat.com>
 
+	all output messages redirected to PLUGIN_{DEBUG,ERROR} macros
+	* plugin/icedteanp/IcedTeaJavaRequestProcessor.cc: affected
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: affected
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: affected
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: affected
+	* plugin/icedteanp/IcedTeaPluginUtils.h: affected
+	* plugin/icedteanp/IcedTeaRunnable.cc: affected
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: affected
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: added 
+	(TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on)) and
+	(TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off)) which call new
+	(doDebugErrorRun) and are measuring refactoring impacts.
+
+2013-10-25  Jiri Vanek  <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/util/logging/OutputController.java:
 	(getCallerClass) now gets out also from sun.applet.PluginDebug class.
 

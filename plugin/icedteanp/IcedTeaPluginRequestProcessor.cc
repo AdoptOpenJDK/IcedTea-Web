@@ -440,7 +440,7 @@ PluginRequestProcessor::setMember(std::vector<std::string*>* message_parts)
         // the result we want is in result_string (assuming there was no error)
         if (java_result->error_occurred)
         {
-	    printf("Unable to get member name for setMember. Error occurred: %s\n", java_result->error_msg->c_str());
+	    PLUGIN_ERROR("Unable to get member name for setMember. Error occurred: %s\n", java_result->error_msg->c_str());
             //goto cleanup;
         }
 
@@ -521,7 +521,7 @@ PluginRequestProcessor::sendMember(std::vector<std::string*>* message_parts)
         // the result we want is in result_string (assuming there was no error)
         if (java_result->error_occurred)
         {
-	    printf("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
+	    PLUGIN_ERROR("Unable to process getMember request. Error occurred: %s\n", java_result->error_msg->c_str());
             //goto cleanup;
         }
 
@@ -800,7 +800,7 @@ _getMember(void* data)
 
     if (!browser_functions.hasproperty(instance, parent_ptr, member_identifier))
     {
-        printf("%s not found!\n", IcedTeaPluginUtilities::NPIdentifierAsString(member_identifier).c_str());
+        PLUGIN_ERROR("%s not found!\n", IcedTeaPluginUtilities::NPIdentifierAsString(member_identifier).c_str());
     }
     ((AsyncCallThreadData*) data)->call_successful = browser_functions.getproperty(instance, parent_ptr, member_identifier, member_ptr);
 

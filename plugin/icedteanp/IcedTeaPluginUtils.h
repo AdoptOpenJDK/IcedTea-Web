@@ -82,7 +82,7 @@ do                                                          \
 {                                                                    \
     if (((JavaResultData*) result_data)->error_occurred)             \
     {                                                                \
-        printf("Error: Error occurred on Java side: %s.\n",          \
+        PLUGIN_ERROR("Error: Error occurred on Java side: %s.\n",    \
                ((JavaResultData*) result_data)->error_msg->c_str()); \
         return;                                                      \
     }                                                                \

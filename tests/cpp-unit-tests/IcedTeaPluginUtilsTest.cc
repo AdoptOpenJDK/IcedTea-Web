@@ -36,14 +36,19 @@
 
 #include <fstream>
 #include <UnitTest++.h>
+#include <stdio.h>
 
 #include <npapi.h>
+
 
 #include "browser_mock.h"
 #include "MemoryLeakDetector.h"
 
 #include "IcedTeaPluginUtils.h"
 #include "IcedTeaNPPlugin.h"
+
+
+void doDebugErrorRun();
 
 TEST(NPVariantAsString) {
     NPVariant var;
@@ -130,4 +135,61 @@ TEST(file_exists) {
 	remove(f1.c_str());
 	bool b = IcedTeaPluginUtilities::file_exists(f1);
 	CHECK_EQUAL(b, false);
+}
+
+
+void doDebugErrorRun() {
+	FILE* old1 = stdout;
+	FILE* old2 = stderr;
+	char* buf1 = " 	                         ";
+	char* buf2 = "                           ";
+	stdout = fmemopen (buf1, strlen (buf1), "rw");
+	stderr = fmemopen (buf2, strlen (buf2), "rw");
+	
+	clock_t begin1, end1;
+	clock_t begin2, end2;
+	int i;
+	int max = 1000000;
+	std::string hello = std::string("hello");
+	std::string eello = std::string("eello");
+	
+	begin1 = clock();
+	for (i = 0 ; i < max ; i++ ) {
+		PLUGIN_DEBUG("hello \n");
+		PLUGIN_DEBUG("hello %s\n", hello.c_str());
+		PLUGIN_DEBUG("hello %d %d\n", 10 , 0.5);
+		PLUGIN_DEBUG("hello %s %s \n", hello.c_str() , hello.c_str());
+		PLUGIN_DEBUG("hello %s %d %s %d\n", hello.c_str() ,10, hello.c_str(), 0.5);
+	}
+	end1 = clock();
+	begin2 = clock();
+	for (i = 0 ; i < max ; i++ ) {
+		PLUGIN_ERROR("eello \n");
+		PLUGIN_ERROR("eello %s\n", eello.c_str());
+		PLUGIN_ERROR("eello %d %d\n", 10 , 0.5);
+		PLUGIN_ERROR("eello %s %s \n", eello.c_str() , eello.c_str());
+		PLUGIN_ERROR("eello %s %d %s %d\n", eello.c_str() ,10, eello.c_str(), 0.5);
+	}
+	end2 = clock();
+	fclose(stdout);
+    fclose(stderr);
+	stdout = old1;
+	stderr = old2;
+	long time_spent1 = ((end1 - begin1));
+	long time_spent2 = ((end2 - begin2));
+	fprintf  (stdout, "  PLUGIN_DEBUG %d, ", time_spent1);
+	fprintf  (stdout, "PLUGIN_ERROR %d\n", time_spent2);
+}
+
+TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on) {
+	bool plugin_debug_backup = plugin_debug;
+	plugin_debug = true;
+	doDebugErrorRun();
+	plugin_debug = plugin_debug_backup;
+}
+TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off) {
+	bool plugin_debug_backup = plugin_debug;
+	plugin_debug = false;
+	doDebugErrorRun();
+	plugin_debug = plugin_debug_backup;
 }

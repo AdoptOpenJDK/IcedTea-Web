@@ -248,7 +248,7 @@ static std::string get_plugin_executable(){
             if (IcedTeaPluginUtilities::file_exists(custom_jre+"/bin/java")){
                   return custom_jre+"/bin/java";
             } else {
-                 fprintf(stderr, "Your custom jre (/bin/java check) %s is not valid. Please fix %s in your %s. In attempt to run using default one. \n", custom_jre.c_str(), custom_jre_key.c_str(), default_file_ITW_deploy_props_name.c_str());
+                 PLUGIN_ERROR("Your custom jre (/bin/java check) %s is not valid. Please fix %s in your %s. In attempt to run using default one. \n", custom_jre.c_str(), custom_jre_key.c_str(), default_file_ITW_deploy_props_name.c_str());
             }
       }
       return appletviewer_default_executable;      
@@ -261,7 +261,7 @@ static std::string get_plugin_rt_jar(){
             if (IcedTeaPluginUtilities::file_exists(custom_jre+"/lib/rt.jar")){
                   return custom_jre+"/lib/rt.jar";
             } else {
-                  fprintf(stderr, "Your custom jre (/lib/rt.jar check) %s is not valid. Please fix %s in your %s. In attempt to run using default one. \n", custom_jre.c_str(), custom_jre_key.c_str(), default_file_ITW_deploy_props_name.c_str());
+                  PLUGIN_ERROR("Your custom jre (/lib/rt.jar check) %s is not valid. Please fix %s in your %s. In attempt to run using default one. \n", custom_jre.c_str(), custom_jre_key.c_str(), default_file_ITW_deploy_props_name.c_str());
             }
       }
       return appletviewer_default_rtjar;      
@@ -317,7 +317,7 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
   identifier = browser_functions.getstringidentifier("document");
   if (!browser_functions.hasproperty(instance, window_ptr, identifier))
   {
-	printf("%s not found!\n", "document");
+	PLUGIN_ERROR("%s not found!\n", "document");
   }
   browser_functions.getproperty(instance, window_ptr, identifier, &member_ptr);
 
@@ -1903,7 +1903,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   np_error = plugin_test_appletviewer ();
   if (np_error != NPERR_NO_ERROR)
     {
-      fprintf(stderr, "Unable to find java executable %s\n", get_plugin_executable().c_str());
+      PLUGIN_ERROR("Unable to find java executable %s\n", get_plugin_executable().c_str());
       return np_error;
     }
 
@@ -2110,7 +2110,7 @@ get_scriptable_object(NPP instance)
 
         if (java_result->error_occurred)
         {
-            printf("Error: Unable to fetch applet instance id from Java side.\n");
+            PLUGIN_ERROR("Error: Unable to fetch applet instance id from Java side.\n");
             return NULL;
         }
 
@@ -2120,7 +2120,7 @@ get_scriptable_object(NPP instance)
 
         if (java_result->error_occurred)
         {
-            printf("Error: Unable to fetch applet instance id from Java side.\n");
+            PLUGIN_ERROR("Error: Unable to fetch applet instance id from Java side.\n");
             return NULL;
         }
 

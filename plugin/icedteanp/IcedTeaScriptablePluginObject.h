@@ -175,7 +175,7 @@ public:
             const NPVariant *args, uint32_t argCount, NPVariant *result);
     static bool invokeDefault(NPObject *npobj, const NPVariant *args,
             uint32_t argCount, NPVariant *result) {
-        printf ("** Unimplemented: IcedTeaScriptableJavaObject::invokeDefault %p\n", npobj);
+        PLUGIN_ERROR ("** Unimplemented: IcedTeaScriptableJavaObject::invokeDefault %p\n", npobj);
         return false;
     }
     static bool hasProperty(NPObject *npobj, NPIdentifier name_id);
@@ -185,12 +185,12 @@ public:
             const NPVariant *value);
 
     static bool removeProperty(NPObject *npobj, NPIdentifier name_id) {
-        printf ("** Unimplemented: IcedTeaScriptableJavaObject::removeProperty %p\n", npobj);
+        PLUGIN_ERROR ("** Unimplemented: IcedTeaScriptableJavaObject::removeProperty %p\n", npobj);
         return false;
     }
     static bool enumerate(NPObject *npobj, NPIdentifier **value,
             uint32_t *count) {
-        printf ("** Unimplemented: IcedTeaScriptableJavaObject::enumerate %p\n", npobj);
+        PLUGIN_ERROR ("** Unimplemented: IcedTeaScriptableJavaObject::enumerate %p\n", npobj);
         return false;
     }
     static bool construct(NPObject *npobj, const NPVariant *args,
