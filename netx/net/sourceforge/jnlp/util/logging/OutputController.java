@@ -362,7 +362,9 @@ public class OutputController {
             int i = 1;
             for (; i < stack.length; i++) {
                 result = stack[i];//at least moving up
-                if (stack[i].getClassName().contains(OutputController.class.getName())) {
+                if (stack[i].getClassName().contains(OutputController.class.getName()) ||
+                    //PluginDebug.class.getName() not avaiable during netx make
+                    stack[i].getClassName().contains("sun.applet.PluginDebug") ) {
                     continue;
                 } else {
                     break;

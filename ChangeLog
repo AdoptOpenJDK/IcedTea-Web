@@ -1,3 +1,8 @@
+2013-10-25  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java:
+	(getCallerClass) now gets out also from sun.applet.PluginDebug class.
+
 2013-10-24  Andrew Azores  <aazores@redhat.com>
 
 	Fix array index out of bounds due to malformed plugin message (PR539)
