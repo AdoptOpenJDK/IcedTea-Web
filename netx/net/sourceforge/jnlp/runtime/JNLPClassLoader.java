@@ -682,33 +682,26 @@ public class JNLPClassLoader extends URLClassLoader {
             if (jcv.isFullySigned()) {
                 signing = true;
 
-                if (!jcv.allJarsSigned() &&
-                                    !SecurityDialogs.showNotAllSignedWarningDialog(file))
-                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
-
                 // Check for main class in the downloaded jars, and check/verify signed JNLP fill
                 checkForMain(initialJars);
 
                 // If jar with main class was not found, check available resources
-                while (!foundMainJar && available != null && available.size() != 0) 
+                while (!foundMainJar && available != null && available.size() != 0)
                     addNextResource();
 
                 // If the jar with main class was not found, check extension
                 // jnlp's resources
                 foundMainJar = foundMainJar || hasMainInExtensions();
 
-                // If jar with main class was not found and there are no more
-                // available jars, throw a LaunchException
-                if (file.getLaunchInfo() != null) {
-                    if (!foundMainJar
-                            && (available == null || available.size() == 0))
-                        throw new LaunchException(file, null, R("LSFatal"),
-                                R("LCClient"), R("LCantDetermineMainClass"),
-                                R("LCantDetermineMainClassInfo"));
-                }
+                boolean externalMainClass = (file.getLaunchInfo() != null && !foundMainJar
+                        && (available == null || available.size() == 0));
+
+                if ((!jcv.allJarsSigned() || externalMainClass) &&
+                                    !SecurityDialogs.showNotAllSignedWarningDialog(file))
+                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
 
                 // If main jar was found, but a signed JNLP file was not located
-                if (!isSignedJNLP && foundMainJar) 
+                if (!isSignedJNLP && foundMainJar)
                     file.setSignedJNLPAsMissing();
 
                 //user does not trust this publisher

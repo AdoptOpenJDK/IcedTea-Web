@@ -1,3 +1,10 @@
+2013-10-29  Andrew Azores  <aazores@redhat.com>
+
+	Fix PR1513, signed applets with external main-class support
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(initializeResources) ask for user approval rather than throwing
+	LaunchException for signed applets with external main-class
+
 2013-10-25  Jiri Vanek  <jvanek@redhat.com>
 
 	Plugin debug can now be controlled from itw_settings, in same way java side.
