@@ -21,31 +21,32 @@ import java.net.URL;
 /**
  * The JAR element.
  *
+ * This class is immutable and thread safe
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.6 $
  */
 public class JARDesc {
 
     /** the location of the JAR file */
-    private URL location;
+    private final URL location;
 
     /** the required JAR versions, or null */
-    private Version version;
+    private final Version version;
 
     /** the part name */
-    private String part;
+    private final String part;
 
     /** whether to load the JAR on demand */
-    private boolean lazy;
+    private final boolean lazy;
 
     /** whether the JAR contains the main class */
-    private boolean main;
+    private final boolean main;
 
     /** whether the JAR contains native libraries */
-    private boolean nativeJar;
+    private final boolean nativeJar;
 
     /** whether the JAR can be cached */
-    private boolean cacheable;
+    private final boolean cacheable;
 
     /**
      * Create a JAR descriptor.
