@@ -1,3 +1,12 @@
+2013-11-01  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
+	added tests for custom attributes (getCustomAtributes), (getCustomAtributesEmpty) and test to ensure order during searching for
+	attributes in manifests (checkOrderWhenReadingAttributes).
+	* tests/test-extensions/net/sourceforge/jnlp/mock/DummyJNLPFileWithJar.java:
+	can now handle multiple source jars, and set main jar (new constructors),
+	(jarFiles)  and (jarDescs) redeclared to arrays.
+
 2013-10-30  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JARDesc.java: made immutable

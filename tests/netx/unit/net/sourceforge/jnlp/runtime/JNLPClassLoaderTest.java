@@ -92,7 +92,7 @@ public class JNLPClassLoaderTest {
         assertNoFileLeak( new Runnable () {
             @Override
             public void run() {
-                    assertFalse(classLoader.isInvalidJar(jnlpFile.jarDesc));
+                    assertFalse(classLoader.isInvalidJar(jnlpFile.getJarDesc()));
             }
         });
     }
@@ -113,11 +113,17 @@ public class JNLPClassLoaderTest {
             assertNoFileLeak(new Runnable() {
                 @Override
                 public void run() {
-                    assertEquals("DummyClass", classLoader.getMainClassName(jnlpFile.jarLocation));
+                    assertEquals("DummyClass", classLoader.getMainClassName(jnlpFile.getJarLocation()));
                 }
             });
         }
+    }
+    
+    @Test
+    public void getMainClassNameTestEmpty() throws Exception {
         /* Test with-out any main-class specified */ {
+            File tempDirectory = FileTestUtils.createTempDirectory();
+            File jarLocation = new File(tempDirectory, "test.jar");
             FileTestUtils.createJarWithContents(jarLocation /* No contents */);
 
             final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
@@ -126,7 +132,7 @@ public class JNLPClassLoaderTest {
             assertNoFileLeak(new Runnable() {
                 @Override
                 public void run() {
-                    assertEquals(null, classLoader.getMainClassName(jnlpFile.jarLocation));
+                    assertEquals(null, classLoader.getMainClassName(jnlpFile.getJarLocation()));
                 }
             });
         }
@@ -145,12 +151,113 @@ public class JNLPClassLoaderTest {
             @Override
             public void run() {
                 try {
-                    classLoader.checkForMain(Arrays.asList(jnlpFile.jarDesc));
+                    classLoader.checkForMain(Arrays.asList(jnlpFile.getJarDesc()));
                 } catch (LaunchException e) {
                     fail(e.toString());
                 }
             }
          });
         assertFalse(classLoader.hasMainJar());
+    }
+ 
+    @Test
+    public void getCustomAtributes() throws Exception {
+        File tempDirectory = FileTestUtils.createTempDirectory();
+        File jarLocation = new File(tempDirectory, "testX.jar");
+
+        /* Test with attributes in manifest */
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass");
+        manifest.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_TITLE, "it");
+        manifest.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_VENDOR, "rh");
+        FileTestUtils.createJarWithContents(jarLocation, manifest);
+
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
+        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
+
+        assertNoFileLeak(new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("rh", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_VENDOR));
+                assertEquals("DummyClass", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
+                assertEquals("it", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+            }
+        });
+    }
+
+    @Test
+    public void getCustomAtributesEmpty() throws Exception {
+        File tempDirectory = FileTestUtils.createTempDirectory();
+        File jarLocation = new File(tempDirectory, "testX.jar");
+
+        /* Test with-out any attribute specified specified */
+        FileTestUtils.createJarWithContents(jarLocation /* No contents */);
+
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
+        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
+
+        assertNoFileLeak(new Runnable() {
+            @Override
+            public void run() {
+                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_VENDOR));
+                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
+                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+            }
+        });
+    }
+
+    @Test
+    public void checkOrderWhenReadingAttributes() throws Exception {
+        File tempDirectory = FileTestUtils.createTempDirectory();
+        File jarLocation1 = new File(tempDirectory, "test1.jar");
+        File jarLocation2 = new File(tempDirectory, "test2.jar");
+        File jarLocation3 = new File(tempDirectory, "test3.jar");
+        File jarLocation4 = new File(tempDirectory, "test4.jar");
+        File jarLocation5 = new File(tempDirectory, "test5.jar");
+
+        /* Test with various attributes in manifest!s! */
+        Manifest manifest1 = new Manifest();
+        manifest1.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass1"); //two times, but one in main jar, see DummyJNLPFileWithJar constructor with int
+
+        Manifest manifest2 = new Manifest();
+        manifest2.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_VENDOR, "rh1"); //two times, both in not main jar, see DummyJNLPFileWithJar constructor with int
+
+        Manifest manifest3 = new Manifest();
+        manifest3.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_TITLE, "it"); //jsut once in not main jar, see DummyJNLPFileWithJar constructor with int
+        manifest3.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_VENDOR, "rh2");
+
+        Manifest manifest4 = new Manifest();
+        manifest4.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass2"); //see jnlpFile.setMainJar(3);
+        manifest4.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_URL, "some url2"); //see DummyJNLPFileWithJar constructor with int
+
+        //first jar
+        Manifest manifest5 = new Manifest();
+        manifest5.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_URL, "some url1"); //see DummyJNLPFileWithJar constructor with int
+
+
+        FileTestUtils.createJarWithContents(jarLocation1, manifest1);
+        FileTestUtils.createJarWithContents(jarLocation2, manifest2);
+        FileTestUtils.createJarWithContents(jarLocation3, manifest3);
+        FileTestUtils.createJarWithContents(jarLocation4, manifest4);
+        FileTestUtils.createJarWithContents(jarLocation5, manifest5);
+
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(3, jarLocation5, jarLocation3, jarLocation4, jarLocation1, jarLocation2); //jar 1 should be main
+        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
+
+        assertNoFileLeak(new Runnable() {
+            @Override
+            public void run() {
+                //defined twice
+                assertEquals(null, classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_VENDOR));
+                //defined twice, but one in main jar
+                assertEquals("DummyClass1", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.MAIN_CLASS));
+                //defined not in main jar 
+                assertEquals("it", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_TITLE));
+                //not deffined
+                assertEquals(null, classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_VENDOR_ID));
+                //deffined in first jar
+                assertEquals("some url1", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_URL));
+            }
+        });
     }
 }

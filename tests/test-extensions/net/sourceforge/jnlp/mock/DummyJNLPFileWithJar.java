@@ -17,25 +17,65 @@ import net.sourceforge.jnlp.Version;
 public class DummyJNLPFileWithJar extends JNLPFile {
 
     /* Create a JARDesc for the given URL location */
-    static JARDesc makeJarDesc(URL jarLocation) {
-        return new JARDesc(jarLocation, new Version("1"), null, false,false, false,false);
+    static JARDesc makeJarDesc(URL jarLocation, boolean main) {
+        return new JARDesc(jarLocation, new Version("1"), null, false,main, false,false);
     }
 
-    public URL codeBase, jarLocation;
-    public JARDesc jarDesc;
+    private final URL codeBase;
+    private final JARDesc[] jarDescs;
+    private final File[] jarFiles;
 
-    public DummyJNLPFileWithJar(File jarFile) throws MalformedURLException {
-        codeBase = jarFile.getParentFile().toURI().toURL();
-        jarLocation = jarFile.toURI().toURL();
-        jarDesc = makeJarDesc(jarLocation); 
+    public DummyJNLPFileWithJar(File... jarFiles) throws MalformedURLException {
+        this(-1, jarFiles);
+    }
+    public DummyJNLPFileWithJar(int main, File... jarFiles) throws MalformedURLException {
+        codeBase = jarFiles[0].getParentFile().toURI().toURL();
+        this.jarFiles = jarFiles;
+        jarDescs = new JARDesc[jarFiles.length];
+
+        for (int i = 0; i < jarFiles.length; i++) {
+            jarDescs[i] = makeJarDesc(jarFiles[i].toURI().toURL(), i==main);
+
+        }
         info = new ArrayList<InformationDesc>();
     }
 
+    public URL getJarLocation() {
+        try {
+            return jarFiles[0].toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public URL getJarLocation(int i) {
+        try {
+            return jarFiles[i].toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public JARDesc[] getJarDescs() {
+        return jarDescs;
+    }
+    
+    public JARDesc getJarDesc() {
+        return jarDescs[0];
+    }
+
+    public JARDesc getJarDesc(int i) {
+        return jarDescs[i];
+    }
+    
+        
     @Override
     public ResourcesDesc getResources() {
-        ResourcesDesc resources = new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
-        resources.addResource(jarDesc);
-        return resources;
+        ResourcesDesc localResources = new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
+        for (JARDesc j : jarDescs) {
+            localResources.addResource(j);            
+        }
+        return localResources;
     }
     @Override
     public ResourcesDesc[] getResourcesDescs(final Locale locale, final String os, final String arch) {
