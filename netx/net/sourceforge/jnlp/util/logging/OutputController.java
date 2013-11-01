@@ -346,6 +346,10 @@ public class OutputController {
             if (stack != null) {
                 sb.append('[').append(getCallerClass(stack)).append(']');
             }
+            sb.append(" NETX Thread# ")
+                    .append(Integer.toHexString(((Object)Thread.currentThread()).hashCode()))
+                    .append(", name ")
+                    .append(Thread.currentThread().getName());
         } catch (Exception ex) {
             getLogger().log(ex);
         }

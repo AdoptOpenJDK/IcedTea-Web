@@ -1,5 +1,14 @@
 2013-11-01  Jiri Vanek  <jvanek@redhat.com>
 
+	Synced headers between PLUGIN_DEBUG, PLUGIN_ERROR and javaside
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: (getHeader)
+	added thread id and name to log header.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: (PLUGIN_DEBUG) (PLUGIN_ERROR) 
+	headerrs generation code moved to macro (CREATE_HEADER0). Both
+	headers now contains pthread_self and g_thread_self. Fixed indentation.
+
+2013-11-01  Jiri Vanek  <jvanek@redhat.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
 	added tests for custom attributes (getCustomAtributes), (getCustomAtributesEmpty) and test to ensure order during searching for
 	attributes in manifests (checkOrderWhenReadingAttributes).

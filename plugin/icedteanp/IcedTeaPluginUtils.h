@@ -78,43 +78,46 @@ exception statement from your version. */
   } while (0) 
 
 
-#define PLUGIN_DEBUG(...)                                          \
-  do                                                               \
-  {                                                                \
-	initialize_debug();                                            \
-    if (plugin_debug)  {                                           \
-      if (plugin_debug_to_streams) {                               \
-	    if (plugin_debug_headers) {                                \
-          char s[1000];                                            \
-          time_t t = time(NULL);                                   \
-          struct tm * p = localtime(&t);                           \
-          strftime(s, 1000, "%a %b %d %H:%M:%S %Z %Y", p);         \
-          const char *userNameforDebug = (getenv("USERNAME") == NULL) ? "unknown user" : getenv("USERNAME");  \
-	      fprintf  (stdout, "[%s][ITW-C-PLUGIN][MESSAGE_DEBUG][%s][%s:%d] ITNPP Thread# %ld: ",               \
-            userNameforDebug, s, __FILE__, __LINE__,  pthread_self());                                        \
-	    }                                                          \
-      fprintf (stdout, __VA_ARGS__);                               \
-	  }                                                            \
-    }                                                              \
+//f is after expansion used as FILE*
+#define CREATE_HEADER(f)                               \
+  do                                                   \
+  {                                                    \
+    char s[200];                                       \
+    time_t t = time(NULL);                             \
+    struct tm  p;                                      \
+    localtime_r(&t, &p);                               \
+    strftime(s, 200, "%a %b %d %H:%M:%S %Z %Y", &p);   \
+    const char *userNameforDebug = (getenv("USERNAME") == NULL) ? "unknown user" : getenv("USERNAME");  \
+    fprintf  (f, "[%s][ITW-C-PLUGIN][MESSAGE_DEBUG][%s][%s:%d] ITNPP Thread# %ld, gthread %p: ",        \
+    userNameforDebug, s, __FILE__, __LINE__,  pthread_self(), g_thread_self ());                        \
+  } while (0)
+  
+ 
+#define PLUGIN_DEBUG(...)              \
+  do                                   \
+  {                                    \
+    initialize_debug();                \
+    if (plugin_debug)  {               \
+      if (plugin_debug_to_streams) {   \
+        if (plugin_debug_headers) {    \
+          CREATE_HEADER(stdout);       \
+        }                              \
+      fprintf (stdout, __VA_ARGS__);   \
+      }                                \
+    }                                  \
   } while (0)
 
-// Error reporting macro.
-#define PLUGIN_ERROR(...)                                   \
-  do                                                        \
-  {                                                         \
-	initialize_debug();                                     \
-    if (plugin_debug_to_streams) {                          \
-      if (plugin_debug_headers) {                           \
-        char s[1000];                                       \
-        time_t t = time(NULL);                              \
-        struct tm * p = localtime(&t);                      \
-        strftime(s, 1000, "%A, %B %d %Y", p);               \
-        const char *userNameforDebug = (getenv("USERNAME") == NULL) ? "unknown user" : getenv("USERNAME"); \
-        fprintf  (stderr, "[%s][ITW-C-PLUGIN][ERROR_ALL][%s][%s:%d] thread %p: ",                          \
-          userNameforDebug, s, __FILE__, __LINE__, g_thread_self ());                                      \
-		}                                                   \
-		fprintf  (stderr,  __VA_ARGS__);                    \
-	  }                                                     \
+
+#define PLUGIN_ERROR(...)              \
+  do                                   \
+  {                                    \
+    initialize_debug();                \
+    if (plugin_debug_to_streams) {     \
+      if (plugin_debug_headers) {      \
+          CREATE_HEADER(stderr);       \
+        }                              \
+      fprintf  (stderr,  __VA_ARGS__); \
+      }                                \
    } while (0)
 
 
