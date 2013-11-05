@@ -91,9 +91,11 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
                 (Translator.R("DPEnableSyslogHint"))
         };
 
-        ComboItem[] javaConsoleItems = { new ComboItem(Translator.R("DPDisable"), "DISABLE"),
-                new ComboItem(Translator.R("DPHide"), "HIDE"),
-                new ComboItem(Translator.R("DPShow"), "SHOW"), };
+        ComboItem[] javaConsoleItems = { new ComboItem(Translator.R("DPDisable"), DeploymentConfiguration.CONSOLE_DISABLE),
+                new ComboItem(Translator.R("DPHide"), DeploymentConfiguration.CONSOLE_HIDE),
+                new ComboItem(Translator.R("DPShow"), DeploymentConfiguration.CONSOLE_SHOW), 
+                new ComboItem(Translator.R("DPShowPluginOnly"), DeploymentConfiguration.CONSOLE_SHOW_PLUGIN), 
+                new ComboItem(Translator.R("DPShowJavawsOnly"), DeploymentConfiguration.CONSOLE_SHOW_JAVAWS) };
 
         JLabel consoleLabel = new JLabel(Translator.R("DPJavaConsole"));
         JComboBox consoleComboBox = new JComboBox();

@@ -67,8 +67,8 @@ import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.security.VariableX509TrustManager;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.TeeOutputStream;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import sun.net.www.protocol.jar.URLJarFile;
 
@@ -162,8 +162,7 @@ public class JNLPRuntime {
     /** a lock which is held to indicate that an instance of netx is running */
     private static FileLock fileLock;
 
-    public static final String STDERR_FILE = "java.stderr";
-    public static final String STDOUT_FILE = "java.stdout";
+  
 
 
     /**
@@ -196,6 +195,9 @@ public class JNLPRuntime {
         try {
             config.load();
             config.copyTo(System.getProperties());
+            if (JavaConsole.canShowOnStartup(isApplication)) {
+                JavaConsole.getConsole().showConsoleLater();
+            }
         } catch (ConfigurationException e) {
             /* exit if there is a fatal exception loading the configuration */
             if (isApplication) {

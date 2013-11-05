@@ -235,7 +235,7 @@ public class PluginAppletSecurityContext {
     private ClassLoader liveconnectLoader = ClassLoader.getSystemClassLoader();
     int identifier = 0;
 
-    public static PluginStreamHandler streamhandler;
+    private static PluginStreamHandler streamhandler;
 
     long startTime = 0;
 
@@ -320,6 +320,10 @@ public class PluginAppletSecurityContext {
     public static void setStreamhandler(PluginStreamHandler sh) {
         streamhandler = sh;
     }
+
+    public static PluginStreamHandler getStreamhandler() {
+        return streamhandler;
+    }    
 
     public static Map<String, String> getLoaderInfo() {
         Hashtable<String, String> map = new Hashtable<String, String>();

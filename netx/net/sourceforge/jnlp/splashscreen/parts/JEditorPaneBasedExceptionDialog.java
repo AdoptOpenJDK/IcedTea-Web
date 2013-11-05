@@ -40,8 +40,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.WindowEvent;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -65,6 +63,7 @@ import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.BasicExceptionDialog;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class JEditorPaneBasedExceptionDialog extends JDialog implements HyperlinkListener {
@@ -74,6 +73,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
     private JButton closeAndCopyButton;
     private JButton homeButton;
     private JButton aboutButton;
+    private JButton consoleButton;
     private JEditorPane htmlErrorAndHelpPanel;
     private JLabel exceptionLabel;
     private JLabel iconLabel;
@@ -142,6 +142,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
         htmlErrorAndHelpPanel = new JEditorPane();
         homeButton = new JButton();
         aboutButton = new JButton();
+        consoleButton = BasicExceptionDialog.getShowButton(JEditorPaneBasedExceptionDialog.this);
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -166,9 +167,27 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
         GroupLayout jPanel2Layout = new GroupLayout(topPanel);
         topPanel.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(jPanel2Layout.createSequentialGroup().addContainerGap().addComponent(closeButton).addContainerGap().addComponent(aboutButton).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 314, Short.MAX_VALUE).addComponent(closeAndCopyButton).addContainerGap()));
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(closeButton)
+                        .addContainerGap()
+                        .addComponent(aboutButton)
+                        .addContainerGap()
+                        .addComponent(consoleButton)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 314, Short.MAX_VALUE)
+                        .addComponent(closeAndCopyButton)
+                        .addContainerGap()));
         jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup().addContainerGap(24, Short.MAX_VALUE).addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(closeButton).addComponent(aboutButton).addComponent(closeAndCopyButton)).addContainerGap()));
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addContainerGap(24, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(closeButton)
+                        .addComponent(aboutButton)
+                        .addComponent(consoleButton)
+                        .addComponent(closeAndCopyButton))
+                    .addContainerGap()));
 
         exceptionLabel.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         exceptionLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -204,7 +223,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
             }
             }
         });
-
+        
         GroupLayout jPanel1Layout = new GroupLayout(mainPanel);
         mainPanel.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -271,6 +290,9 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
         StringBuilder s = new StringBuilder("<html><body>");
         String info = "<p>"
                 + Translator.R(InfoItem.SPLASH + "mainL1", createLink())
+                + " </p> \n" +
+                "<p>"
+                + Translator.R(InfoItem.SPLASH + "mainL2", createLink())
                 + " </p> \n";
         String t = "<p>"
                 + Translator.R(InfoItem.SPLASH + "mainL3")

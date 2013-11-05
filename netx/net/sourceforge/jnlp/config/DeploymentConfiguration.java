@@ -64,14 +64,31 @@ public final class DeploymentConfiguration {
     public static final int JNLP_ASSOCIATION_ASK_USER = 2;
     public static final int JNLP_ASSOCIATION_REPLACE_ASK = 3;
 
-    /*
-     * FIXME these should be moved into JavaConsole, but there is a strange
-     * dependency in the build system. First all of netx is built. Then the
-     * plugin is built. So we cannot refer to plugin code in here :(
+    /**
+     * when set to as value of KEY_CONSOLE_STARTUP_MODE = "deployment.console.startup.mode",
+     * then console is not visible by default, but may be shown
      */
     public static final String CONSOLE_HIDE = "HIDE";
+    /**
+     * when set to as value of KEY_CONSOLE_STARTUP_MODE = "deployment.console.startup.mode",
+     * then console show for both javaws and plugin
+     */
     public static final String CONSOLE_SHOW = "SHOW";
+    /**
+     * when set to as value of KEY_CONSOLE_STARTUP_MODE = "deployment.console.startup.mode",
+     * then console is not visible by default, nop data are passed to it (save memory and cpu) but can not be shown
+     */
     public static final String CONSOLE_DISABLE = "DISABLE";
+    /**
+     * when set to as value of KEY_CONSOLE_STARTUP_MODE = "deployment.console.startup.mode",
+     * then console show for  plugin
+     */
+    public static final String CONSOLE_SHOW_PLUGIN = "SHOW_PLUGIN_ONLY";
+    /**
+     * when set to as value of KEY_CONSOLE_STARTUP_MODE = "deployment.console.startup.mode",
+     * then console show for javaws
+     */
+    public static final String CONSOLE_SHOW_JAVAWS = "SHOW_JAVAWS_ONLY";
 
     public static final String KEY_USER_CACHE_DIR = "deployment.user.cachedir";
     public static final String KEY_USER_PERSISTENCE_CACHE_DIR = "deployment.user.pcachedir";
@@ -156,10 +173,19 @@ public final class DeploymentConfiguration {
     public static final String KEY_ENABLE_LOGGING_TOSTREAMS = "deployment.log.stdstreams";
     public static final String KEY_ENABLE_LOGGING_TOSYSTEMLOG = "deployment.log.system";
 
-    /*
-     * Console
+    /**
+     * Console initial status.
+     * One of CONSOLE_* values
+     * See declaration above:
+     * CONSOLE_HIDE = "HIDE";
+     * CONSOLE_SHOW = "SHOW";
+     * CONSOLE_DISABLE = "DISABLE";
+     * CONSOLE_SHOW_PLUGIN = "SHOW_PLUGIN_ONLY";
+     * CONSOLE_SHOW_JAVAWS = "SHOW_JAVAWS_ONLY";
      */
     public static final String KEY_CONSOLE_STARTUP_MODE = "deployment.console.startup.mode";
+    
+
 
     /*
      * Desktop Integration

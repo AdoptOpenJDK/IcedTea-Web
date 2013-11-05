@@ -12,6 +12,7 @@ New in release 1.5 (2013-XX-XX):
 * IcedTea-Web now using tagsoup as default (tagsoup dependence) sanitizer for input
 * JDK older then 1.5 no longer supported
 * IcedTea-Web is now following XDG .config and .cache specification(RH947647)
+* A console for debugging plugin and javaws
 * Cache Viewer
   - Can be closed by ESC key
   - Enabling and disabling of operational buttons is handled properly

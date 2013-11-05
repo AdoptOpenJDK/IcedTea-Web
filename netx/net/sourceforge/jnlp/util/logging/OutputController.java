@@ -45,16 +45,30 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 public class OutputController {
 
-    public static enum Level {
+   public static enum Level {
 
         MESSAGE_ALL, // - stdout/log in all cases
         MESSAGE_DEBUG, // - stdout/log in verbose/debug mode
         WARNING_ALL, // - stdout+stderr/log in all cases (default for
         WARNING_DEBUG, // - stdou+stde/logrr in verbose/debug mode
         ERROR_ALL, // - stderr/log in all cases (default for
-        ERROR_DEBUG, // - stderr/log in verbose/debug mode
+        ERROR_DEBUG; // - stderr/log in verbose/debug mode
         //ERROR_DEBUG is default for Throwable
         //MESSAGE_VERBOSE is defautrl  for String
+        
+        private static boolean isOutput(MessageWithLevel s) {
+            return s.level == Level.MESSAGE_ALL
+                    || s.level == Level.MESSAGE_DEBUG
+                    || s.level == Level.WARNING_ALL
+                    || s.level == Level.WARNING_DEBUG;
+        }
+
+        private static boolean isError(MessageWithLevel s) {
+            return s.level == Level.ERROR_ALL
+                    || s.level == Level.ERROR_DEBUG
+                    || s.level == Level.WARNING_ALL
+                    || s.level == Level.WARNING_DEBUG;
+        }
     }
 
     private static final class MessageWithLevel {
@@ -134,16 +148,10 @@ public class OutputController {
             }
         }
         if (LogConfig.getLogConfig().isLogToStreams()) {
-            if (s.level == Level.MESSAGE_ALL
-                    || s.level == Level.MESSAGE_DEBUG
-                    || s.level == Level.WARNING_ALL
-                    || s.level == Level.WARNING_DEBUG) {
+            if (Level.isOutput(s)) {
                 outLog.log(message);
             }
-            if (s.level == Level.ERROR_ALL
-                    || s.level == Level.ERROR_DEBUG
-                    || s.level == Level.WARNING_ALL
-                    || s.level == Level.WARNING_DEBUG) {
+            if (Level.isError(s)) {
                 errLog.log(message);
             }
         }
@@ -152,6 +160,14 @@ public class OutputController {
         }
         if (LogConfig.getLogConfig().isLogToSysLog()) {
             getSystemLog().log(message);
+        }
+        if (LogConfig.getLogConfig().isLogToConsole()) {
+            if (Level.isOutput(s)){
+            JavaConsole.getConsole().logOutput(message);
+            }
+            if (Level.isError(s)){
+            JavaConsole.getConsole().logError(message);
+            }
         }
 
     }

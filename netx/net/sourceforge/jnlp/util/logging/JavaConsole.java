@@ -1,5 +1,5 @@
 /* JavaConsole -- A java console for the plugin
-   Copyright (C) 2009  Red Hat
+Copyright (C) 2009, 2013  Red Hat
 
 This file is part of IcedTea.
 
@@ -34,8 +34,9 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
+package net.sourceforge.jnlp.util.logging;
 
-package sun.applet;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -43,16 +44,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -62,38 +58,73 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
- * A simple Java console for IcedTeaPlugin
+ * A simple Java console for IcedTeaPlugin and JavaWS
  * 
  */
 public class JavaConsole {
 
-    private boolean initialized = false;
+    public static interface ClassLoaderInfoProvider {
 
-    JFrame consoleWindow;
-    JTextArea stdErrText;
-    JTextArea stdOutText;
+        public Map<String, String> getLoaderInfo();
+    }
+    private static JavaConsole console;
+
+    public static JavaConsole getConsole() {
+        if (console == null) {
+            console = new JavaConsole();
+        }
+        return console;
+    }
+
+    public static boolean isEnabled() {
+        return isEnabled(JNLPRuntime.getConfiguration());
+    }
+
+    public static boolean isEnabled(DeploymentConfiguration config) {
+        return !DeploymentConfiguration.CONSOLE_DISABLE.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
+                && !JNLPRuntime.isHeadless();
+    }
+
+    public static boolean canShowOnStartup(boolean isApplication) {
+        return canShowOnStartup(isApplication, JNLPRuntime.getConfiguration());
+    }
+
+    public static boolean canShowOnStartup(boolean isApplication, DeploymentConfiguration config) {
+        if (!isEnabled(config)) {
+            return false;
+        }
+        return DeploymentConfiguration.CONSOLE_SHOW.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
+                || (DeploymentConfiguration.CONSOLE_SHOW_PLUGIN.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
+                && !isApplication)
+                || (DeploymentConfiguration.CONSOLE_SHOW_JAVAWS.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
+                && isApplication);
+    }
+    private JDialog consoleWindow;
+    private JTextArea stdErrText;
+    private JTextArea stdOutText;
+    private ClassLoaderInfoProvider classLoaderInfoProvider;
+
+    public JavaConsole() {
+        initialize();
+    }
 
     /**
      * Initialize the console
      */
-    public void initialize() {
+    private void initialize() {
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
-        final String logDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
-
-        consoleWindow = new JFrame("Java Console");
+        consoleWindow = new JDialog((JFrame) null, R("DPJavaConsole"));
         consoleWindow.setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
         JPanel contentPanel = new JPanel();
@@ -103,7 +134,6 @@ public class JavaConsole {
 
         Font monoSpace = new Font("Monospaced", Font.PLAIN, 12);
 
-        /* std out */
 
         stdOutText = new JTextArea();
         JScrollPane stdOutScrollPane = new JScrollPane(stdOutText);
@@ -112,22 +142,12 @@ public class JavaConsole {
         stdOutText.setEditable(false);
         stdOutText.setFont(monoSpace);
 
-        TextAreaUpdater stdOutUpdater = new TextAreaUpdater(new File(logDir,
-                PluginMain.PLUGIN_STDOUT_FILE), stdOutText);
-        stdOutUpdater.setName("IcedteaPlugin Console Thread(System.out)");
-
-        /* std err */
-
         stdErrText = new JTextArea();
         JScrollPane stdErrScrollPane = new JScrollPane(stdErrText);
         stdErrScrollPane.setBorder(new TitledBorder(
                 new EmptyBorder(5, 5, 5, 5), "System.err"));
         stdErrText.setEditable(false);
         stdErrText.setFont(monoSpace);
-
-        TextAreaUpdater stdErrUpdater = new TextAreaUpdater(new File(logDir,
-                PluginMain.PLUGIN_STDERR_FILE), stdErrText);
-        stdErrUpdater.setName("IcedteaPlugin Console Thread(System.err)");
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 stdOutScrollPane, stdErrScrollPane);
@@ -150,73 +170,75 @@ public class JavaConsole {
         JPanel buttonPanel = new JPanel();
         contentPanel.add(buttonPanel, c);
 
-        JButton gcButton = new JButton("Run GC");
+        JButton gcButton = new JButton(R("CONSOLErungc"));
         buttonPanel.add(gcButton);
         gcButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Performing Garbage Collection....");
                 System.gc();
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Done");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("ButDone"));
                 printMemoryInfo();
             }
-
         });
 
-        JButton finalizersButton = new JButton("Run Finalizers");
+        JButton finalizersButton = new JButton(R("CONSOLErunFinalizers"));
         buttonPanel.add(finalizersButton);
         finalizersButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Running finalization....");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLErunningFinalizers"));
                 Runtime.getRuntime().runFinalization();
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Done");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("ButDone"));
                 printMemoryInfo();
             }
         });
 
-        JButton memoryButton = new JButton("Memory Info");
+        JButton memoryButton = new JButton(R("CONSOLEmemoryInfo"));
         buttonPanel.add(memoryButton);
         memoryButton.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
             }
-
         });
 
-        JButton systemPropertiesButton = new JButton("System Properties");
+        JButton systemPropertiesButton = new JButton(R("CONSOLEsystemProperties"));
         buttonPanel.add(systemPropertiesButton);
         systemPropertiesButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 printSystemProperties();
             }
-
         });
 
-        JButton classloadersButton = new JButton("Classloaders");
+        JButton classloadersButton = new JButton(R("CONSOLEclassLoaders"));
         buttonPanel.add(classloadersButton);
         classloadersButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 printClassLoaders();
             }
-
         });
 
-        JButton threadListButton = new JButton("Thread List");
+        JButton threadListButton = new JButton(R("CONSOLEthreadList"));
         buttonPanel.add(threadListButton);
         threadListButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 printThreadInfo();
             }
-
         });
 
-        JButton closeButton = new JButton("Close");
+        JButton closeButton = new JButton(R("ButClose"));
         buttonPanel.add(closeButton);
         closeButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         hideConsole();
                     }
@@ -224,38 +246,56 @@ public class JavaConsole {
             }
         });
 
-        stdOutUpdater.start();
-        stdErrUpdater.start();
-
         consoleWindow.add(contentPanel);
         consoleWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         consoleWindow.pack();
         consoleWindow.setSize(new Dimension(900, 600));
         consoleWindow.setMinimumSize(new Dimension(900, 300));
 
-        initialized = true;
-
         splitPane.setDividerLocation(0.5);
         splitPane.setResizeWeight(0.5);
     }
 
     public void showConsole() {
+        showConsole(false);
+    }
 
-        if (!initialized) {
-            initialize();
-        }
-
+    public void showConsole(boolean b) {
+        consoleWindow.setModal(b);
         consoleWindow.setVisible(true);
     }
 
     public void hideConsole() {
+        consoleWindow.setModal(false);
         consoleWindow.setVisible(false);
+    }
+
+    public void showConsoleLater() {
+        showConsoleLater(false);
+    }
+
+    public void showConsoleLater(final boolean b) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                JavaConsole.getConsole().showConsole(b);
+            }
+        });
+    }
+
+    public void hideConsoleLater() {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                JavaConsole.getConsole().hideConsole();
+            }
+        });
     }
 
     protected void printSystemProperties() {
 
         OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "System Properties:");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLEsystemProperties") + ":");
         OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "");
         Properties p = System.getProperties();
         Set<Object> keys = p.keySet();
@@ -266,26 +306,34 @@ public class JavaConsole {
         OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
     }
 
+    public void setClassLoaderInfoProvider(ClassLoaderInfoProvider clip) {
+        classLoaderInfoProvider = clip;
+    }
+
     private void printClassLoaders() {
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Available Classloaders: ");
-        Set<String> loaders = PluginAppletSecurityContext.getLoaderInfo().keySet();
-        for (String loader : loaders) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, loader + "\n"
-                    + "  codebase = "
-                    + PluginAppletSecurityContext.getLoaderInfo().get(loader));
+        if (classLoaderInfoProvider == null) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLEnoClassLoaders"));
+        } else {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLEclassLoaders") + ": ");
+            Set<String> loaders = classLoaderInfoProvider.getLoaderInfo().keySet();
+            for (String loader : loaders) {
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, loader + "\n"
+                        + "  codebase = "
+                        + classLoaderInfoProvider.getLoaderInfo().get(loader));
+            }
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
         }
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
     }
 
     private void printMemoryInfo() {
         OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----- ");
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  Memory Info:");
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    Max Memory:   "
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  " + R("CONSOLEmemoryInfo") + ":");
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "   " + R("CONSOLEmemoryMax") + ":   "
                 + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    Total Memory: "
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    " + R("CONSOLEmemoryTotal") + ": "
                 + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    Free Memory:  "
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    " + R("CONSOLEmemoryFree") + ":  "
                 + String.format("%1$10d", Runtime.getRuntime().freeMemory()));
         OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
 
@@ -295,7 +343,7 @@ public class JavaConsole {
         Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
         Set<Thread> keys = map.keySet();
         for (Thread key : keys) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Thread " + key.getId() + ": " + key.getName());
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLEthread") + " " + key.getId() + ": " + key.getName());
             for (StackTraceElement element : map.get(key)) {
                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  " + element);
             }
@@ -317,6 +365,7 @@ public class JavaConsole {
 
         if (toShowConsole) {
             SwingUtilities.invokeLater(new Runnable() {
+
                 public void run() {
                     console.showConsole();
                 }
@@ -325,47 +374,11 @@ public class JavaConsole {
 
     }
 
-    /**
-     * This thread updates the text on a JTextArea based on the text in a file
-     */
-    class TextAreaUpdater extends Thread {
-
-        File fileToRead;
-        JTextArea outputTextArea;
-
-        public TextAreaUpdater(File file, JTextArea textArea) {
-            fileToRead = file;
-            outputTextArea = textArea;
-            setDaemon(true);
-        }
-
-        public void run() {
-
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(
-                        fileToRead));
-                String line;
-                while (true) {
-                    while ((line = reader.readLine()) != null) {
-                        outputTextArea.insert(line + "\n", outputTextArea
-                                .getDocument().getLength());
-                        outputTextArea.setCaretPosition(outputTextArea
-                                .getText().length());
-                    }
-                    Thread.sleep(1000);
-                }
-
-            } catch (FileNotFoundException e) {
-               OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
-            } catch (IOException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
-            } catch (InterruptedException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL,e);
-                Thread.currentThread().interrupt();
-            }
-
-        }
-
+    void logOutput(String s) {
+        stdOutText.setText(stdOutText.getText() + s + "\n");
     }
 
+    void logError(String s) {
+        stdErrText.setText(stdErrText.getText() + s + "\n");
+    }
 }

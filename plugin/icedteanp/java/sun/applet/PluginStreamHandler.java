@@ -44,11 +44,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 
 import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class PluginStreamHandler {
@@ -58,7 +59,6 @@ public class PluginStreamHandler {
 
     private RequestQueue queue = new RequestQueue();
 
-    private JavaConsole console = new JavaConsole();
 
     private PluginMessageConsumer consumer;
     private volatile boolean shuttingDown = false;
@@ -242,9 +242,17 @@ public class PluginStreamHandler {
 
     private void handlePluginMessage(String message) {
         if (message.equals("plugin showconsole")) {
-            showConsole();
+            if (JavaConsole.isEnabled()){
+                JavaConsole.getConsole().showConsoleLater();
+            } else {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("DPJavaConsoleDisabledHint"));
+            }
         } else if (message.equals("plugin hideconsole")) {
-            hideConsole();
+            if (JavaConsole.isEnabled()){
+                JavaConsole.getConsole().hideConsoleLater();
+            } else {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("DPJavaConsoleDisabledHint"));
+            }
         } else {
             // else this is something that was specifically requested
             finishCallRequest(message);
@@ -373,21 +381,5 @@ public class PluginStreamHandler {
         }
 
         return;
-    }
-
-    private void showConsole() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                console.showConsole();
-            }
-        });
-    }
-
-    private void hideConsole() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                console.hideConsole();
-            }
-        });
     }
 }

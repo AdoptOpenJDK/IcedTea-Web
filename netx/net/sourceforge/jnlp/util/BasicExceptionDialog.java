@@ -41,6 +41,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,6 +56,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.JavaConsole;
 
 /**
  * A dialog that displays some basic information about an exception
@@ -91,6 +94,10 @@ public class BasicExceptionDialog {
         viewDetails.setActionCommand("show");
         quickInfoPanel.add(viewDetails);
 
+        final JButton consoleButton = getShowButton(errorDialog);
+        consoleButton.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        quickInfoPanel.add(consoleButton);
+
         JTextArea textArea = new JTextArea();
         textArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         textArea.setEditable(false);
@@ -119,5 +126,27 @@ public class BasicExceptionDialog {
         errorDialog.setResizable(true);
         errorDialog.setVisible(true);
         errorDialog.dispose();
+    }
+
+     public static JButton getShowButton(final Component parent) {
+        JButton consoleButton = new JButton();
+        consoleButton.setText(R("DPJavaConsole"));
+        consoleButton.addActionListener(new java.awt.event.ActionListener() {
+
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try {
+                    JavaConsole.getConsole().showConsoleLater(true);
+                } catch (Exception ex) {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                    JOptionPane.showConfirmDialog(parent, ex);
+                }
+            }
+        });
+        if (!JavaConsole.isEnabled()) {
+            consoleButton.setEnabled(false);
+            consoleButton.setToolTipText(R("DPJavaConsoleDisabledHint"));
+        }
+        return consoleButton;
     }
 }

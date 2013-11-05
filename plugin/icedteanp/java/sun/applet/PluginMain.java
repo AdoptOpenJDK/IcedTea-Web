@@ -75,6 +75,7 @@ import java.net.URL;
 import java.net.URLStreamHandler;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
@@ -82,15 +83,13 @@ import sun.awt.SunToolkit;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
+import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * The main entry point into PluginAppletViewer.
  */
 public class PluginMain {
-    // the files where stdout/stderr are sent to
-    public static final String PLUGIN_STDERR_FILE = "java.stderr";
-    public static final String PLUGIN_STDOUT_FILE = "java.stdout";
 
     // This is used in init().  Getting rid of this is desirable but depends
     // on whether the property that uses it is necessary/standard.
@@ -147,6 +146,13 @@ public class PluginMain {
             streamHandler.startProcessing();
 
             setCookieHandler(streamHandler);
+            JavaConsole.getConsole().setClassLoaderInfoProvider(new JavaConsole.ClassLoaderInfoProvider() {
+
+                @Override
+                public Map<String, String> getLoaderInfo() {
+                    return PluginAppletSecurityContext.getLoaderInfo();
+                }
+            });
 
         } catch (Exception e) {
             OutputController.getLogger().log(e);

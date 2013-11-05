@@ -337,7 +337,9 @@ public class Defaults {
                         BasicValueValidators.getStringValidator(new String[] {
                                 DeploymentConfiguration.CONSOLE_DISABLE,
                                 DeploymentConfiguration.CONSOLE_HIDE,
-                                DeploymentConfiguration.CONSOLE_SHOW
+                                DeploymentConfiguration.CONSOLE_SHOW,
+                                DeploymentConfiguration.CONSOLE_SHOW_PLUGIN,
+                                DeploymentConfiguration.CONSOLE_SHOW_JAVAWS
                         }),
                         DeploymentConfiguration.CONSOLE_HIDE
                 },

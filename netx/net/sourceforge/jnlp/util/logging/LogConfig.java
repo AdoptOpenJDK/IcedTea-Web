@@ -156,6 +156,10 @@ public class LogConfig {
     void setLogToSysLog(boolean logToSysLog) {
         this.logToSysLog = logToSysLog;
     }
+
+    boolean isLogToConsole() {
+        return JavaConsole.isEnabled();
+    }
     
     
     
