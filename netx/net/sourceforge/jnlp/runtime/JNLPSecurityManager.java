@@ -317,10 +317,14 @@ class JNLPSecurityManager extends AWTSecurityManager {
             JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
             cl.addPermission(perm);
             if (JNLPRuntime.isDebug()) {
-                if (cl.getPermissions(null).implies(perm)){
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Added permission: " + perm.toString());
+                if (cl.getSecurity() == null) {
+                    if (cl.getPermissions(null).implies(perm)){
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Added permission: " + perm.toString());
+                    } else {
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to add permission: " + perm.toString());
+                    }
                 } else {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to add permission: " + perm.toString());
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Cannot get permissions for null codesource when classloader security is not null");
                 }
             }
         } else {

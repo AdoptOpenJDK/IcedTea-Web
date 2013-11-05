@@ -1,3 +1,9 @@
+2013-11-05  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java:
+	(addPermission) avoid NPE in JNLPClassLoader#getPermissions with debug
+	enabled
+
 2013-11-01  Jiri Vanek  <jvanek@redhat.com>
 
 	Synced headers between PLUGIN_DEBUG, PLUGIN_ERROR and javaside
