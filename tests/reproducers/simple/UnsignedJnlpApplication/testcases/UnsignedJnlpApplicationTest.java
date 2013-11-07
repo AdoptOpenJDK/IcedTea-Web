@@ -38,6 +38,7 @@ exception statement from your version.
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,19 +51,19 @@ public class UnsignedJnlpApplicationTest {
 
     @Test
     public void jnlpFileIsUnchecked1() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/UnsignedJnlpApplication1.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/UnsignedJnlpApplication1.jnlp");
         Assert.assertTrue("Stdout should contains " + outputString + " but did not", pr.stdout.contains(outputString));
     }
 
     @Test
     public void jnlpFileIsUnchecked2() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/UnsignedJnlpApplication2.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/UnsignedJnlpApplication2.jnlp");
         Assert.assertTrue("Stdout should contains " + outputString + " but did not", pr.stdout.contains(outputString));
     }
 
     @Test
     public void jnlpFileIsUnchecked3() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/UnsignedJnlpApplication3.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/UnsignedJnlpApplication3.jnlp");
         Assert.assertTrue("Stdout should contains " + outputString + " but did not", pr.stdout.contains(outputString));
     }
 }

@@ -1,4 +1,4 @@
-/* MissingJar.java
+/* MissingJarTest.java
 Copyright (C) 2011 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -38,10 +38,10 @@ exception statement from your version.
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
-import org.junit.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class MissingJarTest {
@@ -60,25 +60,25 @@ public class MissingJarTest {
 
     @Test
     public void MissingJarTest1() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar.jnlp");
         evaluateResult(pr);
     }
 
     @Test
     public void MissingJarTest2() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar2.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar2.jnlp");
         evaluateResult(pr);
     }
 
     @Test
     public void MissingJarTest3() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar3.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar3.jnlp");
         evaluateResult(pr);
     }
 
     @Test
     public void MissingJarTest4() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar4.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/MissingJar4.jnlp");
         evaluateResult(pr);
     }
 }

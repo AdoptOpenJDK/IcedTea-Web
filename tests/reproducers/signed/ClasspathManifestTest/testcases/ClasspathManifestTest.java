@@ -38,8 +38,8 @@ exception statement from your version.
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
@@ -76,14 +76,14 @@ public class ClasspathManifestTest extends BrowserTest {
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add("ClasspathManifestApplicationTest.jnlp");
-        ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands, server.getDir());
+        ProcessResult pr = ServerAccess.executeProcess(commands, server.getDir());
         checkAppFails(pr, "ApplicationJNLPLocalTest");
     }
 
     @NeedsDisplay
     @Test
     public void AppletJNLPRemoteTest() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/ClasspathManifestAppletTest.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(null, "/ClasspathManifestAppletTest.jnlp");
         checkAppFails(pr, "AppletJNLPRemoteTest");
     }
 
@@ -95,7 +95,7 @@ public class ClasspathManifestTest extends BrowserTest {
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add("ClasspathManifestAppletTest.jnlp");
-        ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands, server.getDir());
+        ProcessResult pr = ServerAccess.executeProcess(commands, server.getDir());
         checkAppFails(pr, "AppletJNLPRLocalTest");
     }
 
@@ -103,7 +103,7 @@ public class ClasspathManifestTest extends BrowserTest {
     @TestInBrowsers(testIn = {Browsers.one})
     @Test
     public void BrowserJNLPHrefRemoteTest() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("/ClasspathManifestJNLPHrefTest.html");
+        ProcessResult pr = server.executeBrowser("/ClasspathManifestJNLPHrefTest.html");
         checkAppFails(pr, "BrowserJNLPHrefRemoteTest");
     }
 
@@ -115,7 +115,7 @@ public class ClasspathManifestTest extends BrowserTest {
         List<String> commands=new ArrayList<String>(2);
         commands.add(server.getBrowserLocation());
         commands.add("ClasspathManifestJNLPHrefTest.html");
-        ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands, server.getDir());
+        ProcessResult pr = ServerAccess.executeProcess(commands, server.getDir());
         checkAppFails(pr, "BrowserJNLPHrefLocalTest");
     }
 
@@ -123,7 +123,7 @@ public class ClasspathManifestTest extends BrowserTest {
     @TestInBrowsers(testIn = {Browsers.one})
     @Test
     public void BrowserAppletRemoteTest() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("/ClasspathManifestAppletTest.html");
+        ProcessResult pr = server.executeBrowser("/ClasspathManifestAppletTest.html");
         Assert.assertTrue("ClasspathManifest.BrowserAppletRemoteTest stdout should contain " + s1 + " but didn't", pr.stdout.contains(s1));
         // Should be the only one to search manifest for classpath.
         Assert.assertTrue("ClasspathManifest.BrowserAppletRemoteTest stdout should contain " + s2 + " but didn't", pr.stdout.contains(s2));

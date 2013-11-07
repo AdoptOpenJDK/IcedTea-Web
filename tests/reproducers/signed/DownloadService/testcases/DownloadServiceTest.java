@@ -40,10 +40,10 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

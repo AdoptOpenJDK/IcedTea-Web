@@ -35,12 +35,13 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
-import org.junit.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class AppletReadsInvalidJarTests extends BrowserTest{
@@ -52,7 +53,7 @@ public class AppletReadsInvalidJarTests extends BrowserTest{
     /*This SHOULD NOT execute the applet!*/
     @Test
     public void AppletJNLPTest() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless("/AppletReadsInvalidJar.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless("/AppletReadsInvalidJar.jnlp");
 
         Assert.assertFalse("AppletReadsInvalidJar stdout should NOT contain '" + CORRECT_EXECUTION + "', but did (applet should not have ran!).", pr.stdout.contains(CORRECT_EXECUTION));
         Assert.assertTrue("AppletReadsInvalidJar stderr should contain 'ZipException', but did not.", pr.stderr.contains(JNLP_EXPECTED_EXCEPTION));
@@ -62,7 +63,7 @@ public class AppletReadsInvalidJarTests extends BrowserTest{
     @Test
     @TestInBrowsers(testIn={Browsers.one})
     public void AppletInFirefoxTest() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("/AppletReadsInvalidJar.html");
+        ProcessResult pr = server.executeBrowser("/AppletReadsInvalidJar.html");
 
         Assert.assertTrue("AppletReadsInvalidJar stdout should contain '" + CORRECT_EXECUTION + "' but did not.", pr.stdout.contains(CORRECT_EXECUTION));
     }

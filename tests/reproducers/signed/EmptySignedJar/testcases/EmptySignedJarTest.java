@@ -1,4 +1,4 @@
-/* EmptySignedJar.java
+/* EmptySignedJarTest.java
 Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -38,6 +38,7 @@ exception statement from your version.
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
 
@@ -53,21 +54,21 @@ public class EmptySignedJarTest {
     @Test
     public void checkingForRequiredResources() throws Exception {
         String s = "Running SignedJarResource..";
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJarResource.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJarResource.jnlp");
         Assert.assertTrue("Could not locate SignedJarResource class within SignedJarResource jar", pr.stdout.contains(s));
     }
 
     @Bug(id = "PR1049")
     @Test
     public void usingExtensionWithEmptyJar() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/EmptySignedJarInExtensionJnlp.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/EmptySignedJarInExtensionJnlp.jnlp");
         Assert.assertTrue("Stdout should contain " + jarOutput + " but did not", pr.stdout.contains(jarOutput));
     }
 
     @Bug(id = "PR1049")
     @Test
     public void usingLauncherWithEmptyJar() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/EmptySignedJarInLaunchingJnlp.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/EmptySignedJarInLaunchingJnlp.jnlp");
         Assert.assertTrue("Stdout should contain " + jarOutput + " but did not", pr.stdout.contains(jarOutput));
     }
 }

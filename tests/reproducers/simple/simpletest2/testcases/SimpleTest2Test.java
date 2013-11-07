@@ -35,9 +35,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import org.junit.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class SimpleTest2Test {
@@ -47,14 +48,13 @@ public class SimpleTest2Test {
 
     @Test
     public void testSimpletest2lunchException() throws Exception {
-        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(null,"/simpletest2.jnlp");
+        ProcessResult pr=server.executeJavawsHeadless(null,"/simpletest2.jnlp");
         Assert.assertTrue("stdout should be < 1 , but was "+pr.stdout.trim().length(),pr.stdout.trim().length() < 1);
         String s="Correct exception";
         Assert.assertTrue("stderr should contains "+s+" but didn't",pr.stderr.contains(s));
         String ss="Exception";
         Assert.assertTrue("stderr should contains "+ss+" but did not",pr.stderr.contains(ss));
         Assert.assertFalse("testSimpletest2lunchException should not be terminated, but was",pr.wasTerminated);
-        //Assert.assertFalse(0==pr.returnValue);exception and still returned 0?
     }
 
 

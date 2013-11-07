@@ -35,10 +35,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-
 import java.util.Arrays;
 import java.util.List;
 
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class InformationTitleVendorParserTest {
 
     public void runTest(String jnlpName, String exception) throws Exception {
         List<String> verbosed = Arrays.asList(new String[] { "-verbose" });
-        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(verbosed, "/" + jnlpName + ".jnlp");
+        ProcessResult pr=server.executeJavawsHeadless(verbosed, "/" + jnlpName + ".jnlp");
         String s1 = "Good simple javaws exapmle";
         Assert.assertFalse("test" + jnlpName + " stdout should not contain " + s1 + " but did.", pr.stdout.contains(s1));
         Assert.assertTrue("testForTitle stderr should contain " + exception + " but did not.", pr.stderr.contains(exception));

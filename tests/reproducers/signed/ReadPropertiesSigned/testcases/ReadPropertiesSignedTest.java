@@ -35,11 +35,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,7 +54,7 @@ public class ReadPropertiesSignedTest {
     @Test
     public void ReadSignedPropertiesWithoutPermissionsWithXtrustAll() throws Exception {
         //no request for permissions
-        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesSigned1.jnlp");
+        ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesSigned1.jnlp");
         Assert.assertTrue("Stderr should match "+accessMatcher+" but did not",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
@@ -65,7 +66,7 @@ public class ReadPropertiesSignedTest {
     @Test
     public void ReadSignedPropertiesWithPermissionsWithXtrustAll() throws Exception {
         //request for allpermissions
-        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesSigned2.jnlp");
+        ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesSigned2.jnlp");
         Assert.assertFalse("Stderr should NOT match "+accessMatcher+" but did",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
@@ -76,16 +77,15 @@ public class ReadPropertiesSignedTest {
 
     @Test
     public void EnsureXtrustallNotAffectingUnsignedBehaviour() throws Exception {
-        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadProperties1.jnlp");
+        ProcessResult pr=server.executeJavawsHeadless(l,"/ReadProperties1.jnlp");
         Assert.assertTrue("Stderr should match "+accessMatcher+" but did not",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
         Assert.assertFalse("stdout lenght should not be  >2 but was "+pr.stdout.length(),pr.stdout.length()>2);
         Assert.assertFalse("should not be terminated but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
-        ServerAccess.ProcessResult pr2=server.executeJavawsHeadless(null,"/ReadProperties1.jnlp");
+        ProcessResult pr2=server.executeJavawsHeadless(null,"/ReadProperties1.jnlp");
         Assert.assertEquals(pr.stderr, pr2.stderr);
         Assert.assertEquals(pr.stdout, pr2.stdout);
-
     }
   }

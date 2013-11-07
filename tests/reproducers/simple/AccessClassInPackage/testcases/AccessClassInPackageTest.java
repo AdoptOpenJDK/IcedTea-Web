@@ -37,10 +37,10 @@ exception statement from your version.
 
 import java.util.Arrays;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
-import org.junit.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class AccessClassInPackageTest {
@@ -72,12 +72,12 @@ public class AccessClassInPackageTest {
     };
     private static final List<String> xta = Arrays.asList(new String[]{"-Xtrustall"});
 
-    private void testShouldFail(ServerAccess.ProcessResult pr, String s) {
+    private void testShouldFail(ProcessResult pr, String s) {
         String c = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + s + ".*";
         Assert.assertTrue("stderr should match `" + c + "`, but didn't ", pr.stderr.matches(c));
     }
 
-    private void testShouldNOTFail(ServerAccess.ProcessResult pr, String s) {
+    private void testShouldNOTFail(ProcessResult pr, String s) {
         String c = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + s + ".*";
         Assert.assertFalse("stderr should NOT match `" + c + "`, but did ", pr.stderr.matches(c));
     }
@@ -89,19 +89,19 @@ public class AccessClassInPackageTest {
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 
-    private void testShouldPass(ServerAccess.ProcessResult pr, String s) {
+    private void testShouldPass(ProcessResult pr, String s) {
         String c = "Class was obtained: " + s;
         Assert.assertTrue("stdout should contains `" + c + "`, but didn't ", pr.stdout.contains(c));
     }
 
-    private void testShouldNOTPass(ServerAccess.ProcessResult pr, String s) {
+    private void testShouldNOTPass(ProcessResult pr, String s) {
         String c = "Class was obtained: " + s;
         Assert.assertFalse("stdout should not contains `" + c + "`, but did ", pr.stdout.contains(c));
     }
 
     @Test
     public void AccessClassInPackageJAVAXJNLP() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[0]);
+        ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[0]);
         commonPitfall(pr);
         testShouldPass(pr, pass[0]);
         testShouldNOTFail(pr, badExceptions[0]);
@@ -109,7 +109,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSELF() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[1]);
+        ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[1]);
         commonPitfall(pr);
         testShouldPass(pr, pass[1]);
         testShouldNOTFail(pr, badExceptions[1]);
@@ -117,7 +117,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageNETSF() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[2]);
+        ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[2]);
         commonPitfall(pr);
         testShouldFail(pr, badExceptions[2]);
         testShouldNOTPass(pr, pass[2]);
@@ -125,7 +125,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSUNSEC() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[3]);
+        ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[3]);
         commonPitfall(pr);
         commonPitfall(pr);
         testShouldFail(pr, badExceptions[3]);
@@ -135,7 +135,7 @@ public class AccessClassInPackageTest {
     //now signed vaiants
     @Test
     public void AccessClassInPackageSignedJAVAXJNLP() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[0]);
+        ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[0]);
         commonPitfall(pr);
         testShouldPass(pr, pass[0]);
         testShouldNOTFail(pr, badExceptions[0]);
@@ -143,7 +143,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSignedSELF() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[1]);
+        ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[1]);
         commonPitfall(pr);
         testShouldPass(pr, pass[1]);
         testShouldNOTFail(pr, badExceptions[1]);
@@ -151,7 +151,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSignedNETSF() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[2]);
+        ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[2]);
         commonPitfall(pr);
         testShouldPass(pr, pass[2]);
         testShouldNOTFail(pr, badExceptions[2]);
@@ -159,7 +159,7 @@ public class AccessClassInPackageTest {
 
     @Test
     public void AccessClassInPackageSignedSUNSEC() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[3]);
+        ProcessResult pr = server.executeJavawsHeadless(xta, "/" + filesSigned[3]);
         commonPitfall(pr);
         testShouldPass(pr, pass[3]);
         testShouldNOTFail(pr, badExceptions[3]);

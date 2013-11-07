@@ -36,8 +36,8 @@ exception statement from your version.
  */
 
 import java.util.ArrayList;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import org.junit.Assert;
 import java.util.Arrays;
 import java.util.List;
@@ -80,7 +80,7 @@ public class DeadLockTestTest {
     public void testDeadLockTestTerminatedBody(String jnlp) throws Exception {
         List<String> before = countJavaInstances();
         ServerAccess.logOutputReprint("java1 " + jnlp + " : " + before.size());
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, jnlp);
+        ProcessResult pr = server.executeJavawsHeadless(null, jnlp);
         assertDeadlockTestLaunched(pr);
         List<String> after = countJavaInstances();
         ServerAccess.logOutputReprint("java2 " + jnlp + " : " + after.size());
@@ -167,7 +167,7 @@ public class DeadLockTestTest {
             ServerAccess.logOutputReprint("Killing " + string);
             ServerAccess.PROCESS_LOG = false;
             try {
-                ServerAccess.ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{"kill", "-9", string}));
+                ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{"kill", "-9", string}));
             } finally {
                 ServerAccess.PROCESS_LOG = true;
             }
@@ -182,7 +182,7 @@ public class DeadLockTestTest {
         List<String> result = new ArrayList<String>();
         ServerAccess.PROCESS_LOG = false;
         try {
-            ServerAccess.ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{"ps", "-eo", "pid,ppid,stat,fname"}));
+            ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{"ps", "-eo", "pid,ppid,stat,fname"}));
             Matcher m = Pattern.compile("\\s*\\d+\\s+\\d+ .+ java\\s*").matcher(pr.stdout);
             int i = 0;
             while (m.find()) {

@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import junit.framework.Assert;
 import net.sourceforge.jnlp.ContentReaderListener;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ProcessWrapper;
@@ -57,6 +56,7 @@ import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+import org.junit.Assert;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -190,7 +190,7 @@ public class XDGspecificationTests extends BrowserTest {
     private String[] removeXdgVAlues() {
         Map<String, String> p = System.getenv();
         Set<Entry<String, String>> r = p.entrySet();
-        List<Entry<String, String>> rr = new ArrayList(r);
+        List<Entry<String, String>> rr = new ArrayList<Entry<String, String>>(r);
         Collections.sort(rr, new Comparator<Entry<String, String>>() {
 
             @Override
@@ -228,7 +228,7 @@ public class XDGspecificationTests extends BrowserTest {
         boolean config = false;
         Map<String, String> p = System.getenv();
         Set<Entry<String, String>> r = p.entrySet();
-        List<Entry<String, String>> rr = new ArrayList(r);
+        List<Entry<String, String>> rr = new ArrayList<Entry<String, String>>(r);
         Collections.sort(rr, new Comparator<Entry<String, String>>() {
 
             @Override
@@ -351,7 +351,7 @@ public class XDGspecificationTests extends BrowserTest {
     }
 
     private static List<File> getContentOfDirectory(File f) {
-        List<File> result = new ArrayList();
+        List<File> result = new ArrayList<File>();
         if (f == null || !f.exists() || !f.isDirectory()) {
             return result;
         }

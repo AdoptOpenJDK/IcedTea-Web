@@ -55,6 +55,7 @@ import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.browsertesting.Browser;
 import net.sourceforge.jnlp.browsertesting.BrowserFactory;
 import net.sourceforge.jnlp.browsertesting.Browsers;
@@ -270,7 +271,7 @@ public class ServerAccess {
        if (this.currentBrowser==null) return null;
        List<String> l1=this.currentBrowser.getComaptibilitySwitches();
        List<String> l2=this.currentBrowser.getDefaultSwitches();
-       List<String> l= new ArrayList();
+       List<String> l= new ArrayList<String>();
        if (l1!=null)l.addAll(l1);
        if (l2!=null)l.addAll(l2);
        return l;
@@ -832,15 +833,4 @@ public class ServerAccess {
         return new ProcessWrapper(args, dir, stdoutl, stderrl, vars).execute();
     }
 
-    /**
-     * this is temprary solution until refactoring is fully done
-     * Use  net.sourceforge.jnlp.ProcessResult instead
-     */
-    @Deprecated
-    public static class ProcessResult extends net.sourceforge.jnlp.ProcessResult {
-
-        public ProcessResult(String stdout, String stderr, Process process, boolean wasTerminated, Integer r, Throwable deadlyException) {
-            super(stdout, stderr, process, wasTerminated, r, deadlyException);
-        }
-    }
-    }
+}

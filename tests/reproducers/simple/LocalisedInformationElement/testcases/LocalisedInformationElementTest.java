@@ -62,7 +62,7 @@ public class LocalisedInformationElementTest {
         ServerAccess.logOutputReprint("Setting locales");
         Map<String, String> p = System.getenv();
         Set<Entry<String, String>> r = p.entrySet();
-        List<Entry<String, String>> rr = new ArrayList(r);
+        List<Entry<String, String>> rr = new ArrayList<Entry<String, String>>(r);
         Collections.sort(rr, new Comparator<Entry<String, String>>() {
 
             @Override

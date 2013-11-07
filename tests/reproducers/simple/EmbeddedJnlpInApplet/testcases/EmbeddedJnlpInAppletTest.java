@@ -35,13 +35,13 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import junit.framework.Assert;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess.AutoClose;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class EmbeddedJnlpInAppletTest extends BrowserTest {

@@ -37,19 +37,19 @@ exception statement from your version.
 
 import java.util.ArrayList;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import org.junit.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 @Bug(id={"http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-October/016127.html","PR804","PR811"})
 public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
-
 
     @Bug(id="PR811")
     @Test
@@ -82,7 +82,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
          * it is in headless mode. This can be considered as bug, but because it is
          * only on ocal files, and probably only from test run - it can be ignored
          */
-        ServerAccess.ProcessResult pr =  ServerAccess.executeProcess(commands);
+        ProcessResult pr =  ServerAccess.executeProcess(commands);
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "xception";
@@ -95,7 +95,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
     @Test
     @NeedsDisplay
     public void SpacesCanBeEverywhereRemoteAppletTestsJnlp2Signed() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavaws("/NotOnly%20spaces%20can%20kill%20%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%20too%20signed.jnlp");
+        ProcessResult pr = server.executeJavaws("/NotOnly%20spaces%20can%20kill%20%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%20too%20signed.jnlp");
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "xception";
@@ -108,7 +108,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void SpacesCanBeEverywhereRemoteAppletTestsHtml2Signed() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("/spaces+applet+Tests+signed.html");
+        ProcessResult pr = server.executeBrowser("/spaces+applet+Tests+signed.html");
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "xception";
@@ -120,7 +120,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
     @Bug(id={"PR811","http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-October/016144.html"})
     @Test
     public void SpacesCanBeEverywhereRemoteTests1Signed() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere1%20signed.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere1%20signed.jnlp");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("stdout should contains `" + s + "`, but did not", pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -132,7 +132,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
     @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests2Signed() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2%20signed.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2%20signed.jnlp");
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -144,7 +144,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
     @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests2Signed_withQuery1() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2%20signed.jnlp?test=20");
+        ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2%20signed.jnlp?test=20");
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -156,7 +156,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
      @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests2Signed_withQuery2() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2%20signed.jnlp?test%3D20");
+        ProcessResult pr = server.executeJavawsHeadless(null, "/Spaces%20can%20be%20everywhere2%20signed.jnlp?test%3D20");
 
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
@@ -169,7 +169,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
     @Bug(id="PR811")
     @Test
     public void SpacesCanBeEverywhereRemoteTests3Signed() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/SpacesCanBeEverywhere1signed.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(null, "/SpacesCanBeEverywhere1signed.jnlp");
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -186,7 +186,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add("Spaces can be everywhere1.jnlp");
-        ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
+        ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("stdout should contains `" + s + "`, but did not", pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -202,7 +202,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add("Spaces can be everywhere2 signed.jnlp");
-        ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
+        ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -218,7 +218,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add(server.getDir()+"/Spaces can be everywhere2 signed.jnlp");
-        ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands);
+        ProcessResult pr = ServerAccess.executeProcess(commands);
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";
@@ -234,7 +234,7 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add("SpacesCanBeEverywhere1signed.jnlp");
-        ServerAccess.ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
+        ProcessResult pr = ServerAccess.executeProcess(commands,server.getDir());
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
         String cc = "ClassNotFoundException";

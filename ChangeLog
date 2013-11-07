@@ -1,3 +1,25 @@
+2013-11-07  Andrew Azores  <aazores@redhat.com>
+
+	Reproducer test cleanup. Replaced ServerAccess.ProcessResult in favour of
+	ProcessResult, and junit.framework.Assert in favour of org.junit.Assert.
+	Other notable changes below.
+	* tests/reproducers/simple/simpletest1/testcases/XDGspecificationTests.java:
+	(removeXdgValues, setXdgValues) list 'rr' uses parameterized type.
+	(getContentOfDirectory) list 'result' uses parameterized type
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	(ProcessResult) inner class removed. (getBrowserParams) list 'l' uses
+	parameterized type
+	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java:
+	(getChangedLocalesForSubproces) list 'rr' uses parameterized type
+	* tests/reproducers/simple/LocalisedInformationElement/testcases/LocalisedInformationElementTest.java:
+	same
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessWrapper.java:
+	constructor for (String, List<String>, String) lists 'urledArgs' and
+	'otherArgs' use parameterized type. (stdoutl, stderrl) use parameterized
+	type.
+	* tests/test-extensions/net/sourceforge/jnlp/ContentReader.java:
+	(listeners) use parameterized type
+
 2013-11-05  Jiri Vanek  <jvanek@redhat.com>
 
 	Java console resurrected and connected to new logging.

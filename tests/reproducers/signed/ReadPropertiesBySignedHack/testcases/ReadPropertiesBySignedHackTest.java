@@ -1,4 +1,4 @@
-/* ReadPropertiesSignedTest.java
+/* ReadPropertiesBySignedHackTest.java
 Copyright (C) 2011 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -35,11 +35,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,7 +53,7 @@ public class ReadPropertiesBySignedHackTest {
     @Test
     public void ReadPropertiesBySignedHackWithjoutXtrustAll() throws Exception {
         //no request for permissions
-        ServerAccess.ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesBySignedHack.jnlp");
+        ProcessResult pr=server.executeJavawsHeadless(l,"/ReadPropertiesBySignedHack.jnlp");
         String s="java.lang.SecurityException: class \"ReadProperties\"'s signer information does not match signer information of other classes in the same package";
         Assert.assertTrue("Stderr should contains "+s+" but did not",pr.stderr.contains(s));
         String ss="ClassNotFoundException";

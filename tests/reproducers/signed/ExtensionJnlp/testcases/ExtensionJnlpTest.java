@@ -38,6 +38,7 @@ exception statement from your version.
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
 
@@ -55,7 +56,7 @@ public class ExtensionJnlpTest {
 
     @Test
     public void checkingForRequiredResources() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/UsesSignedJar.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/UsesSignedJar.jnlp");
         Assert.assertTrue("Could not locate SignedJarResource class within SignedJarResource jar", pr.stdout.contains(jarOutput));
 
         String s = "Running SignedJnlpResource..";
@@ -66,21 +67,21 @@ public class ExtensionJnlpTest {
     @Bug(id = "PR1040")
     @Test
     public void usingSignedExtension() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/UsesSignedJarExtension.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/UsesSignedJarExtension.jnlp");
         Assert.assertTrue("Stdout should contain " + jarOutput + " but did not", pr.stdout.contains(jarOutput));
     }
 
     @Bug(id = "PR1041")
     @Test
     public void mainJarInExtension() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/UsesSignedJnlpJarAndSignedJarExtension.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/UsesSignedJnlpJarAndSignedJarExtension.jnlp");
         Assert.assertTrue("Stdout should contain " + jarOutput + " but did not", pr.stdout.contains(jarOutput));
     }
 
     @Bug(id = "PR1042")
     @Test
     public void checkingSignedJnlpInExtension() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/UsesSignedJnlpExtension.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/UsesSignedJnlpExtension.jnlp");
         Assert.assertTrue("Stdout should contain " + signedJnlpException + " but did not", pr.stderr.contains(signedJnlpException));
     }
 }

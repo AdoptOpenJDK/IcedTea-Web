@@ -38,7 +38,9 @@ exception statement from your version.
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,14 +51,14 @@ public class SignedJnlpCaseOneTest {
 
     @Test
     public void launchingFileMatchesSigned() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpCaseTestOne1.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpCaseTestOne1.jnlp");
         String s = "Running signed application in main";
         Assert.assertTrue("Stdout should contains " + s + " but did not", pr.stdout.contains(s));
     }
 
     @Test
     public void launchingFileDoesNotMatchSigned() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpCaseTestOne2.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpCaseTestOne2.jnlp");
         String s = "net.sourceforge.jnlp.LaunchException: Fatal: Application Error: The signed " +
                 "JNLP file did not match the launching JNLP file. Missing Resource: Signed Application did not match " +
                 "launching JNLP File";

@@ -64,26 +64,26 @@ public class ResourcesTest extends  BrowserTest{
     @NeedsDisplay
     public void testNonExisitngBrowserWillNotDeadlock() throws Exception {
         server.setCurrentBrowser(Browsers.none);
-        ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html");
+        ProcessResult pr = server.executeBrowser("not_existing_url.html");
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
         Assert.assertEquals(pr.stdout, "");
         Assert.assertTrue(pr.wasTerminated);
         Assert.assertTrue(pr.returnValue < 0);
-        junit.framework.Assert.assertNotNull(pr.deadlyException);
+        Assert.assertNotNull(pr.deadlyException);
     }
 
     @Test
     public void testUnexistingProcessWillFailRecognizedly() throws Exception {
         server.setCurrentBrowser(Browsers.none);
         List<String> al=Arrays.asList(new String[] {"definietly_not_Existing_process"});
-        ServerAccess.ProcessResult pr = server.executeProcess(al);
+        ProcessResult pr = server.executeProcess(al);
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
         Assert.assertEquals(pr.stdout, "");
         Assert.assertTrue(pr.wasTerminated);
         Assert.assertTrue(pr.returnValue < 0);
-        junit.framework.Assert.assertNotNull(pr.deadlyException);
+        Assert.assertNotNull(pr.deadlyException);
     }
 
     @Test
@@ -96,13 +96,13 @@ public class ResourcesTest extends  BrowserTest{
     @Test
     @TestInBrowsers(testIn=Browsers.none)
     public void testNonExisitngBrowserWillNotCauseMess() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html");
+        ProcessResult pr = server.executeBrowser("not_existing_url.html");
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
         Assert.assertEquals(pr.stdout, "");
         Assert.assertTrue(pr.wasTerminated);
         Assert.assertTrue(pr.returnValue < 0);
-        junit.framework.Assert.assertNotNull(pr.deadlyException);
+        Assert.assertNotNull(pr.deadlyException);
     }
 
     @Test
@@ -288,7 +288,7 @@ public class ResourcesTest extends  BrowserTest{
                 e2.append(s).append("\n");
             }
         };
-       ServerAccess.ProcessResult pr = server.executeBrowser("not_existing_url.html",lo,le);
+       ProcessResult pr = server.executeBrowser("not_existing_url.html",lo,le);
        server.setCurrentBrowser(BrowserFactory.getFactory().getFirst().getID());
        Assert.assertNotNull(server.getCurrentBrowsers());
        Assert.assertNotNull(server.getCurrentBrowser());

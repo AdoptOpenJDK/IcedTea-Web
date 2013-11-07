@@ -35,6 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class SetContextClassLoaderTest {
 
     @Test
     public void SetContextClassLoader1() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(null, "/SetContextClassLoader.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(null, "/SetContextClassLoader.jnlp");
         String s = "(?s).*java.security.AccessControlException.{0,5}access denied.{0,5}java.lang.RuntimePermission.{0,5}" + "setContextClassLoader" + ".*";
         Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";

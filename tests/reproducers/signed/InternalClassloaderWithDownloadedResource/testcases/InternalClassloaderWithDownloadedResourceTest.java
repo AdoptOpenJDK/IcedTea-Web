@@ -39,8 +39,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerAccess.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
@@ -78,7 +78,7 @@ public class InternalClassloaderWithDownloadedResourceTest extends BrowserTest {
     @Test
     @Bug(id = {"RH816592","PR858"})
     public void launchInternalClassloaderWithDownloadedResourceAsJnlpApplication() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/InternalClassloaderWithDownloadedResource-new.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/InternalClassloaderWithDownloadedResource-new.jnlp");
         evaluate(pr);
         Assert.assertFalse("should not be terminated but was", pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
@@ -94,7 +94,7 @@ public class InternalClassloaderWithDownloadedResourceTest extends BrowserTest {
     @Test
     @Bug(id = {"RH816592","PR858"})
     public void launchInternalClassloaderWithDownloadedResourceAsJnlpApplet() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/InternalClassloaderWithDownloadedResource-applet-new.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/InternalClassloaderWithDownloadedResource-applet-new.jnlp");
         evaluate(pr);
         Assert.assertFalse("should not be terminated but was", pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
@@ -105,7 +105,7 @@ public class InternalClassloaderWithDownloadedResourceTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn={Browsers.all})
     public void launchInternalClassloaderWithDownloadedResourceAsHtmlApplet() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("/InternalClassloaderWithDownloadedResource-new.html");
+        ProcessResult pr = server.executeBrowser("/InternalClassloaderWithDownloadedResource-new.html");
         evaluate(pr);
         Assert.assertTrue("should be terminated but was not", pr.wasTerminated);
     }
@@ -113,7 +113,7 @@ public class InternalClassloaderWithDownloadedResourceTest extends BrowserTest {
     @Test
     @Bug(id = {"http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-May/018737.html"})
     public void launchInternalClassloaderWithDownloadedResourceAsJnlpApplicationHack() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/InternalClassloaderWithDownloadedResource-hack.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/InternalClassloaderWithDownloadedResource-hack.jnlp");
         evaluate(pr);
         Assert.assertFalse("should not be terminated but was", pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
@@ -122,7 +122,7 @@ public class InternalClassloaderWithDownloadedResourceTest extends BrowserTest {
     @Test
     @Bug(id = {"http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-May/018737.html"})
     public void launchInternalClassloaderWithDownloadedResourceAsJnlpAppletHack() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/InternalClassloaderWithDownloadedResource-applet-hack.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/InternalClassloaderWithDownloadedResource-applet-hack.jnlp");
         evaluate(pr);
         Assert.assertFalse("should not be terminated but was", pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
@@ -133,7 +133,7 @@ public class InternalClassloaderWithDownloadedResourceTest extends BrowserTest {
     @Bug(id = {"http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2012-May/018737.html"})
     @TestInBrowsers(testIn={Browsers.all})
     public void launchInternalClassloaderWithDownloadedResourceAsHtmlAppletHack() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeBrowser("/InternalClassloaderWithDownloadedResource-hack.html");
+        ProcessResult pr = server.executeBrowser("/InternalClassloaderWithDownloadedResource-hack.html");
         evaluate(pr);
         Assert.assertTrue("should be terminated but was not", pr.wasTerminated);
     }

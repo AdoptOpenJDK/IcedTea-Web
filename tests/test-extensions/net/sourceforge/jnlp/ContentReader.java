@@ -52,7 +52,7 @@ class ContentReader implements Runnable {
     StringBuilder sb = new StringBuilder();
     private final InputStream is;
     private boolean done;
-    final List<ContentReaderListener> listeners = new ArrayList(1);
+    final List<ContentReaderListener> listeners = new ArrayList<ContentReaderListener>(1);
 
     public String getContent() {
         return sb.toString();

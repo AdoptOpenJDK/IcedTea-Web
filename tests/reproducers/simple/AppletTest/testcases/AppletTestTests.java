@@ -87,7 +87,7 @@ public class AppletTestTests extends BrowserTest {
             Assert.assertTrue(pr1.wasTerminated);
             //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
             // just verify loging is recording browser
-            ServerAccess.ProcessResult pr = server.executeBrowser("/appletAutoTests2.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
+            ProcessResult pr = server.executeBrowser("/appletAutoTests2.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
             evaluateApplet(pr, false);
             Assert.assertTrue(pr.wasTerminated);
         } finally {

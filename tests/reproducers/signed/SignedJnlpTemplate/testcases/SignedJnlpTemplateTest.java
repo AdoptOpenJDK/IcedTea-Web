@@ -38,7 +38,9 @@ exception statement from your version.
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,7 +54,7 @@ public class SignedJnlpTemplateTest {
 
     @Test
     public void launchingFileMatchesSignedTemplate1() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpTemplate1.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpTemplate1.jnlp");
         String s = "Running signed application in main";
         Assert.assertTrue("Stdout should contains " + s + " but did not", pr.stdout.contains(s));
     }
@@ -62,7 +64,7 @@ public class SignedJnlpTemplateTest {
      */
     @Test
     public void launchingFileDoesNotMatchSignedTemplate2() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpTemplate2.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpTemplate2.jnlp");
         Assert.assertTrue("Stderr should contains " + signedException + " but did not", pr.stderr.contains(signedException));
     }
 
@@ -71,7 +73,7 @@ public class SignedJnlpTemplateTest {
      */
     @Test
     public void launchingFileDoesNotMatchSignedTemplate3() throws Exception {
-        ServerAccess.ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpTemplate3.jnlp");
+        ProcessResult pr = server.executeJavawsHeadless(l, "/SignedJnlpTemplate3.jnlp");
         Assert.assertTrue("Stderr should contains " + signedException + " but did not", pr.stderr.contains(signedException));
     }
 }
