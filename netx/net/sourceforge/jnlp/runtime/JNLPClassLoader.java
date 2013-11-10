@@ -828,11 +828,9 @@ public class JNLPClassLoader extends URLClassLoader {
         // Check launch info
         if (mainClass == null) {
             LaunchDesc launchDesc = file.getLaunchInfo();
-            if (launchDesc == null) {
-                return;
+            if (launchDesc != null) {
+                mainClass = launchDesc.getMainClass();
             }
-
-            mainClass = launchDesc.getMainClass();
         }
 
         // The main class may be specified in the manifest

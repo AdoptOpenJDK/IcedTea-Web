@@ -1,3 +1,8 @@
+2013-11-10  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	removed suspicious return when (searchForMain) had null launchDesc
+	
 2013-11-07  Andrew Azores  <aazores@redhat.com>
 
 	Reproducer test cleanup. Replaced ServerAccess.ProcessResult in favour of
