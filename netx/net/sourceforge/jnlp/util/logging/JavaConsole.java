@@ -44,6 +44,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -73,6 +75,7 @@ public class JavaConsole {
         public Map<String, String> getLoaderInfo();
     }
     private static JavaConsole console;
+    private static Dimension lastSize;
 
     public static JavaConsole getConsole() {
         if (console == null) {
@@ -107,12 +110,42 @@ public class JavaConsole {
     private JDialog consoleWindow;
     private JTextArea stdErrText;
     private JTextArea stdOutText;
+    private JPanel contentPanel = new JPanel();
     private ClassLoaderInfoProvider classLoaderInfoProvider;
 
     public JavaConsole() {
         initialize();
     }
 
+    
+    private void initializeWindow() {
+        initializeWindow(lastSize, contentPanel);
+    }
+    
+    private void initializeWindow(Dimension size, JPanel content) {
+        consoleWindow = new JDialog((JFrame) null, R("DPJavaConsole"));
+        consoleWindow.addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                lastSize=consoleWindow.getSize();
+            }
+            
+        });        
+        consoleWindow.setIconImages(ImageResources.INSTANCE.getApplicationImages());
+        
+        consoleWindow.add(content);
+        consoleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //HIDE_ON_CLOSE can cause shut down deadlock
+        consoleWindow.pack();
+        if (size!=null){
+            consoleWindow.setSize(size);
+        } else {
+            consoleWindow.setSize(new Dimension(900, 600));
+        }
+        consoleWindow.setMinimumSize(new Dimension(900, 300));
+
+    }
+    
     /**
      * Initialize the console
      */
@@ -124,10 +157,8 @@ public class JavaConsole {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
-        consoleWindow = new JDialog((JFrame) null, R("DPJavaConsole"));
-        consoleWindow.setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
-        JPanel contentPanel = new JPanel();
+        contentPanel = new JPanel();
         contentPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints c;
@@ -174,6 +205,7 @@ public class JavaConsole {
         buttonPanel.add(gcButton);
         gcButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Performing Garbage Collection....");
@@ -187,6 +219,7 @@ public class JavaConsole {
         buttonPanel.add(finalizersButton);
         finalizersButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLErunningFinalizers"));
@@ -200,6 +233,7 @@ public class JavaConsole {
         buttonPanel.add(memoryButton);
         memoryButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
             }
@@ -209,6 +243,7 @@ public class JavaConsole {
         buttonPanel.add(systemPropertiesButton);
         systemPropertiesButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 printSystemProperties();
             }
@@ -218,6 +253,7 @@ public class JavaConsole {
         buttonPanel.add(classloadersButton);
         classloadersButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 printClassLoaders();
             }
@@ -227,6 +263,7 @@ public class JavaConsole {
         buttonPanel.add(threadListButton);
         threadListButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 printThreadInfo();
             }
@@ -236,21 +273,17 @@ public class JavaConsole {
         buttonPanel.add(closeButton);
         closeButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         hideConsole();
                     }
                 });
             }
         });
-
-        consoleWindow.add(contentPanel);
-        consoleWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        consoleWindow.pack();
-        consoleWindow.setSize(new Dimension(900, 600));
-        consoleWindow.setMinimumSize(new Dimension(900, 300));
 
         splitPane.setDividerLocation(0.5);
         splitPane.setResizeWeight(0.5);
@@ -260,25 +293,28 @@ public class JavaConsole {
         showConsole(false);
     }
 
-    public void showConsole(boolean b) {
-        consoleWindow.setModal(b);
+    public void showConsole(boolean modal) {
+        initializeWindow();
+        consoleWindow.setModal(modal);
         consoleWindow.setVisible(true);
     }
 
     public void hideConsole() {
         consoleWindow.setModal(false);
         consoleWindow.setVisible(false);
+        consoleWindow.dispose();
     }
 
     public void showConsoleLater() {
         showConsoleLater(false);
     }
 
-    public void showConsoleLater(final boolean b) {
+    public void showConsoleLater(final boolean modal) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
-                JavaConsole.getConsole().showConsole(b);
+                JavaConsole.getConsole().showConsole(modal);
             }
         });
     }
@@ -286,6 +322,7 @@ public class JavaConsole {
     public void hideConsoleLater() {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 JavaConsole.getConsole().hideConsole();
             }
@@ -364,12 +401,7 @@ public class JavaConsole {
         }
 
         if (toShowConsole) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    console.showConsole();
-                }
-            });
+            console.showConsoleLater();
         }
 
     }

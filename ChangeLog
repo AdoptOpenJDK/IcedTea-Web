@@ -1,5 +1,17 @@
 2013-11-10  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed lock in awt threads. JavaConsole window is now disposed instead of hidden.
+	* netx/net/sourceforge/jnlp/util/logging/JavaConsole.java: (lastSize) new
+	global variable to remember last size of window.(contentPanel) moved from
+	local to global scope. (initializeWindow) extracted from (initialize), is
+	handling creation and filling of window. (showConsole) is now initializing
+	window, and (hideConsole) is disposing it. Added override annotations and
+	removed duplicate code.
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: messageQueConsumer
+	thread is now named, and its wait, have timeout. 
+
+2013-11-10  Jiri Vanek  <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
 	removed suspicious return when (searchForMain) had null launchDesc
 	

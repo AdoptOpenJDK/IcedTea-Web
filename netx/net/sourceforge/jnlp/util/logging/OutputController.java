@@ -102,7 +102,7 @@ public class OutputController {
             while (true) {
                 try {
                     synchronized (OutputController.this) {
-                        OutputController.this.wait();
+                        OutputController.this.wait(1000);
                         if (!(OutputController.this == null || messageQue.isEmpty())) {
                             flush();
                         }
@@ -199,7 +199,7 @@ public class OutputController {
         outLog = new PrintStreamLogger(out);
         errLog = new PrintStreamLogger(err);
         //itw logger have to be fully initialised before start
-        Thread t = new Thread(messageQueConsumer);
+        Thread t = new Thread(messageQueConsumer, "Output controller consumer daemon");
         t.setDaemon(true);
         t.start();
         //some messages were probably posted before start of consumer
