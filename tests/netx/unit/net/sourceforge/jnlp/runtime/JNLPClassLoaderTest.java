@@ -42,9 +42,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -52,10 +50,11 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.util.FileTestUtils;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 
 import org.junit.Test;
 
-public class JNLPClassLoaderTest {
+public class JNLPClassLoaderTest extends NoStdOutErrTest{
 
     /* Note: Only does file leak testing for now. */
     @Test

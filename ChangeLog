@@ -1,5 +1,15 @@
 2013-11-13  Jiri Vanek  <jvanek@redhat.com>
 
+	Added test-extension to silence stdout/err of itw when run from junit
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java: now extends NoStdOutErrTest
+	* tests/netx/unit/net/sourceforge/jnlp/ParserBasic.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java: same
+	* tests/test-extensions/net/sourceforge/jnlp/util/logging/NoStdOutErrTest.java:
+	new class with (disableStds) BeforeClass method and (restoreStds) AfterClass
+	method which are responsible for silence all itw messages from extending test.
+
+2013-11-13  Jiri Vanek  <jvanek@redhat.com>
+
 	Enabled access to manifests' attributes from JNLPFile class
 	Implemented http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
 	* netx/net/sourceforge/jnlp/JNLPFile.java: Added (manifestsAttributes) field.
