@@ -1,5 +1,12 @@
 2013-11-13  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: add
+	parameterized type information to several return types and local
+	variables. Refactor for-loops and Enumeration iterations into
+	for-each-loops.
+
+2013-11-13  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java: centers
 	on-screen before appearing
 

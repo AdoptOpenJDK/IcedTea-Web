@@ -17,11 +17,6 @@ package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.util.concurrent.locks.ReentrantLock;
-
-import java.util.concurrent.locks.Lock;
-
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -59,15 +54,13 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
-import net.sourceforge.jnlp.util.JarFile;
 import java.util.jar.Manifest;
 
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.ApplicationDesc;
-import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.ExtensionDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -91,10 +84,11 @@ import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.security.PluginAppVerifier;
 import net.sourceforge.jnlp.security.SecurityDialogs;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.misc.JarIndex;
 
 /**
@@ -499,7 +493,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Load the extensions specified in the JNLP file.
      */
     void initializeExtensions() {
-        ExtensionDesc[] ext = resources.getExtensions();
+        ExtensionDesc[] extDescs = resources.getExtensions();
 
         List<JNLPClassLoader> loaderList = new ArrayList<JNLPClassLoader>();
 
@@ -518,10 +512,10 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         //if (ext != null) {
-        for (int i = 0; i < ext.length; i++) {
+        for (ExtensionDesc ext : extDescs) {
             try {
                 String uniqueKey = this.getJNLPFile().getUniqueKey();
-                JNLPClassLoader loader = getInstance(ext[i].getLocation(), uniqueKey, ext[i].getVersion(), file.getParserSettings(), updatePolicy, mainClass);
+                JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass);
                 loaderList.add(loader);
             } catch (Exception ex) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
@@ -539,12 +533,11 @@ public class JNLPClassLoader extends URLClassLoader {
         resourcePermissions = new ArrayList<Permission>();
 
         JARDesc jars[] = resources.getJARs();
-        for (int i = 0; i < jars.length; i++) {
-            Permission p = CacheUtil.getReadPermission(jars[i].getLocation(),
-                                                       jars[i].getVersion());
+        for (JARDesc jar : jars) {
+            Permission p = CacheUtil.getReadPermission(jar.getLocation(), jar.getVersion());
 
             if (p == null) {
-                OutputController.getLogger().log("Unable to add permission for " + jars[i].getLocation());
+                OutputController.getLogger().log("Unable to add permission for " + jar.getLocation());
             } else {
                 OutputController.getLogger().log("Permission added: " + p.toString());
             }
@@ -632,20 +625,18 @@ public class JNLPClassLoader extends URLClassLoader {
         */
         List<JARDesc> initialJars = new ArrayList<JARDesc>();
 
-        for (int i = 0; i < jars.length; i++) {
+        for (JARDesc jar : jars) {
 
-            available.add(jars[i]);
+            available.add(jar);
 
-            if (jars[i].isEager())
-                initialJars.add(jars[i]); // regardless of part
+            if (jar.isEager())
+                initialJars.add(jar); // regardless of part
 
-            tracker.addResource(jars[i].getLocation(),
-                                jars[i].getVersion(),
-                                file.getDownloadOptions(),
-                                jars[i].isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE
-                               );
+            tracker.addResource(jar.getLocation(),
+                    jar.getVersion(), file.getDownloadOptions(),
+                    jar.isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE);
         }
-        
+
         //If there are no eager jars, initialize the first jar
         if(initialJars.size() == 0)
             initialJars.add(jars[0]);
@@ -846,27 +837,24 @@ public class JNLPClassLoader extends URLClassLoader {
 
         String desiredJarEntryName = mainClass + ".class";
 
-        for (int i = 0; i < jars.size(); i++) {
+        for (JARDesc jar : jars) {
 
             try {
                 File localFile = tracker
-                        .getCacheFile(jars.get(i).getLocation());
+                        .getCacheFile(jar.getLocation());
 
                 if (localFile == null) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jars.get(i).getLocation() + " not found. Continuing.");
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jar.getLocation() + " not found. Continuing.");
                     continue; // JAR not found. Keep going.
                 }
 
                 JarFile jarFile = new JarFile(localFile);
-                Enumeration<JarEntry> entries = jarFile.entries();
-                JarEntry je;
 
-                while (entries.hasMoreElements()) {
-                    je = entries.nextElement();
-                    String jeName = je.getName().replaceAll("/", ".");
+                for (JarEntry entry : Collections.list(jarFile.entries())) {
+                    String jeName = entry.getName().replaceAll("/", ".");
                     if (jeName.equals(desiredJarEntryName)) {
                         foundMainJar = true;
-                        verifySignedJNLP(jars.get(i), jarFile);
+                        verifySignedJNLP(jar, jarFile);
                         break;
                     }
                 }
@@ -965,11 +953,7 @@ public class JNLPClassLoader extends URLClassLoader {
             // calling jcv.verifyJars(desc, tracker) here should have no affect.
             if (jcv.isFullySigned()) {
 
-                Enumeration<JarEntry> entries = jarFile.entries();
-                JarEntry je;
-
-                while (entries.hasMoreElements()) {
-                    je = entries.nextElement();
+                for (JarEntry je : Collections.list(jarFile.entries())) {
                     String jeName = je.getName().toUpperCase();
 
                     if (jeName.equals(TEMPLATE) || jeName.equals(APPLICATION)) {
@@ -1150,20 +1134,19 @@ public class JNLPClassLoader extends URLClassLoader {
                     }
                 }
 
-                Enumeration<Permission> e = permissions.elements();
-                while (e.hasMoreElements()) {
-                    result.add(e.nextElement());
+                for (Permission perm : Collections.list(permissions.elements())) {
+                    result.add(perm);
                 }
             }
 
             // add in permission to read the cached JAR files
-            for (int i = 0; i < resourcePermissions.size(); i++) {
-                result.add(resourcePermissions.get(i));
+            for (Permission perm : resourcePermissions) {
+                result.add(perm);
             }
 
             // add in the permissions that the user granted.
-            for (int i = 0; i < runtimePermissions.size(); i++) {
-                result.add(runtimePermissions.get(i));
+            for (Permission perm : runtimePermissions) {
+                result.add(perm);
             }
 
             // Class from host X should be allowed to connect to host X
@@ -1188,12 +1171,10 @@ public class JNLPClassLoader extends URLClassLoader {
      * in the same part).
      */
     protected void fillInPartJars(List<JARDesc> jars) {
-        for (int i = 0; i < jars.size(); i++) {
-            String part = jars.get(i).getPart();
+        for (JARDesc desc : jars) {
+            String part = desc.getPart();
 
-            for (int a = 0; a < available.size(); a++) {
-                JARDesc jar = available.get(a);
-
+            for (JARDesc jar : available) {
                 if (part != null && part.equals(jar.getPart()))
                     if (!jars.contains(jar))
                         jars.add(jar);
@@ -1217,9 +1198,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 // transfer the Jars
                 waitForJars(jars);
 
-                for (int i = 0; i < jars.size(); i++) {
-                    JARDesc jar = jars.get(i);
-
+                for (JARDesc jar : jars) {
                     available.remove(jar);
 
                     // add jar
@@ -1239,9 +1218,7 @@ public class JNLPClassLoader extends URLClassLoader {
                             // particularly when using The FileManager applet from Webmin.
 
                             JarFile jarFile = new JarFile(localFile);
-                            Enumeration<JarEntry> e = jarFile.entries();
-                            while (e.hasMoreElements()) {
-                                JarEntry je = e.nextElement();
+                            for (JarEntry je : Collections.list(jarFile.entries())) {
 
                                 // another jar in my jar? it is more likely than you think
                                 if (je.getName().endsWith(".jar")) {
@@ -1382,11 +1359,11 @@ public class JNLPClassLoader extends URLClassLoader {
      * Try to find the library path from another peer classloader.
      */
     protected String findLibraryExt(String lib) {
-        for (int i = 0; i < loaders.length; i++) {
+        for (JNLPClassLoader loader : loaders) {
             String result = null;
 
-            if (loaders[i] != this)
-                result = loaders[i].findLibrary(lib);
+            if (loader != this)
+                result = loader.findLibrary(lib);
 
             if (result != null)
                 return result;
@@ -1401,11 +1378,11 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param jars the jars
      */
-    private void waitForJars(List jars) {
+    private void waitForJars(List<JARDesc> jars) {
         URL urls[] = new URL[jars.size()];
 
         for (int i = 0; i < jars.size(); i++) {
-            JARDesc jar = (JARDesc) jars.get(i);
+            JARDesc jar = jars.get(i);
 
             urls[i] = jar.getLocation();
         }
@@ -1416,14 +1393,14 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Find the loaded class in this loader or any of its extension loaders.
      */
-    protected Class findLoadedClassAll(String name) {
-        for (int i = 0; i < loaders.length; i++) {
-            Class result = null;
+    protected Class<?> findLoadedClassAll(String name) {
+        for (JNLPClassLoader loader : loaders) {
+            Class<?> result = null;
 
-            if (loaders[i] == this) {
+            if (loader == this) {
                 result = JNLPClassLoader.super.findLoadedClass(name);
             } else {
-                result = loaders[i].findLoadedClassAll(name);
+                result = loader.findLoadedClassAll(name);
             }
 
             if (result != null)
@@ -1623,10 +1600,10 @@ public class JNLPClassLoader extends URLClassLoader {
      * Find the class in this loader or any of its extension loaders.
      */
     @Override
-    protected Class findClass(String name) throws ClassNotFoundException {
-        for (int i = 0; i < loaders.length; i++) {
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
+        for (JNLPClassLoader loader : loaders) {
             try {
-                if (loaders[i] == this) {
+                if (loader == this) {
                     final String fName = name;
                     return AccessController.doPrivileged(
                             new PrivilegedExceptionAction<Class<?>>() {
@@ -1635,7 +1612,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 }
                             }, getAccessControlContextForClassLoading());
                 } else {
-                    return loaders[i].findClass(name);
+                    return loader.findClass(name);
                 }
             } catch (ClassNotFoundException ex) {
             } catch (ClassFormatError cfe) {
@@ -1659,7 +1636,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * classloader and its extension classloaders until the resource
      * is found.
      */
-    private Class loadClassExt(String name) throws ClassNotFoundException {
+    private Class<?> loadClassExt(String name) throws ClassNotFoundException {
         // make recursive
         addAvailable();
 
@@ -1751,12 +1728,12 @@ public class JNLPClassLoader extends URLClassLoader {
         List<URL> resources = new ArrayList<URL>();
         Enumeration<URL> e = null;
 
-        for (int i = 0; i < loaders.length; i++) {
+        for (JNLPClassLoader loader : loaders) {
             // TODO check if this will blow up or not
             // if loaders[1].getResource() is called, wont it call getResource() on
             // the original caller? infinite recursion?
 
-            if (loaders[i] == this) {
+            if (loader == this) {
                 final String fName = name;
                 try {
                     e = AccessController.doPrivileged(
@@ -1768,7 +1745,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 } catch (PrivilegedActionException pae) {
                 }
             } else {
-                e = loaders[i].findResources(name);
+                e = loader.findResources(name);
             }
 
             final Enumeration<URL> fURLEnum = e;
