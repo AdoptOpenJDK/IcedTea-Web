@@ -184,7 +184,7 @@ public class PluginBridge extends JNLPFile {
 
         // the class name should be of the form foo.bar.Baz not foo/bar/Baz
         String mainClass = main.replace('/', '.');
-        launchType = new AppletDesc(params.getAppletTitle(), mainClass, documentBase, width,
+        launchType = new AppletDesc(getTitle(), mainClass, documentBase, width,
                                     height, params.getUnmodifiableMap());
 
         if (main.endsWith(".class")) //single class file only
@@ -231,7 +231,18 @@ public class PluginBridge extends JNLPFile {
         return new DownloadOptions(usePack, useVersion);
     }
 
+    @Override
     public String getTitle() {
+        String inManifestTitle = super.getTitleFromManifest();
+        if (inManifestTitle != null) {
+            return inManifestTitle;
+        }
+        //specification is recommending  main class instead of html parameter
+        //http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
+        String mainClass = getManifestsAttributes().getMainClass();
+        if (mainClass != null) {
+            return mainClass;
+        }
         return params.getAppletTitle();
     }
 

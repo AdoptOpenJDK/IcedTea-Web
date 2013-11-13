@@ -27,9 +27,11 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.jar.Attributes;
 
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -51,6 +53,13 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * @version $Revision: 1.21 $
  */
 public class JNLPFile {
+    
+    
+    public static final String APP_NAME = "Application-Name";
+    public static final String CALLER_ALLOWABLE = "Caller-Allowable-Codebase";
+    public static final String APP_LIBRARY_ALLOWABLE = "Application-Library-Allowable-Codebase";
+        
+    
 
     // todo: save the update policy, then if file was not updated
     // then do not check resources for being updated.
@@ -121,6 +130,10 @@ public class JNLPFile {
      * List of acceptable properties (not-special)
      */
     private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
+    
+    /** important manifests' attributes */
+    private final ManifestsAttributes manifestsAttributes = new ManifestsAttributes();
+
 
     { // initialize defaults if security allows
         try {
@@ -293,10 +306,46 @@ public class JNLPFile {
     /**
      * Returns the JNLP file's best localized title. This method returns the same
      * value as InformationDesc.getTitle().
+     * 
+     * Since jdk7 u45, also manifest title, and mainclass are taken to consideration;
+     * See PluginBridge
      */
     public String getTitle() {
+        String jnlpTitle = getTitleFromJnlp();
+        String manifestTitle = getTitleFromManifest();
+        if (jnlpTitle != null && manifestTitle != null) {
+            if (jnlpTitle.equals(manifestTitle)) {
+                return jnlpTitle;
+            }
+            return jnlpTitle+" ("+manifestTitle+")";
+        }
+        if (jnlpTitle != null && manifestTitle == null) {
+            return jnlpTitle;
+        }
+        if (jnlpTitle == null && manifestTitle != null) {
+            return manifestTitle;
+        }
+        String mainClass = getManifestsAttributes().getMainClass();
+        return mainClass;        
+    }
+    
+    /**
+     * Returns the JNLP file's best localized title. This method returns the same
+     * value as InformationDesc.getTitle().
+     */
+    public String getTitleFromJnlp() {
         return getInformation().getTitle();
     }
+    
+    public String getTitleFromManifest() {
+        String inManifestTitle = getManifestsAttributes().getApplicationName();
+        if (inManifestTitle == null && getManifestsAttributes().isLoader()){
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL,"Application title was not found in manifest. Check with application vendor");
+        }
+        return inManifestTitle;
+    }
+    
+    
 
     /**
      * Returns the JNLP file's best localized vendor. This method returns the same
@@ -818,4 +867,76 @@ public class JNLPFile {
     public void setSignedJNLPAsMissing() {
         missingSignedJNLP = true;
     }
+
+    public ManifestsAttributes getManifestsAttributes() {
+        return manifestsAttributes;
+    }
+    
+    
+ public class ManifestsAttributes{
+        private JNLPClassLoader loader;
+        
+        
+        public void setLoader(JNLPClassLoader loader) {
+            this.loader = loader;
+        }
+
+        public boolean isLoader() {
+            return loader != null;
+        }
+        
+        
+
+        /**
+         * main class can be defined outside of manifest.
+         * This method is mostly for completeness
+         */
+        public String getMainClass(){
+            if (loader == null) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jars not ready to provide main class");
+                return null;    
+            }
+            return loader.getMainClass();
+        }
+        
+        /**
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
+         */
+        public String getApplicationName(){
+            return getAttribute(APP_NAME);
+        }
+        
+        /**
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#caller_allowable
+         */
+         public String getCallerAllowableCodebase(){
+            return getAttribute(CALLER_ALLOWABLE);
+        }
+
+        /**
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_library
+         */
+         public String getApplicationLibraryAllowableCodebase(){
+            return getAttribute(APP_LIBRARY_ALLOWABLE);
+        }
+         
+        /**
+         * get custom attribute.
+         */
+        public String getAttribute(String name){
+            return getAttribute(new Attributes.Name(name));
+        }
+        
+        /**
+         * get standard attribute
+         */
+        public String getAttribute(Attributes.Name name){
+          if (loader == null) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jars not ready to provide attribute "+ name);
+                return null;    
+            }
+            return loader.checkForAttributeInJars(Arrays.asList(getResources().getJARs()), name);
+        }
+    }
+ 
 }

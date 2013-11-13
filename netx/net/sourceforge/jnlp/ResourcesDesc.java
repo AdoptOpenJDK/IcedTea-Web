@@ -67,23 +67,30 @@ public class ResourcesDesc {
         return resources.toArray(new JREDesc[resources.size()]);
     }
 
+    public static JARDesc getMainJAR(JARDesc jars[] ) {
+        return getMainJAR(Arrays.asList(jars));
+    }
+
+    public static JARDesc getMainJAR(List<JARDesc> jars) {
+        for (JARDesc jar : jars) {
+            if (jar.isMain()) {
+                return jar;
+            }
+        }
+
+        if (jars.size() > 0) {
+            return jars.get(0);
+        } else {
+            return null;
+        }
+    }
     /**
      * Returns the main JAR for these resources.  There first JAR
      * is returned if no JARs are specified as the main JAR, and if
      * there are no JARs defined then null is returned.
      */
     public JARDesc getMainJAR() {
-        JARDesc jars[] = getJARs();
-
-        for (JARDesc jar : jars) {
-            if (jar.isMain())
-                return jar;
-        }
-
-        if (jars.length > 0)
-            return jars[0];
-        else
-            return null;
+        return getMainJAR(getJARs());
     }
 
     /**

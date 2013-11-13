@@ -1,3 +1,23 @@
+2013-11-13  Jiri Vanek  <jvanek@redhat.com>
+
+	Enabled access to manifests' attributes from JNLPFile class
+	Implemented http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
+	* netx/net/sourceforge/jnlp/JNLPFile.java: Added (manifestsAttributes) field.
+	Added (ManifestsAttributes) inner class, to encapsulate access to attributes.
+	(getTitle) can handle manifests too.
+	* netx/net/sourceforge/jnlp/PluginBridge.java: is following app_name recommendations.
+	* netx/net/sourceforge/jnlp/ResourcesDesc.java: (getMainJAR) made more granular
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (init) inject itself
+	to file's ManifestsAttributes. (checkForAttributeInJars) renamed field
+	mainClassInThisJar to attributeInThisJar. Added getter for mainClass.
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java: bracketing cleanup.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPFileTest.java: new test to
+	check new functionalites
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/ResourcesDescTest.java: same 
+	* tests/test-extensions/net/sourceforge/jnlp/mock/DummyJNLPFileWithJar.java:
+	can set info
+	* NEWS: mentioned first u45 attribute
+
 2013-11-10  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed lock in awt threads. JavaConsole window is now disposed instead of hidden.

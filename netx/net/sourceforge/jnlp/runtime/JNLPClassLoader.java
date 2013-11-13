@@ -115,7 +115,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /** Signed JNLP File and Template */
     final public static String TEMPLATE = "JNLP-INF/APPLICATION_TEMPLATE.JNLP";
     final public static String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
-    
+
     /** Actions to specify how cache is to be managed **/
     public static enum DownloadAction {
         DOWNLOAD_TO_CACHE, REMOVE_FROM_CACHE, CHECK_CACHE
@@ -200,7 +200,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     /** Name of the application's main class */
     private String mainClass = null;
-
+    
     /**
      * Variable to track how many times this loader is in use
      */
@@ -245,6 +245,9 @@ public class JNLPClassLoader extends URLClassLoader {
 
         this.mainClass = mainName;
 
+        //as it is harmless, we can set is as soon as possible.
+        file.getManifestsAttributes().setLoader(this);
+        
         AppVerifier verifier;
 
         if (file instanceof PluginBridge && !((PluginBridge)file).useJNLPHref()) {
@@ -259,13 +262,15 @@ public class JNLPClassLoader extends URLClassLoader {
         initializeExtensions();
 
         initializeResources();
+        
 
         // initialize permissions
         initializePermissions();
 
         setSecurity();
-
+        
         installShutdownHooks();
+        
 
     }
 
@@ -786,7 +791,7 @@ public class JNLPClassLoader extends URLClassLoader {
         String result = null;
         
         // Check main jar
-        JARDesc mainJarDesc = file.getResources().getMainJAR();
+        JARDesc mainJarDesc = ResourcesDesc.getMainJAR(jars);
         result = getManifestAttribute(mainJarDesc.getLocation(), name);
 
         if (result != null) {
@@ -803,10 +808,10 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // Still not found? Iterate and set if only 1 was found
         for (JARDesc jarDesc: jars) {
-            String mainClassInThisJar = getManifestAttribute(jarDesc.getLocation(), name);
-                if (mainClassInThisJar != null) {
+            String attributeInThisJar = getManifestAttribute(jarDesc.getLocation(), name);
+                if (attributeInThisJar != null) {
                     if (result == null) { // first main class
-                        result = mainClassInThisJar;
+                        result = attributeInThisJar;
                     } else { // There is more than one main class. Set to null and break.
                         result = null;
                         break;
@@ -2193,6 +2198,10 @@ public class JNLPClassLoader extends URLClassLoader {
 
         return new AccessControlContext(new ProtectionDomain[] { pd });
     }
+    
+    public String getMainClass() {
+        return mainClass;
+    }
 
     /*
      * Helper class to expose protected URLClassLoader methods.
@@ -2317,6 +2326,6 @@ public class JNLPClassLoader extends URLClassLoader {
             return null;
         }
     }
-
-
+    
+    
 }

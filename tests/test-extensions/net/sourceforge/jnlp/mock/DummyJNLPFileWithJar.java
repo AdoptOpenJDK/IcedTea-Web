@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import net.sourceforge.jnlp.InformationDesc;
@@ -21,7 +22,6 @@ public class DummyJNLPFileWithJar extends JNLPFile {
         return new JARDesc(jarLocation, new Version("1"), null, false,main, false,false);
     }
 
-    private final URL codeBase;
     private final JARDesc[] jarDescs;
     private final File[] jarFiles;
 
@@ -91,4 +91,10 @@ public class DummyJNLPFileWithJar extends JNLPFile {
     public SecurityDesc getSecurity() {
         return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
     }
+
+    public void setInfo(List<InformationDesc> info) {
+        this.info = info;
+    }
+    
+    
 }
