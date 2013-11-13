@@ -56,7 +56,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
 
 /**
@@ -124,6 +123,7 @@ public class BasicExceptionDialog {
 
         errorDialog.pack();
         errorDialog.setResizable(true);
+        ScreenFinder.centerWindowsToCurrentScreen(errorDialog);
         errorDialog.setVisible(true);
         errorDialog.dispose();
     }

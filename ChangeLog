@@ -1,3 +1,8 @@
+2013-11-13  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java: centers
+	on-screen before appearing
+
 2013-11-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Added test-extension to silence stdout/err of itw when run from junit
