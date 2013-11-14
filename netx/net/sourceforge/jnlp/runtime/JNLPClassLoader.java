@@ -779,6 +779,10 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     public String checkForAttributeInJars(List<JARDesc> jars, Attributes.Name name) {
        
+        if (jars.isEmpty()) {
+            return null;
+        }
+
         String result = null;
         
         // Check main jar
