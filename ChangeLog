@@ -1,3 +1,8 @@
+2013-11-22  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/DefaultLaunchHandlerTest.java: (init)
+	enable logging to streams if disabled.
+
 2013-11-13  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: add

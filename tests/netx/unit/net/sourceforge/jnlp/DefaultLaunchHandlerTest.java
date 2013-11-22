@@ -42,6 +42,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
+import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 import org.junit.Test;
@@ -63,6 +65,13 @@ public class DefaultLaunchHandlerTest {
 
         LocalLogger() {
             super(new AccessibleStream(new ByteArrayOutputStream()), new AccessibleStream(new ByteArrayOutputStream()));
+            try{
+                Field f = LogConfig.class.getDeclaredField("logToStreams");
+                f.setAccessible(true);
+                f.set(LogConfig.getLogConfig(), true);
+            }catch(Exception ex){
+                ServerAccess.logException(ex);
+            }
         }
 
         public String getStream1() {
