@@ -134,6 +134,8 @@ public class JNLPFile {
     /** important manifests' attributes */
     private final ManifestsAttributes manifestsAttributes = new ManifestsAttributes();
 
+    public static final String TITLE_NOT_FOUND = "Application title was not found in manifest. Check with application vendor";
+
 
     { // initialize defaults if security allows
         try {
@@ -340,7 +342,7 @@ public class JNLPFile {
     public String getTitleFromManifest() {
         String inManifestTitle = getManifestsAttributes().getApplicationName();
         if (inManifestTitle == null && getManifestsAttributes().isLoader()){
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL,"Application title was not found in manifest. Check with application vendor");
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, TITLE_NOT_FOUND);
         }
         return inManifestTitle;
     }

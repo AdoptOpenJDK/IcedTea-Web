@@ -52,7 +52,6 @@ public class ReadPropertiesTest {
         Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
-        Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
         Assert.assertFalse("ReadPropertiesLunch1 should not be terminated, but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
@@ -64,7 +63,6 @@ public class ReadPropertiesTest {
         Assert.assertTrue("stderr should match "+s+" but didn't",pr.stderr.matches(s));
         String cc="ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
-        Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
         Assert.assertFalse("ReadPropertiesLunch2 should not be terminated, but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }

@@ -58,7 +58,6 @@ public class ReadPropertiesBySignedHackTest {
         Assert.assertTrue("Stderr should contains "+s+" but did not",pr.stderr.contains(s));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
-        Assert.assertTrue("stdout lenght should be <2 but was "+pr.stdout.length(),pr.stdout.length()<2); // /home/user or /root or eanything else :(
         Assert.assertFalse("should not be terminated but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
    }

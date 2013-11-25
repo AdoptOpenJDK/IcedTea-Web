@@ -1,5 +1,27 @@
 2013-11-25  Jiri Vanek  <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/JNLPFile.java: (TITLE_NOT_FOUND) new constant
+	holding the no title found string to be reused. (getTitleFromManifest)
+	Now using that constant.
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java: adding window
+	erro message moved to be debug only.
+	* ests/reproducers/custom/remote/testcases/RemoteApplicationSettings.java: 
+	Added (clean) mechanism to filter out TITLE_NOT_FOUND
+	* tests/reproducers/signed/ReadPropertiesBySignedHack/testcases/ReadPropertiesBySignedHackTest.java:
+	* tests/reproducers/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java:
+	* tests/reproducers/simple/AddShutdownHook/testcases/AddShutdownHookTest.java:
+	* tests/reproducers/simple/AllStackTraces/testcases/AllStackTracesTest.java	
+	* tests/reproducers/simple/CreateClassLoader/testcases/CreateClassLoaderTest.java
+	* tests/reproducers/simple/ReadEnvironment/testcases/ReadEnvironmentTest.java
+	* tests/reproducers/simple/ReadProperties/testcases/ReadPropertiesTest.java
+	* tests/reproducers/simple/RedirectStreams/testcases/RedirectStreamsTest.java
+	* tests/reproducers/simple/ReplaceSecurityManager/testcases/ReplaceSecurityManagerTest.java
+	* tests/reproducers/simple/SetContextClassLoader/testcases/SetContextClassLoaderTest.java
+	* tests/reproducers/simple/simpletest2/testcases/SimpleTest2Test.java
+	Removed checks for emty outputs
+
+2013-11-25  Jiri Vanek  <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/ResourcesDesc.java: (getMainJAR) throw an
 	RuntimeException when more then one main jar is specified. Preventing
 	app to start.

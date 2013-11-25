@@ -58,7 +58,6 @@ public class ReadPropertiesSignedTest {
         Assert.assertTrue("Stderr should match "+accessMatcher+" but did not",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
-        Assert.assertTrue("stdout lenght should be <2 but was "+pr.stdout.length(),pr.stdout.length()<2); // /home/user or /root or eanything else :(
         Assert.assertFalse("should not be terminated but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
@@ -70,7 +69,6 @@ public class ReadPropertiesSignedTest {
         Assert.assertFalse("Stderr should NOT match "+accessMatcher+" but did",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
-        Assert.assertTrue("stdout lenght should be >= but was "+pr.stdout.length(),pr.stdout.length()>=4); // /home/user or /root or eanything else :(
         Assert.assertFalse("should not be terminated but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }
@@ -81,7 +79,6 @@ public class ReadPropertiesSignedTest {
         Assert.assertTrue("Stderr should match "+accessMatcher+" but did not",pr.stderr.matches(accessMatcher));
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
-        Assert.assertFalse("stdout lenght should not be  >2 but was "+pr.stdout.length(),pr.stdout.length()>2);
         Assert.assertFalse("should not be terminated but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
         ProcessResult pr2=server.executeJavawsHeadless(null,"/ReadProperties1.jnlp");

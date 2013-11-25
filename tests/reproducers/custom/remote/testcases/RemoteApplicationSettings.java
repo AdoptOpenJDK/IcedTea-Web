@@ -37,6 +37,7 @@
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ProcessResult;
 import org.junit.Assert;
 import org.junit.Test;
@@ -70,6 +71,9 @@ public class RemoteApplicationSettings {
 
         URL u;
 
+        public String clean(String s){
+            return s.replaceAll("\\s*" + JNLPFile.TITLE_NOT_FOUND + "\\s*", "").trim();
+        }
         @Override
         public URL getUrl() {
             return u;
@@ -88,8 +92,8 @@ public class RemoteApplicationSettings {
 
         @Override
         public void evaluate(ProcessResult pr) {
-            Assert.assertTrue(stdoutEmpty, pr.stdout.length() == 0);
-            Assert.assertTrue(pr.stderr.length() == 0 || pr.stderr.contains(IllegalStateException.class.getName()));
+            Assert.assertTrue(stdoutEmpty, clean(pr.stdout).length() == 0);
+            Assert.assertTrue(clean(pr.stderr).length() == 0 || pr.stderr.contains(IllegalStateException.class.getName()));
 
         }
     }
@@ -102,8 +106,8 @@ public class RemoteApplicationSettings {
 
         @Override
         public void evaluate(ProcessResult pr) {
-            Assert.assertTrue(stdoutEmpty, pr.stdout.length() == 0);
-            Assert.assertTrue(pr.stderr.length() == 0 || pr.stderr.contains("Cannot grant permissions to unsigned jars. Application requested security permissions, but jars are not signed"));
+            Assert.assertTrue(stdoutEmpty, clean(pr.stdout).length() == 0);
+            Assert.assertTrue(clean(pr.stderr).length() == 0 || pr.stderr.contains("Cannot grant permissions to unsigned jars. Application requested security permissions, but jars are not signed"));
 
         }
     }
@@ -116,7 +120,7 @@ public class RemoteApplicationSettings {
 
         @Override
         public void evaluate(ProcessResult pr) {
-            Assert.assertTrue(stdout, pr.stdout.length() == 0);
+            Assert.assertTrue(stdout, clean(pr.stdout).length() == 0);
             Assert.assertTrue(pr.stderr.contains("Splash closed"));
             Assert.assertFalse(pr.stderr.contains("Exception"));
 
@@ -131,10 +135,8 @@ public class RemoteApplicationSettings {
 
         @Override
         public void evaluate(ProcessResult pr) {
-            Assert.assertTrue(pr.stdout.length() > 0);
-            Assert.assertTrue(pr.stderr.length() > 0);
-            Assert.assertFalse(pr.stderr.contains("Exception"));
-            Assert.assertFalse(pr.stdout.contains("Exception"));
+            Assert.assertTrue(pr.stdout.length() == 0);
+            Assert.assertTrue(pr.stderr.length() == 0);
 
         }
     }
@@ -153,35 +155,49 @@ public class RemoteApplicationSettings {
         }
     }
 
-    public static class Arbores extends NoOutputs {
+     public abstract static class NearlyNoOutputs extends StringBasedURL {
+
+        public NearlyNoOutputs(String r) {
+            super(r);
+        }
+
+        @Override
+        public void evaluate(ProcessResult pr) {
+            Assert.assertTrue(stdoutEmpty, clean(pr.stdout).length() == 0);
+            Assert.assertTrue(stderrEmpty, clean(pr.stderr).length() == 0);
+
+        }
+    }
+
+    public static class Arbores extends NearlyNoOutputs {
 
         public Arbores() {
             super("http://www.arbores.ca/AnnuityCalc.jnlp");
         }
     }
 
-    public static class PhetSims extends NoOutputs {
+    public static class PhetSims extends NearlyNoOutputs {
 
         public PhetSims() {
             super("http://phetsims.colorado.edu/sims/circuit-construction-kit/circuit-construction-kit-dc_en.jnlp");
         }
     }
 
-    public static class TopCoder extends NoOutputs {
+    public static class TopCoder extends NearlyNoOutputs {
 
         public TopCoder() {
             super("http://www.topcoder.com/contest/arena/ContestAppletProd.jnlp");
         }
     }
 
-    public static class SunSwingDemo extends NoOutputs {
+    public static class SunSwingDemo extends NearlyNoOutputs {
 
         public SunSwingDemo() throws MalformedURLException {
             super("http://java.sun.com/docs/books/tutorialJWS/uiswing/events/ex6/ComponentEventDemo.jnlp");
         }
     }
 
-    public static class ArboresDeposit extends NoOutputs {
+    public static class ArboresDeposit extends NearlyNoOutputs {
 
         public ArboresDeposit() throws MalformedURLException {
             super("http://www.arbores.ca/Deposit.jnlp");
@@ -192,8 +208,8 @@ public class RemoteApplicationSettings {
 
         @Override
         public void evaluate(ProcessResult pr) {
-            Assert.assertTrue(stdoutEmpty, pr.stdout.length() == 0);
-            Assert.assertTrue(pr.stderr.length() == 0 || (pr.stderr.contains("Cannot read File Manager history data file,")
+            Assert.assertTrue(stdoutEmpty, clean(pr.stdout).length() == 0);
+            Assert.assertTrue(clean(pr.stderr).length() == 0 || (clean(pr.stderr).contains("Cannot read File Manager history data file,")
                     && pr.stderr.contains("FileMgr will be initialized with default options")));
 
         }
@@ -203,7 +219,7 @@ public class RemoteApplicationSettings {
         }
     }
 
-    public static class FuseSwing extends NoOutputs {
+    public static class FuseSwing extends NearlyNoOutputs {
 
         public FuseSwing() {
             super("http://www.progx.org/users/Gfx/apps/fuse-swing-demo.jnlp");

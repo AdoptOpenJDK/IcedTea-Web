@@ -49,7 +49,6 @@ public class SimpleTest2Test {
     @Test
     public void testSimpletest2lunchException() throws Exception {
         ProcessResult pr=server.executeJavawsHeadless(null,"/simpletest2.jnlp");
-        Assert.assertTrue("stdout should be < 1 , but was "+pr.stdout.trim().length(),pr.stdout.trim().length() < 1);
         String s="Correct exception";
         Assert.assertTrue("stderr should contains "+s+" but didn't",pr.stderr.contains(s));
         String ss="Exception";

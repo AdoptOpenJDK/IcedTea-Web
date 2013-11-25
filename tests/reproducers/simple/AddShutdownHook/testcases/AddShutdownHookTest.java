@@ -61,7 +61,6 @@ public class AddShutdownHookTest extends BrowserTest {
         ProcessResult pr = server.executeJavawsHeadless(null, "/AddShutdownHook.jnlp");
         Assert.assertTrue("stderr " + mr.toPassingString(), mr.evaluate(pr.stderr));
         Assert.assertFalse("stderr " + cnf.toFailingString(), cnf.evaluate(pr.stderr));
-        Assert.assertFalse("stdout length should be <=2, but was " + pr.stdout.length(), pr.stdout.length() > 2);
         Assert.assertFalse("AddShutdownHookTestLunch1 should not be terminated, but was", pr.wasTerminated);
         Assert.assertFalse("stderr " + cf.toFailingString(), cf.evaluate(pr.stderr));
         Assert.assertEquals((Integer) 0, pr.returnValue);

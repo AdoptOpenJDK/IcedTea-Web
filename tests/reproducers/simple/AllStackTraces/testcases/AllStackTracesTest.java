@@ -54,7 +54,6 @@ public class AllStackTracesTest {
         Assert.assertTrue("stderr should match `"+c+"`, but didn't ",pr.stderr.matches(c));
         String cc="ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did ",pr.stderr.contains(cc));
-        Assert.assertFalse("stdout length should be <=2, but was "+pr.stdout.length(),pr.stdout.length()>2);
         Assert.assertFalse("AllStackTracesTest1 should not be terminated, but was",pr.wasTerminated);
         Assert.assertEquals((Integer)0, pr.returnValue);
     }

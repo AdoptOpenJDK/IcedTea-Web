@@ -344,7 +344,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         if (app != null && window instanceof Window) {
             Window w = (Window) window;
 
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "SM: app: " + app.getTitle() + " is adding a window: " + window + " with appContext " + AppContext.getAppContext());
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "SM: app: " + app.getTitle() + " is adding a window: " + window + " with appContext " + AppContext.getAppContext());
 
             weakWindows.add(w); // for mapping window -> app
             weakApplications.add(app);
