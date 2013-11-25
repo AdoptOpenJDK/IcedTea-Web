@@ -1,3 +1,12 @@
+2013-11-25  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/ResourcesDesc.java: (getMainJAR) throw an
+	RuntimeException when more then one main jar is specified. Preventing
+	app to start.
+	* tests/reproducers/simple/ManifestedJar1/testcases/ManifestedJar1Test.java:
+	(manifestedJar1main2mainNoAppDesc), (manifestedJar1nothing2nothingAppDesc)
+	fixed and adapted to change.
+
 2013-11-22  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/DefaultLaunchHandlerTest.java: (init)

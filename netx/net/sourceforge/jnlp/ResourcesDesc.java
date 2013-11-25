@@ -72,10 +72,19 @@ public class ResourcesDesc {
     }
 
     public static JARDesc getMainJAR(List<JARDesc> jars) {
+        JARDesc markedMain = null;
         for (JARDesc jar : jars) {
             if (jar.isMain()) {
-                return jar;
+                if (markedMain == null){
+                markedMain = jar;
+                } else {
+                    //more then one main jar specified. It stinks. Return null to die later null;
+                    throw new RuntimeException("Multiple main JARs specified, refusing to continue.");
+                }
             }
+        }
+        if (markedMain!=null){
+            return markedMain;
         }
 
         if (jars.size() > 0) {

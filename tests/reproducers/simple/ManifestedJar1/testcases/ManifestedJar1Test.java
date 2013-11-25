@@ -155,14 +155,13 @@ public class ManifestedJar1Test {
      *
      * Two jars, both with manifest, sboth with main tag, no app desc
      *
-     * thisis passing, SUSPICIOUS, but to lunch at least something is better then to lunch nothing at all.
-     * althoug it maybe SHOULD throw twoMainException
      */
     @Test
     public void manifestedJar1main2mainNoAppDesc() throws Exception {
         String id = "ManifestedJar-1main2mainNoAppDesc";
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        assertManifestedJar1(id, pr);
+        assertNotManifestedJar1(id, pr);
+        assertNotManifestedJar2(id, pr);
         assertNotDead(id, pr);
     }
 
@@ -210,7 +209,7 @@ public class ManifestedJar1Test {
     public void manifestedJar1nothing2nothingAppDesc() throws Exception {
         String id = "ManifestedJar-1nothing2nothingAppDesc";
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        assertNotManifestedJar2(id, pr);
+        assertManifestedJar2(id, pr);
         assertNotManifestedJar1(id, pr);
         assertNotDead(id, pr);
     }
