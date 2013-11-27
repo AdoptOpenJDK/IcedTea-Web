@@ -2,7 +2,7 @@
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (getManifestAttribute)
 	added check for null manifest to prevent npe.
-	* /tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
 	added test for npe from getManifestAttribute
 	* tests/test-extensions/net/sourceforge/jnlp/util/FileTestUtils.java:
 	(createJarWithContents) enhanced to be able to create jar without manifest.
