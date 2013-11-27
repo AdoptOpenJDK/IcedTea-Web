@@ -250,13 +250,13 @@ class Parser {
         Node resources[] = getChildNodes(parent, "resources");
 
         // ensure that there are at least one information section present
-        if (resources.length == 0 && !j2se)
+        if (resources.length == 0 && !j2se) {
             throw new ParseException(R("PNoResources"));
-
+        }
         // create objects from the resources sections
-        for (int i = 0; i < resources.length; i++)
+        for (int i = 0; i < resources.length; i++) {
             result.add(getResourcesDesc(resources[i], j2se));
-
+        }
         return result;
     }
 
@@ -302,9 +302,11 @@ class Parser {
 
                 // check for duplicate main entries
                 if (jar.isMain()) {
-                    if (mainFlag == true)
-                        if (strict)
+                    if (mainFlag == true) {
+                        if (strict) {
                             throw new ParseException(R("PTwoMains"));
+                        }
+                    }
                     mainFlag = true;
                 }
 
@@ -1073,10 +1075,11 @@ class Parser {
                 URL result = new URL(base, href);
 
                 // check for going above the codebase
-                if (!result.toString().startsWith(base.toString()))
-                    if (strict)
+                if (!result.toString().startsWith(base.toString()) &&  !base.toString().startsWith(result.toString())){
+                    if (strict) {
                         throw new ParseException(R("PUrlNotInCodebase", node.getNodeName(), href, base));
-
+                    }
+                }
                 return result;
             }
 

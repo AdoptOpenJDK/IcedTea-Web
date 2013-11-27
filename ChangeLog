@@ -1,5 +1,16 @@
 2013-11-26  Jiri Vanek  <jvanek@redhat.com>
 
+	Reverted "fix to ManifestedJar1Test cases", better manifestedjar tests,
+	added srtict test
+	* netx/net/sourceforge/jnlp/Parser.java: added indentation, fixes
+	condition in strict base check
+	* netx/net/sourceforge/jnlp/ResourcesDesc.java: revertedt recently added throw
+	* tests/reproducers/simple/ManifestedJar1/testcases/ManifestedJar1Test.java:
+	(manifestedJar1main2mainNoAppDesc) adapted and 
+	(manifestedJar1main2mainNoAppDescStrict) added
+
+2013-11-26  Jiri Vanek  <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (getManifestAttribute)
 	added check for null manifest to prevent npe.
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:

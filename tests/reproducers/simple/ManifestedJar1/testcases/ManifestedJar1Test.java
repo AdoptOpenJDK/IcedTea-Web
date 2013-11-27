@@ -35,9 +35,11 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
+import java.util.Arrays;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.runtime.Translator;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -154,15 +156,32 @@ public class ManifestedJar1Test {
     /**
      *
      * Two jars, both with manifest, sboth with main tag, no app desc
+     * first jar is taken
      *
      */
     @Test
     public void manifestedJar1main2mainNoAppDesc() throws Exception {
         String id = "ManifestedJar-1main2mainNoAppDesc";
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
+        assertManifestedJar1(id, pr);
+        assertNotManifestedJar2(id, pr);
+        assertNotDead(id, pr);
+    }
+    
+    /**
+     *
+     * Two jars, both with manifest, sboth with main tag, no app desc
+     * two main jars reported
+     *
+     */
+    @Test
+    public void manifestedJar1main2mainNoAppDescStrict() throws Exception {
+        String id = "ManifestedJar-1main2mainNoAppDesc";
+        ProcessResult pr = server.executeJavawsHeadless(Arrays.asList(new String[]{"-strict"}), "/" + id + ".jnlp");
         assertNotManifestedJar1(id, pr);
         assertNotManifestedJar2(id, pr);
         assertNotDead(id, pr);
+        Assert.assertTrue(pr.stderr.contains(Translator.R("PTwoMains")) || pr.stdout.contains(Translator.R("PTwoMains")));
     }
 
     /**
