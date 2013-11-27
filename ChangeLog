@@ -1,3 +1,12 @@
+2013-11-26  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (getManifestAttribute)
+	added check for null manifest to prevent npe.
+	* /tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
+	added test for npe from getManifestAttribute
+	* tests/test-extensions/net/sourceforge/jnlp/util/FileTestUtils.java:
+	(createJarWithContents) enhanced to be able to create jar without manifest.
+
 2013-11-25  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/JNLPFile.java: (TITLE_NOT_FOUND) new constant

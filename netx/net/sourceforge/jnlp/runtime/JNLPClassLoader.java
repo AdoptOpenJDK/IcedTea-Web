@@ -900,8 +900,12 @@ public class JNLPClassLoader extends URLClassLoader {
             JarFile mainJar = null;
             try {
                 mainJar = new JarFile(f);
-                attributeValue = mainJar.getManifest().
-                        getMainAttributes().getValue(attribute);
+                Manifest manifest = mainJar.getManifest();
+                if (manifest == null || manifest.getMainAttributes() == null){
+                    //yes, jars without manifest exists
+                    return null;
+                }
+                attributeValue = manifest.getMainAttributes().getValue(attribute);
             } catch (IOException ioe) {
                 attributeValue = null;
             } finally {

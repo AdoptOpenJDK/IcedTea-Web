@@ -51,6 +51,7 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.util.FileTestUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.Assert;
 
 import org.junit.Test;
 
@@ -258,5 +259,39 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
                 assertEquals("some url1", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_URL));
             }
         });
+    }
+    
+    
+    @Test
+    public void tryNullManifest() throws Exception {
+        File tempDirectory = FileTestUtils.createTempDirectory();
+        File jarLocation = new File(tempDirectory, "test-npe.jar");
+        File dummyContent = File.createTempFile("dummy", "context", tempDirectory);
+        jarLocation.deleteOnExit();
+
+        /* Test with-out any attribute specified specified */
+        FileTestUtils.createJarWithoutManifestContents(jarLocation, dummyContent);
+
+        final Exception[] exs = new Exception[2];
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
+        try {
+            final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
+            assertNoFileLeak(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
+                        assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+                    } catch (Exception e) {
+                        exs[0] = e;
+                    }
+                }
+            });
+        } catch (Exception e) {
+            exs[1] = e;
+        }
+        Assert.assertNotNull(exs);
+        Assert.assertNull(exs[0]);
+        Assert.assertNull(exs[1]);
     }
 }
