@@ -15,7 +15,6 @@ public class JNLPClassLoaderDeadlock_1 extends Applet {
         setBackground(Color.white);
         add(tf);
         System.out.println("JNLPClassLoaderDeadlock_1 applet finished");
-        System.out.println("*** APPLET FINISHED ***");
     }
 
     public static void main(String[] args) {

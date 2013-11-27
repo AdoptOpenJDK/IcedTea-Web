@@ -1,3 +1,13 @@
+2013-11-27  Andrew Azores  <aazores@redhat.com>
+
+	Made JNLPClassLoaderDeadlock reproducer more reliable
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/srcs/JNLPClassLoaderDeadlock_1.java:
+	Removed "AutoOkClosingListener" magic string
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/srcs/JNLPClassLoaderDeadlock_2.java:
+	same
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/testcases/JNLPClassLoaderDeadlockTest.java:
+	Changed AutoOkClosingListener to RulesFolowingClosingListener
+
 2013-11-26  Jiri Vanek  <jvanek@redhat.com>
 
 	Reverted "fix to ManifestedJar1Test cases", better manifestedjar tests,

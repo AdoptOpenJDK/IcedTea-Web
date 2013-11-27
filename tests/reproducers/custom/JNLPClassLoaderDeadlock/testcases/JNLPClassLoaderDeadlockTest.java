@@ -43,7 +43,7 @@ import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -55,7 +55,10 @@ public class JNLPClassLoaderDeadlockTest extends BrowserTest {
     @TestInBrowsers(testIn={Browsers.one})
     @Bug(id="RH976833")
     public void testClassLoaderDeadlock() throws Exception {
-        ProcessResult pr = server.executeBrowser("JNLPClassLoaderDeadlock.html", AutoClose.CLOSE_ON_CORRECT_END);
+        RulesFolowingClosingListener listener = new RulesFolowingClosingListener();
+        listener.addContainsRule("JNLPClassLoaderDeadlock_1 applet finished");
+        listener.addContainsRule("JNLPClassLoaderDeadlock_2 applet finished");
+        ProcessResult pr = server.executeBrowser("JNLPClassLoaderDeadlock.html", listener, null);
         assertTrue("First applet should have initialized",
                 pr.stdout.contains("JNLPClassLoaderDeadlock_1 applet initialized"));
         assertTrue("Second applet should have initialized",

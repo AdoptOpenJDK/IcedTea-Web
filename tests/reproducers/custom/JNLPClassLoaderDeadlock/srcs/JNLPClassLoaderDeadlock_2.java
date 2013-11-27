@@ -78,6 +78,5 @@ public class JNLPClassLoaderDeadlock_2 extends Applet implements Runnable {
             }
         }
         System.out.println("JNLPClassLoaderDeadlock_2 applet finished");
-        System.out.println("*** APPLET FINISHED ***");
     }
 }
