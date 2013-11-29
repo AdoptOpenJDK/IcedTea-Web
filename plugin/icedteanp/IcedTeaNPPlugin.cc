@@ -219,6 +219,10 @@ bool plugin_debug_headers = false;
 bool plugin_debug_to_file = false ;
 bool plugin_debug_to_streams = true ;
 bool plugin_debug_to_system = false;
+bool plugin_debug_to_console = true;
+FILE *  plugin_file_log;
+std::string plugin_file_log_name;
+
 int plugin_debug_suspend = (getenv("ICEDTEAPLUGIN_DEBUG") != NULL) &&
         (strcmp(getenv("ICEDTEAPLUGIN_DEBUG"), "suspend") == 0);
 
@@ -330,7 +334,7 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 
   if (!instance)
   {
-      PLUGIN_ERROR ("Browser-provided instance pointer is NULL.");
+      PLUGIN_ERROR ("Browser-provided instance pointer is NULL.\n");
       return NPERR_INVALID_INSTANCE_ERROR;
   }
 
@@ -338,7 +342,7 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
   ITNPPluginData* data = plugin_data_new ();
   if (data == NULL)
   {
-      PLUGIN_ERROR ("Failed to allocate plugin data.");
+      PLUGIN_ERROR ("Failed to allocate plugin data.\n");
       return NPERR_OUT_OF_MEMORY_ERROR;
     }
 
@@ -439,7 +443,7 @@ void start_jvm_if_needed()
                                          data_directory.c_str(), getpid());
   if (!in_pipe_name)
     {
-      PLUGIN_ERROR ("Failed to create input pipe name.");
+      PLUGIN_ERROR ("Failed to create input pipe name.\n");
       np_error = NPERR_OUT_OF_MEMORY_ERROR;
       // If in_pipe_name is NULL then the g_free at
       // cleanup_in_pipe_name will simply return.
@@ -452,7 +456,7 @@ void start_jvm_if_needed()
   PLUGIN_DEBUG ("ITNP_New: creating input fifo: %s\n", in_pipe_name);
   if (mkfifo (in_pipe_name, 0600) == -1 && errno != EEXIST)
     {
-      PLUGIN_ERROR ("Failed to create input pipe", strerror (errno));
+      PLUGIN_ERROR ("Failed to create input pipe\n", strerror (errno));
       np_error = NPERR_GENERIC_ERROR;
       goto cleanup_in_pipe_name;
     }
@@ -467,7 +471,7 @@ void start_jvm_if_needed()
 
   if (!out_pipe_name)
     {
-      PLUGIN_ERROR ("Failed to create output pipe name.");
+      PLUGIN_ERROR ("Failed to create output pipe name.\n");
       np_error = NPERR_OUT_OF_MEMORY_ERROR;
       goto cleanup_out_pipe_name;
     }
@@ -478,7 +482,7 @@ void start_jvm_if_needed()
   PLUGIN_DEBUG ("ITNP_New: creating output fifo: %s\n", out_pipe_name);
   if (mkfifo (out_pipe_name, 0600) == -1 && errno != EEXIST)
     {
-      PLUGIN_ERROR ("Failed to create output pipe", strerror (errno));
+      PLUGIN_ERROR ("Failed to create output pipe\n", strerror (errno));
       np_error = NPERR_GENERIC_ERROR;
       goto cleanup_out_pipe_name;
     }
@@ -500,13 +504,13 @@ void start_jvm_if_needed()
     {
       if (channel_error)
         {
-          PLUGIN_ERROR ("Failed to create output channel",
+          PLUGIN_ERROR ("Failed to create output channel, '%s'\n",
                             channel_error->message);
           g_error_free (channel_error);
           channel_error = NULL;
         }
       else
-        PLUGIN_ERROR ("Failed to create output channel");
+        PLUGIN_ERROR ("Failed to create output channel\n");
 
       np_error = NPERR_GENERIC_ERROR;
       goto cleanup_out_to_appletviewer;
@@ -527,13 +531,13 @@ void start_jvm_if_needed()
     {
       if (channel_error)
         {
-          PLUGIN_ERROR ("Failed to create input channel",
+          PLUGIN_ERROR ("Failed to create input channel, '%s'\n",
                             channel_error->message);
           g_error_free (channel_error);
           channel_error = NULL;
         }
       else
-        PLUGIN_ERROR ("Failed to create input channel");
+        PLUGIN_ERROR ("Failed to create input channel\n");
 
       np_error = NPERR_GENERIC_ERROR;
       goto cleanup_in_from_appletviewer;
@@ -549,7 +553,7 @@ void start_jvm_if_needed()
 
   goto done;
 
-  // Free allocated data
+  // Free allocated data in case of error
 
  cleanup_in_watch_source:
   // Removing a source is harmless if it fails since it just means the
@@ -593,6 +597,7 @@ void start_jvm_if_needed()
 
  done:
 
+  IcedTeaPluginUtilities::printDebugStatus();
   // Now other threads may re-enter.. unlock the mutex
   g_mutex_unlock(vm_start_mutex);
 
@@ -621,7 +626,7 @@ ITNP_GetValue (NPP instance, NPPVariable variable, void* value)
       }
       break;
     default:
-      PLUGIN_ERROR ("Unknown plugin value requested.");
+      PLUGIN_ERROR ("Unknown plugin value requested.\n");
       np_error = NPERR_GENERIC_ERROR;
       break;
     }
@@ -670,7 +675,7 @@ ITNP_SetWindow (NPP instance, NPWindow* window)
 
   if (instance == NULL)
     {
-      PLUGIN_ERROR ("Invalid instance.");
+      PLUGIN_ERROR ("Invalid instance.\n");
 
       return NPERR_INVALID_INSTANCE_ERROR;
     }
@@ -990,13 +995,13 @@ plugin_in_pipe_callback (GIOChannel* source,
         {
           if (channel_error)
             {
-              PLUGIN_ERROR ("Failed to read line from input channel",
+              PLUGIN_ERROR ("Failed to read line from input channel, %s\n",
                                 channel_error->message);
               g_error_free (channel_error);
               channel_error = NULL;
             }
           else
-            PLUGIN_ERROR ("Failed to read line from input channel");
+            PLUGIN_ERROR ("Failed to read line from input channel\n");
         } else
         {
           consume_message(message);
@@ -1329,13 +1334,13 @@ plugin_test_appletviewer ()
     {
       if (channel_error)
         {
-          PLUGIN_ERROR ("Failed to spawn applet viewer",
+          PLUGIN_ERROR ("Failed to spawn applet viewer %s\n",
                             channel_error->message);
           g_error_free (channel_error);
           channel_error = NULL;
         }
       else
-        PLUGIN_ERROR ("Failed to spawn applet viewer");
+        PLUGIN_ERROR ("Failed to spawn applet viewer\n");
       error = NPERR_GENERIC_ERROR;
     }
 
@@ -1409,13 +1414,13 @@ plugin_start_appletviewer (ITNPPluginData* data)
     {
       if (channel_error)
         {
-          PLUGIN_ERROR ("Failed to spawn applet viewer",
+          PLUGIN_ERROR ("Failed to spawn applet viewer %s\n",
                             channel_error->message);
           g_error_free (channel_error);
           channel_error = NULL;
         }
       else
-        PLUGIN_ERROR ("Failed to spawn applet viewer");
+        PLUGIN_ERROR ("Failed to spawn applet viewer\n");
       error = NPERR_GENERIC_ERROR;
     }
 
@@ -1540,13 +1545,13 @@ plugin_send_message_to_appletviewer (gchar const* message)
         {
           if (channel_error)
             {
-              PLUGIN_ERROR ("Failed to write bytes to output channel",
+              PLUGIN_ERROR ("Failed to write bytes to output channel '%s' \n",
                                 channel_error->message);
               g_error_free (channel_error);
               channel_error = NULL;
             }
           else
-            PLUGIN_ERROR ("Failed to write bytes to output channel");
+            PLUGIN_ERROR ("Failed to write bytes to output channel for %s", newline_message);
         }
 
       if (g_io_channel_flush (out_to_appletviewer, &channel_error)
@@ -1554,18 +1559,18 @@ plugin_send_message_to_appletviewer (gchar const* message)
         {
           if (channel_error)
             {
-              PLUGIN_ERROR ("Failed to flush bytes to output channel",
+              PLUGIN_ERROR ("Failed to flush bytes to output channel '%s'\n",
                                 channel_error->message);
               g_error_free (channel_error);
               channel_error = NULL;
             }
           else
-            PLUGIN_ERROR ("Failed to flush bytes to output channel");
+            PLUGIN_ERROR ("Failed to flush bytes to output channel for %s", newline_message);
         }
       g_free (newline_message);
       newline_message = NULL;
 
-      PLUGIN_DEBUG ("  PIPE: plugin wrote: %s\n", message);
+      PLUGIN_DEBUG ("  PIPE: plugin wrote(?): %s\n", message);
     }
 
   PLUGIN_DEBUG ("plugin_send_message_to_appletviewer return\n");
@@ -1621,13 +1626,13 @@ plugin_stop_appletviewer ()
             {
               if (channel_error)
                 {
-                  PLUGIN_ERROR ("Failed to write shutdown message to"
-                                    " appletviewer", channel_error->message);
+                  PLUGIN_ERROR ("Failed to write shutdown message to "
+                                    " appletviewer, %s \n", channel_error->message);
                   g_error_free (channel_error);
                   channel_error = NULL;
                 }
               else
-                PLUGIN_ERROR ("Failed to write shutdown message to");
+                PLUGIN_ERROR ("Failed to write shutdown message to\n");
             }
 
           if (g_io_channel_flush (out_to_appletviewer, &channel_error)
@@ -1636,12 +1641,12 @@ plugin_stop_appletviewer ()
               if (channel_error)
                 {
                   PLUGIN_ERROR ("Failed to write shutdown message to"
-                                    " appletviewer", channel_error->message);
+                                    " appletviewer %s \n", channel_error->message);
                   g_error_free (channel_error);
                   channel_error = NULL;
                 }
               else
-                PLUGIN_ERROR ("Failed to write shutdown message to");
+                PLUGIN_ERROR ("Failed to write shutdown message to\n");
             }
 
           if (g_io_channel_shutdown (out_to_appletviewer,
@@ -1651,12 +1656,12 @@ plugin_stop_appletviewer ()
               if (channel_error)
                 {
                   PLUGIN_ERROR ("Failed to shut down appletviewer"
-                                    " output channel", channel_error->message);
+                                    " output channel %s \n", channel_error->message);
                   g_error_free (channel_error);
                   channel_error = NULL;
                 }
               else
-                PLUGIN_ERROR ("Failed to shut down appletviewer");
+                PLUGIN_ERROR ("Failed to shut down appletviewer\n");
             }
         }
 
@@ -1669,12 +1674,12 @@ plugin_stop_appletviewer ()
               if (channel_error)
                 {
                   PLUGIN_ERROR ("Failed to shut down appletviewer"
-                                    " input channel", channel_error->message);
+                                    " input channel %s \n", channel_error->message);
                   g_error_free (channel_error);
                   channel_error = NULL;
                 }
               else
-                PLUGIN_ERROR ("Failed to shut down appletviewer");
+                PLUGIN_ERROR ("Failed to shut down appletviewer\n");
             }
         }
     }
@@ -1812,7 +1817,7 @@ initialize_data_directory()
     file_error = g_mkdir (data_directory.c_str(), 0700);
     if (file_error != 0)
     {
-      PLUGIN_ERROR ("Failed to create data directory",
+      PLUGIN_ERROR ("Failed to create data directory %s, %s\n",
                           data_directory.c_str(),
                           strerror (errno));
       return NPERR_GENERIC_ERROR;
@@ -1824,7 +1829,7 @@ initialize_data_directory()
   if (!g_file_test (data_directory.c_str(),
                     (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
   {
-    PLUGIN_ERROR ("Temp directory does not exist: ",
+    PLUGIN_ERROR ("Temp directory does not exist %s, %s \n",
                         data_directory.c_str(),
                         strerror (errno));
     return NPERR_GENERIC_ERROR;
@@ -1852,7 +1857,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
 
   if ((browserTable == NULL) || (pluginTable == NULL))
   {
-    PLUGIN_ERROR ("Browser or plugin function table is NULL.");
+    PLUGIN_ERROR ("Browser or plugin function table is NULL.\n");
 
     return NPERR_INVALID_FUNCTABLE_ERROR;
   }
@@ -1862,7 +1867,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   // we've implemented.
   if ((browserTable->version >> 8) > NP_VERSION_MAJOR)
     {
-      PLUGIN_ERROR ("Incompatible version.");
+      PLUGIN_ERROR ("Incompatible version.\n");
 
       return NPERR_INCOMPATIBLE_VERSION_ERROR;
     }
@@ -1875,7 +1880,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   // Check if everything we rely on is supported
   if ( !browser_functions_supported )
   {
-	PLUGIN_ERROR ("Invalid browser function table.");
+	PLUGIN_ERROR ("Invalid browser function table.\n");
 
 	return NPERR_INVALID_FUNCTABLE_ERROR;
   }
@@ -1888,7 +1893,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   // Check if everything we rely on is supported
   if ( !plugin_functions_supported )
   {
-    PLUGIN_ERROR ("Invalid plugin function table.");
+    PLUGIN_ERROR ("Invalid plugin function table.\n");
 
     return NPERR_INVALID_FUNCTABLE_ERROR;
   }
@@ -1954,6 +1959,7 @@ __attribute__ ((visibility ("default")))
 const char*
 NP_GetMIMEDescription ()
 {
+  //this function is called severaltimes between lunches
   PLUGIN_DEBUG ("NP_GetMIMEDescription\n");
 
   PLUGIN_DEBUG ("NP_GetMIMEDescription return\n");
@@ -1985,7 +1991,7 @@ NP_GetValue (void* future, NPPVariable variable, void* value)
       break;
 
     default:
-      PLUGIN_ERROR ("Unknown plugin value requested.");
+      PLUGIN_ERROR ("Unknown plugin value requested.\n");
       result = NPERR_GENERIC_ERROR;
       break;
     }
@@ -2081,6 +2087,12 @@ NP_Shutdown (void)
   //delete internal_bus;
 
   PLUGIN_DEBUG ("NP_Shutdown return\n");
+  
+  if (plugin_debug_to_file){
+    fflush (plugin_file_log);
+    //fclose (plugin_file_log);
+    //keep writing untill possible!
+  }  
 
   return NPERR_NO_ERROR;
 }

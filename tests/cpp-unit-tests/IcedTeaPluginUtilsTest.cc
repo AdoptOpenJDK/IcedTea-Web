@@ -184,38 +184,50 @@ void doDebugErrorRun() {
 TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_off) {
 	bool plugin_debug_backup = plugin_debug;
 	bool plugin_debug_headers_backup = plugin_debug_headers;
+	bool plugin_debug_console_backup = plugin_debug_to_console;
+	plugin_debug_to_console = false;
 	plugin_debug = true;
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
 	plugin_debug_headers = plugin_debug_headers_backup;
+	plugin_debug_to_console =  plugin_debug_console_backup;
 }
 TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off_headers_off) {
 	bool plugin_debug_backup = plugin_debug;
 	bool plugin_debug_headers_backup = plugin_debug_headers;
+	bool plugin_debug_console_backup = plugin_debug_to_console;
+	plugin_debug_to_console = false;
 	plugin_debug = false;
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
 	plugin_debug_headers = plugin_debug_headers_backup;
+	plugin_debug_to_console =  plugin_debug_console_backup;
 }
 
 
 TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_on) {
 	bool plugin_debug_backup = plugin_debug;
 	bool plugin_debug_headers_backup = plugin_debug_headers;
+	bool plugin_debug_console_backup = plugin_debug_to_console;
+	plugin_debug_to_console = false;
 	plugin_debug = true;
 	plugin_debug_headers = true;
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
 	plugin_debug_headers = plugin_debug_headers_backup;
+	plugin_debug_to_console =  plugin_debug_console_backup;
 }
 
 TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off_headers_on) {
 	bool plugin_debug_backup = plugin_debug;
 	bool plugin_debug_headers_backup = plugin_debug_headers;
+	bool plugin_debug_console_backup = plugin_debug_to_console;
+	plugin_debug_to_console = false;
 	plugin_debug = false;
 	plugin_debug_headers = true;
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
 	plugin_debug_headers = plugin_debug_headers_backup;
+	plugin_debug_to_console =  plugin_debug_console_backup;
 }
 

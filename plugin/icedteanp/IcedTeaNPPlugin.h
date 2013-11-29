@@ -122,6 +122,9 @@ extern bool plugin_debug_headers;
 extern bool plugin_debug_to_file;
 extern bool plugin_debug_to_streams;
 extern bool plugin_debug_to_system;
+extern bool plugin_debug_to_console;
+extern FILE * plugin_file_log;
+extern std::string plugin_file_log_name;
 
 // Browser function table.
 extern NPNetscapeFuncs browser_functions;

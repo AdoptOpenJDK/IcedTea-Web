@@ -47,7 +47,9 @@ exception statement from your version. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 
+#include <fcntl.h>
 #include <cstring>
 #include <iostream>
 #include <list>
@@ -68,41 +70,69 @@ exception statement from your version. */
   do                                                                          \
   {                                                                           \
     if (!debug_initiated) {                                                   \
-	  debug_initiated = true;                                                 \
+      debug_initiated = true;                                                 \
       plugin_debug = getenv ("ICEDTEAPLUGIN_DEBUG") != NULL || is_debug_on(); \
       plugin_debug_headers = is_debug_header_on();                            \
       plugin_debug_to_file = is_logging_to_file();                            \
       plugin_debug_to_streams = is_logging_to_stds();                         \
       plugin_debug_to_system = is_logging_to_system();                        \
+      plugin_debug_to_console = is_java_console_enabled();                    \
+      if (plugin_debug_to_file) {                                             \
+           IcedTeaPluginUtilities::initFileLog();                             \
+      }                                                                       \
+      if (plugin_debug_to_console) {                                          \
+          /*no op now*/                                                       \
+      }                                                                       \
+      IcedTeaPluginUtilities::printDebugStatus();                             \
     }                                                                         \
   } while (0) 
 
 
-//f is after expansion used as FILE*
-#define CREATE_HEADER(f)                               \
+#define  HEADER_SIZE  500
+#define  BODY_SIZE  500
+#define  MESSAGE_SIZE  HEADER_SIZE + BODY_SIZE 
+
+//header is destination char array
+#define CREATE_HEADER(ldebug_header)                   \
   do                                                   \
   {                                                    \
-    char s[200];                                       \
+    char times[100];                                   \
     time_t t = time(NULL);                             \
     struct tm  p;                                      \
     localtime_r(&t, &p);                               \
-    strftime(s, 200, "%a %b %d %H:%M:%S %Z %Y", &p);   \
+    strftime(times, 100, "%a %b %d %H:%M:%S %Z %Y", &p);\
     const char *userNameforDebug = (getenv("USERNAME") == NULL) ? "unknown user" : getenv("USERNAME");  \
-    fprintf  (f, "[%s][ITW-C-PLUGIN][MESSAGE_DEBUG][%s][%s:%d] ITNPP Thread# %ld, gthread %p: ",        \
-    userNameforDebug, s, __FILE__, __LINE__,  pthread_self(), g_thread_self ());                        \
+    /*this message is parsed in JavaConsole*/          \
+    snprintf(ldebug_header, HEADER_SIZE, "[%s][ITW-C-PLUGIN][MESSAGE_DEBUG][%s][%s:%d] ITNPP Thread# %ld, gthread %p: ",        \
+    userNameforDebug, times, __FILE__, __LINE__,  pthread_self(), g_thread_self ());                        \
   } while (0)
   
- 
+
 #define PLUGIN_DEBUG(...)              \
   do                                   \
   {                                    \
     initialize_debug();                \
     if (plugin_debug)  {               \
+      char ldebug_header[HEADER_SIZE]; \
+      char ldebug_body[BODY_SIZE];     \
+      char ldebug_message[MESSAGE_SIZE];\
+      if (plugin_debug_headers) {      \
+        CREATE_HEADER(ldebug_header);  \
+      } else {                         \
+        sprintf(ldebug_header,"");     \
+      }                                \
+      snprintf(ldebug_body, BODY_SIZE,  __VA_ARGS__);                               \
       if (plugin_debug_to_streams) {   \
-        if (plugin_debug_headers) {    \
-          CREATE_HEADER(stdout);       \
-        }                              \
-      fprintf (stdout, __VA_ARGS__);   \
+        snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body); \
+        fprintf  (stdout, "%s", ldebug_message);\
+      }                                \
+      if (plugin_debug_to_file) {      \
+        snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body);   \
+        fprintf (plugin_file_log, "%s", ldebug_message);   \
+        fflush(plugin_file_log);       \
+      }                                \
+      if (plugin_debug_to_console) {   \
+        /*no op now*/            \
       }                                \
     }                                  \
   } while (0)
@@ -112,12 +142,27 @@ exception statement from your version. */
   do                                   \
   {                                    \
     initialize_debug();                \
+    char ldebug_header[HEADER_SIZE];   \
+    char ldebug_body[BODY_SIZE];       \
+    char ldebug_message[MESSAGE_SIZE]; \
+    if (plugin_debug_headers) {        \
+      CREATE_HEADER(ldebug_header);    \
+    } else {                           \
+      sprintf(ldebug_header,"");       \
+    }                                  \
+    snprintf(ldebug_body, BODY_SIZE,  __VA_ARGS__);   \
     if (plugin_debug_to_streams) {     \
-      if (plugin_debug_headers) {      \
-          CREATE_HEADER(stderr);       \
-        }                              \
-      fprintf  (stderr,  __VA_ARGS__); \
-      }                                \
+      snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body); \
+      fprintf  (stderr, "%s", ldebug_message);                                    \
+    }                                  \
+    if (plugin_debug_to_file) {        \
+      snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body); \
+      fprintf (plugin_file_log, "%s", ldebug_message);   \
+      fflush(plugin_file_log);         \
+    }                                  \
+    if (plugin_debug_to_console) {     \
+      /*no op now*/            \
+    }                                  \
    } while (0)
 
 
@@ -338,7 +383,10 @@ class IcedTeaPluginUtilities
         /*cutting whitespaces from end and start of string*/
         static void trim(std::string& str);
         static bool file_exists(std::string filename);
-
+        //file-loggers helpers
+        static std::string generateLogFileName();
+        static void initFileLog();
+        static void printDebugStatus();
 };
 
 /*

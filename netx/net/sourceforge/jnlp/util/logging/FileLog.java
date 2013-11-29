@@ -38,6 +38,8 @@ package net.sourceforge.jnlp.util.logging;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -50,17 +52,20 @@ import net.sourceforge.jnlp.util.FileUtils;
  *
  */
 public final class FileLog implements SingleStreamLogger {
+    private static SimpleDateFormat fileLogNameFormatter =  new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.S");
+    /**"Tue Nov 19 09:43:50 CET 2013"*/
+    private static SimpleDateFormat pluginSharedFormatter =  new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZ yyyy");
 
     private final Logger impl;
     private final FileHandler fh;
     private static final String defaultloggerName = "IcedTea-Web file-logger";
 
     public FileLog() {
-        this(defaultloggerName, LogConfig.getLogConfig().getIcedteaLogDir() + "itw-" + java.lang.System.currentTimeMillis() + ".log", false);
+        this(false);
     }
     
      public FileLog(boolean append) {
-        this(defaultloggerName, LogConfig.getLogConfig().getIcedteaLogDir() + "itw-" + java.lang.System.currentTimeMillis() + ".log", append);
+        this(defaultloggerName, LogConfig.getLogConfig().getIcedteaLogDir() + "itw-javantx-" + getStamp() + ".log", append);
     }
 
 
@@ -104,4 +109,18 @@ public final class FileLog implements SingleStreamLogger {
     public void close(){
         fh.close();
     }
+
+    private static String getStamp() {
+        return fileLogNameFormatter.format(new Date());
+    }
+
+    public static SimpleDateFormat getFileLogNameFormatter() {
+        return fileLogNameFormatter;
+    }
+
+    public static SimpleDateFormat getPluginSharedFormatter() {
+        return pluginSharedFormatter;
+    }
+
+    
 }

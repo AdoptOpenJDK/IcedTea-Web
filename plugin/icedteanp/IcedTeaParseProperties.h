@@ -40,10 +40,11 @@ exception statement from your version. */
  * Utility classes for parsing values from properties files
  */
 #include <string>
-
+#include <glib.h>
 
 //public api
 std::string  user_properties_file();
+std::string  get_log_dir();
 bool  find_system_config_file(std::string& dest);
 bool  find_custom_jre(std::string& dest);
 bool  read_deploy_property_value(std::string property, std::string& dest);
@@ -52,7 +53,9 @@ bool  is_debug_header_on();
 bool  is_logging_to_file();
 bool  is_logging_to_stds();
 bool  is_logging_to_system();
+bool  is_java_console_enabled();
 //half public api
 extern const std::string default_file_ITW_deploy_props_name;
+extern const std::string default_itw_log_dir_name;
 extern const std::string custom_jre_key;
 //end of public api

@@ -112,7 +112,7 @@ class PluginMessageHandlerWorker extends Thread {
                 waitForWork();
 
                 // Someone woke us up, see if there is work to do
-                PluginDebug.debug("Consumer thread ", id, " woken...");
+                // PluginDebug.debug("Consumer thread ", id, " woken...");
             }
         }
     }

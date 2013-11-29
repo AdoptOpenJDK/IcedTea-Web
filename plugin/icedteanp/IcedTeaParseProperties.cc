@@ -76,6 +76,7 @@ bool  read_deploy_property_value(string user_file, string system_file,  bool use
 bool  find_custom_jre(string user_file, string main_file,string& dest);
 //end of non-public IcedTeaParseProperties api
 const std::string default_file_ITW_deploy_props_name = "deployment.properties";
+const std::string default_itw_log_dir_name = "log";
 const std::string custom_jre_key = "deployment.jre.dir";
 
 void remove_all_spaces(string& str)
@@ -110,7 +111,7 @@ string  user_properties_file(){
 	string old_name = string(mypasswd->pw_dir)+"/.icedtea/"+default_file_ITW_deploy_props_name;
 	//exists? then itw was not yet migrated. Use it
 	if (IcedTeaPluginUtilities::file_exists(old_name)) {
-		PLUGIN_ERROR("IcedTea-Web plugin is using out-dated configuration");
+		PLUGIN_ERROR("IcedTea-Web plugin is using out-dated configuration\n");
 		return old_name;
 	}
 	//we are probably  on XDG specification now
@@ -120,6 +121,37 @@ string  user_properties_file(){
 	}
 	//if not then use default
 	return string(mypasswd->pw_dir)+"/.config/icedtea-web/"+default_file_ITW_deploy_props_name;
+}
+
+string  get_log_dir(){
+	string value;
+	if (!read_deploy_property_value("deployment.user.logdir", value)) {
+		int myuid = getuid();
+		struct passwd *mypasswd = getpwuid(myuid);
+		// try pre 1.5  file location
+		if (getenv ("XDG_CONFIG_HOME") != NULL){
+			string r1= string(getenv ("XDG_CONFIG_HOME"))+"/icedtea-web";
+			string r2 = r1+"/"+default_itw_log_dir_name;
+			if (!IcedTeaPluginUtilities::file_exists(r1)){
+				g_mkdir(r1.c_str(), 755);
+			}
+			if (!IcedTeaPluginUtilities::file_exists(r2)){
+				g_mkdir(r2.c_str(), 755);
+			}
+			return r2;
+		}
+		//if not then use default
+		string r1 = string(mypasswd->pw_dir)+"/.config/icedtea-web";
+		string r2 = r1+"/"+default_itw_log_dir_name;
+		if (!IcedTeaPluginUtilities::file_exists(r1)){
+			g_mkdir(r1.c_str(), 755);
+		}
+		if (!IcedTeaPluginUtilities::file_exists(r2)){
+			g_mkdir(r2.c_str(), 755);
+		}
+		return r2;
+	}
+	return value;
 }
 
 
@@ -149,6 +181,17 @@ bool find_system_config_file(string& dest){
 	return find_system_config_file(main_properties_file(), jdest, found, default_java_properties_file(), dest);
 }
 
+bool  is_java_console_enabled(){
+	string value;
+	if (!read_deploy_property_value("deployment.console.startup.mode", value)) {
+		return true;
+	}
+	if (value == "DISABLE") {
+		return false;
+	} else {
+		return true;
+	}
+}
 
 bool  read_bool_property(string key, bool defaultValue){
 	string value;

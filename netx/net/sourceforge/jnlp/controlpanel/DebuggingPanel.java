@@ -23,13 +23,20 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.LogConfig;
@@ -74,7 +81,41 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
     private void addComponents() {
         GridBagConstraints c = new GridBagConstraints();
 
-        JLabel debuggingDescription = new JLabel("<html>" + Translator.R("CPDebuggingDescription") + "<hr /><br /></html>");
+
+        final JLabel debuggingDescription = new JLabel("<html>" + Translator.R("CPDebuggingDescription") + "<hr /><br /></html>");
+        final JLabel logsDestinationTitle = new JLabel(Translator.R("CPFilesLogsDestDir")+": ");
+        final JTextField logsDestination = new JTextField(config.getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR));
+        logsDestination.getDocument().addDocumentListener(new DocumentListener() {
+
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                 save();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                 save();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                save();
+
+            }
+
+            private void save() {
+                config.setProperty(DeploymentConfiguration.KEY_USER_LOG_DIR, logsDestination.getText());
+            }
+        });
+        final JButton logsDestinationReset = new JButton(Translator.R("CPFilesLogsDestDirResert"));
+        logsDestinationReset.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                logsDestination.setText(Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_LOG_DIR).getDefaultValue());
+            }
+        });
 
         JCheckBox[] debuggingOptions = { 
                 new JCheckBox(Translator.R("DPEnableLogging")),
@@ -130,8 +171,17 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             debuggingOptions[i].addItemListener(this);
             add(debuggingOptions[i], c);
 
-
+              if (i == 2) {
+                 c.gridx++;
+                add(logsDestinationTitle, c);
+                c.gridx++;
+                add(logsDestination, c);
+                c.gridx++;
+                add(logsDestinationReset, c);
+                c.gridx-=3;
+            }
         }
+
 
         for (int j = 0; j < javaConsoleItems.length; j++) {
             consoleComboBox.addItem(javaConsoleItems[j]);

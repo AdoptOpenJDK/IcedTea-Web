@@ -399,7 +399,7 @@ IcedTeaPluginUtilities::getUTF16LEString(int length, int begin, std::vector<std:
 
 	wchar_t c;
 
-	PLUGIN_DEBUG("Converted UTF-16LE string: ");
+	PLUGIN_DEBUG("Converted UTF-16LE string: \n");
 
 	result_unicode_str->clear();
 	for (int i = begin; i < begin+length; i+=2)
@@ -413,7 +413,7 @@ IcedTeaPluginUtilities::getUTF16LEString(int length, int begin, std::vector<std:
         	(c >= 'A' && c <= 'Z') ||
         	(c >= '0' && c <= '9'))
         {
-        	PLUGIN_DEBUG("%c", c);
+        	PLUGIN_DEBUG("%c\n", c);
         }
 
         result_unicode_str->push_back(c);
@@ -1104,6 +1104,69 @@ bool IcedTeaPluginUtilities::file_exists(std::string filename)
     std::ifstream infile(filename.c_str());
     return infile.good();
 }
+
+void IcedTeaPluginUtilities::initFileLog(){
+    if (plugin_file_log != NULL ) {
+        //reusing
+        return;
+    }
+    plugin_file_log_name = get_log_dir() + "/" + IcedTeaPluginUtilities::generateLogFileName();
+    int plugin_file_log_fd = open(plugin_file_log_name.c_str(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+    if (plugin_file_log_fd <=0 ) {
+        plugin_debug_to_file = false;
+    } else {
+        plugin_file_log = fdopen(plugin_file_log_fd, "w");
+    }
+    if (plugin_file_log == NULL ) {
+        plugin_debug_to_file = false;
+    }
+}
+
+
+
+std::string IcedTeaPluginUtilities::generateLogFileName(){
+    char times[96];
+    char result[100];
+    time_t t = time(NULL);
+    struct tm  p;
+    localtime_r(&t, &p);
+    struct timeval current_time;   \
+    gettimeofday (&current_time, NULL);\
+    strftime(times, 96, "%Y-%m-%d_%H:%M:%S", &p);
+    snprintf(result, 100, "%s.%i",times, current_time.tv_usec/1000);
+    return "itw-cplugin-"+std::string(result)+".log";
+}
+
+void IcedTeaPluginUtilities::printDebugStatus(){
+      if (plugin_debug){
+        PLUGIN_DEBUG("plugin_debug: true, initialised\n");
+        if (plugin_debug_headers){
+          PLUGIN_DEBUG("plugin_debug_headers: true\n");
+        } else {
+          PLUGIN_DEBUG("plugin_debug_headers: false\n");
+        } 
+        if (plugin_debug_to_file){
+          PLUGIN_DEBUG("plugin_debug_to_file: true, using %s\n", plugin_file_log_name.c_str());
+        } else {
+          PLUGIN_DEBUG("plugin_debug_to_file: false\n");
+        } 
+        if (plugin_debug_to_streams){ 
+          PLUGIN_DEBUG("plugin_debug_to_streams: true\n");
+        } else {
+          PLUGIN_DEBUG("plugin_debug_to_streams: false\n"); 
+        } 
+        if (plugin_debug_to_system){
+          PLUGIN_DEBUG("plugin_debug_to_system: true\n"); 
+        } else {
+          PLUGIN_DEBUG("plugin_debug_to_system: false\n");
+        } 
+        if (plugin_debug_to_console){ 
+          PLUGIN_DEBUG("plugin_debug_to_console: true\n");
+        } else {
+          PLUGIN_DEBUG("plugin_debug_to_console: false\n"); 
+        } 
+      } 
+    } 
 
 
 /******************************************
