@@ -1169,6 +1169,36 @@ void IcedTeaPluginUtilities::printDebugStatus(){
     } 
 
 
+std::string IcedTeaPluginUtilities::getTmpPath(){
+  const char* tmpdir_env = getenv("TMPDIR");
+  if (tmpdir_env != NULL && g_file_test (tmpdir_env,
+                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+  {
+    return std::string(tmpdir_env);
+  }
+  else if (g_file_test (P_tmpdir,
+                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+  {
+    return std::string(P_tmpdir);
+  }
+  else
+  {
+    // If TMPDIR and P_tmpdir do not exist, try /tmp directly
+    return "/tmp";
+  }
+}
+
+std::string IcedTeaPluginUtilities::getRuntimePath(){
+ const char* rntdir_env = getenv("XDG_RUNTIME_DIR");
+  if (rntdir_env != NULL && g_file_test (rntdir_env,
+                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+  {
+    return std::string(rntdir_env);
+  }
+  return IcedTeaPluginUtilities::getTmpPath();
+}
+
+
 /******************************************
  * Begin JavaMessageSender implementation *
  ******************************************

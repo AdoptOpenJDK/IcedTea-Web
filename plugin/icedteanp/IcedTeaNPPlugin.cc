@@ -1787,24 +1787,8 @@ initialize_plugin_table(NPPluginFuncs* pluginTable)
 NPError
 initialize_data_directory()
 {
-  const char* tmpdir_env = getenv("TMPDIR");
-  if (tmpdir_env != NULL && g_file_test (tmpdir_env,
-                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
-  {
-    data_directory = tmpdir_env;
-  }
-  else if (g_file_test (P_tmpdir,
-                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
-  {
-    data_directory = P_tmpdir;
-  }
-  else
-  {
-    // If TMPDIR and P_tmpdir do not exist, try /tmp directly
-    data_directory = "/tmp";
-  }
 
-  data_directory += "/icedteaplugin-";
+  data_directory = IcedTeaPluginUtilities::getRuntimePath() + "/icedteaplugin-";
   if (getenv("USER") != NULL)
     data_directory += getenv("USER");
 

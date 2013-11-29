@@ -1,5 +1,16 @@
 2013-11-29  Jiri Vanek  <jvanek@redhat.com>
 
+	Pipes moved into XDG_RUNTIME_DIR
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: (initialize_data_directory) logic
+	responsible for tmp dir path moved into (getTmpPath) and (data_directory)
+	initialized from (getRuntimePath) rather.
+	*  plugin/icedteanp/IcedTeaPluginUtils.cc: (getTmpPath) new function,
+	provides path to tmp dir. (getRuntimePath) new function resolving 
+	XDG_RUNTIME_DIR value, returning (getTmpPath) as fallback.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: declared new two methods.
+
+2013-11-29  Jiri Vanek  <jvanek@redhat.com>
+
 	Enabled file logging in plugin, user enabled to choose logs dir.
 	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java: added
 	text-field to show/edit logs' destination. Added reset to default button.

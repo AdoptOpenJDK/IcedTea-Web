@@ -387,6 +387,8 @@ class IcedTeaPluginUtilities
         static std::string generateLogFileName();
         static void initFileLog();
         static void printDebugStatus();
+        static std::string getTmpPath();
+        static std::string getRuntimePath();
 };
 
 /*
