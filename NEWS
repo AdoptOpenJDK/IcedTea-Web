@@ -30,6 +30,8 @@ New in release 1.5 (2013-XX-XX):
   - PR854: Resizing an applet several times causes 100% CPU load
   - PR1271: icedtea-web does not handle 'javascript:'-protocol URLs
   - RH976833: Multiple applets on one page cause deadlock
+  - Pipes moved into XDG_RUNTIME_DIR
+  - Added debug to file
 * Common
   - PR1474: Can't get javaws to use SOCKS proxy
 * Security Updates
