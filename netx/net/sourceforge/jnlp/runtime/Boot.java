@@ -124,11 +124,15 @@ public final class Boot implements PrivilegedAction<Void> {
      * Launch the JNLP file specified by the command-line arguments.
      */
     public static void main(String[] argsIn) {
+        args = argsIn;
+
         if (AppContext.getAppContext() == null) {
             SunToolkit.createNewAppContext();
         }
+        if (null != getOption("-headless"))
+            JNLPRuntime.setHeadless(true);
+
         DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
-        args = argsIn;
 
         if (null != getOption("-viewer")) {
 
@@ -169,9 +173,6 @@ public final class Boot implements PrivilegedAction<Void> {
             int value = Integer.parseInt(getOption("-update"));
             JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000l));
         }
-
-        if (null != getOption("-headless"))
-            JNLPRuntime.setHeadless(true);
 
         if (null != getOption("-noupdate"))
             JNLPRuntime.setDefaultUpdatePolicy(UpdatePolicy.NEVER);

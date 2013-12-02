@@ -36,6 +36,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.naming.ConfigurationException;
+import javax.swing.JOptionPane;
 
 import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -213,9 +214,9 @@ public final class DeploymentConfiguration {
     /** is it mandatory to load the system properties? */
     private boolean systemPropertiesMandatory = false;
 
-    /** The system's deployment.config file */
+    /** The system's subdirResult deployment.config file */
     private File systemPropertiesFile = null;
-    /** The user's deployment.config file */
+    /** The user's subdirResult deployment.config file */
     private File userPropertiesFile = null;
     
     /*default user file*/
@@ -280,7 +281,7 @@ public final class DeploymentConfiguration {
         Map<String, Setting<String>> systemProperties = null;
 
         /*
-         * First, try to read the system's deployment.config file to find if
+         * First, try to read the system's subdirResult deployment.config file to find if
          * there is a system-level deployment.poperties file
          */
 
@@ -304,7 +305,7 @@ public final class DeploymentConfiguration {
         }
 
         /*
-         * Third, read the user's deployment.properties file
+         * Third, read the user's subdirResult deployment.properties file
          */
         userPropertiesFile = userFile;
         Map<String, Setting<String>> userProperties = loadProperties(ConfigType.User, userPropertiesFile, false);
@@ -713,6 +714,8 @@ public final class DeploymentConfiguration {
         int errors = 0;
         String PRE_15_DEPLOYMENT_DIR = ".icedtea";
         String LEGACY_USER_HOME = System.getProperty("user.home") + File.separator + PRE_15_DEPLOYMENT_DIR;
+        File configDir = new File(Defaults.USER_CONFIG_HOME);
+        File cacheDir = new File(Defaults.USER_CACHE_HOME);
         File legacyUserDir = new File(LEGACY_USER_HOME);
         if (legacyUserDir.exists()) {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Legacy configuration and cache found. Those will be now transported to new locations");
@@ -723,11 +726,9 @@ public final class DeploymentConfiguration {
 
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Preparing new directories:");
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + Defaults.USER_CONFIG_HOME);
-            File f1 = new File(Defaults.USER_CONFIG_HOME);
-            errors += resultToStd(f1.mkdirs());
+            errors += resultToStd(configDir.mkdirs());
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + Defaults.USER_CACHE_HOME);
-            File f2 = new File(Defaults.USER_CACHE_HOME);
-            errors += resultToStd(f2.mkdirs());
+            errors += resultToStd(cacheDir.mkdirs());
 
             String legacySecurity = LEGACY_USER_HOME + File.separator + "security";
             String currentSecurity = Defaults.USER_SECURITY;
@@ -786,14 +787,21 @@ public final class DeploymentConfiguration {
         } else {
             OutputController.getLogger().log("System is already following XDG .cache and .config specifications");
             try {
-                OutputController.getLogger().log("config: " + Defaults.USER_CONFIG_HOME + " file exists: " + new File(Defaults.USER_CONFIG_HOME).exists());
+                OutputController.getLogger().log("config: " + Defaults.USER_CONFIG_HOME + " file exists: " + configDir.exists());
             } catch (Exception ex) {
                 OutputController.getLogger().log(ex);
             }
             try {
-                OutputController.getLogger().log("cache: " + Defaults.USER_CACHE_HOME + " file exists:" + new File(Defaults.USER_CACHE_HOME));
+                OutputController.getLogger().log("cache: " + Defaults.USER_CACHE_HOME + " file exists:" + cacheDir.exists());
             } catch (Exception ex) {
                 OutputController.getLogger().log(ex);
+            }
+        }
+        //this call should endure even if (ever) will migration code be removed
+        DirectoryValidator.DirectoryCheckResults r = new DirectoryValidator().ensureDirs();
+        if (!JNLPRuntime.isHeadless()) {
+            if (r.getFailures() > 0) {
+                JOptionPane.showMessageDialog(null, r.getMessage());
             }
         }
 

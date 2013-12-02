@@ -69,4 +69,4 @@ public class DeploymentConfigurationTest {
         assertTrue(target.size() != 0);
     }
 
-}
+    }

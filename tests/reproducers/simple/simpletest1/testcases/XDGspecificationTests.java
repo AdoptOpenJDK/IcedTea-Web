@@ -1014,10 +1014,11 @@ public class XDGspecificationTests extends BrowserTest {
             pw.addStdOutListener(new RulesFolowingClosingListener(applet1Run));
             pw.setVars(setXdgVAlues(f));
             ProcessResult pr = pw.execute();
-            Assert.assertTrue(applet1Run.toPassingString(), applet1Run.evaluate(pr.stdout));
             Assert.assertTrue(notMoving.toPassingString(), notMoving.evaluate(pr.stdout));
             assertMainFiles(listToString(getContentOfDirectory(f)), false, false, true);
             assertOldNotMainFilesInHome(true, true, true);
+            /*do alst, we need to check the migration, not applet lunching itself*/
+            Assert.assertTrue(applet1Run.toPassingString(), applet1Run.evaluate(pr.stdout));
         } finally {
             deleteRecursively(f);
         }
@@ -1090,10 +1091,11 @@ public class XDGspecificationTests extends BrowserTest {
             pw.addStdOutListener(new RulesFolowingClosingListener(applet1Run));
             pw.setVars(setXdgVAlues(f));
             ProcessResult pr = pw.execute();
-            Assert.assertTrue(applet1Run.toPassingString(), applet1Run.evaluate(pr.stdout));
             Assert.assertTrue(notMoving.toPassingString(), notMoving.evaluate(pr.stdout));
             assertMainFiles(listToString(getContentOfDirectory(f)), false, false, true);
             assertOldNotMainFilesInHome(true, true, true);
+            /*do last, we need to check the migration, not applet lunching itself*/
+            Assert.assertTrue(applet1Run.toPassingString(), applet1Run.evaluate(pr.stdout));
         } finally {
             deleteRecursively(f);
         }

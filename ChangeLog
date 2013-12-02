@@ -1,5 +1,20 @@
 2013-11-29  Jiri Vanek  <jvanek@redhat.com>
 
+	Better validation of crytical dirs with proper message on startup
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: small
+	refactoring to match the new directory validator pattern.
+	* netx/net/sourceforge/jnlp/config/DirectoryValidator.java: new class to verify
+	if directory have necessary permissions (like creating subdirectories,
+	read and write files created in).
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: patterns for 
+	validation results
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: headless determination moved
+	as up as possible in (main)
+	* tests/netx/unit/net/sourceforge/jnlp/config/DeploymentConfigurationTest.java: 
+	Few test testing what DirtectoryValidator should validate.
+
+2013-11-29  Jiri Vanek  <jvanek@redhat.com>
+
 	Pipes moved into XDG_RUNTIME_DIR
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: (initialize_data_directory) logic
 	responsible for tmp dir path moved into (getTmpPath) and (data_directory)
