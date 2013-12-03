@@ -1,5 +1,29 @@
 2013-12-03  Andrew Azores  <aazores@redhat.com>
 
+	Tests for PR1592.
+	* tests/reproducers/signed/MixedSigningAppletSigned/srcs/MixedSigningAppletSigned.java:
+	new tests for per-JAR applet security
+	* tests/reproducers/signed/MixedSigningAppletSigned/testcases/MixedSigningAppletSignedTests.java:
+	same
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-1.jnlp:
+	same
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-2.jnlp:
+	same
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-3.jnlp:
+	same
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-4.jnlp:
+	same
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-5.jnlp:
+	same
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-6.jnlp:
+	same
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet.html:
+	same
+	* tests/reproducers/simple/MixedSigningApplet/srcs/MixedSigningAppletHelper.java:
+	same 
+
+2013-12-03  Andrew Azores  <aazores@redhat.com>
+
 	Fix/new feature for PR1592. Each JAR in partially signed applets is
 	assigned its own security level, rather than forcing the entire applet to
 	run sandboxed.
