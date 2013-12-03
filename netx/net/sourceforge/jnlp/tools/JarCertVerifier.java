@@ -183,6 +183,14 @@ public class JarCertVerifier implements CertVerifier {
         return fullySigned;
     }
 
+    public static boolean isJarSigned(JARDesc jar, AppVerifier verifier, ResourceTracker tracker) throws Exception {
+        JarCertVerifier certVerifier = new JarCertVerifier(verifier);
+        List<JARDesc> singleJarList = new ArrayList<JARDesc>();
+        singleJarList.add(jar);
+        certVerifier.add(singleJarList, tracker);
+        return certVerifier.allJarsSigned();
+    }
+
     /**
      * Update the verifier to consider new jars when verifying.
      * 

@@ -1,3 +1,17 @@
+2013-12-03  Andrew Azores  <aazores@redhat.com>
+
+	Fix/new feature for PR1592. Each JAR in partially signed applets is
+	assigned its own security level, rather than forcing the entire applet to
+	run sandboxed.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(initializeResources)
+	each JAR in partially signed applets is assigned its own security
+	descriptor.
+	(signing) changed to three-valued enum. (checkNotAllSignedWithUser) new
+	method
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: (isJarSigned) new
+	method
+
 2013-11-29  Jiri Vanek  <jvanek@redhat.com>
 
 	Better validation of crytical dirs with proper message on startup

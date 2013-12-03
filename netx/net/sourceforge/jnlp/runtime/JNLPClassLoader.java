@@ -84,6 +84,8 @@ import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.security.PluginAppVerifier;
 import net.sourceforge.jnlp.security.SecurityDialogs;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.JarFile;
@@ -113,6 +115,10 @@ public class JNLPClassLoader extends URLClassLoader {
     /** Actions to specify how cache is to be managed **/
     public static enum DownloadAction {
         DOWNLOAD_TO_CACHE, REMOVE_FROM_CACHE, CHECK_CACHE
+    }
+
+    public static enum SigningState {
+        FULL, PARTIAL, NONE
     }
 
     /** True if the application has a signed JNLP File */
@@ -167,7 +173,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /** the jar cert verifier tool to verify our jars */
     private final JarCertVerifier jcv;
 
-    private boolean signing = false;
+    private SigningState signing = SigningState.NONE;
 
     /** ArrayList containing jar indexes for various jars available to this classloader */
     private ArrayList<JarIndex> jarIndexes = new ArrayList<JarIndex>();
@@ -304,7 +310,7 @@ public class JNLPClassLoader extends URLClassLoader {
          * determine security settings here, after trying to verify jars.
          */
         if (file instanceof PluginBridge) {
-            if (signing == true) {
+            if (getSigning()) {
                 this.security = new SecurityDesc(file,
                         SecurityDesc.ALL_PERMISSIONS,
                         codebase.getHost());
@@ -327,13 +333,13 @@ public class JNLPClassLoader extends URLClassLoader {
              * Unsigned      no <security>     Sandbox
              *
              */
-            if (!file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS) && !signing) {
+            if (!file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS) && !getSigning()) {
                 if (jcv.allJarsSigned()) {
                     throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedJNLPAppDifferentCerts"), R("LSignedJNLPAppDifferentCertsInfo"));
                 } else {
                     throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedJarWithSecurity"), R("LUnsignedJarWithSecurityInfo"));
                 }
-            } else if (signing == true) {
+            } else if (getSigning()) {
                 this.security = file.getSecurity();
             } else {
                 this.security = new SecurityDesc(file,
@@ -390,7 +396,7 @@ public class JNLPClassLoader extends URLClassLoader {
         JNLPClassLoader extLoader = uniqueKeyToLoader.get(uniqueKey);
 
         if (extLoader != null && extLoader != loader) {
-            if (loader.signing && !extLoader.signing)
+            if (loader.getSigning() && !extLoader.getSigning())
                 if (!SecurityDialogs.showNotAllSignedWarningDialog(file))
                     throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
 
@@ -609,8 +615,8 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             }
 
-            if(allSigned)
-                signing = true;
+            if (allSigned)
+                signing = SigningState.FULL;
 
             //Check if main jar is found within extensions
             foundMainJar = foundMainJar || hasMainInExtensions();
@@ -676,7 +682,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             //Case when at least one jar has some signing
             if (jcv.isFullySigned()) {
-                signing = true;
+                signing = SigningState.FULL;
 
                 // Check for main class in the downloaded jars, and check/verify signed JNLP fill
                 checkForMain(initialJars);
@@ -692,9 +698,10 @@ public class JNLPClassLoader extends URLClassLoader {
                 boolean externalMainClass = (file.getLaunchInfo() != null && !foundMainJar
                         && (available == null || available.size() == 0));
 
-                if ((!jcv.allJarsSigned() || externalMainClass) &&
-                                    !SecurityDialogs.showNotAllSignedWarningDialog(file))
-                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
+                if (!jcv.allJarsSigned() || externalMainClass) {
+                    checkNotAllSignedWithUser(file);
+                    signing = SigningState.PARTIAL;
+                }
 
                 // If main jar was found, but a signed JNLP file was not located
                 if (!isSignedJNLP && foundMainJar)
@@ -713,60 +720,69 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 // Otherwise this jar is simply unsigned -- make sure to ask
                 // for permission on certain actions
-                signing = false;
+                signing = SigningState.NONE;
             }
         }
 
+        boolean containsSignedJar = false, containsUnsignedJar = false;
         for (JARDesc jarDesc : file.getResources().getJARs()) {
-            try {
+            File cachedFile;
 
-                File cachedFile;
+            try {
+                cachedFile = tracker.getCacheFile(jarDesc.getLocation());
+            } catch (IllegalResourceDescriptorException irde) {
+                //Caused by ignored resource being removed due to not being valid
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jarDesc.getLocation() + " is not a valid jar file. Continuing.");
+                continue;
+            }
+
+            if (cachedFile == null) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jarDesc.getLocation() + " not found. Continuing.");
+                continue; // JAR not found. Keep going.
+            }
+
+            SecurityDesc jarSecurity = file.getSecurity();
+
+            if (file instanceof PluginBridge) {
+
+                URL codebase = null;
+
+                if (file.getCodeBase() != null) {
+                    codebase = file.getCodeBase();
+                } else {
+                    //Fixme: codebase should be the codebase of the Main Jar not
+                    //the location. Although, it still works in the current state.
+                    codebase = file.getResources().getMainJAR().getLocation();
+                }
 
                 try {
-                    cachedFile = tracker.getCacheFile(jarDesc.getLocation());
-                } catch (IllegalResourceDescriptorException irde){
-                    //Caused by ignored resource being removed due to not being valid
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jarDesc.getLocation() + " is not a valid jar file. Continuing.");
-                    continue;
-                }
-
-                if (cachedFile == null) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jarDesc.getLocation() + " not found. Continuing.");
-                    continue; // JAR not found. Keep going.
-                }
-
-                // TODO: Should be toURI().toURL()
-                URL location = cachedFile.toURL();
-                SecurityDesc jarSecurity = file.getSecurity();
-
-                if (file instanceof PluginBridge) {
-
-                    URL codebase = null;
-
-                    if (file.getCodeBase() != null) {
-                        codebase = file.getCodeBase();
-                    } else {
-                        //Fixme: codebase should be the codebase of the Main Jar not
-                        //the location. Although, it still works in the current state.
-                        codebase = file.getResources().getMainJAR().getLocation();
-                    }
-
-                    if (signing) {
+                    if (JarCertVerifier.isJarSigned(jarDesc, new PluginAppVerifier(), tracker)) {
+                        containsSignedJar = true;
                         jarSecurity = new SecurityDesc(file,
-                                                        SecurityDesc.ALL_PERMISSIONS,
-                                                        codebase.getHost());
+                                SecurityDesc.ALL_PERMISSIONS,
+                                codebase.getHost());
                     } else {
+                        containsUnsignedJar = true;
                         jarSecurity = new SecurityDesc(file,
-                                                        SecurityDesc.SANDBOX_PERMISSIONS,
-                                                        codebase.getHost());
+                                SecurityDesc.SANDBOX_PERMISSIONS,
+                                codebase.getHost());
                     }
+                } catch (Exception e) {
+                    OutputController.getLogger().log(e);
+                    jarSecurity = new SecurityDesc(file,
+                            SecurityDesc.SANDBOX_PERMISSIONS,
+                            codebase.getHost());
                 }
-
-                jarLocationSecurityMap.put(jarDesc.getLocation(), jarSecurity);
-            } catch (MalformedURLException mfe) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, mfe);
             }
+
+            jarLocationSecurityMap.put(jarDesc.getLocation(), jarSecurity);
         }
+
+        if (containsSignedJar && containsUnsignedJar) {
+            checkNotAllSignedWithUser(file);
+            signing = SigningState.PARTIAL;
+        }
+
         activateJars(initialJars);
     }
     
@@ -1063,6 +1079,22 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
+    /**
+     * Prompt the user to proceed on applets with mixed signing.
+     * @param file the JNLPFile or PluginBridge describing the applet/application to be launched
+     * @throws LaunchException if the user does not approve the prompt
+     */
+    private void checkNotAllSignedWithUser(JNLPFile file) throws LaunchException {
+        boolean promptUser = true;
+
+        if (JNLPRuntime.isTrustAll()) {
+            promptUser = false;
+        }
+
+        if (promptUser && !SecurityDialogs.showNotAllSignedWarningDialog(file)) {
+            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
+        }
+    }
     /**
      * Add applet's codebase URL.  This allows compatibility with
      * applets that load resources from their codebase instead of
@@ -1864,7 +1896,7 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     public boolean getSigning() {
-        return signing;
+        return signing == SigningState.FULL;
     }
 
     protected SecurityDesc getSecurity() {
