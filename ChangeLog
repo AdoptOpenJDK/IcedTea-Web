@@ -1,3 +1,8 @@
+2013-12-09  Jiri Vanek  <jvanek@redhat.com>
+
+	* Messages.properties: added "It will be granted unrestricted access to your computer."
+	to (SSigUnverified) (SSigVerified) (SSignatureError) messages.
+
 2013-12-05  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: add units to
