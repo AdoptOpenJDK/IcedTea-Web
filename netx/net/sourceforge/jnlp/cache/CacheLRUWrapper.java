@@ -221,8 +221,11 @@ public enum CacheLRUWrapper {
      * 
      * @return List of Strings sorted by ascending order.
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    //although Properties are pretending to be <object,Object> they are always <String,String>
+    //bug in jdk?
     public synchronized List<Entry<String, String>> getLRUSortedEntries() {
-        ArrayList<Entry<String, String>> entries = new ArrayList(cacheOrder.entrySet());
+        List<Entry<String, String>> entries = new ArrayList(cacheOrder.entrySet());
         // sort by keys in descending order.
         Collections.sort(entries, new Comparator<Entry<String, String>>() {
             @Override

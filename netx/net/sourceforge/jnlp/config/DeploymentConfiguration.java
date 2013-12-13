@@ -515,7 +515,7 @@ public final class DeploymentConfiguration {
                 OutputController.getLogger().log("Using System level" + DEPLOYMENT_PROPERTIES + ": "
                             + systemPropertiesFile);
                 Setting<String> mandatory = systemConfiguration.get("deployment.system.config.mandatory");
-                systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : (String) mandatory.getValue());
+                systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue());
                 return true;
             } else {
                 OutputController.getLogger().log("Remote + " + DEPLOYMENT_PROPERTIES + " not supported");
@@ -580,8 +580,8 @@ public final class DeploymentConfiguration {
 
         for (String key : currentConfiguration.keySet()) {
             String oldValue = unchangeableConfiguration.get(key) == null ? null
-                    : (String) unchangeableConfiguration.get(key).getValue();
-            String newValue = currentConfiguration.get(key) == null ? null : (String) currentConfiguration
+                    : unchangeableConfiguration.get(key).getValue();
+            String newValue = currentConfiguration.get(key) == null ? null : currentConfiguration
                     .get(key).getValue();
             if (oldValue == null && newValue == null) {
                 continue;

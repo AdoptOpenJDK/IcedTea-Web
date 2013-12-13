@@ -115,7 +115,7 @@ public class NatCubic extends ControlCurve {
         Cubic[] Y = calcNaturalCubic(pts.npoints - 1, pts.ypoints);
         /* very crude technique - just break each segment up into steps lines */
         Polygon p = new Polygon();
-        p.addPoint((int) Math.round(X[0].eval(0)), (int) Math.round(Y[0].eval(0)));
+        p.addPoint(Math.round(X[0].eval(0)), Math.round(Y[0].eval(0)));
         for (int i = 0; i < X.length; i++) {
             for (int j = 1; j <= STEPS; j++) {
                 float u = j / (float) STEPS;

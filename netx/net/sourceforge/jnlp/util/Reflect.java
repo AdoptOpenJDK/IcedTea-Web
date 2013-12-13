@@ -16,8 +16,9 @@
 
 package net.sourceforge.jnlp.util;
 
+import java.lang.reflect.Method;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import java.lang.reflect.*;
+
 
 /**
  * Provides simply, convenient methods to invoke methods by
@@ -75,11 +76,12 @@ public class Reflect {
      */
     public Object invokeStatic(String className, String method, Object args[]) {
         try {
-            Class c = Class.forName(className, true, Reflect.class.getClassLoader());
+            Class<?> c = Class.forName(className, true, Reflect.class.getClassLoader());
 
             Method m = getMethod(c, method, args);
-            if (m.isAccessible() != accessible)
+            if (m.isAccessible() != accessible) {
                 m.setAccessible(accessible);
+            }
 
             return m.invoke(null, args);
         } catch (Exception ex) { // eat
@@ -103,8 +105,9 @@ public class Reflect {
     public Object invoke(Object object, String method, Object args[]) {
         try {
             Method m = getMethod(object.getClass(), method, args);
-            if (m.isAccessible() != accessible)
+            if (m.isAccessible() != accessible) {
                 m.setAccessible(accessible);
+            }
 
             return m.invoke(object, args);
         } catch (Exception ex) { // eat
@@ -117,17 +120,18 @@ public class Reflect {
      * Return the Method matching the specified name and number of
      * arguments.
      */
-    public Method getMethod(Class type, String method, Object args[]) {
+    public Method getMethod(Class<?> type, String method, Object args[]) {
         try {
-            for (Class c = type; c != null; c = c.getSuperclass()) {
+            for (Class<?> c = type; c != null; c = c.getSuperclass()) {
                 Method methods[] = c.getMethods();
 
                 for (int i = 0; i < methods.length; i++) {
                     if (methods[i].getName().equals(method)) {
                         Class parameters[] = methods[i].getParameterTypes();
 
-                        if (parameters.length == args.length)
+                        if (parameters.length == args.length) {
                             return methods[i];
+                        }
                     }
                 }
             }

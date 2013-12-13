@@ -372,7 +372,7 @@ public class XMLElement {
      * </ul></dd></dl>
      *
      */
-    public Enumeration enumerateAttributeNames() {
+    public Enumeration<String> enumerateAttributeNames() {
         return this.attributes.keys();
     }
 
@@ -384,7 +384,7 @@ public class XMLElement {
      * </ul></dd></dl>
      *
      */
-    public Enumeration enumerateChildren() {
+    public Enumeration<XMLElement> enumerateChildren() {
         return this.children.elements();
     }
 

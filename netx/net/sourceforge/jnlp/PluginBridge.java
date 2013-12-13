@@ -324,7 +324,10 @@ public class PluginBridge extends JNLPFile {
                     } catch (MalformedURLException ex) { /* Ignored */
                     }
                 } else if (launchType.equals(ExtensionDesc.class)) {
-                    return (List<T>) extensionJars; // this list is populated when the PluginBridge is first constructed
+                    // We hope this is a safe list of JarDesc objects
+                    @SuppressWarnings("unchecked")
+                    List<T> castList = (List<T>) extensionJars; // this list is populated when the PluginBridge is first constructed
+                    return castList;
                 }
                 return sharedResources.getResources(launchType);
             }

@@ -403,7 +403,7 @@ public class MethodOverloadResolver {
             }
         }
 
-        return matchingConstructors.toArray(new Constructor[0]);
+        return matchingConstructors.toArray(new Constructor<?>[0]);
     }
 
     private static Class<?> getPrimitiveType(Class<?> c) {
@@ -435,8 +435,9 @@ public class MethodOverloadResolver {
     private static boolean isNumericString(Object o) {
         // At this point, it _has_ to be a string else automatically
         // return false
-        if (!(o instanceof java.lang.String))
+        if (!(o instanceof java.lang.String)) {
             return false;
+        }
 
         try {
             Long.parseLong((String) o); // whole number test

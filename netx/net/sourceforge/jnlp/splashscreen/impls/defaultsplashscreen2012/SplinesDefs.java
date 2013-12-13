@@ -153,24 +153,24 @@ public class SplinesDefs {
         return polygonizeControlPoints(mainLeafArray, scalex, scaley);
     }
 
-    static Polygon polygonizeControlPoints(Point[] pp, Double scalex, double scaley) {
+    static Polygon polygonizeControlPoints(Point[] pp, double scalex, double scaley) {
         Polygon r = new Polygon();
         for (int i = 0; i < pp.length; i++) {
             Point p = pp[i];
-            r.addPoint((int) ((double) p.x * (double) scalex), (int) ((double) p.y * (double) scaley));
+            r.addPoint( (int) ((double) p.x * scalex), (int) ((double) p.y * scaley));
         }
         return r;
     }
 
-    public static Polygon getSecondLeaf(Double scalex, double scaley) {
+    public static Polygon getSecondLeaf(double scalex, double scaley) {
         return polygonizeControlPoints(smallLeafArray, scalex, scaley);
     }
 
-    public static Polygon getSecondLeafStalk(Double scalex, double scaley) {
+    public static Polygon getSecondLeafStalk(double scalex, double scaley) {
         return polygonizeControlPoints(smallLeafStalkArray, scalex, scaley);
     }
 
-    public static Polygon getMainLeafStalk(Double scalex, double scaley) {
+    public static Polygon getMainLeafStalk(double scalex, double scaley) {
         return polygonizeControlPoints(mainLeafStalkArray, scalex, scaley);
     }
 

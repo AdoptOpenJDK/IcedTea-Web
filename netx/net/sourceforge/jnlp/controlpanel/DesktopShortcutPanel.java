@@ -62,7 +62,7 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
     private void addComponents() {
         GridBagConstraints c = new GridBagConstraints();
         JLabel description = new JLabel("<html>" + Translator.R("CPDesktopIntegrationDescription") + "<hr /></html>");
-        JComboBox shortcutComboOptions = new JComboBox();
+        JComboBox<ComboItem> shortcutComboOptions = new JComboBox<ComboItem>();
         ComboItem[] items = { new ComboItem(Translator.R("DSPNeverCreate"), "NEVER"),
                 new ComboItem(Translator.R("DSPAlwaysAllow"), "ALWAYS"),
                 new ComboItem(Translator.R("DSPAskUser"), "ASK_USER"),
@@ -72,8 +72,9 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
         shortcutComboOptions.setActionCommand("deployment.javaws.shortcut"); // The configuration property this combobox affects.
         for (int j = 0; j < items.length; j++) {
             shortcutComboOptions.addItem(items[j]);
-            if (config.getProperty("deployment.javaws.shortcut").equals(items[j].getValue()))
+            if (config.getProperty("deployment.javaws.shortcut").equals(items[j].getValue())) {
                 shortcutComboOptions.setSelectedIndex(j);
+            }
         }
 
         shortcutComboOptions.addItemListener(this);

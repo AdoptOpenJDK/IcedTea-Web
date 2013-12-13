@@ -21,9 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
 import java.net.ProxySelector;
@@ -33,8 +31,6 @@ import java.security.AllPermission;
 import java.security.KeyStore;
 import java.security.Policy;
 import java.security.Security;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -44,8 +40,6 @@ import javax.naming.ConfigurationException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.swing.UIManager;
@@ -64,7 +58,6 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
-import net.sourceforge.jnlp.security.VariableX509TrustManager;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
@@ -462,7 +455,7 @@ public class JNLPRuntime {
      *
      * @throws IllegalStateException if caller is not the exit class
      */
-    public static void setExitClass(Class exitClass) {
+    public static void setExitClass(Class<?> exitClass) {
         checkExitClass();
         security.setExitClass(exitClass);
     }

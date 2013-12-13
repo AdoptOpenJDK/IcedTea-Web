@@ -65,7 +65,6 @@ import javax.swing.tree.TreeSelectionModel;
 public class CertsInfoPane extends SecurityDialogPanel {
 
     private CertPath certPath;
-    private JList list;
     protected JTree tree;
     private JTable table;
     private JTextArea output;
@@ -175,7 +174,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
     /**
      * Constructs the GUI components of this panel
      */
-    protected void addComponents() {
+    private void addComponents() {
         buildTree();
         populateTable();
         /**
@@ -235,17 +234,21 @@ public class CertsInfoPane extends SecurityDialogPanel {
      * Copies the currently selected certificate to the system Clipboard.
      */
     private class CopyToClipboardHandler implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             int certIndex = 0;
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                     tree.getLastSelectedPathComponent();
-            if (node == null)
+            if (node == null) {
                 return;
-            if (node.isRoot())
+            }
+            if (node.isRoot()) {
                 certIndex = 0;
-            else if (node.isLeaf())
+            }
+            else if (node.isLeaf()) {
                 certIndex = 1;
+            }
 
             String[][] cert = certsData.get(certIndex);
             int rows = cert.length;
@@ -268,12 +271,14 @@ public class CertsInfoPane extends SecurityDialogPanel {
      * Updates the JTable when the JTree selection has changed.
      */
     protected class TreeSelectionHandler implements TreeSelectionListener {
+        @Override
         public void valueChanged(TreeSelectionEvent e) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                                 tree.getLastSelectedPathComponent();
 
-            if (node == null)
+            if (node == null) {
                 return;
+            }
             if (node.isRoot()) {
                 table.setModel(new DefaultTableModel(certsData.get(0),
                                         columnNames));
@@ -288,6 +293,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
     * Updates the JTable when the selection on the list has changed.
     */
     private class ListSelectionHandler implements ListSelectionListener {
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
@@ -308,6 +314,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
      * has changed.
      */
     private class TableSelectionHandler implements ListSelectionListener {
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
@@ -329,8 +336,9 @@ public class CertsInfoPane extends SecurityDialogPanel {
     private String makeFingerprint(byte[] hash) {
         String fingerprint = "";
         for (int i = 0; i < hash.length; i++) {
-            if (!fingerprint.equals(""))
+            if (!fingerprint.equals("")) {
                 fingerprint += ":";
+            }
             fingerprint += Integer.toHexString(
                                 ((hash[i] & 0xFF) | 0x100)).substring(1, 3);
         }

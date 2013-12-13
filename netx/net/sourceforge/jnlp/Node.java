@@ -63,13 +63,16 @@ class Node {
     }
 
     Node getFirstChild() {
-        if (children == null)
+        if (children == null) {
             getChildNodes();
+        }
 
-        if (children.length == 0)
+        if (children.length == 0) {
             return null;
-        else
+        }
+        else {
             return children[0];
+        }
     }
 
     Node getNextSibling() {
@@ -87,13 +90,15 @@ class Node {
         if (children == null) {
             List<Node> list = new ArrayList<Node>();
 
-            for (Enumeration e = xml.enumerateChildren(); e.hasMoreElements();)
-                list.add(new Node((XMLElement) e.nextElement()));
+            for (Enumeration<XMLElement> e = xml.enumerateChildren(); e.hasMoreElements();) {
+                list.add(new Node(e.nextElement()));
+            }
 
             children = list.toArray(new Node[list.size()]);
 
-            for (int i = 0; i < children.length - 1; i++)
+            for (int i = 0; i < children.length - 1; i++) {
                 children[i].next = children[i + 1];
+            }
         }
 
         return children;
@@ -107,8 +112,9 @@ class Node {
         if (attributeNames == null) {
             attributeNames= new ArrayList<String>();
 
-            for (Enumeration e = xml.enumerateAttributeNames(); e.hasMoreElements();)
-                attributeNames.add(new String((String) e.nextElement()));
+            for (Enumeration<String> e = xml.enumerateAttributeNames(); e.hasMoreElements();) {
+                attributeNames.add(new String(e.nextElement()));
+            }
         }
 
         return attributeNames;
@@ -119,12 +125,15 @@ class Node {
     }
 
     String getNodeName() {
-        if (xml.getName() == null)
+        if (xml.getName() == null) {
             return "";
-        else
+        }
+        else {
             return xml.getName();
+        }
     }
 
+    @Override
     public String toString() {
         return getNodeName();
     }

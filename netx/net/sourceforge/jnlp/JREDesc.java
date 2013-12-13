@@ -30,22 +30,22 @@ import java.util.*;
 public class JREDesc {
 
     /** the platform version or the product version if location is not null */
-    private Version version;
+    final private Version version;
 
     /** the location of a JRE product or null */
-    private URL location;
+    final private URL location;
 
     /** inital heap size */
-    private String initialHeapSize;
+    final private String initialHeapSize;
 
     /** maximum head size */
-    private String maximumHeapSize;
+    final private String maximumHeapSize;
 
     /** args to pass to the vm */
-    private String vmArgs;
+    final private String vmArgs;
 
     /** list of ResourceDesc objects */
-    private List resources;
+    final private List<ResourcesDesc> resources;
 
     /**
      * Create a JRE descriptor.
@@ -59,7 +59,7 @@ public class JREDesc {
      */
     public JREDesc(Version version, URL location,
             String vmArgs, String initialHeapSize,
-            String maximumHeapSize, List resources) throws ParseException {
+            String maximumHeapSize, List<ResourcesDesc> resources) throws ParseException {
         this.version = version;
         this.location = location;
         this.vmArgs = vmArgs;
@@ -112,7 +112,7 @@ public class JREDesc {
     /**
      * Returns the resources defined for this JRE.
      */
-    public List getResourcesDesc() {
+    public List<ResourcesDesc> getResourcesDesc() {
         return resources;
     }
 

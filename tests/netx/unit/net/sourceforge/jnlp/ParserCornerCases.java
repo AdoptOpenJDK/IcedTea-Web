@@ -84,7 +84,7 @@ public class ParserCornerCases {
                 "</jnlp>";
         XMLElement elem = new XMLElement();
         elem.parseFromReader(new StringReader(data));
-        XMLElement target = (XMLElement) ((XMLElement) elem.enumerateChildren().nextElement()).enumerateChildren().nextElement();
+        XMLElement target = (elem.enumerateChildren().nextElement()).enumerateChildren().nextElement();
         Assert.assertEquals("argument", target.getName());
         Assert.assertTrue("too small", target.getContent().length() > 20);
         Assert.assertTrue(target.getContent().contains("xml"));

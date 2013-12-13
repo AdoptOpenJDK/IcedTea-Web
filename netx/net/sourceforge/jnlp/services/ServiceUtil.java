@@ -155,9 +155,9 @@ public class ServiceUtil {
      * must be more than extremely careful in the operations they
      * perform.
      */
-    static Object createPrivilegedProxy(Class iface, final Object receiver) {
+    static Object createPrivilegedProxy(Class<?> iface, final Object receiver) {
         return java.lang.reflect.Proxy.newProxyInstance(XServiceManagerStub.class.getClassLoader(),
-                new Class[] { iface },
+                new Class<?>[] { iface },
                 new PrivilegedHandler(receiver));
     }
 
@@ -171,15 +171,19 @@ public class ServiceUtil {
             this.receiver = receiver;
         }
 
+        @Override
         public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
             if (JNLPRuntime.isDebug()) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "call privileged method: " + method.getName());
-                if (args != null)
-                    for (int i = 0; i < args.length; i++)
+                if (args != null) {
+                    for (int i = 0; i < args.length; i++) {
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "           arg: " + args[i]);
+                    }
+                }
             }
 
             PrivilegedExceptionAction<Object> invoker = new PrivilegedExceptionAction<Object>() {
+                @Override
                 public Object run() throws Exception {
                     return method.invoke(receiver, args);
                 }
@@ -242,8 +246,9 @@ public class ServiceUtil {
             if (!shouldPromptUser()) {
                 return false;
             }
-            if (app == null)
+            if (app == null) {
                 app = JNLPRuntime.getApplication();
+            }
 
             final AccessType tmpType = type;
             final Object[] tmpExtras = extras;
@@ -253,6 +258,7 @@ public class ServiceUtil {
             //applets, otherwise permissions won't be granted to load icons
             //from resources.jar.
             Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                @Override
                 public Boolean run() {
                     boolean b = SecurityDialogs.showAccessWarningDialog(tmpType,
                                 tmpApp.getJNLPFile(), tmpExtras);
@@ -294,14 +300,15 @@ public class ServiceUtil {
 
     public static boolean isSigned(ApplicationInstance app) {
 
-        if (app == null)
+        if (app == null) {
             app = JNLPRuntime.getApplication();
+        }
 
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 
         for (int i = 0; i < stack.length; i++) {
 
-            Class c = null;
+            Class<?> c = null;
 
             try {
                 c = Class.forName(stack[i].getClassName());

@@ -345,7 +345,7 @@ class Parser {
         }
         String initialHeap = getAttribute(node, "initial-heap-size", null);
         String maxHeap = getAttribute(node, "max-heap-size", null);
-        List resources = getResources(node, true);
+        List<ResourcesDesc> resources = getResources(node, true);
 
         // require version attribute
         getRequiredAttribute(node, "version", null);

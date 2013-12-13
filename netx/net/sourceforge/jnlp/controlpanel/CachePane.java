@@ -110,14 +110,15 @@ public class CachePane extends JPanel {
         cacheTable = new JTable(model);
         cacheTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         cacheTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
             final public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 // If no row has been selected, disable the delete button, else enable it
-                if (cacheTable.getSelectionModel().isSelectionEmpty())
-                    // Disable delete button, since nothing selected
+                if (cacheTable.getSelectionModel().isSelectionEmpty()) {
                     deleteButton.setEnabled(false);
-                else
-                    // Enable delete button, since something selected
+                }
+                else {
                     deleteButton.setEnabled(true);
+                }
             }
         });
         cacheTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
@@ -126,7 +127,9 @@ public class CachePane extends JPanel {
         JScrollPane scrollPane = new JScrollPane(cacheTable);
 
         TableRowSorter<TableModel> tableSorter = new TableRowSorter<TableModel>(model);
-        final Comparator comparator = new Comparator<Comparable>() { // General purpose Comparator
+        final Comparator<Comparable<?>> comparator = new Comparator<Comparable<?>>() { // General purpose Comparator
+            @Override
+            @SuppressWarnings("unchecked")
             public final int compare(final Comparable a, final Comparable b) {
                 return a.compareTo(b);
             }
@@ -258,6 +261,7 @@ public class CachePane extends JPanel {
      */
     private final void invokeLaterDelete() {
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 try {
                     FileLock fl = null;
@@ -278,7 +282,9 @@ public class CachePane extends JPanel {
 
                     int row = cacheTable.getSelectedRow();
                     try {
-                        if (fl == null) return;
+                        if (fl == null) {
+                            return;
+                        }
                         int modelRow = cacheTable.convertRowIndexToModel(row);
                         DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
                         if (fileNode.getFile().delete()) {
@@ -305,7 +311,9 @@ public class CachePane extends JPanel {
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, exception);
                 } finally {
                     // If nothing selected then keep deleteButton disabled
-                    if (!cacheTable.getSelectionModel().isSelectionEmpty()) deleteButton.setEnabled(true);
+                    if (!cacheTable.getSelectionModel().isSelectionEmpty()) {
+                        deleteButton.setEnabled(true);
+                    }
                     // Enable buttons
                     refreshButton.setEnabled(true);
                     doneButton.setEnabled(true);
@@ -344,6 +352,7 @@ public class CachePane extends JPanel {
      */
     final void invokeLaterPopulateTable() {
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 try {
                     populateTable();
@@ -378,7 +387,9 @@ public class CachePane extends JPanel {
 
             NonEditableTableModel tableModel;
             (tableModel = (NonEditableTableModel)cacheTable.getModel()).setRowCount(0); //Clears the table
-            for (Object[] v : generateData(root)) tableModel.addRow(v);
+            for (Object[] v : generateData(root)) {
+                tableModel.addRow(v);
+            }
         } catch (Exception exception) {
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, exception);
         } finally {

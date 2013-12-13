@@ -296,7 +296,7 @@ public class ApplicationInstance {
             }
 
             // then stop
-            Thread.currentThread().yield();
+            Thread.yield();
             nthreads = group.enumerate(threads);
             for (int i = 0; i < nthreads; i++) {
                 OutputController.getLogger().log("Stop thread: " + threads[i]);

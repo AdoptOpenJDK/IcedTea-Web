@@ -39,7 +39,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
@@ -96,9 +95,9 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
     private javax.swing.JButton moveRowDownButton;
     private javax.swing.JCheckBox askBeforeActionCheckBox;
     private javax.swing.JCheckBox filterRegexesCheckBox;
-    private javax.swing.JComboBox mainPolicyComboBox;
-    private javax.swing.JComboBox deleteTypeComboBox;
-    private javax.swing.JComboBox viewFilter;
+    private javax.swing.JComboBox<AppletSecurityLevel> mainPolicyComboBox;
+    private javax.swing.JComboBox<String> deleteTypeComboBox;
+    private javax.swing.JComboBox<String> viewFilter;
     private javax.swing.JLabel globalBehaviourLabel;
     private javax.swing.JLabel securityLevelLabel;
     private javax.swing.JScrollPane userTableScrollPane;
@@ -117,7 +116,6 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
     private UnsignedAppletActionTableModel currentModel;
     private String lastDoc;
     private String lastCode;
-    private final UnsignedAppletsTrustingListPanel self;
 
 
     /*
@@ -151,7 +149,6 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
     }
 
     public UnsignedAppletsTrustingListPanel(File globalSettings, File customSettings, DeploymentConfiguration conf) {
-        self = this;
         customBackEnd = new UnsignedAppletActionStorageExtendedImpl(customSettings);
         globalBackEnd = new UnsignedAppletActionStorageExtendedImpl(globalSettings);
         customModel = new UnsignedAppletActionTableModel(customBackEnd);
@@ -252,7 +249,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
         userTable = createTbale(customModel);
         globalTable = createTbale(globalModel);
         helpButton = new javax.swing.JButton();
-        mainPolicyComboBox = new JComboBox(new AppletSecurityLevel[]{
+        mainPolicyComboBox = new JComboBox<AppletSecurityLevel>(new AppletSecurityLevel[]{
                     AppletSecurityLevel.DENY_ALL,
                     AppletSecurityLevel.DENY_UNSIGNED,
                     AppletSecurityLevel.ASK_UNSIGNED,
@@ -261,8 +258,8 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
         mainPolicyComboBox.setSelectedItem(AppletSecurityLevel.getDefault());
         securityLevelLabel = new javax.swing.JLabel();
         globalBehaviourLabel = new javax.swing.JLabel();
-        deleteTypeComboBox = new javax.swing.JComboBox();
-        viewFilter = new javax.swing.JComboBox();
+        deleteTypeComboBox = new javax.swing.JComboBox<String>();
+        viewFilter = new javax.swing.JComboBox<String>();
         deleteButton = new javax.swing.JButton();
         testUrlButton = new javax.swing.JButton();
         addRowButton = new javax.swing.JButton();
@@ -338,7 +335,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
         globalBehaviourLabel.setText(Translator.R("APPEXTSECguiPanelGlobalBehaviourCaption"));
 
-        deleteTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
+        deleteTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{
                     Translator.R("APPEXTSECguiPanelDeleteMenuSelected"),
                     Translator.R("APPEXTSECguiPanelDeleteMenuAllA"),
                     Translator.R("APPEXTSECguiPanelDeleteMenuAllN"),
@@ -346,7 +343,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
                     Translator.R("APPEXTSECguiPanelDeleteMenuAlln"),
                     Translator.R("APPEXTSECguiPanelDeleteMenuAllAll")}));
 
-        viewFilter.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
+        viewFilter.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{
                     Translator.R("APPEXTSECguiPanelShowOnlyPermanent"),
                     Translator.R("APPEXTSECguiPanelShowOnlyTemporal"),
                     Translator.R("APPEXTSECguiPanelShowAll"),
@@ -704,7 +701,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
             public TableCellEditor getCellEditor(int row, int column) {
                 int columnx = convertColumnIndexToModel(column);
                 if (columnx == 0) {
-                    return new DefaultCellEditor(new JComboBox(new ExecuteUnsignedApplet[]{ExecuteUnsignedApplet.ALWAYS, ExecuteUnsignedApplet.NEVER, ExecuteUnsignedApplet.YES, ExecuteUnsignedApplet.NO}));
+                    return new DefaultCellEditor(new JComboBox<ExecuteUnsignedApplet>(new ExecuteUnsignedApplet[]{ExecuteUnsignedApplet.ALWAYS, ExecuteUnsignedApplet.NEVER, ExecuteUnsignedApplet.YES, ExecuteUnsignedApplet.NO}));
                 }
                 if (columnx == 2) {
                     column = convertColumnIndexToModel(column);
@@ -764,7 +761,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
     private void removeByBehaviour(ExecuteUnsignedApplet unsignedAppletAction) {
         UnsignedAppletActionEntry[] items = currentModel.back.toArray();
         if (askBeforeActionCheckBox.isSelected()) {
-            List<UnsignedAppletActionEntry> toBeDeleted = new ArrayList();
+            List<UnsignedAppletActionEntry> toBeDeleted = new ArrayList<UnsignedAppletActionEntry>();
             for (int i = 0; i < items.length; i++) {
                 UnsignedAppletActionEntry unsignedAppletActionEntry = items[i];
                 if (unsignedAppletActionEntry.getUnsignedAppletAction() == unsignedAppletAction) {
@@ -880,7 +877,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
         @Override
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_DELETE && !currentModel.back.isReadOnly()) {
-                removeSelectedFromTable(table, askBeforeActionCheckBox.isSelected(), (UnsignedAppletActionTableModel) table.getModel(), self);
+                removeSelectedFromTable(table, askBeforeActionCheckBox.isSelected(), (UnsignedAppletActionTableModel) table.getModel(), UnsignedAppletsTrustingListPanel.this);
             }
         }
 

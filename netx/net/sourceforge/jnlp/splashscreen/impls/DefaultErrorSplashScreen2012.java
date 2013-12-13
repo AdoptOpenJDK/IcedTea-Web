@@ -46,7 +46,6 @@ import net.sourceforge.jnlp.splashscreen.parts.BasicComponentErrorSplashScreen;
 
 public final class DefaultErrorSplashScreen2012 extends BasicComponentErrorSplashScreen {
 
-    private final DefaultErrorSplashScreen2012 self;
     private final ErrorPainter painter;
     private final DefaultSplashScreens2012Commons commons;
 
@@ -55,22 +54,21 @@ public final class DefaultErrorSplashScreen2012 extends BasicComponentErrorSplas
         //setSplashHeight(height);
         //setSplashWidth(width);
         //to have this in inner classes
-        self = this;
         setLoadingException(ex);
         setSplashReason(splashReason);
-        painter = new ErrorPainter(self, true);
+        painter = new ErrorPainter(this, true);
         addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (((ErrorPainter) painter).getErrorCorner() != null
-                        && e.getX() > ((ErrorPainter) painter).getErrorCorner().x
-                        && e.getY() > ((ErrorPainter) painter).getErrorCorner().y) {
+                if ((painter).getErrorCorner() != null
+                        && e.getX() > (painter).getErrorCorner().x
+                        && e.getY() > (painter).getErrorCorner().y) {
                     raiseExceptionDialog();
                 }
             }
         });
-        commons = new DefaultSplashScreens2012Commons(painter, self);
+        commons = new DefaultSplashScreens2012Commons(painter, this);
     }
 
     @Override

@@ -18,25 +18,19 @@ package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.awt.Frame;
 import java.awt.Window;
-import java.lang.ref.WeakReference;
 import java.net.SocketPermission;
-import java.security.AllPermission;
 import java.security.AccessControlException;
 import java.security.Permission;
-import java.security.SecurityPermission;
 
 import javax.swing.JWindow;
 
-import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AWTSecurityManager;
 import sun.awt.AppContext;
-import sun.security.util.SecurityConstants;
 
 /**
  * Security manager for JNLP environment.  This security manager
@@ -118,8 +112,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
         // not added to any window list when checkTopLevelWindow is
         // called for it (and not disposed).
 
-        if (!JNLPRuntime.isHeadless())
+        if (!JNLPRuntime.isHeadless()) {
             new JWindow().getOwner();
+        }
 
         mainAppContext = AppContext.getAppContext();
     }
@@ -137,12 +132,15 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * true if no exit class is set.
      */
     private boolean isExitClass(Class stack[]) {
-        if (exitClass == null)
+        if (exitClass == null) {
             return true;
+        }
 
-        for (int i = 0; i < stack.length; i++)
-            if (stack[i] == exitClass)
+        for (int i = 0; i < stack.length; i++) {
+            if (stack[i] == exitClass) {
                 return true;
+            }
+        }
 
         return false;
     }
@@ -154,9 +152,10 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * @param exitClass the exit class
      * @throws IllegalStateException if the exit class is already set
      */
-    public void setExitClass(Class exitClass) throws IllegalStateException {
-        if (this.exitClass != null)
+    public void setExitClass(Class<?> exitClass) throws IllegalStateException {
+        if (this.exitClass != null) {
             throw new IllegalStateException(R("RExitTaken"));
+        }
 
         this.exitClass = exitClass;
     }
@@ -181,8 +180,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
                 weakApplications.remove(i);
             }
 
-            if (w == window)
+            if (w == window) {
                 return weakApplications.get(i);
+            }
         }
 
         return null;
@@ -204,8 +204,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
             cl = cl.getParent();
         }
 
-        if (maxDepth <= 0)
+        if (maxDepth <= 0) {
             maxDepth = stack.length;
+        }
 
         // this needs to be tightened up
         for (int i = 0; i < stack.length && i < maxDepth; i++) {
@@ -230,8 +231,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
     private JNLPClassLoader getJnlpClassLoader(ClassLoader cl) {
         // Since we want to deal with JNLPClassLoader, extract it if this
         // is a codebase loader
-        if (cl instanceof JNLPClassLoader.CodeBaseClassLoader)
+        if (cl instanceof JNLPClassLoader.CodeBaseClassLoader) {
             cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
+        }
 
         if (cl instanceof JNLPClassLoader) {
             JNLPClassLoader loader = (JNLPClassLoader) cl;
@@ -245,10 +247,12 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * Returns the application's thread group if the application can
      * be determined; otherwise returns super.getThreadGroup()
      */
+    @Override
     public ThreadGroup getThreadGroup() {
         ApplicationInstance app = getApplication();
-        if (app == null)
+        if (app == null) {
             return super.getThreadGroup();
+        }
 
         return app.getThreadGroup();
     }
@@ -258,6 +262,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * otherwise return normally.  This method always denies
      * permission to change the security manager or policy.
      */
+    @Override
     public void checkPermission(Permission perm) {
         String name = perm.getName();
 
@@ -267,8 +272,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
         //        OutputController.getLogger().log("Checking permission: " + perm.toString());
 
         if (!JNLPRuntime.isWebstartApplication() &&
-                ("setPolicy".equals(name) || "setSecurityManager".equals(name)))
+                ("setPolicy".equals(name) || "setSecurityManager".equals(name))) {
             throw new SecurityException(R("RCantReplaceSM"));
+        }
 
         try {
             // deny all permissions to stopped applications
@@ -337,6 +343,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * warning banner, and adds the window to the list of windows to
      * be disposed when the calling application exits.
      */
+    @Override
     public boolean checkTopLevelWindow(Object window) {
         ApplicationInstance app = getApplication();
 
@@ -371,22 +378,26 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * Calls not from Runtime.exit or with no exit class set will
      * behave normally, and the exit class can always exit the JVM.
      */
+    @Override
     public void checkExit(int status) {
 
         // applets are not allowed to exit, but the plugin main class (primordial loader) is
         Class stack[] = getClassContext();
         if (!exitAllowed) {
-            for (int i = 0; i < stack.length; i++)
-                if (stack[i].getClassLoader() != null)
+            for (int i = 0; i < stack.length; i++) {
+                if (stack[i].getClassLoader() != null) {
                     throw new AccessControlException("Applets may not call System.exit()");
+                }
+            }
         }
 
         super.checkExit(status);
 
         boolean realCall = (stack[1] == Runtime.class);
 
-        if (isExitClass(stack)) // either exitClass called or no exitClass set
-            return; // to Runtime.exit or fake call to see if app has permission
+        if (isExitClass(stack)) {
+            return;
+        } // to Runtime.exit or fake call to see if app has permission
 
         // not called from Runtime.exit()
         if (!realCall) {
@@ -446,6 +457,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * @exception  SecurityException  if the caller does not have
      *             permission to accesss the AWT event queue.
      */
+    @Override
     public void checkAwtEventQueueAccess() {
         /*
          * this is the templace of the code that should allow applets access to

@@ -108,7 +108,7 @@ public class CertificatePane extends JPanel {
     JTabbedPane tabbedPane;
     private final JTable userTable;
     private final JTable systemTable;
-    private JComboBox certificateTypeCombo;
+    private JComboBox<CertificateType> certificateTypeCombo;
     private KeyStores.Type currentKeyStoreType;
     private KeyStores.Level currentKeyStoreLevel;
 
@@ -156,7 +156,7 @@ public class CertificatePane extends JPanel {
     }
 
     //create the GUI here.
-    protected void addComponents() {
+    private void addComponents() {
 
         JPanel main = new JPanel(new BorderLayout());
 
@@ -165,7 +165,7 @@ public class CertificatePane extends JPanel {
 
         JLabel certificateTypeLabel = new JLabel(R("CVCertificateType"));
 
-        certificateTypeCombo = new JComboBox(certificateTypes);
+        certificateTypeCombo = new JComboBox<CertificateType>(certificateTypes);
         certificateTypeCombo.addActionListener(new CertificateTypeListener());
 
         certificateTypePanel.add(certificateTypeLabel, BorderLayout.LINE_START);
@@ -264,8 +264,9 @@ public class CertificatePane extends JPanel {
             aliases = keyStore.aliases();
             while (aliases.hasMoreElements()) {
                 Certificate c = keyStore.getCertificate(aliases.nextElement());
-                if (c instanceof X509Certificate)
+                if (c instanceof X509Certificate) {
                     certs.add((X509Certificate) c);
+                }
             }
 
             //get the publisher and root information
@@ -310,10 +311,12 @@ public class CertificatePane extends JPanel {
                                 new Object[]{label, jpf},  R("CVPasswordTitle"),
                                 JOptionPane.OK_CANCEL_OPTION,
                                 JOptionPane.INFORMATION_MESSAGE);
-        if (result == JOptionPane.OK_OPTION)
+        if (result == JOptionPane.OK_OPTION) {
             return jpf.getPassword();
-        else
+        }
+        else {
             return null;
+        }
     }
 
     /** Allows storing KeyStores.Types in a JComponent */
@@ -328,6 +331,7 @@ public class CertificatePane extends JPanel {
             return type;
         }
 
+        @Override
         public String toString() {
             return KeyStores.toDisplayableString(null, type);
         }
@@ -336,8 +340,9 @@ public class CertificatePane extends JPanel {
     /** Invoked when a user selects a different certificate type */
     private class CertificateTypeListener implements ActionListener {
         @Override
+        @SuppressWarnings("unchecked")//this is just certificateTypeCombo, nothing else
         public void actionPerformed(ActionEvent e) {
-            JComboBox source = (JComboBox) e.getSource();
+            JComboBox<CertificateType> source = (JComboBox<CertificateType>) e.getSource();
             CertificateType type = (CertificateType) source.getSelectedItem();
             currentKeyStoreType = type.getType();
             repopulateTables();
@@ -372,6 +377,7 @@ public class CertificatePane extends JPanel {
     }
 
     private class ImportButtonListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
 
             JFileChooser chooser = new JFileChooser();
@@ -412,9 +418,10 @@ public class CertificatePane extends JPanel {
     }
 
     private class ExportButtonListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
 
-            JTable table = null;
+            final JTable table ;
             if (currentKeyStoreLevel == Level.USER) {
                 table = userTable;
             } else {
@@ -435,8 +442,9 @@ public class CertificatePane extends JPanel {
                         if (alias != null) {
                             if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
                                 char[] password = getPassword(R("CVExportPasswordMessage"));
-                                if (password != null)
+                                if (password != null) {
                                     CertificateUtils.dumpPKCS12(alias, chooser.getSelectedFile(), keyStore, password);
+                                }
                             } else {
                                 Certificate c = keyStore.getCertificate(alias);
                                 PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
@@ -457,9 +465,10 @@ public class CertificatePane extends JPanel {
         /**
          * Removes a certificate from the keyStore and writes changes to disk.
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
 
-            JTable table = null;
+            final JTable table;
             if (currentKeyStoreLevel == Level.USER) {
                 table = userTable;
             } else {
@@ -502,9 +511,10 @@ public class CertificatePane extends JPanel {
         /**
          * Shows the details of a trusted certificate.
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
 
-            JTable table = null;
+            final JTable table;
             if (currentKeyStoreLevel == Level.USER) {
                 table = userTable;
             } else {

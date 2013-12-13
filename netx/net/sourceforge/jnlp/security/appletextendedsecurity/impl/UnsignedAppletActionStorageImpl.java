@@ -151,7 +151,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     public List<UnsignedAppletActionEntry> getMatchingItems(String documentBase, String codeBase, List<String> archives) {
-        List<UnsignedAppletActionEntry> result = new ArrayList();
+        List<UnsignedAppletActionEntry> result = new ArrayList<UnsignedAppletActionEntry>();
         lock();
         try {
             readContents();
