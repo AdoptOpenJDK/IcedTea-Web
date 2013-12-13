@@ -291,7 +291,7 @@ public class ControlPanel extends JFrame {
             settingsPanel.add(p, panel.toString());
         }
 
-        final JList<SettingsPanel> settingsList = new JList<SettingsPanel>(panels);
+        final JList settingsList = new JList(panels);
         settingsList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {

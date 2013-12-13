@@ -1,5 +1,16 @@
 2013-12-13  Jiri Vanek  <jvanek@redhat.com>
 
+	Made again compatible with JDK6.All JLists, JComboBoxs, and DefaultComboBoxModels
+	moved back to be not generics-like
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+
+2013-12-13  Jiri Vanek  <jvanek@redhat.com>
+
 	itw itself warning cleanup: fixed rawtypes and  unchecks, added braces and  Override
 	* netx/net/sourceforge/jnlp/JREDesc.java
 	* netx/net/sourceforge/jnlp/Launcher.java

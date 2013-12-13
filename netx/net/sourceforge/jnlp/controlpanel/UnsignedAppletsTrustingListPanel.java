@@ -95,9 +95,9 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
     private javax.swing.JButton moveRowDownButton;
     private javax.swing.JCheckBox askBeforeActionCheckBox;
     private javax.swing.JCheckBox filterRegexesCheckBox;
-    private javax.swing.JComboBox<AppletSecurityLevel> mainPolicyComboBox;
-    private javax.swing.JComboBox<String> deleteTypeComboBox;
-    private javax.swing.JComboBox<String> viewFilter;
+    private javax.swing.JComboBox mainPolicyComboBox;
+    private javax.swing.JComboBox deleteTypeComboBox;
+    private javax.swing.JComboBox viewFilter;
     private javax.swing.JLabel globalBehaviourLabel;
     private javax.swing.JLabel securityLevelLabel;
     private javax.swing.JScrollPane userTableScrollPane;
@@ -249,7 +249,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
         userTable = createTbale(customModel);
         globalTable = createTbale(globalModel);
         helpButton = new javax.swing.JButton();
-        mainPolicyComboBox = new JComboBox<AppletSecurityLevel>(new AppletSecurityLevel[]{
+        mainPolicyComboBox = new JComboBox(new AppletSecurityLevel[]{
                     AppletSecurityLevel.DENY_ALL,
                     AppletSecurityLevel.DENY_UNSIGNED,
                     AppletSecurityLevel.ASK_UNSIGNED,
@@ -258,8 +258,8 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
         mainPolicyComboBox.setSelectedItem(AppletSecurityLevel.getDefault());
         securityLevelLabel = new javax.swing.JLabel();
         globalBehaviourLabel = new javax.swing.JLabel();
-        deleteTypeComboBox = new javax.swing.JComboBox<String>();
-        viewFilter = new javax.swing.JComboBox<String>();
+        deleteTypeComboBox = new javax.swing.JComboBox();
+        viewFilter = new javax.swing.JComboBox();
         deleteButton = new javax.swing.JButton();
         testUrlButton = new javax.swing.JButton();
         addRowButton = new javax.swing.JButton();
@@ -335,7 +335,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
         globalBehaviourLabel.setText(Translator.R("APPEXTSECguiPanelGlobalBehaviourCaption"));
 
-        deleteTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{
+        deleteTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
                     Translator.R("APPEXTSECguiPanelDeleteMenuSelected"),
                     Translator.R("APPEXTSECguiPanelDeleteMenuAllA"),
                     Translator.R("APPEXTSECguiPanelDeleteMenuAllN"),
@@ -343,7 +343,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
                     Translator.R("APPEXTSECguiPanelDeleteMenuAlln"),
                     Translator.R("APPEXTSECguiPanelDeleteMenuAllAll")}));
 
-        viewFilter.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{
+        viewFilter.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
                     Translator.R("APPEXTSECguiPanelShowOnlyPermanent"),
                     Translator.R("APPEXTSECguiPanelShowOnlyTemporal"),
                     Translator.R("APPEXTSECguiPanelShowAll"),
@@ -701,7 +701,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
             public TableCellEditor getCellEditor(int row, int column) {
                 int columnx = convertColumnIndexToModel(column);
                 if (columnx == 0) {
-                    return new DefaultCellEditor(new JComboBox<ExecuteUnsignedApplet>(new ExecuteUnsignedApplet[]{ExecuteUnsignedApplet.ALWAYS, ExecuteUnsignedApplet.NEVER, ExecuteUnsignedApplet.YES, ExecuteUnsignedApplet.NO}));
+                    return new DefaultCellEditor(new JComboBox(new ExecuteUnsignedApplet[]{ExecuteUnsignedApplet.ALWAYS, ExecuteUnsignedApplet.NEVER, ExecuteUnsignedApplet.YES, ExecuteUnsignedApplet.NO}));
                 }
                 if (columnx == 2) {
                     column = convertColumnIndexToModel(column);

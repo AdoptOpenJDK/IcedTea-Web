@@ -139,7 +139,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
                 new ComboItem(Translator.R("DPShowJavawsOnly"), DeploymentConfiguration.CONSOLE_SHOW_JAVAWS) };
 
         JLabel consoleLabel = new JLabel(Translator.R("DPJavaConsole"));
-        JComboBox<ComboItem> consoleComboBox = new JComboBox<ComboItem>();
+        JComboBox consoleComboBox = new JComboBox();
         consoleComboBox.setActionCommand(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE); // The property this comboBox affects.
 
         JPanel consolePanel = new JPanel();
@@ -210,7 +210,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             JCheckBox jcb = (JCheckBox) o;
             config.setProperty(jcb.getActionCommand(), String.valueOf(jcb.isSelected()));
         } else if (o instanceof JComboBox) {
-            JComboBox<ComboItem>  jcb = (JComboBox) o;
+            JComboBox jcb = (JComboBox) o;
             ComboItem c = (ComboItem) e.getItem();
             config.setProperty(jcb.getActionCommand(), c.getValue());
         }

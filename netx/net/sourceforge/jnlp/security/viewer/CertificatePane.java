@@ -108,7 +108,7 @@ public class CertificatePane extends JPanel {
     JTabbedPane tabbedPane;
     private final JTable userTable;
     private final JTable systemTable;
-    private JComboBox<CertificateType> certificateTypeCombo;
+    private JComboBox certificateTypeCombo;
     private KeyStores.Type currentKeyStoreType;
     private KeyStores.Level currentKeyStoreLevel;
 
@@ -165,7 +165,7 @@ public class CertificatePane extends JPanel {
 
         JLabel certificateTypeLabel = new JLabel(R("CVCertificateType"));
 
-        certificateTypeCombo = new JComboBox<CertificateType>(certificateTypes);
+        certificateTypeCombo = new JComboBox(certificateTypes);
         certificateTypeCombo.addActionListener(new CertificateTypeListener());
 
         certificateTypePanel.add(certificateTypeLabel, BorderLayout.LINE_START);
@@ -342,7 +342,7 @@ public class CertificatePane extends JPanel {
         @Override
         @SuppressWarnings("unchecked")//this is just certificateTypeCombo, nothing else
         public void actionPerformed(ActionEvent e) {
-            JComboBox<CertificateType> source = (JComboBox<CertificateType>) e.getSource();
+            JComboBox source = (JComboBox) e.getSource();
             CertificateType type = (CertificateType) source.getSelectedItem();
             currentKeyStoreType = type.getType();
             repopulateTables();

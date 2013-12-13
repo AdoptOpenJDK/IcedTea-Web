@@ -62,7 +62,7 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
     private void addComponents() {
         GridBagConstraints c = new GridBagConstraints();
         JLabel description = new JLabel("<html>" + Translator.R("CPDesktopIntegrationDescription") + "<hr /></html>");
-        JComboBox<ComboItem> shortcutComboOptions = new JComboBox<ComboItem>();
+        JComboBox shortcutComboOptions = new JComboBox();
         ComboItem[] items = { new ComboItem(Translator.R("DSPNeverCreate"), "NEVER"),
                 new ComboItem(Translator.R("DSPAlwaysAllow"), "ALWAYS"),
                 new ComboItem(Translator.R("DSPAskUser"), "ASK_USER"),
