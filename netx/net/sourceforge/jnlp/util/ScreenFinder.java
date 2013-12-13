@@ -39,12 +39,14 @@ package net.sourceforge.jnlp.util;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class ScreenFinder {
 
@@ -54,8 +56,13 @@ public class ScreenFinder {
 
     }
     public static Rectangle  getCurrentScreenSizeWithoutBounds() {
-        Point p = MouseInfo.getPointerInfo().getLocation();
-        return getScreenOnCoordsWithutBounds(p);
+        try {
+            Point p = MouseInfo.getPointerInfo().getLocation();
+            return getScreenOnCoordsWithoutBounds(p);
+        } catch (HeadlessException ex) {
+            OutputController.getLogger().log(ex);
+            return new Rectangle(800, 600);
+        }
 
     }
 
@@ -89,11 +96,16 @@ public class ScreenFinder {
         return result;
     }
 
-    public static Rectangle getScreenOnCoordsWithutBounds(Point p) {
-        GraphicsDevice device = getScreenOnCoords(p);
-        Rectangle screenSize = device.getDefaultConfiguration().getBounds();
-        Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(device.getDefaultConfiguration());
-        return new Rectangle((int)screenSize.getX()+insets.left, (int)screenSize.getY()+insets.top, (int)screenSize.getWidth()-insets.left, (int)screenSize.getHeight()-insets.bottom);
+    public static Rectangle getScreenOnCoordsWithoutBounds(Point p) {
+        try {
+            GraphicsDevice device = getScreenOnCoords(p);
+            Rectangle screenSize = device.getDefaultConfiguration().getBounds();
+            Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(device.getDefaultConfiguration());
+            return new Rectangle((int) screenSize.getX() + insets.left, (int) screenSize.getY() + insets.top, (int) screenSize.getWidth() - insets.left, (int) screenSize.getHeight() - insets.bottom);
+        } catch (HeadlessException ex) {
+            OutputController.getLogger().log(ex);
+            return new Rectangle(800, 600);
+        }
     }
 
 

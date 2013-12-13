@@ -59,10 +59,11 @@ public class SplashUtilsTest {
         Assert.assertEquals(SplashUtils.SplashReason.JAVAWS, p2.getSplashReason());
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, String> getEnvironment() throws Exception {
-        Class[] classes = Collections.class.getDeclaredClasses();
+        Class<?>[] classes = Collections.class.getDeclaredClasses();
         Map<String, String> env = System.getenv();
-        for (Class cl : classes) {
+        for (Class<?> cl : classes) {
             if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
                 Field field = cl.getDeclaredField("m");
                 field.setAccessible(true);
@@ -74,10 +75,11 @@ public class SplashUtilsTest {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static void fakeEnvironment(Map<String, String> newenv) throws Exception {
-        Class[] classes = Collections.class.getDeclaredClasses();
+        Class<?>[] classes = Collections.class.getDeclaredClasses();
         Map<String, String> env = System.getenv();
-        for (Class cl : classes) {
+        for (Class<?> cl : classes) {
             if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
                 Field field = cl.getDeclaredField("m");
                 field.setAccessible(true);
@@ -91,8 +93,8 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen1() throws Exception {
-        Map fake1 = new HashMap();
-        Map original = getEnvironment();
+        Map<String,String> fake1 = new HashMap<String,String>();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -112,10 +114,10 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen2() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -134,10 +136,10 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen3() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -156,10 +158,10 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen4() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -178,10 +180,10 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen5() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -197,10 +199,10 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen6() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -219,9 +221,9 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen7() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, "egtrutkyukl");
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);

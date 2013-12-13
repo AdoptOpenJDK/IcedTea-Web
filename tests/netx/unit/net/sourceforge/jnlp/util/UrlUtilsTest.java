@@ -42,8 +42,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Test;
@@ -134,7 +132,7 @@ public class UrlUtilsTest {
 
         for (String testPath : testPaths) {
             File testFile = new File(testPath);
-            URL notEncodedUrl = testFile.toURL();
+            URL notEncodedUrl = testFile.toURI().toURL();
             URL encodedUrl = testFile.toURI().toURL();
             assertEquals(testFile, UrlUtils.decodeUrlAsFile(notEncodedUrl));
             assertEquals(testFile, UrlUtils.decodeUrlAsFile(encodedUrl));

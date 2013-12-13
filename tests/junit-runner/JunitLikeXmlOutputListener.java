@@ -80,7 +80,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
 
     private class ClassStat {
 
-        Class c;
+        Class<?> c;
         int total;
         int failed;
         int passed;
@@ -178,8 +178,9 @@ public class JunitLikeXmlOutputListener extends RunListener {
     }
     
 
+    @SuppressWarnings("unchecked")
     private void testDone(Description description, long testTime, double testTimeSeconds, boolean ignored) throws Exception {
-        Class testClass = null;
+        Class<?> testClass = null;
         Method testMethod = null;
         try {
             testClass = description.getTestClass();
@@ -305,6 +306,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void testRunFinished(Result result) throws Exception {
 
         writeElement(SOUT_ELEMENT, "@sout@");
@@ -335,7 +337,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
             try {
                 Bug b = null;
                 if (entry.getValue().c != null) {
-                    b = (Bug) entry.getValue().c.getAnnotation(Bug.class);
+                    b = entry.getValue().c.getAnnotation(Bug.class);
                 }
                 if (b != null) {
                     openElement(BUGS);

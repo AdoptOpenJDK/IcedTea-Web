@@ -42,7 +42,7 @@ import java.util.List;
 
 public class RulesFolowingClosingListener extends CountingClosingListener {
 
-    private List<Rule> rules = new ArrayList<Rule>();
+    private List<Rule<?,String>> rules = new ArrayList<Rule<?,String>>();
 
     public static class ContainsRule extends StringRule<String> {
 
@@ -176,19 +176,19 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
     public RulesFolowingClosingListener() {
     }
 
-    public RulesFolowingClosingListener(List<Rule> l) {
+    public RulesFolowingClosingListener(List<Rule<?,String>> l) {
         addRules(l);
     }
 
-    public RulesFolowingClosingListener(Rule... l) {
+    public RulesFolowingClosingListener(Rule<?,String>... l) {
         addRules(l);
     }
 
-    public List<Rule> getRules() {
+    public List<Rule<?,String>> getRules() {
         return rules;
     }
 
-    public void setRules(List<Rule> rules) {
+    public void setRules(List<Rule<?,String>> rules) {
         if (rules == null) {
             throw new NullPointerException("rules cant be null");
         }
@@ -199,14 +199,14 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
      * no more rules will be possible to add by doing this
      * @param rules
      */
-    public void setRules(Rule[] rules) {
+    public void setRules(Rule<?,String>[] rules) {
         if (rules == null) {
             throw new NullPointerException("rules cant be null");
         }
         this.rules = Arrays.asList(rules);
     }
 
-     public RulesFolowingClosingListener addRules(List<Rule> rules) {
+     final public RulesFolowingClosingListener addRules(List<Rule<?,String>> rules) {
         if (rules == null) {
             throw new NullPointerException("rules cant be null");
         }
@@ -214,7 +214,7 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
         return this;
     }
 
-    public RulesFolowingClosingListener addRules(Rule... rules) {
+    final public RulesFolowingClosingListener addRules(Rule<?,String>... rules) {
         if (rules == null) {
             throw new NullPointerException("rules cant be null");
         }
@@ -227,7 +227,7 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
         if (rules == null || rules.size() < 1) {
             throw new IllegalStateException("No rules specified");
         }
-        for (Rule rule : rules) {
+        for (Rule<?,String> rule : rules) {
             if (!rule.evaluate(content)) {
                 return false;
             }

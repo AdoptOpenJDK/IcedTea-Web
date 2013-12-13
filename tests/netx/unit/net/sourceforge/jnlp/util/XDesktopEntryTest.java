@@ -84,7 +84,7 @@ public class XDesktopEntryTest {
             backupedEnv = null;
         } else {
             backupedEnv = env;
-            Map m = new HashMap(env);
+            Map<String,String> m = new HashMap<String,String>(env);
             m.put(HOME, System.getProperty("user.home"));
             fakeEnvironment(m);
             ServerAccess.logOutputReprint("Hacked environment");
@@ -102,7 +102,7 @@ public class XDesktopEntryTest {
         }
     }
 
-    private static void fakeEnvironment(Map m) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+    private static void fakeEnvironment(Map<String,String> m) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
         Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
         Field env = processEnvironmentClass.getDeclaredField("theUnmodifiableEnvironment");
         env.setAccessible(true);

@@ -779,9 +779,9 @@ public class ServerAccess {
             }
             //probablky it is necessary to get out of net.sourceforge.jnlp.
             //package where are right now all test-extensions
-            //for now keeping exactly the three clases helping yo  acces the log
+            //for now keeping exactly the three classes helping you  access the log
             try {
-                Class clazz = Class.forName(stack[i].getClassName());
+                Class<?> clazz = Class.forName(stack[i].getClassName());
                 String path = null;
                 try {
                     path = clazz.getProtectionDomain().getCodeSource().getLocation().getPath();

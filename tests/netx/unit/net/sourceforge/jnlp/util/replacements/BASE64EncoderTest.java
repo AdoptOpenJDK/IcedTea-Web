@@ -108,7 +108,7 @@ public class BASE64EncoderTest {
 
     private static Object createInsatnce(String ofCalss) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-        Class classDefinition = Class.forName(ofCalss);
+        Class<?> classDefinition = Class.forName(ofCalss);
         return classDefinition.newInstance();
 
     }

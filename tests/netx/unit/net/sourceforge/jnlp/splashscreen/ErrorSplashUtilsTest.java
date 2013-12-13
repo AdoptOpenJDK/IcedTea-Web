@@ -44,11 +44,11 @@ import org.junit.Test;
 
 public class ErrorSplashUtilsTest {
 
-    private void fakeEnvironment(Map original) throws Exception {
+    private void fakeEnvironment(Map<String,String> original) throws Exception {
         SplashUtilsTest.fakeEnvironment(original);
     }
 
-    private Map getEnvironment() throws Exception {
+    private Map<String,String> getEnvironment() throws Exception {
         return SplashUtilsTest.getEnvironment();
     }
 
@@ -64,8 +64,8 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testgetErrorSplashScreen1() throws Exception {
-        Map fake1 = new HashMap();
-        Map original = getEnvironment();
+        Map<String,String> fake1 = new HashMap<String,String>();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -85,10 +85,10 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testgetErrorSplashScreen2() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -107,10 +107,10 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testgetErrorSplashScreen3() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -129,10 +129,10 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testgetErrorSplashScreen4() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -151,10 +151,10 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testgetErrorSplashScreen5() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -170,10 +170,10 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testgetErrorSplashScreen6() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
         fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);
@@ -192,9 +192,9 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testgetErrorSplashScreen7() throws Exception {
-        Map fake1 = new HashMap();
+        Map<String,String> fake1 = new HashMap<String,String>();
         fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, "egtrutkyukl");
-        Map original = getEnvironment();
+        Map<String,String> original = getEnvironment();
         Assert.assertNotNull(original);
         try {
             fakeEnvironment(fake1);

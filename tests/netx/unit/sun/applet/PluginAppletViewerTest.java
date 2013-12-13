@@ -42,10 +42,7 @@ import static org.junit.Assert.assertEquals;
 import static sun.applet.PluginPipeMockUtil.getPluginStoreId;
 import static sun.applet.PluginPipeMockUtil.getPluginStoreObject;
 
-import java.net.URI;
 import java.util.concurrent.Callable;
-
-import junit.framework.Assert;
 
 import net.sourceforge.jnlp.AsyncCall;
 import net.sourceforge.jnlp.ServerAccess;

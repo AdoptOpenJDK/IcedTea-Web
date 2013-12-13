@@ -164,7 +164,7 @@ public class LoggingBottleneck {
 
    synchronized public String modifyMethodWithForBrowser(String methodBrowseredName, String className) {
         try {
-            Class clazz = Class.forName(className);
+            Class<?> clazz = Class.forName(className);
             /*
              * By using this isAssignable to ensure corect class before invocation,
              * then we lost possibility to track manualy set browsers, but it is correct,

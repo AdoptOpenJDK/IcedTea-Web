@@ -118,9 +118,8 @@ public class ThreadedProcess extends Thread {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            return commandLine;
         }
+        return commandLine;
     }
 
     public Process getP() {

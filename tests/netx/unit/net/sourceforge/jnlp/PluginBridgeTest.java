@@ -32,10 +32,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Hashtable;
 import java.util.List;
-import junit.framework.Assert;
 
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
+import org.junit.Assert;
 
 import org.junit.Test;
 

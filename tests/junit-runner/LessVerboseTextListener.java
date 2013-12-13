@@ -114,11 +114,12 @@ public class LessVerboseTextListener extends RunListener {
         }
     }
 
-  
-    public static <T extends Annotation> T getAnnotation(Class q, String methodName, Class<T> a) {
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Annotation> T getAnnotation(Class<?> q, String methodName, Class<T> a) {
         try {
             if (q != null) {
-                T rem = (T) q.getAnnotation(a);
+                T rem = q.getAnnotation(a);
                 if (rem != null) {
                     return rem;
                 }
@@ -140,11 +141,11 @@ public class LessVerboseTextListener extends RunListener {
     }
 
     public static KnownToFail getK2F(Description description) {
-        return (KnownToFail) getAnnotation(description.getTestClass(), description.getMethodName(), KnownToFail.class);
+        return getAnnotation(description.getTestClass(), description.getMethodName(), KnownToFail.class);
     }
 
     public static Remote getRemote(Description description) {
-        return (Remote) getAnnotation(description.getTestClass(), description.getMethodName(), Remote.class);
+        return getAnnotation(description.getTestClass(), description.getMethodName(), Remote.class);
 
     }
 

@@ -1,3 +1,27 @@
+2013-12-13  Jiri Vanek  <jvanek@redhat.com>
+
+	unittests warning cleanup: fixed typechecks, rawtypes, redundant casts...
+	* tests/junit-runner/CommandLine.java
+	* tests/junit-runner/JunitLikeXmlOutputListener.java
+	* tests/junit-runner/LessVerboseTextListener.java
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/ErrorSplashUtilsTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/SplashUtilsTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/parts/DescriptionInfoItemTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/util/XDesktopEntryTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64EncoderTest.java
+	* tests/netx/unit/sun/applet/PluginAppletViewerTest.java
+	* tests/test-extensions/net/sourceforge/jnlp/LoggingBottleneck.java
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java
+	* tests/test-extensions/net/sourceforge/jnlp/ThreadedProcess.java
+	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java
+	* tests/test-extensions/net/sourceforge/jnlp/awt/awtactions/KeyboardActions.java
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/RulesFolowingClosingListener.java
+	* netx/net/sourceforge/jnlp/util/ScreenFinder.java: centering of screen
+	fixed to work also in headless mode by returrning some defaults
+
 2013-12-09  Jiri Vanek  <jvanek@redhat.com>
 
 	* Messages.properties: added "It will be granted unrestricted access to your computer."

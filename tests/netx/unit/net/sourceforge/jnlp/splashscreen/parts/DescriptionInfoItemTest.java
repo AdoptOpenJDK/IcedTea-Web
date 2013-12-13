@@ -36,8 +36,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.parts;
 
-import junit.framework.Assert;
 import net.sourceforge.jnlp.ServerAccess;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DescriptionInfoItemTest {

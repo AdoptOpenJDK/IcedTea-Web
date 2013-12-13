@@ -175,7 +175,7 @@ public class MessagesPropertiesTest {
                 allLog("Checking for same items between " + resourceBundle1.getLocale() + " x " + resourceBundle2.getLocale() + " (should be " + resourceBundle1.getIdentifier() + " x " + resourceBundle2.getIdentifier() + ")");
                 int localErrors=0;
                 while (keys1.hasMoreElements()) {
-                    String key = (String) keys1.nextElement();
+                    String key = keys1.nextElement();
                     String val1 = getMissingResourceAsEmpty(resourceBundle1.getBundle(), key);
                     String val2 = getMissingResourceAsEmpty(resourceBundle2.getBundle(), key);
                     outLog("\""+val1+"\" x \""+val2);
@@ -222,7 +222,7 @@ public class MessagesPropertiesTest {
             String id = secondary[i].getIdentifier();
             allLog("Checking for missing  strings in " + sec.getLocale() + " (should be " + id + ") compared with default");
             while (keys.hasMoreElements()) {
-                String key = (String) keys.nextElement();
+                String key = keys.nextElement();
                 String val1 = getMissingResourceAsEmpty(main.getBundle(), key);
                 String val2 = getMissingResourceAsEmpty(sec, key);
                 outLog("\""+val1+"\" x \""+val2);
@@ -257,7 +257,7 @@ public class MessagesPropertiesTest {
                 allLog("Checking for empty items in " + resourceBundle.getLocale() + "  (should be " + id + ")");
                 int localErrors=0;
                 while (keys.hasMoreElements()) {
-                    String key = (String) keys.nextElement();
+                    String key = keys.nextElement();
                     String val = getMissingResourceAsEmpty(resourceBundle, key);
                     outLog("\""+key+"\" = \""+val);
                         if (val.trim().isEmpty()) {
@@ -285,7 +285,7 @@ public class MessagesPropertiesTest {
             outLog("Checking for redundant keys in " + sec.getLocale() + " (should be " + id + ") compared with default");
             errLog("Checking for redundant keys in " + sec.getLocale() + " (should be " + id + ") compared with default");
             while (keys.hasMoreElements()) {
-                String key = (String) keys.nextElement();
+                String key = keys.nextElement();
                 String val2 = getMissingResourceAsEmpty(main.getBundle(), key);
                 String val1 = getMissingResourceAsEmpty(sec, key);
                 outLog("\""+val1+"\" x \""+val2);

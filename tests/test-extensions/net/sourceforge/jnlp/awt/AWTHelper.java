@@ -42,7 +42,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
-import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -239,18 +238,18 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * 
      * @return
      */
-    public Rule getInitStrAsRule(){
+    public Rule<String, String> getInitStrAsRule(){
     	if( initStr != null ){
             return new ContainsRule(this.initStr);
     	}else{
-    		return new Rule(){
+    		return new Rule<String, String>(){
 
 				@Override
-				public void setRule(Object rule) {
+				public void setRule(String rule) {
 				}
 
 				@Override
-				public boolean evaluate(Object upon) {
+				public boolean evaluate(String upon) {
 					return true;
 				}
 

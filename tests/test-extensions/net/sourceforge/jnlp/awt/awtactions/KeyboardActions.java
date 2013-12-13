@@ -98,9 +98,9 @@ public class KeyboardActions {
         int key;
         
         if( ('0' <= ch) && ('9' >= ch) ){
-            key = (int)(ch - '0') + KeyEvent.VK_0; 
+            key = (ch - '0') + KeyEvent.VK_0; 
         }else if( ( 'a' <= ch) && ('z' >= ch) ){
-            key = (int)(ch - 'a') + KeyEvent.VK_A;
+            key = (ch - 'a') + KeyEvent.VK_A;
         }else{
             key = KeyEvent.VK_SPACE;
         }
