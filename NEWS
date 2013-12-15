@@ -26,6 +26,7 @@ New in release 1.5 (2013-XX-XX):
   - PR1026 - Apps fail to run because of the nanoxml parser's strict XML validation
   - PR1473 - javaws should not depend on name of local file
   - Redesigned About dialogue layout and contents
+  - Console made aware of plugin messages
 * Plugin
   - PR854: Resizing an applet several times causes 100% CPU load
   - PR1271: icedtea-web does not handle 'javascript:'-protocol URLs

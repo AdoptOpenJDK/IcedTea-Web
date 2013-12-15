@@ -84,6 +84,7 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
+import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -119,16 +120,30 @@ public class PluginMain {
      */
     public static void main(String args[])
             throws IOException {
+        //we are polite, we reprint start arguments
+        OutputController.getLogger().log("startup arguments: ");
+        for (int i = 0; i < args.length; i++) {
+            String string = args[i];
+            OutputController.getLogger().log(i + ": "+string);
+            
+        }
         if (AppContext.getAppContext() == null) {
             SunToolkit.createNewAppContext();
         }
         installDummyJavascriptProtocolHandler();
 
-        if (args.length != 2 || !(new File(args[0]).exists()) || !(new File(args[1]).exists())) {
+        if (args.length < 2 || !(new File(args[0]).exists()) || !(new File(args[1]).exists())) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Invalid pipe names provided. Refusing to proceed.");
             JNLPRuntime.exit(1);
         }
         DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
+        if (JavaConsole.isEnabled()) {
+            if ((args.length < 3) || !new File(args[2]).exists()) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Warning, although console is on, plugin debug connection do not exists. No plugin information will be displayed in console (only java ones).");
+            } else {
+                JavaConsole.getConsole().createPluginReader(new File(args[2]));
+            }
+        }
         try {
             PluginStreamHandler streamHandler = connect(args[0], args[1]);
 

@@ -58,12 +58,16 @@ exception statement from your version. */
 #include <sstream>
 #include <string>
 #include <vector>
+#include <queue>
 
 #include <npapi.h>
 #include <glib.h>
 #include <npruntime.h>
 
 #include "IcedTeaParseProperties.h"
+
+void *flush_pre_init_messages(void* data);
+void push_pre_init_messages(char * ldm);
 
 // debugging macro.
 #define initialize_debug()                                                    \
@@ -81,7 +85,7 @@ exception statement from your version. */
            IcedTeaPluginUtilities::initFileLog();                             \
       }                                                                       \
       if (plugin_debug_to_console) {                                          \
-          /*no op now*/                                                       \
+          /*initialisation done during jvm startup*/                          \
       }                                                                       \
       IcedTeaPluginUtilities::printDebugStatus();                             \
     }                                                                         \
@@ -91,6 +95,7 @@ exception statement from your version. */
 #define  HEADER_SIZE  500
 #define  BODY_SIZE  500
 #define  MESSAGE_SIZE  HEADER_SIZE + BODY_SIZE 
+#define  LDEBUG_MESSAGE_SIZE MESSAGE_SIZE+50
 
 //header is destination char array
 #define CREATE_HEADER(ldebug_header)                   \
@@ -132,7 +137,21 @@ exception statement from your version. */
         fflush(plugin_file_log);       \
       }                                \
       if (plugin_debug_to_console) {   \
-        /*no op now*/            \
+        /*headers are always going to console*/            \
+        if (!plugin_debug_headers){      \
+          CREATE_HEADER(ldebug_header);  \
+        }                                \
+        snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body); \
+        char ldebug_channel_message[LDEBUG_MESSAGE_SIZE];                               \
+        struct timeval current_time;   \
+        gettimeofday (&current_time, NULL);\
+        if (jvm_up) {                  \
+          snprintf(ldebug_channel_message, LDEBUG_MESSAGE_SIZE, "%s %ld %s", "plugindebug", current_time.tv_sec*1000000L+current_time.tv_usec, ldebug_message);   \
+          push_pre_init_messages(ldebug_channel_message);                           \
+        } else {                       \
+          snprintf(ldebug_channel_message, LDEBUG_MESSAGE_SIZE, "%s %ld %s", "preinit_plugindebug", current_time.tv_sec*1000000L+current_time.tv_usec, ldebug_message);   \
+          push_pre_init_messages(ldebug_channel_message);                            \
+        }                              \
       }                                \
     }                                  \
   } while (0)
@@ -161,7 +180,21 @@ exception statement from your version. */
       fflush(plugin_file_log);         \
     }                                  \
     if (plugin_debug_to_console) {     \
-      /*no op now*/            \
+      /*headers are always going to console*/            \
+      if (!plugin_debug_headers){            \
+        CREATE_HEADER(ldebug_header);  \
+      }                                \
+      snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body); \
+      char ldebug_channel_message[LDEBUG_MESSAGE_SIZE];                               \
+      struct timeval current_time;     \
+      gettimeofday (&current_time, NULL);\
+        if (jvm_up) {                  \
+          snprintf(ldebug_channel_message, LDEBUG_MESSAGE_SIZE, "%s %ld %s", "pluginerror", current_time.tv_sec*1000000L+current_time.tv_usec, ldebug_message);   \
+          push_pre_init_messages(ldebug_channel_message);                         \
+        } else {                       \
+          snprintf(ldebug_channel_message, LDEBUG_MESSAGE_SIZE, "%s %ld %s", "preinit_pluginerror", current_time.tv_sec*1000000L+current_time.tv_usec, ldebug_message);   \
+          push_pre_init_messages(ldebug_channel_message);                         \
+        }                              \
     }                                  \
    } while (0)
 

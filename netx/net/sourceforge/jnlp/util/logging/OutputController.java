@@ -54,20 +54,37 @@ public class OutputController {
         ERROR_ALL, // - stderr/log in all cases (default for
         ERROR_DEBUG; // - stderr/log in verbose/debug mode
         //ERROR_DEBUG is default for Throwable
-        //MESSAGE_VERBOSE is defautrl  for String
+        //MESSAGE_DEBUG is default  for String
         
-        private static boolean isOutput(MessageWithLevel s) {
-            return s.level == Level.MESSAGE_ALL
-                    || s.level == Level.MESSAGE_DEBUG
-                    || s.level == Level.WARNING_ALL
-                    || s.level == Level.WARNING_DEBUG;
+        public  boolean isOutput() {
+            return this == Level.MESSAGE_ALL
+                    || this == Level.MESSAGE_DEBUG
+                    || this == Level.WARNING_ALL
+                    || this == Level.WARNING_DEBUG;
         }
 
-        private static boolean isError(MessageWithLevel s) {
-            return s.level == Level.ERROR_ALL
-                    || s.level == Level.ERROR_DEBUG
-                    || s.level == Level.WARNING_ALL
-                    || s.level == Level.WARNING_DEBUG;
+        public  boolean isError() {
+            return this == Level.ERROR_ALL
+                    || this == Level.ERROR_DEBUG
+                    || this == Level.WARNING_ALL
+                    || this == Level.WARNING_DEBUG;
+        }
+        
+        public  boolean isWarning() {
+            return this == Level.WARNING_ALL
+                    || this == Level.WARNING_DEBUG;
+        }
+
+         public  boolean isDebug() {
+            return this == Level.ERROR_DEBUG
+                    || this == Level.MESSAGE_DEBUG
+                    || this == Level.WARNING_DEBUG;
+        }
+
+        public  boolean isInfo() {
+            return this == Level.ERROR_ALL
+                    || this == Level.WARNING_ALL
+                    || this == Level.MESSAGE_ALL;
         }
     }
 
@@ -76,6 +93,8 @@ public class OutputController {
         public final String message;
         public final Level level;
         public final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        public final Thread thread = Thread.currentThread();
+        public final Date loggedAt = new Date();
 
         public MessageWithLevel(String message, Level level) {
             this.message = message;
@@ -132,6 +151,11 @@ public class OutputController {
     private void consume() {
         MessageWithLevel s = messageQue.get(0);
         messageQue.remove(0);
+        net.sourceforge.jnlp.util.logging.headers.Header header = new net.sourceforge.jnlp.util.logging.headers.Header(s.level, s.stack, s.thread, s.loggedAt, false);
+        //filtering is done in console during runtime
+        if (LogConfig.getLogConfig().isLogToConsole()) {
+            JavaConsole.getConsole().addMessage(header, s.message);
+        }
         if (!JNLPRuntime.isDebug() && (s.level == Level.MESSAGE_DEBUG
                 || s.level == Level.WARNING_DEBUG
                 || s.level == Level.ERROR_DEBUG)) {
@@ -142,16 +166,16 @@ public class OutputController {
         String message = s.message;
         if (LogConfig.getLogConfig().isEnableHeaders()) {
             if (message.contains("\n")) {
-                message = getHeader(s.level, s.stack) + "\n" + message;
+                message = header.toString() + "\n" + message;
             } else {
-                message = getHeader(s.level, s.stack) + " " + message;
+                message = header.toString() + " " + message;
             }
         }
         if (LogConfig.getLogConfig().isLogToStreams()) {
-            if (Level.isOutput(s)) {
+            if (s.level.isOutput()) {
                 outLog.log(message);
             }
-            if (Level.isError(s)) {
+            if (s.level.isError()) {
                 errLog.log(message);
             }
         }
@@ -160,14 +184,6 @@ public class OutputController {
         }
         if (LogConfig.getLogConfig().isLogToSysLog()) {
             getSystemLog().log(message);
-        }
-        if (LogConfig.getLogConfig().isLogToConsole()) {
-            if (Level.isOutput(s)){
-            JavaConsole.getConsole().logOutput(message);
-            }
-            if (Level.isError(s)){
-            JavaConsole.getConsole().logError(message);
-            }
         }
 
     }
@@ -344,59 +360,6 @@ public class OutputController {
         printOut(e);
         printError(e);
     }
-
-    public static String getHeader(Level level, StackTraceElement[] stack) {
-        StringBuilder sb = new StringBuilder();
-        try {
-            String user = System.getProperty("user.name");
-            sb.append("[").append(user).append("]");
-            if (JNLPRuntime.isWebstartApplication()) {
-                sb.append("[ITW-JAVAWS]");
-            } else {
-                sb.append("[ITW]");
-            }
-            if (level != null) {
-                sb.append('[').append(level.toString()).append(']');
-            }
-            sb.append('[').append(new Date().toString()).append(']');
-            if (stack != null) {
-                sb.append('[').append(getCallerClass(stack)).append(']');
-            }
-            sb.append(" NETX Thread# ")
-                    .append(Integer.toHexString(((Object)Thread.currentThread()).hashCode()))
-                    .append(", name ")
-                    .append(Thread.currentThread().getName());
-        } catch (Exception ex) {
-            getLogger().log(ex);
-        }
-        return sb.toString();
-
-    }
-
-    static String getCallerClass(StackTraceElement[] stack) {
-        try {
-            //0 is always thread
-            //1..? is OutputController itself
-            //pick up first after.
-            StackTraceElement result = stack[0];
-            int i = 1;
-            for (; i < stack.length; i++) {
-                result = stack[i];//at least moving up
-                if (stack[i].getClassName().contains(OutputController.class.getName()) ||
-                    //PluginDebug.class.getName() not avaiable during netx make
-                    stack[i].getClassName().contains("sun.applet.PluginDebug") ) {
-                    continue;
-                } else {
-                    break;
-                }
-            }
-            return result.toString();
-        } catch (Exception ex) {
-            getLogger().log(ex);
-            return "Unknown caller";
-        }
-    }
-    
     
    //package private setters for testing
 

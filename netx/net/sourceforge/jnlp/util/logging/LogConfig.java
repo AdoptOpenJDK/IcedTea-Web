@@ -55,12 +55,13 @@ public class LogConfig {
     private boolean logToFile;
     private boolean logToStreams;
     private boolean logToSysLog;
+    private DeploymentConfiguration config;
     
     private static LogConfig logConfig;
 
     public LogConfig() {
         try {
-            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+            config = JNLPRuntime.getConfiguration();
             if (config.getRaw().isEmpty()){
                 config = new DeploymentConfiguration();//JNLPRuntime.getConfiguration() cannotbe loaded time
                 config.load(); //read one prior
@@ -161,7 +162,11 @@ public class LogConfig {
         return JavaConsole.isEnabled();
     }
     
-    
-    
+    /*
+    * logging stuff may be interested in used config
+    */
+    public DeploymentConfiguration getConfig() {
+        return config;
+    }    
     
 }

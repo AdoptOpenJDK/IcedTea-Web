@@ -46,6 +46,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -63,6 +68,10 @@ import javax.swing.border.TitledBorder;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.logging.headers.Header;
+import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
+import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
+import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 
 /**
  * A simple Java console for IcedTeaPlugin and JavaWS
@@ -392,7 +401,7 @@ public class JavaConsole {
 
         final JavaConsole console = new JavaConsole();
 
-        boolean toShowConsole = false;
+        boolean toShowConsole = true;
 
         for (String arg : args) {
             if ("--show-console".equals(arg)) {
@@ -406,11 +415,73 @@ public class JavaConsole {
 
     }
 
-    void logOutput(String s) {
-        stdOutText.setText(stdOutText.getText() + s + "\n");
+    
+    void addMessage(Header header, String message) {
+       if (!LogConfig.getLogConfig().isEnableHeaders()){
+           if (header.level.isError()){
+               stdErrText.setText(stdErrText.getText() + message + "\n");
+           }
+           if (header.level.isOutput()){
+               stdOutText.setText(stdOutText.getText() + message + "\n");
+           }
+       } else {
+           if (header.level.isError()){
+               stdErrText.setText(stdErrText.getText( )+ header.toString() + message  +"\n");
+           }
+           if (header.level.isOutput()){
+               stdOutText.setText(stdOutText.getText() + header.toString() + message + "\n");
+           }
+       }
     }
 
-    void logError(String s) {
-        stdErrText.setText(stdErrText.getText() + s + "\n");
+    /**
+     * parse plugin message and add it as header+message to data
+     * @param s string to be parsed 
+     */
+    private void processPluginMessage(String s) {
+        PluginMessage pm = new PluginMessage(s);
+        addMessage(pm.getHeader(), pm.getMessage());
+    }
+
+   
+    public void createPluginReader(final File file) {
+        OutputController.getLogger().log("Starting processing of plugin-debug-to-console " + file.getAbsolutePath());
+        Thread t = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                BufferedReader br = null;
+                try {
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+                            Charset.forName("UTF-8")));
+                    //never ending loop
+                    while (true) {
+                        try{
+                        String s = br.readLine();
+                        if (s == null) {
+                            break;
+                        }
+                        processPluginMessage(s);
+                        }catch(Exception ex){
+                            OutputController.getLogger().log(ex);
+                        }
+                    }
+                } catch (Exception ex) {
+                    OutputController.getLogger().log(ex);
+                    if (br != null) {
+                        try {
+                            br.close();
+                        } catch (Exception exx) {
+                            OutputController.getLogger().log(exx);
+                        }
+                    }
+                }
+                OutputController.getLogger().log("Ended processing of plugin-debug-to-console " + file.getAbsolutePath());
+            }
+        }, "plugin-debug-to-console reader thread");
+        t.setDaemon(true);
+        t.start();
+
+        OutputController.getLogger().log("Started processing of plugin-debug-to-console " + file.getAbsolutePath());
     }
 }

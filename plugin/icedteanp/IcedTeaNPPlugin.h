@@ -115,6 +115,9 @@ extern pthread_t itnp_plugin_thread_id;
 /* Mutex around plugin async call queue ops */
 extern pthread_mutex_t pluginAsyncCallMutex;
 
+/*to sync pipe to apletviewer console*/
+extern pthread_mutex_t debug_pipe_lock;
+
 // debug switches
 extern bool debug_initiated;
 extern int plugin_debug;
@@ -125,6 +128,9 @@ extern bool plugin_debug_to_system;
 extern bool plugin_debug_to_console;
 extern FILE * plugin_file_log;
 extern std::string plugin_file_log_name;
+extern gchar* debug_pipe_name;
+
+extern gboolean jvm_up;
 
 // Browser function table.
 extern NPNetscapeFuncs browser_functions;
@@ -152,6 +158,9 @@ int get_id_from_instance(NPP instance);
 
 /* Sends a message to the appletviewer */
 void plugin_send_message_to_appletviewer(gchar const* message);
+/*this method is not logging, do not add \n and is using different pipe*/
+void plugin_send_message_to_appletviewer_console(gchar const* message);
+void flush_plugin_send_message_to_appletviewer_console();
 
 /* Returns an appropriate (package/object) scriptable npobject */
 NPObject* get_scriptable_object(NPP instance);

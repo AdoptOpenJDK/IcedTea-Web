@@ -46,6 +46,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.headers.Header;
 
 /**
  * This class writes log information to file.
@@ -90,7 +91,7 @@ public final class FileLog implements SingleStreamLogger {
             impl = Logger.getLogger(loggerName);
             impl.setLevel(Level.ALL);
             impl.addHandler(fh);
-            log(OutputController.getHeader(null, null));
+            log(new Header(OutputController.Level.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false).toString());
         } catch (IOException e) {
            throw new RuntimeException(e);
         }

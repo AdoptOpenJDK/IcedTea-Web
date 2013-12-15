@@ -1,3 +1,43 @@
+2013-12-15  Jiri Vanek  <jvanek@redhat.com>
+
+	Console made aware of plugin messages
+	* NEWS : mentioned
+	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: call to log adapted
+	to new Header.
+	* netx/net/sourceforge/jnlp/util/logging/JavaConsole.java: (logOutput) and
+	(logError) replaced by (addMessage). Added (createPluginReader) to process
+	plugin debug pipe
+	* netx/net/sourceforge/jnlp/util/logging/LogConfig.java: (getConfig) do 
+	config available untill JNLPRuntime config is proper singleton
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: (Level)
+	static methods converted to members and enhanced. (getHeader) and
+	(getCallerClass) moved to Headers.
+	* netx/net/sourceforge/jnlp/util/logging/headers/Header.java: Structure
+	to keep header as object instead of string.
+	* netx/net/sourceforge/jnlp/util/logging/headers/JavaMessage.java: Structure
+	to hold message and its header.
+	* netx/net/sourceforge/jnlp/util/logging/headers/MessageWithHeader.java: 
+	Interface for JavaMessage and PluginMessage 
+	* netx/net/sourceforge/jnlp/util/logging/headers/PluginHeader.java: extended
+	header to handle plugin's preinit and threads.
+	* netx/net/sourceforge/jnlp/util/logging/headers/PluginMessage.java:
+	implementation of MessageWithHeader which parse from String from plugin
+	debug pipe.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: added debug pipe (debug_pipe_name),
+	synced via (debug_pipe_lock), controlled by (debug_to_appletviewer) and used
+	by method (plugin_send_message_to_appletviewer_console).
+	* plugin/icedteanp/IcedTeaNPPlugin.h: (debug_pipe_name) and (jvvm_up) declared
+	extern. Utility methods (plugin_send_message_to_appletviewer_console) and
+	(flush_plugin_send_message_to_appletviewer_console) declared and impelmented
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: print debug info enhanced for 
+	debug pipe
+	* plugin/icedteanp/IcedTeaPluginUtils.h:  (PLUGIN_MESSAGE) and (PLIGIN_ERROR)
+	now log to debug pipe if enabled.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java: args reprinted, checked
+	third  parameter debug pipe if should. Started debug_pipe reader if should
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/JavaConsoleTest.java: 
+	added tests for parsing the plugin message.
+
 2013-12-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Made again compatible with JDK6.All JLists, JComboBoxs, and DefaultComboBoxModels

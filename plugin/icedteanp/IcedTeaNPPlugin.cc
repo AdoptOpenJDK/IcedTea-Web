@@ -138,6 +138,9 @@ gint in_watch_source;
 // Applet viewer output pipe name.
 gchar* out_pipe_name;
 
+// Applet viewer debug pipe name.
+gchar* debug_pipe_name = NULL;
+
 // Applet viewer output watch source.
 gint out_watch_source;
 
@@ -147,8 +150,14 @@ pthread_t itnp_plugin_thread_id;
 // Mutex to lock async call queue
 pthread_mutex_t pluginAsyncCallMutex;
 
+/*to sync pipe to apletviewer console*/
+pthread_mutex_t debug_pipe_lock = PTHREAD_MUTEX_INITIALIZER;
+
 // Applet viewer output channel.
 GIOChannel* out_to_appletviewer;
+
+// Applet viewer debug channel.
+GIOChannel* debug_to_appletviewer = NULL;
 
 // Tracks jvm status
 gboolean jvm_up = FALSE;
@@ -488,6 +497,34 @@ void start_jvm_if_needed()
     }
   PLUGIN_DEBUG ("ITNP_New: created output fifo: %s\n", out_pipe_name);
 
+  // Create plugin-debug-to-appletviewer pipe which we refer to as the
+  // debug pipe.
+  initialize_debug();//should be already initialized, but...
+  if (plugin_debug_to_console){
+    // debug_pipe_name
+    debug_pipe_name = g_strdup_printf ("%s/%d-icedteanp-plugin-debug-to-appletviewer",
+                                         data_directory.c_str(), getpid());
+
+    if (!debug_pipe_name)
+      {
+        PLUGIN_ERROR ("Failed to create debug pipe name.\n");
+        np_error = NPERR_OUT_OF_MEMORY_ERROR;
+        goto cleanup_debug_pipe_name;
+      }
+
+    // clean up any older pip
+    unlink (debug_pipe_name);
+
+    PLUGIN_DEBUG ("ITNP_New: creating debug fifo: %s\n", debug_pipe_name);
+    if (mkfifo (debug_pipe_name, 0600) == -1 && errno != EEXIST)
+      {
+        PLUGIN_ERROR ("Failed to create debug pipe\n", strerror (errno));
+        np_error = NPERR_GENERIC_ERROR;
+        goto cleanup_debug_pipe_name;
+      }
+    PLUGIN_DEBUG ("ITNP_New: created debug fifo: %s\n", debug_pipe_name);
+  }
+
   // Start a separate appletviewer process for each applet, even if
   // there are multiple applets in the same page.  We may need to
   // change this behaviour if we find pages with multiple applets that
@@ -548,12 +585,46 @@ void start_jvm_if_needed()
     g_io_add_watch (in_from_appletviewer,
                     (GIOCondition) (G_IO_IN | G_IO_ERR | G_IO_HUP),
                     plugin_in_pipe_callback, (gpointer) in_from_appletviewer);
+                    
+  // Create plugin-to-appletviewer console debug channel.  The default encoding for
+  // the file is UTF-8.
+  // debug_to_appletviewer
+  if (plugin_debug_to_console){
+    debug_to_appletviewer = g_io_channel_new_file (debug_pipe_name,
+                                                 "w", &channel_error);
+    if (!debug_to_appletviewer)
+      {
+        if (channel_error)
+          {
+            PLUGIN_ERROR ("Failed to debug output channel, '%s'\n",
+                              channel_error->message);
+            g_error_free (channel_error);
+            channel_error = NULL;
+          }
+        else
+          PLUGIN_ERROR ("Failed to create debug channel\n");
+
+        np_error = NPERR_GENERIC_ERROR;
+        goto cleanup_debug_to_appletviewer;
+     }
+  }
 
   jvm_up = TRUE;
-
+  
+  if (plugin_debug_to_console){
+    //jvm is up, we can start console producer thread
+    pthread_t debug_to_console_consumer;
+    pthread_create(&debug_to_console_consumer,NULL,&flush_pre_init_messages,NULL);
+  }
   goto done;
 
   // Free allocated data in case of error
+ cleanup_debug_to_appletviewer:
+  if (plugin_debug_to_console){
+    if (debug_to_appletviewer)
+      g_io_channel_unref (debug_to_appletviewer);
+    debug_to_appletviewer = NULL;
+  }
 
  cleanup_in_watch_source:
   // Removing a source is harmless if it fails since it just means the
@@ -574,6 +645,21 @@ void start_jvm_if_needed()
   if (out_to_appletviewer)
     g_io_channel_unref (out_to_appletviewer);
   out_to_appletviewer = NULL;
+
+  if (plugin_debug_to_console){
+    // cleanup_debug_pipe:
+    // Delete output pipe.
+    PLUGIN_DEBUG ("ITNP_New: deleting debug fifo: %s\n", debug_pipe_name);
+    unlink (debug_pipe_name);
+    PLUGIN_DEBUG ("ITNP_New: deleted debug fifo: %s\n", debug_pipe_name);
+  }
+ cleanup_debug_pipe_name:
+  if (plugin_debug_to_console){
+    g_free (debug_pipe_name);
+    debug_pipe_name = NULL;
+  }
+
+
 
   // cleanup_out_pipe:
   // Delete output pipe.
@@ -1401,6 +1487,9 @@ plugin_start_appletviewer (ITNPPluginData* data)
   command_line.push_back("sun.applet.PluginMain");
   command_line.push_back(out_pipe_name);
   command_line.push_back(in_pipe_name);
+  if (plugin_debug_to_console){
+      command_line.push_back(debug_pipe_name);
+  }
 
   // Finished command line parameters
 
@@ -1574,6 +1663,38 @@ plugin_send_message_to_appletviewer (gchar const* message)
     }
 
   PLUGIN_DEBUG ("plugin_send_message_to_appletviewer return\n");
+}
+
+// unlike like  plugin_send_message_to_appletviewer
+// do not debug
+// do not error
+// do not have its own line end
+// is accesed by only one thread
+// have own pipe
+// jvm must be up
+void
+plugin_send_message_to_appletviewer_console (gchar const* newline_message)
+{
+  gsize bytes_written = 0;
+  if (g_io_channel_write_chars (debug_to_appletviewer,
+                                newline_message, -1, &bytes_written,
+                                &channel_error) != G_IO_STATUS_NORMAL)  {
+          if (channel_error) {
+              //error must be freed
+              g_error_free (channel_error);
+              channel_error = NULL;
+            }
+        }
+}
+//flush only when its full
+void flush_plugin_send_message_to_appletviewer_console (){
+  if (g_io_channel_flush (debug_to_appletviewer, &channel_error)
+                                                 != G_IO_STATUS_NORMAL) {
+          if (channel_error) {
+              g_error_free (channel_error);
+              channel_error = NULL;
+            }
+        }
 }
 
 /*
@@ -2046,6 +2167,36 @@ NP_Shutdown (void)
   g_free (in_pipe_name);
   in_pipe_name = NULL;
 
+  if (plugin_debug_to_console){
+    //jvm_up is now false
+    if (g_io_channel_shutdown (debug_to_appletviewer,
+                                     TRUE, &channel_error)
+              != G_IO_STATUS_NORMAL)
+            {
+              if (channel_error)
+                {
+                  PLUGIN_ERROR ("Failed to shut down appletviewer"
+                                    " debug channel\n", channel_error->message);
+                  g_error_free (channel_error);
+                  channel_error = NULL;
+                }
+              else
+                PLUGIN_ERROR ("Failed to shut down debug to appletviewer\n");
+            }
+    // cleanup_out_to_appletviewer:
+    if (debug_to_appletviewer)
+     g_io_channel_unref (debug_to_appletviewer);
+    out_to_appletviewer = NULL;
+    // cleanup_debug_pipe:
+    // Delete debug pipe.
+    PLUGIN_DEBUG ("NP_Shutdown: deleting debug fifo: %s\n", debug_pipe_name);
+    unlink (debug_pipe_name);
+    PLUGIN_DEBUG ("NP_Shutdown: deleted debug fifo: %s\n", debug_pipe_name);
+    // cleanup_out_pipe_name:
+    g_free (debug_pipe_name);
+    debug_pipe_name = NULL;
+  }
+  
   // Destroy the call queue mutex
   pthread_mutex_destroy(&pluginAsyncCallMutex);
 

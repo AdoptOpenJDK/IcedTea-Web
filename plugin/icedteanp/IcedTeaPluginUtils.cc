@@ -54,9 +54,36 @@ int IcedTeaPluginUtilities::reference = -1;
 pthread_mutex_t IcedTeaPluginUtilities::reference_mutex = PTHREAD_MUTEX_INITIALIZER;
 std::map<void*, NPP>* IcedTeaPluginUtilities::instance_map = new std::map<void*, NPP>();
 std::map<std::string, NPObject*>* IcedTeaPluginUtilities::object_map = new std::map<std::string, NPObject*>();
+std::queue<std::string> pre_jvm_message;
 
 /* Plugin async call queue */
 static std::vector< PluginThreadCall* >* pendingPluginThreadRequests = new std::vector< PluginThreadCall* >();
+
+void *flush_pre_init_messages(void* data) {
+while (true){
+  struct timespec ts;
+    ts.tv_sec = 1;
+    ts.tv_nsec = 0;
+  nanosleep(&ts ,0);
+  if (jvm_up) {
+    while (!pre_jvm_message.empty()) {
+      pthread_mutex_lock(&debug_pipe_lock);
+      std::string  message = pre_jvm_message.front();
+      pre_jvm_message.pop();
+      pthread_mutex_unlock(&debug_pipe_lock);
+      plugin_send_message_to_appletviewer_console(message.c_str());
+      
+    }
+    flush_plugin_send_message_to_appletviewer_console();
+  }
+  
+}
+}
+void push_pre_init_messages(char * ldm){
+  pthread_mutex_lock(&debug_pipe_lock);
+  pre_jvm_message.push(std::string(ldm));
+  pthread_mutex_unlock(&debug_pipe_lock);
+}
 
 /**
  * Given a context number, constructs a message prefix to send to Java
@@ -1161,7 +1188,11 @@ void IcedTeaPluginUtilities::printDebugStatus(){
           PLUGIN_DEBUG("plugin_debug_to_system: false\n");
         } 
         if (plugin_debug_to_console){ 
-          PLUGIN_DEBUG("plugin_debug_to_console: true\n");
+          if (debug_pipe_name){
+            PLUGIN_DEBUG("plugin_debug_to_console: true, pipe %s\n", debug_pipe_name);
+          } else {
+            PLUGIN_DEBUG("plugin_debug_to_console: true, pipe not yet known or broken\n");
+          }
         } else {
           PLUGIN_DEBUG("plugin_debug_to_console: false\n"); 
         } 
