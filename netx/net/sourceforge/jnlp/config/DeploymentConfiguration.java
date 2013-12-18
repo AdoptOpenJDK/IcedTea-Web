@@ -206,6 +206,16 @@ public final class DeploymentConfiguration {
      */
     public static final String KEY_PLUGIN_JVM_ARGUMENTS= "deployment.plugin.jvm.arguments";
     public static final String KEY_JRE_DIR= "deployment.jre.dir";
+    private ConfigurationException loadingException = null;
+
+    public void setLoadingException(ConfigurationException ex) {
+        loadingException = ex;
+    }
+
+    public ConfigurationException getLoadingException() {
+        return loadingException;
+    }
+    
 
     public enum ConfigType {
         System, User

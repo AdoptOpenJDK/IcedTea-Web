@@ -90,7 +90,7 @@ public class JNLPRuntime {
     /** the localized resource strings */
     private static ResourceBundle resources;
 
-    private static final DeploymentConfiguration config = new DeploymentConfiguration();
+    private static DeploymentConfiguration config;
 
     /** the security manager */
     private static JNLPSecurityManager security;
@@ -185,21 +185,14 @@ public class JNLPRuntime {
     public static void initialize(boolean isApplication) throws IllegalStateException {
         checkInitialized();
 
-        try {
-            config.load();
-            config.copyTo(System.getProperties());
-            if (JavaConsole.canShowOnStartup(isApplication)) {
-                JavaConsole.getConsole().showConsoleLater();
-            }
-        } catch (ConfigurationException e) {
-            /* exit if there is a fatal exception loading the configuration */
-            if (isApplication) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, getMessage("RConfigurationError"));
-                JNLPRuntime.exit(1);
-            }
+        if (JavaConsole.canShowOnStartup(isApplication)) {
+            JavaConsole.getConsole().showConsoleLater();
         }
-
-        KeyStores.setConfiguration(config);
+        /* exit if there is a fatal exception loading the configuration */
+        if (isApplication && getConfiguration().getLoadingException() != null) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, getMessage("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
+        }
+        KeyStores.setConfiguration(getConfiguration());
 
         isWebstartApplication = isApplication;
 
@@ -261,7 +254,7 @@ public class JNLPRuntime {
 
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
-        BrowserAwareProxySelector proxySelector = new BrowserAwareProxySelector(config);
+        BrowserAwareProxySelector proxySelector = new BrowserAwareProxySelector(getConfiguration());
         proxySelector.initialize();
         ProxySelector.setDefault(proxySelector);
 
@@ -362,7 +355,20 @@ public class JNLPRuntime {
      * @return a {@link DeploymentConfiguration} object that can be queried to
      * find relevant configuration settings
      */
-    public static DeploymentConfiguration getConfiguration() {
+    public synchronized static DeploymentConfiguration getConfiguration() {
+        if (config == null){
+            config = new DeploymentConfiguration();
+            try{
+                config.load();
+                config.copyTo(System.getProperties());
+            }catch(ConfigurationException ex){
+                OutputController.getLogger().log(ex);
+                //mark first occurence of exception so we can react later
+                if (config.getLoadingException() == null){
+                    config.setLoadingException(ex);
+                }
+            }
+        }
         return config;
     }
 

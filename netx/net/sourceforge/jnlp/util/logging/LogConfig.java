@@ -55,19 +55,11 @@ public class LogConfig {
     private boolean logToFile;
     private boolean logToStreams;
     private boolean logToSysLog;
-    private DeploymentConfiguration config;
     
     private static LogConfig logConfig;
 
     public LogConfig() {
-        try {
-            config = JNLPRuntime.getConfiguration();
-            if (config.getRaw().isEmpty()){
-                config = new DeploymentConfiguration();//JNLPRuntime.getConfiguration() cannotbe loaded time
-                config.load(); //read one prior
-                //todo fix JNLPRuntime.getConfiguration(); to be correct singleton - not easy task!
-            }
-
+            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
             // Check whether logging and tracing is enabled.
             enableLogging = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
             //enagle disable headers
@@ -87,9 +79,6 @@ public class LogConfig {
                     enableLogging = false;
                 }
             }
-        } catch (ConfigurationException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static LogConfig getLogConfig() {
@@ -161,12 +150,5 @@ public class LogConfig {
     boolean isLogToConsole() {
         return JavaConsole.isEnabled();
     }
-    
-    /*
-    * logging stuff may be interested in used config
-    */
-    public DeploymentConfiguration getConfig() {
-        return config;
-    }    
     
 }
