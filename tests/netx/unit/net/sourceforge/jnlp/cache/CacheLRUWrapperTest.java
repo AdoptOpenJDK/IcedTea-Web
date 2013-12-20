@@ -111,8 +111,8 @@ public class CacheLRUWrapperTest {
         // wait more than 100 microseconds for noLoops = 1000 and noEntries=1000 is bad
         assertTrue("load() must not take longer than 100 µs, but took in avg " + avg/1000 + "µs", avg < 100 * 1000);
         } finally {
-        clw.unlock();
-        cacheIndexFile.delete();
+            clw.unlock();
+            cacheIndexFile.delete();
         }
     }
 
