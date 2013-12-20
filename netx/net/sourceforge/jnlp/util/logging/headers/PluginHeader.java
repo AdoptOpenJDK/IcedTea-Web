@@ -52,15 +52,12 @@ public class PluginHeader extends Header {
     static final Pattern whiteSpaces = Pattern.compile("\\s+");
     static final Pattern threadsPattern = Pattern.compile("\\s+|,\\s*|:");
 
+    
     @Override
     public String toString() {
-        if (preinit) {
-            return "!" + super.toString();
-        } else {
-            return super.toString();
-        }
+        return toString(true, true, true, true, true, true, true);
     }
-
+      
     @Override
     public String toString(boolean userb, boolean originb, boolean levelb, boolean dateb, boolean callerb, boolean thread1b, boolean thread2b) {
         if (preinit) {

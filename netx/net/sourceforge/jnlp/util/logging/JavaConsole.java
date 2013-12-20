@@ -62,15 +62,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.headers.Header;
-import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
-import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 
 /**
@@ -86,11 +83,14 @@ public class JavaConsole {
     private static JavaConsole console;
     private static Dimension lastSize;
 
+     private static class JavaConsoleHolder {
+
+        //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+        //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+        private static final JavaConsole INSTANCE = new JavaConsole();
+    }
     public static JavaConsole getConsole() {
-        if (console == null) {
-            console = new JavaConsole();
-        }
-        return console;
+        return JavaConsoleHolder.INSTANCE;
     }
 
     public static boolean isEnabled() {
@@ -119,15 +119,22 @@ public class JavaConsole {
     private JDialog consoleWindow;
     private JTextArea stdErrText;
     private JTextArea stdOutText;
-    private JPanel contentPanel = new JPanel();
+    private JPanel contentPanel;
     private ClassLoaderInfoProvider classLoaderInfoProvider;
+    private boolean initialized = false;
+    
+    private String stdErrTextSrc = "";
+    private String stdOutTextSrc = "";
 
     public JavaConsole() {
-        initialize();
+        
     }
 
     
     private void initializeWindow() {
+        if (!initialized){
+            initialize();
+        }
         initializeWindow(lastSize, contentPanel);
     }
     
@@ -159,13 +166,6 @@ public class JavaConsole {
      * Initialize the console
      */
     private void initialize() {
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-        }
-
 
         contentPanel = new JPanel();
         contentPanel.setLayout(new GridBagLayout());
@@ -296,6 +296,7 @@ public class JavaConsole {
 
         splitPane.setDividerLocation(0.5);
         splitPane.setResizeWeight(0.5);
+        initialized = true;
     }
 
     public void showConsole() {
@@ -416,22 +417,21 @@ public class JavaConsole {
     }
 
     
-    void addMessage(Header header, String message) {
-       if (!LogConfig.getLogConfig().isEnableHeaders()){
-           if (header.level.isError()){
-               stdErrText.setText(stdErrText.getText() + message + "\n");
-           }
-           if (header.level.isOutput()){
-               stdOutText.setText(stdOutText.getText() + message + "\n");
-           }
-       } else {
-           if (header.level.isError()){
-               stdErrText.setText(stdErrText.getText( )+ header.toString() + message  +"\n");
-           }
-           if (header.level.isOutput()){
-               stdOutText.setText(stdOutText.getText() + header.toString() + message + "\n");
-           }
+    synchronized void addMessage(Header header, String message) {
+        String headerString = "";
+       if (LogConfig.getLogConfig().isEnableHeaders()){
+           headerString = header.toString();
        }
+           if (header.level.isError()){
+               stdErrTextSrc += headerString + message  +"\n";
+           }
+           if (header.level.isOutput()){
+               stdOutTextSrc += headerString + message + "\n";
+           }
+           if (initialized){
+               stdErrText.setText(stdErrTextSrc);
+               stdOutText.setText(stdOutTextSrc);
+           }
     }
 
     /**
@@ -440,7 +440,7 @@ public class JavaConsole {
      */
     private void processPluginMessage(String s) {
         PluginMessage pm = new PluginMessage(s);
-        addMessage(pm.getHeader(), pm.getMessage());
+        OutputController.getLogger().log(pm);
     }
 
    

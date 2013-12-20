@@ -34,11 +34,11 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
+
 package net.sourceforge.jnlp.util.logging;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import net.sourceforge.jnlp.ServerAccess;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -54,36 +54,47 @@ import org.junit.BeforeClass;
  * by junit classlaoder is visible from itw, but not vice verse.
  */
 public class NoStdOutErrTest {
-    
+
     private static boolean origialStds;
-    
     private static final String setLogToStreams = "setLogToStreams";
-    
-     @BeforeClass
-    public static void disableStds() throws Exception {
-        //init logger and log and flush message
-        //it is crucial for junit to grip it
-        OutputController.getLogger().log("initialising");
-        //one more times: if TESTED class is the first which creates instance of logger
-        //then when junit can not access this class, and creates its own for its purposes
-        //when junit creates this class, then also TESTED class have access to it and so it behaves as expected
-        OutputController.getLogger().flush();
-        origialStds = LogConfig.getLogConfig().isLogToStreams();
-        invokeSetLogToStreams(false);
-    }
-    
-    @AfterClass
-    public static void restoreStds() throws Exception {
-        OutputController.getLogger().flush();
-        invokeSetLogToStreams(origialStds);
+    /*
+     * "printed" exceptions are otherwise  consumed via junit if thrown :-/
+     */
+
+    @BeforeClass
+    public static synchronized void disableStds() {
+        try {
+            //init logger and log and flush message
+            //it is crucial for junit to grip it
+            OutputController.getLogger().log("initialising");
+            //one more times: if TESTED class is the first which creates instance of logger
+            //then when junit can not access this class, and creates its own for its purposes
+            //when junit creates this class, then also TESTED class have access to it and so it behaves as expected
+            OutputController.getLogger().flush();
+            origialStds = LogConfig.getLogConfig().isLogToStreams();
+            invokeSetLogToStreams(false);
+        } catch (Exception ex) {
+            ServerAccess.logException(ex);
+        }
     }
 
-    private static void invokeSetLogToStreams(boolean state) throws IllegalAccessException, SecurityException, NoSuchMethodException, InvocationTargetException, IllegalArgumentException {
-        Method lcs = LogConfig.class.getDeclaredMethod(setLogToStreams, boolean.class);
-        lcs.setAccessible(true);
-        lcs.invoke(LogConfig.getLogConfig(), state);
+    @AfterClass
+    public static synchronized void restoreStds() {
+        try {
+            OutputController.getLogger().flush();
+            invokeSetLogToStreams(origialStds);
+        } catch (Exception ex) {
+            ServerAccess.logException(ex);
+        }
     }
-   
-    
-    
+
+    private static synchronized void invokeSetLogToStreams(boolean state) {
+        try {
+            Method lcs = LogConfig.class.getDeclaredMethod(setLogToStreams, boolean.class);
+            lcs.setAccessible(true);
+            lcs.invoke(LogConfig.getLogConfig(), state);
+        } catch (Exception ex) {
+            ServerAccess.logException(ex);
+        }
+    }
 }

@@ -90,8 +90,6 @@ public class JNLPRuntime {
     /** the localized resource strings */
     private static ResourceBundle resources;
 
-    private static DeploymentConfiguration config;
-
     /** the security manager */
     private static JNLPSecurityManager security;
 
@@ -351,25 +349,39 @@ public class JNLPRuntime {
 
    
     /**
+     * see https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+     * for cases how not to do lazy initialization
+     * and https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+     * for ITW approach
+     */
+    private static class DeploymentConfigurationHolder {
+
+        private static final DeploymentConfiguration INSTANCE = initConfiguration();
+
+        private static DeploymentConfiguration initConfiguration() {
+            DeploymentConfiguration config = new DeploymentConfiguration();
+            try {
+                config.load();
+                config.copyTo(System.getProperties());
+            } catch (ConfigurationException ex) {
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, getMessage("RConfigurationError"));
+                //mark this exceptionas we can die on it later
+                config.setLoadingException(ex);
+            } finally {
+                OutputController.getLogger().startConsumer();
+            }
+            return config;
+        }
+    }
+
+    /**
      * Gets the Configuration associated with this runtime
+     *
      * @return a {@link DeploymentConfiguration} object that can be queried to
      * find relevant configuration settings
      */
-    public synchronized static DeploymentConfiguration getConfiguration() {
-        if (config == null){
-            config = new DeploymentConfiguration();
-            try{
-                config.load();
-                config.copyTo(System.getProperties());
-            }catch(ConfigurationException ex){
-                OutputController.getLogger().log(ex);
-                //mark first occurence of exception so we can react later
-                if (config.getLoadingException() == null){
-                    config.setLoadingException(ex);
-                }
-            }
-        }
-        return config;
+    public static DeploymentConfiguration getConfiguration() {
+        return DeploymentConfigurationHolder.INSTANCE;
     }
 
     /**

@@ -42,8 +42,9 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputController.Level;
 
 public class Header {
-
-    public String user;
+    public static String  default_user = System.getProperty("user.name");
+    
+    public String user = default_user;
     public boolean application;
     public Level level;
     public Date date = new Date();
@@ -56,12 +57,15 @@ public class Header {
     public Header() {
     }
 
+    public Header(Level level, boolean isC) {
+        this(level, Thread.currentThread().getStackTrace(), Thread.currentThread(), isC);   
+    }
+    
     public Header(Level level, StackTraceElement[] stack, Thread thread, boolean isC) {
         this(level, stack, thread, new Date(), isC);
     }
 
     public Header(Level level, StackTraceElement[] stack, Thread thread, Date d, boolean isC) {
-        this.user = System.getProperty("user.name");
         this.application = JNLPRuntime.isWebstartApplication();
         this.level = level;
         this.date = d;
@@ -146,7 +150,8 @@ public class Header {
                 result = stack[i];//at least moving up
                 if (stack[i].getClassName().contains(OutputController.class.getName())
                         || //PluginDebug.class.getName() not avaiable during netx make
-                        stack[i].getClassName().contains("sun.applet.PluginDebug")) {
+                        stack[i].getClassName().contains("sun.applet.PluginDebug")
+                        || stack[i].getClassName().contains(Header.class.getName())) {
                     continue;
                 } else {
                     break;

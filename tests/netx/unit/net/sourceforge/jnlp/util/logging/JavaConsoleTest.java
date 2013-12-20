@@ -21,7 +21,6 @@ public class JavaConsoleTest {
     @Test
     public void CreatePluginHeaderTestOK() throws Exception{
         PluginMessage p1 = new PluginMessage(s1);
-                System.out.println(p1.header + p1.restOfMessage);
         PluginMessage p3 = new PluginMessage(s3);
         Assert.assertFalse(p1.wasError);
         Assert.assertFalse(p3.wasError);

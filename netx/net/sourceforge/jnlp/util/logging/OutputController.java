@@ -38,11 +38,19 @@ package net.sourceforge.jnlp.util.logging;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.headers.Header;
+import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
+import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 
+
+/**
+ * 
+ * OutputController class (thread) must NOT call JNLPRuntime.getConfiguraion()
+ * 
+ */
 public class OutputController {
 
    public static enum Level {
@@ -88,30 +96,15 @@ public class OutputController {
         }
     }
 
-    private static final class MessageWithLevel {
-
-        public final String message;
-        public final Level level;
-        public final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-        public final Thread thread = Thread.currentThread();
-        public final Date loggedAt = new Date();
-
-        public MessageWithLevel(String message, Level level) {
-            this.message = message;
-            this.level = level;
-        }
-    }
     /*
      * singleton instance
      */
-    private static OutputController logger;
     private static final String NULL_OBJECT = "Trying to log null object";
-    private FileLog fileLog;
     private PrintStreamLogger outLog;
     private PrintStreamLogger errLog;
-    private SingleStreamLogger sysLog;
-    private List<MessageWithLevel> messageQue = new LinkedList<MessageWithLevel>();
+    private List<MessageWithHeader> messageQue = new LinkedList<MessageWithHeader>();
     private MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
+    Thread consumerThread;
 
     //bounded to instance
     private class MessageQueConsumer implements Runnable {
@@ -149,33 +142,32 @@ public class OutputController {
     }
 
     private void consume() {
-        MessageWithLevel s = messageQue.get(0);
+        MessageWithHeader s = messageQue.get(0);
         messageQue.remove(0);
-        net.sourceforge.jnlp.util.logging.headers.Header header = new net.sourceforge.jnlp.util.logging.headers.Header(s.level, s.stack, s.thread, s.loggedAt, false);
         //filtering is done in console during runtime
         if (LogConfig.getLogConfig().isLogToConsole()) {
-            JavaConsole.getConsole().addMessage(header, s.message);
+            JavaConsole.getConsole().addMessage(s.getHeader(), s.getMessage());
         }
-        if (!JNLPRuntime.isDebug() && (s.level == Level.MESSAGE_DEBUG
-                || s.level == Level.WARNING_DEBUG
-                || s.level == Level.ERROR_DEBUG)) {
+        if (!JNLPRuntime.isDebug() && (s.getHeader().level == Level.MESSAGE_DEBUG
+                || s.getHeader().level == Level.WARNING_DEBUG
+                || s.getHeader().level == Level.ERROR_DEBUG)) {
             //filter out debug messages
             //must be here to prevent deadlock, casued by exception form jnlpruntime, loggers or configs themselves
             return;
         }
-        String message = s.message;
+        String message = s.getMessage();
         if (LogConfig.getLogConfig().isEnableHeaders()) {
             if (message.contains("\n")) {
-                message = header.toString() + "\n" + message;
+                message = s.getHeader().toString() + "\n" + message;
             } else {
-                message = header.toString() + " " + message;
+                message = s.getHeader().toString() + " " + message;
             }
         }
         if (LogConfig.getLogConfig().isLogToStreams()) {
-            if (s.level.isOutput()) {
+            if (s.getHeader().level.isOutput()) {
                 outLog.log(message);
             }
-            if (s.level.isError()) {
+            if (s.getHeader().level.isError()) {
                 errLog.log(message);
             }
         }
@@ -191,17 +183,22 @@ public class OutputController {
     private OutputController() {
         this(System.out, System.err);
     }
+    
+    
+    private static class OutputControllerHolder {
+
+        //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+        //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+        private static final OutputController INSTANCE = new OutputController();
+    }
 
     /**
      * This should be the only legal way to get logger for ITW
      *
      * @return logging singleton
      */
-    synchronized public static OutputController getLogger() {
-        if (logger == null) {
-            logger = new OutputController();
-        }
-        return logger;
+    public static OutputController getLogger() {
+        return OutputControllerHolder.INSTANCE;
     }
 
     /**
@@ -215,21 +212,23 @@ public class OutputController {
         outLog = new PrintStreamLogger(out);
         errLog = new PrintStreamLogger(err);
         //itw logger have to be fully initialised before start
-        Thread t = new Thread(messageQueConsumer, "Output controller consumer daemon");
-        t.setDaemon(true);
-        t.start();
-        //some messages were probably posted before start of consumer
-        synchronized (this){
-            this.notifyAll();
-        }
+        consumerThread = new Thread(messageQueConsumer, "Output controller consumer daemon");
+        consumerThread.setDaemon(true);
+        //is started in JNLPRuntime.getConfig() after config is laoded
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!messageQue.isEmpty()) {
-                    consume();
-                }
+                flush();
             }
         }));
+    }
+     
+    public void startConsumer() {
+        consumerThread.start();
+        //some messages were probably posted before start of consumer
+        synchronized (this) {
+            this.notifyAll();
+        }
     }
 
     /**
@@ -302,33 +301,52 @@ public class OutputController {
         log(Level.ERROR_DEBUG, (Object) s);
     }
 
-    private synchronized void log(Level level, Object o) {
+    private void log(Level level, Object o) {
+        String s ="";
         if (o == null) {
-            messageQue.add(new MessageWithLevel(NULL_OBJECT, level));
+            s = NULL_OBJECT;
         } else if (o instanceof Throwable) {
-            messageQue.add(new MessageWithLevel(exceptionToString((Throwable) o), level));
+            s = exceptionToString((Throwable) o);
         } else {
-            messageQue.add(new MessageWithLevel(o.toString(), level));
+            s=o.toString();
         }
-        this.notifyAll();
+        log(new JavaMessage(new Header(level, false), s));
     }
 
+    synchronized void log(MessageWithHeader l){
+        messageQue.add(l);
+        this.notifyAll();
+    }
+    
+    
+
+    private static class FileLogHolder {
+        
+        //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+        //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+        private static volatile FileLog INSTANCE = new FileLog();
+    }
     private FileLog getFileLog() {
-        if (fileLog == null) {
-            fileLog = new FileLog();
+        return FileLogHolder.INSTANCE;
+    }
+
+    private static class SystemLogHolder {
+
+        //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+        //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+        private static volatile SingleStreamLogger INSTANCE = initSystemLogger();
+
+        private static SingleStreamLogger initSystemLogger() {
+            if (JNLPRuntime.isWindows()) {
+                return new WinSystemLog();
+            } else {
+                return new UnixSystemLog();
+            }
         }
-        return fileLog;
     }
 
     private SingleStreamLogger getSystemLog() {
-        if (sysLog == null) {
-            if (JNLPRuntime.isWindows()) {
-                sysLog = new WinSystemLog();
-            } else {
-                sysLog = new UnixSystemLog();
-            }
-        }
-        return sysLog;
+        return SystemLogHolder.INSTANCE;
     }
 
     public void printErrorLn(String e) {
@@ -368,7 +386,7 @@ public class OutputController {
     }
 
     void setFileLog(FileLog fileLog) {
-        this.fileLog = fileLog;
+        FileLogHolder.INSTANCE = fileLog;
     }
 
     void setOutLog(PrintStreamLogger outLog) {
@@ -376,7 +394,7 @@ public class OutputController {
     }
 
     void setSysLog(SingleStreamLogger sysLog) {
-        this.sysLog = sysLog;
+        SystemLogHolder.INSTANCE = sysLog;
     }
     
     

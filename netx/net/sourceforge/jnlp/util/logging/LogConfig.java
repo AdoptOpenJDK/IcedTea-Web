@@ -37,8 +37,6 @@
 package net.sourceforge.jnlp.util.logging;
 
 import java.io.File;
-import javax.naming.ConfigurationException;
-
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -56,9 +54,7 @@ public class LogConfig {
     private boolean logToStreams;
     private boolean logToSysLog;
     
-    private static LogConfig logConfig;
-
-    public LogConfig() {
+    private LogConfig() {
             DeploymentConfiguration config = JNLPRuntime.getConfiguration();
             // Check whether logging and tracing is enabled.
             enableLogging = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
@@ -81,18 +77,20 @@ public class LogConfig {
             }
     }
 
+    private static class LogConfigHolder {
+
+        //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+        //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+        private static volatile LogConfig INSTANCE = new LogConfig();
+    }
+
     public static LogConfig getLogConfig() {
-        if (logConfig == null) {
-            logConfig = new LogConfig();
-        }
-        return logConfig;
+        return LogConfigHolder.INSTANCE;
     }
 
     /** For testing only: throw away the previous config */
-    static void resetLogConfig() {
-        if (logConfig != null) {
-            logConfig = new LogConfig();
-        }
+    static synchronized void resetLogConfig() {
+            LogConfigHolder.INSTANCE = new LogConfig();
     }
 
     public String getIcedteaLogDir() {

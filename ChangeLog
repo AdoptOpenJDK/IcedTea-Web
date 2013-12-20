@@ -1,3 +1,30 @@
+2013-12-20  Jiri Vanek  <jvanek@redhat.com>
+
+	singletons logic, logs and test cleanup/fixes
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	config singleton made properly synchronized via Holder pattern
+	(DeploymentConfigurationHolder).
+	* netx/net/sourceforge/jnlp/util/logging/JavaConsole.java: same,
+	(JavaConsoleHolder). Console gui initialized on show, not on creation.
+	Removed look and feel. (addMessage) gui update adapted.
+	* netx/net/sourceforge/jnlp/util/logging/LogConfig.java: made private,
+	singleton handled via LogConfigHolder.
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: mentioned
+	issue with (getConfiguration), removed obsoleted (MessageWithLevel), 
+	(messageQue) retyped to <MessageWithHeader>, (consume) adapted.
+	(consumerThread) made global variable, ist start moved to (startConsumer)
+	which is called after initialisation of config singleton. Logs queing
+	moved to (log) of (MessageWithHeader) signature. (FileLogHolder) and
+	(SystemLogHolder) created for holder pattern synchronization.
+	* netx/net/sourceforge/jnlp/util/logging/headers/Header.java: constructor
+	and (getCaller) adaptation.
+	* netx/net/sourceforge/jnlp/util/logging/headers/PluginHeader.java: fixed
+	(toString) for preinit messages.
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/JavaConsoleTest.java:
+	removed erroneous stdout.
+	* tests/test-extensions/net/sourceforge/jnlp/util/logging/NoStdOutErrTest.java:
+	is no longer throwing exceptions (was causing errors in junit) and synchronized.
+
 2013-12-17  Jiri Vanek  <jvanek@redhat.com>
 
 	JNLPRuntime.config changed to proper singleton.
