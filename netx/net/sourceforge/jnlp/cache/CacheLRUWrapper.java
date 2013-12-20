@@ -73,14 +73,14 @@ public enum CacheLRUWrapper {
 
     /* location of cache directory */
     private final String setCachePath = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
-    private final String cacheDir = new File(setCachePath != null ? setCachePath : System.getProperty("java.io.tmpdir")).getPath();
+    String cacheDir = new File(setCachePath != null ? setCachePath : System.getProperty("java.io.tmpdir")).getPath();
 
     /*
      * back-end of how LRU is implemented This file is to keep track of the most
      * recently used items. The items are to be kept with key = (current time
      * accessed) followed by folder of item. value = path to file.
      */
-    private PropertiesFile cacheOrder = new PropertiesFile(
+    PropertiesFile cacheOrder = new PropertiesFile(
             new File(cacheDir + File.separator + CACHE_INDEX_FILE_NAME));
     public static final String CACHE_INDEX_FILE_NAME = "recently_used";
 

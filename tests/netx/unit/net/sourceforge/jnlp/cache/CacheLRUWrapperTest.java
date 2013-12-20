@@ -42,31 +42,46 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import net.sourceforge.jnlp.ServerAccess;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.PropertiesFile;
+import org.junit.AfterClass;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CacheLRUWrapperTest {
 
-    private final CacheLRUWrapper clw = CacheLRUWrapper.getInstance();
-    private final String cacheDir = new File(JNLPRuntime.getConfiguration()
-            .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR)).getPath();
-
+    private static final CacheLRUWrapper clw = CacheLRUWrapper.getInstance();
+    private static String cacheDirBackup;
+    private static PropertiesFile cacheOrderBackup;
     // does no DeploymentConfiguration exist for this file name? 
-    private final String cacheIndexFileName = CacheLRUWrapper.CACHE_INDEX_FILE_NAME;
+    private static  final String cacheIndexFileName = CacheLRUWrapper.CACHE_INDEX_FILE_NAME + "_testing";
 
     private final int noEntriesCacheFile = 1000;
 
     @BeforeClass
     static public void setupJNLPRuntimeConfig() {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, System.getProperty("java.io.tmpdir"));
+        cacheDirBackup = clw.cacheDir;
+        cacheOrderBackup = clw.cacheOrder;
+        clw.cacheDir=System.getProperty("java.io.tmpdir");
+        clw.cacheOrder = new PropertiesFile( new File(clw.cacheDir + File.separator + cacheIndexFileName));
+        
+    }
+    
+    @AfterClass
+    static public void restoreJNLPRuntimeConfig() {
+        clw.cacheDir = cacheDirBackup;
+        clw.cacheOrder = cacheOrderBackup;
     }
     
     @Test
     public void testLoadStoreTiming() throws InterruptedException {
 
+        final File cacheIndexFile = new File(clw.cacheDir + File.separator + cacheIndexFileName);
+        cacheIndexFile.delete();
+        //ensure it exists, so we can lock
+        clw.store();
+        try{
+        
         int noLoops = 1000;
 
         long time[] = new long[noLoops];
@@ -95,15 +110,17 @@ public class CacheLRUWrapperTest {
 
         // wait more than 100 microseconds for noLoops = 1000 and noEntries=1000 is bad
         assertTrue("load() must not take longer than 100 µs, but took in avg " + avg/1000 + "µs", avg < 100 * 1000);
-
+        } finally {
         clw.unlock();
+        cacheIndexFile.delete();
+        }
     }
 
     private void fillCacheIndexFile(int noEntries) {
 
         // fill cache index file
         for(int i = 0; i < noEntries; i++) {
-            String path = cacheDir + File.separatorChar + i + File.separatorChar + "test" + i + ".jar";
+            String path = clw.cacheDir + File.separatorChar + i + File.separatorChar + "test" + i + ".jar";
             String key = clw.generateKey(path);
             clw.addEntry(key, path);
         }
@@ -112,18 +129,24 @@ public class CacheLRUWrapperTest {
     @Test
     public void testModTimestampAfterStore() throws InterruptedException {
 
-        final File cacheIndexFile = new File(cacheDir + File.separator + cacheIndexFileName);
-
+        final File cacheIndexFile = new File(clw.cacheDir + File.separator + cacheIndexFileName);
+        cacheIndexFile.delete();
+        //ensure it exists, so we can lock
+        clw.store();
+        try{
         clw.lock();
         
         // 1. clear cache entries + store
+        clw.addEntry("aa", "bb");
+        clw.store();
         long lmBefore = cacheIndexFile.lastModified();
+        Thread.sleep(1010);
         clearCacheIndexFile();
         long lmAfter = cacheIndexFile.lastModified();
         assertTrue("modification timestamp hasn't changed! Before = " + lmBefore + " After = " + lmAfter, lmBefore < lmAfter);
 
         // FIXME: wait a second, because of file modification timestamp only provides accuracy on seconds.
-        Thread.sleep(1000);
+        Thread.sleep(1010);
 
         // 2. load cache file
         lmBefore = cacheIndexFile.lastModified();
@@ -138,7 +161,10 @@ public class CacheLRUWrapperTest {
         lmAfter = cacheIndexFile.lastModified();
         assertTrue("modification timestamp hasn't changed! Before = " + lmBefore + " After = " + lmAfter, lmBefore < lmAfter);
 
-        clw.unlock();
+        } finally {
+            cacheIndexFile.delete();
+            clw.unlock();
+        }
     }
     
     private void clearCacheIndexFile() {
