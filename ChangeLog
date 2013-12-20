@@ -1,5 +1,11 @@
 2013-12-20  Jiri Vanek  <jvanek@redhat.com>
 
+	finished removal of legacy xulrunner api
+	* acinclude.m4: (IT_CHECK_XULRUNNER_API_VERSION) removed 
+	* configure.ac: likewise
+
+2013-12-20  Jiri Vanek  <jvanek@redhat.com>
+
 	singletons logic, logs and test cleanup/fixes
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
 	config singleton made properly synchronized via Holder pattern
