@@ -45,13 +45,13 @@ public class Header {
     public static String  default_user = System.getProperty("user.name");
     
     public String user = default_user;
-    public boolean application;
-    public Level level;
+    public boolean application = true;
+    public Level level = Level.WARNING_ALL;
     public Date date = new Date();
-    public boolean isC;//false=> java
-    public String caller;
-    public String thread1;
-    public String thread2;
+    public boolean isC = false;//false=> java
+    public String caller = "unknown";
+    public String thread1 = "unknown";
+    public String thread2 = "unknown";
 
     //to alow simple inheritance
     public Header() {

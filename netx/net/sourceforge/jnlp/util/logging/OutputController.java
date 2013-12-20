@@ -146,7 +146,7 @@ public class OutputController {
         messageQue.remove(0);
         //filtering is done in console during runtime
         if (LogConfig.getLogConfig().isLogToConsole()) {
-            JavaConsole.getConsole().addMessage(s.getHeader(), s.getMessage());
+            JavaConsole.getConsole().addMessage(s);
         }
         if (!JNLPRuntime.isDebug() && (s.getHeader().level == Level.MESSAGE_DEBUG
                 || s.getHeader().level == Level.WARNING_DEBUG

@@ -5,8 +5,8 @@
 
 package net.sourceforge.jnlp.util.logging;
 
-import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 import java.util.Date;
+import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,8 +50,8 @@ public class JavaConsoleTest {
         Assert.assertEquals(OutputController.Level.WARNING_ALL,p2.header.level);
         Assert.assertTrue(p2.header.date.toString().contains(new Date().toString().substring(0,16))); //means no Tue Nov 19 09:43:50 :)
         Assert.assertTrue(p2.header.user.equals("jvanek"));
-        Assert.assertTrue(p2.header.thread1 == null);
-        Assert.assertTrue(p2.header.thread2 == null);
+        Assert.assertTrue(p2.header.thread1.equals("unknown"));
+        Assert.assertTrue(p2.header.thread2.equals("unknown"));
 
 
     }

@@ -915,6 +915,9 @@ public class Launcher {
                 if (exitOnFailure) {
                     JNLPRuntime.exit(1);
                 }
+            }  catch (Throwable ex) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                throw new RuntimeException(ex);
             }
         }
 

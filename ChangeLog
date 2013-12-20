@@ -1,5 +1,23 @@
 2013-12-20  Jiri Vanek  <jvanek@redhat.com>
 
+	Rewritten java console
+	* netx/net/sourceforge/jnlp/Launcher.java: fatal error from lunch can reach console
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: new console,
+	controls
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPaneModel.java: data
+	manager of new console.
+	* netx/net/sourceforge/jnlp/util/logging/JavaConsole.java: removed old gui,
+	now using multiple 1-n instances of ConsoleOutputPane with theirs models.
+	(addMessage) now receive MessageWithHeader object instead body and header.
+	* netx/net/sourceforge/jnlp/util/logging/headers/Header.java: have not null
+	defaults
+	* netx/net/sourceforge/jnlp/util/logging/headers/ObservableMessagesProvider.java:
+	abstraction of datasource for new console
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/JavaConsoleTest.java:
+	adapted.
+
+2013-12-20  Jiri Vanek  <jvanek@redhat.com>
+
 	fixed CacheLRUWrapperTest
 	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: (cacheDir) and 
 	(cacheOrder) made package private for testing purposes. 
