@@ -167,26 +167,41 @@ public class JNLPClassLoader extends URLClassLoader {
     /** Permissions granted by the user during runtime. */
     private ArrayList<Permission> runtimePermissions = new ArrayList<Permission>();
 
-    /** all jars not yet part of classloader or active */
-    private List<JARDesc> available = new ArrayList<JARDesc>();
+    /** all jars not yet part of classloader or active
+     * Synchronized since this field may become shared data between multiple classloading threads.
+     * See loadClass(String) and CodebaseClassLoader.findClassNonRecursive(String).
+     */
+    private List<JARDesc> available = Collections.synchronizedList(new ArrayList<JARDesc>());
 
     /** the jar cert verifier tool to verify our jars */
     private final JarCertVerifier jcv;
 
     private SigningState signing = SigningState.NONE;
 
-    /** ArrayList containing jar indexes for various jars available to this classloader */
-    private ArrayList<JarIndex> jarIndexes = new ArrayList<JarIndex>();
+    /** ArrayList containing jar indexes for various jars available to this classloader
+     * Synchronized since this field may become shared data between multiple classloading threads/
+     * See loadClass(String) and CodebaseClassLoader.findClassNonRecursive(String).
+     */
+    private List<JarIndex> jarIndexes = Collections.synchronizedList(new ArrayList<JarIndex>());
 
-    /** Set of classpath strings declared in the manifest.mf files */
-    private Set<String> classpaths = new HashSet<String>();
+    /** Set of classpath strings declared in the manifest.mf files
+     * Synchronized since this field may become shared data between multiple classloading threads.
+     * See loadClass(String) and CodebaseClassLoader.findClassNonRecursive(String).
+     */
+    private Set<String> classpaths = Collections.synchronizedSet(new HashSet<String>());
 
-    /** File entries in the jar files available to this classloader */
-    private TreeSet<String> jarEntries = new TreeSet<String>();
+    /** File entries in the jar files available to this classloader
+     * Synchronized sinc this field may become shared data between multiple classloading threads.
+     * See loadClass(String) and CodebaseClassLoader.findClassNonRecursive(String).
+     */
+    private Set<String> jarEntries = Collections.synchronizedSet(new TreeSet<String>());
 
-    /** Map of specific original (remote) CodeSource Urls  to securitydesc */
-    private HashMap<URL, SecurityDesc> jarLocationSecurityMap =
-            new HashMap<URL, SecurityDesc>();
+    /** Map of specific original (remote) CodeSource Urls  to securitydesc
+     *  Synchronized since this field may become shared data between multiple classloading threads.
+     *  See loadClass(String) and CodebaseClassLoader.findClassNonRecursive(String).
+     */
+    private Map<URL, SecurityDesc> jarLocationSecurityMap =
+            Collections.synchronizedMap(new HashMap<URL, SecurityDesc>());
 
     /*Set to prevent once tried-to-get resources to be tried again*/
     private Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<URL>());
@@ -205,16 +220,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * Variable to track how many times this loader is in use
      */
     private int useCount = 0;
-
-    /* This Object is used as a lock on the loadClass(String) method. This method should not
-     * be entered by multiple threads simultaneously. This Object should be used for no other
-     * purpose than synchronizing the body of the loadClass(String) method. The intrinsic instance
-     * lock is not suitable for this purpose or else deadlock may occur.
-     *
-     * See bug RH976833 and the mailing list archive discussion:
-     * http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2013-September/024536.html
-     */
-    private final Object loadClassLock = new Object();
 
     /**
      * Create a new JNLPClassLoader from the specified file.
@@ -1214,10 +1219,14 @@ public class JNLPClassLoader extends URLClassLoader {
         for (JARDesc desc : jars) {
             String part = desc.getPart();
 
-            for (JARDesc jar : available) {
-                if (part != null && part.equals(jar.getPart()))
-                    if (!jars.contains(jar))
-                        jars.add(jar);
+            // "available" field can be affected by two different threads
+            // working in loadClass(String)
+            synchronized (available) {
+                for (JARDesc jar : available) {
+                    if (part != null && part.equals(jar.getPart()))
+                        if (!jars.contains(jar))
+                            jars.add(jar);
+                }
             }
         }
     }
@@ -1459,35 +1468,56 @@ public class JNLPClassLoader extends URLClassLoader {
      * Find a JAR in the shared 'extension' classloaders, this
      * classloader, or one of the classloaders for the JNLP file's
      * extensions.
+     * This method used to be qualified "synchronized." This was done solely for the
+     * purpose of ensuring only one thread entered the method at a time. This was not
+     * strictly necessary - ensuring that all affected fields are thread-safe is
+     * sufficient. Locking on the JNLPClassLoader instance when this method is called
+     * can result in deadlock if another thread is dealing with the CodebaseClassLoader
+     * at the same time. This solution is very heavy-handed as the instance lock is not
+     * truly required, and taking the lock on the classloader instance when not needed is
+     * not in general a good idea because it can and will lead to deadlock when multithreaded
+     * classloading is in effect. The solution is to keep the fields thread safe on their own.
+     * This is accomplished by wrapping them in Collections.synchronized* to provide
+     * atomic add/remove operations, and synchronizing on them when iterating or performing
+     * multiple mutations.
+     * See bug report RH976833. On some systems this bug will manifest itself as deadlock on
+     * every webpage with more than one Java applet, potentially also causing the browser
+     * process to hang.
+     * More information in the mailing list archives:
+     * http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2013-September/024536.html
+     * 
+     * Affected fields: available, classpaths, jarIndexes, jarEntries, jarLocationSecurityMap
      */
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-        synchronized (loadClassLock) {
-            Class<?> result = findLoadedClassAll(name);
+        Class<?> result = findLoadedClassAll(name);
 
-            // try parent classloader
-            if (result == null) {
-                try {
-                    ClassLoader parent = getParent();
-                    if (parent == null)
-                        parent = ClassLoader.getSystemClassLoader();
+        // try parent classloader
+        if (result == null) {
+            try {
+                ClassLoader parent = getParent();
+                if (parent == null)
+                    parent = ClassLoader.getSystemClassLoader();
 
-                    return parent.loadClass(name);
-                } catch (ClassNotFoundException ex) {
-                }
+                return parent.loadClass(name);
+            } catch (ClassNotFoundException ex) {
             }
+        }
 
-            // filter out 'bad' package names like java, javax
-            // validPackage(name);
+        // filter out 'bad' package names like java, javax
+        // validPackage(name);
 
-            // search this and the extension loaders
-            if (result == null) {
+        // search this and the extension loaders
+        if (result == null) {
+            try {
+                result = loadClassExt(name);
+            } catch (ClassNotFoundException cnfe) {
+                // Not found in external loader either
+
+                // Look in 'Class-Path' as specified in the manifest file
                 try {
-                    result = loadClassExt(name);
-                } catch (ClassNotFoundException cnfe) {
-                    // Not found in external loader either
-
-                    // Look in 'Class-Path' as specified in the manifest file
-                    try {
+                    // This field synchronized before iterating over it since it may
+                    // be shared data between threads
+                    synchronized (classpaths) {
                         for (String classpath : classpaths) {
                             JARDesc desc;
                             try {
@@ -1498,17 +1528,21 @@ public class JNLPClassLoader extends URLClassLoader {
                             }
                             addNewJar(desc);
                         }
-
-                        result = loadClassExt(name);
-                        return result;
-                    } catch (ClassNotFoundException cnfe1) {
-                        OutputController.getLogger().log(cnfe1);
                     }
 
-                    // As a last resort, look in any available indexes
+                    result = loadClassExt(name);
+                    return result;
+                } catch (ClassNotFoundException cnfe1) {
+                    OutputController.getLogger().log(cnfe1);
+                }
 
-                    // Currently this loads jars directly from the site. We cannot cache it because this
-                    // call is initiated from within the applet, which does not have disk read/write permissions
+                // As a last resort, look in any available indexes
+
+                // Currently this loads jars directly from the site. We cannot cache it because this
+                // call is initiated from within the applet, which does not have disk read/write permissions
+                // This field synchronized before iterating over it since it may
+                // be shared data between threads
+                synchronized (jarIndexes) {
                     for (JarIndex index : jarIndexes) {
                         // Non-generic code in sun.misc.JarIndex
                         @SuppressWarnings("unchecked")
@@ -1536,13 +1570,13 @@ public class JNLPClassLoader extends URLClassLoader {
                     }
                 }
             }
-
-            if (result == null) {
-                throw new ClassNotFoundException(name);
-            }
-
-            return result;
         }
+
+        if (result == null) {
+            throw new ClassNotFoundException(name);
+        }
+
+        return result;
     }
 
     /**
@@ -1912,17 +1946,19 @@ public class JNLPClassLoader extends URLClassLoader {
 
     protected SecurityDesc getCodeSourceSecurity(URL source) {
         SecurityDesc sec=jarLocationSecurityMap.get(source);
-        if (sec == null && !alreadyTried.contains(source)) {
-            alreadyTried.add(source);
-            //try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
-            OutputController.getLogger().log("Application is trying to get permissions for " + source.toString() + ", which was not added by standard way. Trying to download and verify!");
-            try {
-                JARDesc des = new JARDesc(source, null, null, false, false, false, false);
-                addNewJar(des);
-                sec = jarLocationSecurityMap.get(source);
-            } catch (Throwable t) {
-                OutputController.getLogger().log(t);
-                sec = null;
+        synchronized (alreadyTried) {
+            if (sec == null && !alreadyTried.contains(source)) {
+                alreadyTried.add(source);
+                //try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
+                OutputController.getLogger().log("Application is trying to get permissions for " + source.toString() + ", which was not added by standard way. Trying to download and verify!");
+                try {
+                    JARDesc des = new JARDesc(source, null, null, false, false, false, false);
+                    addNewJar(des);
+                    sec = jarLocationSecurityMap.get(source);
+                } catch (Throwable t) {
+                    OutputController.getLogger().log(t);
+                    sec = null;
+                }
             }
         }
         if (sec == null){
@@ -1958,8 +1994,10 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         // security descriptors
-        for (URL key : extLoader.jarLocationSecurityMap.keySet()) {
-            jarLocationSecurityMap.put(key, extLoader.jarLocationSecurityMap.get(key));
+        synchronized (jarLocationSecurityMap) {
+            for (URL key : extLoader.jarLocationSecurityMap.keySet()) {
+                jarLocationSecurityMap.put(key, extLoader.jarLocationSecurityMap.get(key));
+            }
         }
     }
 
@@ -2198,9 +2236,11 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         // Permissions for all remote hosting urls
-        for (URL u: jarLocationSecurityMap.keySet()) {
-            permissions.add(new SocketPermission(u.getHost(),
-                                                 "connect, accept"));
+        synchronized (jarLocationSecurityMap) {
+            for (URL u : jarLocationSecurityMap.keySet()) {
+                permissions.add(new SocketPermission(u.getHost(),
+                        "connect, accept"));
+            }
         }
 
         // Permissions for codebase urls (if there is a loader)

@@ -1,3 +1,13 @@
+2013-12-27  Andrew Azores  <aazores@redhat.com>
+
+	Resolve deadlock issue in JNLPClassLoader. See
+	http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2013-December/025546.html
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (loadClassLock)
+	removed. (available, jarIndexes, classpaths, jarEntries, jarLocationSecurityMap)
+	fields wrapped in Collections.synchronized*() to provide atomic read/write.
+	Synchronized on while iterating over these collections. (loadClass) no longer
+	uses implicit JNLPClassLoader instance lock nor dedicated loadClassLock object.
+
 2013-12-20  Jiri Vanek  <jvanek@redhat.com>
 
 	Rewritten java console
