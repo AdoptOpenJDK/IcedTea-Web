@@ -1,3 +1,8 @@
+2014-01-02  Andrew Azores  <aazores@redhat.com>
+
+	Added ChangeLog revision hyperlinking to html-gen.sh
+	* html-gen.sh: ChangeLog dates made hyperlinks to corresponding commits
+
 2013-12-27  Andrew Azores  <aazores@redhat.com>
 
 	Resolve deadlock issue in JNLPClassLoader. See

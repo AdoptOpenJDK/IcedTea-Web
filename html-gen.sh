@@ -45,24 +45,35 @@
 # same directory as this script. These generated HTML documents are then used
 # in the netx About Dialog, which can be invoked with "javaws -about".
 
-# Currently the script is not configurable in any way and the files it processes
+# The only configuration option is the number of Changesets, and the files processed
 # are hardcoded. To run the script manually, create a directory "html-gen" in the
 # same directory as this script, containing files named AUTHORS, NEWS, ChangeLog,
 # and COPYING. Note that these files WILL be modified in-place during the HTML
 # "conversion" process. Setting the environment variable "HTML_GEN_DEBUG" to "true"
 # will enable some output from the script, which may be useful if you encounter
 # issues with this script's processing of an input file.
-
-if [ -z "$HTML_GEN_DEBUG" ]; then HTML_GEN_DEBUG="false"; fi
+# The number of Changesets to process into the ChangeLog can be set by setting the
+# environment variable HTML_GEN_CHANGESETS, or by passing an integer argument to
+# the script. The parameter will take priority over the environment variable.
 
 print_debug() {
-    if [ "$HTML_GEN_DEBUG" == "true" ]; then echo "$1"; fi
+    if [ "$HTML_GEN_DEBUG" ]; then echo "$1"; fi
 }
+
+CHANGESETS="$1"
+
+if [ -z "$CHANGESETS" ]; then CHANGESETS="$HTML_GEN_CHANGESETS"; fi
+
+if [ -z "$CHANGESETS" ] || [ "$CHANGESETS" -lt 0 ]; then CHANGESETS=10; fi
+
+NEWS_ITEMS=2
+REPO_URL="$(hg paths default | sed -r 's/.*icedtea.classpath.org\/(.*)/\1/')"
 
 start_time=$(date +%s.%N)
 
 cd html-gen
 
+print_debug "Generating HTML content for javaws -about for $REPO_URL. $CHANGESETS changesets, $NEWS_ITEMS news items"
 print_debug "Starting sed substitutions"
 for FILE in NEWS AUTHORS COPYING ChangeLog
 do
@@ -88,6 +99,8 @@ sed -i '4i <center>' AUTHORS.html
 sed -i '5i <br><img src="jamIcon.jpg" alt="Jam Icon" width="87" height="84"><br><br>' AUTHORS.html
 echo "</center>" >> AUTHORS.html
 
+REVS=(`hg log -l$CHANGESETS | grep 'changeset:' | cut -d: -f3 | tr '\n' ' '`)
+
 print_debug "Done. Starting formatting (bolding, mailto and hyperlink creation)"
 
 for FILE in NEWS.html ChangeLog.html
@@ -105,20 +118,26 @@ do
                 BOLD=0
                 COUNTER=$(( $COUNTER + 1 ))
             fi
-            if [[ $COUNTER -gt 2 ]] # Cut to two releases
+            if [[ $COUNTER -gt $NEWS_ITEMS ]] # Cut to two releases
             then
                 break
             fi
         else
-            if [[ $LINE =~ .*\&lt\;.*\@.*\&gt\; ]] # Matches eg <aazores@redhat.com>, after HTML-escaping
+            email_regex=".*\&lt;.*\@.*\&gt;"
+            if [[ $LINE =~ $email_regex ]] # Matches eg <aazores@redhat.com>, after HTML-escaping
             then
                 BOLD=0
             fi
-            if [[ $LINE =~ [0-9]{4}-[0-9]{2}-[0-9]{2}* ]] # Matches eg 2013-07-01
+            date_regex="[0-9]{4}-[0-9]{2}-[0-9]{2}"
+            if [[ $LINE =~ $date_regex* ]] # Matches line starting with eg 2013-07-01
             then
+                html_space="\&ensp;\&ensp;"
+                REV=${REVS[$COUNTER]}
+                # Turn the date into a hyperlink for the revision this changelog entry describes
+                LINE=$(echo "$LINE" | sed -r "s|($date_regex)($html_space.*$html_space.*)|<a href=http://icedtea.classpath.org/$REPO_URL/rev/$REV>\1</a>\2|")
                 COUNTER=$(( $COUNTER + 1 ))
             fi
-            if [[ $COUNTER -gt 10 ]] # Cut to ten changesets
+            if [[ $COUNTER -gt $CHANGESETS ]] # Cut to ten changesets
             then
                 break
             fi
