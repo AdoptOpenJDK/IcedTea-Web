@@ -48,10 +48,10 @@ import org.junit.Test;
 /** Test various corner cases of the parser */
 public class BASE64EncoderTest {
 
-    private static final String sSrc = "abcdefgHIJKLMNOPQrstuvwxyz1234567890\r\n"
+    static final String sSrc = "abcdefgHIJKLMNOPQrstuvwxyz1234567890\r\n"
             + "-=+_))(**&&&^^%%$$##@@!!~{}][\":'/\\.,><\n"
             + "+ěšěčřžýáíé=ů/úěřťšďňéíáč";
-    private static final byte[] encoded = {89, 87, 74, 106, 90, 71, 86, 109, 90,
+    static final byte[] encoded = {89, 87, 74, 106, 90, 71, 86, 109, 90,
         48, 104, 74, 83, 107, 116, 77, 84, 85, 53, 80, 85, 70, 70, 121, 99, 51,
         82, 49, 100, 110, 100, 52, 101, 88, 111, 120, 77, 106, 77, 48, 78, 84,
         89, 51, 79, 68, 107, 119, 68, 81, 111, 116, 80, 83, 116, 102, 75, 83,
@@ -63,8 +63,7 @@ public class BASE64EncoderTest {
         69, 109, 56, 87, 90, 120, 97, 88, 70, 111, 99, 83, 80, 10, 120, 89, 106,
         68, 113, 99, 79, 116, 119, 54, 72, 69, 106, 81, 61, 61, 10};
     
-    public static final String sunClassE = "sun.misc.BASE64Encoder";
-    public static final String sunClassD = "sun.misc.BASE64Decoder";
+    private static final String sunClassD = "sun.misc.BASE64Decoder";
 
     @Test
     public void testEmbededBase64Encoder() throws Exception {
@@ -97,23 +96,32 @@ public class BASE64EncoderTest {
         e2.encodeBuffer(data, out2);
         byte[] encoded2 = out2.toByteArray();
         Object decoder = createInsatnce(sunClassD);
-        byte[] decoded = (byte[]) (getAndInvokeMethod(decoder, "decodeBuffer", new String(encoded, "utf-8")));
+        byte[] decoded = (byte[]) (getAndInvokeMethod(decoder, "decodeBuffer", new String(encoded2, "utf-8")));
         Assert.assertArrayEquals(data, decoded);
         Assert.assertEquals(sSrc, new String(decoded, "utf-8"));
-
-
-
-
+    }
+    
+      @Test
+    public void testEmbededBase64EncoderAgainstEbededDecoder() throws Exception {
+        final byte[] data = sSrc.getBytes("utf-8");
+        ByteArrayOutputStream out2 = new ByteArrayOutputStream();
+        BASE64Encoder e2 = new BASE64Encoder();
+        e2.encodeBuffer(data, out2);
+        byte[] encoded2 = out2.toByteArray();
+        BASE64Decoder decoder = new BASE64Decoder();
+        byte[] decoded = decoder.decodeBuffer(new String(encoded2, "utf-8"));
+        Assert.assertArrayEquals(data, decoded);
+        Assert.assertEquals(sSrc, new String(decoded, "utf-8"));
     }
 
-    private static Object createInsatnce(String ofCalss) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    static Object createInsatnce(String ofCalss) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         Class<?> classDefinition = Class.forName(ofCalss);
         return classDefinition.newInstance();
 
     }
 
-    private static Object getAndInvokeMethod(Object instance, String methodName, Object... params) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    static Object getAndInvokeMethod(Object instance, String methodName, Object... params) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Class<?>[] cs = new Class<?>[params.length];
         for (int i = 0; i < params.length; i++) {
             Object object = params[i];

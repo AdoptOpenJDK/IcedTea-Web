@@ -1,3 +1,19 @@
+2011-10-17  Jiri Vanek <jvanek@redhat.com>
+
+	Removed depndence on  sun.misc.BASE64Decoder
+	* configure.ac: removed check for sun.misc.BASE64Decoder
+	* netx/net/sourceforge/jnlp/PluginBridge.java :  sun.misc.BASE64Decoder
+	import repalced by net.sourceforge.jnlp.util.replacements.BASE64Decoder
+	* netx/net/sourceforge/jnlp/util/replacements/BASE64Decoder.java: new
+	file, in-tre copy from jdk7
+	* netx/net/sourceforge/jnlp/util/replacements/CharacterDecoder.java: likewise
+	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64DecoderTest.java:
+	new tests for new files
+	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64EncoderTest.java:
+	(getAndInvokeMethod), (encoded) and (sSrc) made public final. Corrected
+	usage of (encoded2), added new test (testEmbededBase64EncoderAgainstEbededDecoder)
+	to test with internal  decoder.	
+
 2014-01-02  Andrew Azores  <aazores@redhat.com>
 
 	Added ChangeLog revision hyperlinking to html-gen.sh

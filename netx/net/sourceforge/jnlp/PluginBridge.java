@@ -38,7 +38,7 @@ import java.util.Set;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.misc.BASE64Decoder;
+import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
 
 /**
  * Allows reuse of code that expects a JNLPFile object,
