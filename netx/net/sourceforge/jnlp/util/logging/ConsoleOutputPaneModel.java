@@ -125,8 +125,12 @@ public class ConsoleOutputPaneModel {
     String importList(int start) {
         return importList(highLight, start);
     }
-
+    
     String importList(boolean mark, int start) {
+        return  importList(mark, start, sortBy);
+    }
+
+    String importList(boolean mark, int start, int sortByLocal) {
         int added = start;
         StringBuilder sb = new StringBuilder();
         if (mark) {
@@ -139,9 +143,9 @@ public class ConsoleOutputPaneModel {
 
         List<MessageWithHeader> sortedList;
         if (start == 0) {
-            sortedList = preSort(dataProvider.getData());
+            sortedList = preSort(dataProvider.getData(), sortByLocal);
         } else {
-            sortedList = preSort(Collections.synchronizedList(dataProvider.getData().subList(start, dataProvider.getData().size())));
+            sortedList = preSort(Collections.synchronizedList(dataProvider.getData().subList(start, dataProvider.getData().size())), sortByLocal);
         }
         lastUpdateIndex = dataProvider.getData().size();
 
@@ -226,9 +230,9 @@ public class ConsoleOutputPaneModel {
         return sb.toString();
     }
 
-    List<MessageWithHeader> preSort(List<MessageWithHeader> data) {
+    List<MessageWithHeader> preSort(List<MessageWithHeader> data, int sortByLocal) {
         List<MessageWithHeader> sortedData;
-        if (sortBy == 0) {
+        if (sortByLocal == 0) {
             if (revertSort) {
                 sortedData = Collections.synchronizedList(new ArrayList<MessageWithHeader>(data));
                 Collections.reverse(sortedData);
@@ -237,7 +241,7 @@ public class ConsoleOutputPaneModel {
             }
         } else {
             sortedData = Collections.synchronizedList(new ArrayList<MessageWithHeader>(data));
-            switch (sortBy) {
+            switch (sortByLocal) {
                 case 1:
                     Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
                         @Override

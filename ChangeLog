@@ -1,11 +1,22 @@
-2011-10-17  Jiri Vanek <jvanek@redhat.com>
+2014-01-06 Jiri Vanek <jvanek@redhat.com>
 
-	Removed depndence on  sun.misc.BASE64Decoder
+	Copy all button in console controls sorts by date by default.
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: added
+	(sortCopyAll) checkbox. Logic from  (copyPlainActionPerformed) and
+	(copyRichActionPerformed)  extracted to  new (fillClipBoard) which also
+	used correct call of  ConsoleOutputPaneModel.importList  based on
+	 (sortCopyAll) value.
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPaneModel.java:
+	added abstraction for (importList)  to allow sorting via parameter 
+
+2014-01-06 Jiri Vanek <jvanek@redhat.com>
+
+	Removed dependence on  sun.misc.BASE64Decoder
 	* configure.ac: removed check for sun.misc.BASE64Decoder
 	* netx/net/sourceforge/jnlp/PluginBridge.java :  sun.misc.BASE64Decoder
-	import repalced by net.sourceforge.jnlp.util.replacements.BASE64Decoder
+	import replaced by net.sourceforge.jnlp.util.replacements.BASE64Decoder
 	* netx/net/sourceforge/jnlp/util/replacements/BASE64Decoder.java: new
-	file, in-tre copy from jdk7
+	file, in-tree copy from jdk7
 	* netx/net/sourceforge/jnlp/util/replacements/CharacterDecoder.java: likewise
 	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64DecoderTest.java:
 	new tests for new files

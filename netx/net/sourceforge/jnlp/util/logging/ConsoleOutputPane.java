@@ -242,6 +242,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         jPanel2 = new javax.swing.JPanel();
         showHeaders = new javax.swing.JCheckBox();
         showUser = new javax.swing.JCheckBox();
+        sortCopyAll = new javax.swing.JCheckBox();
         showOrigin = new javax.swing.JCheckBox();
         showLevel = new javax.swing.JCheckBox();
         showDate = new javax.swing.JCheckBox();
@@ -286,6 +287,10 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         jEditorPane1 = new javax.swing.JTextPane();
         showHide = new javax.swing.JButton();
 
+        sortCopyAll.setSelected(true);
+        sortCopyAll.setText("sort copy all by date");
+        sortCopyAll.setToolTipText("The sort by date is a bit more time consuming, but most natural for posting purposes");
+        
         showHeaders.setSelected(true);
         showHeaders.setText("Show headers:");
         showHeaders.addActionListener(getDefaultActionSingleton());
@@ -487,6 +492,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
                 addComponent(next).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE).
                 addComponent(wordWrap).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(highLight).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(sortCopyAll).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(copyRich).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(copyPlain)).addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup().
                 addComponent(searchLabel).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
@@ -568,6 +574,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
                 jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).
                 addComponent(previous).
                 addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
+                addComponent(sortCopyAll).
                 addComponent(copyPlain).
                 addComponent(copyRich).
                 addComponent(highLight).
@@ -782,13 +789,20 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
     }
 
     private void copyPlainActionPerformed(java.awt.event.ActionEvent evt) {
-        StringSelection stringSelection = new StringSelection(model.importList(false, 0));
-        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clpbrd.setContents(stringSelection, null);
+        fillClipBoard(false, sortCopyAll.isSelected());
     }
 
     private void copyRichActionPerformed(java.awt.event.ActionEvent evt) {
-        StringSelection stringSelection = new StringSelection(model.importList(true, 0));
+        fillClipBoard(true, sortCopyAll.isSelected());
+    }
+    
+    private void fillClipBoard(boolean mark, boolean forceSort){
+        StringSelection stringSelection ; 
+        if (forceSort){
+            stringSelection = new StringSelection(model.importList(mark, 0, 4/*date*/));
+        } else {
+            stringSelection = new StringSelection(model.importList(mark, 0));
+        }
         Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
         clpbrd.setContents(stringSelection, null);
     }
@@ -879,6 +893,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
     private javax.swing.JCheckBox showThread1;
     private javax.swing.JCheckBox showThread2;
     private javax.swing.JCheckBox showUser;
+    private javax.swing.JCheckBox sortCopyAll;
     private javax.swing.JComboBox sortBy;
     private javax.swing.JLabel sortByLabel;
     private javax.swing.JLabel statistics;
