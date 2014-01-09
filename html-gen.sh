@@ -69,7 +69,7 @@ if [ -z "$CHANGESETS" ] || [ "$CHANGESETS" -lt 0 ]; then CHANGESETS=10; fi
 NEWS_ITEMS=2
 REPO_URL="$(hg paths default | sed -r 's/.*icedtea.classpath.org\/(.*)/\1/')"
 
-start_time=$(date +%s.%N)
+start_time="$(date +%s.%N)"
 
 cd html-gen
 
@@ -99,54 +99,54 @@ sed -i '4i <center>' AUTHORS.html
 sed -i '5i <br><img src="jamIcon.jpg" alt="Jam Icon" width="87" height="84"><br><br>' AUTHORS.html
 echo "</center>" >> AUTHORS.html
 
-REVS=(`hg log -l$CHANGESETS | grep 'changeset:' | cut -d: -f3 | tr '\n' ' '`)
+REVS=(`hg log -l"$CHANGESETS" | grep 'changeset:' | cut -d: -f3 | tr '\n' ' '`)
 
 print_debug "Done. Starting formatting (bolding, mailto and hyperlink creation)"
 
 for FILE in NEWS.html ChangeLog.html
 do
     print_debug "Processing $FILE..."
-    mv $FILE "$FILE.old"
+    mv "$FILE" "$FILE.old"
     COUNTER=0
     while read LINE
     do
         BOLD=1
-        if [[ $FILE == "NEWS.html" ]]
+        if [ "$FILE" = "NEWS.html" ]
         then
-            if [[ $LINE =~ New\ in\ release* ]]
+            if [[ "$LINE" =~ New\ in\ release* ]]
             then
                 BOLD=0
-                COUNTER=$(( $COUNTER + 1 ))
+                COUNTER="$(( COUNTER + 1 ))"
             fi
-            if [[ $COUNTER -gt $NEWS_ITEMS ]] # Cut to two releases
+            if [ "$COUNTER" -gt "$NEWS_ITEMS" ] # Cut to two releases
             then
                 break
             fi
         else
             email_regex=".*\&lt;.*\@.*\&gt;"
-            if [[ $LINE =~ $email_regex ]] # Matches eg <aazores@redhat.com>, after HTML-escaping
+            if [[ "$LINE" =~ $email_regex ]] # Matches eg <aazores@redhat.com>, after HTML-escaping
             then
                 BOLD=0
             fi
-            date_regex="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-            if [[ $LINE =~ $date_regex* ]] # Matches line starting with eg 2013-07-01
+            date_regex=[0-9]{4}-[0-9]{2}-[0-9]{2}
+            if [[ "$LINE" =~ $date_regex* ]] # Matches line starting with eg 2013-07-01
             then
                 html_space="\&ensp;\&ensp;"
-                REV=${REVS[$COUNTER]}
+                REV="${REVS["$COUNTER"]}"
                 # Turn the date into a hyperlink for the revision this changelog entry describes
                 LINE=$(echo "$LINE" | sed -r "s|($date_regex)($html_space.*$html_space.*)|<a href=http://icedtea.classpath.org/$REPO_URL/rev/$REV>\1</a>\2|")
-                COUNTER=$(( $COUNTER + 1 ))
+                COUNTER="$(( COUNTER + 1 ))"
             fi
-            if [[ $COUNTER -gt $CHANGESETS ]] # Cut to ten changesets
+            if [ "$COUNTER" -gt "$CHANGESETS" ] # Cut to ten changesets
             then
                 break
             fi
         fi
-        if [[ $BOLD -eq 0 ]] # Highlight "New In Release" in News, and author name lines in ChangeLog
+        if [ "$BOLD" -eq 0 ] # Highlight "New In Release" in News, and author name lines in ChangeLog
         then
             LINE="<b>$LINE</b>"
         fi
-        echo "$LINE" >> $FILE
+        echo "$LINE" >> "$FILE"
     done < "$FILE.old"
     rm "$FILE.old"
     print_debug "$FILE finished"
@@ -154,7 +154,7 @@ done
 
 sed -i -r 's|(\*\ .*):|<u>\1</u>:|' ChangeLog.html # Underline changed files in ChangeLog, eg "* Makefile.am:"
 
-end_time=$(date +%s.%N)
+end_time="$(date +%s.%N)"
 
 print_debug "HTML generation complete"
 print_debug "Total elapsed time: $(echo "$end_time - $start_time" | bc )"

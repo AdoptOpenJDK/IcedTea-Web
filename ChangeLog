@@ -1,4 +1,8 @@
-2014-01-06 Jiri Vanek <jvanek@redhat.com>
+2014-01-09  Andrew Azores  <aazores@redhat.com>
+
+	* html-gen.sh: made more idiomatic and removed some bashisms
+
+2014-01-06  Jiri Vanek  <jvanek@redhat.com>
 
 	Copy all button in console controls sorts by date by default.
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: added
@@ -9,7 +13,7 @@
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPaneModel.java:
 	added abstraction for (importList)  to allow sorting via parameter 
 
-2014-01-06 Jiri Vanek <jvanek@redhat.com>
+2014-01-06  Jiri Vanek  <jvanek@redhat.com>
 
 	Removed dependence on  sun.misc.BASE64Decoder
 	* configure.ac: removed check for sun.misc.BASE64Decoder
