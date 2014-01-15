@@ -1,3 +1,12 @@
+2014-01-15  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed memory leak detector to correctly handle pre_init_messages queue.
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: implemented (reset_pre_init_messages)
+	method.
+	* plugin/icedteanp/IcedTeaPluginUtils.h: declared (reset_pre_init_messages).
+	* tests/cpp-unit-tests/MemoryLeakDetector.h: (reset_global_state) called
+	(reset_pre_init_messages).	
+
 2014-01-09  Andrew Azores  <aazores@redhat.com>
 
 	* html-gen.sh: made more idiomatic and removed some bashisms

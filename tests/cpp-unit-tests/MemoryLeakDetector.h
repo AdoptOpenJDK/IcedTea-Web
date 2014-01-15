@@ -75,6 +75,8 @@ public:
         IcedTeaPluginUtilities::clearInstanceIDs();
         /* Clears allocations caused by storeObjectMapping */
         IcedTeaPluginUtilities::clearObjectMapping();
+        /*reset messages*/
+        reset_pre_init_messages();
     }
 
     int initial_cpp_allocations;

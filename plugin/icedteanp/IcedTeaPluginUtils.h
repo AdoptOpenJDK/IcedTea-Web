@@ -68,6 +68,7 @@ exception statement from your version. */
 
 void *flush_pre_init_messages(void* data);
 void push_pre_init_messages(char * ldm);
+void reset_pre_init_messages();
 
 // debugging macro.
 #define initialize_debug()                                                    \

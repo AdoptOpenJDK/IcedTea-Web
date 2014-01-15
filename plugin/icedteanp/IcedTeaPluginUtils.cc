@@ -85,6 +85,10 @@ void push_pre_init_messages(char * ldm){
   pthread_mutex_unlock(&debug_pipe_lock);
 }
 
+void reset_pre_init_messages(){
+    pre_jvm_message = std::queue<std::string>();
+  }
+
 /**
  * Given a context number, constructs a message prefix to send to Java
  *
