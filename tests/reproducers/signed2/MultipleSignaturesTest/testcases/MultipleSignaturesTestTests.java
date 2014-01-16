@@ -59,8 +59,6 @@ public class MultipleSignaturesTestTests  extends BrowserTest{
         ProcessResult pr = server.executeJavaws("/MultipleSignaturesTest2.jnlp");
         String s = GSJE;
         Assert.assertTrue("stdout should contains `" + s + "`, but did not", pr.stdout.contains(s));
-        String cc = "xception";
-        Assert.assertFalse("stderr should NOT contains `" + cc + "`, but did", pr.stderr.contains(cc));
     }
 
     @Test
@@ -93,9 +91,6 @@ public class MultipleSignaturesTestTests  extends BrowserTest{
         // permissions, but still usage of foreign code is allowed.
         String s = GSJE;
         Assert.assertTrue("stdout should contains `" + s + "`, but did not", pr.stdout.contains(s));
-        String cc = "xception";
-        Assert.assertFalse("stderr should NOT contains `" + cc + "`, but did", pr.stderr.contains(cc));
-        Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 
     @Test

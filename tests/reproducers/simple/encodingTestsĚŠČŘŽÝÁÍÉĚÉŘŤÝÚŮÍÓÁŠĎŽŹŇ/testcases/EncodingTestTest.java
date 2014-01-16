@@ -195,8 +195,6 @@ public class EncodingTestTest extends BrowserTest {
         ProcessResult pr = server.executeJavawsHeadless(verboseArg, "/encodingTest1-" + encoding + ".jnlp");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("encodingTest1 (in " + encoding + ") stdout should contain " + s + " bud didn't", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("encodingTest1 (in " + encoding + ") stderr should not contain " + ss + " but did", pr.stderr.contains(ss));
         //javaws in verbose mode is printing out readed jnlp. I'm no sure if the following test is relevant
         Assert.assertTrue("encodingTest1 (in " + encoding + ") stdout should contain " + arg + " bud didn't", pr.stdout.contains(arg));
     }
@@ -208,8 +206,6 @@ public class EncodingTestTest extends BrowserTest {
         ProcessResult pr = server.executeJavawsHeadless(verboseArg, "/encodingTest2ĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ-" + encoding + ".jnlp");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("encodingTest2ĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ (in " + encoding + ") stdout should contain " + s + " bud didn't", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("encodingTest2ĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ (in " + encoding + ") stderr should not contain " + ss + " but did", pr.stderr.contains(ss));
         //javaws in verbose mode is printing out readed jnlp. I'm no sure if the following test is relevant
         Assert.assertTrue("encodingTest2ĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ (in " + encoding + ") stdout should contain " + arg + " bud didn't", pr.stdout.contains(arg));
     }
@@ -223,8 +219,6 @@ public class EncodingTestTest extends BrowserTest {
         String s = "Encoded jar decoded correctly";
         Assert.assertTrue("encodingTest3 (in " + encoding + ") stdout should contain " + s + " bud didn't", pr.stdout.contains(s));
         Assert.assertTrue("encodingTest3 (in " + encoding + ") stdout should contain " + arg + " bud didn't", pr.stdout.contains(arg));
-        String ss = "xception";
-        Assert.assertFalse("encodingTest3 (in " + encoding + ") stderr should not contain " + ss + " but did", pr.stderr.contains(ss));
     }
 
     /**
@@ -237,8 +231,6 @@ public class EncodingTestTest extends BrowserTest {
         String s0 = "applet was started";
         Assert.assertTrue("encodingTest4 stdout should contains " + s0 + " bud didn't", pr.stdout.contains(s3));
         Assert.assertTrue("encodingTest4 (in " + encoding + ") stdout should contain " + arg + " bud didn't", pr.stdout.contains(arg));
-        String ss = "xception";
-        Assert.assertFalse("encodingTest4 (in " + encoding + ") stderr should not contain " + ss + " but did", pr.stderr.contains(ss));
     }
 
     /**
@@ -252,7 +244,5 @@ public class EncodingTestTest extends BrowserTest {
         String s0 = "applet was started";
         Assert.assertTrue("encodingTest5 stdout should contains " + s0 + " bud didn't", pr.stdout.contains(s3));
         Assert.assertTrue("encodingTest5 (in " + encoding + ") stdout should contain " + arg + " bud didn't", pr.stdout.contains(arg));
-        String ss = "xception";
-        Assert.assertFalse("encodingTest5 (in " + encoding + ") stderr should not contain " + ss + " but did", pr.stderr.contains(ss));
     }
 }

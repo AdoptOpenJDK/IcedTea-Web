@@ -1,3 +1,26 @@
+2014-01-16  Jiri Vanek  <jvanek@redhat.com>
+
+	Reproducers stabilization by removing check for not presented general Exception
+	or error.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: removed
+	legacy debug call
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: as in subject,
+	and same in others
+	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java:
+	* tests/reproducers/signed/ClasspathManifestTest/testcases/ClasspathManifestTest.java:
+	* tests/reproducers/signed/ClipboardContentSigned/testcases/ClipboardContentSignedTests.java:
+	* tests/reproducers/signed/InternalClassloaderWithDownloadedResource/testcases/InternalClassloaderWithDownloadedResourceTest.java:
+	* tests/reproducers/signed/Spaces can be everywhere signed/testcases/SpacesCanBeEverywhereTestsSigned.java:
+	* tests/reproducers/signed2/MultipleSignaturesTest/testcases/MultipleSignaturesTestTests.java:
+	* tests/reproducers/simple/AppletTest/testcases/AppletTestTests.java:
+	* tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java:
+	* tests/reproducers/simple/LocalisedInformationElement/testcases/LocalisedInformationElementTest.java:
+	* tests/reproducers/simple/ParametrizedJarUrl/testcases/ParametrizedJarUrlTests.java:
+	* tests/reproducers/simple/Spaces can be everywhere/testcases/SpacesCanBeEverywhereTests.java:
+	* tests/reproducers/simple/deadlocktest/testcases/DeadLockTestTest.java:
+	* tests/reproducers/simple/encodingTestsĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ/testcases/EncodingTestTest.java:
+	* tests/reproducers/simple/simpletest1/testcases/SimpleTest1Test.java:
+
 2014-01-15  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed memory leak detector to correctly handle pre_init_messages queue.

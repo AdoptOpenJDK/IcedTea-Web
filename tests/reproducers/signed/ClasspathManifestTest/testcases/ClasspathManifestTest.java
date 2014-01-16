@@ -127,6 +127,5 @@ public class ClasspathManifestTest extends BrowserTest {
         Assert.assertTrue("ClasspathManifest.BrowserAppletRemoteTest stdout should contain " + s1 + " but didn't", pr.stdout.contains(s1));
         // Should be the only one to search manifest for classpath.
         Assert.assertTrue("ClasspathManifest.BrowserAppletRemoteTest stdout should contain " + s2 + " but didn't", pr.stdout.contains(s2));
-        Assert.assertFalse("ClasspathManifest.BrowserAppletRemoteTest stderr should not contain " + ss + " but did", pr.stderr.contains(ss));
     }
 }

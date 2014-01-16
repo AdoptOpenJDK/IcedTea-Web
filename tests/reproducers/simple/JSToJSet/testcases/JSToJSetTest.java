@@ -54,8 +54,6 @@ public class JSToJSetTest extends BrowserTest {
     //the JS<->J tests tend to make Opera unusable
     public final boolean doNotRunInOpera = true;
 
-    private final String exceptionStr = "xception";
-    private final String errorStr = "rror";
     private final String initStr = "JSToJSet applet initialized.";
     private final String afterStr = "afterTests";
 
@@ -67,9 +65,6 @@ public class JSToJSetTest extends BrowserTest {
 
             @Override
             protected boolean isAlowedToFinish(String s) {
-                if (s.contains(exceptionStr) || s.contains(errorStr)) {
-                    return true;
-                }
                 return (s.contains(initStr) && s.contains(afterStr));
             }
         }

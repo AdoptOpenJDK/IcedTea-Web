@@ -53,7 +53,6 @@ import org.junit.Test;
 @Bug(id = "PR708")
 public class ClipboardContentSignedTests {
 
-    private static final String XCEPTION = "xception";
     private static final String contentC = "COPY#$REPRODUCER";
     private static final String contentP = "PASTE#$REPRODUCER";
     private static final String emptyContent = "empty content";
@@ -77,7 +76,6 @@ public class ClipboardContentSignedTests {
         wfsp.run();
         String ss = pasteFromClipboard();
         Assert.assertEquals("Clipboard must contain new value, did not", contentC, ss);
-        //Assert.assertFalse("ClipboardContentSignedCopy stderr should not contain " + XCEPTION + " but did ", wfsp.getErr().contains(XCEPTION));
     }
 
     @Test
@@ -90,7 +88,6 @@ public class ClipboardContentSignedTests {
         wfsp.run();
         String ss = pasteFromClipboard();
         Assert.assertEquals("Clipboard must contain new value, did not", contentC, ss);
-        //Assert.assertFalse("ClipboardContentSignedCopy stderr should not contain " + XCEPTION + " but did ", wfsp.getErr().contains(XCEPTION));
 
     }
 
@@ -105,7 +102,6 @@ public class ClipboardContentSignedTests {
         Assert.assertEquals("Clipboard must contain new value, did not", contentP, pasteFromClipboard());
         ProcessResult pr = server.executeJavawsHeadless(javawsTrustArg, "/ClipboardContentSignedPaste1.jnlp");
         Assert.assertTrue("ClipboardContentSignedTestPaste stdout should contain " + contentP + " but didn't", pr.stdout.contains(contentP));
-        //Assert.assertFalse("ClipboardContentSignedTestPaste stderr should not contain " + XCEPTION + " but did ", pr.stderr.contains(XCEPTION));
     }
 
     @Test
@@ -121,6 +117,5 @@ public class ClipboardContentSignedTests {
         Assert.assertEquals("Clipboard must contain new value, did not", contentP, pasteFromClipboard());
         ProcessResult pr = server.executeJavaws(javawsTrustArg, "/ClipboardContentSignedPaste2.jnlp");
         Assert.assertTrue("ClipboardContentSignedTestPaste stdout should contain " + contentP + " but didn't", pr.stdout.contains(contentP));
-        //Assert.assertFalse("ClipboardContentSignedTestPaste stderr should not contain " + XCEPTION + " but did ", pr.stderr.contains(XCEPTION));
     }
 }

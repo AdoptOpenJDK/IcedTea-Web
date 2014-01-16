@@ -93,9 +93,6 @@ public class LocalisedInformationElementTest {
         ProcessResult pr = executeJavaws(verbose, variables, id);
         String s = "LocalisedInformationElement launched";
         Assert.assertTrue(id + " stdout should contains " + s + " bud didn't", pr.stdout.contains(s));
-        //to strict?
-        //String ss = "xception";
-        //Assert.assertFalse(id + " stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
         String locMatch = "(?s).*default locale: \\w{2}.*";
         Assert.assertTrue(id + " stdout should match " + locMatch + " bud didn't", pr.stdout.matches(locMatch));
         return pr;

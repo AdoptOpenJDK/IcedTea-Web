@@ -205,8 +205,6 @@ public class DeadLockTestTest {
     private void assertDeadlockTestLaunched(ProcessResult pr) {
         String s = "Deadlock test started";
         Assert.assertTrue("Deadlock test should print out " + s + ", but did not", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("Deadlock test should not stderr " + ss + " but did", pr.stderr.contains(ss));
         //each 3500 seconds deadlock test stdout something
         //timeout is 20s
         //so it should write out FIVE sentences, but is mostly just three or four. Last is nearly always consumed by termination

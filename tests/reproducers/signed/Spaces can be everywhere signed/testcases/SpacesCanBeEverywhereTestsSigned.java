@@ -85,8 +85,6 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
         ProcessResult pr =  ServerAccess.executeProcess(commands);
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
-        String cc = "xception";
-        Assert.assertFalse("stderr should NOT contains `" + cc + "`, but did", pr.stderr.contains(cc));
         Assert.assertFalse("should not be terminated, but was", pr.wasTerminated);
         Assert.assertEquals((Integer) 0, pr.returnValue);
     }
@@ -98,8 +96,6 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
         ProcessResult pr = server.executeJavaws("/NotOnly%20spaces%20can%20kill%20%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%20too%20signed.jnlp");
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
-        String cc = "xception";
-        Assert.assertFalse("stderr should NOT contains `" + cc + "`, but did", pr.stderr.contains(cc));
         Assert.assertFalse("should NOT be terminated, but was not", pr.wasTerminated);
     }
 
@@ -111,8 +107,6 @@ public class SpacesCanBeEverywhereTestsSigned extends BrowserTest {
         ProcessResult pr = server.executeBrowser("/spaces+applet+Tests+signed.html");
         String s="Signed spaces can be everywhere.jsr was launched correctly";
         Assert.assertTrue("stdout should contains `"+s+"`, but did not",pr.stdout.contains(s));
-        String cc = "xception";
-        Assert.assertFalse("stderr should NOT contains `" + cc + "`, but did", pr.stderr.contains(cc));
         Assert.assertTrue("should be terminated, but was not", pr.wasTerminated);
     }
 

@@ -149,13 +149,6 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         Assert.assertTrue("AppletTestSigned stdout should contain " + s1 + " but didn't", pr.stdout.contains(s1));
         String s2 = "value2";
         Assert.assertTrue("AppletTestSigned stdout should contain " + s2 + " but didn't", pr.stdout.contains(s2));
-//        too strict!
-//        String s4 = "AppletTestSigned was stopped";
-//        Assert.assertFalse("AppletTestSigned stdout shouldn't contains " + s4 + " but did", pr.stdout.contains(s4));
-//        String s5 = "AppletTestSigned will be destroyed";
-//        Assert.assertFalse("AppletTestSigned stdout shouldn't contains " + s5 + " but did", pr.stdout.contains(s5));
-//        String ss = "xception";
-//        Assert.assertFalse("AppletTestSigned stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
         String s7 = "AppletTestSigned killing himself after 2000 ms of life";
         Assert.assertTrue("AppletTestSigned stdout should contain " + s7 + " but didn't", pr.stdout.contains(s7));
     }
@@ -166,8 +159,6 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         ProcessResult pr = server.executeJavawsHeadless(l, "/ParametrizedJarUrlSigned1.jnlp");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("ParametrizedJarUrlSigned1 stdout should contain " + s + " but didn't", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("ParametrizedJarUrlSigned1 stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
     }
 
     @Test
@@ -175,8 +166,6 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         ProcessResult pr = server.executeJavawsHeadless(l, "/ParametrizedJarUrlSigned2.jnlp");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("ParametrizedJarUrlSigned2 stdout should contain " + s + " but didn't", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("ParametrizedJarUrlSigned2 stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
     }
 
     @Test
@@ -184,8 +173,6 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         ProcessResult pr = server.executeJavawsHeadless(l, "/ParametrizedJarUrlSigned2.jnlp?test=123456");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("ParametrizedJarUrlSigned2 stdout should contain " + s + " but didn't", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("ParametrizedJarUrlSigned2 stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
     }
 
     @Test
@@ -193,8 +180,6 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         ProcessResult pr = server.executeJavawsHeadless(null, "/ParametrizedJarUrl1.jnlp");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("ParametrizedJarUrl1 stdout should contain " + s + " but didn't", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("ParametrizedJarUrl1 stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
     }
 
     @Test
@@ -202,8 +187,6 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         ProcessResult pr = server.executeJavawsHeadless(null, "/ParametrizedJarUrl2.jnlp");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("ParametrizedJarUrl2 stdout should contain " + s + " but didn't", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("ParametrizedJarUrl2 stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
     }
 
     @Test
@@ -211,8 +194,6 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         ProcessResult pr = server.executeJavawsHeadless(null, "/ParametrizedJarUrl2.jnlp?test=123456");
         String s = "Good simple javaws exapmle";
         Assert.assertTrue("ParametrizedJarUrl2 stdout should contain " + s + " but didn't", pr.stdout.contains(s));
-        String ss = "xception";
-        Assert.assertFalse("ParametrizedJarUrl2 stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
 ;
     }
 
@@ -225,13 +206,6 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         Assert.assertTrue("AppletTest stdout should contain " + s1 + " but didn't", pr.stdout.contains(s1));
         String s2 = "value2";
         Assert.assertTrue("AppletTest stdout should contain " + s2 + " but didn't", pr.stdout.contains(s2));
-//        This is to strict, each browser is killing as it wish
-//        String s4 = "applet was stopped";
-//        Assert.assert("AppletTest stdout shouldn't contains " + s4 + " but did", pr.stdout.contains(s4));
-//        String s5 = "applet will be destroyed";
-//        Assert.assert("AppletTest stdout shouldn't contains " + s5 + " but did", pr.stdout.contains(s5));
-        String ss = "xception";
-        Assert.assertFalse("AppletTest stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
         String s7 = "Aplet killing himself after 2000 ms of life";
         Assert.assertTrue("AppletTest stdout should contain " + s7 + " but didn't", pr.stdout.contains(s7));
     }

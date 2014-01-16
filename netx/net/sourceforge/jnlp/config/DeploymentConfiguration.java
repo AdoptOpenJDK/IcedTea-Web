@@ -562,9 +562,7 @@ public final class DeploymentConfiguration {
         try {
             return parsePropertiesFile(file);
         } catch (IOException e) {
-            if (JNLPRuntime.isDebug()){
-                OutputController.getLogger().log(e);
-            }
+            OutputController.getLogger().log(e);
             return null;
         }
     }

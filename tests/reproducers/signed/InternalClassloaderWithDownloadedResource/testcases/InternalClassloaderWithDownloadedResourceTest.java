@@ -87,8 +87,6 @@ public class InternalClassloaderWithDownloadedResourceTest extends BrowserTest {
     private void evaluate(ProcessResult pr) {
         String ss = "Good simple javaws exapmle";
         Assert.assertTrue("Stdout should  contains " + ss + " but didn't", pr.stdout.contains(ss));
-        String s = "xception";
-        Assert.assertFalse("Stderr should  not contains " + s + " but did", pr.stderr.contains(s));
     }
 
     @Test
