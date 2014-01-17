@@ -1,3 +1,10 @@
+2014-01-17  Andrew Azores  <aazores@redhat.com>
+
+	Fixes JS reproducer regression.
+	http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-January/025764.html
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: (hasMethod) fixed
+	regression from rev 757:ee92f55c69a3
+
 2014-01-16  Jiri Vanek  <jvanek@redhat.com>
 
 	Reproducers stabilization by removing check for not presented general Exception

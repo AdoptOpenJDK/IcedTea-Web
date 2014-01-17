@@ -474,7 +474,7 @@ IcedTeaScriptableJavaObject::hasMethod(NPObject *npobj, NPIdentifier name_id)
     bool hasMethod = false;
 
     // If object is an array and requested "method" may be a number, check for it first
-    if ( scriptable_object->is_object_array  ||
+    if ( !scriptable_object->is_object_array  ||
          (browser_functions.intfromidentifier(name_id) < 0))
     {
 
