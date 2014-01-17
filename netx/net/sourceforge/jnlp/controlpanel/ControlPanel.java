@@ -264,7 +264,8 @@ public class ControlPanel extends JFrame {
                 // new SettingsPanel(Translator.R("CPTabRuntimes"), createRuntimesSettingsPanel()),
                 new SettingsPanel(Translator.R("CPTabSecurity"), createSecuritySettingsPanel()),
                 //todo refactor to work with tmp file and apply as asu designed it
-                new SettingsPanel(Translator.R("APPEXTSECControlPanelExtendedAppletSecurityTitle"), new UnsignedAppletsTrustingListPanel(DeploymentConfiguration.getAppletTrustGlobalSettingsPath(),DeploymentConfiguration.getAppletTrustUserSettingsPath(), this.config) )
+                new SettingsPanel(Translator.R("CPTabPolicy"), createPolicySettingsPanel()),
+                new SettingsPanel(Translator.R("APPEXTSECControlPanelExtendedAppletSecurityTitle"), new UnsignedAppletsTrustingListPanel(DeploymentConfiguration.getAppletTrustGlobalSettingsPath(), DeploymentConfiguration.getAppletTrustUserSettingsPath(), this.config))
         };
 
         // Add panels.
@@ -355,6 +356,10 @@ public class ControlPanel extends JFrame {
 
     private JPanel createSecuritySettingsPanel() {
         return new SecuritySettingsPanel(this.config);
+    }
+
+    private JPanel createPolicySettingsPanel() {
+        return new PolicyPanel(this, this.config);
     }
 
     private JPanel createJVMSettingsPanel() {

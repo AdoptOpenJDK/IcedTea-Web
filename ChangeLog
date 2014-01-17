@@ -1,5 +1,23 @@
 2014-01-17  Andrew Azores  <aazores@redhat.com>
 
+	Added itweb-settings panel to explain custom policy files and allow
+	launching a policy editor for user's policy file.
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:
+	(createMainSettingsPanel, createPolicySettingsPanel) added PolicyPanel
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: new messages
+	for PolicyPanel
+	* netx/net/sourceforge/jnlp/controlpanel/PolicyPanel.java: new panel to
+	allow launching of external policy editor
+	* tests/reproducers/simple/CustomPolicies/resources/CustomPolicies.html:
+	new test to ensure custom user policy files work correctly
+	* tests/reproducers/simple/CustomPolicies/resources/CustomPoliciesApplet.jnlp
+	* tests/reproducers/simple/CustomPolicies/resources/CustomPoliciesApplication.jnlp
+	* tests/reproducers/simple/CustomPolicies/resources/CustomPoliciesJnlpHref.html
+	* tests/reproducers/simple/CustomPolicies/srcs/CustomPolicies.java
+	* tests/reproducers/simple/CustomPolicies/testcases/CustomPoliciesTest.java
+
+2014-01-17  Andrew Azores  <aazores@redhat.com>
+
 	Fixes JS reproducer regression.
 	http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-January/025764.html
 	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc: (hasMethod) fixed
