@@ -62,7 +62,7 @@ public class HTMLPanel extends JPanel {
              pane = new JEditorPane(url);
         } catch (IOException ex) {
             //no need to have invalid url fatal
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
         }
         pane.setContentType("text/html");
         pane.setEditable(false);
