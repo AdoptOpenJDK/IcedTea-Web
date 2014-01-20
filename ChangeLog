@@ -1,3 +1,15 @@
+2014-01-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Added support for system level linux logging
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: exclusive
+	handling for system critical *java* messages when system logging is on.
+	* netx/net/sourceforge/jnlp/util/logging/UnixSystemLog.java: implemented
+	call to logger
+	* plugin/icedteanp/IcedTeaPluginUtils.h: error messages logged to syslog
+	* plugin/icedteanp/java/sun/applet/PluginDebug.java: default messages
+	are now MESSAGE_DEBUG instead of ERROR_ALL
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.c: adapted to system logging	
+
 2014-01-17  Andrew Azores  <aazores@redhat.com>
 
 	Added itweb-settings panel to explain custom policy files and allow

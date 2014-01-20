@@ -174,8 +174,13 @@ public class OutputController {
         if (LogConfig.getLogConfig().isLogToFile()) {
             getFileLog().log(message);
         }
-        if (LogConfig.getLogConfig().isLogToSysLog()) {
-            getSystemLog().log(message);
+        //only crucial stuff is going to system log
+        //only java messages handled here, plugin is onhis own
+        if (LogConfig.getLogConfig().isLogToSysLog() && 
+                (s.getHeader().level.equals(Level.ERROR_ALL) || s.getHeader().level.equals(Level.WARNING_ALL)) &&
+                s.getHeader().isC == false) {
+            //no headers here
+            getSystemLog().log(s.getMessage());
         }
 
     }

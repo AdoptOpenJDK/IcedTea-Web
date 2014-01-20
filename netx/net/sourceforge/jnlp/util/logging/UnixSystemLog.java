@@ -44,14 +44,23 @@ public class UnixSystemLog implements SingleStreamLogger{
     
     }
     
- 
-    @Override
-    public void log(String s) {
-        
-    }
- 
     
-      
-
+    @Override
+    public void log(String message) {
+        final String s = "IcedTea-Web java error - for more info see itweb-settings debug options or console. See http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs for help.\nIcedTea-Web java error manual log: \n" + message;
+        try {
+            String[] ss = s.split("\\n"); //exceptions have many lines
+            for (String m : ss) {
+                m = m.replaceAll("\t", "    ");
+                ProcessBuilder pb = new ProcessBuilder("logger", "-p","user.err", "--", m);
+                Process p = pb.start();
+                p.waitFor();
+                OutputController.getLogger().log("System logger called with result of " + p.exitValue());
+            }
+        } catch (Exception ex) {
+            OutputController.getLogger().log(ex);
+        }
+    }
+    
 
 }

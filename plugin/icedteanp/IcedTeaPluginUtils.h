@@ -47,6 +47,7 @@ exception statement from your version. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <syslog.h>
 #include <sys/time.h>
 
 #include <fcntl.h>
@@ -154,6 +155,9 @@ void reset_pre_init_messages();
           push_pre_init_messages(ldebug_channel_message);                            \
         }                              \
       }                                \
+     if (plugin_debug_to_system){      \
+     /*no debug messages to systemlog*/\
+     }                                 \
     }                                  \
   } while (0)
 
@@ -197,6 +201,15 @@ void reset_pre_init_messages();
           push_pre_init_messages(ldebug_channel_message);                         \
         }                              \
     }                                  \
+    if (plugin_debug_to_system){      \
+      /*java can not have prefix*/    \
+      openlog("", LOG_NDELAY, LOG_USER);\
+      syslog(LOG_ERR, "%s", "IcedTea-Web c-plugin - for more info see itweb-settings debug options or console. See http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs for help.");\
+      syslog(LOG_ERR, "%s", "IcedTea-Web c-plugin error manual log:");\
+      /*no headers to syslog*/        \
+      syslog(LOG_ERR, "%s", ldebug_body);   \
+      closelog();                     \
+    }                                 \
    } while (0)
 
 

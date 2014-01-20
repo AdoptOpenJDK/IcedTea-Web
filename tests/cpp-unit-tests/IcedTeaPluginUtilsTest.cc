@@ -138,7 +138,7 @@ TEST(file_exists) {
 }
 
 
-void doDebugErrorRun() {
+void doDebugErrorRun(int max) {
 	FILE* old1 = stdout;
 	FILE* old2 = stderr;
 	char* buf1 = " 	                         ";
@@ -149,7 +149,6 @@ void doDebugErrorRun() {
 	clock_t begin1, end1;
 	clock_t begin2, end2;
 	int i;
-	int max = 1000000;
 	std::string hello = std::string("hello");
 	std::string eello = std::string("eello");
 	
@@ -172,7 +171,7 @@ void doDebugErrorRun() {
 	}
 	end2 = clock();
 	fclose(stdout);
-    fclose(stderr);
+	fclose(stderr);
 	stdout = old1;
 	stderr = old2;
 	long time_spent1 = ((end1 - begin1));
@@ -181,27 +180,42 @@ void doDebugErrorRun() {
 	fprintf  (stdout, "PLUGIN_ERROR %d\n", time_spent2);
 }
 
+void doDebugErrorRun() {
+	doDebugErrorRun(1000000);
+}
+
+/*
+ *The family of PLUGIN_DEBUG_ERROR_PROFILING tests actually do not test.
+ *It is just messure that the mechanisms around do not break soething fataly.
+ */
+
 TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_off) {
 	bool plugin_debug_backup = plugin_debug;
 	bool plugin_debug_headers_backup = plugin_debug_headers;
 	bool plugin_debug_console_backup = plugin_debug_to_console;
+	bool plugin_debug_system_backup = plugin_debug_to_system;
 	plugin_debug_to_console = false;
 	plugin_debug = true;
+	plugin_debug_to_system = false; //no need to torture system log in testing
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
 	plugin_debug_headers = plugin_debug_headers_backup;
 	plugin_debug_to_console =  plugin_debug_console_backup;
+	plugin_debug_to_system = plugin_debug_system_backup;
 }
 TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off_headers_off) {
 	bool plugin_debug_backup = plugin_debug;
 	bool plugin_debug_headers_backup = plugin_debug_headers;
 	bool plugin_debug_console_backup = plugin_debug_to_console;
+	bool plugin_debug_system_backup = plugin_debug_to_system;
 	plugin_debug_to_console = false;
 	plugin_debug = false;
+	plugin_debug_to_system = false; //no need to torture system log in testing
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
 	plugin_debug_headers = plugin_debug_headers_backup;
 	plugin_debug_to_console =  plugin_debug_console_backup;
+	plugin_debug_to_system = plugin_debug_system_backup;
 }
 
 
@@ -209,25 +223,47 @@ TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_on) {
 	bool plugin_debug_backup = plugin_debug;
 	bool plugin_debug_headers_backup = plugin_debug_headers;
 	bool plugin_debug_console_backup = plugin_debug_to_console;
+	bool plugin_debug_system_backup = plugin_debug_to_system;
 	plugin_debug_to_console = false;
 	plugin_debug = true;
 	plugin_debug_headers = true;
+	plugin_debug_to_system = false; //no need to torture system log in testing
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
 	plugin_debug_headers = plugin_debug_headers_backup;
 	plugin_debug_to_console =  plugin_debug_console_backup;
+	plugin_debug_to_system = plugin_debug_system_backup;
 }
 
 TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_off_headers_on) {
 	bool plugin_debug_backup = plugin_debug;
 	bool plugin_debug_headers_backup = plugin_debug_headers;
 	bool plugin_debug_console_backup = plugin_debug_to_console;
+	bool plugin_debug_system_backup = plugin_debug_to_system;
 	plugin_debug_to_console = false;
 	plugin_debug = false;
 	plugin_debug_headers = true;
+	plugin_debug_to_system = false; //no need to torture system log in testing
 	doDebugErrorRun();
 	plugin_debug = plugin_debug_backup;
 	plugin_debug_headers = plugin_debug_headers_backup;
 	plugin_debug_to_console =  plugin_debug_console_backup;
+	plugin_debug_to_system = plugin_debug_system_backup;
+}
+
+TEST(PLUGIN_DEBUG_ERROR_PROFILING_debug_on_headers_on_syslog_on) {
+	bool plugin_debug_backup = plugin_debug;
+	bool plugin_debug_headers_backup = plugin_debug_headers;
+	bool plugin_debug_console_backup = plugin_debug_to_console;
+	bool plugin_debug_system_backup = plugin_debug_to_system;
+	plugin_debug_to_console = false;
+	plugin_debug = true;
+	plugin_debug_headers = true;
+	plugin_debug_to_system = true;
+	doDebugErrorRun(50);
+	plugin_debug = plugin_debug_backup;
+	plugin_debug_headers = plugin_debug_headers_backup;
+	plugin_debug_to_console =  plugin_debug_console_backup;
+	plugin_debug_to_system = plugin_debug_system_backup;
 }
 

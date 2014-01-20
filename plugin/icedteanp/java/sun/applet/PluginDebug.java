@@ -53,7 +53,7 @@ public class PluginDebug {
             for (Object chunk : messageChunks) {
                 b.append(chunk);
             }
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, b.toString());
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, b.toString());
         }
     }
 }
