@@ -57,6 +57,7 @@ public class SplashScreenTest extends JDialog {
     static int height = JNLPSplashScreen.DEF_HEIGHT;
     static SplashPanel panel;
     private static boolean swap = true;
+    private static InformationElement ie = new InformationElement();
 
     public SplashScreenTest() {
 
@@ -67,8 +68,7 @@ public class SplashScreenTest extends JDialog {
         //setLocation(x, y);
         setLocationRelativeTo(null);
         this.pack();
-        panel = SplashUtils.getSplashScreen(width, height, SplashUtils.SplashReason.JAVAWS);
-        InformationElement ie = new InformationElement();
+        panel = SplashUtils.getSplashScreen(width, height, SplashUtils.SplashReason.APPLET);
         ie.setHomepage("http://someones.org/amazing?page");
         ie.setTitle("Testing information title");
         ie.setvendor("IcedTea-Web team");
@@ -145,6 +145,7 @@ public class SplashScreenTest extends JDialog {
 
     public static void main(String args[]) {
         SplashScreenTest app = new SplashScreenTest();
+        app.setSize(800, 600);
         app.setVisible(true);
 
         app.addWindowListener(
@@ -165,7 +166,8 @@ public class SplashScreenTest extends JDialog {
         //not needed
         //panel.stopAnimation();
         if (swap) {
-            SplashErrorPanel r = SplashUtils.getErrorSplashScreen(panel.getSplashWidth(), panel.getSplashHeight(), SplashUtils.SplashReason.JAVAWS, null);
+            SplashErrorPanel r = SplashUtils.getErrorSplashScreen(panel.getSplashWidth(), panel.getSplashHeight(), SplashUtils.SplashReason.APPLET, null);
+            r.setInformationElement(ie);
             app.remove(panel.getSplashComponent());
             r.setPercentage(panel.getPercentage());
             r.adjustForSize();
@@ -174,9 +176,9 @@ public class SplashScreenTest extends JDialog {
             panel.setVersion("1.2-re45fdg");
 
             app.add(panel.getSplashComponent());
-            app.validateTree();
-            //app.pack();
-            //app.setVisible(true);
+            app.validate();
+            app.pack();
+            app.setVisible(true);
             try {
                 Thread.sleep(10000);
             } catch (Exception e) {

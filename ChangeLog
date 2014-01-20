@@ -1,5 +1,25 @@
 2014-01-20  Jiri Vanek  <jvanek@redhat.com>
 
+	Added Christmas splashscreen extension.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainter.java:
+	base colors are derived from active extension. And extension is painted (if any)
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/ErrorPainter.java:
+	same
+	* netx/net/sourceforge/jnlp/splashscreen/parts/extensions/ChristmasExtension.java:
+	extension valid in Christmas time, painting falling stars and dimming colors.
+	* netx/net/sourceforge/jnlp/splashscreen/parts/extensions/ExtensionManager.java
+	provider of extension. Know only the Christmas one right now.
+	* netx/net/sourceforge/jnlp/splashscreen/parts/extensions/NoExtension.java:
+	no op extension for no extension times
+	* netx/net/sourceforge/jnlp/splashscreen/parts/extensions/SplashExtension.java:
+	unfinished extension interface
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/ErrorSplashScreenTest.java:
+	and
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/SplashScreenTest.java:
+	adapted to current purposes
+
+2014-01-20  Jiri Vanek  <jvanek@redhat.com>
+
 	Added support for system level linux logging
 	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: exclusive
 	handling for system critical *java* messages when system logging is on.
