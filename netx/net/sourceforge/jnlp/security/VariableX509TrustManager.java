@@ -200,7 +200,7 @@ final public class VariableX509TrustManager {
      * @param authType The auth type algorithm
      * @param hostName The expected hostName that the server should have
      * @param socket The SSLSocket in use (may be null)
-     * @param ending The SSLEngine in use (may be null)
+     * @param engine The SSLEngine in use (may be null)
      */
     public synchronized void checkTrustServer(X509Certificate[] chain,
                              String authType, String hostName,

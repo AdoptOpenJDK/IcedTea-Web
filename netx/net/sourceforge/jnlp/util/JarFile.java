@@ -115,7 +115,8 @@ public class JarFile extends java.util.jar.JarFile implements Closeable{
      * So for our purposes we must insists on first record to be valid.
      *
      * @param file
-     * @throws IOException, InvalidJarHeaderException
+     * @throws IOException
+     * @throws InvalidJarHeaderException
      */
     public static void verifyZipHeader(File file) throws IOException {
         if (!JNLPRuntime.isIgnoreHeaders()) {

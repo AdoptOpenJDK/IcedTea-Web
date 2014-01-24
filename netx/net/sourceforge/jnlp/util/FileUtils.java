@@ -398,7 +398,8 @@ public final class FileUtils {
     /**
      * utility method which can read from any stream as one long String
      * 
-     * @param input stream
+     * @param is stream
+     * @param encoding the encoding to use to convert the bytes from the stream
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
@@ -424,7 +425,7 @@ public final class FileUtils {
     /**
      * utility method which can read from any stream as one long String
      *
-     * @param input stream
+     * @param is stream
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */

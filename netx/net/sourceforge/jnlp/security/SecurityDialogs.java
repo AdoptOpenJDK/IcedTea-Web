@@ -240,7 +240,7 @@ public class SecurityDialogs {
 
     /**
      * FIXME This is unused. Remove it?
-     * @return (0, 1, 2) => (Yes, No, Cancel)
+     * @return (0, 1, 2) =&gt; (Yes, No, Cancel)
      */
     public static int showAppletWarning() {
 

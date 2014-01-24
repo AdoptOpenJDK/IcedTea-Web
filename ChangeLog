@@ -1,3 +1,26 @@
+2014-01-23  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPFile.java,
+	* netx/net/sourceforge/jnlp/NetxPanel.java,
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java,
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java,
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java,
+	* netx/net/sourceforge/jnlp/config/DirectoryValidator.java,
+	* netx/net/sourceforge/jnlp/config/Setting.java,
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java,
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java,
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java,
+	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java,
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java,
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java,
+	* netx/net/sourceforge/jnlp/services/XSingleInstanceService.java,
+	* netx/net/sourceforge/jnlp/util/FileUtils.java,
+	* netx/net/sourceforge/jnlp/util/JarFile.java,
+	* netx/net/sourceforge/nanoxml/XMLElement.java,
+	* netx/net/sourceforge/nanoxml/XMLParseException.java,
+	* plugin/icedteanp/java/sun/applet/PluginStreamHandler.java: Fix incorrect
+	parameter names, throws declerations and malformed html in javadocs.
+
 2014-01-20  Jiri Vanek  <jvanek@redhat.com>
 
 	Added Christmas splashscreen extension.

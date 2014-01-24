@@ -796,7 +796,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * 
      * @param jars Jars that are checked to see if they contain the main class
      * @param  name attribute to be found
-     * @throws LaunchException Thrown if the signed JNLP file, within the main jar, fails to be verified or does not match
      */
     public String checkForAttributeInJars(List<JARDesc> jars, Attributes.Name name) {
        

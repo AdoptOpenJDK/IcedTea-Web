@@ -247,7 +247,7 @@ public final class DeploymentConfiguration {
      * Initialize this deployment configuration by reading configuration files.
      * Generally, it will try to continue and ignore errors it finds (such as file not found).
      *
-     * @throws DeploymentException if it encounters a fatal error.
+     * @throws ConfigurationException if it encounters a fatal error.
      */
     public void load() throws ConfigurationException {
         load(true);
@@ -269,7 +269,7 @@ public final class DeploymentConfiguration {
      *
      * @param fixIssues If true, fix issues that are discovered when reading configuration by
      * resorting to the default values
-     * @throws DeploymentException if it encounters a fatal error.
+     * @throws ConfigurationException if it encounters a fatal error.
      */
     public void load(boolean fixIssues) throws ConfigurationException {
         // make sure no state leaks if security check fails later on

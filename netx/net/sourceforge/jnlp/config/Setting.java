@@ -67,7 +67,7 @@ public class Setting<T> {
      * @param defaultValue the default value of this setting. If this is not a
      * recognized setting, use null.
      * @param value the initial value of this setting
-     * @param source the origin of the value (a file, or perhaps "<internal>")
+     * @param source the origin of the value (a file, or perhaps "{@code <internal>}")
      */
     public Setting(String name, String description, boolean locked,
             ValueValidator validator, T defaultValue, T value, String source) {

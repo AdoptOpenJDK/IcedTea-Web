@@ -42,7 +42,7 @@ import sun.awt.SunToolkit;
  * This panel calls into netx to run an applet, and pipes the display
  * into a panel from the icedtea-web browser plugin.
  *
- * @author      Francis Kung <fkung@redhat.com>
+ * @author      Francis Kung &lt;fkung@redhat.com&gt;
  */
 public class NetxPanel extends AppletViewerPanel implements SplashController {
     private final PluginParameters parameters;

@@ -103,7 +103,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
     /**
      * Initialize the new SingleInstanceService
      *
-     * @throws InstanceAlreadyExistsException if the instance already exists
+     * @throws InstanceExistsException if the instance already exists
      */
     public void initializeSingleInstance() {
         // this is called after the application has started. so safe to use
@@ -222,7 +222,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
     /**
      * Add the specified SingleInstanceListener
      *
-     * @throws InstanceExistsException, which is likely to terminate the
+     * @throws InstanceExistsException which is likely to terminate the
      *         application but not guaranteed to
      */
     public void addSingleInstanceListener(SingleInstanceListener sil) {

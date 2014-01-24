@@ -368,7 +368,7 @@ public class CacheUtil {
 
     /**
      * Returns the parent directory of the cached resource.
-     * @param path The path of the cached resource directory.
+     * @param filePath The path of the cached resource directory.
      */
     public static String getCacheParentDirectory(String filePath) {
         String path = filePath;

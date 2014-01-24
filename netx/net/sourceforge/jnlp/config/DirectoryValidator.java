@@ -216,12 +216,14 @@ public class DirectoryValidator {
     /**
      *  Creates DirectoryValidator to ensure directories read from
      *  user (if any - default otherwise ) settings via keys:
+     * <ul>
      * <li>KEY_USER_CACHE_DIR</li> 
      * <li>KEY_USER_PERSISTENCE_CACHE_DIR</li>
      * <li>KEY_SYSTEM_CACHE_DIR</li> 
      * <li>KEY_USER_LOG_DIR</li>
      * <li>KEY_USER_TMP_DIR</li> 
      * <li>KEY_USER_LOCKS_DIR</li>
+     * </ul>
      */
     public DirectoryValidator() {
         dirsToCheck = new ArrayList<File>(6);

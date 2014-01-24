@@ -199,7 +199,7 @@ public class JNLPFile {
      *
      * @param location the location of the JNLP file
      * @param version the version of the JNLP file
-     * @param strict whether to enforce the spec when
+     * @param settings the {@link ParserSettings} to use when parsing the {@code location}
      * @param policy the update policy
      * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
@@ -264,7 +264,6 @@ public class JNLPFile {
     /**
      * Create a JNLPFile from an input stream.
      *
-     * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(InputStream input, ParserSettings settings) throws ParseException {
@@ -277,8 +276,7 @@ public class JNLPFile {
      *
      * @param input input stream of JNLP file.
      * @param codebase codebase to use if not specified in JNLP file..
-     * @param strict whether to enforce the spec rules
-     * @throws IOException if an IO exception occurred
+     * @param settings the {@link ParserSettings} to use when parsing
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(InputStream input, URL codebase, ParserSettings settings) throws ParseException {
@@ -665,9 +663,7 @@ public class JNLPFile {
      *
      * @param requested the local
      * @param available the available locales
-     * @param precision the depth with which to match locales. 1 checks only
-     * language, 2 checks language and country, 3 checks language, country and
-     * variant for matches. Passing 0 will always return true.
+     * @param matchLevel the detail with which to match locales.
      * @return true if requested matches any of available, or if
      * available is empty or null.
      */

@@ -37,7 +37,7 @@ import net.sourceforge.jnlp.util.ScreenFinder;
 /**
  * This dialog provides a means for user to edit more of the proxy settings.
  * 
- * @author Andrew Su <asu@redhat.com, andrew.su@utoronto.ca>
+ * @author Andrew Su &lt;asu@redhat.com, andrew.su@utoronto.ca&gt;
  * 
  */
 public class AdvancedProxySettingsDialog extends JDialog {

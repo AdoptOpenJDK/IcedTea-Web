@@ -98,9 +98,6 @@ public enum CacheLRUWrapper {
     
     /**
      * Returns an instance of the policy.
-     * 
-     * @param propertiesFile
-     * @return
      */
     public static CacheLRUWrapper getInstance() {
         return INSTANCE;

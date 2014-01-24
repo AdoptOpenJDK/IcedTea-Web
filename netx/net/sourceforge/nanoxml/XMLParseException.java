@@ -53,7 +53,7 @@ public class XMLParseException
      * <code>NO_LINE</code> if the line number is unknown.
      *
      * <dl><dt><b>Invariants:</b></dt><dd>
-     * <ul><li><code>lineNr &gt 0 || lineNr == NO_LINE</code>
+     * <ul><li>{@code lineNr > 0 || lineNr == NO_LINE}
      * </ul></dd></dl>
      */
     private int lineNr;
@@ -64,13 +64,13 @@ public class XMLParseException
      * @param name    The name of the element where the error is located.
      * @param message A message describing what went wrong.
      *
-     * </dl><dl><dt><b>Preconditions:</b></dt><dd>
-     * <ul><li><code>message != null</code>
+     * <dl><dt><b>Preconditions:</b></dt><dd>
+     * <ul><li>{@code message != null}
      * </ul></dd></dl>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>getLineNr() => NO_LINE
-     * </ul></dd></dl><dl>
+     * <ul><li>{@code getLineNr() => NO_LINE}
+     * </ul></dd></dl>
      */
     public XMLParseException(String name,
                              String message) {
@@ -88,14 +88,14 @@ public class XMLParseException
      * @param lineNr  The number of the line in the input.
      * @param message A message describing what went wrong.
      *
-     * </dl><dl><dt><b>Preconditions:</b></dt><dd>
+     * <dl><dt><b>Preconditions:</b></dt><dd>
      * <ul><li><code>message != null</code>
      *     <li><code>lineNr &gt; 0</code>
      * </ul></dd></dl>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>getLineNr() => lineNr
-     * </ul></dd></dl><dl>
+     * <ul><li>{@code getLineNr() => lineNr}
+     * </ul></dd></dl>
      */
     public XMLParseException(String name,
                              int lineNr,

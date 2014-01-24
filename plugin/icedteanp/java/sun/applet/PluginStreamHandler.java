@@ -320,8 +320,6 @@ public class PluginStreamHandler {
      * Read string from plugin.
      *
      * @return the read string
-     *
-     * @exception IOException if an error occurs
      */
     private String read() {
         String message = null;
@@ -355,8 +353,6 @@ public class PluginStreamHandler {
      * Write string to plugin.
      * 
      * @param message the message to write
-     *
-     * @exception IOException if an error occurs
      */
     public void write(String message) {
 

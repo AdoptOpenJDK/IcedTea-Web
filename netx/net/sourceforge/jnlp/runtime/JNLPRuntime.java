@@ -684,7 +684,8 @@ public class JNLPRuntime {
     }
 
     /**
-     * Indicate that netx is running by creating the {@link JNLPRuntime#INSTANCE_FILE} and
+     * Indicate that netx is running by creating the file corresponding to 
+     * {@link DeploymentConfiguration#KEY_USER_NETX_RUNNING_FILE} and
      * acquiring a shared lock on it
      */
     public synchronized static void markNetxRunning() {
@@ -734,8 +735,8 @@ public class JNLPRuntime {
     }
 
     /**
-     * Indicate that netx is stopped by releasing the shared lock on
-     * {@link JNLPRuntime#INSTANCE_FILE}.
+     * Indicate that netx is stopped by releasing the shared lock on the file
+     * corresponding to {@link DeploymentConfiguration#KEY_USER_NETX_RUNNING_FILE}.
      */
     private static void markNetxStopped() {
         if (fileLock == null) {
