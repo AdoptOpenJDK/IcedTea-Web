@@ -1,5 +1,10 @@
 2014-01-23  Omair Majid  <omajid@redhat.com>
 
+	* Makefile.am [ENABLE_DOCS] [JAVADOC_SUPPORTS_J_OPTIONS]:
+	Don't specify perm gen size.
+
+2014-01-23  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/JNLPFile.java,
 	* netx/net/sourceforge/jnlp/NetxPanel.java,
 	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java,

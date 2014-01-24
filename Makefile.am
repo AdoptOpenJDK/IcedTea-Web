@@ -172,7 +172,7 @@ if ENABLE_DOCS
 JAVADOC_OPTS=-use -keywords -encoding UTF-8 -splitIndex \
  -bottom '<font size="-1"> <a href="http://icedtea.classpath.org/bugzilla">Submit a bug or feature</a></font>'
 if JAVADOC_SUPPORTS_J_OPTIONS
-JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m -J-XX:PermSize=32m -J-XX:MaxPermSize=160m
+JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m
 endif
 endif
 
