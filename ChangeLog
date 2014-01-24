@@ -1,3 +1,12 @@
+2014-01-24  Andrew Azores  <aazores@redhat.com>
+
+	http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-January/025971.html
+	* netx/net/sourceforge/jnlp/controlpanel/PolicyPanel.java: added license
+	header and javadocs. Launch PolicyTool by ProcessBuilder rather than
+	calling PolicyTool.main directly, with reflective launch fallback method.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added message
+	(CPPolicyEditorNotFound)
+
 2014-01-23  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am [ENABLE_DOCS] [JAVADOC_SUPPORTS_J_OPTIONS]:
