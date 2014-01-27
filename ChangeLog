@@ -1,4 +1,4 @@
-2014-01-20  Jiri Vanek  <jvanek@redhat.com>
+2014-01-27  Jiri Vanek  <jvanek@redhat.com>
 
 	Tuning of properties loading.
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: added
