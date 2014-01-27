@@ -1,3 +1,30 @@
+2014-01-27  Andrew Azores  <aazores@redhat.com>
+
+	MixedSigningApplet reproducer (PR1592) moved into custom reproducer. JNLP
+	files generated per-test rather than premade. Many new tests added.
+	* tests/reproducers/custom/MixedSigningApplet/resources/MixedSigningApplet.html:
+	moved to custom reproducer
+	* tests/reproducers/custom/MixedSigningApplet/resources/MixedSigningApplet.jnlp:
+	moved to custom reproducer and now used as template by testcases file
+	* tests/reproducers/custom/MixedSigningApplet/srcs/Makefile: new Makefile
+	for custom reproducer
+	* tests/reproducers/custom/MixedSigningApplet/srcs/MixedSigningAppletHelper.java
+	* tests/reproducers/custom/MixedSigningApplet/srcs/MixedSigningAppletSigned.java
+	*
+	tests/reproducers/custom/MixedSigningApplet/testcases/MixedSigningAppletSignedTests.java:
+	new tests added, JNLP files generated per-test rather than all prepackaged
+	* tests/reproducers/signed/MixedSigningAppletSigned/srcs/MixedSigningAppletSigned.java:
+	moved to custom reproducer
+	* tests/reproducers/signed/MixedSigningAppletSigned/testcases/MixedSigningAppletSignedTests.java
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-1.jnlp
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-2.jnlp
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-3.jnlp
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-4.jnlp
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-5.jnlp
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet-6.jnlp
+	* tests/reproducers/simple/MixedSigningApplet/resources/MixedSigningApplet.html
+	* tests/reproducers/simple/MixedSigningApplet/srcs/MixedSigningAppletHelper.java
+
 2014-01-27  Jiri Vanek  <jvanek@redhat.com>
 
 	Tuning of properties loading.

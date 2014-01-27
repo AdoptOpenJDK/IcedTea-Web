@@ -36,7 +36,7 @@ exception statement from your version.
 
  -->
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0" href="MixedSigningApplet.jnlp" codebase=".">
+<jnlp spec="1.0" href="JNLP_HREF" codebase=".">
   <information>
     <title>MixedSigningApplet</title>
     <vendor>IcedTea</vendor>
@@ -49,13 +49,13 @@ exception statement from your version.
     <jar href="MixedSigningAppletSigned.jar"/>
     <jar href="MixedSigningApplet.jar"/>
   </resources>
-  <applet-desc
+  <APP_TYPE_TARGET
     documentBase="."
     name="AppletTest"
-    main-class="com.redhat.mixedsigning.signed.MixedSigningAppletSigned"
+    main-class="signed.MixedSigningAppletSigned"
     width="100"
     height="100">
-      <param name="testName" value="testUnsignedAttacksSigned"/>
-  </applet-desc>
-  </application-desc>
+        PARAM_ARG_TARGET
+  </APP_TYPE_TARGET>
+  SECURITY_TAG_TARGET
 </jnlp>

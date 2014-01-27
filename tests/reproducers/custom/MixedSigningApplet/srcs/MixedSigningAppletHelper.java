@@ -35,9 +35,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package com.redhat.mixedsigning.helper;
+package helper;
+import signed.MixedSigningAppletSigned;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /* See also signed/MixedSigningAppletSigned */
 public class MixedSigningAppletHelper {
@@ -46,13 +49,31 @@ public class MixedSigningAppletHelper {
         return "MixedSigningApplet Applet Running";
     }
 
+    public static String helpDoPrivileged() {
+        return AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return "MixedSigningApplet Applet Running";
+            }
+        });
+    }
+
     public static String getProperty(String prop) {
         return System.getProperty(prop);
     }
 
+    public static String getPropertyDoPrivileged(final String prop) {
+        return AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return getProperty(prop);
+            }
+        });
+    }
+
     public static String getPropertyFromSignedJar(String prop) {
         try {
-            Class<?> signedAppletClass = Class.forName("com.redhat.mixedsigning.signed.MixedSigningAppletSigned");
+            Class<?> signedAppletClass = Class.forName("signed.MixedSigningAppletSigned");
             Method m = signedAppletClass.getMethod("getProperty", String.class);
             String result = (String) m.invoke(null, prop);
             return result;
@@ -62,9 +83,18 @@ public class MixedSigningAppletHelper {
         }
     }
 
+    public static String getPropertyFromSignedJarDoPrivileged(final String prop) {
+        return AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return getPropertyFromSignedJar(prop);
+            }
+        });
+    }
+
     public static String attack() {
         try {
-            Class<?> signedAppletClass = Class.forName("com.redhat.mixedsigning.signed.MixedSigningAppletSigned");
+            Class<?> signedAppletClass = Class.forName("signed.MixedSigningAppletSigned");
             Method m = signedAppletClass.getMethod("getProperty", String.class);
             String result = (String) m.invoke(signedAppletClass.newInstance(), "user.home");
             return result;
@@ -74,10 +104,19 @@ public class MixedSigningAppletHelper {
         }
     }
 
+    public static String attackDoPrivileged() {
+        return AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return new MixedSigningAppletSigned().testSignedReadPropertiesDoPrivileged();
+            }
+        });
+    }
+
     public static String reflectiveAttack() {
         String result = null;
         try {
-            Object signedApplet = Class.forName("com.redhat.mixedsigning.signed.MixedSigningAppletSigned").newInstance();
+            Object signedApplet = Class.forName("signed.MixedSigningAppletSigned").newInstance();
             Method getProp = signedApplet.getClass().getMethod("calledByReflection");
             result = (String)getProp.invoke(signedApplet);
         } catch (Exception e) {
@@ -85,5 +124,14 @@ public class MixedSigningAppletHelper {
             result = e.toString();
         }
         return result;
+    }
+
+    public static String reflectiveAttackDoPrivileged() {
+        return AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return reflectiveAttack();
+            }
+        });
     }
 }
