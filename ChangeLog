@@ -1,3 +1,18 @@
+2014-01-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Tuning of properties loading.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: added
+	(resetToDefaults) methods to set default values to map.
+	(loadSystemConfiguration) now throws ConfigurationException. Added more
+	verbose error messages. The ioexception is now also cause of ConfigurationException
+	if mandatory is on.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: now correctly fails to 
+	initiate if ConfigurationException appeared.
+	Init of (configuration) now catch general exception, and fall back  to default
+	(instead of die  fatally with NoClassDefFoundError). User is warned.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: new key of
+	(RFailingToDefault) added.
+
 2014-01-24  Andrew Azores  <aazores@redhat.com>
 
 	http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-January/025971.html

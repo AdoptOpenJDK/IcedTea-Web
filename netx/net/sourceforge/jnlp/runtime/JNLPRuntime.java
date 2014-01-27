@@ -42,6 +42,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 
@@ -187,7 +188,13 @@ public class JNLPRuntime {
             JavaConsole.getConsole().showConsoleLater();
         }
         /* exit if there is a fatal exception loading the configuration */
-        if (isApplication && getConfiguration().getLoadingException() != null) {
+        if (getConfiguration().getLoadingException() != null) {
+            if (getConfiguration().getLoadingException() instanceof ConfigurationException){
+                // ConfigurationException is thrown only if deployment.config's field
+                // deployment.system.config.mandatory is true, and the destination
+                //where deployment.system.config points is not readable
+                throw new RuntimeException(getConfiguration().getLoadingException());
+            }
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, getMessage("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
         }
         KeyStores.setConfiguration(getConfiguration());
@@ -364,9 +371,19 @@ public class JNLPRuntime {
                 config.load();
                 config.copyTo(System.getProperties());
             } catch (ConfigurationException ex) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, getMessage("RConfigurationError"));
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("RConfigurationError"));
                 //mark this exceptionas we can die on it later
                 config.setLoadingException(ex);
+                //to be sure - we MUST die - http://docs.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/properties.html
+            }catch(Exception t){
+                //all exceptions are causing InstantiatizationError so this do it much more readble
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, t);
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("RFailingToDefault"));
+                if (!JNLPRuntime.isHeadless()){
+                    JOptionPane.showMessageDialog(null, getMessage("RFailingToDefault")+"\n"+t.toString());
+                }
+                //try to survive this unlikely exception
+                config.resetToDefaults();
             } finally {
                 OutputController.getLogger().startConsumer();
             }

@@ -215,6 +215,10 @@ public final class DeploymentConfiguration {
     public ConfigurationException getLoadingException() {
         return loadingException;
     }
+
+    public void resetToDefaults() {
+        currentConfiguration = Defaults.getDefaults();
+    }
     
 
     public enum ConfigType {
@@ -495,7 +499,7 @@ public final class DeploymentConfiguration {
      * Reads the system configuration file and sets the relevant
      * system-properties related variables
      */
-    private boolean loadSystemConfiguration(File configFile) {
+    private boolean loadSystemConfiguration(File configFile) throws ConfigurationException {
 
         OutputController.getLogger().log("Loading system configuation from: " + configFile);
 
@@ -503,7 +507,7 @@ public final class DeploymentConfiguration {
         try {
             systemConfiguration = parsePropertiesFile(configFile);
         } catch (IOException e) {
-            OutputController.getLogger().log("No System level " + DEPLOYMENT_PROPERTIES + " found.");
+            OutputController.getLogger().log("No System level " + DEPLOYMENT_CONFIG_FILE + " found.");
             OutputController.getLogger().log(e);
             return false;
         }
@@ -512,29 +516,36 @@ public final class DeploymentConfiguration {
          * at this point, we have read the system deployment.config file
          * completely
          */
-
+        String urlString = null;
         try {
-            String urlString = systemConfiguration.get("deployment.system.config").getValue();
-            if (urlString == null) {
-                OutputController.getLogger().log("No System level " + DEPLOYMENT_PROPERTIES + " found.");
+            Setting<String> urlSettings = systemConfiguration.get("deployment.system.config");
+            if (urlSettings == null || urlSettings.getValue() == null) {
+                OutputController.getLogger().log("No System level " + DEPLOYMENT_PROPERTIES + " found in "+configFile.getAbsolutePath());
                 return false;
             }
+            urlString = urlSettings.getValue();
+            Setting<String> mandatory = systemConfiguration.get("deployment.system.config.mandatory");
+            systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue()); //never null
+            OutputController.getLogger().log("System level settings " + DEPLOYMENT_PROPERTIES + " are mandatory:" + systemPropertiesMandatory);
             URL url = new URL(urlString);
             if (url.getProtocol().equals("file")) {
                 systemPropertiesFile = new File(url.getFile());
-                OutputController.getLogger().log("Using System level" + DEPLOYMENT_PROPERTIES + ": "
-                            + systemPropertiesFile);
-                Setting<String> mandatory = systemConfiguration.get("deployment.system.config.mandatory");
-                systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue());
+                OutputController.getLogger().log("Using System level" + DEPLOYMENT_PROPERTIES + ": " + systemPropertiesFile);
                 return true;
             } else {
-                OutputController.getLogger().log("Remote + " + DEPLOYMENT_PROPERTIES + " not supported");
+                OutputController.getLogger().log("Remote + " + DEPLOYMENT_PROPERTIES + " not supported: " + urlString + "in " + configFile.getAbsolutePath());
                 return false;
             }
         } catch (MalformedURLException e) {
-            OutputController.getLogger().log("Invalid url for " + DEPLOYMENT_PROPERTIES);
+            OutputController.getLogger().log("Invalid url for " + DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.getAbsolutePath());
             OutputController.getLogger().log(e);
-            return false;
+            if (systemPropertiesMandatory){
+                ConfigurationException ce = new ConfigurationException("Invalid url to system properties, which are mandatory");
+                ce.initCause(e);
+                throw ce;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -562,6 +573,11 @@ public final class DeploymentConfiguration {
         try {
             return parsePropertiesFile(file);
         } catch (IOException e) {
+            if (mandatory){
+                ConfigurationException ce = new ConfigurationException("Exception during loading of " + file + " which is mandatory to read");
+                ce.initCause(e);
+                throw ce;
+            }
             OutputController.getLogger().log(e);
             return null;
         }
