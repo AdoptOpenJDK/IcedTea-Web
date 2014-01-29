@@ -694,13 +694,7 @@ public class Launcher {
     protected  AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
          AppletInstance appletInstance = null;
          try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy);
-
-            if (enableCodeBase) {
-                loader.enableCodeBase();
-            } else if (file.getResources().getJARs().length == 0) {
-                throw new ClassNotFoundException("Can't do a codebase look up and there are no jars. Failing sooner rather than later");
-            }
+            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
 
             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
@@ -741,13 +735,7 @@ public class Launcher {
      */
     protected Applet createAppletObject(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
         try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy);
-
-            if (enableCodeBase) {
-                loader.enableCodeBase();
-            } else if (file.getResources().getJARs().length == 0) {
-                throw new ClassNotFoundException("Can't do a codebase look up and there are no jars. Failing sooner rather than later");
-            }
+            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
 
             String appletName = file.getApplet().getMainClass();
             Class<?> appletClass = loader.loadClass(appletName);

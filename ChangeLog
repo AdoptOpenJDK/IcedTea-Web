@@ -1,3 +1,17 @@
+2014-01-29  Andrew Azores  <aazores@redhat.com>
+
+	Fix for regression due to PR1513 fix. ClassLoader was too optimistic about
+	finding codebase main-classes and so the not-all-signed dialog would
+	appear even for applets that were entirely broken and could not be loaded
+	at all.
+	* netx/net/sourceforge/jnlp/Launcher.java: (createApplet,
+	createAppletObject) pass enableCodeBase to JNLPClassLoader
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (enableCodeBase)
+	removed, now done by constructor argument. (checkNotAllSignedWithUser)
+	minor refactor. (initializeResources) actually check if main-class is
+	loadable from codebase when this is suspected, rather than assuming it
+	will be there
+
 2014-01-27  Andrew Azores  <aazores@redhat.com>
 
 	MixedSigningApplet reproducer (PR1592) moved into custom reproducer. JNLP
