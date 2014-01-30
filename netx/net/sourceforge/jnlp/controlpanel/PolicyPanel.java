@@ -66,6 +66,12 @@ import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
+/**
+ * Implements a Policy Settings panel for the itweb-settings control panel.
+ * This gives the user information about custom user-level JNLP Policy files,
+ * as well as offering a way to launch a policy file editor with the correct
+ * file path to the user's personal policy file location presupplied.
+ */
 public class PolicyPanel extends NamedBorderPanel {
 
     /**
@@ -94,16 +100,16 @@ public class PolicyPanel extends NamedBorderPanel {
         JLabel aboutLabel = new JLabel("<html>" + R("CPPolicyDetail") + "</html>");
 
         final String fileUrlString = config.getProperty(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
-        JButton showUserPolicyButton = new JButton(R("CPButPolicy"));
+        final JButton showUserPolicyButton = new JButton(R("CPButPolicy"));
         showUserPolicyButton.addActionListener(new ViewPolicyButtonAction(frame, fileUrlString));
 
-        String pathPart = localFilePathFromUrlString(fileUrlString);
+        final String pathPart = localFilePathFromUrlString(fileUrlString);
         showUserPolicyButton.setToolTipText(R("CPPolicyTooltip", FileUtils.displayablePath(pathPart, 60)));
 
-        JTextField locationField = new JTextField(pathPart);
+        final JTextField locationField = new JTextField(pathPart);
         locationField.setEditable(false);
 
-        GridBagConstraints c = new GridBagConstraints();
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 1;
         c.gridy = 0;
@@ -124,8 +130,8 @@ public class PolicyPanel extends NamedBorderPanel {
          * the right edge of the frame and the button
          */
         c.fill = GridBagConstraints.BOTH;
-        Component filler1 = Box.createRigidArea(new Dimension(240, 1));
-        Component filler2 = Box.createRigidArea(new Dimension(1, 1));
+        final Component filler1 = Box.createRigidArea(new Dimension(240, 1));
+        final Component filler2 = Box.createRigidArea(new Dimension(1, 1));
         c.gridx++;
         add(filler1, c);
         c.gridx--;
@@ -142,7 +148,7 @@ public class PolicyPanel extends NamedBorderPanel {
     private static void launchPolicyTool(final JFrame frame, final String filePath) {
         try {
             final File policyFile = new File(filePath).getCanonicalFile();
-            OpenFileResult result = canOpenPolicyFile(policyFile);
+            final OpenFileResult result = canOpenPolicyFile(policyFile);
             if (result == OpenFileResult.SUCCESS) {
                 policyToolLaunchHelper(frame, filePath);
             } else if (result == OpenFileResult.CANT_WRITE) {
@@ -173,7 +179,7 @@ public class PolicyPanel extends NamedBorderPanel {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ProcessBuilder pb = new ProcessBuilder("policytool", "-file", filePath)
+                final ProcessBuilder pb = new ProcessBuilder("policytool", "-file", filePath)
                         .directory(new File(System.getProperty("user.home")));
                 try {
                     pb.start();
@@ -200,11 +206,18 @@ public class PolicyPanel extends NamedBorderPanel {
      * @throws Exception if any sort of exception occurs during reflective launch of policytool
      */
     private static void reflectivePolicyToolLaunch(final String filePath) throws Exception {
-        Class<?> policyTool = Class.forName("sun.security.tools.policytool.PolicyTool");
-        Class<?>[] signature = new Class<?>[] { String[].class };
-        Method main = policyTool.getDeclaredMethod("main", signature);
-        Object args = new String[] { "-file", filePath };
-        main.invoke(null, args);
+        Class<?> policyTool;
+        try {
+            // Java 7 location
+            policyTool = Class.forName("sun.security.tools.policytool.PolicyTool");
+        } catch (ClassNotFoundException cnfe) {
+            // Java 6 location
+            policyTool = Class.forName("sun.security.tools.PolicyTool");
+        }
+        final Class<?>[] signature = new Class<?>[] { String[].class };
+        final Method main = policyTool.getMethod("main", signature);
+        final String[] args = new String[] { "-file", filePath };
+        main.invoke(null, (Object) args);
     }
 
     /**
@@ -216,7 +229,7 @@ public class PolicyPanel extends NamedBorderPanel {
      * @throws IOException if the file is not accessible
      */
     private static OpenFileResult canOpenPolicyFile(final File policyFile) {
-        DirectoryCheckResults dcr = testPolicyFileDirectory(policyFile);
+        final DirectoryCheckResults dcr = testPolicyFileDirectory(policyFile);
         if (dcr.getFailures() == 0) {
             if (policyFile.isDirectory())
                 return OpenFileResult.NOT_FILE;
@@ -227,7 +240,7 @@ public class PolicyPanel extends NamedBorderPanel {
             } catch (IOException e) {
                 return OpenFileResult.CANT_CREATE;
             }
-            boolean read = policyFile.canRead(), write = policyFile.canWrite();
+            final boolean read = policyFile.canRead(), write = policyFile.canWrite();
             if (read && write)
                 return OpenFileResult.SUCCESS;
             else if (read)
@@ -245,10 +258,10 @@ public class PolicyPanel extends NamedBorderPanel {
      * @return a {@link DirectoryCheckResults} object representing the results of the test
      */
     private static DirectoryCheckResults testPolicyFileDirectory(final File policyFile) {
-        List<File> policyDirectory = new ArrayList<File>();
+        final List<File> policyDirectory = new ArrayList<File>();
         policyDirectory.add(policyFile.getParentFile());
-        DirectoryValidator validator = new DirectoryValidator(policyDirectory);
-        DirectoryCheckResults result = validator.ensureDirs();
+        final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
+        final DirectoryCheckResults result = validator.ensureDirs();
 
         return result;
     }
@@ -269,7 +282,7 @@ public class PolicyPanel extends NamedBorderPanel {
      * @param reason a {@link OpenFileResult} specifying more precisely why we failed to open the file
      */
     private static void showCouldNotOpenFileDialog(final JFrame frame, final String filePath, final OpenFileResult reason) {
-        String message;
+        final String message;
         switch (reason) {
             case CANT_CREATE:
                 message = R("RCantCreateFile", filePath);
@@ -324,9 +337,9 @@ public class PolicyPanel extends NamedBorderPanel {
      * @param url the {@link String} representing the URL whose path is desired
      * @return a {@link String} representing the local filepath of the given file:/ URL
      */
-    private static String localFilePathFromUrlString(String url) {
+    private static String localFilePathFromUrlString(final String url) {
         try {
-            URL u = new URL(url);
+            final URL u = new URL(url);
             return u.getPath();
         } catch (MalformedURLException e) {
             return url;
@@ -346,7 +359,7 @@ public class PolicyPanel extends NamedBorderPanel {
         }
 
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(final ActionEvent event) {
             try {
                 final URL fileUrl = new URL(fileUrlString);
                 SwingUtilities.invokeLater(new Runnable() {

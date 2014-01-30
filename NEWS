@@ -15,6 +15,7 @@ New in release 1.5 (2013-XX-XX):
 * A console for debugging plugin and javaws
 * Dialogs center on screen before becoming visible
 * Support for u45 new manifest attributes (Application-Name)
+* Custom applet permission policies panel in itweb-settings control panel
 * Cache Viewer
   - Can be closed by ESC key
   - Enabling and disabling of operational buttons is handled properly

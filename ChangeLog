@@ -1,3 +1,10 @@
+2014-01-30  Andrew Azores  <aazores@redhat.com>
+
+	* NEWS: added entry for PolicyPanel
+	* netx/net/sourceforge/jnlp/controlpanel/PolicyPanel.java: added
+	class-level Javadoc comment, made some local variables final, added
+	reflective fallback case for JRE 6 PolicyTool location
+
 2014-01-29  Andrew Azores  <aazores@redhat.com>
 
 	Fix for regression due to PR1513 fix. ClassLoader was too optimistic about
