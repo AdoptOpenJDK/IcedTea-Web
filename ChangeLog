@@ -1,3 +1,8 @@
+2014-01-31  Jacob Wisor  <gitne@gmx.de>
+
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPaneModel.java:
+	(importList) Separate XHTML fix due to revision 884
+
 2014-01-30  Jacob Wisor  <gitne@gmx.de>
 
 	* Javadoc, XHTML conformance, and formatting cleanup
