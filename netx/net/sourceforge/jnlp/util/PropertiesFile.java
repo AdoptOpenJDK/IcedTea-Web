@@ -24,7 +24,7 @@ import java.util.*;
  * A properties object backed by a specified file without throwing
  * exceptions.  The properties are automatically loaded from the
  * file when the first property is requested, but the save method
- * must be called before changes are saved to the file.<p>
+ * must be called before changes are saved to the file.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.4 $

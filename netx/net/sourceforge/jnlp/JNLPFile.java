@@ -36,18 +36,21 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
+ * <p>
  * Provides methods to access the information in a Java Network
  * Launching Protocol (JNLP) file.  The Java Network Launching
  * Protocol specifies in an XML file the information needed to
  * load, cache, and run Java code over the network and in a secure
- * environment.<p>
- *
+ * environment.
+ * </p>
+ * <p>
  * This class represents the overall information about a JNLP file
  * from the jnlp element.  Other information is accessed through
  * objects that represent the elements of a JNLP file
  * (information, resources, application-desc, etc).  References to
  * these objects are obtained by calling the getInformation,
- * getResources, getSecurity, etc methods.<p>
+ * getResources, getSecurity, etc methods.
+ * </p>
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.21 $
@@ -205,7 +208,7 @@ public class JNLPFile {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location, Version version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
-	this(location, version, settings, policy, null);
+	    this(location, version, settings, policy, null);
     }
 
     /**
@@ -264,6 +267,7 @@ public class JNLPFile {
     /**
      * Create a JNLPFile from an input stream.
      *
+     * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(InputStream input, ParserSettings settings) throws ParseException {
@@ -277,6 +281,7 @@ public class JNLPFile {
      * @param input input stream of JNLP file.
      * @param codebase codebase to use if not specified in JNLP file..
      * @param settings the {@link ParserSettings} to use when parsing
+     * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(InputStream input, URL codebase, ParserSettings settings) throws ParseException {
@@ -657,17 +662,19 @@ public class JNLPFile {
 
     /**
      * Returns whether a locale is matched by one of more other
-     * locales.  Only the non-empty language, country, and variant
+     * locales. Only the non-empty language, country, and variant
      * codes are compared; for example, a requested locale of
      * Locale("","","") would always return true.
      *
-     * @param requested the local
+     * @param requested the requested locale
      * @param available the available locales
-     * @param matchLevel the detail with which to match locales.
-     * @return true if requested matches any of available, or if
-     * available is empty or null.
+     * @param matchLevel the depth with which to match locales.
+     * @return {@code true} if {@code requested} matches any of {@code available}, or if
+     * {@code available} is empty or {@code null}.
+     * @see Locale
+     * @see Match
      */
-    public boolean localeMatches(Locale requested, Locale available[], Match matchLevel) {
+    public boolean localeMatches(Locale requested, Locale[] available, Match matchLevel) {
 
         if (matchLevel == Match.GENERALIZED)
             return available == null || available.length == 0;
@@ -730,9 +737,7 @@ public class JNLPFile {
      * Initialize the JNLPFile fields. Private because it's called
      * from the constructor.
      *
-     * @param root the root node
-     * @param settings the parser settings to use while parsing the file
-     * @param location the file location or null
+     * @param location the file location or {@code null}
      */
     private void parse(InputStream input, URL location, URL forceCodebase) throws ParseException {
         try {

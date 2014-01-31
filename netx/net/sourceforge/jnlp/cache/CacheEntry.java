@@ -27,7 +27,7 @@ import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.*;
 
 /**
- * Describes an entry in the cache.<p>
+ * Describes an entry in the cache.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.10 $

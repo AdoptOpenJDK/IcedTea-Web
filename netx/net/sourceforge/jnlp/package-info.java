@@ -1,5 +1,5 @@
 /* package-info.java
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2014 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -31,10 +31,18 @@ you may extend this exception to your version of the library, but you are not
 obligated to do so. If you do not wish to do so, delete this exception
 statement from your version.*/
 /**
- * Contains classes that deal with common and recurring UI tasks.
- * <p>
- * <b>NOTE:</b> Before adding new self-sufficient {@code public static} methods
- * to this package please evaluate thier suitability for {@link UI} first.</p>
- * @since IcedTea-Web 1.5
+ * This package contains the classes that represent the parts of a Java Network
+ * Launching Protocol (JNLP) file as objects, and a way to launch a JNLP file
+ * as an application, applet, or installer.
+ *
+ * <h2>Package Specification</h2>
+ * <ul>
+ *   <li><a href="http://java.sun.com/products/javawebstart/download-spec.html">JNLP specification</a>
+ * </ul>
+ * <h2>Related Documentation</h2>
+ * For overviews, tutorials, examples, guides, and tool documentation, please see:
+ * @see <a href="https://jcp.org/en/jsr/detail?id=56">JSR56: Java Network Launching Protocol and API</a>
+ * @see <a href="http://jnlp.sourceforge.net/netx/">Netx JNLP Client</a>
+ * @see <a href="http://www.oracle.com/technetwork/java/javase/javawebstart">Java Web Start JNLP Client</a>
  */
-package net.sourceforge.jnlp.util.ui;
+package net.sourceforge.jnlp;

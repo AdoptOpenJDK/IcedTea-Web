@@ -50,13 +50,14 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.SunToolkit;
 
 /**
- * Launches JNLPFiles either in the foreground or background.<p>
- *
+ * Launches JNLPFiles either in the foreground or background.
+ * <p>
  * An optional LaunchHandler can be specified that is notified of
  * warning and error condition while launching and that indicates
  * whether a launch may proceed after a warning has occurred.  If
  * specified, the LaunchHandler is notified regardless of whether
- * the file is launched in the foreground or background.<p>
+ * the file is launched in the foreground or background.
+ * </p>
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.22 $
@@ -597,15 +598,16 @@ public class Launcher {
 
     /**
      * Launches a JNLP applet. This method should be called from a
-     * thread in the application's thread group.<p>
-     *
+     * thread in the application's thread group.
+     * <p>
      * The enableCodeBase parameter adds the applet's codebase to
      * the locations searched for resources and classes.  This can
      * slow down the applet loading but allows browser-style applets
      * that don't use JAR files exclusively to be run from a applet
      * JNLP file.  If the applet JNLP file does not specify any
      * resources then the code base will be enabled regardless of
-     * the specified value.<p>
+     * the specified value.
+     * </p>
      *
      * @param file the JNLP file
      * @param enableCodeBase whether to add the codebase URL to the classloader

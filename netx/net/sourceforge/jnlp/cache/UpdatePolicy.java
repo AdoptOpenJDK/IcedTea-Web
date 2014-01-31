@@ -18,7 +18,7 @@ package net.sourceforge.jnlp.cache;
 
 /**
  * A policy that determines when a resource should be checked for
- * an updated version.<p>
+ * an updated version.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.3 $

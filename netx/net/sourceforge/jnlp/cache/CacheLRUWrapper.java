@@ -60,7 +60,7 @@ import net.sourceforge.jnlp.util.PropertiesFile;
  * This class helps maintain the ordering of most recently use items across
  * multiple jvm instances.
  * 
- * @author Andrew Su (asu@redhat.com, andrew.su@utoronto.ca)
+ * @author <a href="mailto:Andrew%20Su%20&lt;asu@redhat.com&gt;">Andrew Su (asu@redhat.com</a>, <a href="mailto:Andrew%20Su%20&lt;andrew.su@utoronto.ca&gt;">andrew.su@utoronto.ca)</a>
  * 
  */
 public enum CacheLRUWrapper {
@@ -98,6 +98,8 @@ public enum CacheLRUWrapper {
     
     /**
      * Returns an instance of the policy.
+     * 
+     * @return an instance of the policy
      */
     public static CacheLRUWrapper getInstance() {
         return INSTANCE;

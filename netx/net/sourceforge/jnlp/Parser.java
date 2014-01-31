@@ -94,14 +94,14 @@ class Parser {
     private boolean allowExtensions; // true if extensions to JNLP spec are ok
 
     /**
-     * Create a parser for the JNLP file.  If the location
+     * Create a parser for the JNLP file. If the location
      * parameters is not null it is used as the default codebase
      * (does not override value of jnlp element's href
-     * attribute).<p>
-     *
+     * attribute).
+     * <p>
      * The root node may be normalized as a side effect of this
      * constructor.
-     *
+     * </p>
      * @param file the (uninitialized) file reference
      * @param base if codebase is not specified, a default base for relative URLs
      * @param root the root node
@@ -113,14 +113,14 @@ class Parser {
     }
 
     /**
-     * Create a parser for the JNLP file.  If the location
+     * Create a parser for the JNLP file. If the location
      * parameters is not null it is used as the default codebase
      * (does not override value of jnlp element's href
-     * attribute).<p>
-     *
+     * attribute).
+     * <p>
      * The root node may be normalized as a side effect of this
      * constructor.
-     *
+     * </p>
      * @param file the (uninitialized) file reference
      * @param base if codebase is not specified, a default base for relative URLs
      * @param root the root node
@@ -914,9 +914,9 @@ class Parser {
     }
 
     /**
-     * Returns a Locale from a single locale.
+     * Returns a {@link Locale} from a single locale.
      *
-     * @param locale the locale string
+     * @param localeStr the locale string
      */
     public Locale getLocale(String localeStr) {
         if (localeStr.length() < 2)
@@ -1048,9 +1048,9 @@ class Parser {
 
     /**
      * Returns a URL object from a href string relative to the
-     * code base.  If the href denotes a relative URL, it must
+     * code base. If the href denotes a relative URL, it must
      * reference a location that is a subdirectory of the
-     * codebase.<p>
+     * codebase.
      *
      * @param node the node
      * @param name the attribute containing an href

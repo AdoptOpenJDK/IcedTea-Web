@@ -42,12 +42,12 @@ import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
 /**
- * This is the main entry point for the JNLP client.  The main
+ * This is the main entry point for the JNLP client. The main
  * method parses the command line parameters and loads a JNLP
- * file into the secure runtime environment.  This class is meant
+ * file into the secure runtime environment. This class is meant
  * to be called from the command line or file association; to
  * initialize the netx engine from other code invoke the
- * <code>JNLPRuntime.initialize</code> method after configuring
+ * {@link JNLPRuntime#initialize} method after configuring
  * the runtime.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author

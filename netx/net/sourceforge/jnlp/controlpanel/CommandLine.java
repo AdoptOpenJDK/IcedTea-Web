@@ -44,9 +44,9 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * printCOMMANDHelp method also exists, and prints out the help message for
  * that specific command. For example, see {@link #handleListCommand(List)}
  * and {@link #printListHelp()}.
- * <p>
+ * </p>
  * Sample usage:
- * <pre>
+ * <pre><code>
  * CommandLine cli = new CommandLine();
  * // the string array represents input using the command line
  * int retVal = cli.handle(new String[] { "help" });
@@ -55,9 +55,9 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * } else {
  *    // bad!
  * }
- * </pre>
+ * </code></pre>
  *
- * @author Omair Majid (omajid@redhat.com)
+ * @author <a href="mailto:Omair%20Majid%20&lt;omajid@redhat.com&gt;">Omair Majid</a>
  */
 public class CommandLine {
 

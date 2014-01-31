@@ -640,7 +640,6 @@ public final class DeploymentConfiguration {
      * Reads a properties file and returns a map representing the properties
      *
      * @param propertiesFile the file to read Properties from
-     * @param destination the map to which all the properties should be added
      * @throws IOException if an IO problem occurs
      */
     private Map<String, Setting<String>> parsePropertiesFile(File propertiesFile) throws IOException {

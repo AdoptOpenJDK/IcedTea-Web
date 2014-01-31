@@ -38,50 +38,50 @@ import java.nio.ByteBuffer;
  * A character decoder is an algorithim for transforming 8 bit
  * binary data that has been encoded into text by a character
  * encoder, back into original binary form.
- *
+ * <p>
  * The character encoders, in general, have been structured
  * around a central theme that binary data can be encoded into
  * text that has the form:
- *
- * <pre>
+ * <pre><code>
  *      [Buffer Prefix]
  *      [Line Prefix][encoded data atoms][Line Suffix]
  *      [Buffer Suffix]
- * </pre>
- *
+ * </code></pre>
+ * </p>
+ * <p>
  * Of course in the simplest encoding schemes, the buffer has no
  * distinct prefix of suffix, however all have some fixed relationship
  * between the text in an 'atom' and the binary data itself.
- *
- * In the CharacterEncoder and CharacterDecoder classes, one complete
- * chunk of data is referred to as a <i>buffer</i>. Encoded buffers
- * are all text, and decoded buffers (sometimes just referred to as
- * buffers) are binary octets.
- *
- * To create a custom decoder, you must, at a minimum,  overide three
+ * </p>
+ * <p>
+ * In the {@link CharacterEncoder} and {@code CharacterDecoder}
+ * classes, one complete chunk of data is referred to as a
+ * <i>buffer</i>. Encoded buffers are all text, and decoded buffers
+ * (sometimes just referred to as buffers) are binary octets.
+ * </p>
+ * <p>
+ * To create a custom decoder, you must, at a minimum, overide three
  * abstract methods in this class.
- * <DL>
- * <DD>bytesPerAtom which tells the decoder how many bytes to
+ * </p>
+ * <dl>
+ * <dd/>bytesPerAtom which tells the decoder how many bytes to
  * expect from decodeAtom
- * <DD>decodeAtom which decodes the bytes sent to it as text.
- * <DD>bytesPerLine which tells the encoder the maximum number of
+ * <dd/>decodeAtom which decodes the bytes sent to it as text.
+ * <dd/>bytesPerLine which tells the encoder the maximum number of
  * bytes per line.
- * </DL>
- *
+ * </dl>
+ * <p>
  * In general, the character decoders return error in the form of a
  * CEFormatException. The syntax of the detail string is
- * <pre>
+ * <pre><code>
  *      DecoderClassName: Error message.
- * </pre>
- *
+ * </code></pre>
+ * <p>
  * Several useful decoders have already been written and are
  * referenced in the See Also list below.
- *
+ * </p>
  * @author      Chuck McManis
- * @see         CEFormatException
  * @see         CharacterEncoder
- * @see         UCDecoder
- * @see         UUDecoder
  * @see         BASE64Decoder
  */
 

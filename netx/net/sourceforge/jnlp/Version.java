@@ -19,18 +19,21 @@ package net.sourceforge.jnlp;
 import java.util.*;
 
 /**
+ * <p>
  * A JNLP Version string in the form "1.2-3_abc" followed by an
  * optional + (includes all later versions) or * (matches any
  * suffixes on versions).  More than one version can be included
- * in a string by separating them with spaces.<p>
- *
+ * in a string by separating them with spaces.
+ * </p>
+ * <p>
  * Version strings are divided by "._-" charecters into parts.
  * These parts are compared numerically if they can be parsed as
  * integers or lexographically as strings otherwise.  If the
  * number of parts is different between two version strings then
  * the smaller one is padded with zero or the empty string.  Note
  * that the padding in this version means that 1.2+ matches
- * 1.4.0-beta1, but may not in future versions.<p>
+ * 1.4.0-beta1, but may not in future versions.
+ * </p>
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.5 $

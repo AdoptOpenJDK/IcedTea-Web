@@ -306,7 +306,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                     + Translator.R(InfoItem.SPLASH + "mainL4")
                     + " </p>\n"
                     + info + formatListInfoList(l) + formatInfo(anotherInfo)
-                    +"<br>"+DateFormat.getInstance().format(shown)+"<br>"
+                    +"<br/>"+DateFormat.getInstance().format(shown)+"<br/>"
                     + "<p>"
                     + Translator.R(InfoItem.SPLASH + "exWas")
                     + " <br/>\n" + "<pre>" + getExceptionStackTraceAsString(ex) + "</pre>"
@@ -392,9 +392,9 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
 
     String getMessage() {
         return message;
-   }
+    }
 
-   private static String createLink() {
+    private static String createLink() {
         return "<a href=\"" + Translator.R(InfoItem.SPLASH + "url") + "\">" +
                 Translator.R(InfoItem.SPLASH + "urlLooks") + "</a>";
     }

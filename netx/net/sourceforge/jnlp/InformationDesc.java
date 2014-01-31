@@ -21,7 +21,7 @@ import java.net.*;
 import java.util.*;
 
 /**
- * The information element.<p>
+ * The information element.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.9 $

@@ -56,13 +56,17 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
- * A factory for showing many possible types of security warning to the user.<p>
- *
+ * <p>
+ * A factory for showing many possible types of security warning to the user.
+ * </p>
+ * <p>
  * This contains all the public methods that classes outside this package should
  * use instead of using {@link SecurityDialog} directly.
- *
+ * </p>
+ * <p>
  * All of these methods post a message to the
  * {@link SecurityDialogMessageHandler} and block waiting for a response.
+ * </p>
  */
 public class SecurityDialogs {
     /** Types of dialogs we can create */
@@ -180,9 +184,9 @@ public class SecurityDialogs {
 
     /**
      * Shows a security warning dialog according to the specified type of
-     * access. If <code>type</code> is one of AccessType.VERIFIED or
-     * AccessType.UNVERIFIED, extra details will be available with regards
-     * to code signing and signing certificates.
+     * access. If {@code accessType} is one of {@link AccessType#VERIFIED} or
+     * {@link AccessType#UNVERIFIED}, extra details will be available with
+     * regards to code signing and signing certificates.
      *
      * @param accessType the type of warning dialog to show
      * @param file the JNLPFile associated with this warning

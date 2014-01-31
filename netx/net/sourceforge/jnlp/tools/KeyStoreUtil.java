@@ -26,7 +26,7 @@
 package net.sourceforge.jnlp.tools;
 
 /**
- * <p> This class provides several utilities to <code>KeyStore</code>.
+ * This class provides several utilities to {@link java.security.KeyStore}.
  *
  * @since 1.6.0
  */

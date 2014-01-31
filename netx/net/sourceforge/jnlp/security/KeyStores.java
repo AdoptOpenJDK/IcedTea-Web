@@ -58,7 +58,7 @@ import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
- * The <code>KeyStores</code> class allows easily accessing the various KeyStores
+ * The {@code KeyStores} class allows easily accessing the various KeyStores
  * used.
  */
 public final class KeyStores {

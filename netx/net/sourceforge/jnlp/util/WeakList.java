@@ -25,7 +25,7 @@ import java.util.*;
  * turn to null at any point (ie, indexOf(x) followed by get(x)
  * may return null).  The weak references are only removed when
  * the trimToSize method is called so that the indices remain
- * constant otherwise.<p>
+ * constant otherwise.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.3 $

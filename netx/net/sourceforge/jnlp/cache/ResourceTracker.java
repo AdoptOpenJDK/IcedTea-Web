@@ -52,16 +52,17 @@ import net.sourceforge.jnlp.util.WeakList;
 
 /**
  * This class tracks the downloading of various resources of a
- * JNLP file to local files in the cache.  It can be used to
+ * JNLP file to local files in the cache. It can be used to
  * download icons, jnlp and extension files, jars, and jardiff
  * files using the version based protocol or any file using the
  * basic download protocol (jardiff and version not implemented
- * yet).<p>
- *
+ * yet).
+ * <p>
  * The resource tracker can be configured to prefetch resources,
  * which are downloaded in the order added to the media
- * tracker.<p>
- *
+ * tracker.
+ * </p>
+ * <p>
  * Multiple threads are used to download and cache resources that
  * are actively being waited for (blocking a caller) or those that
  * have been started downloading by calling the startDownload
@@ -69,7 +70,8 @@ import net.sourceforge.jnlp.util.WeakList;
  * time and only if no other trackers have requested downloads.
  * This allows the tracker to start downloading many items without
  * using many system resources, but still quickly download items
- * as needed.<p>
+ * as needed.
+ * </p>
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.22 $
@@ -238,7 +240,7 @@ public class ResourceTracker {
 
     /**
      * Check the cache for a resource, and initialize the resource
-     * as already downloaded if found. <p>
+     * as already downloaded if found.
      *
      * @param updatePolicy whether to check for updates if already in cache
      * @return whether the resource are already downloaded
@@ -285,7 +287,7 @@ public class ResourceTracker {
 
     /**
      * Adds the listener to the list of objects interested in
-     * receivind DownloadEvents.<p>
+     * receivind DownloadEvents.
      *
      * @param listener the listener to add.
      */
@@ -339,10 +341,11 @@ public class ResourceTracker {
     /**
      * Returns a URL pointing to the cached location of the
      * resource, or the resource itself if it is a non-cacheable
-     * resource.<p>
-     *
+     * resource.
+     * <p>
      * If the resource has not downloaded yet, the method will block
-     * until it has been transferred to the cache.<p>
+     * until it has been transferred to the cache.
+     * </p>
      *
      * @param location the resource location
      * @return the resource, or null if it could not be downloaded
@@ -365,10 +368,11 @@ public class ResourceTracker {
     /**
      * Returns a file containing the downloaded resource.  If the
      * resource is non-cacheable then null is returned unless the
-     * resource is a local file (the original file is returned).<p>
-     *
+     * resource is a local file (the original file is returned).
+     * <p>
      * If the resource has not downloaded yet, the method will block
-     * until it has been transferred to the cache.<p>
+     * until it has been transferred to the cache.
+     * </p>
      *
      * @param location the resource location
      * @return a local file containing the resource, or null
@@ -404,10 +408,11 @@ public class ResourceTracker {
      * Returns an input stream that reads the contents of the
      * resource.  For non-cacheable resources, an InputStream that
      * reads from the source location is returned.  Otherwise the
-     * InputStream reads the cached resource.<p>
-     *
+     * InputStream reads the cached resource.
+     * <p>
      * This method will block while the resource is downloaded to
      * the cache.
+     * </p>
      *
      * @throws IOException if there was an error opening the stream
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
@@ -550,9 +555,10 @@ public class ResourceTracker {
 
     /**
      * Start a new download thread if there are not too many threads
-     * already running.<p>
-     *
+     * already running.
+     * <p>
      * Calls to this method should be synchronized on lock.
+     * </p>
      */
     protected void startThread() {
         if (threads < maxThreads) {
@@ -564,9 +570,10 @@ public class ResourceTracker {
     }
 
     /**
-     * A thread is ending, called by the thread itself.<p>
-     *
+     * A thread is ending, called by the thread itself.
+     * <p>
      * Calls to this method should be synchronized.
+     * </p>
      */
     private void endThread() {
         threads--;
@@ -917,16 +924,18 @@ public class ResourceTracker {
     }
 
     /**
-     * Pick the next resource to download or initialize.  If there
+     * Pick the next resource to download or initialize. If there
      * are no more resources requested then one is taken from a
-     * resource tracker with prefetch enabled.<p>
-     *
+     * resource tracker with prefetch enabled.
+     * <p>
      * The resource state is advanced before it is returned
-     * (CONNECT-&gt;CONNECTING).<p>
+     * (CONNECT-&gt;CONNECTING).
+     * </p>
+     * <p>
+     * Calls to this method should be synchronized on lock.
+     * </p>
      *
-     * Calls to this method should be synchronized on lock.<p>
-     *
-     * @return the resource to initialize or download, or null
+     * @return the resource to initialize or download, or {@code null}
      */
     private static Resource selectNextResource() {
         Resource result;
@@ -964,9 +973,10 @@ public class ResourceTracker {
 
     /**
      * Returns the next resource to be prefetched before
-     * requested.<p>
-     *
-     * Calls to this method should be synchronized on lock.<p>
+     * requested.
+     * <p>
+     * Calls to this method should be synchronized on lock.
+     * </p>
      */
     private static Resource getPrefetch() {
         Resource result = null;
@@ -1012,10 +1022,11 @@ public class ResourceTracker {
 
     /**
      * Selects a resource from the source list that has the
-     * specified flag set.<p>
-     *
+     * specified flag set.
+     * <p>
      * Calls to this method should be synchronized on lock and
-     * source list.<p>
+     * source list.
+     * </p>
      */
     private static Resource selectByFlag(List<Resource> source, int flag,
                                          int notflag) {
@@ -1070,12 +1081,12 @@ public class ResourceTracker {
      * Wait for some resources.
      *
      * @param resources the resources to wait for
-     * @param timeout the timeout, or 0 to wait until completed
-     * @returns true if the resources were downloaded or had errors,
-     * false if the timeout was reached
+     * @param timeout the timeout, or {@code 0} to wait until completed
+     * @return {@code true} if the resources were downloaded or had errors,
+     * {@code false} if the timeout was reached
      * @throws InterruptedException if another thread interrupted the wait
      */
-    private boolean wait(Resource resources[], long timeout) throws InterruptedException {
+    private boolean wait(Resource[] resources, long timeout) throws InterruptedException {
         long startTime = System.currentTimeMillis();
 
         // start them downloading / connecting in background

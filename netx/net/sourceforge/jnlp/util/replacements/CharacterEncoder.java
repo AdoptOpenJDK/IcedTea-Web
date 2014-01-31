@@ -39,38 +39,38 @@ import java.nio.ByteBuffer;
  * A character encoder is an algorithim for transforming 8 bit binary
  * data into text (generally 7 bit ASCII or 8 bit ISO-Latin-1 text)
  * for transmition over text channels such as e-mail and network news.
- *
+ * <p>
  * The character encoders have been structured around a central theme
  * that, in general, the encoded text has the form:
- *
- * <pre>
+ * <pre><code>
  *      [Buffer Prefix]
  *      [Line Prefix][encoded data atoms][Line Suffix]
  *      [Buffer Suffix]
- * </pre>
- *
- * In the CharacterEncoder and CharacterDecoder classes, one complete
- * chunk of data is referred to as a <i>buffer</i>. Encoded buffers
- * are all text, and decoded buffers (sometimes just referred to as
- * buffers) are binary octets.
- *
- * To create a custom encoder, you must, at a minimum,  overide three
+ * </code></pre>
+ * </p>
+ * <p>
+ * In the {@code CharacterEncoder} and {@link CharacterDecoder}
+ * classes, one complete chunk of data is referred to as a
+ * <i>buffer</i>. Encoded buffers are all text, and decoded buffers
+ * (sometimes just referred to as buffers) are binary octets.
+ * </p>
+ * <p>
+ * To create a custom encoder, you must, at a minimum, overide three
  * abstract methods in this class.
- * <DL>
- * <DD>bytesPerAtom which tells the encoder how many bytes to
+ * <dl>
+ * <dd/>bytesPerAtom which tells the encoder how many bytes to
  * send to encodeAtom
- * <DD>encodeAtom which encodes the bytes sent to it as text.
- * <DD>bytesPerLine which tells the encoder the maximum number of
+ * <dd/>encodeAtom which encodes the bytes sent to it as text.
+ * <dd/>bytesPerLine which tells the encoder the maximum number of
  * bytes per line.
- * </DL>
- *
+ * </dl>
+ * </p>
+ * <p>
  * Several useful encoders have already been written and are
  * referenced in the See Also list below.
- *
+ * </p>
  * @author      Chuck McManis
- * @see         CharacterDecoder;
- * @see         UCEncoder
- * @see         UUEncoder
+ * @see         CharacterDecoder
  * @see         BASE64Encoder
  */
 public abstract class CharacterEncoder {
@@ -200,12 +200,14 @@ public abstract class CharacterEncoder {
 
     /**
      * Return a byte array from the remaining bytes in this ByteBuffer.
-     * <P>
+     * <p>
      * The ByteBuffer's position will be advanced to ByteBuffer's limit.
-     * <P>
+     * </p>
+     * <p>
      * To avoid an extra copy, the implementation will attempt to return the
      * byte array backing the ByteBuffer.  If this is not possible, a
      * new byte array will be created.
+     * </p>
      */
     private byte [] getBytes(ByteBuffer bb) {
         /*
@@ -247,8 +249,9 @@ public abstract class CharacterEncoder {
     /**
      * Encode the <i>aBuffer</i> ByteBuffer and write the encoded
      * result to the OutputStream <i>aStream</i>.
-     * <P>
+     * <p>
      * The ByteBuffer's position will be advanced to ByteBuffer's limit.
+     * </p>
      */
     public void encode(ByteBuffer aBuffer, OutputStream aStream)
         throws IOException {
@@ -259,8 +262,9 @@ public abstract class CharacterEncoder {
     /**
      * A 'streamless' version of encode that simply takes a ByteBuffer
      * and returns a string containing the encoded buffer.
-     * <P>
+     * <p>
      * The ByteBuffer's position will be advanced to ByteBuffer's limit.
+     * </p>
      */
     public String encode(ByteBuffer aBuffer) {
         byte [] buf = getBytes(aBuffer);
@@ -331,8 +335,9 @@ public abstract class CharacterEncoder {
     /**
      * Encode the <i>aBuffer</i> ByteBuffer and write the encoded
      * result to the OutputStream <i>aStream</i>.
-     * <P>
+     * <p>
      * The ByteBuffer's position will be advanced to ByteBuffer's limit.
+     * </p>
      */
     public void encodeBuffer(ByteBuffer aBuffer, OutputStream aStream)
         throws IOException {
@@ -343,8 +348,9 @@ public abstract class CharacterEncoder {
     /**
      * A 'streamless' version of encode that simply takes a ByteBuffer
      * and returns a string containing the encoded buffer.
-     * <P>
+     * <p>
      * The ByteBuffer's position will be advanced to ByteBuffer's limit.
+     * </p>
      */
     public String encodeBuffer(ByteBuffer aBuffer) {
         byte [] buf = getBytes(aBuffer);

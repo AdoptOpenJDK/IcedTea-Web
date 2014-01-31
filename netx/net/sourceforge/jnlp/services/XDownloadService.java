@@ -36,8 +36,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 class XDownloadService implements DownloadService {
 
     /**
-     * Returns the JNLPClassLoader of the application
-     * @return
+     * Returns the {@link JNLPClassLoader} of the application
+     * @return the {@link JNLPClassLoader} of the application
      */
     JNLPClassLoader getClassLoader() {
         return (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
@@ -46,6 +46,7 @@ class XDownloadService implements DownloadService {
     /**
      * Returns a listener that will automatically display download
      * progress to the user.
+     * @return always {@code null}
      */
     public DownloadServiceListener getDefaultProgressWindow() {
         return null;

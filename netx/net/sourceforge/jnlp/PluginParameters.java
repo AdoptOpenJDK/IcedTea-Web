@@ -192,8 +192,7 @@ public class PluginParameters {
      * Creates the underlying hash table with the proper overrides. Ensure all
      * keys are lowercase consistently.
      * 
-     * @param params
-     *            the properties, before parameter aliasing rules.
+     * @param rawParams the properties, before parameter aliasing rules.
      * @return the resulting parameter table
      */
     static Hashtable<String, String> createParameterTable(

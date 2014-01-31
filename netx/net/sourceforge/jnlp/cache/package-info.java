@@ -1,5 +1,5 @@
 /* package-info.java
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2014 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -31,10 +31,6 @@ you may extend this exception to your version of the library, but you are not
 obligated to do so. If you do not wish to do so, delete this exception
 statement from your version.*/
 /**
- * Contains classes that deal with common and recurring UI tasks.
- * <p>
- * <b>NOTE:</b> Before adding new self-sufficient {@code public static} methods
- * to this package please evaluate thier suitability for {@link UI} first.</p>
- * @since IcedTea-Web 1.5
+ * This package contains the JNLP cache.
  */
-package net.sourceforge.jnlp.util.ui;
+package netx.sourceforge.jnlp.cache;

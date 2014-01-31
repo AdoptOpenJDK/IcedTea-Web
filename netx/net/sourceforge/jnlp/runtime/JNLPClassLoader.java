@@ -94,9 +94,9 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.misc.JarIndex;
 
 /**
- * Classloader that takes it's resources from a JNLP file.  If the
+ * Classloader that takes it's resources from a JNLP file. If the
  * JNLP file defines extensions, separate classloaders for these
- * will be created automatically.  Classes are loaded with the
+ * will be created automatically. Classes are loaded with the
  * security context when the classloader was created.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
@@ -365,7 +365,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Gets the lock for a given unique key, creating one if it does not yet exist.
      * This operation is atomic & thread-safe.
      * 
-     * @param file the file whose unique key should be used
+     * @param uniqueKey the file whose unique key should be used
      * @return the lock
      */
     private static ReentrantLock getUniqueKeyLock(String uniqueKey) {
@@ -1623,6 +1623,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * <p>
      * This will add the JARDesc into the resourceTracker and block until it
      * is downloaded.
+     * </p>
      * @param desc the JARDesc for the new jar
      */
     private void addNewJar(final JARDesc desc) {
@@ -1790,7 +1791,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Finds the resource in this, the parent, or the extension
      * class loaders.
      *
-     * @return a <code>URL</code> for the resource, or <code>null</code>
+     * @return a {@link URL} for the resource, or {@code null}
      * if the resource could not be found.
      */
     @Override
@@ -2043,7 +2044,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Adds the given path to the path loader
      * 
-     * @param URL the path to add
+     * @param u the path to add
      * @throws IllegalArgumentException If the given url is not a path
      */
     private void addToCodeBaseLoader(URL u) {

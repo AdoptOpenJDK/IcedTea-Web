@@ -170,12 +170,15 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
     }
 
     /**
+     * <p>
      * The main entry point for {@link BrowserAwareProxySelector}. Based on
      * the browser settings, determines proxy information for a given URI.
+     * </p>
      * <p>
      * The appropriate proxy may be determined by reading static information
      * from the browser's preferences file, or it may be computed dynamically,
      * by, for example, running javascript code.
+     * </p>
      */
     @Override
     protected List<Proxy> getFromBrowser(URI uri) {

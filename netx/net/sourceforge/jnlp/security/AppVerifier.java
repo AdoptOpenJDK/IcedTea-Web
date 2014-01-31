@@ -77,7 +77,6 @@ public interface AppVerifier {
      * @param certs Any possible signer and their respective information regarding this app.
      * @param signedJars A map of all the jars of this app and the number of
      * signed entries each one has.
-     * @return
      */
     public boolean isFullySigned(Map<CertPath, CertInformation> certs,
             Map<String, Integer> signedJars);

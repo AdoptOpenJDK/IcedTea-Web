@@ -56,11 +56,13 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * security prompt. This ensures that all security prompts are isolated and
  * their Look and Feel is not affected by the Look and Feel of the
  * applet/application.
+ * </p>
  * <p>
  * This class contains allows a client application to post a
  * {@link SecurityDialogMessage}. When this class finds a security message in
  * the queue, it shows a security warning to the user, and sets
  * {@link SecurityDialogMessage#userResponse} to the appropriate value.
+ * </p>
  */
 public final class SecurityDialogMessageHandler implements Runnable {
 
@@ -90,6 +92,7 @@ public final class SecurityDialogMessageHandler implements Runnable {
      * Once the user has made a choice the
      * {@link SecurityDialogMessage#toDispose} (if not null) is disposed and
      * {@link SecurityDialogMessage#lock} (in not null) is released.
+     * </p>
      *
      * @param message the message indicating what type of security dialog to
      * show
@@ -126,6 +129,7 @@ public final class SecurityDialogMessageHandler implements Runnable {
      * Once the user has made a choice the
      * {@link SecurityDialogMessage#toDispose} (if not null) is disposed and
      * {@link SecurityDialogMessage#lock} (in not null) is released.
+     * </p>
      *
      * @param message indicates the type of security dialog to show
      */

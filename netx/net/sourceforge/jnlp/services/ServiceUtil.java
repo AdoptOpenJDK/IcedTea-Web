@@ -46,7 +46,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Provides static methods to interact useful for using the JNLP
- * services.<p>
+ * services.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>

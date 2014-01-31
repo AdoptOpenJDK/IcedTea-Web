@@ -168,8 +168,8 @@ public class ControlPanel extends JFrame {
                 || validationResult.id == JvmValidationResult.STATE.NOT_VALID_DIR
                 || validationResult.id == JvmValidationResult.STATE.NOT_VALID_JDK) {
             return JOptionPane.showConfirmDialog(ControlPanel.this,
-                    "<html>"+Translator.R("CPJVMNotokMessage1", s)+"<br>"
-                    + validationResult.formattedText+"<br>"
+                    "<html>"+Translator.R("CPJVMNotokMessage1", s)+"<br/>"
+                    + validationResult.formattedText+"<br/>"
                     + Translator.R("CPJVMNotokMessage2", DeploymentConfiguration.KEY_JRE_DIR, DeploymentConfiguration.USER_DEPLOYMENT_PROPERTIES_FILE)+"</html>",
                     Translator.R("CPJVMconfirmInvalidJdkTitle"),JOptionPane.OK_CANCEL_OPTION);
         }
@@ -369,7 +369,8 @@ public class ControlPanel extends JFrame {
     /**
      * This is a placeholder panel.
      * 
-     * @return
+     * @return a placeholder panel
+     * @see JPanel
      */
     private JPanel createNotImplementedPanel() {
 

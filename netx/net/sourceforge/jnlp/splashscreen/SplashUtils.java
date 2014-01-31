@@ -40,7 +40,8 @@ import net.sourceforge.jnlp.runtime.AppletEnvironment;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.splashscreen.impls.*;
+import net.sourceforge.jnlp.splashscreen.impls.DefaultSplashScreen2012;
+import net.sourceforge.jnlp.splashscreen.impls.DefaultErrorSplashScreen2012;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class SplashUtils {
@@ -50,13 +51,10 @@ public class SplashUtils {
     static final String NONE = "none";
     static final String DEFAULT = "default";
 
-
     /**
-     *
      * Indicator whether to show icedtea-web plugin or just icedtea-web
-     * For "just icedtea-web" will be done  an attempt to show content of
+     * For "just icedtea-web" will be done an attempt to show content of
      * information element 
-     *
      */
     public static enum SplashReason {
 
@@ -110,62 +108,69 @@ public class SplashUtils {
 
     
     private static SplashReason getReason() {
-        if (JNLPRuntime.isWebstartApplication()){
+        if (JNLPRuntime.isWebstartApplication()) {
             return SplashReason.JAVAWS;
-        }else{
+        } else {
             return SplashReason.APPLET;
-        }
-        
+        }        
     }
     
 
     /**
-     * Warrning - splash should have recieve width and height without borders.
-     * plugin's window have NO border, but javaws window HAVE border. This msut be calcualted prior calling this method
+     * Warning - splash should have recieve width and height without borders.
+     * plugin's window have NO border, but javaws window HAVE border. This must 
+     * be calcualted prior calling this method
      * @param width
      * @param height
-     * @return
      */
     public static SplashPanel getSplashScreen(int width, int height) {
         return getSplashScreen(width, height, getReason());
     }
 
     /**
-     * Warrning - splash should have recieve width and height without borders.
-     * plugin's window have NO border, but javaws window HAVE border. This msut be calcualted prior calling this method
+     * Warning - splash should have recieve width and height without borders.
+     * plugin's window have NO border, but javaws window HAVE border. This must
+     * be calcualted prior calling this method
      * @param width
      * @param height
-     * @param  ex - exception to be shown if any
-     * @return
+     * @param ex exception to be shown if any
      */
     public static SplashErrorPanel getErrorSplashScreen(int width, int height, Throwable ex) {
         return getErrorSplashScreen(width, height, getReason(), ex);
     }
 
     /**
-     * Warrning - splash should have recieve width and height without borders.
-     * plugin's window have NO border, but javaws window HAVE border. This msut be calcualted prior calling this method
+     * Warning - splash should have recieve width and height without borders.
+     * plugin's window have NO border, but javaws window HAVE border. This must
+     * be calcualted prior calling this method
      * @param width
      * @param height
      * @param splashReason
-     * @return
      */
     static SplashPanel getSplashScreen(int width, int height, SplashUtils.SplashReason splashReason) {
         return getSplashScreen(width, height, splashReason, null, false);
     }
 
     /**
-     * Warrning - splash should have recieve width and height without borders.
-     * plugin's window have NO border, but javaws window HAVE border. This msut be calcualted prior calling this method
+     * Warning - splash should have recieve width and height without borders.
+     * plugin's window have NO border, but javaws window HAVE border. This must
+     * be calcualted prior calling this method
      * @param width
      * @param height
      * @param splashReason
-     * @return
+     * @param ex exception to be shown if any
      */
     static SplashErrorPanel getErrorSplashScreen(int width, int height, SplashUtils.SplashReason splashReason, Throwable ex) {
         return (SplashErrorPanel) getSplashScreen(width, height, splashReason, ex, true);
     }
 
+    /**
+     * @param width
+     * @param height
+     * @param splashReason
+     * @param loadingException
+     * @param isError
+     */
     static SplashPanel getSplashScreen(int width, int height, SplashUtils.SplashReason splashReason, Throwable loadingException, boolean isError) {
         String splashEnvironmetVar = null;
         String pluginSplashEnvironmetVar = null;

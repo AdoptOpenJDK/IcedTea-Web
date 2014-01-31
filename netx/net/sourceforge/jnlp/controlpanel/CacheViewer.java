@@ -97,8 +97,8 @@ public class CacheViewer extends JDialog {
         final CacheViewer cacheViewer = this;
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             /**
-             * Dispatches mainly the <code>VK_ESCAPE</code> key event to close
-             * the <code>CacheViewer</code> dialog.
+             * Dispatches mainly the {@code KeyEvent.VK_ESCAPE} key event to
+             * close the {@code CacheViewer} dialog.
              * @return {@code true} after an {@link KeyEvent#VK_ESCAPE
              * VK_ESCAPE} has been processed, otherwise {@code false}
              * @see KeyEventDispatcher

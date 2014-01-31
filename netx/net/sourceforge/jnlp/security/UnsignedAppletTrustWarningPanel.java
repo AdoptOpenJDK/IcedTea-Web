@@ -160,10 +160,10 @@ public class UnsignedAppletTrustWarningPanel extends JPanel {
         ExecuteUnsignedApplet rememberedAction = UnsignedAppletTrustConfirmation.getStoredAction(file);
         int panelHeight = INFO_PANEL_HEIGHT;
         if (rememberedAction == ExecuteUnsignedApplet.YES) {
-            infoLabelText += "<br>" + R("SUnsignedAllowedBefore");
+            infoLabelText += "<br/>" + R("SUnsignedAllowedBefore");
             panelHeight += INFO_PANEL_HINT_HEIGHT;
         } else if (rememberedAction == ExecuteUnsignedApplet.NO) {
-            infoLabelText += "<br>" + R("SUnsignedRejectedBefore");
+            infoLabelText += "<br/>" + R("SUnsignedRejectedBefore");
             panelHeight += INFO_PANEL_HINT_HEIGHT;
         }
 

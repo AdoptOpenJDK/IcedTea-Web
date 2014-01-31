@@ -126,12 +126,12 @@ public class ManageJnlpResources {
     }
 
     /**
-     * Returns true if the resource (not mentioned in the jnlp file) is cached, otherwise false
+     * Returns {@code true} if the resource (not mentioned in the jnlp file) is cached, otherwise {@code false}
      * Used by DownloadService.
-     * @param rootClassLoader Root JNLPClassLoader of the application.
+     * @param rootClassLoader Root {@link JNLPClassLoader} of the application.
      * @param ref Path to the resource.
-     * @param version The version of resource. If null, no version is specified.
-     * @return
+     * @param version The version of resource. If {@code null}, no version is specified.
+     * @return {@code true} if the external resource is cached, otherwise {@code false}
      */
     public static boolean isExternalResourceCached(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
         return rootClassLoader.manageExternalJars(ref, version, DownloadAction.CHECK_CACHE);

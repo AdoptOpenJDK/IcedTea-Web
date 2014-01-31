@@ -50,12 +50,11 @@ import net.sourceforge.jnlp.util.logging.headers.Header;
 
 /**
  * This class writes log information to file.
- *
  */
 public final class FileLog implements SingleStreamLogger {
-    private static SimpleDateFormat fileLogNameFormatter =  new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.S");
+    private static SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.S");
     /**"Tue Nov 19 09:43:50 CET 2013"*/
-    private static SimpleDateFormat pluginSharedFormatter =  new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZ yyyy");
+    private static SimpleDateFormat pluginSharedFormatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZ yyyy");
 
     private final Logger impl;
     private final FileHandler fh;
@@ -71,43 +70,43 @@ public final class FileLog implements SingleStreamLogger {
 
 
      
-     public FileLog(String fileName, boolean append) {
-         this(fileName, fileName, append);
-     }
+    public FileLog(String fileName, boolean append) {
+        this(fileName, fileName, append);
+    }
      
-     public FileLog(String loggerName, String fileName, boolean append) {
-        try{
-            File futureFile = new File(fileName);
-            if (!futureFile.exists()) {
-                FileUtils.createRestrictedFile(futureFile, true);
-            }
-            fh  = new FileHandler(fileName, append);
-            fh.setFormatter(new Formatter() {
-                @Override
-                public String format(LogRecord record) {
-                    return record.getMessage() + "\n";
-                }
-            });
-            impl = Logger.getLogger(loggerName);
-            impl.setLevel(Level.ALL);
-            impl.addHandler(fh);
-            log(new Header(OutputController.Level.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false).toString());
-        } catch (IOException e) {
+    public FileLog(String loggerName, String fileName, boolean append) {
+       try {
+           File futureFile = new File(fileName);
+           if (!futureFile.exists()) {
+               FileUtils.createRestrictedFile(futureFile, true);
+           }
+           fh = new FileHandler(fileName, append);
+           fh.setFormatter(new Formatter() {
+               @Override
+               public String format(LogRecord record) {
+                   return record.getMessage() + "\n";
+               }
+           });
+           impl = Logger.getLogger(loggerName);
+           impl.setLevel(Level.ALL);
+           impl.addHandler(fh);
+           log(new Header(OutputController.Level.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false).toString());
+       } catch (IOException e) {
            throw new RuntimeException(e);
-        }
+       }
     }
 
     /**
      * Log the String to file.
      *
-     * @param e Exception that was thrown.
+     * @param s {@link Exception} that was thrown.
      */
     @Override
     public synchronized void log(String s) {
         impl.log(Level.FINE, s);
     }
     
-    public void close(){
+    public void close() {
         fh.close();
     }
 
@@ -122,6 +121,4 @@ public final class FileLog implements SingleStreamLogger {
     public static SimpleDateFormat getPluginSharedFormatter() {
         return pluginSharedFormatter;
     }
-
-    
 }

@@ -54,7 +54,7 @@ import net.sourceforge.jnlp.util.UrlUtils;
 
 /**
  * Provides static methods to interact with the cache, download
- * indicator, and other utility methods.<p>
+ * indicator, and other utility methods.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.17 $
@@ -68,7 +68,7 @@ public class CacheUtil {
 
     /**
      * Compares a URL using string compare of its protocol, host,
-     * port, path, query, and anchor.  This method avoids the host
+     * port, path, query, and anchor. This method avoids the host
      * name lookup that URL.equals does for http: protocol URLs.
      * It may not return the same value as the URL.equals method
      * (different hostnames that resolve to the same IP address,
@@ -111,12 +111,12 @@ public class CacheUtil {
     }
     /**
      * Caches a resource and returns a URL for it in the cache;
-     * blocks until resource is cached.  If the resource location is
+     * blocks until resource is cached. If the resource location is
      * not cacheable (points to a local file, etc) then the original
-     * URL is returned.<p>
+     * URL is returned.
      *
      * @param location location of the resource
-     * @param version the version, or null
+     * @param version the version, or {@code null}
      * @return either the location in the cache or the original location
      */
     public static URL getCachedResource(URL location, Version version, UpdatePolicy policy) {
@@ -132,7 +132,7 @@ public class CacheUtil {
     }
 
     /**
-     * Compare strings that can be null.
+     * Compare strings that can be {@code null}.
      */
     private static boolean compare(String s1, String s2, boolean ignore) {
         if (s1 == s2)
@@ -148,7 +148,7 @@ public class CacheUtil {
 
     /**
      * Returns the Permission object necessary to access the
-     * resource, or null if no permission is needed.
+     * resource, or {@code null} if no permission is needed.
      */
     public static Permission getReadPermission(URL location, Version version) {
         if (CacheUtil.isCacheable(location, version)) {
@@ -230,9 +230,9 @@ public class CacheUtil {
      * cache and it is up to date.  This method may not return
      * immediately.
      *
-     * @param source the source URL
+     * @param source the source {@link URL}
      * @param version the versions to check for
-     * @param connection a connection to the URL, or null
+     * @param connection a connection to the {@link URL}, or {@code null}
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
@@ -304,9 +304,9 @@ public class CacheUtil {
      * not download the resource.  The latest version of the
      * resource that matches the specified version will be returned.
      *
-     * @param source the source URL
+     * @param source the source {@link URL}
      * @param version the version id of the local file
-     * @return the file location in the cache, or null if no versions cached
+     * @return the file location in the cache, or {@code null} if no versions cached
      * @throws IllegalArgumentException if the source is not cacheable
      */
     public static File getCacheFile(URL source, Version version) {
@@ -336,7 +336,7 @@ public class CacheUtil {
      * This will return a File pointing to the location of cache item.
      * 
      * @param urlPath Path of cache item within cache directory.
-     * @return File if we have searched before, null otherwise.
+     * @return File if we have searched before, {@code null} otherwise.
      */
     private static File getCacheFileIfExist(File urlPath) {
         synchronized (lruHandler) {

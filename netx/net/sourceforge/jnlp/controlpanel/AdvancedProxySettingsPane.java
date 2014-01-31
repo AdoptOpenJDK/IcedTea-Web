@@ -240,7 +240,8 @@ public class AdvancedProxySettingsPane extends JPanel {
     /**
      * Make the button panel.
      * 
-     * @return
+     * @return the button panel created
+     * @see JPanel
      */
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));

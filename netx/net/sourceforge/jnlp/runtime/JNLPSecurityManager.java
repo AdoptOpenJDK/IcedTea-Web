@@ -33,15 +33,16 @@ import sun.awt.AWTSecurityManager;
 import sun.awt.AppContext;
 
 /**
- * Security manager for JNLP environment.  This security manager
+ * Security manager for JNLP environment. This security manager
  * cannot be replaced as it always denies attempts to replace the
- * security manager or policy.<p>
- *
+ * security manager or policy.
+ * <p>
  * The JNLP security manager tracks windows created by an
  * application, allowing those windows to be disposed when the
- * application exits but the JVM does not.  If security is not
+ * application exits but the JVM does not. If security is not
  * enabled then the first application to call System.exit will
- * halt the JVM.<p>
+ * halt the JVM.
+ * </p>
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.17 $
@@ -366,17 +367,18 @@ class JNLPSecurityManager extends AWTSecurityManager {
     }
 
     /**
-     * Checks whether the caller can exit the system.  This method
+     * Checks whether the caller can exit the system. This method
      * identifies whether the caller is a real call to Runtime.exec
      * and has special behavior when returning from this method
      * would exit the JVM and an exit class is set: if the caller is
      * not the exit class then the calling application will be
      * stopped and its resources destroyed (when possible), and an
      * exception will be thrown to prevent the JVM from shutting
-     * down.<p>
-     *
+     * down.
+     * <p>
      * Calls not from Runtime.exit or with no exit class set will
      * behave normally, and the exit class can always exit the JVM.
+     * </p>
      */
     @Override
     public void checkExit(int status) {
@@ -426,11 +428,12 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * check if the current {@link SecurityManager} is an instance of
      * AWTSecurityManager and if so, call this method to give it a chance to
      * return the appropriate appContext based on the application that is
-     * running.<p>
-     *
+     * running.
+     * <p>
      * This can be called from any thread (possibly a swing thread) to find out
      * the AppContext for the thread (which may correspond to a particular
      * applet).
+     * </p>
      */
     @Override
     public AppContext getAppContext() {

@@ -48,7 +48,7 @@ class LocateJnlpClassLoader {
     /**
      * Locates the JNLPClassLoader of the JNLP file.
      * @param rootClassLoader Root JNLPClassLoader of the application.
-     * @param urlToJnlpFile Path of the JNLP file. If null, main JNLP's file location
+     * @param urlToJnlpFile Path of the JNLP file. If {@code null}, main JNLP file's location
      * be used instead
      * @return the JNLPClassLoader of the JNLP file.
      */
@@ -79,8 +79,8 @@ class LocateJnlpClassLoader {
     /**
      * Locates the JNLPClassLoader of the JNLP file's resource.
      * @param rootClassLoader Root JNLPClassLoader of the application.
-     * @param urlToJnlpFile Path of the launch or extension JNLP File. If null,
-     * main JNLP's file location will be used instead.
+     * @param ref Path of the launch or extension JNLP File. If {@code null},
+     * main JNLP file's location will be used instead.
      * @param version The version of resource. Is null if no version is specified
      * @return the JNLPClassLoader of the JNLP file's resource.
      */

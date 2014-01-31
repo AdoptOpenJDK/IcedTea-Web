@@ -19,7 +19,7 @@ package net.sourceforge.jnlp;
 import java.util.*;
 
 /**
- * The resources element.<p>
+ * The resources element.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.7 $

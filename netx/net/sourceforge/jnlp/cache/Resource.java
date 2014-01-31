@@ -26,17 +26,20 @@ import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.*;
 
 /**
+ * <p>
  * Information about a single resource to download.
  * This class tracks the downloading of various resources of a
  * JNLP file to local files.  It can be used to download icons,
  * jnlp and extension files, jars, and jardiff files using the
  * version based protocol or any file using the basic download
- * protocol.<p>
- *
+ * protocol.
+ * </p>
+ * <p>
  * Resources can be put into download groups by specifying a part
  * name for the resource.  The resource tracker can also be
  * configured to prefetch resources, which are downloaded in the
- * order added to the media tracker.<p>
+ * order added to the media tracker.
+ * </p>
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.9 $

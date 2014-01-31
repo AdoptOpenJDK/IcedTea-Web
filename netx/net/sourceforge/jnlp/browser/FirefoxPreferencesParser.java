@@ -48,16 +48,17 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
+ * <p>
  * A parser for Firefox's preferences file. It can 'parse' Firefox's
  * preferences file and expose the prefrences in a simple to use format.
- * <p>
+ * </p>
  * Sample usage:
- * <pre>
+ * <pre><code>
  * FirefoxPreferencesParser p = new FirefoxPreferencesParser(prefsFile);
  * p.parse();
  * Map&lt;String,String&gt; prefs = p.getPreferences();
  * System.out.println("blink allowed: " + prefs.get("browser.blink_allowed"));
- * </pre>
+ * </code></pre>
  */
 public final class FirefoxPreferencesParser {
 

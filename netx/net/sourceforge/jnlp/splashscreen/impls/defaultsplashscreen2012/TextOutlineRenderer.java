@@ -137,7 +137,7 @@ public class TextOutlineRenderer {
     }
 
     /**
-     * @param outlineColor the color of outline
+     * @param textOutline the color of outline
      */
     public void setTextOutline(Color textOutline) {
         this.outlineColor = textOutline;

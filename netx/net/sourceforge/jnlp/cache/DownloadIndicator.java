@@ -32,13 +32,14 @@ public interface DownloadIndicator {
 
     /**
      * Return a download service listener that displays the progress
-     * of downloading resources.  Update messages may be reported
-     * for URLs that are not included initially.<p>
-     *
+     * of downloading resources. Update messages may be reported
+     * for URLs that are not included initially.
+     * <p>
      * Progress messages are sent as if the DownloadServiceListener
-     * were listening to a DownloadService request.  The listener
+     * were listening to a DownloadService request. The listener
      * will receive progress messages from time to time during the
-     * download. <p>
+     * download.
+     * </p>
      *
      * @param app JNLP application downloading the files, or null if not applicable
      * @param downloadName name identifying the download to the user

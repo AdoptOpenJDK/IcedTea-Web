@@ -67,17 +67,20 @@ import net.sourceforge.jnlp.util.logging.LogConfig;
 import sun.net.www.protocol.jar.URLJarFile;
 
 /**
+ * <p>
  * Configure and access the runtime environment.  This class
  * stores global jnlp properties such as default download
  * indicators, the install/base directory, the default resource
  * update policy, etc.  Some settings, such as the base directory,
- * cannot be changed once the runtime has been initialized.<p>
- *
+ * cannot be changed once the runtime has been initialized.
+ * </p>
+ * <p>
  * The JNLP runtime can be locked to prevent further changes to
  * the runtime environment except by a specified class.  If set,
  * only instances of the <i>exit class</i> can exit the JVM or
  * change the JNLP runtime settings once the runtime has been
- * initialized.<p>
+ * initialized.
+ * </p>
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.19 $
@@ -123,12 +126,13 @@ public class JNLPRuntime {
 
     /** whether debug mode is on */
     private static boolean debug = false;
+
     /**
      * whether plugin debug mode is on
      */
     private static Boolean pluginDebug = null;
 
-   /** mutex to wait on, for initialization */
+    /** mutex to wait on, for initialization */
     public static Object initMutex = new Object();
 
     /** set to true if this is a webstart application. */
@@ -139,12 +143,14 @@ public class JNLPRuntime {
 
     /** all security dialogs will be consumed and pretented as being verified by user and allowed.*/
     private static boolean trustAll=false;
+
     /** 
-     * Header is not checked and so eg. gifar exploit is possible
-     * @see http://en.wikipedia.org/wiki/Gifar for this kind of attack.
+     * Header is not checked and so eg
+     * <a href="https://en.wikipedia.org/wiki/Gifar">gifar</a> exploit is
+     * possible.<br/>
      * However if jar file is a bit corrupted, then it sometimes can work so 
      * this switch can disable the header check.
-     * 
+     * @see <a href="https://en.wikipedia.org/wiki/Gifar">Gifar attack</a>
      */
     private static boolean ignoreHeaders=false;
 
@@ -154,13 +160,10 @@ public class JNLPRuntime {
     /** a lock which is held to indicate that an instance of netx is running */
     private static FileLock fileLock;
 
-  
-
-
     /**
      * Returns whether the JNLP runtime environment has been
-     * initialized.  Once initialized, some properties such as the
-     * base directory cannot be changed.  Before
+     * initialized. Once initialized, some properties such as the
+     * base directory cannot be changed. Before
      */
     public static boolean isInitialized() {
         return initialized;
@@ -169,16 +172,18 @@ public class JNLPRuntime {
     /**
      * Initialize the JNLP runtime environment by installing the
      * security manager and security policy, initializing the JNLP
-     * standard services, etc.<p>
-     *
-     * This method should be called from the main AppContext/Thread. <p>
-     *
-     * This method cannot be called more than once.  Once
+     * standard services, etc.
+     * <p>
+     * This method should be called from the main AppContext/Thread.
+     * </p>
+     * <p>
+     * This method cannot be called more than once. Once
      * initialized, methods that alter the runtime can only be
-     * called by the exit class.<p>
+     * called by the exit class.
+     * </p>
      *
-     * @param isApplication is true if a webstart application is being initialized
-     *
+     * @param isApplication is {@code true} if a webstart application is being
+     * initialized
      * @throws IllegalStateException if the runtime was previously initialized
      */
     public static void initialize(boolean isApplication) throws IllegalStateException {
@@ -356,9 +361,9 @@ public class JNLPRuntime {
 
    
     /**
-     * see https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+     * see <a href="https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java">Double-checked locking in Java</a>
      * for cases how not to do lazy initialization
-     * and https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+     * and <a href="https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom">Initialization on demand holder idiom</a>
      * for ITW approach
      */
     private static class DeploymentConfigurationHolder {
@@ -428,7 +433,7 @@ public class JNLPRuntime {
      * Sets whether the JNLP client will use any AWT/Swing
      * components.  In headless mode, client features that use the
      * AWT are disabled such that the client can be used in
-     * headless mode (<code>java.awt.headless=true</code>).
+     * headless mode ({@code java.awt.headless=true}).
      *
      * @throws IllegalStateException if the runtime was previously initialized
      */
@@ -458,10 +463,11 @@ public class JNLPRuntime {
      * Disabling security can increase performance for some
      * applications, and can be used to use netx with other code
      * that uses its own security manager or policy.
-     *
+     * <p>
      * Disabling security is not recommended and should only be
-     * used if the JNLP files opened are trusted.  This method can
-     * only be called before initalizing the runtime.<p>
+     * used if the JNLP files opened are trusted. This method can
+     * only be called before initalizing the runtime.
+     * </p>
      *
      * @param enabled whether security should be enabled
      * @throws IllegalStateException if the runtime is already initialized
@@ -587,7 +593,7 @@ public class JNLPRuntime {
 
     /**
      * Returns the localized resource string identified by the
-     * specified key.  If the message is empty, a null is
+     * specified key. If the message is empty, a null is
      * returned.
      */
     public static String getMessage(String key) {
@@ -606,8 +612,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns the localized resource string using the specified
-     * arguments.
+     * Returns the localized resource string using the specified arguments.
      *
      * @param args the formatting arguments to the resource string
      */
@@ -616,7 +621,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns true if the current runtime will fork
+     * Returns {@code true} if the current runtime will fork
      */
     public static boolean getForksAllowed() {
         return forksAllowed;
@@ -628,8 +633,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Throws an exception if called when the runtime is
-     * already initialized.
+     * Throws an exception if called when the runtime is already initialized.
      */
     private static void checkInitialized() {
         if (initialized)
@@ -637,9 +641,8 @@ public class JNLPRuntime {
     }
 
     /**
-     * Throws an exception if called with security enabled but
-     * a caller is not the exit class and the runtime has been
-     * initialized.
+     * Throws an exception if called with security enabled but a caller is not
+     * the exit class and the runtime has been initialized.
      */
     private static void checkExitClass() {
         if (securityEnabled && initialized)
@@ -672,7 +675,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * @return true if running on Windows
+     * @return {@code true} if running on Windows
      */
     public static boolean isWindows() {
         String os = System.getProperty("os.name");
@@ -680,8 +683,8 @@ public class JNLPRuntime {
     }
 
     /**
-     * @return true if running on a Unix or Unix-like system (including Linux
-     * and *BSD)
+     * @return {@code true} if running on a Unix or Unix-like system (including
+     * Linux and *BSD)
      */
     public static boolean isUnix() {
         String sep = System.getProperty("file.separator");
@@ -701,7 +704,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Indicate that netx is running by creating the file corresponding to 
+     * Indicate that netx is running by creating the
      * {@link DeploymentConfiguration#KEY_USER_NETX_RUNNING_FILE} and
      * acquiring a shared lock on it
      */
@@ -752,8 +755,8 @@ public class JNLPRuntime {
     }
 
     /**
-     * Indicate that netx is stopped by releasing the shared lock on the file
-     * corresponding to {@link DeploymentConfiguration#KEY_USER_NETX_RUNNING_FILE}.
+     * Indicate that netx is stopped by releasing the shared lock on
+     * {@link DeploymentConfiguration#KEY_USER_NETX_RUNNING_FILE}.
      */
     private static void markNetxStopped() {
         if (fileLock == null) {
@@ -804,5 +807,4 @@ public class JNLPRuntime {
         OutputController.getLogger().close();
         System.exit(i);
     }
-
 }

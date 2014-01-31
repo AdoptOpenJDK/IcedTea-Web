@@ -39,85 +39,85 @@ import java.util.List;
 
 /**
  * This is abstract access to white/blacklist created from some permanent storage.
- * 
+ * <p>
  * It is daclaring adding, updating and searching. Intentionally not removing as 
  * during plugin runtime no deletations should be done.
- * 
+ * </p>
+ * <p>
  * Implementations of this interface (unless dummy ones:) should ensure correct
  * communication with permanent storage and be prepared for multiple instances 
- * read/write the same storage at time
- * 
+ * read/write the same storage at time.
+ * </p>
  */
 public interface UnsignedAppletActionStorage {
 
     /**
      * This methods iterates through records in
-     * DeploymentConfiguration.getAppletTrustSettingsPath(), and is matching
+     * {@link net.sourceforge.jnlp.config.DeploymentConfiguration#getAppletTrustUserSettingsPath} or
+     * {@link net.sourceforge.jnlp.config.DeploymentConfiguration#getAppletTrustGlobalSettingsPath}, and is matching
      * regexes saved here against params. So parameters here are NOT regexes,
      * but are matched against saved regexes.
-     *
-     * Null or empty values are dangerously ignored, user, be aware of it. eg:
-     * match only codeBase will be null someCodeBase null null match only
-     * documentBase will be someDocBase null null null match only applet not
-     * regarding code or document base will be null null mainClass archives
-     *
+     * <p>
+     * {@code null} or empty values are dangerously ignored, user, be aware of it. eg:
+     * match only {@code codeBase} will be {@code null} someCodeBase {@code null} {@code null} match only
+     * {@code documentBase} will be someDocBase {@code null} {@code null} {@code null} match only applet not
+     * regarding code or document base will be {@code null} {@code null} mainClass archives.
+     * </p>
      * @param documentBase
      * @param codeBase
-     * @param mainClass
      * @param archives
-     * @return
+     * @return a matching unsigned applet action entry
      */
     public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives);
 
     /**
-     * Shortcut getMatchingItem(documentBase, null,null,null)
+     * Shortcut {@code getMatchingItem(documentBase, null, null, null)}
      *
      * @param documentBase
-     * @return
+     * @return a matching unsigned applet action entry
      */
     public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase);
 
     /**
-     * Shortcut getMatchingItem(null, codeBase,null,null)
+     * Shortcut {@code getMatchingItem(null, codeBase, null, null)}
      *
      * @param codeBase
-     * @return
+     * @return a matching unsigned applet action entry
      */
     public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase);
 
     /**
-     * Shortcut getMatchingItem(documentBase, codeBase,null,null)
+     * Shortcut {@code getMatchingItem(documentBase, codeBase, null, null)}
      *
      * @param documentBase
      * @param codeBase
-     * @return
+     * @return a matching unsigned applet action entry
      */
     public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase);
 
     /**
      * Will add new record. Note that regexes are stored for bases matching.
-     *
-     * eg UnsignedAppletActionEntry which will deny some applet no matter of
-     * page will be new UnsignedAppletActionEntry(UnsignedAppletAction.NEVER,
-     * new Date(), null, null, someMain, someArchives)
-     *
-     * eg UnsignedAppletActionEntry which will allow all applets on page with
-     * same codebase will be new
-     * UnsignedAppletActionEntry(UnsignedAppletAction.NEVER, new Date(), ".*",
-     * ".*", null, null);
-     *
+     * <p>
+     * eg {@link UnsignedAppletActionEntry} which will deny some applet no matter of
+     * page will be {@code new }{@link UnsignedAppletActionEntry#UnsignedAppletActionEntry UnsignedAppletActionEntry}{@code (}{@link ExecuteUnsignedApplet#NEVER}{@code , new }{@link java.util.Date#Date() Date()}{@code , null, null, someMain, someArchives)}
+     * </p>
+     * <p>
+     * eg {@link UnsignedAppletActionEntry} which will
+     * allow all applets on page with same codebase will be {@code new }{@link UnsignedAppletActionEntry#UnsignedAppletActionEntry UnsignedAppletActionEntry}{@code (}{@link ExecuteUnsignedApplet#NEVER}{@code , new }{@link java.util.Date#Date() Date()}{@code , ".*", ".*", null, null);}
+     * </p>
      * @param item
      */
     public void add(final UnsignedAppletActionEntry item);
 
     /**
-     * Will replace (current impl is matching by object's hashcode This is not
-     * reloading the list(but still saving after), so StorageIoEception can be
+     * Will replace (current impl is matching by object's hashcode. This is not
+     * reloading the list (but still saving after), so
+     * {@link net.sourceforge.jnlp.util.lockingfile.StorageIoException} can be
      * thrown if it was not loaded before.
-     *
+     * <p>
      * Imho this should be used only to actualise timestamps or change
-     * UnsignedAppletAction
-     *
+     * {@link UnsignedAppletActionEntry}
+     * </p>
      * @param item
      */
     public void update(final UnsignedAppletActionEntry item);

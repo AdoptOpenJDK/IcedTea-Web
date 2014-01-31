@@ -13,18 +13,15 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
-/**
- *
- * @author jvanek
- */
 public class DirectoryValidator {
     
     /**
      * This class is holding results of directory validation.
-     * Various errors like can not  read, write create dir can apeear
+     * Various errors like can not read, write create dir can apeear
      * For sumaries of results are here getPasses, getFailures methods
-     * 
-     * Individual results can be read from  results field, or converted to string
+     * <p>
+     * Individual results can be read from results field, or converted to string
+     * </p>
      */
     public static class DirectoryCheckResults {
         public final List<DirectoryCheckResult> results;
@@ -38,7 +35,6 @@ public class DirectoryValidator {
         }
         
         /**
-         * 
          * @return sum of passed checks, 0-3 per result
          */
          public int getPasses() {
@@ -50,7 +46,6 @@ public class DirectoryValidator {
         }
 
          /**
-          * 
           * @return  sum of failed checks, 0-3 per results
           */
         public int getFailures() {
@@ -67,13 +62,13 @@ public class DirectoryValidator {
          *
          * @return all results connected. 
          */
-        public String getMessage(){
+        public String getMessage() {
             return resultsToString(results);
         }
 
         /**
          * using getMessage
-         * @return 
+         * @return a text representation of a {@code DirectoryValidator} object
          */
         @Override
         public String toString() {
@@ -83,15 +78,14 @@ public class DirectoryValidator {
         
         
         public  static String resultsToString(List<DirectoryCheckResult> results) {
-        StringBuilder sb = new StringBuilder();
-        for (DirectoryCheckResult r : results) {
-            if (r.getFailures() >0 ){
-                sb.append(r.getMessage());
+            StringBuilder sb = new StringBuilder();
+            for (DirectoryCheckResult r : results) {
+                if (r.getFailures() > 0) {
+                    sb.append(r.getMessage());
+                }
             }
+            return sb.toString();
         }
-        return sb.toString();
-    }
-        
     }
 
     /**
@@ -154,7 +148,7 @@ public class DirectoryValidator {
                     + subdirs;
         }
         
-        /*
+        /**
          * count failures of this result (0-3, both inclusive). 
          */
         public int getFailures() {
@@ -214,15 +208,15 @@ public class DirectoryValidator {
 
     
     /**
-     *  Creates DirectoryValidator to ensure directories read from
-     *  user (if any - default otherwise ) settings via keys:
+     * Creates DirectoryValidator to ensure directories read from
+     * user (if any - default otherwise) settings via keys:
      * <ul>
-     * <li>KEY_USER_CACHE_DIR</li> 
-     * <li>KEY_USER_PERSISTENCE_CACHE_DIR</li>
-     * <li>KEY_SYSTEM_CACHE_DIR</li> 
-     * <li>KEY_USER_LOG_DIR</li>
-     * <li>KEY_USER_TMP_DIR</li> 
-     * <li>KEY_USER_LOCKS_DIR</li>
+     *     <li>{@link DeploymentConfiguration#KEY_USER_CACHE_DIR}</li>
+     *     <li>{@link DeploymentConfiguration#KEY_USER_PERSISTENCE_CACHE_DIR}</li>
+     *     <li>{@link DeploymentConfiguration#KEY_SYSTEM_CACHE_DIR}</li>
+     *     <li>{@link DeploymentConfiguration#KEY_USER_LOG_DIR}</li>
+     *     <li>{@link DeploymentConfiguration#KEY_USER_TMP_DIR}</li>
+     *     <li>{@link DeploymentConfiguration#KEY_USER_LOCKS_DIR}</li>
      * </ul>
      */
     public DirectoryValidator() {
@@ -255,13 +249,14 @@ public class DirectoryValidator {
     /**
      * This method is ensuring, that specified directories will exists after
      * call and will have enough permissions. 
-     *
+     * <p>
      * This methods is trying to create the directories if they are not present
      * and is testing if can be written inside. All checks are done in bulk. If
      * one or more defect is found, user is warned via dialogue in gui mode
      * (again in bulk). In headless mode stdout/stderr is enough, as application
      * (both gui and headless) should not stop to work, but continue to run with
      * hope that corrupted dirs will not be necessary
+     * </p>
      */
     public DirectoryCheckResults ensureDirs() {
         return ensureDirs(dirsToCheck);
@@ -278,7 +273,7 @@ public class DirectoryValidator {
             if (!f.mkdirs()) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "ERROR: Directory " + f.getAbsolutePath() + " does not exist and has not been created");
             } else {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG,"OK: Directory " + f.getAbsolutePath() + " did not exist but has been created");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "OK: Directory " + f.getAbsolutePath() + " did not exist but has been created");
             }
             DirectoryCheckResult r = testDir(f, true, true);
             result.add(r);
@@ -288,15 +283,17 @@ public class DirectoryValidator {
 
     /**
      * This method is package private for testing purposes only.
-     *
+     * <p>
      * This method verify that directory exists, is directory, file and
      * directory can be created, file can be written into, and subdirectory can
      * be written into.
-     *
+     * </p>
+     * <p>
      * Some steps may looks like redundant, but some permission settings really
      * alow to create file but not directory and vice versa. Also some settings
      * can allow to create file or directory which can not be written into. (eg
      * ACL or network disks)
+     * </p>
      */
     static DirectoryCheckResult testDir(File f, boolean verbose, boolean testSubdir) {
         DirectoryCheckResult result = new DirectoryCheckResult(f);
@@ -376,6 +373,5 @@ public class DirectoryValidator {
             result.correctPermissions = false;
         }
         return result;
-
     }
 }

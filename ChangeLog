@@ -1,3 +1,7 @@
+2014-01-30  Jacob Wisor  <gitne@gmx.de>
+
+	* Javadoc, XHTML conformance, and formatting cleanup
+
 2014-01-30  Andrew Azores  <aazores@redhat.com>
 
 	* NEWS: added entry for PolicyPanel
@@ -1896,7 +1900,7 @@
             Jacob Wisor  <gitne@excite.co.jp>
 
 	Added default, DE and PL localization's tweeks
-	* /netx/net/sourceforge/jnlp/resources/Messages.properties:
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
 	* netx/net/sourceforge/jnlp/resources/Messages_de.properties:
 	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties
 
@@ -2111,7 +2115,7 @@
 	Added polish localisation
 	* netx/net/sourceforge/jnlp/resources/Messages_de.properties
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: minor fixes
-	* /netx/net/sourceforge/jnlp/resources/Messages_pl.properties: new localization
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: new localization
 	nearly complete list of PL values
 	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java
 	Added PL as known translation

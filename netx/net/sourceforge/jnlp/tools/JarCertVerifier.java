@@ -58,7 +58,6 @@ import sun.security.util.DerValue;
 import sun.security.x509.NetscapeCertTypeExtension;
 
 /**
- * <p>
  * The jar certificate verifier utility.
  * 
  * @author Roland Schemers

@@ -76,7 +76,7 @@ public final class ErrorPainter extends BasePainter {
      * @param currentSize
      * @param from
      * @param to
-     * @return
+     * @return interpolated value
      */
     public static double interpol(double origSize, double currentSize, double from, double to) {
         return getRatio(origSize, currentSize) * (to - from) + from;
@@ -90,7 +90,7 @@ public final class ErrorPainter extends BasePainter {
      * @param currentSize
      * @param from
      * @param to
-     * @return
+     * @return interpolated {@link Color}
      */
     public static Color interpolateColor(double origSize, double currentSize, Color from, Color to) {
         double r = interpol(origSize, currentSize, to.getRed(), from.getRed());

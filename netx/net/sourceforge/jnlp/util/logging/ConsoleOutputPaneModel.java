@@ -189,7 +189,7 @@ public class ConsoleOutputPaneModel {
             String line = (createLine(messageWithHeader));
             if (mark) {
                 line = line.replaceAll("\n", "<br>\n");
-                line = line.replaceAll("  ", "&nbsp; ");//small trick, html is reducting row of sapces to single space. This handles it and stimm allow line wrap
+                line = line.replaceAll("  ", "&nbsp; ");//small trick, html is reducting row of spaces to single space. This handles it and stimm allow line wrap
                 line = line.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
             }
             sb.append(line);

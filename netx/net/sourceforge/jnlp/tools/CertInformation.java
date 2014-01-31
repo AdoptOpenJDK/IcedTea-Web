@@ -95,7 +95,7 @@ public class CertInformation {
 
     /**
      * Return if there are signing issues with this certificate.
-     * @return true if there are any issues with expiry, validity or bad key usage.
+     * @return {@code true} if there are any issues with expiry, validity or bad key usage.
      */
     public boolean hasSigningIssues() {
         return hasExpiredCert || isNotYetValidCert || hasBadKeyUsage
@@ -105,7 +105,7 @@ public class CertInformation {
     /**
      * Return whether or not the publisher is already trusted.
      *
-     * @return True if the publisher is trusted already.
+     * @return {@code true} if the publisher is trusted already.
      */
     public boolean isPublisherAlreadyTrusted() {
         return alreadyTrustPublisher;
@@ -113,7 +113,6 @@ public class CertInformation {
 
     /**
      * Set whether or not the publisher is already trusted.
-     *
      */
     public void setAlreadyTrustPublisher() {
         alreadyTrustPublisher = true;
@@ -122,7 +121,7 @@ public class CertInformation {
     /**
      * Return whether or not the root is in the list of trusted CA certificates.
      *
-     * @return True if the root is in the list of CA certificates.
+     * @return {@code true} if the root is in the list of CA certificates.
      */
     public boolean isRootInCacerts() {
         return rootInCacerts;
@@ -149,7 +148,7 @@ public class CertInformation {
     /**
      * Check if this cert is the signer of a jar.
      * @param jarName The absolute path of the jar this certificate has signed.
-     * @return true if this cert has signed the jar found at jarName.
+     * @return {@code true} if this cert has signed the jar found at {@code jarName}.
      */
     public boolean isSignerOfJar(String jarName) {
         return signedJars.containsKey(jarName);
@@ -160,7 +159,7 @@ public class CertInformation {
      * number of entries it has signed in the jar.
      *
      * @param jarName The absolute path of the jar this certificate has signed.
-     * @param signedEntriesCount The number of entries this cert has signed in jarName.
+     * @param signedEntriesCount The number of entries this cert has signed in {@code jarName}.
      */
     public void setNumJarEntriesSigned(String jarName, int signedEntriesCount) {
         if (signedJars.containsKey(jarName)) {
@@ -174,7 +173,7 @@ public class CertInformation {
     /**
      * Find the number of entries this cert has signed in the specified jar.
      * @param jarName The absolute path of the jar this certificate has signed.
-     * @return The number of entries this cert has signed in jarName.
+     * @return The number of entries this cert has signed in {@code jarName}.
      */
     public int getNumJarEntriesSigned(String jarName) {
         return signedJars.get(jarName);
@@ -183,7 +182,7 @@ public class CertInformation {
     /**
      * Get all the jars this cert has signed along with the number of entries
      * in each jar.
-     * @return
+     * @return a {link Map} of jars and their number of entries this cert has signed
      */
     public Map<String, Integer> getSignedJars() {
         return signedJars;
@@ -233,7 +232,7 @@ public class CertInformation {
 
     /**
      * Get whether or not this cert will expire within 6 months.
-     * @return true if the cert will be expired after 6 months.
+     * @return {@code true} if the cert will be expired after 6 months.
      */
     public boolean hasExpiringCert() {
         return hasExpiringCert;
@@ -249,7 +248,6 @@ public class CertInformation {
         details.add(Detail.NOT_YET_VALID);
     }
 
-
     /**
      * Set that this cert has bad key usage
      * and add this issue to the list of details.
@@ -260,7 +258,6 @@ public class CertInformation {
         details.add(Detail.BAD_KEY_USAGE);
     }
 
-
     /**
      * Set that this cert has bad extended key usage
      * and add this issue to the list of details.
@@ -270,7 +267,6 @@ public class CertInformation {
         details.add(Detail.RUN_WITHOUT_RESTRICTIONS);
         details.add(Detail.BAT_EXTENDED_KEY_USAGE);
     }
-
 
     /**
      * Set that this cert has a bad netscape cert type
@@ -287,6 +283,5 @@ public class CertInformation {
      */
     public void setUntrusted() {
         details.add(Detail.UNTRUSTED);
-
     }
 }
