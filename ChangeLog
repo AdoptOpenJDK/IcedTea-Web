@@ -1,5 +1,13 @@
 2014-02-04  Jacob Wisor  <gitne@gmx.de>
 
+	Added missing PL localized messages
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: added
+	RCantOpenFile RCantWriteFile RFileReadOnly RExpectedFile CPPolicyDetail
+	CPPolicyTooltip	CPPolicyEditorNotFound CPButPolicy CPHeadPolicy
+	CPTabPolicy. Modified SSigUnverified SSigVerified SSignatureError
+
+2014-02-04  Jacob Wisor  <gitne@gmx.de>
+
 	Added missing DE localized messages
 	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: added
 	RCantOpenFile RCantWriteFile RFileReadOnly RExpectedFile CPPolicyDetail
