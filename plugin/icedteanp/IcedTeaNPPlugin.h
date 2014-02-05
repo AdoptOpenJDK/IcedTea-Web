@@ -104,7 +104,7 @@ ITNPPluginData* plugin_data_new ();
 void plugin_data_destroy (NPP instance);
 
 NPError initialize_data_directory();
-void start_jvm_if_needed();
+NPError start_jvm_if_needed();
 
 // Condition on which the queue processor waits
 extern pthread_cond_t cond_message_available;

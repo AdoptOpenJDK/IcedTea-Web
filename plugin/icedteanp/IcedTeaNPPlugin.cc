@@ -38,6 +38,9 @@ exception statement from your version. */
 
 // System includes.
 #include <dlfcn.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <dirent.h>
 #include <errno.h>
 #include <libgen.h>
 #include <stdio.h>
@@ -121,6 +124,7 @@ exception statement from your version. */
 
 // Data directory for plugin.
 static std::string data_directory;
+static DIR *data_directory_descriptor;
 
 // Fully-qualified appletviewer default  executable and rt.jar
 static const char* appletviewer_default_executable = ICEDTEA_WEB_JRE "/bin/java";
@@ -285,7 +289,21 @@ static std::string get_plugin_rt_jar(){
       return appletviewer_default_rtjar;      
 }
 
-
+static void cleanUpDir(){
+  //free data_directory descriptor 
+  if (data_directory_descriptor != NULL) {
+    closedir(data_directory_descriptor);
+  }
+  //clean up pipes directory
+  PLUGIN_DEBUG ("Removing runtime directory %s \n", data_directory.c_str());
+  int removed = rmdir(data_directory.c_str());
+  if (removed != 0) {
+    PLUGIN_ERROR ("Failed to remove runtime directory %s, because of  %s \n", data_directory.c_str(), strerror(errno));
+  } else {
+    PLUGIN_DEBUG ("Removed runtime directory %s \n", data_directory.c_str());
+  }
+  data_directory_descriptor = NULL;
+}
 /* 
  * Find first member in GHashTable* depending on version of glib
  */
@@ -356,7 +374,7 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
     }
 
   // start the jvm if needed
-  start_jvm_if_needed();
+   NPError startup_error = start_jvm_if_needed();
 
   // Initialize data->instance_id.
   //
@@ -421,7 +439,7 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 }
 
 // Starts the JVM if it is not already running
-void start_jvm_if_needed()
+NPError start_jvm_if_needed()
 {
 
   // This is asynchronized function. It must
@@ -436,7 +454,7 @@ void start_jvm_if_needed()
   if (jvm_up)
   {
       PLUGIN_DEBUG("JVM is up. Returning.\n");
-      return;
+      return  NPERR_NO_ERROR;
   }
 
   PLUGIN_DEBUG("No JVM is running. Attempting to start one...\n");
@@ -681,11 +699,13 @@ void start_jvm_if_needed()
   g_free (in_pipe_name);
   in_pipe_name = NULL;
 
+  cleanUpDir();
  done:
 
   IcedTeaPluginUtilities::printDebugStatus();
   // Now other threads may re-enter.. unlock the mutex
   g_mutex_unlock(vm_start_mutex);
+  return np_error;
 
 }
 
@@ -1910,34 +1930,28 @@ initialize_data_directory()
 {
 
   data_directory = IcedTeaPluginUtilities::getRuntimePath() + "/icedteaplugin-";
-  if (getenv("USER") != NULL)
-    data_directory += getenv("USER");
-
-  // Now create a icedteaplugin subdir
-  if (!g_file_test (data_directory.c_str(),
-                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
-  {
-    int file_error = 0;
-
-    file_error = g_mkdir (data_directory.c_str(), 0700);
-    if (file_error != 0)
-    {
-      PLUGIN_ERROR ("Failed to create data directory %s, %s\n",
-                          data_directory.c_str(),
-                          strerror (errno));
-      return NPERR_GENERIC_ERROR;
-    }
+  if (getenv("USER") != NULL) {
+    data_directory = data_directory + getenv("USER") + "-";
   }
-
-
-  // If data directory doesn't exist by this point, bail
-  if (!g_file_test (data_directory.c_str(),
-                    (GFileTest) (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
-  {
-    PLUGIN_ERROR ("Temp directory does not exist %s, %s \n",
+  data_directory += "XXXXXX";
+  // Now create a icedteaplugin subdir
+  char fileName[data_directory.length()+1];
+  std::strcpy (fileName, data_directory.c_str());
+  fileName = mkdtemp(fileName);
+  if (fileName == NULL) {
+    PLUGIN_ERROR ("Failed to create data directory %s, %s\n",
                         data_directory.c_str(),
                         strerror (errno));
     return NPERR_GENERIC_ERROR;
+  }
+  data_directory = std::string(fileName);
+
+  //open uniques icedteaplugin subdir for one single run  
+  data_directory_descriptor = opendir(data_directory.c_str());
+  if (data_directory_descriptor == NULL) {
+      PLUGIN_ERROR ("Failed to open data directory %s %s\n",
+                      data_directory.c_str(), strerror (errno));
+      return NPERR_GENERIC_ERROR;
   }
 
   return NPERR_NO_ERROR;
@@ -2009,10 +2023,14 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   if (initialized)
     return NPERR_NO_ERROR;
 
-  NPError np_error = NPERR_NO_ERROR;
-
-  initialize_data_directory();
-
+  // create directory for pipes
+  NPError np_error =  initialize_data_directory();
+  if (np_error != NPERR_NO_ERROR)
+    {
+      PLUGIN_ERROR("Unable create data directory %s\n");
+      return np_error;
+    }
+    
   // Set appletviewer_executable.
   PLUGIN_DEBUG("Executing java at %s\n", get_plugin_executable().c_str());
   np_error = plugin_test_appletviewer ();
@@ -2221,6 +2239,8 @@ NP_Shutdown (void)
   delete plugin_to_java_bus;
   //delete internal_bus;
 
+  cleanUpDir();
+  
   PLUGIN_DEBUG ("NP_Shutdown return\n");
   
   if (plugin_debug_to_file){

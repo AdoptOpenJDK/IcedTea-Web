@@ -1,3 +1,12 @@
+2014-02-05  Jiri Vanek  <jvanek@redhat.com>
+
+	Added salt to plugin-java pipes' directory (fixing RH1010958)
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: (cleanUpDir) new utility method
+	to clean up pipes directory. (start_jvm_if_needed) is now returning 
+	error status and creating salt in directory name. (initialize_data_directory)
+	now add salt to the name.
+	* plugin/icedteanp/IcedTeaNPPlugin.h: changed declaration of (start_jvm_if_needed)
+
 2014-02-04  Jacob Wisor  <gitne@gmx.de>
 
 	Added missing PL localized messages
