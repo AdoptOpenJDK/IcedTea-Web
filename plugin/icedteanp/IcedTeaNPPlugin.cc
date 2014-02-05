@@ -1935,9 +1935,9 @@ initialize_data_directory()
   }
   data_directory += "XXXXXX";
   // Now create a icedteaplugin subdir
-  char fileName[data_directory.length()+1];
-  std::strcpy (fileName, data_directory.c_str());
-  fileName = mkdtemp(fileName);
+  char fileNameX[data_directory.length()+1];
+  std::strcpy (fileNameX, data_directory.c_str());
+  char * fileName = mkdtemp(fileNameX);
   if (fileName == NULL) {
     PLUGIN_ERROR ("Failed to create data directory %s, %s\n",
                         data_directory.c_str(),
