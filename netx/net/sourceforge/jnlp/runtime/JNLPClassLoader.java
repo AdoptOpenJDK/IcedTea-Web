@@ -227,7 +227,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param file the JNLP file
      */
     protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy) throws LaunchException {
-        this(file, policy, null, false);
+        this(file, policy, null);
     }
 
     /**
@@ -237,7 +237,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy the UpdatePolicy for this class loader
      * @param mainName name of the application's main class
      */
-    protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
+    protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         OutputController.getLogger().log("New classloader: " + file.getFileLocation());
@@ -262,13 +262,6 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         jcv = new JarCertVerifier(verifier);
-
-        if (enableCodeBase) {
-            addToCodeBaseLoader(file.getCodeBase());
-        } else if (file.getResources().getJARs().length == 0) {
-            throw new LaunchException(
-                    new ClassNotFoundException("Can't do a codebase lookup and there are no jars. Failing sooner rather than later"));
-        }
 
         // initialize extensions
         initializeExtensions();
@@ -390,12 +383,11 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param file the file to load classes for
      * @param policy the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
-     * @param enableCodeBase if codebase lookups are allowed
      */
-    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
+    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName) throws LaunchException {
         String uniqueKey = file.getUniqueKey();
         JNLPClassLoader baseLoader = uniqueKeyToLoader.get(uniqueKey);
-        JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase);
+        JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName);
 
         // If security level is 'high' or greater, we must check if the user allows unsigned applets 
         // when the JNLPClassLoader is created. We do so here, because doing so in the constructor 
@@ -441,32 +433,9 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param file the file to load classes for
      * @param policy the update policy to use when downloading resources
-     * @param enableCodeBase if codebase lookups are allowed
-     */
-    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase) throws LaunchException {
-        return getInstance(file, policy, null, enableCodeBase);
-    }
-
-    /**
-     * Returns a JNLP classloader for the specified JNLP file.
-     *
-     * @param file the file to load classes for
-     * @param policy the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
      */
     public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName) throws LaunchException {
-        return getInstance(file, policy, mainName, false);
-    }
-
-    /**
-     * Returns a JNLP classloader for the specified JNLP file.
-     *
-     * @param file the file to load classes for
-     * @param policy the update policy to use when downloading resources
-     * @param mainName Overrides the main class name of the application
-     * @param enableCodeBase if lookups are allowed
-     */
-    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
         JNLPClassLoader baseLoader = null;
         JNLPClassLoader loader = null;
         String uniqueKey = file.getUniqueKey();
@@ -480,12 +449,12 @@ public class JNLPClassLoader extends URLClassLoader {
                     (file.isApplication() && 
                      !baseLoader.getJNLPFile().getFileLocation().equals(file.getFileLocation()))) {
 
-                loader = createInstance(file, policy, mainName, enableCodeBase);
+                loader = createInstance(file, policy, mainName);
             } else {
                 // if key is same and locations match, this is the loader we want
                 if (!file.isApplication()) {
                     // If this is an applet, we do need to consider its loader
-                    loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase);
+                    loader = new JNLPClassLoader(file, policy, mainName);
 
                     if (baseLoader != null)
                         baseLoader.merge(loader);
@@ -1147,6 +1116,16 @@ public class JNLPClassLoader extends URLClassLoader {
         if (!SecurityDialogs.showNotAllSignedWarningDialog(file)) {
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
         }
+    }
+
+    /**
+     * Add applet's codebase URL.  This allows compatibility with
+     * applets that load resources from their codebase instead of
+     * through JARs, but can slow down resource loading.  Resources
+     * loaded from the codebase are not cached.
+     */
+    public void enableCodeBase() {
+        addToCodeBaseLoader(file.getCodeBase());
     }
 
     /**

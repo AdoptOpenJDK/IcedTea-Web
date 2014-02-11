@@ -1,3 +1,12 @@
+2014-02-11  Andrew Azores  <aazores@redhat.com>
+
+	Partial revert of 7933143a1286, refactoring to move
+	codebase-loading-enabling logic out of Launcher and into JNLPClassLoader.
+	* netx/net/sourceforge/jnlp/Launcher.java: (createApplet,
+	createAppletObject): handle enableCodebase again
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (enableCodebase):
+	re-added, codebase enabling logic moved back out into Launcher
+
 2014-02-05  Jiri Vanek  <jvanek@redhat.com>
 
 	Added salt to plugin-java pipes' directory (fixing RH1010958)
