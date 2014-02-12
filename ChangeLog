@@ -1,3 +1,31 @@
+2014-02-12  Jiri Vanek  <jvanek@redhat.com>
+
+	Implemented Codebase manifest entry handling.
+	* netx/net/sourceforge/jnlp/JNLPFile.java: manifests names constants moved into
+	ManifestsAttributes inner class.(getCallerAllowableCodebase) (getApplicationLibraryAllowableCodebase)
+	(getCodebase) (getCodeBaseMatchersAttribute)  (getCodeBaseMatchersAttribute) are
+	now returning (ClasspathMatcher.ClasspathMatchers). added boolean access to (isTrustedOnly)
+	(isTrustedLibrary).
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added (CBCheckFile)
+	(CBCheckNoEntry) (CBCheckUnsignedPass) (CBCheckUnsignedPass) (CBCheckOkSignedOk)
+	(CBCheckOkSignedOk)	(CBCheckOkSignedOk) keys to inform about Classpath validation
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: in Init call new method
+	(checkCodebaseAttribute) which check the codebase manifest entry.
+	* netx/net/sourceforge/jnlp/util/ClasspathMatcher.java: New class, responsible 
+	for matching Classpath like pattern with URL
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPFileTest.java: added tests to
+	cover all newly accessible attributes from JNLPFile.ManifestsAttributes
+	* tests/netx/unit/net/sourceforge/jnlp/util/ClasspathMatcherTest.java: mostly
+	corner and must-fullfill cases tests.
+	* tests/test-extensions/net/sourceforge/jnlp/util/FileTestUtils.java: (assertNoFileLeak)
+	have timeout before actual countings. JVM needs time to propagate cleanup.
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/:
+    * tests/reproducers/signed/CodeBaseManifestEntrySignedNotMatching/:
+	* tests/reproducers/simple/CodeBaseManifestEntryUnsignedMatching/:
+    *tests/reproducers/simple/CodeBaseManifestEntryUnsignedNotMatching/:
+	New set of reproducers to test Codebases processing. All testcas are in 
+	(CodeBaseManifestEntrySignedMatching) so they can share code.
+	
 2014-02-11  Andrew Azores  <aazores@redhat.com>
 
 	Partial revert of 7933143a1286, refactoring to move

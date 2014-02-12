@@ -88,6 +88,7 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
+import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -274,6 +275,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
         setSecurity();
         
+        checkCodebaseAttribute();
+        
         installShutdownHooks();
         
 
@@ -299,15 +302,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private void setSecurity() throws LaunchException {
 
-        URL codebase = null;
-
-        if (file.getCodeBase() != null) {
-            codebase = file.getCodeBase();
-        } else {
-            //Fixme: codebase should be the codebase of the Main Jar not
-            //the location. Although, it still works in the current state.
-            codebase = file.getResources().getMainJAR().getLocation();
-        }
+        URL codebase = guessCodeBase();
 
         /**
          * When we're trying to load an applet, file.getSecurity() will return
@@ -2277,6 +2272,51 @@ public class JNLPClassLoader extends URLClassLoader {
     
     public String getMainClass() {
         return mainClass;
+    }
+    
+    private URL guessCodeBase() {
+        if (file.getCodeBase() != null) {
+            return file.getCodeBase();
+        } else {
+            //Fixme: codebase should be the codebase of the Main Jar not
+            //the location. Although, it still works in the current state.
+            return file.getResources().getMainJAR().getLocation();
+        }
+    }
+
+    /**
+     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
+     */
+    private void checkCodebaseAttribute() throws LaunchException {
+        if (file.getCodeBase() == null || file.getCodeBase().getProtocol().equals("file")) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("CBCheckFile"));
+            return;
+        }
+        final Object securityType = security.getSecurityType();
+        final URL codebase = guessCodeBase();
+        final ClasspathMatchers codebaseAtt = file.getManifestsAttributes().getCodebase();
+        if (codebaseAtt == null) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("CBCheckNoEntry"));
+            return;
+        }
+        if (securityType.equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+            if (codebaseAtt.matches(codebase)) {
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("CBCheckUnsignedPass"));
+            } else {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("CBCheckUnsignedFail"));
+            }
+        } else {
+            if (codebaseAtt.matches(codebase)) {
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("CBCheckOkSignedOk"));
+            } else {
+                if (file instanceof PluginBridge) {
+                    throw new LaunchException(Translator.R("CBCheckSignedAppletDontMatchException", file.getManifestsAttributes().getCodebase().toString(), codebase));
+                } else {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("CBCheckSignedFail"));
+                }
+            }
+        }
+
     }
 
     /*

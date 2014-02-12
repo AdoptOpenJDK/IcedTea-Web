@@ -73,9 +73,11 @@ public class FileTestUtils {
     }
 
     /* Check the amount of file descriptors before and after a Runnable */
-    static public void assertNoFileLeak(Runnable runnable) {
+    static public void assertNoFileLeak(Runnable runnable) throws InterruptedException {
+        Thread.sleep(10);
         long filesOpenBefore = getOpenFileDescriptorCount();
         runnable.run();
+        Thread.sleep(10);
         long filesLeaked = getOpenFileDescriptorCount() - filesOpenBefore;
         assertEquals(0, filesLeaked);
     }

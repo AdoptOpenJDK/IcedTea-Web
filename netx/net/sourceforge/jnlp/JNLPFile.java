@@ -33,6 +33,7 @@ import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.ClasspathMatcher;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -56,13 +57,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * @version $Revision: 1.21 $
  */
 public class JNLPFile {
-    
-    
-    public static final String APP_NAME = "Application-Name";
-    public static final String CALLER_ALLOWABLE = "Caller-Allowable-Codebase";
-    public static final String APP_LIBRARY_ALLOWABLE = "Application-Library-Allowable-Codebase";
-        
-    
+   
 
     // todo: save the update policy, then if file was not updated
     // then do not check resources for being updated.
@@ -876,10 +871,18 @@ public class JNLPFile {
     }
     
     
- public class ManifestsAttributes{
+    public class ManifestsAttributes {
+
+        public static final String APP_NAME = "Application-Name";
+        public static final String CALLER_ALLOWABLE = "Caller-Allowable-Codebase";
+        public static final String APP_LIBRARY_ALLOWABLE = "Application-Library-Allowable-Codebase";
+        public static final String PERMISSIONS = "Permissions";
+        public static final String CODEBASE = "Codebase";
+        public static final String TRUSTED_ONLY = "Trusted-Only";
+        public static final String TRUSTED_LIBRARY = "Trusted-Library";
         private JNLPClassLoader loader;
-        
-        
+
+
         public void setLoader(JNLPClassLoader loader) {
             this.loader = loader;
         }
@@ -912,34 +915,103 @@ public class JNLPFile {
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#caller_allowable
          */
-         public String getCallerAllowableCodebase(){
-            return getAttribute(CALLER_ALLOWABLE);
+        public ClasspathMatcher.ClasspathMatchers getCallerAllowableCodebase() {
+            return getCodeBaseMatchersAttribute(CALLER_ALLOWABLE);
         }
 
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_library
          */
-         public String getApplicationLibraryAllowableCodebase(){
-            return getAttribute(APP_LIBRARY_ALLOWABLE);
+        public ClasspathMatcher.ClasspathMatchers getApplicationLibraryAllowableCodebase() {
+            return getCodeBaseMatchersAttribute(APP_LIBRARY_ALLOWABLE);
         }
-         
+
+        /**
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
+         */
+        public ClasspathMatcher.ClasspathMatchers getCodebase() {
+            return getCodeBaseMatchersAttribute(CODEBASE);
+        }
+
+        /**
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_only
+         */
+        public Boolean isTrustedOnly() {
+            return processBooleanAttribute(TRUSTED_ONLY);
+
+        }
+
+        /**
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_library
+         */
+        public Boolean isTrustedLibrary() {
+            return processBooleanAttribute(TRUSTED_LIBRARY);
+
+        }
+
+        /**
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
+         */
+        public Boolean isSandboxForced() {
+            String s = getAttribute(PERMISSIONS);
+            if (s == null) {
+                return null;
+            } else if (s.trim().equalsIgnoreCase("sandbox")) {
+                return true;
+            } else if (s.trim().equalsIgnoreCase("all-permissions")) {
+                return false;
+            } else {
+                throw new IllegalArgumentException("Unknown value of " + PERMISSIONS + " attribute " + s + ". Expected sandbox or all-permissions");
+            }
+
+
+        }
+
         /**
          * get custom attribute.
          */
-        public String getAttribute(String name){
+        public String getAttribute(String name) {
             return getAttribute(new Attributes.Name(name));
         }
-        
+
         /**
          * get standard attribute
          */
-        public String getAttribute(Attributes.Name name){
-          if (loader == null) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jars not ready to provide attribute "+ name);
-                return null;    
+        public String getAttribute(Attributes.Name name) {
+            if (loader == null) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jars not ready to provide attribute " + name);
+                return null;
             }
             return loader.checkForAttributeInJars(Arrays.asList(getResources().getJARs()), name);
         }
+
+        public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(String s) {
+            return getCodeBaseMatchersAttribute(new Attributes.Name(s));
+        }
+
+        public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(Attributes.Name name) {
+            String s = getAttribute(name);
+            if (s == null) {
+                return null;
+            }
+            return ClasspathMatcher.ClasspathMatchers.compile(s);
+        }
+
+        private Boolean processBooleanAttribute(String id) throws IllegalArgumentException {
+            String s = getAttribute(id);
+            if (s == null) {
+                return null;
+            } else {
+                s = s.trim();
+                if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false")) {
+                    //the Boolean is working like below, thats why the condition
+                    //return ((name != null) && name.equalsIgnoreCase("true"));
+                    return Boolean.parseBoolean(s);
+                } else {
+                    throw new IllegalArgumentException("Unknown value of " + id + " attribute " + s + ". Expected true or false");
+                }
+            }
+        }
     }
- 
 }
+
