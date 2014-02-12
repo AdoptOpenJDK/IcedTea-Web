@@ -14,7 +14,7 @@ New in release 1.5 (2013-XX-XX):
 * IcedTea-Web is now following XDG .config and .cache specification(RH947647)
 * A console for debugging plugin and javaws
 * Dialogs center on screen before becoming visible
-* Support for u45 new manifest attributes (Application-Name)
+* Support for u45 and u51 new manifest attributes (Application-Name, Codebase)
 * Custom applet permission policies panel in itweb-settings control panel
 * Cache Viewer
   - Can be closed by ESC key
