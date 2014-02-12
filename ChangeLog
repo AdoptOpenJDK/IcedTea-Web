@@ -1,5 +1,13 @@
 2014-02-12  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed behaviour of href in jnlp file to correctly download another it if it is remote
+	* netx/net/sourceforge/jnlp/Launcher.java: (fromUrl) if file is not local, and
+	have href and href point elsewhere, then it is used as future jnlpfile
+	* tests/reproducers/simple/GeneratedId/testcases/GeneratedIdTest.java:
+	(launchRemoteChangedFileWithHref) adapted to new behaviour
+
+2014-02-12  Jiri Vanek  <jvanek@redhat.com>
+
 	Implemented Codebase manifest entry handling.
 	* netx/net/sourceforge/jnlp/JNLPFile.java: manifests names constants moved into
 	ManifestsAttributes inner class.(getCallerAllowableCodebase) (getApplicationLibraryAllowableCodebase)

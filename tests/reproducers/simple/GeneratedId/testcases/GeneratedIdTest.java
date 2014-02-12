@@ -150,13 +150,12 @@ public class GeneratedIdTest {
 
     //remote
     //have href
-    //should NOT be redownloaded
-    //href is different file
+    //should be redownloaded as href is different file
     @Test
     public void launchRemoteChangedFileWithHref() throws Exception {
         File f = prepareChangedFileWithHref();
         ProcessResult pr = server.executeJavawsHeadless("/" + f.getName());
-        Assert.assertTrue("Stdout should contain '" + okBase2 + "', but did not.", pr.stdout.contains(okBase2));
+        Assert.assertTrue("Stdout should contain '" + okBase1 + "', but did not.", pr.stdout.contains(okBase1));
     }
 
     @Test

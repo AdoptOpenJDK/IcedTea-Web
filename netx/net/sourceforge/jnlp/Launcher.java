@@ -465,6 +465,17 @@ public class Launcher {
             if (file.getSourceLocation() != null) {
                 haveHref = true;
             }
+            if (!isLocal && haveHref){
+                //this is case when remote file have href to different file
+                if (!location.equals(file.getSourceLocation())){
+                    //mark local true, so the folowing condition will be true and 
+                    //new jnlp file will be downlaoded
+                    isLocal = true;
+                    //maybe this check is to strict, and will force redownlaod to often
+                    //another check can be just on jnlp name. But it will not work
+                    //if the href will be the file of same name, but on diferent path (or even domain)
+                }
+            }
 
             if (isLocal && haveHref) {
                 file = new JNLPFile(file.getSourceLocation(), parserSettings);
