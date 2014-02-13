@@ -111,6 +111,7 @@ public final class Boot implements PrivilegedAction<Void> {
             + "  -headless             " + R("BOHeadless") + "\n"
             + "  -strict               " + R("BOStrict") + "\n"
             + "  -xml                  " + R("BOXml") + "\n"
+            + "  -allowredirect        " + R("BOredirect") + "\n"
             + "  -Xnofork              " + R("BXnofork") + "\n"
             + "  -Xclearcache          " + R("BXclearcache") + "\n"
             + "  -Xignoreheaders       " + R("BXignoreheaders") + "\n"
@@ -185,6 +186,9 @@ public final class Boot implements PrivilegedAction<Void> {
         }
         if (null != getOption("-Xignoreheaders")) {
             JNLPRuntime.setIgnoreHeaders(true);
+        }
+        if (null != getOption("-allowredirect")) {
+            JNLPRuntime.setAllowRedirect(true);
         }
 
         JNLPRuntime.setInitialArgments(Arrays.asList(argsIn));

@@ -143,6 +143,9 @@ public class JNLPRuntime {
 
     /** all security dialogs will be consumed and pretented as being verified by user and allowed.*/
     private static boolean trustAll=false;
+    
+    /** allows 301.302.303.307.308 redirects to be followed when downloading resources*/
+    private static boolean allowRedirect = false;;
 
     /** 
      * Header is not checked and so eg
@@ -441,6 +444,16 @@ public class JNLPRuntime {
         checkInitialized();
         headless = enabled;
     }
+    
+    public static void setAllowRedirect(boolean enabled) {
+        checkInitialized();
+        allowRedirect = enabled;
+    }
+
+    public static boolean isAllowRedirect() {
+        return allowRedirect;
+    }
+    
 
     /**
          * Sets whether we will verify code signing.

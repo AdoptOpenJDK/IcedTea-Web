@@ -849,21 +849,55 @@ public class ResourceTracker {
         }
     }
     /**
-     * Connects to the given URL, and grabs a response code if the URL uses
-     * the HTTP protocol, or returns an arbitrary valid HTTP response code.
-     * 
-     * @return the response code if HTTP connection, or HttpURLConnection.HTTP_OK if not.
+     * testing wrapper
+     *
+     * @param url
+     * @param requestProperties
+     * @param requestMethod
+     * @return
      * @throws IOException
      */
-     static int getUrlResponseCode(URL url, Map<String, String> requestProperties, String requestMethod) throws IOException {
+    static int getUrlResponseCode(URL url, Map<String, String> requestProperties, String requestMethod) throws IOException {
+        return getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod).result;
+    }
+
+    private static class CodeWithRedirect {
+
+        int result = HttpURLConnection.HTTP_OK;
+        URL URL;
+
+        public boolean shouldRedirect() {
+            return (result == 301
+                    || result == 302
+                    || result == 303/*?*/
+                    || result == 307
+                    || result == 308);
+        }
+
+        public boolean isInvalid() {
+            return (result < 200 || result >= 300);
+        }
+    }
+
+    /**
+     * Connects to the given URL, and grabs a response code and redirecton if
+     * the URL uses the HTTP protocol, or returns an arbitrary valid HTTP
+     * response code.
+     *
+     * @return the response code if HTTP connection and redirection value, or
+     * HttpURLConnection.HTTP_OK and null if not.
+     * @throws IOException
+     */
+    static CodeWithRedirect getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, String requestMethod) throws IOException {
+        CodeWithRedirect result = new CodeWithRedirect();
         URLConnection connection = url.openConnection();
 
-        for (Map.Entry<String, String> property : requestProperties.entrySet()){
+        for (Map.Entry<String, String> property : requestProperties.entrySet()) {
             connection.addRequestProperty(property.getKey(), property.getValue());
         }
 
         if (connection instanceof HttpURLConnection) {
-            HttpURLConnection httpConnection = (HttpURLConnection)connection;
+            HttpURLConnection httpConnection = (HttpURLConnection) connection;
             httpConnection.setRequestMethod(requestMethod);
 
             int responseCode = httpConnection.getResponseCode();
@@ -872,10 +906,24 @@ public class ResourceTracker {
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
             HttpUtils.consumeAndCloseConnectionSilently(httpConnection);
 
-            return responseCode;
+            result.result = responseCode;
         }
 
-        return HttpURLConnection.HTTP_OK /* return a valid response code */;
+        Map<String, List<String>> header = connection.getHeaderFields();
+        for (Map.Entry<String, List<String>> entry : header.entrySet()) {
+            OutputController.getLogger().log("Key : " + entry.getKey() + " ,Value : " + entry.getValue());
+        }
+        /*
+         * Do this only on 301,302,303(?)307,308>
+         * Now setting value for all, and lets upper stack to handle it
+         */
+        String possibleRedirect = connection.getHeaderField("Location");
+        if (possibleRedirect != null && possibleRedirect.trim().length() > 0) {
+            result.URL = new URL(possibleRedirect);
+        }
+
+        return result;
+
     }
 
 
@@ -898,15 +946,25 @@ public class ResourceTracker {
                  + resource.toString() + " : " + urls);
         
          for (String requestMethod : requestMethods) {
-             for (URL url : urls) {
+             for (int i = 0; i < urls.size(); i++) {
+                 URL url = urls.get(i);
                  try {
                      Map<String, String> requestProperties = new HashMap<String, String>();
                      requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
 
-                     int responseCode = getUrlResponseCode(url, requestProperties, requestMethod);
-
-                     if (responseCode < 200 || responseCode >= 300) {
-                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "For " + resource.toString() + " the server returned " + responseCode + " code for " + requestMethod + " request for " + url.toExternalForm());
+                     CodeWithRedirect response = getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod);
+                     if (response.shouldRedirect()){
+                         if (response.URL == null) {
+                             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Although " + resource.toString() + " got redirect " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm() + " the target was null. Not following");
+                         } else {
+                             OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Resource " + resource.toString() + " got redirect " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm() + " adding " + response.URL.toExternalForm()+" to list of possible urls");
+                             if (!JNLPRuntime.isAllowRedirect()){
+                                 throw new RedirectionException("The resource " + url.toExternalForm() + " is being redirected (" + response.result + ") to " + response.URL.toExternalForm() + ". This is disabled by default. If you wont to allow it, run javaws with -allowredirect parameter.");
+                             }
+                             urls.add(response.URL);
+                         }
+                     } else if (response.isInvalid()) {
+                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "For " + resource.toString() + " the server returned " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm());
                      } else {
                          OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
                          return url; /* This is the best URL */
@@ -1125,6 +1183,18 @@ public class ResourceTracker {
                 lock.wait(waitTime);
             }
         }
+    }
+
+    private static class RedirectionException extends RuntimeException {
+
+        public RedirectionException(String string) {
+            super(string);
+        }
+
+        public RedirectionException(Throwable cause) {
+            super(cause);
+        }
+        
     }
 
     // inner classes
