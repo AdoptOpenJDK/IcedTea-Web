@@ -1,5 +1,11 @@
 2014-02-13  Jiri Vanek  <jvanek@redhat.com>
 
+	Get rid of ConcurrentModificationException in Console output.
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPaneModel.java: (importList)
+	now	synchronise over original data, instead of (somtimes by) copy as, wrongly, before.
+
+2014-02-13  Jiri Vanek  <jvanek@redhat.com>
+
 	Added possibility to follow redirects for javaws in demand by
 	-allowredirect switch.
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: added inner class

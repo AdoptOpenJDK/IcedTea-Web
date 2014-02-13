@@ -142,10 +142,12 @@ public class ConsoleOutputPaneModel {
         }
 
         List<MessageWithHeader> sortedList;
-        if (start == 0) {
-            sortedList = preSort(dataProvider.getData(), sortByLocal);
-        } else {
-            sortedList = preSort(Collections.synchronizedList(dataProvider.getData().subList(start, dataProvider.getData().size())), sortByLocal);
+        synchronized (dataProvider.getData()) {
+            if (start == 0) {
+                sortedList = preSort(dataProvider.getData(), sortByLocal);
+            } else {
+                sortedList = preSort(Collections.synchronizedList(dataProvider.getData().subList(start, dataProvider.getData().size())), sortByLocal);
+            }
         }
         lastUpdateIndex = dataProvider.getData().size();
 
