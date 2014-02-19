@@ -1,3 +1,10 @@
+2014-02-19  Michal Vyskocil  <mvyskocil@suse.com>
+
+	Put link flags to the end of gcc command line to prevent link failures
+	Make sure that path to PUBLIC_KEYSTORE exists to prevent keytool fail
+	* tests/softkiller/Makefile: put -lX11 to the end of command line
+	* Makefile.am: if path to PUBLIC_KEYSTORE does not exists, make it
+
 2014-02-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Get rid of ConcurrentModificationException in Console output.

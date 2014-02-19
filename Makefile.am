@@ -735,6 +735,8 @@ stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
+	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
 	for which in "$${types[@]}" ; do \
 	  $(BOOT_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
@@ -752,6 +754,8 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
+	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
 	for which in "$${types[@]}" ; do \
 	  yes | $(BOOT_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) ;\
 	done ;
@@ -765,6 +769,8 @@ netx-dist-tests-remove-cert-from-public:
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
+	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
 	for which in "$${types[@]}" ; do \
 	  $(BOOT_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
