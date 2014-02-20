@@ -49,8 +49,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -61,9 +59,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DirectoryValidator;
-import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -74,22 +72,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 public class PolicyPanel extends NamedBorderPanel {
 
-    /**
-     * Indicates whether a file was successfully opened. If not, provides specific reasons
-     * along with a general failure case
-     */
-    private enum OpenFileResult {
-        /** The file was successfully opened */
-        SUCCESS,
-        /** The file could not be opened, for non-specified reasons */
-        FAILURE,
-        /** The file could not be opened because it did not exist and could not be created */
-        CANT_CREATE,
-        /** The file can be opened but in read-only */
-        CANT_WRITE,
-        /** The specified path pointed to a non-file filesystem object, ie a directory */
-        NOT_FILE
-    }
+    private PolicyEditor policyEditor = null;
 
     public PolicyPanel(final JFrame frame, final DeploymentConfiguration config) {
         super(R("CPHeadPolicy"), new GridBagLayout());
@@ -100,11 +83,14 @@ public class PolicyPanel extends NamedBorderPanel {
         JLabel aboutLabel = new JLabel("<html>" + R("CPPolicyDetail") + "</html>");
 
         final String fileUrlString = config.getProperty(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
-        final JButton showUserPolicyButton = new JButton(R("CPButPolicy"));
-        showUserPolicyButton.addActionListener(new ViewPolicyButtonAction(frame, fileUrlString));
+        final JButton simpleEditorButton = new JButton(R("CPButSimpleEditor"));
+        simpleEditorButton.addActionListener(new LaunchSimplePolicyEditorAction(frame, fileUrlString));
+
+        final JButton advancedEditorButton = new JButton(R("CPButAdvancedEditor"));
+        advancedEditorButton.addActionListener(new LaunchPolicyToolAction(frame, fileUrlString));
 
         final String pathPart = localFilePathFromUrlString(fileUrlString);
-        showUserPolicyButton.setToolTipText(R("CPPolicyTooltip", FileUtils.displayablePath(pathPart, 60)));
+        simpleEditorButton.setToolTipText(R("CPPolicyTooltip", FileUtils.displayablePath(pathPart, 60)));
 
         final JTextField locationField = new JTextField(pathPart);
         locationField.setEditable(false);
@@ -123,7 +109,10 @@ public class PolicyPanel extends NamedBorderPanel {
 
         c.fill = GridBagConstraints.NONE;
         c.gridx++;
-        add(showUserPolicyButton, c);
+        add(simpleEditorButton, c);
+        c.gridx++;
+        add(advancedEditorButton, c);
+        c.gridx--;
 
         /* Keep all the elements at the top of the panel (Extra padding)
          * Keep View/Edit button next to location field, with padding between
@@ -148,18 +137,36 @@ public class PolicyPanel extends NamedBorderPanel {
     private static void launchPolicyTool(final JFrame frame, final String filePath) {
         try {
             final File policyFile = new File(filePath).getCanonicalFile();
-            final OpenFileResult result = canOpenPolicyFile(policyFile);
+            final OpenFileResult result = FileUtils.testFilePermissions(policyFile);
             if (result == OpenFileResult.SUCCESS) {
                 policyToolLaunchHelper(frame, filePath);
             } else if (result == OpenFileResult.CANT_WRITE) {
-                showReadOnlyDialog(frame);
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Opening user JNLP policy read-only");
+                FileUtils.showReadOnlyDialog(frame);
                 policyToolLaunchHelper(frame, filePath);
             } else {
-                showCouldNotOpenFileDialog(frame, policyFile.getPath(), result);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not open user JNLP policy");
+                FileUtils.showCouldNotOpenFileDialog(frame, policyFile.getPath(), result);
             }
         } catch (IOException e) {
             OutputController.getLogger().log(e);
-            showCouldNotOpenFileDialog(frame, filePath);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not open user JNLP policy");
+            FileUtils.showCouldNotOpenFilepathDialog(frame, filePath);
+        }
+    }
+
+    /**
+     * Launch the simplified PolicyEditor for a specified file path
+     * @param frame a {@link JFrame} to act as parent to warning dialogs which may appear
+     * @param filePath a {@link String} representing the path to the file to be opened
+     */
+    private void launchSimplePolicyEditor(final String filePath) {
+        if (policyEditor == null || policyEditor.isClosed()) {
+            policyEditor = PolicyEditor.createInstance(filePath);
+            policyEditor.setVisible(true);
+        } else {
+            policyEditor.toFront();
+            policyEditor.repaint();
         }
     }
 
@@ -189,7 +196,8 @@ public class PolicyPanel extends NamedBorderPanel {
                         reflectivePolicyToolLaunch(filePath);
                     } catch (Exception e) {
                         OutputController.getLogger().log(e);
-                        showCouldNotOpenFileDialog(frame, filePath, R("CPPolicyEditorNotFound"));
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not open user JNLP policy");
+                        FileUtils.showCouldNotOpenDialog(frame, R("CPPolicyEditorNotFound"));
                     }
                 }
             }
@@ -221,116 +229,6 @@ public class PolicyPanel extends NamedBorderPanel {
     }
 
     /**
-     * Verify that a given file object points to a real, accessible plain file.
-     * As a side effect, if the file is accessible but does not yet exist, it will be created
-     * as an empty plain file.
-     * @param policyFile the {@link File} to verify
-     * @return an {@link OpenFileResult} representing the accessibility level of the file
-     * @throws IOException if the file is not accessible
-     */
-    private static OpenFileResult canOpenPolicyFile(final File policyFile) {
-        final DirectoryCheckResults dcr = testPolicyFileDirectory(policyFile);
-        if (dcr.getFailures() == 0) {
-            if (policyFile.isDirectory())
-                return OpenFileResult.NOT_FILE;
-            try {
-                if (!policyFile.exists() && !policyFile.createNewFile()) {
-                    return OpenFileResult.CANT_CREATE;
-                }
-            } catch (IOException e) {
-                return OpenFileResult.CANT_CREATE;
-            }
-            final boolean read = policyFile.canRead(), write = policyFile.canWrite();
-            if (read && write)
-                return OpenFileResult.SUCCESS;
-            else if (read)
-                return OpenFileResult.CANT_WRITE;
-            else
-                return OpenFileResult.FAILURE;
-        }
-        return OpenFileResult.FAILURE;
-    }
-
-    /**
-     * Ensure that the parent directory of the Policy File exists and that we are
-     * able to create and access files within this directory
-     * @param policyFile the {@link File} representing a Java Policy file to test
-     * @return a {@link DirectoryCheckResults} object representing the results of the test
-     */
-    private static DirectoryCheckResults testPolicyFileDirectory(final File policyFile) {
-        final List<File> policyDirectory = new ArrayList<File>();
-        policyDirectory.add(policyFile.getParentFile());
-        final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
-        final DirectoryCheckResults result = validator.ensureDirs();
-
-        return result;
-    }
-
-    /**
-     * Show a generic error dialog indicating the policy file could not be opened
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param filePath a {@link String} representing the path to the file we failed to open
-     */
-    private static void showCouldNotOpenFileDialog(final JFrame frame, final String filePath) {
-        showCouldNotOpenFileDialog(frame, filePath, OpenFileResult.FAILURE);
-    }
-
-    /**
-     * Show an error dialog indicating the policy file could not be opened, with a particular reason
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param filePath a {@link String} representing the path to the file we failed to open
-     * @param reason a {@link OpenFileResult} specifying more precisely why we failed to open the file
-     */
-    private static void showCouldNotOpenFileDialog(final JFrame frame, final String filePath, final OpenFileResult reason) {
-        final String message;
-        switch (reason) {
-            case CANT_CREATE:
-                message = R("RCantCreateFile", filePath);
-                break;
-            case CANT_WRITE:
-                message = R("RCantWriteFile", filePath);
-                break;
-            case NOT_FILE:
-                message = R("RExpectedFile", filePath);
-                break;
-            default:
-                message = R("RCantOpenFile", filePath);
-                break;
-        }
-        showCouldNotOpenFileDialog(frame, filePath, message);
-    }
-
-    /**
-     * Show a dialog informing the user that the policy file could not be opened
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param filePath a {@link String} representing the path to the file we failed to open
-     * @param message a {@link String} giving the specific reason the file could not be opened
-     */
-    private static void showCouldNotOpenFileDialog(final JFrame frame, final String filePath, final String message) {
-        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not open user JNLP policy");
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(frame, message, R("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-        });
-    }
-
-    /**
-     * Show a dialog informing the user that the policy file is currently read-only
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     */
-    private static void showReadOnlyDialog(final JFrame frame) {
-        OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Opening user JNLP policy read-only");
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(frame, R("RFileReadOnly"), R("Warning"), JOptionPane.WARNING_MESSAGE);
-            }
-        });
-    }
-
-    /**
      * Loosely attempt to get the path part of a file URL string. If this fails,
      * simply return back the input. This is only intended to be used for displaying
      * GUI elements such as the CPPolicyTooltip.
@@ -347,13 +245,13 @@ public class PolicyPanel extends NamedBorderPanel {
     }
 
     /**
-     * Implements the action to be performed when the "View Policy" button is clicked
+     * Implements the action to be performed when the "Advanced" button is clicked
      */
-    private class ViewPolicyButtonAction implements ActionListener {
+    private class LaunchPolicyToolAction implements ActionListener {
         private final JFrame frame;
         private final String fileUrlString;
 
-        public ViewPolicyButtonAction(final JFrame frame, final String fileUrlString) {
+        public LaunchPolicyToolAction(final JFrame frame, final String fileUrlString) {
             this.fileUrlString = fileUrlString;
             this.frame = frame;
         }
@@ -370,7 +268,33 @@ public class PolicyPanel extends NamedBorderPanel {
                 });
             } catch (MalformedURLException ex) {
                 OutputController.getLogger().log(ex);
-                showCouldNotOpenFileDialog(frame, fileUrlString);
+                FileUtils.showCouldNotOpenFilepathDialog(frame, fileUrlString);
+            }
+        }
+    }
+
+    private class LaunchSimplePolicyEditorAction implements ActionListener {
+        private final JFrame frame;
+        private final String fileUrlString;
+
+        public LaunchSimplePolicyEditorAction(final JFrame frame, final String fileUrlString) {
+            this.fileUrlString = fileUrlString;
+            this.frame = frame;
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent event) {
+            try {
+                final URL fileUrl = new URL(fileUrlString);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        launchSimplePolicyEditor(fileUrl.getPath());
+                    }
+                });
+            } catch (MalformedURLException ex) {
+                OutputController.getLogger().log(ex);
+                FileUtils.showCouldNotOpenFilepathDialog(frame, fileUrlString);
             }
         }
     }

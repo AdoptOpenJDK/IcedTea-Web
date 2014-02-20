@@ -1,3 +1,49 @@
+2014-02-20  Andrew Azores  <aazores@redhat.com>
+
+	New simplified PolicyEditor for editing Java policy files, particularly
+	user-level JNLP policies.
+	* Makefile.am: added policyeditor launcher targets
+	* netx/net/sourceforge/jnlp/controlpanel/PolicyPanel.java:
+	(OpenFileResult, canOpenPolicyFile, testPolicyFileDirectory,
+	showCouldNotOpenFileDialog, showReadOnlyDialog) moved into FileUtils.
+	(PolicyPanel) added button for PolicyEditor. (launchSimplePolicyEditor)
+	new function. (LaunchSimplePolicyEditorAction) new class, action for new
+	button.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: new messages
+	for PolicyEditor
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: (OpenFileResult,
+	testDirectoryPermissions, testFilePermissions, showReadOnlyDialog,
+	showCouldNotOpenFileDialog) new functions
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPermission.java:
+	new class
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java:
+	new class
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionActions.java:
+	new class
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionTarget.java:
+	new class
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionType.java: new
+	class
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: new
+	class
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java:
+	new class
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEntry.java: new
+	class
+	* policyeditor.desktop.in: new launcher desktop file
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/CustomPermissionTest.java:
+	new class
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PermissionActionsTest.java:
+	new class
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PermissionTargetTest.java:
+	new class
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PermissionTypeTest.java:
+	new class
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissionsTest.java:
+	new class
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java:
+	new class
+
 2014-02-19  Michal Vyskocil  <mvyskocil@suse.com>
 
 	Put link flags to the end of gcc command line to prevent link failures

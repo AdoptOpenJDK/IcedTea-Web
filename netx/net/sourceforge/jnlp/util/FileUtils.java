@@ -16,11 +16,10 @@
 
 package net.sourceforge.jnlp.util;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,8 +32,17 @@ import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import net.sourceforge.jnlp.config.DirectoryValidator;
+import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This class contains a few file-related utility functions.
@@ -43,6 +51,23 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
  */
 
 public final class FileUtils {
+
+    /**
+     * Indicates whether a file was successfully opened. If not, provides specific reasons
+     * along with a general failure case
+     */
+    public enum OpenFileResult {
+        /** The file was successfully opened */
+        SUCCESS,
+        /** The file could not be opened, for non-specified reasons */
+        FAILURE,
+        /** The file could not be opened because it did not exist and could not be created */
+        CANT_CREATE,
+        /** The file can be opened but in read-only */
+        CANT_WRITE,
+        /** The specified path pointed to a non-file filesystem object, ie a directory */
+        NOT_FILE;
+    }
 
     /**
      * list of characters not allowed in filenames
@@ -251,8 +276,121 @@ public final class FileUtils {
             throw new IOException(R("RCantRename", tempFile, file));
         }
         }
-        
 
+    }
+
+    /**
+     * Ensure that the parent directory of the file exists and that we are
+     * able to create and access files within this directory
+     * @param file the {@link File} representing a Java Policy file to test
+     * @return a {@link DirectoryCheckResults} object representing the results of the test
+     */
+    public static DirectoryCheckResults testDirectoryPermissions(final File file) {
+        if (file == null || !file.getParentFile().exists()) {
+            return null;
+        }
+        final List<File> policyDirectory = new ArrayList<File>();
+        policyDirectory.add(file.getParentFile());
+        final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
+        final DirectoryCheckResults result = validator.ensureDirs();
+
+        return result;
+    }
+
+    /**
+     * Verify that a given file object points to a real, accessible plain file.
+     * As a side effect, if the file is accessible but does not yet exist, it will be created
+     * as an empty plain file.
+     * @param file the {@link File} to verify
+     * @return an {@link OpenFileResult} representing the accessibility level of the file
+     * @throws IOException if the file is not accessible
+     */
+    public static OpenFileResult testFilePermissions(final File file) {
+        if (file == null || !file.exists()) {
+            return null;
+        }
+        final DirectoryCheckResults dcr = FileUtils.testDirectoryPermissions(file);
+        if (dcr != null && dcr.getFailures() == 0) {
+            if (file.isDirectory())
+                return OpenFileResult.NOT_FILE;
+            try {
+                if (!file.exists() && !file.createNewFile()) {
+                    return OpenFileResult.CANT_CREATE;
+                }
+            } catch (IOException e) {
+                return OpenFileResult.CANT_CREATE;
+            }
+            final boolean read = file.canRead(), write = file.canWrite();
+            if (read && write)
+                return OpenFileResult.SUCCESS;
+            else if (read)
+                return OpenFileResult.CANT_WRITE;
+            else
+                return OpenFileResult.FAILURE;
+        }
+        return OpenFileResult.FAILURE;
+    }
+
+    /**
+     * Show a dialog informing the user that the file is currently read-only
+     * @param frame a {@link JFrame} to act as parent to this dialog
+     */
+    public static void showReadOnlyDialog(final JFrame frame) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(frame, R("RFileReadOnly"), R("Warning"), JOptionPane.WARNING_MESSAGE);
+            }
+        });
+    }
+
+    /**
+     * Show a generic error dialog indicating the  file could not be opened
+     * @param frame a {@link JFrame} to act as parent to this dialog
+     * @param filePath a {@link String} representing the path to the file we failed to open
+     */
+    public static void showCouldNotOpenFilepathDialog(final JFrame frame, final String filePath) {
+        showCouldNotOpenDialog(frame, R("RCantOpenFile", filePath));
+    }
+
+    /**
+     * Show an error dialog indicating the file could not be opened, with a particular reason
+     * @param frame a {@link JFrame} to act as parent to this dialog
+     * @param filePath a {@link String} representing the path to the file we failed to open
+     * @param reason a {@link OpenFileResult} specifying more precisely why we failed to open the file
+     */
+    public static void showCouldNotOpenFileDialog(final JFrame frame, final String filePath, final OpenFileResult reason) {
+        final String message;
+        switch (reason) {
+            case CANT_CREATE:
+                message = R("RCantCreateFile", filePath);
+                break;
+            case CANT_WRITE:
+                message = R("RCantWriteFile", filePath);
+                break;
+            case NOT_FILE:
+                message = R("RExpectedFile", filePath);
+                break;
+            default:
+                message = R("RCantOpenFile", filePath);
+                break;
+        }
+        showCouldNotOpenDialog(frame, message);
+    }
+
+    /**
+     * Show a dialog informing the user that the file could not be opened
+     * @param frame a {@link JFrame} to act as parent to this dialog
+     * @param filePath a {@link String} representing the path to the file we failed to open
+     * @param message a {@link String} giving the specific reason the file could not be opened
+     */
+    public static void showCouldNotOpenDialog(final JFrame frame, final String message) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(frame, message, R("Error"), JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     /**

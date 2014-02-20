@@ -208,6 +208,7 @@ export EXPORTED_JAVAC=$(BOOT_DIR)/bin/javac
 # binary names
 javaws:= $(shell echo javaws | sed '@program_transform_name@')
 itweb_settings:= $(shell echo itweb-settings | sed '@program_transform_name@')
+policyeditor:= $(shell echo policyeditor | sed '@program_transform_name@')
 
 # the launcher needs to know $(bindir) and $(datadir) which can be different at
 # make-time from configure-time
@@ -224,7 +225,8 @@ edit_launcher_script = sed \
 # =================
 
 all-local: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
- javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop
+ javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop \
+ launcher.build/$(policyeditor) policyeditor.desktop
 
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
@@ -249,6 +251,7 @@ endif
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/$(policyeditor) $(DESTDIR)$(bindir)
 
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(mandir)/man1
@@ -276,6 +279,7 @@ uninstall-local:
 	rm -f $(DESTDIR)$(mandir)/man1/javaws.1
 	rm -f $(DESTDIR)$(bindir)/$(javaws)
 	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
+	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
 	rm -rf $(DESTDIR)$(htmldir)
 
 # Plugin
@@ -531,9 +535,17 @@ launcher.build/$(itweb_settings): launcher/launchers.in
 	PROGRAM_NAME=$(itweb_settings) ;\
 	$(edit_launcher_script) < $< > $@
 
+launcher.build/$(policyeditor): launcher/launchers.in
+	mkdir -p launcher.build
+	MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ;\
+	BIN_LOCATION=$(bindir)/$(policyeditor) ;\
+	PROGRAM_NAME=$(policyeditor) ;\
+	$(edit_launcher_script) < $< > $@
+
 clean-launchers:
 	rm -f launcher.build/$(javaws)
 	rm -f launcher.build/$(itweb_settings)
+	rm -f launcher.build/$(policyeditor)
 	if [ -e launcher.build ] ; then \
 	  rmdir launcher.build ; \
 	fi
@@ -544,6 +556,10 @@ javaws.desktop: javaws.desktop.in
 itweb-settings.desktop: $(srcdir)/itweb-settings.desktop.in
 	sed "s#PATH_TO_ITWEB_SETTINGS#$(bindir)/$(itweb_settings)#" \
 	  < $(srcdir)/itweb-settings.desktop.in > itweb-settings.desktop
+
+policyeditor.desktop: $(srcdir)/policyeditor.desktop.in
+	sed 's#PATH_TO_POLICYEDITOR#$(bindir)/$(policyeditor)#' \
+	< $(srcdir)/policyeditor.desktop.in > policyeditor.desktop
 
 # documentation
 
@@ -870,7 +886,7 @@ $(TESTS_DIR)/$(SOFTKILLER):
 	mv $(SOFTKILLER) $(TESTS_DIR)/
 
 stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
- javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop \
+ javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop launcher.build/$(policyeditor) policyeditor.desktop \
  stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public $(TESTS_DIR)/softkiller \
  stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp\
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES) stamps/process-custom-reproducers.stamp
