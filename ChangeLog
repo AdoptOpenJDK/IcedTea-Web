@@ -1,3 +1,14 @@
+2014-02-21  Jiri Vanek  <jvanek@redhat.com>
+
+	* acinclude.m4: added (IT_CHECK_XULRUNNER_API_VERSION_CONSTCHAR) macro,
+	Added (IT_CHECK_XULRUNNER_API_VERSION_C11) 
+	* configure.ac: added call of IT_CHECK_XULRUNNER_API_CONSTCHAR and
+	IT_CHECK_XULRUNNER_API_VERSION_C11
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: (NP_GetMIMEDescription) 
+	return type set-up by dependency on defined LEGACY_XULRUNNERAPI.
+	 This one is set by IT_CHECK_XULRUNNER_API_VERSION during configure.
+	if defined, then old char* is used. New const char* is used otherwise.
+
 2014-02-20  Andrew Azores  <aazores@redhat.com>
 
 	New simplified PolicyEditor for editing Java policy files, particularly

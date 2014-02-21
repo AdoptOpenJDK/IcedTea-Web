@@ -520,6 +520,47 @@ AC_DEFUN_ONCE([IT_CHECK_GLIB_VERSION],[
    PKG_CHECK_MODULES([GLIB2_V_216],[glib-2.0 >= 2.16],[],[AC_DEFINE([LEGACY_GLIB])])
  ])
 
+AC_DEFUN_ONCE([IT_CHECK_XULRUNNER_MIMEDESCRIPTION_CONSTCHAR],
+[
+  AC_MSG_CHECKING([for legacy xulrunner api])
+  AC_LANG_PUSH(C++)
+  CXXFLAGS_BACKUP="$CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS"" ""$MOZILLA_CFLAGS"
+  AC_COMPILE_IFELSE([
+    #include <npfunctions.h>]
+    [const  char* NP_GetMIMEDescription ()
+    {return (char*) "yap!";}
+    ],[
+    AC_MSG_RESULT(no)
+    ],[
+    AC_MSG_RESULT(yes)
+    AC_DEFINE([LEGACY_XULRUNNERAPI])
+  ])
+  CXXFLAGS="$CXXFLAGS_BACKUP"
+  AC_LANG_POP(C++)
+])
+
+AC_DEFUN_ONCE([IT_CHECK_XULRUNNER_REQUIRES_C11],
+[
+  AC_MSG_CHECKING([for xulrunner enforcing C++11 standard])
+  AC_LANG_PUSH(C++)
+  CXXFLAGS_BACKUP="$CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS"" ""$MOZILLA_CFLAGS"
+  AC_COMPILE_IFELSE([
+    #include <npapi.h>
+    #include <npruntime.h>]
+    [void setnpptr (NPVariant *result)
+    {VOID_TO_NPVARIANT(*result);}
+    ],[
+    AC_MSG_RESULT(no)
+    CXXFLAGS="$CXXFLAGS_BACKUP"
+    ],[
+    AC_MSG_RESULT(yes)
+    CXXFLAGS="$CXXFLAGS_BACKUP -std=c++11"
+  ])
+  AC_LANG_POP(C++)
+])
+
 AC_DEFUN([IT_CHECK_WITH_GCJ],
 [
   AC_MSG_CHECKING([whether to compile ecj natively])
