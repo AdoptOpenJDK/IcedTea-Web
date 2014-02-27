@@ -707,7 +707,7 @@ public class Launcher {
     protected  AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
          AppletInstance appletInstance = null;
          try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy);
+            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
 
             if (enableCodeBase) {
                 loader.enableCodeBase();
@@ -754,7 +754,7 @@ public class Launcher {
      */
     protected Applet createAppletObject(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
         try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy);
+            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
 
             if (enableCodeBase) {
                 loader.enableCodeBase();
@@ -777,7 +777,7 @@ public class Launcher {
      */
     protected ApplicationInstance createApplication(JNLPFile file) throws LaunchException {
         try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy);
+            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, false);
             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
             ApplicationInstance app = new ApplicationInstance(file, group, loader);

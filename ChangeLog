@@ -1,3 +1,22 @@
+2014-02-27  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: treat signed
+	applets which load from the codebase as partially signed, and fix
+	regression with signed applets loading main-classes from codebase
+	* tests/reproducers/custom/SignedAppletCodebaseLoading/resources/SignedAppletCodebaseLoading.html:
+	new test to ensure that signed applets with codebase loading can run
+	* tests/reproducers/custom/SignedAppletCodebaseLoading/srcs/Makefile
+	* tests/reproducers/custom/SignedAppletCodebaseLoading/srcs/SignedAppletCodebaseLoading.java
+	* tests/reproducers/custom/SignedAppletCodebaseLoading/srcs/SignedAppletCodebaseLoadingHelper.java
+	* tests/reproducers/custom/SignedAppletCodebaseLoading/testcases/SignedAppletCodebaseLoadingTests.java
+	* tests/reproducers/custom/SignedAppletExternalMainClass/resources/SignedAppletExternalMainClass.html:
+	new test to ensure that signed applets with codebase-loaded main-classes
+	can run
+	* tests/reproducers/custom/SignedAppletExternalMainClass/srcs/Makefile
+	* tests/reproducers/custom/SignedAppletExternalMainClass/srcs/SignedAppletExternalMainClass.java
+	* tests/reproducers/custom/SignedAppletExternalMainClass/srcs/SignedAppletExternalMainClassHelper.java
+	* tests/reproducers/custom/SignedAppletExternalMainClass/testcases/SignedAppletExternalMainClassTest.java
+
 2014-02-21  Jiri Vanek  <jvanek@redhat.com>
 
 	* acinclude.m4: added (IT_CHECK_XULRUNNER_API_VERSION_CONSTCHAR) macro,
