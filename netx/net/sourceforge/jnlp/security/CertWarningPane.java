@@ -206,18 +206,37 @@ public class CertWarningPane extends SecurityDialogPanel {
         //run and cancel buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton run = new JButton(R("ButRun"));
+        JButton sandbox = new JButton(R("ButSandbox"));
         JButton cancel = new JButton(R("ButCancel"));
+        run.setToolTipText(R("CertWarnRunTip"));
+        sandbox.setToolTipText(R("CertWarnSandboxTip"));
+        cancel.setToolTipText(R("CertWarnCancelTip"));
+
+        alwaysTrust.addActionListener(new ButtonDisableListener(sandbox));
         int buttonWidth = Math.max(run.getMinimumSize().width,
-                        cancel.getMinimumSize().width);
+                sandbox.getMinimumSize().width);
+        buttonWidth = Math.max(buttonWidth, cancel.getMinimumSize().width);
         int buttonHeight = run.getMinimumSize().height;
         Dimension d = new Dimension(buttonWidth, buttonHeight);
         run.setPreferredSize(d);
+        sandbox.setPreferredSize(d);
         cancel.setPreferredSize(d);
+
+        sandbox.setEnabled(!alwaysTrust.isSelected());
+
         run.addActionListener(createSetValueListener(parent, 0));
         run.addActionListener(new CheckBoxListener());
-        cancel.addActionListener(createSetValueListener(parent, 1));
+        sandbox.addActionListener(createSetValueListener(parent, 1));
+        cancel.addActionListener(createSetValueListener(parent, 2));
         initialFocusComponent = cancel;
         buttonPanel.add(run);
+        // file will be null iff this dialog is being called from VariableX509TrustManager.
+        // In this case, the "sandbox" button does not make any sense, as we are asking
+        // the user if they trust some certificate that is not being used to sign an app.
+        // Since there is no app, there is nothing to run sandboxed.
+        if (file != null) {
+            buttonPanel.add(sandbox);
+        }
         buttonPanel.add(cancel);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -242,6 +261,7 @@ public class CertWarningPane extends SecurityDialogPanel {
     }
 
     private class MoreInfoButtonListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             SecurityDialog.showMoreInfoDialog(parent.getCertVerifier(),
                                 parent);
@@ -249,9 +269,26 @@ public class CertWarningPane extends SecurityDialogPanel {
     }
 
     /**
+     * Disable the Sandbox button when the AlwaysTrust checkbox is checked
+     */
+    private class ButtonDisableListener implements ActionListener {
+        private JButton button;
+
+        public ButtonDisableListener(JButton button) {
+            this.button = button;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            button.setEnabled(!alwaysTrust.isSelected());
+        }
+    }
+
+    /**
      * Updates the user's KeyStore of trusted Certificates.
      */
     private class CheckBoxListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (alwaysTrust != null && alwaysTrust.isSelected()) {
                 try {

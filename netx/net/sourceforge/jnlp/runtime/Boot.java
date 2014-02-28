@@ -184,6 +184,9 @@ public final class Boot implements PrivilegedAction<Void> {
         if (null != getOption("-Xtrustall")) {
             JNLPRuntime.setTrustAll(true);
         }
+        if (null != getOption("-Xtrustnone")) {
+            JNLPRuntime.setTrustNone(true);
+        }
         if (null != getOption("-Xignoreheaders")) {
             JNLPRuntime.setIgnoreHeaders(true);
         }

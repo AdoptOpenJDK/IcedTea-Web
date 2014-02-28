@@ -354,8 +354,12 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // If security level is 'high' or greater, we must check if the user allows unsigned applets 
         // when the JNLPClassLoader is created. We do so here, because doing so in the constructor 
-        // causes unwanted side-effects for some applets
-        if (!loader.getSigning() && file instanceof PluginBridge) {
+        // causes unwanted side-effects for some applets. However, if the loader has been tagged
+        // with "runInSandbox", then we do not show this dialog - since this tag indicates that
+        // the user was already shown a CertWarning dialog and has chosen to run the applet sandboxed.
+        // This means they've already agreed to running the applet and have specified with which
+        // permission level to do it!
+        if (!loader.getSigning() && !loader.securityDelegate.userPromptedForSandbox() && file instanceof PluginBridge) {
             UnsignedAppletTrustConfirmation.checkUnsignedWithUserIfRequired((PluginBridge)file);
         }
 
@@ -1035,13 +1039,35 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws LaunchException if the user does not approve every dialog prompt.
      */
     private void checkTrustWithUser() throws LaunchException {
-        if (JNLPRuntime.isTrustAll()){
+        if (JNLPRuntime.isTrustNone()) {
+            if (!securityDelegate.getRunInSandbox()) {
+                setRunInSandbox();
+            }
+            return;
+        }
+        if (JNLPRuntime.isTrustAll() || securityDelegate.getRunInSandbox()) {
             return;
         }
 
         if (jcv.isFullySigned() && !jcv.getAlreadyTrustPublisher()) {
-            jcv.checkTrustWithUser(file);
+            jcv.checkTrustWithUser(securityDelegate, file);
         }
+    }
+
+    /*
+     * Sets whether applets are to be run sandboxed, regardless of JAR
+     * signing. This MUST be called before any call to initializeResources,
+     * setSecurity, activateJars, or any other method that sets the value
+     * of this.security or adds entries into this.jarLocationSecurityMap.
+     * @throws LaunchException if security settings have been initialized before
+     * this method is called
+     */
+    public void setRunInSandbox() throws LaunchException {
+        securityDelegate.setRunInSandbox();
+    }
+
+    public boolean userPromptedForSandbox() {
+        return securityDelegate.getRunInSandbox();
     }
 
     /**

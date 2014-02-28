@@ -98,6 +98,24 @@ public class SecurityDialogs {
         SIGNING_ERROR
     }
 
+    public static enum AppletAction {
+        RUN,
+        SANDBOX,
+        CANCEL;
+        public static AppletAction fromInteger(int i) {
+            switch (i) {
+                case 0:
+                    return RUN;
+                case 1:
+                    return SANDBOX;
+                case 2:
+                    return CANCEL;
+                default:
+                    return CANCEL;
+            }
+        }
+    }
+
     /**
      * Shows a warning dialog for different types of system access (i.e. file
      * open/save, clipboard read/write, printing, etc).
@@ -192,13 +210,15 @@ public class SecurityDialogs {
      * @param file the JNLPFile associated with this warning
      * @param certVerifier the JarCertVerifier used to verify this application
      *
-     * @return true if the user accepted the certificate
+     * @return RUN if the user accepted the certificate, SANDBOX if the user
+     * wants the applet to run with only sandbox permissions, or CANCEL if the
+     * user did not accept running the applet
      */
-    public static boolean showCertWarningDialog(AccessType accessType,
+    public static AppletAction showCertWarningDialog(AccessType accessType,
             JNLPFile file, CertVerifier certVerifier) {
 
         if (!shouldPromptUser()) {
-            return false;
+            return AppletAction.CANCEL;
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
@@ -209,7 +229,7 @@ public class SecurityDialogs {
 
         Object selectedValue = getUserResponse(message);
 
-        return getIntegerResponseAsBoolean(selectedValue);
+        return getIntegerResponseAsAppletAction(selectedValue);
     }
 
     /**
@@ -360,6 +380,13 @@ public class SecurityDialogs {
             return i.intValue() == 0;
         }
         return false;
+    }
+
+    public static AppletAction getIntegerResponseAsAppletAction(Object ref) {
+        if (ref instanceof Integer) {
+            return AppletAction.fromInteger((Integer) ref);
+        }
+        return AppletAction.CANCEL;
     }
 
     /**

@@ -36,9 +36,13 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import static net.sourceforge.jnlp.security.SecurityDialogs.getIntegerResponseAsAppletAction;
 import static net.sourceforge.jnlp.security.SecurityDialogs.getIntegerResponseAsBoolean;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static net.sourceforge.jnlp.security.SecurityDialogs.AppletAction.*;
+
 import org.junit.Test;
 
 public class SecurityDialogsTest {
@@ -66,5 +70,34 @@ public class SecurityDialogsTest {
         assertFalse("String reference should have resulted in false", getIntegerResponseAsBoolean(strRef));
         assertFalse("Non-0 Integer reference should have resulted in false", getIntegerResponseAsBoolean(intRef1));
         assertTrue("0 Integer reference should have resulted in true", getIntegerResponseAsBoolean(intRef2));
+    }
+
+    @Test
+    public void testGetIntegerResponseAsAppletAction() throws Exception {
+        Object nullRef = null;
+        Object objRef = new Object();
+        Float floatRef = new Float(0.0f);
+        Double doubleRef = new Double(0.0d);
+        Long longRef = new Long(0);
+        Byte byteRef = new Byte((byte) 0);
+        Short shortRef = new Short((short) 0);
+        String strRef = "0";
+        Integer intRef1 = new Integer(0);
+        Integer intRef2 = new Integer(1);
+        Integer intRef3 = new Integer(2);
+        Integer intRef4 = new Integer(3);
+
+        assertEquals("null reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(nullRef), CANCEL);
+        assertEquals("Object reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(objRef), CANCEL);
+        assertEquals("Float reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(floatRef), CANCEL);
+        assertEquals("Double reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(doubleRef), CANCEL);
+        assertEquals("Long reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(longRef), CANCEL);
+        assertEquals("Byte reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(byteRef), CANCEL);
+        assertEquals("Short reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(shortRef), CANCEL);
+        assertEquals("String reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(strRef), CANCEL);
+        assertEquals("Integer reference 0 should have resulted in RUN", getIntegerResponseAsAppletAction(intRef1), RUN);
+        assertEquals("Integer reference 1 should have resulted in SANDBOX", getIntegerResponseAsAppletAction(intRef2), SANDBOX);
+        assertEquals("Integer reference 2 should have resulted in CANCEL", getIntegerResponseAsAppletAction(intRef3), CANCEL);
+        assertEquals("Integer reference 3 should have resulted in CANCEL", getIntegerResponseAsAppletAction(intRef4), CANCEL);
     }
 }

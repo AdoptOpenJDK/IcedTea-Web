@@ -1,7 +1,39 @@
 2014-02-28  Andrew Azores  <aazores@redhat.com>
 
+	Added "Sandbox" button to CertWarning dialogs, allowing signed applets
+	to be run with restricted permissions
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: (ButSandbox,
+	LRunInSandboxError, LRunInSandboxErrorInfo, CertWarnRunTip,
+	CertWarnSandboxTip, CertWarnCancelTip): new messages
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (createInstance)
+	added check to not display unsigned warning dialog if the cert warning
+	dialog has been presented and the applet is sandboxed.
+	(checkTrustWithUser) updated for Run In Sandbox functionality.
+	(setRunInSandbox, userPromptedForSandbox) new functions
+	* netx/net/sourceforge/jnlp/security/AppVerifier.java:
+	(checkTrustWithUser) added SecurityDelegate param
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java: added Sandbox
+	button
+	* netx/net/sourceforge/jnlp/security/JNLPAppVerifier.java:
+	(checkTrustWithUser) uses AppletAction enum type, calls
+	JNLPClassLoader#setRunInSandbox if AppletAction is SANDBOX
+	* netx/net/sourceforge/jnlp/security/PluginAppVerifier.java: same
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: added
+	(AppletAction) enum type. (showCertWarning) returns AppletAction
+	rather than boolean
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java:
+	(askUser) refactor to use AppletAction rather than boolean
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java:
+	(checkTrustWithUser) added SecurityDelegate param
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java:
+	(testGetIntegerResponseAsAppletAction) new tests for converting Object
+	references into AppletActions 
+
+2014-02-28  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
 	(SecurityDelegate, SecurityDelegateImpl) new interface and implementation.
+	Includes logic for Run In Sandbox, which is not yet used
 	(initializeResources, setSecurity, activateJars, addNewJar) refactored to
 	use SecurityDelegate
 

@@ -41,17 +41,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.jar.JarEntry;
-import net.sourceforge.jnlp.util.JarFile;
 
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
+import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
@@ -598,8 +598,8 @@ public class JarCertVerifier implements CertVerifier {
         return this.unverifiedJars.size() == 0;
     }
 
-    public void checkTrustWithUser(JNLPFile file) throws LaunchException {
-        appVerifier.checkTrustWithUser(this, file);
+    public void checkTrustWithUser(SecurityDelegate securityDelegate, JNLPFile file) throws LaunchException {
+        appVerifier.checkTrustWithUser(securityDelegate, this, file);
     }
 
     public Map<String, Integer> getJarSignableEntries() {

@@ -46,7 +46,9 @@ import java.util.Map;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AppletAction;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
@@ -126,7 +128,7 @@ public class PluginAppVerifier implements AppVerifier {
     }
 
     @Override
-    public void checkTrustWithUser(JarCertVerifier jcv, JNLPFile file)
+    public void checkTrustWithUser(SecurityDelegate securityDelegate, JarCertVerifier jcv, JNLPFile file)
             throws LaunchException {
         List<CertPath> certPaths = buildCertPathsList(jcv);
         List<CertPath> alreadyApprovedByUser = new ArrayList<CertPath>();
@@ -165,9 +167,12 @@ public class PluginAppVerifier implements AppVerifier {
                         dialogType = AccessType.UNVERIFIED;
                     }
 
-                    boolean wasApproved = SecurityDialogs.showCertWarningDialog(
+                    AppletAction action = SecurityDialogs.showCertWarningDialog(
                             dialogType, file, jcv);
-                    if (wasApproved) {
+                    if (action != AppletAction.CANCEL) {
+                        if (action == AppletAction.SANDBOX) {
+                            securityDelegate.setRunInSandbox();
+                        }
                         alreadyApprovedByUser.add(cPath);
                         trustFoundOrApproved = true;
                         break;

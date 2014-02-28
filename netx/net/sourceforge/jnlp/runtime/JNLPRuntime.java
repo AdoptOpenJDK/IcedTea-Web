@@ -143,6 +143,9 @@ public class JNLPRuntime {
 
     /** all security dialogs will be consumed and pretented as being verified by user and allowed.*/
     private static boolean trustAll=false;
+
+    /** all security dialogs will be consumed and we will pretend the Sandbox option was chosen */
+    private static boolean trustNone = false;
     
     /** allows 301.302.303.307.308 redirects to be followed when downloading resources*/
     private static boolean allowRedirect = false;;
@@ -792,6 +795,14 @@ public class JNLPRuntime {
 
     public static boolean isTrustAll() {
         return trustAll;
+    }
+
+    static void setTrustNone(final boolean b) {
+        trustNone = b;
+    }
+
+    public static boolean isTrustNone() {
+        return trustNone;
     }
 
     public static boolean isIgnoreHeaders() {

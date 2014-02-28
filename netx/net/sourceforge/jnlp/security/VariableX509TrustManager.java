@@ -58,6 +58,7 @@ import javax.net.ssl.X509TrustManager;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.security.SecurityDialogs.AppletAction;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.security.util.HostnameChecker;
 import sun.security.validator.ValidatorException;
@@ -417,7 +418,6 @@ final public class VariableX509TrustManager {
         if (JNLPRuntime.isTrustAll()){
             return true;
         }
-        final VariableX509TrustManager trustManager = this;
         return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             @Override
             public Boolean run() {
@@ -425,7 +425,7 @@ final public class VariableX509TrustManager {
                         AccessType.UNVERIFIED, null,
                         new HttpsCertVerifier(chain, authType,
                                               isTrusted, hostMatched,
-                                              hostName));
+                                hostName)) == AppletAction.RUN;
             }
         });
     }
