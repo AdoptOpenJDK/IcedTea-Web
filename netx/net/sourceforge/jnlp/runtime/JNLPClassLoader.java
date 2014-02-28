@@ -224,6 +224,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private boolean enableCodeBase = false;
 
+    private final SecurityDelegate securityDelegate;
+
     /**
      * Create a new JNLPClassLoader from the specified file.
      *
@@ -272,6 +274,8 @@ public class JNLPClassLoader extends URLClassLoader {
             addToCodeBaseLoader(this.file.getCodeBase());
         }
 
+        this.securityDelegate = new SecurityDelegateImpl(this);
+
         // initialize extensions
         initializeExtensions();
 
@@ -309,52 +313,8 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     private void setSecurity() throws LaunchException {
-
         URL codebase = guessCodeBase();
-
-        /**
-         * When we're trying to load an applet, file.getSecurity() will return
-         * null since there is no jnlp file to specify permissions. We
-         * determine security settings here, after trying to verify jars.
-         */
-        if (file instanceof PluginBridge) {
-            if (getSigning()) {
-                this.security = new SecurityDesc(file,
-                        SecurityDesc.ALL_PERMISSIONS,
-                        codebase.getHost());
-            } else {
-                this.security = new SecurityDesc(file,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebase.getHost());
-            }
-        } else { //regular jnlp file
-
-            /*
-             * Various combinations of the jars being signed and <security> tags being
-             * present are possible. They are treated as follows
-             *
-             * Jars          JNLP File         Result
-             *
-             * Signed        <security>        Appropriate Permissions
-             * Signed        no <security>     Sandbox
-             * Unsigned      <security>        Error
-             * Unsigned      no <security>     Sandbox
-             *
-             */
-            if (!file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS) && !getSigning()) {
-                if (jcv.allJarsSigned()) {
-                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedJNLPAppDifferentCerts"), R("LSignedJNLPAppDifferentCertsInfo"));
-                } else {
-                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedJarWithSecurity"), R("LUnsignedJarWithSecurityInfo"));
-                }
-            } else if (getSigning()) {
-                this.security = file.getSecurity();
-            } else {
-                this.security = new SecurityDesc(file,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebase.getHost());
-            }
-        }
+        this.security = securityDelegate.getClassLoaderSecurity(codebase.getHost());
     }
 
     /**
@@ -766,38 +726,20 @@ public class JNLPClassLoader extends URLClassLoader {
                 continue; // JAR not found. Keep going.
             }
 
-            SecurityDesc jarSecurity = file.getSecurity();
+            final URL codebase;
+            if (file.getCodeBase() != null) {
+                codebase = file.getCodeBase();
+            } else {
+                // FIXME: codebase should be the codebase of the Main Jar not
+                // the location. Although, it still works in the current state.
+                codebase = file.getResources().getMainJAR().getLocation();
+            }
 
-            if (file instanceof PluginBridge) {
-
-                URL codebase = null;
-
-                if (file.getCodeBase() != null) {
-                    codebase = file.getCodeBase();
-                } else {
-                    //Fixme: codebase should be the codebase of the Main Jar not
-                    //the location. Although, it still works in the current state.
-                    codebase = file.getResources().getMainJAR().getLocation();
-                }
-
-                try {
-                    if (JarCertVerifier.isJarSigned(jarDesc, new PluginAppVerifier(), tracker)) {
-                        containsSignedJar = true;
-                        jarSecurity = new SecurityDesc(file,
-                                SecurityDesc.ALL_PERMISSIONS,
-                                codebase.getHost());
-                    } else {
-                        containsUnsignedJar = true;
-                        jarSecurity = new SecurityDesc(file,
-                                SecurityDesc.SANDBOX_PERMISSIONS,
-                                codebase.getHost());
-                    }
-                } catch (Exception e) {
-                    OutputController.getLogger().log(e);
-                    jarSecurity = new SecurityDesc(file,
-                            SecurityDesc.SANDBOX_PERMISSIONS,
-                            codebase.getHost());
-                }
+            final SecurityDesc jarSecurity = securityDelegate.getCodebaseSecurityDesc(jarDesc, codebase.getHost());
+            if (jarSecurity.getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+                containsUnsignedJar = true;
+            } else {
+                containsSignedJar = true;
             }
 
             jarLocationSecurityMap.put(jarDesc.getLocation(), jarSecurity);
@@ -1326,17 +1268,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                         codebase = file.getResources().getMainJAR().getLocation();
                                     }
 
-                                    SecurityDesc jarSecurity = null;
-                                    if (jcv.isFullySigned()) {
-                                        // Already trust application, nested jar should be given
-                                        jarSecurity = new SecurityDesc(file,
-                                                SecurityDesc.ALL_PERMISSIONS,
-                                                codebase.getHost());
-                                    } else {
-                                        jarSecurity = new SecurityDesc(file,
-                                                SecurityDesc.SANDBOX_PERMISSIONS,
-                                                codebase.getHost());
-                                    }
+                                    final SecurityDesc jarSecurity = securityDelegate.getJarPermissions(codebase.getHost());
 
                                     try {
                                         URL fileURL = new URL("file://" + extractedJarLocation);
@@ -1659,16 +1591,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                     checkTrustWithUser();
 
-                    final SecurityDesc security;
-                    if (jcv.isFullySigned()) {
-                        security = new SecurityDesc(file,
-                                SecurityDesc.ALL_PERMISSIONS,
-                                file.getCodeBase().getHost());
-                    } else {
-                        security = new SecurityDesc(file,
-                                SecurityDesc.SANDBOX_PERMISSIONS,
-                                file.getCodeBase().getHost());
-                    }
+                    final SecurityDesc security = securityDelegate.getJarPermissions(file.getCodeBase().getHost());
 
                     jarLocationSecurityMap.put(remoteURL, security);
 
@@ -2342,6 +2265,154 @@ public class JNLPClassLoader extends URLClassLoader {
                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("CBCheckSignedFail"));
                 }
             }
+        }
+
+    }
+
+    /**
+     * SecurityDelegate, in real usage, relies on having a "parent" JNLPClassLoader instance.
+     * However, JNLPClassLoaders are very large, heavyweight, difficult-to-mock objects, which
+     * means that unit testing on anything that uses a SecurityDelegate can become very difficult.
+     * For example, JarCertVerifier is designed separated from the ClassLoader so it can be tested
+     * in isolation. However, JCV needs some sort of access back to JNLPClassLoader instances to
+     * be able to invoke setRunInSandbox(). The SecurityDelegate handles this, allowing JCV to be
+     * tested without instantiating JNLPClassLoaders, by creating a fake SecurityDelegate that does
+     * not require one.
+     */
+    public static interface SecurityDelegate {
+        public boolean isPluginApplet();
+
+        public boolean userPromptedForSandbox();
+
+        public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final String codebaseHost);
+
+        public SecurityDesc getClassLoaderSecurity(final String codebaseHost) throws LaunchException;
+
+        public SecurityDesc getJarPermissions(final String codebaseHost);
+
+        public void setRunInSandbox() throws LaunchException;
+
+        public boolean getRunInSandbox();
+    }
+
+    /**
+     * Handles security decision logic for the JNLPClassLoader, eg which permission level to assign
+     * to JARs.
+     */
+    public static class SecurityDelegateImpl implements SecurityDelegate {
+        private final JNLPClassLoader classLoader;
+        private boolean runInSandbox;
+        private boolean promptedForSandbox;
+
+        public SecurityDelegateImpl(final JNLPClassLoader classLoader) {
+            this.classLoader = classLoader;
+            runInSandbox = false;
+            promptedForSandbox = false;
+        }
+
+        public boolean isPluginApplet() {
+            return classLoader.file instanceof PluginBridge;
+        }
+
+        public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final String codebaseHost) {
+            if (runInSandbox) {
+                return new SecurityDesc(classLoader.file,
+                        SecurityDesc.SANDBOX_PERMISSIONS,
+                        codebaseHost);
+            } else {
+                if (isPluginApplet()) {
+                    try {
+                        if (JarCertVerifier.isJarSigned(jarDesc, new PluginAppVerifier(), classLoader.tracker)) {
+                            return new SecurityDesc(classLoader.file,
+                                    SecurityDesc.ALL_PERMISSIONS,
+                                    codebaseHost);
+                        } else {
+                            return new SecurityDesc(classLoader.file,
+                                    SecurityDesc.SANDBOX_PERMISSIONS,
+                                    codebaseHost);
+                        }
+                    } catch (final Exception e) {
+                        OutputController.getLogger().log(e);
+                        return new SecurityDesc(classLoader.file,
+                                SecurityDesc.SANDBOX_PERMISSIONS,
+                                codebaseHost);
+                    }
+                } else {
+                    return classLoader.file.getSecurity();
+                }
+            }
+        }
+
+        public SecurityDesc getClassLoaderSecurity(final String codebaseHost) throws LaunchException {
+            if (isPluginApplet()) {
+                if (!runInSandbox && classLoader.getSigning()) {
+                    return new SecurityDesc(classLoader.file,
+                            SecurityDesc.ALL_PERMISSIONS,
+                            codebaseHost);
+                } else {
+                    return new SecurityDesc(classLoader.file,
+                            SecurityDesc.SANDBOX_PERMISSIONS,
+                            codebaseHost);
+                }
+            } else {
+                /*
+                 * Various combinations of the jars being signed and <security> tags being
+                 * present are possible. They are treated as follows
+                 *
+                 * Jars          JNLP File         Result
+                 *
+                 * Signed        <security>        Appropriate Permissions
+                 * Signed        no <security>     Sandbox
+                 * Unsigned      <security>        Error
+                 * Unsigned      no <security>     Sandbox
+                 *
+                 */
+                if (!runInSandbox && !classLoader.getSigning()
+                        && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+                    if (classLoader.jcv.allJarsSigned()) {
+                        throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCClient"), R("LSignedJNLPAppDifferentCerts"), R("LSignedJNLPAppDifferentCertsInfo"));
+                    } else {
+                        throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCClient"), R("LUnsignedJarWithSecurity"), R("LUnsignedJarWithSecurityInfo"));
+                    }
+                } else if (!runInSandbox && classLoader.getSigning()) {
+                    return classLoader.file.getSecurity();
+                } else {
+                    return new SecurityDesc(classLoader.file,
+                            SecurityDesc.SANDBOX_PERMISSIONS,
+                            codebaseHost);
+                }
+            }
+        }
+
+        public SecurityDesc getJarPermissions(final String codebaseHost) {
+            if (!runInSandbox && classLoader.jcv.isFullySigned()) {
+                // Already trust application, nested jar should be given
+                return new SecurityDesc(classLoader.file,
+                        SecurityDesc.ALL_PERMISSIONS,
+                        codebaseHost);
+            } else {
+                return new SecurityDesc(classLoader.file,
+                        SecurityDesc.SANDBOX_PERMISSIONS,
+                        codebaseHost);
+            }
+        }
+
+        public void setRunInSandbox() throws LaunchException {
+            if (promptedForSandbox || classLoader.security != null
+                    || classLoader.jarLocationSecurityMap.size() != 0) {
+                throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCInit"), R("LRunInSandboxError"), R("LRunInSandboxErrorInfo"));
+            }
+
+            this.promptedForSandbox = true;
+            this.runInSandbox = true;
+        }
+
+        public boolean getRunInSandbox() {
+            return this.runInSandbox;
+        }
+
+        public boolean userPromptedForSandbox() {
+            return this.promptedForSandbox;
         }
 
     }

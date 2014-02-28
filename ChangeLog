@@ -1,3 +1,10 @@
+2014-02-28  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	(SecurityDelegate, SecurityDelegateImpl) new interface and implementation.
+	(initializeResources, setSecurity, activateJars, addNewJar) refactored to
+	use SecurityDelegate
+
 2014-02-27  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: treat signed
