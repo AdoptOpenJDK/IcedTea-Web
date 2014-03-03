@@ -88,6 +88,7 @@ public class SecurityDesc {
     private static Permission sandboxPermissions[] = {
             new SocketPermission("localhost:1024-", "listen"),
             // new SocketPermission("<DownloadHost>", "connect, accept"), // added by code
+            new PropertyPermission("java.util.Arrays.useLegacyMergeSort", "read,write"),
             new PropertyPermission("java.version", "read"),
             new PropertyPermission("java.vendor", "read"),
             new PropertyPermission("java.vendor.url", "read"),
