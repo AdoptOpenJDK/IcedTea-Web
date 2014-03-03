@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
 import net.sourceforge.jnlp.util.lockingfile.LockingReaderWriter;
@@ -140,8 +140,8 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
         // Actions such as 'always accept' or 'always reject' are 'stronger' than
         // the hints 'was accepted' or 'was rejected'.
         for (UnsignedAppletActionEntry candidate : results) {
-                if (candidate.getUnsignedAppletAction() == ExecuteUnsignedApplet.ALWAYS
-                    || candidate.getUnsignedAppletAction() == ExecuteUnsignedApplet.NEVER) {
+                if (candidate.getUnsignedAppletAction() == ExecuteAppletAction.ALWAYS
+                    || candidate.getUnsignedAppletAction() == ExecuteAppletAction.NEVER) {
                     //return first found strong
                     return  candidate;
                 }

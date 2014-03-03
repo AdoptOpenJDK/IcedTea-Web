@@ -1,3 +1,33 @@
+2014-03-03  Andrew Azores  <aazores@redhat.com>
+
+	UnsignedAppletTrustWarningPanel logic moved into new abstract parent class
+	AppTrustWarningPanel for reusability.
+	* netx/net/sourceforge/jnlp/security/AppTrustWarningDialog.java: new class
+	* netx/net/sourceforge/jnlp/security/AppTrustWarningPanel.java: new class
+	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningPanel.java:
+	major refactor into subclass of AppTrustWarningPanel
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
+	(UnsignedWarningAction) references changed to AppSigningWarningAction
+	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningDialog.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/security/AppTrustWarningPanelTest.java:
+	new tests for AppTrustWarningPanel
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExecuteUnsignedApplet.java:
+	renamed, changed all references
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExecuteAppletAction.java:
+	(ExecuteUnsignedApplet) renamed to this
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java:
+	(ExecuteAppletAction) changed references
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	(ExecuteAppletAction) changed references
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionEntry.java:
+	(ExecuteAppletAction) changed references
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	(ExecuteAppletAction) changed references
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
+	(ExecuteAppletAction) changed references
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	(ExecuteAppletAction) changed references
+
 2014-02-28  Andrew Azores  <aazores@redhat.com>
 
 	Added "Sandbox" button to CertWarning dialogs, allowing signed applets

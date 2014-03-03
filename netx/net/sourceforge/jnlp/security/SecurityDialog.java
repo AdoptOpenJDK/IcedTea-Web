@@ -308,7 +308,7 @@ public class SecurityDialog extends JDialog {
         else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
             panel = new NotAllSignedWarningPane(this);
         else if (dialogType == DialogType.UNSIGNED_WARNING) // Only necessary for applets on 'high security' or above
-            panel = new UnsignedAppletTrustWarningDialog(this, (PluginBridge)file);
+            panel = new UnsignedAppletTrustWarningDialog(this, file);
         else if (dialogType == DialogType.AUTHENTICATION)
             panel = new PasswordAuthenticationPane(this, extras);
 

@@ -37,7 +37,7 @@ package net.sourceforge.jnlp.security.appletextendedsecurity;
 
 import net.sourceforge.jnlp.runtime.Translator;
 
-public enum ExecuteUnsignedApplet {
+public enum ExecuteAppletAction {
 
     ALWAYS, NEVER, YES, NO;
 
@@ -69,15 +69,15 @@ public enum ExecuteUnsignedApplet {
         throw new RuntimeException("Unknown UnsignedAppletAction");
     }
 
-    public static ExecuteUnsignedApplet fromString(String s) {
+    public static ExecuteAppletAction fromString(String s) {
         if (s.startsWith("A")) {
-            return ExecuteUnsignedApplet.ALWAYS;
+            return ExecuteAppletAction.ALWAYS;
         } else if (s.startsWith("N")) {
-            return ExecuteUnsignedApplet.NEVER;
+            return ExecuteAppletAction.NEVER;
         } else if (s.startsWith("y")) {
-            return ExecuteUnsignedApplet.YES;
+            return ExecuteAppletAction.YES;
         } else if (s.startsWith("n")) {
-            return ExecuteUnsignedApplet.NO;
+            return ExecuteAppletAction.NO;
         } else {
             throw new RuntimeException("Unknown ExecuteUnsignedApplet for " + s);
         }

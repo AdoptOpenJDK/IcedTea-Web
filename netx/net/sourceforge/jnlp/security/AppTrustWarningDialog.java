@@ -42,22 +42,27 @@ import net.sourceforge.jnlp.security.AppTrustWarningPanel.AppSigningWarningActio
 
 /**
  * A panel that confirms that the user is OK with unsigned code running.
- * 
  */
-public class UnsignedAppletTrustWarningDialog extends SecurityDialogPanel {
+public class AppTrustWarningDialog extends SecurityDialogPanel {
 
-    public UnsignedAppletTrustWarningDialog(SecurityDialog x, JNLPFile file) {
-        super(x);
+    private AppTrustWarningDialog(final SecurityDialog dialog) {
+        super(dialog);
+    }
 
-        add(new UnsignedAppletTrustWarningPanel(file,
-                new ActionChoiceListener() {
-                    @Override
-                    public void actionChosen(AppSigningWarningAction action) {
-                        parent.setValue(action);
-                        parent.dispose();
-                    }
-                })
-        );
+    public static AppTrustWarningDialog unsigned(final SecurityDialog dialog, final JNLPFile file) {
+        final AppTrustWarningDialog warningDialog = new AppTrustWarningDialog(dialog);
+        warningDialog.add(new UnsignedAppletTrustWarningPanel(file, warningDialog.getActionChoiceListener()));
+        return warningDialog;
+    }
+
+    private ActionChoiceListener getActionChoiceListener() {
+        return new ActionChoiceListener() {
+            @Override
+            public void actionChosen(final AppSigningWarningAction action) {
+                parent.setValue(action);
+                parent.dispose();
+            }
+        };
     }
 
 }

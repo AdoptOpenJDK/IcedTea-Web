@@ -37,9 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import net.sourceforge.jnlp.security.UnsignedAppletTrustWarningPanel.UnsignedWarningAction;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
-
 import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -54,6 +51,8 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.AppTrustWarningPanel.AppSigningWarningAction;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 
 /**
  * <p>
@@ -186,10 +185,10 @@ public class SecurityDialogs {
      *
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static UnsignedWarningAction showUnsignedWarningDialog(JNLPFile file) {
+    public static AppSigningWarningAction showUnsignedWarningDialog(JNLPFile file) {
 
         if (!shouldPromptUser()) {
-            return new UnsignedWarningAction(ExecuteUnsignedApplet.NO, false);
+            return new AppSigningWarningAction(ExecuteAppletAction.NO, false);
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
@@ -197,7 +196,7 @@ public class SecurityDialogs {
         message.accessType = AccessType.UNSIGNED;
         message.file = file;
 
-        return (UnsignedWarningAction)getUserResponse(message);
+        return (AppSigningWarningAction) getUserResponse(message);
     }
 
     /**

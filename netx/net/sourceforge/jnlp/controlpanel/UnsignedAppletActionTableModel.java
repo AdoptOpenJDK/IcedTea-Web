@@ -39,7 +39,7 @@ import java.util.Date;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
 import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageExtendedImpl;
@@ -75,7 +75,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == 0) {
-            return ExecuteUnsignedApplet.class;
+            return ExecuteAppletAction.class;
         }
         if (columnIndex == 1) {
             return Date.class;
@@ -145,7 +145,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
         int i = getRowCount()-1;
         String s = "\\Qhttp://localhost:80/\\E.*";
         back.add(new UnsignedAppletActionEntry(
-                ExecuteUnsignedApplet.NEVER,
+                ExecuteAppletAction.NEVER,
                 new Date(),
                 new UrlRegEx(s),
                 new UrlRegEx(s),
@@ -174,7 +174,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
         fireTableRowsDeleted(0, i);
     }
 
-    void removeByBehaviour(ExecuteUnsignedApplet unsignedAppletAction) {
+    void removeByBehaviour(ExecuteAppletAction unsignedAppletAction) {
         int i = getRowCount()-1;
         if (i<0){
             return;

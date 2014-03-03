@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 Red Hat, Inc.
+/* Copyright (C) 2014 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -32,271 +32,63 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
- */
+*/
 
 package net.sourceforge.jnlp.security;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.SwingConstants;
-
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.sourceforge.jnlp.util.ScreenFinder;
 
-public class UnsignedAppletTrustWarningPanel extends JPanel {
 
-    /*
-     * Details of decided action.
-     */
-    public static class UnsignedWarningAction {
-        private ExecuteUnsignedApplet action;
-        private boolean applyToCodeBase;
+public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
-        public UnsignedWarningAction(ExecuteUnsignedApplet action,
-                boolean applyToCodeBase) {
-            this.action = action;
-            this.applyToCodeBase = applyToCodeBase;
-        }
-
-        public ExecuteUnsignedApplet getAction() {
-            return action;
-        }
-        public boolean rememberForCodeBase() {
-            return applyToCodeBase;
-        }
-    }
-
-    /*
-     * Callback for when action is decided.
-     */
-    public static interface ActionChoiceListener {
-        void actionChosen(UnsignedWarningAction action);
-    }
-
-    private final int PANE_WIDTH = 500;
-
-    private final int TOP_PANEL_HEIGHT = 60;
-    private final int INFO_PANEL_HEIGHT = 140;
-    private final int INFO_PANEL_HINT_HEIGHT = 25;
-    private final int QUESTION_PANEL_HEIGHT = 35;
-
-    private JButton allowButton;
-    private JButton rejectButton;
-    private JButton helpButton;
-    private JCheckBox permanencyCheckBox;
-    private JRadioButton applyToAppletButton;
-    private JRadioButton applyToCodeBaseButton;
-
-    private PluginBridge file;
-
-    private ActionChoiceListener actionChoiceListener;
-
-    public UnsignedAppletTrustWarningPanel(PluginBridge file, ActionChoiceListener actionChoiceListener) {
-
-        this.file = file;
-        this.actionChoiceListener = actionChoiceListener;
-
+    public UnsignedAppletTrustWarningPanel(final JNLPFile file, final ActionChoiceListener listener) {
+        super(file, listener);
         addComponents();
     }
-    
-    public JButton getAllowButton() {
-        return allowButton;
-    }
 
-    public JButton getRejectButton() {
-        return rejectButton;
-    }
-
-    private String htmlWrap(String text) {
-        return "<html>" + text + "</html>";
-    }
-
-    private ImageIcon infoImage() {
+    @Override
+    protected ImageIcon getInfoImage() {
         final String location = "net/sourceforge/jnlp/resources/info-small.png";
-        final ClassLoader appLoader = new sun.misc.Launcher().getClassLoader();
-        return new ImageIcon(appLoader.getResource(location));
+        return new ImageIcon(ClassLoader.getSystemClassLoader().getResource(location));
     }
 
-    private void setupTopPanel() {
-        final String topLabelText = R("SUnsignedSummary");
-
-        JLabel topLabel = new JLabel(htmlWrap(topLabelText), infoImage(),
-                SwingConstants.LEFT);
-        topLabel.setFont(new Font(topLabel.getFont().toString(), Font.BOLD, 12));
-
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
-        topPanel.add(topLabel, BorderLayout.CENTER);
-        topPanel.setPreferredSize(new Dimension(PANE_WIDTH, TOP_PANEL_HEIGHT));
-        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        add(topPanel);
+    protected static String getTopPanelTextKey() {
+        return "SUnsignedSummary";
     }
 
-    private void setupInfoPanel() {
-        String infoLabelText = R("SUnsignedDetail", file.getCodeBase(), file.getSourceLocation());
-        ExecuteUnsignedApplet rememberedAction = UnsignedAppletTrustConfirmation.getStoredAction(file);
-        int panelHeight = INFO_PANEL_HEIGHT;
-        if (rememberedAction == ExecuteUnsignedApplet.YES) {
-            infoLabelText += "<br/>" + R("SUnsignedAllowedBefore");
-            panelHeight += INFO_PANEL_HINT_HEIGHT;
-        } else if (rememberedAction == ExecuteUnsignedApplet.NO) {
-            infoLabelText += "<br/>" + R("SUnsignedRejectedBefore");
-            panelHeight += INFO_PANEL_HINT_HEIGHT;
+    protected static String getInfoPanelTextKey() {
+        return "SUnsignedDetail";
+    }
+
+    protected static String getQuestionPanelTextKey() {
+        return "SUnsignedQuestion";
+    }
+
+    @Override
+    protected String getTopPanelText() {
+        return htmlWrap(R(getTopPanelTextKey()));
+    }
+
+    @Override
+    protected String getInfoPanelText() {
+        String text = R(getInfoPanelTextKey(), file.getCodeBase(), file.getSourceLocation());
+        ExecuteAppletAction rememberedAction = UnsignedAppletTrustConfirmation.getStoredAction(file);
+        if (rememberedAction == ExecuteAppletAction.YES) {
+            text += "<br>" + R("SUnsignedAllowedBefore");
+        } else if (rememberedAction == ExecuteAppletAction.NO) {
+            text += "<br>" + R("SUnsignedRejectedBefore");
         }
-
-        JLabel infoLabel = new JLabel(htmlWrap(infoLabelText));
-        JPanel infoPanel = new JPanel(new BorderLayout());
-        infoPanel.add(infoLabel, BorderLayout.CENTER);
-        infoPanel.setPreferredSize(new Dimension(PANE_WIDTH, panelHeight));
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        add(infoPanel);
+        return htmlWrap(text);
     }
 
-    private void setupQuestionsPanel() {
-        JPanel questionPanel = new JPanel(new BorderLayout());
-
-        questionPanel.add(new JLabel(htmlWrap(R("SUnsignedQuestion"))), BorderLayout.EAST);
-
-        questionPanel.setPreferredSize(new Dimension(PANE_WIDTH, QUESTION_PANEL_HEIGHT));
-        questionPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-
-        add(questionPanel);
+    @Override
+    protected String getQuestionPanelText() {
+        return htmlWrap(R(getQuestionPanelTextKey()));
     }
 
-    private JPanel createMatchOptionsPanel() {
-        JPanel matchOptionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-        ButtonGroup group = new ButtonGroup();
-        applyToAppletButton = new JRadioButton(R("SRememberAppletOnly"));
-        applyToAppletButton.setSelected(true);
-        applyToAppletButton.setEnabled(false); // Start disabled until 'Remember this option' is selected
-
-        applyToCodeBaseButton = new JRadioButton(htmlWrap(R("SRememberCodebase", file.getCodeBase())));
-        applyToCodeBaseButton.setEnabled(false);
-
-        group.add(applyToAppletButton);
-        group.add(applyToCodeBaseButton);
-
-        matchOptionsPanel.add(applyToAppletButton);
-        matchOptionsPanel.add(applyToCodeBaseButton);
-
-        return matchOptionsPanel;
-    }
-
-    private JPanel createCheckBoxPanel() {
-        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-        permanencyCheckBox = new JCheckBox(htmlWrap(R("SRememberOption")));
-        permanencyCheckBox.addActionListener(permanencyListener());
-        checkBoxPanel.add(permanencyCheckBox);
-
-        return checkBoxPanel;
-    }
-
-    private JPanel createButtonPanel() {
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-        allowButton = new JButton(R("ButProceed"));
-        rejectButton = new JButton(R("ButCancel"));
-        helpButton = new JButton(R("APPEXTSECguiPanelHelpButton"));
-
-        allowButton.addActionListener(chosenActionSetter(true));
-        rejectButton.addActionListener(chosenActionSetter(false));
-
-        helpButton.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                JDialog d = new ExtendedAppletSecurityHelp(null, false,"dialogue");
-                ScreenFinder.centerWindowsToCurrentScreen(d);
-                d.setVisible(true);
-            }
-        });
-
-        buttonPanel.add(allowButton);
-        buttonPanel.add(rejectButton);
-        buttonPanel.add(helpButton);
-
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-
-        return buttonPanel;
-    }
-
-    // Set up 'Remember Option' checkbox & Proceed/Cancel buttons
-    private void setupButtonAndCheckBoxPanel() {
-        JPanel outerPanel = new JPanel(new BorderLayout());
-        JPanel rememberPanel = new JPanel(new GridLayout(2 /*rows*/, 1 /*column*/));
-        rememberPanel.add(createCheckBoxPanel());
-        rememberPanel.add(createMatchOptionsPanel());
-        rememberPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        outerPanel.add(rememberPanel, BorderLayout.WEST);
-        outerPanel.add(createButtonPanel(), BorderLayout.EAST);
-
-        add(outerPanel);
-    }
-
-    /**
-     * Creates the actual GUI components, and adds it to this panel
-     */
-    private void addComponents() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        setupTopPanel();
-        setupInfoPanel();
-        setupQuestionsPanel();
-        setupButtonAndCheckBoxPanel();
-    }
-
-    // Toggles whether 'match applet' or 'match codebase' options are greyed out
-    private ActionListener permanencyListener() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                applyToAppletButton.setEnabled(permanencyCheckBox.isSelected());
-                applyToCodeBaseButton.setEnabled(permanencyCheckBox.isSelected());
-            }
-        };
-    }
-    // Sets action depending on allowApplet + checkbox state
-    private ActionListener chosenActionSetter(final boolean allowApplet) {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ExecuteUnsignedApplet action;
-
-                if (allowApplet) {
-                    action = permanencyCheckBox.isSelected() ? ExecuteUnsignedApplet.ALWAYS : ExecuteUnsignedApplet.YES;
-                } else {
-                    action = permanencyCheckBox.isSelected() ? ExecuteUnsignedApplet.NEVER : ExecuteUnsignedApplet.NO;
-                }
-
-                boolean applyToCodeBase = applyToCodeBaseButton.isSelected();
-                actionChoiceListener.actionChosen(new UnsignedWarningAction(action, applyToCodeBase));
-            }
-        };
-    }
 }

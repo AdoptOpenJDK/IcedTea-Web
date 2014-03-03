@@ -75,7 +75,7 @@ import javax.swing.table.TableRowSorter;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
@@ -520,16 +520,16 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
             removeSelectedFromTable(currentTable);
         }
         if (deleteTypeComboBox.getSelectedIndex() == 1) {
-            removeByBehaviour(ExecuteUnsignedApplet.ALWAYS);
+            removeByBehaviour(ExecuteAppletAction.ALWAYS);
         }
         if (deleteTypeComboBox.getSelectedIndex() == 2) {
-            removeByBehaviour(ExecuteUnsignedApplet.NEVER);
+            removeByBehaviour(ExecuteAppletAction.NEVER);
         }
         if (deleteTypeComboBox.getSelectedIndex() == 3) {
-            removeByBehaviour(ExecuteUnsignedApplet.YES);
+            removeByBehaviour(ExecuteAppletAction.YES);
         }
         if (deleteTypeComboBox.getSelectedIndex() == 4) {
-            removeByBehaviour(ExecuteUnsignedApplet.NO);
+            removeByBehaviour(ExecuteAppletAction.NO);
         }
         if (deleteTypeComboBox.getSelectedIndex() == 5) {
             removeAllItemsFromTable(currentTable, customModel);
@@ -701,7 +701,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
             public TableCellEditor getCellEditor(int row, int column) {
                 int columnx = convertColumnIndexToModel(column);
                 if (columnx == 0) {
-                    return new DefaultCellEditor(new JComboBox(new ExecuteUnsignedApplet[]{ExecuteUnsignedApplet.ALWAYS, ExecuteUnsignedApplet.NEVER, ExecuteUnsignedApplet.YES, ExecuteUnsignedApplet.NO}));
+                    return new DefaultCellEditor(new JComboBox(new ExecuteAppletAction[]{ExecuteAppletAction.ALWAYS, ExecuteAppletAction.NEVER, ExecuteAppletAction.YES, ExecuteAppletAction.NO}));
                 }
                 if (columnx == 2) {
                     column = convertColumnIndexToModel(column);
@@ -758,7 +758,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
     }
 
-    private void removeByBehaviour(ExecuteUnsignedApplet unsignedAppletAction) {
+    private void removeByBehaviour(ExecuteAppletAction unsignedAppletAction) {
         UnsignedAppletActionEntry[] items = currentModel.back.toArray();
         if (askBeforeActionCheckBox.isSelected()) {
             List<UnsignedAppletActionEntry> toBeDeleted = new ArrayList<UnsignedAppletActionEntry>();
@@ -904,16 +904,16 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteUnsignedApplet o = (ExecuteUnsignedApplet) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteUnsignedApplet.ALWAYS) || o.equals(ExecuteUnsignedApplet.NEVER));
+                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                return (o.equals(ExecuteAppletAction.ALWAYS) || o.equals(ExecuteAppletAction.NEVER));
             }
         }
 
         private static final class ShowPermanentA extends MyCommonSorter {
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteUnsignedApplet o = (ExecuteUnsignedApplet) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteUnsignedApplet.ALWAYS));
+                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                return (o.equals(ExecuteAppletAction.ALWAYS));
             }
         }
 
@@ -921,8 +921,8 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteUnsignedApplet o = (ExecuteUnsignedApplet) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteUnsignedApplet.NEVER));
+                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                return (o.equals(ExecuteAppletAction.NEVER));
             }
         }
 
@@ -930,8 +930,8 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteUnsignedApplet o = (ExecuteUnsignedApplet) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteUnsignedApplet.YES) || o.equals(ExecuteUnsignedApplet.NO));
+                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                return (o.equals(ExecuteAppletAction.YES) || o.equals(ExecuteAppletAction.NO));
             }
         }
 
@@ -939,8 +939,8 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteUnsignedApplet o = (ExecuteUnsignedApplet) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteUnsignedApplet.YES));
+                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                return (o.equals(ExecuteAppletAction.YES));
             }
            
             
@@ -950,8 +950,8 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteUnsignedApplet o = (ExecuteUnsignedApplet) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteUnsignedApplet.NO));
+                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                return (o.equals(ExecuteAppletAction.NO));
             }
             
         }

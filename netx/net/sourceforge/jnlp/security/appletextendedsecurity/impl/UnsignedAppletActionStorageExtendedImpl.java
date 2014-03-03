@@ -38,7 +38,7 @@ package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteUnsignedApplet;
+import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
@@ -78,7 +78,7 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
         });
     }
 
-    public void removeByBehaviour(final ExecuteUnsignedApplet unsignedAppletAction) {
+    public void removeByBehaviour(final ExecuteAppletAction unsignedAppletAction) {
         doLocked(new Runnable() {
             public void run() {
                 try {
@@ -156,7 +156,7 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
                     }
 
                     if (columnIndex == 0) {
-                        source.setUnsignedAppletAction((ExecuteUnsignedApplet) aValue);
+                        source.setUnsignedAppletAction((ExecuteAppletAction) aValue);
                     }
                     if (columnIndex == 1) {
                         source.setTimeStamp((Date) aValue);

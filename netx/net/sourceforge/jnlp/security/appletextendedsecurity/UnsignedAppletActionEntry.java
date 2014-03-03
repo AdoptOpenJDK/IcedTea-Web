@@ -43,7 +43,7 @@ import java.util.List;
 
 public class UnsignedAppletActionEntry {
 
-    private ExecuteUnsignedApplet unsignedAppletAction;
+    private ExecuteAppletAction unsignedAppletAction;
     private Date timeStamp;
     private UrlRegEx documentBase;
     private UrlRegEx codeBase;
@@ -52,7 +52,7 @@ public class UnsignedAppletActionEntry {
     public static UnsignedAppletActionEntry createFromString(String s) {
         String[] split = s.split("\\s+");
         UnsignedAppletActionEntry nw = new UnsignedAppletActionEntry(
-                ExecuteUnsignedApplet.fromString(split[0]),
+                ExecuteAppletAction.fromString(split[0]),
                 new Date(new Long(split[1])),
                 new UrlRegEx(split[2]),
                 null,
@@ -66,7 +66,7 @@ public class UnsignedAppletActionEntry {
         return nw;
     }
 
-    public UnsignedAppletActionEntry(ExecuteUnsignedApplet unsignedAppletAction, Date timeStamp, UrlRegEx documentBase, UrlRegEx codeBase, List<String> archives) {
+    public UnsignedAppletActionEntry(ExecuteAppletAction unsignedAppletAction, Date timeStamp, UrlRegEx documentBase, UrlRegEx codeBase, List<String> archives) {
         this.unsignedAppletAction = unsignedAppletAction;
         this.timeStamp = timeStamp;
         this.documentBase = documentBase;
@@ -109,11 +109,11 @@ public class UnsignedAppletActionEntry {
         this.documentBase = documentBase;
     }
 
-    public ExecuteUnsignedApplet getUnsignedAppletAction() {
+    public ExecuteAppletAction getUnsignedAppletAction() {
         return unsignedAppletAction;
     }
 
-    public void setUnsignedAppletAction(ExecuteUnsignedApplet unsignedAppletAction) {
+    public void setUnsignedAppletAction(ExecuteAppletAction unsignedAppletAction) {
         this.unsignedAppletAction = unsignedAppletAction;
     }
 
