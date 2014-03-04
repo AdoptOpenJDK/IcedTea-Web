@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.UIManager;
+
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
@@ -161,6 +163,11 @@ public final class Boot implements PrivilegedAction<Void> {
             if (null != getOption("-headless")) {
                 JNLPRuntime.exit(0);
             } else {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception e) {
+                    OutputController.getLogger().log("Unable to set system look and feel");
+                }
                 OutputController.getLogger().printOutLn(R("BLaunchAbout"));
                 AboutDialog.display();
                 return;

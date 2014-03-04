@@ -917,11 +917,6 @@ public class PolicyEditor extends JFrame {
     }
 
     public static PolicyEditor createInstance(final String filepath) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (final Exception e) {
-            // not really important, so just ignore
-        }
         return new PolicyEditor(filepath);
     }
 

@@ -195,6 +195,12 @@ public class JNLPRuntime {
     public static void initialize(boolean isApplication) throws IllegalStateException {
         checkInitialized();
 
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            OutputController.getLogger().log("Unable to set system look and feel");
+        }
+
         if (JavaConsole.canShowOnStartup(isApplication)) {
             JavaConsole.getConsole().showConsoleLater();
         }
@@ -235,12 +241,6 @@ public class JNLPRuntime {
 
         policy = new JNLPPolicy();
         security = new JNLPSecurityManager(); // side effect: create JWindow
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-        }
 
         doMainAppContextHacks();
 

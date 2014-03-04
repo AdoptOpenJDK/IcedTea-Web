@@ -1,5 +1,23 @@
 2014-03-03  Omair Majid  <omajid@redhat.com>
 
+	PR857
+	* netx/net/sourceforge/jnlp/about/AboutDialog.java
+	(run): Do not set look and feel.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java
+	(main) <about>: Set look and feel before displaying dialog.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
+	(initialize): Set look and feel before any UI is created.
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java
+	(init): Do not set look and feel.
+	(setSystemLookAndFeel): Removed.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(createInstance): Do not set look and feel.
+	* netx/net/sourceforge/jnlp/security/viewer/CertificateViewer.java
+	(showCertificateViewer): Do not set look and feel.
+	(setSystemLookAndFeel): Removed.
+
+2014-03-03  Omair Majid  <omajid@redhat.com>
+
 	PR1676
 	* netx/net/sourceforge/jnlp/SecurityDesc.java: Add permission to
 	read/write useLegacyMergeSort.

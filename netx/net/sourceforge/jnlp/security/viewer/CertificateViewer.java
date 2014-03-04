@@ -100,21 +100,12 @@ public class CertificateViewer extends JDialog {
 
     public static void showCertificateViewer() throws Exception {
         JNLPRuntime.initialize(true);
-        setSystemLookAndFeel();
 
         CertificateViewer cv = new CertificateViewer();
         cv.setResizable(true);
         cv.centerDialog();
         cv.setVisible(true);
         cv.dispose();
-    }
-
-    private static void setSystemLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // don't worry if we can't.
-        }
     }
 
     public static void main(String[] args) throws Exception {

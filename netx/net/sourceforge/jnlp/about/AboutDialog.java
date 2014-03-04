@@ -175,11 +175,6 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
 
     @Override
     public void run() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-        }
-
         layoutWindow();
         ScreenFinder.centerWindowsToCurrentScreen(frame);
         frame.setVisible(true);

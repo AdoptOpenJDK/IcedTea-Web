@@ -216,8 +216,6 @@ public class SecurityDialog extends JDialog {
     }
 
     private void initDialog() {
-        setSystemLookAndFeel();
-
         String dialogTitle = "";
         if (dialogType == DialogType.CERT_WARNING) {
             if (accessType == AccessType.VERIFIED)
@@ -344,17 +342,6 @@ public class SecurityDialog extends JDialog {
     public void dispose() {
         notifySelectionMade();
         super.dispose();
-    }
-
-    /**
-     * Updates the look and feel of the window to be the system look and feel
-     */
-    protected void setSystemLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            //don't worry if we can't.
-        }
     }
 
     private final List<ActionListener> listeners = new CopyOnWriteArrayList<ActionListener>();
