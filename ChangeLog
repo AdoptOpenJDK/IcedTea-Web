@@ -1,3 +1,13 @@
+2014-03-04  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(SAppletTitle) new message
+	* netx/net/sourceforge/jnlp/security/AppTrustWarningPanel.java:
+	(buttons) new list of UI buttons. (getAllowButton, getRejectButton,
+	addComponents) made final.
+	(createButtonPanel) uses list of buttons rather than hardcoded.
+	(helpButton) action made configurable.
+
 2014-03-03  Omair Majid  <omajid@redhat.com>
 
 	PR857

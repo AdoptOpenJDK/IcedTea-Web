@@ -46,6 +46,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -60,7 +62,6 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.util.ScreenFinder;
@@ -111,16 +112,17 @@ public abstract class AppTrustWarningPanel extends JPanel {
     protected int INFO_PANEL_HINT_HEIGHT = 25;
     protected int QUESTION_PANEL_HEIGHT = 35;
 
-    private JButton allowButton;
-    private JButton rejectButton;
-    private JButton helpButton;
-    private JCheckBox permanencyCheckBox;
-    private JRadioButton applyToAppletButton;
-    private JRadioButton applyToCodeBaseButton;
+    protected List<JButton> buttons;
+    protected JButton allowButton;
+    protected JButton rejectButton;
+    protected JButton helpButton;
+    protected JCheckBox permanencyCheckBox;
+    protected JRadioButton applyToAppletButton;
+    protected JRadioButton applyToCodeBaseButton;
 
     protected JNLPFile file;
 
-    private ActionChoiceListener actionChoiceListener;
+    protected ActionChoiceListener actionChoiceListener;
 
     /*
      * Subclasses should call addComponents() IMMEDIATELY after calling the super() constructor!
@@ -128,6 +130,20 @@ public abstract class AppTrustWarningPanel extends JPanel {
     public AppTrustWarningPanel(JNLPFile file, ActionChoiceListener actionChoiceListener) {
         this.file = file;
         this.actionChoiceListener = actionChoiceListener;
+        this.buttons = new ArrayList<JButton>();
+
+        allowButton = new JButton(R("ButProceed"));
+        rejectButton = new JButton(R("ButCancel"));
+        helpButton = new JButton(R("APPEXTSECguiPanelHelpButton"));
+
+        allowButton.addActionListener(chosenActionSetter(true));
+        rejectButton.addActionListener(chosenActionSetter(false));
+
+        helpButton.addActionListener(getHelpButtonAction());
+
+        buttons.add(allowButton);
+        buttons.add(rejectButton);
+        buttons.add(helpButton);
     }
 
     /*
@@ -151,15 +167,26 @@ public abstract class AppTrustWarningPanel extends JPanel {
      */
     protected abstract String getQuestionPanelText();
 
-    public JButton getAllowButton() {
+    public final JButton getAllowButton() {
         return allowButton;
     }
 
-    public JButton getRejectButton() {
+    public final JButton getRejectButton() {
         return rejectButton;
     }
 
-    protected static String htmlWrap(String text) {
+    protected ActionListener getHelpButtonAction() {
+        return new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new ExtendedAppletSecurityHelp(null, false, "dialogue");
+                ScreenFinder.centerWindowsToCurrentScreen(d);
+                d.setVisible(true);
+            }
+        };
+    }
+
+    protected static final String htmlWrap(String text) {
         return "<html>" + text + "</html>";
     }
 
@@ -180,11 +207,16 @@ public abstract class AppTrustWarningPanel extends JPanel {
     }
 
     private void setupInfoPanel() {
-        String infoLabelText = getInfoPanelText();
-        int panelHeight = INFO_PANEL_HEIGHT + INFO_PANEL_HINT_HEIGHT;
+        String titleText = R("SAppletTitle", file.getTitle());
+        JLabel titleLabel = new JLabel(titleText);
+        titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.BOLD, 18));
 
+        String infoLabelText = getInfoPanelText();
         JLabel infoLabel = new JLabel(infoLabelText);
+
+        int panelHeight = titleLabel.getHeight() + INFO_PANEL_HEIGHT + INFO_PANEL_HINT_HEIGHT;
         JPanel infoPanel = new JPanel(new BorderLayout());
+        infoPanel.add(titleLabel, BorderLayout.PAGE_START);
         infoPanel.add(infoLabel, BorderLayout.CENTER);
         infoPanel.setPreferredSize(new Dimension(PANE_WIDTH, panelHeight));
         infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -237,25 +269,9 @@ public abstract class AppTrustWarningPanel extends JPanel {
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        allowButton = new JButton(R("ButProceed"));
-        rejectButton = new JButton(R("ButCancel"));
-        helpButton = new JButton(R("APPEXTSECguiPanelHelpButton"));
-
-        allowButton.addActionListener(chosenActionSetter(true));
-        rejectButton.addActionListener(chosenActionSetter(false));
-
-        helpButton.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                JDialog d = new ExtendedAppletSecurityHelp(null, false, "dialogue");
-                ScreenFinder.centerWindowsToCurrentScreen(d);
-                d.setVisible(true);
-            }
-        });
-
-        buttonPanel.add(allowButton);
-        buttonPanel.add(rejectButton);
-        buttonPanel.add(helpButton);
+        for (final JButton button : buttons) {
+            buttonPanel.add(button);
+        }
 
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
@@ -280,7 +296,7 @@ public abstract class AppTrustWarningPanel extends JPanel {
      * Creates the actual GUI components, and adds it to this panel. This should be called by all subclasses
      * IMMEDIATELY after calling the super() constructor!
      */
-    protected void addComponents() {
+    protected final void addComponents() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         setupTopPanel();
