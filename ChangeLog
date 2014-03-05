@@ -1,3 +1,7 @@
+2014-03-05  Matthias Klose  <doko@ubuntu.com>
+
+	* launcher/launchers.in: Use bash as shebang.
+
 2014-03-04  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
