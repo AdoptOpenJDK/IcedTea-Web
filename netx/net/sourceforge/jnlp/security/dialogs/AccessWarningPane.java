@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -58,6 +58,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.util.FileUtils;
 
@@ -202,6 +204,7 @@ public class AccessWarningPane extends SecurityDialogPanel {
     }
 
     private class CheckBoxListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (alwaysAllow != null && alwaysAllow.isSelected()) {
                 // TODO: somehow tell the ApplicationInstance

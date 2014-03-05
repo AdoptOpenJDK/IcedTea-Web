@@ -48,7 +48,7 @@ import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.security.AppTrustWarningPanel.AppSigningWarningAction;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.util.UrlUtils;

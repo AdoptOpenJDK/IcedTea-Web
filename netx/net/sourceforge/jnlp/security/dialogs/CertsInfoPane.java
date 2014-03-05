@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -55,6 +55,9 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.SecurityUtil;
 
 /**
  * Provides the panel for the Certificate Info dialog. This dialog displays data from

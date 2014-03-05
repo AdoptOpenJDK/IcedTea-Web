@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -65,9 +65,15 @@ import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.CertificateUtils;
+import net.sourceforge.jnlp.security.HttpsCertVerifier;
+import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
+import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 

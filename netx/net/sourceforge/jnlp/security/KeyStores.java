@@ -86,7 +86,7 @@ public final class KeyStores {
     /** the default password used to protect the KeyStores */
     private static final String DEFAULT_PASSWORD = "changeit";
 
-    public static final char[] getPassword() {
+    public static char[] getPassword() {
         return DEFAULT_PASSWORD.toCharArray();
     }
 

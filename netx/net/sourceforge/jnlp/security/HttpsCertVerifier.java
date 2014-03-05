@@ -77,6 +77,7 @@ public class HttpsCertVerifier implements CertVerifier {
         this.hostMatched = hostMatched;
     }
 
+    @Override
     public boolean getAlreadyTrustPublisher() {
         return isTrusted;
     }

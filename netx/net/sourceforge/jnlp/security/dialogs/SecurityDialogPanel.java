@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -43,6 +43,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityDialog;
 
 /**
  * Provides a JPanel for use in JNLP warning dialogs.

@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -52,6 +52,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import net.sourceforge.jnlp.security.SecurityDialog;
 
 public class NotAllSignedWarningPane extends SecurityDialogPanel {
 

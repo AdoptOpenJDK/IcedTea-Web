@@ -44,7 +44,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import sun.awt.AppContext;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**

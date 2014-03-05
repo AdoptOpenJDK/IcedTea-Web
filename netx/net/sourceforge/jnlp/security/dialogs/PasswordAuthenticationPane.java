@@ -35,7 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -50,6 +50,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import net.sourceforge.jnlp.security.SecurityDialog;
 
 /**
  * Modal non-minimizable dialog to request http authentication credentials
@@ -156,6 +157,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
         initialFocusComponent = jtfUserName;
 
         ActionListener acceptActionListener = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 parent.setValue(new Object[] { jtfUserName.getText(), jpfPassword.getPassword() });
                 parent.dispose();
@@ -163,6 +165,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
         };
 
         ActionListener cancelActionListener = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 parent.setValue(null);
                 parent.dispose();

@@ -34,7 +34,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import java.awt.BorderLayout;
 import java.net.URL;

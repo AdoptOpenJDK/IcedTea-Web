@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -48,6 +48,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityDialog;
 
 public class AppletWarningPane extends SecurityDialogPanel {
 

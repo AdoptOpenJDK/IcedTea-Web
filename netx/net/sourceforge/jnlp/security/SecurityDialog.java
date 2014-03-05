@@ -37,9 +37,17 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
+import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
+import net.sourceforge.jnlp.security.dialogs.NotAllSignedWarningPane;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningDialog;
+import net.sourceforge.jnlp.security.dialogs.PasswordAuthenticationPane;
+import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
+import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
+import net.sourceforge.jnlp.security.dialogs.SingleCertInfoPane;
+import net.sourceforge.jnlp.security.dialogs.CertsInfoPane;
+import net.sourceforge.jnlp.security.dialogs.MoreInfoPane;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -324,7 +332,7 @@ public class SecurityDialog extends JDialog {
         panel.requestFocusOnDefaultButton();
     }
 
-    protected void setValue(Object value) {
+    public void setValue(Object value) {
         OutputController.getLogger().log("Setting value:" + value);
         this.value = value;
     }

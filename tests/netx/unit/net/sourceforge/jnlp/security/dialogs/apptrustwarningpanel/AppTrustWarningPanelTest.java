@@ -1,5 +1,7 @@
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;

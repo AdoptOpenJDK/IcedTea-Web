@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -43,6 +43,9 @@ import java.util.ArrayList;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.SecurityUtil;
 
 public class SingleCertInfoPane extends CertsInfoPane {
 
@@ -50,6 +53,7 @@ public class SingleCertInfoPane extends CertsInfoPane {
         super(x, certVerifier);
     }
 
+    @Override
     protected void buildTree() {
         X509Certificate cert = parent.getCert();
         String subjectString =
@@ -65,6 +69,7 @@ public class SingleCertInfoPane extends CertsInfoPane {
         tree.addTreeSelectionListener(new TreeSelectionHandler());
     }
 
+    @Override
     protected void populateTable() {
         X509Certificate c = parent.getCert();
         certNames = new String[1];

@@ -118,10 +118,10 @@ public class ClasspathMatcherTest {
         }
         Assert.assertNotNull(ex);
         //wrongly palced :// - is catched by hasProtocol
-        Assert.assertNotEquals("http", ClasspathMatcher.extractProtocol("httpsome.correct.url:5050://full/path"));
-        Assert.assertNotEquals("http", ClasspathMatcher.extractProtocol("httpsome.corr://ect.url:5050/full/path"));
-        Assert.assertNotEquals("http", ClasspathMatcher.extractProtocol("httpsome.corr://ect.url"));
-        Assert.assertNotEquals("http", ClasspathMatcher.extractProtocol("httpsome/ful://l/path"));
+        Assert.assertFalse("http".equals(ClasspathMatcher.extractProtocol("httpsome.correct.url:5050://full/path")));
+        Assert.assertFalse("http".equals(ClasspathMatcher.extractProtocol("httpsome.corr://ect.url:5050/full/path")));
+        Assert.assertFalse("http".equals(ClasspathMatcher.extractProtocol("httpsome.corr://ect.url")));
+        Assert.assertFalse("http".equals(ClasspathMatcher.extractProtocol("httpsome/ful://l/path")));
     }
 
     @Test
@@ -154,10 +154,10 @@ public class ClasspathMatcherTest {
         }
         Assert.assertNotNull(ex);
         //wrongly palced :// - is catched by hasProtocol
-        Assert.assertNotEquals("some.correct.url:5050://full/path", ClasspathMatcher.removeProtocol("httpsome.correct.url:5050://full/path"));
-        Assert.assertNotEquals("some.corr://ect.url:5050/full/path", ClasspathMatcher.removeProtocol("httpsome.corr://ect.url:5050/full/path"));
-        Assert.assertNotEquals("some.corr://ect.url", ClasspathMatcher.removeProtocol("httpsome.corr://ect.url"));
-        Assert.assertNotEquals("some/ful://l/path", ClasspathMatcher.removeProtocol("httpsome/ful://l/path"));
+        Assert.assertFalse("some.correct.url:5050://full/path".equals(ClasspathMatcher.removeProtocol("httpsome.correct.url:5050://full/path")));
+        Assert.assertFalse("some.corr://ect.url:5050/full/path".equals(ClasspathMatcher.removeProtocol("httpsome.corr://ect.url:5050/full/path")));
+        Assert.assertFalse("some.corr://ect.url".equals(ClasspathMatcher.removeProtocol("httpsome.corr://ect.url")));
+        Assert.assertFalse("some/ful://l/path".equals(ClasspathMatcher.removeProtocol("httpsome/ful://l/path")));
     }
 
     @Test

@@ -51,7 +51,7 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.AppTrustWarningPanel.AppSigningWarningAction;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 
 /**

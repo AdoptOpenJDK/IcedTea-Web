@@ -1,5 +1,45 @@
 2014-03-05  Jiri Vanek  <jvanek@redhat.com>
 
+	All security dialogs moved to appropriate package
+	* netx/net/sourceforge/jnlp/security/AccessWarningPane.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java:
+	* netx/net/sourceforge/jnlp/security/AppletWarningPane.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/AppletWarningPane.java:
+	* netx/net/sourceforge/jnlp/security/CertWarningPane.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java
+	* netx/net/sourceforge/jnlp/security/CertsInfoPane.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/CertsInfoPane.java:
+	* netx/net/sourceforge/jnlp/security/MoreInfoPane.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/MoreInfoPane.java:
+	* netx/net/sourceforge/jnlp/security/NotAllSignedWarningPane.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/NotAllSignedWarningPane.java:
+	* netx/net/sourceforge/jnlp/security/PasswordAuthenticationPane.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/PasswordAuthenticationPane.java:
+	* netx/net/sourceforge/jnlp/security/SecurityDialogPanel.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/SecurityDialogPanel.java:
+	* netx/net/sourceforge/jnlp/security/SingleCertInfoPane.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/SingleCertInfoPane.java:
+	* netx/net/sourceforge/jnlp/security/AppTrustWarningDialog.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
+	* netx/net/sourceforge/jnlp/security/AppTrustWarningPanel.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningDialog.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningDialog.java:
+	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningPanel.java: to
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
+	* tests/netx/unit/net/sourceforge/jnlp/security/AppTrustWarningPanelTest.java: to
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanelTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/util/ClasspathMatcherTest.java: necessary changes
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java: necessary changes
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: necessary changes
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessageHandler.java: necessary changes
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: necessary changes
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: necessary changes
+	* netx/net/sourceforge/jnlp/security/HttpsCertVerifier.java: necessary changes
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java: necessary changes
+
+2014-03-05  Jiri Vanek  <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/AppTrustWarningPanel.java: fixed
 	layout so buttons do not disappear under radioboxes.
 	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningPanel.java:

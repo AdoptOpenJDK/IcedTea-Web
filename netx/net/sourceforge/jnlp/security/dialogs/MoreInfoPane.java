@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -52,6 +52,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityDialog;
 
 /**
  * Provides the panel for the More Info dialog. This dialog shows details about an
@@ -117,6 +119,7 @@ public class MoreInfoPane extends SecurityDialogPanel {
     }
 
     private class CertInfoButtonListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             SecurityDialog.showCertInfoDialog(parent.getCertVerifier(),
                                 parent);

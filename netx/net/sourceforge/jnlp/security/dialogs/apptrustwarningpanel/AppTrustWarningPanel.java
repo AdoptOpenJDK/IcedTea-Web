@@ -34,7 +34,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp.security;
+package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -108,7 +108,7 @@ public abstract class AppTrustWarningPanel extends JPanel {
     protected int PANE_WIDTH = 500;
 
     protected int TOP_PANEL_HEIGHT = 60;
-    protected int INFO_PANEL_HEIGHT = 140;
+    protected int INFO_PANEL_HEIGHT = 160;
     protected int INFO_PANEL_HINT_HEIGHT = 25;
     protected int QUESTION_PANEL_HEIGHT = 35;
 
@@ -178,6 +178,7 @@ public abstract class AppTrustWarningPanel extends JPanel {
     protected ActionListener getHelpButtonAction() {
         return new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JDialog d = new ExtendedAppletSecurityHelp(null, false, "dialogue");
                 ScreenFinder.centerWindowsToCurrentScreen(d);
@@ -186,7 +187,7 @@ public abstract class AppTrustWarningPanel extends JPanel {
         };
     }
 
-    protected static final String htmlWrap(String text) {
+    protected static String htmlWrap(String text) {
         return "<html>" + text + "</html>";
     }
 
