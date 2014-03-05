@@ -1,5 +1,12 @@
 2014-03-05  Jiri Vanek  <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/security/AppTrustWarningPanel.java: fixed
+	layout so buttons do not disappear under radioboxes.
+	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningPanel.java:
+	added testable main method.	
+
+2014-03-05  Jiri Vanek  <jvanek@redhat.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/security/AppTrustWarningPanelTest.java:
 	removed unused imports
 	* tests/netx/unit/net/sourceforge/jnlp/util/ClasspathMatcherTest.java:

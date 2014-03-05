@@ -36,9 +36,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import java.awt.BorderLayout;
+import java.net.URL;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
@@ -89,6 +92,15 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
     @Override
     protected String getQuestionPanelText() {
         return htmlWrap(R(getQuestionPanelTextKey()));
+    }
+    
+    public static void main(String[] args) throws Exception {
+        UnsignedAppletTrustWarningPanel w = new UnsignedAppletTrustWarningPanel(new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")), null);
+        JFrame f = new JFrame();
+        f.setSize(600, 400);
+        f.add(w, BorderLayout.CENTER);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
     }
 
 }

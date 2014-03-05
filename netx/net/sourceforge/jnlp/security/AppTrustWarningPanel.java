@@ -237,7 +237,7 @@ public abstract class AppTrustWarningPanel extends JPanel {
     }
 
     private JPanel createMatchOptionsPanel() {
-        JPanel matchOptionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel matchOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         ButtonGroup group = new ButtonGroup();
         applyToAppletButton = new JRadioButton(R("SRememberAppletOnly"));
@@ -257,11 +257,12 @@ public abstract class AppTrustWarningPanel extends JPanel {
     }
 
     private JPanel createCheckBoxPanel() {
-        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel checkBoxPanel = new JPanel(new BorderLayout());
 
         permanencyCheckBox = new JCheckBox(htmlWrap(R("SRememberOption")));
         permanencyCheckBox.addActionListener(permanencyListener());
-        checkBoxPanel.add(permanencyCheckBox);
+        checkBoxPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0));
+        checkBoxPanel.add(permanencyCheckBox,  BorderLayout.SOUTH);
 
         return checkBoxPanel;
     }
@@ -282,11 +283,11 @@ public abstract class AppTrustWarningPanel extends JPanel {
     private void setupButtonAndCheckBoxPanel() {
         JPanel outerPanel = new JPanel(new BorderLayout());
         JPanel rememberPanel = new JPanel(new GridLayout(2 /*rows*/, 1 /*column*/));
-        rememberPanel.add(createCheckBoxPanel());
         rememberPanel.add(createMatchOptionsPanel());
-        rememberPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        rememberPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
-        outerPanel.add(rememberPanel, BorderLayout.WEST);
+        outerPanel.add(createCheckBoxPanel(), BorderLayout.WEST);
+        outerPanel.add(rememberPanel, BorderLayout.SOUTH);
         outerPanel.add(createButtonPanel(), BorderLayout.EAST);
 
         add(outerPanel);
