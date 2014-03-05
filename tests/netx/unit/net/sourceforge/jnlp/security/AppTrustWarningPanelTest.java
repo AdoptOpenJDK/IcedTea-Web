@@ -1,24 +1,17 @@
 package net.sourceforge.jnlp.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.JButton;
-
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
-import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

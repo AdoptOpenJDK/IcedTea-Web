@@ -556,4 +556,13 @@ public class ClasspathMatcherTest {
         Assert.assertFalse(cps2.matches(new URL("http://bb.cz")));
         
     }
+    
+    @Test
+    public void testStar() throws MalformedURLException {
+        ClasspathMatchers cps1  = ClasspathMatcher.ClasspathMatchers.compile("*");
+        Assert.assertTrue(cps1.matches(new URL("http://whatever.anywher/something/at.some")));
+        Assert.assertTrue(cps1.matches(new URL("http://whatever.anywher/something/at")));
+        Assert.assertTrue(cps1.matches(new URL("http://whatever.anywher/")));
+        Assert.assertTrue(cps1.matches(new URL("http://whatever.anywher")));
+    }
 }
