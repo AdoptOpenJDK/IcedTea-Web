@@ -1,3 +1,11 @@
+2014-03-06  Andrew Azores  <aazores@redhat.com>
+
+	* NEWS: added -version flag entry
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: (BOVersion)
+	new message for command line -version flag
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: (main) added "-version"
+	flag
+
 2014-03-05  Jiri Vanek  <jvanek@redhat.com>
 
 	All security dialogs moved to appropriate package

@@ -63,6 +63,8 @@ public final class Boot implements PrivilegedAction<Void> {
     public static final String name = Boot.class.getPackage().getImplementationTitle();
     public static final String version = Boot.class.getPackage().getImplementationVersion();
 
+    private static final String nameAndVersion = name + " " + version;
+
     private static final String miniLicense = "\n"
             + "   netx - an open-source JNLP client.\n"
             + "   Copyright (C) 2001-2003 Jon A. Maxwell (JAM)\n"
@@ -83,7 +85,7 @@ public final class Boot implements PrivilegedAction<Void> {
             + "\n";
 
     private static final String itwInfoMessage = ""
-            + name + " " + version
+            + nameAndVersion
             + "\n\n*  "
             + R("BAboutITW")
             + "\n*  "
@@ -102,6 +104,7 @@ public final class Boot implements PrivilegedAction<Void> {
             + "  -viewer               " + R("BOViewer") + "\n"
             + "\n"
             + "run-options:" + "\n"
+            + "  -version              " + R("BOVersion") + "\n"
             + "  -arg arg              " + R("BOArg") + "\n"
             + "  -param name=value     " + R("BOParam") + "\n"
             + "  -property name=value  " + R("BOProperty") + "\n"
@@ -138,14 +141,17 @@ public final class Boot implements PrivilegedAction<Void> {
         DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
 
         if (null != getOption("-viewer")) {
-
             try {
                 CertificateViewer.main(null);
                 JNLPRuntime.exit(0);
             } catch (Exception e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
+        }
 
+        if (null != getOption("-version")) {
+            OutputController.getLogger().printOutLn(nameAndVersion);
+            JNLPRuntime.exit(0);
         }
 
         if (null != getOption("-license")) {
