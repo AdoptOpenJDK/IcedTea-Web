@@ -1,5 +1,10 @@
 2014-03-10  Jiri Vanek  <jvanek@redhat.com>
 
+	Actualized man page for javaws
+	* netx/javaws.1: made sync with current state
+
+2014-03-10  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed rhbz#1072013
 	* netx/net/sourceforge/jnlp/PluginBridge.java: The (fileLocation) of
 	JNLPFile is now properly set in constructor if not existing.
