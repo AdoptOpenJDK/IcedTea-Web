@@ -1,5 +1,15 @@
 2014-03-10  Jiri Vanek  <jvanek@redhat.com>
 
+	Added getter for java-abrt-connector on demand whitelist of fields.
+	* netx/net/sourceforge/jnlp/Launcher.java: (launch) saving (location.toExternalForm())
+	via JNLPRuntime.saveHistory
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: (history) new static field
+	with getter (getHistory) and "setter" (saveHistory)
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: (handleInitializationMessage)
+	saving (documentBase) via JNLPRuntime.saveHistory
+
+2014-03-10  Jiri Vanek  <jvanek@redhat.com>
+
 	Actualized man page for javaws
 	* netx/javaws.1: made sync with current state
 

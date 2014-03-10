@@ -281,6 +281,7 @@ public class Launcher {
      * @return the application instance
      */
     public ApplicationInstance launch(URL location) throws LaunchException {
+        JNLPRuntime.saveHistory(location.toExternalForm());
         return launch(fromUrl(location));
     }
 
@@ -943,7 +944,5 @@ public class Launcher {
         }
 
     };
-
- 
 
 }

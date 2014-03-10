@@ -91,6 +91,14 @@ public class JNLPRuntime {
         loadResources();
     }
 
+    /**
+     * java-abrt-connector can print out specific application String method, it is good to save visited urls for reproduce purposes.
+     * For javaws we can read the destination jnlp from commandline
+     * However for plugin (url arrive via pipes). Also for plugin we can not be sure which opened tab/window
+     * have caused the crash. Thats why the individual urls are added, not replaced.
+     */
+    private static String history = "";
+
     /** the localized resource strings */
     private static ResourceBundle resources;
 
@@ -831,4 +839,20 @@ public class JNLPRuntime {
         OutputController.getLogger().close();
         System.exit(i);
     }
+
+
+    public static void saveHistory(String documentBase) {
+        JNLPRuntime.history += " " + documentBase + " ";
+    }
+
+    /**
+     * Used by java-abrt-connector via reflection
+     * @return history
+     */
+    private static String getHistory() {
+        return history;
+    }
+    
+    
+
 }

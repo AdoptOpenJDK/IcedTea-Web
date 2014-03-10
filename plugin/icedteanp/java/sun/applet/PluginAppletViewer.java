@@ -118,6 +118,7 @@ import sun.awt.X11.XEmbeddedFrame;
 import sun.misc.Ref;
 
 import com.sun.jndi.toolkit.url.UrlUtil;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /*
@@ -467,6 +468,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                             "Height = ", height, "\n",
                             "DocumentBase = ", documentBase, "\n",
                             "Params = ", paramString);
+        JNLPRuntime.saveHistory(documentBase);
 
         PluginAppletPanelFactory factory = new PluginAppletPanelFactory();
         AppletMessageHandler amh = new AppletMessageHandler("appletviewer");
