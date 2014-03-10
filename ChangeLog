@@ -1,3 +1,9 @@
+2014-03-10  Omair Majid  <omajid@redhat.com>
+
+	* netx/javaws.1,
+	* netx/itweb-settings.1: Change "SYNOPSYS" to "SYNOPSIS".
+	* NEWS: Add itweb-setings man page.
+
 2014-03-10  Andrew Azores  <aazores@redhat.com>
 
 	Added MD5SumWatcher utility class to detect when a file's contents have been
