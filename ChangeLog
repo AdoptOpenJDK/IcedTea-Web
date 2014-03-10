@@ -1,3 +1,8 @@
+2014-03-10  Omair Majid  <omajid@redhat.com>
+
+	* Makefile.am (install-data-local): Install itweb-settings.1.
+	* netx/itweb-settings.1: New file.
+
 2014-03-10  Jiri Vanek  <jvanek@redhat.com>
 
 	Added getter for java-abrt-connector on demand whitelist of fields.

@@ -256,6 +256,7 @@ endif
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(mandir)/man1
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(mandir)/man1
+	${INSTALL_DATA} $(NETX_SRCDIR)/itweb-settings.1 $(DESTDIR)$(mandir)/man1
 if ENABLE_DOCS
 	${mkinstalldirs} $(DESTDIR)$(htmldir)
 	(cd ${abs_top_builddir}/docs/netx; \
