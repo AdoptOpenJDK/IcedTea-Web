@@ -1,5 +1,12 @@
 2014-03-10  Andrew Azores  <aazores@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissionsTest.java:
+	(testActionsRegex, testTargetRegex, testRegexesAgainstBadPermissionNames):
+	update after moving regexes from PolicyEditorPermissions into
+	CustomPermission
+
+2014-03-10  Andrew Azores  <aazores@redhat.com>
+
 	PolicyEditor parsing enhancements, new tests, and bugfixes
 	* NEWS: added entry for PolicyEditor
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
