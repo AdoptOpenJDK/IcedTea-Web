@@ -101,6 +101,9 @@ public class PluginBridge extends JNLPFile {
                 // value is a complete URL, it will replace codeBase's context.
                 ParserSettings defaultSettings = new ParserSettings();
                 URL jnlp = new URL(codeBase, params.getJNLPHref());
+                if (fileLocation == null){
+                    fileLocation = jnlp;
+                }
                 JNLPFile jnlpFile = null;
 
                 if (params.getJNLPEmbedded() != null) {

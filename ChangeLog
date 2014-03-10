@@ -1,3 +1,9 @@
+2014-03-10  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed rhbz#1072013
+	* netx/net/sourceforge/jnlp/PluginBridge.java: The (fileLocation) of
+	JNLPFile is now properly set in constructor if not existing.
+
 2014-03-06  Andrew Azores  <aazores@redhat.com>
 
 	* NEWS: added -version flag entry
