@@ -122,6 +122,14 @@ public class PolicyEditorTest {
     }
 
     @Test
+    public void testReturnedCustomPermissionsSetIsCopy() throws Exception {
+        final Collection<CustomPermission> original = editor.getCustomPermissions("");
+        original.add(new CustomPermission("java.io.FilePermission", "*", "write"));
+        final Collection<CustomPermission> second = editor.getCustomPermissions("");
+        assertTrue("There should not be any custom permissions", second.isEmpty());
+    }
+
+    @Test
     public void testDefaultPermissionsAllFalse() throws Exception {
         final Map<PolicyEditorPermissions, Boolean> defaultMap = editor.getPermissions("");
         editor.addNewCodebase("http://redhat.com");
@@ -148,6 +156,19 @@ public class PolicyEditorTest {
         }
         for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
             assertTrue("Permission " + perm + " should be in the editor's codebase keyset", addedMap.keySet().contains(perm));
+        }
+    }
+
+    @Test
+    public void testCodebaseTrailingSlashesDoNotMatch() throws Exception {
+        final Set<String> toAdd = new HashSet<String>();
+        toAdd.add("http://redhat.com");
+        toAdd.add("http://redhat.com/");
+        editor.addNewCodebases(toAdd);
+        final Collection<String> codebases = editor.getCodebases();
+        assertTrue("Editor should have default codebase", codebases.contains(""));
+        for (final String codebase : toAdd) {
+            assertTrue("Editor should have " + codebase, codebases.contains(codebase));
         }
     }
 

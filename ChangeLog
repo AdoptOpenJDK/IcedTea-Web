@@ -1,3 +1,33 @@
+2014-03-10  Andrew Azores  <aazores@redhat.com>
+
+	PolicyEditor parsing enhancements, new tests, and bugfixes
+	* NEWS: added entry for PolicyEditor
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(PESaveAsMenuItemMnemonic, PEExitMenuItemMnemonic) changed mnemonic keys
+	due to masking with ctrl rather than alt
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPermission.java:
+	(ACTIONS_PERMISSION, TARGET_PERMISSION, fromString) use regexes to parse
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(file) keep reference to File rather than String filePath. (getPermissions)
+	returns empty map rather than null. (setComponentMnemonic) new method.
+	(getCustomPermissions) new function. (openAndParsePolicyFile) check for
+	OpenFileResult FAILURE and NOT_FILE rather than null. (setupLayout) File,
+	Save, SaveAs, and Exit items modifier mask changed to Ctrl rather than Alt
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java:
+	(fromString) use regexes to parse, using CustomPermission as intermediate
+	representation
+	* netx/net/sourceforge/jnlp/util/FileUtils.java:
+	(testDirectoryPermissions) add check for getCanonicalFile and null
+	safeguarding. (testFilePermissions) add check for getCanonicalFile and
+	return FAILURE rather than null
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/CustomPermissionTest.java:
+	(testMissingQuotationMarks) new test
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java:
+	(testReturnedCustomPermissionsSetIsCopy,
+	testCodebaseTrailingSlashesDoNotMatch) new tests
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorParsingTest.java:
+	new tests
+
 2014-03-10  Omair Majid  <omajid@redhat.com>
 
 	* Makefile.am (install-data-local): Install itweb-settings.1.

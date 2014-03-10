@@ -17,6 +17,7 @@ New in release 1.5 (2013-XX-XX):
 * Support for u45 and u51 new manifest attributes (Application-Name, Codebase)
 * Custom applet permission policies panel in itweb-settings control panel
 * javaws -version flag
+* New PolicyEditor for easily adding/removing permissions to individual applets
 * Cache Viewer
   - Can be closed by ESC key
   - Enabling and disabling of operational buttons is handled properly

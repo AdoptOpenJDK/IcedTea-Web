@@ -37,6 +37,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.policyeditor;
 
 import static org.junit.Assert.assertTrue;
+import net.sourceforge.jnlp.security.policyeditor.CustomPermission;
 
 import org.junit.Test;
 
@@ -67,6 +68,47 @@ public class CustomPermissionTest {
     }
 
     @Test
+    public void testMissingQuotationMarks() throws Exception {
+        final CustomPermission cp = CustomPermission.fromString("permission java.io.FilePermission *, read,write;");
+        assertTrue("Custom permission should be null", cp == null);
+    }
+
+    @Test
+    public void testActionsMissingComma() throws Exception {
+        final String missingComma = "permission java.io.FilePermission \"*\" \"read,write\";";
+        final CustomPermission cp1 = CustomPermission.fromString(missingComma);
+        assertTrue("Custom permission for " + missingComma + " should be null", cp1 == null);
+    }
+
+    @Test
+    public void testActionsMissingFirstQuote() throws Exception {
+        final String missingFirstQuote = "permission java.io.FilePermission \"*\", read,write\";";
+        final CustomPermission cp2 = CustomPermission.fromString(missingFirstQuote);
+        assertTrue("Custom permission for " + missingFirstQuote + " should be null", cp2 == null);
+    }
+
+    @Test
+    public void testActionsMissingSecondQuote() throws Exception {
+        final String missingSecondQuote = "permission java.io.FilePermission \"*\", \"read,write;";
+        final CustomPermission cp3 = CustomPermission.fromString(missingSecondQuote);
+        assertTrue("Custom permission for " + missingSecondQuote + " should be null", cp3 == null);
+    }
+
+    @Test
+    public void testActionsMissingBothQuotes() throws Exception {
+        final String missingBothQuotes = "permission java.io.FilePermission \"*\", read,write;";
+        final CustomPermission cp4 = CustomPermission.fromString(missingBothQuotes);
+        assertTrue("Custom permission for " + missingBothQuotes + " should be null", cp4 == null);
+    }
+
+    @Test
+    public void testActionsMissingAllPunctuation() throws Exception {
+        final String missingAll = "permission java.io.FilePermission \"*\" read,write;";
+        final CustomPermission cp5 = CustomPermission.fromString(missingAll);
+        assertTrue("Custom permission for " + missingAll + " should be null", cp5 == null);
+    }
+
+    @Test
     public void testToString() throws Exception {
         final CustomPermission cp = new CustomPermission("java.io.FilePermission", "*", "read");
         final String expected = "permission java.io.FilePermission \"*\", \"read\";";
@@ -78,8 +120,8 @@ public class CustomPermissionTest {
         final CustomPermission cp1 = new CustomPermission("java.io.FilePermission", "*", "read");
         final CustomPermission cp2 = new CustomPermission("java.io.FilePermission", "${user.home}${/}*", "read");
         final CustomPermission cp3 = new CustomPermission("java.lang.RuntimePermission", "queuePrintJob", "");
-        assertTrue(cp1.compareTo(cp2) > 0);
-        assertTrue(cp1.compareTo(cp1) == 0);
-        assertTrue(cp2.compareTo(cp3) < 0);
+        assertTrue("cp1.compareTo(cp2) should be > 0", cp1.compareTo(cp2) > 0);
+        assertTrue("cp1.compareTo(cp1) should be 0", cp1.compareTo(cp1) == 0);
+        assertTrue("cp2.compareTo(cp3) should be < 0", cp2.compareTo(cp3) < 0);
     }
 }

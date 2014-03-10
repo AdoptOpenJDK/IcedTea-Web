@@ -38,6 +38,9 @@ package net.sourceforge.jnlp.security.policyeditor;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Defines the set of default permissions for PolicyEditor, ie the ones which are assigned
  * dedicated checkboxes
@@ -159,19 +162,14 @@ public enum PolicyEditorPermissions {
      * @return the PolicyEditorPermissions value matching the input String, or null if no such match is found
      */
     public static PolicyEditorPermissions fromString(final String string) {
-        final String[] parts = string.split(" ");
-        if (parts.length < 3) {
+        final CustomPermission tmpPerm = CustomPermission.fromString(string);
+        if (tmpPerm == null) {
             return null;
         }
-        final String typeStr = removeQuotes(parts[1]);
-        final String targetStr = removeQuotes(removeSemicolon(removeComma(parts[2])));
-        String actionsStr = "";
-        if (parts.length > 3) {
-            actionsStr = removeQuotes(removeSemicolon(parts[3]));
-        }
-        final PermissionType type = PermissionType.fromString(typeStr);
-        final PermissionTarget target = PermissionTarget.fromString(targetStr);
-        final PermissionActions actions = PermissionActions.fromString(actionsStr);
+
+        final PermissionType type = PermissionType.fromString(tmpPerm.type);
+        final PermissionTarget target = PermissionTarget.fromString(tmpPerm.target);
+        final PermissionActions actions = PermissionActions.fromString(tmpPerm.actions);
 
         for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
             final boolean sameType = perm.type.equals(type);
@@ -185,19 +183,4 @@ public enum PolicyEditorPermissions {
         return null;
     }
 
-    private static String removeQuotes(final String string) {
-        return string.replaceAll("\"", "");
-    }
-
-    private static String removeSemicolon(final String string) {
-        if (string.contains(";")) {
-            return string.substring(0, string.lastIndexOf(';'));
-        } else {
-            return string;
-        }
-    }
-
-    private static String removeComma(final String string) {
-        return string.replaceAll(",", "");
-    }
 }

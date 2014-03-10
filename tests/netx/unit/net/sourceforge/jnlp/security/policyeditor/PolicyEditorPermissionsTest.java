@@ -37,6 +37,11 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.policyeditor;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.regex.Pattern;
+
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
 
 import org.junit.Test;
 
@@ -62,5 +67,41 @@ public class PolicyEditorPermissionsTest {
             assertFalse("Permission " + perm + " should have a defined permission string",
                     perm.toPermissionString().trim().isEmpty());
         }
+    }
+
+    @Test
+    public void testActionsRegex() throws Exception {
+    	final Pattern pattern = PolicyEditorPermissions.ACTIONS_PERMISSION;
+
+    	final String actionsPermission = "permission java.io.FilePermission \"${user.home}\", \"read\";";
+    	final String targetPermission = "permission java.io.RuntimePermission \"queuePrintJob\";";
+    	final String badPermission = "permission java.io.FilePermission user.home read;";
+
+    	assertTrue(actionsPermission + " should match", pattern.matcher(actionsPermission).matches());
+    	assertFalse(targetPermission + " should not match", pattern.matcher(targetPermission).matches());
+    	assertFalse(badPermission + " should not match", pattern.matcher(badPermission).matches());
+    }
+
+    @Test
+    public void testTargetRegex() throws Exception {
+    	final Pattern pattern = PolicyEditorPermissions.TARGET_PERMISSION;
+
+    	final String actionsPermission = "permission java.io.FilePermission \"${user.home}\", \"read\";";
+    	final String targetPermission = "permission java.io.RuntimePermission \"queuePrintJob\";";
+    	final String badPermission = "permission java.io.FilePermission user.home read;";
+
+    	assertFalse(actionsPermission + " should not match", pattern.matcher(actionsPermission).matches());
+    	assertTrue(targetPermission + " should match", pattern.matcher(targetPermission).matches());
+    	assertFalse(badPermission + " should not match", pattern.matcher(badPermission).matches());
+    }
+
+    @Test
+    public void testRegexesAgainstBadPermissionNames() throws Exception {
+    	final Pattern targetPattern = PolicyEditorPermissions.TARGET_PERMISSION;
+    	final Pattern actionsPattern = PolicyEditorPermissions.ACTIONS_PERMISSION;
+    	final String badPermission = "permission abc123^$% \"target\", \"actions\"";
+
+    	assertFalse(badPermission + " should not match", targetPattern.matcher(badPermission).matches());
+    	assertFalse(badPermission + " should not match", actionsPattern.matcher(badPermission).matches());
     }
 }

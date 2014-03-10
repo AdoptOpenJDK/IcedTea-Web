@@ -36,12 +36,27 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * This class models a permission entry in a policy file which is not included
  * in the default set of permissions used by the PolicyEditor, ie, permissions
  * not defined in the enum PolicyEditorPermissions.
  */
 public class CustomPermission implements Comparable<CustomPermission> {
+
+    /* Matches eg 'permission java.io.FilePermission "${user.home}${/}*", "read";'
+     * eg permissions that have a permission type, target, and actions set.
+     */
+    public static final Pattern ACTIONS_PERMISSION =
+            Pattern.compile("\\s*permission\\s+([\\w\\.]+)\\s+\"([^\"]+)\",\\s*\"([^\"]*)\";.*");
+
+    /* Matches eg 'permission java.lang.RuntimePermission "queuePrintJob";'
+     * eg permissions that have a permission type and target, but no actions.
+     */
+    public static final Pattern TARGET_PERMISSION =
+            Pattern.compile("\\s*permission\\s+([\\w\\.]+)\\s+\"([^\"]+)\";.*");
 
     public final String type, target, actions;
 
@@ -63,16 +78,23 @@ public class CustomPermission implements Comparable<CustomPermission> {
      * @return a CustomPermission representing this string
      */
     public static CustomPermission fromString(final String string) {
-        final String[] parts = string.trim().split(" ");
-        if (!parts[0].equals("permission") || parts.length < 3 || !string.trim().endsWith(";")) {
-            return null;
+        final String typeStr, targetStr, actionsStr;
+
+        final Matcher actionMatcher = ACTIONS_PERMISSION.matcher(string);
+        if (actionMatcher.matches()) {
+            typeStr = actionMatcher.group(1);
+            targetStr = actionMatcher.group(2);
+            actionsStr = actionMatcher.group(3);
+        } else {
+            final Matcher targetMatcher = TARGET_PERMISSION.matcher(string);
+            if (!targetMatcher.matches()) {
+                return null;
+            }
+            typeStr = targetMatcher.group(1);
+            targetStr = targetMatcher.group(2);
+            actionsStr = "";
         }
-        final String typeStr = removeQuotes(parts[1]);
-        final String targetStr = removeQuotes(removeSemicolon(removeComma(parts[2])));
-        String actionsStr = "";
-        if (parts.length > 3) {
-            actionsStr = removeQuotes(removeSemicolon(parts[3]));
-        }
+
         return new CustomPermission(typeStr, targetStr, actionsStr);
     }
 
@@ -94,18 +116,6 @@ public class CustomPermission implements Comparable<CustomPermission> {
         sb.append(";");
 
         return sb.toString();
-    }
-
-    private static String removeQuotes(final String string) {
-        return string.replaceAll("\"", "");
-    }
-
-    private static String removeSemicolon(final String string) {
-        return string.replaceAll(";", "");
-    }
-
-    private static String removeComma(final String string) {
-        return string.replaceAll(",", "");
     }
 
     @Override

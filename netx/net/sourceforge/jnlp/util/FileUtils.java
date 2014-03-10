@@ -285,8 +285,14 @@ public final class FileUtils {
      * @param file the {@link File} representing a Java Policy file to test
      * @return a {@link DirectoryCheckResults} object representing the results of the test
      */
-    public static DirectoryCheckResults testDirectoryPermissions(final File file) {
-        if (file == null || !file.getParentFile().exists()) {
+    public static DirectoryCheckResults testDirectoryPermissions(File file) {
+        try {
+            file = file.getCanonicalFile();
+        } catch (final IOException e) {
+            OutputController.getLogger().log(e);
+            return null;
+        }
+        if (file == null || file.getParentFile() == null || !file.getParentFile().exists()) {
             return null;
         }
         final List<File> policyDirectory = new ArrayList<File>();
@@ -299,15 +305,17 @@ public final class FileUtils {
 
     /**
      * Verify that a given file object points to a real, accessible plain file.
-     * As a side effect, if the file is accessible but does not yet exist, it will be created
-     * as an empty plain file.
      * @param file the {@link File} to verify
      * @return an {@link OpenFileResult} representing the accessibility level of the file
-     * @throws IOException if the file is not accessible
      */
-    public static OpenFileResult testFilePermissions(final File file) {
+    public static OpenFileResult testFilePermissions(File file) {
         if (file == null || !file.exists()) {
-            return null;
+            return OpenFileResult.FAILURE;
+        }
+        try {
+            file = file.getCanonicalFile();
+        } catch (final IOException e) {
+            return OpenFileResult.FAILURE;
         }
         final DirectoryCheckResults dcr = FileUtils.testDirectoryPermissions(file);
         if (dcr != null && dcr.getFailures() == 0) {
