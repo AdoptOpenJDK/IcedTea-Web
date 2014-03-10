@@ -1,5 +1,15 @@
 2014-03-10  Andrew Azores  <aazores@redhat.com>
 
+	Added MD5SumWatcher utility class to detect when a file's contents have been
+	changed on disk.
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: (getFileMD5Sum) new
+	function
+	* netx/net/sourceforge/jnlp/util/MD5SumWatcher.java: new class
+	* tests/netx/unit/net/sourceforge/jnlp/util/MD5SumWatcherTest.java: new
+	tests for MD5SumWatcher
+
+2014-03-10  Andrew Azores  <aazores@redhat.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissionsTest.java:
 	(testActionsRegex, testTargetRegex, testRegexesAgainstBadPermissionNames):
 	update after moving regexes from PolicyEditorPermissions into

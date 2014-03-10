@@ -30,8 +30,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.Writer;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -586,5 +590,28 @@ public final class FileUtils {
 
     public static String loadFileAsString(File f, String encoding) throws IOException {
         return getContentOfStream(new FileInputStream(f), encoding);
+    }
+
+    public static byte[] getFileMD5Sum(final File file, final String algorithm) throws NoSuchAlgorithmException,
+            FileNotFoundException, IOException {
+        final MessageDigest md5;
+        InputStream is = null;
+        DigestInputStream dis = null;
+        try {
+            md5 = MessageDigest.getInstance(algorithm);
+            is = new FileInputStream(file);
+            dis = new DigestInputStream(is, md5);
+
+            md5.update(getContentOfStream(dis).getBytes());
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+            if (dis != null) {
+                dis.close();
+            }
+        }
+
+        return md5.digest();
     }
 }
