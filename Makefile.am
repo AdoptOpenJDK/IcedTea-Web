@@ -257,6 +257,7 @@ install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(mandir)/man1
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(mandir)/man1
 	${INSTALL_DATA} $(NETX_SRCDIR)/itweb-settings.1 $(DESTDIR)$(mandir)/man1
+	${INSTALL_DATA} $(NETX_SRCDIR)/policyeditor.1 $(DESTDIR)$(mandir)/man1
 if ENABLE_DOCS
 	${mkinstalldirs} $(DESTDIR)$(htmldir)
 	(cd ${abs_top_builddir}/docs/netx; \
@@ -278,6 +279,8 @@ uninstall-local:
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	rm -f $(DESTDIR)$(mandir)/man1/javaws.1
+	rm -f $(DESTDIR)$(mandir)/man1/itweb-settings.1
+	rm -f $(DESTDIR)$(mandir)/man1/policyeditor.1
 	rm -f $(DESTDIR)$(bindir)/$(javaws)
 	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
 	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
