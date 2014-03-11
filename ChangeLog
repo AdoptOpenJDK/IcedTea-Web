@@ -1,5 +1,9 @@
 2014-03-11  Jiri Vanek  <jvanek@redhat.com>
 
+	* netx/policyeditor.1: Mentioned that it is more GUI then commandline tool
+
+2014-03-11  Jiri Vanek  <jvanek@redhat.com>
+
 	Implemented Permissions manifest entry handling.
 	* NEWS: mentioned Permissions attribute
 	* netx/net/sourceforge/jnlp/JNLPFile.java: new enum (ManifestBoolean) introduced
