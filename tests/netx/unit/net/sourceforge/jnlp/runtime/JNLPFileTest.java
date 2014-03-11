@@ -45,13 +45,32 @@ import java.util.jar.Manifest;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.sourceforge.jnlp.util.FileTestUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JNLPFileTest extends NoStdOutErrTest {
+
+    private static AppletSecurityLevel level;
+
+    @BeforeClass
+    public static void setPermissions() {
+        level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+    }
+
+    @AfterClass
+    public static void resetPermissions() {
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, level.toChars());
+    }
+
 
     @Test
     public void newSecurityAttributesTestNotSet() throws Exception {
@@ -83,9 +102,9 @@ public class JNLPFileTest extends NoStdOutErrTest {
         Assert.assertNull("classlaoder attached, but should be null", jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase());
         Assert.assertNull("classlaoder attached, but should be null", jnlpFile.getManifestsAttributes().getCallerAllowableCodebase());
         Assert.assertNull("classlaoder attached, but should be null", jnlpFile.getManifestsAttributes().getCodebase());
-        Assert.assertNull("classlaoder attached, but should be null", jnlpFile.getManifestsAttributes().isSandboxForced());
-        Assert.assertNull("classlaoder attached, but should be null", jnlpFile.getManifestsAttributes().isTrustedLibrary());
-        Assert.assertNull("classlaoder attached, but should be null", jnlpFile.getManifestsAttributes().isTrustedOnly());
+        Assert.assertEquals("no classlaoder attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isSandboxForced());
+        Assert.assertEquals("no classlaoder attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isTrustedLibrary());
+        Assert.assertEquals("no classlaoder attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isTrustedOnly());
     }
 
     @Test
@@ -135,15 +154,22 @@ public class JNLPFileTest extends NoStdOutErrTest {
         Assert.assertNull("no classlaoder attached, should be null", jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase());
         Assert.assertNull("no classlaoder attached, should be null", jnlpFile.getManifestsAttributes().getCallerAllowableCodebase());
         Assert.assertNull("no classlaoder attached, should be null", jnlpFile.getManifestsAttributes().getCodebase());
-        Assert.assertNull("no classlaoder attached, should be null", jnlpFile.getManifestsAttributes().isSandboxForced());
-        Assert.assertNull("no classlaoder attached, should be null", jnlpFile.getManifestsAttributes().isTrustedLibrary());
-        Assert.assertNull("no classlaoder attached, should be null", jnlpFile.getManifestsAttributes().isTrustedOnly());
+        Assert.assertEquals("no classlaoder attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isSandboxForced());
+        Assert.assertEquals("no classlaoder attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isTrustedLibrary());
+        Assert.assertEquals("no classlaoder attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isTrustedOnly());
 
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS); //jnlp file got its instance in classlaoders constructor
         //jnlpFile.getManifestsAttributes().setLoader(classLoader);
 
-        final JNLPClassLoader errorClassLoader = new JNLPClassLoader(errorJnlpFile, UpdatePolicy.ALWAYS);//jnlp file got its instance in classlaoders constructor
-        //errorJnlpFile.getManifestsAttributes().setLoader(errorClassLoader);
+        Exception ex = null;
+        try {
+           final JNLPClassLoader errorClassLoader = new JNLPClassLoader(errorJnlpFile, UpdatePolicy.ALWAYS);//jnlp file got its instance in classlaoders constructor
+           //errorJnlpFile.getManifestsAttributes().setLoader(errorClassLoader);
+        } catch (Exception e){
+            //correct exception
+            ex = e;
+        }
+        Assert.assertNotNull(ex);
 
         Assert.assertEquals("DummyClass1 title", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
         Assert.assertEquals("*.com  https://*.cz", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_LIBRARY_ALLOWABLE)));
@@ -175,11 +201,11 @@ public class JNLPFileTest extends NoStdOutErrTest {
         Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getCodebase().matches(new URL("ftp://aa.bb.net")));
         Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getCodebase().matches(new URL("https://x.net")));
         Assert.assertEquals(false, jnlpFile.getManifestsAttributes().getCodebase().matches(new URL("http://aa.bb/com")));
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().isSandboxForced());
-        Assert.assertEquals(false, jnlpFile.getManifestsAttributes().isTrustedLibrary());
-        Assert.assertEquals(false, jnlpFile.getManifestsAttributes().isTrustedOnly());
+        Assert.assertEquals(JNLPFile.ManifestBoolean.TRUE, jnlpFile.getManifestsAttributes().isSandboxForced());
+        Assert.assertEquals(JNLPFile.ManifestBoolean.FALSE, jnlpFile.getManifestsAttributes().isTrustedLibrary());
+        Assert.assertEquals(JNLPFile.ManifestBoolean.FALSE, jnlpFile.getManifestsAttributes().isTrustedOnly());
 
-        Exception ex = null;
+        ex = null;
         try {
             errorJnlpFile.getManifestsAttributes().isSandboxForced();
         } catch (Exception e) {

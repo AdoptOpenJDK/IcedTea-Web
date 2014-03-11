@@ -53,7 +53,7 @@ public abstract class SecurityDialogPanel extends JPanel {
 
     protected SecurityDialog parent;
 
-    JComponent initialFocusComponent = null;
+    protected JComponent initialFocusComponent = null;
 
     CertVerifier certVerifier = null;
 

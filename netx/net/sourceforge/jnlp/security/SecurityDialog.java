@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.sourceforge.jnlp.security.dialogs.MissingPermissionsAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
 import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
 import net.sourceforge.jnlp.security.dialogs.NotAllSignedWarningPane;
@@ -317,6 +318,8 @@ public class SecurityDialog extends JDialog {
             panel = new UnsignedAppletTrustWarningDialog(this, file);
         else if (dialogType == DialogType.AUTHENTICATION)
             panel = new PasswordAuthenticationPane(this, extras);
+        else if (dialogType == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING)
+            panel = new MissingPermissionsAttributePanel(this, (String) extras[0], (String) extras[1]);
 
         add(panel, BorderLayout.CENTER);
     }

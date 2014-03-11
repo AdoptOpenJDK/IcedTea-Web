@@ -53,12 +53,30 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.CodeBaseClassLoader;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.Remote;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 
 import org.junit.Test;
 
-public class CodeBaseClassLoaderTest {
+public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
+
+    private static AppletSecurityLevel level;
+
+    @BeforeClass
+    public static void setPermissions() {
+        level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+    }
+
+    @AfterClass
+    public static void resetPermissions() {
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, level.toChars());
+    }
 
     private static final String isWSA = "isWebstartApplication";
 

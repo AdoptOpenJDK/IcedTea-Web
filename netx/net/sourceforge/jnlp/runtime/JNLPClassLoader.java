@@ -15,6 +15,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.sourceforge.jnlp.JNLPFile.ManifestBoolean;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
@@ -288,6 +289,8 @@ public class JNLPClassLoader extends URLClassLoader {
         setSecurity();
         
         checkCodebaseAttribute();
+        
+        checkPermissionsAttribute();
         
         installShutdownHooks();
         
@@ -2441,6 +2444,52 @@ public class JNLPClassLoader extends URLClassLoader {
             return this.promptedForSandbox;
         }
 
+    }
+    
+    /**
+     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
+     */
+    public void checkPermissionsAttribute() throws LaunchException {
+        final ManifestBoolean permissions = file.getManifestsAttributes().isSandboxForced();
+        AppletSecurityLevel level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
+        if (level == AppletSecurityLevel.ALLOW_UNSIGNED) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Although 'permissions' attribute of this application is '" + file.getManifestsAttributes().permissionsToString() + "' Your Extended applets security is at 'low', continuing");
+            return;
+        }
+        switch (permissions) {
+            case UNDEFINED: {
+                if (level == AppletSecurityLevel.DENY_UNSIGNED) {
+                    throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
+                }
+                if (level == AppletSecurityLevel.ASK_UNSIGNED) {
+                    boolean a = SecurityDialogs.showMissingPermissionsAttributeDialogue(file.getTitle(), file.getCodeBase());
+                    if (!a) {
+                        throw new LaunchException("Your Extended applets security is at 'high' and  this applicationis missing the 'permissions' attribute in manifest. And you have refused to run it.");
+                    } else {
+                        OutputController.getLogger().log("Your Extended applets security is at 'high' and  this applicationis missing the 'permissions' attribute in manifest. And you have allowed to run it.");
+                    }
+                }
+                //default for missing is sandbox
+                if (!SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
+                    throw new LaunchException("The 'permissions' attribute is not specified, and application is requesting permissions. This is fatal");
+                }
+                break;
+            }
+            case TRUE: {
+                if (SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
+                    OutputController.getLogger().log("The permissions attribute of this application is " + file.getManifestsAttributes().permissionsToString() + "' and security is '" + security.getSecurityType() + "'. Thats correct");
+                } else {
+                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but  security is '" + security.getSecurityType() + "'. This is fatal");
+                }
+            }
+            case FALSE: {
+                if (SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
+                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but  security is' " + security.getSecurityType() + "'. This is fatal");
+                } else {
+                    OutputController.getLogger().log("The permissions attribute of this application is '" + file.getManifestsAttributes().permissionsToString() + "' and security is '" + security.getSecurityType() + "'. Thats correct");
+                }
+            }
+        }
     }
 
     /*

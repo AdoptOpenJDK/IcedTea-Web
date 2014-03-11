@@ -41,6 +41,7 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.NetPermission;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.Semaphore;
@@ -79,6 +80,7 @@ public class SecurityDialogs {
         UNSIGNED_WARNING,   /* requires confirmation with 'high-security' setting */
         APPLET_WARNING,
         AUTHENTICATION,
+        UNSIGNED_EAS_NO_PERMISSIONS_WARNING   /* when Extended applet security is at High Security and no permission attribute is find, */
     }
 
     /** The types of access which may need user permission. */
@@ -286,6 +288,18 @@ public class SecurityDialogs {
         }
     }
 
+     public static boolean showMissingPermissionsAttributeDialogue(String title, URL codeBase) {
+
+         if (!shouldPromptUser()) {
+             return false;
+         }
+
+         SecurityDialogMessage message = new SecurityDialogMessage();
+         message.dialogType = DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING;
+         message.extras = new Object[]{title, codeBase.toExternalForm()};
+         Object selectedValue = getUserResponse(message);
+         return SecurityDialogs.getIntegerResponseAsBoolean(selectedValue);
+    }
     /**
      * Posts the message to the SecurityThread and gets the response. Blocks
      * until a response has been recieved. It's safe to call this from an

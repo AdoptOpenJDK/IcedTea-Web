@@ -1,3 +1,28 @@
+2014-03-11  Jiri Vanek  <jvanek@redhat.com>
+
+	Implemented Permissions manifest entry handling.
+	* NEWS: mentioned Permissions attribute
+	* netx/net/sourceforge/jnlp/JNLPFile.java: new enum (ManifestBoolean) introduced
+	to replace true/false/null by TRUE/FALSE/UNDEFFINED. (isTrustedOnly), 
+	(isTrustedLibrary), (isSandboxForced) and (processBooleanAttribute) moved 
+	to use ManifestBoolean.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Added (ButYes) (ButNo)
+	(MissingPermissionsMainTitle) and (MissingPermissionsInfo) keys
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: is now checking
+	(checkPermissionsAttribute) in (init). Implemented new (checkPermissionsAttribute)
+	method to handle Permissions attribute
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: can handle
+	(UNSIGNED_EAS_NO_PERMISSIONS_WARNING)
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: defined
+	(UNSIGNED_EAS_NO_PERMISSIONS_WARNING ) and (showMissingPermissionsAttributeDialogue)
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingPermissionsAttributePanel.java:
+	new class, implementation of missing permissions attribute panel.
+	* netx/net/sourceforge/jnlp/security/dialogs/SecurityDialogPanel.java: changed 
+	(initialFocusComponent) from package private to descendant visible
+	*  tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java: and
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPFileTest.java: adapted to 
+	(ManifestBoolean) and to Permissions attribute handling at all.
+
 2014-03-10  Omair Majid  <omajid@redhat.com>
 
 	* netx/javaws.1,

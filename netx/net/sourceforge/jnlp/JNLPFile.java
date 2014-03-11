@@ -57,6 +57,10 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * @version $Revision: 1.21 $
  */
 public class JNLPFile {
+
+    public static enum ManifestBoolean {
+        TRUE, FALSE, UNDEFINED;
+    }
    
 
     // todo: save the update policy, then if file was not updated
@@ -936,7 +940,7 @@ public class JNLPFile {
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_only
          */
-        public Boolean isTrustedOnly() {
+        public ManifestBoolean isTrustedOnly() {
             return processBooleanAttribute(TRUSTED_ONLY);
 
         }
@@ -944,7 +948,7 @@ public class JNLPFile {
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_library
          */
-        public Boolean isTrustedLibrary() {
+        public ManifestBoolean isTrustedLibrary() {
             return processBooleanAttribute(TRUSTED_LIBRARY);
 
         }
@@ -952,19 +956,34 @@ public class JNLPFile {
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
          */
-        public Boolean isSandboxForced() {
+        public ManifestBoolean isSandboxForced() {
             String s = getAttribute(PERMISSIONS);
             if (s == null) {
-                return null;
+                return ManifestBoolean.UNDEFINED;
             } else if (s.trim().equalsIgnoreCase("sandbox")) {
-                return true;
+                return ManifestBoolean.TRUE;
             } else if (s.trim().equalsIgnoreCase("all-permissions")) {
-                return false;
+                return ManifestBoolean.FALSE;
             } else {
                 throw new IllegalArgumentException("Unknown value of " + PERMISSIONS + " attribute " + s + ". Expected sandbox or all-permissions");
             }
 
 
+        }
+        /**
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
+         */
+        public String permissionsToString() {
+            String s = getAttribute(PERMISSIONS);
+            if (s == null) {
+                return "Not defined";
+            } else if (s.trim().equalsIgnoreCase("sandbox")) {
+                return s.trim();
+            } else if (s.trim().equalsIgnoreCase("all-permissions")) {
+                return s.trim();
+            } else {
+                return "illegal";
+            }
         }
 
         /**
@@ -997,16 +1016,16 @@ public class JNLPFile {
             return ClasspathMatcher.ClasspathMatchers.compile(s);
         }
 
-        private Boolean processBooleanAttribute(String id) throws IllegalArgumentException {
+        private ManifestBoolean processBooleanAttribute(String id) throws IllegalArgumentException {
             String s = getAttribute(id);
             if (s == null) {
-                return null;
+                return ManifestBoolean.UNDEFINED;
             } else {
-                s = s.trim();
-                if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false")) {
-                    //the Boolean is working like below, thats why the condition
-                    //return ((name != null) && name.equalsIgnoreCase("true"));
-                    return Boolean.parseBoolean(s);
+                s = s.toLowerCase().trim();
+                if (s.equals("true")) {
+                    return  ManifestBoolean.TRUE;
+                } else if (s.equals("false")) {
+                    return ManifestBoolean.FALSE;
                 } else {
                     throw new IllegalArgumentException("Unknown value of " + id + " attribute " + s + ". Expected true or false");
                 }
