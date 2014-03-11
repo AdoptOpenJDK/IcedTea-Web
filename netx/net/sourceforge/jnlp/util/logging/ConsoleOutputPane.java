@@ -33,6 +33,14 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
 
     @Override
     public synchronized void update(Observable o, Object arg) {
+        boolean force = false;
+        if ( arg!= null && arg instanceof Boolean && ((Boolean)arg).booleanValue()) {
+            force = true;
+        }
+        if (force){
+             refreshPane();
+             return;
+        }
         if (!autorefresh.isSelected()) {
             statistics.setText(model.createStatisticHint());
             return;

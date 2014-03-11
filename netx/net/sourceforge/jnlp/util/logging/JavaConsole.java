@@ -354,6 +354,19 @@ public class JavaConsole implements ObservableMessagesProvider {
             }
         });
 
+        JButton cleanButton = new JButton(R("CONSOLEClean"));
+        buttonPanel.add(cleanButton);
+        cleanButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                synchronized (rawData){
+                    rawData.clear();
+                    updateModel(true);
+                }
+            }
+        });
+
         initialized = true;
     }
 
@@ -484,10 +497,13 @@ public class JavaConsole implements ObservableMessagesProvider {
         rawData.add(m);
         updateModel();
     }
-    
+
     private synchronized void updateModel() {
+        updateModel(null);
+    }
+    private synchronized void updateModel(Boolean force) {
         observable.setChanged();
-        observable.notifyObservers();
+        observable.notifyObservers(force);
     }
 
 
