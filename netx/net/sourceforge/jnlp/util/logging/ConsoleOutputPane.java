@@ -27,6 +27,7 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 
 public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
@@ -296,79 +297,88 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         showHide = new javax.swing.JButton();
 
         sortCopyAll.setSelected(true);
-        sortCopyAll.setText("sort copy all by date");
+        sortCopyAll.setText(Translator.R("COPsortCopyAllDate"));
         sortCopyAll.setToolTipText("The sort by date is a bit more time consuming, but most natural for posting purposes");
         
         showHeaders.setSelected(true);
-        showHeaders.setText("Show headers:");
+        showHeaders.setText(Translator.R("COPshowHeaders"));
         showHeaders.addActionListener(getDefaultActionSingleton());
 
         showUser.setSelected(true);
-        showUser.setText("user");
+        showUser.setText(Translator.R("COPuser"));
         showUser.addActionListener(getDefaultActionSingleton());
 
         showOrigin.setSelected(true);
-        showOrigin.setText("origin");
+        showOrigin.setText(Translator.R("COPorigin"));
         showOrigin.addActionListener(getDefaultActionSingleton());
 
         showLevel.setSelected(true);
-        showLevel.setText("level");
+        showLevel.setText(Translator.R("COPlevel"));
         showLevel.addActionListener(getDefaultActionSingleton());
 
         showDate.setSelected(true);
-        showDate.setText("date");
+        showDate.setText(Translator.R("COPdate"));
         showDate.addActionListener(getDefaultActionSingleton());
 
         showThread1.setSelected(true);
-        showThread1.setText("thread 1");
+        showThread1.setText(Translator.R("COPthread1"));
         showThread1.addActionListener(getDefaultActionSingleton());
 
         showThread2.setSelected(true);
-        showThread2.setText("thread 2");
+        showThread2.setText(Translator.R("COPthread2"));
         showThread2.addActionListener(getDefaultActionSingleton());
 
         showMessage.setSelected(true);
-        showMessage.setText("Show messages");
+        showMessage.setText(Translator.R("COPShowMessages"));
         showMessage.addActionListener(getDefaultActionSingleton());
 
         showOut.setSelected(true);
-        showOut.setText("std. Out");
+        showOut.setText(Translator.R("COPstdOut"));
         showOut.addActionListener(getDefaultActionSingleton());
 
         showErr.setSelected(true);
-        showErr.setText("std. Err");
+        showErr.setText(Translator.R("COPstdErr"));
         showErr.addActionListener(getDefaultActionSingleton());
 
         showJava.setSelected(true);
-        showJava.setText("java");
+        showJava.setText(Translator.R("COPjava"));
         showJava.addActionListener(getDefaultActionSingleton());
 
         showPlugin.setSelected(true);
-        showPlugin.setText("plugin");
+        showPlugin.setText(Translator.R("COPplugin"));
         showPlugin.addActionListener(getDefaultActionSingleton());
 
         showPreInit.setSelected(true);
-        showPreInit.setText("pre-init");
-        showPreInit.setToolTipText("plugin only");
+        showPreInit.setText(Translator.R("COPpreInit"));
+        showPreInit.setToolTipText(Translator.R("COPpluginOnly"));
         showPreInit.addActionListener(getDefaultActionSingleton());
 
-        sortByLabel.setText("Sort by:");
+        sortByLabel.setText(Translator.R("COPSortBy") + ":");
 
-        regExLabel.setText("Regular expression filter:");
+        regExLabel.setText(Translator.R("COPregex") + ":");
         regExLabel.addActionListener(getDefaultActionSingleton());
 
-        sortBy.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"As arrived (no sort)", "user", "origin", "level", "date", "code", "thread1", "thread2", "message"}));
+        sortBy.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
+            Translator.R("COPAsArrived"),
+            Translator.R("COPuser"),
+            Translator.R("COPorigin"),
+            Translator.R("COPlevel"),
+            Translator.R("COPdate"),
+            Translator.R("COPcode"),
+            Translator.R("COPthread1"),
+            Translator.R("COPthread2"),
+            Translator.R("COPmessage")}));
         sortBy.addActionListener(getDefaultActionSingleton());
 
-        searchLabel.setText("Search:");
+        searchLabel.setText(Translator.R("COPSearch") + ":");
 
         autorefresh.setSelected(true);
-        autorefresh.setText("auto refresh");
+        autorefresh.setText(Translator.R("COPautoRefresh"));
 
-        refresh.setText("refresh");
+        refresh.setText(Translator.R("COPrefresh"));
         refresh.addActionListener(getDefaultActionSingleton());
 
-        apply.setText("Apply");
+        apply.setText(Translator.R("COPApply"));
         apply.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
@@ -380,7 +390,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
 
         regExFilter.setText(".*");
 
-        copyPlain.setText("Copy all (plain)");
+        copyPlain.setText(Translator.R("COPCopyAllPlain"));
         copyPlain.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
@@ -389,7 +399,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
             }
         });
 
-        copyRich.setText("Copy all (rich)");
+        copyRich.setText(Translator.R("COPCopyAllRich"));
         copyRich.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
@@ -398,7 +408,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
             }
         });
 
-        next.setText("next>>>");
+        next.setText(Translator.R("COPnext"));
         next.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
@@ -407,7 +417,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
             }
         });
 
-        previous.setText("<<<previous");
+        previous.setText(Translator.R("COPprevious"));
         previous.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
@@ -416,56 +426,56 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
             }
         });
 
-        caseSensitive.setText("case sensitive");
+        caseSensitive.setText(Translator.R("COPcaseSensitive"));
 
         showIncomplete.setSelected(true);
-        showIncomplete.setText("incomplete");
-        showIncomplete.setToolTipText("plugin only");
+        showIncomplete.setText(Translator.R("COPincomplete"));
+        showIncomplete.setToolTipText(Translator.R("COPpluginOnly"));
         showIncomplete.addActionListener(getDefaultActionSingleton());
 
         highLight.setSelected(true);
-        highLight.setText("highlight");
+        highLight.setText(Translator.R("COPhighlight"));
         highLight.addActionListener(getDefaultActionSingleton());
 
-        wordWrap.setText("word wrap");
+        wordWrap.setText(Translator.R("COPwordWrap"));
         wordWrap.addActionListener(getDefaultActionSingleton());
 
         showDebug.setSelected(true);
-        showDebug.setText("debug");
+        showDebug.setText(Translator.R("COPdebug"));
         showDebug.addActionListener(getDefaultActionSingleton());
 
         showInfo.setSelected(true);
-        showInfo.setText("info");
+        showInfo.setText(Translator.R("COPinfo"));
         showInfo.addActionListener(getDefaultActionSingleton());
 
         showCode.setSelected(true);
-        showCode.setText("code");
+        showCode.setText(Translator.R("COPcode"));
         showCode.addActionListener(getDefaultActionSingleton());
 
         statistics.setText("x/y");
 
         showPostInit.setSelected(true);
-        showPostInit.setText("post-init");
-        showPostInit.setToolTipText("plugin only");
+        showPostInit.setText(Translator.R("COPpostInit"));
+        showPostInit.setToolTipText(Translator.R("COPpluginOnly"));
         showPostInit.addActionListener(getDefaultActionSingleton());
 
         showComplete.setSelected(true);
-        showComplete.setText("complete");
-        showComplete.setToolTipText("plugin only");
+        showComplete.setText(Translator.R("COPcomplete"));
+        showComplete.setToolTipText(Translator.R("COPpluginOnly"));
         showComplete.addActionListener(getDefaultActionSingleton());
 
         match.setSelected(true);
-        match.setText("match");
+        match.setText(Translator.R("COPmatch"));
         match.addActionListener(getDefaultActionSingleton());
 
-        notMatch.setText("not");
+        notMatch.setText(Translator.R("COPnot"));
         notMatch.addActionListener(getDefaultActionSingleton());
 
         revertSort.setSelected(true);
-        revertSort.setText("revert");
+        revertSort.setText(Translator.R("COPrevert"));
         revertSort.addActionListener(getDefaultActionSingleton());
 
-        mark.setText("mark");
+        mark.setText(Translator.R("COPmark"));
         mark.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
@@ -594,7 +604,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         jEditorPane1.setEditable(false);
         jScrollPane1.setViewportView(jEditorPane1);
 
-        showHide.setText("Hide");
+        showHide.setText(Translator.R("ButHideDetails"));
         showHide.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
@@ -726,7 +736,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
                             highlightPainter);
                 }
             }
-            mark.setText("mark (" + matches + ")");
+            mark.setText(Translator.R("COPmark") + "(" + matches + ")");
         } catch (BadLocationException ex) {
             OutputController.getLogger().log(ex);
         }
@@ -789,10 +799,10 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
     private void showHideActionPerformed(java.awt.event.ActionEvent evt) {
         if (jPanel2.isVisible()) {
             jPanel2.setVisible(false);
-            showHide.setText("Show controls");
+            showHide.setText(Translator.R("ButShowDetails"));
         } else {
             jPanel2.setVisible(true);
-            showHide.setText("Hide");
+            showHide.setText(Translator.R("ButHideDetails"));
         }
     }
 

@@ -76,8 +76,6 @@ import javax.swing.text.DefaultFormatter;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.logging.headers.Header;
-import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
@@ -88,8 +86,8 @@ import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
  */
 public class JavaConsole implements ObservableMessagesProvider {
 
-    private List<MessageWithHeader> rawData = Collections.synchronizedList(new ArrayList<MessageWithHeader>());
-    private List<ConsoleOutputPane> outputs = new ArrayList<ConsoleOutputPane>();
+    final private List<MessageWithHeader> rawData = Collections.synchronizedList(new ArrayList<MessageWithHeader>());
+    final private List<ConsoleOutputPane> outputs = new ArrayList<ConsoleOutputPane>();
 
     private void refreshOutputs() {
         refreshOutputs(outputsPanel, (Integer)numberOfOutputs.getValue());
@@ -476,7 +474,7 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     public static void main(String[] args) {
 
-        final JavaConsole console = new JavaConsole();
+        final JavaConsole cconsole = new JavaConsole();
 
         boolean toShowConsole = true;
 
@@ -487,7 +485,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         }
 
         if (toShowConsole) {
-            console.showConsoleLater();
+            cconsole.showConsoleLater();
         }
 
     }
