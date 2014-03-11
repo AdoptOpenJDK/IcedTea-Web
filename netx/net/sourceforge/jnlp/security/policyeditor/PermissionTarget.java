@@ -44,7 +44,7 @@ public enum PermissionTarget {
 	NONE(""),
     ALL("*"),
     USER_HOME("${user.home}${/}*"),
-    TMPDIR("${io.tmpdir}${/}*"),
+    TMPDIR("${java.io.tmpdir}${/}*"),
     CLIPBOARD("accessClipboard"),
     PRINT("queuePrintJob"),
     PLAY("play");
