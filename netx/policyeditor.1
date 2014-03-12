@@ -12,6 +12,8 @@ and the browser plugin
 .br
 .B policyeditor [-file]
 policy_file
+.B [-codebase]
+url
 .SH DESCRIPTION
 .B policyeditor
 is a GUI application with small command line support to view and edit applet security policy settings
@@ -31,10 +33,24 @@ policy file.
 .SH OPTIONS
 
 .TP
--file
-Specifies a policy file path to open. If this is not given as an argument, the
-first argument given is interpreted as a file path to open anyway. This switch
-exists mostly for compatibility with Policy Tool.
+-help
+Prints a short help text and exits.
+
+.TP
+-file policy_file
+Specifies a policy file path to open. If exactly one argument is given, and it
+is not this flag, it is interpreted as a file path to open, as if this flag
+was given first. This flag exists mostly for compatibility with Policy Tool,
+but is also needed when opening a policy file and also using the -codebase flag.
+
+.TP
+-codebase url
+Specifies an applet codebase URL. If the specified codebase already exists in
+the policy file (if any), then it will be selected when the editor opens. If
+it is a new codebase then it will be added and selected. Multiple URLs may also
+be given with a single -codebase flag by separating them with spaces. In this
+case, the last codebase given will be selected, and all will be added. If this
+flag is given more than once, only the first is used.
 
 .SH EXAMPLES
 

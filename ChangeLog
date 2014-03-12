@@ -1,3 +1,11 @@
+2014-03-12  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(PECodebaseFlag) new message for policyeditor -help
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(HELP_MESSAGE) added -codebase flag
+	* netx/policyeditor.1: updated -file and added -codebase and -help
+
 2014-03-11  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionTarget.java:
