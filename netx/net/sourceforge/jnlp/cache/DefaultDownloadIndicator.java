@@ -112,6 +112,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
             if (resources != null) {
                 for (URL url : resources) {
                     result.addProgressPanel(url, null);
+        
                 }
             }
 

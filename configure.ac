@@ -27,6 +27,11 @@ AC_ARG_ENABLE([docs],
 AM_CONDITIONAL([ENABLE_DOCS], [test x$ENABLE_DOCS = xyes])
 AC_MSG_RESULT(${ENABLE_DOCS})
 
+AC_PATH_PROG([BIN_BASH], [bash],, [/bin])
+if test x"$BIN_BASH" = x ; then
+    AC_MSG_ERROR([/bin/bash is used in runtime and for about generation. Dying sooner rather then later])
+fi
+
 IT_CHECK_WITH_GCJ
 FIND_TOOL([ZIP], [zip])
 FIND_JAVAC

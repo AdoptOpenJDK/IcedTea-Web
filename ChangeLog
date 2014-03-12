@@ -1,3 +1,7 @@
+2014-03-12  Jiri Vanek  <jvanek@redhat.com>
+
+	* configure.ac: added check for /bin/bash
+
 2014-03-12  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
