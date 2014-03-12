@@ -1,5 +1,12 @@
 2014-03-12  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(initializeMapForCodebase) returns boolean indicating if the given
+	codebase already existed. (addNewCodebase) do not add codebases if they
+	already exist
+
+2014-03-12  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
 	(PEFileModified, PEFileModifiedDetail) new messages
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:

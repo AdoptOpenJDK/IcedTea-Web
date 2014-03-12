@@ -470,16 +470,18 @@ public class PolicyEditor extends JFrame {
             OutputController.getLogger().log(mfue);
             return;
         }
-        initializeMapForCodebase(codebase);
+        final boolean existingCodebase = initializeMapForCodebase(codebase);
         final String model;
         if (codebase.isEmpty()) {
             model = R("PEGlobalSettings");
         } else {
             model = codebase;
         }
-        listModel.addElement(model);
+        if (!existingCodebase) {
+            listModel.addElement(model);
+            changesMade = true;
+        }
         list.setSelectedValue(model, true);
-        changesMade = true;
     }
 
     /**
@@ -897,8 +899,13 @@ public class PolicyEditor extends JFrame {
      * Ensure that the model contains a specified mapping. No action is taken
      * if there already is a map with this key
      * @param codebase for which a permissions mapping is required
+     * @return true iff there was already an entry for this codebase
      */
-    private void initializeMapForCodebase(final String codebase) {
+    private boolean initializeMapForCodebase(final String codebase) {
+        if (codebasePermissionsMap.containsKey(codebase) || customPermissionsMap.containsKey(codebase)) {
+            return true;
+        }
+
         if (codebasePermissionsMap.get(codebase) == null) {
             final Map<PolicyEditorPermissions, Boolean> map = new HashMap<PolicyEditorPermissions, Boolean>();
             for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
@@ -911,6 +918,8 @@ public class PolicyEditor extends JFrame {
             final Set<CustomPermission> set = new HashSet<CustomPermission>();
             customPermissionsMap.put(codebase, set);
         }
+
+        return false;
     }
 
     /**
