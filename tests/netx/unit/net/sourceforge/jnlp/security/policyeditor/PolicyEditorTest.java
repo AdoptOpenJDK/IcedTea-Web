@@ -69,18 +69,18 @@ public class PolicyEditorTest {
 
     @Test
     public void testAddCodebase() throws Exception {
-        final String redHatUrlString = "http://redhat.com";
-        editor.addNewCodebase(redHatUrlString);
+        final String urlString = "http://example.com";
+        editor.addNewCodebase(urlString);
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));
-        assertTrue("Editor should have http://redhat.com", codebases.contains(redHatUrlString));
+        assertTrue("Editor should have http://example.com", codebases.contains(urlString));
         assertTrue("Editor should only have two codebases", codebases.size() == 2);
     }
 
     @Test
     public void addMultipleCodebases() throws Exception {
         final Set<String> toAdd = new HashSet<String>();
-        toAdd.add("http://redhat.com");
+        toAdd.add("http://example.com");
         toAdd.add("http://icedtea.classpath.org");
         editor.addNewCodebases(toAdd);
         final Collection<String> codebases = editor.getCodebases();
@@ -132,8 +132,8 @@ public class PolicyEditorTest {
     @Test
     public void testDefaultPermissionsAllFalse() throws Exception {
         final Map<PolicyEditorPermissions, Boolean> defaultMap = editor.getPermissions("");
-        editor.addNewCodebase("http://redhat.com");
-        final Map<PolicyEditorPermissions, Boolean> addedMap = editor.getPermissions("http://redhat.com");
+        editor.addNewCodebase("http://example.com");
+        final Map<PolicyEditorPermissions, Boolean> addedMap = editor.getPermissions("http://example.com");
         for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : defaultMap.entrySet()) {
             assertFalse("Permission " + entry.getKey() + " should be false", entry.getValue());
         }
@@ -145,8 +145,8 @@ public class PolicyEditorTest {
     @Test
     public void testAllPermissionsRepresented() throws Exception {
         final Map<PolicyEditorPermissions, Boolean> defaultMap = editor.getPermissions("");
-        editor.addNewCodebase("http://redhat.com");
-        final Map<PolicyEditorPermissions, Boolean> addedMap = editor.getPermissions("http://redhat.com");
+        editor.addNewCodebase("http://example.com");
+        final Map<PolicyEditorPermissions, Boolean> addedMap = editor.getPermissions("http://example.com");
         assertTrue("Default codebase permissions keyset should be the same size as enum values set",
                 defaultMap.keySet().size() == PolicyEditorPermissions.values().length);
         assertTrue("Added codebase permissions keyset should be the same size as enum values set",
@@ -175,7 +175,7 @@ public class PolicyEditorTest {
     @Test
     public void testArgsToMap() throws Exception {
         final String[] args = new String[] {
-                "-codebase", "http://redhat.com http://icedtea.classpath.org",
+                "-codebase", "http://example.com http://icedtea.classpath.org",
                 "-file", "/tmp/some-policy-file.tmp",
                 "-help"
         };
@@ -187,8 +187,8 @@ public class PolicyEditorTest {
         assertTrue("Value for -file should be /tmp/some-policy-file.tmp but was " + map.get("-file"),
                 map.get("-file").equals("/tmp/some-policy-file.tmp"));
         assertTrue("Args map should contain codebase flag", map.containsKey("-codebase"));
-        assertTrue("Value for codebase flag should be \"http://redhat.com http://icedtea.classpath.org\" but was " + map.get("-codebase"),
-                map.get("-codebase").equals("http://redhat.com http://icedtea.classpath.org"));
+        assertTrue("Value for codebase flag should be \"http://example.com http://icedtea.classpath.org\" but was " + map.get("-codebase"),
+                map.get("-codebase").equals("http://example.com http://icedtea.classpath.org"));
     }
 
 }

@@ -94,6 +94,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import net.sourceforge.jnlp.util.MD5SumWatcher;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -164,6 +165,7 @@ public class PolicyEditor extends JFrame {
     private final JFileChooser fileChooser;
     private CustomPolicyViewer cpViewer = null;
     private final WeakReference<PolicyEditor> weakThis = new WeakReference<PolicyEditor>(this);
+    private MD5SumWatcher fileWatcher;
 
     private final ActionListener okButtonAction, closeButtonAction, addCodebaseButtonAction,
             removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction;
@@ -593,12 +595,25 @@ public class PolicyEditor extends JFrame {
             for (final ActionListener l : box.getActionListeners()) {
                 box.removeActionListener(l);
             }
-            box.setSelected(codebasePermissionsMap.get(codebase).get(perm));
+            initializeMapForCodebase(codebase);
+            final Map<PolicyEditorPermissions, Boolean> map = codebasePermissionsMap.get(codebase);
+            final boolean state;
+            if (map != null) {
+                final Boolean s = map.get(perm);
+                if (s != null) {
+                    state = s;
+                } else {
+                    state = false;
+                }
+            } else {
+                state = false;
+            }
+            box.setSelected(state);
             box.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     changesMade = true;
-                    codebasePermissionsMap.get(codebase).put(perm, box.isSelected());
+                    map.put(perm, box.isSelected());
                 }
             });
         }
@@ -797,6 +812,10 @@ public class PolicyEditor extends JFrame {
                 }
                 final String contents;
                 try {
+                    fileWatcher = new MD5SumWatcher(file);
+                    fileWatcher.update();
+                    // User-level policy files are expected to be short enough that loading them in as a String
+                    // should not actually be *too* bad, and it's easy to work with.
                     contents = FileUtils.loadFileAsString(file);
                 } catch (final IOException e) {
                     OutputController.getLogger().log(e);
@@ -804,10 +823,12 @@ public class PolicyEditor extends JFrame {
                     FileUtils.showCouldNotOpenDialog(weakThis.get(), R("PECouldNotOpen"));
                     return;
                 }
+                codebasePermissionsMap.clear();
+                customPermissionsMap.clear();
                 // Split on newlines, both \r\n and \n style, for platform-independence
                 final String[] lines = contents.split("\\r?\\n+");
                 String codebase = "";
-                FileLock fileLock = null;
+                final FileLock fileLock;
                 try {
                     fileLock = FileUtils.getFileLock(file.getAbsolutePath(), false, true);
                 } catch (final FileNotFoundException e) {
@@ -828,13 +849,16 @@ public class PolicyEditor extends JFrame {
                         openBlock = true;
                     }
 
+                    // Matches '};', the closing block delimiter, with any amount of whitespace on either side
                     boolean commentLine = false;
                     if (line.matches("\\s*\\};\\s*")) {
                         openBlock = false;
                     }
+                    // Matches '/*', the start of a block comment
                     if (line.matches(".*/\\*.*")) {
                         commentBlock = true;
                     }
+                    // Matches '*/', the end of a block comment, and '//', a single-line comment
                     if (line.matches(".*\\*/.*")) {
                         commentBlock = false;
                     }
@@ -899,6 +923,28 @@ public class PolicyEditor extends JFrame {
         new Thread() {
             @Override
             public void run() {
+                try {
+                    final int response = updateMd5WithDialog();
+                    switch (response) {
+                        case JOptionPane.YES_OPTION:
+                            openAndParsePolicyFile();
+                            return;
+                        case JOptionPane.NO_OPTION:
+                            break;
+                        case JOptionPane.CANCEL_OPTION:
+                            return;
+                        default:
+                            break;
+                    }
+                } catch (final FileNotFoundException e) {
+                    // File on disk has been somehow removed since we first checked. Attempt to save to it
+                    // anyway then. If we can't, then the failure simply occurs later in this method
+                    OutputController.getLogger().log(e);
+                } catch (final IOException e) {
+                    OutputController.getLogger().log(e);
+                    showCouldNotSaveDialog();
+                    return;
+                }
                 final StringBuilder sb = new StringBuilder();
                 sb.append(AUTOGENERATED_NOTICE);
                 sb.append("\n/* Generated by PolicyEditor at " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
@@ -929,6 +975,7 @@ public class PolicyEditor extends JFrame {
 
                 try {
                     FileUtils.saveFile(sb.toString(), file);
+                    fileWatcher.update();
                     changesMade = false;
                     showChangesSavedDialog();
                 } catch (final IOException e) {
@@ -961,6 +1008,21 @@ public class PolicyEditor extends JFrame {
                 JOptionPane.showMessageDialog(weakThis.get(), R("PECouldNotSave"), R("Error"), JOptionPane.ERROR_MESSAGE);
             }
         });
+    }
+
+    /**
+     * Detect if the file's MD5 has changed. If so, track its new sum, and prompt the user on how to proceed
+     * @return the user's choice (Yes/No/Cancel - see JOptionPane constants). "No" if the file hasn't changed.
+     * @throws FileNotFoundException if the watched file does not exist
+     * @throws IOException if the file cannot be read
+     */
+    public int updateMd5WithDialog() throws FileNotFoundException, IOException {
+        final boolean changed = fileWatcher.update();
+        if (changed) {
+            return JOptionPane.showConfirmDialog(weakThis.get(), R("PEFileModifiedDetail", file.getCanonicalPath()),
+                    R("PEFileModified"), JOptionPane.YES_NO_CANCEL_OPTION);
+        }
+        return JOptionPane.NO_OPTION;
     }
 
     /**

@@ -1,6 +1,17 @@
 2014-03-12  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(PEFileModified, PEFileModifiedDetail) new messages
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(fileWatcher, openAndParsePolicyFile, savePolicyFile) update to use
+	MD5SumWatcher to check if the file has changed externally since being
+	opened
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java:
+	URLs changed to example.com
+
+2014-03-12  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
 	(PECodebaseFlag) new message for policyeditor -help
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
 	(HELP_MESSAGE) added -codebase flag
