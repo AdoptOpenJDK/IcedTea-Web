@@ -1,3 +1,8 @@
+2014-03-13  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(savePolicyFile, updateMd5WithDialog) avoid NPE when saving to a new file
+
 2014-03-13  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java: adapted

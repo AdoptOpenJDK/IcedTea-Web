@@ -984,6 +984,9 @@ public class PolicyEditor extends JFrame {
 
                 try {
                     FileUtils.saveFile(sb.toString(), file);
+                    if (fileWatcher == null) {
+                        fileWatcher = new MD5SumWatcher(file);
+                    }
                     fileWatcher.update();
                     changesMade = false;
                     showChangesSavedDialog();
@@ -1026,6 +1029,12 @@ public class PolicyEditor extends JFrame {
      * @throws IOException if the file cannot be read
      */
     public int updateMd5WithDialog() throws FileNotFoundException, IOException {
+        if (fileWatcher == null) {
+            if (file != null) {
+                fileWatcher = new MD5SumWatcher(file);
+            }
+            return JOptionPane.NO_OPTION;
+        }
         final boolean changed = fileWatcher.update();
         if (changed) {
             return JOptionPane.showConfirmDialog(weakThis.get(), R("PEFileModifiedDetail", file.getCanonicalPath()),
