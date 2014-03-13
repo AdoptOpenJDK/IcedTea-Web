@@ -217,7 +217,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         });
     }
 
-    private synchronized void refreshPaneBody(final boolean reset) throws BadLocationException, IOException {
+    private void refreshPaneBody(final boolean reset) throws BadLocationException, IOException {
         if (reset) {
             jEditorPane1.setText(model.importList(0));
         } else {
