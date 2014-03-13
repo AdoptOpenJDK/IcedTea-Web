@@ -1,5 +1,10 @@
 2014-03-13  Jiri Vanek  <jvanek@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java: adapted
+	to permissions attribute 
+
+2014-03-13  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixing rear deadlock issue
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: removed
 	(probably) unnecessary synchronization of (refreshPaneBody).

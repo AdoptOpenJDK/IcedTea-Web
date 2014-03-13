@@ -48,15 +48,44 @@ import java.util.jar.Manifest;
 
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.sourceforge.jnlp.util.FileTestUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 
 import org.junit.Test;
 
 public class JNLPClassLoaderTest extends NoStdOutErrTest{
 
+    private static AppletSecurityLevel level;
+    public static String askUser;
+    
+    
+    @BeforeClass
+    public static void setPermissions() {
+        level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+    }
+
+    @AfterClass
+    public static void resetPermissions() {
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, level.toChars());
+    }
+    @BeforeClass
+    public static void noDialogs(){
+        askUser = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER); 
+       JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER, Boolean.toString(false)); 
+    }
+    
+    @AfterClass
+    public static void restoreDialogs(){
+       JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER, askUser); 
+    }
     /* Note: Only does file leak testing for now. */
     @Test
     public void constructorFileLeakTest() throws Exception {
