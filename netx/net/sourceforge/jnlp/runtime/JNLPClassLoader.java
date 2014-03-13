@@ -2432,6 +2432,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCInit"), R("LRunInSandboxError"), R("LRunInSandboxErrorInfo"));
             }
 
+            JNLPRuntime.reloadPolicy(); // ensure that we have the most up-to-date custom policy loaded
             this.promptedForSandbox = true;
             this.runInSandbox = true;
         }

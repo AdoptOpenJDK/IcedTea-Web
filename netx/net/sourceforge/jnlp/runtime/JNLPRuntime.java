@@ -292,6 +292,10 @@ public class JNLPRuntime {
 
     }
 
+    public static void reloadPolicy() {
+        policy.refresh();
+    }
+
     /**
      * Returns a TrustManager ideal for the running VM.
      *
