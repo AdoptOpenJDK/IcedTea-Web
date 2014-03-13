@@ -258,8 +258,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
         this.enableCodeBase = enableCodeBase;
 
-        //as it is harmless, we can set is as soon as possible.
-        file.getManifestsAttributes().setLoader(this);
         
         AppVerifier verifier;
 
@@ -282,6 +280,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
         initializeResources();
         
+        //loading mainfests before resources are initialised may cause waiting for resources
+        file.getManifestsAttributes().setLoader(this);
 
         // initialize permissions
         initializePermissions();

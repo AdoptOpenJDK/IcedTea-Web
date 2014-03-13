@@ -1,3 +1,9 @@
+2014-03-13  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed apearence of download indicator
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (init) attributes
+	are alowed to access jars only once all resources are downloaded
+
 2014-03-12  Jiri Vanek  <jvanek@redhat.com>
 
 	* configure.ac: added check for /bin/bash
