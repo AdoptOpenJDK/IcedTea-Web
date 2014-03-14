@@ -15,7 +15,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.sourceforge.jnlp.JNLPFile.ManifestBoolean;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
@@ -65,6 +64,7 @@ import net.sourceforge.jnlp.ApplicationDesc;
 import net.sourceforge.jnlp.ExtensionDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFile.ManifestBoolean;
 import net.sourceforge.jnlp.JNLPMatcher;
 import net.sourceforge.jnlp.JNLPMatcherException;
 import net.sourceforge.jnlp.LaunchDesc;
@@ -365,7 +365,9 @@ public class JNLPClassLoader extends URLClassLoader {
         // the user was already shown a CertWarning dialog and has chosen to run the applet sandboxed.
         // This means they've already agreed to running the applet and have specified with which
         // permission level to do it!
-        if (!loader.getSigning() && !loader.securityDelegate.userPromptedForSandbox() && file instanceof PluginBridge) {
+        if (loader.getSigningState() == SigningState.PARTIAL) {
+            loader.securityDelegate.promptUserOnPartialSigning();
+        } else if (!loader.getSigning() && !loader.securityDelegate.userPromptedForSandbox() && file instanceof PluginBridge) {
             UnsignedAppletTrustConfirmation.checkUnsignedWithUserIfRequired((PluginBridge)file);
         }
 
@@ -374,10 +376,9 @@ public class JNLPClassLoader extends URLClassLoader {
         JNLPClassLoader extLoader = uniqueKeyToLoader.get(uniqueKey);
 
         if (extLoader != null && extLoader != loader) {
-            if (loader.getSigning() && !extLoader.getSigning())
-                if (!SecurityDialogs.showNotAllSignedWarningDialog(file))
-                    throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
-
+            if (loader.getSigning() != extLoader.getSigning()) {
+                loader.securityDelegate.promptUserOnPartialSigning();
+            }
             loader.merge(extLoader);
             extLoader.decrementLoaderUseCount(); // loader urls have been merged, ext loader is no longer used
         }
@@ -1055,7 +1056,7 @@ public class JNLPClassLoader extends URLClassLoader {
             return;
         }
 
-        if (jcv.isFullySigned() && !jcv.getAlreadyTrustPublisher()) {
+        if (getSigningState() == SigningState.FULL && jcv.isFullySigned() && !jcv.getAlreadyTrustPublisher()) {
             jcv.checkTrustWithUser(securityDelegate, file);
         }
     }
@@ -1074,21 +1075,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
     public boolean userPromptedForSandbox() {
         return securityDelegate.getRunInSandbox();
-    }
-
-    /**
-     * Display a dialog prompting the user to proceed on applets with mixed signing.
-     * @param file the JNLPFile or PluginBridge describing the applet/application to be launched
-     * @throws LaunchException if the user does not approve the prompt
-     */
-    private void showNotAllSignedDialog(JNLPFile file) throws LaunchException {
-        if (JNLPRuntime.isTrustAll()) {
-            return;
-        }
-
-        if (!SecurityDialogs.showNotAllSignedWarningDialog(file)) {
-            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LSignedAppJarUsingUnsignedJar"), R("LSignedAppJarUsingUnsignedJarInfo"));
-        }
     }
 
     /**
@@ -1921,12 +1907,16 @@ public class JNLPClassLoader extends URLClassLoader {
         if (signing == SigningState.FULL && JNLPRuntime.isVerifying()) {
             signing = SigningState.PARTIAL;
             try {
-                showNotAllSignedDialog(this.file);
+                securityDelegate.promptUserOnPartialSigning();
             } catch (LaunchException e) {
                 throw new RuntimeException("The signed applet required loading of unsigned code from the codebase, "
                         + "which the user refused", e);
             }
         }
+    }
+
+    public SigningState getSigningState() {
+        return signing;
     }
 
     protected SecurityDesc getSecurity() {
@@ -2314,6 +2304,8 @@ public class JNLPClassLoader extends URLClassLoader {
     public static interface SecurityDelegate {
         public boolean isPluginApplet();
 
+        public boolean userPromptedForPartialSigning();
+
         public boolean userPromptedForSandbox();
 
         public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final String codebaseHost);
@@ -2321,6 +2313,8 @@ public class JNLPClassLoader extends URLClassLoader {
         public SecurityDesc getClassLoaderSecurity(final String codebaseHost) throws LaunchException;
 
         public SecurityDesc getJarPermissions(final String codebaseHost);
+
+        public void promptUserOnPartialSigning() throws LaunchException;
 
         public void setRunInSandbox() throws LaunchException;
 
@@ -2424,6 +2418,7 @@ public class JNLPClassLoader extends URLClassLoader {
     public static class SecurityDelegateImpl implements SecurityDelegate {
         private final JNLPClassLoader classLoader;
         private boolean runInSandbox;
+        private boolean promptedForPartialSigning;
         private boolean promptedForSandbox;
 
         public SecurityDelegateImpl(final JNLPClassLoader classLoader) {
@@ -2530,8 +2525,20 @@ public class JNLPClassLoader extends URLClassLoader {
             this.runInSandbox = true;
         }
 
+        public void promptUserOnPartialSigning() throws LaunchException {
+            if (promptedForPartialSigning || JNLPRuntime.isTrustAll()) {
+                return;
+            }
+            promptedForPartialSigning = true;
+            UnsignedAppletTrustConfirmation.checkPartiallySignedWithUserIfRequired(this, classLoader.file, classLoader.jcv);
+        }
+
         public boolean getRunInSandbox() {
             return this.runInSandbox;
+        }
+
+        public boolean userPromptedForPartialSigning() {
+            return this.promptedForPartialSigning;
         }
 
         public boolean userPromptedForSandbox() {

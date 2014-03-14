@@ -59,14 +59,11 @@ public class SignedAppletCodebaseLoadingTests extends BrowserTest {
     private static final String RUNNING_STRING = "SignedAppletCodebaseLoading Applet Running";
     private static final String CLOSE_STRING = AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING;
 
-    @KnownToFail
     @Bug(id="PR1513")
     @NeedsDisplay
     @Test
     @TestInBrowsers(testIn={Browsers.one})
     public void testCodebaseLoading() throws Exception {
-        assertTrue("NotAllSigned dialog will appear if this test runs. Remove this exception and KnownToFail "
-                + "when a proper replacement is in place", false);
         ProcessResult pr = server.executeBrowser("SignedAppletCodebaseLoading.html", AutoClose.CLOSE_ON_CORRECT_END);
         assertProperStart(pr);
         assertCloseString(pr);

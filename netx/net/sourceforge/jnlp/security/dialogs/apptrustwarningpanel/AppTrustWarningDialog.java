@@ -57,6 +57,12 @@ public class AppTrustWarningDialog extends SecurityDialogPanel {
         return warningDialog;
     }
 
+    public static AppTrustWarningDialog partiallySigned(final SecurityDialog dialog, final JNLPFile file) {
+        final AppTrustWarningDialog warningDialog = new AppTrustWarningDialog(dialog);
+        warningDialog.add(new PartiallySignedAppTrustWarningPanel(file, warningDialog.getActionChoiceListener(), dialog));
+        return warningDialog;
+    }
+
     private ActionChoiceListener getActionChoiceListener() {
         return new ActionChoiceListener() {
             @Override

@@ -39,7 +39,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 
 public enum ExecuteAppletAction {
 
-    ALWAYS, NEVER, YES, NO;
+    ALWAYS, NEVER, YES, SANDBOX, NO;
 
     public String toChar() {
         switch (this) {
@@ -49,6 +49,8 @@ public enum ExecuteAppletAction {
                 return "N";
             case YES:
                 return "y";
+            case SANDBOX:
+                return "s";
             case NO:
                 return "n";
         }
@@ -63,6 +65,8 @@ public enum ExecuteAppletAction {
                 return Translator.R("APPEXTSECunsignedAppletActionNever");
             case YES:
                 return Translator.R("APPEXTSECunsignedAppletActionYes");
+            case SANDBOX:
+                return Translator.R("APPEXTSECunsignedAppletActionSandbox");
             case NO:
                 return Translator.R("APPEXTSECunsignedAppletActionNo");
         }
@@ -76,6 +80,8 @@ public enum ExecuteAppletAction {
             return ExecuteAppletAction.NEVER;
         } else if (s.startsWith("y")) {
             return ExecuteAppletAction.YES;
+        } else if (s.startsWith("s")) {
+            return ExecuteAppletAction.SANDBOX;
         } else if (s.startsWith("n")) {
             return ExecuteAppletAction.NO;
         } else {

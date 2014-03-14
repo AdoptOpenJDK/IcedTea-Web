@@ -37,35 +37,34 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import net.sourceforge.jnlp.security.dialogs.MissingALACAttributePanel;
-import net.sourceforge.jnlp.security.dialogs.MatchingALACAttributePanel;
-import net.sourceforge.jnlp.security.dialogs.MissingPermissionsAttributePanel;
-import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
-import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
-import net.sourceforge.jnlp.security.dialogs.NotAllSignedWarningPane;
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningDialog;
-import net.sourceforge.jnlp.security.dialogs.PasswordAuthenticationPane;
-import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
-import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
-import net.sourceforge.jnlp.security.dialogs.SingleCertInfoPane;
-import net.sourceforge.jnlp.security.dialogs.CertsInfoPane;
-import net.sourceforge.jnlp.security.dialogs.MoreInfoPane;
+import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.swing.JDialog;
+
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
+import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
+import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
+import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
+import net.sourceforge.jnlp.security.dialogs.CertsInfoPane;
+import net.sourceforge.jnlp.security.dialogs.MatchingALACAttributePanel;
+import net.sourceforge.jnlp.security.dialogs.MissingALACAttributePanel;
+import net.sourceforge.jnlp.security.dialogs.MissingPermissionsAttributePanel;
+import net.sourceforge.jnlp.security.dialogs.MoreInfoPane;
+import net.sourceforge.jnlp.security.dialogs.PasswordAuthenticationPane;
+import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
+import net.sourceforge.jnlp.security.dialogs.SingleCertInfoPane;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningDialog;
 import net.sourceforge.jnlp.util.ImageResources;
-
-import java.awt.*;
-
-import javax.swing.*;
-
-import java.awt.event.*;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import java.util.List;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Provides methods for showing security warning dialogs for a wide range of
@@ -241,7 +240,7 @@ public class SecurityDialog extends JDialog {
             dialogTitle = "Security Warning";
         else if (dialogType == DialogType.APPLET_WARNING)
             dialogTitle = "Applet Warning";
-        else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
+        else if (dialogType == DialogType.PARTIALLYSIGNED_WARNING)
             dialogTitle = "Security Warning";
         else if (dialogType == DialogType.AUTHENTICATION)
             dialogTitle = "Authentication Required";
@@ -314,10 +313,10 @@ public class SecurityDialog extends JDialog {
             panel = new AccessWarningPane(this, extras, this.certVerifier);
         else if (dialogType == DialogType.APPLET_WARNING)
             panel = new AppletWarningPane(this, this.certVerifier);
-        else if (dialogType == DialogType.NOTALLSIGNED_WARNING)
-            panel = new NotAllSignedWarningPane(this);
+        else if (dialogType == DialogType.PARTIALLYSIGNED_WARNING)
+            panel = AppTrustWarningDialog.partiallySigned(this, file);
         else if (dialogType == DialogType.UNSIGNED_WARNING) // Only necessary for applets on 'high security' or above
-            panel = new UnsignedAppletTrustWarningDialog(this, file);
+            panel = AppTrustWarningDialog.unsigned(this, file);
         else if (dialogType == DialogType.AUTHENTICATION)
             panel = new PasswordAuthenticationPane(this, extras);
         else if (dialogType == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING)

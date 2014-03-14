@@ -48,6 +48,8 @@ import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialogs;
@@ -208,6 +210,54 @@ public class UnsignedAppletTrustConfirmation {
 
         if (!appletOK) {
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletUserDenied"));
+        }
+
+    }
+
+    public static void checkPartiallySignedWithUserIfRequired(SecurityDelegate securityDelegate, JNLPFile file,
+            CertVerifier certVerifier) throws LaunchException {
+
+        if (JNLPRuntime.isTrustNone()) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running partially signed applet at " + file.getCodeBase() + " with only Sandbox permissions due to -Xtrustnone flag");
+            securityDelegate.setRunInSandbox();
+            return;
+        }
+
+        if (!unsignedConfirmationIsRequired()) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running partially signed applet at " + file.getCodeBase() + " does not require confirmation according to security policy.");
+            return;
+        }
+
+        ExecuteAppletAction storedAction = getStoredAction(file);
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Stored action for partially signed applet at " + file.getCodeBase() + " was " + storedAction);
+
+        boolean appletOK;
+
+        if (storedAction == ExecuteAppletAction.ALWAYS) {
+            appletOK = true;
+        } else if (storedAction == ExecuteAppletAction.NEVER) {
+            appletOK = false;
+        } else {
+            // No remembered decision, prompt the user
+            AppSigningWarningAction warningResponse = SecurityDialogs.showPartiallySignedWarningDialog(file, certVerifier);
+            ExecuteAppletAction executeAction = warningResponse.getAction();
+
+            if (executeAction == ExecuteAppletAction.SANDBOX) {
+                securityDelegate.setRunInSandbox();
+            }
+
+            appletOK = (executeAction == ExecuteAppletAction.YES || executeAction == ExecuteAppletAction.ALWAYS
+                    || executeAction == ExecuteAppletAction.SANDBOX);
+
+            if (executeAction != null) {
+                updateAppletAction(file, executeAction, warningResponse.rememberForCodeBase());
+            }
+
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for unsigned applet at " + file.getCodeBase() + " was " + executeAction);
+        }
+
+        if (!appletOK) {
+            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LPartiallySignedApplet"), R("LPartiallySignedAppletUserDenied"));
         }
 
     }

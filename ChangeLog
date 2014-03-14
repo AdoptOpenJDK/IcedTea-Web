@@ -1,5 +1,46 @@
 2014-03-14  Andrew Azores  <aazores@redhat.com>
 
+	Added new PartiallySigned Dialog to replace NotAllSignedWarningPane.
+	Also includes a Sandbox button.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(APPEXTSecunsignedAppletActionSandbox, LPartiallySignedApplet,
+	LPartiallySignedAppletUserDenied) new messages. (SNotAllSignedSummary,
+	SNotAllSignedDetail, SNotAllSignedQuestion) keys renamed to SPartially*
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: (SNotAllSignedSummary,
+	SNotAllSignedDetail, SNotAllSignedQuestion) keys renamed to SPartially*
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: same
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: same
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	Logic added for displaying new PartiallySigned dialog.
+	(showNotAllSignedDialog) removed. (getSigningState) new method.
+	(promptUserOnPartialSigning, userPromptedForPartialSigning) new methods for
+	SecurityDelegate.
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
+	(partiallySigned) new method
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	(chosenActionSetter) refactored to allow Sandbox action. (setupInfoPanel) applet
+	title made overrideable by subclasses
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: (NOTALLSIGNED_WARNING)
+	renamed PARTIALLYSIGNED_WARNING, display new dialog rather than old
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: (NOTALLSIGNED_WARNING)
+	renamed PARTIALLYSIGNED_WARNING. (showNotAllSignedWarningDialog) removed.
+	(showPartiallySignedWarningDialog) new method
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExecuteAppletAction.java:
+	Added Sandbox action
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	(checkPartiallySignedWithUserIfRequired) new method
+	* tests/reproducers/custom/SignedAppletCodebaseLoading/testcases/SignedAppletCodebaseLoadingTests.java:
+	test now passes since dialog will not appear if applet security is set to Low.
+	KnownToFail removed.
+	* tests/reproducers/custom/SignedAppletExternalMainClass/testcases/SignedAppletExternalMainClassTest.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	new class
+	* netx/net/sourceforge/jnlp/security/dialogs/NotAllSignedWarningPane.java: deleted
+	in favour of PartiallySignedAppTrustWarningPanel
+
+2014-03-14  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
 	(addNewCodebase) ensure that checkboxes update. (removeCodebase,
 	updateCheckboxes) ensure UI updates are done on EDT.

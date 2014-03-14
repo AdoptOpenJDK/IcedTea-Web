@@ -78,7 +78,7 @@ public class SecurityDialogs {
         CERT_INFO,
         SINGLE_CERT_INFO,
         ACCESS_WARNING,
-        NOTALLSIGNED_WARNING,
+        PARTIALLYSIGNED_WARNING,
         UNSIGNED_WARNING,   /* requires confirmation with 'high-security' setting */
         APPLET_WARNING,
         AUTHENTICATION,
@@ -98,7 +98,7 @@ public class SecurityDialogs {
         NETWORK,
         VERIFIED,
         UNVERIFIED,
-        NOTALLSIGNED,
+        PARTIALLYSIGNED,
         UNSIGNED,           /* requires confirmation with 'high-security' setting */
         SIGNING_ERROR
     }
@@ -163,29 +163,6 @@ public class SecurityDialogs {
     }
 
     /**
-     * Shows a warning dialog for when the main application jars are signed,
-     * but extensions aren't
-     *
-     * @return true if permission was granted by the user, false otherwise.
-     */
-    public static boolean showNotAllSignedWarningDialog(JNLPFile file) {
-
-        if (!shouldPromptUser()) {
-            return false;
-        }
-
-        final SecurityDialogMessage message = new SecurityDialogMessage();
-        message.dialogType = DialogType.NOTALLSIGNED_WARNING;
-        message.accessType = AccessType.NOTALLSIGNED;
-        message.file = file;
-        message.extras = new Object[0];
-
-        Object selectedValue = getUserResponse(message);
-
-        return getIntegerResponseAsBoolean(selectedValue);
-    }
-
-    /**
      * Shows a warning dialog for when a plugin applet is unsigned.
      * This is used with 'high-security' setting.
      *
@@ -235,6 +212,22 @@ public class SecurityDialogs {
         Object selectedValue = getUserResponse(message);
 
         return getIntegerResponseAsAppletAction(selectedValue);
+    }
+
+    /**
+     * Shows a warning dialog for when an applet or application is partially signed.
+     *
+     * @return true if permission was granted by the user, false otherwise.
+     */
+    public static AppSigningWarningAction showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier) {
+
+        final SecurityDialogMessage message = new SecurityDialogMessage();
+        message.dialogType = DialogType.PARTIALLYSIGNED_WARNING;
+        message.accessType = AccessType.PARTIALLYSIGNED;
+        message.file = file;
+        message.certVerifier = certVerifier;
+
+        return (AppSigningWarningAction) getUserResponse(message);
     }
 
     /**

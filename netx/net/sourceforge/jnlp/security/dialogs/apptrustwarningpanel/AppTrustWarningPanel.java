@@ -136,8 +136,8 @@ public abstract class AppTrustWarningPanel extends JPanel {
         rejectButton = new JButton(R("ButCancel"));
         helpButton = new JButton(R("APPEXTSECguiPanelHelpButton"));
 
-        allowButton.addActionListener(chosenActionSetter(true));
-        rejectButton.addActionListener(chosenActionSetter(false));
+        allowButton.addActionListener(chosenActionSetter(ExecuteAppletAction.YES));
+        rejectButton.addActionListener(chosenActionSetter(ExecuteAppletAction.NO));
 
         helpButton.addActionListener(getHelpButtonAction());
 
@@ -207,8 +207,12 @@ public abstract class AppTrustWarningPanel extends JPanel {
         add(topPanel);
     }
 
+    protected String getAppletTitle() {
+        return R("SAppletTitle", file.getTitle());
+    }
+
     private void setupInfoPanel() {
-        String titleText = R("SAppletTitle", file.getTitle());
+        String titleText = getAppletTitle();
         JLabel titleLabel = new JLabel(titleText);
         titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.BOLD, 18));
 
@@ -308,7 +312,7 @@ public abstract class AppTrustWarningPanel extends JPanel {
     }
 
     // Toggles whether 'match applet' or 'match codebase' options are greyed out
-    private ActionListener permanencyListener() {
+    protected ActionListener permanencyListener() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -318,21 +322,22 @@ public abstract class AppTrustWarningPanel extends JPanel {
         };
     }
 
-    // Sets action depending on allowApplet + checkbox state
-    private ActionListener chosenActionSetter(final boolean allowApplet) {
+    protected ActionListener chosenActionSetter(final ExecuteAppletAction action) {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ExecuteAppletAction action;
+                ExecuteAppletAction realAction;
 
-                if (allowApplet) {
-                    action = permanencyCheckBox.isSelected() ? ExecuteAppletAction.ALWAYS : ExecuteAppletAction.YES;
+                if (action == ExecuteAppletAction.YES) {
+                    realAction = permanencyCheckBox.isSelected() ? ExecuteAppletAction.ALWAYS : ExecuteAppletAction.YES;
+                } else if (action == ExecuteAppletAction.NO) {
+                    realAction = permanencyCheckBox.isSelected() ? ExecuteAppletAction.NEVER : ExecuteAppletAction.NO;
                 } else {
-                    action = permanencyCheckBox.isSelected() ? ExecuteAppletAction.NEVER : ExecuteAppletAction.NO;
+                    realAction = action;
                 }
 
                 boolean applyToCodeBase = applyToCodeBaseButton.isSelected();
-                actionChoiceListener.actionChosen(new AppSigningWarningAction(action, applyToCodeBase));
+                actionChoiceListener.actionChosen(new AppSigningWarningAction(realAction, applyToCodeBase));
             }
         };
     }
