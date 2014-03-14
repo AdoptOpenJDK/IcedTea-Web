@@ -1,3 +1,9 @@
+2014-03-14  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(addNewCodebase) ensure that checkboxes update. (removeCodebase,
+	updateCheckboxes) ensure UI updates are done on EDT.
+
 2014-03-14  Jiri Vanek  <jvanek@redhat.com>
 
 	Base implementation of Application-Library-Allowable-Codebase. Remember

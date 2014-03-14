@@ -478,10 +478,21 @@ public class PolicyEditor extends JFrame {
             model = codebase;
         }
         if (!existingCodebase) {
-            listModel.addElement(model);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    listModel.addElement(model);
+                }
+            });
             changesMade = true;
         }
-        list.setSelectedValue(model, true);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                list.setSelectedValue(model, true);
+                updateCheckboxes(codebase);
+            }
+        });
     }
 
     /**
@@ -545,8 +556,14 @@ public class PolicyEditor extends JFrame {
             previousIndex = 0;
         }
         codebasePermissionsMap.remove(codebase);
-        listModel.removeElement(codebase);
-        list.setSelectedIndex(previousIndex);
+        final int fIndex = previousIndex;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                listModel.removeElement(codebase);
+                list.setSelectedIndex(fIndex);
+            }
+        });
         changesMade = true;
     }
 
@@ -592,33 +609,39 @@ public class PolicyEditor extends JFrame {
      * @param codebase whose permissions to display
      */
     private void updateCheckboxes(final String codebase) {
-        for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
-            final JCheckBox box = checkboxMap.get(perm);
-            for (final ActionListener l : box.getActionListeners()) {
-                box.removeActionListener(l);
-            }
-            initializeMapForCodebase(codebase);
-            final Map<PolicyEditorPermissions, Boolean> map = codebasePermissionsMap.get(codebase);
-            final boolean state;
-            if (map != null) {
-                final Boolean s = map.get(perm);
-                if (s != null) {
-                    state = s;
-                } else {
-                    state = false;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
+                    final JCheckBox box = checkboxMap.get(perm);
+                    for (final ActionListener l : box.getActionListeners()) {
+                        box.removeActionListener(l);
+                    }
+                    initializeMapForCodebase(codebase);
+                    final Map<PolicyEditorPermissions, Boolean> map = codebasePermissionsMap.get(codebase);
+                    final boolean state;
+                    if (map != null) {
+                        final Boolean s = map.get(perm);
+                        if (s != null) {
+                            state = s;
+                        } else {
+                            state = false;
+                        }
+                    } else {
+                        state = false;
+                    }
+                    box.setSelected(state);
+                    box.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(final ActionEvent e) {
+                            changesMade = true;
+                            map.put(perm, box.isSelected());
+                        }
+                    });
                 }
-            } else {
-                state = false;
             }
-            box.setSelected(state);
-            box.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    changesMade = true;
-                    map.put(perm, box.isSelected());
-                }
-            });
-        }
+        });
+
     }
 
     /**
