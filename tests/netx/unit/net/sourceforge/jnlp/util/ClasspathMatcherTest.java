@@ -565,4 +565,102 @@ public class ClasspathMatcherTest {
         Assert.assertTrue(cps1.matches(new URL("http://whatever.anywher/")));
         Assert.assertTrue(cps1.matches(new URL("http://whatever.anywher")));
     }
+    
+     @Test
+    public void matchersTestWithPathsNix() throws MalformedURLException {
+        ClasspathMatchers cps1 = ClasspathMatcher.ClasspathMatchers.compile("    aa bb     cc     ", true);
+        ArrayList<ClasspathMatcher> q = cps1.getMatchers();
+        Assert.assertEquals(3, q.size());
+        Assert.assertEquals("aa", q.get(0).getParts().domain);
+        Assert.assertEquals("bb", q.get(1).getParts().domain);
+        Assert.assertEquals("cc", q.get(2).getParts().domain);
+
+
+        ClasspathMatchers cps2 = ClasspathMatcher.ClasspathMatchers.compile("http://aa.cz/xyz  ftp://*bb.cz/bcq/dfg/aa*", true);
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz/aa")));
+        Assert.assertFalse(cps2.matches(new URL("http://bb.cz")));
+        Assert.assertFalse(cps2.matches(new URL("http://aa.cz")));
+        Assert.assertFalse(cps2.matches(new URL("http://bb.cz")));
+        //star
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz/bcq/aa-test.html")));
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz/bcq/dfg-aa-test.html")));
+        Assert.assertTrue(cps2.matches(new URL("ftp://123.bb.cz/bcq/dfg/aa-test.html")));
+        Assert.assertTrue(cps2.matches(new URL("ftp://123.bb.cz/bcq/dfg/aa")));
+        Assert.assertTrue(cps2.matches(new URL("ftp://123.bb.cz/bcq/dfg/aa/")));
+        Assert.assertTrue(cps2.matches(new URL("ftp://123.bb.cz/bcq/dfg/aa-files/aaa.jar")));
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz/bcq\\dfg\\aa-files\\aaa.jar")));
+        //double quotes may harm
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz//bcq/dfg/aa-files/aaa.jar")));
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz//bcq/dfg/aa-files//aaa.jar")));
+        //no star
+        Assert.assertFalse(cps2.matches(new URL("http://bb.cz")));
+        Assert.assertFalse(cps2.matches(new URL("http://aa.cz")));
+        Assert.assertTrue(cps2.matches(new URL("http://aa.cz/xyz")));
+        //double quotes may harm again
+        Assert.assertTrue(cps2.matches(new URL("http://aa.cz/xyz/")));
+        Assert.assertFalse(cps2.matches(new URL("http://aa.cz//xyz")));
+
+
+
+    }
+
+    @Test
+    public void matchersTestWithPathsWin() throws MalformedURLException {
+        ClasspathMatchers cps1 = ClasspathMatcher.ClasspathMatchers.compile("    aa bb     cc     ", true);
+        ArrayList<ClasspathMatcher> q = cps1.getMatchers();
+        Assert.assertEquals(3, q.size());
+        Assert.assertEquals("aa", q.get(0).getParts().domain);
+        Assert.assertEquals("bb", q.get(1).getParts().domain);
+        Assert.assertEquals("cc", q.get(2).getParts().domain);
+
+
+        ClasspathMatchers cps2 = ClasspathMatcher.ClasspathMatchers.compile("http://aa.cz/xyz  ftp://*bb.cz/bcq\\dfg\\aa*", true);
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz/aa")));
+        Assert.assertFalse(cps2.matches(new URL("http://bb.cz")));
+        Assert.assertFalse(cps2.matches(new URL("http://aa.cz")));
+        Assert.assertFalse(cps2.matches(new URL("http://bb.cz")));
+        //star
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz/bcq\\aa-test.html")));
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz/bcq\\dfg-aa-test.html")));
+        Assert.assertTrue(cps2.matches(new URL("ftp://123.bb.cz/bcq\\dfg\\aa-test.html")));
+        Assert.assertTrue(cps2.matches(new URL("ftp://123.bb.cz/bcq\\dfg\\aa")));
+        Assert.assertTrue(cps2.matches(new URL("ftp://123.bb.cz/bcq\\dfg\\aa\\")));
+        Assert.assertTrue(cps2.matches(new URL("ftp://123.bb.cz/bcq\\dfg\\aa-files\\aaa.jar")));
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz/bcq/dfg/aa-files/aaa.jar")));
+        //double quotes may harm
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz//bcq\\dfg\\aa-files\\aaa.jar")));
+        Assert.assertFalse(cps2.matches(new URL("ftp://123.bb.cz//bcq\\dfg\\aa-files\\aaa.jar")));
+        //no star
+        Assert.assertFalse(cps2.matches(new URL("http://bb.cz")));
+        Assert.assertFalse(cps2.matches(new URL("http://aa.cz")));
+        Assert.assertTrue(cps2.matches(new URL("http://aa.cz/xyz")));
+        //double quotes may harm again
+        Assert.assertTrue(cps2.matches(new URL("http://aa.cz/xyz\\")));
+        Assert.assertFalse(cps2.matches(new URL("http://aa.cz//xyz")));
+
+
+
+    }
+
+    @Test
+    public void trickyPathsMatchTes() throws MalformedURLException {
+        ClasspathMatchers cps1 = ClasspathMatcher.ClasspathMatchers.compile("http://aaa.com/some/path", true);
+        ClasspathMatchers cps11 = ClasspathMatcher.ClasspathMatchers.compile("http://aaa.com/some/path", false);
+        ClasspathMatchers cps2 = ClasspathMatcher.ClasspathMatchers.compile("http://aaa.com/some/path/", true);
+        ClasspathMatchers cps22 = ClasspathMatcher.ClasspathMatchers.compile("http://aaa.com/some/path/", false);
+
+        Assert.assertTrue(cps1.matches(new URL("http://aaa.com/some/path")));
+        Assert.assertTrue(cps1.matches(new URL("http://aaa.com/some/path/")));
+
+        Assert.assertFalse(cps2.matches(new URL("http://aaa.com/some/path")));
+        Assert.assertTrue(cps2.matches(new URL("http://aaa.com/some/path/")));
+
+
+        Assert.assertTrue(cps11.matches(new URL("http://aaa.com/some/path")));
+        Assert.assertTrue(cps11.matches(new URL("http://aaa.com/some/path/")));
+
+        Assert.assertTrue(cps22.matches(new URL("http://aaa.com/some/path")));
+        Assert.assertTrue(cps22.matches(new URL("http://aaa.com/some/path/")));
+
+    }
 }

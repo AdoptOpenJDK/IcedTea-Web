@@ -92,6 +92,7 @@ import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.misc.JarIndex;
 
@@ -291,6 +292,8 @@ public class JNLPClassLoader extends URLClassLoader {
         checkCodebaseAttribute();
         
         checkPermissionsAttribute();
+        
+        checkApplicationLibraryAllowableCodebaseAttribute();
         
         installShutdownHooks();
         
@@ -2322,6 +2325,96 @@ public class JNLPClassLoader extends URLClassLoader {
         public void setRunInSandbox() throws LaunchException;
 
         public boolean getRunInSandbox();
+    }
+
+    private void checkApplicationLibraryAllowableCodebaseAttribute() throws LaunchException {
+        if (signing == SigningState.NONE){
+            return; /*when app is not signed at all, then skip this check*/
+        } 
+        //conditions
+        URL codebase = file.getCodeBase();
+        URL documentBase = null;
+        if (file instanceof PluginBridge) {
+            documentBase = ((PluginBridge) file).getSourceLocation();
+        }
+        if (documentBase == null) {
+            documentBase = file.getCodeBase();
+        }
+
+        //cases
+        Set<URL> usedUrls = new HashSet<URL>();
+        URL sourceLocation = file.getSourceLocation();
+        ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
+        if (sourceLocation != null) {
+            usedUrls.add(UrlUtils.removeFileName(sourceLocation));
+        }
+        for (ResourcesDesc resourcesDesc: resourcesDescs) {
+            ExtensionDesc[] ex = resourcesDesc.getExtensions();
+            if (ex != null) {
+                for ( ExtensionDesc extensionDesc: ex) {
+                    if (extensionDesc != null) {
+                        usedUrls.add(UrlUtils.removeFileName(extensionDesc.getLocation()));
+                    }
+                }
+            }
+            JARDesc[] jars = resourcesDesc.getJARs();
+            if (jars != null) {
+                for (JARDesc jarDesc: jars) {
+                    if (jarDesc != null) {
+                        usedUrls.add(UrlUtils.removeFileName(jarDesc.getLocation()));
+                    }
+                }
+            }
+            JNLPFile jnlp = resourcesDesc.getJNLPFile();
+            if (jnlp != null) {
+                usedUrls.add(UrlUtils.removeFileName(jnlp.getSourceLocation()));
+            }
+
+        }
+        OutputController.getLogger().log("Found alaca URLs to be verified");
+        for (URL url : usedUrls) {
+            OutputController.getLogger().log(" - " + url.toExternalForm());
+        }
+        if (usedUrls.isEmpty()) {
+            //I hope this is the case, when the resources is/are
+            //only codebase classes. Then it should be safe to return.
+            OutputController.getLogger().log("The application is not using any url resources, skipping Application-Library-Allowable-Codebase Attribute check.");
+            return;
+        }
+
+        if (usedUrls.size() == 1) {
+            if (UrlUtils.equalsIgnoreLastSlash(usedUrls.toArray(new URL[0])[0], codebase)
+                    && UrlUtils.equalsIgnoreLastSlash(usedUrls.toArray(new URL[0])[0], documentBase)) {
+                //all resoources are from codebase or document base. it is ok to proceeed.
+                OutputController.getLogger().log("All applications resources (" + usedUrls.toArray(new URL[0])[0] + ") are from codebas/documentbase " + codebase + "/" + documentBase + ", skipping Application-Library-Allowable-Codebase Attribute check.");
+                return;
+            }
+        }
+        ClasspathMatchers att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
+
+        if (att == null) {
+            boolean a = SecurityDialogs.showMissingALACAttributePanel(file.getTitle(), documentBase, usedUrls);
+            if (!a) {
+                throw new LaunchException("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was blocked from running by the user");
+            } else {
+                OutputController.getLogger().log("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user");
+                return;
+            }
+        } else {
+            for (URL foundUrl : usedUrls) {
+                if (!att.matches(foundUrl)) {
+                    throw new LaunchException("The resource from " + foundUrl + " does not match the  location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
+                } else {
+                    OutputController.getLogger().log("The resource from " + foundUrl + " does  match the  location in Application-Library-Allowable-Codebase Attribute " + att + ". Continuing.");
+                }
+            }
+        }
+        boolean a = SecurityDialogs.showMatchingALACAttributePanel(file.getTitle(), documentBase, usedUrls);
+        if (!a) {
+            throw new LaunchException("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, but was blocked from running by the user." );
+        } else {
+            OutputController.getLogger().log("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user." );
+        }
     }
 
     /**

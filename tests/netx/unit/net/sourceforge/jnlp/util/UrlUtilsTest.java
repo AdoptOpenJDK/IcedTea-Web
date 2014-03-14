@@ -138,4 +138,111 @@ public class UrlUtilsTest {
             assertEquals(testFile, UrlUtils.decodeUrlAsFile(encodedUrl));
         }
     }
+    
+     
+    @Test
+    public void testNormalizeUrlSlashStrings() throws Exception {
+        String u11 = UrlUtils.sanitizeLastSlash("http://aa.bb/aaa/bbb////");
+        String u22 = UrlUtils.sanitizeLastSlash("http://aa.bb/aaa/bbb");
+        assertEquals(u11, u22);
+        assertEquals(u11, "http://aa.bb/aaa/bbb");
+
+        String u1 = UrlUtils.sanitizeLastSlash(("http://aa.bb/aaa\\bbb\\"));
+        String u2 = UrlUtils.sanitizeLastSlash(("http://aa.bb/aaa\\bbb"));
+        assertEquals(u1, u2);
+        assertEquals(u1, ("http://aa.bb/aaa\\bbb"));
+    }
+    
+    @Test
+    public void testNormalizeUrlSlashUrls() throws Exception {
+        URL u11 = UrlUtils.sanitizeLastSlash(new URL("http://aa.bb/aaa/bbb////"));
+        URL u22 = UrlUtils.sanitizeLastSlash(new URL("http://aa.bb/aaa/bbb"));
+        assertEquals(u11, u22);
+        assertEquals(u11, new URL("http://aa.bb/aaa/bbb"));
+
+        URL u1 = UrlUtils.sanitizeLastSlash(new URL("http://aa.bb/aaa\\bbb\\"));
+        URL u2 = UrlUtils.sanitizeLastSlash(new URL("http://aa.bb/aaa\\bbb"));
+        assertEquals(u1, u2);
+        assertEquals(u1, new URL("http://aa.bb/aaa\\bbb"));
+    }
+
+    @Test
+    public void testEqualsIgnoreLastSlash() throws Exception {
+        URL u11 = (new URL("http://aa.bb/aaa/bbb////"));
+        URL u22 = (new URL("http://aa.bb/aaa/bbb"));
+        assertTrue(UrlUtils.equalsIgnoreLastSlash(u11, u22));
+        assertTrue(UrlUtils.equalsIgnoreLastSlash(u11, new URL("http://aa.bb/aaa/bbb")));
+
+        URL u1 = (new URL("http://aa.bb/aaa\\bbb\\"));
+        URL u2 = (new URL("http://aa.bb/aaa\\bbb"));
+        assertTrue(UrlUtils.equalsIgnoreLastSlash(u1, u2));
+        assertTrue(UrlUtils.equalsIgnoreLastSlash(u1, new URL("http://aa.bb/aaa\\bbb")));
+
+        assertTrue(UrlUtils.equalsIgnoreLastSlash(new URL("http://aa.bb/aaa\\bbb\\"), new URL("http://aa.bb/aaa\\bbb/")));
+        assertFalse(UrlUtils.equalsIgnoreLastSlash(new URL("http://aa.bb/aaa\\bbb\\"), new URL("http://aa.bb/aaa/bbb/")));
+    }
+
+    @Test
+    public void removeFileName1() throws Exception {
+        URL l1 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/hchkr/jar.jar"));
+        assertEquals(l1, new URL("http://aaa.bb/xyz/hchkr"));
+
+        URL l2 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/hchkr/"));
+        assertEquals(l2, new URL("http://aaa.bb/xyz/hchkr"));
+
+        URL l3 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/hchkr"));
+        assertEquals(l3, new URL("http://aaa.bb/xyz"));
+
+        URL l4 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/jar.jar"));
+        assertEquals(l4, new URL("http://aaa.bb/xyz"));
+
+        URL l5 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/"));
+        assertEquals(l5, new URL("http://aaa.bb/xyz"));
+
+        URL l6 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz"));
+        assertEquals(l6, new URL("http://aaa.bb"));
+
+        URL l7 = UrlUtils.removeFileName(new URL("http://aaa.bb/jar.jar"));
+        assertEquals(l7, new URL("http://aaa.bb"));
+
+        URL l8 = UrlUtils.removeFileName(new URL("http://aaa.bb/"));
+        assertEquals(l8, new URL("http://aaa.bb"));
+
+        URL l9 = UrlUtils.removeFileName(new URL("http://aaa.bb"));
+        assertEquals(l9, new URL("http://aaa.bb"));
+
+    }
+
+    public void removeFileName2() throws Exception {
+        URL l1 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\hchkr\\jar.jar"));
+        assertEquals(l1, new URL("http://aaa.bb/xyz\\hchkr"));
+
+        URL l2  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\hchkr\\"));
+         assertEquals(l2, new URL("http://aaa.bb/xyz\\hchkr"));
+         
+         URL l3  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\hchkr"));
+         assertEquals(l3, new URL("http://aaa.bb/xyz"));
+         
+         URL l4  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\jar.jar"));
+         assertEquals(l4, new URL("http://aaa.bb/xyz"));
+         
+         URL l5  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\"));
+         assertEquals(l5, new URL("http://aaa.bb/xyz"));
+         
+         URL l6  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz"));
+         assertEquals(l6, new URL("http://aaa.bb"));
+         
+         URL l7  = UrlUtils.removeFileName(new URL("http://aaa.bb/jar.jar"));
+         assertEquals(l7, new URL("http://aaa.bb"));
+         
+         URL l8  = UrlUtils.removeFileName(new URL("http://aaa.bb/"));
+         assertEquals(l8, new URL("http://aaa.bb"));
+         
+         URL l9  = UrlUtils.removeFileName(new URL("http://aaa.bb"));
+         assertEquals(l9, new URL("http://aaa.bb"));
+        
+    }
+     
+    
+
 }

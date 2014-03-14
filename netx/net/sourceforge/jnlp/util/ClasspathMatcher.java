@@ -24,6 +24,7 @@ public class ClasspathMatcher {
     public static class ClasspathMatchers {
 
         private final ArrayList<ClasspathMatcher> matchers;
+        private final boolean includePath;
 
         ArrayList<ClasspathMatcher> getMatchers() {
             return matchers;
@@ -36,8 +37,12 @@ public class ClasspathMatcher {
          * @return
          */
         public static ClasspathMatchers compile(String s) {
+            return compile(s, false);
+        }
+
+        public static ClasspathMatchers compile(String s, boolean includePath) {
             if (s == null) {
-                return new ClasspathMatchers(new ArrayList<ClasspathMatcher>(0));
+                return new ClasspathMatchers(new ArrayList<ClasspathMatcher>(0), includePath);
             }
             String[] splitted = s.trim().split("\\s+");
             ArrayList<ClasspathMatcher> matchers = new ArrayList<ClasspathMatcher>(splitted.length);
@@ -45,11 +50,12 @@ public class ClasspathMatcher {
                 matchers.add(ClasspathMatcher.compile(string.trim()));
             }
 
-            return new ClasspathMatchers(matchers);
+            return new ClasspathMatchers(matchers, includePath);
         }
 
-        public ClasspathMatchers(ArrayList<ClasspathMatcher> matchers) {
+        public ClasspathMatchers(ArrayList<ClasspathMatcher> matchers, boolean includePath) {
             this.matchers = matchers;
+            this.includePath = includePath;
         }
 
         public boolean matches(URL s) {
@@ -58,7 +64,7 @@ public class ClasspathMatcher {
 
         private boolean or(URL s) {
             for (ClasspathMatcher classpathMatcher : matchers) {
-                if (classpathMatcher.match(s)) {
+                if (classpathMatcher.match(s, includePath)) {
                     return true;
                 }
             }
@@ -67,7 +73,7 @@ public class ClasspathMatcher {
 
         private boolean and(URL s) {
             for (ClasspathMatcher classpathMatcher : matchers) {
-                if (!classpathMatcher.match(s)) {
+                if (!classpathMatcher.match(s, includePath)) {
                     return false;
                 }
             }
@@ -171,11 +177,7 @@ public class ClasspathMatcher {
         return r;
     }
 
-    public boolean match(URL url) {
-        //path is not counted in specification
-        return matchWithoutPath(url);
-    }
-
+  
     private boolean match(URL url, boolean includePath) {
         String protocol = url.getProtocol();
         int port = url.getPort(); //negative if not set
@@ -186,7 +188,9 @@ public class ClasspathMatcher {
                 && parts.matchDomain(domain);
 
         if (includePath) {
-            return always && parts.matchPath(path);
+            return always
+                    && (parts.matchPath(UrlUtils.sanitizeLastSlash(path))
+                    || parts.matchPath(path));
         } else {
             return always;
         }
@@ -195,6 +199,10 @@ public class ClasspathMatcher {
     /*
      * For testing purposes
      */
+    public boolean match(URL url) {
+        return match(url, false);
+    }
+    
     public boolean matchWithPath(URL url) {
         return match(url, true);
     }

@@ -44,6 +44,7 @@ import java.net.NetPermission;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import javax.swing.JDialog;
@@ -52,6 +53,7 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 
@@ -80,7 +82,9 @@ public class SecurityDialogs {
         UNSIGNED_WARNING,   /* requires confirmation with 'high-security' setting */
         APPLET_WARNING,
         AUTHENTICATION,
-        UNSIGNED_EAS_NO_PERMISSIONS_WARNING   /* when Extended applet security is at High Security and no permission attribute is find, */
+        UNSIGNED_EAS_NO_PERMISSIONS_WARNING,   /* when Extended applet security is at High Security and no permission attribute is find, */
+        MISSING_ALACA, /*alaca - Application-Library-Allowable-Codebase Attribute*/
+        MATCHING_ALACA
     }
 
     /** The types of access which may need user permission. */
@@ -263,6 +267,32 @@ public class SecurityDialogs {
         return (Object[]) response;
     }
 
+     public static boolean  showMissingALACAttributePanel(String title, URL codeBase, Set<URL> remoteUrls) {
+
+        if (!shouldPromptUser()) {
+            return false;
+        }
+
+        SecurityDialogMessage message = new SecurityDialogMessage();
+        message.dialogType = DialogType.MISSING_ALACA;
+        message.extras = new Object[]{title, codeBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
+        Object selectedValue = getUserResponse(message);
+        return getIntegerResponseAsBoolean(selectedValue);
+    } 
+     
+     public static boolean showMatchingALACAttributePanel(String title, URL codeBase, Set<URL> remoteUrls) {
+
+        if (!shouldPromptUser()) {
+            return false;
+        }
+
+        SecurityDialogMessage message = new SecurityDialogMessage();
+        message.dialogType = DialogType.MATCHING_ALACA;
+        message.extras = new Object[]{title, codeBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
+        Object selectedValue = getUserResponse(message);
+        return getIntegerResponseAsBoolean(selectedValue);
+    } 
+     
     /**
      * FIXME This is unused. Remove it?
      * @return (0, 1, 2) =&gt; (Yes, No, Cancel)
@@ -417,5 +447,5 @@ public class SecurityDialogs {
             }
         });
     }
-
+    
 }

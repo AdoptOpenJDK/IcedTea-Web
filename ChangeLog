@@ -1,3 +1,36 @@
+2014-03-14  Jiri Vanek  <jvanek@redhat.com>
+
+	Base implementation of Application-Library-Allowable-Codebase. Remember
+	button not yet working.
+	* netx/net/sourceforge/jnlp/JNLPFile.java: (ClasspathMatchers)
+	(getApplicationLibraryAllowableCodebase) (getCodebase) (getCodeBaseMatchersAttribute)
+	(getCodeBaseMatchersAttribute) (getCodeBaseMatchersAttribute) changed signature
+	to include/not include path in returned matcher.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: Added keys
+	(ALACAMissingMainTitle) (ALACAMissingInfo) (ALACAMatchingMainTitle)
+	(ALACAMatchingInfo) for new dialogs.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Implemented 
+	(checkApplicationLibraryAllowableCodebaseAttribute). Used in (init)
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: made aware of 
+	new constants (MISSING_ALACA) and (MATCHING_ALACA)
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: new constants
+	(MISSING_ALACA) and (MATCHING_ALACA). Implemented (showMissingALACAttributePanel)
+	and (showMatchingALACAttributePanel)
+	* netx/net/sourceforge/jnlp/security/dialogs/MatchingALACAttributePanel.java
+	new dialog for Matching attribute
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingALACAttributePanel.java:
+	new dialog for Missing attribute.
+	* netx/net/sourceforge/jnlp/util/ClasspathMatcher.java: allowing user to
+	choose whether to include paths in matching or not.
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: new util methods (removeFileName)
+	(setOfUrlsToHtmlList) (sanitizeLastSlash) and (equalsIgnoreLastSlash) to
+	strip filename from url, toString for iterable of urls to string, and 
+	for operations with URLs independently on last slash	
+	* tests/netx/unit/net/sourceforge/jnlp/util/ClasspathMatcherTest.java: added
+	tests for paths
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java: added tests
+	for new methods
+
 2014-03-13  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:

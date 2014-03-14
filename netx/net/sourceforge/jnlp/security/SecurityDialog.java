@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.sourceforge.jnlp.security.dialogs.MissingALACAttributePanel;
+import net.sourceforge.jnlp.security.dialogs.MatchingALACAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MissingPermissionsAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
 import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
@@ -320,6 +322,10 @@ public class SecurityDialog extends JDialog {
             panel = new PasswordAuthenticationPane(this, extras);
         else if (dialogType == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING)
             panel = new MissingPermissionsAttributePanel(this, (String) extras[0], (String) extras[1]);
+        else if (dialogType == DialogType.MISSING_ALACA)
+            panel = new MissingALACAttributePanel(this, (String) extras[0], (String) extras[1], (String) extras[2]);
+        else if (dialogType == DialogType.MATCHING_ALACA)
+            panel = new MatchingALACAttributePanel(this, (String) extras[0], (String) extras[1], (String) extras[2]);
 
         add(panel, BorderLayout.CENTER);
     }

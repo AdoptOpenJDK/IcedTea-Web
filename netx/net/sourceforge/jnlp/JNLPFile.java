@@ -920,21 +920,21 @@ public class JNLPFile {
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#caller_allowable
          */
         public ClasspathMatcher.ClasspathMatchers getCallerAllowableCodebase() {
-            return getCodeBaseMatchersAttribute(CALLER_ALLOWABLE);
+            return getCodeBaseMatchersAttribute(CALLER_ALLOWABLE, false);
         }
 
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_library
          */
         public ClasspathMatcher.ClasspathMatchers getApplicationLibraryAllowableCodebase() {
-            return getCodeBaseMatchersAttribute(APP_LIBRARY_ALLOWABLE);
+            return getCodeBaseMatchersAttribute(APP_LIBRARY_ALLOWABLE, true);
         }
 
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
          */
         public ClasspathMatcher.ClasspathMatchers getCodebase() {
-            return getCodeBaseMatchersAttribute(CODEBASE);
+            return getCodeBaseMatchersAttribute(CODEBASE, false);
         }
 
         /**
@@ -1004,16 +1004,16 @@ public class JNLPFile {
             return loader.checkForAttributeInJars(Arrays.asList(getResources().getJARs()), name);
         }
 
-        public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(String s) {
-            return getCodeBaseMatchersAttribute(new Attributes.Name(s));
+        public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(String s, boolean includePath) {
+            return getCodeBaseMatchersAttribute(new Attributes.Name(s), includePath);
         }
 
-        public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(Attributes.Name name) {
+        public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(Attributes.Name name, boolean includePath) {
             String s = getAttribute(name);
             if (s == null) {
                 return null;
             }
-            return ClasspathMatcher.ClasspathMatchers.compile(s);
+            return ClasspathMatcher.ClasspathMatchers.compile(s, includePath);
         }
 
         private ManifestBoolean processBooleanAttribute(String id) throws IllegalArgumentException {
