@@ -1,5 +1,26 @@
 2014-03-20  Andrew Azores  <aazores@redhat.com>
 
+	Trusted-only manifest attribute implementation
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(STrustedOnlyAttributeFailure) new message
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: added
+	ManifestsAttributesValidator#checkTrustedOnlyAttribute() to constructor
+	* netx/net/sourceforge/jnlp/runtime/ManifestsAttributesValidator.java:
+	(checkTrustedOnlyAttribute) new method
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-signed-nosecurity.jnlp:
+	new tests for Trusted-only attribute
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-signed-security.jnlp
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-signed.html
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-unsigned-nosecurity.jnlp
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-unsigned-security.jnlp
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-unsigned.html
+	* tests/reproducers/custom/TrustedOnlyAttribute/srcs/MANIFEST.MF
+	* tests/reproducers/custom/TrustedOnlyAttribute/srcs/Makefile
+	* tests/reproducers/custom/TrustedOnlyAttribute/srcs/TrustedOnlyAttribute.java
+	* tests/reproducers/custom/TrustedOnlyAttribute/testcases/TrustedOnlyAttributeTest.java
+
+2014-03-20  Andrew Azores  <aazores@redhat.com>
+
 	Passing a reference to SecurityDelegate to CertWarningPane, so that UI
 	elements can be added later to allow the applet to be run Sandboxed + some
 	temporary permissions

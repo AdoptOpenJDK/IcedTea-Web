@@ -285,6 +285,7 @@ public class JNLPClassLoader extends URLClassLoader {
         setSecurity();
 
         ManifestsAttributesValidator mav = new ManifestsAttributesValidator(security, file, signing);
+        mav.checkTrustedOnlyAttribute();
         mav.checkCodebaseAttribute();
         mav.checkPermissionsAttribute();
         mav.checkApplicationLibraryAllowableCodebaseAttribute();

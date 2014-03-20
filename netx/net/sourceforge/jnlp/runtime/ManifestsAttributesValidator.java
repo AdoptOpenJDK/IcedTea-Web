@@ -66,8 +66,50 @@ public class ManifestsAttributesValidator {
         this.file = file;
         this.signing = signing;
     }
-    
-    
+
+    /**
+     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#trusted_only
+     */
+    void checkTrustedOnlyAttribute() throws LaunchException {
+        final ManifestBoolean trustedOnly = file.getManifestsAttributes().isTrustedOnly();
+        if (trustedOnly == ManifestBoolean.UNDEFINED) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Trusted Only manifest attribute not found. Continuing.");
+            return;
+        }
+
+        if (trustedOnly == ManifestBoolean.FALSE) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Trusted Only manifest attribute is false. Continuing.");
+            return;
+        }
+
+        final Object desc = security.getSecurityType();
+
+        final String securityType;
+        if (desc == null) {
+            securityType = "Not Specified";
+        } else if (desc.equals(SecurityDesc.ALL_PERMISSIONS)) {
+            securityType = "All-Permission";
+        } else if (desc.equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+            securityType = "Sandbox";
+        } else if (desc.equals(SecurityDesc.J2EE_PERMISSIONS)) {
+            securityType = "J2EE";
+        } else {
+            securityType = "Unknown";
+        }
+
+        final boolean isFullySigned = signing == SigningState.FULL;
+        final String signedMsg;
+        if (isFullySigned) {
+            signedMsg = "The applet is fully signed";
+        } else {
+            signedMsg = "The applet is not fully signed";
+        }
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG,
+                "Trusted Only manifest attribute is \"true\". " + signedMsg + " and requests permission level: " + securityType);
+        if (!(isFullySigned && SecurityDesc.ALL_PERMISSIONS.equals(desc))) {
+            throw new LaunchException(Translator.R("STrustedOnlyAttributeFailure", signedMsg, securityType));
+        }
+    }
 
     /**
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
