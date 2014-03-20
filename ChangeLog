@@ -1,5 +1,24 @@
 2014-03-20  Andrew Azores  <aazores@redhat.com>
 
+	Passing a reference to SecurityDelegate to CertWarningPane, so that UI
+	elements can be added later to allow the applet to be run Sandboxed + some
+	temporary permissions
+	* netx/net/sourceforge/jnlp/security/JNLPAppVerifier.java: (checkTrustWithUser)
+	pass SecurityDelegate reference to SecurityDialogs.showCertWarningDialog
+	* netx/net/sourceforge/jnlp/security/PluginAppVerifier.java: same
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: pass SecurityDelegate
+	reference from extras into CertWarningPane constructor
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: (showCertWarningDialog)
+	added SecurityDelegate parameter, add to extras array.
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java: (askUser)
+	pass null for SecurityDelegate reference
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: (CertWarningPane)
+	added SecurityDelegate constructor parameter and (securityDelegate) field 
+
+2014-03-20  Andrew Azores  <aazores@redhat.com>
+
+	SecurityDelegate can be used to add permissions to JNLPClassLoader during
+	run. This is useful for adding temporary extra permissions to an applet.
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (SecurityDelegate
 	addPermission, addPermissions) new methods. (SecurityDelegateImpl addPermission,
 	addPermissions) implement previous.

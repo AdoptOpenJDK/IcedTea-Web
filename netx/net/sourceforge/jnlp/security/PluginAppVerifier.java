@@ -168,7 +168,7 @@ public class PluginAppVerifier implements AppVerifier {
                     }
 
                     AppletAction action = SecurityDialogs.showCertWarningDialog(
-                            dialogType, file, jcv);
+                            dialogType, file, jcv, securityDelegate);
                     if (action != AppletAction.CANCEL) {
                         if (action == AppletAction.SANDBOX) {
                             securityDelegate.setRunInSandbox();

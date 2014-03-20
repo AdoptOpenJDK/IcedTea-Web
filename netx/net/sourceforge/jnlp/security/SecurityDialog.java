@@ -48,6 +48,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JDialog;
 
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
 import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
@@ -302,7 +303,7 @@ public class SecurityDialog extends JDialog {
     private void installPanel() {
 
         if (dialogType == DialogType.CERT_WARNING)
-            panel = new CertWarningPane(this, this.certVerifier);
+            panel = new CertWarningPane(this, this.certVerifier, (SecurityDelegate) extras[0]);
         else if (dialogType == DialogType.MORE_INFO)
             panel = new MoreInfoPane(this, this.certVerifier);
         else if (dialogType == DialogType.CERT_INFO)

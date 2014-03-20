@@ -65,6 +65,7 @@ import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
@@ -89,10 +90,12 @@ public class CertWarningPane extends SecurityDialogPanel {
 
     JCheckBox alwaysTrust;
     CertVerifier certVerifier;
+    SecurityDelegate securityDelegate;
 
-    public CertWarningPane(SecurityDialog x, CertVerifier certVerifier) {
+    public CertWarningPane(SecurityDialog x, CertVerifier certVerifier, SecurityDelegate securityDelegate) {
         super(x, certVerifier);
         this.certVerifier = certVerifier;
+        this.securityDelegate = securityDelegate;
         addComponents();
     }
 

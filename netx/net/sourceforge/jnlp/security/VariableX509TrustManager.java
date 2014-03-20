@@ -425,7 +425,7 @@ final public class VariableX509TrustManager {
                         AccessType.UNVERIFIED, null,
                         new HttpsCertVerifier(chain, authType,
                                               isTrusted, hostMatched,
-                                hostName)) == AppletAction.RUN;
+                                hostName), null) == AppletAction.RUN;
             }
         });
     }

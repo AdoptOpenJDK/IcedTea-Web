@@ -52,10 +52,11 @@ import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
+import net.sourceforge.jnlp.util.UrlUtils;
 
 /**
  * <p>
@@ -197,7 +198,7 @@ public class SecurityDialogs {
      * user did not accept running the applet
      */
     public static AppletAction showCertWarningDialog(AccessType accessType,
-            JNLPFile file, CertVerifier certVerifier) {
+            JNLPFile file, CertVerifier certVerifier, SecurityDelegate securityDelegate) {
 
         if (!shouldPromptUser()) {
             return AppletAction.CANCEL;
@@ -208,6 +209,7 @@ public class SecurityDialogs {
         message.accessType = accessType;
         message.file = file;
         message.certVerifier = certVerifier;
+        message.extras = new Object[] { securityDelegate };
 
         Object selectedValue = getUserResponse(message);
 
