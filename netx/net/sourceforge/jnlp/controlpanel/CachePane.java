@@ -46,6 +46,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -58,6 +59,7 @@ import javax.swing.table.TableRowSorter;
 
 import net.sourceforge.jnlp.cache.CacheDirectory;
 import net.sourceforge.jnlp.cache.CacheLRUWrapper;
+import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -80,7 +82,7 @@ public class CachePane extends JPanel {
             Translator.R("CVCPColSize"),
             Translator.R("CVCPColLastModified") };
     JTable cacheTable;
-    private JButton deleteButton, refreshButton, doneButton;
+    private JButton deleteButton, refreshButton, doneButton, cleanAll;
 
     /**
      * Creates a new instance of the CachePane.
@@ -192,12 +194,7 @@ public class CachePane extends JPanel {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Deleting may take a while, so indicate busy by cursor
-                parent.getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                // Disable dialog and buttons while deleting
-                deleteButton.setEnabled(false);
-                refreshButton.setEnabled(false);
-                doneButton.setEnabled(false);
+                disableButtons();
                 // Delete on AWT thread after this action has been performed
                 // in order to allow the cache viewer to update itself
                 invokeLaterDelete();
@@ -206,14 +203,24 @@ public class CachePane extends JPanel {
         deleteButton.setEnabled(false);
         buttons.add(deleteButton);
 
+        this.cleanAll = new JButton(Translator.R("CVCPCleanCache"));
+        cleanAll.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                disableButtons();
+                // Delete on AWT thread after this action has been performed
+                // in order to allow the cache viewer to update itself
+                invokeLaterDeleteAll();
+            }
+        });
+        buttons.add(cleanAll);
+
         this.refreshButton = new JButton(Translator.R("CVCPButRefresh"));
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Disable all its controls when performing cacheTable refresh (populating)
-                deleteButton.setEnabled(false);
-                refreshButton.setEnabled(false);
-                doneButton.setEnabled(false);
+                disableButtons();
                 // Populate cacheTable on AWT thread after this action event has been performed
                 invokeLaterPopulateTable();
             }
@@ -259,7 +266,7 @@ public class CachePane extends JPanel {
      * {@link CacheViewer} have been instantiated and painted.
      * @see CachePane#cacheTable
      */
-    private final void invokeLaterDelete() {
+    private  void invokeLaterDelete() {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -283,6 +290,7 @@ public class CachePane extends JPanel {
                     int row = cacheTable.getSelectedRow();
                     try {
                         if (fl == null) {
+                            JOptionPane.showMessageDialog(parent, Translator.R("CCannotClearCache"));
                             return;
                         }
                         int modelRow = cacheTable.convertRowIndexToModel(row);
@@ -310,21 +318,7 @@ public class CachePane extends JPanel {
                 } catch (Exception exception) {
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, exception);
                 } finally {
-                    // If nothing selected then keep deleteButton disabled
-                    if (!cacheTable.getSelectionModel().isSelectionEmpty()) {
-                        deleteButton.setEnabled(true);
-                    }
-                    // Enable buttons
-                    refreshButton.setEnabled(true);
-                    doneButton.setEnabled(true);
-                    // If cacheTable is empty disable it and set background
-                    // color to indicate being disabled
-                    if (cacheTable.getModel().getRowCount() == 0) {
-                        cacheTable.setEnabled(false);
-                        cacheTable.setBackground(SystemColor.control);
-                    }
-                    // Reset cursor
-                    parent.getContentPane().setCursor(Cursor.getDefaultCursor());
+                    restoreDisabled();
                 }
             }
 
@@ -340,6 +334,23 @@ public class CachePane extends JPanel {
                     }
                 }
                 pf.store();
+            }
+        });
+    }
+
+    private void invokeLaterDeleteAll() {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    visualCleanCache(parent);
+                    populateTable();
+                } catch (Exception exception) {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, exception);
+                } finally {
+                    restoreDisabled();
+                }
             }
         });
     }
@@ -371,6 +382,7 @@ public class CachePane extends JPanel {
                 } finally {
                     refreshButton.setEnabled(true);
                     doneButton.setEnabled(true);
+                    cleanAll.setEnabled(true);
                 }
             }
         });
@@ -439,4 +451,43 @@ public class CachePane extends JPanel {
             defaultFocusComponent.requestFocusInWindow();
         }
     }
+
+    public void disableButtons() {
+        // may take a while, so indicate busy by cursor
+        parent.getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        // Disable dialog and buttons while operating
+        deleteButton.setEnabled(false);
+        refreshButton.setEnabled(false);
+        doneButton.setEnabled(false);
+        cleanAll.setEnabled(false);
+    }
+
+    public void restoreDisabled() {
+        cleanAll.setEnabled(true);
+        // If nothing selected then keep deleteButton disabled
+        if (!cacheTable.getSelectionModel().isSelectionEmpty()) {
+            deleteButton.setEnabled(true);
+        }
+        // Enable buttons
+        refreshButton.setEnabled(true);
+        doneButton.setEnabled(true);
+        // If cacheTable is empty disable it and set background
+        // color to indicate being disabled
+        if (cacheTable.getModel().getRowCount() == 0) {
+            cacheTable.setEnabled(false);
+            cacheTable.setBackground(SystemColor.control);
+        }
+        // Reset cursor
+        parent.getContentPane().setCursor(Cursor.getDefaultCursor());
+    }
+
+    public static boolean visualCleanCache(Component parent) {
+        boolean success = CacheUtil.clearCache();
+        if (!success) {
+            JOptionPane.showMessageDialog(parent, Translator.R("CCannotClearCache"));
+        }
+        return success;
+    }
 }
+
+

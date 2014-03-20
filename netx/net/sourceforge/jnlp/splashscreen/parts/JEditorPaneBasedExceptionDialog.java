@@ -74,6 +74,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
     private JButton homeButton;
     private JButton aboutButton;
     private JButton consoleButton;
+    private JButton cacheButton;
     private JEditorPane htmlErrorAndHelpPanel;
     private JLabel exceptionLabel;
     private JLabel iconLabel;
@@ -143,6 +144,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
         homeButton = new JButton();
         aboutButton = new JButton();
         consoleButton = BasicExceptionDialog.getShowButton(JEditorPaneBasedExceptionDialog.this);
+        cacheButton = BasicExceptionDialog.getClearCacheButton(JEditorPaneBasedExceptionDialog.this);
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -174,6 +176,8 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                         .addContainerGap()
                         .addComponent(aboutButton)
                         .addContainerGap()
+                        .addComponent(cacheButton)
+                        .addContainerGap()
                         .addComponent(consoleButton)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 314, Short.MAX_VALUE)
                         .addComponent(closeAndCopyButton)
@@ -185,6 +189,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                     .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(closeButton)
                         .addComponent(aboutButton)
+                        .addComponent(cacheButton)
                         .addComponent(consoleButton)
                         .addComponent(closeAndCopyButton))
                     .addContainerGap()));

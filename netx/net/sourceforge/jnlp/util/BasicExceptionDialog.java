@@ -56,6 +56,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import net.sourceforge.jnlp.controlpanel.CachePane;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
 
 /**
@@ -79,23 +81,39 @@ public class BasicExceptionDialog {
         final JDialog errorDialog = optionPane.createDialog(R("Error"));
         errorDialog.setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
-        final JPanel quickInfoPanel = new JPanel();
-        BoxLayout layout = new BoxLayout(quickInfoPanel, BoxLayout.Y_AXIS);
-        quickInfoPanel.setLayout(layout);
-        mainPanel.add(quickInfoPanel, BorderLayout.PAGE_START);
+        final JPanel quickInfoPanelAll = new JPanel();
+        final JPanel quickInfoPanelMessage = new JPanel();
+        final JPanel quickInfoPanelButtons = new JPanel();
+        BoxLayout layoutAll = new BoxLayout(quickInfoPanelAll, BoxLayout.Y_AXIS);
+        BoxLayout layoutMessage = new BoxLayout(quickInfoPanelMessage, BoxLayout.X_AXIS);
+        BoxLayout layoutButtons = new BoxLayout(quickInfoPanelButtons, BoxLayout.X_AXIS);
+        quickInfoPanelAll.setLayout(layoutAll);
+        quickInfoPanelMessage.setLayout(layoutMessage);
+        quickInfoPanelButtons.setLayout(layoutButtons);
+        mainPanel.add(quickInfoPanelAll, BorderLayout.PAGE_START);
+        quickInfoPanelAll.add(quickInfoPanelMessage);
+        quickInfoPanelAll.add(quickInfoPanelButtons);
 
         JLabel errorLabel = new JLabel(exception.getMessage());
         errorLabel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
-        quickInfoPanel.add(errorLabel);
+        quickInfoPanelMessage.add(errorLabel);
 
         final JButton viewDetails = new JButton(R("ButShowDetails"));
         viewDetails.setAlignmentY(JComponent.LEFT_ALIGNMENT);
         viewDetails.setActionCommand("show");
-        quickInfoPanel.add(viewDetails);
+        quickInfoPanelButtons.add(viewDetails);
+
+        final JButton cacheButton = getClearCacheButton(errorDialog);
+        cacheButton.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        quickInfoPanelButtons.add(cacheButton);
 
         final JButton consoleButton = getShowButton(errorDialog);
         consoleButton.setAlignmentY(JComponent.LEFT_ALIGNMENT);
-        quickInfoPanel.add(consoleButton);
+        quickInfoPanelButtons.add(consoleButton);
+
+        final JPanel fillRest = new JPanel();
+        fillRest.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        quickInfoPanelButtons.add(fillRest);
 
         JTextArea textArea = new JTextArea();
         textArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -148,5 +166,29 @@ public class BasicExceptionDialog {
             consoleButton.setToolTipText(R("DPJavaConsoleDisabledHint"));
         }
         return consoleButton;
+    }
+
+    public static JButton getClearCacheButton(final Component parent) {
+        JButton clearAllButton = new JButton();
+        clearAllButton.setText(R("CVCPCleanCache"));
+        clearAllButton.setToolTipText(R("CVCPCleanCacheTip"));
+        clearAllButton.addActionListener(new java.awt.event.ActionListener() {
+
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            CachePane.visualCleanCache(parent);
+                        } catch (Exception ex) {
+                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
+                        }
+                    }
+                });
+            }
+        });
+        return clearAllButton;
     }
 }

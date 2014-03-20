@@ -191,6 +191,7 @@ public class CacheUtil {
         try {
             cacheDir = cacheDir.getCanonicalFile();
             FileUtils.recursiveDelete(cacheDir, cacheDir);
+            cacheDir.mkdir();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -202,14 +203,15 @@ public class CacheUtil {
      * @return true if the cache can be cleared at this time without problems
      */
     private static boolean okToClearCache() {
-        File otherJavawsRunning = new File(JNLPRuntime.getConfiguration()
-                .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
+        File otherJavawsRunning = new File(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
+        FileLock locking = null;
         try {
             if (otherJavawsRunning.isFile()) {
                 FileOutputStream fis = new FileOutputStream(otherJavawsRunning);
                 
                 FileChannel channel = fis.getChannel();
-                if (channel.tryLock() == null) {
+                locking  = channel.tryLock();
+                if (locking == null) {
                     OutputController.getLogger().log("Other instances of netx are running");
                     return false;
                 }
@@ -222,6 +224,14 @@ public class CacheUtil {
             }
         } catch (IOException e) {
             return false;
+        } finally {
+            if (locking != null) {
+                try {
+                    locking.release();
+                } catch (IOException ex) {
+                    OutputController.getLogger().log(ex);
+                }
+            }
         }
     }
 
