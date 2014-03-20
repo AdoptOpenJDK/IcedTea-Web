@@ -2270,6 +2270,12 @@ public class JNLPClassLoader extends URLClassLoader {
         public void setRunInSandbox() throws LaunchException;
 
         public boolean getRunInSandbox();
+
+        public void addPermission(final Permission perm);
+
+        public void addPermissions(final PermissionCollection perms);
+
+        public void addPermissions(final Collection<Permission> perms);
     }
 
     /**
@@ -2404,6 +2410,23 @@ public class JNLPClassLoader extends URLClassLoader {
 
         public boolean userPromptedForSandbox() {
             return this.promptedForSandbox;
+        }
+
+        public void addPermission(final Permission perm) {
+            classLoader.addPermission(perm);
+        }
+
+        public void addPermissions(final PermissionCollection perms) {
+            Enumeration<Permission> e = perms.elements();
+            while (e.hasMoreElements()) {
+                addPermission(e.nextElement());
+            }
+        }
+
+        public void addPermissions(final Collection<Permission> perms) {
+            for (final Permission perm : perms) {
+                addPermission(perm);
+            }
         }
 
     }

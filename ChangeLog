@@ -1,3 +1,9 @@
+2014-03-20  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (SecurityDelegate
+	addPermission, addPermissions) new methods. (SecurityDelegateImpl addPermission,
+	addPermissions) implement previous.
+
 2014-03-20  Jiri Vanek  <jvanek@redhat.com>
 
 	Clear cache function made more visible.
