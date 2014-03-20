@@ -46,6 +46,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import net.sourceforge.jnlp.JNLPFile;
 
 public class UrlUtils {
     private static final String UTF8 = "utf-8";
@@ -256,6 +257,16 @@ public class UrlUtils {
             return sanitizeLastSlash(u1).equals(sanitizeLastSlash(u2));
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+     public static URL guessCodeBase(JNLPFile file) {
+        if (file.getCodeBase() != null) {
+            return file.getCodeBase();
+        } else {
+            //Fixme: codebase should be the codebase of the Main Jar not
+            //the location. Although, it still works in the current state.
+            return file.getResources().getMainJAR().getLocation();
         }
     }
 }

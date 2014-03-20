@@ -64,7 +64,6 @@ import net.sourceforge.jnlp.ApplicationDesc;
 import net.sourceforge.jnlp.ExtensionDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPFile.ManifestBoolean;
 import net.sourceforge.jnlp.JNLPMatcher;
 import net.sourceforge.jnlp.JNLPMatcherException;
 import net.sourceforge.jnlp.LaunchDesc;
@@ -84,12 +83,8 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.security.PluginAppVerifier;
-import net.sourceforge.jnlp.security.SecurityDialogs;
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
-import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -288,12 +283,11 @@ public class JNLPClassLoader extends URLClassLoader {
         initializePermissions();
 
         setSecurity();
-        
-        checkCodebaseAttribute();
-        
-        checkPermissionsAttribute();
-        
-        checkApplicationLibraryAllowableCodebaseAttribute();
+
+        ManifestsAttributesValidator mav = new ManifestsAttributesValidator(security, file, signing);
+        mav.checkCodebaseAttribute();
+        mav.checkPermissionsAttribute();
+        mav.checkApplicationLibraryAllowableCodebaseAttribute();
         
         installShutdownHooks();
         
@@ -319,7 +313,7 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     private void setSecurity() throws LaunchException {
-        URL codebase = guessCodeBase();
+        URL codebase = UrlUtils.guessCodeBase(file);
         this.security = securityDelegate.getClassLoaderSecurity(codebase.getHost());
     }
 
@@ -2246,52 +2240,9 @@ public class JNLPClassLoader extends URLClassLoader {
         return mainClass;
     }
     
-    private URL guessCodeBase() {
-        if (file.getCodeBase() != null) {
-            return file.getCodeBase();
-        } else {
-            //Fixme: codebase should be the codebase of the Main Jar not
-            //the location. Although, it still works in the current state.
-            return file.getResources().getMainJAR().getLocation();
-        }
-    }
 
-    /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
-     */
-    private void checkCodebaseAttribute() throws LaunchException {
-        if (file.getCodeBase() == null || file.getCodeBase().getProtocol().equals("file")) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("CBCheckFile"));
-            return;
-        }
-        final Object securityType = security.getSecurityType();
-        final URL codebase = guessCodeBase();
-        final ClasspathMatchers codebaseAtt = file.getManifestsAttributes().getCodebase();
-        if (codebaseAtt == null) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("CBCheckNoEntry"));
-            return;
-        }
-        if (securityType.equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
-            if (codebaseAtt.matches(codebase)) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("CBCheckUnsignedPass"));
-            } else {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("CBCheckUnsignedFail"));
-            }
-        } else {
-            if (codebaseAtt.matches(codebase)) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("CBCheckOkSignedOk"));
-            } else {
-                if (file instanceof PluginBridge) {
-                    throw new LaunchException(Translator.R("CBCheckSignedAppletDontMatchException", file.getManifestsAttributes().getCodebase().toString(), codebase));
-                } else {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("CBCheckSignedFail"));
-                }
-            }
-        }
 
-    }
-
-    /**
+   /**
      * SecurityDelegate, in real usage, relies on having a "parent" JNLPClassLoader instance.
      * However, JNLPClassLoaders are very large, heavyweight, difficult-to-mock objects, which
      * means that unit testing on anything that uses a SecurityDelegate can become very difficult.
@@ -2319,96 +2270,6 @@ public class JNLPClassLoader extends URLClassLoader {
         public void setRunInSandbox() throws LaunchException;
 
         public boolean getRunInSandbox();
-    }
-
-    private void checkApplicationLibraryAllowableCodebaseAttribute() throws LaunchException {
-        if (signing == SigningState.NONE){
-            return; /*when app is not signed at all, then skip this check*/
-        } 
-        //conditions
-        URL codebase = file.getCodeBase();
-        URL documentBase = null;
-        if (file instanceof PluginBridge) {
-            documentBase = ((PluginBridge) file).getSourceLocation();
-        }
-        if (documentBase == null) {
-            documentBase = file.getCodeBase();
-        }
-
-        //cases
-        Set<URL> usedUrls = new HashSet<URL>();
-        URL sourceLocation = file.getSourceLocation();
-        ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
-        if (sourceLocation != null) {
-            usedUrls.add(UrlUtils.removeFileName(sourceLocation));
-        }
-        for (ResourcesDesc resourcesDesc: resourcesDescs) {
-            ExtensionDesc[] ex = resourcesDesc.getExtensions();
-            if (ex != null) {
-                for ( ExtensionDesc extensionDesc: ex) {
-                    if (extensionDesc != null) {
-                        usedUrls.add(UrlUtils.removeFileName(extensionDesc.getLocation()));
-                    }
-                }
-            }
-            JARDesc[] jars = resourcesDesc.getJARs();
-            if (jars != null) {
-                for (JARDesc jarDesc: jars) {
-                    if (jarDesc != null) {
-                        usedUrls.add(UrlUtils.removeFileName(jarDesc.getLocation()));
-                    }
-                }
-            }
-            JNLPFile jnlp = resourcesDesc.getJNLPFile();
-            if (jnlp != null) {
-                usedUrls.add(UrlUtils.removeFileName(jnlp.getSourceLocation()));
-            }
-
-        }
-        OutputController.getLogger().log("Found alaca URLs to be verified");
-        for (URL url : usedUrls) {
-            OutputController.getLogger().log(" - " + url.toExternalForm());
-        }
-        if (usedUrls.isEmpty()) {
-            //I hope this is the case, when the resources is/are
-            //only codebase classes. Then it should be safe to return.
-            OutputController.getLogger().log("The application is not using any url resources, skipping Application-Library-Allowable-Codebase Attribute check.");
-            return;
-        }
-
-        if (usedUrls.size() == 1) {
-            if (UrlUtils.equalsIgnoreLastSlash(usedUrls.toArray(new URL[0])[0], codebase)
-                    && UrlUtils.equalsIgnoreLastSlash(usedUrls.toArray(new URL[0])[0], documentBase)) {
-                //all resoources are from codebase or document base. it is ok to proceeed.
-                OutputController.getLogger().log("All applications resources (" + usedUrls.toArray(new URL[0])[0] + ") are from codebas/documentbase " + codebase + "/" + documentBase + ", skipping Application-Library-Allowable-Codebase Attribute check.");
-                return;
-            }
-        }
-        ClasspathMatchers att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
-
-        if (att == null) {
-            boolean a = SecurityDialogs.showMissingALACAttributePanel(file.getTitle(), documentBase, usedUrls);
-            if (!a) {
-                throw new LaunchException("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was blocked from running by the user");
-            } else {
-                OutputController.getLogger().log("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user");
-                return;
-            }
-        } else {
-            for (URL foundUrl : usedUrls) {
-                if (!att.matches(foundUrl)) {
-                    throw new LaunchException("The resource from " + foundUrl + " does not match the  location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
-                } else {
-                    OutputController.getLogger().log("The resource from " + foundUrl + " does  match the  location in Application-Library-Allowable-Codebase Attribute " + att + ". Continuing.");
-                }
-            }
-        }
-        boolean a = SecurityDialogs.showMatchingALACAttributePanel(file.getTitle(), documentBase, usedUrls);
-        if (!a) {
-            throw new LaunchException("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, but was blocked from running by the user." );
-        } else {
-            OutputController.getLogger().log("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user." );
-        }
     }
 
     /**
@@ -2547,51 +2408,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
     }
     
-    /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
-     */
-    public void checkPermissionsAttribute() throws LaunchException {
-        final ManifestBoolean permissions = file.getManifestsAttributes().isSandboxForced();
-        AppletSecurityLevel level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
-        if (level == AppletSecurityLevel.ALLOW_UNSIGNED) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Although 'permissions' attribute of this application is '" + file.getManifestsAttributes().permissionsToString() + "' Your Extended applets security is at 'low', continuing");
-            return;
-        }
-        switch (permissions) {
-            case UNDEFINED: {
-                if (level == AppletSecurityLevel.DENY_UNSIGNED) {
-                    throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
-                }
-                if (level == AppletSecurityLevel.ASK_UNSIGNED) {
-                    boolean a = SecurityDialogs.showMissingPermissionsAttributeDialogue(file.getTitle(), file.getCodeBase());
-                    if (!a) {
-                        throw new LaunchException("Your Extended applets security is at 'high' and  this applicationis missing the 'permissions' attribute in manifest. And you have refused to run it.");
-                    } else {
-                        OutputController.getLogger().log("Your Extended applets security is at 'high' and  this applicationis missing the 'permissions' attribute in manifest. And you have allowed to run it.");
-                    }
-                }
-                //default for missing is sandbox
-                if (!SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
-                    throw new LaunchException("The 'permissions' attribute is not specified, and application is requesting permissions. This is fatal");
-                }
-                break;
-            }
-            case TRUE: {
-                if (SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
-                    OutputController.getLogger().log("The permissions attribute of this application is " + file.getManifestsAttributes().permissionsToString() + "' and security is '" + security.getSecurityType() + "'. Thats correct");
-                } else {
-                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but  security is '" + security.getSecurityType() + "'. This is fatal");
-                }
-            }
-            case FALSE: {
-                if (SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
-                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but  security is' " + security.getSecurityType() + "'. This is fatal");
-                } else {
-                    OutputController.getLogger().log("The permissions attribute of this application is '" + file.getManifestsAttributes().permissionsToString() + "' and security is '" + security.getSecurityType() + "'. Thats correct");
-                }
-            }
-        }
-    }
 
     /*
      * Helper class to expose protected URLClassLoader methods.

@@ -1,3 +1,15 @@
+2014-03-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Methods validating manifests' attributes moved to separate class.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Cleaned imports.
+	At (init) methods (checkCodebaseAttribute), (checkPermissionsAttribute) and 
+	(checkApplicationLibraryAllowableCodebaseAttribute) moved to
+	ManifestsAttributesValidator. (guessCodeBase) generalized in UrlUtils.
+	* netx/net/sourceforge/jnlp/runtime/ManifestsAttributesValidator.java:
+	new class. Contains logic to validate manifests'attributes.
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: added method (guessCodeBase)
+	as generalization of JNLPClassLoader's guessCodeBase method.
+
 2014-03-14  Andrew Azores  <aazores@redhat.com>
 
 	Added new PartiallySigned Dialog to replace NotAllSignedWarningPane.
