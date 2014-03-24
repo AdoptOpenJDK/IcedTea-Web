@@ -135,8 +135,9 @@ public final class Boot implements PrivilegedAction<Void> {
         if (AppContext.getAppContext() == null) {
             SunToolkit.createNewAppContext();
         }
-        if (null != getOption("-headless"))
+        if (null != getOption("-headless")) {
             JNLPRuntime.setHeadless(true);
+        }
 
         DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
 

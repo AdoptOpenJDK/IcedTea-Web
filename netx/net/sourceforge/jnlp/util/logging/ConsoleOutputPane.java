@@ -31,6 +31,8 @@ import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 
 public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
+    
+    private boolean canChange = true;
 
     @Override
     public synchronized void update(Observable o, Object arg) {
@@ -171,7 +173,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
 
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                refreshAction(evt);
+                refreshAction();
             }
         };
     }
@@ -284,6 +286,8 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         wordWrap = new javax.swing.JCheckBox();
         showDebug = new javax.swing.JCheckBox();
         showInfo = new javax.swing.JCheckBox();
+        showItw = new javax.swing.JCheckBox();
+        showApp = new javax.swing.JCheckBox();
         showCode = new javax.swing.JCheckBox();
         statistics = new javax.swing.JLabel();
         showPostInit = new javax.swing.JCheckBox();
@@ -384,7 +388,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 model.usedPattern = model.lastValidPattern;
-                refreshAction(evt);
+                refreshAction();
             }
         });
 
@@ -447,6 +451,14 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         showInfo.setSelected(true);
         showInfo.setText(Translator.R("COPinfo"));
         showInfo.addActionListener(getDefaultActionSingleton());
+        
+        showItw.setSelected(true);
+        showItw.setText(Translator.R("COPitw"));
+        showItw.addActionListener(getDefaultActionSingleton());
+        
+        showApp.setSelected(true);
+        showApp.setText(Translator.R("COPclientApp"));
+        showApp.addActionListener(getDefaultActionSingleton());
 
         showCode.setSelected(true);
         showCode.setText(Translator.R("COPcode"));
@@ -523,7 +535,10 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
                 addComponent(showJava).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(showPlugin).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(showDebug).addGap(6, 6, 6).
-                addComponent(showInfo))).addGap(2, 2, 2).
+                addComponent(showInfo).addGap(6, 6, 6).
+                addComponent(showItw).addGap(6, 6, 6).
+                addComponent(showApp)
+                )).addGap(2, 2, 2).
                 addComponent(statistics)).addGroup(
                 javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup().
                 addComponent(showPreInit).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
@@ -564,6 +579,8 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
                 addComponent(showPlugin).
                 addComponent(showDebug).
                 addComponent(showInfo).
+                addComponent(showItw).
+                addComponent(showApp).
                 addComponent(statistics)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
                 jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
                 addComponent(showPreInit).
@@ -708,7 +725,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         validate();
     }
 
-    private void refreshAction(java.awt.event.ActionEvent evt) {
+    private void refreshAction() {
         updateModel();
         refreshPane();
     }
@@ -807,10 +824,20 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
     }
 
     private void copyPlainActionPerformed(java.awt.event.ActionEvent evt) {
+        if (canChange) {
+            showApp.setSelected(false);
+            refreshAction();
+            canChange = false;
+        }
         fillClipBoard(false, sortCopyAll.isSelected());
     }
 
     private void copyRichActionPerformed(java.awt.event.ActionEvent evt) {
+        if (canChange) {
+            showApp.setSelected(false);
+            refreshAction();
+            canChange = false;
+        }
         fillClipBoard(true, sortCopyAll.isSelected());
     }
     
@@ -856,6 +883,8 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         model.showHeaders = showHeaders.isSelected();
         model.showIncomplete = showIncomplete.isSelected();
         model.showInfo = showInfo.isSelected();
+        model.showItw = showItw.isSelected();
+        model.showApp = showApp.isSelected();
         model.showJava = showJava.isSelected();
         model.showLevel = showLevel.isSelected();
         model.showMessage = showMessage.isSelected();
@@ -900,6 +929,8 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
     private javax.swing.JButton showHide;
     private javax.swing.JCheckBox showIncomplete;
     private javax.swing.JCheckBox showInfo;
+    private javax.swing.JCheckBox showItw;
+    private javax.swing.JCheckBox showApp;
     private javax.swing.JCheckBox showJava;
     private javax.swing.JCheckBox showLevel;
     private javax.swing.JCheckBox showMessage;

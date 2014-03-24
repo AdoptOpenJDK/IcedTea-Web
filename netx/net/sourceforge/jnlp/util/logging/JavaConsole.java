@@ -89,6 +89,16 @@ public class JavaConsole implements ObservableMessagesProvider {
     final private List<MessageWithHeader> rawData = Collections.synchronizedList(new ArrayList<MessageWithHeader>());
     final private List<ConsoleOutputPane> outputs = new ArrayList<ConsoleOutputPane>();
 
+    public JavaConsole() {
+        //add middleware, which catches client's application stdout/err
+        //and will submit it into console
+        System.setErr(new TeeOutputStream(System.err, true));
+        System.setOut(new TeeOutputStream(System.out, false));
+        //internal stdOut/Err are going throughs outLog/errLog
+        //when console is off, those tees are not installed
+    }
+
+    
     private void refreshOutputs() {
         refreshOutputs(outputsPanel, (Integer)numberOfOutputs.getValue());
     }

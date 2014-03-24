@@ -96,6 +96,12 @@ public class ConsoleOutputPaneModel {
             origData.add(new JavaMessage(new Header(Level.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 2"));
             origData.add(new JavaMessage(new Header(Level.WARNING_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 4"));
             origData.add(new JavaMessage(new Header(Level.MESSAGE_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 9"));
+            JavaMessage m1 = new JavaMessage(new Header(Level.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "app1");
+            JavaMessage m2 = new JavaMessage(new Header(Level.ERROR_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "app2");
+            m1.getHeader().isClientApp = true;
+            m2.getHeader().isClientApp = true;
+            origData.add(m1);
+            origData.add(m2);
             origData.add(new JavaMessage(new Header(Level.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 0 - multilined \n"
                     + "since beggining\n"
                     + "         later\n"
@@ -117,7 +123,8 @@ public class ConsoleOutputPaneModel {
     private static final String HTMLCOLOR_GREENYELLOW = "AAAA00";
     private static final String HTMLCOLOR_PINKYREAD = "FF0055";
     private static final String HTMLCOLOR_BLACK = "000000";
-
+    private static final String HTMLCOLOR_GREEN = "669966";
+    private static final String HTMLCOLOR_PURPLE = "990066";
     String importList() {
         return importList(lastUpdateIndex);
     }
@@ -174,12 +181,20 @@ public class ConsoleOutputPaneModel {
                         }
                     }
                 } else {
-                    if (messageWithHeader.getHeader().level.isWarning()) {
-                        sb.append(HTMLCOLOR_GREENYELLOW);
-                    } else if (messageWithHeader.getHeader().level.isError()) {
-                        sb.append(HTMLCOLOR_PINKYREAD);
+                    if (messageWithHeader.getHeader().isClientApp) {
+                        if (messageWithHeader.getHeader().level.isError()) {
+                            sb.append(HTMLCOLOR_PURPLE);
+                        } else {
+                            sb.append(HTMLCOLOR_GREEN);
+                        }
                     } else {
-                        sb.append(HTMLCOLOR_BLACK);
+                        if (messageWithHeader.getHeader().level.isWarning()) {
+                            sb.append(HTMLCOLOR_GREENYELLOW);
+                        } else if (messageWithHeader.getHeader().level.isError()) {
+                            sb.append(HTMLCOLOR_PINKYREAD);
+                        } else {
+                            sb.append(HTMLCOLOR_BLACK);
+                        }
                     }
                 }
                 sb.append("'>");
@@ -328,6 +343,12 @@ public class ConsoleOutputPaneModel {
         if (!showInfo && m.getHeader().level.isInfo()) {
             return true;
         }
+        if (!showItw && !m.getHeader().isClientApp) {
+            return true;
+        }
+        if (!showApp && m.getHeader().isClientApp) {
+            return true;
+        }
         if (!showJava && !m.getHeader().isC) {
             return true;
         }
@@ -376,6 +397,8 @@ public class ConsoleOutputPaneModel {
     boolean showHeaders;
     boolean showIncomplete;
     boolean showInfo;
+    boolean showItw;
+    boolean showApp;
     boolean showJava;
     boolean showLevel;
     boolean showMessage;

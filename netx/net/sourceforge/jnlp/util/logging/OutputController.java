@@ -148,6 +148,10 @@ public class OutputController {
         if (LogConfig.getLogConfig().isLogToConsole()) {
             JavaConsole.getConsole().addMessage(s);
         }
+        //clients app's messages are reprinted only to console
+        if (s.getHeader().isClientApp){
+            return;
+        }
         if (!JNLPRuntime.isDebug() && (s.getHeader().level == Level.MESSAGE_DEBUG
                 || s.getHeader().level == Level.WARNING_DEBUG
                 || s.getHeader().level == Level.ERROR_DEBUG)) {

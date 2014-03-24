@@ -40,6 +40,7 @@ import java.util.Date;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputController.Level;
+import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 
 public class Header {
     public static String  default_user = System.getProperty("user.name");
@@ -49,6 +50,7 @@ public class Header {
     public Level level = Level.WARNING_ALL;
     public Date date = new Date();
     public boolean isC = false;//false=> java
+    public boolean isClientApp = false;//false=> ITW
     public String caller = "unknown";
     public String thread1 = "unknown";
     public String thread2 = "unknown";
@@ -127,16 +129,24 @@ public class Header {
                 + ", " + thread2ToString();
     }
 
+    private static final String CLIENT = "CLIENT";
+
     public String getOrigin() {
+        String s;
         if (application) {
-            return "ITW-JAVAWS";
+            s = "ITW-JAVAWS";
         } else {
             if (isC) {
-                return "ITW-C-PLUGIN";
+                s = "ITW-C-PLUGIN";
             } else {
-                return "ITW-APPLET";
+                s = "ITW-APPLET";
             }
         }
+        if (isClientApp) {
+            s = s + "-" + CLIENT;
+        }
+        return s;
+
     }
 
     static String getCallerClass(StackTraceElement[] stack) {
@@ -151,7 +161,8 @@ public class Header {
                 if (stack[i].getClassName().contains(OutputController.class.getName())
                         || //PluginDebug.class.getName() not avaiable during netx make
                         stack[i].getClassName().contains("sun.applet.PluginDebug")
-                        || stack[i].getClassName().contains(Header.class.getName())) {
+                        || stack[i].getClassName().contains(Header.class.getName())
+                        || stack[i].getClassName().contains(TeeOutputStream.class.getName())) {
                     continue;
                 } else {
                     break;
