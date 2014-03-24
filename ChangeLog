@@ -1,6 +1,18 @@
 2014-03-24  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/ManifestsAttributesValidator.java:
+	renamed to ManifestAttributesChecker.
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java:
+	(checkTrustedOnlyAttribute, checkCodebaseAttribute,
+	checkPermissionsAttribute,
+	checkApplicationLibraryAllowableCodebaseAttribute) made private.
+	(checkAll) new method.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: reflect above
+	changes
+
+2014-03-24  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/ManifestsAttributesValidator.java:
 	(checkTrustedOnlyAttrubute) works properly with sandboxing
 
 2014-03-24  Jiri Vanek  <jvanek@redhat.com>

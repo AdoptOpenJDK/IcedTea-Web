@@ -57,25 +57,32 @@ import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
-public class ManifestsAttributesValidator {
+public class ManifestAttributesChecker {
 
     private final SecurityDesc security;
     private final JNLPFile file;
     private final SigningState signing;
     private final SecurityDelegate securityDelegate;
 
-    public ManifestsAttributesValidator(final SecurityDesc security, final JNLPFile file,
-            final SigningState signing, final SecurityDelegate securityDelegate) {
+    public ManifestAttributesChecker(final SecurityDesc security, final JNLPFile file,
+            final SigningState signing, final SecurityDelegate securityDelegate) throws LaunchException {
         this.security = security;
         this.file = file;
         this.signing = signing;
         this.securityDelegate = securityDelegate;
     }
 
+    void checkAll() throws LaunchException {
+        checkTrustedOnlyAttribute();
+        checkCodebaseAttribute();
+        checkPermissionsAttribute();
+        checkApplicationLibraryAllowableCodebaseAttribute();
+    }
+
     /**
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#trusted_only
      */
-    void checkTrustedOnlyAttribute() throws LaunchException {
+    private void checkTrustedOnlyAttribute() throws LaunchException {
         final ManifestBoolean trustedOnly = file.getManifestsAttributes().isTrustedOnly();
         if (trustedOnly == ManifestBoolean.UNDEFINED) {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Trusted Only manifest attribute not found. Continuing.");
@@ -124,7 +131,7 @@ public class ManifestsAttributesValidator {
     /**
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
      */
-    void checkCodebaseAttribute() throws LaunchException {
+    private void checkCodebaseAttribute() throws LaunchException {
         if (file.getCodeBase() == null || file.getCodeBase().getProtocol().equals("file")) {
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("CBCheckFile"));
             return;
@@ -159,7 +166,7 @@ public class ManifestsAttributesValidator {
     /**
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
      */
-    void checkPermissionsAttribute() throws LaunchException {
+    private void checkPermissionsAttribute() throws LaunchException {
         final ManifestBoolean permissions = file.getManifestsAttributes().isSandboxForced();
         AppletSecurityLevel level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
         if (level == AppletSecurityLevel.ALLOW_UNSIGNED || securityDelegate.getRunInSandbox()) {
@@ -203,7 +210,7 @@ public class ManifestsAttributesValidator {
         }
     }
 
-    void checkApplicationLibraryAllowableCodebaseAttribute() throws LaunchException {
+    private void checkApplicationLibraryAllowableCodebaseAttribute() throws LaunchException {
         if (signing == SigningState.NONE) {
             return; /*when app is not signed at all, then skip this check*/
         }
