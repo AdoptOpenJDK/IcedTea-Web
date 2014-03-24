@@ -102,16 +102,21 @@ public class ManifestsAttributesValidator {
             securityType = "Unknown";
         }
 
-        final boolean isFullySigned = signing == SigningState.FULL || (signing == SigningState.PARTIAL && securityDelegate.getRunInSandbox());
+        final boolean isFullySigned = signing == SigningState.FULL;
+        final boolean isSandboxed = securityDelegate.getRunInSandbox();
+        final boolean requestsCorrectPermissions = (isFullySigned && SecurityDesc.ALL_PERMISSIONS.equals(desc))
+                || (isSandboxed && SecurityDesc.SANDBOX_PERMISSIONS.equals(desc));
         final String signedMsg;
-        if (isFullySigned) {
+        if (isFullySigned && !isSandboxed) {
             signedMsg = "The applet is fully signed";
+        } else if (isFullySigned && isSandboxed) {
+            signedMsg = "The applet is fully signed and sandboxed";
         } else {
             signedMsg = "The applet is not fully signed";
         }
         OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG,
                 "Trusted Only manifest attribute is \"true\". " + signedMsg + " and requests permission level: " + securityType);
-        if (!(isFullySigned && SecurityDesc.ALL_PERMISSIONS.equals(desc))) {
+        if (!(isFullySigned && requestsCorrectPermissions)) {
             throw new LaunchException(Translator.R("STrustedOnlyAttributeFailure", signedMsg, securityType));
         }
     }
