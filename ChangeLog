@@ -1,3 +1,12 @@
+2014-03-24  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: pass
+	SecurityDelegate to ManifestsAttributesValidator
+	* netx/net/sourceforge/jnlp/runtime/ManifestsAttributesValidator.java:
+	(securityDelegate) new field, added to constructor.
+	(checkTrustedOnlyAttribute, checkPermissionsAttribute) works with
+	RunInSandbox.
+
 2014-03-20  Andrew Azores  <aazores@redhat.com>
 
 	Trusted-only manifest attribute implementation

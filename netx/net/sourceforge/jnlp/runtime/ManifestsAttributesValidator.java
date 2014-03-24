@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.runtime;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+
 import net.sourceforge.jnlp.ExtensionDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -47,6 +48,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.SecurityDesc;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SigningState;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
@@ -60,11 +62,14 @@ public class ManifestsAttributesValidator {
     private final SecurityDesc security;
     private final JNLPFile file;
     private final SigningState signing;
+    private final SecurityDelegate securityDelegate;
 
-    public ManifestsAttributesValidator(SecurityDesc security, JNLPFile file, SigningState signing) {
+    public ManifestsAttributesValidator(final SecurityDesc security, final JNLPFile file,
+            final SigningState signing, final SecurityDelegate securityDelegate) {
         this.security = security;
         this.file = file;
         this.signing = signing;
+        this.securityDelegate = securityDelegate;
     }
 
     /**
@@ -97,7 +102,7 @@ public class ManifestsAttributesValidator {
             securityType = "Unknown";
         }
 
-        final boolean isFullySigned = signing == SigningState.FULL;
+        final boolean isFullySigned = signing == SigningState.FULL || (signing == SigningState.PARTIAL && securityDelegate.getRunInSandbox());
         final String signedMsg;
         if (isFullySigned) {
             signedMsg = "The applet is fully signed";
@@ -152,8 +157,9 @@ public class ManifestsAttributesValidator {
     void checkPermissionsAttribute() throws LaunchException {
         final ManifestBoolean permissions = file.getManifestsAttributes().isSandboxForced();
         AppletSecurityLevel level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
-        if (level == AppletSecurityLevel.ALLOW_UNSIGNED) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Although 'permissions' attribute of this application is '" + file.getManifestsAttributes().permissionsToString() + "' Your Extended applets security is at 'low', continuing");
+        if (level == AppletSecurityLevel.ALLOW_UNSIGNED || securityDelegate.getRunInSandbox()) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Although 'permissions' attribute of this application is '" + file.getManifestsAttributes().permissionsToString()
+                    + "' Your Extended applets security is at 'low', or you have specifically chosen to run the applet Sandboxed. Continuing");
             return;
         }
         switch (permissions) {
