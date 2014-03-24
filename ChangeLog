@@ -1,5 +1,9 @@
 2014-03-24  Andrew Azores  <aazores@redhat.com>
 
+	* NEWS: added mention of Trusted-only manifest attribute
+
+2014-03-24  Andrew Azores  <aazores@redhat.com>
+
 	Added ability to launch PolicyEditor from security prompts, with the
 	current applet's codebase pre-selected in the editor.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
