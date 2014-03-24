@@ -1,5 +1,16 @@
 2014-03-24  Andrew Azores  <aazores@redhat.com>
 
+	Added ability to launch PolicyEditor from security prompts, with the
+	current applet's codebase pre-selected in the editor.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(CertWarnPolicyTip, CertWarnPolicyEditor): new messages
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: can
+	launch PolicyEditor from new options overflow button
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	same
+
+2014-03-24  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: pass
 	SecurityDelegate to ManifestsAttributesValidator
 	* netx/net/sourceforge/jnlp/runtime/ManifestsAttributesValidator.java:

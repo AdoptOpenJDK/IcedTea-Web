@@ -47,9 +47,13 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -60,12 +64,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
@@ -75,6 +83,7 @@ import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -88,14 +97,29 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 public class CertWarningPane extends SecurityDialogPanel {
 
-    JCheckBox alwaysTrust;
-    CertVerifier certVerifier;
-    SecurityDelegate securityDelegate;
+    private final JNLPFile file;
+    private final AccessType accessType;
+    private final Certificate cert;
+    private JCheckBox alwaysTrust;
+    private final CertVerifier certVerifier;
+    private SecurityDelegate securityDelegate;
+    private JPopupMenu policyMenu;
+    private JPanel topPanel, infoPanel, buttonPanel, bottomPanel;
+    private JLabel topLabel, nameLabel, publisherLabel, fromLabel, bottomLabel;
+    private JButton run, sandbox, advancedOptions, cancel, moreInfo;
+    private boolean alwaysTrustSelected;
+    private String bottomLabelWarningText;
+    private PolicyEditor policyEditor = null;
 
     public CertWarningPane(SecurityDialog x, CertVerifier certVerifier, SecurityDelegate securityDelegate) {
         super(x, certVerifier);
         this.certVerifier = certVerifier;
         this.securityDelegate = securityDelegate;
+
+        this.accessType = parent.getAccessType();
+        this.file = parent.getFile();
+        this.cert = parent.getCertVerifier().getPublisher(null);
+
         addComponents();
     }
 
@@ -103,10 +127,11 @@ public class CertWarningPane extends SecurityDialogPanel {
      * Creates the actual GUI components, and adds it to this panel
      */
     private void addComponents() {
-        AccessType type = parent.getAccessType();
-        JNLPFile file = parent.getFile();
-        Certificate c = parent.getCertVerifier().getPublisher(null);
+        setTextAndLabels();
+        addButtons();
+    }
 
+    private void setTextAndLabels() {
         String name = "";
         String publisher = "";
         String from = "";
@@ -115,8 +140,8 @@ public class CertWarningPane extends SecurityDialogPanel {
         //these strings -- we just want to fill in as many as possible.
         try {
             if ((certVerifier instanceof HttpsCertVerifier) &&
-                             (c instanceof X509Certificate)) {
-                name = SecurityUtil.getCN(((X509Certificate) c)
+                    (cert instanceof X509Certificate)) {
+                name = SecurityUtil.getCN(((X509Certificate) cert)
                                         .getSubjectX500Principal().getName());
             } else if (file instanceof PluginBridge) {
                 name = file.getTitle();
@@ -127,8 +152,8 @@ public class CertWarningPane extends SecurityDialogPanel {
         }
 
         try {
-            if (c instanceof X509Certificate) {
-                publisher = SecurityUtil.getCN(((X509Certificate) c)
+            if (cert instanceof X509Certificate) {
+                publisher = SecurityUtil.getCN(((X509Certificate) cert)
                                         .getSubjectX500Principal().getName());
             }
         } catch (Exception e) {
@@ -145,63 +170,66 @@ public class CertWarningPane extends SecurityDialogPanel {
 
         // Labels
         String topLabelText = "";
-        String bottomLabelText = parent.getCertVerifier().getRootInCacerts() ?
-                                 R("STrustedSource") : R("SUntrustedSource");
-        String propertyName = "";
+        bottomLabelWarningText = parent.getCertVerifier().getRootInCacerts() ?
+                R("STrustedSource") : R("SUntrustedSource");
         String iconLocation = "net/sourceforge/jnlp/resources/";
-        boolean alwaysTrustSelected = false;
+        alwaysTrustSelected = false;
         if (certVerifier instanceof HttpsCertVerifier) {
             // HTTPS certs that are verified do not prompt for a dialog.
             // @see VariableX509TrustManager#checkServerTrusted
             topLabelText = R("SHttpsUnverified") + " " + R("Continue");
-            propertyName = "OptionPane.warningIcon";
             iconLocation += "warning.png";
         } else {
-            switch (type) {
+            switch (accessType) {
                 case VERIFIED:
                     topLabelText = R("SSigVerified");
-                    propertyName = "OptionPane.informationIcon";
                     iconLocation += "question.png";
                     alwaysTrustSelected = true;
                     break;
                 case UNVERIFIED:
                     topLabelText = R("SSigUnverified");
-                    propertyName = "OptionPane.warningIcon";
                     iconLocation += "warning.png";
-                    bottomLabelText += " " + R("SWarnFullPermissionsIgnorePolicy");
+                    bottomLabelWarningText += " " + R("SWarnFullPermissionsIgnorePolicy");
                     break;
                 case SIGNING_ERROR:
                     topLabelText = R("SSignatureError");
-                    propertyName = "OptionPane.warningIcon";
                     iconLocation += "warning.png";
-                    bottomLabelText += " " + R("SWarnFullPermissionsIgnorePolicy");
+                    bottomLabelWarningText += " " + R("SWarnFullPermissionsIgnorePolicy");
                     break;
             }
         }
-        ImageIcon icon = new ImageIcon((new sun.misc.Launcher())
-                                .getClassLoader().getResource(iconLocation));
-        JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
+        ImageIcon icon = getImageIcon(iconLocation);
+        topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                                 Font.BOLD, 12));
-        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
         topPanel.setPreferredSize(new Dimension(400, 75));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         //application info
-        JLabel nameLabel = new JLabel(R("Name") + ":   " + name);
+        nameLabel = new JLabel(R("Name") + ":   " + name);
         nameLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JLabel publisherLabel = new JLabel(R("Publisher") + ": " + publisher);
+        publisherLabel = new JLabel(R("Publisher") + ": " + publisher);
         publisherLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JLabel fromLabel = new JLabel(R("From") + ":   " + from);
+        fromLabel = new JLabel(R("From") + ":   " + from);
         fromLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    }
+
+    private ImageIcon getImageIcon(final String imageLocation) {
+        return new ImageIcon((new sun.misc.Launcher())
+                .getClassLoader().getResource(imageLocation));
+    }
+
+    private void addButtons() {
+        createPolicyPermissionsMenu();
 
         alwaysTrust = new JCheckBox(R("SAlwaysTrustPublisher"));
         alwaysTrust.setEnabled(true);
         alwaysTrust.setSelected(alwaysTrustSelected);
 
-        JPanel infoPanel = new JPanel(new GridLayout(4, 1));
+        infoPanel = new JPanel(new GridLayout(4, 1));
         infoPanel.add(nameLabel);
         infoPanel.add(publisherLabel);
 
@@ -213,12 +241,15 @@ public class CertWarningPane extends SecurityDialogPanel {
         infoPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
         //run and cancel buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton run = new JButton(R("ButRun"));
-        JButton sandbox = new JButton(R("ButSandbox"));
-        JButton cancel = new JButton(R("ButCancel"));
+        buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        run = new JButton(R("ButRun"));
+        sandbox = new JButton(R("ButSandbox"));
+        advancedOptions = new JButton("\u2630"); // "hamburger" navicon
+        cancel = new JButton(R("ButCancel"));
+
         run.setToolTipText(R("CertWarnRunTip"));
         sandbox.setToolTipText(R("CertWarnSandboxTip"));
+        advancedOptions.setToolTipText(R("CertWarnPolicyTip"));
         cancel.setToolTipText(R("CertWarnCancelTip"));
 
         alwaysTrust.addActionListener(new ButtonDisableListener(sandbox));
@@ -227,16 +258,23 @@ public class CertWarningPane extends SecurityDialogPanel {
         buttonWidth = Math.max(buttonWidth, cancel.getMinimumSize().width);
         int buttonHeight = run.getMinimumSize().height;
         Dimension d = new Dimension(buttonWidth, buttonHeight);
+
         run.setPreferredSize(d);
         sandbox.setPreferredSize(d);
+        advancedOptions.setPreferredSize(new Dimension(advancedOptions.getMinimumSize().width, buttonHeight));
         cancel.setPreferredSize(d);
 
         sandbox.setEnabled(!alwaysTrust.isSelected());
 
         run.addActionListener(createSetValueListener(parent, 0));
         run.addActionListener(new CheckBoxListener());
+
         sandbox.addActionListener(createSetValueListener(parent, 1));
+
+        advancedOptions.addMouseListener(new PolicyEditorPopupListener());
+
         cancel.addActionListener(createSetValueListener(parent, 2));
+
         initialFocusComponent = cancel;
         buttonPanel.add(run);
         // file will be null iff this dialog is being called from VariableX509TrustManager.
@@ -245,8 +283,10 @@ public class CertWarningPane extends SecurityDialogPanel {
         // Since there is no app, there is nothing to run sandboxed.
         if (file != null) {
             buttonPanel.add(sandbox);
+            buttonPanel.add(advancedOptions);
         }
         buttonPanel.add(cancel);
+
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         //all of the above
@@ -255,18 +295,75 @@ public class CertWarningPane extends SecurityDialogPanel {
         add(infoPanel);
         add(buttonPanel);
 
-        JLabel bottomLabel = new JLabel(htmlWrap(bottomLabelText));
-        JButton moreInfo = new JButton(R("ButMoreInformation"));
+        bottomLabel = new JLabel(htmlWrap(bottomLabelWarningText));
+        moreInfo = new JButton(R("ButMoreInformation"));
         moreInfo.addActionListener(new MoreInfoButtonListener());
 
-        JPanel bottomPanel = new JPanel();
+        bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
         bottomPanel.add(bottomLabel);
         bottomPanel.add(moreInfo);
         bottomPanel.setPreferredSize(new Dimension(600, 100));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(bottomPanel);
+    }
 
+    private void createPolicyPermissionsMenu() {
+        policyMenu = new JPopupMenu();
+
+        JMenuItem launchPolicyEditor = new JMenuItem(R("CertWarnPolicyEditorItem"));
+        launchPolicyEditor.addActionListener(new PolicyEditorLaunchListener());
+
+        policyMenu.add(launchPolicyEditor);
+        policyMenu.setSize(policyMenu.getMinimumSize());
+        policyMenu.setVisible(false);
+    }
+
+    private class PolicyEditorLaunchListener implements ActionListener {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            final String rawFilepath = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
+            String filepath;
+            try {
+                filepath = new URL(rawFilepath).getPath();
+            } catch (final MalformedURLException mfue) {
+                filepath = null;
+            }
+
+            if (policyEditor == null || policyEditor.isClosed()) {
+                policyEditor = PolicyEditor.createInstance(filepath);
+            } else {
+                policyEditor.toFront();
+                policyEditor.repaint();
+            }
+            policyEditor.addNewCodebase(file.getCodeBase().toString());
+            policyEditor.setVisible(true);
+            policyMenu.setVisible(false);
+        }
+    }
+
+    private class PolicyEditorPopupListener implements MouseListener {
+        @Override
+        public void mouseClicked(final MouseEvent e) {
+            policyMenu.setLocation(e.getLocationOnScreen());
+            policyMenu.setVisible(!policyMenu.isVisible());
+        }
+
+        @Override
+        public void mousePressed(final MouseEvent e) {
+        }
+
+        @Override
+        public void mouseReleased(final MouseEvent e) {
+        }
+
+        @Override
+        public void mouseEntered(final MouseEvent e) {
+        }
+
+        @Override
+        public void mouseExited(final MouseEvent e) {
+        }
     }
 
     private class MoreInfoButtonListener implements ActionListener {
