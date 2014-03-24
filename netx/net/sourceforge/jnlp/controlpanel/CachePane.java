@@ -481,12 +481,15 @@ public class CachePane extends JPanel {
         parent.getContentPane().setCursor(Cursor.getDefaultCursor());
     }
 
-    public static boolean visualCleanCache(Component parent) {
-        boolean success = CacheUtil.clearCache();
-        if (!success) {
+    public static void visualCleanCache(Component parent) {
+        try {
+            boolean success = CacheUtil.clearCache();
+            if (!success) {
+                JOptionPane.showMessageDialog(parent, Translator.R("CCannotClearCache"));
+            }
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(parent, Translator.R("CCannotClearCache"));
         }
-        return success;
     }
 }
 
