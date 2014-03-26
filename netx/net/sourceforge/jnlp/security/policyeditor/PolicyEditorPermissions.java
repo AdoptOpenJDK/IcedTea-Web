@@ -36,10 +36,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import java.util.Map;
+import javax.swing.JCheckBox;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Defines the set of default permissions for PolicyEditor, ie the ones which are assigned
@@ -107,6 +107,97 @@ public enum PolicyEditorPermissions {
     PRINT(R("PEPrint"), R("PEPrintDetail"),
             PermissionType.RUNTIME_PERMISSION, PermissionTarget.PRINT, PermissionActions.NONE);
 
+    
+    public static enum Group {
+
+       
+        ReadFileSystem(R("PEGReadFileSystem"),  READ_LOCAL_FILES, READ_PROPERTIES, READ_SYSTEM_FILES, READ_TMP_FILES, GET_ENV),
+        WriteFileSystem(R("PEGWriteFileSystem"), WRITE_LOCAL_FILES, WRITE_PROPERTIES, WRITE_SYSTEM_FILES, WRITE_TMP_FILES, EXEC_COMMANDS),
+        AccesUnowenedCode(R("PEGAccesUnowenedCode"), JAVA_REFLECTION, GET_CLASSLOADER, ACCESS_CLASS_IN_PACKAGE, ACCESS_DECLARED_MEMBERS),
+        MediaAccess(R("PEGMediaAccess"), PLAY_AUDIO, RECORD_AUDIO, PRINT, CLIPBOARD);
+        
+
+        private final PolicyEditorPermissions[] permissions;
+        private final String title; 
+        private Group(String title, PolicyEditorPermissions... permissions) {
+            this.title = title;
+            this.permissions = permissions;
+        
+        }
+        
+        public static boolean anyContains(PolicyEditorPermissions permission) {
+            for (Group g : Group.values()) {
+                if (g.contains(permission)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        public static boolean anyContains(JCheckBox view, Map<PolicyEditorPermissions, JCheckBox> checkboxMap) {
+            for (Map.Entry<PolicyEditorPermissions, JCheckBox> pairs : checkboxMap.entrySet()){
+                if (pairs.getValue() == view) {
+                    for (Group g : Group.values()) {
+                        if (g.contains(pairs.getKey())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        
+        /*
+         * + all is selected
+         * 0 invalid
+         * - none is selected
+         */
+        public int getState (final Map<PolicyEditorPermissions, Boolean> map) {
+            boolean allTrue=true;
+            boolean allFalse=true;
+            for (PolicyEditorPermissions pp: getPermissions()){
+                Boolean b = map.get(pp);
+                if (b == null){
+                    return 0;
+                }
+                if (b.booleanValue()){
+                    allFalse = false;
+                } else {
+                    allTrue = false;
+                }
+            }
+            if (allFalse){
+                return -1;
+            }
+            if (allTrue){
+                return 1;
+            }
+            return 0;
+        }
+        
+        public boolean contains(PolicyEditorPermissions permission) {
+            for (PolicyEditorPermissions policyEditorPermissions : permissions) {
+                if (policyEditorPermissions == permission) {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
+        public String getTitle() {
+            return title + " ˇ";
+        }
+
+        public PolicyEditorPermissions[] getPermissions() {
+            return permissions;
+        }
+        
+        
+        
+    }
+
+    
     private final String name, description;
     private final PermissionType type;
     private final PermissionTarget target;

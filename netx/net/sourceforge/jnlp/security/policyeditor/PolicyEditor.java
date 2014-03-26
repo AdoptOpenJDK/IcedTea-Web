@@ -36,6 +36,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dialog.ModalityType;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -45,6 +47,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -55,12 +59,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,8 +98,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
 
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
@@ -159,6 +167,7 @@ public class PolicyEditor extends JPanel {
     private final Map<String, Map<PolicyEditorPermissions, Boolean>> codebasePermissionsMap = new HashMap<String, Map<PolicyEditorPermissions, Boolean>>();
     private final Map<String, Set<CustomPermission>> customPermissionsMap = new HashMap<String, Set<CustomPermission>>();
     private final Map<PolicyEditorPermissions, JCheckBox> checkboxMap = new TreeMap<PolicyEditorPermissions, JCheckBox>();
+    private final List<JCheckBoxWithGroup> groupBoxList = new ArrayList<JCheckBoxWithGroup>(Group.values().length);
     private final JScrollPane scrollPane = new JScrollPane();
     private final DefaultListModel listModel = new DefaultListModel();
     private final JList list = new JList(listModel);
@@ -172,6 +181,43 @@ public class PolicyEditor extends JPanel {
     private final ActionListener okButtonAction, closeButtonAction, addCodebaseButtonAction,
             removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction;
 
+    private static class JCheckBoxWithGroup extends JCheckBox {
+
+        private final PolicyEditorPermissions.Group group;
+
+        private JCheckBoxWithGroup(Group g) {
+            super(g.getTitle());
+            group = g;
+        }
+
+        public Group getGroup() {
+            return group;
+        }
+
+        private void setState(Map<PolicyEditorPermissions, Boolean> map) {
+            List<ActionListener> backup = new LinkedList<ActionListener>();
+            for (final ActionListener l : this.getActionListeners()) {
+                backup.add(l);
+                this.removeActionListener(l);
+            }
+            int i = group.getState(map);
+            this.setBackground(getParent().getBackground());
+            if (i > 0) {
+                this.setSelected(true);
+            }
+            if (i < 0) {
+                this.setSelected(false);
+            }
+            if (i == 0) {
+                this.setBackground(Color.yellow);
+                this.setSelected(false);
+            }
+
+            for (ActionListener al : backup) {
+                this.addActionListener(al);
+            }
+        }
+    }
     public PolicyEditor(final String filepath) {
         super();
         setLayout(new GridBagLayout());
@@ -277,12 +323,9 @@ public class PolicyEditor extends JPanel {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        String codebase = (String) list.getSelectedValue();
-                        if (codebase == null || codebase.isEmpty()) {
+                        String codebase = getSelectedCodebase();
+                        if (codebase == null){
                             return;
-                        }
-                        if (codebase.equals(R("PEGlobalSettings"))) {
-                            codebase = "";
                         }
                         if (cpViewer == null) {
                             cpViewer = new CustomPolicyViewer(weakThis.get(), codebase, customPermissionsMap.get(codebase));
@@ -301,6 +344,17 @@ public class PolicyEditor extends JPanel {
         setupLayout();
         list.setSelectedIndex(0);
         updateCheckboxes("");
+    }
+    
+    private String getSelectedCodebase() {
+        String codebase = (String) list.getSelectedValue();
+        if (codebase == null || codebase.isEmpty()) {
+            return null;
+        }
+        if (codebase.equals(R("PEGlobalSettings"))) {
+            return "";
+        }
+        return codebase;
     }
 
     private static void preparePolicyEditorWindow(final PolicyEditorWindow w, PolicyEditor e) {
@@ -767,12 +821,18 @@ public class PolicyEditor extends JPanel {
                     } else {
                         state = false;
                     }
+                    for (JCheckBoxWithGroup jg : groupBoxList) {
+                        jg.setState(map);
+                    }
                     box.setSelected(state);
                     box.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(final ActionEvent e) {
                             changesMade = true;
                             map.put(perm, box.isSelected());
+                            for (JCheckBoxWithGroup jg : groupBoxList) {
+                                jg.setState(map);
+                            }
                         }
                     });
                 }
@@ -869,6 +929,10 @@ public class PolicyEditor extends JPanel {
         checkboxConstraints.gridy = 1;
 
         for (final JCheckBox box : checkboxMap.values()) {
+             if (PolicyEditorPermissions.Group.anyContains(box, checkboxMap)){
+                 //do not show boxes in any group
+                continue;
+            }
             add(box, checkboxConstraints);
             checkboxConstraints.gridx++;
             // Two columns of checkboxes
@@ -877,6 +941,89 @@ public class PolicyEditor extends JPanel {
                 checkboxConstraints.gridy++;
             }
         }
+        //add groups
+        for (PolicyEditorPermissions.Group g : PolicyEditorPermissions.Group.values()) {
+            //no metter what, put group title on new line
+            checkboxConstraints.gridy++;
+            //all groups are in second column
+            checkboxConstraints.gridx = 2;
+            final JCheckBoxWithGroup groupCh = new JCheckBoxWithGroup(g);
+            groupBoxList.add(groupCh);
+            final JPanel groupPanel = new JPanel(new GridBagLayout());
+            groupPanel.setBorder(new LineBorder(Color.black));
+            groupCh.setToolTipText(R("PEGrightClick"));
+            groupCh.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON3) {
+                        groupPanel.setVisible(!groupPanel.isVisible());
+                        PolicyEditor.this.validate();
+                        Container c = PolicyEditor.this.getParent();
+                        //find the window and repack it
+                        while (!(c instanceof Window)) {
+                            if (c == null) {
+                                return;
+                            }
+                            c = c.getParent();
+                        }
+                        Window w = (Window) c;
+                        w.pack();
+
+                    }
+                }
+            });
+            groupCh.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String codebase = getSelectedCodebase();
+                    if (codebase == null) {
+                        return;
+                    }
+                    List<ActionListener> backup = new LinkedList<ActionListener>();
+                    for (final ActionListener l : groupCh.getActionListeners()) {
+                        backup.add(l);
+                        groupCh.removeActionListener(l);
+                    }
+                    final Map<PolicyEditorPermissions, Boolean> map = codebasePermissionsMap.get(codebase);
+                    for (PolicyEditorPermissions p : groupCh.getGroup().getPermissions()) {
+                        map.put(p, groupCh.isSelected());
+                    }
+                    changesMade = true;
+                    updateCheckboxes(codebase);
+                    for (ActionListener al : backup) {
+                        groupCh.addActionListener(al);
+                    }
+
+                }
+            });
+            add(groupCh, checkboxConstraints);
+            //place panel with mebers below the title
+            checkboxConstraints.gridy++;
+            checkboxConstraints.gridx = 2;
+            //spread group's panel over two columns
+            checkboxConstraints.gridwidth = 2;
+            checkboxConstraints.fill = checkboxConstraints.BOTH;
+            add(groupPanel, checkboxConstraints);
+            final GridBagConstraints groupCheckboxLabelConstraints = new GridBagConstraints();
+            groupCheckboxLabelConstraints.anchor = GridBagConstraints.LINE_START;
+            groupCheckboxLabelConstraints.weightx = 0;
+            groupCheckboxLabelConstraints.weighty = 0;
+            groupCheckboxLabelConstraints.gridx = 1;
+            groupCheckboxLabelConstraints.gridy = 1;
+            for (PolicyEditorPermissions p : g.getPermissions()) {
+                groupPanel.add(checkboxMap.get(p), groupCheckboxLabelConstraints);
+                // Two columns of checkboxes
+                groupCheckboxLabelConstraints.gridx++;
+                if (groupCheckboxLabelConstraints.gridx > 2) {
+                    groupCheckboxLabelConstraints.gridx = 1;
+                    groupCheckboxLabelConstraints.gridy++;
+                }
+            }
+            groupPanel.setVisible(false);
+            //reset
+            checkboxConstraints.gridwidth = 1;
+        }
+
 
         final JLabel codebaseListLabel = new JLabel(R("PECodebaseLabel"));
         codebaseListLabel.setBorder(new EmptyBorder(2, 2, 2, 2));
@@ -892,15 +1039,9 @@ public class PolicyEditor extends JPanel {
                 if (e.getValueIsAdjusting()) {
                     return; // ignore first click, act on release
                 }
-                final String selectedCodebase = (String) list.getSelectedValue();
-                if (selectedCodebase == null) {
+                final String codebase = getSelectedCodebase();
+                if (codebase == null) {
                     return;
-                }
-                final String codebase;
-                if (selectedCodebase.equals(R("PEGlobalSettings"))) {
-                    codebase = "";
-                } else {
-                    codebase = selectedCodebase;
                 }
                 updateCheckboxes(codebase);
             }
@@ -1061,6 +1202,7 @@ public class PolicyEditor extends JPanel {
                     }
                 }
                 list.setSelectedIndex(0);
+                updateCheckboxes("");
                 try {
                     fileLock.release();
                 } catch (final IOException e) {
