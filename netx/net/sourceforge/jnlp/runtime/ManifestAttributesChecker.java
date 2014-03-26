@@ -115,11 +115,11 @@ public class ManifestAttributesChecker {
                 || (isSandboxed && SecurityDesc.SANDBOX_PERMISSIONS.equals(desc));
         final String signedMsg;
         if (isFullySigned && !isSandboxed) {
-            signedMsg = "The applet is fully signed";
+            signedMsg = Translator.R("STOAsignedMsgFully");
         } else if (isFullySigned && isSandboxed) {
-            signedMsg = "The applet is fully signed and sandboxed";
+            signedMsg = Translator.R("STOAsignedMsgAndSandbox");
         } else {
-            signedMsg = "The applet is not fully signed";
+            signedMsg = Translator.R("STOAsignedMsgPartiall");
         }
         OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG,
                 "Trusted Only manifest attribute is \"true\". " + signedMsg + " and requests permission level: " + securityType);
