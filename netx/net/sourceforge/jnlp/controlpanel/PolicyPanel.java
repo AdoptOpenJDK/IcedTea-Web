@@ -54,12 +54,12 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -72,7 +72,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 public class PolicyPanel extends NamedBorderPanel {
 
-    private PolicyEditor policyEditor = null;
+    private PolicyEditorWindow policyEditor = null;
 
     public PolicyPanel(final JFrame frame, final DeploymentConfiguration config) {
         super(R("CPHeadPolicy"), new GridBagLayout());
@@ -161,12 +161,12 @@ public class PolicyPanel extends NamedBorderPanel {
      * @param filePath a {@link String} representing the path to the file to be opened
      */
     private void launchSimplePolicyEditor(final String filePath) {
-        if (policyEditor == null || policyEditor.isClosed()) {
-            policyEditor = PolicyEditor.createInstance(filePath);
-            policyEditor.setVisible(true);
+        if (policyEditor == null || policyEditor.getPolicyEditor().isClosed()) {
+            policyEditor = PolicyEditor.getPolicyEditorFrame(filePath);
+            policyEditor.asWindow().setVisible(true);
         } else {
-            policyEditor.toFront();
-            policyEditor.repaint();
+            policyEditor.asWindow().toFront();
+            policyEditor.asWindow().repaint();
         }
     }
 

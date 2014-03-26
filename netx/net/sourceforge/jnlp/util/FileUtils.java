@@ -16,8 +16,10 @@
 
 package net.sourceforge.jnlp.util;
 
+import java.awt.Component;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,7 +32,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.Writer;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.security.DigestInputStream;
@@ -347,7 +348,7 @@ public final class FileUtils {
      * Show a dialog informing the user that the file is currently read-only
      * @param frame a {@link JFrame} to act as parent to this dialog
      */
-    public static void showReadOnlyDialog(final JFrame frame) {
+    public static void showReadOnlyDialog(final Component frame) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -361,7 +362,7 @@ public final class FileUtils {
      * @param frame a {@link JFrame} to act as parent to this dialog
      * @param filePath a {@link String} representing the path to the file we failed to open
      */
-    public static void showCouldNotOpenFilepathDialog(final JFrame frame, final String filePath) {
+    public static void showCouldNotOpenFilepathDialog(final Component frame, final String filePath) {
         showCouldNotOpenDialog(frame, R("RCantOpenFile", filePath));
     }
 
@@ -371,7 +372,7 @@ public final class FileUtils {
      * @param filePath a {@link String} representing the path to the file we failed to open
      * @param reason a {@link OpenFileResult} specifying more precisely why we failed to open the file
      */
-    public static void showCouldNotOpenFileDialog(final JFrame frame, final String filePath, final OpenFileResult reason) {
+    public static void showCouldNotOpenFileDialog(final Component frame, final String filePath, final OpenFileResult reason) {
         final String message;
         switch (reason) {
             case CANT_CREATE:
@@ -396,7 +397,7 @@ public final class FileUtils {
      * @param filePath a {@link String} representing the path to the file we failed to open
      * @param message a {@link String} giving the specific reason the file could not be opened
      */
-    public static void showCouldNotOpenDialog(final JFrame frame, final String message) {
+    public static void showCouldNotOpenDialog(final Component frame, final String message) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

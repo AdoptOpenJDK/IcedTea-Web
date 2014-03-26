@@ -2,6 +2,7 @@ package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -25,6 +26,7 @@ import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
@@ -34,7 +36,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     private final JButton sandboxButton;
     private final JButton advancedOptionsButton;
     private final JPopupMenu policyMenu;
-    private PolicyEditor policyEditor = null;
+    private PolicyEditorWindow policyEditor = null;
 
     public PartiallySignedAppTrustWarningPanel(JNLPFile file, ActionChoiceListener actionChoiceListener, SecurityDialog securityDialog) {
         super(file, actionChoiceListener);
@@ -175,14 +177,15 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
                 filepath = null;
             }
 
-            if (policyEditor == null || policyEditor.isClosed()) {
-                policyEditor = PolicyEditor.createInstance(filepath);
+            if (policyEditor == null || policyEditor.getPolicyEditor().isClosed()) {
+                policyEditor = PolicyEditor.getPolicyEditorDialog(filepath);
             } else {
-                policyEditor.toFront();
-                policyEditor.repaint();
+                policyEditor.asWindow().toFront();
+                policyEditor.asWindow().repaint();
             }
-            policyEditor.addNewCodebase(file.getCodeBase().toString());
-            policyEditor.setVisible(true);
+            policyEditor.setModalityType(ModalityType.DOCUMENT_MODAL);
+            policyEditor.getPolicyEditor().addNewCodebase(file.getCodeBase().toString());
+            policyEditor.asWindow().setVisible(true);
             policyMenu.setVisible(false);
         }
     }

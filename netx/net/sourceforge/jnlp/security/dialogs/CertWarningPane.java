@@ -41,6 +41,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -84,6 +85,7 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -109,7 +111,7 @@ public class CertWarningPane extends SecurityDialogPanel {
     private JButton run, sandbox, advancedOptions, cancel, moreInfo;
     private boolean alwaysTrustSelected;
     private String bottomLabelWarningText;
-    private PolicyEditor policyEditor = null;
+    private PolicyEditorWindow policyEditor = null;
 
     public CertWarningPane(SecurityDialog x, CertVerifier certVerifier, SecurityDelegate securityDelegate) {
         super(x, certVerifier);
@@ -330,14 +332,15 @@ public class CertWarningPane extends SecurityDialogPanel {
                 filepath = null;
             }
 
-            if (policyEditor == null || policyEditor.isClosed()) {
-                policyEditor = PolicyEditor.createInstance(filepath);
+            if (policyEditor == null || policyEditor.getPolicyEditor().isClosed()) {
+                policyEditor = PolicyEditor.getPolicyEditorDialog(filepath);
             } else {
-                policyEditor.toFront();
-                policyEditor.repaint();
+                policyEditor.asWindow().toFront();
+                policyEditor.asWindow().repaint();
             }
-            policyEditor.addNewCodebase(file.getCodeBase().toString());
-            policyEditor.setVisible(true);
+            policyEditor.setModalityType(ModalityType.DOCUMENT_MODAL);
+            policyEditor.getPolicyEditor().addNewCodebase(file.getCodeBase().toString());
+            policyEditor.asWindow().setVisible(true);
             policyMenu.setVisible(false);
         }
     }

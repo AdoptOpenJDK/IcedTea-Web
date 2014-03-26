@@ -1,4 +1,26 @@
 2014-03-26  Andrew Azores  <aazores@redhat.com>
+            Jiri Vanek  <jvanek@redhat.com>
+
+	PolicyEditor can be made modal.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(PolicyEditorWindow) new interface to facilitate PolicyEditor as a Window
+	rather than Panel. (PolicyEditorFrame, PolicyEditorDialog)
+	PolicyEditorWindow implementations. (getPolicyEditorFrame,
+	getPolicyEditorWindow) new methods to get frame or dialog implementations.
+	(setComponentMnemonic) made static. (preparePolicyEditorWindow) common
+	setup for frame and dialog implementations.
+	* netx/net/sourceforge/jnlp/controlpanel/PolicyPanel.java: refactor to use
+	PolicyEditorWindow
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java
+	same
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: (showReadOnlyDialog,
+	showCouldNotOpenFileDialog, showCouldNotOpenFilePathDialog,
+	showCouldNotOpenDialog) use Component rather than JFrame
+
+
+2014-03-26  Andrew Azores  <aazores@redhat.com>
 
 	Added many new permissions for PolicyEditor
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: (PEWriteProps,

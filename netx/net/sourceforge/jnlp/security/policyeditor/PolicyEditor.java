@@ -36,10 +36,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import java.awt.Dialog.ModalityType;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -73,6 +75,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -81,7 +84,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -124,7 +127,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * Comments will *not* be preserved when PolicyEditor next saves to the
  * file.
  */
-public class PolicyEditor extends JFrame {
+public class PolicyEditor extends JPanel {
 
     /**
      * Command line switch to print a help message.
@@ -161,7 +164,6 @@ public class PolicyEditor extends JFrame {
     private final JList list = new JList(listModel);
     private final JButton okButton = new JButton(), closeButton = new JButton(),
             addCodebaseButton = new JButton(), removeCodebaseButton = new JButton();
-    private final JMenuBar menuBar = new JMenuBar();
     private final JFileChooser fileChooser;
     private CustomPolicyViewer cpViewer = null;
     private final WeakReference<PolicyEditor> weakThis = new WeakReference<PolicyEditor>(this);
@@ -295,19 +297,156 @@ public class PolicyEditor extends JFrame {
         };
 
         setAccelerators();
-        setTitle(R("PETitle"));
 
         setupLayout();
         list.setSelectedIndex(0);
         updateCheckboxes("");
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    }
 
-        addWindowListener(new WindowAdapter() {
+    private static void preparePolicyEditorWindow(final PolicyEditorWindow w, PolicyEditor e) {
+        w.setModalityType(ModalityType.MODELESS); //at least some default
+        w.setPolicyEditor(e);
+        w.setTitle(R("PETitle"));
+        w.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        w.setJMenuBar(createMenuBar(w.asWindow(), w.getPolicyEditor()));
+        setupPolicyEditorWindow(w.asWindow(), w.getPolicyEditor());
+
+    }
+
+    private static void setupPolicyEditorWindow(final Window window, final PolicyEditor editor) {
+        window.add(editor);
+        window.pack();
+        editor.setVisible(true);
+
+        window.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
-                quit();
+                editor.quit();
+                window.dispose();
             }
         });
+
+        editor.closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                window.dispose();
+            }
+        });
+    }
+
+    public static interface PolicyEditorWindow {
+
+        public void setTitle(String s);
+
+        public void setDefaultCloseOperation(int i);
+
+        public PolicyEditor getPolicyEditor();
+
+        public void setPolicyEditor(PolicyEditor e);
+
+        public void setJMenuBar(JMenuBar menu);
+
+        public Window asWindow();
+
+        public void setModalityType(ModalityType modalityType);
+    }
+
+    private static class PolicyEditorFrame extends JFrame implements PolicyEditorWindow {
+
+        private PolicyEditor editor;
+
+        private PolicyEditorFrame(final PolicyEditor editor) {
+            super();
+            preparePolicyEditorWindow((PolicyEditorWindow)this, editor);
+        }
+
+        @Override
+        public final void setTitle(String title) {
+            super.setTitle(title);
+        }
+
+        @Override
+        public final PolicyEditor getPolicyEditor() {
+            return editor;
+        }
+
+        @Override
+        public final void setPolicyEditor(PolicyEditor e) {
+            editor = e;
+        }
+
+        @Override
+        public final void setDefaultCloseOperation(int operation) {
+            super.setDefaultCloseOperation(operation);
+        }
+
+        @Override
+        public final void setJMenuBar(JMenuBar menu) {
+            super.setJMenuBar(menu);
+        }
+
+        @Override
+        public final Window asWindow() {
+            return this;
+        }
+
+        @Override
+        public void setModalityType(ModalityType type) {
+            //no op for frame
+        }
+    }
+
+    public static PolicyEditorWindow getPolicyEditorFrame(final String filepath) {
+        return new PolicyEditorFrame(new PolicyEditor(filepath));
+    }
+
+    private static class PolicyEditorDialog extends JDialog implements PolicyEditorWindow {
+
+        private PolicyEditor editor;
+
+        private PolicyEditorDialog(final PolicyEditor editor) {
+            super();
+            preparePolicyEditorWindow((PolicyEditorWindow)this, editor);
+        }
+
+        @Override
+        public final void setTitle(String title) {
+            super.setTitle(title);
+        }
+
+        @Override
+        public final PolicyEditor getPolicyEditor() {
+            return editor;
+        }
+
+        @Override
+        public final void setPolicyEditor(PolicyEditor e) {
+            editor = e;
+        }
+
+        @Override
+        public final void setDefaultCloseOperation(int operation) {
+            super.setDefaultCloseOperation(operation);
+        }
+
+        @Override
+        public final void setJMenuBar(JMenuBar menu) {
+            super.setJMenuBar(menu);
+        }
+
+        @Override
+        public final Window asWindow() {
+            return this;
+        }
+
+        @Override
+        public void setModalityType(ModalityType type) {
+            super.setModalityType(type);
+        }
+    }
+
+    public static PolicyEditorWindow getPolicyEditorDialog(final String filepath) {
+        return new PolicyEditorDialog(new PolicyEditor(filepath));
     }
 
     private void setClosed() {
@@ -370,9 +509,8 @@ public class PolicyEditor extends JFrame {
      */
     private void setAccelerator(final int trigger, final int modifiers, final Action action, final String identifier) {
         final KeyStroke key = KeyStroke.getKeyStroke(trigger, modifiers);
-        final JRootPane root = getRootPane();
-        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, identifier);
-        root.getActionMap().put(identifier, action);
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, identifier);
+        this.getActionMap().put(identifier, action);
     }
 
     /**
@@ -454,7 +592,6 @@ public class PolicyEditor extends JFrame {
         }
         weakThis.clear();
         setClosed();
-        dispose();
     }
 
     /**
@@ -649,7 +786,7 @@ public class PolicyEditor extends JFrame {
      * @param component the component for which to set a mnemonic
      * @param mnemonic the mnemonic to set
      */
-    private void setComponentMnemonic(final AbstractButton component, final String mnemonic) {
+    private static void setComponentMnemonic(final AbstractButton component, final String mnemonic) {
         final int trig;
         try {
             trig = Integer.parseInt(mnemonic);
@@ -660,45 +797,61 @@ public class PolicyEditor extends JFrame {
         component.setMnemonic(trig);
     }
 
-    /**
-     * Lay out all controls, tooltips, etc.
-     */
-    private void setupLayout() {
+    private static JMenuBar createMenuBar(final Window window, final PolicyEditor editor) {
+        final JMenuBar menuBar = new JMenuBar();
+
         final JMenu fileMenu = new JMenu(R("PEFileMenu"));
         setComponentMnemonic(fileMenu, R("PEFileMenuMnemonic"));
+
         final JMenuItem openItem = new JMenuItem(R("PEOpenMenuItem"));
         setComponentMnemonic(openItem, R("PEOpenMenuItemMnemonic"));
         openItem.setAccelerator(KeyStroke.getKeyStroke(openItem.getMnemonic(), ActionEvent.CTRL_MASK));
-        openItem.addActionListener(openButtonAction);
+        openItem.addActionListener(editor.openButtonAction);
         fileMenu.add(openItem);
+
         final JMenuItem saveItem = new JMenuItem(R("PESaveMenuItem"));
         setComponentMnemonic(saveItem, R("PESaveMenuItemMnemonic"));
         saveItem.setAccelerator(KeyStroke.getKeyStroke(saveItem.getMnemonic(), ActionEvent.CTRL_MASK));
-        saveItem.addActionListener(okButtonAction);
+        saveItem.addActionListener(editor.okButtonAction);
         fileMenu.add(saveItem);
+
         final JMenuItem saveAsItem = new JMenuItem(R("PESaveAsMenuItem"));
         setComponentMnemonic(saveAsItem, R("PESaveAsMenuItemMnemonic"));
         saveAsItem.setAccelerator(KeyStroke.getKeyStroke(saveAsItem.getMnemonic(), ActionEvent.CTRL_MASK));
-        saveAsItem.addActionListener(saveAsButtonAction);
+        saveAsItem.addActionListener(editor.saveAsButtonAction);
         fileMenu.add(saveAsItem);
+
         final JMenuItem exitItem = new JMenuItem(R("PEExitMenuItem"));
         setComponentMnemonic(exitItem, R("PEExitMenuItemMnemonic"));
         exitItem.setAccelerator(KeyStroke.getKeyStroke(exitItem.getMnemonic(), ActionEvent.CTRL_MASK));
-        exitItem.addActionListener(closeButtonAction);
+        exitItem.addActionListener(editor.closeButtonAction);
+        exitItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                window.dispose();
+            }
+        });
         fileMenu.add(exitItem);
         menuBar.add(fileMenu);
 
         final JMenu viewMenu = new JMenu(R("PEViewMenu"));
         setComponentMnemonic(viewMenu, R("PEViewMenuMnemonic"));
+
         final JMenuItem customPermissionsItem = new JMenuItem(R("PECustomPermissionsItem"));
         setComponentMnemonic(customPermissionsItem, R("PECustomPermissionsItemMnemonic"));
         customPermissionsItem.setAccelerator(KeyStroke.getKeyStroke(customPermissionsItem.getMnemonic(), ActionEvent.ALT_MASK));
-        customPermissionsItem.addActionListener(viewCustomButtonAction);
+        customPermissionsItem.addActionListener(editor.viewCustomButtonAction);
 
         viewMenu.add(customPermissionsItem);
         menuBar.add(viewMenu);
-        this.setJMenuBar(menuBar);
 
+        return menuBar;
+    }
+
+    /**
+     * Lay out all controls, tooltips, etc.
+     */
+    private void setupLayout() {
         final JLabel checkboxLabel = new JLabel();
         checkboxLabel.setText(R("PECheckboxLabel"));
         checkboxLabel.setBorder(new EmptyBorder(2, 2, 2, 2));
@@ -796,7 +949,6 @@ public class PolicyEditor extends JFrame {
         add(closeButton, cancelButtonConstraints);
 
         setMinimumSize(getPreferredSize());
-        pack();
     }
 
     /**
@@ -979,10 +1131,10 @@ public class PolicyEditor extends JFrame {
                 }
                 final StringBuilder sb = new StringBuilder();
                 sb.append(AUTOGENERATED_NOTICE);
-                sb.append("\n/* Generated by PolicyEditor at " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                        .format(Calendar.getInstance().getTime()) + " */" + System.getProperty("line.separator"));
+                sb.append("\n/* Generated by PolicyEditor at ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                              .format(Calendar.getInstance().getTime())).append(" */").append(System.getProperty("line.separator"));
                 final Set<PolicyEditorPermissions> enabledPermissions = new HashSet<PolicyEditorPermissions>();
-                FileLock fileLock = null;
+                FileLock fileLock;
                 try {
                     fileLock = FileUtils.getFileLock(file.getAbsolutePath(), false, true);
                 } catch (final FileNotFoundException e) {
@@ -1098,12 +1250,12 @@ public class PolicyEditor extends JFrame {
                     // maybe the user just forgot the -file flag, so try to open anyway
                     filepath = args[0];
                 }
-                final PolicyEditor editor = new PolicyEditor(filepath);
-                editor.setVisible(true);
+                final PolicyEditorWindow frame = getPolicyEditorFrame(filepath);
+                frame.asWindow().setVisible(true);
                 final String codebaseStr = argsMap.get(CODEBASE_FLAG);
                 if (codebaseStr != null) {
                     final String[] urls = codebaseStr.split(" ");
-                    editor.addNewCodebases(urls);
+                    frame.getPolicyEditor().addNewCodebases(urls);
                 }
             }
         });
