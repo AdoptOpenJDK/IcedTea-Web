@@ -1,3 +1,10 @@
+2014-03-26  Andrew Azores  <aazores@redhat.com>
+
+	Fix JOptionPane modality problems after making PolicyEditor itself modal
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	JOptionPane dialog parents set correctly to JDialog or JFrame rather than
+	JPanel
+
 2014-03-26  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.propertie: new keys (STOAsignedMsgFully)
@@ -9,7 +16,7 @@
 
 	Added possibility to group permissions in PolicyEditor
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added groups names
-	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java	: (setLayout)
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: (setLayout)
 	added grouping panels and checkboxes. (JcheckBoxWithGroup) New inner class to work
 	with groups.
 	netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java:

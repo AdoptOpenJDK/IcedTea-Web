@@ -36,11 +36,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dialog.ModalityType;
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -101,8 +101,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
 
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
 import net.sourceforge.jnlp.util.MD5SumWatcher;
@@ -178,8 +178,9 @@ public class PolicyEditor extends JPanel {
     private final WeakReference<PolicyEditor> weakThis = new WeakReference<PolicyEditor>(this);
     private MD5SumWatcher fileWatcher;
 
-    private final ActionListener okButtonAction, closeButtonAction, addCodebaseButtonAction,
+    private final ActionListener okButtonAction, addCodebaseButtonAction,
             removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction;
+    private ActionListener closeButtonAction;
 
     private static class JCheckBoxWithGroup extends JCheckBox {
 
@@ -259,15 +260,6 @@ public class PolicyEditor extends JPanel {
         };
         okButton.setText(R("ButApply"));
         okButton.addActionListener(okButtonAction);
-
-        closeButtonAction = new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                quit();
-            }
-        };
-        closeButton.setText(R("ButClose"));
-        closeButton.addActionListener(closeButtonAction);
 
         addCodebaseButtonAction = new ActionListener() {
             @Override
@@ -364,7 +356,6 @@ public class PolicyEditor extends JPanel {
         w.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         w.setJMenuBar(createMenuBar(w.asWindow(), w.getPolicyEditor()));
         setupPolicyEditorWindow(w.asWindow(), w.getPolicyEditor());
-
     }
 
     private static void setupPolicyEditorWindow(final Window window, final PolicyEditor editor) {
@@ -375,17 +366,44 @@ public class PolicyEditor extends JPanel {
         window.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
-                editor.quit();
+                ((PolicyEditorWindow) window).quit();
                 window.dispose();
             }
         });
 
-        editor.closeButton.addActionListener(new ActionListener() {
+        editor.closeButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                ((PolicyEditorWindow) window).quit();
+            }
+        };
+        editor.closeButton.setText(R("ButClose"));
+        editor.closeButton.addActionListener(editor.closeButtonAction);
+
+
+        final Action saveAct = new AbstractAction() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                window.dispose();
+                editor.savePolicyFile();
             }
-        });
+        };
+        editor.setAccelerator(R("PEOkButtonMnemonic"), ActionEvent.ALT_MASK, saveAct, "OkButtonAccelerator");
+
+        final Action quitAct = new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                ((PolicyEditorWindow) window).quit();
+            }
+        };
+        editor.setAccelerator(R("PECancelButtonMnemonic"), ActionEvent.ALT_MASK, quitAct, "CancelButtonAccelerator");
+
+        final Action escAct = new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                ((PolicyEditorWindow) window).quit();
+            }
+        };
+        editor.setAccelerator(KeyEvent.VK_ESCAPE, ActionEvent.ALT_MASK, escAct, "ExitOnEscape");
     }
 
     public static interface PolicyEditorWindow {
@@ -403,6 +421,8 @@ public class PolicyEditor extends JPanel {
         public Window asWindow();
 
         public void setModalityType(ModalityType modalityType);
+
+        public void quit();
     }
 
     private static class PolicyEditorFrame extends JFrame implements PolicyEditorWindow {
@@ -448,6 +468,22 @@ public class PolicyEditor extends JPanel {
         public void setModalityType(ModalityType type) {
             //no op for frame
         }
+
+        @Override
+        public void quit() {
+            if (editor.changesMade) {
+                final int save = JOptionPane.showConfirmDialog(this, R("PESaveChanges"));
+                if (save == JOptionPane.YES_OPTION) {
+                    editor.savePolicyFile();
+                } else if (save == JOptionPane.CANCEL_OPTION) {
+                    return;
+                }
+            }
+            editor.weakThis.clear();
+            editor.setClosed();
+            dispose();
+        }
+
     }
 
     public static PolicyEditorWindow getPolicyEditorFrame(final String filepath) {
@@ -497,6 +533,21 @@ public class PolicyEditor extends JPanel {
         public void setModalityType(ModalityType type) {
             super.setModalityType(type);
         }
+
+        @Override
+        public void quit() {
+            if (editor.changesMade) {
+                final int save = JOptionPane.showConfirmDialog(this, R("PESaveChanges"));
+                if (save == JOptionPane.YES_OPTION) {
+                    editor.savePolicyFile();
+                } else if (save == JOptionPane.CANCEL_OPTION) {
+                    return;
+                }
+            }
+            editor.weakThis.clear();
+            editor.setClosed();
+            dispose();
+        }
     }
 
     public static PolicyEditorWindow getPolicyEditorDialog(final String filepath) {
@@ -527,11 +578,8 @@ public class PolicyEditor extends JPanel {
      * Set keyboard accelerators for each major function in the editor
      */
     private void setAccelerators() {
-        setEscapeExit();
         setAddCodebaseAccelerator();
         setRemoveCodebaseAccelerator();
-        setOkAccelerator();
-        setCancelAccelerator();
     }
 
     /**
@@ -568,19 +616,6 @@ public class PolicyEditor extends JPanel {
     }
 
     /**
-     * Quit the editor when the Escape key is pressed
-     */
-    private void setEscapeExit() {
-        final Action act = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                quit();
-            }
-        };
-        setAccelerator(KeyEvent.VK_ESCAPE, ActionEvent.ALT_MASK, act, "ExitOnEscape");
-    }
-
-    /**
      * Add an accelerator for adding new codebases
      */
     private void setAddCodebaseAccelerator() {
@@ -604,48 +639,6 @@ public class PolicyEditor extends JPanel {
             }
         };
         setAccelerator(R("PERemoveCodebaseMnemonic"), ActionEvent.ALT_MASK, act, "RemoveCodebaseAccelerator");
-    }
-
-    /**
-     * Add an accelerator for applying changes (saving file)
-     */
-    private void setOkAccelerator() {
-        final Action act = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                savePolicyFile();
-            }
-        };
-        setAccelerator(R("PEOkButtonMnemonic"), ActionEvent.ALT_MASK, act, "OkButtonAccelerator");
-    }
-
-    /**
-     * Add an accelerator for quitting
-     */
-    private void setCancelAccelerator() {
-        final Action act = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                quit();
-            }
-        };
-        setAccelerator(R("PECancelButtonMnemonic"), ActionEvent.ALT_MASK, act, "CancelButtonAccelerator");
-    }
-
-    /**
-     * Quit, prompting the user first if there are unsaved changes
-     */
-    public void quit() {
-        if (changesMade) {
-            final int save = JOptionPane.showConfirmDialog(weakThis.get(), R("PESaveChanges"));
-            if (save == JOptionPane.YES_OPTION) {
-                savePolicyFile();
-            } else if (save == JOptionPane.CANCEL_OPTION) {
-                return;
-            }
-        }
-        weakThis.clear();
-        setClosed();
     }
 
     /**
@@ -923,6 +916,7 @@ public class PolicyEditor extends JPanel {
 
         final GridBagConstraints checkboxConstraints = new GridBagConstraints();
         checkboxConstraints.anchor = GridBagConstraints.LINE_START;
+        checkboxConstraints.fill = GridBagConstraints.HORIZONTAL;
         checkboxConstraints.weightx = 0;
         checkboxConstraints.weighty = 0;
         checkboxConstraints.gridx = 2;
@@ -1073,6 +1067,7 @@ public class PolicyEditor extends JPanel {
         removeCodebaseButtonConstraints.gridx = addCodebaseButtonConstraints.gridx + 1;
         removeCodebaseButtonConstraints.gridy = addCodebaseButtonConstraints.gridy;
         setComponentMnemonic(removeCodebaseButton, R("PERemoveCodebaseMnemonic"));
+        removeCodebaseButton.setPreferredSize(addCodebaseButton.getPreferredSize());
         add(removeCodebaseButton, removeCodebaseButtonConstraints);
 
         final GridBagConstraints okButtonConstraints = new GridBagConstraints();
