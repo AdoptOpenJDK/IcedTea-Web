@@ -56,8 +56,14 @@ public enum PolicyEditorPermissions {
     READ_PROPERTIES(R("PEReadProps"), R("PEReadPropsDetail"),
             PermissionType.PROPERTY_PERMISSION, PermissionTarget.ALL, PermissionActions.READ),
 
+    WRITE_PROPERTIES(R("PEWriteProps"), R("PEWritePropsDetail"),
+            PermissionType.PROPERTY_PERMISSION, PermissionTarget.ALL, PermissionActions.WRITE),
+
     READ_SYSTEM_FILES(R("PEReadSystemFiles"), R("PEReadSystemFilesDetail"),
-            PermissionType.FILE_PERMISSION, PermissionTarget.ALL, PermissionActions.READ),
+            PermissionType.FILE_PERMISSION, PermissionTarget.ALL_FILES, PermissionActions.READ),
+
+    WRITE_SYSTEM_FILES(R("PEWriteSystemFiles"), R("PEWriteSystemFilesDetail"),
+            PermissionType.FILE_PERMISSION, PermissionTarget.ALL_FILES, PermissionActions.WRITE),
 
     READ_TMP_FILES(R("PEReadTempFiles"), R("PEReadTempFilesDetail"),
             PermissionType.FILE_PERMISSION, PermissionTarget.TMPDIR, PermissionActions.READ),
@@ -65,17 +71,41 @@ public enum PolicyEditorPermissions {
     WRITE_TMP_FILES(R("PEWriteTempFiles"), R("PEWriteTempFilesDetail"),
             PermissionType.FILE_PERMISSION, PermissionTarget.TMPDIR, PermissionActions.WRITE),
 
-    CLIPBOARD(R("PEClipboard"), R("PEClipboardDetail"),
-            PermissionType.AWT_PERMISSION, PermissionTarget.CLIPBOARD, PermissionActions.NONE),
+    JAVA_REFLECTION(R("PEReflection"), R("PEReflectionDetail"),
+            PermissionType.REFLECT_PERMISSION, PermissionTarget.REFLECT, PermissionActions.NONE),
+
+    GET_CLASSLOADER(R("PEClassLoader"), R("PEClassLoaderDetail"),
+            PermissionType.RUNTIME_PERMISSION, PermissionTarget.CLASSLOADER, PermissionActions.NONE),
+
+    ACCESS_CLASS_IN_PACKAGE(R("PEClassInPackage"), R("PEClassInPackageDetail"),
+            PermissionType.RUNTIME_PERMISSION, PermissionTarget.ACCESS_CLASS_IN_PACKAGE, PermissionActions.NONE),
+
+    ACCESS_DECLARED_MEMBERS(R("PEDeclaredMembers"), R("PEDeclaredMembersDetail"),
+            PermissionType.RUNTIME_PERMISSION, PermissionTarget.DECLARED_MEMBERS, PermissionActions.NONE),
 
     NETWORK(R("PENetwork"), R("PENetworkDetail"),
             PermissionType.SOCKET_PERMISSION, PermissionTarget.ALL, PermissionActions.NETALL),
 
-    PRINT(R("PEPrint"), R("PEPrintDetail"),
-            PermissionType.RUNTIME_PERMISSION, PermissionTarget.PRINT, PermissionActions.NONE),
+    EXEC_COMMANDS(R("PEExec"), R("PEExecDetail"),
+            PermissionType.FILE_PERMISSION, PermissionTarget.ALL_FILES, PermissionActions.EXECUTE),
 
-    AUDIO(R("PEAudio"), R("PEAudioDetail"),
-            PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY, PermissionActions.NONE);
+    GET_ENV(R("PEGetEnv"), R("PEGetEnvDetail"),
+            PermissionType.RUNTIME_PERMISSION, PermissionTarget.GETENV, PermissionActions.NONE),
+
+    ALL_AWT(R("PEAWTPermission"), R("PEAWTPermissionDetail"),
+            PermissionType.AWT_PERMISSION, PermissionTarget.ALL, PermissionActions.NONE),
+
+    CLIPBOARD(R("PEClipboard"), R("PEClipboardDetail"),
+            PermissionType.AWT_PERMISSION, PermissionTarget.CLIPBOARD, PermissionActions.NONE),
+
+    PLAY_AUDIO(R("PEPlayAudio"), R("PEPlayAudioDetail"),
+            PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY, PermissionActions.NONE),
+
+    RECORD_AUDIO(R("PERecordAudio"), R("PERecordAudioDetail"),
+            PermissionType.AUDIO_PERMISSION, PermissionTarget.RECORD, PermissionActions.NONE),
+
+    PRINT(R("PEPrint"), R("PEPrintDetail"),
+            PermissionType.RUNTIME_PERMISSION, PermissionTarget.PRINT, PermissionActions.NONE);
 
     private final String name, description;
     private final PermissionType type;

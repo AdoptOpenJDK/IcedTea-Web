@@ -1,3 +1,26 @@
+2014-03-26  Andrew Azores  <aazores@redhat.com>
+
+	Added many new permissions for PolicyEditor
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: (PEWriteProps,
+	PEWritePropsDetail, PEWriteSystemFiles, PEWriteSystemFilesDetail,
+	PEAWTPermission, PEAWTPermissionDetail, PERecordAudio,
+	PERecordAudioDetail, PEReflection, PEReflectionDetail, PEClassLoader,
+	PEClassLoaderDetail, PEClassInPackage, PEClassInPackageDetail,
+	PEDeclaredMembers, PEDeclaredMembersDetail, PEExec, PEExecDetail,
+	PEGetEnv, PEGetEnvDetail): new messages. (PEAudio, PEAudioDetail) renamed
+	to PEPlayAudio{,Detail}.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionActions.java:
+	(EXECUTE) new action
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionTarget.java:
+	(ALL_FILES, RECORD, REFLECT, GETENV, ACCESS_CLASS_IN_PACKAGE,
+	DECLARED_MEMBERS, CLASSLOADER) new targets
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionType.java:
+	(REFLECT_PERMISSION) new type
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java:
+	(WRITE_PROPERTIES, WRITE_SYSTEM_FILES, JAVA_REFLECTION, GET_CLASSLOADER,
+	ACCESS_CLASS_IN_PACKAGE, ACCESS_DECLARED_MEMBERS, EXEC_COMMANDS, GET_ENV,
+	ALL_AWT, RECORD_AUDIO) new permissions. (AUDIO) renamed PLAY_AUDIO.
+
 2014-03-24  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/ManifestsAttributesValidator.java:

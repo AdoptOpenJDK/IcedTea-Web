@@ -49,6 +49,7 @@ public enum PermissionActions {
     NONE(""),
     READ("read"),
     WRITE("write"),
+    EXECUTE("execute"),
     ACCEPT("accept"),
     LISTEN("listen"),
     CONNECT("connect"),

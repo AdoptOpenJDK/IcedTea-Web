@@ -47,7 +47,8 @@ public enum PermissionType {
     AWT_PERMISSION("java.awt.AWTPermission"),
     SOCKET_PERMISSION("java.net.SocketPermission"),
     RUNTIME_PERMISSION("java.lang.RuntimePermission"),
-    AUDIO_PERMISSION("javax.sound.sampled.AudioPermission");
+    AUDIO_PERMISSION("javax.sound.sampled.AudioPermission"),
+    REFLECT_PERMISSION("java.lang.reflect.ReflectPermission");
 
     public final String type;
 

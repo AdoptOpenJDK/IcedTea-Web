@@ -41,13 +41,20 @@ package net.sourceforge.jnlp.security.policyeditor;
  */
 public enum PermissionTarget {
 
-	NONE(""),
+    NONE(""),
     ALL("*"),
+    ALL_FILES("<<ALL FILES>>"),
     USER_HOME("${user.home}${/}*"),
     TMPDIR("${java.io.tmpdir}${/}*"),
     CLIPBOARD("accessClipboard"),
     PRINT("queuePrintJob"),
-    PLAY("play");
+    PLAY("play"),
+    RECORD("record"),
+    REFLECT("suppressAccessChecks"),
+    GETENV("getenv.*"),
+    ACCESS_CLASS_IN_PACKAGE("accessClassInPackage.*"),
+    DECLARED_MEMBERS("accessDeclaredMembers"),
+    CLASSLOADER("getClassLoader");
 
     public final String target;
 
