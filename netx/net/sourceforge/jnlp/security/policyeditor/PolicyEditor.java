@@ -1067,7 +1067,9 @@ public class PolicyEditor extends JPanel {
                     OutputController.getLogger().log(e);
                 }
             }
-        }.start();
+        }.run(); // #run() to make IO synchronous right now. #start() can be used to make it async instead.
+        // http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-March/026886.html
+        // TODO: use SwingWorker and give some visual indication that IO is occurring
     }
 
     /**
@@ -1170,7 +1172,9 @@ public class PolicyEditor extends JPanel {
                     showCouldNotSaveDialog();
                 }
             }
-        }.start();
+        }.run(); // #run() to make IO synchronous right now. #start() can be used to make it async instead.
+        // http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-March/026886.html
+        // TODO: use SwingWorker and give some visual indication that IO is occurring
     }
 
     /**

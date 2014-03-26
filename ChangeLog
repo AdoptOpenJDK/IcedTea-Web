@@ -1,4 +1,11 @@
 2014-03-26  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(savePolicyFile, openAndParsePolicyFile) made synchronous so that
+	programmatically adding a new codebase has a well-defined order when
+	performed immediately after starting a new PolicyEditor instance
+
+2014-03-26  Andrew Azores  <aazores@redhat.com>
             Jiri Vanek  <jvanek@redhat.com>
 
 	PolicyEditor can be made modal.
