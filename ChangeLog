@@ -1,5 +1,13 @@
 2014-03-27  Andrew Azores  <aazores@redhat.com>
 
+	Fix bug with checkboxes not correctly updating on open and with repeats of
+	a codebase appearing when opening a file multiple times
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(resetCodebases) new method. (openAndParsePolicyFile) call resetCodebases
+	at start. (PolicyEditor) call resetCodebases in constructor
+
+2014-03-27  Andrew Azores  <aazores@redhat.com>
+
 	Applets can be temporarily granted permission levels above fully sandboxed
 	but below all-permission
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:

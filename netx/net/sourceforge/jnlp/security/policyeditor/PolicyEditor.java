@@ -220,6 +220,7 @@ public class PolicyEditor extends JPanel {
             }
         }
     }
+
     public PolicyEditor(final String filepath) {
         super();
         setLayout(new GridBagLayout());
@@ -234,14 +235,12 @@ public class PolicyEditor extends JPanel {
         if (filepath != null) {
             file = new File(filepath);
             openAndParsePolicyFile();
+        } else {
+            resetCodebases();
         }
 
         fileChooser = new JFileChooser(file);
         fileChooser.setFileHidingEnabled(false);
-
-        initializeMapForCodebase("");
-        listModel.addElement(R("PEGlobalSettings"));
-        updateCheckboxes("");
 
         okButtonAction = new ActionListener() {
             @Override
@@ -335,8 +334,6 @@ public class PolicyEditor extends JPanel {
         setAccelerators();
 
         setupLayout();
-        list.setSelectedIndex(0);
-        updateCheckboxes("");
     }
     
     private String getSelectedCodebase() {
@@ -1118,6 +1115,17 @@ public class PolicyEditor extends JPanel {
         customPermissionsMap.get(codebase).addAll(permissions);
     }
 
+    private void resetCodebases() {
+        listModel.clear();
+        codebasePermissionsMap.clear();
+        customPermissionsMap.clear();
+
+        initializeMapForCodebase("");
+        listModel.addElement(R("PEGlobalSettings"));
+        list.setSelectedValue(R("PEGlobalSettings"), true);
+        updateCheckboxes("");
+    }
+
     /**
      * Open the file pointed to by the filePath field. This is either provided by the
      * "-file" command line flag, or if none given, comes from DeploymentConfiguration.
@@ -1126,6 +1134,8 @@ public class PolicyEditor extends JPanel {
         new Thread() {
             @Override
             public void run() {
+                resetCodebases();
+
                 if (!file.exists()) {
                     try {
                         file.createNewFile();
@@ -1215,7 +1225,7 @@ public class PolicyEditor extends JPanel {
                         }
                     }
                 }
-                list.setSelectedIndex(0);
+                list.setSelectedValue(R("PEGlobalSettings"), true);
                 updateCheckboxes("");
                 try {
                     fileLock.release();
