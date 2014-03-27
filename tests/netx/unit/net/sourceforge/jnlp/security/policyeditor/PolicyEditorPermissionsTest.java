@@ -36,13 +36,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import java.util.regex.Pattern;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.regex.Pattern;
-
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
-
 import org.junit.Test;
 
 public class PolicyEditorPermissionsTest {

@@ -79,6 +79,10 @@ public class FileTestUtils {
         runnable.run();
         Thread.sleep(10);
         long filesLeaked = getOpenFileDescriptorCount() - filesOpenBefore;
+        //how come? Appearently can...
+        if (filesLeaked<0){
+            return;
+        }
         assertEquals(0, filesLeaked);
     }
 

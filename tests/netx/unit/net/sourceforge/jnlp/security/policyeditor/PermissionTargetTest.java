@@ -37,7 +37,6 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.policyeditor;
 
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
 public class PermissionTargetTest {

@@ -55,6 +55,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileLock;
@@ -793,10 +794,31 @@ public class PolicyEditor extends JPanel {
      * @param codebase whose permissions to display
      */
     private void updateCheckboxes(final String codebase) {
-        SwingUtilities.invokeLater(new Runnable() {
+        try {
+            if (SwingUtilities.isEventDispatchThread()){
+             updateCheckboxesImpl(codebase);   
+            } else {
+            updateCheckboxesInvokeAndWait(codebase);
+            }
+        } catch (InterruptedException ex) {
+            OutputController.getLogger().log(ex);
+        } catch (InvocationTargetException ex) {
+            OutputController.getLogger().log(ex);
+        }
+    }
+    
+    private void updateCheckboxesInvokeAndWait(final String codebase) throws InterruptedException, InvocationTargetException {
+        SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
+               updateCheckboxesImpl(codebase);
+            }
+        });
+
+    }
+    
+     private void updateCheckboxesImpl(String codebase) {
+                 for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
                     final JCheckBox box = checkboxMap.get(perm);
                     for (final ActionListener l : box.getActionListeners()) {
                         box.removeActionListener(l);
@@ -830,9 +852,6 @@ public class PolicyEditor extends JPanel {
                     });
                 }
             }
-        });
-
-    }
 
     /**
      * Set a mnemonic key for a menu item or button

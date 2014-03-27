@@ -33,18 +33,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+package net.sourceforge.jnlp.security.policyeditor;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Map;
 import net.sourceforge.jnlp.annotations.KnownToFail;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
 import net.sourceforge.jnlp.util.FileUtils;
-import org.junit.After;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,3 +1,13 @@
+2014-03-27  Jiri Vanek  <jvanek@redhat.com>
+
+	Clenaup in PolicyEditor tests and MVC
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: MVC
+	mixing method (updatecheckboxes) splited to invokelater and plain impls.
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/* : removed
+	warnings and fixed wrong package declaration.
+	* tests/test-extensions/net/sourceforge/jnlp/util/FileTestUtils.java: when
+	filelaks are negative, take it as success.
+
 2014-03-26  Andrew Azores  <aazores@redhat.com>
 
 	Fix JOptionPane modality problems after making PolicyEditor itself modal
