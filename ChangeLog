@@ -1,3 +1,43 @@
+2014-03-27  Andrew Azores  <aazores@redhat.com>
+
+	Applets can be temporarily granted permission levels above fully sandboxed
+	but below all-permission
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(STempPermNoFile, STempPermNoNetwork, STempPermNoExec,
+	STempPermNoFileOrNetwork, STempPermNoExecOrNetwork, STempPermNoFileOrExec,
+	STempPermNoFileOrNetworkOrExec, STempAllMedia, STempSoundOnly,
+	STempClipboardOnly, STempPrintOnly, STempAllFileAndPropertyAccess,
+	STempReadLocalFilesAndProperties, STempReflectionOnly): new messages
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: (installPanel)
+	pass SecurityDelegate to partially signed dialog
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
+	(showPartiallySignedWarningDialog) added SecutityDelegate param for
+	message extras
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	(checkPartiallySignedWithUserIfRequired) added SecurityDelegate param
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java:
+	(createPolicyPermissionsMenu, PolicyEditorLaunchListener,
+	PolicyEditorPopupListener) removed in favour of TemporaryPermissionsButton
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
+	(partiallySigned) SecurityDelegate param
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionActions.java:
+	(DELETE, READLINK, FILE_ALL) new actions. (rawActions, rawString) can
+	retrieve raw String representation of the action
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionTarget.java:
+	(USER_HOME, TMPDIR) grant permissions to entire directory, not only
+	children
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java: 
+	(DELETE_LOCAL_FILES, DELETE_TMP_FILES) new permissions.
+	(Group.WriteFileSystem) added DELETE* permissions
+	* nests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorParsingTest.java: 
+	update for change in PermissionTarget
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissions.java:
+	new class
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissionsButton.java:
+	new class
+
 2014-03-27  Jiri Vanek  <jvanek@redhat.com>
 
 	Clenaup in PolicyEditor tests and MVC

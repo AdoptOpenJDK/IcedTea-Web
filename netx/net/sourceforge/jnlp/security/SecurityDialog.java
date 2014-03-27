@@ -315,7 +315,7 @@ public class SecurityDialog extends JDialog {
         else if (dialogType == DialogType.APPLET_WARNING)
             panel = new AppletWarningPane(this, this.certVerifier);
         else if (dialogType == DialogType.PARTIALLYSIGNED_WARNING)
-            panel = AppTrustWarningDialog.partiallySigned(this, file);
+            panel = AppTrustWarningDialog.partiallySigned(this, file, (SecurityDelegate) extras[0]);
         else if (dialogType == DialogType.UNSIGNED_WARNING) // Only necessary for applets on 'high security' or above
             panel = AppTrustWarningDialog.unsigned(this, file);
         else if (dialogType == DialogType.AUTHENTICATION)

@@ -50,15 +50,20 @@ public enum PermissionActions {
     READ("read"),
     WRITE("write"),
     EXECUTE("execute"),
+    DELETE("delete"),
+    READLINK("readlink"),
+    FILE_ALL("read,write,execute,delete,readlink"),
     ACCEPT("accept"),
     LISTEN("listen"),
     CONNECT("connect"),
     RESOLVE("resolve"),
     NETALL("accept,listen,connect,resolve");
 
+    private final String rawActions;
     private final Set<String> actions;
 
     private PermissionActions(final String actions) {
+        this.rawActions = actions;
         this.actions = setFromString(actions);
     }
 
@@ -86,5 +91,9 @@ public enum PermissionActions {
         final Set<String> set = new HashSet<String>();
         Collections.addAll(set, string.split(","));
         return set;
+    }
+
+    public String rawString() {
+        return rawActions;
     }
 }

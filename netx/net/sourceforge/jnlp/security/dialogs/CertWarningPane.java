@@ -41,20 +41,15 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -65,16 +60,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
@@ -84,7 +76,6 @@ import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -225,8 +216,6 @@ public class CertWarningPane extends SecurityDialogPanel {
     }
 
     private void addButtons() {
-        createPolicyPermissionsMenu();
-
         alwaysTrust = new JCheckBox(R("SAlwaysTrustPublisher"));
         alwaysTrust.setEnabled(true);
         alwaysTrust.setSelected(alwaysTrustSelected);
@@ -246,7 +235,7 @@ public class CertWarningPane extends SecurityDialogPanel {
         buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         run = new JButton(R("ButRun"));
         sandbox = new JButton(R("ButSandbox"));
-        advancedOptions = new JButton("\u2630"); // "hamburger" navicon
+        advancedOptions = new TemporaryPermissionsButton(file, securityDelegate, sandbox);
         cancel = new JButton(R("ButCancel"));
 
         run.setToolTipText(R("CertWarnRunTip"));
@@ -272,8 +261,6 @@ public class CertWarningPane extends SecurityDialogPanel {
         run.addActionListener(new CheckBoxListener());
 
         sandbox.addActionListener(createSetValueListener(parent, 1));
-
-        advancedOptions.addMouseListener(new PolicyEditorPopupListener());
 
         cancel.addActionListener(createSetValueListener(parent, 2));
 
@@ -308,65 +295,6 @@ public class CertWarningPane extends SecurityDialogPanel {
         bottomPanel.setPreferredSize(new Dimension(600, 100));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(bottomPanel);
-    }
-
-    private void createPolicyPermissionsMenu() {
-        policyMenu = new JPopupMenu();
-
-        JMenuItem launchPolicyEditor = new JMenuItem(R("CertWarnPolicyEditorItem"));
-        launchPolicyEditor.addActionListener(new PolicyEditorLaunchListener());
-
-        policyMenu.add(launchPolicyEditor);
-        policyMenu.setSize(policyMenu.getMinimumSize());
-        policyMenu.setVisible(false);
-    }
-
-    private class PolicyEditorLaunchListener implements ActionListener {
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            final String rawFilepath = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
-            String filepath;
-            try {
-                filepath = new URL(rawFilepath).getPath();
-            } catch (final MalformedURLException mfue) {
-                filepath = null;
-            }
-
-            if (policyEditor == null || policyEditor.getPolicyEditor().isClosed()) {
-                policyEditor = PolicyEditor.getPolicyEditorDialog(filepath);
-            } else {
-                policyEditor.asWindow().toFront();
-                policyEditor.asWindow().repaint();
-            }
-            policyEditor.setModalityType(ModalityType.DOCUMENT_MODAL);
-            policyEditor.getPolicyEditor().addNewCodebase(file.getCodeBase().toString());
-            policyEditor.asWindow().setVisible(true);
-            policyMenu.setVisible(false);
-        }
-    }
-
-    private class PolicyEditorPopupListener implements MouseListener {
-        @Override
-        public void mouseClicked(final MouseEvent e) {
-            policyMenu.setLocation(e.getLocationOnScreen());
-            policyMenu.setVisible(!policyMenu.isVisible());
-        }
-
-        @Override
-        public void mousePressed(final MouseEvent e) {
-        }
-
-        @Override
-        public void mouseReleased(final MouseEvent e) {
-        }
-
-        @Override
-        public void mouseEntered(final MouseEvent e) {
-        }
-
-        @Override
-        public void mouseExited(final MouseEvent e) {
-        }
     }
 
     private class MoreInfoButtonListener implements ActionListener {

@@ -1,32 +1,57 @@
+/* Copyright (C) 2014 Red Hat, Inc.
+
+This file is part of IcedTea.
+
+IcedTea is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 2.
+
+IcedTea is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with IcedTea; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version.
+ */
+
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.awt.Dialog.ModalityType;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
+import net.sourceforge.jnlp.security.dialogs.TemporaryPermissionsButton;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
@@ -35,10 +60,9 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     private final JarCertVerifier jcv;
     private final JButton sandboxButton;
     private final JButton advancedOptionsButton;
-    private final JPopupMenu policyMenu;
-    private PolicyEditorWindow policyEditor = null;
 
-    public PartiallySignedAppTrustWarningPanel(JNLPFile file, ActionChoiceListener actionChoiceListener, SecurityDialog securityDialog) {
+    public PartiallySignedAppTrustWarningPanel(JNLPFile file, ActionChoiceListener actionChoiceListener,
+            SecurityDialog securityDialog, SecurityDelegate securityDelegate) {
         super(file, actionChoiceListener);
         this.jcv = (JarCertVerifier) securityDialog.getCertVerifier();
         this.INFO_PANEL_HEIGHT = 200;
@@ -47,11 +71,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         sandboxButton.setText(R("ButSandbox"));
         sandboxButton.addActionListener(chosenActionSetter(ExecuteAppletAction.SANDBOX));
 
-        policyMenu = createPolicyPermissionsMenu();
-        advancedOptionsButton = new JButton();
-        advancedOptionsButton.setText("\u2630");
-        advancedOptionsButton.addMouseListener(new PolicyEditorPopupListener());
-        advancedOptionsButton.setToolTipText(R("CertWarnPolicyTip"));
+        advancedOptionsButton = new TemporaryPermissionsButton(file, securityDelegate, sandboxButton);
 
         buttons.add(1, sandboxButton);
         buttons.add(2, advancedOptionsButton);
@@ -151,67 +171,6 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     @Override
     protected String getQuestionPanelText() {
         return htmlWrap(R(getQuestionPanelTextKey()));
-    }
-
-    private JPopupMenu createPolicyPermissionsMenu() {
-        final JPopupMenu policyMenu = new JPopupMenu();
-
-        JMenuItem launchPolicyEditor = new JMenuItem(R("CertWarnPolicyEditorItem"));
-        launchPolicyEditor.addActionListener(new PolicyEditorLaunchListener());
-
-        policyMenu.add(launchPolicyEditor);
-        policyMenu.setSize(policyMenu.getMinimumSize());
-        policyMenu.setVisible(false);
-
-        return policyMenu;
-    }
-
-    private class PolicyEditorLaunchListener implements ActionListener {
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            final String rawFilepath = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
-            String filepath;
-            try {
-                filepath = new URL(rawFilepath).getPath();
-            } catch (final MalformedURLException mfue) {
-                filepath = null;
-            }
-
-            if (policyEditor == null || policyEditor.getPolicyEditor().isClosed()) {
-                policyEditor = PolicyEditor.getPolicyEditorDialog(filepath);
-            } else {
-                policyEditor.asWindow().toFront();
-                policyEditor.asWindow().repaint();
-            }
-            policyEditor.setModalityType(ModalityType.DOCUMENT_MODAL);
-            policyEditor.getPolicyEditor().addNewCodebase(file.getCodeBase().toString());
-            policyEditor.asWindow().setVisible(true);
-            policyMenu.setVisible(false);
-        }
-    }
-
-    private class PolicyEditorPopupListener implements MouseListener {
-        @Override
-        public void mouseClicked(final MouseEvent e) {
-            policyMenu.setLocation(e.getLocationOnScreen());
-            policyMenu.setVisible(!policyMenu.isVisible());
-        }
-
-        @Override
-        public void mousePressed(final MouseEvent e) {
-        }
-
-        @Override
-        public void mouseReleased(final MouseEvent e) {
-        }
-
-        @Override
-        public void mouseEntered(final MouseEvent e) {
-        }
-
-        @Override
-        public void mouseExited(final MouseEvent e) {
-        }
     }
 
 }

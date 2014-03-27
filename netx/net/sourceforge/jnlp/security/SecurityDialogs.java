@@ -221,13 +221,15 @@ public class SecurityDialogs {
      *
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static AppSigningWarningAction showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier) {
+    public static AppSigningWarningAction showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier,
+            SecurityDelegate securityDelegate) {
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
         message.dialogType = DialogType.PARTIALLYSIGNED_WARNING;
         message.accessType = AccessType.PARTIALLYSIGNED;
         message.file = file;
         message.certVerifier = certVerifier;
+        message.extras = new Object[] { securityDelegate };
 
         return (AppSigningWarningAction) getUserResponse(message);
     }

@@ -37,10 +37,11 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.ActionChoiceListener;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
-import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 
 /**
  * A panel that confirms that the user is OK with unsigned code running.
@@ -57,9 +58,9 @@ public class AppTrustWarningDialog extends SecurityDialogPanel {
         return warningDialog;
     }
 
-    public static AppTrustWarningDialog partiallySigned(final SecurityDialog dialog, final JNLPFile file) {
+    public static AppTrustWarningDialog partiallySigned(final SecurityDialog dialog, final JNLPFile file, final SecurityDelegate securityDelegate) {
         final AppTrustWarningDialog warningDialog = new AppTrustWarningDialog(dialog);
-        warningDialog.add(new PartiallySignedAppTrustWarningPanel(file, warningDialog.getActionChoiceListener(), dialog));
+        warningDialog.add(new PartiallySignedAppTrustWarningPanel(file, warningDialog.getActionChoiceListener(), dialog, securityDelegate));
         return warningDialog;
     }
 

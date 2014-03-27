@@ -52,8 +52,8 @@ public class PolicyEditorParsingTest {
 
     private static final String LINEBREAK = System.getProperty("line.separator");
 
-    private static final String READ_PERMISSION = "permission java.io.FilePermission \"${user.home}${/}*\", \"read\";";
-    private static final String WRITE_PERMISSION = "permission java.io.FilePermission \"${user.home}${/}*\", \"write\";";
+    private static final String READ_PERMISSION = "permission java.io.FilePermission \"${user.home}\", \"read\";";
+    private static final String WRITE_PERMISSION = "permission java.io.FilePermission \"${user.home}\", \"write\";";
     private static final String COMMENT_HEADER = "/* TEST COMMENT */" + LINEBREAK;
 
     private static final String NORMAL_POLICY = "grant {" + LINEBREAK

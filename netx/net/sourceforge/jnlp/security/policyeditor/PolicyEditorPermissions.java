@@ -53,6 +53,9 @@ public enum PolicyEditorPermissions {
     WRITE_LOCAL_FILES(R("PEWriteFiles"), R("PEWriteFilesDetail"),
             PermissionType.FILE_PERMISSION, PermissionTarget.USER_HOME, PermissionActions.WRITE),
 
+    DELETE_LOCAL_FILES(R("PEDeleteFiles"), R("PEDeleteFilesDetail"),
+            PermissionType.FILE_PERMISSION, PermissionTarget.USER_HOME, PermissionActions.DELETE),
+
     READ_PROPERTIES(R("PEReadProps"), R("PEReadPropsDetail"),
             PermissionType.PROPERTY_PERMISSION, PermissionTarget.ALL, PermissionActions.READ),
 
@@ -70,6 +73,9 @@ public enum PolicyEditorPermissions {
 
     WRITE_TMP_FILES(R("PEWriteTempFiles"), R("PEWriteTempFilesDetail"),
             PermissionType.FILE_PERMISSION, PermissionTarget.TMPDIR, PermissionActions.WRITE),
+
+    DELETE_TMP_FILES(R("PEDeleteTempFiles"), R("PEDeleteTempFilesDetail"),
+            PermissionType.FILE_PERMISSION, PermissionTarget.TMPDIR, PermissionActions.DELETE),
 
     JAVA_REFLECTION(R("PEReflection"), R("PEReflectionDetail"),
             PermissionType.REFLECT_PERMISSION, PermissionTarget.REFLECT, PermissionActions.NONE),
@@ -107,15 +113,13 @@ public enum PolicyEditorPermissions {
     PRINT(R("PEPrint"), R("PEPrintDetail"),
             PermissionType.RUNTIME_PERMISSION, PermissionTarget.PRINT, PermissionActions.NONE);
 
-    
     public static enum Group {
 
-       
         ReadFileSystem(R("PEGReadFileSystem"),  READ_LOCAL_FILES, READ_PROPERTIES, READ_SYSTEM_FILES, READ_TMP_FILES, GET_ENV),
-        WriteFileSystem(R("PEGWriteFileSystem"), WRITE_LOCAL_FILES, WRITE_PROPERTIES, WRITE_SYSTEM_FILES, WRITE_TMP_FILES, EXEC_COMMANDS),
+        WriteFileSystem(R("PEGWriteFileSystem"), WRITE_LOCAL_FILES, DELETE_LOCAL_FILES, WRITE_PROPERTIES, WRITE_SYSTEM_FILES, WRITE_TMP_FILES,
+                DELETE_TMP_FILES, EXEC_COMMANDS),
         AccesUnowenedCode(R("PEGAccesUnowenedCode"), JAVA_REFLECTION, GET_CLASSLOADER, ACCESS_CLASS_IN_PACKAGE, ACCESS_DECLARED_MEMBERS),
         MediaAccess(R("PEGMediaAccess"), PLAY_AUDIO, RECORD_AUDIO, PRINT, CLIPBOARD);
-        
 
         private final PolicyEditorPermissions[] permissions;
         private final String title; 
@@ -124,7 +128,7 @@ public enum PolicyEditorPermissions {
             this.permissions = permissions;
         
         }
-        
+
         public static boolean anyContains(PolicyEditorPermissions permission) {
             for (Group g : Group.values()) {
                 if (g.contains(permission)) {
@@ -133,7 +137,7 @@ public enum PolicyEditorPermissions {
             }
             return false;
         }
-        
+
         public static boolean anyContains(JCheckBox view, Map<PolicyEditorPermissions, JCheckBox> checkboxMap) {
             for (Map.Entry<PolicyEditorPermissions, JCheckBox> pairs : checkboxMap.entrySet()){
                 if (pairs.getValue() == view) {
@@ -146,7 +150,7 @@ public enum PolicyEditorPermissions {
             }
             return false;
         }
-        
+
         /*
          * + all is selected
          * 0 invalid
@@ -174,7 +178,7 @@ public enum PolicyEditorPermissions {
             }
             return 0;
         }
-        
+
         public boolean contains(PolicyEditorPermissions permission) {
             for (PolicyEditorPermissions policyEditorPermissions : permissions) {
                 if (policyEditorPermissions == permission) {
@@ -192,9 +196,7 @@ public enum PolicyEditorPermissions {
         public PolicyEditorPermissions[] getPermissions() {
             return permissions;
         }
-        
-        
-        
+
     }
 
     

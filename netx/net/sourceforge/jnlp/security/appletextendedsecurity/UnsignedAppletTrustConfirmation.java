@@ -239,7 +239,7 @@ public class UnsignedAppletTrustConfirmation {
             appletOK = false;
         } else {
             // No remembered decision, prompt the user
-            AppSigningWarningAction warningResponse = SecurityDialogs.showPartiallySignedWarningDialog(file, certVerifier);
+            AppSigningWarningAction warningResponse = SecurityDialogs.showPartiallySignedWarningDialog(file, certVerifier, securityDelegate);
             ExecuteAppletAction executeAction = warningResponse.getAction();
 
             if (executeAction == ExecuteAppletAction.SANDBOX) {
