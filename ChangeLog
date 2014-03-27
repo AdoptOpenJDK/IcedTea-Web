@@ -1,5 +1,13 @@
 2014-03-27  Andrew Azores  <aazores@redhat.com>
 
+	Fix NPE when trying to open a new file, with changes made, and wanting to
+	save these changes to a file
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(openButtonAction) display Save As file chooser if there is no file object
+	yet and user wishes to save changes
+
+2014-03-27  Andrew Azores  <aazores@redhat.com>
+
 	Fix bug with checkboxes not correctly updating on open and with repeats of
 	a codebase appearing when opening a file multiple times
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:

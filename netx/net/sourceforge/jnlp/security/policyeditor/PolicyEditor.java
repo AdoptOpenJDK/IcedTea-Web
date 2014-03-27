@@ -285,6 +285,14 @@ public class PolicyEditor extends JPanel {
                 if (changesMade) {
                     final int save = JOptionPane.showConfirmDialog(weakThis.get(), R("PESaveChanges"));
                     if (save == JOptionPane.YES_OPTION) {
+                        if (file == null) {
+                            final int choice = fileChooser.showSaveDialog(weakThis.get());
+                            if (choice == JFileChooser.APPROVE_OPTION) {
+                                file = fileChooser.getSelectedFile();
+                            } else if (choice == JFileChooser.CANCEL_OPTION) {
+                                return;
+                            }
+                        }
                         savePolicyFile();
                     } else if (save == JOptionPane.CANCEL_OPTION) {
                         return;
