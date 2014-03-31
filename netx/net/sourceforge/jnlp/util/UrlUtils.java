@@ -195,9 +195,11 @@ public class UrlUtils {
      */
     public static String setOfUrlsToHtmlList(Iterable<URL> remoteUrls) {
         StringBuilder sb = new StringBuilder();
+        sb.append("<ul>");
         for (URL url : remoteUrls) {
             sb.append("<li>").append(url.toExternalForm()).append("</li>");
         }
+        sb.append("</ul>");
         return sb.toString();
     }
 
