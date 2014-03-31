@@ -14,6 +14,15 @@
 	Enclose list in 'ul' element.
 
 2013-03-31  Jiri Vanek  <jvanek@redhat.com>
+
+	Allowed wrong match of the aaaexample.com by *.example.com expression as in
+	specification.
+	* netx/net/sourceforge/jnlp/util/ClasspathMatcher.java: uncommented  handling 
+	of dot in (domainToRegEx).
+	* tests/netx/unit/net/sourceforge/jnlp/util/ClasspathMatcherTest.java:
+	(matchTest) uncommented and added tests of/for dot issue.
+
+2013-03-31  Jiri Vanek  <jvanek@redhat.com>
             Alexandr Kolouch  <skolnag@gmail.com>
 
 	Fixed cz_CS locales and adapted tests
