@@ -1,3 +1,13 @@
+2014-03-31  Jiri Vanek  <jvanek@redhat.com>
+
+	Refactored check of heap space. Now recognize g/G and is based on regex
+	* netx/net/sourceforge/jnlp/JREDesc.java: Added (heapPattern) constant.
+	(checkHeapSize) now returns trimmed string and its logic is matching the
+	heapPattern instead compelx structure. (init) set result of checkHeapSize
+	as initialHeapSize and maximumHeapSize.
+	* tests/netx/unit/net/sourceforge/jnlp/JREDescTest.java: tests for (checkHeapSize)
+	and (init) of JREDesc.
+	
 2014-03-27  Andrew Azores  <aazores@redhat.com>
 
 	Fix NPE when trying to open a new file, with changes made, and wanting to
