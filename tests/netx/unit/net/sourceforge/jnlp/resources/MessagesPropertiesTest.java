@@ -38,7 +38,6 @@ package net.sourceforge.jnlp.resources;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -147,7 +146,7 @@ public class MessagesPropertiesTest {
         //get default by non existing language and country
         main = LocalesIdentifier.DEFAULT;
         assertNotNull(main);
-        secondary= new LocalesIdentifier[] {LocalesIdentifier.CZ,LocalesIdentifier.DE,LocalesIdentifier.PL};
+        secondary= new LocalesIdentifier[] {LocalesIdentifier.CZ, LocalesIdentifier.DE, LocalesIdentifier.PL};
         assertNotNull(secondary);
         for (int i = 0; i < secondary.length; i++) {
             assertNotNull(secondary[i]);
@@ -183,7 +182,13 @@ public class MessagesPropertiesTest {
                         if (val1.trim().length() <= 5 /* short words like"ok", "", ...*/
                                 || val1.toLowerCase().contains("://") /*urls...*/
                                 || !val1.trim().contains(" ") /*one word*/
-                                || val1.replaceAll("\\{\\d\\}", "").trim().length()<5 /*only vars and short words*/) {
+                                || val1.replaceAll("\\{\\d\\}", "").trim().length()<5 /*only vars and short words*/
+                                //white list
+                                || (val1.trim().equals("std. err"))
+                                || (val1.trim().equals("std. out"))
+                                || (val1.trim().equals("Policy Editor"))
+                                || (val1.trim().equals("Java Reflection")))
+                        {
                             errLog("Warning! Items equals for: " + key + " = " + val1 + " but are in allowed subset");
                         } else {
                             errors++;
