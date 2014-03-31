@@ -527,9 +527,9 @@ AC_DEFUN_ONCE([IT_CHECK_XULRUNNER_MIMEDESCRIPTION_CONSTCHAR],
   CXXFLAGS_BACKUP="$CXXFLAGS"
   CXXFLAGS="$CXXFLAGS"" ""$MOZILLA_CFLAGS"
   AC_COMPILE_IFELSE([
-    #include <npfunctions.h>]
-    [const  char* NP_GetMIMEDescription ()
-    {return (char*) "yap!";}
+    AC_LANG_SOURCE([[#include <npfunctions.h>
+                     const  char* NP_GetMIMEDescription ()
+                       {return (char*) "yap!";}]])
     ],[
     AC_MSG_RESULT(no)
     ],[
@@ -547,10 +547,10 @@ AC_DEFUN_ONCE([IT_CHECK_XULRUNNER_REQUIRES_C11],
   CXXFLAGS_BACKUP="$CXXFLAGS"
   CXXFLAGS="$CXXFLAGS"" ""$MOZILLA_CFLAGS"
   AC_COMPILE_IFELSE([
-    #include <npapi.h>
-    #include <npruntime.h>]
-    [void setnpptr (NPVariant *result)
-    {VOID_TO_NPVARIANT(*result);}
+    AC_LANG_SOURCE([[#include <npapi.h>
+                     #include <npruntime.h>
+                     void setnpptr (NPVariant *result)
+                       { VOID_TO_NPVARIANT(*result);}]])
     ],[
     AC_MSG_RESULT(no)
     CXXFLAGS="$CXXFLAGS_BACKUP"

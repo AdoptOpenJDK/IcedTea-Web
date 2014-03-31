@@ -1,3 +1,9 @@
+2014-03-31  Omair Majid  <omajid@redhat.com>
+
+	* acinclude.m4
+	(IT_CHECK_XULRUNNER_MIMEDESCRIPTION_CONSTCHAR),
+	(IT_CHECK_XULRUNNER_REQUIRES_C11): Use AC_LANG_SOURCE with code.
+
 2014-03-31  Jiri Vanek  <jvanek@redhat.com>
 
 	Refactored check of heap space. Now recognize g/G and is based on regex
