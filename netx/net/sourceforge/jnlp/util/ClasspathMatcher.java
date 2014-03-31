@@ -146,10 +146,11 @@ public class ClasspathMatcher {
         }
 
         private static Pattern domainToRegEx(String domain) {
-            // I have conisdered the "dot" as bug i specification
-            // while (domain.startsWith("*.")) {
-            //    domain = "*" + domain.substring(2);
-            //}
+            // Although I have conisdered the "dot" as bug in specification, 
+            // to many applications are depnding on it
+            while (domain.startsWith("*.")) {
+                domain = "*" + domain.substring(2);
+            }
             return ClasspathMatcher.sourceToRegEx(domain);
         }
     }

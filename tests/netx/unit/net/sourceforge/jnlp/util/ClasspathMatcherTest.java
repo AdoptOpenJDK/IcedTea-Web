@@ -422,9 +422,13 @@ public class ClasspathMatcherTest {
         Assert.assertTrue(p.match(urls[13]));
         Assert.assertTrue(p.match(urls[14]));
         //those represent the "dot" issue 
-        //Assert.assertTrue(p.match(urls[15]));
-        //Assert.assertTrue(p.match(urls[16]));
+        Assert.assertTrue(p.match(urls[15]));
+        Assert.assertTrue(p.match(urls[16]));
         Assert.assertFalse(p.match(urls[17]));
+        //reasons for alowing "dot" issue
+        Assert.assertTrue(p.match(new URL("http://www.example.com")));
+        Assert.assertTrue(p.match(new URL("http://example.com"))); //yah, this is really nasty
+        //still the DOT issue is an BUG
     }
 
     @Test
