@@ -1,6 +1,12 @@
 2013-03-31  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties
+	(MissingPermissionsMainTitle): Remove 'codebase'
+	(MissingPermissionsInfo): Use simple link title.
+
+2013-03-31  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties
 	(ALACAMissingMainTitle, ALACAMissingInfo ALACAMatchingMainTitle)
 	(ALACAMatchingInfo): Rephrase strings and replace full links with page
 	names.
