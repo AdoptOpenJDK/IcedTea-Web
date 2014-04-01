@@ -232,11 +232,11 @@ public class PluginBridge extends JNLPFile {
         final String level = params.getPermissions();
         if (level == null) {
             return RequestedPermissionLevel.NONE;
-        } else if (level.equals("default")) {
+        } else if (level.equals(SecurityDesc.RequestedPermissionLevel.DEFAULT.toHtmlString())) {
             return RequestedPermissionLevel.NONE;
-        } else if (level.equals("sandbox")) {
+        } else if (level.equals(SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString())) {
             return RequestedPermissionLevel.SANDBOX;
-        } else if (level.equals("all-permissions")) {
+        } else if (level.equals(SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString())) {
             return RequestedPermissionLevel.ALL;
         } else {
             return RequestedPermissionLevel.NONE;

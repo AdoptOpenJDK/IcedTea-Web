@@ -39,10 +39,12 @@ public class SecurityDesc {
      */
     public enum RequestedPermissionLevel {
         NONE(null, null),
+        DEFAULT(null, "default"),
         SANDBOX(null, "sandbox"),
-        J2EE("j2ee-applitcation-client-permissions", null),
+        J2EE("j2ee-application-client-permissions", null),
         ALL("all-permissions", "all-permissions");
 
+        public static final String PERMISSIONS_NAME = "permissions";
         private final String jnlpString, htmlString;
 
         private RequestedPermissionLevel(final String jnlpString, final String htmlString) {

@@ -1,4 +1,18 @@
-2014-04-01  Andrew Azores  <aazores@redhat.com
+2014-04-01  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPFile.java: hardcoded strings replaced by
+	SecurityDesc.RequestedPermissionLevel values.
+	* netx/net/sourceforge/jnlp/PluginBridge.java: likewise
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPFileTest.java: likewise
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java: added new tests
+	(testGetRequestedPermissionLevel1) - (testGetRequestedPermissionLevel7).
+	Added (minimalJnlp) field.
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: added new
+	(testGetRequestedPermissionLevel) test.
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: added (DEFAULT) into
+	(RequestedPermissionLevel) and fixed typo in (J2EE) jnlpValue
+
+2014-04-01  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/SecurityDesc.java: (RequestedPermissionLevel)
 	new enum to describe the permission level requested in an applet's

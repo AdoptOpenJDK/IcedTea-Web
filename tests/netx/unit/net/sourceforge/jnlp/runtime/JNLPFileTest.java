@@ -44,6 +44,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.SecurityDesc;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
@@ -175,7 +176,7 @@ public class JNLPFileTest extends NoStdOutErrTest {
         Assert.assertEquals("*.com  https://*.cz", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_LIBRARY_ALLOWABLE)));
         Assert.assertEquals("*.net  ftp://*uu.co.uk", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CALLER_ALLOWABLE)));
         Assert.assertEquals("*.com *.net *.cz *.co.uk", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CODEBASE)));
-        Assert.assertEquals("sandbox", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS)));
+        Assert.assertEquals(SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString(), jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS)));
         Assert.assertEquals("false", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY)));
         Assert.assertEquals("false", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY)));
 

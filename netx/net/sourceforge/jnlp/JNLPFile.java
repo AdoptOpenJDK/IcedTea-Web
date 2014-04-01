@@ -965,12 +965,12 @@ public class JNLPFile {
             String s = getAttribute(PERMISSIONS);
             if (s == null) {
                 return ManifestBoolean.UNDEFINED;
-            } else if (s.trim().equalsIgnoreCase("sandbox")) {
+            } else if (s.trim().equalsIgnoreCase(SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString())) {
                 return ManifestBoolean.TRUE;
-            } else if (s.trim().equalsIgnoreCase("all-permissions")) {
+            } else if (s.trim().equalsIgnoreCase(SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString())) {
                 return ManifestBoolean.FALSE;
             } else {
-                throw new IllegalArgumentException("Unknown value of " + PERMISSIONS + " attribute " + s + ". Expected sandbox or all-permissions");
+                throw new IllegalArgumentException("Unknown value of " + PERMISSIONS + " attribute " + s + ". Expected "+SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString()+" or "+SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString());
             }
 
 
@@ -982,9 +982,9 @@ public class JNLPFile {
             String s = getAttribute(PERMISSIONS);
             if (s == null) {
                 return "Not defined";
-            } else if (s.trim().equalsIgnoreCase("sandbox")) {
+            } else if (s.trim().equalsIgnoreCase(SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString())) {
                 return s.trim();
-            } else if (s.trim().equalsIgnoreCase("all-permissions")) {
+            } else if (s.trim().equalsIgnoreCase(SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString())) {
                 return s.trim();
             } else {
                 return "illegal";
