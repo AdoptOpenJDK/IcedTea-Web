@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.net.*;
 import java.util.*;
 
+import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -595,20 +596,26 @@ class Parser {
                 throw new ParseException(R("PTwoSecurity"));
 
         Object type = SecurityDesc.SANDBOX_PERMISSIONS;
+        RequestedPermissionLevel requestedPermissionLevel = RequestedPermissionLevel.NONE;
 
-        if (nodes.length == 0)
+        if (nodes.length == 0) {
             type = SecurityDesc.SANDBOX_PERMISSIONS;
-        else if (null != getChildNode(nodes[0], "all-permissions"))
+            requestedPermissionLevel = RequestedPermissionLevel.NONE;
+        } else if (null != getChildNode(nodes[0], "all-permissions")) {
             type = SecurityDesc.ALL_PERMISSIONS;
-        else if (null != getChildNode(nodes[0], "j2ee-application-client-permissions"))
+            requestedPermissionLevel = RequestedPermissionLevel.ALL;
+        } else if (null != getChildNode(nodes[0], "j2ee-application-client-permissions")) {
             type = SecurityDesc.J2EE_PERMISSIONS;
-        else if (strict)
+            requestedPermissionLevel = RequestedPermissionLevel.J2EE;
+        } else if (strict) {
             throw new ParseException(R("PEmptySecurity"));
+        }
 
-        if (base != null)
-            return new SecurityDesc(file, type, base.getHost());
-        else
-            return new SecurityDesc(file, type, null);
+        if (base != null) {
+            return new SecurityDesc(file, requestedPermissionLevel, type, base.getHost());
+        } else {
+            return new SecurityDesc(file, requestedPermissionLevel, type, null);
+        }
     }
 
     /**

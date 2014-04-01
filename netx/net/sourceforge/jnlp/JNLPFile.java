@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.jar.Attributes;
 
+import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
@@ -486,6 +487,10 @@ public class JNLPFile {
      */
     public SecurityDesc getSecurity() {
         return security;
+    }
+
+    public RequestedPermissionLevel getRequestedPermissionLevel() {
+        return this.security.getRequestedPermissionLevel();
     }
 
     /**

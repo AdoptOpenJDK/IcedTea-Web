@@ -34,6 +34,73 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 public class SecurityDesc {
 
+    /**
+     * Represents the security level requested by an applet/application, as specified in its JNLP or HTML.
+     */
+    public enum RequestedPermissionLevel {
+        NONE(null, null),
+        SANDBOX(null, "sandbox"),
+        J2EE("j2ee-applitcation-client-permissions", null),
+        ALL("all-permissions", "all-permissions");
+
+        private final String jnlpString, htmlString;
+
+        private RequestedPermissionLevel(final String jnlpString, final String htmlString) {
+            this.jnlpString = jnlpString;
+            this.htmlString = htmlString;
+        }
+
+        /**
+         * This permission level, as it would appear requested in a JNLP file. null if this level
+         * is NONE (unspecified) or cannot be requested in a JNLP file.
+         * @return the String level
+         */
+        public String toJnlpString() {
+            return this.jnlpString;
+        }
+
+        /**
+         * This permission level, as it would appear requested in an HTML file. null if this level
+         * is NONE (unspecified) or cannot be requested in an HTML file.
+         * @return the String level
+         */
+        public String toHtmlString() {
+            return this.htmlString;
+        }
+
+        /**
+         * The JNLP permission level corresponding to the given String. If null is given, null comes
+         * back. If there is no permission level that can be granted in JNLP matching the given String,
+         * null is also returned.
+         * @param jnlpString the JNLP permission String
+         * @return the matching RequestedPermissionLevel
+         */
+        public RequestedPermissionLevel fromJnlpString(final String jnlpString) {
+            for (final RequestedPermissionLevel level : RequestedPermissionLevel.values()) {
+                if (level.jnlpString != null && level.jnlpString.equals(jnlpString)) {
+                    return level;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * The HTML permission level corresponding to the given String. If null is given, null comes
+         * back. If there is no permission level that can be granted in HTML matching the given String,
+         * null is also returned.
+         * @param jnlpString the JNLP permission String
+         * @return the matching RequestedPermissionLevel
+         */
+        public RequestedPermissionLevel fromHtmlString(final String htmlString) {
+            for (final RequestedPermissionLevel level : RequestedPermissionLevel.values()) {
+                if (level.htmlString != null && level.htmlString.equals(htmlString)) {
+                    return level;
+                }
+            }
+            return null;
+        }
+    }
+
     /*
      * We do not verify security here, the classloader deals with security
      */
@@ -46,6 +113,9 @@ public class SecurityDesc {
 
     /** J2EE permissions. */
     public static final Object J2EE_PERMISSIONS = "J2SE";
+
+    /** requested permissions type according to HTML or JNLP */
+    private final RequestedPermissionLevel requestedPermissionLevel;
 
     /** permissions type */
     private Object type;
@@ -147,14 +217,16 @@ public class SecurityDesc {
      * Create a security descriptor.
      *
      * @param file the JNLP file
+     * @param requestedPermissionLevel the permission level specified in the JNLP
      * @param type the type of security
      * @param downloadHost the download host (can always connect to)
      */
-    public SecurityDesc(JNLPFile file, Object type, String downloadHost) {
+    public SecurityDesc(JNLPFile file, RequestedPermissionLevel requestedPermissionLevel, Object type, String downloadHost) {
         if (file == null) {
             throw new NullJnlpFileException();
         }
         this.file = file;
+        this.requestedPermissionLevel = requestedPermissionLevel;
         this.type = type;
         this.downloadHost = downloadHost;
 
@@ -162,6 +234,17 @@ public class SecurityDesc {
         grantAwtPermissions = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(key));
 
         customTrustedPolicy = getCustomTrustedPolicy();
+    }
+
+    /**
+     * Create a security descriptor.
+     *
+     * @param file the JNLP file
+     * @param type the type of security
+     * @param downloadHost the download host (can always connect to)
+     */
+    public SecurityDesc(JNLPFile file, Object type, String downloadHost) {
+        this(file, RequestedPermissionLevel.NONE, type, downloadHost);
     }
 
     /**
@@ -223,6 +306,13 @@ public class SecurityDesc {
                 permissions.add(j2eePermissions[i]);
 
         return permissions;
+    }
+
+    /**
+     * @return the permission level requested in the JNLP
+     */
+    public RequestedPermissionLevel getRequestedPermissionLevel() {
+        return requestedPermissionLevel;
     }
 
     /**

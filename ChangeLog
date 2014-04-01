@@ -1,16 +1,32 @@
-2013-04-01  Jiri Vanek  <jvanek@redhat.com>
+2014-04-01  Andrew Azores  <aazores@redhat.com
+
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: (RequestedPermissionLevel)
+	new enum to describe the permission level requested in an applet's
+	JNLP/HTML. (requestedPermissionLevel) new field. (SecurityDesc) new
+	constructor with RequestedPermissionLevel added.
+	(getRequestedPermissionLevel) new method.
+	* netx/net/sourceforge/jnlp/JNLPFile.java: (getRequestedPermissionLevel)
+	new method
+	* netx/net/sourceforge/jnlp/Parser.java: (getSecurity) construct
+	SecurityDescs with correct RequestedPermissionLevel
+	* netx/net/sourceforge/jnlp/PluginBridge.java:
+	(getRequestedPermissionLevel) new overridden method
+	* netx/net/sourceforge/jnlp/PluginParameters.java: (getPermissions) new
+	method
+
+2014-04-01  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: adapted to match newest state.
 	(MissingPermissionsMainTitle) (MissingPermissionsInfo) (ALACAMissingMainTitle) (ALACAMissingInfo)
 	(ALACAMatchingMainTitle) (ALACAMatchingInfo) removed codebase word, used text in all hrefs.
 
-2013-04-01  Jiri Vanek  <jvanek@redhat.com>
+2014-04-01  Jiri Vanek  <jvanek@redhat.com>
 
 	Manual quotation in ClasspathMatcher regex replaced by Pattern.quote
 	* netx/net/sourceforge/jnlp/util/ClasspathMatcher.java: (quote)
 	is now using Pattern.quote instead manual \Q + original + \E
 
-2013-04-01  Jiri Vanek  <jvanek@redhat.com>
+2014-04-01  Jiri Vanek  <jvanek@redhat.com>
 
 	Restricted CodebaseMatcher to not match aaexample.com by *.example.com expression
 	but still match example.com - as in specification.
@@ -22,13 +38,13 @@
 	focusing on aaexample.com/example.com/aaa.example.com in *.example.com both
 	path and domain.
 
-2013-03-31  Omair Majid  <omajid@redhat.com>
+2014-03-31  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties
 	(MissingPermissionsMainTitle): Remove 'codebase'
 	(MissingPermissionsInfo): Use simple link title.
 
-2013-03-31  Omair Majid  <omajid@redhat.com>
+2014-03-31  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties
 	(ALACAMissingMainTitle, ALACAMissingInfo ALACAMatchingMainTitle)
@@ -37,7 +53,7 @@
 	* netx/net/sourceforge/jnlp/util/UrlUtils.java (setOfUrlsToHtmlList):
 	Enclose list in 'ul' element.
 
-2013-03-31  Jiri Vanek  <jvanek@redhat.com>
+2014-03-31  Jiri Vanek  <jvanek@redhat.com>
 
 	Allowed wrong match of the aaaexample.com by *.example.com expression as in
 	specification.
@@ -46,7 +62,7 @@
 	* tests/netx/unit/net/sourceforge/jnlp/util/ClasspathMatcherTest.java:
 	(matchTest) uncommented and added tests of/for dot issue.
 
-2013-03-31  Jiri Vanek  <jvanek@redhat.com>
+2014-03-31  Jiri Vanek  <jvanek@redhat.com>
             Alexandr Kolouch  <skolnag@gmail.com>
 
 	Fixed cz_CS locales and adapted tests

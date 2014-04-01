@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
@@ -224,6 +225,22 @@ public class PluginBridge extends JNLPFile {
 
     public boolean useJNLPHref() {
         return useJNLPHref;
+    }
+
+    @Override
+    public RequestedPermissionLevel getRequestedPermissionLevel() {
+        final String level = params.getPermissions();
+        if (level == null) {
+            return RequestedPermissionLevel.NONE;
+        } else if (level.equals("default")) {
+            return RequestedPermissionLevel.NONE;
+        } else if (level.equals("sandbox")) {
+            return RequestedPermissionLevel.SANDBOX;
+        } else if (level.equals("all-permissions")) {
+            return RequestedPermissionLevel.ALL;
+        } else {
+            return RequestedPermissionLevel.NONE;
+        }
     }
 
     /**

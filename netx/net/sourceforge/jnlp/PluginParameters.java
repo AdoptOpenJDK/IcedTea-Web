@@ -156,6 +156,10 @@ public class PluginParameters {
         return Integer.valueOf(heightStr);
     }
 
+    public String getPermissions() {
+        return get("permissions");
+    }
+
     public void updateSize(int width, int height) {
         parameters.put("width", Integer.toString(width));
         parameters.put("height", Integer.toString(height));
