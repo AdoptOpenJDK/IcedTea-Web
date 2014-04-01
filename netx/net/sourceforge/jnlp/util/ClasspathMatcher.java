@@ -326,22 +326,21 @@ public class ClasspathMatcher {
     private static String quote(String s) {
         /*
          * coment for lazybones:
-         * \Q is start of citation
-         * \E is end of citation
-         *  - all characters in citation are threated as are without any special meaning
+         *  Pattern.quote - all characters in citation are threated as are without any special meaning
+         *   Citation is based on \Q and \E marks wwith escapped inner \Q and \E
          * ^ is start of th e line
          * $ is end of the line
          */
         if (s.startsWith("*") && s.endsWith("*")) {
-            return "^.*\\Q" + s.substring(1, s.length() - 1) + "\\E.*$";
+            return "^.*" + Pattern.quote(s.substring(1, s.length() - 1)) + ".*$";
         } else if (s.endsWith("*")) {
-            return "^\\Q" + s.substring(0, s.length() - 1) + "\\E.*$";
+            return "^" + Pattern.quote(s.substring(0, s.length() - 1)) + ".*$";
 
         } else if (s.startsWith("*")) {
-            return "^.*\\Q" + s.substring(1) + "\\E$";
+            return "^.*" + Pattern.quote(s.substring(1)) + "$";
 
         } else {
-            return "^\\Q" + s + "\\E$";
+            return "^" + Pattern.quote(s) + "$";
         }
     }
 

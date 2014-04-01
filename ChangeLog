@@ -1,5 +1,11 @@
 2013-04-01  Jiri Vanek  <jvanek@redhat.com>
 
+	Manual quotation in ClasspathMatcher regex replaced by Pattern.quote
+	* netx/net/sourceforge/jnlp/util/ClasspathMatcher.java: (quote)
+	is now using Pattern.quote instead manual \Q + original + \E
+
+2013-04-01  Jiri Vanek  <jvanek@redhat.com>
+
 	Restricted CodebaseMatcher to not match aaexample.com by *.example.com expression
 	but still match example.com - as in specification.
 	* netx/net/sourceforge/jnlp/util/ClasspathMatcher.java: (domainToRegEx) consists
