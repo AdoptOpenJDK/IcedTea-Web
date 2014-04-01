@@ -1,5 +1,11 @@
 2013-04-01  Jiri Vanek  <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: adapted to match newest state.
+	(MissingPermissionsMainTitle) (MissingPermissionsInfo) (ALACAMissingMainTitle) (ALACAMissingInfo)
+	(ALACAMatchingMainTitle) (ALACAMatchingInfo) removed codebase word, used text in all hrefs.
+
+2013-04-01  Jiri Vanek  <jvanek@redhat.com>
+
 	Manual quotation in ClasspathMatcher regex replaced by Pattern.quote
 	* netx/net/sourceforge/jnlp/util/ClasspathMatcher.java: (quote)
 	is now using Pattern.quote instead manual \Q + original + \E
