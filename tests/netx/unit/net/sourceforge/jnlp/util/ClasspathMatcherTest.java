@@ -427,8 +427,35 @@ public class ClasspathMatcherTest {
         Assert.assertFalse(p.match(urls[17]));
         //reasons for alowing "dot" issue
         Assert.assertTrue(p.match(new URL("http://www.example.com")));
-        Assert.assertTrue(p.match(new URL("http://example.com"))); //yah, this is really nasty
-        //still the DOT issue is an BUG
+        Assert.assertTrue(p.match(new URL("http://example.com")));
+        //reason for restricting dost issue
+        Assert.assertFalse(p.match(new URL("http://aaaexample.com")));
+    }
+
+    @Test
+    public void wildCardSubdomainDoesNotMatchParentDomainPaths() throws MalformedURLException {
+        ClasspathMatchers p1 = ClasspathMatchers.compile("*.example.com*/*.abc.cde*", true);
+        Assert.assertFalse(p1.matches(new URL("http://aaaexample.com/xyz.abc.cde")));
+
+        Assert.assertTrue(p1.matches(new  URL("http://www.example.com/.abc.cde")));
+        Assert.assertTrue(p1.matches(new  URL("http://www.example.com/xyz.abc.cde")));
+        Assert.assertFalse(p1.matches(new URL("http://www.example.com/abc.cde")));
+        Assert.assertTrue(p1.matches(new  URL("http://example.com/xyz.abc.cdeefg")));
+        Assert.assertTrue(p1.matches(new  URL("http://example.com/xyz.abc.cde.efg")));
+        Assert.assertFalse(p1.matches(new URL("http://example.com/abc.cde.efg")));
+        Assert.assertFalse(p1.matches(new URL("http://example.com")));
+
+
+        ClasspathMatchers p = ClasspathMatchers.compile("*.example.com*/*.abc.cde*", false);
+        Assert.assertFalse(p.matches(new URL("http://aaaexample.com/xyz.abc.cde")));
+
+        Assert.assertTrue(p.matches(new URL("http://www.example.com/.abc.cde")));
+        Assert.assertTrue(p.matches(new URL("http://www.example.com/xyz.abc.cde")));
+        Assert.assertTrue(p.matches(new URL("http://www.example.com/abc.cde")));
+        Assert.assertTrue(p.matches(new URL("http://example.com/xyz.abc.cdeefg")));
+        Assert.assertTrue(p.matches(new URL("http://example.com/xyz.abc.cde.efg")));
+        Assert.assertTrue(p.matches(new URL("http://example.com/abc.cde.efg")));
+        Assert.assertTrue(p.matches(new URL("http://example.com")));
     }
 
     @Test

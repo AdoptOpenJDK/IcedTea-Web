@@ -146,12 +146,16 @@ public class ClasspathMatcher {
         }
 
         private static Pattern domainToRegEx(String domain) {
-            // Although I have conisdered the "dot" as bug in specification, 
-            // to many applications are depnding on it
-            while (domain.startsWith("*.")) {
-                domain = "*" + domain.substring(2);
+            String pre = "";
+            String post = "";
+            if (domain.startsWith("*.")) {
+                //this is handling case, when *.abc.xy
+                //should match also abc.xy except whatever.abc.xz
+                //but NOT whatewerabc.xy
+                pre = "(" + quote(domain.substring(2)) + ")|(";
+                post = ")";
             }
-            return ClasspathMatcher.sourceToRegEx(domain);
+            return Pattern.compile(pre + ClasspathMatcher.sourceToRegExString(domain) + post);
         }
     }
 
@@ -316,6 +320,10 @@ public class ClasspathMatcher {
         if (s.equals("*")) {
             return ".*";
         }
+        return quote(s);
+    }
+    
+    private static String quote(String s) {
         /*
          * coment for lazybones:
          * \Q is start of citation
