@@ -44,6 +44,7 @@ import net.sourceforge.jnlp.ExtensionDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFile.ManifestBoolean;
+import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ResourcesDesc;
@@ -167,46 +168,68 @@ public class ManifestAttributesChecker {
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
      */
     private void checkPermissionsAttribute() throws LaunchException {
-        final ManifestBoolean permissions = file.getManifestsAttributes().isSandboxForced();
-        AppletSecurityLevel level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
-        if (level == AppletSecurityLevel.ALLOW_UNSIGNED || securityDelegate.getRunInSandbox()) {
+        final ManifestBoolean sandboxForced = file.getManifestsAttributes().isSandboxForced();
+        final AppletSecurityLevel itwSecurityLevel = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
+        if (itwSecurityLevel == AppletSecurityLevel.ALLOW_UNSIGNED || securityDelegate.getRunInSandbox()) {
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Although 'permissions' attribute of this application is '" + file.getManifestsAttributes().permissionsToString()
                     + "' Your Extended applets security is at 'low', or you have specifically chosen to run the applet Sandboxed. Continuing");
             return;
         }
-        switch (permissions) {
-            case UNDEFINED: {
-                if (level == AppletSecurityLevel.DENY_UNSIGNED) {
-                    throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
+
+        if (sandboxForced == ManifestBoolean.UNDEFINED) {
+            if (itwSecurityLevel == AppletSecurityLevel.DENY_UNSIGNED) {
+                throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
+            }
+            if (itwSecurityLevel == AppletSecurityLevel.ASK_UNSIGNED) {
+                final boolean userApproved = SecurityDialogs.showMissingPermissionsAttributeDialogue(file.getTitle(), file.getCodeBase());
+                if (!userApproved) {
+                    throw new LaunchException("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have refused to run it.");
+                } else {
+                    OutputController.getLogger().log("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have allowed to run it.");
+                    return;
                 }
-                if (level == AppletSecurityLevel.ASK_UNSIGNED) {
-                    boolean a = SecurityDialogs.showMissingPermissionsAttributeDialogue(file.getTitle(), file.getCodeBase());
-                    if (!a) {
-                        throw new LaunchException("Your Extended applets security is at 'high' and  this applicationis missing the 'permissions' attribute in manifest. And you have refused to run it.");
-                    } else {
-                        OutputController.getLogger().log("Your Extended applets security is at 'high' and  this applicationis missing the 'permissions' attribute in manifest. And you have allowed to run it.");
+            }
+        }
+
+        final RequestedPermissionLevel requestedPermissions = file.getRequestedPermissionLevel();
+        validateRequestedPermissionLevelMatchesManifestPermissions(requestedPermissions, sandboxForced);
+        if (file instanceof PluginBridge) { // HTML applet
+            if (isNoneOrDefault(requestedPermissions)) {
+                if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
+                    // http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
+                    // FIXME: attempting to follow the spec, but it is too late now to actually set the applet
+                    // to run in sandbox. If we do this the applet will not be run at all, rather than run sandboxed!
+                    try {
+                        securityDelegate.setRunInSandbox();
+                    } catch (final LaunchException e) {
+                        OutputController.getLogger().log(e);
+                        throw new LaunchException("The applet is signed but its manifest specifies Sandbox permissions. This is not yet supported. Try running the applet again, but choose the Sandbox run option.", e);
                     }
                 }
-                //default for missing is sandbox
-                if (!SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
-                    throw new LaunchException("The 'permissions' attribute is not specified, and application is requesting permissions. This is fatal");
-                }
-                break;
             }
-            case TRUE: {
-                if (SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
-                    OutputController.getLogger().log("The permissions attribute of this application is " + file.getManifestsAttributes().permissionsToString() + "' and security is '" + security.getSecurityType() + "'. Thats correct");
-                } else {
-                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but  security is '" + security.getSecurityType() + "'. This is fatal");
+        } else { // JNLP
+            if (isNoneOrDefault(requestedPermissions)) {
+                if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
+                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' and the applet is signed. This is fatal.");
+                }
+                if (sandboxForced == ManifestBoolean.FALSE && signing == SigningState.NONE) {
+                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' and the applet is unsigned. This is fatal.");
                 }
             }
-            case FALSE: {
-                if (SecurityDesc.SANDBOX_PERMISSIONS.equals(security.getSecurityType())) {
-                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but  security is' " + security.getSecurityType() + "'. This is fatal");
-                } else {
-                    OutputController.getLogger().log("The permissions attribute of this application is '" + file.getManifestsAttributes().permissionsToString() + "' and security is '" + security.getSecurityType() + "'. Thats correct");
-                }
-            }
+        }
+    }
+
+    private static boolean isNoneOrDefault(final RequestedPermissionLevel requested) {
+        return requested == RequestedPermissionLevel.NONE || requested == RequestedPermissionLevel.DEFAULT;
+    }
+
+    private void validateRequestedPermissionLevelMatchesManifestPermissions(final RequestedPermissionLevel requested, final ManifestBoolean sandboxForced) throws LaunchException {
+        if (requested == RequestedPermissionLevel.ALL && sandboxForced != ManifestBoolean.FALSE) {
+            throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
+        }
+
+        if (requested == RequestedPermissionLevel.SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
+            throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
     }
 
