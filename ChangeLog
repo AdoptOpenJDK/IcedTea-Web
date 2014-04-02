@@ -1,5 +1,9 @@
 2014-04-02  Jiri Vanek  <jvanek@redhat.com>
 
+	* NEWS: Added 1.6 section
+
+2014-04-02  Jiri Vanek  <jvanek@redhat.com>
+
 	* configure.ac: bumped (AC_INIT) to 1.6pre
 
 2014-04-02  Jiri Vanek  <jvanek@redhat.com>
