@@ -152,7 +152,7 @@ public class ClasspathMatcher {
                 //this is handling case, when *.abc.xy
                 //should match also abc.xy except whatever.abc.xz
                 //but NOT whatewerabc.xy
-                pre = "(" + quote(domain.substring(2)) + ")|(";
+                pre = "(" + convertWildcardToRegEx(domain.substring(2)) + ")|(";
                 post = ")";
             }
             return Pattern.compile(pre + ClasspathMatcher.sourceToRegExString(domain) + post);
@@ -320,17 +320,10 @@ public class ClasspathMatcher {
         if (s.equals("*")) {
             return ".*";
         }
-        return quote(s);
+        return convertWildcardToRegEx(s);
     }
     
-    private static String quote(String s) {
-        /*
-         * coment for lazybones:
-         *  Pattern.quote - all characters in citation are threated as are without any special meaning
-         *   Citation is based on \Q and \E marks wwith escapped inner \Q and \E
-         * ^ is start of th e line
-         * $ is end of the line
-         */
+    private static String convertWildcardToRegEx(String s) {
         if (s.startsWith("*") && s.endsWith("*")) {
             return "^.*" + Pattern.quote(s.substring(1, s.length() - 1)) + ".*$";
         } else if (s.endsWith("*")) {
