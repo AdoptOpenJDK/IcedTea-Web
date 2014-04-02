@@ -1,5 +1,9 @@
 2014-04-02  Jiri Vanek  <jvanek@redhat.com>
 
+	* configure.ac: bumped (AC_INIT) to 1.6pre
+
+2014-04-02  Jiri Vanek  <jvanek@redhat.com>
+
 	* NEWS: Bumped date of 1.5 release to 2014
 
 2014-04-01  Andrew Azores  <aazores@redhat.com>
