@@ -1914,7 +1914,7 @@
 	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: (initDialog)
 	centerDialog called in init rather than on windowOpened event
 
-2013-10-09  Omair Majid  <oamjid@redhat.com>
+2013-10-09  Omair Majid  <omajid@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginProxySelector.java
 	(computeKey): New method.
@@ -2189,7 +2189,7 @@
 	(testHttpFallsBackToManualSocksProxy): New method.
 	(testManualSameProxy): Remove test for socket protocol.
 
-2013-09-23  Omair Majid  <omajid@rehdat.com>
+2013-09-23  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/browser/BrowserAwareProxySelector.java
 	(BrowserAwareProxySelector): Rename to...
