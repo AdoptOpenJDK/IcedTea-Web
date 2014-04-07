@@ -224,6 +224,10 @@ public class SecurityDialogs {
     public static AppSigningWarningAction showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier,
             SecurityDelegate securityDelegate) {
 
+        if (!shouldPromptUser()) {
+            return new AppSigningWarningAction(ExecuteAppletAction.NO, false);
+        }
+
         final SecurityDialogMessage message = new SecurityDialogMessage();
         message.dialogType = DialogType.PARTIALLYSIGNED_WARNING;
         message.accessType = AccessType.PARTIALLYSIGNED;
