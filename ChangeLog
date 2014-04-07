@@ -1,5 +1,10 @@
 2014-04-07  Andrew Azores  <aazores@redhat.com>
 
+	* Makefile.am: (IT_LANGUAGE_SOURCE_VERSION, IT_CLASS_TARGET_VERSION)
+	bumped to 7, dropping JDK6 compatibility
+
+2014-04-07  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
 	(showPartiallySignedWarningDialog) add missing shouldPromptUser check
 
