@@ -465,9 +465,6 @@ netx-source-files.txt:
 if !WITH_RHINO
 	sed -i '/RhinoBasedPacEvaluator/ d' $@
 endif
-if !HAVE_JAVA7
-	sed -i '/VariableX509TrustManagerJDK7/ d' $@
-endif
 
 stamps/netx-html-gen.stamp:
 	(cd $$NETX_SRCDIR/..; \

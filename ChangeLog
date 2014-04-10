@@ -1,3 +1,15 @@
+2014-04-10  Andrew Azores  <aazores@redhat.com>
+
+	* Makefile.am: (HAVE_JAVA7) removed
+	* acinclude.m4: (IT_CHECK_JAVA_VERSION) new check for JDK version.
+	(IT_CHECK_FOR_JDK) changed directories to search for JDK, notably adding
+	alternatives-defined JDK location
+	* configure.ac: (IT_CHECK_JAVA_VERSION) new check for JDK version
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: (HAVE_JAVA7) renamed and modified
+	to HAVE_JAVA8
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManagerJDK6.java:
+	removed
+
 2014-04-07  Andrew Azores  <aazores@redhat.com>
 
 	* Makefile.am: (IT_LANGUAGE_SOURCE_VERSION, IT_CLASS_TARGET_VERSION)

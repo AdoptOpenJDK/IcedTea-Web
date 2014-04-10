@@ -47,10 +47,18 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
 	        SYSTEM_JDK_DIR=
               ])
   if test -z "${SYSTEM_JDK_DIR}"; then
-    for dir in /usr/lib/jvm/java-openjdk /usr/lib/jvm/icedtea6 \
-    	      /usr/lib/jvm/java-6-openjdk /usr/lib/jvm/openjdk \
-              /usr/lib/jvm/java-icedtea /usr/lib/jvm/java-gcj /usr/lib/jvm/gcj-jdk \
-              /usr/lib/jvm/cacao ; do
+    for dir in /etc/alternatives/java_sdk \
+               /usr/lib/jvm/java-1.7.0-openjdk \
+               /usr/lib/jvm/icedtea7 \
+               /usr/lib/jvm/java-7-openjdk \
+               /usr/lib/jvm/java-1.8.0-openjdk \
+               /usr/lib/jvm/icedtea8 \
+               /usr/lib/jvm/java-8-openjdk \
+               /usr/lib/jvm/java-icedtea \
+               /usr/lib/jvm/java-openjdk \
+               /usr/lib/jvm/openjdk \
+               /usr/lib/jvm/cacao \
+               /usr/lib/jvm/jamvm ; do
        if test -d $dir; then
          SYSTEM_JDK_DIR=$dir
 	 break
@@ -698,7 +706,7 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
   AC_REQUIRE([IT_CHECK_FOR_JRE])
   AC_MSG_CHECKING([for a Java virtual machine])
   AC_ARG_WITH([java],
-              [AS_HELP_STRING(--with-java,specify location of the 1.5 java vm)],
+              [AS_HELP_STRING(--with-java, specify location of the Java 1.7 VM)],
   [
     JAVA="${withval}"
   ],
@@ -712,21 +720,29 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
     AC_PATH_PROG(JAVA, "java")
   fi
   if test -z "${JAVA}"; then
-    AC_PATH_PROG(JAVA, "gij")
-  fi
-  if test -z "${JAVA}"; then
-    AC_MSG_ERROR("A 1.5-compatible Java VM is required.")
+    AC_MSG_ERROR("A 1.7+-compatible Java VM is required.")
   fi
   AC_MSG_RESULT(${JAVA})
   AC_SUBST(JAVA)
-  JAVA_VERSION=`$JAVA -version 2>&1 | sed -n '1s/@<:@^"@:>@*"\(.*\)"$/\1/p'`
-  HAVE_JAVA7=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.7) print "yes"}'`
-  if  ! test -z "$HAVE_JAVA7" ; then
-    VERSION_DEFS='-DHAVE_JAVA7'
-  fi
+])
 
-  AM_CONDITIONAL([HAVE_JAVA7], test x"${HAVE_JAVA7}" = "xyes" )
+AC_DEFUN_ONCE([IT_CHECK_JAVA_VERSION],
+[
+  AC_REQUIRE([IT_FIND_JAVA])
+  AC_MSG_CHECKING([JDK version])
+  JAVA_VERSION=`$JAVA -version 2>&1 | sed -n '1s/@<:@^"@:>@*"\(.*\)"$/\1/p'`
+  AC_MSG_RESULT($JAVA_VERSION)
+  HAVE_JAVA7=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.7) print "yes"}'`
+  HAVE_JAVA8=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.8) print "yes"}'`
+  if test -z "$HAVE_JAVA7"; then
+    AC_MSG_ERROR([JDK7 or newer is required, detected was: $JAVA_VERSION])
+  fi
+  if ! test -z "$HAVE_JAVA8"; then
+    VERSION_DEFS="-DHAVE_JAVA8"
+  fi
   AC_SUBST(VERSION_DEFS)
+  AM_CONDITIONAL([HAVE_JAVA7], test x"${HAVE_JAVA7}" = "xyes")
+  AM_CONDITIONAL([HAVE_JAVA8], test x"${HAVE_JAVA8}" = "xyes")
 ])
 
 AC_DEFUN_ONCE([IT_FIND_KEYTOOL],
