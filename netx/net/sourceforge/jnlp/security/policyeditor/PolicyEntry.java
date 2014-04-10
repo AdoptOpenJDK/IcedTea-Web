@@ -51,8 +51,8 @@ import java.util.Set;
 public class PolicyEntry {
 
     private final String codebase;
-    private final Set<PolicyEditorPermissions> permissions = new HashSet<PolicyEditorPermissions>();
-    private final Set<CustomPermission> customPermissions = new HashSet<CustomPermission>();
+    private final Set<PolicyEditorPermissions> permissions = new HashSet<>();
+    private final Set<CustomPermission> customPermissions = new HashSet<>();
 
     public PolicyEntry(final String codebase, final Collection<PolicyEditorPermissions> permissions,
             final Collection<CustomPermission> customPermissions) {

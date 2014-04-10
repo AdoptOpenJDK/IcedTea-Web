@@ -1,5 +1,15 @@
 2014-04-10  Andrew Azores  <aazores@redhat.com>
 
+	Update PolicyEditor classes for Java 7 - Swing Generics, Diamond operator.
+	Also some formatting fixes.
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionActions.java
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEntry.java
+
+2014-04-10  Andrew Azores  <aazores@redhat.com>
+
 	* Makefile.am: (HAVE_JAVA7) removed
 	* acinclude.m4: (IT_CHECK_JAVA_VERSION) new check for JDK version.
 	(IT_CHECK_FOR_JDK) changed directories to search for JDK, notably adding

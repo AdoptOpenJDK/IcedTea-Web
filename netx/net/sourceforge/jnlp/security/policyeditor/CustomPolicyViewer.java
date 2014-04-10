@@ -66,14 +66,14 @@ import javax.swing.border.EmptyBorder;
  */
 public class CustomPolicyViewer extends JFrame {
 
-    private final Collection<CustomPermission> customPermissions = new TreeSet<CustomPermission>();
+    private final Collection<CustomPermission> customPermissions = new TreeSet<>();
     private final JScrollPane scrollPane = new JScrollPane();
-    private final DefaultListModel listModel = new DefaultListModel();
-    private final JList list = new JList(listModel);
+    private final DefaultListModel<CustomPermission> listModel = new DefaultListModel<>();
+    private final JList<CustomPermission> list = new JList<>(listModel);
     private final JButton addButton = new JButton(), removeButton = new JButton(), closeButton = new JButton();
     private final JLabel listLabel = new JLabel();
     private final ActionListener addButtonAction, removeButtonAction, closeButtonAction;
-    private final WeakReference<CustomPolicyViewer> weakThis = new WeakReference<CustomPolicyViewer>(this);
+    private final WeakReference<CustomPolicyViewer> weakThis = new WeakReference<>(this);
 
     /**
      * @param parent the parent PolicyEditor which created this CustomPolicyViewer

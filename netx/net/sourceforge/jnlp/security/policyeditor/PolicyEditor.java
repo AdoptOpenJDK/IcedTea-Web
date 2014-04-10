@@ -165,18 +165,18 @@ public class PolicyEditor extends JPanel {
     private File file;
     private boolean changesMade = false;
     private boolean closed = false;
-    private final Map<String, Map<PolicyEditorPermissions, Boolean>> codebasePermissionsMap = new HashMap<String, Map<PolicyEditorPermissions, Boolean>>();
-    private final Map<String, Set<CustomPermission>> customPermissionsMap = new HashMap<String, Set<CustomPermission>>();
-    private final Map<PolicyEditorPermissions, JCheckBox> checkboxMap = new TreeMap<PolicyEditorPermissions, JCheckBox>();
-    private final List<JCheckBoxWithGroup> groupBoxList = new ArrayList<JCheckBoxWithGroup>(Group.values().length);
+    private final Map<String, Map<PolicyEditorPermissions, Boolean>> codebasePermissionsMap = new HashMap<>();
+    private final Map<String, Set<CustomPermission>> customPermissionsMap = new HashMap<>();
+    private final Map<PolicyEditorPermissions, JCheckBox> checkboxMap = new TreeMap<>();
+    private final List<JCheckBoxWithGroup> groupBoxList = new ArrayList<>(Group.values().length);
     private final JScrollPane scrollPane = new JScrollPane();
-    private final DefaultListModel listModel = new DefaultListModel();
-    private final JList list = new JList(listModel);
+    private final DefaultListModel<String> listModel = new DefaultListModel<>();
+    private final JList<String> list = new JList<>(listModel);
     private final JButton okButton = new JButton(), closeButton = new JButton(),
             addCodebaseButton = new JButton(), removeCodebaseButton = new JButton();
     private final JFileChooser fileChooser;
     private CustomPolicyViewer cpViewer = null;
-    private final WeakReference<PolicyEditor> weakThis = new WeakReference<PolicyEditor>(this);
+    private final WeakReference<PolicyEditor> weakThis = new WeakReference<>(this);
     private MD5SumWatcher fileWatcher;
 
     private final ActionListener okButtonAction, addCodebaseButtonAction,
@@ -196,13 +196,13 @@ public class PolicyEditor extends JPanel {
             return group;
         }
 
-        private void setState(Map<PolicyEditorPermissions, Boolean> map) {
-            List<ActionListener> backup = new LinkedList<ActionListener>();
+        private void setState(final Map<PolicyEditorPermissions, Boolean> map) {
+            final List<ActionListener> backup = new LinkedList<>();
             for (final ActionListener l : this.getActionListeners()) {
                 backup.add(l);
                 this.removeActionListener(l);
             }
-            int i = group.getState(map);
+            final int i = group.getState(map);
             this.setBackground(getParent().getBackground());
             if (i > 0) {
                 this.setSelected(true);
@@ -215,7 +215,7 @@ public class PolicyEditor extends JPanel {
                 this.setSelected(false);
             }
 
-            for (ActionListener al : backup) {
+            for (final ActionListener al : backup) {
                 this.addActionListener(al);
             }
         }
@@ -273,7 +273,7 @@ public class PolicyEditor extends JPanel {
         removeCodebaseButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                removeCodebase((String) list.getSelectedValue());
+                removeCodebase(getSelectedCodebase());
             }
         };
         removeCodebaseButton.setText(R("PERemoveCodebase"));
@@ -324,7 +324,7 @@ public class PolicyEditor extends JPanel {
                     @Override
                     public void run() {
                         String codebase = getSelectedCodebase();
-                        if (codebase == null){
+                        if (codebase == null) {
                             return;
                         }
                         if (cpViewer == null) {
@@ -343,9 +343,9 @@ public class PolicyEditor extends JPanel {
 
         setupLayout();
     }
-    
+
     private String getSelectedCodebase() {
-        String codebase = (String) list.getSelectedValue();
+        final String codebase = list.getSelectedValue();
         if (codebase == null || codebase.isEmpty()) {
             return null;
         }
@@ -355,7 +355,7 @@ public class PolicyEditor extends JPanel {
         return codebase;
     }
 
-    private static void preparePolicyEditorWindow(final PolicyEditorWindow w, PolicyEditor e) {
+    private static void preparePolicyEditorWindow(final PolicyEditorWindow w, final PolicyEditor e) {
         w.setModalityType(ModalityType.MODELESS); //at least some default
         w.setPolicyEditor(e);
         w.setTitle(R("PETitle"));
@@ -385,7 +385,6 @@ public class PolicyEditor extends JPanel {
         };
         editor.closeButton.setText(R("ButClose"));
         editor.closeButton.addActionListener(editor.closeButtonAction);
-
 
         final Action saveAct = new AbstractAction() {
             @Override
@@ -437,7 +436,7 @@ public class PolicyEditor extends JPanel {
 
         private PolicyEditorFrame(final PolicyEditor editor) {
             super();
-            preparePolicyEditorWindow((PolicyEditorWindow)this, editor);
+            preparePolicyEditorWindow((PolicyEditorWindow) this, editor);
         }
 
         @Override
@@ -451,17 +450,17 @@ public class PolicyEditor extends JPanel {
         }
 
         @Override
-        public final void setPolicyEditor(PolicyEditor e) {
+        public final void setPolicyEditor(final PolicyEditor e) {
             editor = e;
         }
 
         @Override
-        public final void setDefaultCloseOperation(int operation) {
+        public final void setDefaultCloseOperation(final int operation) {
             super.setDefaultCloseOperation(operation);
         }
 
         @Override
-        public final void setJMenuBar(JMenuBar menu) {
+        public final void setJMenuBar(final JMenuBar menu) {
             super.setJMenuBar(menu);
         }
 
@@ -471,7 +470,7 @@ public class PolicyEditor extends JPanel {
         }
 
         @Override
-        public void setModalityType(ModalityType type) {
+        public void setModalityType(final ModalityType type) {
             //no op for frame
         }
 
@@ -502,11 +501,11 @@ public class PolicyEditor extends JPanel {
 
         private PolicyEditorDialog(final PolicyEditor editor) {
             super();
-            preparePolicyEditorWindow((PolicyEditorWindow)this, editor);
+            preparePolicyEditorWindow((PolicyEditorWindow) this, editor);
         }
 
         @Override
-        public final void setTitle(String title) {
+        public final void setTitle(final String title) {
             super.setTitle(title);
         }
 
@@ -516,17 +515,17 @@ public class PolicyEditor extends JPanel {
         }
 
         @Override
-        public final void setPolicyEditor(PolicyEditor e) {
+        public final void setPolicyEditor(final PolicyEditor e) {
             editor = e;
         }
 
         @Override
-        public final void setDefaultCloseOperation(int operation) {
+        public final void setDefaultCloseOperation(final int operation) {
             super.setDefaultCloseOperation(operation);
         }
 
         @Override
-        public final void setJMenuBar(JMenuBar menu) {
+        public final void setJMenuBar(final JMenuBar menu) {
             super.setJMenuBar(menu);
         }
 
@@ -536,7 +535,7 @@ public class PolicyEditor extends JPanel {
         }
 
         @Override
-        public void setModalityType(ModalityType type) {
+        public void setModalityType(final ModalityType type) {
             super.setModalityType(type);
         }
 
@@ -641,7 +640,7 @@ public class PolicyEditor extends JPanel {
         final Action act = new AbstractAction() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                removeCodebase((String) list.getSelectedValue());
+                removeCodebase(getSelectedCodebase());
             }
         };
         setAccelerator(R("PERemoveCodebaseMnemonic"), ActionEvent.ALT_MASK, act, "RemoveCodebaseAccelerator");
@@ -726,6 +725,7 @@ public class PolicyEditor extends JPanel {
                             stopAsking = true;
                         }
                     } catch (final MalformedURLException mfue) {
+                        // ignore - loop/ask again
                     }
                 }
                 addNewCodebase(codebase);
@@ -773,7 +773,7 @@ public class PolicyEditor extends JPanel {
         if (permissions != null) {
             return new HashMap<PolicyEditorPermissions, Boolean>(permissions);
         } else {
-            final Map<PolicyEditorPermissions, Boolean> blank = new HashMap<PolicyEditorPermissions, Boolean>();
+            final Map<PolicyEditorPermissions, Boolean> blank = new HashMap<>();
             for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
                 blank.put(perm, false);
             }
@@ -800,10 +800,10 @@ public class PolicyEditor extends JPanel {
      */
     private void updateCheckboxes(final String codebase) {
         try {
-            if (SwingUtilities.isEventDispatchThread()){
-             updateCheckboxesImpl(codebase);   
+            if (SwingUtilities.isEventDispatchThread()) {
+                updateCheckboxesImpl(codebase);
             } else {
-            updateCheckboxesInvokeAndWait(codebase);
+                updateCheckboxesInvokeAndWait(codebase);
             }
         } catch (InterruptedException ex) {
             OutputController.getLogger().log(ex);
@@ -811,52 +811,52 @@ public class PolicyEditor extends JPanel {
             OutputController.getLogger().log(ex);
         }
     }
-    
+
     private void updateCheckboxesInvokeAndWait(final String codebase) throws InterruptedException, InvocationTargetException {
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-               updateCheckboxesImpl(codebase);
+                updateCheckboxesImpl(codebase);
             }
         });
 
     }
-    
-     private void updateCheckboxesImpl(String codebase) {
-                 for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
-                    final JCheckBox box = checkboxMap.get(perm);
-                    for (final ActionListener l : box.getActionListeners()) {
-                        box.removeActionListener(l);
-                    }
-                    initializeMapForCodebase(codebase);
-                    final Map<PolicyEditorPermissions, Boolean> map = codebasePermissionsMap.get(codebase);
-                    final boolean state;
-                    if (map != null) {
-                        final Boolean s = map.get(perm);
-                        if (s != null) {
-                            state = s;
-                        } else {
-                            state = false;
-                        }
-                    } else {
-                        state = false;
-                    }
+
+    private void updateCheckboxesImpl(final String codebase) {
+        for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
+            final JCheckBox box = checkboxMap.get(perm);
+            for (final ActionListener l : box.getActionListeners()) {
+                box.removeActionListener(l);
+            }
+            initializeMapForCodebase(codebase);
+            final Map<PolicyEditorPermissions, Boolean> map = codebasePermissionsMap.get(codebase);
+            final boolean state;
+            if (map != null) {
+                final Boolean s = map.get(perm);
+                if (s != null) {
+                    state = s;
+                } else {
+                    state = false;
+                }
+            } else {
+                state = false;
+            }
+            for (final JCheckBoxWithGroup jg : groupBoxList) {
+                jg.setState(map);
+            }
+            box.setSelected(state);
+            box.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    changesMade = true;
+                    map.put(perm, box.isSelected());
                     for (JCheckBoxWithGroup jg : groupBoxList) {
                         jg.setState(map);
                     }
-                    box.setSelected(state);
-                    box.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(final ActionEvent e) {
-                            changesMade = true;
-                            map.put(perm, box.isSelected());
-                            for (JCheckBoxWithGroup jg : groupBoxList) {
-                                jg.setState(map);
-                            }
-                        }
-                    });
                 }
-            }
+            });
+        }
+    }
 
     /**
      * Set a mnemonic key for a menu item or button
@@ -947,8 +947,8 @@ public class PolicyEditor extends JPanel {
         checkboxConstraints.gridy = 1;
 
         for (final JCheckBox box : checkboxMap.values()) {
-             if (PolicyEditorPermissions.Group.anyContains(box, checkboxMap)){
-                 //do not show boxes in any group
+            if (PolicyEditorPermissions.Group.anyContains(box, checkboxMap)) {
+                //do not show boxes in any group
                 continue;
             }
             add(box, checkboxConstraints);
@@ -960,7 +960,7 @@ public class PolicyEditor extends JPanel {
             }
         }
         //add groups
-        for (PolicyEditorPermissions.Group g : PolicyEditorPermissions.Group.values()) {
+        for (final PolicyEditorPermissions.Group g : PolicyEditorPermissions.Group.values()) {
             //no metter what, put group title on new line
             checkboxConstraints.gridy++;
             //all groups are in second column
@@ -977,14 +977,14 @@ public class PolicyEditor extends JPanel {
                         groupPanel.setVisible(!groupPanel.isVisible());
                         PolicyEditor.this.validate();
                         Container c = PolicyEditor.this.getParent();
-                        //find the window and repack it
+                        // find the window and repack it
                         while (!(c instanceof Window)) {
                             if (c == null) {
                                 return;
                             }
                             c = c.getParent();
                         }
-                        Window w = (Window) c;
+                        final Window w = (Window) c;
                         w.pack();
 
                     }
@@ -993,34 +993,34 @@ public class PolicyEditor extends JPanel {
             groupCh.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    String codebase = getSelectedCodebase();
+                    final String codebase = getSelectedCodebase();
                     if (codebase == null) {
                         return;
                     }
-                    List<ActionListener> backup = new LinkedList<ActionListener>();
+                    List<ActionListener> backup = new LinkedList<>();
                     for (final ActionListener l : groupCh.getActionListeners()) {
                         backup.add(l);
                         groupCh.removeActionListener(l);
                     }
                     final Map<PolicyEditorPermissions, Boolean> map = codebasePermissionsMap.get(codebase);
-                    for (PolicyEditorPermissions p : groupCh.getGroup().getPermissions()) {
+                    for (final PolicyEditorPermissions p : groupCh.getGroup().getPermissions()) {
                         map.put(p, groupCh.isSelected());
                     }
                     changesMade = true;
                     updateCheckboxes(codebase);
-                    for (ActionListener al : backup) {
+                    for (final ActionListener al : backup) {
                         groupCh.addActionListener(al);
                     }
 
                 }
             });
             add(groupCh, checkboxConstraints);
-            //place panel with mebers below the title
+            // place panel with members below the title
             checkboxConstraints.gridy++;
             checkboxConstraints.gridx = 2;
-            //spread group's panel over two columns
+            // spread group's panel over two columns
             checkboxConstraints.gridwidth = 2;
-            checkboxConstraints.fill = checkboxConstraints.BOTH;
+            checkboxConstraints.fill = GridBagConstraints.BOTH;
             add(groupPanel, checkboxConstraints);
             final GridBagConstraints groupCheckboxLabelConstraints = new GridBagConstraints();
             groupCheckboxLabelConstraints.anchor = GridBagConstraints.LINE_START;
@@ -1028,7 +1028,7 @@ public class PolicyEditor extends JPanel {
             groupCheckboxLabelConstraints.weighty = 0;
             groupCheckboxLabelConstraints.gridx = 1;
             groupCheckboxLabelConstraints.gridy = 1;
-            for (PolicyEditorPermissions p : g.getPermissions()) {
+            for (final PolicyEditorPermissions p : g.getPermissions()) {
                 groupPanel.add(checkboxMap.get(p), groupCheckboxLabelConstraints);
                 // Two columns of checkboxes
                 groupCheckboxLabelConstraints.gridx++;
@@ -1041,7 +1041,6 @@ public class PolicyEditor extends JPanel {
             //reset
             checkboxConstraints.gridwidth = 1;
         }
-
 
         final JLabel codebaseListLabel = new JLabel(R("PECodebaseLabel"));
         codebaseListLabel.setBorder(new EmptyBorder(2, 2, 2, 2));
@@ -1152,7 +1151,7 @@ public class PolicyEditor extends JPanel {
                         // If this fails we'll end up handling it a few lines down anyway.
                     }
                 }
-                OpenFileResult ofr = FileUtils.testFilePermissions(file);
+                final OpenFileResult ofr = FileUtils.testFilePermissions(file);
                 if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
                     FileUtils.showCouldNotOpenFilepathDialog(weakThis.get(), file.getPath());
                     return;
@@ -1258,7 +1257,7 @@ public class PolicyEditor extends JPanel {
         }
 
         if (codebasePermissionsMap.get(codebase) == null) {
-            final Map<PolicyEditorPermissions, Boolean> map = new HashMap<PolicyEditorPermissions, Boolean>();
+            final Map<PolicyEditorPermissions, Boolean> map = new HashMap<>();
             for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
                 map.put(perm, false);
             }
@@ -1266,7 +1265,7 @@ public class PolicyEditor extends JPanel {
         }
 
         if (customPermissionsMap.get(codebase) == null) {
-            final Set<CustomPermission> set = new HashSet<CustomPermission>();
+            final Set<CustomPermission> set = new HashSet<>();
             customPermissionsMap.put(codebase, set);
         }
 
@@ -1307,8 +1306,10 @@ public class PolicyEditor extends JPanel {
                 }
                 final StringBuilder sb = new StringBuilder();
                 sb.append(AUTOGENERATED_NOTICE);
-                sb.append("\n/* Generated by PolicyEditor at ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                              .format(Calendar.getInstance().getTime())).append(" */").append(System.getProperty("line.separator"));
+                sb.append("\n/* Generated by PolicyEditor at ")
+                    .append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime()))
+                    .append(" */")
+                    .append(System.getProperty("line.separator"));
                 final Set<PolicyEditorPermissions> enabledPermissions = new HashSet<PolicyEditorPermissions>();
                 FileLock fileLock;
                 try {
@@ -1456,7 +1457,7 @@ public class PolicyEditor extends JPanel {
      */
     static Map<String, String> argsToMap(final String[] args) {
         final List<String> argsList = Arrays.<String> asList(args);
-        final Map<String, String> map = new HashMap<String, String>();
+        final Map<String, String> map = new HashMap<>();
 
         if (argsList.contains(HELP_FLAG)) {
             map.put(HELP_FLAG, null);

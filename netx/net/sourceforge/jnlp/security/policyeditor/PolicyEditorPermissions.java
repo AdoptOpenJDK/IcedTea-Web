@@ -123,13 +123,14 @@ public enum PolicyEditorPermissions {
 
         private final PolicyEditorPermissions[] permissions;
         private final String title; 
-        private Group(String title, PolicyEditorPermissions... permissions) {
+
+        private Group(final String title, final PolicyEditorPermissions... permissions) {
             this.title = title;
             this.permissions = permissions;
         
         }
 
-        public static boolean anyContains(PolicyEditorPermissions permission) {
+        public static boolean anyContains(final PolicyEditorPermissions permission) {
             for (Group g : Group.values()) {
                 if (g.contains(permission)) {
                     return true;
@@ -138,10 +139,10 @@ public enum PolicyEditorPermissions {
             return false;
         }
 
-        public static boolean anyContains(JCheckBox view, Map<PolicyEditorPermissions, JCheckBox> checkboxMap) {
-            for (Map.Entry<PolicyEditorPermissions, JCheckBox> pairs : checkboxMap.entrySet()){
+        public static boolean anyContains(final JCheckBox view, final Map<PolicyEditorPermissions, JCheckBox> checkboxMap) {
+            for (final Map.Entry<PolicyEditorPermissions, JCheckBox> pairs : checkboxMap.entrySet()) {
                 if (pairs.getValue() == view) {
-                    for (Group g : Group.values()) {
+                    for (final Group g : Group.values()) {
                         if (g.contains(pairs.getKey())) {
                             return true;
                         }
@@ -157,10 +158,10 @@ public enum PolicyEditorPermissions {
          * - none is selected
          */
         public int getState (final Map<PolicyEditorPermissions, Boolean> map) {
-            boolean allTrue=true;
-            boolean allFalse=true;
-            for (PolicyEditorPermissions pp: getPermissions()){
-                Boolean b = map.get(pp);
+            boolean allTrue = true;
+            boolean allFalse = true;
+            for (final PolicyEditorPermissions pp : getPermissions()) {
+                final Boolean b = map.get(pp);
                 if (b == null){
                     return 0;
                 }
@@ -170,23 +171,22 @@ public enum PolicyEditorPermissions {
                     allTrue = false;
                 }
             }
-            if (allFalse){
+            if (allFalse) {
                 return -1;
             }
-            if (allTrue){
+            if (allTrue) {
                 return 1;
             }
             return 0;
         }
 
-        public boolean contains(PolicyEditorPermissions permission) {
-            for (PolicyEditorPermissions policyEditorPermissions : permissions) {
+        public boolean contains(final PolicyEditorPermissions permission) {
+            for (final PolicyEditorPermissions policyEditorPermissions : permissions) {
                 if (policyEditorPermissions == permission) {
                     return true;
                 }
             }
             return false;
-
         }
 
         public String getTitle() {
@@ -199,7 +199,7 @@ public enum PolicyEditorPermissions {
 
     }
 
-    
+
     private final String name, description;
     private final PermissionType type;
     private final PermissionTarget target;

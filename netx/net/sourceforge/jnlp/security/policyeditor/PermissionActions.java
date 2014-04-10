@@ -88,7 +88,7 @@ public enum PermissionActions {
     }
 
     private static Set<String> setFromString(final String string) {
-        final Set<String> set = new HashSet<String>();
+        final Set<String> set = new HashSet<>();
         Collections.addAll(set, string.split(","));
         return set;
     }
