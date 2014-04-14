@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -36,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -139,7 +141,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
                 new ComboItem(Translator.R("DPShowJavawsOnly"), DeploymentConfiguration.CONSOLE_SHOW_JAVAWS) };
 
         JLabel consoleLabel = new JLabel(Translator.R("DPJavaConsole"));
-        JComboBox consoleComboBox = new JComboBox();
+        JComboBox<ComboItem> consoleComboBox = new JComboBox<>();
         consoleComboBox.setActionCommand(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE); // The property this comboBox affects.
 
         JPanel consolePanel = new JPanel();
@@ -201,7 +203,6 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void itemStateChanged(ItemEvent e) {
 
         Object o = e.getSource();
@@ -210,7 +211,8 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             JCheckBox jcb = (JCheckBox) o;
             config.setProperty(jcb.getActionCommand(), String.valueOf(jcb.isSelected()));
         } else if (o instanceof JComboBox) {
-            JComboBox jcb = (JComboBox) o;
+            @SuppressWarnings("unchecked")
+            JComboBox<ComboItem> jcb = (JComboBox<ComboItem>) o;
             ComboItem c = (ComboItem) e.getItem();
             config.setProperty(jcb.getActionCommand(), c.getValue());
         }

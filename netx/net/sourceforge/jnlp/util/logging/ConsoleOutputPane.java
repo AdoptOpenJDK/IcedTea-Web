@@ -15,6 +15,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -26,6 +27,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
+
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
@@ -247,7 +249,6 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         statistics.setText(model.createStatisticHint());
     }
 
-    @SuppressWarnings("unchecked")
     private void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
@@ -267,7 +268,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         showPreInit = new javax.swing.JCheckBox();
         sortByLabel = new javax.swing.JLabel();
         regExLabel = new javax.swing.JCheckBox();
-        sortBy = new javax.swing.JComboBox();
+        sortBy = new javax.swing.JComboBox<>();
         searchLabel = new javax.swing.JLabel();
         autorefresh = new javax.swing.JCheckBox();
         refresh = new javax.swing.JButton();
@@ -362,7 +363,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         regExLabel.setText(Translator.R("COPregex") + ":");
         regExLabel.addActionListener(getDefaultActionSingleton());
 
-        sortBy.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
+        sortBy.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {
             Translator.R("COPAsArrived"),
             Translator.R("COPuser"),
             Translator.R("COPorigin"),
@@ -943,7 +944,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
     private javax.swing.JCheckBox showThread2;
     private javax.swing.JCheckBox showUser;
     private javax.swing.JCheckBox sortCopyAll;
-    private javax.swing.JComboBox sortBy;
+    private javax.swing.JComboBox<String> sortBy;
     private javax.swing.JLabel sortByLabel;
     private javax.swing.JLabel statistics;
     private javax.swing.JCheckBox wordWrap;

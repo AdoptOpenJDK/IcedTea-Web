@@ -163,7 +163,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
                 new ComboItem("7", "7"),
                 new ComboItem("8", "8"),
                 new ComboItem(Translator.R("TIFPMax"), "9"), };
-        JComboBox cbCompression = new JComboBox(compressionOptions);
+        JComboBox<ComboItem> cbCompression = new JComboBox<>(compressionOptions);
         cbCompression.setSelectedIndex(Integer.parseInt(this.config.getProperty(properties[3])));
         cbCompression.addItemListener(new ItemListener() {
             @Override

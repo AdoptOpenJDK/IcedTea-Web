@@ -292,12 +292,13 @@ public class ControlPanel extends JFrame {
             settingsPanel.add(p, panel.toString());
         }
 
-        final JList settingsList = new JList(panels);
+        final JList<SettingsPanel> settingsList = new JList<>(panels);
         settingsList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                JList list = (JList) e.getSource();
-                SettingsPanel panel = (SettingsPanel) list.getSelectedValue();
+                @SuppressWarnings("unchecked")
+                JList<SettingsPanel> list = (JList<SettingsPanel>) e.getSource();
+                SettingsPanel panel = list.getSelectedValue();
                 CardLayout cl = (CardLayout) settingsPanel.getLayout();
                 cl.show(settingsPanel, panel.toString());
             }

@@ -108,7 +108,7 @@ public class CertificatePane extends JPanel {
     JTabbedPane tabbedPane;
     private final JTable userTable;
     private final JTable systemTable;
-    private JComboBox certificateTypeCombo;
+    private JComboBox<CertificateType> certificateTypeCombo;
     private KeyStores.Type currentKeyStoreType;
     private KeyStores.Level currentKeyStoreLevel;
 
@@ -130,7 +130,7 @@ public class CertificatePane extends JPanel {
 
         userTable = new JTable(null);
         systemTable = new JTable(null);
-        disableForSystem = new ArrayList<JComponent>();
+        disableForSystem = new ArrayList<>();
 
         addComponents();
 
@@ -165,7 +165,7 @@ public class CertificatePane extends JPanel {
 
         JLabel certificateTypeLabel = new JLabel(R("CVCertificateType"));
 
-        certificateTypeCombo = new JComboBox(certificateTypes);
+        certificateTypeCombo = new JComboBox<>(certificateTypes);
         certificateTypeCombo.addActionListener(new CertificateTypeListener());
 
         certificateTypePanel.add(certificateTypeLabel, BorderLayout.LINE_START);
@@ -257,7 +257,7 @@ public class CertificatePane extends JPanel {
     private void readKeyStore() {
 
         Enumeration<String> aliases = null;
-        certs = new ArrayList<X509Certificate>();
+        certs = new ArrayList<>();
         try {
 
             //Get all of the X509Certificates and put them into an ArrayList
@@ -279,7 +279,7 @@ public class CertificatePane extends JPanel {
                                         SecurityUtil.getCN(c.getIssuerX500Principal().getName());
             }
         } catch (Exception e) {
-            //TODO
+            // TODO handle exception
            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
@@ -314,9 +314,7 @@ public class CertificatePane extends JPanel {
         if (result == JOptionPane.OK_OPTION) {
             return jpf.getPassword();
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     /** Allows storing KeyStores.Types in a JComponent */
@@ -342,7 +340,7 @@ public class CertificatePane extends JPanel {
         @Override
         @SuppressWarnings("unchecked")//this is just certificateTypeCombo, nothing else
         public void actionPerformed(ActionEvent e) {
-            JComboBox source = (JComboBox) e.getSource();
+            JComboBox<CertificateType> source = (JComboBox<CertificateType>) e.getSource();
             CertificateType type = (CertificateType) source.getSelectedItem();
             currentKeyStoreType = type.getType();
             repopulateTables();

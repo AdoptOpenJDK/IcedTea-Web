@@ -1,3 +1,15 @@
+2014-04-14  Andrew Azores  <aazores@redhat.com>
+
+	Use Swing generics, cleanup with diamond operator
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java
+
 2014-04-10  Andrew Azores  <aazores@redhat.com>
 
 	Update PolicyEditor classes for Java 7 - Swing Generics, Diamond operator.
