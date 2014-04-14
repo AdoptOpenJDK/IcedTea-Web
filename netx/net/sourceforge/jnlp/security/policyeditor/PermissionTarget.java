@@ -52,6 +52,8 @@ public enum PermissionTarget {
     RECORD("record"),
     REFLECT("suppressAccessChecks"),
     GETENV("getenv.*"),
+    ACCESS_THREADS("modifyThread"),
+    ACCESS_THREAD_GROUPS("modifyThreadGroup"),
     ACCESS_CLASS_IN_PACKAGE("accessClassInPackage.*"),
     DECLARED_MEMBERS("accessDeclaredMembers"),
     CLASSLOADER("getClassLoader");

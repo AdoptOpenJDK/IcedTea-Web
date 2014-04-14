@@ -89,6 +89,12 @@ public enum PolicyEditorPermissions {
     ACCESS_DECLARED_MEMBERS(R("PEDeclaredMembers"), R("PEDeclaredMembersDetail"),
             PermissionType.RUNTIME_PERMISSION, PermissionTarget.DECLARED_MEMBERS, PermissionActions.NONE),
 
+    ACCESS_THREADS(R("PEAccessThreads"), R("PEAccessThreadsDetail"),
+            PermissionType.RUNTIME_PERMISSION, PermissionTarget.ACCESS_THREADS, PermissionActions.NONE),
+
+    ACCESS_THREAD_GROUPS(R("PEAccessThreadGroups"), R("PEAccessThreadGroupsDetail"),
+            PermissionType.RUNTIME_PERMISSION, PermissionTarget.ACCESS_THREAD_GROUPS, PermissionActions.NONE),
+
     NETWORK(R("PENetwork"), R("PENetworkDetail"),
             PermissionType.SOCKET_PERMISSION, PermissionTarget.ALL, PermissionActions.NETALL),
 
@@ -116,22 +122,20 @@ public enum PolicyEditorPermissions {
     public static enum Group {
 
         ReadFileSystem(R("PEGReadFileSystem"),  READ_LOCAL_FILES, READ_PROPERTIES, READ_SYSTEM_FILES, READ_TMP_FILES, GET_ENV),
-        WriteFileSystem(R("PEGWriteFileSystem"), WRITE_LOCAL_FILES, DELETE_LOCAL_FILES, WRITE_PROPERTIES, WRITE_SYSTEM_FILES, WRITE_TMP_FILES,
-                DELETE_TMP_FILES, EXEC_COMMANDS),
-        AccesUnowenedCode(R("PEGAccesUnowenedCode"), JAVA_REFLECTION, GET_CLASSLOADER, ACCESS_CLASS_IN_PACKAGE, ACCESS_DECLARED_MEMBERS),
+        WriteFileSystem(R("PEGWriteFileSystem"), WRITE_LOCAL_FILES, DELETE_LOCAL_FILES, WRITE_PROPERTIES, WRITE_SYSTEM_FILES, WRITE_TMP_FILES, DELETE_TMP_FILES, EXEC_COMMANDS),
+        AccessUnownedCode(R("PEGAccesUnowenedCode"), JAVA_REFLECTION, GET_CLASSLOADER, ACCESS_CLASS_IN_PACKAGE, ACCESS_DECLARED_MEMBERS, ACCESS_THREADS, ACCESS_THREAD_GROUPS),
         MediaAccess(R("PEGMediaAccess"), PLAY_AUDIO, RECORD_AUDIO, PRINT, CLIPBOARD);
 
         private final PolicyEditorPermissions[] permissions;
-        private final String title; 
+        private final String title;
 
         private Group(final String title, final PolicyEditorPermissions... permissions) {
             this.title = title;
             this.permissions = permissions;
-        
         }
 
         public static boolean anyContains(final PolicyEditorPermissions permission) {
-            for (Group g : Group.values()) {
+            for (final Group g : Group.values()) {
                 if (g.contains(permission)) {
                     return true;
                 }

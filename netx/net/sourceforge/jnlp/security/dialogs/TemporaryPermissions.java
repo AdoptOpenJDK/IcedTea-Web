@@ -83,6 +83,8 @@ public class TemporaryPermissions {
     public static final RuntimePermission CLASSLOADER_PERMISSION = new RuntimePermission(GET_CLASSLOADER.getTarget().target);
     public static final RuntimePermission ACCESS_CLASS_IN_PACKAGE_PERMISSION = new RuntimePermission(ACCESS_CLASS_IN_PACKAGE.getTarget().target);
     public static final RuntimePermission ACCESS_DECLARED_MEMBERS_PERMISSION = new RuntimePermission(ACCESS_DECLARED_MEMBERS.getTarget().target);
+    public static final RuntimePermission ACCESS_THREADS_PERMISSION = new RuntimePermission(ACCESS_THREADS.getTarget().target);
+    public static final RuntimePermission ACCESS_THREADGROUPS_PERMISSION = new RuntimePermission(ACCESS_THREAD_GROUPS.getTarget().target);
 
     public static final AWTPermission AWT_PERMISSION = new AWTPermission(ALL_AWT.getTarget().target);
     public static final AudioPermission PLAY_AUDIO_PERMISSION = new AudioPermission(PLAY_AUDIO.getTarget().target);
@@ -93,8 +95,8 @@ public class TemporaryPermissions {
     public static final Collection<Permission> ALL_PERMISSIONS, FILE_PERMISSIONS, PROPERTY_PERMISSIONS, NETWORK_PERMISSIONS, EXEC_PERMISSIONS,
             REFLECTION_PERMISSIONS, MEDIA_PERMISSIONS;
     static {
-        final Collection<Permission> all = new HashSet<Permission>(), file = new HashSet<Permission>(), property = new HashSet<Permission>(),
-                network = new HashSet<Permission>(), exec = new HashSet<Permission>(), reflection = new HashSet<Permission>(), media = new HashSet<Permission>();
+        final Collection<Permission> all = new HashSet<>(), file = new HashSet<>(), property = new HashSet<>(),
+              network = new HashSet<>(), exec = new HashSet<>(), reflection = new HashSet<>(), media = new HashSet<>();
 
         file.add(READ_LOCAL_FILES_PERMISSION);
         file.add(WRITE_LOCAL_FILES_PERMISSION);
@@ -121,6 +123,8 @@ public class TemporaryPermissions {
         reflection.add(CLASSLOADER_PERMISSION);
         reflection.add(ACCESS_CLASS_IN_PACKAGE_PERMISSION);
         reflection.add(ACCESS_DECLARED_MEMBERS_PERMISSION);
+        reflection.add(ACCESS_THREADS_PERMISSION);
+        reflection.add(ACCESS_THREADGROUPS_PERMISSION);
         REFLECTION_PERMISSIONS = Collections.unmodifiableCollection(reflection);
 
         media.add(AWT_PERMISSION);
@@ -144,19 +148,19 @@ public class TemporaryPermissions {
     }
 
     private static Collection<Permission> sum(final Permission... permissions) {
-        final Collection<Permission> result = new HashSet<Permission>(Arrays.asList(permissions));
+        final Collection<Permission> result = new HashSet<>(Arrays.asList(permissions));
         return Collections.unmodifiableCollection(result);
     }
 
     private static Collection<Permission> sum(final Collection<Permission> a, final Collection<Permission> b) {
-        final Collection<Permission> result = new HashSet<Permission>();
+        final Collection<Permission> result = new HashSet<>();
         result.addAll(a);
         result.addAll(b);
         return Collections.unmodifiableCollection(result);
     }
 
     private static final Collection<Permission> subtract(final Collection<Permission> from, final Collection<Permission> remove) {
-        final Collection<Permission> result = new HashSet<Permission>(from);
+        final Collection<Permission> result = new HashSet<>(from);
         result.removeAll(remove);
         return Collections.unmodifiableCollection(result);
     }

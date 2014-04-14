@@ -1,3 +1,17 @@
+2014-04-14  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(PEAccessThreads, PEAccessThreadsDetail, PEAccessThreadGroups,
+	PEAccessThreadGroupsDetail) new messages
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissions.java:
+	(ACCESS_THREADS_PERMISSION, ACCESS_THREAD_GROUPS_PERMISSION) new
+	permissions, added to reflection group. Use diamond operator.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionTarget.java:
+	(ACCESS_THREADS, ACCESS_THREAD_GROUPS) new targets
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java:
+	(ACCESS_THREADS, ACCESS_THREAD_GROUPS) new permissions, added to
+	reflection group. Minor formatting fixes.
+
 2014-04-14  Jiri Vanek  <jvanek@redhat.com>
 
 	All manifest attributes can be disabled
