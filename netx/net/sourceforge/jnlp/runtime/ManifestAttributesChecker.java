@@ -49,6 +49,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.SecurityDesc;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SigningState;
 import net.sourceforge.jnlp.security.SecurityDialogs;
@@ -74,10 +75,19 @@ public class ManifestAttributesChecker {
     }
 
     void checkAll() throws LaunchException {
-        checkTrustedOnlyAttribute();
-        checkCodebaseAttribute();
-        checkPermissionsAttribute();
-        checkApplicationLibraryAllowableCodebaseAttribute();
+        if (isCheckEnabled()) {
+            checkTrustedOnlyAttribute();
+            checkCodebaseAttribute();
+            checkPermissionsAttribute();
+            checkApplicationLibraryAllowableCodebaseAttribute();
+        } else {
+            OutputController.getLogger().log("Checking for attributes in manifest is disabled.");
+        }
+    }
+
+    public static boolean isCheckEnabled() {
+        String value = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+        return Boolean.parseBoolean(value);
     }
 
     /**

@@ -428,6 +428,12 @@ public class Defaults {
                         DeploymentConfiguration.KEY_JRE_DIR,
                         null,
                         null
+                },
+                //enable manifest-attributes checks
+                {
+                        DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(true)
                 }
         };
 

@@ -1,3 +1,14 @@
+2014-04-14  Jiri Vanek  <jvanek@redhat.com>
+
+	All manifest attributes can be disabled
+	* netx/net/sourceforge/jnlp/config/Defaults.java: added new
+	KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK configuration.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: 
+	Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK key
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: 
+	(isCheckEnabled) new method to check value of KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK
+	(checkAll) is testing isCheckEnabled before checking individual attributes.
+
 2014-04-14  Andrew Azores  <aazores@redhat.com>
 
 	Use Swing generics, cleanup with diamond operator

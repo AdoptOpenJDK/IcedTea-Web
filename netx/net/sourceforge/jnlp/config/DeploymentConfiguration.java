@@ -173,6 +173,11 @@ public final class DeploymentConfiguration {
     public static final String KEY_ENABLE_LOGGING_TOFILE = "deployment.log.file";
     public static final String KEY_ENABLE_LOGGING_TOSTREAMS = "deployment.log.stdstreams";
     public static final String KEY_ENABLE_LOGGING_TOSYSTEMLOG = "deployment.log.system";
+    
+    /*
+     * manifest check
+     */
+    public static final String KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK = "deployment.manifest.attributes.check";
 
     /**
      * Console initial status.
