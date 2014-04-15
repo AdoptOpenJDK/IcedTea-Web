@@ -60,16 +60,20 @@ import org.junit.Test;
 public class JNLPFileTest extends NoStdOutErrTest {
 
     private static AppletSecurityLevel level;
+    private static boolean attCheckValue;
 
     @BeforeClass
     public static void setPermissions() {
         level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
+        attCheckValue = ManifestAttributesChecker.isCheckEnabled();
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, String.valueOf(true));
     }
 
     @AfterClass
     public static void resetPermissions() {
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, level.toChars());
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, String.valueOf(attCheckValue));
     }
 
 
