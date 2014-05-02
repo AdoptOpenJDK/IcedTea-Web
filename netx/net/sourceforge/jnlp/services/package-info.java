@@ -34,4 +34,4 @@ statement from your version.*/
  * This package contains the classes that implement the standard services 
  * defined by the JNLP specification.
  */
-package netx.sourceforge.jnlp.services;
+package net.sourceforge.jnlp.services;

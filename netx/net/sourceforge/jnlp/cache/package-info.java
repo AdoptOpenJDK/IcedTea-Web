@@ -33,4 +33,4 @@ statement from your version.*/
 /**
  * This package contains the JNLP cache.
  */
-package netx.sourceforge.jnlp.cache;
+package net.sourceforge.jnlp.cache;

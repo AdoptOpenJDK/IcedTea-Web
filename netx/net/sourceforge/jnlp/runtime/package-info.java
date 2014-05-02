@@ -34,4 +34,4 @@ statement from your version.*/
  * This package contains the classes that manage the secure runtime environment
  * for JNLP apps.
  */
-package netx.sourceforge.jnlp.runtime;
+package net.sourceforge.jnlp.runtime;

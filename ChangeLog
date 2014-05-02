@@ -1,3 +1,10 @@
+2014-05-02  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/package-info.java,
+	* netx/net/sourceforge/jnlp/runtime/package-info.java,
+	* netx/net/sourceforge/jnlp/services/package-info.java: Fix package name
+	by replacing 'netx' with 'net'.
+
 2014-04-15  Jiri Vanek  <jvanek@redhat.com>
 
 	Reflect possibility of disabled manifest check to unit-test
