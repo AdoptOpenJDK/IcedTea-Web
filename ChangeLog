@@ -1,5 +1,11 @@
 2014-05-02  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java: Switch to
+	JDialog from JFrame. Rename frame to dialog and frameMutex to dialogMutex.
+	Adjust all Callers.
+
+2014-05-02  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/package-info.java,
 	* netx/net/sourceforge/jnlp/runtime/package-info.java,
 	* netx/net/sourceforge/jnlp/services/package-info.java: Fix package name

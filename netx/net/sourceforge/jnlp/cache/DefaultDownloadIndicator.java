@@ -58,8 +58,8 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
     private static final int CLOSE_DELAY = 750;
 
     /** the display window */
-    private static JFrame frame;
-    private static final Object frameMutex = new Object();
+    private static JDialog dialog;
+    private static final Object dialogMutex = new Object();
 
     /** shared constraint */
     static GridBagConstraints vertical;
@@ -104,9 +104,9 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
     public DownloadServiceListener getListener(ApplicationInstance app, String downloadName, URL resources[]) {
         DownloadPanel result = new DownloadPanel(downloadName);
 
-        synchronized (frameMutex) {
-            if (frame == null) {
-                frame=createDownloadIndicatorFrame(true);
+        synchronized (dialogMutex) {
+            if (dialog == null) {
+                dialog = createDownloadIndicatorWindow(true);
             }
 
             if (resources != null) {
@@ -116,8 +116,8 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                 }
             }
 
-            frame.getContentPane().add(result, vertical);
-            frame.pack();
+            dialog.getContentPane().add(result, vertical);
+            dialog.pack();
             placeFrameToLowerRight();
             result.addComponentListener(new ComponentAdapter() {
                 @Override
@@ -126,14 +126,14 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                 }
             });
 
-            frame.setVisible(true);
+            dialog.setVisible(true);
 
             return result;
         }
     }
 
-     public static JFrame createDownloadIndicatorFrame(boolean undecorated) throws HeadlessException {
-        JFrame f = new JFrame(downloading + "...");
+     public static JDialog createDownloadIndicatorWindow(boolean undecorated) throws HeadlessException {
+        JDialog f = new JDialog((JFrame)null, downloading + "...");
         f.setUndecorated(undecorated);
         f.setIconImages(ImageResources.INSTANCE.getApplicationImages());
         f.getContentPane().setLayout(new GridBagLayout());
@@ -145,8 +145,8 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
      */
     private static void placeFrameToLowerRight() throws HeadlessException {
        Rectangle bounds = ScreenFinder.getCurrentScreenSizeWithoutBounds();
-        frame.setLocation(bounds.width+bounds.x - frame.getWidth(),
-                bounds.height+bounds.y - frame.getHeight());
+        dialog.setLocation(bounds.width+bounds.x - dialog.getWidth(),
+                bounds.height+bounds.y - dialog.getHeight());
     }
 
     /**
@@ -160,14 +160,14 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
 
         ActionListener hider = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                synchronized(frameMutex) {
-                    frame.getContentPane().remove((DownloadPanel) listener);
-                    frame.pack();
+                synchronized(dialogMutex) {
+                    dialog.getContentPane().remove((DownloadPanel) listener);
+                    dialog.pack();
 
-                    if (frame.getContentPane().getComponentCount() == 0) {
-                        frame.setVisible(false);
-                        frame.dispose();
-                        frame = null;
+                    if (dialog.getContentPane().getComponentCount() == 0) {
+                        dialog.setVisible(false);
+                        dialog.dispose();
+                        dialog = null;
                     }
                 }
             }
@@ -253,14 +253,14 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                 }
 
                 public void recreateFrame(boolean undecorated) throws HeadlessException {
-                    JFrame oldFrame = frame;
-                    frame = createDownloadIndicatorFrame(undecorated);
-                    frame.getContentPane().add(self, vertical);
-                    synchronized (frameMutex) {
-                        frame.pack();
+                    JDialog oldFrame = dialog;
+                    dialog = createDownloadIndicatorWindow(undecorated);
+                    dialog.getContentPane().add(self, vertical);
+                    synchronized (dialogMutex) {
+                        dialog.pack();
                         placeFrameToLowerRight();
                     }
-                    frame.setVisible(true);
+                    dialog.setVisible(true);
                     oldFrame.dispose();
                 }
             });
@@ -294,8 +294,8 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                     add(mainProgressPanel, verticalIndent);
                     state=States.COLLAPSED;
                 }
-                synchronized (frameMutex) {
-                    frame.pack();
+                synchronized (dialogMutex) {
+                    dialog.pack();
                     placeFrameToLowerRight();
                 }
 
@@ -333,7 +333,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
             // each update.
             header.setText(downloading + " " + downloadName + ": " + percent + "% " + complete + ".");
             Container c = header.getParent();
-            //we need to adapt both panels and also frame to new length of header text
+            //we need to adapt both panels and also dialog to new length of header text
             while (c != null) {
                 c.invalidate();
                 c.validate();
