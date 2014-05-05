@@ -40,12 +40,15 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,15 +59,19 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /*
  * This class is meant to provide a common layout and functionality for warning dialogs
@@ -212,15 +219,31 @@ public abstract class AppTrustWarningPanel extends JPanel {
     }
 
     private void setupInfoPanel() {
+        JPanel infoPanel = new JPanel(new BorderLayout());
         String titleText = getAppletTitle();
         JLabel titleLabel = new JLabel(titleText);
         titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.BOLD, 18));
 
         String infoLabelText = getInfoPanelText();
-        JLabel infoLabel = new JLabel(infoLabelText);
+        JEditorPane infoLabel = new JEditorPane("text/html", htmlWrap(infoLabelText));
+        infoLabel.setBackground(infoPanel.getBackground());
+        infoLabel.setEditable(false);
+        infoLabel.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                try {
+                    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        Desktop.getDesktop().browse(e.getURL().toURI());
+                    }
+                } catch (IOException ex) {
+                    OutputController.getLogger().log(ex);
+                } catch (URISyntaxException ex) {
+                    OutputController.getLogger().log(ex);
+                }
+            }
+        });
 
         int panelHeight = titleLabel.getHeight() + INFO_PANEL_HEIGHT + INFO_PANEL_HINT_HEIGHT;
-        JPanel infoPanel = new JPanel(new BorderLayout());
         infoPanel.add(titleLabel, BorderLayout.PAGE_START);
         infoPanel.add(infoLabel, BorderLayout.CENTER);
         infoPanel.setPreferredSize(new Dimension(PANE_WIDTH, panelHeight));

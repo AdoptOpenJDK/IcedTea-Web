@@ -1,5 +1,15 @@
 2014-05-05  Jiri Vanek  <jvanek@redhat.com>
 
+	Links in AppTrustWarningPanel are now clickable.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: (SUnsignedDetail)
+	codebase and url changed to href.
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	infoLabel redeclared from JLabel to JEditorPane. Added hyperlinkListener.
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	publisher string allowed to use href.
+
+2014-05-05  Jiri Vanek  <jvanek@redhat.com>
+
 	Properly disconnect all connected http connections
 	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: (isCurrent) is using
 	lastModified of long rather then whole url connection. Callers adapted.

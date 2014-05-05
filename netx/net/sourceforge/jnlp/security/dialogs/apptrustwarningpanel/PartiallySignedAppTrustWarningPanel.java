@@ -109,14 +109,14 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
 
         try {
             if (file instanceof PluginBridge) {
-                from = file.getCodeBase().getHost();
+                from = file.getCodeBase().toExternalForm();
             } else {
-                from = file.getInformation().getHomepage().toString();
+                from = file.getInformation().getHomepage().toExternalForm();
             }
         } catch (Exception e) {
         }
 
-        return "<br>" + R("Publisher") + ":  " + publisher + "<br>" + R("From") + ": " + from;
+        return "<br>" + R("Publisher") + ":  " + publisher + "<br>" + R("From") + ": <a href='"+from+"'>" + from + "</a>";
     }
 
     private String getSigningInfo() {
