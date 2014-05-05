@@ -118,6 +118,7 @@ import sun.awt.X11.XEmbeddedFrame;
 import sun.misc.Ref;
 
 import com.sun.jndi.toolkit.url.UrlUtil;
+import java.net.HttpURLConnection;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -478,6 +479,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
          * sets it to whatever URL/codebase we ended up getting
          */
         url = conn.getURL();
+        if (conn instanceof  HttpURLConnection){
+            ((HttpURLConnection)conn).disconnect();
+        }
 
         PluginParameters params = new PluginParameterParser().parse(width, height, paramString);
 
@@ -1543,8 +1547,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
         SecurityManager security = System.getSecurityManager();
         if (security != null) {
             try {
-                java.security.Permission perm =
-                        url.openConnection().getPermission();
+                URLConnection conn = url.openConnection();
+                java.security.Permission perm = conn.getPermission();
+                if (conn instanceof HttpURLConnection) {
+                    ((HttpURLConnection) conn).disconnect();
+                }
                 if (perm != null) {
                     security.checkPermission(perm);
                 }

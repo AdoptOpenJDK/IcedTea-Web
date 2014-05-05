@@ -27,6 +27,7 @@ import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -149,23 +150,30 @@ public class CacheUtil {
     /**
      * Returns the Permission object necessary to access the
      * resource, or {@code null} if no permission is needed.
+     * @param location
+     * @param version
+     * @return 
      */
     public static Permission getReadPermission(URL location, Version version) {
+        Permission result = null;
         if (CacheUtil.isCacheable(location, version)) {
             File file = CacheUtil.getCacheFile(location, version);
-
-            return new FilePermission(file.getPath(), "read");
+            result = new FilePermission(file.getPath(), "read");
         } else {
             try {
                 // this is what URLClassLoader does
-                return location.openConnection().getPermission();
+                URLConnection conn = location.openConnection();
+                result = conn.getPermission();
+                if (conn instanceof HttpURLConnection) {
+                    ((HttpURLConnection) conn).disconnect();
+                }                
             } catch (java.io.IOException ioe) {
                 // should try to figure out the permission
                 OutputController.getLogger().log(ioe);
             }
         }
 
-        return null;
+        return result;
     }
 
     /**
@@ -242,23 +250,18 @@ public class CacheUtil {
      *
      * @param source the source {@link URL}
      * @param version the versions to check for
-     * @param connection a connection to the {@link URL}, or {@code null}
+     * @param lastModifed
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCurrent(URL source, Version version, URLConnection connection) {
+    public static boolean isCurrent(URL source, Version version, long lastModifed) {
 
         if (!isCacheable(source, version))
             throw new IllegalArgumentException(R("CNotCacheable", source));
 
         try {
-            if (connection == null)
-                connection = source.openConnection();
-
-            connection.connect();
-
             CacheEntry entry = new CacheEntry(source, version); // could pool this
-            boolean result = entry.isCurrent(connection);
+            boolean result = entry.isCurrent(lastModifed);
 
             OutputController.getLogger().log("isCurrent: " + source + " = " + result);
 

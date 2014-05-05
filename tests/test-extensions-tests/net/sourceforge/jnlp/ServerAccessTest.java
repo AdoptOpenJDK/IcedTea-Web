@@ -38,7 +38,9 @@ package net.sourceforge.jnlp;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -158,10 +160,12 @@ public class ServerAccessTest {
         String dirFileContent = ServerAccess.getContentOfStream(new FileInputStream(dirFile));
 
         URL portUrl = new URL("http", "localhost", server.getPort(), "/server.port");
+        HttpURLConnection portConn = (HttpURLConnection) portUrl.openConnection();
         URL dirUrl = new URL("http", "localhost", server.getPort(), "/server.dir");
+        HttpURLConnection dirConn = (HttpURLConnection) dirUrl.openConnection();
 
-        String portUrlContent = ServerAccess.getContentOfStream(portUrl.openConnection().getInputStream());
-        String dirUrlContent = ServerAccess.getContentOfStream(dirUrl.openConnection().getInputStream());
+        String portUrlContent = ServerAccess.getContentOfStream(portConn.getInputStream());
+        String dirUrlContent = ServerAccess.getContentOfStream(dirConn.getInputStream());
 
         Assert.assertEquals(portUrlContent.trim(), portFileContent.trim());
         Assert.assertEquals(dirUrlContent.trim(), dirFileContent.trim());
@@ -169,11 +173,18 @@ public class ServerAccessTest {
         Assert.assertEquals(new Integer(portUrlContent.trim()), server.getPort());
 
         URL fastUrl = new URL("http", "localhost", server.getPort(), "/simpletest1.jnlp");
+        HttpURLConnection fastUrlConn = (HttpURLConnection) fastUrl.openConnection();
         URL slowUrl = new URL("http", "localhost", server.getPort(), "/XslowXsimpletest1.jnlp");
+        HttpURLConnection slowUrlConn = (HttpURLConnection) slowUrl.openConnection();
 
-        String fastUrlcontent = ServerAccess.getContentOfStream(fastUrl.openConnection().getInputStream());
-        String slowUrlContent = ServerAccess.getContentOfStream(slowUrl.openConnection().getInputStream());
+        String fastUrlcontent = ServerAccess.getContentOfStream(fastUrlConn.getInputStream());
+        String slowUrlContent = ServerAccess.getContentOfStream(slowUrlConn.getInputStream());
         Assert.assertEquals(fastUrlcontent, slowUrlContent);
+        
+        portConn.disconnect();
+        dirConn.disconnect();
+        fastUrlConn.disconnect();
+        slowUrlConn.disconnect();
 
     }
 

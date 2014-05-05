@@ -1,3 +1,24 @@
+2014-05-05  Jiri Vanek  <jvanek@redhat.com>
+
+	Properly disconnect all connected http connections
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: (isCurrent) is using
+	lastModified of long rather then whole url connection. Callers adapted.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (getReadPermission)
+	closed http connection.	(isCurrent)  retyped to use lastModified of long
+	rather then whole connection. Removed workaround of it. Callers adapted.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: (downloadResource)
+	Closed http connection.
+	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java: Closed http
+	connection.
+	* netx/net/sourceforge/jnlp/services/XBasicService.java: (isOffline) Closed
+	http connection.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: Closed http
+	connections.
+	* tests/test-extensions-tests/net/sourceforge/jnlp/ServerAccessTest.java:
+	Adapted to URLconnection -> long signature changes.
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: Closed http
+	connections.
+
 2014-05-02  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java: Switch to

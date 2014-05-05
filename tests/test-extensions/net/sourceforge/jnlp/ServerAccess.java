@@ -53,6 +53,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.jnlp.ProcessResult;
@@ -427,7 +428,7 @@ public class ServerAccess {
     /**
      * utility method which can read from any stream as one long String
      *
-     * @param input stream
+     * @param is
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
@@ -438,36 +439,53 @@ public class ServerAccess {
     /**
      * utility method which can read bytes of resource from any url
      * 
-     * @param resource to be located on any url
+     * @param u
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
      */
     public static ByteArrayOutputStream getResourceAsBytes(URL u) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) u.openConnection();
-        connection = (HttpURLConnection) u.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setDoOutput(true);
-        connection.setReadTimeout(READ_TIMEOUT);
-        connection.connect();
-        return getBytesFromStream(connection.getInputStream());
+        URLConnection connection = null;
+        try {
+            connection = u.openConnection();
+            if (connection instanceof HttpURLConnection) {
+                ((HttpURLConnection) connection).setRequestMethod("GET");
+            }
+            connection.setDoOutput(true);
+            connection.setReadTimeout(READ_TIMEOUT);
+            connection.connect();
+            return getBytesFromStream(connection.getInputStream());
+        } finally {
+            if (connection != null && connection instanceof HttpURLConnection) {
+                ((HttpURLConnection) connection).disconnect();
+            }
+        }
 
     }
 
     /**
      * utility method which can read string of resource from any url
-     * 
-     * @param resource to be located on any url
+     *
+     * @param u
      * @return resource as string
-     * @throws IOException if connection can't be established or resource does not exist
+     * @throws IOException if connection can't be established or resource does
+     * not exist
      */
     public static String getResourceAsString(URL u) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) u.openConnection();
-        connection = (HttpURLConnection) u.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setDoOutput(true);
-        connection.setReadTimeout(READ_TIMEOUT);
-        connection.connect();
-        return getContentOfStream(connection.getInputStream());
+        URLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) u.openConnection();
+            if (connection instanceof HttpURLConnection) {
+                ((HttpURLConnection) connection).setRequestMethod("GET");
+            }
+            connection.setDoOutput(true);
+            connection.setReadTimeout(READ_TIMEOUT);
+            connection.connect();
+            return getContentOfStream(connection.getInputStream());
+        } finally {
+            if (connection != null && connection instanceof HttpURLConnection) {
+                ((HttpURLConnection) connection).disconnect();
+            }
+        }
     }
 
     /**

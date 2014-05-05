@@ -43,7 +43,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -126,9 +128,9 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
         java.util.jar.JarFile result = null;
 
         final int BUF_SIZE = 2048;
-
+        URLConnection conn = url.openConnection();
         /* get the stream before asserting privileges */
-        final InputStream in = url.openConnection().getInputStream();
+        final InputStream in = conn.getInputStream();
 
         try {
             result =
@@ -166,6 +168,10 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
                     });
         } catch (PrivilegedActionException pae) {
             throw (IOException) pae.getException();
+        } finally{
+            if (conn instanceof HttpURLConnection) {
+                ((HttpURLConnection) conn).disconnect();
+            }
         }
 
         return result;

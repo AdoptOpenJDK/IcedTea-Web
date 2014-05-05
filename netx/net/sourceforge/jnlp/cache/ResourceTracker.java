@@ -647,14 +647,14 @@ public class ResourceTracker {
      */
     private void downloadResource(Resource resource) {
         resource.fireDownloadEvent(); // fire DOWNLOADING
-
+        URLConnection con = null;
         CacheEntry origEntry = new CacheEntry(resource.location, resource.downloadVersion); // This is where the jar file will be.
         origEntry.lock();
 
         try {
             // create out second in case in does not exist
             URL realLocation = resource.getDownloadLocation();
-            URLConnection con = realLocation.openConnection();
+            con = realLocation.openConnection();
             con.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
             con.connect();
@@ -689,7 +689,7 @@ public class ResourceTracker {
             CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.downloadVersion);
             File finalFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion); // This is where extracted version will be, or downloaded file if not compressed.
 
-            if (!downloadEntry.isCurrent(con)) {
+            if (!downloadEntry.isCurrent(con.getLastModified())) {
                 // Make sure we don't re-download the file. however it will wait as if it was downloading.
                 // (This is fine because file is not ready yet anyways)
                 byte buf[] = new byte[1024];
@@ -768,6 +768,11 @@ public class ResourceTracker {
             resource.fireDownloadEvent(); // fire ERROR
         } finally {
             origEntry.unlock();
+            if (con != null) {
+                if (con instanceof HttpURLConnection) {
+                    ((HttpURLConnection) con).disconnect();
+                }
+            }
         }
     }
 
@@ -797,7 +802,7 @@ public class ResourceTracker {
             connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
             int size = connection.getContentLength();
-            boolean current = CacheUtil.isCurrent(resource.location, resource.requestVersion, connection) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
+            boolean current = CacheUtil.isCurrent(resource.location, resource.requestVersion, connection.getLastModified()) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
             if (!current) {
                 if (entry.isCached()) {
                     entry.markForDelete();
@@ -835,8 +840,9 @@ public class ResourceTracker {
             resource.fireDownloadEvent(); // fire CONNECTED
 
             // explicitly close the URLConnection.
-            if (connection instanceof HttpURLConnection)
+            if (connection instanceof HttpURLConnection) {
                 ((HttpURLConnection) connection).disconnect();
+            }
         } catch (Exception ex) {
             OutputController.getLogger().log(ex);
             resource.changeStatus(0, ERROR);
@@ -920,6 +926,9 @@ public class ResourceTracker {
         String possibleRedirect = connection.getHeaderField("Location");
         if (possibleRedirect != null && possibleRedirect.trim().length() > 0) {
             result.URL = new URL(possibleRedirect);
+        }
+        if (connection instanceof HttpURLConnection) {
+            ((HttpURLConnection) connection).disconnect();
         }
 
         return result;

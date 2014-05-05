@@ -82,6 +82,7 @@ public class CacheEntry {
     /**
      * Returns the time in the local system clock that the file was
      * most recently checked for an update.
+     * @return 
      */
     public long getLastUpdated() {
         try {
@@ -94,6 +95,7 @@ public class CacheEntry {
     /**
      * Sets the time in the local system clock that the file was
      * most recently checked for an update.
+     * @param updatedTime
      */
     public void setLastUpdated(long updatedTime) {
         properties.setProperty("last-updated", Long.toString(updatedTime));
@@ -104,17 +106,17 @@ public class CacheEntry {
      * the cache and it is up to date.  This method may not return
      * immediately.
      *
-     * @param connection a connection to the remote URL
+     * @param lastModified
      * @return whether the cache contains the version
      */
-    public boolean isCurrent(URLConnection connection) {
+    public boolean isCurrent(long lastModified) {
         boolean cached = isCached();
 
         if (!cached)
             return false;
 
         try {
-            long remoteModified = connection.getLastModified();
+            long remoteModified = lastModified;
             long cachedModified = Long.parseLong(properties.getProperty("last-modified"));
 
             if (remoteModified > 0 && remoteModified <= cachedModified)
