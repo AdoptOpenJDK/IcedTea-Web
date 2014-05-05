@@ -1,6 +1,7 @@
 AC_INIT([icedtea-web],[1.6pre],[distro-pkg-dev@openjdk.java.net], [icedtea-web], [http://icedtea.classpath.org/wiki/IcedTea-Web])
 AM_INIT_AUTOMAKE([1.9 tar-pax foreign])
 AC_CONFIG_FILES([Makefile netx.manifest])
+AM_MAINTAINER_MODE([enable])
 
 # Older automake doesn't generate these correctly
 abs_top_builddir=`pwd -P`
