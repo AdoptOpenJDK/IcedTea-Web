@@ -1,5 +1,14 @@
 2014-05-09  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: (selectByFlag)
+	made package-private
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:
+	(testSelectByFlag) new test method
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTest.java: new test
+	class
+
+2014-05-09  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: (setExpiry) new
 	method
 	* tests/netx/unit/net/sourceforge/jnlp/util/TimedHashMapTest.java: new

@@ -45,7 +45,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
 import net.sourceforge.jnlp.Version;
@@ -65,6 +67,30 @@ public class ResourceTrackerTest {
     private static ByteArrayOutputStream currentErrorStream;
     private static final String nameStub1 = "itw-server";
     private static final String nameStub2 = "test-file";
+
+    @Test
+    public void testSelectByFlag() throws Exception {
+        Resource connectedResource = Resource.getResource(new URL("http://example.com/connected.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
+        connectedResource.status = Resource.CONNECTED | Resource.DOWNLOADING;
+        Resource erroredResource = Resource.getResource(new URL("http://example.com/errored.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
+        erroredResource.status = Resource.ERROR | Resource.CONNECT;
+        Resource downloadingResource = Resource.getResource(new URL("http://example.com/downloading.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
+        downloadingResource.status = Resource.DOWNLOADING;
+        Resource uninitializedResource = Resource.getResource(new URL("http://example.com/uninitialized.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
+        List<Resource> source = Arrays.asList(connectedResource, erroredResource, downloadingResource, uninitializedResource);
+
+        Resource result1 = ResourceTracker.selectByFlag(source, Resource.CONNECT | Resource.CONNECTING | Resource.CONNECTED, Resource.ERROR);
+        Resource result2 = ResourceTracker.selectByFlag(source, Resource.DOWNLOADING, Resource.CONNECTED);
+        Resource result3 = ResourceTracker.selectByFlag(source, Resource.DOWNLOADED, Resource.UNINITIALIZED);
+        Resource result4 = ResourceTracker.selectByFlag(source, Resource.UNINITIALIZED, Integer.MAX_VALUE);
+        Resource result5 = ResourceTracker.selectByFlag(source, Resource.CONNECT | Resource.CONNECTING | Resource.CONNECTED, Resource.DOWNLOADING);
+
+        Assert.assertEquals(connectedResource, result1);
+        Assert.assertEquals(downloadingResource, result2);
+        Assert.assertNull("Result 3 should have been null", result3);
+        Assert.assertEquals(uninitializedResource, result4);
+        Assert.assertEquals(erroredResource, result5);
+    }
 
     @Test
     public void testNormalizeUrl() throws Exception {

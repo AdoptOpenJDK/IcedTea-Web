@@ -1095,7 +1095,7 @@ public class ResourceTracker {
      * source list.
      * </p>
      */
-    private static Resource selectByFlag(List<Resource> source, int flag,
+    static Resource selectByFlag(List<Resource> source, int flag,
                                          int notflag) {
         Resource result = null;
         int score = Integer.MAX_VALUE;
