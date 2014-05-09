@@ -1,3 +1,27 @@
+2014-05-09  Jiri Vanek  <jvanek@redhat.com>
+
+	Internal implementation of ExecuteAppletAction now support multiple items
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java: 
+	Returning AppletSecurityActions instead of ExecuteAppletAction class
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added
+	APPEXTSECunsetAppletAction key.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/AppletSecurityActions.java: 
+	New file, to handle multiple actions hidden in one record.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExecuteAppletAction.java: Added
+	UNSET option, handled in (fromString) and (fromChar) and (toChar) and (toExpalnation)
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionEntry.java: 
+	instead of ExecuteAppletAction type in fromString and constructor, using
+	AppletSecurityActions
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java: 
+	behaviour wrapped by  AppletSecurityActions.fromAction(behaviour)
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/AppletSecurityActionsTest.java: 
+	New test for new file
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java: 
+	added license header
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java: 
+	Test adapted to new features, and to preserving old behavior.
+
+
 2014-05-05  Jiri Vanek  <jvanek@redhat.com>
 
 	Links in AppTrustWarningPanel are now clickable.

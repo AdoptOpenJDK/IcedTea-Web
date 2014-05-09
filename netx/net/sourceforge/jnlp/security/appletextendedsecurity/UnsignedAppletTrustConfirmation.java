@@ -148,7 +148,7 @@ public class UnsignedAppletTrustConfirmation {
             }
 
             UnsignedAppletActionEntry entry = new UnsignedAppletActionEntry(
-                    behaviour, 
+                    AppletSecurityActions.fromAction(behaviour), 
                     new Date(),
                     documentbaseRegex, 
                     codebaseRegex,

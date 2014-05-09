@@ -43,7 +43,7 @@ import java.util.List;
 
 public class UnsignedAppletActionEntry {
 
-    private ExecuteAppletAction unsignedAppletAction;
+    private final AppletSecurityActions unsignedAppletAction;
     private Date timeStamp;
     private UrlRegEx documentBase;
     private UrlRegEx codeBase;
@@ -52,7 +52,7 @@ public class UnsignedAppletActionEntry {
     public static UnsignedAppletActionEntry createFromString(String s) {
         String[] split = s.split("\\s+");
         UnsignedAppletActionEntry nw = new UnsignedAppletActionEntry(
-                ExecuteAppletAction.fromString(split[0]),
+                AppletSecurityActions.fromString(split[0]),
                 new Date(new Long(split[1])),
                 new UrlRegEx(split[2]),
                 null,
@@ -66,7 +66,7 @@ public class UnsignedAppletActionEntry {
         return nw;
     }
 
-    public UnsignedAppletActionEntry(ExecuteAppletAction unsignedAppletAction, Date timeStamp, UrlRegEx documentBase, UrlRegEx codeBase, List<String> archives) {
+    public UnsignedAppletActionEntry(AppletSecurityActions unsignedAppletAction, Date timeStamp, UrlRegEx documentBase, UrlRegEx codeBase, List<String> archives) {
         this.unsignedAppletAction = unsignedAppletAction;
         this.timeStamp = timeStamp;
         this.documentBase = documentBase;
@@ -86,7 +86,7 @@ public class UnsignedAppletActionEntry {
     }
 
     private String serializeToReadableAndParseableString() {
-        return unsignedAppletAction.toChar()
+        return unsignedAppletAction.toString()
                 + " " + ((timeStamp == null) ? "1" : timeStamp.getTime())
                 + " " + ((documentBase == null) ? "" : documentBase.getRegEx())
                 + " " + ((codeBase == null) ? "" : codeBase.getRegEx())
@@ -110,11 +110,20 @@ public class UnsignedAppletActionEntry {
     }
 
     public ExecuteAppletAction getUnsignedAppletAction() {
+        return unsignedAppletAction.getUnsignedAppletAction();
+    }
+    
+    /**
+     * should be testing only
+     * 
+     * @return 
+     */
+    public AppletSecurityActions getAppletSecurityActions() {
         return unsignedAppletAction;
     }
 
     public void setUnsignedAppletAction(ExecuteAppletAction unsignedAppletAction) {
-        this.unsignedAppletAction = unsignedAppletAction;
+        this.unsignedAppletAction.setUnsignedAppletAction(unsignedAppletAction);
     }
 
     public UrlRegEx getCodeBase() {

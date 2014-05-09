@@ -39,6 +39,7 @@ import java.util.Date;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityActions;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
@@ -75,7 +76,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == 0) {
-            return ExecuteAppletAction.class;
+            return AppletSecurityActions.class;
         }
         if (columnIndex == 1) {
             return Date.class;
@@ -145,7 +146,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
         int i = getRowCount()-1;
         String s = "\\Qhttp://localhost:80/\\E.*";
         back.add(new UnsignedAppletActionEntry(
-                ExecuteAppletAction.NEVER,
+                AppletSecurityActions.fromAction(ExecuteAppletAction.NEVER),
                 new Date(),
                 new UrlRegEx(s),
                 new UrlRegEx(s),
