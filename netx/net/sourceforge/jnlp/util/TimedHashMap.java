@@ -56,6 +56,10 @@ public class TimedHashMap<K, V> {
     HashMap<K, Long> timeStamps = new HashMap<K, Long>();
     Long expiry = 10000000000L;
 
+    public void setExpiry(long expiry) {
+        this.expiry = expiry;
+    }
+
     /**
      * Store the item in the map and associate a timestamp with it
      *

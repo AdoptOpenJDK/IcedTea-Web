@@ -1,3 +1,10 @@
+2014-05-09  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: (setExpiry) new
+	method
+	* tests/netx/unit/net/sourceforge/jnlp/util/TimedHashMapTest.java: new
+	test class for TimedHashMap
+
 2014-05-09  Jiri Vanek  <jvanek@redhat.com>
 
 	Internal implementation of ExecuteAppletAction now support multiple items
@@ -20,7 +27,6 @@
 	added license header
 	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java: 
 	Test adapted to new features, and to preserving old behavior.
-
 
 2014-05-05  Jiri Vanek  <jvanek@redhat.com>
 
