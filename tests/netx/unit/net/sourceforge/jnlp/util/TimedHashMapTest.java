@@ -1,4 +1,4 @@
-/*
+/* TimedHashMapTest.java
    Copyright (C) 2014 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -37,34 +37,174 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import static org.junit.Assert.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class TimedHashMapTest {
 
+    private TimedHashMap<Object, Object> testMap;
+    private Object o1, o2, o3, o4;
+
+    @Before
+    public void resetTestMap() {
+        testMap = new TimedHashMap<>();
+        o1 = new Object();
+        o2 = new Object();
+        o3 = new Object();
+        o4 = new Object();
+    }
+
     @Test
     public void testPutAndGet() {
-        final TimedHashMap<Object, Object> map = new TimedHashMap<>();
-        final Object o1 = new Object(), o2 = new Object(), o3 = new Object(), o4 = new Object();
-        map.put(o1, o2);
-        map.put(o2, o4);
-        map.put(o3, o4);
-        assertEquals(o2, map.get(o1));
-        assertEquals(o4, map.get(o2));
-        assertEquals(o4, map.get(o3));
-        map.put(o1, o3);
-        assertEquals(o3, map.get(o1));
+        testMap.put(o1, o2);
+        testMap.put(o2, o4);
+        testMap.put(o3, o4);
+        assertEquals("map[o1] != o2", o2, testMap.get(o1));
+        assertEquals("map[o2] != o4", o4, testMap.get(o2));
+        assertEquals("map[o3] != o4", o4, testMap.get(o3));
+        testMap.put(o1, o3);
+        assertEquals("map[o1] != o3", o3, testMap.get(o1));
     }
 
     @Test
     public void testEntryExpiry() throws Exception {
-        final TimedHashMap<Object, Object> map = new TimedHashMap<>();
-        final Object o1 = new Object(), o2 = new Object();
-        map.setExpiry(0l); // immediate expiry
-        map.put(o1, o2);
+        testMap.setTimeout(0, TimeUnit.NANOSECONDS); // immediate expiry
+        testMap.put(o1, o2);
         Thread.sleep(5); // so we don't manage to put and get in the same nanosecond
-        assertNull(map.get(o1));
+        assertNull("map[o1] should have expired", testMap.get(o1));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testPutNullKey() {
+        testMap.put(null, o1);
+    }
+
+    @Test
+    public void testPutNullValue() {
+        testMap.put(o1, null);
+        assertNull("map[o1] != null", testMap.get(o1));
+        assertTrue("testMap should contain the key o1", testMap.containsKey(o1));
+    }
+
+    @Test
+    public void testContainsKey() {
+        testMap.put(o1, o2);
+        assertTrue("testMap should contain the key o1", testMap.containsKey(o1));
+    }
+
+    @Test
+    public void testSize() {
+        assertEquals(0, testMap.size());
+        testMap.put(o1, o2);
+        assertEquals(1, testMap.size());
+    }
+
+    @Test
+    public void testIsEmpty() {
+        assertTrue("map should be empty", testMap.isEmpty());
+        testMap.put(o1, o2);
+        assertFalse("map should not be empty", testMap.isEmpty());
+    }
+
+    @Test
+    public void testContainsValue() {
+        assertFalse("map should not contain o2", testMap.containsValue(o2));
+        testMap.put(o1, o2);
+        assertTrue("map does not contain o2", testMap.containsValue(o2));
+    }
+
+    @Test
+    public void testContainsValueNull() {
+        assertFalse("map should not contain null value", testMap.containsValue(null));
+        testMap.put(o1, null);
+        assertTrue("map does not contain null value", testMap.containsValue(null));
+    }
+
+    @Test
+    public void testRemove() {
+        testMap.put(o1, o2);
+        o3 = testMap.remove(o1);
+        assertEquals("o2 != o3", o2, o3);
+        assertFalse("map should not contain o1", testMap.containsKey(o1));
+    }
+
+    @Test
+    public void testRemoveFromEmpty() {
+        o2 = testMap.remove(o1);
+        assertNull("o2 should be null", o2);
+    }
+
+    @Test
+    public void testPutAll() {
+        final Map<Object, Object> newMap = new HashMap<>();
+        newMap.put(o1, o2);
+        newMap.put(o3, o4);
+        testMap.putAll(newMap);
+        assertTrue("map should contain key o1", testMap.containsKey(o1));
+        assertTrue("map should contain value o2", testMap.containsValue(o2));
+        assertTrue("map should contain key o3", testMap.containsKey(o3));
+        assertTrue("map should contain value o4", testMap.containsValue(o4));
+        assertEquals("map[o1] != o2", o2, testMap.get(o1));
+        assertEquals("map[o3] != o4", o4, testMap.get(o3));
+        assertEquals(2, testMap.size());
+    }
+
+    @Test
+    public void testClear() {
+        testMap.put(o1, o2);
+        testMap.clear();
+        assertEquals(0, testMap.size());
+        assertFalse("map should not contain key o1", testMap.containsKey(o1));
+        assertFalse("map should not contain value o2", testMap.containsValue(o2));
+    }
+
+    @Test
+    public void testKeySet() {
+        testMap.put(o1, o2);
+        Set<Object> keys = testMap.keySet();
+        assertNotNull("keyset should not be null", keys);
+        assertTrue("keyset should contain o1", keys.contains(o1));
+        assertEquals(1, keys.size());
+    }
+
+    @Test
+    public void testValues() {
+        testMap.put(o1, o2);
+        Collection<Object> values = testMap.values();
+        assertNotNull("values collection should not be null", values);
+        assertTrue("values collection should contain o2", values.contains(o2));
+        assertEquals(1, values.size());
+    }
+
+    @Test
+    public void testEntrySet() {
+        testMap.put(o1, o2);
+        testMap.put(o3, o4);
+        Set<Map.Entry<Object, Object>> entrySet = testMap.entrySet();
+        assertNotNull("entryset should not be null", entrySet);
+        assertEquals(2, entrySet.size());
+        for (final Map.Entry<Object, Object> entry : entrySet) {
+            final Object key = entry.getKey();
+            final Object value = entry.getValue();
+            if (key.equals(o1)) {
+                assertEquals("entry with key o1 should have value o2", o2, value);
+            }
+            if (key.equals(o3)) {
+                assertEquals("entry with key o3 should have value o4", o4, value);
+            }
+        }
     }
 
 }

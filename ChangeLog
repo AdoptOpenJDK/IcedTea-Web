@@ -1,5 +1,13 @@
 2014-05-09  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: implements Map
+	interface, added all missing methods. (timeStamps) removed, refactored to
+	only be composed of one backing map rather than two.
+	* tests/netx/unit/net/sourceforge/jnlp/util/TimedHashMapTest.java: new
+	test methods added
+
+2014-05-09  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: (selectByFlag)
 	made package-private
 	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:

@@ -37,38 +37,90 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import static java.util.Objects.requireNonNull;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Simple utility class that extends HashMap by adding an expiry to the entries.
  *
- * This map stores entries, and returns them only if the entries were last accessed within time t=10 seconds
+ * This map stores entries, and returns them only if the entries were last accessed within a specified timeout period.
+ * Otherwise, null is returned.
+ * 
+ * This map does not allow null keys but does allow null values.
  *
  * @param K The key type
  * @param V The Object type
  */
-public class TimedHashMap<K, V> {
+public class TimedHashMap<K, V> implements Map<K, V> {
 
-    HashMap<K,V> actualMap = new HashMap<K,V>();
-    HashMap<K, Long> timeStamps = new HashMap<K, Long>();
-    Long expiry = 10000000000L;
+    private static class TimedEntry<T> {
+        private final T value;
+        private long timestamp;
 
-    public void setExpiry(long expiry) {
-        this.expiry = expiry;
+        public TimedEntry(final T value) {
+            this.value = value;
+            updateTimestamp();
+        }
+
+        public void updateTimestamp() {
+            timestamp = System.nanoTime();
+        }
+    }
+
+    private static final long DEFAULT_TIMEOUT = TimeUnit.SECONDS.toNanos(10);
+
+    private final HashMap<K, TimedEntry<V>> actualMap = new HashMap<>();
+    private long timeout = DEFAULT_TIMEOUT;
+
+    public TimedHashMap() {
+        this(DEFAULT_TIMEOUT, TimeUnit.NANOSECONDS);
     }
 
     /**
-     * Store the item in the map and associate a timestamp with it
+     * Create a new map with a non-default entry timeout period
+     * @param unit the units of the timeout
+     * @param timeout the length of the timeout
+     */
+    public TimedHashMap(final long timeout, final TimeUnit unit) {
+        setTimeout(timeout, unit);
+    }
+
+    /**
+     * Specify how long (in nanoseconds) entries are valid for
+     * @param unit the units of the timeout
+     * @param timeout the length of the timeout
+     */
+    public void setTimeout(final long timeout, final TimeUnit unit) {
+        this.timeout = unit.toNanos(timeout);
+    }
+
+    /**
+     * Store the item in the map and associate a timestamp with it. null is not accepted as a key.
      *
      * @param key The key
      * @param value The value to store
      */
-    public V put(K key, V value) {
-        timeStamps.put(key, System.nanoTime());
-        return actualMap.put(key, value);
+    @Override
+    public V put(final K key, final V value) {
+        requireNonNull(key);
+        final TimedEntry<V> oldEntry = actualMap.get(key);
+        final V oldValue;
+        if (oldEntry != null) {
+            oldValue = oldEntry.value;
+        } else {
+            oldValue = null;
+        }
+        actualMap.put(key, new TimedEntry<>(value));
+        return oldValue;
     }
 
     /**
@@ -79,23 +131,94 @@ public class TimedHashMap<K, V> {
      *
      * @param key The key
      */
-    public V get(K key) {
-        Long now = System.nanoTime();
+    @Override
+    public V get(final Object key) {
+        final long now = System.nanoTime();
 
         if (actualMap.containsKey(key)) {
-            Long age = now - timeStamps.get(key);
+            final TimedEntry<V> timedEntry = actualMap.get(key);
+            final long age = now - timedEntry.timestamp;
 
             // Item exists. If it has not expired, renew its access time and return it
-            if (age <= expiry) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Returning proxy " + actualMap.get(key) + " from cache for " + key);
-                timeStamps.put(key, System.nanoTime());
-                return actualMap.get(key);
+            if (age <= timeout) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Returning entry " + actualMap.get(key) + " from cache for " + key);
+                timedEntry.updateTimestamp();
+                return timedEntry.value;
             } else {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Proxy cache for " + key + " has expired (age=" + (age * 1e-9) + " seconds)");
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached entry for " + key + " has expired (age=" + (age * 1e-9) + " seconds)");
             }
         }
 
         return null;
     }
+
+    @Override
+    public boolean containsKey(final Object key) {
+        return actualMap.containsKey(key);
+    }
+
+    @Override
+    public int size() {
+        return actualMap.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return actualMap.isEmpty();
+    }
+
+    @Override
+    public boolean containsValue(final Object value) {
+        for (final TimedEntry<V> entry : actualMap.values()) {
+            if (Objects.equals(entry.value, value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public V remove(final Object key) {
+        if (actualMap.containsKey(key)) {
+            return actualMap.remove(key).value;
+        }
+        return null;
+    }
+
+    @Override
+    public void putAll(Map<? extends K, ? extends V> m) {
+        for (final Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+            actualMap.put(entry.getKey(), new TimedEntry<V>(entry.getValue()));
+        }
+    }
+
+    @Override
+    public void clear() {
+        actualMap.clear();
+    }
+
+    @Override
+    public Set<K> keySet() {
+        return new HashSet<>(actualMap.keySet());
+    }
+
+    @Override
+    public Collection<V> values() {
+        final Collection<V> values = new ArrayList<>(actualMap.size());
+        for (final TimedEntry<V> value : actualMap.values()) {
+            values.add(value.value);
+        }
+        return values;
+    }
+
+    @Override
+    public Set<Map.Entry<K, V>> entrySet() {
+        final Map<K, V> strippedMap = new HashMap<>(actualMap.size());
+        for (final Map.Entry<K, TimedEntry<V>> entry : actualMap.entrySet()) {
+            strippedMap.put(entry.getKey(), entry.getValue().value);
+        }
+        return strippedMap.entrySet();
+    }
+
 }
 
