@@ -1,5 +1,12 @@
 2014-05-09  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (urlToPath) use
+	StringBuilder, not StringBuffer
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java:
+	(testUrlEquals, testUrlToPath) new tests
+
+2014-05-09  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/util/TimedHashMap.java: implements Map
 	interface, added all missing methods. (timeStamps) removed, refactored to
 	only be composed of one backing map rather than two.
