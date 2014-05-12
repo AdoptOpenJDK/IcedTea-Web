@@ -695,6 +695,9 @@ public class ResourceTracker {
                 byte buf[] = new byte[1024];
                 int rlen;
 
+                long contentLength = con.getContentLengthLong();
+                long lastModified = con.getLastModified();
+
                 InputStream in = new BufferedInputStream(con.getInputStream());
                 OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.downloadVersion);
 
@@ -710,11 +713,16 @@ public class ResourceTracker {
                 if (con instanceof HttpURLConnection)
                     ((HttpURLConnection) con).disconnect();
 
+                if (packgz || gzip) {
+                    // TODO why not set this otherwise?
+                    downloadEntry.setRemoteContentLength(contentLength);
+                    downloadEntry.setLastModified(lastModified);
+                }
+
                 /*
                  * If the file was compressed, uncompress it.
                  */
                 if (packgz) {
-                    downloadEntry.initialize(con);
                     GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                             .getCacheFile(downloadLocation, resource.downloadVersion)));
                     InputStream inputStream = new BufferedInputStream(gzInputStream);
@@ -729,7 +737,6 @@ public class ResourceTracker {
                     inputStream.close();
                     gzInputStream.close();
                 } else if (gzip) {
-                    downloadEntry.initialize(con);
                     GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                             .getCacheFile(downloadLocation, resource.downloadVersion)));
                     InputStream inputStream = new BufferedInputStream(gzInputStream);
@@ -828,8 +835,10 @@ public class ResourceTracker {
             }
 
             // update cache entry
-            if (!current)
-                entry.initialize(connection);
+            if (!current) {
+                entry.setRemoteContentLength(connection.getContentLengthLong());
+                entry.setLastModified(connection.getLastModified());
+            }
 
             entry.setLastUpdated(System.currentTimeMillis());
             entry.store();

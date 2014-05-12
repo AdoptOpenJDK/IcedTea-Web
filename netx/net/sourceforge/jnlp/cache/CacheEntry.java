@@ -23,7 +23,6 @@ import java.io.*;
 import java.net.*;
 
 import net.sourceforge.jnlp.*;
-import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.*;
 
 /**
@@ -33,6 +32,10 @@ import net.sourceforge.jnlp.util.*;
  * @version $Revision: 1.10 $
  */
 public class CacheEntry {
+
+    private static final String KEY_CONTENT_LENGTH = "content-length";
+    private static final String KEY_LAST_MODIFIED = "last-modified";
+    private static final String KEY_LAST_UPDATED = "last-updated";
 
     /** the remote resource location */
     private URL location;
@@ -61,18 +64,6 @@ public class CacheEntry {
     }
 
     /**
-     * Initialize the cache entry data from a connection to the
-     * remote resource (does not store data).
-     */
-    void initialize(URLConnection connection) {
-        long modified = connection.getLastModified();
-        long length = connection.getContentLength(); // an int
-
-        properties.setProperty("content-length", Long.toString(length));
-        properties.setProperty("last-modified", Long.toString(modified));
-    }
-
-    /**
      * Returns the remote location this entry caches.
      */
     public URL getLocation() {
@@ -85,11 +76,7 @@ public class CacheEntry {
      * @return 
      */
     public long getLastUpdated() {
-        try {
-            return Long.parseLong(properties.getProperty("last-updated"));
-        } catch (Exception ex) {
-            return 0;
-        }
+        return getLongKey(KEY_LAST_UPDATED);
     }
 
     /**
@@ -98,7 +85,35 @@ public class CacheEntry {
      * @param updatedTime
      */
     public void setLastUpdated(long updatedTime) {
-        properties.setProperty("last-updated", Long.toString(updatedTime));
+        setLongKey(KEY_LAST_UPDATED, updatedTime);
+    }
+
+    public long getRemoteContentLength() {
+        return getLongKey(KEY_CONTENT_LENGTH);
+    }
+
+    public void setRemoteContentLength(long length) {
+        setLongKey(KEY_CONTENT_LENGTH, length);
+    }
+
+    public long getLastModified() {
+        return getLongKey(KEY_LAST_MODIFIED);
+    }
+
+    public void setLastModified(long modifyTime) {
+        setLongKey(KEY_LAST_MODIFIED, modifyTime);
+    }
+
+    private long getLongKey(String key) {
+        try {
+            return Long.parseLong(properties.getProperty(key));
+        } catch (Exception ex) {
+            return 0;
+        }
+    }
+
+    private void setLongKey(String key, long value) {
+        properties.setProperty(key, Long.toString(value));
     }
 
     /**
@@ -117,7 +132,7 @@ public class CacheEntry {
 
         try {
             long remoteModified = lastModified;
-            long cachedModified = Long.parseLong(properties.getProperty("last-modified"));
+            long cachedModified = Long.parseLong(properties.getProperty(KEY_LAST_MODIFIED));
 
             if (remoteModified > 0 && remoteModified <= cachedModified)
                 return true;
@@ -137,13 +152,13 @@ public class CacheEntry {
      * @return true if the resource is in the cache
      */
     public boolean isCached() {
-        File localFile = CacheUtil.getCacheFile(location, version);
+        File localFile = getCacheFile();
         if (!localFile.exists())
             return false;
 
         try {
             long cachedLength = localFile.length();
-            long remoteLength = Long.parseLong(properties.getProperty("content-length", "-1"));
+            long remoteLength = Long.parseLong(properties.getProperty(KEY_CONTENT_LENGTH, "-1"));
 
             if (remoteLength >= 0 && cachedLength != remoteLength)
                 return false;
@@ -154,6 +169,13 @@ public class CacheEntry {
 
             return false; // should throw?
         }
+    }
+
+    /**
+     * Seam for testing
+     */
+    File getCacheFile() {
+        return CacheUtil.getCacheFile(location, version);
     }
 
     /**
@@ -183,4 +205,5 @@ public class CacheEntry {
     protected void unlock() {
         CacheUtil.unlockFile(properties);
     }
+
 }

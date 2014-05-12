@@ -1,3 +1,17 @@
+2014-05-12  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: Use
+	constants for strings.
+	(initialize): Remove.
+	(getRemoteContentLength, setRemoteContentLength, getLastModified)
+	(setLastModified, getLongKey, setLongKey): New method.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheEntryTest.java: New
+	file.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+	(initializeResource, downloadResource): Use
+	CacheEntry.setRemoteContentLength and CacheEntry.setLastModified instead
+	of CacheEntry.initialize.
+
 2014-05-12  Jiri Vanek  <jvanek@redhat.com>
 
 	ALACA is now able to remember decisions.
