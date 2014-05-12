@@ -1,5 +1,20 @@
 2014-05-12  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: Add
+	KEY_CONTENT_ORIGINAL_LENGTH and LENGTH_UNKNOWN.
+	(getOriginalContentLength, setOriginalContentLength)
+	(getLongKey(String,long)): New methods.
+	(isCached): Check if the original content length is recorded and use it,
+	if available, as the content length.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java (downloadResource):
+	If the content was compressed, store original content length in the cache
+	entry.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheEntryTest.java
+	(testOriginalContentLengthIsSetCorrectly)
+	(verifyCachedIfOriginalContentLengthsAreSame): New method.
+
+2014-05-12  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: Use
 	constants for strings.
 	(initialize): Remove.

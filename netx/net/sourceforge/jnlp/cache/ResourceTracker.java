@@ -757,6 +757,9 @@ public class ResourceTracker {
             }
 
             if (!downloadLocationFile.getPath().equals(finalFile.getPath())) {
+                origEntry.setOriginalContentLength(downloadEntry.getRemoteContentLength());
+                origEntry.store();
+
                 downloadEntry.markForDelete();
                 downloadEntry.store();
             }

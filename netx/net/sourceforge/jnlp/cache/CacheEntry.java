@@ -33,7 +33,10 @@ import net.sourceforge.jnlp.util.*;
  */
 public class CacheEntry {
 
+    public static final long LENGTH_UNKNOWN = -1;
+
     private static final String KEY_CONTENT_LENGTH = "content-length";
+    private static final String KEY_CONTENT_ORIGINAL_LENGTH = "content-original-length";
     private static final String KEY_LAST_MODIFIED = "last-modified";
     private static final String KEY_LAST_UPDATED = "last-updated";
 
@@ -96,6 +99,24 @@ public class CacheEntry {
         setLongKey(KEY_CONTENT_LENGTH, length);
     }
 
+    /**
+     * Return the length of the original content that was cached. May be different
+     * from the actual cache entry size due to (de)compression.
+     *
+     * @return the content length or {@link #LENGTH_UNKNOWN} if unknown.
+     */
+    public long getOriginalContentLength() {
+        return getLongKey(KEY_CONTENT_ORIGINAL_LENGTH, LENGTH_UNKNOWN);
+    }
+
+    /**
+     * Set the length of the original content that was cached. May be different
+     * from the actual cache entry size due to (de)compression.
+     */
+    public void setOriginalContentLength(long contentLength) {
+        setLongKey(KEY_CONTENT_ORIGINAL_LENGTH, contentLength);
+    }
+
     public long getLastModified() {
         return getLongKey(KEY_LAST_MODIFIED);
     }
@@ -105,10 +126,15 @@ public class CacheEntry {
     }
 
     private long getLongKey(String key) {
+        return getLongKey(key, 0);
+    }
+
+    private long getLongKey(String key, long defaultValue) {
         try {
             return Long.parseLong(properties.getProperty(key));
         } catch (Exception ex) {
-            return 0;
+            OutputController.getLogger().log(ex);
+            return defaultValue;
         }
     }
 
@@ -158,6 +184,11 @@ public class CacheEntry {
 
         try {
             long cachedLength = localFile.length();
+            String originalLength = properties.getProperty(KEY_CONTENT_ORIGINAL_LENGTH);
+            if (originalLength != null) {
+                cachedLength = Long.parseLong(originalLength);
+            }
+
             long remoteLength = Long.parseLong(properties.getProperty(KEY_CONTENT_LENGTH, "-1"));
 
             if (remoteLength >= 0 && cachedLength != remoteLength)
