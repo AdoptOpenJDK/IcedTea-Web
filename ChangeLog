@@ -1,5 +1,10 @@
 2014-05-09  Andrew Azores  <aazores@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/util/FileUtilsTest.java: new test
+	class for FileUtils
+
+2014-05-09  Andrew Azores  <aazores@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (urlToPath) use
 	StringBuilder, not StringBuffer
 	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java:
