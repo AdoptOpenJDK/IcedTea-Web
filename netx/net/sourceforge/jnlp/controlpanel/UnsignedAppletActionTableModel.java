@@ -48,7 +48,8 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletA
 public class UnsignedAppletActionTableModel extends AbstractTableModel {
 
     final UnsignedAppletActionStorageExtendedImpl back;
-    private final String[] columns = new String[]{Translator.R("APPEXTSECguiTableModelTableColumnAction"),
+    private final String[] columns = new String[]{Translator.R("APPEXTSECguiTableModelTableColumnActionUA"),
+        Translator.R("APPEXTSECguiTableModelTableColumnActionMatchALACA"),
         Translator.R("APPEXTSECguiTableModelTableColumnDateOfAction"),
         Translator.R("APPEXTSECguiTableModelTableColumnDocumentBase"),
         Translator.R("APPEXTSECguiTableModelTableColumnCodeBase"),
@@ -79,21 +80,21 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
             return AppletSecurityActions.class;
         }
         if (columnIndex == 1) {
-            return Date.class;
+            return AppletSecurityActions.class;
         }
         if (columnIndex == 2) {
-            return UrlRegEx.class;
+            return Date.class;
         }
         if (columnIndex == 3) {
             return UrlRegEx.class;
         }
         if (columnIndex == 4) {
-            return String.class;
+            return UrlRegEx.class;
         }
         if (columnIndex == 5) {
             return String.class;
         }
-        return Object.class;
+         return Object.class;
     }
 
     @Override
@@ -101,7 +102,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
         if (back.isReadOnly()) {
             return false;
         }
-        if (columnIndex == 1) {
+        if (columnIndex == 2) {
             return false;
         }
         if (columnIndex == 0) {
@@ -118,18 +119,21 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
 
         UnsignedAppletActionEntry source = back.toArray()[rowIndex];
         if (columnIndex == 0) {
-            return source.getUnsignedAppletAction();
+            return source.getAppletSecurityActions().getUnsignedAppletAction();
         }
         if (columnIndex == 1) {
-            return source.getTimeStamp();
+            return source.getAppletSecurityActions().getMatchingAlacaAction();
         }
         if (columnIndex == 2) {
-            return source.getDocumentBase();
+            return source.getTimeStamp();
         }
         if (columnIndex == 3) {
-            return source.getCodeBase();
+            return source.getDocumentBase();
         }
         if (columnIndex == 4) {
+            return source.getCodeBase();
+        }
+        if (columnIndex == 5) {
             return UnsignedAppletActionEntry.createArchivesString(source.getArchives());
         }
         return null;
@@ -146,7 +150,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
         int i = getRowCount()-1;
         String s = "\\Qhttp://localhost:80/\\E.*";
         back.add(new UnsignedAppletActionEntry(
-                AppletSecurityActions.fromAction(ExecuteAppletAction.NEVER),
+                AppletSecurityActions.createDefault(),
                 new Date(),
                 new UrlRegEx(s),
                 new UrlRegEx(s),

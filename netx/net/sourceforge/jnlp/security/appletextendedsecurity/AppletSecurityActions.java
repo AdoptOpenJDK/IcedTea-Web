@@ -36,23 +36,43 @@
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
-public class AppletSecurityActions {
-    private final List<ExecuteAppletAction> actions = new ArrayList<>();
+public class AppletSecurityActions implements Iterable<ExecuteAppletAction>{
 
-    
+    private final List<ExecuteAppletAction> actions = new ArrayList<>();
+    public static final int UNSIGNED_APPLET_ACTION = 0;
+    public static final int MATCHING_ALACA_ACTION = 1;
+    /** well this si not nice. We can iterate through all the records to find
+    * longest remembered item, but it is unnecessary overhead. The new record is
+    * added willingly with some effort. Should be easy to inc also this
+    */ 
+    public static final int REMEMBER_COLUMNS_COUNT = /*2*/
+        Collections.max(Arrays.asList(UNSIGNED_APPLET_ACTION, MATCHING_ALACA_ACTION))+1;
+
+
+    public static AppletSecurityActions createDefault() {
+        AppletSecurityActions asas = new AppletSecurityActions();
+        asas.setUnsignedAppletAction(ExecuteAppletAction.UNSET);
+        asas.setMatchingAlacaAction(ExecuteAppletAction.UNSET);
+        return asas;
+    }
     /*
-     * backward compatibility method for base, UnsignedAppletTrustConfirmation usage
-     * FIXME - remove
+     * quick setup method when new item , with one action, is added
      */
-    public static AppletSecurityActions fromAction(ExecuteAppletAction s) {
+    public static AppletSecurityActions fromAction(int id, ExecuteAppletAction s) {
         if (s == null){
             s = ExecuteAppletAction.UNSET;
         }
-        return fromString(s.toChar());
+        AppletSecurityActions asas = new AppletSecurityActions();
+        asas.setAction(id, s);
+        return asas;
     }
-    
+
+
     static AppletSecurityActions fromString(String s) {
         if (s == null) {
             s = "";
@@ -78,24 +98,46 @@ public class AppletSecurityActions {
         return actions.get(i);
     }
     
-    void setAction(int i, ExecuteAppletAction a) {
+    public void setAction(int i, ExecuteAppletAction a) {
         while (actions.size() <= i){
             actions.add(ExecuteAppletAction.UNSET);
         }
         actions.set(i,a);
     }
-    
-    
+
+
     public ExecuteAppletAction getUnsignedAppletAction() {
-        return getAction(0);
+        return getAction(UNSIGNED_APPLET_ACTION);
+    }
+
+    public void setUnsignedAppletAction(ExecuteAppletAction a) {
+       setAction(UNSIGNED_APPLET_ACTION,a);
+    }
+
+
+    public ExecuteAppletAction getMatchingAlacaAction() {
+        return getAction(MATCHING_ALACA_ACTION);
     }
     
-    public void setUnsignedAppletAction(ExecuteAppletAction a) {
-        actions.set(0,a);
+    public void setMatchingAlacaAction(ExecuteAppletAction a) {
+        setAction(MATCHING_ALACA_ACTION, a);
     }
 
     @Override
     public String toString() {
+        return toShortString();
+    }
+
+    public String toLongString() {
+        StringBuilder sb = new StringBuilder();
+        for (ExecuteAppletAction executeAppletAction : actions) {
+            sb.append(executeAppletAction.toString()).append("; ");
+        }
+        return sb.toString();
+    }
+
+
+    public String toShortString() {
         StringBuilder sb = new StringBuilder();
         for (ExecuteAppletAction executeAppletAction : actions) {
             sb.append(executeAppletAction.toChar());
@@ -103,7 +145,11 @@ public class AppletSecurityActions {
         return sb.toString();
     }
 
-    
+    public int getRealCount() {
+        return actions.size();
+    }
+
+
     /**
      * stub for testing 
      * @return 
@@ -111,6 +157,10 @@ public class AppletSecurityActions {
     List<ExecuteAppletAction> getActions() {
         return actions;
     }
-    
-    
+
+    @Override
+    public Iterator<ExecuteAppletAction> iterator() {
+        return actions.iterator();
+    }
+
 }

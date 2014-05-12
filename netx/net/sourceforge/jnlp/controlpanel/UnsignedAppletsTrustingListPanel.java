@@ -76,6 +76,7 @@ import javax.swing.table.TableRowSorter;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityActions;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
@@ -187,7 +188,7 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
     public static String appletItemToCaption(UnsignedAppletActionEntry i, String caption) {
         return Translator.R("APPEXTSECguiPanelAppletInfoHederPart1", caption, i.getDocumentBase().getFilteredRegEx())
-                + "\n  (" + Translator.R("APPEXTSECguiPanelAppletInfoHederPart2", i.getUnsignedAppletAction(), DateFormat.getInstance().format(i.getTimeStamp()))
+                + "\n  (" + Translator.R("APPEXTSECguiPanelAppletInfoHederPart2", i.getAppletSecurityActions().toString(), DateFormat.getInstance().format(i.getTimeStamp()))
                 + "\n    " + Translator.R("APPEXTSECguiTableModelTableColumnDocumentBase") + ": " + i.getDocumentBase().getFilteredRegEx()
                 + "\n    " + Translator.R("APPEXTSECguiTableModelTableColumnCodeBase") + ": " + i.getCodeBase().getFilteredRegEx()
                 + "\n    " + Translator.R("APPEXTSECguiTableModelTableColumnArchives") + ": " + UnsignedAppletActionEntry.createArchivesString(i.getArchives());
@@ -702,19 +703,20 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
             @Override
             public TableCellEditor getCellEditor(int row, int column) {
                 int columnx = convertColumnIndexToModel(column);
-                if (columnx == 0) {
+                if (columnx == 0 || columnx == 1) {
                     return new DefaultCellEditor(new JComboBox<>(new ExecuteAppletAction[] {
                             ExecuteAppletAction.ALWAYS,
                             ExecuteAppletAction.NEVER,
                             ExecuteAppletAction.YES,
-                            ExecuteAppletAction.NO }));
+                            ExecuteAppletAction.NO,
+                            ExecuteAppletAction.UNSET }));
                 }
-                if (columnx == 2) {
+                if (columnx == 3) {
                     column = convertColumnIndexToModel(column);
                     row = convertRowIndexToModel(row);
                     return new DefaultCellEditor(new MyTextField((UrlRegEx) (model.getValueAt(row, column))));
                 }
-                if (columnx == 3) {
+                if (columnx == 4) {
                     column = convertColumnIndexToModel(column);
                     row = convertRowIndexToModel(row);
                     return new DefaultCellEditor(new MyTextField((UrlRegEx) (model.getValueAt(row, column))));
@@ -725,19 +727,19 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
             @Override
             public TableCellRenderer getCellRenderer(int row, int column) {
                 int columnx = convertColumnIndexToModel(column);
-                if (columnx == 1) {
+                if (columnx == 2) {
                     column = convertColumnIndexToModel(column);
                     row = convertRowIndexToModel(row);
                     return new UrlRegexCellRenderer.MyDateCellRenderer((Date) (model.getValueAt(row, column)));
                 }
-                if (columnx == 2) {
+                if (columnx == 3) {
                     if (!filterRegexesCheckBox.isSelected()) {
                         column = convertColumnIndexToModel(column);
                         row = convertRowIndexToModel(row);
                         return new UrlRegexCellRenderer((UrlRegEx) (model.getValueAt(row, column)));
                     }
                 }
-                if (columnx == 3) {
+                if (columnx == 4) {
                     if (!filterRegexesCheckBox.isSelected()) {
                         column = convertColumnIndexToModel(column);
                         row = convertRowIndexToModel(row);
@@ -768,16 +770,18 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
         UnsignedAppletActionEntry[] items = currentModel.back.toArray();
         if (askBeforeActionCheckBox.isSelected()) {
             List<UnsignedAppletActionEntry> toBeDeleted = new ArrayList<>();
-            for (int i = 0; i < items.length; i++) {
-                UnsignedAppletActionEntry unsignedAppletActionEntry = items[i];
-                if (unsignedAppletActionEntry.getUnsignedAppletAction() == unsignedAppletAction) {
-                    toBeDeleted.add(unsignedAppletActionEntry);
+            for (UnsignedAppletActionEntry unsignedAppletActionEntry : items) {
+                AppletSecurityActions actions = unsignedAppletActionEntry.getAppletSecurityActions();
+                 for (int j = 0; j < actions.getRealCount(); j++) {
+                    ExecuteAppletAction action = actions.getAction(j);
+                    if (action == unsignedAppletAction) {
+                        toBeDeleted.add(unsignedAppletActionEntry);
+                    }
                 }
-
             }
             String s = Translator.R("APPEXTSECguiPanelConfirmDeletionOf", toBeDeleted.size()) + ": \n";
-            for (int i = 0; i < toBeDeleted.size(); i++) {
-                s += appletItemToCaption(toBeDeleted.get(i), "  ") + "\n";
+            for (UnsignedAppletActionEntry toBeDeleted1 : toBeDeleted) {
+                s += appletItemToCaption(toBeDeleted1, "  ") + "\n";
             }
             int a = JOptionPane.showConfirmDialog(this, s);
             if (a != JOptionPane.OK_OPTION) {
@@ -892,10 +896,10 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
         }
     }
 
-    private abstract static  class MyCommonSorter extends RowFilter<UnsignedAppletActionTableModel, Integer>  {
-        
-        
+    private abstract static class MyCommonSorter extends RowFilter<UnsignedAppletActionTableModel, Integer> {
+
     }
+
     private static final class ByPermanencyFilter extends TableRowSorter<UnsignedAppletActionTableModel> {
 
         private static final class ShowAll extends MyCommonSorter {
@@ -910,56 +914,87 @@ public class UnsignedAppletsTrustingListPanel extends javax.swing.JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteAppletAction.ALWAYS) || o.equals(ExecuteAppletAction.NEVER));
+                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
+                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                    if (o.equals(ExecuteAppletAction.ALWAYS) || o.equals(ExecuteAppletAction.NEVER)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 
         private static final class ShowPermanentA extends MyCommonSorter {
+
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteAppletAction.ALWAYS));
+                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
+                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                    if (o.equals(ExecuteAppletAction.ALWAYS)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+        }
+
+        private static final class ShowPermanentN extends MyCommonSorter {
+
+            @Override
+            public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
+                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
+                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                    if (o.equals(ExecuteAppletAction.NEVER)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 
-        private static final class ShowPermanentN  extends MyCommonSorter {
+        private static final class ShowTemporarilyDecisions extends MyCommonSorter {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteAppletAction.NEVER));
+                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
+                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                    if (o.equals(ExecuteAppletAction.YES) || o.equals(ExecuteAppletAction.NO)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 
-        private static final class ShowTemporarilyDecisions  extends MyCommonSorter {
+        private static final class ShowHasChosenYes extends MyCommonSorter {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteAppletAction.YES) || o.equals(ExecuteAppletAction.NO));
+                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
+                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                    if (o.equals(ExecuteAppletAction.YES)) {
+                        return true;
+                    }
+                }
+                return false;
             }
+
         }
 
-        private static final class ShowHasChosenYes  extends MyCommonSorter {
+        private static final class ShowHasChosenNo extends MyCommonSorter {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteAppletAction.YES));
+                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
+                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                    if (o.equals(ExecuteAppletAction.NO)) {
+                        return true;
+                    }
+                }
+                return false;
             }
-           
-            
-        }
 
-        private static final class ShowHasChosenNo  extends MyCommonSorter {
-
-            @Override
-            public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), 0);
-                return (o.equals(ExecuteAppletAction.NO));
-            }
-            
         }
         public static final ShowAll showAll = new ShowAll();
         public static final ShowPermanents showPermanents = new ShowPermanents();

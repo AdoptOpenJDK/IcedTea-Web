@@ -131,17 +131,21 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     @Override
-    public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives) {
+    public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives, Integer id) {
         List<UnsignedAppletActionEntry> results = getMatchingItems(documentBase, codeBase, archives);
         if (results == null || results.isEmpty()) {
             return null;
+        }
+        //no comaprsion id provided
+        if (id  == null){
+            return results.get(0);    
         }
         // Chose the first result, unless we find a 'stronger' result
         // Actions such as 'always accept' or 'always reject' are 'stronger' than
         // the hints 'was accepted' or 'was rejected'.
         for (UnsignedAppletActionEntry candidate : results) {
-                if (candidate.getUnsignedAppletAction() == ExecuteAppletAction.ALWAYS
-                    || candidate.getUnsignedAppletAction() == ExecuteAppletAction.NEVER) {
+                if (candidate.getAppletSecurityActions().getAction(id) == ExecuteAppletAction.ALWAYS
+                    || candidate.getAppletSecurityActions().getAction(id) == ExecuteAppletAction.NEVER) {
                     //return first found strong
                     return  candidate;
                 }
@@ -228,17 +232,17 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     @Override
-    public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase) {
-        return getMatchingItem(documentBase, null, null);
+    public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase, Integer id) {
+        return getMatchingItem(documentBase, null, null, id);
     }
 
     @Override
-    public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase) {
-        return getMatchingItem(null, codeBase, null);
+    public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase, Integer id) {
+        return getMatchingItem(null, codeBase, null, id);
     }
 
     @Override
-    public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase) {
-        return getMatchingItem(documentBase, codeBase, null);
+    public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase, Integer id) {
+        return getMatchingItem(documentBase, codeBase, null, id);
     }
 }

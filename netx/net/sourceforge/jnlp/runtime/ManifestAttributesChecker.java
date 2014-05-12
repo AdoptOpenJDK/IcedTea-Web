@@ -325,7 +325,7 @@ public class ManifestAttributesChecker {
                 }
             }
         }
-        boolean a = SecurityDialogs.showMatchingALACAttributePanel(file.getTitle(), documentBase, usedUrls);
+        boolean a = SecurityDialogs.showMatchingALACAttributePanel(file, documentBase, usedUrls);
         if (!a) {
             throw new LaunchException("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, but was blocked from running by the user.");
         } else {

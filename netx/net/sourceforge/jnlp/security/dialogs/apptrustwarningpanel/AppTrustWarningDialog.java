@@ -47,6 +47,7 @@ import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarnin
  * A panel that confirms that the user is OK with unsigned code running.
  */
 public class AppTrustWarningDialog extends SecurityDialogPanel {
+    private ActionChoiceListener listener;
 
     private AppTrustWarningDialog(final SecurityDialog dialog) {
         super(dialog);
@@ -54,7 +55,7 @@ public class AppTrustWarningDialog extends SecurityDialogPanel {
 
     public static AppTrustWarningDialog unsigned(final SecurityDialog dialog, final JNLPFile file) {
         final AppTrustWarningDialog warningDialog = new AppTrustWarningDialog(dialog);
-        warningDialog.add(new UnsignedAppletTrustWarningPanel(file, warningDialog.getActionChoiceListener()));
+        warningDialog.add(new UnsignedAppletTrustWarningPanel(dialog, file, warningDialog.getActionChoiceListener()));
         return warningDialog;
     }
 
@@ -63,8 +64,21 @@ public class AppTrustWarningDialog extends SecurityDialogPanel {
         warningDialog.add(new PartiallySignedAppTrustWarningPanel(file, warningDialog.getActionChoiceListener(), dialog, securityDelegate));
         return warningDialog;
     }
+    
+    public static AppTrustWarningDialog matchingAlaca(SecurityDialog x, JNLPFile file, String codebase, String remoteUrls) {
+        final AppTrustWarningDialog warningDialog = new AppTrustWarningDialog(x);
+        warningDialog.add(new MatchingALACAttributePanel(x, file, codebase, remoteUrls, warningDialog.getActionChoiceListener()));
+        return warningDialog;
+    }
 
     private ActionChoiceListener getActionChoiceListener() {
+        if (listener == null) {
+            listener = createActionChoiceListener();
+        }
+        return listener;
+    }
+
+    private ActionChoiceListener createActionChoiceListener() {
         return new ActionChoiceListener() {
             @Override
             public void actionChosen(final AppSigningWarningAction action) {

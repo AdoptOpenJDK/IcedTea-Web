@@ -37,21 +37,29 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.net.URL;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityActions;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 
 
 public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
-    public UnsignedAppletTrustWarningPanel(final JNLPFile file, final ActionChoiceListener listener) {
+    public UnsignedAppletTrustWarningPanel(SecurityDialog securityDialog, final JNLPFile file, final ActionChoiceListener listener) {
         super(file, listener);
+        this.INFO_PANEL_HEIGHT = 250;
         addComponents();
+        if (securityDialog != null) {
+            securityDialog.setMinimumSize(new Dimension(600, 400));
+        }
     }
 
     @Override
@@ -80,11 +88,14 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
     @Override
     protected String getInfoPanelText() {
         String text = R(getInfoPanelTextKey(), file.getCodeBase(), file.getSourceLocation());
-        ExecuteAppletAction rememberedAction = UnsignedAppletTrustConfirmation.getStoredAction(file);
-        if (rememberedAction == ExecuteAppletAction.YES) {
-            text += "<br>" + R("SUnsignedAllowedBefore");
-        } else if (rememberedAction == ExecuteAppletAction.NO) {
-            text += "<br>" + R("SUnsignedRejectedBefore");
+        UnsignedAppletActionEntry rememberedEntry = UnsignedAppletTrustConfirmation.getStoredEntry(file, AppletSecurityActions.UNSIGNED_APPLET_ACTION);
+        if (rememberedEntry != null) {
+            ExecuteAppletAction rememberedAction = rememberedEntry.getAppletSecurityActions().getUnsignedAppletAction();
+            if (rememberedAction == ExecuteAppletAction.YES) {
+                text += "<br>" + R("SUnsignedAllowedBefore", rememberedEntry.getLocalisedTimeStamp());
+            } else if (rememberedAction == ExecuteAppletAction.NO) {
+                text += "<br>" + R("SUnsignedRejectedBefore", rememberedEntry.getLocalisedTimeStamp());
+            }
         }
         return htmlWrap(text);
     }
@@ -95,7 +106,7 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
     }
     
     public static void main(String[] args) throws Exception {
-        UnsignedAppletTrustWarningPanel w = new UnsignedAppletTrustWarningPanel(new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")), null);
+        UnsignedAppletTrustWarningPanel w = new UnsignedAppletTrustWarningPanel(null, new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")), null);
         JFrame f = new JFrame();
         f.setSize(600, 400);
         f.add(w, BorderLayout.CENTER);

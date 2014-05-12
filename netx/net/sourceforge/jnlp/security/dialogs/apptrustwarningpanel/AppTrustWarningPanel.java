@@ -68,6 +68,8 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridge;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.util.ScreenFinder;
@@ -215,7 +217,17 @@ public abstract class AppTrustWarningPanel extends JPanel {
     }
 
     protected String getAppletTitle() {
-        return R("SAppletTitle", file.getTitle());
+        String title;
+        try {
+            if (file instanceof PluginBridge) {
+                title = file.getTitle();
+            } else {
+                title = file.getInformation().getTitle();
+            }
+        } catch (Exception e) {
+            title = "";
+        }
+        return title;
     }
 
     private void setupInfoPanel() {

@@ -54,9 +54,13 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityActions;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import static net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation.getStoredAction;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
 import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * <p>
@@ -167,6 +171,7 @@ public class SecurityDialogs {
      * Shows a warning dialog for when a plugin applet is unsigned.
      * This is used with 'high-security' setting.
      *
+     * @param file the file to be base as information source for this dialogue
      * @return true if permission was granted by the user, false otherwise.
      */
     public static AppSigningWarningAction showUnsignedWarningDialog(JNLPFile file) {
@@ -192,6 +197,7 @@ public class SecurityDialogs {
      * @param accessType the type of warning dialog to show
      * @param file the JNLPFile associated with this warning
      * @param certVerifier the JarCertVerifier used to verify this application
+     * @param securityDelegate the delegate for security atts.
      *
      * @return RUN if the user accepted the certificate, SANDBOX if the user
      * wants the applet to run with only sandbox permissions, or CANCEL if the
@@ -219,6 +225,9 @@ public class SecurityDialogs {
     /**
      * Shows a warning dialog for when an applet or application is partially signed.
      *
+     * @param file the JNLPFile associated with this warning
+     * @param certVerifier the JarCertVerifier used to verify this application
+     * @param securityDelegate the delegate for security atts.
      * @return true if permission was granted by the user, false otherwise.
      */
     public static AppSigningWarningAction showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier,
@@ -281,18 +290,40 @@ public class SecurityDialogs {
         return getIntegerResponseAsBoolean(selectedValue);
     } 
      
-     public static boolean showMatchingALACAttributePanel(String title, URL codeBase, Set<URL> remoteUrls) {
+     public static boolean showMatchingALACAttributePanel(JNLPFile file, URL codeBase, Set<URL> remoteUrls) {
+         
+        ExecuteAppletAction storedAction = getStoredAction(file, AppletSecurityActions.MATCHING_ALACA_ACTION);
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Stored action for matching alaca at " + file.getCodeBase() +" was " + storedAction);
+        
+        if (storedAction != null){
+            if (storedAction == ExecuteAppletAction.ALWAYS){
+                return true;
+            }
+            if (storedAction == ExecuteAppletAction.NEVER){
+                return false;
+            }
+        }
+        
 
         if (!shouldPromptUser()) {
             return false;
         }
 
-        SecurityDialogMessage message = new SecurityDialogMessage();
-        message.dialogType = DialogType.MATCHING_ALACA;
-        message.extras = new Object[]{title, codeBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
-        Object selectedValue = getUserResponse(message);
-        return getIntegerResponseAsBoolean(selectedValue);
-    } 
+         SecurityDialogMessage message = new SecurityDialogMessage();
+         message.dialogType = DialogType.MATCHING_ALACA;
+         message.extras = new Object[]{file, codeBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
+         AppSigningWarningAction selectedValue = (AppSigningWarningAction) getUserResponse(message);
+
+         if (selectedValue != null) {
+             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue.getAction());
+             UnsignedAppletTrustConfirmation.updateAppletAction(file, selectedValue.getAction(), selectedValue.rememberForCodeBase(), AppletSecurityActions.MATCHING_ALACA_ACTION);
+             return selectedValue.getAction() == ExecuteAppletAction.ALWAYS || selectedValue.getAction() == ExecuteAppletAction.YES;
+         }
+
+         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + null);
+         return false;
+
+    }
      
     /**
      * FIXME This is unused. Remove it?

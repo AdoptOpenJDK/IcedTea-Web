@@ -1,3 +1,62 @@
+2014-05-12  Jiri Vanek  <jvanek@redhat.com>
+
+	ALACA is now able to remember decisions.
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java:
+	moved columns in table. Inserted alaca between 0 and 1
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	Added handling of UNSET, fixed calls to (now) getAppletSecurityActions.
+	Shifted columns
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(SUnsignedAllowedBefore) and (SUnsignedRejectedBefore) now handles date
+	(SAppletTitle) removed, was legacy
+	(APPEXTSECguiTableModelTableColumnActionUA) and
+	(APPEXTSECguiTableModelTableColumnActionMatchALACA) added.
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties:(SAppletTitle) removed, was legacy
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Added (getLocalisedTimeStamp)
+	helper method. 
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: 
+	Call to showMatchingALACAttributePanel dialogue now forwards whole file, not just title.
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: First extras to
+	matchingAlaca retyped to JNLPFile
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: MInor javadoc fixes.
+	(showMatchingALACAttributePanel) now have whole JNLP instead of just title.
+	Added handling of saved/saving value
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/AppletSecurityActions.java:
+	made to recognize second record as alaca one.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionEntry.java:
+	unsignedAppletAction changed to appletSecurityActions
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionStorage.java:
+	Whole getMatchingItem family of methods get Integer id parameter, to recognize
+	which record is the one they care about. If id is null, then they return first
+	match, no meter of whether is "strong"(pernament) or week (just hint)
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	adapted to id in interface. Fixed bug with saving the entry.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
+	Added handling of multiple actions, added column.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	implemented the id change.
+	* netx/net/sourceforge/jnlp/security/dialogs/MatchingALACAttributePanel.java:
+	removed to apptrustwarningpanel
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
+	made ALCA dialog aware
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	added generalized impl for title handling.
+	* /netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/MatchingALACAttributePanel.java:
+	new class, derived from dialogs, now extending AppTrustWarningPanel
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	removed custom handling of title. Added minSize. Added usage of stored date in text
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningDialog.java:
+	removed, should be removed long ago when this dialogue was generalized.
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
+	removed custom handling of title. Added minSize. Added usage of stored date in text
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/AppletSecurityActionsTest.java:
+	added test for iteration (testIterator)
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java:
+	adapted for need of id of attribute
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanelTest.java:
+	Adapted to dialog in constructor of UnsignedAppletTrustWarningPanel
+
+
 2014-05-09  Andrew Azores  <aazores@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/util/FileUtilsTest.java: new test

@@ -48,7 +48,7 @@ public class AppTrustWarningPanelTest {
         mockPluginBridge = new PluginBridge(mockCodebase, mockDocumentBase, mockJar,
                 mockMainClass, mockWidth, mockHeight, mockParameters);
 
-        panelList.add(new UnsignedAppletTrustWarningPanel(mockPluginBridge, null));
+        panelList.add(new UnsignedAppletTrustWarningPanel(null, mockPluginBridge, null));
     }
 
     @Test

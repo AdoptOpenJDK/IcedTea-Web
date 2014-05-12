@@ -31,7 +31,9 @@ import java.security.AllPermission;
 import java.security.KeyStore;
 import java.security.Policy;
 import java.security.Security;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -637,6 +639,10 @@ public class JNLPRuntime {
             else
                 return "Missing resource: " + key;
         }
+    }
+    
+    public static String getLocalisedTimeStamp(Date timestamp) {
+        return DateFormat.getInstance().format(timestamp);
     }
 
     /**

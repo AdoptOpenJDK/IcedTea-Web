@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
+import java.awt.Dimension;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.security.cert.Certificate;
@@ -49,7 +50,9 @@ import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityActions;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.security.dialogs.TemporaryPermissionsButton;
 import net.sourceforge.jnlp.tools.CertInformation;
@@ -65,7 +68,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
             SecurityDialog securityDialog, SecurityDelegate securityDelegate) {
         super(file, actionChoiceListener);
         this.jcv = (JarCertVerifier) securityDialog.getCertVerifier();
-        this.INFO_PANEL_HEIGHT = 200;
+        this.INFO_PANEL_HEIGHT = 250;
 
         sandboxButton = new JButton();
         sandboxButton.setText(R("ButSandbox"));
@@ -77,21 +80,9 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         buttons.add(2, advancedOptionsButton);
 
         addComponents();
-    }
-
-    @Override
-    protected String getAppletTitle() {
-        String title;
-        try {
-            if (file instanceof PluginBridge) {
-                title = file.getTitle();
-            } else {
-                title = file.getInformation().getTitle();
-            }
-        } catch (Exception e) {
-            title = "";
+        if (securityDialog != null) {
+            securityDialog.setMinimumSize(new Dimension(600, 400));
         }
-        return R("SAppletTitle", title);
     }
 
     private String getAppletInfo() {
@@ -159,11 +150,14 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         String text = getAppletInfo();
         text += "<br><br>" + R(getInfoPanelTextKey(), file.getCodeBase(), file.getSourceLocation());
         text += "<br><br>" + getSigningInfo();
-        ExecuteAppletAction rememberedAction = UnsignedAppletTrustConfirmation.getStoredAction(file);
-        if (rememberedAction == ExecuteAppletAction.YES) {
-            text += "<br>" + R("SUnsignedAllowedBefore");
-        } else if (rememberedAction == ExecuteAppletAction.NO) {
-            text += "<br>" + R("SUnsignedRejectedBefore");
+        UnsignedAppletActionEntry rememberedEntry = UnsignedAppletTrustConfirmation.getStoredEntry(file, AppletSecurityActions.UNSIGNED_APPLET_ACTION);
+        if (rememberedEntry != null) {
+            ExecuteAppletAction rememberedAction = rememberedEntry.getAppletSecurityActions().getUnsignedAppletAction();
+            if (rememberedAction == ExecuteAppletAction.YES) {
+                text += "<br>" + R("SUnsignedAllowedBefore", rememberedEntry.getLocalisedTimeStamp());
+            } else if (rememberedAction == ExecuteAppletAction.NO) {
+                text += "<br>" + R("SUnsignedRejectedBefore", rememberedEntry.getLocalisedTimeStamp());
+            }
         }
         return htmlWrap(text);
     }

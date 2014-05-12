@@ -143,5 +143,16 @@ public class AppletSecurityActionsTest {
         assertEquals(ExecuteAppletAction.UNSET, a1.getAction(10));
         assertEquals(4, a1.getActions().size());
     }
+    
+    @Test
+    public void testIterator() throws Exception {
+        AppletSecurityActions a1 = AppletSecurityActions.fromString("ANXs AAA");
+        int i = 0;
+        for (ExecuteAppletAction eaa : a1) {
+            assertEquals(a1.getAction(i), eaa);
+            i++;
+        }
+        assertEquals(a1.getRealCount(), i);
+    }
 
 }

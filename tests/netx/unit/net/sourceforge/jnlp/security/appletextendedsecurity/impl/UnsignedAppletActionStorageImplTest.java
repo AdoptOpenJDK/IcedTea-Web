@@ -57,6 +57,9 @@ public class UnsignedAppletActionStorageImplTest {
     private static File ff3;
     private static File ff4;
 
+    public static final int ZERO = AppletSecurityActions.UNSIGNED_APPLET_ACTION;
+    public static final int ONE = AppletSecurityActions.MATCHING_ALACA_ACTION;
+
     @BeforeClass
     public static void preapreTestFiles() throws IOException {
         f1 = File.createTempFile("itwMatching", "testFile1");
@@ -68,6 +71,9 @@ public class UnsignedAppletActionStorageImplTest {
                 + "A 1 \\Qhttp://jmol.sourceforge.net/demo/atoms/\\E \\Qhttp://jmol.sourceforge.net/jmol/\\E JmolApplet0.jar\n"
                 + "N 1363278653454 \\Qhttp://www.walter-fendt.de/ph14e\\E.* \\Qhttp://www.walter-fendt.de\\E.*\n"
                 + "n 1363281783104 \\Qhttp://www.walter-fendt.de/ph14e/inclplane.htm\\E \\Qhttp://www.walter-fendt.de/ph14_jar/\\E Ph14English.jar,SchiefeEbene.jar"
+                + "yA 1 \\Qhttp://jmol.sourceforge.net/demo/atoms/\\E \\Qhttp://jmol.sourceforge.net/jmol/\\E JmolApplet0.jar\n"
+                + "Ay 1363278653454 \\Qhttp://www.walter-fendt.de/ph14e\\E.* \\Qhttp://www.walter-fendt.de\\E.*\n"
+                + "nn 1363281783104 \\Qhttp://www.walter-fendt.de/ph14e/inclplane.htm\\E \\Qhttp://www.walter-fendt.de/ph14_jar/\\E Ph14English.jar,SchiefeEbene.jar"
                 + "", f3);
 
         ff1 = File.createTempFile("itwMatching", "testFile1");
@@ -105,15 +111,16 @@ public class UnsignedAppletActionStorageImplTest {
     public void multipleActionsf4() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(ff4);
         //reed whatever
-        UnsignedAppletActionEntry r1 = i1.getMatchingItem("a", "b", Arrays.asList(new String[]{"jar1"}));
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("a", "b", Arrays.asList(new String[]{"jar1"}), ZERO);
+        //fail
     }
 
     @Test
     public void multipleActionsf3() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(ff3);
-        UnsignedAppletActionEntry r1 = i1.getMatchingItem("a", "b", Arrays.asList(new String[]{"jar1"}));
-        UnsignedAppletActionEntry r2 = i1.getMatchingItem("c", "d", Arrays.asList(new String[]{}));
-        UnsignedAppletActionEntry r3 = i1.getMatchingItem("e", "f", Arrays.asList(new String[]{"j1", "j2"}));
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("a", "b", Arrays.asList(new String[]{"jar1"}), ONE);
+        UnsignedAppletActionEntry r2 = i1.getMatchingItem("c", "d", Arrays.asList(new String[]{}), ONE);
+        UnsignedAppletActionEntry r3 = i1.getMatchingItem("e", "f", Arrays.asList(new String[]{"j1", "j2"}), ONE);
 
         Assert.assertNotNull("r1 should be found", r1);
         checkValues(r1, ExecuteAppletAction.UNSET, ExecuteAppletAction.ALWAYS);
@@ -128,7 +135,7 @@ public class UnsignedAppletActionStorageImplTest {
     @Test
     public void multipleActionsf2() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(ff2);
-        UnsignedAppletActionEntry r1 = i1.getMatchingItem("whatever", "bla", Arrays.asList(new String[]{"jar1", "jar2"}));
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("whatever", "bla", Arrays.asList(new String[]{"jar1", "jar2"}), ONE);
         Assert.assertNotNull("r1 should be found", r1);
         checkValues(r1, ExecuteAppletAction.UNSET, ExecuteAppletAction.UNSET, ExecuteAppletAction.UNSET, ExecuteAppletAction.UNSET, ExecuteAppletAction.UNSET, ExecuteAppletAction.YES);
     }
@@ -136,7 +143,7 @@ public class UnsignedAppletActionStorageImplTest {
     @Test
     public void multipleActionsf1() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(ff1);
-        UnsignedAppletActionEntry r1 = i1.getMatchingItem("bla", "blaBla", Arrays.asList(new String[]{"jar1", "jar2"}));
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("bla", "blaBla", Arrays.asList(new String[]{"jar1", "jar2"}), ONE);
         Assert.assertNotNull("r1 should be found", r1);
         checkValues(r1, ExecuteAppletAction.ALWAYS, ExecuteAppletAction.UNSET, ExecuteAppletAction.NO);
 
@@ -145,7 +152,7 @@ public class UnsignedAppletActionStorageImplTest {
     @Test
     public void wildcards1() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(f3);
-        UnsignedAppletActionEntry r1 = i1.getMatchingItem("http://www.walter-fendt.de/ph14e/inclplane.htm", "http://www.walter-fendt.de/ph14_jar/", Arrays.asList(new String[]{"Ph14English.jar", "SchiefeEbene.jar"}));
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("http://www.walter-fendt.de/ph14e/inclplane.htm", "http://www.walter-fendt.de/ph14_jar/", Arrays.asList(new String[]{"Ph14English.jar", "SchiefeEbene.jar"}), ZERO);
         Assert.assertNotNull("r1 should be found", r1);
         ServerAccess.logOutputReprint(r1.toString());
         checkValues(r1, ExecuteAppletAction.NEVER);
@@ -154,15 +161,15 @@ public class UnsignedAppletActionStorageImplTest {
     @Test
     public void allMatchingDocAndCode() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(f1);
-        UnsignedAppletActionEntry r1 = i1.getMatchingItem("bla", "blaBla", Arrays.asList(new String[]{"jar1", "jar2"}));
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("bla", "blaBla", Arrays.asList(new String[]{"jar1", "jar2"}), ZERO);
         Assert.assertNotNull("r1 should be found", r1);
         checkValues(r1, ExecuteAppletAction.ALWAYS);
-        UnsignedAppletActionEntry r3 = i1.getMatchingItem("blah", "blaBla", Arrays.asList(new String[]{"jar2", "jar1"}));
+        UnsignedAppletActionEntry r3 = i1.getMatchingItem("blah", "blaBla", Arrays.asList(new String[]{"jar2", "jar1"}), ZERO);
         checkValues(r3, ExecuteAppletAction.ALWAYS);
         Assert.assertNotNull("r3 should be found", r3);
-        UnsignedAppletActionEntry r4 = i1.getMatchingItem("blha", "blaBlam", Arrays.asList(new String[]{"jar2", "wrong_jar"}));
+        UnsignedAppletActionEntry r4 = i1.getMatchingItem("blha", "blaBlam", Arrays.asList(new String[]{"jar2", "wrong_jar"}), ZERO);
         Assert.assertNull("r4 should NOT be found", r4);
-        UnsignedAppletActionEntry r5 = i1.getMatchingItem("blaBla", "blaBlaBla", Arrays.asList(new String[]{"jar2"}));
+        UnsignedAppletActionEntry r5 = i1.getMatchingItem("blaBla", "blaBlaBla", Arrays.asList(new String[]{"jar2"}), ZERO);
         Assert.assertNull("r5 should NOT be found", r5);
 
     }
@@ -170,15 +177,15 @@ public class UnsignedAppletActionStorageImplTest {
     @Test
     public void allMatchingDocAndStrictCode() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(f2);
-        UnsignedAppletActionEntry r1 = i1.getMatchingItem("whatever", "bla", Arrays.asList(new String[]{"jar1", "jar2"}));
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("whatever", "bla", Arrays.asList(new String[]{"jar1", "jar2"}), ZERO);
         Assert.assertNotNull("r1 should be found", r1);
         checkValues(r1, ExecuteAppletAction.NEVER);
-        UnsignedAppletActionEntry r3 = i1.getMatchingItem("whatever", null, Arrays.asList(new String[]{"jar2", "jar1"}));
+        UnsignedAppletActionEntry r3 = i1.getMatchingItem("whatever", null, Arrays.asList(new String[]{"jar2", "jar1"}), ZERO);
         Assert.assertNotNull("r3 should be found", r3);
         checkValues(r3, ExecuteAppletAction.NEVER);
-        UnsignedAppletActionEntry r2 = i1.getMatchingItem("bla", "blaBlam", Arrays.asList(new String[]{"jar1", "jar2"}));
+        UnsignedAppletActionEntry r2 = i1.getMatchingItem("bla", "blaBlam", Arrays.asList(new String[]{"jar1", "jar2"}), ZERO);
         Assert.assertNull("r2 should NOT be found", r2);
-        UnsignedAppletActionEntry r4 = i1.getMatchingItem(null, "blaBlam", null);
+        UnsignedAppletActionEntry r4 = i1.getMatchingItem(null, "blaBlam", null, ZERO);
         Assert.assertNull("r4 should NOT be found", r4);
 
     }
@@ -186,23 +193,23 @@ public class UnsignedAppletActionStorageImplTest {
     @Test
     public void allMatchingDocAndCodeWithNulls() {
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(f1);
-        UnsignedAppletActionEntry r1 = i1.getMatchingItem("bla", "blaBla", null);
+        UnsignedAppletActionEntry r1 = i1.getMatchingItem("bla", "blaBla", null, ZERO);
         Assert.assertNotNull("r1 should be found", r1);
         checkValues(r1, ExecuteAppletAction.ALWAYS);
-        UnsignedAppletActionEntry r3 = i1.getMatchingItem("bla", "whatever", null);
+        UnsignedAppletActionEntry r3 = i1.getMatchingItem("bla", "whatever", null, ZERO);
         Assert.assertNotNull("r3 should be found", r3);
         checkValues(r3, ExecuteAppletAction.ALWAYS);
-        UnsignedAppletActionEntry r2 = i1.getMatchingItem("bla", "blaBla", Arrays.asList(new String[]{"jar2", "jar1"}));
+        UnsignedAppletActionEntry r2 = i1.getMatchingItem("bla", "blaBla", Arrays.asList(new String[]{"jar2", "jar1"}), ZERO);
         Assert.assertNotNull("r2 should be found", r2);
         checkValues(r2, ExecuteAppletAction.ALWAYS);
-        UnsignedAppletActionEntry r4 = i1.getMatchingItem("bla", "blaBla", null);
+        UnsignedAppletActionEntry r4 = i1.getMatchingItem("bla", "blaBla", null, ZERO);
         Assert.assertNotNull("r4 should be found", r4);
         checkValues(r2, ExecuteAppletAction.ALWAYS);
-        UnsignedAppletActionEntry r5 = i1.getMatchingItem("", "blaBla", Arrays.asList(new String[]{"jar2", "jar1"}));
+        UnsignedAppletActionEntry r5 = i1.getMatchingItem("", "blaBla", Arrays.asList(new String[]{"jar2", "jar1"}), ZERO);
         Assert.assertNotNull("r5 should be found", r5);
-        UnsignedAppletActionEntry r6 = i1.getMatchingItem(null, null, Arrays.asList(new String[]{"jar2", "jar1"}));
+        UnsignedAppletActionEntry r6 = i1.getMatchingItem(null, null, Arrays.asList(new String[]{"jar2", "jar1"}), ZERO);
         Assert.assertNotNull("r6 should be found", r6);
-        UnsignedAppletActionEntry r7 = i1.getMatchingItem(null, null, Arrays.asList(new String[]{"jar2", "jar11"}));
+        UnsignedAppletActionEntry r7 = i1.getMatchingItem(null, null, Arrays.asList(new String[]{"jar2", "jar11"}), ZERO);
         Assert.assertNull("r7 should NOT be found", r7);
 
     }

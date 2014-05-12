@@ -66,34 +66,38 @@ public interface UnsignedAppletActionStorage {
      * @param documentBase
      * @param codeBase
      * @param archives
+     * @param id of AppletSecurityAction's ExecuteAppletAction to be used for "strong" search
      * @return a matching unsigned applet action entry
      */
-    public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives);
+    public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives, Integer id);
 
     /**
      * Shortcut {@code getMatchingItem(documentBase, null, null, null)}
      *
      * @param documentBase
+     * @param id of AppletSecurityAction's ExecuteAppletAction to be used for "strong" search
      * @return a matching unsigned applet action entry
      */
-    public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase);
+    public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase, Integer id);
 
     /**
      * Shortcut {@code getMatchingItem(null, codeBase, null, null)}
      *
      * @param codeBase
+     * @param id of AppletSecurityAction's ExecuteAppletAction to be used for "strong" search
      * @return a matching unsigned applet action entry
      */
-    public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase);
+    public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase, Integer id);
 
     /**
      * Shortcut {@code getMatchingItem(documentBase, codeBase, null, null)}
      *
      * @param documentBase
      * @param codeBase
+     * @param id of AppletSecurityAction's ExecuteAppletAction to be used for "strong" search
      * @return a matching unsigned applet action entry
      */
-    public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase);
+    public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase, Integer id);
 
     /**
      * Will add new record. Note that regexes are stored for bases matching.

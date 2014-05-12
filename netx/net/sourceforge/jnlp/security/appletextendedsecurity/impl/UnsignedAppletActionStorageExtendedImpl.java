@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityActions;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
@@ -85,11 +86,15 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
                     readContents();
                     for (int i = 0; i < items.size(); i++) {
                         UnsignedAppletActionEntry unsignedAppletActionEntry = items.get(i);
-                        if (unsignedAppletActionEntry.getUnsignedAppletAction() == unsignedAppletAction) {
-                            items.remove(i);
-                            i--;
+                        AppletSecurityActions actions = unsignedAppletActionEntry.getAppletSecurityActions();
+                        for (int j = 0; j < actions.getRealCount(); j++) {
+                            ExecuteAppletAction action = actions.getAction(j);
+                            if (action == unsignedAppletAction) {
+                                items.remove(i);
+                                i--;
+                                break; //actions loop
+                            }
                         }
-
                     }
                     writeContents();
                 } catch (IOException e) {
@@ -156,18 +161,21 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
                     }
 
                     if (columnIndex == 0) {
-                        source.setUnsignedAppletAction((ExecuteAppletAction) aValue);
+                        source.getAppletSecurityActions().setUnsignedAppletAction((ExecuteAppletAction) aValue);
                     }
                     if (columnIndex == 1) {
-                        source.setTimeStamp((Date) aValue);
+                        source.getAppletSecurityActions().setMatchingAlacaAction((ExecuteAppletAction) aValue);
                     }
                     if (columnIndex == 2) {
-                        source.setDocumentBase(new UrlRegEx((String) aValue));
+                        source.setTimeStamp((Date) aValue);
                     }
                     if (columnIndex == 3) {
-                        source.setCodeBase(new UrlRegEx((String) aValue));
+                        source.setDocumentBase(new UrlRegEx((String) aValue));
                     }
                     if (columnIndex == 4) {
+                        source.setCodeBase(new UrlRegEx((String) aValue));
+                    }
+                    if (columnIndex == 5) {
                         source.setArchives(UnsignedAppletActionEntry.createArchivesList((String) aValue));
                     }
 

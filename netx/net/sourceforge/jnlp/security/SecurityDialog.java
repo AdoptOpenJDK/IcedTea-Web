@@ -55,7 +55,7 @@ import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
 import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
 import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
 import net.sourceforge.jnlp.security.dialogs.CertsInfoPane;
-import net.sourceforge.jnlp.security.dialogs.MatchingALACAttributePanel;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.MatchingALACAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MissingALACAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MissingPermissionsAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MoreInfoPane;
@@ -63,6 +63,7 @@ import net.sourceforge.jnlp.security.dialogs.PasswordAuthenticationPane;
 import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.security.dialogs.SingleCertInfoPane;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningDialog;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -325,7 +326,7 @@ public class SecurityDialog extends JDialog {
         else if (dialogType == DialogType.MISSING_ALACA)
             panel = new MissingALACAttributePanel(this, (String) extras[0], (String) extras[1], (String) extras[2]);
         else if (dialogType == DialogType.MATCHING_ALACA)
-            panel = new MatchingALACAttributePanel(this, (String) extras[0], (String) extras[1], (String) extras[2]);
+            panel = AppTrustWarningDialog.matchingAlaca(this, (JNLPFile) extras[0], (String) extras[1], (String) extras[2]);
 
         add(panel, BorderLayout.CENTER);
     }
