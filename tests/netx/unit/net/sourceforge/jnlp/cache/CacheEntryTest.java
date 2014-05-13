@@ -48,6 +48,7 @@ import java.net.URL;
 import java.nio.file.Files;
 
 import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.PropertiesFile;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +65,14 @@ public class CacheEntryTest {
         @Override
         protected File getCacheFile() {
             return cacheFile;
+        }
+        @Override
+        protected PropertiesFile readCacheEntryInfo() {
+            try {
+                return new PropertiesFile(createFile(""));
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
         }
     }
 
@@ -116,7 +125,7 @@ public class CacheEntryTest {
     public void verifyOriginalContentLengthIsSetCorrectly() {
         long ORIGINAL_CONTENT_LENGTH = 1000;
 
-        CacheEntry entry = new CacheEntry(url, version);
+        CacheEntry entry = new TestCacheEntry(url, version, null);
         entry.setOriginalContentLength(ORIGINAL_CONTENT_LENGTH);
 
         assertEquals(ORIGINAL_CONTENT_LENGTH, entry.getOriginalContentLength());
@@ -133,7 +142,7 @@ public class CacheEntryTest {
 
     @Test
     public void verifyNotCachedIfContentLengthsDiffer() throws IOException {
-        File cachedFile = createCacheFile("Foo");
+        File cachedFile = createFile("Foo");
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
         entry.setRemoteContentLength(10000);
@@ -144,7 +153,7 @@ public class CacheEntryTest {
     @Test
     public void verifyCachedIfContentLengthsAreSame() throws IOException {
         String contents = "Foo";
-        File cachedFile = createCacheFile(contents);
+        File cachedFile = createFile(contents);
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
         entry.setRemoteContentLength(contents.length());
@@ -156,7 +165,7 @@ public class CacheEntryTest {
     public void verifyCachedIfOriginalContentLengthsAreSame() throws IOException {
         String contents = "FooDECOMPRESSED";
         long compressedLength = 5;
-        File cachedFile = createCacheFile(contents);
+        File cachedFile = createFile(contents);
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
         entry.setRemoteContentLength(compressedLength);
@@ -169,7 +178,7 @@ public class CacheEntryTest {
     public void verifyCurrentWhenCacheEntryHasSameTimeStamp() throws IOException {
         long lastModified = 10;
         String contents = "Foo";
-        File cachedFile = createCacheFile(contents);
+        File cachedFile = createFile(contents);
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
         entry.setRemoteContentLength(contents.length());
@@ -183,7 +192,7 @@ public class CacheEntryTest {
         long oldTimeStamp = 10;
         long newTimeStamp = 100;
         String contents = "Foo";
-        File cachedFile = createCacheFile(contents);
+        File cachedFile = createFile(contents);
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
         entry.setRemoteContentLength(contents.length());
@@ -192,7 +201,7 @@ public class CacheEntryTest {
         assertFalse(entry.isCurrent(newTimeStamp));
     }
 
-    protected File createCacheFile(String contents) throws IOException {
+    private static File createFile(String contents) throws IOException {
         File cachedFile = File.createTempFile("CacheEntryTest", null);
         Files.write(cachedFile.toPath(), contents.getBytes());
         cachedFile.deleteOnExit();

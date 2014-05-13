@@ -60,10 +60,17 @@ public class CacheEntry {
         this.location = location;
         this.version = version;
 
+        this.properties = readCacheEntryInfo();
+    }
+
+    /**
+     * Seam for testing
+     */
+    PropertiesFile readCacheEntryInfo() {
         File infoFile = CacheUtil.getCacheFile(location, version);
         infoFile = new File(infoFile.getPath() + ".info"); // replace with something that can't be clobbered
 
-        properties = new PropertiesFile(infoFile, R("CAutoGen"));
+        return new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
     /**

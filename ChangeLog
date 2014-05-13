@@ -1,3 +1,15 @@
+2014-05-13  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java
+	(readCacheEntryInfo): New method.
+	(CacheEntry): Call readCacheEntryInfo to get properties.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheEntryTest.java
+	(readCacheEntryInfo): New method.
+	(createCacheFile): Rename to ...
+	(createFile): New method. Adjust all callers.
+	(verifyOriginalContentLengthIsSetCorrectly): Create instances of
+	TestCacheEntry, not CacheEntry.
+
 2014-05-12  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: Add
