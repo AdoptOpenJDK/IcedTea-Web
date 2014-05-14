@@ -25,17 +25,24 @@
 
 package net.sourceforge.jnlp.tools;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.CodeSigner;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.SignatureException;
 import java.security.Timestamp;
 import java.security.cert.CertPath;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 
 import sun.security.x509.AlgorithmId;
-import sun.security.x509.CertAndKeyGen;
 import sun.security.x509.CertificateAlgorithmId;
 import sun.security.x509.CertificateIssuerName;
 import sun.security.x509.CertificateSerialNumber;
@@ -72,13 +79,10 @@ public class CodeSignerCreator {
         // KeyTool#doGenKeyPair
         X500Name x500Name = new X500Name(dname);
 
-        CertAndKeyGen keypair = new CertAndKeyGen(keyAlgName, sigAlgName);
+        KeyPair keyPair = new KeyPair(keyAlgName, sigAlgName, keysize);
+        PrivateKey privKey = keyPair.getPrivateKey();
 
-        keypair.generate(keysize);
-        PrivateKey privKey = keypair.getPrivateKey();
-
-        X509Certificate oldCert = keypair.getSelfCertificate(x500Name,
-                notBefore, validity * 24L * 60L * 60L);
+        X509Certificate oldCert = keyPair.getSelfCertificate(x500Name, notBefore, validity);
 
         // KeyTool#doSelfCert
         byte[] encoded = oldCert.getEncoded();
@@ -141,5 +145,71 @@ public class CodeSignerCreator {
         CertPath certPath = cf.generateCertPath(certs);
         Timestamp certTimestamp = new Timestamp(jarEntryCert.getNotBefore(), certPath);
         return new CodeSigner(certPath, certTimestamp);
+    }
+
+    /**
+     * A wrapper over JDK-internal CertAndKeyGen Class.
+     * <p>
+     * This is an internal class whose package changed between OpenJDK 7 and 8.
+     * Use reflection to access the right thing.
+     */
+    public static class KeyPair {
+
+        private /* CertAndKeyGen */ Object keyPair;
+
+        public KeyPair(String keyAlgName, String sigAlgName, int keySize) throws NoSuchAlgorithmException, InvalidKeyException {
+            try {
+                // keyPair = new CertAndKeyGen(keyAlgName, sigAlgName);
+                Class<?> certAndKeyGenClass = Class.forName(getCertAndKeyGenClass());
+                Constructor<?> constructor = certAndKeyGenClass.getDeclaredConstructor(String.class, String.class);
+                keyPair = constructor.newInstance(keyAlgName, sigAlgName);
+
+                // keyPair.generate(keySize);
+                Method generate = certAndKeyGenClass.getMethod("generate", int.class);
+                generate.invoke(keyPair, keySize);
+            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException |
+                    IllegalAccessException | IllegalArgumentException | InvocationTargetException certAndKeyGenClassError) {
+                throw new AssertionError("Unable to use CertAndKeyGen class", certAndKeyGenClassError);
+            }
+        }
+
+        public PrivateKey getPrivateKey() {
+            try {
+                // return keyPair.getPrivateKey();
+                Class<?> klass = keyPair.getClass();
+                Method method = klass.getMethod("getPrivateKey");
+                return (PrivateKey) method.invoke(keyPair);
+            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException error) {
+                throw new AssertionError(error);
+            }
+        }
+
+        public X509Certificate getSelfCertificate(X500Name name, Date notBefore, long validityInDays)
+                throws InvalidKeyException, CertificateException, SignatureException,
+                NoSuchAlgorithmException, NoSuchProviderException {
+            try {
+                // return keyPair.getSelfCertificate(name, notBefore, validityInDays * 24L * 60L * 60L);
+                Class<?> klass = keyPair.getClass();
+                Method method = klass.getMethod("getSelfCertificate", X500Name.class, Date.class, long.class);
+                return (X509Certificate) method.invoke(keyPair, name, notBefore, validityInDays * 24L * 60L * 60L);
+            } catch (InvocationTargetException ite) {
+                throw new RuntimeException(ite.getCause());
+            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException error) {
+                throw new AssertionError(error);
+            }
+        }
+
+        private String getCertAndKeyGenClass() {
+            String javaVersion = System.getProperty("java.version");
+            String className = null;
+            if (javaVersion.startsWith("1.7")) {
+                className = "sun.security.x509.CertAndKeyGen";
+            } else if (javaVersion.startsWith("1.8")) {
+                className = "sun.security.tools.keytool.CertAndKeyGen";
+            } else {
+                throw new AssertionError("Unrecognized Java Version");
+            }
+            return className;
+        }
     }
 }

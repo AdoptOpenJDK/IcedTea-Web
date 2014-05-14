@@ -1,5 +1,11 @@
 2014-05-14  Omair Majid  <omajid@redhat.com>
 
+	* tests/test-extensions/net/sourceforge/jnlp/tools/CodeSignerCreator.java
+	(KeyPair): New class.
+	(createCert): Use KeyPair.
+
+2014-05-14  Omair Majid  <omajid@redhat.com>
+
 	* netx/net/sourceforge/jnlp/JNLPFile.java
 	(JNLPFile(InputStream,ParserSettings))
 	(JNLPFile(InputStream,URL,ParserSettings)): Remove incorrect @throws
