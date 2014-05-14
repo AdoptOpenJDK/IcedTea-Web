@@ -39,7 +39,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 /**
  * XMLElement is a representation of an XML object. The object is able to parse
  * XML code.
- * <p><dl>
+ * <dl>
  * <dt><b>Parsing XML Data</b></dt>
  * <dd>
  * You can parse XML data using the following code:
@@ -83,7 +83,6 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * {@link #createAnotherElement() createAnotherElement}
  * which has to return a new copy of the receiver.
  * </dd></dl>
- * </p>
  *
  * @see net.sourceforge.nanoxml.XMLParseException
  *
@@ -178,7 +177,8 @@ public class XMLElement {
     private boolean ignoreWhitespace;
 
     /**
-     * Character read too much.<br/>
+     * Character read too much.
+     * <p>
      * This character provides push-back functionality to the input reader
      * without having to use a PushbackReader.
      * If there is no such character, this field is {@code '\0'}.
@@ -210,7 +210,8 @@ public class XMLElement {
     private int parserLineNr;
 
     /**
-     * Creates and initializes a new XML element.<br/>
+     * Creates and initializes a new XML element.
+     * <p>
      * Calling the construction is equivalent to:
      * <ul><li>{@code new XMLElement(new Hashtable(), false, true)}</li></ul>
      *
@@ -400,7 +401,8 @@ public class XMLElement {
     }
 
     /**
-     * Returns an attribute of the element.<br/>
+     * Returns an attribute of the element.
+     * <p>
      * If the attribute doesn't exist, {@code null} is returned.
      *
      * @param name The name of the attribute.
@@ -535,7 +537,7 @@ public class XMLElement {
      *     The new name.
      *
      * <dl><dt><b>Preconditions:</b></dt><dd>
-     * <ul><li{@code name != null}</li>
+     * <ul><li>{@code name != null}</li>
      *     <li>{@code name} is a valid XML identifier</li>
      * </ul></dd></dl>
      */
@@ -597,7 +599,8 @@ public class XMLElement {
     }
 
     /**
-     * This method scans an identifier from the current reader.<br/>
+     * This method scans an identifier from the current reader.
+     * <p>
      * The scanned whitespace is appended to {@code result}.
      *
      * @return the next character following the whitespace.
@@ -625,7 +628,8 @@ public class XMLElement {
     }
 
     /**
-     * This method scans a delimited string from the current reader.<br/>
+     * This method scans a delimited string from the current reader.
+     * <p>
      * The scanned string without delimiters is appended to {@code string}.
      *
      * <dl><dt><b>Preconditions:</b></dt><dd>
@@ -653,8 +657,10 @@ public class XMLElement {
 
     /**
      * Scans a {@code #PCDATA} element. CDATA sections and entities are
-     * resolved.<br/>
-     * The next &lt; char is skipped.<br/>
+     * resolved.
+     * <p>
+     * The next &lt; char is skipped.
+     * <p>
      * The scanned data is appended to {@code data}.
      *
      * <dl><dt><b>Preconditions:</b></dt><dd>
@@ -831,7 +837,8 @@ public class XMLElement {
     }
 
     /**
-     * Scans the data for literal text.<br/>
+     * Scans the data for literal text.
+     * <p>
      * Scanning stops when a character does not match or after the complete
      * text has been checked, whichever comes first.
      *
@@ -985,7 +992,8 @@ public class XMLElement {
     }
 
     /**
-     * Resolves an entity. The name of the entity is read from the reader.<br/>
+     * Resolves an entity. The name of the entity is read from the reader.
+     * <p>
      * The value of the entity is appended to {@code buf}.
      *
      * @param buf Where to put the entity value.

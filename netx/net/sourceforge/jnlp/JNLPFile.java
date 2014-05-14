@@ -267,7 +267,6 @@ public class JNLPFile {
     /**
      * Create a JNLPFile from an input stream.
      *
-     * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(InputStream input, ParserSettings settings) throws ParseException {
@@ -281,7 +280,6 @@ public class JNLPFile {
      * @param input input stream of JNLP file.
      * @param codebase codebase to use if not specified in JNLP file..
      * @param settings the {@link ParserSettings} to use when parsing
-     * @throws IOException if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(InputStream input, URL codebase, ParserSettings settings) throws ParseException {

@@ -394,7 +394,6 @@ public final class FileUtils {
     /**
      * Show a dialog informing the user that the file could not be opened
      * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param filePath a {@link String} representing the path to the file we failed to open
      * @param message a {@link String} giving the specific reason the file could not be opened
      */
     public static void showCouldNotOpenDialog(final Component frame, final String message) {

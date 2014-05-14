@@ -90,7 +90,7 @@ public class SecurityDesc {
          * The HTML permission level corresponding to the given String. If null is given, null comes
          * back. If there is no permission level that can be granted in HTML matching the given String,
          * null is also returned.
-         * @param jnlpString the JNLP permission String
+         * @param htmlString the JNLP permission String
          * @return the matching RequestedPermissionLevel
          */
         public RequestedPermissionLevel fromHtmlString(final String htmlString) {

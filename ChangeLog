@@ -1,3 +1,16 @@
+2014-05-14  Omair Majid  <omajid@redhat.com>
+
+	* netx/net/sourceforge/jnlp/JNLPFile.java
+	(JNLPFile(InputStream,ParserSettings))
+	(JNLPFile(InputStream,URL,ParserSettings)): Remove incorrect @throws
+	IOException in javadoc.
+	* netx/net/sourceforge/jnlp/SecurityDesc.java
+	(fromHtmlString): Fix param name in javadoc.
+	* netx/net/sourceforge/jnlp/util/FileUtils.java
+	(showCouldNotOpenDialog): Remove incorrect @param filePath from javadoc.
+	* netx/net/sourceforge/nanoxml/XMLParseException.java,
+	* netx/net/sourceforge/nanoxml/XMLElement.java: Replace <br/> with <p>.
+
 2014-05-14  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/Resource.java: (Status) new enum

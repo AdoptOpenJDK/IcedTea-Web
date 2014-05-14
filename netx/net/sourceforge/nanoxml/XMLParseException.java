@@ -32,7 +32,8 @@ package net.sourceforge.nanoxml;
  * An XMLParseException is thrown when an error occures while parsing an XML
  * string.
  * <p>
- * $Revision: 1.1 $<br/>
+ * $Revision: 1.1 $</p>
+ * <p>
  * $Date: 2002/08/03 04:05:32 $</p>
  *
  * @see net.sourceforge.nanoxml.XMLElement
