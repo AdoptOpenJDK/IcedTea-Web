@@ -16,14 +16,14 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.File;
+import java.net.URL;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
 
-import net.sourceforge.jnlp.*;
-import net.sourceforge.jnlp.runtime.*;
-import net.sourceforge.jnlp.util.*;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.WeakList;
 
 /**
  * <p>
@@ -51,25 +51,26 @@ public class Resource {
     // todo: IIRC, any resource is checked for being up-to-date
     // only once, regardless of UpdatePolicy.  verify and fix.
 
-    /** status bits */
-    public static final int UNINITIALIZED = 0;
-    public static final int CONNECT = 1;
-    public static final int CONNECTING = 2;
-    public static final int CONNECTED = 4;
-    public static final int DOWNLOAD = 8;
-    public static final int DOWNLOADING = 16;
-    public static final int DOWNLOADED = 32;
-    public static final int ERROR = 64;
-    public static final int STARTED = 128; // enqueued or being worked on
+    public enum Status {
+        CONNECT,
+        CONNECTING,
+        CONNECTED,
+        DOWNLOAD,
+        DOWNLOADING,
+        DOWNLOADED,
+        ERROR,
+        STARTED // enqueued or being worked on
+    }
+
 
     /** list of weak references of resources currently in use */
-    private static WeakList<Resource> resources = new WeakList<Resource>();
+    private static final WeakList<Resource> resources = new WeakList<>();
 
     /** weak list of trackers monitoring this resource */
-    private WeakList<ResourceTracker> trackers = new WeakList<ResourceTracker>();
+    private final WeakList<ResourceTracker> trackers = new WeakList<>();
 
     /** the remote location of the resource */
-    URL location;
+    final URL location;
 
     /** the location to use when downloading */
     private URL downloadLocation;
@@ -78,22 +79,22 @@ public class Resource {
     File localFile;
 
     /** the requested version */
-    Version requestVersion;
+    final Version requestVersion;
 
     /** the version downloaded from server */
     Version downloadVersion;
 
     /** amount in bytes transferred */
-    long transferred = 0;
+    volatile long transferred = 0;
 
     /** total size of the resource, or -1 if unknown */
-    long size = -1;
+    volatile long size = -1;
 
     /** the status of the resource */
-    int status = UNINITIALIZED;
+    final EnumSet<Status> status = EnumSet.noneOf(Status.class);
 
     /** Update policy for this resource */
-    UpdatePolicy updatePolicy;
+    final UpdatePolicy updatePolicy;
 
     /**
      * Create a resource.
@@ -118,8 +119,9 @@ public class Resource {
             int index = resources.indexOf(resource);
             if (index >= 0) { // return existing object
                 Resource result = resources.get(index);
-                if (result != null)
+                if (result != null) {
                     return result;
+                }
             }
 
             resources.add(resource);
@@ -161,21 +163,34 @@ public class Resource {
     ResourceTracker getTracker() {
         synchronized (trackers) {
             List<ResourceTracker> t = trackers.hardList();
-            if (t.size() > 0)
+            if (t.size() > 0) {
                 return t.get(0);
+            }
 
             return null;
         }
     }
 
     /**
-     * Returns true if any of the specified flags are set.
+     * Check if the specified flag is set.
+     * @param flag a status flag
+     * @return true iff the flag is set
      */
-    public boolean isSet(int flag) {
-        if (flag == UNINITIALIZED)
-            return status == UNINITIALIZED;
-        else
-            return (status & flag) != 0;
+    public boolean isSet(Status flag) {
+        synchronized (status) {
+            return status.contains(flag);
+        }
+    }
+
+    /**
+     * Check if all the specified flags are set.
+     * @param flags a collection of flags
+     * @return true iff all the flags are set
+     */
+    public boolean hasFlags(Collection<Status> flags) {
+        synchronized (status) {
+            return status.containsAll(flags);
+        }
     }
 
     /**
@@ -190,55 +205,85 @@ public class Resource {
     /**
      * Returns a human-readable status string.
      */
-    private String getStatusString(int flag) {
-        StringBuffer result = new StringBuffer();
+    private String getStatusString() {
+        StringBuilder result = new StringBuilder();
 
-        if (flag == 0)
-            result.append("<> ");
-        if ((flag & CONNECT) != 0)
-            result.append("CONNECT ");
-        if ((flag & CONNECTING) != 0)
-            result.append("CONNECTING ");
-        if ((flag & CONNECTED) != 0)
-            result.append("CONNECTED ");
-        if ((flag & DOWNLOAD) != 0)
-            result.append("DOWNLOAD ");
-        if ((flag & DOWNLOADING) != 0)
-            result.append("DOWNLOADING ");
-        if ((flag & DOWNLOADED) != 0)
-            result.append("DOWNLOADED ");
-        if ((flag & ERROR) != 0)
-            result.append("ERROR ");
-        if ((flag & STARTED) != 0)
-            result.append("STARTED ");
+        synchronized (status) {
+            if (status.isEmpty()) {
+                return "<>";
+            }
+            for (Status stat : status) {
+                result.append(stat.toString()).append(" ");
+            }
+        }
 
-        return result.deleteCharAt(result.length() - 1).toString();
+        return result.toString().trim();
     }
 
     /**
      * Changes the status by clearing the flags in the first
      * parameter and setting the flags in the second.  This method
      * is synchronized on this resource.
+     * @param clear a collection of status flags to unset
+     * @param add a collection of status flags to set
      */
-    public void changeStatus(int clear, int add) {
-        int orig = 0;
-
-        synchronized (this) {
-            orig = status;
-
-            this.status &= ~clear;
-            this.status |= add;
+    public void changeStatus(Collection<Status> clear, Collection<Status> add) {
+        synchronized (status) {
+            if (clear != null) {
+                status.removeAll(clear);
+            }
+            if (add != null) {
+                status.addAll(add);
+            }
         }
+    }
 
-           if (status != orig) {
-            OutputController.getLogger().log("Status: " + getStatusString(status));
-            if ((status & ~orig) != 0) {
-                OutputController.getLogger().log(" +(" + getStatusString(status & ~orig) + ")");
-            }
-            if ((~status & orig) != 0) {
-                OutputController.getLogger().log(" -(" + getStatusString(~status & orig) + ")");
-            }
-            OutputController.getLogger().log(" @ " + location.getPath());
+    /**
+     * Set status flag
+     * @param flag a flag to set
+     */
+    public void setStatusFlag(Status flag) {
+        synchronized (status) {
+            status.add(flag);
+        }
+    }
+
+    /**
+     * Set flags
+     * @param flags a collection of flags to set
+     */
+    public void setStatusFlags(Collection<Status> flags) {
+        synchronized (status) {
+            status.addAll(flags);
+        }
+    }
+
+    /**
+     * Unset flags
+     * @param flags a collection of flags to unset
+     */
+    public void unsetStatusFlag(Collection<Status> flags) {
+        synchronized (status) {
+            status.removeAll(flags);
+        }
+    }
+
+    /**
+     * Clear all flags
+     */
+    public void resetStatus() {
+        synchronized (status) {
+            status.clear();
+        }
+    }
+
+    /**
+     * Check if this resource has been initialized
+     * @return true iff any flags have been set
+     */
+    public boolean isInitialized() {
+        synchronized (status) {
+            return !status.isEmpty();
         }
     }
 
@@ -284,6 +329,16 @@ public class Resource {
         }
     }
 
+    @Override
+    public int hashCode() {
+        // FIXME: should probably have a better hashcode than this, but considering
+        // #equals(Object) was already defined first (without also overriding hashcode!),
+        // this is just being implemented in line with that so we don't break HashMaps,
+        // HashSets, etc
+        return location.hashCode();
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other instanceof Resource) {
             // this prevents the URL handler from looking up the IP
@@ -296,8 +351,9 @@ public class Resource {
         return false;
     }
 
+    @Override
     public String toString() {
-        return "location=" + location.toString() + " state=" + getStatusString(status);
+        return "location=" + location.toString() + " state=" + getStatusString();
     }
 
 }

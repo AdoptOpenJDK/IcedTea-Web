@@ -37,64 +37,55 @@
 
 package net.sourceforge.jnlp.cache;
 
-import java.util.Arrays;
+import static net.sourceforge.jnlp.cache.Resource.Status.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.EnumSet;
+
 import net.sourceforge.jnlp.Version;
 
-import org.junit.AfterClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
 public class ResourceTest {
-
-    private static final int UNINITIALIZED = Resource.UNINITIALIZED;
-    private static final int CONNECT = Resource.CONNECT;
-    private static final int CONNECTING = Resource.CONNECTING;
-    private static final int CONNECTED = Resource.CONNECTED;
-    private static final int DOWNLOAD = Resource.DOWNLOAD;
-    private static final int DOWNLOADING = Resource.DOWNLOADING;
-    private static final int DOWNLOADED = Resource.DOWNLOADED;
-    private static final int ERROR = Resource.ERROR;
-    private static final int STARTED = Resource.STARTED;
 
     @Test
     public void testNewResourceIsUninitialized() throws Exception {
         Resource res = createResource("NewResource");
-        assertTrue("Resource should not have had any status flags set", hasFlag(res, UNINITIALIZED));
+        assertTrue("Resource should not have had any status flags set", isUninitialized(res));
     }
 
     @Test
     public void testSetFlag() throws Exception {
         Resource res = createResource("SetFlag");
-        setStatus(res, Arrays.asList(Integer.valueOf(CONNECT)));
-        assertFalse("Resource should have been initialized", hasFlag(res, UNINITIALIZED));
+        setStatus(res, EnumSet.of(CONNECT));
+        assertFalse("Resource should have been initialized", isUninitialized(res));
         assertTrue("Resource should have had CONNECT set", hasFlag(res, CONNECT));
-        assertTrue("Resource should have only had CONNECT set", hasOnly(res, Arrays.asList(Integer.valueOf(CONNECT))));
+        assertTrue("Resource should have only had CONNECT set", hasOnly(res, EnumSet.of(CONNECT)));
     }
 
     @Test
     public void testSetMultipleFlags() throws Exception {
         Resource res = createResource("SetFlags");
-        setStatus(res, Arrays.asList(Integer.valueOf(CONNECT), Integer.valueOf(DOWNLOAD)));
-        assertFalse("Resource should have been initialized", hasFlag(res, UNINITIALIZED));
+        setStatus(res, EnumSet.of(CONNECT, DOWNLOAD));
+        assertFalse("Resource should have been initialized", isUninitialized(res));
         assertTrue("Resource should have had CONNECT set", hasFlag(res, CONNECT));
         assertTrue("Resource should have had DOWNLOAD set", hasFlag(res, DOWNLOAD));
-        assertTrue("Resource should have only had CONNECT and DOWNLOAD set", hasOnly(res, Arrays.asList(Integer.valueOf(CONNECT), Integer.valueOf(DOWNLOAD))));
+        assertTrue("Resource should have only had CONNECT and DOWNLOAD set", hasOnly(res, EnumSet.of(CONNECT, DOWNLOAD)));
     }
 
     @Test
     public void testChangeStatus() throws Exception {
         Resource res = createResource("ChangeStatus");
-        setStatus(res, Arrays.asList(Integer.valueOf(CONNECT)));
+        setStatus(res, EnumSet.of(CONNECT));
         assertTrue("Resource should have had CONNECT set", hasFlag(res, CONNECT));
-        assertTrue("Resource should have only had CONNECT set", hasOnly(res, Arrays.asList(Integer.valueOf(CONNECT))));
+        assertTrue("Resource should have only had CONNECT set", hasOnly(res, EnumSet.of(CONNECT)));
 
-        Collection<Integer> downloadFlags = Arrays.asList(DOWNLOAD, DOWNLOADING, DOWNLOADED);
-        Collection<Integer> connectFlags = Arrays.asList(CONNECT, CONNECTING, CONNECTED);
+        Collection<Resource.Status> downloadFlags = EnumSet.of(DOWNLOAD, DOWNLOADING, DOWNLOADED);
+        Collection<Resource.Status> connectFlags = EnumSet.of(CONNECT, CONNECTING, CONNECTED);
         changeStatus(res, connectFlags, downloadFlags);
 
         assertTrue("Resource should have had DOWNLOAD set", hasFlag(res, DOWNLOAD));
@@ -109,33 +100,34 @@ public class ResourceTest {
         return Resource.getResource(dummyUrl, new Version("1.0"), UpdatePolicy.ALWAYS);
     }
 
-    private static void setStatus(Resource resource, Collection<Integer> flags) {
-        for (Integer flag : flags) {
-            resource.status = resource.status | flag;
-        }
+    private static void setStatus(Resource resource, Collection<Resource.Status> flags) {
+        resource.setStatusFlags(flags);
     }
 
-    private static void changeStatus(Resource resource, Collection<Integer> clear, Collection<Integer> add) {
-        int setMask = 0, unsetMask = 0;
-        for (Integer setFlag : add) {
-            setMask = setMask | setFlag;
-        }
-        for (Integer unsetFlag : clear) {
-            unsetMask = unsetMask | unsetFlag;
-        }
-        resource.changeStatus(unsetMask, setMask);
+    private static void changeStatus(Resource resource, Collection<Resource.Status> clear, Collection<Resource.Status> add) {
+        resource.changeStatus(clear, add);
     }
 
-    private static boolean hasOnly(Resource resource, Collection<Integer> flags) {
-        int mask = 0;
-        for (Integer flag : flags) {
-            mask = mask | flag;
+    private static boolean hasOnly(Resource resource, Collection<Resource.Status> flags) {
+        for (final Resource.Status flag : flags) { // ensure all the specified flags are set
+            if (!resource.isSet(flag)) {
+                return false;
+            }
         }
-        return (resource.status ^ mask) == 0;
+        for (final Resource.Status flag : Resource.Status.values()) { // ensure all other flags are unset
+            if (resource.isSet(flag) && !flags.contains(flag)) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    private static boolean hasFlag(Resource resource, int flag) {
+    private static boolean hasFlag(Resource resource, Resource.Status flag) {
         return resource.isSet(flag);
+    }
+
+    private static boolean isUninitialized(Resource resource) {
+        return !resource.isInitialized();
     }
 
 }

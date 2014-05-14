@@ -36,6 +36,13 @@
  */
 package net.sourceforge.jnlp.cache;
 
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECT;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
+import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -46,14 +53,17 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -69,27 +79,37 @@ public class ResourceTrackerTest {
     private static final String nameStub2 = "test-file";
 
     @Test
-    public void testSelectByFlag() throws Exception {
+    public void testSelectByStatus() throws Exception {
         Resource connectedResource = Resource.getResource(new URL("http://example.com/connected.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
-        connectedResource.status = Resource.CONNECTED | Resource.DOWNLOADING;
+        connectedResource.setStatusFlags(EnumSet.of(CONNECTED, DOWNLOADING));
         Resource erroredResource = Resource.getResource(new URL("http://example.com/errored.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
-        erroredResource.status = Resource.ERROR | Resource.CONNECT;
+        erroredResource.setStatusFlags(EnumSet.of(ERROR, CONNECT));
         Resource downloadingResource = Resource.getResource(new URL("http://example.com/downloading.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
-        downloadingResource.status = Resource.DOWNLOADING;
+        downloadingResource.setStatusFlag(DOWNLOADING);
         Resource uninitializedResource = Resource.getResource(new URL("http://example.com/uninitialized.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
         List<Resource> source = Arrays.asList(connectedResource, erroredResource, downloadingResource, uninitializedResource);
 
-        Resource result1 = ResourceTracker.selectByFlag(source, Resource.CONNECT | Resource.CONNECTING | Resource.CONNECTED, Resource.ERROR);
-        Resource result2 = ResourceTracker.selectByFlag(source, Resource.DOWNLOADING, Resource.CONNECTED);
-        Resource result3 = ResourceTracker.selectByFlag(source, Resource.DOWNLOADED, Resource.UNINITIALIZED);
-        Resource result4 = ResourceTracker.selectByFlag(source, Resource.UNINITIALIZED, Integer.MAX_VALUE);
-        Resource result5 = ResourceTracker.selectByFlag(source, Resource.CONNECT | Resource.CONNECTING | Resource.CONNECTED, Resource.DOWNLOADING);
+        Resource result1 = ResourceTracker.selectByStatus(source, EnumSet.of(CONNECT, CONNECTING, CONNECTED), EnumSet.of(ERROR));
+        Resource result2 = ResourceTracker.selectByStatus(source, DOWNLOADING, CONNECTED);
+        Resource result3 = ResourceTracker.selectByFilter(source, new ResourceTracker.Filter<Resource>() {
+            @Override
+            public boolean test(Resource t) {
+                return t.isSet(DOWNLOADED) && t.isInitialized();
+            }
+        });
+        Resource result4 = ResourceTracker.selectByFilter(source, new ResourceTracker.Filter<Resource>() {
+            @Override
+            public boolean test(Resource t) {
+                return !t.isInitialized();
+            }
+        });
+        Resource result5 = ResourceTracker.selectByStatus(source, EnumSet.of(CONNECT, CONNECTING, CONNECTED), EnumSet.of(DOWNLOADING));
 
-        Assert.assertEquals(connectedResource, result1);
-        Assert.assertEquals(downloadingResource, result2);
+        Assert.assertEquals("result1 should be connected resource", connectedResource, result1);
+        Assert.assertEquals("result2 should be downloading resource", downloadingResource, result2);
         Assert.assertNull("Result 3 should have been null", result3);
-        Assert.assertEquals(uninitializedResource, result4);
-        Assert.assertEquals(erroredResource, result5);
+        Assert.assertEquals("result4 should be uninitialized resource", uninitializedResource, result4);
+        Assert.assertEquals("result5 should be errored resource", erroredResource, result5);
     }
 
     @Test

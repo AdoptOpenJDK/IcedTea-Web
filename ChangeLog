@@ -1,3 +1,20 @@
+2014-05-14  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/Resource.java: (Status) new enum
+	replacing int bitfield statuses. (transferred, size) made volatile for
+	atomic read/write. (isSet, getStatusString, changeStatus) refactored for
+	Status enum. (hasFlags, setStatusFlag, setStatusFlags, unsetStatusFlag,
+	resetStatus, isInitialized) new methods. (hashCode) newly overridden since
+	equals was already overridden.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: all references to
+	Resource int bitfield status refactored. (selectByFilter) new method since
+	UNINITIALIZED is no longer an actual flag in Resource Status, allows for
+	filtering by uninitialized resources anyway.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTest.java: refactored
+	for Status enum
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:
+	refactored for Status enum and selectByFilter
+
 2014-05-13  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/cache/CacheEntry.java

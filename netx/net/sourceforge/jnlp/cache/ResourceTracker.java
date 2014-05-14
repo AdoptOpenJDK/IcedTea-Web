@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp.cache;
 
+import static net.sourceforge.jnlp.cache.Resource.Status.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -31,6 +33,8 @@ import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +50,9 @@ import net.sourceforge.jnlp.event.DownloadEvent;
 import net.sourceforge.jnlp.event.DownloadListener;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.HttpUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This class tracks the downloading of various resources of a
@@ -103,17 +107,6 @@ public class ResourceTracker {
 
     /** notified on initialization or download of a resource */
     private static final Object lock = new Object(); // used to lock static structures
-
-    // shortcuts
-    private static final int UNINITIALIZED = Resource.UNINITIALIZED;
-    private static final int CONNECT = Resource.CONNECT;
-    private static final int CONNECTING = Resource.CONNECTING;
-    private static final int CONNECTED = Resource.CONNECTED;
-    private static final int DOWNLOAD = Resource.DOWNLOAD;
-    private static final int DOWNLOADING = Resource.DOWNLOADING;
-    private static final int DOWNLOADED = Resource.DOWNLOADED;
-    private static final int ERROR = Resource.ERROR;
-    private static final int STARTED = Resource.STARTED;
 
     /** max threads */
     private static final int maxThreads = 5;
@@ -251,7 +244,7 @@ public class ResourceTracker {
             // they will just 'pass through' the tracker as if they were
             // never added (for example, not affecting the total download size).
             synchronized (resource) {
-                resource.changeStatus(0, DOWNLOADED | CONNECTED | STARTED);
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, STARTED));
             }
             fireDownloadEvent(resource);
             return true;
@@ -267,7 +260,7 @@ public class ResourceTracker {
                     resource.localFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion);
                     resource.size = resource.localFile.length();
                     resource.transferred = resource.localFile.length();
-                    resource.changeStatus(0, DOWNLOADED | CONNECTED | STARTED);
+                    resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, STARTED));
                 }
                 fireDownloadEvent(resource);
                 return true;
@@ -276,7 +269,7 @@ public class ResourceTracker {
 
         if (updatePolicy == UpdatePolicy.FORCE) { // ALWAYS update
             // When we are "always" updating, we update for each instance. Reset resource status.
-            resource.changeStatus(Integer.MAX_VALUE, 0);
+            resource.resetStatus();
         }
 
         // may or may not be cached, but check update when connection
@@ -322,18 +315,18 @@ public class ResourceTracker {
             l = listeners.toArray(new DownloadListener[0]);
         }
 
-        int status;
+        Collection<Resource.Status> status;
         synchronized (resource) {
             status = resource.status;
         }
 
         DownloadEvent event = new DownloadEvent(this, resource);
         for (DownloadListener dl : l) {
-            if (0 != ((ERROR | DOWNLOADED) & status))
+            if (status.contains(ERROR) || status.contains(DOWNLOADED))
                 dl.downloadCompleted(event);
-            else if (0 != (DOWNLOADING & status))
+            else if (status.contains(DOWNLOADING))
                 dl.downloadStarted(event);
-            else if (0 != (CONNECTING & status))
+            else if (status.contains(CONNECTING))
                 dl.updateStarted(event);
         }
     }
@@ -382,7 +375,7 @@ public class ResourceTracker {
     public File getCacheFile(URL location) {
         try {
             Resource resource = getResource(location);
-            if (!resource.isSet(DOWNLOADED | ERROR))
+            if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR)))
                 waitForResource(location, 0);
 
             if (resource.isSet(ERROR))
@@ -420,7 +413,7 @@ public class ResourceTracker {
     public InputStream getInputStream(URL location) throws IOException {
         try {
             Resource resource = getResource(location);
-            if (!resource.isSet(DOWNLOADED | ERROR))
+            if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR)))
                 waitForResource(location, 0);
 
             if (resource.localFile != null)
@@ -491,7 +484,8 @@ public class ResourceTracker {
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean checkResource(URL location) {
-        return getResource(location).isSet(DOWNLOADED | ERROR); // isSet atomic
+        Resource resource = getResource(location);
+        return resource.isSet(DOWNLOADED) || resource.isSet(ERROR);
     }
 
     /**
@@ -526,12 +520,12 @@ public class ResourceTracker {
 
             enqueue = !resource.isSet(STARTED);
 
-            if (!resource.isSet(CONNECTED | CONNECTING))
-                resource.changeStatus(0, CONNECT | STARTED);
-            if (!resource.isSet(DOWNLOADED | DOWNLOADING))
-                resource.changeStatus(0, DOWNLOAD | STARTED);
+            if (!(resource.isSet(CONNECTED) || resource.isSet(CONNECTING)))
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(CONNECT, STARTED));
+            if (!(resource.isSet(DOWNLOADED) || resource.isSet(DOWNLOADING)))
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOAD, STARTED));
 
-            if (!resource.isSet(DOWNLOAD | CONNECT))
+            if (!(resource.isSet(DOWNLOAD) || resource.isSet(CONNECT)))
                 enqueue = false;
         }
 
@@ -604,7 +598,7 @@ public class ResourceTracker {
      */
     private void queueResource(Resource resource) {
         synchronized (lock) {
-            if (!resource.isSet(CONNECT | DOWNLOAD))
+            if (!(resource.isSet(CONNECT) || resource.isSet(DOWNLOAD)))
                 throw new IllegalResourceDescriptorException("Invalid resource state (resource: " + resource + ")");
 
             queue.add(resource);
@@ -764,14 +758,14 @@ public class ResourceTracker {
                 downloadEntry.store();
             }
 
-            resource.changeStatus(DOWNLOADING, DOWNLOADED);
+            resource.changeStatus(EnumSet.of(DOWNLOADING), EnumSet.of(DOWNLOADED));
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
             resource.fireDownloadEvent(); // fire DOWNLOADED
         } catch (Exception ex) {
             OutputController.getLogger().log(ex);
-            resource.changeStatus(0, ERROR);
+            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
@@ -830,11 +824,11 @@ public class ResourceTracker {
                 resource.localFile = localFile;
                 // resource.connection = connection;
                 resource.size = size;
-                resource.changeStatus(CONNECT | CONNECTING, CONNECTED);
+                resource.changeStatus(EnumSet.of(CONNECT, CONNECTING), EnumSet.of(CONNECTED));
 
                 // check if up-to-date; if so set as downloaded
                 if (current)
-                    resource.changeStatus(DOWNLOAD | DOWNLOADING, DOWNLOADED);
+                    resource.changeStatus(EnumSet.of(DOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
             }
 
             // update cache entry
@@ -857,7 +851,7 @@ public class ResourceTracker {
             }
         } catch (Exception ex) {
             OutputController.getLogger().log(ex);
-            resource.changeStatus(0, ERROR);
+            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
@@ -1020,9 +1014,9 @@ public class ResourceTracker {
         Resource result;
 
         // pick from queue
-        result = selectByFlag(queue, CONNECT, ERROR); // connect but not error
+        result = selectByStatus(queue, CONNECT, ERROR); // connect but not error
         if (result == null)
-            result = selectByFlag(queue, DOWNLOAD, ERROR | CONNECT | CONNECTING);
+            result = selectByStatus(queue, EnumSet.of(DOWNLOAD), EnumSet.of(ERROR, CONNECT, CONNECTING));
 
         // remove from queue if found
         if (result != null)
@@ -1037,13 +1031,13 @@ public class ResourceTracker {
 
         synchronized (result) {
             if (result.isSet(CONNECT)) {
-                result.changeStatus(CONNECT, CONNECTING);
+                result.changeStatus(EnumSet.of(CONNECT), EnumSet.of(CONNECTING));
             } else if (result.isSet(DOWNLOAD)) {
                 // only download if *not* connecting, when done connecting
                 // select next will pick up the download part.  This makes
                 // all requested connects happen before any downloads, so
                 // the size is known as early as possible.
-                result.changeStatus(DOWNLOAD, DOWNLOADING);
+                result.changeStatus(EnumSet.of(DOWNLOAD), EnumSet.of(DOWNLOADING));
             }
         }
 
@@ -1069,10 +1063,15 @@ public class ResourceTracker {
                     continue;
 
                 synchronized (tracker.resources) {
-                    result = selectByFlag(tracker.resources, UNINITIALIZED, ERROR);
+                    result = selectByFilter(tracker.resources, new Filter<Resource>() {
+                        @Override
+                        public boolean test(Resource t) {
+                            return !t.isInitialized() && !t.isSet(ERROR);
+                        }
+                    });
 
                     if (result == null && alternate == null)
-                        alternate = selectByFlag(tracker.resources, CONNECTED, ERROR | DOWNLOADED | DOWNLOADING | DOWNLOAD);
+                        alternate = selectByStatus(tracker.resources, EnumSet.of(CONNECTED), EnumSet.of(ERROR, DOWNLOADED, DOWNLOADING, DOWNLOAD));
                 }
             }
         }
@@ -1091,7 +1090,7 @@ public class ResourceTracker {
 
             // prevents startResource from putting it on queue since
             // we're going to return it.
-            result.changeStatus(0, STARTED);
+            result.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(STARTED));
 
             tracker.startResource(result);
         }
@@ -1099,25 +1098,15 @@ public class ResourceTracker {
         return result;
     }
 
-    /**
-     * Selects a resource from the source list that has the
-     * specified flag set.
-     * <p>
-     * Calls to this method should be synchronized on lock and
-     * source list.
-     * </p>
-     */
-    static Resource selectByFlag(List<Resource> source, int flag,
-                                         int notflag) {
+    static Resource selectByFilter(Collection<Resource> source, Filter<Resource> filter) {
         Resource result = null;
         int score = Integer.MAX_VALUE;
 
         for (Resource resource : source) {
-            boolean selectable = false;
+            boolean selectable;
 
             synchronized (resource) {
-                if (resource.isSet(flag) && !resource.isSet(notflag))
-                    selectable = true;
+                selectable = filter.test(resource);
             }
 
             if (selectable) {
@@ -1138,6 +1127,39 @@ public class ResourceTracker {
         }
 
         return result;
+    }
+
+    static Resource selectByStatus(Collection<Resource> source, Resource.Status include, Resource.Status exclude) {
+        return selectByStatus(source, EnumSet.of(include), EnumSet.of(exclude));
+    }
+
+    /**
+     * Selects a resource from the source list that has the
+     * specified flag set.
+     * <p>
+     * Calls to this method should be synchronized on lock and
+     * source list.
+     * </p>
+     */
+    static Resource selectByStatus(Collection<Resource> source, final Collection<Resource.Status> included, final Collection<Resource.Status> excluded) {
+        return selectByFilter(source, new Filter<Resource>() {
+            @Override
+            public boolean test(Resource t) {
+                boolean hasIncluded = false;
+                for (Resource.Status flag : included) {
+                    if (t.isSet(flag)) {
+                        hasIncluded = true;
+                    }
+                }
+                boolean hasExcluded = false;
+                for (Resource.Status flag : excluded) {
+                    if (t.isSet(flag)) {
+                        hasExcluded = true;
+                    }
+                }
+                return hasIncluded && !hasExcluded;
+            }
+        });
     }
 
     /**
@@ -1183,7 +1205,7 @@ public class ResourceTracker {
                     //NetX Deadlocking may be solved by removing this
                     //synch block.
                     synchronized (resource) {
-                        if (!resource.isSet(DOWNLOADED | ERROR)) {
+                        if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR))) {
                             finished = false;
                             break;
                         }
@@ -1204,6 +1226,10 @@ public class ResourceTracker {
                 lock.wait(waitTime);
             }
         }
+    }
+
+    interface Filter<T> {
+        public boolean test(T t);
     }
 
     private static class RedirectionException extends RuntimeException {
