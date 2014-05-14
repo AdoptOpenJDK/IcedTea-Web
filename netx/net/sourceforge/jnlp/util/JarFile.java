@@ -43,94 +43,82 @@ import java.io.IOException;
 import java.io.InputStream;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-//in jdk6 java.util.jar.JarFile is not Closeable - fixing
-//overwritening  class can add duplicate occurence of interface so this should be perfectly safe
-public class JarFile extends java.util.jar.JarFile implements Closeable{
+/**
+ * A wrapper over {@link java.util.jar.JarFile} that verifies zip headers to
+ * protect against GIFAR attacks.
+ *
+ * @see <a href="http://en.wikipedia.org/wiki/Gifar">Gifar</a>
+ */
+public class JarFile extends java.util.jar.JarFile implements Closeable {
 
     public JarFile(String name) throws IOException {
-       super(name);
-       verifyZipHeader(new File(name));
+        super(name);
+        verifyZipHeader(new File(name));
     }
 
-    /**
-     */
     public JarFile(String name, boolean verify) throws IOException {
         super(name, verify);
         verifyZipHeader(new File(name));
     }
 
-    /**
-     */
     public JarFile(File file) throws IOException {
         super(file);
         verifyZipHeader(file);
     }
 
-    /**
-     */
     public JarFile(File file, boolean verify) throws IOException {
         super(file, verify);
         verifyZipHeader(file);
     }
 
-    /*
-     */
     public JarFile(File file, boolean verify, int mode) throws IOException {
         super(file, verify, mode);
-         verifyZipHeader(file);
+        verifyZipHeader(file);
     }
-    
-    
-    
-    
-    /**
-     * According to specification -
-     * http://www.pkware.com/documents/casestudies/APPNOTE.TXT or just google
-     * around zip header all entries in zip-compressed must start with well
-     * known "PK" which is defined as hexa x50 x4b x03 x04, which in decimal are
-     * 80 75 3 4.
-     * 
-     * Note - this is not file-header, it is item-header.
-     *
-     * Actually most of compressing formats have some n-bytes header se eg:
-     * http://www.gzip.org/zlib/rfc-gzip.html#header-trailer for ID1 and ID2 so
-     * in case that some differently compressed jars will come to play, this is
-     * the palce where to fix it.
-     *
-     */
-    private static final byte[] ZIP_LOCAL_FILE_HEADER_SIGNATURE = new byte[]{80, 75, 3, 4};
 
     /**
-     * This method is checking first four bytes of jar-file against
-     * ZIP_LOCAL_FILE_HEADER_SIGNATURE
+     * The ZIP specification requires that the zip header for all entries in a
+     * zip-compressed archive must start with a well known "PK" which is
+     * defined as hex x50 x4b x03 x04.
+     * <p>
+     * Note - this is not file-header, it is item-header.
+     * <p>
+     * Actually most of compressing formats have some n-bytes headers. Eg:
+     * http://www.gzip.org/zlib/rfc-gzip.html#header-trailer for ID1 and ID2 so
+     * in case that some differently compressed jars will come to play, this is
+     * the place where to fix it.
      *
-     * Although zip specification allows to skip all corrupted entries, it is
-     * not safe for jars. If first four bytes of file are not zip
-     * ZIP_LOCAL_FILE_HEADER_SIGNATURE then exception is thrown
-     * 
-     * As noted, ZIP_LOCAL_FILE_HEADER_SIGNATURE is not ile-header, but is item-header.
-     * Possible attack is using the fact that entries without header are considered
-     * corrupted and so can be ignoered. However, for other they can have some meaning.
-     * 
-     * So for our purposes we must insists on first record to be valid.
-     *
-     * @param file
-     * @throws IOException
-     * @throws InvalidJarHeaderException
+     * @see <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP Specification</a>
      */
-    public static void verifyZipHeader(File file) throws IOException {
+    private static final byte[] ZIP_ENTRY_HEADER_SIGNATURE = new byte[] {0x50, 0x4b, 0x03, 0x04};
+
+    /**
+     * Verify the header for the zip entry.
+     * <p>
+     * Although zip specification allows to skip all corrupted entries, it is
+     * not safe for jars since it allows a different format to fake itself as
+     * a Jar.
+     */
+    private void verifyZipHeader(File file) throws IOException {
         if (!JNLPRuntime.isIgnoreHeaders()) {
             InputStream s = new FileInputStream(file);
+
+            /*
+             * Theoretically, a valid ZIP file can begin with anything. We
+             * ensure it begins with a valid entry header to confirm it only
+             * contains zip entries.
+             */
+
             try {
-                byte[] buffer = new byte[ZIP_LOCAL_FILE_HEADER_SIGNATURE.length];
+                byte[] buffer = new byte[ZIP_ENTRY_HEADER_SIGNATURE.length];
                 /*
                  * for case that new byte[] will accidently initialize same
                  * sequence as zip header and during the read the buffer will not be filled
-                 */                
+                 */
                 for (int i = 0; i < buffer.length; i++) {
                     buffer[i] = 0;
                 }
-                int toRead = ZIP_LOCAL_FILE_HEADER_SIGNATURE.length;
+                int toRead = ZIP_ENTRY_HEADER_SIGNATURE.length;
                 int readSoFar = 0;
                 int n = 0;
                 /*
@@ -144,7 +132,7 @@ public class JarFile extends java.util.jar.JarFile implements Closeable{
                     }
                 }
                 for (int i = 0; i < buffer.length; i++) {
-                    if (buffer[i] != ZIP_LOCAL_FILE_HEADER_SIGNATURE[i]) {
+                    if (buffer[i] != ZIP_ENTRY_HEADER_SIGNATURE[i]) {
                         throw new InvalidJarHeaderException("Jar " + file.getName() + " do not heave valid header. You can skip this check by -Xignoreheaders");
                     }
                 }

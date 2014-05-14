@@ -1,5 +1,11 @@
 2014-05-14  Omair Majid  <omajid@redhat.com>
 
+	* netx/net/sourceforge/jnlp/util/JarFile.java: Rename
+	ZIP_LOCAL_FILE_HEADER_SIGNATURE to ZIP_ENTRY_HEADER_SIGNATURE. Fix
+	comments.
+
+2014-05-14  Omair Majid  <omajid@redhat.com>
+
 	* tests/test-extensions/net/sourceforge/jnlp/tools/CodeSignerCreator.java
 	(KeyPair): New class.
 	(createCert): Use KeyPair.
