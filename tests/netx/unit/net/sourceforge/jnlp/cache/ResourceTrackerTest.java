@@ -78,38 +78,67 @@ public class ResourceTrackerTest {
     private static final String nameStub1 = "itw-server";
     private static final String nameStub2 = "test-file";
 
-    @Test
-    public void testSelectByStatus() throws Exception {
-        Resource connectedResource = Resource.getResource(new URL("http://example.com/connected.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
-        connectedResource.setStatusFlags(EnumSet.of(CONNECTED, DOWNLOADING));
-        Resource erroredResource = Resource.getResource(new URL("http://example.com/errored.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
-        erroredResource.setStatusFlags(EnumSet.of(ERROR, CONNECT));
-        Resource downloadingResource = Resource.getResource(new URL("http://example.com/downloading.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
-        downloadingResource.setStatusFlag(DOWNLOADING);
-        Resource uninitializedResource = Resource.getResource(new URL("http://example.com/uninitialized.jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
-        List<Resource> source = Arrays.asList(connectedResource, erroredResource, downloadingResource, uninitializedResource);
+    private static Resource createResource(final String name) throws MalformedURLException {
+        return Resource.getResource(new URL("http://example.com/" + name + ".jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
+    }
 
-        Resource result1 = ResourceTracker.selectByStatus(source, EnumSet.of(CONNECT, CONNECTING, CONNECTED), EnumSet.of(ERROR));
-        Resource result2 = ResourceTracker.selectByStatus(source, DOWNLOADING, CONNECTED);
-        Resource result3 = ResourceTracker.selectByFilter(source, new ResourceTracker.Filter<Resource>() {
-            @Override
-            public boolean test(Resource t) {
-                return t.isSet(DOWNLOADED) && t.isInitialized();
-            }
-        });
-        Resource result4 = ResourceTracker.selectByFilter(source, new ResourceTracker.Filter<Resource>() {
+    @Test
+    public void testSelectByStatusOneMatchingResource() throws Exception {
+        Resource resource = createResource("oneMatchingResource");
+        Assert.assertNotNull(resource);
+        resource.setStatusFlag(DOWNLOADING);
+        List<Resource> resources = Arrays.asList(resource);
+        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
+        Assert.assertEquals(resource, result);
+    }
+
+    @Test
+    public void testSelectByStatusNoMatchingResource() throws Exception {
+        Resource resource = createResource("noMatchingResource");
+        Assert.assertNotNull(resource);
+        List<Resource> resources = Arrays.asList(resource);
+        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testSelectByStatusExcludedResources() throws Exception {
+        Resource resource = createResource("excludedResources");
+        Assert.assertNotNull(resource);
+        resource.setStatusFlag(ERROR);
+        List<Resource> resources = Arrays.asList(resource);
+        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testSelectByStatusMixedResources() throws Exception {
+        Resource r1 = createResource("mixedResources1");
+        Assert.assertNotNull(r1);
+        r1.setStatusFlag(CONNECTED);
+        r1.setStatusFlag(DOWNLOADING);
+        Resource r2 = createResource("mixedResources2");
+        Assert.assertNotNull(r2);
+        r2.setStatusFlag(CONNECTED);
+        r2.setStatusFlag(DOWNLOADING);
+        r2.setStatusFlag(ERROR);
+        List<Resource> resources = Arrays.asList(r1, r2);
+        Resource result = ResourceTracker.selectByStatus(resources, EnumSet.of(CONNECTED, DOWNLOADING), EnumSet.of(ERROR));
+        Assert.assertEquals(r1, result);
+    }
+
+    @Test
+    public void testSelectByFilterUninitialized() throws Exception {
+        Resource resource = createResource("filterUninitialized");
+        Assert.assertNotNull(resource);
+        List<Resource> resources = Arrays.asList(resource);
+        Resource result = ResourceTracker.selectByFilter(resources, new ResourceTracker.Filter<Resource>() {
             @Override
             public boolean test(Resource t) {
                 return !t.isInitialized();
             }
         });
-        Resource result5 = ResourceTracker.selectByStatus(source, EnumSet.of(CONNECT, CONNECTING, CONNECTED), EnumSet.of(DOWNLOADING));
-
-        Assert.assertEquals("result1 should be connected resource", connectedResource, result1);
-        Assert.assertEquals("result2 should be downloading resource", downloadingResource, result2);
-        Assert.assertNull("Result 3 should have been null", result3);
-        Assert.assertEquals("result4 should be uninitialized resource", uninitializedResource, result4);
-        Assert.assertEquals("result5 should be errored resource", erroredResource, result5);
+        Assert.assertEquals(resource, result);
     }
 
     @Test

@@ -1,3 +1,10 @@
+2014-05-14  Andrew Azores  <aazores@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:
+	(testSelectByStatus) split into (testSelectByStatusOneMatchingResource,
+	testSelectByStatusNoMatchingResource, testSelectByStatusExcludedResources,
+	testSelectByStatusMixedResources, testSelectByFilterUninitialized)
+
 2014-05-14  Omair Majid  <omajid@redhat.com>
 
 	* netx/net/sourceforge/jnlp/util/JarFile.java: Rename
