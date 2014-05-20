@@ -1,3 +1,19 @@
+2014-05-20  Lukasz Dracz  <ldracz@redhat.com>
+            Jie Kang      <jkang@redhat.com>
+
+	* netx/net/sourceforge/jnlp/cache/Resource.java:
+	(location, localFile, requestVersion, downloadVersion,
+	transferred, size, status) made fields private and added
+	setters and getters, and all calling sites refactored
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
+	Calling sites refactored
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java:
+	Calling sites refactored
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTest.java:
+	(testGetLocation, testGetRequestVersion, testGetDownloadVersion,
+	testTransferredIsZero, testIncrementTransferred, testSizeIsNegativeOne,
+	testSetSize, testStatusIsCopied) added tests
+
 2014-05-14  Andrew Azores  <aazores@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:

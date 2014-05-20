@@ -239,7 +239,7 @@ public class ResourceTracker {
      * @return whether the resource are already downloaded
      */
     private boolean checkCache(Resource resource, UpdatePolicy updatePolicy) {
-        if (!CacheUtil.isCacheable(resource.location, resource.downloadVersion)) {
+        if (!CacheUtil.isCacheable(resource.getLocation(), resource.getDownloadVersion())) {
             // pretend that they are already downloaded; essentially
             // they will just 'pass through' the tracker as if they were
             // never added (for example, not affecting the total download size).
@@ -251,15 +251,15 @@ public class ResourceTracker {
         }
 
         if (updatePolicy != UpdatePolicy.ALWAYS && updatePolicy != UpdatePolicy.FORCE) { // save loading entry props file
-            CacheEntry entry = new CacheEntry(resource.location, resource.downloadVersion);
+            CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getDownloadVersion());
 
             if (entry.isCached() && !updatePolicy.shouldUpdate(entry)) {
-                OutputController.getLogger().log("not updating: " + resource.location);
+                OutputController.getLogger().log("not updating: " + resource.getLocation());
 
                 synchronized (resource) {
-                    resource.localFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion);
-                    resource.size = resource.localFile.length();
-                    resource.transferred = resource.localFile.length();
+                    resource.setLocalFile(CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
+                    resource.setSize(resource.getLocalFile().length());
+                    resource.setTransferred(resource.getLocalFile().length());
                     resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, STARTED));
                 }
                 fireDownloadEvent(resource);
@@ -317,7 +317,7 @@ public class ResourceTracker {
 
         Collection<Resource.Status> status;
         synchronized (resource) {
-            status = resource.status;
+            status = resource.getCopyOfStatus();
         }
 
         DownloadEvent event = new DownloadEvent(this, resource);
@@ -381,8 +381,8 @@ public class ResourceTracker {
             if (resource.isSet(ERROR))
                 return null;
 
-            if (resource.localFile != null)
-                return resource.localFile;
+            if (resource.getLocalFile() != null)
+                return resource.getLocalFile();
 
             if (location.getProtocol().equalsIgnoreCase("file")) {
                 File file = UrlUtils.decodeUrlAsFile(location);
@@ -416,10 +416,10 @@ public class ResourceTracker {
             if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR)))
                 waitForResource(location, 0);
 
-            if (resource.localFile != null)
-                return new FileInputStream(resource.localFile);
+            if (resource.getLocalFile() != null)
+                return new FileInputStream(resource.getLocalFile());
 
-            return resource.location.openStream();
+            return resource.getLocation().openStream();
         } catch (InterruptedException ex) {
             throw new IOException("wait was interrupted");
         }
@@ -474,7 +474,7 @@ public class ResourceTracker {
     public long getAmountRead(URL location) {
         // not atomic b/c transferred is a long, but so what (each
         // byte atomic? so probably won't affect anything...)
-        return getResource(location).transferred;
+        return getResource(location).getTransferred();
     }
 
     /**
@@ -544,7 +544,7 @@ public class ResourceTracker {
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public long getTotalSize(URL location) {
-        return getResource(location).size; // atomic
+        return getResource(location).getSize(); // atomic
     }
 
     /**
@@ -642,7 +642,7 @@ public class ResourceTracker {
     private void downloadResource(Resource resource) {
         resource.fireDownloadEvent(); // fire DOWNLOADING
         URLConnection con = null;
-        CacheEntry origEntry = new CacheEntry(resource.location, resource.downloadVersion); // This is where the jar file will be.
+        CacheEntry origEntry = new CacheEntry(resource.getLocation(), resource.getDownloadVersion()); // This is where the jar file will be.
         origEntry.lock();
 
         try {
@@ -658,11 +658,11 @@ public class ResourceTracker {
              * foo.jar, the server might send us foo.jar.pack.gz or foo.jar.gz
              * instead. So we save the file with the appropriate extension
              */
-            URL downloadLocation = resource.location;
+            URL downloadLocation = resource.getLocation();
 
             String contentEncoding = con.getContentEncoding();
 
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading" + resource.location + " using " +
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading" + resource.getLocation() + " using " +
                         realLocation + " (encoding : " + contentEncoding + ")");
 
             boolean packgz = "pack200-gzip".equals(contentEncoding) ||
@@ -679,9 +679,10 @@ public class ResourceTracker {
                 downloadLocation = new URL(downloadLocation.toString() + ".gz");
             }
 
-            File downloadLocationFile = CacheUtil.getCacheFile(downloadLocation, resource.downloadVersion);
-            CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.downloadVersion);
-            File finalFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion); // This is where extracted version will be, or downloaded file if not compressed.
+            File downloadLocationFile = CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion());
+            CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
+            // This is where extracted version will be, or downloaded file if not compressed.
+            File finalFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
 
             if (!downloadEntry.isCurrent(con.getLastModified())) {
                 // Make sure we don't re-download the file. however it will wait as if it was downloading.
@@ -693,10 +694,10 @@ public class ResourceTracker {
                 long lastModified = con.getLastModified();
 
                 InputStream in = new BufferedInputStream(con.getInputStream());
-                OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.downloadVersion);
+                OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion());
 
                 while (-1 != (rlen = in.read(buf))) {
-                    resource.transferred += rlen;
+                    resource.incrementTransferred(rlen);
                     out.write(buf, 0, rlen);
                 }
 
@@ -718,11 +719,11 @@ public class ResourceTracker {
                  */
                 if (packgz) {
                     GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                            .getCacheFile(downloadLocation, resource.downloadVersion)));
+                            .getCacheFile(downloadLocation, resource.getDownloadVersion())));
                     InputStream inputStream = new BufferedInputStream(gzInputStream);
 
                     JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(CacheUtil
-                            .getCacheFile(resource.location, resource.downloadVersion)));
+                            .getCacheFile(resource.getLocation(), resource.getDownloadVersion())));
 
                     Unpacker unpacker = Pack200.newUnpacker();
                     unpacker.unpack(inputStream, outputStream);
@@ -732,11 +733,11 @@ public class ResourceTracker {
                     gzInputStream.close();
                 } else if (gzip) {
                     GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                            .getCacheFile(downloadLocation, resource.downloadVersion)));
+                            .getCacheFile(downloadLocation, resource.getDownloadVersion())));
                     InputStream inputStream = new BufferedInputStream(gzInputStream);
 
                     BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(CacheUtil
-                            .getCacheFile(resource.location, resource.downloadVersion)));
+                            .getCacheFile(resource.getLocation(), resource.getDownloadVersion())));
 
                     while (-1 != (rlen = inputStream.read(buf))) {
                         outputStream.write(buf, 0, rlen);
@@ -747,7 +748,7 @@ public class ResourceTracker {
                     gzInputStream.close();
                 }
             } else {
-                resource.transferred = downloadLocationFile.length();
+                resource.setTransferred(downloadLocationFile.length());
             }
 
             if (!downloadLocationFile.getPath().equals(finalFile.getPath())) {
@@ -787,17 +788,17 @@ public class ResourceTracker {
     private void initializeResource(Resource resource) {
         resource.fireDownloadEvent(); // fire CONNECTING
 
-        CacheEntry entry = new CacheEntry(resource.location, resource.requestVersion);
+        CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
 
         try {
-            File localFile = CacheUtil.getCacheFile(resource.location, resource.downloadVersion);
+            File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
 
             // connect
             URL finalLocation = findBestUrl(resource);
 
             if (finalLocation == null) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Attempted to download " + resource.location + ", but failed to connect!");
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Attempted to download " + resource.getLocation() + ", but failed to connect!");
                 throw new NullPointerException("finalLocation == null"); // Caught below
             }
 
@@ -806,14 +807,14 @@ public class ResourceTracker {
             connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
             int size = connection.getContentLength();
-            boolean current = CacheUtil.isCurrent(resource.location, resource.requestVersion, connection.getLastModified()) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
+            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), connection.getLastModified()) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
             if (!current) {
                 if (entry.isCached()) {
                     entry.markForDelete();
                     entry.store();
                     // Old entry will still exist. (but removed at cleanup)
-                    localFile = CacheUtil.makeNewCacheFile(resource.location, resource.downloadVersion);
-                    CacheEntry newEntry = new CacheEntry(resource.location, resource.requestVersion);
+                    localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
+                    CacheEntry newEntry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
                     newEntry.lock();
                     entry.unlock();
                     entry = newEntry;
@@ -821,9 +822,9 @@ public class ResourceTracker {
             }
 
             synchronized (resource) {
-                resource.localFile = localFile;
+                resource.setLocalFile(localFile);
                 // resource.connection = connection;
-                resource.size = size;
+                resource.setSize(size);
                 resource.changeStatus(EnumSet.of(CONNECT, CONNECTING), EnumSet.of(CONNECTED));
 
                 // check if up-to-date; if so set as downloaded
@@ -1170,7 +1171,7 @@ public class ResourceTracker {
     private Resource getResource(URL location) {
         synchronized (resources) {
             for (Resource resource : resources) {
-                if (CacheUtil.urlEquals(resource.location, location))
+                if (CacheUtil.urlEquals(resource.getLocation(), location))
                     return resource;
             }
         }

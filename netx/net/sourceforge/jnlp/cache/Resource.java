@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.util.WeakList;
@@ -62,7 +63,6 @@ public class Resource {
         STARTED // enqueued or being worked on
     }
 
-
     /** list of weak references of resources currently in use */
     private static final WeakList<Resource> resources = new WeakList<>();
 
@@ -70,31 +70,31 @@ public class Resource {
     private final WeakList<ResourceTracker> trackers = new WeakList<>();
 
     /** the remote location of the resource */
-    final URL location;
+    private final URL location;
 
     /** the location to use when downloading */
     private URL downloadLocation;
 
     /** the local file downloaded to */
-    File localFile;
+    private File localFile;
 
     /** the requested version */
-    final Version requestVersion;
+    private final Version requestVersion;
 
     /** the version downloaded from server */
-    Version downloadVersion;
+    private Version downloadVersion;
 
     /** amount in bytes transferred */
-    volatile long transferred = 0;
+    private volatile long transferred = 0;
 
     /** total size of the resource, or -1 if unknown */
-    volatile long size = -1;
+    private volatile long size = -1;
 
     /** the status of the resource */
-    final EnumSet<Status> status = EnumSet.noneOf(Status.class);
-
+    private final EnumSet<Status> status = EnumSet.noneOf(Status.class);
+    
     /** Update policy for this resource */
-    final UpdatePolicy updatePolicy;
+    private final UpdatePolicy updatePolicy;
 
     /**
      * Create a resource.
@@ -152,8 +152,8 @@ public class Resource {
      * Set the url to use for downloading the resource
      * @param location
      */
-    public void setDownloadLocation(URL location) {
-        downloadLocation = location;
+    public void setDownloadLocation(URL downloadLocation) {
+        this.downloadLocation = downloadLocation;
     }
 
     /**
@@ -169,6 +169,85 @@ public class Resource {
 
             return null;
         }
+    }
+    
+    /**
+     * Returns the local file currently being downloaded
+     */
+    public File getLocalFile() {
+    	return localFile;
+    }
+    
+    /**
+     * Sets the local file to be downloaded
+     */
+    public void setLocalFile(File localFile) {
+    	this.localFile = localFile;
+    }
+    
+    /**
+     * Returns the requested version
+     */
+    public Version getRequestVersion() {
+    	return requestVersion;
+    }
+    
+    /**
+     * Returns the version downloaded from server
+     */
+    public Version getDownloadVersion() {
+    	return downloadVersion;
+    }
+    
+    /**
+     * Sets the version downloaded from server
+     */
+    public void setDownloadVersion(Version downloadVersion) {
+    	this.downloadVersion = downloadVersion;
+    }
+    
+    /**
+     * Returns the amount in bytes transferred
+     */
+    public long getTransferred() {
+    	return transferred;
+    }
+    
+    /**
+     * Sets the amount transferred
+     */
+    public void setTransferred(long transferred) {
+    	this.transferred = transferred;
+    }
+    
+    /**
+     * Increments the amount transferred (in bytes)
+     */
+    public void incrementTransferred(long incTrans) {
+    	transferred += incTrans;
+    }
+
+    /**
+     * Returns the size of the resource
+     * @return size of resource (-1 if unknown)
+     */
+    public long getSize() {
+    	return size;
+    }
+
+    /**
+     * Sets the size of the resource
+     */
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    /**
+     * Returns the status of the resource
+     */
+    public Set<Status> getCopyOfStatus() {
+        return EnumSet.copyOf(status);
+
     }
 
     /**
@@ -195,8 +274,6 @@ public class Resource {
 
     /**
      * Returns the update policy for this resource
-     *
-     * @return The update policy
      */
     public UpdatePolicy getUpdatePolicy() {
         return this.updatePolicy;
@@ -355,5 +432,7 @@ public class Resource {
     public String toString() {
         return "location=" + location.toString() + " state=" + getStatusString();
     }
+    
+    
 
 }

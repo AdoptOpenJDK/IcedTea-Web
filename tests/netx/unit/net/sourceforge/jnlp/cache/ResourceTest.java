@@ -37,20 +37,103 @@
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.*;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECT;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOAD;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Set;
 
 import net.sourceforge.jnlp.Version;
 
 import org.junit.Test;
 
 public class ResourceTest {
+
+    public static final long INCREMENT_TRANSFERRED_CONSTANT = 10;
+
+    @Test
+    public void testGetLocation() throws Exception {
+        String testName = "GetLocation";
+        Resource res = createResource(testName);
+        URL location = res.getLocation();
+        URL sameUrl = new URL("http://example.com/applet" + testName + ".jar");
+        assertEquals("Locations should match each other", sameUrl, location);
+    }
+
+    @Test
+    public void testGetRequestVersion() throws Exception {
+        String testName = "GetRequestVersion";
+        Resource res = createResource(testName);
+        Version dummyVersion = new Version("1.0");
+        Version getVersion = res.getRequestVersion();
+        assertTrue("Versions should match each other.", dummyVersion.matches(getVersion));
+    }
+
+    @Test
+    public void testGetDownloadVersion() throws Exception {
+        String testName = "GetDownloadVersion";
+        Resource res = createResource(testName);
+        Version dummyVersion = new Version("1.0");
+        res.setDownloadVersion(dummyVersion);
+        Version getVersion = res.getDownloadVersion();
+       assertTrue("Set version should match other.", getVersion.matches(dummyVersion));
+    }
+
+    @Test
+    public void testTransferredIsZero() throws Exception {
+        String testName = "TransferredIsZero";
+        Resource res = createResource(testName);
+        assertEquals(0, res.getTransferred());
+    }
+
+    @Test
+    public void testIncrementTransferred() throws Exception {
+        String testName = "IncrementTransferred";
+        Resource res = createResource(testName);
+        long original = res.getTransferred();
+        res.incrementTransferred(INCREMENT_TRANSFERRED_CONSTANT);
+        assertEquals(original + INCREMENT_TRANSFERRED_CONSTANT, res.getTransferred());
+    }
+
+    @Test
+    public void testSizeIsNegativeOne() throws Exception {
+        String testName = "SizeIsNegativeOne";
+        Resource res = createResource(testName);
+        assertEquals(-1, res.getSize());
+    }
+
+    @Test
+    public void testSetSize() throws Exception {
+        String testName = "SetSize";
+        Resource res = createResource(testName);
+        long original = res.getSize();
+        res.setSize(original + 10);
+        assertEquals(original + 10,res.getSize());
+    }
+
+    @Test
+    public void testStatusIsCopied() throws Exception {
+        String testName = "testStatus";
+        Resource res = createResource(testName);
+        Set<Resource.Status> original = res.getCopyOfStatus();
+        assertTrue("Original should be emtpy", original.isEmpty());
+        original.add(DOWNLOADING);
+        Set<Resource.Status> dummy = res.getCopyOfStatus();
+        assertNotEquals(dummy, original);
+        assertFalse(dummy.contains(DOWNLOADING));		
+    }
 
     @Test
     public void testNewResourceIsUninitialized() throws Exception {

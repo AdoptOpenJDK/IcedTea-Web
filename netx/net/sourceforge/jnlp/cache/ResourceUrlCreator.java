@@ -120,7 +120,7 @@ public class ResourceUrlCreator {
             return resource.getLocation();
         }
         String filename = location.substring(lastSlash + 1);
-        if (useVersion && resource.requestVersion != null) {
+        if (useVersion && resource.getRequestVersion() != null) {
             // With 'useVersion', j2-commons-cli.jar becomes, for example, j2-commons-cli__V1.0.jar
             String parts[] = filename.split("\\.", -1 /* Keep blank strings*/);
 
@@ -129,7 +129,7 @@ public class ResourceUrlCreator {
                 sb.append(parts[i]);
                 // Append __V<number> before last '.'
                 if (i == parts.length -2) {
-                    sb.append("__V" + resource.requestVersion);
+                    sb.append("__V" + resource.getRequestVersion());
                 }
                 sb.append('.');
             }
@@ -172,13 +172,13 @@ public class ResourceUrlCreator {
         if (!query.isEmpty()) {
             query = "?" + query;
         }
-        if (resource.requestVersion != null && resource.requestVersion.isVersionId()) {
+        if (resource.getRequestVersion() != null && resource.getRequestVersion().isVersionId()) {
             if (!query.isEmpty()) {
                 query += "&";
             } else {
                 query = "?" + query;
             }
-            query += "version-id=" + resource.requestVersion;
+            query += "version-id=" + resource.getRequestVersion();
         }
         try {
             URL url = new URL(protocol + userInfo + host + port + path + query);
