@@ -1,5 +1,11 @@
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
+	Making the previous chnage actualy take an effect.
+	* Makefile.am: All tests runs using CLASSPATH varibale on line, separated by
+	semicolon. I have no idea wy this was needing.
+
+2014-05-21  Jiri Vanek  <jvanek@redhat.com>
+
 	All tests adapted to run from XBootclaspath (forced by extending package private
 	rt.jar class)
 	* Makefile.am: all sets of call of -Xbootclasspath in tests and coverage
