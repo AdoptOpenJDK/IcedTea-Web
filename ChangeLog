@@ -1,3 +1,16 @@
+2014-05-22  Jie Kang  <jkang@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(saveAsButtonAction): set changesMade to true to allow savePolicyFile to save
+	(savePolicyFile): no longer immediately returns if changesMade is false
+	(updateMd5WithDialog): use changesMade along with file MD5 sum changes to
+	determine whether to continue saving to disk, added check for FileNotFound and
+	displays warning message telling user what has happened, also privatized
+	method and renamed method to checkPolicyChangesWithDialog
+	* netx/net/sourceforge/jnlp/util/MD5SumWatcher.java: Removed unused imports.
+	* netx/net/sourceforge/jnlp/resources/Message.properties (PEFileMissing): Added
+	new warning message for PolicyEditor
+
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed slipped test classlaoder fix

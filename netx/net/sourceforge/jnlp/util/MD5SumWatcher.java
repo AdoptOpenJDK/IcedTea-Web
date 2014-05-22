@@ -36,16 +36,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
 

@@ -312,6 +312,7 @@ public class PolicyEditor extends JPanel {
                 final int choice = fileChooser.showSaveDialog(weakThis.get());
                 if (choice == JFileChooser.APPROVE_OPTION) {
                     file = fileChooser.getSelectedFile();
+                    changesMade = true;
                     savePolicyFile();
                 }
             }
@@ -1276,14 +1277,11 @@ public class PolicyEditor extends JPanel {
      * Save the policy model into the file pointed to by the filePath field.
      */
     private void savePolicyFile() {
-        if (!changesMade) {
-            return;
-        }
         new Thread() {
             @Override
             public void run() {
                 try {
-                    final int response = updateMd5WithDialog();
+                    final int response = checkPolicyChangesWithDialog();
                     switch (response) {
                         case JOptionPane.YES_OPTION:
                             openAndParsePolicyFile();
@@ -1377,22 +1375,33 @@ public class PolicyEditor extends JPanel {
     }
 
     /**
-     * Detect if the file's MD5 has changed. If so, track its new sum, and prompt the user on how to proceed
-     * @return the user's choice (Yes/No/Cancel - see JOptionPane constants). "No" if the file hasn't changed.
-     * @throws FileNotFoundException if the watched file does not exist
+     * Detect if the policy settings have changed, either on-disk or in-app.
+     * If an on-disk change has occurred, update the Md5.
+     * @return The user's choice (Yes/No/Cancel - see JOptionPane constants). 
+     * "Cancel" if the file hasn't changed but the user has made modifications
+     * to the settings. "No" otherwise
      * @throws IOException if the file cannot be read
      */
-    public int updateMd5WithDialog() throws FileNotFoundException, IOException {
+    private int checkPolicyChangesWithDialog() throws IOException {
         if (fileWatcher == null) {
             if (file != null) {
                 fileWatcher = new MD5SumWatcher(file);
             }
             return JOptionPane.NO_OPTION;
         }
-        final boolean changed = fileWatcher.update();
+        boolean changed;
+        try {
+            changed = fileWatcher.update();
+        } catch (FileNotFoundException e){
+            JOptionPane.showMessageDialog(weakThis.get(), R("PEFileMissing"), R("PEFileModified"), JOptionPane.WARNING_MESSAGE);
+            return JOptionPane.NO_OPTION;
+        }
         if (changed) {
             return JOptionPane.showConfirmDialog(weakThis.get(), R("PEFileModifiedDetail", file.getCanonicalPath()),
                     R("PEFileModified"), JOptionPane.YES_NO_CANCEL_OPTION);
+        } else if (!changesMade) {
+            //Return without saving or reloading
+            return JOptionPane.CANCEL_OPTION;
         }
         return JOptionPane.NO_OPTION;
     }
