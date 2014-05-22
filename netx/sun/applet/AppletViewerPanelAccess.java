@@ -108,6 +108,14 @@ public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
         }
 
     }
+    
+    @Override
+    //remaining stub of unpatched jdk
+    protected synchronized void createAppletThread() {
+        throw new RuntimeException("Not yet implemented");
+        //no need to call super, is overriden, and not used in  upstream
+        //AppletViewerPanel or AppletPanel
+    }
 
     abstract protected void ourRunLoader();
 
