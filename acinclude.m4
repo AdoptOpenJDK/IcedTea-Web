@@ -868,38 +868,29 @@ EOF
 dnl Checks that sun.applet.AppletViewerPanel is available
 dnl and public (via the patch in IcedTea6, applet_hole.patch)
 dnl Can be removed when that is upstream or unneeded
-AC_DEFUN([IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE],[
+AC_DEFUN([IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY],[
 AC_REQUIRE([IT_FIND_JAVAC])
 AC_REQUIRE([IT_FIND_JAVA])
-AC_CACHE_CHECK([if sun.applet.AppletViewerPanel is available and public], it_cv_applet_hole, [
+AC_CACHE_CHECK([if selected classes, fields and methods from sun.applet are accessible via reflection], it_cv_applet_hole, [
 CLASS=TestAppletViewer.java
 BYTECODE=$(echo $CLASS|sed 's#\.java##')
 mkdir -p tmp.$$
 cd tmp.$$
 cat << \EOF > $CLASS
 [/* [#]line __oline__ "configure" */
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 
 public class TestAppletViewer
 {
-  public static void main(String[] args)
+  public static void main(String[] args) throws Exception
   {
-    try
-      {
-        Class<?> clazz = Class.forName("sun.applet.AppletViewerPanel");
-        if (Modifier.isPublic(clazz.getModifiers()))
-          {
-            System.err.println("Found public sun.applet.AppletViewerPanel");
-            System.exit(0);
-          }
-        System.err.println("Found non-public sun.applet.AppletViewerPanel");
-        System.exit(2);
-      }
-    catch (ClassNotFoundException e)
-      {
-        System.err.println("Could not find sun.applet.AppletViewerPanel");
-        System.exit(1);
-      }
+   Class<?> ap = Class.forName("sun.applet.AppletPanel");
+   Class<?> avp = Class.forName("sun.applet.AppletViewerPanel");
+   Field f1 = ap.getDeclaredField("applet");
+   Field f2 = avp.getDeclaredField("documentURL");
+   Method m1 = ap.getDeclaredMethod("run");
+   Method m2 = ap.getDeclaredMethod("runLoader");
+   Field f3 = avp.getDeclaredField("baseURL");
   }
 }
 ]
@@ -908,21 +899,17 @@ if $JAVAC -cp . $JAVACFLAGS -nowarn $CLASS >&AS_MESSAGE_LOG_FD 2>&1; then
   if $JAVA -classpath . $BYTECODE >&AS_MESSAGE_LOG_FD 2>&1; then
       it_cv_applet_hole=yes;
   else
-      it_cv_applet_hole=$?;
+      it_cv_applet_hole=no;
   fi
 else
-  it_cv_applet_hole=3;
+  it_cv_applet_hole=no;
 fi
 ])
 rm -f $CLASS *.class
 cd ..
 rmdir tmp.$$
-if test x"${it_cv_applet_hole}" = "x1"; then
-   AC_MSG_ERROR([sun.applet.AppletViewerPanel is not available.])
-elif test x"${it_cv_applet_hole}" = "x2"; then
-   AC_MSG_ERROR([sun.applet.AppletViewerPanel is not public.])
-elif test x"${it_cv_applet_hole}" = "x3"; then
-   AC_MSG_ERROR([Compilation failed.  See config.log.])
+if test x"${it_cv_applet_hole}" = "xno"; then
+   AC_MSG_ERROR([Some of the checked items is not avaiable. Check logs.])
 fi
 AC_PROVIDE([$0])dnl
 ])

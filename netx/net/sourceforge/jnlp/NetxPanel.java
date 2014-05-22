@@ -35,7 +35,7 @@ import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
-import sun.applet.AppletViewerPanel;
+import sun.applet.AppletViewerPanelAccess;
 import sun.awt.SunToolkit;
 
 /**
@@ -44,7 +44,7 @@ import sun.awt.SunToolkit;
  *
  * @author      Francis Kung &lt;fkung@redhat.com&gt;
  */
-public class NetxPanel extends AppletViewerPanel implements SplashController {
+public class NetxPanel extends AppletViewerPanelAccess implements SplashController {
     private final PluginParameters parameters;
     private PluginBridge bridge = null;
     private AppletInstance appInst = null;
@@ -76,7 +76,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
         String uniqueKey = params.getUniqueKey(getCodeBase());
         synchronized(TGMapMutex) {
             if (!uKeyToTG.containsKey(uniqueKey)) {
-                ThreadGroup tg = new ThreadGroup(Launcher.mainGroup, this.documentURL.toString());
+                ThreadGroup tg = new ThreadGroup(Launcher.mainGroup, this.getDocumentURL().toString());
                 uKeyToTG.put(uniqueKey, tg);
             }
         }
@@ -95,10 +95,10 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
     //Overriding to use Netx classloader. You might need to relax visibility
     //in sun.applet.AppletPanel for runLoader().
     @Override
-    protected void runLoader() {
+    protected void ourRunLoader() {
 
         try {
-            bridge = new PluginBridge(baseURL,
+            bridge = new PluginBridge(getBaseURL(),
                                 getDocumentBase(),
                                 getJarFiles(),
                                 getCode(),
@@ -114,13 +114,13 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
 
             // May throw LaunchException:
             appInst = (AppletInstance) l.launch(bridge, this);
-            applet = appInst.getApplet();
+            setApplet(appInst.getApplet());
 
-            if (applet != null) {
+            if (getApplet() != null) {
                 // Stick it in the frame
-                applet.setStub(this);
-                applet.setVisible(false);
-                add("Center", applet);
+                getApplet().setStub(this);
+                getApplet().setVisible(false);
+                add("Center", getApplet());
                 showAppletStatus("loaded");
                 validate();
             }
@@ -157,7 +157,7 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
             }
         }
 
-        handler = new Thread(getThreadGroup(), this, "NetxPanelThread@" + this.documentURL);
+        handler = new Thread(getThreadGroup(), this, "NetxPanelThread@" + this.getDocumentURL());
         handler.start();
     }
 
@@ -213,5 +213,5 @@ public class NetxPanel extends AppletViewerPanel implements SplashController {
     public int getSplashHeigth() {
         return splashController.getSplashHeigth();
     }
-
+   
 }

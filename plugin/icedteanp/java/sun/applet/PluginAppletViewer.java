@@ -646,7 +646,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
             pav.dispose();
 
             // If panel is already disposed, return
-            if (pav.panel.applet == null) {
+            if (pav.panel.getApplet() == null) {
                 PluginDebug.debug(identifier, " panel inactive. Returning.");
                 return;
             }
@@ -722,8 +722,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 panel.setSize(width, height);
                 panel.validate();
 
-                panel.applet.resize(width, height);
-                panel.applet.validate();
+                panel.getApplet().resize(width, height);
+                panel.getApplet().validate();
             }
         });
     }
@@ -1425,8 +1425,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
          * at the same time.
          */
         try {
-            ((AppletViewerPanel)panel).joinAppletThread();
-            ((AppletViewerPanel)panel).release();
+            ((AppletViewerPanelAccess)panel).joinAppletThread();
+            ((AppletViewerPanelAccess)panel).release();
         } catch (InterruptedException e) {
             return; // abort the reload
         }
@@ -1434,7 +1434,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             @Override
             public Void run() {
-                ((AppletViewerPanel)panel).createAppletThread();
+                ((AppletViewerPanelAccess)panel).createAppletThread();
                 return null;
             }
         });

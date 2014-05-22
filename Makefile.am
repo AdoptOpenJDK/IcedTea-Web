@@ -135,7 +135,8 @@ export NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
 	net.sourceforge.jnlp.controlpanel net.sourceforge.jnlp.event \
 	net.sourceforge.jnlp.runtime net.sourceforge.jnlp.security \
 	net.sourceforge.jnlp.security.viewer net.sourceforge.jnlp.services \
-	net.sourceforge.jnlp.tools net.sourceforge.jnlp.util
+	net.sourceforge.jnlp.tools net.sourceforge.jnlp.util \
+	sun.applet
 
 NETX_EXCLUDE_SRCS=
 
@@ -502,11 +503,11 @@ stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest
 	(cd $(NETX_DIR) ; \
 	 mkdir -p lib ; \
 	 $(BOOT_DIR)/bin/jar cfm lib/classes.jar \
-	  $(abs_top_builddir)/netx.manifest javax/jnlp net ; \
+	  $(abs_top_builddir)/netx.manifest javax/jnlp net sun; \
 	 cp -pPR $(SRC_DIR_LINK) $(NETX_SRCDIR) src; \
 	 find src -type f -exec chmod 640 '{}' ';' -o -type d -exec chmod 750 '{}' ';'; \
 	 cd src ; \
-	 $(ZIP) -qr $(NETX_DIR)/lib/src.zip javax net )
+	 $(ZIP) -qr $(NETX_DIR)/lib/src.zip javax net sun)
 	mkdir -p stamps
 	touch $@
 

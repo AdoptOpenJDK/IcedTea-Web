@@ -1,3 +1,27 @@
+2014-05-21  Jiri Vanek  <jvanek@redhat.com>
+
+	Made it works (basicaly) on any JDK
+	* Makefile.am: (NETX_PKGS) sun.applet added to recognized netx packages
+	(netx-dist.stamp) sun directory included into packed list
+	* acinclude.m4: removed (IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE) check. Added 
+	IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY, which test existence of 
+	classes sun.applet.AppletPanel, sun.applet.AppletViewerPanel
+	fields applet, documentURL, baseURL and methods run and runLoader. Addapted messge
+	* configure.ac:  call to IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE replaced by call
+	to IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY
+	* /netx/net/sourceforge/jnlp/NetxPanel.java: now extends AppletViewerPanelAccess
+	instead of AppletViewerPanel directly. Access to baseURL, applet and documentURL
+	replaced by dedicated getters/setters
+	* netx/sun/applet/AppletViewerPanelAccess.java: new class extending AppletViewerPanel
+	and enabling access to applet, documentURL and baseURL. Backed by reflection.
+	Also overriding run by usage of short copypasted code.
+	* netx/sun/applet/package-info.java: new file with worning about usage of this
+	package in itw
+	* plugin/icedteanp/java/sun/applet/PluginAppletPanelFactory.java: only call
+	to super debug repalced by ITW's debugging call
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: used getters as in 
+	NetxPanel
+
 2014-05-21  Andrew Azores  <aazores@redhat.com>
 
 	* AUTHORS: added Lukasz Dracz and Jie Kang
