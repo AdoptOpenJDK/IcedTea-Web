@@ -1,5 +1,16 @@
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
+	All tests adapted to run from XBootclaspath (forced by extending package private
+	rt.jar class)
+	* Makefile.am: all sets of call of -Xbootclasspath in tests and coverage
+	are now adding $CLASSPATH to boot classapth. Where CLASSPATH was not deffined,
+	was added.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTest.java: and
+	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ComponentFinder.java:
+	resources loaded from boot classloader
+
+2014-05-21  Jiri Vanek  <jvanek@redhat.com>
+
 	Made it works (basicaly) on any JDK
 	* Makefile.am: (NETX_PKGS) sun.applet added to recognized netx packages
 	(netx-dist.stamp) sun directory included into packed list

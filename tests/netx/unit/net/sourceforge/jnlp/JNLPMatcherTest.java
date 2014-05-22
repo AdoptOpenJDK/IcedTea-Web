@@ -71,7 +71,7 @@ public class JNLPMatcherTest {
             "Testing application with a complete different JNLP application file",
             "Testing by calling JNLPMatcher.match() multiple times. Checking to see if the returns value is consistent" };
 
-    final ClassLoader cl = JNLPMatcherTest.class.getClassLoader();
+    final ClassLoader cl = ClassLoader.getSystemClassLoader();
 
     private InputStreamReader getLaunchReader() {
         InputStream launchStream = cl

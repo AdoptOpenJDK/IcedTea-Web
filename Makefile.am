@@ -896,7 +896,7 @@ stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp stamps/plugin.stamp lau
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_TESTS_DIR):$(TEST_EXTENSIONS_SRCDIR) \
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
-	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names
+	 -Xbootclasspath/a:$(RUNTIME):$$CLASSPATH CommandLine $$class_names
 if WITH_XSLTPROC
 	-$(XSLTPROC)  --stringparam logs logs_reproducers.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(TEST_EXTENSIONS_DIR)/tests-output.xml > $(TESTS_DIR)/index_reproducers.html
 	-$(XSLTPROC)  $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(TEST_EXTENSIONS_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_reproducers.html
@@ -1074,7 +1074,7 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):.:$(TEST_EXTENSIONS_SRCDIR):$(TAGSOUP_JAR) \
-	  $(BOOT_DIR)/bin/java -Xbootclasspath:$(RUNTIME) CommandLine $$class_names 
+	  $(BOOT_DIR)/bin/java -Xbootclasspath/a:$(RUNTIME):$$CLASSPATH CommandLine $$class_names 
 if WITH_XSLTPROC
 	-$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
 	-$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html
@@ -1094,7 +1094,8 @@ if WITH_EMMA
 	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
 	done ;\
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) -Demma.report.html.out.encoding=UTF-8 emmarun \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):.:$(TEST_EXTENSIONS_SRCDIR) \
+	$(BOOT_DIR)/bin/java $(EMMA_JAVA_ARGS) -Xbootclasspath/a:$(RUNTIME):$$CLASSPATH -cp $(EMMA_JAR) -Demma.report.html.out.encoding=UTF-8 emmarun \
 	 -Dreport.html.out.encoding=UTF-8 \
 	 -raw \
 	 -sp $(NETX_SRCDIR) \
@@ -1159,7 +1160,7 @@ if WITH_JACOCO
 	done ;\
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):.:$(TEST_EXTENSIONS_SRCDIR):$(TAGSOUP_JAR)  \
-	  $(BOOT_DIR)/bin/java $(JACOCO_AGENT_SWITCH) -Xbootclasspath:$(RUNTIME)  CommandLine $$class_names ; \
+	  $(BOOT_DIR)/bin/java $(JACOCO_AGENT_SWITCH) -Xbootclasspath/a:$(RUNTIME):$$CLASSPATH  CommandLine $$class_names ; \
 	for file in $(EMMA_MODIFIED_FILES) ; do \
 	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_SUFFIX)" ; \
 	  mv $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)"  $(NETX_UNIT_TEST_DIR)/$$file ; \
@@ -1215,10 +1216,11 @@ if WITH_EMMA
 	  done ; \
 	cd $(TEST_EXTENSIONS_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
+	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(abs_top_builddir)/liveconnect/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):$(TEST_EXTENSIONS_DIR):.:$(TEST_EXTENSIONS_SRCDIR)  \
 	$(BOOT_DIR)/bin/java  \
 	 $(EMMA_JAVA_ARGS) \
 	  $(REPRODUCERS_DPARAMETERS) \
-	 -Xbootclasspath:$(RUNTIME) -cp $(EMMA_JAR) emmarun  \
+	 -Xbootclasspath/a:$(RUNTIME):$$CLASSPATH -cp $(EMMA_JAR) emmarun  \
 	   -raw \
 	   -cp $(NETX_DIR)/lib/classes.jar \
 	   -cp $(JUNIT_JAR) \
@@ -1334,7 +1336,7 @@ if WITH_JACOCO
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_DIR):$(JACOCO_CLASSPATH):$(TEST_EXTENSIONS_TESTS_DIR):$(TEST_EXTENSIONS_SRCDIR) \
 	  $(BOOT_DIR)/bin/java $(JACOCO_AGENT_SWITCH) $(REPRODUCERS_DPARAMETERS) \
-	 -Xbootclasspath:$(RUNTIME) CommandLine $$class_names ; \
+	 -Xbootclasspath/a:$(RUNTIME):$$CLASSPATH CommandLine $$class_names ; \
 	if [ -f $(JACOCO_JAVAWS_RESULTS) ] ; then \
 	  jacoco_javaws_results=$(JACOCO_JAVAWS_RESULTS) ; \
 	  $(JACOCO_OPERATOR_EXEC) \
@@ -1443,14 +1445,14 @@ run-test-server-on-44321: stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/n
 	cd $(TEST_EXTENSIONS_DIR) ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_TESTS_DIR) \
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
-	 -Xbootclasspath:$(RUNTIME) net.sourceforge.jnlp.ServerAccess 
+	 -Xbootclasspath/a:$(RUNTIME):$$CLASSPATH net.sourceforge.jnlp.ServerAccess
 
 run-test-server-on-random-port: stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
  stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp
 	cd $(TEST_EXTENSIONS_DIR) ; \
 	CLASSPATH=$(NETX_DIR)/lib/classes.jar:$(JUNIT_JAR):$(JUNIT_RUNNER_JAR):.:$(TEST_EXTENSIONS_TESTS_DIR) \
 	  $(BOOT_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
-	 -Xbootclasspath:$(RUNTIME) net.sourceforge.jnlp.ServerAccess randomport
+	 -Xbootclasspath/a:$(RUNTIME):$$CLASSPATH net.sourceforge.jnlp.ServerAccess randomport 
 
 clean-netx-tests: clean-netx-unit-tests clean-junit-runner clean-netx-dist-tests clean-test-code-coverage-jacoco clean-test-code-coverage
 	if [ -e $(TESTS_DIR)/netx ]; then \

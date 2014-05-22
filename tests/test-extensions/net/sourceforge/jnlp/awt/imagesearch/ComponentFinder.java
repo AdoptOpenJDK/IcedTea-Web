@@ -50,7 +50,7 @@ public class ComponentFinder {
 
     static{
         try {
-            defaultIcon = ImageIO.read(ComponentFinder.class.getClassLoader().getResource("net/sourceforge/jnlp/awt/imagesearch/marker.png"));
+            defaultIcon = ImageIO.read(ClassLoader.getSystemClassLoader().getResource("net/sourceforge/jnlp/awt/imagesearch/marker.png"));
         } catch (IOException e) {
             throw new RuntimeException("ComponentFinder - problem initializing defaultIcon",e);
         }
