@@ -1,5 +1,11 @@
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed slipped test classlaoder fix
+	* sts/reproducers/simple/JavawsAWTRobotFindsButton/testcases/JavawsAWTRobotFindsButtonTest.java
+	(static init) used system classlaoder to laod image
+
+2014-05-21  Jiri Vanek  <jvanek@redhat.com>
+
 	* netx/sun/applet/AppletViewerPanelAccess.java: addedd accidentally skipped
 	createAppletThread method
 

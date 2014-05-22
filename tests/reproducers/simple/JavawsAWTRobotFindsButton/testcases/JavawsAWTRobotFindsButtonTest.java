@@ -68,7 +68,7 @@ public class JavawsAWTRobotFindsButtonTest {
 
     static{
         try {
-            buttonIcon = ImageIO.read(JavawsAWTRobotFindsButtonTest.class.getClassLoader().getResource("buttonA.png"));
+            buttonIcon = ImageIO.read(ClassLoader.getSystemClassLoader().getResource("buttonA.png"));
         } catch (IOException e) {
             throw new RuntimeException("Problem initializing buttonIcon",e);
         }
