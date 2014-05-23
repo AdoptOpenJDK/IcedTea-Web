@@ -346,7 +346,7 @@ public class CacheReproducerTest {
 
         }
         tryToClearcache();
-        Assert.assertFalse("icedtea cache " + icedteaCache.getAbsolutePath() + " should not exist after clearing", icedteaCache.exists());
+        Assert.assertTrue("icedtea cache " + icedteaCache.getAbsolutePath() + " should be empty after clearing", icedteaCache.listFiles().length == 0);
     }
 
     private static String loadFile(File f) throws FileNotFoundException, UnsupportedEncodingException, IOException {

@@ -1,5 +1,11 @@
 2014-05-23  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed cache tests
+	* tests/reproducers/signed/CacheReproducer/testcases/CacheReproducerTest.java:
+	changed condition on checking cache dir from not existing to being empty,
+
+2014-05-23  Jiri Vanek  <jvanek@redhat.com>
+
 	Minor code enhancements: Enum for HEAD and GET, urlutils classes moved to UrlUtils
 	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: "*" imports replaced by full
 	ones location, version and properties made final. (isCurrent) rewritten
