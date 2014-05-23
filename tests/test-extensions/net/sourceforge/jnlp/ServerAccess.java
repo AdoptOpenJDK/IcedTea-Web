@@ -36,19 +36,10 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
@@ -56,7 +47,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.browsertesting.Browser;
 import net.sourceforge.jnlp.browsertesting.BrowserFactory;
 import net.sourceforge.jnlp.browsertesting.Browsers;
@@ -64,7 +54,6 @@ import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.junit.Assert;
 
 /**
  *
@@ -277,7 +266,7 @@ public class ServerAccess {
        if (this.currentBrowser==null) return null;
        List<String> l1=this.currentBrowser.getComaptibilitySwitches();
        List<String> l2=this.currentBrowser.getDefaultSwitches();
-       List<String> l= new ArrayList<String>();
+       List<String> l= new ArrayList<>();
        if (l1!=null)l.addAll(l1);
        if (l2!=null)l.addAll(l2);
        return l;
@@ -553,9 +542,9 @@ public class ServerAccess {
 
     public ProcessResult executeJavawsHeadless(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
         if (otherargs == null) {
-            otherargs = new ArrayList<String>(1);
+            otherargs = new ArrayList<>(1);
         }
-        List<String> headlesList = new ArrayList<String>(otherargs);
+        List<String> headlesList = new ArrayList<>(otherargs);
         headlesList.add(HEADLES_OPTION);
         return executeJavaws(headlesList, resource,stdoutl,stderrl,vars);
     }
@@ -794,8 +783,7 @@ public class ServerAccess {
     static void log(String message, boolean printToOut, boolean printToErr) {
         String idded;
         StackTraceElement ste = getTestMethod();
-        String fullId = ste.getClassName() + "." + ste.getMethodName();
-        fullId = LoggingBottleneck.getDefaultLoggingBottleneck().modifyMethodWithForBrowser(ste.getMethodName(), ste.getClassName());
+        String fullId = LoggingBottleneck.getDefaultLoggingBottleneck().modifyMethodWithForBrowser(ste.getMethodName(), ste.getClassName());
         if (message.contains("\n")) {
             idded = fullId + ": \n" + message + "\n" + fullId + " ---";
         } else {

@@ -1,4 +1,42 @@
-2014-05-21  Jiri Vanek  <jvanek@redhat.com>
+2014-05-23  Jiri Vanek  <jvanek@redhat.com>
+
+	Minor code enhancements: Enum for HEAD and GET, urlutils classes moved to UrlUtils
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: "*" imports replaced by full
+	ones location, version and properties made final. (isCurrent) rewritten
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (urlEquals) and (notNullUrlEquals)
+	and (compare) moved to UrlUtils. (getReadPermission) got javadoc. urlList, keep,
+	remove colelctions redeclared to diamond
+	* netx/net/sourceforge/jnlp/cache/Resource.java: adapted imports and calls to
+	CacheUtil UrlUtils change.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: (requestMethods) hidden into
+	public inner enum of RequestMethods. prefetchTrackers, queue, downloadOptions, active,
+	resources, listeners marked final and redeclared with diamond. (getUrlResponseCode)
+	adapted to new enum, removed javadoc. (getUrlResponseCodeWithRedirectonResult) adapted
+	to new enum
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: file group loader
+	appContext weakWindows weakWindows made final and redeclared with diamond. Added
+	override annotations. (shouldCreateShortcut) changed to switch.
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: used multi catch where possible.
+	urlEquals, notNullUrlEquals, compareNullableStrings moved from CacheUtils
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java: adapted to 
+	CacheUtils->UrlUtils method movement.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTest.java: assertNotEquals
+	replaced by assertFalse and equals. Specific versions of JUnit have problems with
+	notEquals.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java: Adapted
+	to new enum.
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java: added testUrlEquals
+	verifyNotNullUrlEqualsThrowsExceptionWhenBothArgumentsAreNull
+	nverifyNotNullUrlEqualsThrowsExceptionWhenFirstArgumentIsNull
+	verifyNotNullUrlEqualsThrowsExceptionWhenSecondArgumentIsNull
+	notNullUrlValuesEqualsCaseSensitiveIssuesTest
+	notNullUrlComapreWithPorts (known to fail), testCompareNullableStrings and
+	testCompareNullableStrings tests
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: removed unused
+	imports, used diamonds, removed dead code.
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: Adapted to new enum.
+
+2014-05-23  Jiri Vanek  <jvanek@redhat.com>
 
 	Minor javadoc enhancements
 	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: added or filled some javadocs

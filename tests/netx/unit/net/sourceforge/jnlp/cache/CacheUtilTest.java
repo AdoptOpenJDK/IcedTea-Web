@@ -38,11 +38,11 @@ package net.sourceforge.jnlp.cache;
 
 import java.io.File;
 import java.net.URL;
+import net.sourceforge.jnlp.util.UrlUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-/** Test various corner cases of the parser */
 public class CacheUtilTest {
 
     @Test
@@ -50,18 +50,9 @@ public class CacheUtilTest {
         URL[] u = ResourceTrackerTest.getUrls();
         URL[] n = ResourceTrackerTest.getNormalizedUrls();
         for (int i = 0; i < u.length; i++) {
-            Assert.assertTrue("url " + i + " must CacheUtil.urlEquals to its normalized form " + i, CacheUtil.urlEquals(u[i], n[i]));
-            Assert.assertTrue("normalized form " + i + " must CacheUtil.urlEquals to its original " + i, CacheUtil.urlEquals(n[i], u[i]));
+            Assert.assertTrue("url " + i + " must CacheUtil.urlEquals to its normalized form " + i, UrlUtils.urlEquals(u[i], n[i]));
+            Assert.assertTrue("normalized form " + i + " must CacheUtil.urlEquals to its original " + i, UrlUtils.urlEquals(n[i], u[i]));
         }
-    }
-
-    @Test
-    public void testUrlEquals() throws Exception {
-        final URL n1 = null, n2 = null, u1 = new URL("http://example.com"), u2 = u1, u3 = new URL("http://example.com");
-        Assert.assertTrue("Two nulls should be equal", CacheUtil.urlEquals(n1, n2));
-        Assert.assertFalse("Null URL should not equal a non-null", CacheUtil.urlEquals(n1, u1));
-        Assert.assertTrue("URL should equal itself (same reference)", CacheUtil.urlEquals(u1, u2));
-        Assert.assertTrue("URLs should be equal when different reference but the same URL", CacheUtil.urlEquals(u1, u3));
     }
 
     @Test

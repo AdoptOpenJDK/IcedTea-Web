@@ -272,10 +272,9 @@ public class ResourceTrackerTest {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), "HEAD");
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
+            int i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
             f.delete();
-            i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), "HEAD");
+            i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
         } finally {
             redirectErrBack();
@@ -287,10 +286,10 @@ public class ResourceTrackerTest {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), "HEAD");
+            int i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
             f.delete();
-            i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), "HEAD");
+            i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
         } finally {
             redirectErrBack();
@@ -302,10 +301,10 @@ public class ResourceTrackerTest {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), "GET");
+            int i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.GET);
             Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
             f.delete();
-            i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), "GET");
+            i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.GET);
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
         } finally {
             redirectErrBack();
@@ -317,10 +316,10 @@ public class ResourceTrackerTest {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), "GET");
+            int i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.GET);
             Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
             f.delete();
-            i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), "GET");
+            i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.GET);
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
         } finally {
             redirectErrBack();
@@ -334,7 +333,7 @@ public class ResourceTrackerTest {
             File f = File.createTempFile(nameStub1, nameStub2);
             Exception exception = null;
             try {
-                ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), "SomethingWrong");
+                ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.TESTING_UNDEF);
             } catch (Exception ex) {
                 exception = ex;
             }
@@ -342,7 +341,7 @@ public class ResourceTrackerTest {
             exception = null;
             f.delete();
             try {
-                ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), "SomethingWrong");
+                ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.TESTING_UNDEF);
             } catch (Exception ex) {
                 exception = ex;
             }

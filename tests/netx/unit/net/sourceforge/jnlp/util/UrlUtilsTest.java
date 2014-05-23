@@ -43,6 +43,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
+import net.sourceforge.jnlp.annotations.KnownToFail;
+import org.junit.Assert;
 
 import org.junit.Test;
 
@@ -242,7 +244,86 @@ public class UrlUtilsTest {
          assertEquals(l9, new URL("http://aaa.bb"));
         
     }
-     
     
+    @Test
+    public void testUrlEquals() throws Exception {
+        final URL n1 = null, n2 = null, u1 = new URL("http://example.com"), u2 = u1, u3 = new URL("http://example.com");
+        Assert.assertTrue("Two nulls should be equal", UrlUtils.urlEquals(n1, n2));
+        Assert.assertFalse("Null URL should not equal a non-null", UrlUtils.urlEquals(n1, u1));
+        Assert.assertTrue("URL should equal itself (same reference)", UrlUtils.urlEquals(u1, u2));
+        Assert.assertTrue("URLs should be equal when different reference but the same URL", UrlUtils.urlEquals(u1, u3));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void verifyNotNullUrlEqualsThrowsExceptionWhenBothArgumentsAreNull() throws Exception {
+        UrlUtils.notNullUrlEquals(null, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void nverifyNotNullUrlEqualsThrowsExceptionWhenFirstArgumentIsNull() throws Exception {
+        UrlUtils.notNullUrlEquals(null, new URL("ftp://aa.bb"));
+    }
+
+    @Test
+    public void verifyNotNullUrlEqualsThrowsExceptionWhenSecondArgumentIsNull() throws Exception {
+        UrlUtils.notNullUrlEquals(new URL("ftp://aa.bb"), null);
+    }
+
+    @Test
+    public void notNullUrlValuesEqualsCaseSensitiveIssuesTest() throws Exception {
+        final URL u1 = new URL("http://example.com"), u2 = u1, u3 = new URL("HTTP://example.com");
+        final URL u11 = new URL("http://example.com/path"), u12 = new URL("http://EXAMPLE.com/path"), u13 = new URL("http://example.com/PATH"), u14 = new URL("http://example.com/path2");
+        final URL u21 = new URL("http://example2.com");
+        final URL u22 = new URL("ftp://example.com");
+
+        Assert.assertTrue(UrlUtils.notNullUrlEquals(u1, u2));
+        Assert.assertTrue(UrlUtils.notNullUrlEquals(u1, u3));
+
+        Assert.assertTrue(UrlUtils.notNullUrlEquals(u11, u12));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u11, u13));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u12, u13));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u11, u14));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u12, u14));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u13, u14));
+
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u1, u21));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u1, u22));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u21, u22));
+    }
+
+    @Test
+    //the ports are for some unknown reason ignored from comparsion
+    @KnownToFail
+    public void notNullUrlComapreWithPorts() throws Exception {
+        final URL u1 = new URL("http://example.com:1"), u2 = new URL("http://example.com:1"), u3 = new URL("http://example.com:3");
+        Assert.assertTrue(UrlUtils.notNullUrlEquals(u1, u2));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u1, u3));
+        Assert.assertFalse(UrlUtils.notNullUrlEquals(u2, u3));
+    }
+
+    @Test
+    public void testCompareNullableStrings_nulls() throws Exception {
+        Assert.assertTrue(UrlUtils.compareNullableStrings(null, null, true));
+        Assert.assertTrue(UrlUtils.compareNullableStrings(null, null, false));
+        Assert.assertFalse(UrlUtils.compareNullableStrings(null, "blah", true));
+        Assert.assertFalse(UrlUtils.compareNullableStrings("blah", null, false));
+    }
+
+    @Test
+    public void testCompareNullableStrings_values() throws Exception {
+        Assert.assertTrue(UrlUtils.compareNullableStrings("aaa", "aaa", true));
+        Assert.assertTrue(UrlUtils.compareNullableStrings("aaa", "aaa", false));
+
+        Assert.assertFalse(UrlUtils.compareNullableStrings("aaa", "AAA", false));
+        Assert.assertTrue(UrlUtils.compareNullableStrings("aaa", "AAA", true));
+
+        Assert.assertFalse(UrlUtils.compareNullableStrings("AAA", "aaa", false));
+        Assert.assertTrue(UrlUtils.compareNullableStrings("AAA", "aaa", true));
+
+        Assert.assertFalse(UrlUtils.compareNullableStrings("aaa", "bbb", true));
+        Assert.assertFalse(UrlUtils.compareNullableStrings("aaa", "BBB", false));
+        Assert.assertFalse(UrlUtils.compareNullableStrings("BBB", "aaa", false));
+
+    }
 
 }

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
 /**
@@ -430,7 +431,7 @@ public class Resource {
             // time spent in synchronized addResource determining if
             // Resource is already in a tracker, and better for offline
             // mode on some OS.
-            return CacheUtil.urlEquals(location, ((Resource) other).location);
+            return UrlUtils.urlEquals(location, ((Resource) other).location);
         }
         return false;
     }

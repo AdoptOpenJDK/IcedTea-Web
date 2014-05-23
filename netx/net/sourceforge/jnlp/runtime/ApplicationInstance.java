@@ -56,13 +56,13 @@ public class ApplicationInstance {
     // installed by the application.
 
     /** the file */
-    private JNLPFile file;
+    private final JNLPFile file;
 
     /** the thread group */
-    private ThreadGroup group;
+    private final ThreadGroup group;
 
     /** the classloader */
-    private ClassLoader loader;
+    private final ClassLoader loader;
 
     /**
      * <p>
@@ -75,16 +75,16 @@ public class ApplicationInstance {
      * It is set to the AppContext which created this ApplicationInstance
      * </p>
      */
-    private AppContext appContext;
+    private final AppContext appContext;
 
     /** whether the application has stopped running */
     private boolean stopped = false;
 
     /** weak list of windows opened by the application */
-    private WeakList<Window> weakWindows = new WeakList<Window>();
+    private final WeakList<Window> weakWindows = new WeakList<>();
 
     /** list of application listeners  */
-    private EventListenerList listeners = new EventListenerList();
+    private final EventListenerList listeners = new EventListenerList();
 
     /** whether or not this application is signed */
     private boolean isSigned = false;
@@ -195,24 +195,27 @@ public class ApplicationInstance {
          * check configuration and possibly prompt user to find out if a
          * shortcut should be created or not
          */
-        if (currentSetting.equals(ShortcutDesc.CREATE_NEVER)) {
-            createShortcut = false;
-        } else if (currentSetting.equals(ShortcutDesc.CREATE_ALWAYS)) {
-            createShortcut = true;
-        } else if (currentSetting.equals(ShortcutDesc.CREATE_ASK_USER)) {
-            if (SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
+        switch (currentSetting) {
+            case ShortcutDesc.CREATE_NEVER:
+                createShortcut = false;
+                break;
+            case ShortcutDesc.CREATE_ALWAYS:
                 createShortcut = true;
-            }
-        } else if (currentSetting.equals(ShortcutDesc.CREATE_ASK_USER_IF_HINTED)) {
-            if (sd != null && sd.onDesktop()) {
+                break;
+            case ShortcutDesc.CREATE_ASK_USER:
                 if (SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
                     createShortcut = true;
-                }
-            }
-        } else if (currentSetting.equals(ShortcutDesc.CREATE_ALWAYS_IF_HINTED)) {
-            if (sd != null && sd.onDesktop()) {
-                createShortcut = true;
-            }
+                }   break;
+            case ShortcutDesc.CREATE_ASK_USER_IF_HINTED:
+                if (sd != null && sd.onDesktop()) {
+                    if (SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
+                        createShortcut = true;
+                    }
+                }   break;
+            case ShortcutDesc.CREATE_ALWAYS_IF_HINTED:
+                if (sd != null && sd.onDesktop()) {
+                    createShortcut = true;
+                }   break;
         }
 
         return createShortcut;
@@ -225,6 +228,7 @@ public class ApplicationInstance {
      * application would have to close its windows and exit its
      * threads but not call JNLPRuntime.exit).
      */
+    @Override
     public void finalize() {
         destroy();
     }
@@ -246,6 +250,7 @@ public class ApplicationInstance {
         AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
 
         PrivilegedAction<Object> installProps = new PrivilegedAction<Object>() {
+            @Override
             public Object run() {
                 for (PropertyDesc propDesc : props) {
                     System.setProperty(propDesc.getKey(), propDesc.getValue());

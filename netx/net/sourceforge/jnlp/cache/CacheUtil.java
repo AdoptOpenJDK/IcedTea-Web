@@ -68,49 +68,6 @@ public class CacheUtil {
     private static final HashMap<String, FileLock> propertiesLockPool = new HashMap<String, FileLock>();
 
     /**
-     * Compares a URL using string compare of its protocol, host,
-     * port, path, query, and anchor. This method avoids the host
-     * name lookup that URL.equals does for http: protocol URLs.
-     * It may not return the same value as the URL.equals method
-     * (different hostnames that resolve to the same IP address,
-     * ie sourceforge.net and www.sourceforge.net).
-     */
-    public static boolean urlEquals(URL u1, URL u2) {
-        if (u1 == u2) {
-            return true;
-        }
-        if (u1 == null || u2 == null) {
-            return false;
-        }
-
-        if (notNullUrlEquals(u1, u2)) {
-            return true;
-        }
-        try {
-            URL nu1 = UrlUtils.normalizeUrl(u1);
-            URL nu2 = UrlUtils.normalizeUrl(u2);
-            if (notNullUrlEquals(nu1, nu2)) {
-                return true;
-            }
-        } catch (Exception ex) {
-            //keep silent here and return false
-        }
-        return false;
-    }
-
-    private static boolean notNullUrlEquals(URL u1, URL u2) {
-        if (!compare(u1.getProtocol(), u2.getProtocol(), true)
-                || !compare(u1.getHost(), u2.getHost(), true)
-                || //u1.getDefaultPort() != u2.getDefaultPort() || // only in 1.4
-                !compare(u1.getPath(), u2.getPath(), false)
-                || !compare(u1.getQuery(), u2.getQuery(), false)
-                || !compare(u1.getRef(), u2.getRef(), false)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    /**
      * Caches a resource and returns a URL for it in the cache;
      * blocks until resource is cached. If the resource location is
      * not cacheable (points to a local file, etc) then the original
@@ -133,26 +90,11 @@ public class CacheUtil {
     }
 
     /**
-     * Compare strings that can be {@code null}.
-     */
-    private static boolean compare(String s1, String s2, boolean ignore) {
-        if (s1 == s2)
-            return true;
-        if (s1 == null || s2 == null)
-            return false;
-
-        if (ignore)
-            return s1.equalsIgnoreCase(s2);
-        else
-            return s1.equals(s2);
-    }
-
-    /**
      * Returns the Permission object necessary to access the
      * resource, or {@code null} if no permission is needed.
-     * @param location
-     * @param version
-     * @return 
+     * @param location location of the resource
+     * @param version the version, or {@code null}
+     * @return permissions of the location
      */
     public static Permission getReadPermission(URL location, Version version) {
         Permission result = null;
@@ -540,7 +482,7 @@ public class CacheUtil {
                 return;
 
             // only resources not starting out downloaded are displayed
-            List<URL> urlList = new ArrayList<URL>();
+            List<URL> urlList = new ArrayList<>();
             for (URL url : resources) {
                 if (!tracker.checkResource(url))
                     urlList.add(url);
@@ -591,8 +533,8 @@ public class CacheUtil {
 
         if (okToClearCache()) {
             // First we want to figure out which stuff we need to delete.
-            HashSet<String> keep = new HashSet<String>();
-            HashSet<String> remove = new HashSet<String>();
+            HashSet<String> keep = new HashSet<>();
+            HashSet<String> remove = new HashSet<>();
             lruHandler.load();
             
             long maxSize = -1; // Default

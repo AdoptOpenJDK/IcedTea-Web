@@ -45,7 +45,6 @@ import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -131,7 +130,7 @@ public class ResourceTest {
         assertTrue("Original should be emtpy", original.isEmpty());
         original.add(DOWNLOADING);
         Set<Resource.Status> dummy = res.getCopyOfStatus();
-        assertNotEquals(dummy, original);
+        assertFalse(dummy.equals(original));
         assertFalse(dummy.contains(DOWNLOADING));		
     }
 

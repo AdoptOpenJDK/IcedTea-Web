@@ -16,14 +16,13 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.io.*;
-import java.net.*;
-
-import net.sourceforge.jnlp.*;
-import net.sourceforge.jnlp.util.*;
+import java.io.File;
+import java.net.URL;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Describes an entry in the cache.
@@ -41,13 +40,13 @@ public class CacheEntry {
     private static final String KEY_LAST_UPDATED = "last-updated";
 
     /** the remote resource location */
-    private URL location;
+    private final URL location;
 
     /** the requested version */
-    private Version version;
+    private final Version version;
 
     /** info about the cached file */
-    private PropertiesFile properties;
+    private final PropertiesFile properties;
 
     /**
      * Create a CacheEntry for the resources specified as a remote
@@ -152,30 +151,23 @@ public class CacheEntry {
 
     /**
      * Returns whether there is a version of the URL contents in
-     * the cache and it is up to date.  This method may not return
-     * immediately.
+     * the cache and it is up to date.
      *
-     * @param lastModified
+     * @param lastModified - current time as get from server (in ms). Mostly value of "Last-Modified" http header'? 
      * @return whether the cache contains the version
      */
     public boolean isCurrent(long lastModified) {
         boolean cached = isCached();
 
-        if (!cached)
+        if (!cached) {
             return false;
-
+        }
         try {
-            long remoteModified = lastModified;
             long cachedModified = Long.parseLong(properties.getProperty(KEY_LAST_MODIFIED));
-
-            if (remoteModified > 0 && remoteModified <= cachedModified)
-                return true;
-            else
-                return false;
-        } catch (Exception ex) {
-            OutputController.getLogger().log(ex);;
-
-            return cached; // if can't connect return whether already in cache
+            return lastModified > 0 && lastModified <= cachedModified;
+        } catch (Exception ex){
+            OutputController.getLogger().log(ex);
+            return cached;
         }
     }
 

@@ -104,6 +104,17 @@ public class ResourceTracker {
 
     // separately locks on (in order of aquire order, ie, sync on prefetch never syncs on lock):
     //   lock, prefetch, this.resources, each resource, listeners
+    public static enum RequestMethods{
+        HEAD, GET, TESTING_UNDEF;
+        
+    private static final RequestMethods[] requestMethods = {RequestMethods.HEAD, RequestMethods.GET};
+
+        public static RequestMethods[] getValidRequestMethods() {
+            return requestMethods;
+        }
+    
+    
+    }
 
     /** notified on initialization or download of a resource */
     private static final Object lock = new Object(); // used to lock static structures
@@ -111,31 +122,28 @@ public class ResourceTracker {
     /** max threads */
     private static final int maxThreads = 5;
     
-    /** methods used to try individual URLs when choosing best*/
-    private static final String[] requestMethods = {"HEAD", "GET"};
-
     /** running threads */
     private static int threads = 0;
 
     /** weak list of resource trackers with resources to prefetch */
-    private static WeakList<ResourceTracker> prefetchTrackers =
-            new WeakList<ResourceTracker>();
+    private static final WeakList<ResourceTracker> prefetchTrackers =
+            new WeakList<>();
 
     /** resources requested to be downloaded */
-    private static ArrayList<Resource> queue = new ArrayList<Resource>();
+    private static final ArrayList<Resource> queue = new ArrayList<>();
 
-    private static ConcurrentHashMap<Resource, DownloadOptions> downloadOptions =
-        new ConcurrentHashMap<Resource, DownloadOptions>();
+    private static final ConcurrentHashMap<Resource, DownloadOptions> downloadOptions =
+        new ConcurrentHashMap<>();
 
     /** resource trackers threads are working for (used for load balancing across multi-tracker downloads) */
-    private static ArrayList<ResourceTracker> active =
-            new ArrayList<ResourceTracker>(); //
+    private final static ArrayList<ResourceTracker> active =
+            new ArrayList<>(); //
 
     /** the resources known about by this resource tracker */
-    private List<Resource> resources = new ArrayList<Resource>();
+    private final List<Resource> resources = new ArrayList<>();
 
     /** download listeners for this tracker */
-    private List<DownloadListener> listeners = new ArrayList<DownloadListener>();
+    private final List<DownloadListener> listeners = new ArrayList<>();
 
     /** whether to download parts before requested */
     private boolean prefetch;
@@ -871,24 +879,24 @@ public class ResourceTracker {
             entry.unlock();
         }
     }
-    /**
-     * testing wrapper
-     *
-     * @param url
-     * @param requestProperties
-     * @param requestMethod
-     * @return
-     * @throws IOException
-     */
-    static int getUrlResponseCode(URL url, Map<String, String> requestProperties, String requestMethod) throws IOException {
+
+    
+    static int getUrlResponseCode(URL url, Map<String, String> requestProperties, RequestMethods requestMethod) throws IOException {
         return getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod).result;
     }
 
+    /**
+     * Complex wrapper around return code with utility methods
+     * Default is HTTP_OK
+     */
     private static class CodeWithRedirect {
 
         int result = HttpURLConnection.HTTP_OK;
         URL URL;
 
+        /**
+         *  @return  whether the result code is redirect one. Rigth now 301-303 and 307-308
+         */
         public boolean shouldRedirect() {
             return (result == 301
                     || result == 302
@@ -915,7 +923,7 @@ public class ResourceTracker {
      * HttpURLConnection.HTTP_OK and null if not.
      * @throws IOException
      */
-    static CodeWithRedirect getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, String requestMethod) throws IOException {
+    static CodeWithRedirect getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, RequestMethods requestMethod) throws IOException {
         CodeWithRedirect result = new CodeWithRedirect();
         URLConnection connection = url.openConnection();
 
@@ -925,7 +933,7 @@ public class ResourceTracker {
 
         if (connection instanceof HttpURLConnection) {
             HttpURLConnection httpConnection = (HttpURLConnection) connection;
-            httpConnection.setRequestMethod(requestMethod);
+            httpConnection.setRequestMethod(requestMethod.toString());
 
             int responseCode = httpConnection.getResponseCode();
 
@@ -975,7 +983,7 @@ public class ResourceTracker {
          OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "All possible urls for "
                  + resource.toString() + " : " + urls);
         
-         for (String requestMethod : requestMethods) {
+         for (RequestMethods requestMethod : RequestMethods.getValidRequestMethods()) {
              for (int i = 0; i < urls.size(); i++) {
                  URL url = urls.get(i);
                  try {
@@ -1185,7 +1193,7 @@ public class ResourceTracker {
     private Resource getResource(URL location) {
         synchronized (resources) {
             for (Resource resource : resources) {
-                if (CacheUtil.urlEquals(resource.getLocation(), location))
+                if (UrlUtils.urlEquals(resource.getLocation(), location))
                     return resource;
             }
         }
@@ -1293,6 +1301,7 @@ public class ResourceTracker {
 
                     final Resource fResource = resource;
                     AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                        @Override
                         public Void run() {
                             processResource(fResource);                            
                             return null;

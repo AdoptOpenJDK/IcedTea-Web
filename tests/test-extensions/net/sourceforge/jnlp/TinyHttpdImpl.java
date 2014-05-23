@@ -48,6 +48,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.URLDecoder;
 import java.util.StringTokenizer;
+import net.sourceforge.jnlp.cache.ResourceTracker;
 
 /**
  * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html
@@ -113,8 +114,8 @@ public class TinyHttpdImpl extends Thread {
                     StringTokenizer t = new StringTokenizer(line, " ");
                     String request = t.nextToken();
 
-                    boolean isHeadRequest = request.equals("HEAD");
-                    boolean isGetRequest = request.equals("GET");
+                    boolean isHeadRequest = request.equals(ResourceTracker.RequestMethods.HEAD.toString());
+                    boolean isGetRequest = request.equals(ResourceTracker.RequestMethods.GET.toString());
 
                     if (isHeadRequest && !isSupportingHeadRequest()) {
                         ServerAccess.logOutputReprint("Received HEAD request but not supported");
