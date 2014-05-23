@@ -182,6 +182,7 @@ public class CacheUtil {
      * Note: Because of how our caching system works, deleting jars of another javaws
      * process is using them can be quite disasterous. Hence why Launcher creates lock files
      * and we check for those by calling {@link #okToClearCache()}
+     * @return true if the cache could be cleared and was cleared
      */
     public static boolean clearCache() {
 
@@ -297,6 +298,9 @@ public class CacheUtil {
      * Returns whether the resource can be cached as a local file;
      * if not, then URLConnection.openStream can be used to obtain
      * the contents.
+     * @param source the url of resource
+     * @param version version of resource
+     * @return whether this resource can be cached
      */
     public static boolean isCacheable(URL source, Version version) {
         if (source == null)
@@ -444,6 +448,7 @@ public class CacheUtil {
      *
      * @param source the remote location
      * @param version the file version to write to
+     * @return the stream towrite to resource
      */
     public static OutputStream getOutputStream(URL source, Version version) throws IOException {
         File localFile = getCacheFile(source, version);
@@ -456,6 +461,9 @@ public class CacheUtil {
      * Copies from an input stream to an output stream.  On
      * completion, both streams will be closed.  Streams are
      * buffered automatically.
+     * @param is stream to read from
+     * @param os stream to write to
+     * @throws java.io.IOException if copy fails
      */
     public static void streamCopy(InputStream is, OutputStream os) throws IOException {
         if (!(is instanceof BufferedInputStream))
@@ -511,6 +519,7 @@ public class CacheUtil {
      * Waits until the resources are downloaded, while showing a
      * progress indicator.
      *
+     * @param app application instance with context for this resource
      * @param tracker the resource tracker
      * @param resources the resources to wait for
      * @param title name of the download

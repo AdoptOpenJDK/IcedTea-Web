@@ -75,6 +75,7 @@ public class CacheEntry {
 
     /**
      * Returns the remote location this entry caches.
+     * @return URL same as the one on which this entry was created
      */
     public URL getLocation() {
         return location;
@@ -83,7 +84,7 @@ public class CacheEntry {
     /**
      * Returns the time in the local system clock that the file was
      * most recently checked for an update.
-     * @return 
+     * @return when the item was updated (in ms)
      */
     public long getLastUpdated() {
         return getLongKey(KEY_LAST_UPDATED);
@@ -92,7 +93,7 @@ public class CacheEntry {
     /**
      * Sets the time in the local system clock that the file was
      * most recently checked for an update.
-     * @param updatedTime
+     * @param updatedTime the time (in ms) to be set as last updated time
      */
     public void setLastUpdated(long updatedTime) {
         setLongKey(KEY_LAST_UPDATED, updatedTime);

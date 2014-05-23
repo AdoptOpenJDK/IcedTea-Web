@@ -527,17 +527,25 @@ public final class FileUtils {
         return lock;
     }
 
-    /**
-     * helping dummy  method to save String as file
+/**
+     * Method to save String as file in UTF-8 encoding.
      * 
-     * @param content
-     * @param f
+     * @param content which will be saved as it is saved in this String
+     * @param f file to be saved. No warnings provided
      * @throws IOException
      */
     public static void saveFile(String content, File f) throws IOException {
         saveFile(content, f, "utf-8");
     }
 
+    /**
+     * Method to save String as file in specified encoding/.
+     *
+     * @param content which will be saved as it is saved in this String
+     * @param f file to be saved. No warnings provided
+     * @param encoding of output byte representation
+     * @throws IOException
+     */
     public static void saveFile(String content, File f, String encoding) throws IOException {
         Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), encoding));
         output.write(content);

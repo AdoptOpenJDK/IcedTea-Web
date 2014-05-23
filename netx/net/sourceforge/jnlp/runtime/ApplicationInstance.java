@@ -92,6 +92,9 @@ public class ApplicationInstance {
     /**
      * Create an application instance for the file. This should be done in the
      * appropriate {@link ThreadGroup} only.
+     * @param file jnlpfile for which the instance do exists
+     * @param group thread group to which it belongs
+     * @param loader loader for this application
      */
     public ApplicationInstance(JNLPFile file, ThreadGroup group, ClassLoader loader) {
         this.file = file;
@@ -103,6 +106,7 @@ public class ApplicationInstance {
 
     /**
      * Add an Application listener
+     * @param listener listener to be added
      */
     public void addApplicationListener(ApplicationListener listener) {
         listeners.add(ApplicationListener.class, listener);
@@ -110,6 +114,7 @@ public class ApplicationInstance {
 
     /**
      * Remove an Application Listener
+     * @param listener to be removed
      */
     public void removeApplicationListener(ApplicationListener listener) {
         listeners.remove(ApplicationListener.class, listener);
@@ -253,7 +258,8 @@ public class ApplicationInstance {
     }
 
     /**
-     * Returns the JNLP file for this task.
+     * Returns the jnlpfile on which is this application based
+     * @return JNLP file for this task.
      */
     public JNLPFile getJNLPFile() {
         return file;
@@ -261,6 +267,7 @@ public class ApplicationInstance {
 
     /**
      * Returns the application title.
+     * @return the title of this application
      */
     public String getTitle() {
         return file.getTitle();
@@ -268,6 +275,7 @@ public class ApplicationInstance {
 
     /**
      * Returns whether the application is running.
+     * @return state of application
      */
     public boolean isRunning() {
         return !stopped;
@@ -317,6 +325,7 @@ public class ApplicationInstance {
     /**
      * Returns the thread group.
      *
+     * @return thread group of this application, unless it is stopped
      * @throws IllegalStateException if the app is not running
      */
     public ThreadGroup getThreadGroup() throws IllegalStateException {
@@ -329,6 +338,7 @@ public class ApplicationInstance {
     /**
      * Returns the classloader.
      *
+     * @return the classloader of this application, unless it is stopped
      * @throws IllegalStateException if the app is not running
      */
     public ClassLoader getClassLoader() throws IllegalStateException {
@@ -341,6 +351,7 @@ public class ApplicationInstance {
     /**
      * Adds a window that this application opened.  When the
      * application is disposed, these windows will also be disposed.
+     * @param window to be added
      */
     protected void addWindow(Window window) {
         weakWindows.add(window);
@@ -348,12 +359,16 @@ public class ApplicationInstance {
     }
 
     /**
-     * Returns whether or not this jar is signed.
+     * Returns whether or not this application is signed.
      */
     public boolean isSigned() {
         return isSigned;
     }
 
+    /**
+     *
+     * @return application context of this instance
+     */
     public AppContext getAppContext() {
         return appContext;
     }

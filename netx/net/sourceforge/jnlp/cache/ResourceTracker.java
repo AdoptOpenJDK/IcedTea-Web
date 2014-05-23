@@ -216,6 +216,7 @@ public class ResourceTracker {
      * not required as resources are reclaimed when the tracker is
      * collected.
      *
+     * @param location location of resource to be removed
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public void removeResource(URL location) {
@@ -308,6 +309,7 @@ public class ResourceTracker {
      * on each tracker that is monitoring the resource.  Do not call
      * this method with any locks because the listeners may call
      * back to this ResourceTracker.
+     * @param resource resource on which event is fired
      */
     protected void fireDownloadEvent(Resource resource) {
         DownloadListener l[] = null;
@@ -407,6 +409,8 @@ public class ResourceTracker {
      * the cache.
      * </p>
      *
+     * @param location location of resource which stream will be obtained
+     * @return the stream of the resource
      * @throws IOException if there was an error opening the stream
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
@@ -432,6 +436,7 @@ public class ResourceTracker {
      * @param urls the resources to wait for
      * @param timeout the time in ms to wait before returning, 0 for no timeout
      * @return whether the resources downloaded before the timeout
+     * @throws java.lang.InterruptedException if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean waitForResources(URL urls[], long timeout) throws InterruptedException {
@@ -481,6 +486,8 @@ public class ResourceTracker {
      * Returns whether a resource is available for use (ie, can be
      * accessed with the getCacheFile method).
      *
+     * @param location the resource location
+     * @return resource availability
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean checkResource(URL location) {
@@ -495,6 +502,7 @@ public class ResourceTracker {
      * by the tracker because the tracker will only prefetch one
      * resource at a time to conserve system resources.
      *
+     * @param location the resource location
      * @return true if the resource is already downloaded (or an error occurred)
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
@@ -784,6 +792,8 @@ public class ResourceTracker {
     /**
      * Open a URL connection and get the content length and other
      * fields.
+     * 
+     * @param resource the resource to initialize
      */
     private void initializeResource(Resource resource) {
         resource.fireDownloadEvent(); // fire CONNECTING
@@ -887,6 +897,10 @@ public class ResourceTracker {
                     || result == 308);
         }
 
+        /**
+         * 
+         * @return  whether the return code is OK one - anything except <200,300)
+         */
         public boolean isInvalid() {
             return (result < 200 || result >= 300);
         }

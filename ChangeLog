@@ -1,3 +1,15 @@
+2014-05-21  Jiri Vanek  <jvanek@redhat.com>
+
+	Minor javadoc enhancements
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: added or filled some javadocs
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: same
+	* netx/net/sourceforge/jnlp/cache/Resource.java: same
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: same
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: same
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: same
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: same
+
+
 2014-05-22  Jie Kang  <jkang@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java

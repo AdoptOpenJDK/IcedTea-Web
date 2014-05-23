@@ -134,6 +134,8 @@ public class ServerAccess {
      * param "port" prints out the port
      * nothing or number will run server on random(or on number specified)
      * port in -Dtest.server.dir
+     * @param args params from commandline. recognized params are port and randomport 
+     * @throws java.lang.Exception if anything happens
      */
     public static void main(String[] args) throws Exception {
         if (args.length > 0 && args[0].equalsIgnoreCase("port")) {
@@ -212,6 +214,7 @@ public class ServerAccess {
 
     /**
      *
+     * @param port specific port on which this server is accepting requests
      * @return new not cached iserver instance on random port,
      * useful for testing application loading from different url then base
      */
@@ -226,6 +229,8 @@ public class ServerAccess {
 
     /**
      *
+     * @param dir directory from which server returns resources
+     * @param port specific port on which this server is accepting requests
      * @return new not cached iserver instance on random port upon custom www root directory,
      * useful for testing application loading from different url then base
      */
@@ -342,7 +347,9 @@ public class ServerAccess {
 
     /**
      *
-     * @return url pointing to cached server resource. If non singleton instance is running, new is created.
+     * @throws java.net.MalformedURLException if url for this resource can not be constructed
+     * @return complete url for this resource on this server
+     * @param resource relative path  pointing to server resource. If non singleton instance is running, new is created.
      */
     public URL getUrl(String resource) throws MalformedURLException {
         if (server == null) {
@@ -355,6 +362,7 @@ public class ServerAccess {
     /**
      *
      * @return url pointing to cached server . If non singleton instance is running, new is created.
+     * @throws java.net.MalformedURLException
      */
     public URL getUrl() throws MalformedURLException {
         return getUrl("");
@@ -399,7 +407,7 @@ public class ServerAccess {
     /**
      * utility method which can read bytes of any stream
      * 
-     * @param input stream to be read
+     * @param is stream to be read
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
      */
@@ -417,7 +425,8 @@ public class ServerAccess {
     /**
      * utility method which can read from any stream as one long String
      * 
-     * @param input stream
+     * @param is stream to be read
+     * @param encoding encoding of this stream
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
@@ -428,7 +437,7 @@ public class ServerAccess {
     /**
      * utility method which can read from any stream as one long String
      *
-     * @param is
+     * @param is input stream to read from
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
@@ -439,7 +448,7 @@ public class ServerAccess {
     /**
      * utility method which can read bytes of resource from any url
      * 
-     * @param u
+     * @param u full url to read from
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
      */
@@ -465,7 +474,7 @@ public class ServerAccess {
     /**
      * utility method which can read string of resource from any url
      *
-     * @param u
+     * @param u full url to read from
      * @return resource as string
      * @throws IOException if connection can't be established or resource does
      * not exist
@@ -489,15 +498,24 @@ public class ServerAccess {
     }
 
     /**
-     * helping dummy  method to save String as file
+     * helping dummy  method to save String as file in UTF-8 encoding.
      * 
-     * @param content
-     * @param f
+     * @param content which will be saved as it is saved in this String
+     * @param f file to be saved. No warnings provided
      * @throws IOException
      */
     public static void saveFile(String content, File f) throws IOException {
         FileUtils.saveFile(content, f);
     }
+    
+    /**
+     * helping dummy  method to save String as file in specified encoding/.
+     * 
+     * @param content which will be saved as it is saved in this String
+     * @param f file to be saved. No warnings provided
+     * @param encoding of output byte representation
+     * @throws IOException
+     */
     public static void saveFile(String content, File f,String encoding) throws IOException {
         FileUtils.saveFile(content, f, encoding);
     }
@@ -569,14 +587,36 @@ public class ServerAccess {
         return executeBrowser(string, outClosing, errClosing);
     }
     
-
+    /**
+     *
+     * @param resource relative resource to be opened in browser for current server instance.
+     * @return result of browser run
+     *
+     */
     public ProcessResult executeBrowser(String resource) throws Exception {
         return executeBrowser(getBrowserParams(), resource);
     }
+
+    /**
+     *
+     * @param resource relative resource to be opened in browser for current server instance.
+     * @param stdoutl listener for stdout
+     * @param stderrl listener for stderr
+     * @return result of browser run
+     *
+     */
     public ProcessResult executeBrowser(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
         return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
     }
 
+     /**
+     *
+     * @param resource elative resource to be opened in browser for current server instance.
+     * @param stdoutl listeners for stdout
+     * @param stderrl listeners for stderr
+     * @return result of browser run
+     *
+     */
     public ProcessResult executeBrowser(String resource, List<ContentReaderListener> stdoutl, List<ContentReaderListener> stderrl) throws Exception {
         return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
     }
@@ -651,9 +691,10 @@ public class ServerAccess {
     }
 
     /**
-     * Ctreate resource on http, on 'localhost' on port on which this instance is running
-     * @param resource
-     * @return
+     * Create resource on http, on 'localhost' on port on which this instance is running
+     * @param instance of server to return the resource
+     * @param resource relative path to resource to be loaded from specified instance
+     * @return the absolute url
      * @throws MalformedURLException
      */
     public static URL getUrlUponInstance(ServerLauncher instance,String resource) throws MalformedURLException {
@@ -663,8 +704,8 @@ public class ServerAccess {
     /**
      * wrapping method to executeProcess (eg: javaws arg arg arg url)
      * will execute default javaws (@see JAVAWS_BUILD_BIN) upon any server
+     * @param otherargs - commandline arguments  for javaws process
      * @param u url of resource upon any server
-     * @param javaws arguments
      * @return result what left after running this process
      * @throws Exception
      */
@@ -679,8 +720,9 @@ public class ServerAccess {
      * wrapping utility method to executeProcess (eg: any_binary arg arg arg url)
      *
      * will execute  any process upon  url upon any server
+     * @param toBeExecuted - command to lunch javaws program
      * @param u url of resource upon any server
-     * @param javaws arguments
+     * @param otherargs commandline arguments for new process
      * @return result what left after running this process
      * @throws Exception
      */
@@ -709,12 +751,12 @@ public class ServerAccess {
      * utility method to lunch process, get its stdout/stderr, its return value and to kill it if running to long (@see PROCESS_TIMEOUT)
      *
      *
-     * Small bacground:
+     * Small background:
      * This method creates thread inside which exec will be executed. Then creates assassin thread with given timeout to kill the previously created thread if necessary.
      * Starts assassin thread, starts process thread. Wait until process is running, then starts content readers.
      * Closes input of process.
      * Wait until process is running (no matter if it terminate itself (correctly or badly), or is terminated by its assassin.
-     * Construct result from readed stdout, stderr, process return value, assassin successfully
+     * Construct result from read stdout, stderr, process return value, assassin successfully
      *
      * @param args binary with args to be executed
      * @param dir optional, directory where this process will run

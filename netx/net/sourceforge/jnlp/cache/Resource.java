@@ -109,8 +109,13 @@ public class Resource {
     /**
      * Return a shared Resource object representing the given
      * location and version.
+     * @param location final location of resource
+     * @param requestVersion final version of resource
+     * @param updatePolicy final policy for updating
+     * @return new resource, which is already added in resources list
      */
     public static Resource getResource(URL location, Version requestVersion, UpdatePolicy updatePolicy) {
+        //TODO -rename to create resource?
         synchronized (resources) {
             Resource resource = new Resource(location, requestVersion, updatePolicy);
 
@@ -133,6 +138,7 @@ public class Resource {
 
     /**
      * Returns the remote location of the resource.
+     * @return the same location as the one with which this resource was created
      */
     public URL getLocation() {
         return location;
@@ -378,6 +384,7 @@ public class Resource {
     /**
      * Adds the tracker to the list of trackers monitoring this
      * resource.
+     * @param tracker to observing resource
      */
     public void addTracker(ResourceTracker tracker) {
         synchronized (trackers) {
