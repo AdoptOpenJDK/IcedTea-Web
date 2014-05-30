@@ -1,3 +1,23 @@
+2014-05-29  Jie Kang  <jkang@redhat.com>
+
+	Added reproducer for PR1794: Bug where Java variables are not accessed
+	correctly through Javascript. Attempt to access a string array results
+	in undefined result. However, attempt to access a string results in
+	receiving correct value of string. Tests html applet and jnlp-href
+	applet
+	* tests/reproducers/simple/JToJSString/testcases/JToJSStringTest.java:
+	New reproducer for PR1794
+	* tests/reproducers/simple/JToJSString/resources/JToJSString.html:
+	same
+	* tests/reproducers/simple/JToJSString/resources/JToJSJnlpApplet.html:
+	same
+	* tests/reproducers/simple/JToJSString/resources/JToJSString.js:
+	same
+	* tests/reproducers/simple/JToJSString/resources/JToJSApplet.jnlp:
+	same
+	* tests/reproducers/simple/JToJSString/srcs/JToJSString.java:
+	same
+
 2014-05-23  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed cache tests
