@@ -36,13 +36,17 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -98,13 +102,13 @@ public class PolicyEditorTest {
     }
 
     @Test
-    public void testReturnedCodebasesAreCopy() throws Exception {
+    public void testReturnedCodebasesIsCopy() throws Exception {
         final Collection<String> original = editor.getCodebases();
         original.add("some invalid value");
         original.remove("");
         final Collection<String> second = editor.getCodebases();
         assertTrue("Editor should have default codebase", second.contains(""));
-        assertTrue("Editor should only have default codebase", second.size() == 1);
+        assertEquals("Editor should only have default codebase", 1, second.size());
     }
 
     @Test
@@ -122,9 +126,10 @@ public class PolicyEditorTest {
     @Test
     public void testReturnedCustomPermissionsSetIsCopy() throws Exception {
         final Collection<CustomPermission> original = editor.getCustomPermissions("");
+        assertTrue("There should not be any custom permissions to start", original.isEmpty());
         original.add(new CustomPermission("java.io.FilePermission", "*", "write"));
         final Collection<CustomPermission> second = editor.getCustomPermissions("");
-        assertTrue("There should not be any custom permissions", second.isEmpty());
+        assertTrue("The custom permission should not have been present", second.isEmpty());
     }
 
     @Test

@@ -56,6 +56,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -74,17 +75,23 @@ public class CustomPolicyViewer extends JFrame {
     private final JLabel listLabel = new JLabel();
     private final ActionListener addButtonAction, removeButtonAction, closeButtonAction;
     private final WeakReference<CustomPolicyViewer> weakThis = new WeakReference<>(this);
+    private final PolicyFileModel policyFile;
+    private final PolicyEditor parent;
+    private final String codebase;
 
     /**
      * @param parent the parent PolicyEditor which created this CustomPolicyViewer
      * @param codebase the codebase for which these custom permissions are enabled
-     * @param permissions a collection of CustomPermissions which were found in the policy file
+     * @param policyFile the PolicyFileModel
      */
-    public CustomPolicyViewer(final PolicyEditor parent, final String codebase, final Collection<CustomPermission> permissions) {
+    public CustomPolicyViewer(final PolicyEditor parent, final String codebase, final PolicyFileModel policyFile) {
         super();
+        this.parent = parent;
+        this.codebase = codebase;
+        this.policyFile = policyFile;
         setLayout(new GridBagLayout());
         setTitle(R("PECPTitle"));
-        customPermissions.addAll(permissions);
+        customPermissions.addAll(policyFile.getCopyOfCustomPermissions().get(codebase));
         for (final CustomPermission perm : customPermissions) {
             listModel.addElement(perm);
         }
@@ -112,7 +119,7 @@ public class CustomPolicyViewer extends JFrame {
                 if (perm != null) {
                     customPermissions.add(perm);
                     listModel.addElement(perm);
-                    parent.updateCustomPermissions(codebase, customPermissions);
+                    updateCustomPermissions();
                 }
             }
         };
@@ -127,7 +134,7 @@ public class CustomPolicyViewer extends JFrame {
                 }
                 customPermissions.remove(list.getSelectedValue());
                 listModel.removeElement(list.getSelectedValue());
-                parent.updateCustomPermissions(codebase, customPermissions);
+                updateCustomPermissions();
             }
         };
         removeButton.setText(R("PECPRemoveButton"));
@@ -152,8 +159,8 @@ public class CustomPolicyViewer extends JFrame {
         }
         listLabel.setText(R("PECPListLabel", codebaseText));
 
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         list.setSelectedIndex(0);
         setupLayout();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -207,6 +214,18 @@ public class CustomPolicyViewer extends JFrame {
 
         pack();
         setMinimumSize(getPreferredSize());
+    }
+
+    /**
+     * Update the custom permissions map. Used by the Custom Policy Viewer to update its parent
+     * PolicyEditor to changes it has made
+     * @param codebase the codebase for which changes were made
+     * @param permissions the permissions granted to this codebase
+     */
+    private void updateCustomPermissions() {
+        parent.setChangesMade();
+        policyFile.clearCustomCodebase(codebase);
+        policyFile.addCustomPermissions(codebase, customPermissions);
     }
 
 }

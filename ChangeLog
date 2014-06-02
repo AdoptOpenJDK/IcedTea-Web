@@ -1,3 +1,26 @@
+2014-06-02  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java:
+	store PolicyFileModel as field. (updateCustomPermissions): new method
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(codebasePermissionsMap, customPermissionsMap, file, fileWatcher,
+	savePolicyFile, openAndParsePolicyFile): Policy file model logic extracted
+	into new PolicyFileModel class. (policyFile) new PolicyFileModel field.
+	(addNewCodebase, getCodebases, getPermissions, getCustomPermissions,
+	updateCheckboxes, updateCheckboxesImpl, updateCustomPermissions,
+	resetCodebases, openAndParsePolicyFile, savePolicyFile,
+	initializeMapForCodebase, checkPolicyChangesWithDialog): refactored to use
+	PolicyFileModel
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyFileModel.java:
+	new class for modelling Policy files
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorParsingTest.java:
+	update to use PolicyEditor's policyFile field
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java
+	(testReturnedCustomPermissionsSetIsCopy): initial assertion of empty set
+	added, final assertion of empty set rephrased
+	(testReturnedCodebasesAreCopy) renamed testReturnedCodebasesIsCopy,
+	rephrased and using assertEquals rather than assertTrue
+
 2014-05-29  Jie Kang  <jkang@redhat.com>
 
 	Added reproducer for PR1794: Bug where Java variables are not accessed

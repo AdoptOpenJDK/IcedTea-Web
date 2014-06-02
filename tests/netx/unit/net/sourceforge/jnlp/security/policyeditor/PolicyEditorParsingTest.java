@@ -47,7 +47,7 @@ import org.junit.Test;
 public class PolicyEditorParsingTest {
 
     private File file;
-    private PolicyEditor editor;
+    private PolicyFileModel policyFileModel = new PolicyFileModel();
     private Map<PolicyEditorPermissions, Boolean> permissions;
 
     private static final String LINEBREAK = System.getProperty("line.separator");
@@ -111,9 +111,12 @@ public class PolicyEditorParsingTest {
 
     private void setupTest(final String policyContents, final String codebase) throws Exception {
         FileUtils.saveFile(policyContents, file);
-        editor = PolicyEditor.createInstance(file.getCanonicalPath());
+        policyFileModel = new PolicyFileModel(file.getCanonicalFile());
+        policyFileModel.openAndParsePolicyFile();
+        policyFileModel.addCodebase("");
+        policyFileModel.addCodebase(codebase);
         Thread.sleep(100); // policy editor loads asynch, give it some time to populate
-        permissions = editor.getPermissions(codebase);
+        permissions = policyFileModel.getCopyOfPermissions().get(codebase);
     }
 
     @Test
