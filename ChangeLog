@@ -1,5 +1,18 @@
 2014-06-02  Andrew Azores  <aazores@redhat.com>
 
+	PolicyEditor file I/O made asynchronous with a progress indicator
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(savePolicyFile, openAndParsePolicyFile): use SwingWorker to make
+	IO asynchronous, also show a progress bar.
+	(checkPolicyChangesWithDialog): handle Exceptions thrown by
+	policyFile.hasChanged() and policyFile.getFile().getCanonicalPath(),
+	rather than letting them bubble up
+	* netx/net/sourceforge/jnlp/security/policyeditor/IndeterminateProgressDialog.java:
+	new class
+
+2014-06-02  Andrew Azores  <aazores@redhat.com>
+
+	PolicyEditor file I/O and model logic extracted into a new class
 	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java:
 	store PolicyFileModel as field. (updateCustomPermissions): new method
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java

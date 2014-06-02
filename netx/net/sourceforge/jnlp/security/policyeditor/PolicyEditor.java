@@ -91,6 +91,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
@@ -101,6 +102,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -1100,54 +1102,99 @@ public class PolicyEditor extends JPanel {
         if (ofr == OpenFileResult.CANT_WRITE) {
             FileUtils.showReadOnlyDialog(weakThis.get());
         }
-        try {
-            policyFile.openAndParsePolicyFile();
-            changesMade = false;
-            for (final String codebase : policyFile.getCodebases()) {
-                final String model;
-                if (codebase.isEmpty()) {
-                    model = R("PEGlobalSettings");
-                } else {
-                    model = codebase;
+
+        final Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        final JDialog progressIndicator = new IndeterminateProgressDialog(parentWindow, "Loading...");
+        final SwingWorker<Void, Void> openPolicyFileWorker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressIndicator.setLocationRelativeTo(parentWindow);
+                            progressIndicator.setVisible(true);
+                        }
+                    });
+                    policyFile.openAndParsePolicyFile();
+                } catch (final FileNotFoundException fnfe) {
+                    OutputController.getLogger().log(fnfe);
+                    FileUtils.showCouldNotOpenDialog(weakThis.get(), R("PECouldNotOpen"));
+                } catch (final IOException ioe) {
+                    OutputController.getLogger().log(ioe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantOpenFile", policyFile.getFile().getPath()));
+                    FileUtils.showCouldNotOpenDialog(weakThis.get(), R("PECouldNotOpen"));
                 }
-                listModel.addElement(model);
+                return null;
             }
-            addNewCodebase("");
-        } catch (final FileNotFoundException fnfe) {
-            OutputController.getLogger().log(fnfe);
-            FileUtils.showCouldNotOpenDialog(weakThis.get(), R("PECouldNotOpen"));
-        } catch (final IOException ioe) {
-            OutputController.getLogger().log(ioe);
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantOpenFile", policyFile.getFile().getPath()));
-            FileUtils.showCouldNotOpenDialog(weakThis.get(), R("PECouldNotOpen"));
-        }
+
+            @Override
+            public void done() {
+                changesMade = false;
+                for (final String codebase : policyFile.getCodebases()) {
+                    final String model;
+                    if (codebase.isEmpty()) {
+                        model = R("PEGlobalSettings");
+                    } else {
+                        model = codebase;
+                    }
+                    listModel.addElement(model);
+                }
+                addNewCodebase("");
+                progressIndicator.setVisible(false);
+                progressIndicator.dispose();
+            }
+        };
+        openPolicyFileWorker.execute();
     }
 
     /**
      * Save the policy model into the file pointed to by the filePath field.
      */
     private void savePolicyFile() {
-        try {
-            final int overwriteChanges = checkPolicyChangesWithDialog();
-            switch (overwriteChanges) {
-                case JOptionPane.YES_OPTION:
-                    openAndParsePolicyFile();
-                    return;
-                case JOptionPane.NO_OPTION:
-                    break;
-                case JOptionPane.CANCEL_OPTION:
-                    return;
-                default:
-                    break;
-            }
-            policyFile.savePolicyFile();
-            changesMade = false;
-        } catch (final IOException e) {
-            OutputController.getLogger().log(e);
-            showCouldNotSaveDialog();
-            return;
+        final int overwriteChanges = checkPolicyChangesWithDialog();
+        switch (overwriteChanges) {
+            case JOptionPane.YES_OPTION:
+                openAndParsePolicyFile();
+                return;
+            case JOptionPane.NO_OPTION:
+                break;
+            case JOptionPane.CANCEL_OPTION:
+                return;
+            default:
+                break;
         }
-        showChangesSavedDialog();
+
+        final Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        final JDialog progressIndicator = new IndeterminateProgressDialog(parentWindow, "Saving...");
+        final SwingWorker<Void, Void> savePolicyFileWorker = new SwingWorker<Void, Void>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                try {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressIndicator.setLocationRelativeTo(parentWindow);
+                            progressIndicator.setVisible(true);
+                        }
+                    });
+                    policyFile.savePolicyFile();
+                } catch (final IOException e) {
+                    OutputController.getLogger().log(e);
+                    showCouldNotSaveDialog();
+                }
+                return null;
+            }
+
+            @Override
+            public void done() {
+                changesMade = false;
+                showChangesSavedDialog();
+                progressIndicator.setVisible(false);
+                progressIndicator.dispose();
+            }
+        };
+        savePolicyFileWorker.execute();
     }
 
     /**
@@ -1182,17 +1229,28 @@ public class PolicyEditor extends JPanel {
      * to the settings. "No" otherwise
      * @throws IOException if the file cannot be read
      */
-    private int checkPolicyChangesWithDialog() throws IOException {
-        final boolean changed;
+    private int checkPolicyChangesWithDialog() {
+        boolean changed;
         try {
             changed = policyFile.hasChanged();
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
+            OutputController.getLogger().log(e);
             JOptionPane.showMessageDialog(weakThis.get(), R("PEFileMissing"), R("PEFileModified"), JOptionPane.WARNING_MESSAGE);
             return JOptionPane.NO_OPTION;
+        } catch (IOException e) {
+            OutputController.getLogger().log(e);
+            changed = true;
         }
         if (changed) {
-            return JOptionPane.showConfirmDialog(weakThis.get(), R("PEFileModifiedDetail", policyFile.getFile().getCanonicalPath()),
-                    R("PEFileModified"), JOptionPane.YES_NO_CANCEL_OPTION);
+            String policyFilePath;
+            try {
+                policyFilePath = policyFile.getFile().getCanonicalPath();
+            } catch (final IOException e) {
+                OutputController.getLogger().log(e);
+                policyFilePath = policyFile.getFile().getPath();
+            }
+            return JOptionPane.showConfirmDialog(weakThis.get(), R("PEFileModifiedDetail", policyFilePath,
+                    R("PEFileModified"), JOptionPane.YES_NO_CANCEL_OPTION));
         } else if (!changesMade) {
             //Return without saving or reloading
             return JOptionPane.CANCEL_OPTION;
