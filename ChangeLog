@@ -1,3 +1,14 @@
+2014-06-03  Lukasz Dracz  <ldracz@redhat.com>
+
+	Changed Temporary Permissions from menu items to check box menu items
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissionsButton.java
+	(TemporaryPermissionsListener.actionPerformed): Added behaviour to add
+	or remove permissions from a new collection of permissions based on
+	whether the item is checked or not
+	(TemporaryPermissionsButton.TemporaryPermissionsButton): Added action
+	listener and applied the new collection of permissions for when the
+	sandbox button is pressed
+
 2014-06-02  Andrew Azores  <aazores@redhat.com>
 
 	PolicyEditor file I/O made asynchronous with a progress indicator

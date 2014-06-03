@@ -48,8 +48,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Permission;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -67,14 +71,24 @@ public class TemporaryPermissionsButton extends JButton {
     private PolicyEditorWindow policyEditorWindow = null;
     private final JNLPFile file;
     private final SecurityDelegate securityDelegate;
+    private final Collection<Permission> temporaryPermissions = new HashSet<>();
 
     public TemporaryPermissionsButton(final JNLPFile file, final SecurityDelegate securityDelegate, final JButton linkedButton) {
         super("\u2630");
+        Objects.requireNonNull(file);
+        Objects.requireNonNull(securityDelegate);
+        Objects.requireNonNull(linkedButton);
         this.menu = createPolicyPermissionsMenu();
         this.linkedButton = linkedButton;
         this.file = file;
         this.securityDelegate = securityDelegate;
 
+        linkedButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                securityDelegate.addPermissions(temporaryPermissions);
+            }
+        });
         addMouseListener(new PolicyEditorPopupListener(this));
     }
 
@@ -88,47 +102,47 @@ public class TemporaryPermissionsButton extends JButton {
         policyMenu.addSeparator();
 
 
-        final JMenuItem noFileAccess = new JMenuItem(R("STempPermNoFile"));
+        final JCheckBoxMenuItem noFileAccess = new JCheckBoxMenuItem(R("STempPermNoFile"));
         noFileAccess.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.noFileAccess()));
         policyMenu.add(noFileAccess);
 
-        final JMenuItem noNetworkAccess = new JMenuItem(R("STempPermNoNetwork"));
+        final JCheckBoxMenuItem noNetworkAccess = new JCheckBoxMenuItem(R("STempPermNoNetwork"));
         noNetworkAccess.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.noNetworkAccess()));
         policyMenu.add(noNetworkAccess);
 
-        final JMenuItem noFileOrNetwork = new JMenuItem(R("STempNoFileOrNetwork"));
+        final JCheckBoxMenuItem noFileOrNetwork = new JCheckBoxMenuItem(R("STempNoFileOrNetwork"));
         noFileOrNetwork.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.noFileOrNetworkAccess()));
         policyMenu.add(noFileOrNetwork);
 
         policyMenu.addSeparator();
 
-        final JMenuItem allFileAccessOnly = new JMenuItem(R("STempAllFileAndPropertyAccess"));
+        final JCheckBoxMenuItem allFileAccessOnly = new JCheckBoxMenuItem(R("STempAllFileAndPropertyAccess"));
         allFileAccessOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.allFileAccessAndProperties()));
         policyMenu.add(allFileAccessOnly);
 
-        final JMenuItem readLocalFilesAndProperties = new JMenuItem(R("STempReadLocalFilesAndProperties"));
+        final JCheckBoxMenuItem readLocalFilesAndProperties = new JCheckBoxMenuItem(R("STempReadLocalFilesAndProperties"));
         readLocalFilesAndProperties.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.readLocalFilesAndProperties()));
         policyMenu.add(readLocalFilesAndProperties);
 
-        final JMenuItem reflectionOnly = new JMenuItem(R("STempReflectionOnly"));
+        final JCheckBoxMenuItem reflectionOnly = new JCheckBoxMenuItem(R("STempReflectionOnly"));
         reflectionOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.reflectionOnly()));
         policyMenu.add(reflectionOnly);
 
         policyMenu.addSeparator();
 
-        final JMenuItem allMedia = new JMenuItem(R("STempAllMedia"));
+        final JCheckBoxMenuItem allMedia = new JCheckBoxMenuItem(R("STempAllMedia"));
         allMedia.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.allMedia()));
         policyMenu.add(allMedia);
 
-        final JMenuItem soundOnly = new JMenuItem(R("STempSoundOnly"));
+        final JCheckBoxMenuItem soundOnly = new JCheckBoxMenuItem(R("STempSoundOnly"));
         soundOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.audioOnly()));
         policyMenu.add(soundOnly);
 
-        final JMenuItem clipboardOnly = new JMenuItem(R("STempClipboardOnly"));
+        final JCheckBoxMenuItem clipboardOnly = new JCheckBoxMenuItem(R("STempClipboardOnly"));
         clipboardOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.clipboardOnly()));
         policyMenu.add(clipboardOnly);
 
-        final JMenuItem printOnly = new JMenuItem(R("STempPrintOnly"));
+        final JCheckBoxMenuItem printOnly = new JCheckBoxMenuItem(R("STempPrintOnly"));
         printOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.printOnly()));
         policyMenu.add(printOnly);
 
@@ -144,11 +158,16 @@ public class TemporaryPermissionsButton extends JButton {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            securityDelegate.addPermissions(permissions);
-            menu.setVisible(false);
-            if (linkedButton != null) {
-                linkedButton.doClick();
+            if (!linkedButton.isEnabled()) {
+                return;
             }
+            AbstractButton checkBox = (AbstractButton) e.getSource();
+            if (checkBox.isSelected()) {
+                temporaryPermissions.addAll(permissions);
+            } else {
+                temporaryPermissions.removeAll(permissions);
+            }
+            menu.setVisible(true);
         }
     }
 
