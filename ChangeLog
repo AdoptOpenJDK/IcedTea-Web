@@ -1,3 +1,12 @@
+2014-06-03  Andrew Azores  <aazores@redhat.com>
+
+	Fix for PR1776, PolicyEditor attempting to save to null file location when
+	exiting editor and answering Yes to save changes first.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(quit): select file to save to using fileChooser if file is null 
+	(policyEditorWindowQuit): new helper method for PolicyEditorWindow and
+	PolicyEditorFrame quit()
+
 2014-06-03  Lukasz Dracz  <ldracz@redhat.com>
 
 	Changed Temporary Permissions from menu items to check box menu items

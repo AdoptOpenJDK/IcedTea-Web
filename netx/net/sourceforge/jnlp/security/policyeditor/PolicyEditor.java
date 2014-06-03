@@ -470,19 +470,35 @@ public class PolicyEditor extends JPanel {
 
         @Override
         public void quit() {
-            if (editor.changesMade) {
-                final int save = JOptionPane.showConfirmDialog(this, R("PESaveChanges"));
-                if (save == JOptionPane.YES_OPTION) {
-                    editor.savePolicyFile();
-                } else if (save == JOptionPane.CANCEL_OPTION) {
-                    return;
-                }
-            }
-            editor.weakThis.clear();
-            editor.setClosed();
-            dispose();
+            policyEditorWindowQuit(this);
         }
+    }
 
+    /*
+     * Casting a Window to PolicyEditorWindow is not generally safe - be sure that
+     * the argument passed to this method is actually a PolicyEditorDialog or PolicyEditorFrame.
+     */
+    private static void policyEditorWindowQuit(final Window window) {
+        final PolicyEditor editor = ((PolicyEditorWindow) window).getPolicyEditor();
+        if (editor.changesMade) {
+            final int save = JOptionPane.showConfirmDialog(window, R("PESaveChanges"));
+            if (save == JOptionPane.YES_OPTION) {
+                if (editor.policyFile.getFile() == null) {
+                    final int choice = editor.fileChooser.showSaveDialog(window);
+                    if (choice == JFileChooser.APPROVE_OPTION) {
+                        editor.policyFile.setFile(editor.fileChooser.getSelectedFile());
+                    } else if (choice == JFileChooser.CANCEL_OPTION) {
+                        return;
+                    }
+                }
+                editor.savePolicyFile();
+            } else if (save == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
+        editor.weakThis.clear();
+        editor.setClosed();
+        window.dispose();
     }
 
     public static PolicyEditorWindow getPolicyEditorFrame(final String filepath) {
@@ -535,17 +551,7 @@ public class PolicyEditor extends JPanel {
 
         @Override
         public void quit() {
-            if (editor.changesMade) {
-                final int save = JOptionPane.showConfirmDialog(this, R("PESaveChanges"));
-                if (save == JOptionPane.YES_OPTION) {
-                    editor.savePolicyFile();
-                } else if (save == JOptionPane.CANCEL_OPTION) {
-                    return;
-                }
-            }
-            editor.weakThis.clear();
-            editor.setClosed();
-            dispose();
+            policyEditorWindowQuit(this);
         }
     }
 
