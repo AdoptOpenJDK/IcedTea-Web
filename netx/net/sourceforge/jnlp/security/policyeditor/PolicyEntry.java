@@ -69,7 +69,9 @@ public class PolicyEntry {
 
     @Override
     public String toString() {
-        if (permissions.isEmpty() && customPermissions.isEmpty()) {
+        // Empty codebase is the default "All Applets" codebase. If there are no permissions
+        // applied to it, then don't bother recording it in the policy file.
+        if (codebase.isEmpty() && permissions.isEmpty() && customPermissions.isEmpty()) {
             return "";
         }
         final String newline = System.getProperty("line.separator");

@@ -1,3 +1,12 @@
+2014-06-03  Andrew Azores  <aazores@redhat.com>
+
+	PolicyEditor persists empty non-default codebase entries
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEntry.java
+	(toString): return empty string only if the codebase both has no
+	permissions assigned and is also the default "All Applets" codebase
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyFileModel.java
+	(savePolicyFile): release fileLock with try/finally
+
 2014-06-03  Lukasz Dracz  <ldracz@redhat.com>
 
 	This test expects a Null pointer exception however does not
