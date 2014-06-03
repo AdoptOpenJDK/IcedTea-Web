@@ -1,3 +1,11 @@
+2014-06-03  Lukasz Dracz  <ldracz@redhat.com>
+
+	This test expects a Null pointer exception however does not
+	have a flag specifying that the NullPointer Exception is expected
+	* unit/net/sourceforge/jnlp/util/UrlUtilsTest.java
+	(verifyNotNullUrlEqualsThrowsExceptionWhenSecondArgumentIsNull):
+	added 'expected = NullPointerException.class' to Test annotation
+
 2014-06-03  Andrew Azores  <aazores@redhat.com>
 
 	Fix for PR1776, PolicyEditor attempting to save to null file location when

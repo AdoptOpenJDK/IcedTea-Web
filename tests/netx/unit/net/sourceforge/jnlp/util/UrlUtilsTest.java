@@ -264,7 +264,7 @@ public class UrlUtilsTest {
         UrlUtils.notNullUrlEquals(null, new URL("ftp://aa.bb"));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void verifyNotNullUrlEqualsThrowsExceptionWhenSecondArgumentIsNull() throws Exception {
         UrlUtils.notNullUrlEquals(new URL("ftp://aa.bb"), null);
     }
