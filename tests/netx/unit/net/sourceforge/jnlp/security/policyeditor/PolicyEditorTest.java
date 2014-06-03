@@ -59,6 +59,10 @@ public class PolicyEditorTest {
     public void setNewTempfile() throws Exception {
         tempFilePath = File.createTempFile("policyeditor", null).getCanonicalPath();
         editor = new PolicyEditor(tempFilePath);
+        // policy file is loaded async; give it some time before we test its contents
+        while (editor.isPerformingIO()) {
+            Thread.sleep(50);
+        }
     }
 
     @Test

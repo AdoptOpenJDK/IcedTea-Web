@@ -1,5 +1,16 @@
 2014-06-03  Andrew Azores  <aazores@redhat.com>
 
+	Added indicator method for if PolicyEditor is currently performing file
+	IO. Unit tests wait for IO to complete before testing editor contents.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(performingIO, isPerformingIO): new field and getter to indicate if file
+	IO is currently being performed.
+	(changesMade): made volatile
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java
+	(setNewTempFile): call Thread.sleep while editor.isPerformingIO
+
+2014-06-03  Andrew Azores  <aazores@redhat.com>
+
 	PolicyEditor persists empty non-default codebase entries
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEntry.java
 	(toString): return empty string only if the codebase both has no

@@ -157,8 +157,9 @@ public class PolicyEditor extends JPanel {
             + "  " + CODEBASE_FLAG + "\t\t" + R("PECodebaseFlag") + "\n";
 
     private final PolicyFileModel policyFile = new PolicyFileModel();
-    private boolean changesMade = false;
+    private volatile boolean changesMade = false;
     private boolean closed = false;
+    private volatile boolean performingIO = false;
     private final Map<PolicyEditorPermissions, JCheckBox> checkboxMap = new TreeMap<>();
     private final List<JCheckBoxWithGroup> groupBoxList = new ArrayList<>(Group.values().length);
     private final JScrollPane scrollPane = new JScrollPane();
@@ -1093,6 +1094,13 @@ public class PolicyEditor extends JPanel {
         policyFile.clearCustomPermissions();
     }
 
+    /**
+     * @return whether this PolicyEditor is currently opening or saving a policy file to disk
+     */
+    public boolean isPerformingIO() {
+        return performingIO;
+    }
+
     private void openAndParsePolicyFile() {
         resetCodebases();
         try {
@@ -1115,13 +1123,16 @@ public class PolicyEditor extends JPanel {
             @Override
             protected Void doInBackground() throws Exception {
                 try {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressIndicator.setLocationRelativeTo(parentWindow);
-                            progressIndicator.setVisible(true);
-                        }
-                    });
+                    if (parentWindow != null) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressIndicator.setLocationRelativeTo(parentWindow);
+                                progressIndicator.setVisible(true);
+                            }
+                        });
+                    }
+                    performingIO = true;
                     policyFile.openAndParsePolicyFile();
                 } catch (final FileNotFoundException fnfe) {
                     OutputController.getLogger().log(fnfe);
@@ -1137,6 +1148,7 @@ public class PolicyEditor extends JPanel {
             @Override
             public void done() {
                 changesMade = false;
+                performingIO = false;
                 for (final String codebase : policyFile.getCodebases()) {
                     final String model;
                     if (codebase.isEmpty()) {
@@ -1177,13 +1189,16 @@ public class PolicyEditor extends JPanel {
             @Override
             public Void doInBackground() throws Exception {
                 try {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressIndicator.setLocationRelativeTo(parentWindow);
-                            progressIndicator.setVisible(true);
-                        }
-                    });
+                    if (parentWindow != null) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressIndicator.setLocationRelativeTo(parentWindow);
+                                progressIndicator.setVisible(true);
+                            }
+                        });
+                    }
+                    performingIO = true;
                     policyFile.savePolicyFile();
                 } catch (final IOException e) {
                     OutputController.getLogger().log(e);
@@ -1195,6 +1210,7 @@ public class PolicyEditor extends JPanel {
             @Override
             public void done() {
                 changesMade = false;
+                performingIO = false;
                 showChangesSavedDialog();
                 progressIndicator.setVisible(false);
                 progressIndicator.dispose();
