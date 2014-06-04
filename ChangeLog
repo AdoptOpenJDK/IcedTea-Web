@@ -1,3 +1,12 @@
+2014-06-04  Lukasz Dracz  <ldracz@redhat.com>
+
+	Fixed Time Zone difference failure in unit test CreatePluginHeaderTestOk
+	* unit/net/sourceforge/jnlp/util/logging/JavaConsoleTest.java:
+	Test suite would check for the time in CET against the user's time value
+	converted into their local timezone. Created a Date variable that 
+	ensures time passed into PluginMessage and the one being checked are
+	of the same time zone.
+
 2014-06-03  Andrew Azores  <aazores@redhat.com>
 
 	Added indicator method for if PolicyEditor is currently performing file
