@@ -43,7 +43,11 @@ import java.awt.Container;
 import java.awt.Dialog.ModalityType;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -102,7 +106,6 @@ import javax.swing.event.ListSelectionListener;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
-import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -174,7 +177,7 @@ public class PolicyEditor extends JPanel {
 
     private final ActionListener okButtonAction, addCodebaseButtonAction,
             removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
-            renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction;
+            renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction, copyCodebaseToClipboardButtonAction;
     private ActionListener closeButtonAction;
 
     private static class JCheckBoxWithGroup extends JCheckBox {
@@ -323,7 +326,7 @@ public class PolicyEditor extends JPanel {
                 }
                 String newCodebase = "";
                 while (!validateCodebase(newCodebase) || policyFile.getCopyOfPermissions().containsKey(newCodebase)) {
-                    newCodebase = JOptionPane.showInputDialog(weakThis.get(), R("PERenameCodebase"), "http://");
+                    newCodebase = JOptionPane.showInputDialog(weakThis.get(), R("PERenameCodebase"), oldCodebase);
                     if (newCodebase == null) {
                         return;
                     }
@@ -364,6 +367,19 @@ public class PolicyEditor extends JPanel {
                 }
                 updateCheckboxes(newCodebase);
                 changesMade = true;
+            }
+        };
+
+        copyCodebaseToClipboardButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final String selectedCodebase = getSelectedCodebase();
+                if (selectedCodebase.isEmpty()) {
+                    return;
+                }
+                final Transferable clipboardContents = new StringSelection(selectedCodebase);
+                final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clip.setContents(clipboardContents, null);
             }
         };
 
@@ -950,6 +966,10 @@ public class PolicyEditor extends JPanel {
         final JMenuItem pasteCodebaseItem = new JMenuItem(R("PEPasteCodebaseItem"));
         pasteCodebaseItem.addActionListener(editor.pasteCodebaseButtonAction);
         editMenu.add(pasteCodebaseItem);
+
+        final JMenuItem copyCodebaseToClipboardItem = new JMenuItem(R("PECopyCodebaseToClipboardItem"));
+        copyCodebaseToClipboardItem.addActionListener(editor.copyCodebaseToClipboardButtonAction);
+        editMenu.add(copyCodebaseToClipboardItem);
         menuBar.add(editMenu);
 
         final JMenu viewMenu = new JMenu(R("PEViewMenu"));
