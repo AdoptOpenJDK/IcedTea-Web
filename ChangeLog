@@ -1,3 +1,18 @@
+2014-06-05  Andrew Azores  <aazores@redhat.com>
+
+	Added Rename, Copy, and Paste actions for codebases in PolicyEditor
+	* netx/net/sourceforge/jnlp/resources/Messages.properties (PEEditMenu,
+	PERenameCodebaseItem, PECopyCodebaseItem, PEPasteCodebaseItem,
+	PERenameCodebase, PEPasteCodebase, PEEditMenuMnemonic): new messages
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(codebaseClipboard): new field to facilitate copy/pasting codebases.
+	(renameCodebaseButtonAction, copyCodebaseButtonAction,
+	pasteCodebaseButtonAction): new ActionListener fields for new actions.
+	(interactivelyAddCodebase): renamed to addNewCodebaseInteractive.
+	(validateCodebase): new utility method for validating codebases.
+	(addNewCodebase, addNewCodebaseInteractive): use validateCodebase.
+	(createMenuBar): add Edit menu and items.
+
 2014-06-04  Lukasz Dracz  <ldracz@redhat.com>
 
 	Fixed Time Zone difference failure in unit test CreatePluginHeaderTestOk

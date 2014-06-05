@@ -170,9 +170,11 @@ public class PolicyEditor extends JPanel {
     private final JFileChooser fileChooser;
     private CustomPolicyViewer cpViewer = null;
     private final WeakReference<PolicyEditor> weakThis = new WeakReference<>(this);
+    private Map<PolicyEditorPermissions, Boolean> codebaseClipboard = null;
 
     private final ActionListener okButtonAction, addCodebaseButtonAction,
-            removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction;
+            removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
+            renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction;
     private ActionListener closeButtonAction;
 
     private static class JCheckBoxWithGroup extends JCheckBox {
@@ -258,7 +260,7 @@ public class PolicyEditor extends JPanel {
         addCodebaseButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                interactivelyAddCodebase();
+                addNewCodebaseInteractive();
             }
         };
         addCodebaseButton.setText(R("PEAddCodebase"));
@@ -309,6 +311,59 @@ public class PolicyEditor extends JPanel {
                     changesMade = true;
                     savePolicyFile();
                 }
+            }
+        };
+
+        renameCodebaseButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final String oldCodebase = getSelectedCodebase();
+                if (oldCodebase.isEmpty()) {
+                    return;
+                }
+                String newCodebase = "";
+                while (!validateCodebase(newCodebase) || policyFile.getCopyOfPermissions().containsKey(newCodebase)) {
+                    newCodebase = JOptionPane.showInputDialog(weakThis.get(), R("PERenameCodebase"), "http://");
+                    if (newCodebase == null) {
+                        return;
+                    }
+                }
+                final Map<PolicyEditorPermissions, Boolean> standardPermissions = policyFile.getCopyOfPermissions().get(oldCodebase);
+                final Set<CustomPermission> customPermissions = policyFile.getCopyOfCustomPermissions().get(oldCodebase);
+                removeCodebase(oldCodebase);
+                addNewCodebase(newCodebase);
+                for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : standardPermissions.entrySet()) {
+                    policyFile.setPermission(newCodebase, entry.getKey(), entry.getValue());
+                }
+                policyFile.addCustomPermissions(newCodebase, customPermissions);
+                updateCheckboxes(newCodebase);
+                changesMade = true;
+            }
+        };
+
+        copyCodebaseButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                codebaseClipboard = new HashMap<>(policyFile.getCopyOfPermissions().get(getSelectedCodebase()));
+            }
+        };
+
+        pasteCodebaseButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                String newCodebase = "";
+                while (!validateCodebase(newCodebase) || policyFile.getCopyOfPermissions().containsKey(newCodebase)) {
+                    newCodebase = JOptionPane.showInputDialog(weakThis.get(), R("PEPasteCodebase"), "http://");
+                    if (newCodebase == null) {
+                        return;
+                    }
+                }
+                addNewCodebase(newCodebase);
+                for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : codebaseClipboard.entrySet()) {
+                    policyFile.setPermission(newCodebase, entry.getKey(), entry.getValue());
+                }
+                updateCheckboxes(newCodebase);
+                changesMade = true;
             }
         };
 
@@ -628,7 +683,7 @@ public class PolicyEditor extends JPanel {
         final Action act = new AbstractAction() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                interactivelyAddCodebase();
+                addNewCodebaseInteractive();
             }
         };
         setAccelerator(R("PEAddCodebaseMnemonic"), ActionEvent.ALT_MASK, act, "AddCodebaseAccelerator");
@@ -653,13 +708,8 @@ public class PolicyEditor extends JPanel {
      * @param codebase to be added
      */
     public void addNewCodebase(final String codebase) {
-        try {
-            if (!codebase.isEmpty()) {
-                new URL(codebase);
-            }
-        } catch (final MalformedURLException mfue) {
+        if (!codebase.isEmpty() && !validateCodebase(codebase)) {
             OutputController.getLogger().log("Could not add codebase " + codebase);
-            OutputController.getLogger().log(mfue);
             return;
         }
         final String model;
@@ -705,30 +755,30 @@ public class PolicyEditor extends JPanel {
         addNewCodebases(Arrays.asList(codebases));
     }
 
+    private static boolean validateCodebase(final String codebase) {
+        try {
+            new URL(codebase);
+        } catch (final MalformedURLException mue) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Display an input dialog, which will disappear when the user enters a valid URL
      * or when the user presses cancel. If an invalid URL is entered, the dialog reappears.
      * When a valid URL is entered, it is used to create a new codebase entry in the editor's
      * policy file model.
      */
-    public void interactivelyAddCodebase() {
+    public void addNewCodebaseInteractive() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 String codebase = "";
-                boolean stopAsking = false;
-                while (!stopAsking) {
+                while (!validateCodebase(codebase)) {
                     codebase = JOptionPane.showInputDialog(weakThis.get(), R("PECodebasePrompt"), "http://");
                     if (codebase == null) {
                         return;
-                    }
-                    try {
-                        final URL u = new URL(codebase);
-                        if (u.getProtocol() != null && u.getHost() != null) {
-                            stopAsking = true;
-                        }
-                    } catch (final MalformedURLException mfue) {
-                        // ignore - loop/ask again
                     }
                 }
                 addNewCodebase(codebase);
@@ -885,6 +935,22 @@ public class PolicyEditor extends JPanel {
         });
         fileMenu.add(exitItem);
         menuBar.add(fileMenu);
+
+        final JMenu editMenu = new JMenu(R("PEEditMenu"));
+        setComponentMnemonic(editMenu, R("PEEditMenuMnemonic"));
+
+        final JMenuItem renameCodebaseItem = new JMenuItem(R("PERenameCodebaseItem"));
+        renameCodebaseItem.addActionListener(editor.renameCodebaseButtonAction);
+        editMenu.add(renameCodebaseItem);
+
+        final JMenuItem copyCodebaseItem = new JMenuItem(R("PECopyCodebaseItem"));
+        copyCodebaseItem.addActionListener(editor.copyCodebaseButtonAction);
+        editMenu.add(copyCodebaseItem);
+
+        final JMenuItem pasteCodebaseItem = new JMenuItem(R("PEPasteCodebaseItem"));
+        pasteCodebaseItem.addActionListener(editor.pasteCodebaseButtonAction);
+        editMenu.add(pasteCodebaseItem);
+        menuBar.add(editMenu);
 
         final JMenu viewMenu = new JMenu(R("PEViewMenu"));
         setComponentMnemonic(viewMenu, R("PEViewMenuMnemonic"));
