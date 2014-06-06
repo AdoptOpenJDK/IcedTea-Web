@@ -1,5 +1,13 @@
 2014-06-06  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPermission.java
+	(toString): fixed empty actions string appearing on basic permissions, which
+	do not have actions
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/CustomPermissionTest.java:
+	(testToStringWithoutActions): new test
+
+2014-06-06  Andrew Azores  <aazores@redhat.com>
+
 	PolicyEditor copy/paste/rename methods extracted and unit tests added
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
 	(codebaseClipboard): renamed to editorPermissionsClipboard

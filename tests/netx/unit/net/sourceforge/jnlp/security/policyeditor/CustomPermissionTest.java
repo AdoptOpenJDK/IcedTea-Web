@@ -36,7 +36,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 public class CustomPermissionTest {
@@ -111,6 +113,13 @@ public class CustomPermissionTest {
         final CustomPermission cp = new CustomPermission("java.io.FilePermission", "*", "read");
         final String expected = "permission java.io.FilePermission \"*\", \"read\";";
         assertTrue("Permissions string should have equalled " + expected, cp.toString().equals(expected));
+    }
+
+    @Test
+    public void testToStringWithoutActions() throws Exception {
+        final CustomPermission cp = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
+        final String expected = "permission java.lang.RuntimePermission \"createClassLoader\";";
+        assertEquals(expected, cp.toString());
     }
 
     @Test

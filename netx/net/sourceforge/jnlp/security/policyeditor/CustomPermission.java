@@ -107,7 +107,7 @@ public class CustomPermission implements Comparable<CustomPermission> {
         sb.append(target);
         sb.append("\"");
 
-        if (!this.actions.equals(PermissionActions.NONE)) {
+        if (!this.actions.equals(PermissionActions.NONE.rawString())) {
             sb.append(", \"");
             sb.append(actions);
             sb.append("\"");
