@@ -106,6 +106,42 @@ public class PolicyEditorTest {
     }
 
     @Test
+    public void testRenameCodebase() throws Exception {
+        final String originalUrl = "http://example.com";
+        final String renamedUrl = "http://example.com/example";
+        final PolicyEditorPermissions clipBoard = PolicyEditorPermissions.CLIPBOARD;
+        editor.addNewCodebase(originalUrl);
+        editor.setPermission(originalUrl, clipBoard, Boolean.TRUE);
+        final Collection<String> beforeRenameCodebases = editor.getCodebases();
+        assertTrue("Editor should contain " + originalUrl, beforeRenameCodebases.contains(originalUrl));
+        assertTrue(originalUrl + " should have " + clipBoard, editor.getPermissions(originalUrl).get(clipBoard));
+        editor.renameCodebase(originalUrl, renamedUrl);
+        final Collection<String> afterRenamedCodebases = editor.getCodebases();
+        assertFalse("Editor should not contain old codebase: " + originalUrl, afterRenamedCodebases.contains(originalUrl));
+        assertTrue("Editor should contain new codebase name: " + renamedUrl, afterRenamedCodebases.contains(renamedUrl));
+        assertTrue("Renamed " + renamedUrl + " should have " + clipBoard, editor.getPermissions(renamedUrl).get(clipBoard));
+    }
+
+    @Test
+    public void testCopyPasteCodebase() throws Exception {
+        final String copyUrl = "http://example.com";
+        final String pasteUrl = "http://example.com/example";
+        final PolicyEditorPermissions clipBoard = PolicyEditorPermissions.CLIPBOARD;
+        editor.addNewCodebase(copyUrl);
+        editor.setPermission(copyUrl, clipBoard, Boolean.TRUE);
+        final Collection<String> beforePasteCodebases = editor.getCodebases();
+        assertTrue("Editor should contain original codebase: " + copyUrl, beforePasteCodebases.contains(copyUrl));
+        assertTrue(copyUrl + " should have " + clipBoard, editor.getPermissions(copyUrl).get(clipBoard));
+        editor.copyCodebase(copyUrl);
+        editor.pasteCodebase(pasteUrl);
+        final Collection<String> afterPasteCodebases = editor.getCodebases();
+        assertTrue("Editor should still contain original codebase: " + copyUrl, afterPasteCodebases.contains(copyUrl));
+        assertTrue("Editor should also contain pasted codebase:" + pasteUrl, afterPasteCodebases.contains(pasteUrl));
+        assertTrue(copyUrl + " should have " + clipBoard, editor.getPermissions(copyUrl).get(clipBoard));
+        assertTrue(pasteUrl + " should have " + clipBoard, editor.getPermissions(pasteUrl).get(clipBoard));
+    }
+
+    @Test
     public void testReturnedCodebasesIsCopy() throws Exception {
         final Collection<String> original = editor.getCodebases();
         original.add("some invalid value");

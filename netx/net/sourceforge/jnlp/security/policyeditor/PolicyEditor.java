@@ -65,6 +65,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -173,7 +174,8 @@ public class PolicyEditor extends JPanel {
     private final JFileChooser fileChooser;
     private CustomPolicyViewer cpViewer = null;
     private final WeakReference<PolicyEditor> weakThis = new WeakReference<>(this);
-    private Map<PolicyEditorPermissions, Boolean> codebaseClipboard = null;
+    private Map<PolicyEditorPermissions, Boolean> editorPermissionsClipboard = null;
+    private Set<CustomPermission> customPermissionsClipboard = null;
 
     private final ActionListener okButtonAction, addCodebaseButtonAction,
             removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
@@ -331,23 +333,14 @@ public class PolicyEditor extends JPanel {
                         return;
                     }
                 }
-                final Map<PolicyEditorPermissions, Boolean> standardPermissions = policyFile.getCopyOfPermissions().get(oldCodebase);
-                final Set<CustomPermission> customPermissions = policyFile.getCopyOfCustomPermissions().get(oldCodebase);
-                removeCodebase(oldCodebase);
-                addNewCodebase(newCodebase);
-                for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : standardPermissions.entrySet()) {
-                    policyFile.setPermission(newCodebase, entry.getKey(), entry.getValue());
-                }
-                policyFile.addCustomPermissions(newCodebase, customPermissions);
-                updateCheckboxes(newCodebase);
-                changesMade = true;
+                renameCodebase(oldCodebase, newCodebase);
             }
         };
 
         copyCodebaseButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                codebaseClipboard = new HashMap<>(policyFile.getCopyOfPermissions().get(getSelectedCodebase()));
+                copyCodebase(getSelectedCodebase());
             }
         };
 
@@ -361,12 +354,7 @@ public class PolicyEditor extends JPanel {
                         return;
                     }
                 }
-                addNewCodebase(newCodebase);
-                for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : codebaseClipboard.entrySet()) {
-                    policyFile.setPermission(newCodebase, entry.getKey(), entry.getValue());
-                }
-                updateCheckboxes(newCodebase);
-                changesMade = true;
+                pasteCodebase(newCodebase);
             }
         };
 
@@ -826,13 +814,74 @@ public class PolicyEditor extends JPanel {
         changesMade = true;
     }
 
+    /**
+     * Rename a codebase, preserving its permissions
+     * @param oldCodebase the codebase to rename
+     * @param newCodebase the new name for the codebase
+     */
+    public void renameCodebase(final String oldCodebase, final String newCodebase) {
+        // Renaming a codebase shouldn't overwrite a previously copied clipboard
+        final Map<PolicyEditorPermissions, Boolean> editorPermissionsClipboardBackup = editorPermissionsClipboard;
+        final Set<CustomPermission> customPermissionsClipboardBackup = customPermissionsClipboard;
+
+        copyCodebase(oldCodebase);
+        pasteCodebase(newCodebase);
+        removeCodebase(oldCodebase);
+
+        editorPermissionsClipboard = editorPermissionsClipboardBackup;
+        customPermissionsClipboard = customPermissionsClipboardBackup;
+    }
+
+    /**
+     * Copy a codebase to the editor's "clipboard" (not the system clipboard), preserving its permissions
+     * @param codebase the codebase to copy
+     */
+    public void copyCodebase(final String codebase) {
+        if (!getCodebases().contains(codebase)) {
+            return;
+        }
+        editorPermissionsClipboard = new HashMap<>(policyFile.getCopyOfPermissions().get(codebase));
+
+        final Set<CustomPermission> customPermissions = policyFile.getCopyOfCustomPermissions().get(codebase);
+        if (customPermissions == null) {
+            customPermissionsClipboard = Collections.emptySet();
+        } else {
+            customPermissionsClipboard = new HashSet<>(policyFile.getCopyOfCustomPermissions().get(codebase));
+        }
+    }
+
+    /**
+     * Paste a codebase from the editor's "clipboard" (not the system clipboard)
+     * @param newCodebase the name to paste the codebase with
+     */
+    public void pasteCodebase(final String newCodebase) {
+        if (editorPermissionsClipboard == null || customPermissionsClipboard == null) {
+            return;
+        }
+        addNewCodebase(newCodebase);
+        for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : editorPermissionsClipboard.entrySet()) {
+            policyFile.setPermission(newCodebase, entry.getKey(), entry.getValue());
+        }
+        policyFile.addCustomPermissions(newCodebase, customPermissionsClipboard);
+        updateCheckboxes(newCodebase);
+        changesMade = true;
+    }
+
     public Set<String> getCodebases() {
         return new HashSet<>(policyFile.getCopyOfPermissions().keySet());
+    }
+
+    public void setPermission(final String codebase, final PolicyEditorPermissions permission, final boolean state) {
+        policyFile.setPermission(codebase, permission, state);
     }
 
     public Map<PolicyEditorPermissions, Boolean> getPermissions(final String codebase) {
         policyFile.addCodebase(codebase);
         return new HashMap<>(policyFile.getCopyOfPermissions().get(codebase));
+    }
+
+    public void addCustomPermission(final String codebase, final CustomPermission permission) {
+        policyFile.addCustomPermissions(codebase, Arrays.asList(permission));
     }
 
     public Collection<CustomPermission> getCustomPermissions(final String codebase) {

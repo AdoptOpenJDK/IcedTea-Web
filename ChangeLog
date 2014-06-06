@@ -1,3 +1,18 @@
+2014-06-06  Andrew Azores  <aazores@redhat.com>
+
+	PolicyEditor copy/paste/rename methods extracted and unit tests added
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(codebaseClipboard): renamed to editorPermissionsClipboard
+	(customPermissionsClipboard): new field for copy/pasting custom permissions
+	(copyCodebaseButtonAction, pasteCodebaseButtonAction,
+	renameCodebaseButtonAction): refactor to use newly extracted methods
+	(copyCodebase, pasteCodebase, renameCodebase): methods extracted from
+	corresponding button action ActionListeners
+	(setPermission, addCustomPermission): new methods
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java
+	(testRenameCodebase): new test for renaming codebase action
+	(testCopyPasteCodebase): new test for copying and pasting codebases
+
 2014-06-05  Andrew Azores  <aazores@redhat.com>
 
 	Added "Copy codebase to clipboard" action to PolicyEditor
