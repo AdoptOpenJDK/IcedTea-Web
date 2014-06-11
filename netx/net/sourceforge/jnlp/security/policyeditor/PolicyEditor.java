@@ -382,7 +382,7 @@ public class PolicyEditor extends JPanel {
                             return;
                         }
                         if (cpViewer == null) {
-                            cpViewer = new CustomPolicyViewer(PolicyEditor.this, codebase, policyFile);
+                            cpViewer = new CustomPolicyViewer(PolicyEditor.this, codebase);
                             cpViewer.setVisible(true);
                         } else {
                             cpViewer.toFront();
@@ -887,6 +887,10 @@ public class PolicyEditor extends JPanel {
     public Collection<CustomPermission> getCustomPermissions(final String codebase) {
         policyFile.addCodebase(codebase);
         return new HashSet<>(policyFile.getCopyOfCustomPermissions().get(codebase));
+    }
+
+    public void clearCustomPermissions(final String codebase) {
+        policyFile.clearCustomCodebase(codebase);
     }
 
     private void updateCheckboxes() {

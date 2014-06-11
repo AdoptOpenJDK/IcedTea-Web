@@ -46,6 +46,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import javax.swing.DefaultListModel;
@@ -75,7 +76,6 @@ public class CustomPolicyViewer extends JFrame {
     private final JLabel listLabel = new JLabel();
     private final ActionListener addButtonAction, removeButtonAction, closeButtonAction;
     private final WeakReference<CustomPolicyViewer> weakThis = new WeakReference<>(this);
-    private final PolicyFileModel policyFile;
     private final PolicyEditor parent;
     private final String codebase;
 
@@ -84,14 +84,15 @@ public class CustomPolicyViewer extends JFrame {
      * @param codebase the codebase for which these custom permissions are enabled
      * @param policyFile the PolicyFileModel
      */
-    public CustomPolicyViewer(final PolicyEditor parent, final String codebase, final PolicyFileModel policyFile) {
+    public CustomPolicyViewer(final PolicyEditor parent, final String codebase) {
         super();
+        Objects.requireNonNull(parent);
+        Objects.requireNonNull(codebase);
         this.parent = parent;
         this.codebase = codebase;
-        this.policyFile = policyFile;
         setLayout(new GridBagLayout());
         setTitle(R("PECPTitle"));
-        customPermissions.addAll(policyFile.getCopyOfCustomPermissions().get(codebase));
+        customPermissions.addAll(parent.getCustomPermissions(codebase));
         for (final CustomPermission perm : customPermissions) {
             listModel.addElement(perm);
         }
@@ -100,10 +101,11 @@ public class CustomPolicyViewer extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 final String prefill = R("PECPType") + " " + R("PECPTarget") + " [" + R("PECPActions") + "]";
-                final String string = JOptionPane.showInputDialog(weakThis.get(), R("PECPPrompt"), prefill);
+                String string = JOptionPane.showInputDialog(weakThis.get(), R("PECPPrompt"), prefill);
                 if (string == null || string.isEmpty()) {
                     return;
                 }
+                string = string.replaceAll("\\s+", " ").trim();
                 final String[] parts = string.split(" ");
                 if (parts.length < 2) {
                     return;
@@ -116,11 +118,7 @@ public class CustomPolicyViewer extends JFrame {
                     actions = "";
                 }
                 final CustomPermission perm = new CustomPermission(type, target, actions);
-                if (perm != null) {
-                    customPermissions.add(perm);
-                    listModel.addElement(perm);
-                    updateCustomPermissions();
-                }
+                addCustomPermission(perm);
             }
         };
         addButton.setText(R("PECPAddButton"));
@@ -129,12 +127,11 @@ public class CustomPolicyViewer extends JFrame {
         removeButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                if (list.getSelectedValue() == null) {
+                final CustomPermission selected = list.getSelectedValue();
+                if (selected == null) {
                     return;
                 }
-                customPermissions.remove(list.getSelectedValue());
-                listModel.removeElement(list.getSelectedValue());
-                updateCustomPermissions();
+                removeCustomPermission(selected);
             }
         };
         removeButton.setText(R("PECPRemoveButton"));
@@ -143,9 +140,7 @@ public class CustomPolicyViewer extends JFrame {
         closeButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                weakThis.clear();
-                parent.customPolicyViewerClosing();
-                dispose();
+                quit();
             }
         };
         closeButton.setText(R("PECPCloseButton"));
@@ -168,9 +163,7 @@ public class CustomPolicyViewer extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
-                weakThis.clear();
-                parent.customPolicyViewerClosing();
-                dispose();
+                quit();
             }
         });
     }
@@ -216,6 +209,12 @@ public class CustomPolicyViewer extends JFrame {
         setMinimumSize(getPreferredSize());
     }
 
+    private void quit() {
+        weakThis.clear();
+        parent.customPolicyViewerClosing();
+        dispose();
+    }
+
     /**
      * Update the custom permissions map. Used by the Custom Policy Viewer to update its parent
      * PolicyEditor to changes it has made
@@ -224,8 +223,30 @@ public class CustomPolicyViewer extends JFrame {
      */
     private void updateCustomPermissions() {
         parent.setChangesMade();
-        policyFile.clearCustomCodebase(codebase);
-        policyFile.addCustomPermissions(codebase, customPermissions);
+        parent.clearCustomPermissions(codebase);
+        for (final CustomPermission permission : customPermissions) {
+            parent.addCustomPermission(codebase, permission);
+        }
+    }
+
+    void addCustomPermission(final CustomPermission permission) {
+        Objects.requireNonNull(permission);
+        if (customPermissions.add(permission)) {
+            listModel.addElement(permission);
+            updateCustomPermissions();
+        }
+        list.setSelectedValue(permission, true);
+    }
+
+    void removeCustomPermission(final CustomPermission permission) {
+        Objects.requireNonNull(permission);
+        customPermissions.remove(permission);
+        listModel.removeElement(permission);
+        updateCustomPermissions();
+    }
+
+    Collection<CustomPermission> getCopyOfCustomPermissions() {
+        return new TreeSet<>(customPermissions);
     }
 
 }

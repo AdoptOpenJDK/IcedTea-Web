@@ -38,7 +38,6 @@ package net.sourceforge.jnlp.security.policyeditor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -139,6 +138,24 @@ public class PolicyEditorTest {
         assertTrue("Editor should also contain pasted codebase:" + pasteUrl, afterPasteCodebases.contains(pasteUrl));
         assertTrue(copyUrl + " should have " + clipBoard, editor.getPermissions(copyUrl).get(clipBoard));
         assertTrue(pasteUrl + " should have " + clipBoard, editor.getPermissions(pasteUrl).get(clipBoard));
+    }
+
+    @Test
+    public void testAddCustomPermission() throws Exception {
+        final String codebase = "http://example.com";
+        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
+        editor.addCustomPermission(codebase, customPermission);
+        assertTrue(editor.getCustomPermissions(codebase).contains(customPermission));
+    }
+
+    @Test
+    public void testClearCustomPermissions() throws Exception {
+        final String codebase = "http://example.com";
+        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
+        editor.addCustomPermission(codebase, customPermission);
+        assertTrue(editor.getCustomPermissions(codebase).contains(customPermission));
+        editor.clearCustomPermissions(codebase);
+        assertEquals(0, editor.getCustomPermissions(codebase).size());
     }
 
     @Test

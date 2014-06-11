@@ -1,3 +1,23 @@
+2014-06-11  Andrew Azores  <aazores@redhat.com>
+
+	CustomPolicyViewer refactored - methods extracted for unit testing and no
+	longer holds PolicyFileModel reference, instead using parent
+	PolicyEditor's interface for interacting with the file model
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java:
+	no longer holds PolicyFileModel reference, interacts through
+	PolicyEditor parent instead
+	(addButtonAction, removeButtonAction, closeButtonAction): use extracted methods
+	(addCustomPermission): extracted method, no longer adds visual duplicates
+	(removeCustomPermission, quit): extracted methods
+	(getCopyOfCustomPermissions): new method
+	(updateCustomPermissions): use parent rather than PolicyFileModel
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(clearCustomPermissions): new method
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java
+	(testAddCustomPermission, testClearCustomPermissions): new tests
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewerTest.java:
+	new test class
+
 2014-06-06  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPermission.java
