@@ -173,7 +173,14 @@ public class PolicyEditor extends JPanel {
             addCodebaseButton = new JButton(), removeCodebaseButton = new JButton();
     private final JFileChooser fileChooser;
     private CustomPolicyViewer cpViewer = null;
-    private final WeakReference<PolicyEditor> weakThis = new WeakReference<>(this);
+
+    /**
+     * See showChangesSavedDialog/showCouldNotSaveDialog. This weak reference is needed because
+     * there is a modal child dialog which can sometimes appear after the editor has been closed
+     * and disposed. In this case, its parent should be set to 'null', but otherwise the parent
+     * should be the editor so that the dialog is modal.
+     */
+    private final WeakReference<PolicyEditor> parentPolicyEditor = new WeakReference<>(this);
     private Map<PolicyEditorPermissions, Boolean> editorPermissionsClipboard = null;
     private Set<CustomPermission> customPermissionsClipboard = null;
 
@@ -247,7 +254,7 @@ public class PolicyEditor extends JPanel {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 if (policyFile.getFile() == null) {
-                    final int choice = fileChooser.showOpenDialog(weakThis.get());
+                    final int choice = fileChooser.showOpenDialog(PolicyEditor.this);
                     if (choice == JFileChooser.APPROVE_OPTION) {
                         policyFile.setFile(fileChooser.getSelectedFile());
                     }
@@ -284,10 +291,10 @@ public class PolicyEditor extends JPanel {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 if (changesMade) {
-                    final int save = JOptionPane.showConfirmDialog(weakThis.get(), R("PESaveChanges"));
+                    final int save = JOptionPane.showConfirmDialog(PolicyEditor.this, R("PESaveChanges"));
                     if (save == JOptionPane.YES_OPTION) {
                         if (policyFile.getFile() == null) {
-                            final int choice = fileChooser.showSaveDialog(weakThis.get());
+                            final int choice = fileChooser.showSaveDialog(PolicyEditor.this);
                             if (choice == JFileChooser.APPROVE_OPTION) {
                                 policyFile.setFile(fileChooser.getSelectedFile());
                             } else if (choice == JFileChooser.CANCEL_OPTION) {
@@ -299,7 +306,7 @@ public class PolicyEditor extends JPanel {
                         return;
                     }
                 }
-                final int choice = fileChooser.showOpenDialog(weakThis.get());
+                final int choice = fileChooser.showOpenDialog(PolicyEditor.this);
                 if (choice == JFileChooser.APPROVE_OPTION) {
                     policyFile.setFile(fileChooser.getSelectedFile());
                     openAndParsePolicyFile();
@@ -310,7 +317,7 @@ public class PolicyEditor extends JPanel {
         saveAsButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                final int choice = fileChooser.showSaveDialog(weakThis.get());
+                final int choice = fileChooser.showSaveDialog(PolicyEditor.this);
                 if (choice == JFileChooser.APPROVE_OPTION) {
                     policyFile.setFile(fileChooser.getSelectedFile());
                     changesMade = true;
@@ -328,7 +335,7 @@ public class PolicyEditor extends JPanel {
                 }
                 String newCodebase = "";
                 while (!validateCodebase(newCodebase) || policyFile.getCopyOfPermissions().containsKey(newCodebase)) {
-                    newCodebase = JOptionPane.showInputDialog(weakThis.get(), R("PERenameCodebase"), oldCodebase);
+                    newCodebase = JOptionPane.showInputDialog(PolicyEditor.this, R("PERenameCodebase"), oldCodebase);
                     if (newCodebase == null) {
                         return;
                     }
@@ -349,7 +356,7 @@ public class PolicyEditor extends JPanel {
             public void actionPerformed(final ActionEvent e) {
                 String newCodebase = "";
                 while (!validateCodebase(newCodebase) || policyFile.getCopyOfPermissions().containsKey(newCodebase)) {
-                    newCodebase = JOptionPane.showInputDialog(weakThis.get(), R("PEPasteCodebase"), "http://");
+                    newCodebase = JOptionPane.showInputDialog(PolicyEditor.this, R("PEPasteCodebase"), "http://");
                     if (newCodebase == null) {
                         return;
                     }
@@ -540,6 +547,7 @@ public class PolicyEditor extends JPanel {
      */
     private static void policyEditorWindowQuit(final Window window) {
         final PolicyEditor editor = ((PolicyEditorWindow) window).getPolicyEditor();
+        editor.parentPolicyEditor.clear();
         if (editor.changesMade) {
             final int save = JOptionPane.showConfirmDialog(window, R("PESaveChanges"));
             if (save == JOptionPane.YES_OPTION) {
@@ -556,7 +564,6 @@ public class PolicyEditor extends JPanel {
                 return;
             }
         }
-        editor.weakThis.clear();
         editor.setClosed();
         window.dispose();
     }
@@ -780,7 +787,7 @@ public class PolicyEditor extends JPanel {
             public void run() {
                 String codebase = "";
                 while (!validateCodebase(codebase)) {
-                    codebase = JOptionPane.showInputDialog(weakThis.get(), R("PECodebasePrompt"), "http://");
+                    codebase = JOptionPane.showInputDialog(PolicyEditor.this, R("PECodebasePrompt"), "http://");
                     if (codebase == null) {
                         return;
                     }
@@ -1249,11 +1256,11 @@ public class PolicyEditor extends JPanel {
         }
         final OpenFileResult ofr = FileUtils.testFilePermissions(policyFile.getFile());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
-            FileUtils.showCouldNotOpenFilepathDialog(weakThis.get(), policyFile.getFile().getPath());
+            FileUtils.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyFile.getFile().getPath());
             return;
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
-            FileUtils.showReadOnlyDialog(weakThis.get());
+            FileUtils.showReadOnlyDialog(PolicyEditor.this);
         }
 
         final Window parentWindow = SwingUtilities.getWindowAncestor(this);
@@ -1275,11 +1282,11 @@ public class PolicyEditor extends JPanel {
                     policyFile.openAndParsePolicyFile();
                 } catch (final FileNotFoundException fnfe) {
                     OutputController.getLogger().log(fnfe);
-                    FileUtils.showCouldNotOpenDialog(weakThis.get(), R("PECouldNotOpen"));
+                    FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 } catch (final IOException ioe) {
                     OutputController.getLogger().log(ioe);
                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantOpenFile", policyFile.getFile().getPath()));
-                    FileUtils.showCouldNotOpenDialog(weakThis.get(), R("PECouldNotOpen"));
+                    FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 }
                 return null;
             }
@@ -1362,10 +1369,13 @@ public class PolicyEditor extends JPanel {
      * Show a dialog informing the user that their changes have been saved.
      */
     private void showChangesSavedDialog() {
+        // This dialog is often displayed when closing the editor, and so PolicyEditor
+        // may already be disposed when this dialog appears. Give a weak reference so
+        // that this dialog doesn't prevent GC of the editor
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(weakThis.get(), R("PEChangesSaved"));
+                JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEChangesSaved"));
             }
         });
     }
@@ -1374,10 +1384,13 @@ public class PolicyEditor extends JPanel {
      * Show a dialog informing the user that their changes could not be saved.
      */
     private void showCouldNotSaveDialog() {
+        // This dialog is often displayed when closing the editor, and so PolicyEditor
+        // may already be disposed when this dialog appears. Give a weak reference so
+        // that this dialog doesn't prevent GC of the editor
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(weakThis.get(), R("PECouldNotSave"), R("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PECouldNotSave"), R("Error"), JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -1396,7 +1409,7 @@ public class PolicyEditor extends JPanel {
             changed = policyFile.hasChanged();
         } catch (FileNotFoundException e) {
             OutputController.getLogger().log(e);
-            JOptionPane.showMessageDialog(weakThis.get(), R("PEFileMissing"), R("PEFileModified"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(PolicyEditor.this, R("PEFileMissing"), R("PEFileModified"), JOptionPane.WARNING_MESSAGE);
             return JOptionPane.NO_OPTION;
         } catch (IOException e) {
             OutputController.getLogger().log(e);
@@ -1410,7 +1423,7 @@ public class PolicyEditor extends JPanel {
                 OutputController.getLogger().log(e);
                 policyFilePath = policyFile.getFile().getPath();
             }
-            return JOptionPane.showConfirmDialog(weakThis.get(), R("PEFileModifiedDetail", policyFilePath,
+            return JOptionPane.showConfirmDialog(PolicyEditor.this, R("PEFileModifiedDetail", policyFilePath,
                     R("PEFileModified"), JOptionPane.YES_NO_CANCEL_OPTION));
         } else if (!changesMade) {
             //Return without saving or reloading

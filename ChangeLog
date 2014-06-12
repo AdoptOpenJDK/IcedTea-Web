@@ -1,3 +1,12 @@
+2014-06-12  Andrew Azores  <aazores@redhat.com>
+
+	Reduced usage of weak references in PolicyEditor
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java
+	(weakThis): removed in favour of CustomPolicyViewer.this
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(weakThis): used only in showChangesSavedDialog and showCouldNotSaveDialog,
+	other uses changed to PolicyEditor.this
+
 2014-06-11  Andrew Azores  <aazores@redhat.com>
 
 	CustomPolicyViewer refactored - methods extracted for unit testing and no

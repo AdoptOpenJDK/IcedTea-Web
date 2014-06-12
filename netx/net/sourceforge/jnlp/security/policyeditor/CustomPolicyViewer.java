@@ -44,7 +44,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.TreeSet;
@@ -75,7 +74,6 @@ public class CustomPolicyViewer extends JFrame {
     private final JButton addButton = new JButton(), removeButton = new JButton(), closeButton = new JButton();
     private final JLabel listLabel = new JLabel();
     private final ActionListener addButtonAction, removeButtonAction, closeButtonAction;
-    private final WeakReference<CustomPolicyViewer> weakThis = new WeakReference<>(this);
     private final PolicyEditor parent;
     private final String codebase;
 
@@ -101,7 +99,7 @@ public class CustomPolicyViewer extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 final String prefill = R("PECPType") + " " + R("PECPTarget") + " [" + R("PECPActions") + "]";
-                String string = JOptionPane.showInputDialog(weakThis.get(), R("PECPPrompt"), prefill);
+                String string = JOptionPane.showInputDialog(CustomPolicyViewer.this, R("PECPPrompt"), prefill);
                 if (string == null || string.isEmpty()) {
                     return;
                 }
@@ -210,7 +208,6 @@ public class CustomPolicyViewer extends JFrame {
     }
 
     private void quit() {
-        weakThis.clear();
         parent.customPolicyViewerClosing();
         dispose();
     }
