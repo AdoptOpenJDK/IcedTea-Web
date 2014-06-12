@@ -1,5 +1,11 @@
 2014-06-12  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(showChangesSavedDialog, showCouldNotSaveDialog): fixed comment to explain
+	an issue with JVM exiting, rather than GC
+
+2014-06-12  Andrew Azores  <aazores@redhat.com>
+
 	Reduced usage of weak references in PolicyEditor
 	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java
 	(weakThis): removed in favour of CustomPolicyViewer.this

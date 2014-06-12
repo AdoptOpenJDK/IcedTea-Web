@@ -1371,7 +1371,7 @@ public class PolicyEditor extends JPanel {
     private void showChangesSavedDialog() {
         // This dialog is often displayed when closing the editor, and so PolicyEditor
         // may already be disposed when this dialog appears. Give a weak reference so
-        // that this dialog doesn't prevent GC of the editor
+        // that this dialog doesn't prevent the JVM from exiting
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -1386,7 +1386,7 @@ public class PolicyEditor extends JPanel {
     private void showCouldNotSaveDialog() {
         // This dialog is often displayed when closing the editor, and so PolicyEditor
         // may already be disposed when this dialog appears. Give a weak reference so
-        // that this dialog doesn't prevent GC of the editor
+        // that this dialog doesn't prevent the JVM from exiting
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
