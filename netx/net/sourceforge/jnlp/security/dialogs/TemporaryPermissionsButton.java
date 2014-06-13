@@ -63,6 +63,7 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
 
 public class TemporaryPermissionsButton extends JButton {
 
@@ -101,50 +102,25 @@ public class TemporaryPermissionsButton extends JButton {
 
         policyMenu.addSeparator();
 
+        final JCheckBoxMenuItem networkAccess = new JCheckBoxMenuItem(R("STempNetwork"));
+        networkAccess.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.getPermissions(PolicyEditorPermissions.NETWORK)));
+        policyMenu.add(networkAccess);
 
-        final JCheckBoxMenuItem noFileAccess = new JCheckBoxMenuItem(R("STempPermNoFile"));
-        noFileAccess.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.noFileAccess()));
-        policyMenu.add(noFileAccess);
-
-        final JCheckBoxMenuItem noNetworkAccess = new JCheckBoxMenuItem(R("STempPermNoNetwork"));
-        noNetworkAccess.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.noNetworkAccess()));
-        policyMenu.add(noNetworkAccess);
-
-        final JCheckBoxMenuItem noFileOrNetwork = new JCheckBoxMenuItem(R("STempNoFileOrNetwork"));
-        noFileOrNetwork.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.noFileOrNetworkAccess()));
-        policyMenu.add(noFileOrNetwork);
-
-        policyMenu.addSeparator();
-
-        final JCheckBoxMenuItem allFileAccessOnly = new JCheckBoxMenuItem(R("STempAllFileAndPropertyAccess"));
-        allFileAccessOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.allFileAccessAndProperties()));
-        policyMenu.add(allFileAccessOnly);
-
-        final JCheckBoxMenuItem readLocalFilesAndProperties = new JCheckBoxMenuItem(R("STempReadLocalFilesAndProperties"));
-        readLocalFilesAndProperties.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.readLocalFilesAndProperties()));
+        final JCheckBoxMenuItem readLocalFilesAndProperties = new JCheckBoxMenuItem(R("STempReadFilesAndProperties"));
+        readLocalFilesAndProperties.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.getPermissions(PolicyEditorPermissions.Group.ReadFileSystem)));
         policyMenu.add(readLocalFilesAndProperties);
 
-        final JCheckBoxMenuItem reflectionOnly = new JCheckBoxMenuItem(R("STempReflectionOnly"));
-        reflectionOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.reflectionOnly()));
+        final JCheckBoxMenuItem writeLocalFilesAndProperties = new JCheckBoxMenuItem(R("STempWriteFilesAndProperties"));
+        writeLocalFilesAndProperties.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.getPermissions(PolicyEditorPermissions.Group.WriteFileSystem)));
+        policyMenu.add(writeLocalFilesAndProperties);
+
+        final JCheckBoxMenuItem reflectionOnly = new JCheckBoxMenuItem(R("STempReflectionAndExternal"));
+        reflectionOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.getPermissions(PolicyEditorPermissions.Group.AccessUnownedCode)));
         policyMenu.add(reflectionOnly);
 
-        policyMenu.addSeparator();
-
         final JCheckBoxMenuItem allMedia = new JCheckBoxMenuItem(R("STempAllMedia"));
-        allMedia.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.allMedia()));
+        allMedia.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.getPermissions(PolicyEditorPermissions.Group.MediaAccess)));
         policyMenu.add(allMedia);
-
-        final JCheckBoxMenuItem soundOnly = new JCheckBoxMenuItem(R("STempSoundOnly"));
-        soundOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.audioOnly()));
-        policyMenu.add(soundOnly);
-
-        final JCheckBoxMenuItem clipboardOnly = new JCheckBoxMenuItem(R("STempClipboardOnly"));
-        clipboardOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.clipboardOnly()));
-        policyMenu.add(clipboardOnly);
-
-        final JCheckBoxMenuItem printOnly = new JCheckBoxMenuItem(R("STempPrintOnly"));
-        printOnly.addActionListener(new TemporaryPermissionsListener(TemporaryPermissions.printOnly()));
-        policyMenu.add(printOnly);
 
         return policyMenu;
     }

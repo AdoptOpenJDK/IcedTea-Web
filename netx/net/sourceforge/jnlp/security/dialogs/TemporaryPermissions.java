@@ -36,173 +36,83 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
-import java.awt.AWTPermission;
-import java.io.FilePermission;
-import java.lang.reflect.ReflectPermission;
-import java.net.SocketPermission;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Permission;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.PropertyPermission;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.sound.sampled.AudioPermission;
-
-import static net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.*;
+import net.sourceforge.jnlp.security.policyeditor.PermissionActions;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class TemporaryPermissions {
 
-    // We can't use the PolicyEditorPermissions versions of these, because they rely on System Property expansion, which is perfomed
-    // by the policy parser, but not by the Permissions constructors.
-    private static final String USER_HOME = System.getProperty("user.home");
-    private static final String TMPDIR = System.getProperty("java.io.tmpdir");
+    // Look for expandable properties in targets, eg ${user.home} or ${java.io.tmpdir}
+    private static final Pattern expandablePattern = Pattern.compile("\\$\\{([a-zA-Z0-9\\.}]+)*\\}");
 
-    public static final FilePermission READ_LOCAL_FILES_PERMISSION = new FilePermission(USER_HOME, READ_LOCAL_FILES.getActions().rawString());
-    public static final FilePermission WRITE_LOCAL_FILES_PERMISSION = new FilePermission(USER_HOME, WRITE_LOCAL_FILES.getActions().rawString());
-    public static final FilePermission DELETE_LOCAL_FILES_PERMISSION = new FilePermission(USER_HOME, DELETE_LOCAL_FILES.getActions().rawString());
-    public static final FilePermission READ_TMP_FILES_PERMISSION = new FilePermission(TMPDIR, READ_TMP_FILES.getActions().rawString());
-    public static final FilePermission WRITE_TMP_FILES_PERMISSION = new FilePermission(TMPDIR, WRITE_TMP_FILES.getActions().rawString());
-    public static final FilePermission DELETE_TMP_FILES_PERMISSION = new FilePermission(TMPDIR, DELETE_TMP_FILES.getActions().rawString());
-    public static final FilePermission READ_SYSTEM_FILES_PERMISSION = new FilePermission(READ_SYSTEM_FILES.getTarget().target, READ_SYSTEM_FILES.getActions()
-            .rawString());
-    public static final FilePermission WRITE_SYSTEM_FILES_PERMISSION = new FilePermission(WRITE_SYSTEM_FILES.getTarget().target, WRITE_SYSTEM_FILES
-            .getActions().rawString());
-
-    public static final PropertyPermission READ_PROPERTIES_PERMISSION = new PropertyPermission(READ_PROPERTIES.getTarget().target, READ_PROPERTIES.getActions()
-            .rawString());
-    public static final PropertyPermission WRITE_PROPERTIES_PERMISSION = new PropertyPermission(WRITE_PROPERTIES.getTarget().target, WRITE_PROPERTIES
-            .getActions().rawString());
-
-    public static final FilePermission EXEC_PERMISSION = new FilePermission(EXEC_COMMANDS.getTarget().target, EXEC_COMMANDS.getActions().rawString());
-    public static final RuntimePermission GETENV_PERMISSION = new RuntimePermission(GET_ENV.getTarget().target);
-
-    public static final SocketPermission NETWORK_PERMISSION = new SocketPermission(NETWORK.getTarget().target, NETWORK.getActions().rawString());
-
-    public static final ReflectPermission REFLECTION_PERMISSION = new ReflectPermission(JAVA_REFLECTION.getTarget().target);
-    public static final RuntimePermission CLASSLOADER_PERMISSION = new RuntimePermission(GET_CLASSLOADER.getTarget().target);
-    public static final RuntimePermission ACCESS_CLASS_IN_PACKAGE_PERMISSION = new RuntimePermission(ACCESS_CLASS_IN_PACKAGE.getTarget().target);
-    public static final RuntimePermission ACCESS_DECLARED_MEMBERS_PERMISSION = new RuntimePermission(ACCESS_DECLARED_MEMBERS.getTarget().target);
-    public static final RuntimePermission ACCESS_THREADS_PERMISSION = new RuntimePermission(ACCESS_THREADS.getTarget().target);
-    public static final RuntimePermission ACCESS_THREADGROUPS_PERMISSION = new RuntimePermission(ACCESS_THREAD_GROUPS.getTarget().target);
-
-    public static final AWTPermission AWT_PERMISSION = new AWTPermission(ALL_AWT.getTarget().target);
-    public static final AudioPermission PLAY_AUDIO_PERMISSION = new AudioPermission(PLAY_AUDIO.getTarget().target);
-    public static final AudioPermission RECORD_AUDIO_PERMISSION = new AudioPermission(RECORD_AUDIO.getTarget().target);
-    public static final AWTPermission CLIPBOARD_PERMISSION = new AWTPermission(CLIPBOARD.getTarget().target);
-    public static final RuntimePermission PRINT_PERMISSION = new RuntimePermission(PRINT.getTarget().target);
-
-    public static final Collection<Permission> ALL_PERMISSIONS, FILE_PERMISSIONS, PROPERTY_PERMISSIONS, NETWORK_PERMISSIONS, EXEC_PERMISSIONS,
-            REFLECTION_PERMISSIONS, MEDIA_PERMISSIONS;
-    static {
-        final Collection<Permission> all = new HashSet<>(), file = new HashSet<>(), property = new HashSet<>(),
-              network = new HashSet<>(), exec = new HashSet<>(), reflection = new HashSet<>(), media = new HashSet<>();
-
-        file.add(READ_LOCAL_FILES_PERMISSION);
-        file.add(WRITE_LOCAL_FILES_PERMISSION);
-        file.add(DELETE_LOCAL_FILES_PERMISSION);
-        file.add(READ_TMP_FILES_PERMISSION);
-        file.add(WRITE_TMP_FILES_PERMISSION);
-        file.add(DELETE_TMP_FILES_PERMISSION);
-        file.add(READ_SYSTEM_FILES_PERMISSION);
-        file.add(WRITE_SYSTEM_FILES_PERMISSION);
-        FILE_PERMISSIONS = Collections.unmodifiableCollection(file);
-
-        property.add(READ_PROPERTIES_PERMISSION);
-        property.add(WRITE_PROPERTIES_PERMISSION);
-        PROPERTY_PERMISSIONS = Collections.unmodifiableCollection(property);
-
-        exec.add(EXEC_PERMISSION);
-        exec.add(GETENV_PERMISSION);
-        EXEC_PERMISSIONS = Collections.unmodifiableCollection(exec);
-
-        network.add(NETWORK_PERMISSION);
-        NETWORK_PERMISSIONS = Collections.unmodifiableCollection(network);
-
-        reflection.add(REFLECTION_PERMISSION);
-        reflection.add(CLASSLOADER_PERMISSION);
-        reflection.add(ACCESS_CLASS_IN_PACKAGE_PERMISSION);
-        reflection.add(ACCESS_DECLARED_MEMBERS_PERMISSION);
-        reflection.add(ACCESS_THREADS_PERMISSION);
-        reflection.add(ACCESS_THREADGROUPS_PERMISSION);
-        REFLECTION_PERMISSIONS = Collections.unmodifiableCollection(reflection);
-
-        media.add(AWT_PERMISSION);
-        media.add(PLAY_AUDIO_PERMISSION);
-        media.add(RECORD_AUDIO_PERMISSION);
-        media.add(CLIPBOARD_PERMISSION);
-        media.add(PRINT_PERMISSION);
-        MEDIA_PERMISSIONS = Collections.unmodifiableCollection(media);
-
-        all.addAll(file);
-        all.addAll(property);
-        all.addAll(exec);
-        all.addAll(network);
-        all.addAll(reflection);
-        all.addAll(media);
-        ALL_PERMISSIONS = Collections.unmodifiableCollection(all);
+    public static Collection<Permission> getPermissions(final PolicyEditorPermissions... editorPermissions) {
+        return getPermissions(Arrays.asList(editorPermissions));
     }
 
-    private static final Collection<Permission> allMinus(final Collection<Permission> permissions) {
-        return subtract(ALL_PERMISSIONS, permissions);
+    public static Collection<Permission> getPermissions(final Collection<PolicyEditorPermissions> editorPermissions) {
+        final Collection<Permission> col = new HashSet<Permission>();
+        for (final PolicyEditorPermissions editorPerm : editorPermissions) {
+            col.add(getPermission(editorPerm));
+        }
+        return Collections.unmodifiableCollection(col);
     }
 
-    private static Collection<Permission> sum(final Permission... permissions) {
-        final Collection<Permission> result = new HashSet<>(Arrays.asList(permissions));
-        return Collections.unmodifiableCollection(result);
+    public static Collection<Permission> getPermissions(final PolicyEditorPermissions.Group permissionsGroup) {
+        return getPermissions(permissionsGroup.getPermissions());
     }
 
-    private static Collection<Permission> sum(final Collection<Permission> a, final Collection<Permission> b) {
-        final Collection<Permission> result = new HashSet<>();
-        result.addAll(a);
-        result.addAll(b);
-        return Collections.unmodifiableCollection(result);
+    public static Permission getPermission(final PolicyEditorPermissions editorPermission) {
+        try {
+            final Class<?> clazz = Class.forName(editorPermission.getType().type);
+            final Constructor<?> ctor;
+            final Permission perm;
+            String target = editorPermission.getTarget().target;
+
+            Matcher m = expandablePattern.matcher(target);
+            while (m.find()) {
+                // Expand any matches by reading from System properties, eg ${java.io.tmpdir} is /tmp on most systems
+                target = m.replaceFirst(System.getProperty(m.group(1)));
+                m = expandablePattern.matcher(target);
+            }
+
+            if (editorPermission.getActions().equals(PermissionActions.NONE)) {
+                ctor = clazz.getDeclaredConstructor(new Class[] { String.class });
+                ctor.setAccessible(true);
+                perm = (Permission) ctor.newInstance(target);
+            } else {
+                ctor = clazz.getDeclaredConstructor(new Class[] { String.class, String.class });
+                ctor.setAccessible(true);
+                perm = (Permission) ctor.newInstance(target, collectionToString(editorPermission.getActions().getActions()));
+            }
+            return perm;
+        } catch (final ClassNotFoundException | SecurityException | NoSuchMethodException
+                | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            OutputController.getLogger().log(e);
+            return null;
+        }
     }
 
-    private static final Collection<Permission> subtract(final Collection<Permission> from, final Collection<Permission> remove) {
-        final Collection<Permission> result = new HashSet<>(from);
-        result.removeAll(remove);
-        return Collections.unmodifiableCollection(result);
-    }
-
-    public static Collection<Permission> noFileAccess() {
-        return allMinus(FILE_PERMISSIONS);
-    }
-
-    public static Collection<Permission> noNetworkAccess() {
-        return allMinus(Arrays.asList(new Permission[] { NETWORK_PERMISSION }));
-    }
-
-    public static Collection<Permission> noFileOrNetworkAccess() {
-        return subtract(allMinus(FILE_PERMISSIONS), NETWORK_PERMISSIONS);
-    }
-
-    public static Collection<Permission> allFileAccessAndProperties() {
-        return sum(FILE_PERMISSIONS, PROPERTY_PERMISSIONS);
-    }
-
-    public static Collection<Permission> readLocalFilesAndProperties() {
-        return sum(READ_LOCAL_FILES_PERMISSION, READ_PROPERTIES_PERMISSION);
-    }
-
-    public static Collection<Permission> reflectionOnly() {
-        return REFLECTION_PERMISSIONS;
-    }
-
-    public static Collection<Permission> allMedia() {
-        return MEDIA_PERMISSIONS;
-    }
-
-    public static Collection<Permission> audioOnly() {
-        return sum(PLAY_AUDIO_PERMISSION, RECORD_AUDIO_PERMISSION);
-    }
-
-    public static Collection<Permission> clipboardOnly() {
-        return sum(CLIPBOARD_PERMISSION);
-    }
-
-    public static Collection<Permission> printOnly() {
-        return sum(PRINT_PERMISSION);
+    private static String collectionToString(final Collection<String> col) {
+        final StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (final String str : col) {
+            sb.append(str);
+            if (count < col.size() - 1) {
+                sb.append(",");
+            }
+            ++count;
+        }
+        return sb.toString();
     }
 
 }

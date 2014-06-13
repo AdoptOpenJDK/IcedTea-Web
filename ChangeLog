@@ -1,3 +1,28 @@
+2014-06-13  Andrew Azores  <aazores@redhat.com>
+
+	TemporaryPermissions generated via reflection rather than hard coded
+	* netx/net/sourceforge/jnlp/resources/Messages.properties
+	(STempPermNoFile, STempPermNoNetwork, STempPermNoExec,
+	STempNoFileOrNetwork, STempNoExecOrNetwork, STempNoFileOrExec,
+	STempNoFileOrNetworkOrExec, STempAllMedia, STempSoundOnly,
+	STempClipboardOnly, STempPrintOnly, STempAllFileAndPropertyAccess,
+	STempReadLocalFilesAndProperties, STempReflectionOnly): removed
+	(STempNetwork, STempReadFilesAndProperties, STempWriteFilesAndProperties,
+	STempReflectionAndExternal, STempAllMedia): new messages
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties
+	(STempPermNoFile, STempPermNoNetwork, STempPermNoExec,
+	STempNoFileOrNetwork, STempNoExecOrNetwork, STempNoFileOrExec,
+	STempNoFileOrNetworkOrExec, STempAllMedia, STempSoundOnly,
+	STempClipboardOnly, STempPrintOnly, STempAllFileAndPropertyAccess,
+	STempReadLocalFilesAndProperties, STempReflectionOnly): removed
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissions.java:
+	rewrite to use reflection to generate permissions from
+	PolicyEditorPermissions rather than exposing statically defined values
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissionsButton.java:
+	refactor to use new TemporaryPermissions change
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/TemporaryPermissionsTest.java:
+	new tests for TemporaryPermissions
+
 2014-06-12  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
