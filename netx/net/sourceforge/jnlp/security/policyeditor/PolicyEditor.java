@@ -732,18 +732,14 @@ public class PolicyEditor extends JPanel {
         } else {
             model = codebase;
         }
-        final boolean existingCodebase = policyEditorController.addCodebase(codebase);
-        if (!existingCodebase) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    listModel.addElement(model);
-                }
-            });
-        }
+        policyEditorController.addCodebase(codebase);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                if (!listModel.contains(model)) {
+                    listModel.addElement(model);
+                    setChangesMade(true);
+                }
                 list.setSelectedValue(model, true);
                 updateCheckboxes(codebase);
             }
@@ -1274,7 +1270,9 @@ public class PolicyEditor extends JPanel {
                     } else {
                         model = codebase;
                     }
-                    listModel.addElement(model);
+                    if (!listModel.contains(model)) {
+                        listModel.addElement(model);
+                    }
                 }
                 addNewCodebase("");
                 progressIndicator.setVisible(false);

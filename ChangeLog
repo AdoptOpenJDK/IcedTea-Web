@@ -1,5 +1,14 @@
 2014-06-17  Andrew Azores  <aazores@redhat.com>
 
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(openAndParsePolicyFile): check if listModel already contains an element
+	before adding a potential duplicate
+	(addNewCodebase): perform the check for if the codebase is a duplicate
+	when actually adding the codebase to the listModel, rather than beforehand
+	and updating the UI in an invokeLater, which can cause a race
+
+2014-06-17  Andrew Azores  <aazores@redhat.com>
+
 	Some PolicyEditor logic extracted into new class PolicyEditorController to
 	allow different UIs to be built without invoking any main PolicyEditor UI
 	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java
