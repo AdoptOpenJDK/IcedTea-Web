@@ -1,3 +1,26 @@
+2014-06-17  Andrew Azores  <aazores@redhat.com>
+
+	Some PolicyEditor logic extracted into new class PolicyEditorController to
+	allow different UIs to be built without invoking any main PolicyEditor UI
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java
+	(updateCustomPermissions): give "true" as param for setChangesMade
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(policyFile, changesMade, performingIO): moved into
+	PolicyEditorController. All policyFile references changed to use
+	policyEditorController instead
+	(policyEditorController): new field
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorController.java:
+	new class to provide implementation of and programmatic interface for
+	major PolicyEditor actions, to allow other UIs to be built in the future
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java
+	(setNewTempfile): while-loop for waiting for PolicyEditor IO to complete
+	changed to do-while
+	(testAddMultipleCodebases, testCodebaseTrailingSlashesDoNotMatch):
+	editor.addNewCodebases has been removed, using editor.addNewCodebase and a
+	loop instead
+	(testAddCustomPermission, testClearCustomPermission): added assert
+	messages
+
 2014-06-13  Andrew Azores  <aazores@redhat.com>
 
 	TemporaryPermissions generated via reflection rather than hard coded

@@ -219,7 +219,7 @@ public class CustomPolicyViewer extends JFrame {
      * @param permissions the permissions granted to this codebase
      */
     private void updateCustomPermissions() {
-        parent.setChangesMade();
+        parent.setChangesMade(true);
         parent.clearCustomPermissions(codebase);
         for (final CustomPermission permission : customPermissions) {
             parent.addCustomPermission(codebase, permission);

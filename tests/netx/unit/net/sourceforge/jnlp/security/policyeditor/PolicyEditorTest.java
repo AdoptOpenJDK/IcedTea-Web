@@ -59,9 +59,9 @@ public class PolicyEditorTest {
         tempFilePath = File.createTempFile("policyeditor", null).getCanonicalPath();
         editor = new PolicyEditor(tempFilePath);
         // policy file is loaded async; give it some time before we test its contents
-        while (editor.isPerformingIO()) {
+        do {
             Thread.sleep(50);
-        }
+        } while (editor.isPerformingIO());
     }
 
     @Test
@@ -87,7 +87,9 @@ public class PolicyEditorTest {
         final Set<String> toAdd = new HashSet<String>();
         toAdd.add("http://example.com");
         toAdd.add("http://icedtea.classpath.org");
-        editor.addNewCodebases(toAdd);
+        for (final String cb : toAdd) {
+            editor.addNewCodebase(cb);
+        }
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));
         for (final String codebase : toAdd) {
@@ -145,7 +147,7 @@ public class PolicyEditorTest {
         final String codebase = "http://example.com";
         final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
         editor.addCustomPermission(codebase, customPermission);
-        assertTrue(editor.getCustomPermissions(codebase).contains(customPermission));
+        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(codebase).contains(customPermission));
     }
 
     @Test
@@ -153,7 +155,7 @@ public class PolicyEditorTest {
         final String codebase = "http://example.com";
         final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
         editor.addCustomPermission(codebase, customPermission);
-        assertTrue(editor.getCustomPermissions(codebase).contains(customPermission));
+        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(codebase).contains(customPermission));
         editor.clearCustomPermissions(codebase);
         assertEquals(0, editor.getCustomPermissions(codebase).size());
     }
@@ -224,7 +226,9 @@ public class PolicyEditorTest {
         final Set<String> toAdd = new HashSet<String>();
         toAdd.add("http://redhat.com");
         toAdd.add("http://redhat.com/");
-        editor.addNewCodebases(toAdd);
+        for (final String cb : toAdd) {
+            editor.addNewCodebase(cb);
+        }
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));
         for (final String codebase : toAdd) {

@@ -160,10 +160,7 @@ public class PolicyEditor extends JPanel {
             + "  " + FILE_FLAG + "\t\t\t" + R("PEFileFlag") + "\n"
             + "  " + CODEBASE_FLAG + "\t\t" + R("PECodebaseFlag") + "\n";
 
-    private final PolicyFileModel policyFile = new PolicyFileModel();
-    private volatile boolean changesMade = false;
     private boolean closed = false;
-    private volatile boolean performingIO = false;
     private final Map<PolicyEditorPermissions, JCheckBox> checkboxMap = new TreeMap<>();
     private final List<JCheckBoxWithGroup> groupBoxList = new ArrayList<>(Group.values().length);
     private final JScrollPane scrollPane = new JScrollPane();
@@ -173,7 +170,6 @@ public class PolicyEditor extends JPanel {
             addCodebaseButton = new JButton(), removeCodebaseButton = new JButton();
     private final JFileChooser fileChooser;
     private CustomPolicyViewer cpViewer = null;
-
     /**
      * See showChangesSavedDialog/showCouldNotSaveDialog. This weak reference is needed because
      * there is a modal child dialog which can sometimes appear after the editor has been closed
@@ -181,6 +177,7 @@ public class PolicyEditor extends JPanel {
      * should be the editor so that the dialog is modal.
      */
     private final WeakReference<PolicyEditor> parentPolicyEditor = new WeakReference<>(this);
+    private final PolicyEditorController policyEditorController = new PolicyEditorController();
     private Map<PolicyEditorPermissions, Boolean> editorPermissionsClipboard = null;
     private Set<CustomPermission> customPermissionsClipboard = null;
 
@@ -239,29 +236,29 @@ public class PolicyEditor extends JPanel {
         }
 
         if (filepath != null) {
-            policyFile.setFile(new File(filepath));
+            policyEditorController.setFile(new File(filepath));
             openAndParsePolicyFile();
         } else {
             resetCodebases();
             addNewCodebase("");
         }
-        changesMade = false;
+        setChangesMade(false);
 
-        fileChooser = new JFileChooser(policyFile.getFile());
+        fileChooser = new JFileChooser(policyEditorController.getFile());
         fileChooser.setFileHidingEnabled(false);
 
         okButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                if (policyFile.getFile() == null) {
+                if (policyEditorController.getFile() == null) {
                     final int choice = fileChooser.showOpenDialog(PolicyEditor.this);
                     if (choice == JFileChooser.APPROVE_OPTION) {
-                        policyFile.setFile(fileChooser.getSelectedFile());
+                        policyEditorController.setFile(fileChooser.getSelectedFile());
                     }
                 }
 
                 // May still be null if user cancelled the file chooser
-                if (policyFile.getFile() != null) {
+                if (policyEditorController.getFile() != null) {
                     savePolicyFile();
                 }
             }
@@ -290,13 +287,13 @@ public class PolicyEditor extends JPanel {
         openButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                if (changesMade) {
+                if (policyEditorController.changesMade()) {
                     final int save = JOptionPane.showConfirmDialog(PolicyEditor.this, R("PESaveChanges"));
                     if (save == JOptionPane.YES_OPTION) {
-                        if (policyFile.getFile() == null) {
+                        if (policyEditorController.getFile() == null) {
                             final int choice = fileChooser.showSaveDialog(PolicyEditor.this);
                             if (choice == JFileChooser.APPROVE_OPTION) {
-                                policyFile.setFile(fileChooser.getSelectedFile());
+                                policyEditorController.setFile(fileChooser.getSelectedFile());
                             } else if (choice == JFileChooser.CANCEL_OPTION) {
                                 return;
                             }
@@ -308,7 +305,7 @@ public class PolicyEditor extends JPanel {
                 }
                 final int choice = fileChooser.showOpenDialog(PolicyEditor.this);
                 if (choice == JFileChooser.APPROVE_OPTION) {
-                    policyFile.setFile(fileChooser.getSelectedFile());
+                    policyEditorController.setFile(fileChooser.getSelectedFile());
                     openAndParsePolicyFile();
                 }
             }
@@ -319,8 +316,8 @@ public class PolicyEditor extends JPanel {
             public void actionPerformed(final ActionEvent e) {
                 final int choice = fileChooser.showSaveDialog(PolicyEditor.this);
                 if (choice == JFileChooser.APPROVE_OPTION) {
-                    policyFile.setFile(fileChooser.getSelectedFile());
-                    changesMade = true;
+                    policyEditorController.setFile(fileChooser.getSelectedFile());
+                    setChangesMade(true);
                     savePolicyFile();
                 }
             }
@@ -334,7 +331,7 @@ public class PolicyEditor extends JPanel {
                     return;
                 }
                 String newCodebase = "";
-                while (!validateCodebase(newCodebase) || policyFile.getCopyOfPermissions().containsKey(newCodebase)) {
+                while (!validateCodebase(newCodebase) || policyEditorController.getCopyOfPermissions().containsKey(newCodebase)) {
                     newCodebase = JOptionPane.showInputDialog(PolicyEditor.this, R("PERenameCodebase"), oldCodebase);
                     if (newCodebase == null) {
                         return;
@@ -355,7 +352,7 @@ public class PolicyEditor extends JPanel {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 String newCodebase = "";
-                while (!validateCodebase(newCodebase) || policyFile.getCopyOfPermissions().containsKey(newCodebase)) {
+                while (!validateCodebase(newCodebase) || policyEditorController.getCopyOfPermissions().containsKey(newCodebase)) {
                     newCodebase = JOptionPane.showInputDialog(PolicyEditor.this, R("PEPasteCodebase"), "http://");
                     if (newCodebase == null) {
                         return;
@@ -548,18 +545,24 @@ public class PolicyEditor extends JPanel {
     private static void policyEditorWindowQuit(final Window window) {
         final PolicyEditor editor = ((PolicyEditorWindow) window).getPolicyEditor();
         editor.parentPolicyEditor.clear();
-        if (editor.changesMade) {
+        if (editor.policyEditorController.changesMade()) {
             final int save = JOptionPane.showConfirmDialog(window, R("PESaveChanges"));
             if (save == JOptionPane.YES_OPTION) {
-                if (editor.policyFile.getFile() == null) {
+                if (editor.policyEditorController.getFile() == null) {
                     final int choice = editor.fileChooser.showSaveDialog(window);
                     if (choice == JFileChooser.APPROVE_OPTION) {
-                        editor.policyFile.setFile(editor.fileChooser.getSelectedFile());
+                        editor.policyEditorController.setFile(editor.fileChooser.getSelectedFile());
                     } else if (choice == JFileChooser.CANCEL_OPTION) {
                         return;
                     }
                 }
-                editor.savePolicyFile();
+                try {
+                    editor.policyEditorController.savePolicyFile();
+                } catch (final IOException e) {
+                    OutputController.getLogger().log(e);
+                    editor.showCouldNotSaveDialog();
+                    return;
+                }
             } else if (save == JOptionPane.CANCEL_OPTION) {
                 return;
             }
@@ -729,7 +732,7 @@ public class PolicyEditor extends JPanel {
         } else {
             model = codebase;
         }
-        final boolean existingCodebase = policyFile.addCodebase(codebase);
+        final boolean existingCodebase = policyEditorController.addCodebase(codebase);
         if (!existingCodebase) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -737,7 +740,6 @@ public class PolicyEditor extends JPanel {
                     listModel.addElement(model);
                 }
             });
-            changesMade = true;
         }
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -746,24 +748,6 @@ public class PolicyEditor extends JPanel {
                 updateCheckboxes(codebase);
             }
         });
-    }
-
-    /**
-     * Add a collection of codebases to the editor.
-     * @param codebases the collection of codebases to be added
-     */
-    public void addNewCodebases(final Collection<String> codebases) {
-        for (final String codebase : codebases) {
-            addNewCodebase(codebase);
-        }
-    }
-
-    /**
-     * Add an array of codebases to the editor.
-     * @param codebases the array of codebases to be added
-     */
-    public void addNewCodebases(final String[] codebases) {
-        addNewCodebases(Arrays.asList(codebases));
     }
 
     private static boolean validateCodebase(final String codebase) {
@@ -809,7 +793,7 @@ public class PolicyEditor extends JPanel {
         if (previousIndex < 0) {
             previousIndex = 0;
         }
-        policyFile.removeCodebase(codebase);
+        policyEditorController.removeCodebase(codebase);
         final int fIndex = previousIndex;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -818,7 +802,6 @@ public class PolicyEditor extends JPanel {
                 list.setSelectedIndex(fIndex);
             }
         });
-        changesMade = true;
     }
 
     /**
@@ -847,13 +830,13 @@ public class PolicyEditor extends JPanel {
         if (!getCodebases().contains(codebase)) {
             return;
         }
-        editorPermissionsClipboard = new HashMap<>(policyFile.getCopyOfPermissions().get(codebase));
+        editorPermissionsClipboard = new HashMap<>(policyEditorController.getCopyOfPermissions().get(codebase));
 
-        final Set<CustomPermission> customPermissions = policyFile.getCopyOfCustomPermissions().get(codebase);
+        final Set<CustomPermission> customPermissions = policyEditorController.getCustomPermissions(codebase);
         if (customPermissions == null) {
             customPermissionsClipboard = Collections.emptySet();
         } else {
-            customPermissionsClipboard = new HashSet<>(policyFile.getCopyOfCustomPermissions().get(codebase));
+            customPermissionsClipboard = new HashSet<>(policyEditorController.getCustomPermissions(codebase));
         }
     }
 
@@ -867,43 +850,35 @@ public class PolicyEditor extends JPanel {
         }
         addNewCodebase(newCodebase);
         for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : editorPermissionsClipboard.entrySet()) {
-            policyFile.setPermission(newCodebase, entry.getKey(), entry.getValue());
+            policyEditorController.setPermission(newCodebase, entry.getKey(), entry.getValue());
         }
-        policyFile.addCustomPermissions(newCodebase, customPermissionsClipboard);
+        policyEditorController.addCustomPermissions(newCodebase, customPermissionsClipboard);
+        setChangesMade(true);
         updateCheckboxes(newCodebase);
-        changesMade = true;
     }
 
     public Set<String> getCodebases() {
-        return new HashSet<>(policyFile.getCopyOfPermissions().keySet());
+        return policyEditorController.getCodebases();
     }
 
     public void setPermission(final String codebase, final PolicyEditorPermissions permission, final boolean state) {
-        policyFile.setPermission(codebase, permission, state);
+        policyEditorController.setPermission(codebase, permission, state);
     }
 
     public Map<PolicyEditorPermissions, Boolean> getPermissions(final String codebase) {
-        policyFile.addCodebase(codebase);
-        return new HashMap<>(policyFile.getCopyOfPermissions().get(codebase));
+        return policyEditorController.getPermissions(codebase);
     }
 
     public void addCustomPermission(final String codebase, final CustomPermission permission) {
-        policyFile.addCustomPermissions(codebase, Arrays.asList(permission));
+        policyEditorController.addCustomPermission(codebase, permission);
     }
 
     public Collection<CustomPermission> getCustomPermissions(final String codebase) {
-        policyFile.addCodebase(codebase);
-        return new HashSet<>(policyFile.getCopyOfCustomPermissions().get(codebase));
+        return policyEditorController.getCustomPermissions(codebase);
     }
 
     public void clearCustomPermissions(final String codebase) {
-        policyFile.clearCustomCodebase(codebase);
-    }
-
-    private void updateCheckboxes() {
-        for (String codebase : policyFile.getCopyOfPermissions().keySet()) {
-            updateCheckboxes(codebase);
-        }
+        policyEditorController.clearCustomCodebase(codebase);
     }
 
     /**
@@ -940,19 +915,19 @@ public class PolicyEditor extends JPanel {
             for (final ActionListener l : box.getActionListeners()) {
                 box.removeActionListener(l);
             }
-            policyFile.addCodebase(codebase);
-            final boolean state = policyFile.getPermission(codebase, perm);
+            policyEditorController.addCodebase(codebase);
+            final boolean state = policyEditorController.getPermission(codebase, perm);
             for (final JCheckBoxWithGroup jg : groupBoxList) {
-                jg.setState(policyFile.getCopyOfPermissions().get(codebase));
+                jg.setState(policyEditorController.getCopyOfPermissions().get(codebase));
             }
             box.setSelected(state);
             box.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    changesMade = true;
-                    policyFile.setPermission(codebase, perm, box.isSelected());
+                    setChangesMade(true);
+                    policyEditorController.setPermission(codebase, perm, box.isSelected());
                     for (JCheckBoxWithGroup jg : groupBoxList) {
-                        jg.setState(policyFile.getCopyOfPermissions().get(codebase));
+                        jg.setState(policyEditorController.getCopyOfPermissions().get(codebase));
                     }
                 }
             });
@@ -1124,9 +1099,9 @@ public class PolicyEditor extends JPanel {
                         groupCh.removeActionListener(l);
                     }
                     for (final PolicyEditorPermissions p : groupCh.getGroup().getPermissions()) {
-                        policyFile.setPermission(codebase, p, groupCh.isSelected());
+                        policyEditorController.setPermission(codebase, p, groupCh.isSelected());
                     }
-                    changesMade = true;
+                    setChangesMade(true);
                     updateCheckboxes(codebase);
                     for (final ActionListener al : backup) {
                         groupCh.addActionListener(al);
@@ -1230,33 +1205,33 @@ public class PolicyEditor extends JPanel {
         setMinimumSize(getPreferredSize());
     }
 
-    void setChangesMade() {
-        changesMade = true;
+    void setChangesMade(final boolean b) {
+        policyEditorController.setChangesMade(b);
     }
 
     private void resetCodebases() {
         listModel.clear();
-        policyFile.clearPermissions();
-        policyFile.clearCustomPermissions();
+        policyEditorController.clearPermissions();
+        policyEditorController.clearCustomPermissions();
     }
 
     /**
      * @return whether this PolicyEditor is currently opening or saving a policy file to disk
      */
     public boolean isPerformingIO() {
-        return performingIO;
+        return policyEditorController.performingIO();
     }
 
     private void openAndParsePolicyFile() {
         resetCodebases();
         try {
-            policyFile.getFile().createNewFile();
+            policyEditorController.getFile().createNewFile();
         } catch (final IOException e) {
             OutputController.getLogger().log(e);
         }
-        final OpenFileResult ofr = FileUtils.testFilePermissions(policyFile.getFile());
+        final OpenFileResult ofr = FileUtils.testFilePermissions(policyEditorController.getFile());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
-            FileUtils.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyFile.getFile().getPath());
+            FileUtils.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyEditorController.getFile().getPath());
             return;
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
@@ -1278,14 +1253,13 @@ public class PolicyEditor extends JPanel {
                             }
                         });
                     }
-                    performingIO = true;
-                    policyFile.openAndParsePolicyFile();
+                    policyEditorController.openAndParsePolicyFile();
                 } catch (final FileNotFoundException fnfe) {
                     OutputController.getLogger().log(fnfe);
                     FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 } catch (final IOException ioe) {
                     OutputController.getLogger().log(ioe);
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantOpenFile", policyFile.getFile().getPath()));
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantOpenFile", policyEditorController.getFile().getPath()));
                     FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 }
                 return null;
@@ -1293,9 +1267,7 @@ public class PolicyEditor extends JPanel {
 
             @Override
             public void done() {
-                changesMade = false;
-                performingIO = false;
-                for (final String codebase : policyFile.getCodebases()) {
+                for (final String codebase : policyEditorController.getCodebases()) {
                     final String model;
                     if (codebase.isEmpty()) {
                         model = R("PEGlobalSettings");
@@ -1344,8 +1316,7 @@ public class PolicyEditor extends JPanel {
                             }
                         });
                     }
-                    performingIO = true;
-                    policyFile.savePolicyFile();
+                    policyEditorController.savePolicyFile();
                 } catch (final IOException e) {
                     OutputController.getLogger().log(e);
                     showCouldNotSaveDialog();
@@ -1355,8 +1326,6 @@ public class PolicyEditor extends JPanel {
 
             @Override
             public void done() {
-                changesMade = false;
-                performingIO = false;
                 showChangesSavedDialog();
                 progressIndicator.setVisible(false);
                 progressIndicator.dispose();
@@ -1406,7 +1375,7 @@ public class PolicyEditor extends JPanel {
     private int checkPolicyChangesWithDialog() {
         boolean changed;
         try {
-            changed = policyFile.hasChanged();
+            changed = policyEditorController.fileHasChanged();
         } catch (FileNotFoundException e) {
             OutputController.getLogger().log(e);
             JOptionPane.showMessageDialog(PolicyEditor.this, R("PEFileMissing"), R("PEFileModified"), JOptionPane.WARNING_MESSAGE);
@@ -1418,14 +1387,14 @@ public class PolicyEditor extends JPanel {
         if (changed) {
             String policyFilePath;
             try {
-                policyFilePath = policyFile.getFile().getCanonicalPath();
+                policyFilePath = policyEditorController.getFile().getCanonicalPath();
             } catch (final IOException e) {
                 OutputController.getLogger().log(e);
-                policyFilePath = policyFile.getFile().getPath();
+                policyFilePath = policyEditorController.getFile().getPath();
             }
             return JOptionPane.showConfirmDialog(PolicyEditor.this, R("PEFileModifiedDetail", policyFilePath,
                     R("PEFileModified"), JOptionPane.YES_NO_CANCEL_OPTION));
-        } else if (!changesMade) {
+        } else if (!policyEditorController.changesMade()) {
             //Return without saving or reloading
             return JOptionPane.CANCEL_OPTION;
         }
@@ -1469,7 +1438,9 @@ public class PolicyEditor extends JPanel {
                 final String codebaseStr = argsMap.get(CODEBASE_FLAG);
                 if (codebaseStr != null) {
                     final String[] urls = codebaseStr.split(" ");
-                    frame.getPolicyEditor().addNewCodebases(urls);
+                    for (final String url : urls) {
+                        frame.getPolicyEditor().addNewCodebase(url);
+                    }
                 }
             }
         });
