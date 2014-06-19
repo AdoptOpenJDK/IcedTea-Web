@@ -1,3 +1,23 @@
+2014-06-19  Kurt Miller <kurt@intricatesoftware.com>
+
+	Fixed PR1743 - Intermittant deadlock in PluginRequestProcessor
+	* NEWS: added PR1743
+	* plugin/icedteanp/IcedTeaNPPlugin.cc:  declaration of cond_message_available
+	moved to PluginRequestProcessor class
+	* plugin/icedteanp/IcedTeaNPPlugin.h: removed external cond_message_available search
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.h: message_queue_mutex,
+	syn_write_mutex and message_queue moved to PluginRequestProcessor clas. 
+	Constructor, destructor and newMessageOnBus declarationmoved to end of class.
+	declared queueProcessorThread method.
+	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: Removed declaration of
+	static message_queue_mutex, syn_write_mutex, message_queue. (PluginRequestProcessor)
+	constructor and destructor and (newMessageOnBus) are now using the fields from
+	PluginRequestProcessor class. new method of (queue_wait_cleanup)  to unlock mutex
+	added. (queue_processor) is now calling queueProcessorThread. Implemented
+	(queueProcessorThread), which uses setMember, call , eval and loadUrl rather
+	then processor->, versions. If no message_parts are available,  the cleanup  is done
+	only if message_queue is empty.
+
 2014-06-18  Jacob Wisor  <gitne@gmx.de>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties (BOredirect)

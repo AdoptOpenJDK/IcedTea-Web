@@ -241,8 +241,6 @@ std::string plugin_file_log_name;
 int plugin_debug_suspend = (getenv("ICEDTEAPLUGIN_DEBUG") != NULL) &&
         (strcmp(getenv("ICEDTEAPLUGIN_DEBUG"), "suspend") == 0);
 
-pthread_cond_t cond_message_available = PTHREAD_COND_INITIALIZER;
-
 
 #ifdef LEGACY_GLIB
 // Returns key from first item stored in hashtable

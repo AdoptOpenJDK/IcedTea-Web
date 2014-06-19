@@ -9,6 +9,8 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.6 (2014-XX-XX):
+* Plugin
+  - PR1743 - Intermittant deadlock in PluginRequestProcessor
 
 New in release 1.5 (2014-XX-XX):
 * IcedTea-Web now using tagsoup as default (tagsoup dependence) sanitizer for input

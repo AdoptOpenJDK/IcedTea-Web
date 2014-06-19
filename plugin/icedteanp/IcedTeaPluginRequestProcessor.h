@@ -69,15 +69,6 @@ void _loadURL(void* data);
 
 void* queue_processor(void* data);
 
-/* Mutex to ensure that the request queue is accessed synchronously */
-extern pthread_mutex_t message_queue_mutex;
-
-/* Mutex to ensure synchronized writes */
-extern pthread_mutex_t syn_write_mutex;
-
-/* Queue for holding messages that get processed in a separate thread */
-extern std::vector< std::vector<std::string*>* >* message_queue;
-
 /**
  * Processes requests made TO the plugin (by java or anyone else)
  */
@@ -85,8 +76,17 @@ class PluginRequestProcessor : public BusSubscriber
 {
     private:
 
-    	/* Requests that are still pending */
-    	std::map<pthread_t, uintmax_t>* pendingRequests;
+        /* Mutex to ensure that the request queue is accessed synchronously */
+        pthread_mutex_t message_queue_mutex;
+
+        /* Condition on which the queue processor waits */
+        pthread_cond_t cond_message_available;
+
+        /* Queue for holding messages that get processed in a separate thread */
+        std::vector< std::vector<std::string*>* >* message_queue;
+
+        /* Mutex to ensure synchronized writes */
+        pthread_mutex_t syn_write_mutex;
 
     	/* Dispatch request processing to a new thread for asynch. processing */
     	void dispatch(void* func_ptr (void*), std::vector<std::string>* message, std::string* src);
@@ -96,13 +96,6 @@ class PluginRequestProcessor : public BusSubscriber
 
         /* Stores the variant on java side */
     	void storeVariantInJava(NPVariant variant, std::string* result);
-
-    public:
-    	PluginRequestProcessor(); /* Constructor */
-    	~PluginRequestProcessor(); /* Destructor */
-
-    	/* Process new requests (if applicable) */
-        virtual bool newMessageOnBus(const char* message);
 
         /* Send member ID to Java */
         void sendMember(std::vector<std::string*>* message_parts);
@@ -124,6 +117,16 @@ class PluginRequestProcessor : public BusSubscriber
 
         /* Loads a URL into the specified target */
         void loadURL(std::vector<std::string*>* message_parts);
+
+    public:
+    	PluginRequestProcessor(); /* Constructor */
+    	~PluginRequestProcessor(); /* Destructor */
+
+    	/* Process new requests (if applicable) */
+        virtual bool newMessageOnBus(const char* message);
+
+        /* Thread run method for processing queued messages */
+        void queueProcessorThread();
 };
 
 #endif // __ICEDTEAPLUGINREQUESTPROCESSOR_H__

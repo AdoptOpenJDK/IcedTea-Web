@@ -106,9 +106,6 @@ void plugin_data_destroy (NPP instance);
 NPError initialize_data_directory();
 NPError start_jvm_if_needed();
 
-// Condition on which the queue processor waits
-extern pthread_cond_t cond_message_available;
-
 // ID of plug-in thread
 extern pthread_t itnp_plugin_thread_id;
 
