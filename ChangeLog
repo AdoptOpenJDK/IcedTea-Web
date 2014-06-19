@@ -1,3 +1,8 @@
+2014-06-19  Jiri Vanek  <jvanek@redhat.com>
+
+	* NEWS: mentioned All JDKs ability, DE localization, JDK6 incompatibility
+	and KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK
+
 2014-06-19  Andrew Azores  <aazores@redhat.com>
 
 	* NEWS: added PolicyEditor and TemporaryPermissions 1.6 news

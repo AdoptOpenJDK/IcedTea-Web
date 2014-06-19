@@ -9,6 +9,10 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.6 (2014-XX-XX):
+* Improved to be able to run with any JDK
+* JDK 6 and older no longer supported
+* Added DE localisation
+* Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK deployment property to control scan of Manifest file 
 * Plugin
   - PR1743 - Intermittant deadlock in PluginRequestProcessor
 * PolicyEditor
