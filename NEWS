@@ -11,6 +11,14 @@ CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 New in release 1.6 (2014-XX-XX):
 * Plugin
   - PR1743 - Intermittant deadlock in PluginRequestProcessor
+* PolicyEditor
+  - codebases can be renamed in-place, copied, and pasted
+  - codebase URLs can be copied to system clipboard
+  - displays a progress dialog while opening or saving files
+  - codebases without permissions assigned save to file anyway (and re-appear on next open)
+  - PR1776: NullPointer on save-and-exit
+  - PR1850: duplicate codebases when launching from security dialogs
+* Temporary Permissions in security dialog now multi-selectable and based on PolicyEditor permissions
 
 New in release 1.5 (2014-XX-XX):
 * IcedTea-Web now using tagsoup as default (tagsoup dependence) sanitizer for input
