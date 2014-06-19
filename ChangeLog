@@ -1,4 +1,19 @@
-2014-06-19  Kurt Miller <kurt@intricatesoftware.com>
+2014-06-19  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPermission.java:
+	added 2-arg constructor for permissions without actions
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/CustomPermissionTest.java
+	(testToStringWithoutActions) renamed testToStringWithEmptyActions
+	(testToStringWithNoActions) new test
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewerTest.java
+	(PERMISSION) uses 2-arg constructor
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java
+	(testAddCustomPermission) renamed testAddCustomPermissionEmptyActions
+	(testClearCustomPermissions) renamed testClearCustomPermissionsEmptyActions
+	(testAddCustomPermissionNoActions) new test
+	(testClearCustomPermissionsNoActions) new test
+
+2014-06-19  Kurt Miller  <kurt@intricatesoftware.com>
 
 	Fixed PR1743 - Intermittant deadlock in PluginRequestProcessor
 	* NEWS: added PR1743

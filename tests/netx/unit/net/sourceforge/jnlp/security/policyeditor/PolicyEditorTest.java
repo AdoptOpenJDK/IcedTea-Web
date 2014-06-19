@@ -143,7 +143,15 @@ public class PolicyEditorTest {
     }
 
     @Test
-    public void testAddCustomPermission() throws Exception {
+    public void testAddCustomPermissionNoActions() throws Exception {
+        final String codebase = "http://example.com";
+        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
+        editor.addCustomPermission(codebase, customPermission);
+        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(codebase).contains(customPermission));
+    }
+
+    @Test
+    public void testAddCustomPermissionEmptyActions() throws Exception {
         final String codebase = "http://example.com";
         final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
         editor.addCustomPermission(codebase, customPermission);
@@ -151,7 +159,17 @@ public class PolicyEditorTest {
     }
 
     @Test
-    public void testClearCustomPermissions() throws Exception {
+    public void testClearCustomPermissionsNoActions() throws Exception {
+        final String codebase = "http://example.com";
+        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
+        editor.addCustomPermission(codebase, customPermission);
+        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(codebase).contains(customPermission));
+        editor.clearCustomPermissions(codebase);
+        assertEquals(0, editor.getCustomPermissions(codebase).size());
+    }
+
+    @Test
+    public void testClearCustomPermissionsEmptyActions() throws Exception {
         final String codebase = "http://example.com";
         final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
         editor.addCustomPermission(codebase, customPermission);

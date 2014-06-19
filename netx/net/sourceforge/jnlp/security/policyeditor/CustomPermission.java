@@ -61,6 +61,17 @@ public class CustomPermission implements Comparable<CustomPermission> {
     public final String type, target, actions;
 
     /**
+     * Constructor for custom basic permissions (ie those without actions). This is equivalent
+     * to CustomPermission(type, target, "")
+     * @param type eg java.io.FilePermission
+     * @param target eg ${user.home}${/}*
+     */
+    public CustomPermission(final String type, final String target) {
+        this(type, target, "");
+    }
+
+    /**
+     * Constructor for custom permissions with actions
      * @param type eg java.io.FilePermission
      * @param target eg ${user.home}${/}*
      * @param actions eg read,write

@@ -116,14 +116,31 @@ public class CustomPermissionTest {
     }
 
     @Test
-    public void testToStringWithoutActions() throws Exception {
+    public void testToStringWithNoActions() throws Exception {
+        final CustomPermission cp = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
+        final String expected = "permission java.lang.RuntimePermission \"createClassLoader\";";
+        assertEquals(expected, cp.toString());
+    }
+
+    @Test
+    public void testToStringWithEmptyActions() throws Exception {
         final CustomPermission cp = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
         final String expected = "permission java.lang.RuntimePermission \"createClassLoader\";";
         assertEquals(expected, cp.toString());
     }
 
     @Test
-    public void testCompareTo() throws Exception {
+    public void testCompareToWithNoActions() throws Exception {
+        final CustomPermission cp1 = new CustomPermission("java.io.FilePermission", "*", "read");
+        final CustomPermission cp2 = new CustomPermission("java.io.FilePermission", "${user.home}${/}*", "read");
+        final CustomPermission cp3 = new CustomPermission("java.lang.RuntimePermission", "queuePrintJob");
+        assertTrue("cp1.compareTo(cp2) should be > 0", cp1.compareTo(cp2) > 0);
+        assertTrue("cp1.compareTo(cp1) should be 0", cp1.compareTo(cp1) == 0);
+        assertTrue("cp2.compareTo(cp3) should be < 0", cp2.compareTo(cp3) < 0);
+    }
+
+    @Test
+    public void testCompareToWithEmptyActions() throws Exception {
         final CustomPermission cp1 = new CustomPermission("java.io.FilePermission", "*", "read");
         final CustomPermission cp2 = new CustomPermission("java.io.FilePermission", "${user.home}${/}*", "read");
         final CustomPermission cp3 = new CustomPermission("java.lang.RuntimePermission", "queuePrintJob", "");

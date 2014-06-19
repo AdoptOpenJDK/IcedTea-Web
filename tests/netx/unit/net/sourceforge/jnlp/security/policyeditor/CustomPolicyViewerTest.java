@@ -55,7 +55,7 @@ public class CustomPolicyViewerTest {
 
     private CustomPolicyViewer viewer;
     private static final String CODEBASE = "http://example.com";
-    private static final CustomPermission PERMISSION = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
+    private static final CustomPermission PERMISSION = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
 
     @Before
     public void setupViewer() {
