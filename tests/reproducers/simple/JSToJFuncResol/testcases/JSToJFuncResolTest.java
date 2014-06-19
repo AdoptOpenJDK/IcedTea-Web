@@ -62,16 +62,14 @@ public class JSToJFuncResolTest extends BrowserTest {
 
     private void evaluateStdoutContents(String expectedStdout, ProcessResult pr) {
         // Assert that the applet was initialized.
-        Assert.assertTrue("JSToJFuncResol: the stdout should contain " + initStr
-                + ", but it didnt.", pr.stdout.contains(initStr));
+        Assert.assertTrue("JSToJFuncResol: the stdout should contain " + initStr + ", but it didnt.", pr.stdout.contains(initStr));
 
         // Assert that the values set by JavaScript are ok
-        Assert.assertTrue("JSToJFuncResol: the output should include: "+expectedStdout+", but it didnt.",
-        pr.stdout.contains(expectedStdout));
+        Assert.assertTrue("JSToJFuncResol: the output should include: " + expectedStdout + ", but it didnt.", (pr.stderr.contains(expectedStdout) || pr.stdout.contains(expectedStdout)));
 
     }
 
-    private void jsToJavaFuncResolTest( String methodStr, String valueStr, String expectedStdout) throws Exception {
+    private void jsToJavaFuncResolTest(String methodStr, String valueStr, String expectedStdout) throws Exception {
         String strURL = "/JSToJFuncResol.html?" + methodStr + ";" + valueStr;
         ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
         evaluateStdoutContents(expectedStdout, pr);
@@ -95,7 +93,6 @@ public class JSToJFuncResolTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    @KnownToFail
     public void AppletJSToJFuncResol_numericToDouble_Test() throws Exception {
         jsToJavaFuncResolTest("numericToDouble", "1.1", "numericToDouble(double) with 1.1");
     }
@@ -121,6 +118,7 @@ public class JSToJFuncResolTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJFuncResol_inheritedClassToParent1_Test() throws Exception {
         jsToJavaFuncResolTest("inheritedClassToParent1", "applet.getNewOverloadTestHelper3()", "inheritedClassToParent1(OverloadTestHelper2) with JSToJFuncResol$OverloadTestHelper3@");
     }
@@ -178,8 +176,7 @@ public class JSToJFuncResolTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    public void AppletJSToJFuncResol_javascriptObjectToUnrelatedType_Test()
-            throws Exception {
+    public void AppletJSToJFuncResol_javascriptObjectToUnrelatedType_Test() throws Exception {
         jsToJavaFuncResolTest("javascriptObjectToUnrelatedType", "window", "Error on Java side: No suitable method named javascriptObjectToUnrelatedType with matching args found");
     }
 

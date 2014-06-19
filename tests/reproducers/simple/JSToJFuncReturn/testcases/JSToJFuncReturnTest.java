@@ -56,19 +56,18 @@ public class JSToJFuncReturnTest extends BrowserTest {
 
         @Override
         protected boolean isAlowedToFinish(String s) {
-            
+
             return (s.contains(initStr) && s.contains(afterStr));
         }
     }
 
     private void evaluateStdoutContents(String expectedStdout, ProcessResult pr) {
         // Assert that the applet was initialized.
-        Assert.assertTrue("JSToJFuncReturnTest stdout should contain "+ initStr + " but it didnt.", pr.stdout.contains(initStr));
+        Assert.assertTrue("JSToJFuncReturnTest stdout should contain " + initStr + " but it didnt.", pr.stdout.contains(initStr));
 
         // Assert that the tests have passed.
-        Assert.assertTrue("JSToJFuncReturnTest stdout should contain "+ expectedStdout + " but it didnt.", pr.stdout.contains(expectedStdout));
+        Assert.assertTrue("JSToJFuncReturnTest stdout should contain " + expectedStdout + " but it didnt.", pr.stdout.contains(expectedStdout));
     }
-
 
     private void jsToJavaFuncReturnNormalTest(String methodStr, String expectedStdout) throws Exception {
         String strURL = "/JSToJFuncReturn.html?" + methodStr;
@@ -115,7 +114,7 @@ public class JSToJFuncReturnTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJSToJFuncReturn_char_Test() throws Exception {
-        jsToJavaFuncReturnNormalTest("_char", "number 97"); //'a'
+        jsToJavaFuncReturnNormalTest("_char", "number 97"); // 'a'
     }
 
     @Test
@@ -227,6 +226,7 @@ public class JSToJFuncReturnTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJFuncReturn_CharFullArray_Test() throws Exception {
         jsToJavaFuncReturnNormalTest("_CharacterArray", "object [Ljava.lang.Character;@");
     }
@@ -237,6 +237,5 @@ public class JSToJFuncReturnTest extends BrowserTest {
     public void AppletJSToJFuncReturn_JSObject_Test() throws Exception {
         jsToJavaFuncReturnNormalTest("_JSObject", "object value1");
     }
-
 
 }

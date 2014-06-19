@@ -49,7 +49,7 @@ import org.junit.Test;
 
 public class JSToJGetTest extends BrowserTest {
 
-    //the JS<->J tests tend to make Opera unusable
+    // the JS<->J tests tend to make Opera unusable
     public final boolean doNotRunInOpera = true;
 
     public String passStr = " - passed.";
@@ -67,19 +67,16 @@ public class JSToJGetTest extends BrowserTest {
 
         @Override
         protected boolean isAlowedToFinish(String s) {
-            return (s.contains(initStr) && s.contains(setupStr) && s
-                    .contains(afterStr));
+            return (s.contains(initStr) && s.contains(setupStr) && s.contains(afterStr));
         }
     }
 
     private void evaluateStdoutContents(String testStr, ProcessResult pr) {
         // Assert that the applet was initialized.
-        Assert.assertTrue("JSToJGetTest stdout should contain " + initStr
-                + " but it didnt.", pr.stdout.contains(initStr));
+        Assert.assertTrue("JSToJGetTest stdout should contain " + initStr + " but it didnt.", pr.stdout.contains(initStr));
 
         // Assert that the applet was set up for the GM tests.
-        Assert.assertTrue("JSToJGetTest stdout should contain " + setupStr
-                + " but it didnt.", pr.stdout.contains(setupStr));
+        Assert.assertTrue("JSToJGetTest stdout should contain " + setupStr + " but it didnt.", pr.stdout.contains(setupStr));
 
         // Assert that the tests have passed.
         String s0 = testStr + passStr;
@@ -96,21 +93,20 @@ public class JSToJGetTest extends BrowserTest {
             indBegin = 0;
         }
 
-        String failStr = "JSToJGet " + testStr
-                + ": passed not found in the applet stdout.";
+        String failStr = "JSToJGet " + testStr + ": passed not found in the applet stdout.";
 
         if (ind1 != -1) {
             // int inde = pr.stdout.indexOf(expStr);
             // int indf = pr.stdout.indexOf(foundStr);
             // int indend = pr.stdout.indexOf(endStr);
-            failStr = "JSToJGet: value mismatch in "+testStr;
+            failStr = "JSToJGet: value mismatch in " + testStr;
         }
 
         if (ind2 != -1) {
             // int inde = pr.stdout.indexOf(expStr);
             // int indf = pr.stdout.indexOf(foundStr);
             // int indend = pr.stdout.indexOf(endStr);
-            failStr = "JSToJGet: type mismatch in "+testStr;
+            failStr = "JSToJGet: type mismatch in " + testStr;
         }
 
         Assert.assertTrue(failStr, (ind1 == -1));// no value mismatch
@@ -121,16 +117,14 @@ public class JSToJGetTest extends BrowserTest {
 
     private void jsToJavaGetTest(String urlEnd, String testStr) throws Exception {
 
-        if( doNotRunInOpera){
-            if(server.getCurrentBrowser().getID() == Browsers.opera){
+        if (doNotRunInOpera) {
+            if (server.getCurrentBrowser().getID() == Browsers.opera) {
                 return;
             }
         }
 
         String strURL = "/JSToJGet.html?" + urlEnd;
-        ProcessResult pr = server.executeBrowser(strURL,
-                new CountingClosingListenerImpl(),
-                new CountingClosingListenerImpl());
+        ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
         evaluateStdoutContents(testStr, pr);
 
     }
@@ -187,6 +181,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_intArrayElement_Test() throws Exception {
         jsToJavaGetTest("intArrayElement", "Test no. 8 - (int[] - element access)");
     }
@@ -286,6 +281,7 @@ public class JSToJGetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJGet_DoubleFullArray_Test() throws Exception {
         jsToJavaGetTest("DoubleFullArray", "Test no.21 - (Double[] - full array)");
     }

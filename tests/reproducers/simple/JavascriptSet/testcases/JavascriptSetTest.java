@@ -65,19 +65,21 @@ public class JavascriptSetTest extends BrowserTest {
         // Assert that the applet was initialized.
         Assert.assertTrue("JToJSSetTest stdout should contain " + initStr + " but it didnt.", pr.stdout.contains(initStr));
 
-         // Assert that the values set from JavaScript are ok
+        // Assert that the values set from JavaScript are ok
         boolean atLeastOne = false;
-        for(String s : expectedStdoutsOR){
-        	if(pr.stdout.contains(s)) atLeastOne = true;
+        for (String s : expectedStdoutsOR) {
+            if (pr.stdout.contains(s)) {
+                atLeastOne = true;
+            }
         }
         Assert.assertTrue("JToJSSet: the output should include at least one of expected Stdouts, but it didnt.", atLeastOne);
     }
 
     private void javaToJSSetTest(String urlEnd, String[] expectedValsOR) throws Exception {
 
-        if( doNotRunInOpera){
+        if (doNotRunInOpera) {
             Browsers b = server.getCurrentBrowser().getID();
-            if(b == Browsers.opera){
+            if (b == Browsers.opera) {
                 return;
             }
         }
@@ -91,148 +93,139 @@ public class JavascriptSetTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_int_Test() throws Exception {
-        javaToJSSetTest("jjsSetInt", new String[] {"1"});
+        javaToJSSetTest("jjsSetInt", new String[] { "1" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_Integer_Test() throws Exception {
-        javaToJSSetTest("jjsSetInteger", new String[] {"2"});
+        javaToJSSetTest("jjsSetInteger", new String[] { "2" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_double_Test() throws Exception {
-        javaToJSSetTest("jjsSetdouble", new String[] {"2.5"});
+        javaToJSSetTest("jjsSetdouble", new String[] { "2.5" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_Double_Test() throws Exception {
-        javaToJSSetTest("jjsSetDouble", new String[] {"2.5"});
+        javaToJSSetTest("jjsSetDouble", new String[] { "2.5" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_float_Test() throws Exception {
-        javaToJSSetTest("jjsSetfloat", new String[]{"2.5"}); //2.3->2.2999...
+        javaToJSSetTest("jjsSetfloat", new String[] { "2.5" }); // 2.3->2.2999...
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_Float_Test() throws Exception {
-        javaToJSSetTest("jjsSetFloat", new String[] {"2.5"});
+        javaToJSSetTest("jjsSetFloat", new String[] { "2.5" });
     }
-
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_long_Test() throws Exception {
-        javaToJSSetTest("jjsSetlong", new String[] {"4294967296"});
+        javaToJSSetTest("jjsSetlong", new String[] { "4294967296" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_Long_Test() throws Exception {
-        javaToJSSetTest("jjsSetLong", new String[] {"4294967297"});
+        javaToJSSetTest("jjsSetLong", new String[] { "4294967297" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_short_Test() throws Exception {
-        javaToJSSetTest("jjsSetshort", new String[] {"3"});
+        javaToJSSetTest("jjsSetshort", new String[] { "3" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_Short_Test() throws Exception {
-        javaToJSSetTest("jjsSetShort", new String[] {"4"});
+        javaToJSSetTest("jjsSetShort", new String[] { "4" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_byte_Test() throws Exception {
-        javaToJSSetTest("jjsSetbyte", new String[] {"5"});
+        javaToJSSetTest("jjsSetbyte", new String[] { "5" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_Byte_Test() throws Exception {
-        javaToJSSetTest("jjsSetByte", new String[] {"6"});
+        javaToJSSetTest("jjsSetByte", new String[] { "6" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_char_Test() throws Exception {
-        javaToJSSetTest("jjsSetchar", new String[] {"97"}); //i.e. 'a'
-    }    
+        javaToJSSetTest("jjsSetchar", new String[] { "97" }); // i.e. 'a'
+    }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_Character_Test() throws Exception {
-        javaToJSSetTest("jjsSetCharacter", new String[] {"97"}); //i.e. 'a'
+        javaToJSSetTest("jjsSetCharacter", new String[] { "97" }); // i.e. 'a'
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_boolean_Test() throws Exception {
-        javaToJSSetTest("jjsSetboolean", new String[] {"true"});
+        javaToJSSetTest("jjsSetboolean", new String[] { "true" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_Boolean_Test() throws Exception {
-        javaToJSSetTest("jjsSetBoolean", new String[] {"true"});
+        javaToJSSetTest("jjsSetBoolean", new String[] { "true" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_String_Test() throws Exception {
-        javaToJSSetTest("jjsSetString", new String[] {"𠁎〒£$ǣ€𝍖"});
+        javaToJSSetTest("jjsSetString", new String[] { "𠁎〒£$ǣ€𝍖" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_object_Test() throws Exception {
-        javaToJSSetTest("jjsSetObject", new String[] {"DummyObject2"});
+        javaToJSSetTest("jjsSetObject", new String[] { "DummyObject2" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_1DArrayElement_Test() throws Exception {
-        javaToJSSetTest("jjsSet1DArray", new String[] {"100"});
+        javaToJSSetTest("jjsSet1DArray", new String[] { "100" });
     }
 
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     public void AppletJToJSSet_2DArrayElement_Test() throws Exception {
-        javaToJSSetTest("jjsSet2DArray", new String[] {"200"});
+        javaToJSSetTest("jjsSet2DArray", new String[] { "200" });
     }
-
-    @Test
-    @TestInBrowsers(testIn = { Browsers.all })
-    @NeedsDisplay
-    public void AppletJToJSSet_JSObject_Test() throws Exception {
-        javaToJSSetTest("jjsSetJSObject", new String[] {"[object Window]","[object DOMWindow]", "[object Object]"});
-    }
-
 }

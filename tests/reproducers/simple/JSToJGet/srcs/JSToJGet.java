@@ -30,19 +30,21 @@ public class JSToJGet extends Applet {
     public char[] ca = new char[3];
     public Character[] Ca = new Character[3];
     public JSObject jso;
-
+    private boolean objectReady = false;
     private Label statusLabel;
 
-    public void start(){
+    public void start() {
         JSObject win = JSObject.getWindow(this);
         jso = (JSObject) win.getMember("document");
-        jso.setMember("key1","value1");
+        System.out.println("Document JSObject: " + jso.toString());
+        jso.setMember("key1", "value1");
         ia[4] = 1024;
         Da1[9] = D;
 
         String setupStr = "JSToJGet applet set up for GET tests.";
         System.out.println(setupStr);
         statusLabel.setText(setupStr);
+        objectReady = true;
     }
 
     public void init() {
@@ -57,6 +59,10 @@ public class JSToJGet extends Applet {
     // auxiliary method for setting the statusLabel text:
     public void setStatusLabel(String s) {
         statusLabel.setText(s);
+    }
+
+    public boolean Ready() {
+        return objectReady;
     }
 
     // auxiliary methods for writing to stdout and stderr:

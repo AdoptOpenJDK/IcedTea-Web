@@ -51,14 +51,11 @@ public class JToJSString extends Applet {
     @Override
     public void init() {
         System.out.println("init");
-        // JSObject window = JSObject.getWindow(this);
         window = JSObject.getWindow(this);
 
         if (window == null) {
             System.out.println("init stage: window is null");
         } else {
-            System.out.println(window.toString());
-
             window.call("writeToJS", new Object[] { myStringArray });
             window.call("writeToJSs", new Object[] { myString });
 
@@ -86,9 +83,9 @@ public class JToJSString extends Applet {
 
         System.out.println("afterTests");
     }
-
-    public void printFromJS(String text) {
-        System.out.println(text);
+    
+    public void printFromJS(String message) {
+        System.out.println(message);
     }
 
     @Override

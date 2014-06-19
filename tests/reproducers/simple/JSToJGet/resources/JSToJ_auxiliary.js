@@ -41,15 +41,15 @@ function failTypeTest( testid, appletName, actual, expectedtype ){
 }
 
 function appletStdOut( appletName, str ){
-    document.getElementById( appletName ).stdOutWrite( str );
+    appletName.stdOutWrite( str );
 }
 
 function appletStdOutLn( appletName, str ){
-    document.getElementById( appletName ).stdOutWriteln( str );
+    appletName.stdOutWriteln( str );
 }
 
 function afterTestsMessage( appletName ){
-    document.getElementById( appletName ).stdOutWriteln("afterTests");
+    appletName.stdOutWriteln("afterTests");
 }
 
 function appendMessageDiv( message ){

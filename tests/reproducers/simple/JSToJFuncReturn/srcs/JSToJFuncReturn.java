@@ -21,12 +21,12 @@ public class JSToJFuncReturn extends Applet {
         float f = 1.1F;
         return f;
     }
-    
+
     public long _long() {
         long l = 10000L;
         return l;
     }
-    
+
     public boolean _boolean() {
         boolean b = true;
         return b;
@@ -38,18 +38,18 @@ public class JSToJFuncReturn extends Applet {
     }
 
     public byte _byte() {
-        byte by = 10; 
+        byte by = 10;
         return by;
     }
 
-    public char _charArrayElement(){
-        char[] ca = new char[]{'a', 'b', 'c'};
+    public char _charArrayElement() {
+        char[] ca = new char[] { 'a', 'b', 'c' };
 
         return ca[0];
     }
 
     public char[] _charArray() {
-        char[] ca = new char[]{'a', 'b', 'c'};
+        char[] ca = new char[] { 'a', 'b', 'c' };
 
         return ca;
     }
@@ -96,8 +96,8 @@ public class JSToJFuncReturn extends Applet {
         return B;
     }
 
-    public Character _CharacterArrayElement(){
-        Character[] Ca = new Character[]{'A', 'B', 'C'};
+    public Character _CharacterArrayElement() {
+        Character[] Ca = new Character[] { 'A', 'B', 'C' };
 
         return Ca[0];
     }
@@ -113,16 +113,16 @@ public class JSToJFuncReturn extends Applet {
     }
 
     public Character[] _CharacterArray() {
-        Character[] Ca = new Character[]{'A', 'B', 'C'};
+        Character[] Ca = new Character[] { 'A', 'B', 'C' };
 
         return Ca;
     }
 
-    public JSObject _JSObject(){
+    public JSObject _JSObject() {
         JSObject win = JSObject.getWindow(this);
         JSObject jso = (JSObject) win.getMember("document");
-        jso.setMember("key1","value1");
-  
+        jso.setMember("key1", "value1");
+
         return jso;
     }
 
@@ -135,7 +135,7 @@ public class JSToJFuncReturn extends Applet {
         statusLabel.setText(initStr);
     }
 
-    public void printStringAndFinish(String str){
+    public void printStringAndFinish(String str) {
         System.out.println(str);
         System.out.println("afterTests");
     }

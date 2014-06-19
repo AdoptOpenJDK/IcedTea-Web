@@ -230,5 +230,4 @@ public class JavascriptFuncParamTest extends BrowserTest {
     public void AppletJToJSFuncParam_JSObject_Test() throws Exception {
         javaToJSFuncParamTest("jjsCallJSObjectParam");
     }
-
 }

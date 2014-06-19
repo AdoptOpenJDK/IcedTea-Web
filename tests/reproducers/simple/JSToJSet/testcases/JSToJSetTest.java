@@ -48,42 +48,40 @@ import org.junit.Assert;
 
 import org.junit.Test;
 
-@Bug( id = { "PR1298" })
+@Bug(id = { "PR1298" })
 public class JSToJSetTest extends BrowserTest {
 
-    //the JS<->J tests tend to make Opera unusable
+    // the JS<->J tests tend to make Opera unusable
     public final boolean doNotRunInOpera = true;
 
     private final String initStr = "JSToJSet applet initialized.";
     private final String afterStr = "afterTests";
 
-    public enum TestType{
+    public enum TestType {
         ARRAY_ELEMENT, WHOLE_ARRAY, NORMAL_VALUE
     }
-        
+
     private class CountingClosingListenerImpl extends CountingClosingListener {
 
-            @Override
-            protected boolean isAlowedToFinish(String s) {
-                return (s.contains(initStr) && s.contains(afterStr));
-            }
+        @Override
+        protected boolean isAlowedToFinish(String s) {
+            return (s.contains(initStr) && s.contains(afterStr));
         }
-    
+    }
+
     private void evaluateStdoutContents(String expectedStdout, ProcessResult pr) {
         // Assert that the applet was initialized.
-        Assert.assertTrue("JSToJSet: the stdout should contain " + initStr
-                + ", but it didnt.", pr.stdout.contains(initStr));
+        Assert.assertTrue("JSToJSet: the stdout should contain " + initStr + ", but it didnt.", pr.stdout.contains(initStr));
 
         // Assert that the values set by JavaScript are ok
-        Assert.assertTrue("JSToJSet: the output should include: "+expectedStdout+", but it didnt.",
-        pr.stdout.contains(expectedStdout));
+        Assert.assertTrue("JSToJSet: the output should include: " + expectedStdout + ", but it didnt.", pr.stdout.contains(expectedStdout));
 
     }
 
     private void jsToJavaSetNormalTest(String fieldStr, String valueStr) throws Exception {
 
-        if( doNotRunInOpera){
-            if(server.getCurrentBrowser().getID() == Browsers.opera){
+        if (doNotRunInOpera) {
+            if (server.getCurrentBrowser().getID() == Browsers.opera) {
                 return;
             }
         }
@@ -93,35 +91,35 @@ public class JSToJSetTest extends BrowserTest {
         String expectedStdout = "New value is: " + valueStr;
         evaluateStdoutContents(expectedStdout, pr);
     }
-    
+
     private void jsToJavaSetSpecialTest(String fieldStr, String valueStr, TestType testType) throws Exception {
 
-        if( doNotRunInOpera){
+        if (doNotRunInOpera) {
             Browsers b = server.getCurrentBrowser().getID();
-            if(b == Browsers.opera){
+            if (b == Browsers.opera) {
                 return;
             }
         }
 
         String strURL = "/JSToJSet.html?";
         String expectedStdout = "";
-        switch( testType ){
-        case ARRAY_ELEMENT://array element
+        switch (testType) {
+        case ARRAY_ELEMENT:// array element
             strURL += fieldStr + ";" + valueStr;
-            expectedStdout = "New array value is: "+valueStr;
+            expectedStdout = "New array value is: " + valueStr;
             break;
-        case WHOLE_ARRAY://whole array, set 1st element
+        case WHOLE_ARRAY:// whole array, set 1st element
             strURL += fieldStr + ";[" + valueStr;
-            expectedStdout = "New array value is: "+valueStr;
+            expectedStdout = "New array value is: " + valueStr;
             break;
-        case NORMAL_VALUE://char et al - to be set at JS side
+        case NORMAL_VALUE:// char et al - to be set at JS side
             strURL += fieldStr + ";JavaScript";
-            expectedStdout = "New value is: "+valueStr;
+            expectedStdout = "New value is: " + valueStr;
             break;
         default:
             break;
         }
-         
+
         ProcessResult pr = server.executeBrowser(strURL, new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
         evaluateStdoutContents(expectedStdout, pr);
     }
@@ -179,7 +177,7 @@ public class JSToJSetTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     @KnownToFail
-    @Bug( id = {"PR1298"})
+    @Bug(id = { "PR1298" })
     public void AppletJSToJSet_intArrayElement_Test() throws Exception {
         jsToJavaSetSpecialTest("_intArray[0]", "1", TestType.ARRAY_ELEMENT);
     }
@@ -208,6 +206,7 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJSet_Integer_Test() throws Exception {
         jsToJavaSetNormalTest("_Integer", "1");
     }
@@ -215,6 +214,7 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJSet_Double_Test() throws Exception {
         jsToJavaSetNormalTest("_Double", "1.0");
     }
@@ -222,6 +222,7 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJSet_Float_Test() throws Exception {
         jsToJavaSetNormalTest("_Float", "1.1");
     }
@@ -229,6 +230,7 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJSet_Long_Test() throws Exception {
         jsToJavaSetNormalTest("_Long", "10000");
     }
@@ -250,6 +252,7 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJSet_Byte_Test() throws Exception {
         jsToJavaSetNormalTest("_Byte", "100");
     }
@@ -258,7 +261,7 @@ public class JSToJSetTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
     @KnownToFail
-    @Bug( id = {"PR1298"})
+    @Bug(id = { "PR1298" })
     public void AppletJSToJSet_DoubleArrayElement_Test() throws Exception {
         jsToJavaSetSpecialTest("_DoubleArray[0]", "1.1", TestType.ARRAY_ELEMENT);
     }
@@ -266,6 +269,7 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
+    @KnownToFail
     public void AppletJSToJSet_DoubleFullArray_Test() throws Exception {
         jsToJavaSetSpecialTest("_DoubleArray2", "0.1", TestType.WHOLE_ARRAY);
     }

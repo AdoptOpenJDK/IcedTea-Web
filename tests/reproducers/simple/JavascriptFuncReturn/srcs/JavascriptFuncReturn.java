@@ -1,4 +1,5 @@
 import java.applet.Applet;
+
 import netscape.javascript.JSObject;
 
 public class JavascriptFuncReturn extends Applet {
@@ -13,6 +14,10 @@ public class JavascriptFuncReturn extends Applet {
 
     // method for testing return types of JavaScript function
     public void jCallJSFunction() {
+        if (window == null) {
+            window = JSObject.getWindow(this);
+            System.out.println("Null window.");
+        }
         String  returnTypeTestFuncName = "jsReturningFunction";
         Object ret = window.call(returnTypeTestFuncName, new Object[]{});
         System.out.println(ret.toString());

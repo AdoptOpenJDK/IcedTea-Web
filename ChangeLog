@@ -1,3 +1,55 @@
+2014-06-19  Jie Kang  <jkang@redhat.com>
+
+	Refactored Live-Connect (java-js) test cases to fix race condition between
+	JS and J-applet. Checked each test and marked tests known to fail
+	correctly. Removed and replaced deprecated code usage.
+	* tests/reproducers/simple/JSObjectFromEval/resources/JSObjectFromEval.html
+	* tests/reproducers/simple/JSObjectFromEval/resources/JSObjectFromEval.js
+	* tests/reproducers/simple/JSObjectWithoutToString/resources/JSObjectWithoutToString.html
+	* tests/reproducers/simple/JSObjectWithoutToString/resources/JSObjectWithoutToString.js
+	* tests/reproducers/simple/JSToJFuncParam/resources/JSToJFuncParam.html
+	* tests/reproducers/simple/JSToJFuncParam/resources/JSToJava_FuncParam.js
+	* tests/reproducers/simple/JSToJFuncParam/srcs/JSToJFuncParam.java
+	* tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java
+	* tests/reproducers/simple/JSToJFuncResol/resources/JSToJFuncResol.html
+	* tests/reproducers/simple/JSToJFuncResol/resources/JSToJava_FuncResol.js
+	* tests/reproducers/simple/JSToJFuncResol/srcs/JSToJFuncResol.java
+	* tests/reproducers/simple/JSToJFuncResol/testcases/JSToJFuncResolTest.java
+	* tests/reproducers/simple/JSToJFuncReturn/resources/JSToJFuncReturn.html
+	* tests/reproducers/simple/JSToJFuncReturn/resources/JSToJava_FuncReturn.js
+	* tests/reproducers/simple/JSToJFuncReturn/srcs/JSToJFuncReturn.java
+	* tests/reproducers/simple/JSToJFuncReturn/testcases/JSToJFuncReturnTest.java
+	* tests/reproducers/simple/JSToJGet/resources/JSToJGet.html
+	* tests/reproducers/simple/JSToJGet/resources/JSToJ_auxiliary.js
+	* tests/reproducers/simple/JSToJGet/resources/JSToJava_Get.js
+	* tests/reproducers/simple/JSToJGet/srcs/JSToJGet.java
+	* tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java
+	* tests/reproducers/simple/JSToJSet/resources/JSToJSet.html
+	* tests/reproducers/simple/JSToJSet/resources/JSToJava_Set.js
+	* tests/reproducers/simple/JSToJSet/srcs/JSToJSet.java
+	* tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java
+	* tests/reproducers/simple/JSToJTypeConv/resources/JSToJTypeConv.html
+	* tests/reproducers/simple/JSToJTypeConv/resources/JSToJava_TypeConv.js
+	* tests/reproducers/simple/JToJSString/resources/JToJSString.html
+	* tests/reproducers/simple/JToJSString/resources/JToJSString.js
+	* tests/reproducers/simple/JToJSString/resources/JToJSStringJnlpApplet.html
+	* tests/reproducers/simple/JToJSString/resources/JSTest.js
+	* tests/reproducers/simple/JavascriptFuncParam/resources/JavascriptFuncParam.html
+	* tests/reproducers/simple/JavascriptFuncParam/srcs/JavascriptFuncParam.java
+	* tests/reproducers/simple/JavascriptFuncParam/testcases/JavascriptFuncParamTest.java
+	* tests/reproducers/simple/JavascriptFuncReturn/resources/JavascriptFuncReturn.html
+	* tests/reproducers/simple/JavascriptFuncReturn/srcs/JavascriptFuncReturn.java
+	* tests/reproducers/simple/JavascriptGet/resources/JavascriptGet.html
+	* tests/reproducers/simple/JavascriptGet/resources/Javascript_Get.js
+	* tests/reproducers/simple/JavascriptGet/srcs/JavascriptGet.java
+	* tests/reproducers/simple/JavascriptSet/resources/JavascriptSet.html
+	* tests/reproducers/simple/JavascriptSet/resources/Javascript_Set.js
+	* tests/reproducers/simple/JavascriptSet/srcs/JavascriptSet.java
+	* tests/reproducers/simple/JavascriptSet/testcases/JavascriptSetTest.java
+	* tests/reproducers/simple/JavascriptURLProtocol/resources/JavascriptProtocol.html
+	* tests/reproducers/simple/JavascriptURLProtocol/resources/JavascriptProtocol.js
+	* tests/reproducers/simple/JavascriptFuncReturn/resources/Javascript_FuncReturn.js
+
 2014-06-19  Jiri Vanek  <jvanek@redhat.com>
 
 	* NEWS: mentioned All JDKs ability, DE localization, JDK6 incompatibility

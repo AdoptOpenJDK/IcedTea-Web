@@ -13,37 +13,35 @@ function getDOMElementByID(id) {
     return document.getElementById(id).innerHTML;
 }
 
-function attemptTest() {
-    try {
-        failMessage.innerHTML = failMessage.innerHTML + new Date().getTime() / 1000
+function attemptJToJSStringTest() {
         notice.innerHTML = "1";
-        testapplet.printFromJS("Stage 1 reached");
+        applet.printFromJS("Stage 1 reached");
 
         var byids = document.getElementById("byids");
         notice.innerHTML = "2";
-        testapplet.printFromJS("Stage 2 reached");
+        applet.printFromJS("Stage 2 reached");
 
-        byids.innerHTML = "String by Id: " + testapplet.myString;
+        byids.innerHTML = "String by Id: " + applet.myString;
         notice.innerHTML = "3";
-        testapplet.printFromJS("Stage 3 reached");
+        applet.printFromJS("Stage 3 reached");
 
         var byid = document.getElementById("byid");
         notice.innerHTML = "4";
-        testapplet.printFromJS("Stage 4 reached");
+        applet.printFromJS("Stage 4 reached");
 
-        byid.innerHTML = "StringArray by Id: " + testapplet.myStringArray[0]
-                + ", " + testapplet.myStringArray[1] + ", "
-                + testapplet.myStringArray[2];
+        byid.innerHTML = "StringArray by Id: " + applet.myStringArray[0]
+                + ", " + applet.myStringArray[1] + ", "
+                + applet.myStringArray[2];
         notice.innerHTML = "5";
-        testapplet.printFromJS("Stage 5 reached");
+        applet.printFromJS("Stage 5 reached");
 
-        testapplet.readStringAndFinish();
+        applet.readStringAndFinish();
         notice.innerHTML = "6";
-        testapplet.printFromJS("Stage 6 reached");
-    } catch (err) {
-        failMessage.innerHTML = failMessage.innerHTML + err.message;
-        setTimeout(attemptTest, 100);
-    }
+        applet.printFromJS("Stage 6 reached");
 }
 
-attemptTest();
+try {
+    doTest(attemptJToJSStringTest, applet);
+} catch (err) {
+    alert(err);
+}
