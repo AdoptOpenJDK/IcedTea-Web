@@ -1,3 +1,9 @@
+2014-06-24  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: removed hunk of
+	old commented out code, updated comment on reason for
+	JNLPRuntime.reloadPolicy()
+
 2014-06-19  Jie Kang  <jkang@redhat.com>
 
 	Refactored Live-Connect (java-js) test cases to fix race condition between

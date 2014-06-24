@@ -594,12 +594,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             return;
         }
-        /*
-        if (jars == null || jars.length == 0) {
-                throw new LaunchException(null, null, R("LSFatal"),
-                                    R("LCInit"), R("LFatalVerification"), "No jars!");
-        }
-        */
+
         List<JARDesc> initialJars = new ArrayList<JARDesc>();
 
         for (JARDesc jar : jars) {
@@ -2385,7 +2380,9 @@ public class JNLPClassLoader extends URLClassLoader {
                 throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCInit"), R("LRunInSandboxError"), R("LRunInSandboxErrorInfo"));
             }
 
-            JNLPRuntime.reloadPolicy(); // ensure that we have the most up-to-date custom policy loaded
+            JNLPRuntime.reloadPolicy();
+            // ensure that we have the most up-to-date custom policy loaded since the user may have just launched PolicyEditor
+            // to create a custom policy for the applet they are about to run
             this.promptedForSandbox = true;
             this.runInSandbox = true;
         }
