@@ -1,3 +1,9 @@
+2014-06-25  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(setupLayout) use SwingUtilities.getWindowAncestor() rather than manually
+	searching
+
 2014-06-24  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: removed hunk of

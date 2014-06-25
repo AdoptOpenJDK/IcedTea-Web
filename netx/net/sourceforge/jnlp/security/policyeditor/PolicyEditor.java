@@ -39,7 +39,6 @@ package net.sourceforge.jnlp.security.policyeditor;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dialog.ModalityType;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -1068,17 +1067,10 @@ public class PolicyEditor extends JPanel {
                     if (e.getButton() == MouseEvent.BUTTON3) {
                         groupPanel.setVisible(!groupPanel.isVisible());
                         PolicyEditor.this.validate();
-                        Container c = PolicyEditor.this.getParent();
-                        // find the window and repack it
-                        while (!(c instanceof Window)) {
-                            if (c == null) {
-                                return;
-                            }
-                            c = c.getParent();
+                        final Window w = SwingUtilities.getWindowAncestor(PolicyEditor.this);
+                        if (w != null) {
+                            w.pack();
                         }
-                        final Window w = (Window) c;
-                        w.pack();
-
                     }
                 }
             });
