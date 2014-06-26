@@ -1,3 +1,8 @@
+2014-06-26  Jacob Wisor  <gitne@gmx.de>
+
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: Add new PL
+	localized messages
+
 2014-06-25  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
@@ -8,7 +13,7 @@
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: removed hunk of
 	old commented out code, updated comment on reason for
-	JNLPRuntime.reloadPolicy()
+	JNLPRuntime.reloadPolicy() 
 
 2014-06-19  Jie Kang  <jkang@redhat.com>
 
@@ -110,10 +115,8 @@
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties (BOredirect)
 	(CCannotClearCache, CFakedCache, CONSOLEClean, CVCPCleanCache)
-	(CVCPCleanCacheTip): Fixed language in
-	some messages
-	(COPcode): removed
-	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: Added new DE
+	(CVCPCleanCacheTip): Fixed language in some messages
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: Add new DE
 	localized messages
 
 2014-06-17  Andrew Azores  <aazores@redhat.com>
