@@ -137,9 +137,10 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         insertChars = new JPopupMenu();
         initComponents();
         regExFilter.setText(ConsoleOutputPaneModel.defaultPattern.pattern());
-        if (!LogConfig.getLogConfig().isEnableHeaders()) {
-            showHeaders.setSelected(false);
-        }
+        showHeaders.setSelected(LogConfig.getLogConfig().isEnableHeaders());
+        setHeadersCheckBoxesEnabled(showHeaders.isSelected());
+        setMessagesCheckBoxesEnabled(showMessage.isSelected());
+        refresh.setEnabled(!autorefresh.isSelected());
         if (JNLPRuntime.isWebstartApplication()) {
             showPlugin.setSelected(false);
             showPreInit.setSelected(false);
@@ -214,10 +215,10 @@ public class ConsoleOutputPane extends JPanel implements Observer {
 
                     @Override
                     public final void run() {
-                        try{
-                        insertChars.setLocation(regExFilter.getLocationOnScreen());
-                        insertChars.setVisible(!insertChars.isVisible());
-                             } catch (Exception ex) {
+                        try {
+                            insertChars.setLocation(regExFilter.getLocationOnScreen());
+                            insertChars.setVisible(!insertChars.isVisible());
+                        } catch (Exception ex) {
                             OutputController.getLogger().log(ex);
                         }
                     }
@@ -238,6 +239,16 @@ public class ConsoleOutputPane extends JPanel implements Observer {
 
             @Override
             public final void actionPerformed(final ActionEvent evt) {
+                if (evt == null) return;
+
+                final Object source;
+                if ((source = evt.getSource()) == showHeaders) {
+                    setHeadersCheckBoxesEnabled(showHeaders.isSelected());
+                } else if (source == showMessage) {
+                    setMessagesCheckBoxesEnabled(showMessage.isSelected());
+                } else if (source == autorefresh) {
+                    refresh.setEnabled(!autorefresh.isSelected());
+                }
                 refreshAction();
             }
         };
@@ -395,6 +406,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
 
         autorefresh.setSelected(true);
         autorefresh.setText(Translator.R("COPautoRefresh"));
+        autorefresh.addActionListener(getDefaultActionSingleton());
 
         refresh.setText(Translator.R("COPrefresh"));
         refresh.addActionListener(getDefaultActionSingleton());
@@ -738,6 +750,27 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         insertChars.add(resetRegex);
 
         validate();
+    }
+
+    private final void setHeadersCheckBoxesEnabled(final boolean enable) {
+        showUser.setEnabled(enable);
+        showOrigin.setEnabled(enable);
+        showLevel.setEnabled(enable);
+        showDate.setEnabled(enable);
+        showCode.setEnabled(enable);
+        showThread1.setEnabled(enable);
+        showThread2.setEnabled(enable);
+    }
+
+    private final void setMessagesCheckBoxesEnabled(final boolean enable) {
+        showOut.setEnabled(enable);
+        showErr.setEnabled(enable);
+        showJava.setEnabled(enable);
+        showPlugin.setEnabled(enable);
+        showDebug.setEnabled(enable);
+        showInfo.setEnabled(enable);
+        showItw.setEnabled(enable);
+        showApp.setEnabled(enable);
     }
 
     private final void refreshAction() {

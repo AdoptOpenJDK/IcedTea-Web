@@ -1,3 +1,30 @@
+2014-06-XX  Jacob Wisor  <gitne@gmx.de>
+
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: Fix
+	handling of UI controls
+	(ConsoleOutputPane) Add set enabled state of headers JCheckBoxes with new
+	setHeadersCheckBoxesEnabled() method depending on showHeaders' saved
+	configuration selected state
+	Add set enabled state of messages JCheckBox with new
+	setMessagesCheckBoxesEnabled method depending on showMessage's selected
+	state on initialization
+	Add set enabled state of refresh JButton reciprocally to autorefresh
+	JCheckBox's selected state on initialization
+	(createDefaultAction) Add null check on argument of public method
+	Add call to new setHeadersCheckBoxesEnabled() method with showHeaders'
+	selected state when clicked
+	Add call to new setMessagesCheckBoxesEnabled() method with showMessage's
+	selected state when clicked
+	Add set enabled state of refresh JButton reciprocally to autorefresh
+	JCheckBox's selected state
+	(initComponents) Add default ActionListener to autorefresh JCheckBox
+	(setHeadersCheckBoxesEnabled) Add new method
+	Sets enabled state of showUser, showOrigin, showLevel, showDate, showCode,
+	showThread1, and showThread2 depending on parameter passed in
+	(setMessagesCheckBoxesEnabled) Add new method
+	Sets enabled state of showOut, showErr, showJava, showPlugin, showDebug,
+	showInfo, showItw, and showApp depending on parameter passed in
+
 2014-06-26  Jacob Wisor  <gitne@gmx.de>
 
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: Formatting
