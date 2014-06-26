@@ -1,6 +1,8 @@
 package net.sourceforge.jnlp.util.logging;
 
 import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -17,9 +19,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.LayoutStyle;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -32,17 +47,17 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 
-public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
+public class ConsoleOutputPane extends JPanel implements Observer {
     
     private boolean canChange = true;
 
     @Override
-    public synchronized void update(Observable o, Object arg) {
+    public synchronized void update(final Observable o, final Object arg) {
         boolean force = false;
-        if ( arg!= null && arg instanceof Boolean && ((Boolean)arg).booleanValue()) {
+        if (arg instanceof Boolean && ((Boolean)arg).booleanValue()) {
             force = true;
         }
-        if (force){
+        if (force) {
              refreshPane();
              return;
         }
@@ -50,7 +65,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
             statistics.setText(model.createStatisticHint());
             return;
         }
-        boolean passed = model.shouldUpdate();
+        final boolean passed = model.shouldUpdate();
 
         if (!passed) {
             statistics.setText(model.createStatisticHint());
@@ -62,15 +77,64 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         } else {
             refreshPane();
         }
-
     }
-    private ConsoleOutputPaneModel model;
+
+    private final ConsoleOutputPaneModel model;
     private int lastPostion; //index of search
-    private DefaultHighlighter.DefaultHighlightPainter searchHighligh = new DefaultHighlighter.DefaultHighlightPainter(Color.blue);
+    private final DefaultHighlighter.DefaultHighlightPainter searchHighligh = new DefaultHighlighter.DefaultHighlightPainter(Color.blue);
     private Object lastSearchTag;
 
-    public ConsoleOutputPane(ObservableMessagesProvider dataProvider) {
+    public ConsoleOutputPane(final ObservableMessagesProvider dataProvider) {
         model = new ConsoleOutputPaneModel(dataProvider);
+        // Create final JComponents members
+        jPanel2 = new JPanel();
+        showHeaders = new JCheckBox();
+        showUser = new JCheckBox();
+        sortCopyAll = new JCheckBox();
+        showOrigin = new JCheckBox();
+        showLevel = new JCheckBox();
+        showDate = new JCheckBox();
+        showThread1 = new JCheckBox();
+        showThread2 = new JCheckBox();
+        showMessage = new JCheckBox();
+        showOut = new JCheckBox();
+        showErr = new JCheckBox();
+        showJava = new JCheckBox();
+        showPlugin = new JCheckBox();
+        showPreInit = new JCheckBox();
+        sortByLabel = new JLabel();
+        regExLabel = new JCheckBox();
+        sortBy = new JComboBox<>();
+        searchLabel = new JLabel();
+        autorefresh = new JCheckBox();
+        refresh = new JButton();
+        apply = new JButton();
+        regExFilter = new JTextField();
+        copyPlain = new JButton();
+        copyRich = new JButton();
+        next = new JButton();
+        previous = new JButton();
+        search = new JTextField();
+        caseSensitive = new JCheckBox();
+        showIncomplete = new JCheckBox();
+        highLight = new JCheckBox();
+        wordWrap = new JCheckBox();
+        showDebug = new JCheckBox();
+        showInfo = new JCheckBox();
+        showItw = new JCheckBox();
+        showApp = new JCheckBox();
+        showCode = new JCheckBox();
+        statistics = new JLabel();
+        showPostInit = new JCheckBox();
+        showComplete = new JCheckBox();
+        match = new JRadioButton();
+        notMatch = new JRadioButton();
+        revertSort = new JCheckBox();
+        mark = new JCheckBox();
+        jScrollPane1 = new JScrollPane();
+        jEditorPane1 = new JTextPane();
+        showHide = new JButton();
+        insertChars = new JPopupMenu();
         initComponents();
         regExFilter.setText(ConsoleOutputPaneModel.defaultPattern.pattern());
         if (!LogConfig.getLogConfig().isEnableHeaders()) {
@@ -92,24 +156,24 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         regExFilter.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public final void insertUpdate(final DocumentEvent e) {
                 colorize();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public final void removeUpdate(final DocumentEvent e) {
                 colorize();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public final void changedUpdate(final DocumentEvent e) {
                 colorize();
             }
 
-            private void colorize() {
+            private final void colorize() {
                 try {
-                    String s = regExFilter.getText();
-                    Pattern p = Pattern.compile(s);
+                    final String s = regExFilter.getText();
+                    final Pattern p = Pattern.compile(s);
                     model.lastValidPattern = p;
                     regExLabel.setForeground(Color.green);
                 } catch (Exception ex) {
@@ -120,11 +184,11 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         regExFilter.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mouseClicked(final MouseEvent e) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
+            public final void mouseClicked(final MouseEvent e) {
+                EventQueue.invokeLater(new Runnable() {
 
                     @Override
-                    public void run() {
+                    public final void run() {
                         try {
                             if (e.getButton() != MouseEvent.BUTTON3) {
                                 insertChars.setVisible(false);
@@ -142,14 +206,14 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         regExFilter.addKeyListener(new KeyAdapter() {
 
             @Override
-            public void keyPressed(final KeyEvent e) {
+            public final void keyPressed(final KeyEvent e) {
                 if (e.getKeyCode() != KeyEvent.VK_CONTEXT_MENU) {
                     return;
                 }
-                java.awt.EventQueue.invokeLater(new Runnable() {
+                EventQueue.invokeLater(new Runnable() {
 
                     @Override
-                    public void run() {
+                    public final void run() {
                         try{
                         insertChars.setLocation(regExFilter.getLocationOnScreen());
                         insertChars.setVisible(!insertChars.isVisible());
@@ -161,31 +225,31 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
             }
         });
 
-        ButtonGroup matches = new ButtonGroup();
+        final ButtonGroup matches = new ButtonGroup();
         matches.add(match);
         matches.add(notMatch);
         showHideActionPerformed(null);
         updateModel();
         refreshPane();
-
     }
 
-    private ActionListener createDefaultAction() {
+    private final ActionListener createDefaultAction() {
         return new ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public final void actionPerformed(final ActionEvent evt) {
                 refreshAction();
             }
         };
     }
-    ActionListener defaultActionSingleton = createDefaultAction();
 
-    private ActionListener getDefaultActionSingleton() {
+    final ActionListener defaultActionSingleton = createDefaultAction();
+
+    private final ActionListener getDefaultActionSingleton() {
         return defaultActionSingleton;
     }
 
-    private synchronized void refreshPane() {
+    private synchronized final void refreshPane() {
         if (highLight.isSelected()) {
             jEditorPane1.setContentType("text/html");
         } else {
@@ -196,20 +260,20 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
     }
     /**
      * when various threads update (and it can be)underlying jeditorpane
-     * simultanouskly, then it can lead to unpredictible issues synchroisation
-     * is doen in invoe later
+     * simultaneously, then it can lead to unpredictable issues synchronization
+     * is done in invoke later
      */
-    private AtomicBoolean done = new AtomicBoolean(true);
+    private final AtomicBoolean done = new AtomicBoolean(true);
 
-    private synchronized void updatePane(final boolean reset) {
+    private synchronized final void updatePane(final boolean reset) {
         if (!done.get()) {
             return;
         }
         done.set(false);
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
 
             @Override
-            public void run() {
+            public final void run() {
                 try {
                     refreshPaneBody(reset);
                 } catch (Exception ex) {
@@ -221,11 +285,11 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         });
     }
 
-    private void refreshPaneBody(final boolean reset) throws BadLocationException, IOException {
+    private final void refreshPaneBody(final boolean reset) throws BadLocationException, IOException {
         if (reset) {
             jEditorPane1.setText(model.importList(0));
         } else {
-            String s = model.importList();
+            final String s = model.importList();
             if (highLight.isSelected()) {
                 HTMLDocument orig = (HTMLDocument) jEditorPane1.getDocument();
                 if (revertSort.isSelected()) {
@@ -249,57 +313,9 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         statistics.setText(model.createStatisticHint());
     }
 
-    private void initComponents() {
-
-        jPanel2 = new javax.swing.JPanel();
-        showHeaders = new javax.swing.JCheckBox();
-        showUser = new javax.swing.JCheckBox();
-        sortCopyAll = new javax.swing.JCheckBox();
-        showOrigin = new javax.swing.JCheckBox();
-        showLevel = new javax.swing.JCheckBox();
-        showDate = new javax.swing.JCheckBox();
-        showThread1 = new javax.swing.JCheckBox();
-        showThread2 = new javax.swing.JCheckBox();
-        showMessage = new javax.swing.JCheckBox();
-        showOut = new javax.swing.JCheckBox();
-        showErr = new javax.swing.JCheckBox();
-        showJava = new javax.swing.JCheckBox();
-        showPlugin = new javax.swing.JCheckBox();
-        showPreInit = new javax.swing.JCheckBox();
-        sortByLabel = new javax.swing.JLabel();
-        regExLabel = new javax.swing.JCheckBox();
-        sortBy = new javax.swing.JComboBox<>();
-        searchLabel = new javax.swing.JLabel();
-        autorefresh = new javax.swing.JCheckBox();
-        refresh = new javax.swing.JButton();
-        apply = new javax.swing.JButton();
-        regExFilter = new javax.swing.JTextField();
-        //this is crucial, otherwie PalinDocument implementatin is repalcing all \n by space
-        ((PlainDocument) regExFilter.getDocument()).getDocumentProperties().remove("filterNewlines");
-        copyPlain = new javax.swing.JButton();
-        copyRich = new javax.swing.JButton();
-        next = new javax.swing.JButton();
-        previous = new javax.swing.JButton();
-        search = new javax.swing.JTextField();
-        caseSensitive = new javax.swing.JCheckBox();
-        showIncomplete = new javax.swing.JCheckBox();
-        highLight = new javax.swing.JCheckBox();
-        wordWrap = new javax.swing.JCheckBox();
-        showDebug = new javax.swing.JCheckBox();
-        showInfo = new javax.swing.JCheckBox();
-        showItw = new javax.swing.JCheckBox();
-        showApp = new javax.swing.JCheckBox();
-        showCode = new javax.swing.JCheckBox();
-        statistics = new javax.swing.JLabel();
-        showPostInit = new javax.swing.JCheckBox();
-        showComplete = new javax.swing.JCheckBox();
-        match = new javax.swing.JRadioButton();
-        notMatch = new javax.swing.JRadioButton();
-        revertSort = new javax.swing.JCheckBox();
-        mark = new javax.swing.JCheckBox();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jEditorPane1 = new javax.swing.JTextPane();
-        showHide = new javax.swing.JButton();
+    private final void initComponents() {
+        //this is crucial, otherwie PlainDocument implementatin is repalcing all \n by space
+        ((PlainDocument)regExFilter.getDocument()).getDocumentProperties().remove("filterNewlines");
 
         sortCopyAll.setSelected(true);
         sortCopyAll.setText(Translator.R("COPsortCopyAllDate"));
@@ -363,7 +379,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         regExLabel.setText(Translator.R("COPregex") + ":");
         regExLabel.addActionListener(getDefaultActionSingleton());
 
-        sortBy.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {
+        sortBy.setModel(new DefaultComboBoxModel<>(new String[] {
             Translator.R("COPAsArrived"),
             Translator.R("COPuser"),
             Translator.R("COPorigin"),
@@ -384,10 +400,10 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         refresh.addActionListener(getDefaultActionSingleton());
 
         apply.setText(Translator.R("COPApply"));
-        apply.addActionListener(new java.awt.event.ActionListener() {
+        apply.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public final void actionPerformed(final ActionEvent evt) {
                 model.usedPattern = model.lastValidPattern;
                 refreshAction();
             }
@@ -396,37 +412,37 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         regExFilter.setText(".*");
 
         copyPlain.setText(Translator.R("COPCopyAllPlain"));
-        copyPlain.addActionListener(new java.awt.event.ActionListener() {
+        copyPlain.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public final void actionPerformed(final ActionEvent evt) {
                 copyPlainActionPerformed(evt);
             }
         });
 
         copyRich.setText(Translator.R("COPCopyAllRich"));
-        copyRich.addActionListener(new java.awt.event.ActionListener() {
+        copyRich.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public final void actionPerformed(final ActionEvent evt) {
                 copyRichActionPerformed(evt);
             }
         });
 
         next.setText(Translator.R("COPnext"));
-        next.addActionListener(new java.awt.event.ActionListener() {
+        next.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public final void actionPerformed(final ActionEvent evt) {
                 nextActionPerformed(evt);
             }
         });
 
         previous.setText(Translator.R("COPprevious"));
-        previous.addActionListener(new java.awt.event.ActionListener() {
+        previous.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public final void actionPerformed(final ActionEvent evt) {
                 previousActionPerformed(evt);
             }
         });
@@ -489,81 +505,81 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         revertSort.addActionListener(getDefaultActionSingleton());
 
         mark.setText(Translator.R("COPmark"));
-        mark.addActionListener(new java.awt.event.ActionListener() {
+        mark.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public final void actionPerformed(final ActionEvent evt) {
                 markActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        final GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
                 jPanel2Layout.createParallelGroup(
-                javax.swing.GroupLayout.Alignment.LEADING).
+                GroupLayout.Alignment.LEADING).
                 addGroup(
                 jPanel2Layout.createSequentialGroup().addContainerGap().addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
                 addGroup(
                 jPanel2Layout.createSequentialGroup().
-                addComponent(showHeaders).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showUser).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).
-                addComponent(showOrigin).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showLevel).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).
-                addComponent(showDate).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showCode).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showThread1).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                addComponent(showHeaders).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showUser).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).
+                addComponent(showOrigin).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showLevel).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).
+                addComponent(showDate).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showCode).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showThread1).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(showThread2)).
                 addGroup(jPanel2Layout.createSequentialGroup().addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING).addGroup(
-                javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                .addComponent(previous).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(mark).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(next).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE).
-                addComponent(wordWrap).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(highLight).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(sortCopyAll).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(copyRich).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(copyPlain)).addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup().
-                addComponent(searchLabel).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(search, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING).addGroup(
+                GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                .addComponent(previous).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(mark).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(next).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE).
+                addComponent(wordWrap).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(highLight).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(sortCopyAll).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(copyRich).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(copyPlain)).addGroup(GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup().
+                addComponent(searchLabel).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(search, GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(caseSensitive)).addGroup(
-                javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup().
-                addComponent(showMessage).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showOut).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(showErr).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showJava).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showPlugin).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup().
+                addComponent(showMessage).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showOut).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(showErr).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showJava).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showPlugin).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(showDebug).addGap(6, 6, 6).
                 addComponent(showInfo).addGap(6, 6, 6).
                 addComponent(showItw).addGap(6, 6, 6).
                 addComponent(showApp)
                 )).addGap(2, 2, 2).
                 addComponent(statistics)).addGroup(
-                javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup().
-                addComponent(showPreInit).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showPostInit).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showIncomplete).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
+                GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup().
+                addComponent(showPreInit).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showPostInit).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showIncomplete).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(showComplete)).
                 addGroup(jPanel2Layout.createSequentialGroup().
-                addComponent(autorefresh).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(refresh).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(sortByLabel).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(revertSort).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).
+                addComponent(autorefresh).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(refresh).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(sortByLabel).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(revertSort).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).
                 addComponent(sortBy, 0, 327, Short.MAX_VALUE)).
                 addGroup(jPanel2Layout.createSequentialGroup().
-                addComponent(regExLabel).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(match).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(notMatch).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(regExFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(apply, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))).addContainerGap()));
+                addComponent(regExLabel).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(match).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(notMatch).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(regExFilter, GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(apply, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE))).addContainerGap()));
         jPanel2Layout.setVerticalGroup(
                 jPanel2Layout.createParallelGroup(
-                javax.swing.GroupLayout.Alignment.LEADING).
+                GroupLayout.Alignment.LEADING).
                 addGroup(
                 jPanel2Layout.createSequentialGroup().addContainerGap().addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
                 addComponent(showHeaders).
                 addComponent(showUser).
                 addComponent(showLevel).
@@ -571,8 +587,8 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
                 addComponent(showOrigin).
                 addComponent(showCode).
                 addComponent(showThread1).
-                addComponent(showThread2)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
+                addComponent(showThread2)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
                 addComponent(showMessage).
                 addComponent(showOut).
                 addComponent(showErr).
@@ -582,113 +598,112 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
                 addComponent(showInfo).
                 addComponent(showItw).
                 addComponent(showApp).
-                addComponent(statistics)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
+                addComponent(statistics)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
                 addComponent(showPreInit).
                 addComponent(showIncomplete).
                 addComponent(showPostInit).
-                addComponent(showComplete)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).
+                addComponent(showComplete)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
                 addGroup(
                 jPanel2Layout.createSequentialGroup().addGap(32, 32, 32).addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
-                addComponent(regExLabel).addComponent(regExFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
+                addComponent(regExLabel).addComponent(regExFilter, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).
                 addComponent(apply).
                 addComponent(match).
                 addComponent(notMatch))).
                 addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
                 addComponent(autorefresh).
                 addComponent(refresh).
-                addComponent(sortByLabel).addComponent(sortBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).
-                addComponent(revertSort))).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).
+                addComponent(sortByLabel).addComponent(sortBy, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).
+                addComponent(revertSort))).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addGroup(
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
                 addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
-                addComponent(searchLabel).addComponent(search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)).
-                addComponent(caseSensitive)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
+                addComponent(searchLabel).addComponent(search, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).
+                addComponent(caseSensitive)).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addGroup(
+                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
                 addComponent(previous).
-                addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
+                addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
                 addComponent(sortCopyAll).
                 addComponent(copyPlain).
                 addComponent(copyRich).
                 addComponent(highLight).
                 addComponent(wordWrap)).
-                addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).
+                addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
                 addComponent(mark).
-                addComponent(next))).addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+                addComponent(next))).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
         jEditorPane1.setEditable(false);
         jScrollPane1.setViewportView(jEditorPane1);
 
         showHide.setText(Translator.R("ButHideDetails"));
-        showHide.addActionListener(new java.awt.event.ActionListener() {
+        showHide.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public final void actionPerformed(final ActionEvent evt) {
                 showHideActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(this);
-        this.setLayout(jPanel1Layout);
+        final GroupLayout jPanel1Layout = new GroupLayout(this);
+        super.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).
+                jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
                 addGroup(jPanel1Layout.createSequentialGroup().addContainerGap().
-                addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).
-                addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE).
-                addGroup(jPanel1Layout.createSequentialGroup().addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING).
-                addComponent(showHide, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE).
-                addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).addContainerGap()))));
+                addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
+                addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE).
+                addGroup(jPanel1Layout.createSequentialGroup().addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING).
+                addComponent(showHide, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE).
+                addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).addContainerGap()))));
         jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).
-                addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup().addContainerGap().
-                addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).
+                jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
+                addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup().addContainerGap().
+                addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(showHide).addContainerGap()));
 
-        insertChars = new JPopupMenu();
-        JMenuItem tab = new JMenuItem("insert \\t");
+        final JMenuItem tab = new JMenuItem("insert \\t");
         tab.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
+            public final void actionPerformed(final ActionEvent e) {
+                EventQueue.invokeLater(new Runnable() {
 
                     @Override
-                    public void run() {
-                        try{
-                        int i = regExFilter.getCaretPosition();
-                        StringBuilder s = new StringBuilder(regExFilter.getText());
-                        s.insert(i, "\t");
-                        regExFilter.setText(s.toString());
-                        regExFilter.setCaretPosition(i + 1);
-                        insertChars.setVisible(false);
-                             } catch (Exception ex) {
+                    public final void run() {
+                        try {
+                            final int i = regExFilter.getCaretPosition();
+                            final StringBuilder s = new StringBuilder(regExFilter.getText());
+                            s.insert(i, "\t");
+                            regExFilter.setText(s.toString());
+                            regExFilter.setCaretPosition(i + 1);
+                            insertChars.setVisible(false);
+                        } catch (Exception ex) {
                             OutputController.getLogger().log(ex);
                         }
                     }
                 });
             }
         });
-        JMenuItem newLine = new JMenuItem("insert \\n");
+        final JMenuItem newLine = new JMenuItem("insert \\n");
         newLine.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
+            public final void actionPerformed(final ActionEvent e) {
+                EventQueue.invokeLater(new Runnable() {
 
                     @Override
-                    public void run() {
-                        try{
-                        int i = regExFilter.getCaretPosition();
-                        StringBuilder s = new StringBuilder(regExFilter.getText());
-                        s.insert(i, "\n");
-                        regExFilter.setText(s.toString());
-                        regExFilter.setCaretPosition(i + 1);
-                        insertChars.setVisible(false);
-                             } catch (Exception ex) {
+                    public final void run() {
+                        try {
+                            final int i = regExFilter.getCaretPosition();
+                            final StringBuilder s = new StringBuilder(regExFilter.getText());
+                            s.insert(i, "\n");
+                            regExFilter.setText(s.toString());
+                            regExFilter.setCaretPosition(i + 1);
+                            insertChars.setVisible(false);
+                        } catch (Exception ex) {
                             OutputController.getLogger().log(ex);
                         }
                     }
@@ -696,21 +711,21 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
             }
         });
 
-        JMenuItem resetRegex = new JMenuItem("reset default");
+        final JMenuItem resetRegex = new JMenuItem("reset default");
         resetRegex.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                java.awt.EventQueue.invokeLater(new Runnable() {
+            public final void actionPerformed(final ActionEvent e) {
+                EventQueue.invokeLater(new Runnable() {
 
                     @Override
-                    public void run() {
-                        try{
-                        regExFilter.setText(ConsoleOutputPaneModel.defaultPattern.pattern());
-                        model.lastValidPattern = ConsoleOutputPaneModel.defaultPattern;
-                        model.usedPattern = model.lastValidPattern;
-                        insertChars.setVisible(false);
-                             } catch (Exception ex) {
+                    public final void run() {
+                        try {
+                            regExFilter.setText(ConsoleOutputPaneModel.defaultPattern.pattern());
+                            model.lastValidPattern = ConsoleOutputPaneModel.defaultPattern;
+                            model.usedPattern = model.lastValidPattern;
+                            insertChars.setVisible(false);
+                        } catch (Exception ex) {
                             OutputController.getLogger().log(ex);
                         }
                     }
@@ -722,34 +737,33 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         insertChars.add(tab);
         insertChars.add(resetRegex);
 
-
         validate();
     }
 
-    private void refreshAction() {
+    private final void refreshAction() {
         updateModel();
         refreshPane();
     }
 
-    private void markActionPerformed(java.awt.event.ActionEvent evt) {
+    private final void markActionPerformed(final ActionEvent evt) {
         int matches = 0;
         if (!mark.isSelected()) {
             jEditorPane1.getHighlighter().removeAllHighlights();
             return;
         }
         try {
-            Document document = jEditorPane1.getDocument();
-            String find = search.getText();
+            final Document document = jEditorPane1.getDocument();
+            final String find = search.getText();
             if (find.length() == 0) {
                 jEditorPane1.getHighlighter().removeAllHighlights();
                 return;
             }
             for (int index = 0; index + find.length() < document.getLength(); index++) {
-                String subMatch = document.getText(index, find.length());
+                final String subMatch = document.getText(index, find.length());
                 if ((caseSensitive.isSelected() && find.equals(subMatch)) || (!caseSensitive.isSelected() && find.equalsIgnoreCase(subMatch))) {
                     matches++;
-                    javax.swing.text.DefaultHighlighter.DefaultHighlightPainter highlightPainter =
-                            new javax.swing.text.DefaultHighlighter.DefaultHighlightPainter(Color.orange);
+                    DefaultHighlighter.DefaultHighlightPainter highlightPainter =
+                            new DefaultHighlighter.DefaultHighlightPainter(Color.orange);
                     jEditorPane1.getHighlighter().addHighlight(index, index + find.length(),
                             highlightPainter);
                 }
@@ -760,16 +774,16 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         }
     }
 
-    private void previousActionPerformed(java.awt.event.ActionEvent evt) {
+    private final void previousActionPerformed(final ActionEvent evt) {
         try {
-            Document document = jEditorPane1.getDocument();
-            String find = search.getText();
+            final Document document = jEditorPane1.getDocument();
+            final String find = search.getText();
             if (find.length() == 0) {
                 lastPostion = document.getLength() - find.length() - 1;
                 return;
             }
             for (int index = lastPostion; index >= 0; index--) {
-                String subMatch = document.getText(index, find.length());
+                final String subMatch = document.getText(index, find.length());
                 if ((caseSensitive.isSelected() && find.equals(subMatch)) || (!caseSensitive.isSelected() && find.equalsIgnoreCase(subMatch))) {
                     if (lastSearchTag != null) {
                         jEditorPane1.getHighlighter().removeHighlight(lastSearchTag);
@@ -787,16 +801,16 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         }
     }
 
-    private void nextActionPerformed(java.awt.event.ActionEvent evt) {
+    private final void nextActionPerformed(final ActionEvent evt) {
         try {
-            Document document = jEditorPane1.getDocument();
-            String find = search.getText();
+            final Document document = jEditorPane1.getDocument();
+            final String find = search.getText();
             if (find.length() == 0) {
                 lastPostion = 0;
                 return;
             }
             for (int index = lastPostion; index + find.length() < document.getLength(); index++) {
-                String subMatch = document.getText(index, find.length());
+                final String subMatch = document.getText(index, find.length());
                 if ((caseSensitive.isSelected() && find.equals(subMatch)) || (!caseSensitive.isSelected() && find.equalsIgnoreCase(subMatch))) {
                     if (lastSearchTag != null) {
                         jEditorPane1.getHighlighter().removeHighlight(lastSearchTag);
@@ -814,7 +828,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         }
     }
 
-    private void showHideActionPerformed(java.awt.event.ActionEvent evt) {
+    private final void showHideActionPerformed(final ActionEvent evt) {
         if (jPanel2.isVisible()) {
             jPanel2.setVisible(false);
             showHide.setText(Translator.R("ButShowDetails"));
@@ -824,7 +838,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         }
     }
 
-    private void copyPlainActionPerformed(java.awt.event.ActionEvent evt) {
+    private final void copyPlainActionPerformed(final ActionEvent evt) {
         if (canChange) {
             showApp.setSelected(false);
             refreshAction();
@@ -833,7 +847,7 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         fillClipBoard(false, sortCopyAll.isSelected());
     }
 
-    private void copyRichActionPerformed(java.awt.event.ActionEvent evt) {
+    private final void copyRichActionPerformed(final ActionEvent evt) {
         if (canChange) {
             showApp.setSelected(false);
             refreshAction();
@@ -842,36 +856,36 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         fillClipBoard(true, sortCopyAll.isSelected());
     }
     
-    private void fillClipBoard(boolean mark, boolean forceSort){
-        StringSelection stringSelection ; 
+    private final void fillClipBoard(final boolean mark, final boolean forceSort){
+        final StringSelection stringSelection;
         if (forceSort){
             stringSelection = new StringSelection(model.importList(mark, 0, 4/*date*/));
         } else {
             stringSelection = new StringSelection(model.importList(mark, 0));
         }
-        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clpbrd.setContents(stringSelection, null);
+        final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
     }
 
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
+    public static final void main(final String args[]) {
+        EventQueue.invokeLater(new Runnable() {
 
             @Override
-            public void run() {
-                JFrame dialog = new JFrame();
+            public final void run() {
+                final JFrame dialog = new JFrame();
                 dialog.setSize(800, 600);
                 dialog.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                ObservableMessagesProvider producer = new ConsoleOutputPaneModel.TestMessagesProvider();
-                ConsoleOutputPane jPanel1 = new ConsoleOutputPane(producer);
+                final ObservableMessagesProvider producer = new ConsoleOutputPaneModel.TestMessagesProvider();
+                final ConsoleOutputPane jPanel1 = new ConsoleOutputPane(producer);
                 producer.getObservable().addObserver(jPanel1);
-                dialog.getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+                dialog.getContentPane().add(jPanel1, BorderLayout.CENTER);
                 dialog.pack();
                 dialog.setVisible(true);
             }
         });
     }
 
-    private void updateModel() {
+    private final void updateModel() {
         model.highLight = highLight.isSelected();
         model.matchPattern = match.isSelected();
         model.regExLabel = regExLabel.isSelected();
@@ -899,54 +913,54 @@ public class ConsoleOutputPane extends javax.swing.JPanel implements Observer {
         model.showUser = showUser.isSelected();
         model.sortBy = sortBy.getSelectedIndex();
         model.wordWrap = wordWrap.isSelected();
-
     }
-    private javax.swing.JButton apply;
-    private javax.swing.JCheckBox autorefresh;
-    private javax.swing.JCheckBox caseSensitive;
-    private javax.swing.JButton copyPlain;
-    private javax.swing.JButton copyRich;
-    private javax.swing.JCheckBox highLight;
-    private javax.swing.JEditorPane jEditorPane1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JCheckBox mark;
-    private javax.swing.JRadioButton match;
-    private javax.swing.JButton next;
-    private javax.swing.JRadioButton notMatch;
-    private javax.swing.JButton previous;
-    private javax.swing.JButton refresh;
-    private javax.swing.JTextField regExFilter;
-    private javax.swing.JCheckBox regExLabel;
-    private javax.swing.JCheckBox revertSort;
-    private javax.swing.JTextField search;
-    private javax.swing.JLabel searchLabel;
-    private javax.swing.JCheckBox showCode;
-    private javax.swing.JCheckBox showComplete;
-    private javax.swing.JCheckBox showDate;
-    private javax.swing.JCheckBox showDebug;
-    private javax.swing.JCheckBox showErr;
-    private javax.swing.JCheckBox showHeaders;
-    private javax.swing.JButton showHide;
-    private javax.swing.JCheckBox showIncomplete;
-    private javax.swing.JCheckBox showInfo;
-    private javax.swing.JCheckBox showItw;
-    private javax.swing.JCheckBox showApp;
-    private javax.swing.JCheckBox showJava;
-    private javax.swing.JCheckBox showLevel;
-    private javax.swing.JCheckBox showMessage;
-    private javax.swing.JCheckBox showOrigin;
-    private javax.swing.JCheckBox showOut;
-    private javax.swing.JCheckBox showPlugin;
-    private javax.swing.JCheckBox showPostInit;
-    private javax.swing.JCheckBox showPreInit;
-    private javax.swing.JCheckBox showThread1;
-    private javax.swing.JCheckBox showThread2;
-    private javax.swing.JCheckBox showUser;
-    private javax.swing.JCheckBox sortCopyAll;
-    private javax.swing.JComboBox<String> sortBy;
-    private javax.swing.JLabel sortByLabel;
-    private javax.swing.JLabel statistics;
-    private javax.swing.JCheckBox wordWrap;
-    private javax.swing.JPopupMenu insertChars;
+
+    private final JButton apply;
+    private final JCheckBox autorefresh;
+    private final JCheckBox caseSensitive;
+    private final JButton copyPlain;
+    private final JButton copyRich;
+    private final JCheckBox highLight;
+    private final JEditorPane jEditorPane1;
+    private final JPanel jPanel2;
+    private final JScrollPane jScrollPane1;
+    private final JCheckBox mark;
+    private final JRadioButton match;
+    private final JButton next;
+    private final JRadioButton notMatch;
+    private final JButton previous;
+    private final JButton refresh;
+    private final JTextField regExFilter;
+    private final JCheckBox regExLabel;
+    private final JCheckBox revertSort;
+    private final JTextField search;
+    private final JLabel searchLabel;
+    private final JCheckBox showCode;
+    private final JCheckBox showComplete;
+    private final JCheckBox showDate;
+    private final JCheckBox showDebug;
+    private final JCheckBox showErr;
+    private final JCheckBox showHeaders;
+    private final JButton showHide;
+    private final JCheckBox showIncomplete;
+    private final JCheckBox showInfo;
+    private final JCheckBox showItw;
+    private final JCheckBox showApp;
+    private final JCheckBox showJava;
+    private final JCheckBox showLevel;
+    private final JCheckBox showMessage;
+    private final JCheckBox showOrigin;
+    private final JCheckBox showOut;
+    private final JCheckBox showPlugin;
+    private final JCheckBox showPostInit;
+    private final JCheckBox showPreInit;
+    private final JCheckBox showThread1;
+    private final JCheckBox showThread2;
+    private final JCheckBox showUser;
+    private final JCheckBox sortCopyAll;
+    private final JComboBox<String> sortBy;
+    private final JLabel sortByLabel;
+    private final JLabel statistics;
+    private final JCheckBox wordWrap;
+    private final JPopupMenu insertChars;
 }
