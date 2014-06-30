@@ -1,3 +1,15 @@
+2014-06-30  Andrew Azores  <aazores@redhat.com>
+
+	Runnables to be invoked on the EDT are invoked immediately if the current
+	thread is already the EDT, rather than being queued for invocation later.
+	invokeRunnableOrEnqueueLater replaces SwingUtilities.invokeLater to
+	achieve this.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(updateCheckboxes): uses invokeRunnableOrEnqueueAndWait
+	(updateCheckboxesInvokeAndWait): removed
+	(invokeRunnableOrEnqueueAndWait, invokeRunnableOrEnqueueLater): new
+	methods
+
 2014-06-26  Jacob Wisor  <gitne@gmx.de>
 
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: Formatting
