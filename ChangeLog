@@ -1,4 +1,4 @@
-2014-06-XX  Jacob Wisor  <gitne@gmx.de>
+2014-07-03  Jacob Wisor  <gitne@gmx.de>
 
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: Fix
 	handling of UI controls
