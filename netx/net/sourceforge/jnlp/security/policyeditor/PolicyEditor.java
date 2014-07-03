@@ -377,7 +377,7 @@ public class PolicyEditor extends JPanel {
         viewCustomButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
+                invokeRunnableOrEnqueueLater(new Runnable() {
                     @Override
                     public void run() {
                         String codebase = getSelectedCodebase();
@@ -732,7 +732,7 @@ public class PolicyEditor extends JPanel {
             model = codebase;
         }
         policyEditorController.addCodebase(codebase);
-        SwingUtilities.invokeLater(new Runnable() {
+        invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 if (!listModel.contains(model)) {
@@ -761,7 +761,7 @@ public class PolicyEditor extends JPanel {
      * policy file model.
      */
     public void addNewCodebaseInteractive() {
-        SwingUtilities.invokeLater(new Runnable() {
+        invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 String codebase = "";
@@ -790,7 +790,7 @@ public class PolicyEditor extends JPanel {
         }
         policyEditorController.removeCodebase(codebase);
         final int fIndex = previousIndex;
-        SwingUtilities.invokeLater(new Runnable() {
+        invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 listModel.removeElement(codebase);
@@ -876,32 +876,39 @@ public class PolicyEditor extends JPanel {
         policyEditorController.clearCustomCodebase(codebase);
     }
 
+    private void invokeRunnableOrEnqueueLater(final Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+
+    private void invokeRunnableOrEnqueueAndWait(final Runnable runnable) throws InvocationTargetException, InterruptedException {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeAndWait(runnable);
+        }
+    }
+
     /**
      * Update the checkboxes to show the permissions granted to the specified codebase
      * @param codebase whose permissions to display
      */
     private void updateCheckboxes(final String codebase) {
         try {
-            if (SwingUtilities.isEventDispatchThread()) {
-                updateCheckboxesImpl(codebase);
-            } else {
-                updateCheckboxesInvokeAndWait(codebase);
-            }
+            invokeRunnableOrEnqueueAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    updateCheckboxesImpl(codebase);
+                }
+            });
         } catch (InterruptedException ex) {
             OutputController.getLogger().log(ex);
         } catch (InvocationTargetException ex) {
             OutputController.getLogger().log(ex);
         }
-    }
-
-    private void updateCheckboxesInvokeAndWait(final String codebase) throws InterruptedException, InvocationTargetException {
-        SwingUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                updateCheckboxesImpl(codebase);
-            }
-        });
-
     }
 
     private void updateCheckboxesImpl(final String codebase) {
@@ -1233,7 +1240,7 @@ public class PolicyEditor extends JPanel {
             protected Void doInBackground() throws Exception {
                 try {
                     if (parentWindow != null) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        invokeRunnableOrEnqueueLater(new Runnable() {
                             @Override
                             public void run() {
                                 progressIndicator.setLocationRelativeTo(parentWindow);
@@ -1298,7 +1305,7 @@ public class PolicyEditor extends JPanel {
             public Void doInBackground() throws Exception {
                 try {
                     if (parentWindow != null) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        invokeRunnableOrEnqueueLater(new Runnable() {
                             @Override
                             public void run() {
                                 progressIndicator.setLocationRelativeTo(parentWindow);
@@ -1331,7 +1338,7 @@ public class PolicyEditor extends JPanel {
         // This dialog is often displayed when closing the editor, and so PolicyEditor
         // may already be disposed when this dialog appears. Give a weak reference so
         // that this dialog doesn't prevent the JVM from exiting
-        SwingUtilities.invokeLater(new Runnable() {
+        invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEChangesSaved"));
@@ -1346,7 +1353,7 @@ public class PolicyEditor extends JPanel {
         // This dialog is often displayed when closing the editor, and so PolicyEditor
         // may already be disposed when this dialog appears. Give a weak reference so
         // that this dialog doesn't prevent the JVM from exiting
-        SwingUtilities.invokeLater(new Runnable() {
+        invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PECouldNotSave"), R("Error"), JOptionPane.ERROR_MESSAGE);
