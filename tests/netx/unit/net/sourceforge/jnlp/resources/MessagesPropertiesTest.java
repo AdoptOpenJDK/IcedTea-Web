@@ -138,8 +138,8 @@ public class MessagesPropertiesTest {
         
     }
    
-    public static LocalesIdentifier main;
-    public static LocalesIdentifier[] secondary;
+    private static LocalesIdentifier main;
+    private static LocalesIdentifier[] secondary;
 
     @BeforeClass
     public static void loadResourceBoundels() {
@@ -148,61 +148,54 @@ public class MessagesPropertiesTest {
         assertNotNull(main);
         secondary= new LocalesIdentifier[] {LocalesIdentifier.CZ, LocalesIdentifier.DE, LocalesIdentifier.PL};
         assertNotNull(secondary);
-        for (int i = 0; i < secondary.length; i++) {
-            assertNotNull(secondary[i]);
-         
+        for (LocalesIdentifier secondary1 : secondary) {
+            assertNotNull(secondary1);
         }
     }
 
     @Test
     public void allResourcesAreReallyDifferent() {
-        List<LocalesIdentifier> bundles = new ArrayList<LocalesIdentifier>(secondary.length + 1);
+        List<LocalesIdentifier> bundles = new ArrayList<>(secondary.length + 1);
         String detailResults="";
-        bundles.add(main);
         int errors = 0;
         bundles.addAll(Arrays.asList(secondary));
-        for (int i = 0; i < bundles.size(); i++) {
-            LocalesIdentifier resourceBundle1 = bundles.get(i);
+        for (LocalesIdentifier resourceBundle1 : bundles) {
             Enumeration<String> keys1 = resourceBundle1.getBundle().getKeys();
-            for (int j = 0; j < bundles.size(); j++) {
-                LocalesIdentifier resourceBundle2 = bundles.get(j);
-                if (resourceBundle1.getLanguage().equals(resourceBundle2.getLanguage())) {
-                    //do not compare same language groups
-                    allLog("Skipping same language " + resourceBundle1.getLocale() + " x " + resourceBundle2.getLocale() + " (should be " + resourceBundle1.getIdentifier() + " x " + resourceBundle2.getIdentifier() + ")");
-                    break;
+            LocalesIdentifier resourceBundle2 = main;
+            allLog("Checking for same items between " + resourceBundle1.getLocale() + " x " + resourceBundle2.getLocale() + " (should be " + resourceBundle1.getIdentifier() + " x " + resourceBundle2.getIdentifier() + ")");
+            int localErrors=0;
+            while (keys1.hasMoreElements()) {
+                String key = keys1.nextElement();
+                String val1 = getMissingResourceAsEmpty(resourceBundle1.getBundle(), key);
+                if (val1.length() > 1000) {
+                    errLog("Skipping check of: " + key + " too long. (" + val1.length() + ")"); 
+                    continue;
                 }
-                allLog("Checking for same items between " + resourceBundle1.getLocale() + " x " + resourceBundle2.getLocale() + " (should be " + resourceBundle1.getIdentifier() + " x " + resourceBundle2.getIdentifier() + ")");
-                int localErrors=0;
-                while (keys1.hasMoreElements()) {
-                    String key = keys1.nextElement();
-                    String val1 = getMissingResourceAsEmpty(resourceBundle1.getBundle(), key);
-                    String val2 = getMissingResourceAsEmpty(resourceBundle2.getBundle(), key);
-                    outLog("\""+val1+"\" x \""+val2);
-                    if (val1.trim().equalsIgnoreCase(val2.trim())) {
-                        if (val1.trim().length() <= 5 /* short words like"ok", "", ...*/
-                                || val1.toLowerCase().contains("://") /*urls...*/
-                                || !val1.trim().contains(" ") /*one word*/
-                                || val1.replaceAll("\\{\\d\\}", "").trim().length()<5 /*only vars and short words*/
-                                //white list
-                                || (val1.trim().equals("std. err"))
-                                || (val1.trim().equals("std. out"))
-                                || (val1.trim().equals("Policy Editor"))
-                                || (val1.trim().equals("Java Reflection")))
-                        {
-                            errLog("Warning! Items equals for: " + key + " = " + val1 + " but are in allowed subset");
-                        } else {
-                            errors++;
-                            localErrors++;
-                            errLog("Error! Items equals for: " + key + " = " + val1);
-                        }
+                String val2 = getMissingResourceAsEmpty(resourceBundle2.getBundle(), key);
+                outLog("\""+val1+"\" x \""+val2);
+                if (val1.trim().equalsIgnoreCase(val2.trim())) {
+                    if (val1.trim().length() <= 5 /* short words like"ok", "", ...*/
+                            || val1.toLowerCase().contains("://") /*urls...*/
+                            || !val1.trim().contains(" ") /*one word*/
+                            || val1.replaceAll("\\{\\d\\}", "").trim().length()<5 /*only vars and short words*/
+                            //white list
+                            || (val1.trim().equals("std. err"))
+                            || (val1.trim().equals("std. out"))
+                            || (val1.trim().equals("Policy Editor"))
+                            || (val1.trim().equals("Java Reflection")))
+                    {
+                        errLog("Warning! Items equals for: " + key + " = " + val1 + " but are in allowed subset");
+                    } else {
+                        errors++;
+                        localErrors++;
+                        errLog("Error! Items equals for: " + key + " = " + val1);
                     }
                 }
-                if (localErrors > 0){
-                    detailResults+=resourceBundle1.getIdentifier()+" x "+resourceBundle2.getIdentifier()+": "+localErrors+";";
-                }
-                errLog(localErrors+" errors allResourcesAreReallyDifferent fo "+resourceBundle1.getIdentifier()+" x "+resourceBundle2.getIdentifier());
-
             }
+            if (localErrors > 0){
+                detailResults+=resourceBundle1.getIdentifier()+" x "+resourceBundle2.getIdentifier()+": "+localErrors+";";
+            }
+            errLog(localErrors+" errors allResourcesAreReallyDifferent fo "+resourceBundle1.getIdentifier()+" x "+resourceBundle2.getIdentifier());
         }
         assertTrue("Several - " + errors + " - items are same in  bundles. See error logs for details: "+detailResults, errors == 0);
     }
@@ -221,10 +214,10 @@ public class MessagesPropertiesTest {
     public void warnForNotLocalisedStrings() {
         int errors = 0;
         Enumeration<String> keys = main.getBundle().getKeys();
-        for (int i = 0; i < secondary.length; i++) {
+        for (LocalesIdentifier secondary1 : secondary) {
             int localErrors = 0;
-            ResourceBundle sec = secondary[i].getBundle();
-            String id = secondary[i].getIdentifier();
+            ResourceBundle sec = secondary1.getBundle();
+            String id = secondary1.getIdentifier();
             allLog("Checking for missing  strings in " + sec.getLocale() + " (should be " + id + ") compared with default");
             while (keys.hasMoreElements()) {
                 String key = keys.nextElement();
@@ -234,15 +227,14 @@ public class MessagesPropertiesTest {
                 if (val1.trim().isEmpty()) {
                 } else {
                     if (val2.trim().isEmpty()){
-                    errors++;
-                    localErrors++;
-                    errLog("Error! There is value for default: " + key + ", but for " + id+" is missing");
+                        errors++;
+                        localErrors++;
+                        errLog("Error! There is value for default: " + key + ", but for " + id+" is missing");
                     }
 
                 }
             }
             errLog(localErrors+" warnForNotLocalisedStrings errors for "+id);
-
         }
         assertTrue("Several - " + errors + " - items have missing localization. See error logs for details", errors == 0);
     }
@@ -251,29 +243,28 @@ public class MessagesPropertiesTest {
     
     @Test
     public void noEmptyResources() {
-         List<LocalesIdentifier> bundles = new ArrayList<LocalesIdentifier>(secondary.length + 1);
+         List<LocalesIdentifier> bundles = new ArrayList<>(secondary.length + 1);
         bundles.add(main);
         int errors = 0;
         bundles.addAll(Arrays.asList(secondary));
-        for (int i = 0; i < bundles.size(); i++) {
-            ResourceBundle resourceBundle = bundles.get(i).getBundle();
-            String id = bundles.get(i).getIdentifier();
+        for (LocalesIdentifier bundle : bundles) {
+            ResourceBundle resourceBundle = bundle.getBundle();
+            String id = bundle.getIdentifier();
             Enumeration<String> keys = resourceBundle.getKeys();
-                allLog("Checking for empty items in " + resourceBundle.getLocale() + "  (should be " + id + ")");
-                int localErrors=0;
-                while (keys.hasMoreElements()) {
-                    String key = keys.nextElement();
-                    String val = getMissingResourceAsEmpty(resourceBundle, key);
-                    outLog("\""+key+"\" = \""+val);
-                        if (val.trim().isEmpty()) {
-                            errors++;
-                            localErrors++;
-                            errLog("Error! Key: " + key + " have no vlue");
-                        }
-                    
+            allLog("Checking for empty items in " + resourceBundle.getLocale() + "  (should be " + id + ")");
+            int localErrors=0;
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                String val = getMissingResourceAsEmpty(resourceBundle, key);
+                outLog("\""+key+"\" = \""+val);
+                if (val.trim().isEmpty()) {
+                    errors++;
+                    localErrors++;
+                    errLog("Error! Key: " + key + " have no vlue");
                 }
-                errLog(localErrors+" noEmptyResources errors for "+id);
-
+                
+            }
+            errLog(localErrors+" noEmptyResources errors for "+id);
         }
         assertTrue("Several - " + errors + " - items  have no values", errors == 0);
     }
@@ -282,11 +273,11 @@ public class MessagesPropertiesTest {
     @Test
     public void findKeysWhichAreInLocalisedButNotInDefault() {
         int errors = 0;
-        for (int i = 0; i < secondary.length; i++) {
+        for (LocalesIdentifier secondary1 : secondary) {
             int localErrors = 0;
-            ResourceBundle sec = secondary[i].getBundle();
+            ResourceBundle sec = secondary1.getBundle();
             Enumeration<String> keys = sec.getKeys();
-            String id = secondary[i].getId();
+            String id = secondary1.getId();
             outLog("Checking for redundant keys in " + sec.getLocale() + " (should be " + id + ") compared with default");
             errLog("Checking for redundant keys in " + sec.getLocale() + " (should be " + id + ") compared with default");
             while (keys.hasMoreElements()) {
@@ -294,15 +285,14 @@ public class MessagesPropertiesTest {
                 String val2 = getMissingResourceAsEmpty(main.getBundle(), key);
                 String val1 = getMissingResourceAsEmpty(sec, key);
                 outLog("\""+val1+"\" x \""+val2);
-                    if (val2.trim().isEmpty() && !val1.trim().isEmpty()){
+                if (val2.trim().isEmpty() && !val1.trim().isEmpty()){
                     errors++;
                     localErrors++;
                     errLog("Error! There is value for "+id+", key " + key + ", but for default is missing");
-                    }
-
+                }
+                
             }
             errLog(localErrors+" findKeysWhichAreInLocalisedButNotInDefault errors for "+id);
-
         }
         assertTrue("Several - " + errors + " - items  have value in localized version but not in default one", errors == 0);
     }

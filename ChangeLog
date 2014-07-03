@@ -1,3 +1,10 @@
+2014-07-03  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java
+	removed useless iterations of all resources against all. Kept only all against
+	default.  Preferred diamonds and for each against full declarations and old-style
+	fors.
+
 2014-06-30  Andrew Azores  <aazores@redhat.com>
 
 	Runnables to be invoked on the EDT are invoked immediately if the current
