@@ -1,3 +1,7 @@
+2014-07-08  Emmanuel Bourg  <ebourg@apache.org>
+
+       * netx/policyeditor.1: Escaped the minus signs in the policyeditor manpage
+
 2014-07-03  Jacob Wisor  <gitne@gmx.de>
 
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: Fix
