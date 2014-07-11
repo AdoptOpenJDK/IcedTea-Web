@@ -416,7 +416,7 @@ public class PolicyEditor extends JPanel {
         w.setModalityType(ModalityType.MODELESS); //at least some default
         w.setPolicyEditor(e);
         w.setTitle(R("PETitle"));
-        w.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        w.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         w.setJMenuBar(createMenuBar(w.asWindow(), w.getPolicyEditor()));
         setupPolicyEditorWindow(w.asWindow(), w.getPolicyEditor());
     }
@@ -430,7 +430,6 @@ public class PolicyEditor extends JPanel {
             @Override
             public void windowClosing(final WindowEvent e) {
                 ((PolicyEditorWindow) window).quit();
-                window.dispose();
             }
         });
 

@@ -1,6 +1,15 @@
+2014-07-11  Andrew Azores  <aazores@redhat.com>
+
+	Fixed bug where the "Cancel" option on the "save changes before exiting"
+	dialog would be ignored and the window close without saving
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(preparePolicyEditorWindow): default close operation NONE rather than
+	dispose
+	(setupPolicyEditorWindow): do not automatically dispose on window close
+
 2014-07-08  Emmanuel Bourg  <ebourg@apache.org>
 
-       * netx/policyeditor.1: Escaped the minus signs in the policyeditor manpage
+	* netx/policyeditor.1: Escaped the minus signs in the policyeditor manpage
 
 2014-07-03  Jacob Wisor  <gitne@gmx.de>
 
