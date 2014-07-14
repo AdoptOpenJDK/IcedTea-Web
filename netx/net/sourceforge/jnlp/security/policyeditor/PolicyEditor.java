@@ -50,6 +50,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -76,10 +78,11 @@ import java.util.TreeMap;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.DefaultListModel;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -363,7 +366,7 @@ public class PolicyEditor extends JPanel {
 
         copyCodebaseToClipboardButtonAction = new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 final String selectedCodebase = getSelectedCodebase();
                 if (selectedCodebase.isEmpty()) {
                     return;
@@ -396,7 +399,17 @@ public class PolicyEditor extends JPanel {
             }
         };
 
-        setAccelerators();
+        closeButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                final Window parentWindow = SwingUtilities.getWindowAncestor(PolicyEditor.this);
+                if (parentWindow instanceof PolicyEditorWindow) {
+                    ((PolicyEditorWindow) parentWindow).quit();
+                }
+            }
+        };
+        closeButton.setText(R("ButClose"));
+        closeButton.addActionListener(closeButtonAction);
 
         setupLayout();
     }
@@ -417,7 +430,7 @@ public class PolicyEditor extends JPanel {
         w.setPolicyEditor(e);
         w.setTitle(R("PETitle"));
         w.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        w.setJMenuBar(createMenuBar(w.asWindow(), w.getPolicyEditor()));
+        w.setJMenuBar(createMenuBar(w.getPolicyEditor()));
         setupPolicyEditorWindow(w.asWindow(), w.getPolicyEditor());
     }
 
@@ -432,39 +445,6 @@ public class PolicyEditor extends JPanel {
                 ((PolicyEditorWindow) window).quit();
             }
         });
-
-        editor.closeButtonAction = new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                ((PolicyEditorWindow) window).quit();
-            }
-        };
-        editor.closeButton.setText(R("ButClose"));
-        editor.closeButton.addActionListener(editor.closeButtonAction);
-
-        final Action saveAct = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                editor.savePolicyFile();
-            }
-        };
-        editor.setAccelerator(R("PEOkButtonMnemonic"), ActionEvent.ALT_MASK, saveAct, "OkButtonAccelerator");
-
-        final Action quitAct = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                ((PolicyEditorWindow) window).quit();
-            }
-        };
-        editor.setAccelerator(R("PECancelButtonMnemonic"), ActionEvent.ALT_MASK, quitAct, "CancelButtonAccelerator");
-
-        final Action escAct = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                ((PolicyEditorWindow) window).quit();
-            }
-        };
-        editor.setAccelerator(KeyEvent.VK_ESCAPE, ActionEvent.ALT_MASK, escAct, "ExitOnEscape");
     }
 
     public static interface PolicyEditorWindow {
@@ -645,73 +625,6 @@ public class PolicyEditor extends JPanel {
      */
     void customPolicyViewerClosing() {
         cpViewer = null;
-    }
-
-    /**
-     * Set keyboard accelerators for each major function in the editor
-     */
-    private void setAccelerators() {
-        setAddCodebaseAccelerator();
-        setRemoveCodebaseAccelerator();
-    }
-
-    /**
-     * Set a key accelerator
-     * @param trigger the accelerator key
-     * @param modifiers Alt, Ctrl, or other modifiers to be held with the trigger
-     * @param action to be performed
-     * @param identifier an identifier for the action
-     */
-    private void setAccelerator(final String trigger, final int modifiers, final Action action, final String identifier) {
-        final int trig;
-        try {
-            trig = Integer.parseInt(trigger);
-        } catch (final NumberFormatException nfe) {
-            OutputController.getLogger().log("Unable to set accelerator action \""
-                    + identifier + "\" for trigger \"" + trigger + "\"");
-            OutputController.getLogger().log(nfe);
-            return;
-        }
-        setAccelerator(trig, modifiers, action, identifier);
-    }
-
-    /**
-     * Set a key accelerator
-     * @param trigger the accelerator key
-     * @param modifiers Alt, Ctrl, or other modifiers to be held with the trigger
-     * @param action to be performed
-     * @param identifier an identifier for the action
-     */
-    private void setAccelerator(final int trigger, final int modifiers, final Action action, final String identifier) {
-        final KeyStroke key = KeyStroke.getKeyStroke(trigger, modifiers);
-        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, identifier);
-        this.getActionMap().put(identifier, action);
-    }
-
-    /**
-     * Add an accelerator for adding new codebases
-     */
-    private void setAddCodebaseAccelerator() {
-        final Action act = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                addNewCodebaseInteractive();
-            }
-        };
-        setAccelerator(R("PEAddCodebaseMnemonic"), ActionEvent.ALT_MASK, act, "AddCodebaseAccelerator");
-    }
-
-    /**
-     * Add an accelerator for removing the selected codebase
-     */
-    private void setRemoveCodebaseAccelerator() {
-        final Action act = new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                removeCodebase(getSelectedCodebase());
-            }
-        };
-        setAccelerator(R("PERemoveCodebaseMnemonic"), ActionEvent.ALT_MASK, act, "RemoveCodebaseAccelerator");
     }
 
     /**
@@ -937,87 +850,131 @@ public class PolicyEditor extends JPanel {
 
     /**
      * Set a mnemonic key for a menu item or button
-     * @param component the component for which to set a mnemonic
+     * @param button the component for which to set a mnemonic
      * @param mnemonic the mnemonic to set
      */
-    private static void setComponentMnemonic(final AbstractButton component, final String mnemonic) {
-        final int trig;
-        try {
-            trig = Integer.parseInt(mnemonic);
-        } catch (final NumberFormatException nfe) {
-            OutputController.getLogger().log(nfe);
+    private static void setButtonMnemonic(final AbstractButton button, final String mnemonic) {
+        if (mnemonic.length() != 1) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not set mnemonic \"" + mnemonic + "\" for " + button);
             return;
         }
-        component.setMnemonic(trig);
+        final char ch = mnemonic.charAt(0);
+        button.setMnemonic(ch);
     }
 
-    private static JMenuBar createMenuBar(final Window window, final PolicyEditor editor) {
+    private static void setMenuItemAccelerator(final JMenuItem menuItem, final String accelerator) {
+        final KeyStroke ks = KeyStroke.getKeyStroke(accelerator);
+        menuItem.setAccelerator(ks);
+    }
+
+    private static JMenuBar createMenuBar(final PolicyEditor editor) {
         final JMenuBar menuBar = new JMenuBar();
 
         final JMenu fileMenu = new JMenu(R("PEFileMenu"));
-        setComponentMnemonic(fileMenu, R("PEFileMenuMnemonic"));
+        setButtonMnemonic(fileMenu, R("PEFileMenuMnemonic"));
 
         final JMenuItem openItem = new JMenuItem(R("PEOpenMenuItem"));
-        setComponentMnemonic(openItem, R("PEOpenMenuItemMnemonic"));
-        openItem.setAccelerator(KeyStroke.getKeyStroke(openItem.getMnemonic(), ActionEvent.CTRL_MASK));
+        setButtonMnemonic(openItem, R("PEOpenMenuItemMnemonic"));
+        setMenuItemAccelerator(openItem, R("PEOpenMenuItemAccelerator"));
         openItem.addActionListener(editor.openButtonAction);
         fileMenu.add(openItem);
 
         final JMenuItem saveItem = new JMenuItem(R("PESaveMenuItem"));
-        setComponentMnemonic(saveItem, R("PESaveMenuItemMnemonic"));
-        saveItem.setAccelerator(KeyStroke.getKeyStroke(saveItem.getMnemonic(), ActionEvent.CTRL_MASK));
+        setButtonMnemonic(saveItem, R("PESaveMenuItemMnemonic"));
+        setMenuItemAccelerator(saveItem, R("PESaveMenuItemAccelerator"));
         saveItem.addActionListener(editor.okButtonAction);
         fileMenu.add(saveItem);
 
         final JMenuItem saveAsItem = new JMenuItem(R("PESaveAsMenuItem"));
-        setComponentMnemonic(saveAsItem, R("PESaveAsMenuItemMnemonic"));
-        saveAsItem.setAccelerator(KeyStroke.getKeyStroke(saveAsItem.getMnemonic(), ActionEvent.CTRL_MASK));
+        setButtonMnemonic(saveAsItem, R("PESaveAsMenuItemMnemonic"));
+        setMenuItemAccelerator(saveAsItem, R("PESaveAsMenuItemAccelerator"));
         saveAsItem.addActionListener(editor.saveAsButtonAction);
         fileMenu.add(saveAsItem);
 
         final JMenuItem exitItem = new JMenuItem(R("PEExitMenuItem"));
-        setComponentMnemonic(exitItem, R("PEExitMenuItemMnemonic"));
-        exitItem.setAccelerator(KeyStroke.getKeyStroke(exitItem.getMnemonic(), ActionEvent.CTRL_MASK));
+        setButtonMnemonic(exitItem, R("PEExitMenuItemMnemonic"));
+        setMenuItemAccelerator(exitItem, R("PEExitMenuItemAccelerator"));
         exitItem.addActionListener(editor.closeButtonAction);
-        exitItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                window.dispose();
-            }
-        });
         fileMenu.add(exitItem);
         menuBar.add(fileMenu);
 
-        final JMenu editMenu = new JMenu(R("PEEditMenu"));
-        setComponentMnemonic(editMenu, R("PEEditMenuMnemonic"));
+        final JMenu codebaseMenu = new JMenu(R("PECodebaseMenu"));
+        setButtonMnemonic(codebaseMenu, R("PECodebaseMenuMnemonic"));
+
+        final JMenuItem addNewCodebaseItem = new JMenuItem(R("PEAddCodebaseItem"));
+        setButtonMnemonic(addNewCodebaseItem, R("PEAddCodebaseItemMnemonic"));
+        setMenuItemAccelerator(addNewCodebaseItem, R("PEAddCodebaseItemAccelerator"));
+        addNewCodebaseItem.addActionListener(editor.addCodebaseButtonAction);
+        codebaseMenu.add(addNewCodebaseItem);
+
+        final JMenuItem removeCodebaseItem = new JMenuItem(R("PERemoveCodebaseItem"));
+        setButtonMnemonic(removeCodebaseItem, R("PERemoveCodebaseItemMnemonic"));
+        setMenuItemAccelerator(removeCodebaseItem, R("PERemoveCodebaseItemAccelerator"));
+        removeCodebaseItem.addActionListener(editor.removeCodebaseButtonAction);
+        codebaseMenu.add(removeCodebaseItem);
+
+        codebaseMenu.addSeparator();
 
         final JMenuItem renameCodebaseItem = new JMenuItem(R("PERenameCodebaseItem"));
+        setButtonMnemonic(renameCodebaseItem, R("PERenameCodebaseItemMnemonic"));
+        setMenuItemAccelerator(renameCodebaseItem, R("PERenameCodebaseItemAccelerator"));
         renameCodebaseItem.addActionListener(editor.renameCodebaseButtonAction);
-        editMenu.add(renameCodebaseItem);
+        codebaseMenu.add(renameCodebaseItem);
 
         final JMenuItem copyCodebaseItem = new JMenuItem(R("PECopyCodebaseItem"));
+        setButtonMnemonic(copyCodebaseItem, R("PECopyCodebaseItemMnemonic"));
+        setMenuItemAccelerator(copyCodebaseItem, R("PECopyCodebaseItemAccelerator"));
         copyCodebaseItem.addActionListener(editor.copyCodebaseButtonAction);
-        editMenu.add(copyCodebaseItem);
-
-        final JMenuItem pasteCodebaseItem = new JMenuItem(R("PEPasteCodebaseItem"));
-        pasteCodebaseItem.addActionListener(editor.pasteCodebaseButtonAction);
-        editMenu.add(pasteCodebaseItem);
+        codebaseMenu.add(copyCodebaseItem);
 
         final JMenuItem copyCodebaseToClipboardItem = new JMenuItem(R("PECopyCodebaseToClipboardItem"));
+        setButtonMnemonic(copyCodebaseToClipboardItem, R("PECopyCodebaseToClipboardItemMnemonic"));
+        setMenuItemAccelerator(copyCodebaseToClipboardItem, R("PECopyCodebaseToClipboardItemAccelerator"));
         copyCodebaseToClipboardItem.addActionListener(editor.copyCodebaseToClipboardButtonAction);
-        editMenu.add(copyCodebaseToClipboardItem);
-        menuBar.add(editMenu);
+        codebaseMenu.add(copyCodebaseToClipboardItem);
+        menuBar.add(codebaseMenu);
+
+        final JMenuItem pasteCodebaseItem = new JMenuItem(R("PEPasteCodebaseItem"));
+        setButtonMnemonic(pasteCodebaseItem, R("PEPasteCodebaseItemMnemonic"));
+        setMenuItemAccelerator(pasteCodebaseItem, R("PEPasteCodebaseItemAccelerator"));
+        pasteCodebaseItem.addActionListener(editor.pasteCodebaseButtonAction);
+        codebaseMenu.add(pasteCodebaseItem);
 
         final JMenu viewMenu = new JMenu(R("PEViewMenu"));
-        setComponentMnemonic(viewMenu, R("PEViewMenuMnemonic"));
+        setButtonMnemonic(viewMenu, R("PEViewMenuMnemonic"));
 
         final JMenuItem customPermissionsItem = new JMenuItem(R("PECustomPermissionsItem"));
-        setComponentMnemonic(customPermissionsItem, R("PECustomPermissionsItemMnemonic"));
-        customPermissionsItem.setAccelerator(KeyStroke.getKeyStroke(customPermissionsItem.getMnemonic(), ActionEvent.ALT_MASK));
+        setButtonMnemonic(customPermissionsItem, R("PECustomPermissionsItemMnemonic"));
+        setMenuItemAccelerator(customPermissionsItem, R("PECustomPermissionsItemAccelerator"));
         customPermissionsItem.addActionListener(editor.viewCustomButtonAction);
 
         viewMenu.add(customPermissionsItem);
         menuBar.add(viewMenu);
+
+        /*
+         * JList has default Ctrl-C and Ctrl-V bindings, which we want to override with custom actions
+         */
+        final InputMap listInputMap = editor.list.getInputMap();
+        final ActionMap listActionMap = editor.list.getActionMap();
+
+        final Action listCopyOverrideAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                editor.copyCodebaseButtonAction.actionPerformed(e);
+            }
+        };
+
+        final Action listPasteOverrideAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                editor.pasteCodebaseButtonAction.actionPerformed(e);
+            }
+        };
+
+        listInputMap.put(copyCodebaseItem.getAccelerator(), "CopyCodebaseOverride");
+        listActionMap.put("CopyCodebaseOverride", listCopyOverrideAction);
+        listInputMap.put(pasteCodebaseItem.getAccelerator(), "PasteCodebaseOverride");
+        listActionMap.put("PasteCodebaseOverride", listPasteOverrideAction);
 
         return menuBar;
     }
@@ -1069,20 +1026,23 @@ public class PolicyEditor extends JPanel {
             groupCh.setToolTipText(R("PEGrightClick"));
             groupCh.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mouseClicked(final MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON3) {
-                        groupPanel.setVisible(!groupPanel.isVisible());
-                        PolicyEditor.this.validate();
-                        final Window w = SwingUtilities.getWindowAncestor(PolicyEditor.this);
-                        if (w != null) {
-                            w.pack();
-                        }
+                        toggleExpandedCheckboxGroupPanel(groupPanel);
+                    }
+                }
+            });
+            groupCh.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(final KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_CONTEXT_MENU) {
+                        toggleExpandedCheckboxGroupPanel(groupPanel);
                     }
                 }
             });
             groupCh.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(final ActionEvent e) {
                     final String codebase = getSelectedCodebase();
                     if (codebase == null) {
                         return;
@@ -1171,14 +1131,14 @@ public class PolicyEditor extends JPanel {
         addCodebaseButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
         addCodebaseButtonConstraints.gridx = 0;
         addCodebaseButtonConstraints.gridy = listConstraints.gridy + listConstraints.gridheight + 1;
-        setComponentMnemonic(addCodebaseButton, R("PEAddCodebaseMnemonic"));
+        setButtonMnemonic(addCodebaseButton, R("PEAddCodebaseMnemonic"));
         add(addCodebaseButton, addCodebaseButtonConstraints);
 
         final GridBagConstraints removeCodebaseButtonConstraints = new GridBagConstraints();
         removeCodebaseButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
         removeCodebaseButtonConstraints.gridx = addCodebaseButtonConstraints.gridx + 1;
         removeCodebaseButtonConstraints.gridy = addCodebaseButtonConstraints.gridy;
-        setComponentMnemonic(removeCodebaseButton, R("PERemoveCodebaseMnemonic"));
+        setButtonMnemonic(removeCodebaseButton, R("PERemoveCodebaseMnemonic"));
         removeCodebaseButton.setPreferredSize(addCodebaseButton.getPreferredSize());
         add(removeCodebaseButton, removeCodebaseButtonConstraints);
 
@@ -1186,14 +1146,12 @@ public class PolicyEditor extends JPanel {
         okButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
         okButtonConstraints.gridx = removeCodebaseButtonConstraints.gridx + 2;
         okButtonConstraints.gridy = removeCodebaseButtonConstraints.gridy;
-        setComponentMnemonic(okButton, R("PEOkButtonMnemonic"));
         add(okButton, okButtonConstraints);
 
         final GridBagConstraints cancelButtonConstraints = new GridBagConstraints();
         cancelButtonConstraints.fill = GridBagConstraints.HORIZONTAL;
         cancelButtonConstraints.gridx = okButtonConstraints.gridx + 1;
         cancelButtonConstraints.gridy = okButtonConstraints.gridy;
-        setComponentMnemonic(closeButton, R("PECancelButtonMnemonic"));
         add(closeButton, cancelButtonConstraints);
 
         setMinimumSize(getPreferredSize());
@@ -1395,6 +1353,15 @@ public class PolicyEditor extends JPanel {
             return JOptionPane.CANCEL_OPTION;
         }
         return JOptionPane.NO_OPTION;
+    }
+
+    private void toggleExpandedCheckboxGroupPanel(final JPanel groupPanel) {
+        groupPanel.setVisible(!groupPanel.isVisible());
+        PolicyEditor.this.validate();
+        final Window w = SwingUtilities.getWindowAncestor(PolicyEditor.this);
+        if (w != null) {
+            w.pack();
+        }
     }
 
     /**

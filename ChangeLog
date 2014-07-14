@@ -1,3 +1,41 @@
+2014-07-14  Andrew Azores  <aazores@redhat.com>
+
+	PolicyEditor mnemonics and accelerators overhaul
+	* netx/net/sourceforge/jnlp/resources/Messages.properties (PECodebaseMenu,
+	PERenameCodebaseItem, PECopyCodebaseItem, PEPasteCodebaseItem,
+	PECopyCodebaseToClipboardItem, PEFileMenuMnemonic, PECodebaseMenuMnemonic
+	PEViewMenuMnemonic, PEAddCodebaseItem, PERemoveCodebaseItem): removed "codebase"
+	from item labels, "Edit" menu renamed "codebase"
+	(PEAddCodebaseMnemonic, PEAddCodebaseItemMnemonic, PERemoveCodebaseMnemonic,
+	PERemoveCodebaseItemMnemonic, PEOpenMenuItemMnemonic, PESaveMenuItemMnemonic,
+	PEExitMenuItemMnemonic, PECustomPermissionsItemMnemonic,
+	PECopyCodebaseItemMnemonic, PEPasteCodebaseItemMnemonic,
+	PECopyCodebaseToClipboardItemMnemonic, PESaveAsMenuItemMnemonic,
+	PERenameCodebaseItemMnemonic): updated mnemonics
+	(PEAddCodebaseItemAccelerator, PERemoveCodebaseItemAccelerator,
+	PEOpenMenuItemAccelerator, PESaveMenuItemAccelerator,
+	PESaveAsMenuItemAccelerator, PEExitMenuItemAccelerator,
+	PECustomPermissionsItemAccelerator, PECopyCodebaseItemAccelerator,
+	PEPasteCodebaseItemAccelerator, PERenameCodebaseItemAccelerator,
+	PECopyCodebaseToClipboardItemAccelerator): added accelerators
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(closeButtonAction): set in PolicyEditor constructor rather than
+	setupPolicyEditorWindow
+	(setupPolicyEditorWindow): do not set save/quit/esc actions
+	(setAccelerators, setAccelerator, setAddCodebaseAccelerator,
+	setRemoveCodebaseAccelerator): removed
+	(setButtonMnemonic): simplified, takes a String expected to be a single
+	character representing the mnemonic key directly, rather than a String
+	parseable to an integer which represented the value of the mnemonic key
+	(setMenuItemAccelerator): new method
+	(createMenuBar): use new mnemonics and accelerators, add new Add/Remove
+	items to Codebase menu, override JList default Control-C/Control-V
+	copy/paste actions
+	(setupLayout): groupCh MouseListener#mouseClicked logic extracted to
+	toggleExpandedCheckboxGroupPanel, KeyListener added to allow expanding
+	checkbox groups via keyboard with Enter or "Context Menu"
+	(toggleExpandedCheckboxGroupPanel): new method
+
 2014-07-11  Andrew Azores  <aazores@redhat.com>
 
 	Fixed bug where the "Cancel" option on the "save changes before exiting"
