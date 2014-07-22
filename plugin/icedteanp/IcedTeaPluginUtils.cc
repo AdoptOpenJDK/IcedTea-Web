@@ -60,25 +60,25 @@ std::queue<std::string> pre_jvm_message;
 static std::vector< PluginThreadCall* >* pendingPluginThreadRequests = new std::vector< PluginThreadCall* >();
 
 void *flush_pre_init_messages(void* data) {
-while (true){
-  struct timespec ts;
+  while (true){
+    struct timespec ts;
     ts.tv_sec = 1;
     ts.tv_nsec = 0;
-  nanosleep(&ts ,0);
-  if (jvm_up) {
-    while (!pre_jvm_message.empty()) {
-      pthread_mutex_lock(&debug_pipe_lock);
-      std::string  message = pre_jvm_message.front();
-      pre_jvm_message.pop();
-      pthread_mutex_unlock(&debug_pipe_lock);
-      plugin_send_message_to_appletviewer_console(message.c_str());
-      
+    nanosleep(&ts ,0);
+    if (jvm_up) {
+      while (!pre_jvm_message.empty()) {
+        pthread_mutex_lock(&debug_pipe_lock);
+        std::string message = pre_jvm_message.front();
+        pre_jvm_message.pop();
+        pthread_mutex_unlock(&debug_pipe_lock);
+        plugin_send_message_to_appletviewer_console(message.c_str());
+      }
+      flush_plugin_send_message_to_appletviewer_console();
     }
-    flush_plugin_send_message_to_appletviewer_console();
   }
-  
+  return NULL;
 }
-}
+
 void push_pre_init_messages(char * ldm){
   pthread_mutex_lock(&debug_pipe_lock);
   pre_jvm_message.push(std::string(ldm));

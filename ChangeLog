@@ -1,3 +1,8 @@
+2014-07-22  Fridrich Strba  <fridrich.strba@suse.com>
+
+	* plugin/icedteanp/IcedTeaPluginUtils.cc (flush_pre_init_messages):
+	Return NULL explicitly.
+
 2014-07-14  Andrew Azores  <aazores@redhat.com>
 
 	PolicyEditor mnemonics and accelerators overhaul
