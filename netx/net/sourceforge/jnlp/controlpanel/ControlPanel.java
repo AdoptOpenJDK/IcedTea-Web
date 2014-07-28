@@ -120,7 +120,6 @@ public class ControlPanel extends JFrame {
         add(buttonPanel, BorderLayout.PAGE_END);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         pack();
-        setMinimumSize(getPreferredSize());
     }
 
     private JPanel createTopPanel() {
@@ -304,7 +303,7 @@ public class ControlPanel extends JFrame {
             }
         });
         JScrollPane settingsListScrollPane = new JScrollPane(settingsList);
-        settingsListScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        settingsListScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         final JPanel settingsDetailPanel = new JPanel();
         settingsDetailPanel.setLayout(new BorderLayout());
