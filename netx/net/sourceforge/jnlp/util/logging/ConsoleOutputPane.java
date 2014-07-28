@@ -87,7 +87,9 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     public ConsoleOutputPane(final ObservableMessagesProvider dataProvider) {
         model = new ConsoleOutputPaneModel(dataProvider);
         // Create final JComponents members
+
         jPanel2 = new JPanel();
+        jpanel2scrollpane = new JScrollPane(jPanel2);
         showHeaders = new JCheckBox();
         showUser = new JCheckBox();
         sortCopyAll = new JCheckBox();
@@ -668,12 +670,12 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                 addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE).
                 addGroup(jPanel1Layout.createSequentialGroup().addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING).
                 addComponent(showHide, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE).
-                addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).addContainerGap()))));
+                addComponent(jpanel2scrollpane, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).addContainerGap()))));
         jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
                 addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup().addContainerGap().
                 addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(jpanel2scrollpane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(showHide).addContainerGap()));
 
         final JMenuItem tab = new JMenuItem("insert \\t");
@@ -862,11 +864,11 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     }
 
     private final void showHideActionPerformed(final ActionEvent evt) {
-        if (jPanel2.isVisible()) {
-            jPanel2.setVisible(false);
+        if (jpanel2scrollpane.isVisible()) {
+            jpanel2scrollpane.setVisible(false);
             showHide.setText(Translator.R("ButShowDetails"));
         } else {
-            jPanel2.setVisible(true);
+            jpanel2scrollpane.setVisible(true);
             showHide.setText(Translator.R("ButHideDetails"));
         }
     }
@@ -955,6 +957,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     private final JButton copyRich;
     private final JCheckBox highLight;
     private final JEditorPane jEditorPane1;
+    private final JScrollPane jpanel2scrollpane;
     private final JPanel jPanel2;
     private final JScrollPane jScrollPane1;
     private final JCheckBox mark;

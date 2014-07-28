@@ -1,4 +1,10 @@
 2014-07-28  Jie Kang  <jkang@redhat.com>
+    Fix to Java ConsoleOutputPane for lower resolutions. Addresses bug
+    PR1859 where part of the pane is hidden and unnaccessible when
+    clicking "Show Details".
+    * netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java
+
+2014-07-28  Jie Kang  <jkang@redhat.com>
 
     Fix to Control Panel UI for lower resolutions. Addresses bug
     PR1856 where part of the dialog is hidden and unaccessible
