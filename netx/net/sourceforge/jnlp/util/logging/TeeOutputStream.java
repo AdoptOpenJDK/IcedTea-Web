@@ -38,14 +38,13 @@ exception statement from your version. */
 package net.sourceforge.jnlp.util.logging;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
-import net.sourceforge.jnlp.util.logging.JavaConsole;
-import net.sourceforge.jnlp.util.logging.OutputController;
+
 import net.sourceforge.jnlp.util.logging.OutputController.Level;
-import net.sourceforge.jnlp.util.logging.SingleStreamLogger;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
-import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 
 /**
  * Behaves like the 'tee' command, sends output to both actual std stream and a
@@ -55,14 +54,14 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
 
     // Everthing written to TeeOutputStream is written to our log too
     
-    private final StringBuffer string = new StringBuffer();
+    private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private final boolean isError;
+    private final String lineSeparator = System.getProperty("line.separator");
 
     public TeeOutputStream(PrintStream stdStream, boolean isError) {
         super(stdStream);
         this.isError = isError;
     }
-
 
     @Override
     public void close() {
@@ -82,32 +81,25 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
 
     @Override
     public synchronized void write(byte[] b, int off, int len) {
-        if (b == null) {
-            throw new NullPointerException();
-        } else if ((off < 0) || (off > b.length) || (len < 0)
-                || ((off + len) > b.length) || ((off + len) < 0)) {
-            throw new IndexOutOfBoundsException();
-        } else if (len == 0) {
+        if (len == 0) {
             return;
         }
-        for (int i = 0; i < len; i++) {
-            appendChar(b[off + i]);
-        }
+        appendByteArray(b, off, len);
         super.write(b, off, len);
     }
 
     @Override
     public synchronized void write(int b) {
-        appendChar(b);
+        appendByte(b);
         super.write(b);
     }
 
     private void flushLog() {
-        if (string.length() <= 0 ){
-            return;
+        String s = byteArrayOutputStream.toString();
+        if (s.length() > 0) {
+            log(s);
+            byteArrayOutputStream.reset();
         }
-        log(string.toString());
-        string.setLength(0);
     }
 
     @Override
@@ -121,21 +113,34 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
         return isError;
     }
 
-    private void appendChar(int b) {
-         if ( b <= 0 || b == '\n'){
+    private void appendByte(int b) {
+        byteArrayOutputStream.write(b);
+        String s = byteArrayOutputStream.toString();
+        if (s.endsWith(lineSeparator)) {
             flushLog();
-        } else {
-            string.append((char)b);
+        }
+    }
+
+    private void appendByteArray(byte[] b, int off, int len) {
+        byteArrayOutputStream.write(b, off, len);
+        String s = new String(b, off, len);
+        if (s.endsWith(lineSeparator)) {
+            flushLog();
         }
     }
 
     private Level getlevel() {
-        if (isError()){
+        if (isError()) {
             return OutputController.Level.ERROR_ALL;
         } else {
             return OutputController.Level.MESSAGE_ALL;
         }
     }
-    
-    
+
+    //For unit testing
+    protected ByteArrayOutputStream getByteArrayOutputStream() throws IOException {
+        ByteArrayOutputStream copy = new ByteArrayOutputStream();
+        copy.write(this.byteArrayOutputStream.toByteArray());
+        return copy;
+    }
 }
