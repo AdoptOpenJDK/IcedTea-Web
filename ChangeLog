@@ -1,4 +1,14 @@
+2014-06-20  Jie Kang  <jkang@redhat.com>
+
+    Made adjustments to the MethodOverloadResolver to follow LiveConnect
+    specification when dealing with superclasses.
+    * tests/reproducers/simple/JSToJFuncResol/testcases/JSToJFuncResolTest.java:
+    Removed Known to Fail annotation on test case that is now fixed.
+    * plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java
+    Added distance calculation for comparing superclass resolutions.
+
 2014-07-28  Jie Kang  <jkang@redhat.com>
+
     Fix to Java ConsoleOutputPane for lower resolutions. Addresses bug
     PR1859 where part of the pane is hidden and unnaccessible when
     clicking "Show Details".

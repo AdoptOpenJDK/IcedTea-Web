@@ -104,11 +104,19 @@ public class MethodOverloadResolver {
     static class WeightedCast {
 
         private int cost;
+        private final int distance;
         private Object castedObject;
 
         public WeightedCast(int cost, Object castedObject) {
             this.cost = cost;
             this.castedObject = castedObject;
+            this.distance = 0;
+        }
+
+        public WeightedCast(int cost, Object castedObject, int distance) {
+            this.cost = cost;
+            this.castedObject = castedObject;
+            this.distance = distance;
         }
 
         public Object getCastedObject() {
@@ -117,6 +125,10 @@ public class MethodOverloadResolver {
 
         public int getCost() {
             return cost;
+        }
+
+        public int getDistance() {
+            return distance;
         }
     }
 
@@ -161,6 +173,7 @@ public class MethodOverloadResolver {
             java.lang.reflect.AccessibleObject[] candidates) {
 
         int lowestCost = Integer.MAX_VALUE;
+        int lowestDistance = Integer.MAX_VALUE;
         java.lang.reflect.AccessibleObject cheapestMethod = null;
         Object[] cheapestArgs = null;
         boolean ambiguous = false;
@@ -168,6 +181,7 @@ public class MethodOverloadResolver {
         methodLoop:
         for (java.lang.reflect.AccessibleObject candidate : candidates) {
             int methodCost = 0;
+            int distance = 0;
 
             Class<?>[] paramTypes = getParameterTypesFor(candidate);
             Object[] castedArgs = new Object[paramTypes.length];
@@ -188,6 +202,7 @@ public class MethodOverloadResolver {
                 }
 
                 methodCost += weightedCast.getCost();
+                distance = weightedCast.getDistance();
 
                 Object castedObj = paramTypeClass.isPrimitive() ? 
                             weightedCast.getCastedObject() 
@@ -201,18 +216,20 @@ public class MethodOverloadResolver {
 
                     PluginDebug.debug("Param " + i + " of method " + candidate
                             + " has cost " + weightedCast.getCost()
+                            + " distance " + weightedCast.getDistance()
                             + " original param type " + suppliedParamClass
                             + " casted to " + castedObjClass + " isPrimitive="
                             + castedObjIsPrim + " value " + castedObj);
                 }
             }
 
-            if (methodCost <= lowestCost) {
+            if (methodCost < lowestCost || (methodCost == lowestCost && distance <= lowestDistance)) {
                 if (methodCost < lowestCost
                         || argumentsAreSubclassesOf(castedArgs, cheapestArgs)) {
                     lowestCost = methodCost;
                     cheapestArgs = castedArgs;
                     cheapestMethod = candidate;
+                    lowestDistance = distance;
                     ambiguous = false;
                 } else {
                     ambiguous = true;
@@ -333,7 +350,7 @@ public class MethodOverloadResolver {
 
         // Class type to superclass type;
         if (paramTypeClass.isAssignableFrom(suppliedParamClass)) {
-            return new WeightedCast(CLASS_SUPERCLASS_COST, paramTypeClass.cast(suppliedParam));
+            return new WeightedCast(CLASS_SUPERCLASS_COST, paramTypeClass.cast(suppliedParam), classDistance(suppliedParamClass, paramTypeClass));
         }
 
         // Any java value to String
@@ -344,6 +361,20 @@ public class MethodOverloadResolver {
         return null;
     }
 
+    private static int classDistance(Class<?> subClass, Class<?> superClass) {
+        
+        int distance = 0;
+        
+        if (superClass.isAssignableFrom(subClass)) {
+            while (!subClass.equals(superClass)) {
+                subClass = subClass.getSuperclass();
+                distance++;
+            }
+        }
+        
+        return distance;
+    }
+    
     private static WeightedCast getArrayToArrayCastWeightedCost(Object suppliedArray,
             Class<?> paramTypeClass) {
 

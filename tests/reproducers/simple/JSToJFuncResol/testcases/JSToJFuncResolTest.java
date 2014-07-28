@@ -118,7 +118,6 @@ public class JSToJFuncResolTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    @KnownToFail
     public void AppletJSToJFuncResol_inheritedClassToParent1_Test() throws Exception {
         jsToJavaFuncResolTest("inheritedClassToParent1", "applet.getNewOverloadTestHelper3()", "inheritedClassToParent1(OverloadTestHelper2) with JSToJFuncResol$OverloadTestHelper3@");
     }
