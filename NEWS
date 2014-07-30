@@ -13,9 +13,15 @@ New in release 1.6 (2014-XX-XX):
 * JDK 6 and older no longer supported
 * Added DE localisation
 * Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK deployment property to control scan of Manifest file 
+* Control Panel
+  - PR1856: ControlPanel UI improvement for lower resolutions (800*600)
+* NetX
+  - PR1858: Java Console accepts multi-byte encodings
+  - PR1859: Java Console UI improvement for lower resolutions (800*600)
 * Plugin
   - PR1743 - Intermittant deadlock in PluginRequestProcessor
   - RH1121549: coverity defects
+  - Resolves method overloading correctly with superclass heirarchy distance
 * PolicyEditor
   - codebases can be renamed in-place, copied, and pasted
   - codebase URLs can be copied to system clipboard
@@ -50,6 +56,9 @@ New in release 1.5 (2014-XX-XX):
   - PR1473 - javaws should not depend on name of local file
   - Redesigned About dialogue layout and contents
   - Console made aware of plugin messages
+  - PR1856: ControlPanel UI improvement for lower resolutions (800*600)
+  - PR1858: Java Console accepts multi-byte encodings
+  - PR1859: Java Console UI improvement for lower resolutions (800*600)
 * Plugin
   - PR854: Resizing an applet several times causes 100% CPU load
   - PR1271: icedtea-web does not handle 'javascript:'-protocol URLs
@@ -57,6 +66,7 @@ New in release 1.5 (2014-XX-XX):
   - Pipes moved into XDG_RUNTIME_DIR
   - Added debug to file
   - RH1010958: insecure temporary file use flaw in LiveConnect implementation
+  - Resolves method overloading correctly with superclass heirarchy distance
 * Common
   - PR1474: Can't get javaws to use SOCKS proxy
   - Man page for itweb-settings

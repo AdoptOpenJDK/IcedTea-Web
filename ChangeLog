@@ -1,3 +1,8 @@
+2014-07-30  Jie Kang  <jkang@redhat.com>
+
+	* NEWS: added mention of fixes to Java Console and itweb-settings UI as
+	well as fix to method overloading resolution
+
 2014-07-30  Andrew Azores  <aazores@redhat.com>
 
 	* NEWS: added mention of PolicyEditor mnemonics and accelerators overhaul,
