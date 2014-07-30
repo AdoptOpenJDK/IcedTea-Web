@@ -1,5 +1,11 @@
 2014-07-30  Andrew Azores  <aazores@redhat.com>
 
+	* NEWS: added mention of PolicyEditor mnemonics and accelerators overhaul,
+	PolicyEditor bug fix where "cancel" on the "save before exit" dialog would
+	exit without saving changes
+
+2014-07-30  Andrew Azores  <aazores@redhat.com>
+
 	* NEWS: added mention of RH1121549 fix
 
 2014-07-30  Andrew Azores  <aazores@redhat.com>
@@ -168,7 +174,7 @@
 2014-06-25  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
-	(setupLayout) use SwingUtilities.getWindowAncestor() rather than manually
+	(setupLayout): use SwingUtilities.getWindowAncestor() rather than manually
 	searching
 
 2014-06-24  Andrew Azores  <aazores@redhat.com>

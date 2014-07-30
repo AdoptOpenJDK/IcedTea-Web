@@ -23,6 +23,9 @@ New in release 1.6 (2014-XX-XX):
   - codebases without permissions assigned save to file anyway (and re-appear on next open)
   - PR1776: NullPointer on save-and-exit
   - PR1850: duplicate codebases when launching from security dialogs
+  - Fixed bug where clicking "Cancel" on the "Save before Exiting" dialog could result in the editor
+    exiting without saving changes
+  - Keyboard accelerators and mnemonics greatly improved
 * Temporary Permissions in security dialog now multi-selectable and based on PolicyEditor permissions
 
 New in release 1.5 (2014-XX-XX):
