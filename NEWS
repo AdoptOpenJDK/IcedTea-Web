@@ -15,6 +15,7 @@ New in release 1.6 (2014-XX-XX):
 * Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK deployment property to control scan of Manifest file 
 * Plugin
   - PR1743 - Intermittant deadlock in PluginRequestProcessor
+  - RH1121549: coverity defects
 * PolicyEditor
   - codebases can be renamed in-place, copied, and pasted
   - codebase URLs can be copied to system clipboard

@@ -1,5 +1,9 @@
 2014-07-30  Andrew Azores  <aazores@redhat.com>
 
+	* NEWS: added mention of RH1121549 fix
+
+2014-07-30  Andrew Azores  <aazores@redhat.com>
+
 	Fixes for coverity issues discovered in RH1121549
 	* plugin/icedteanp/IcedTeaNPPlugin.cc (ITNP_New): print error message and
 	return error if JVM fails to start.
