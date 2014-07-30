@@ -18,34 +18,35 @@
 	satisfy file_exists
 
 2014-07-28  Jie Kang  <jkang@redhat.com>
-    Fixed TeeOutputStream to accept multi-byte encodings.
-    * netx/net/sourceforge/jnlp/util/logging/TeeOutputStream.java: Now uses
-    ByteArrayOutputStream instead of StringBuffer
-    * tests/netx/unit/net/sourceforge/jnlp/util/logging/TeeOutputStreamTest.java:
+	
+	Fixed TeeOutputStream to accept multi-byte encodings.
+	* netx/net/sourceforge/jnlp/util/logging/TeeOutputStream.java: Now uses
+	ByteArrayOutputStream instead of StringBuffer
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/TeeOutputStreamTest.java:
 
 2014-07-28  Jie Kang  <jkang@redhat.com>
 
-    Made adjustments to the MethodOverloadResolver to follow LiveConnect
-    specification when dealing with superclasses.
-    * tests/reproducers/simple/JSToJFuncResol/testcases/JSToJFuncResolTest.java:
-    Removed Known to Fail annotation on test case that is now fixed.
-    * plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java
-    Added distance calculation for comparing superclass resolutions.
+	Made adjustments to the MethodOverloadResolver to follow LiveConnect
+	specification when dealing with superclasses.
+	* tests/reproducers/simple/JSToJFuncResol/testcases/JSToJFuncResolTest.java:
+	Removed Known to Fail annotation on test case that is now fixed.
+	* plugin/icedteanp/java/sun/applet/MethodOverloadResolver.java
+	Added distance calculation for comparing superclass resolutions.
 
 2014-07-28  Jie Kang  <jkang@redhat.com>
 
-    Fix to Java ConsoleOutputPane for lower resolutions. Addresses bug
-    PR1859 where part of the pane is hidden and unnaccessible when
-    clicking "Show Details".
-    * netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java:
+	Fix to Java ConsoleOutputPane for lower resolutions. Addresses bug
+	PR1859 where part of the pane is hidden and unnaccessible when
+	clicking "Show Details".
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java:
 
 2014-07-28  Jie Kang  <jkang@redhat.com>
 
-    Fix to Control Panel UI for lower resolutions. Addresses bug
-    PR1856 where part of the dialog is hidden and unaccessible
-    on lower resolutions such as 800 x 600.
-    * netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:
-    * netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	Fix to Control Panel UI for lower resolutions. Addresses bug
+	PR1856 where part of the dialog is hidden and unaccessible
+	on lower resolutions such as 800 x 600.
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
 
 2014-07-22  Fridrich Strba  <fridrich.strba@suse.com>
 
