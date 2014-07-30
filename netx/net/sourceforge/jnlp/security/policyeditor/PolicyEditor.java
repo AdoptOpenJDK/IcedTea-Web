@@ -185,7 +185,8 @@ public class PolicyEditor extends JPanel {
 
     private final ActionListener okButtonAction, addCodebaseButtonAction,
             removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
-            renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction, copyCodebaseToClipboardButtonAction;
+            renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction, copyCodebaseToClipboardButtonAction,
+            policyEditorHelpButtonAction, aboutPolicyEditorButtonAction;
     private ActionListener closeButtonAction;
 
     private static class JCheckBoxWithGroup extends JCheckBox {
@@ -396,6 +397,20 @@ public class PolicyEditor extends JPanel {
                         }
                     }
                 });
+            }
+        };
+
+        policyEditorHelpButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                new PolicyEditorAboutDialog(R("PEHelpDialogTitle"), R("PEHelpDialogContent")).setVisible(true);
+            }
+        };
+
+        aboutPolicyEditorButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                new PolicyEditorAboutDialog(R("PEAboutDialogTitle"), R("PEAboutDialogContent")).setVisible(true);
             }
         };
 
@@ -951,6 +966,21 @@ public class PolicyEditor extends JPanel {
         viewMenu.add(customPermissionsItem);
         menuBar.add(viewMenu);
 
+        final JMenu helpMenu = new JMenu(R("PEHelpMenu"));
+        setButtonMnemonic(helpMenu, R("PEHelpMenuMnemonic"));
+
+        final JMenuItem aboutPolicyEditorItem = new JMenuItem(R("PEAboutPolicyEditorItem"));
+        setButtonMnemonic(aboutPolicyEditorItem, R("PEAboutPolicyEditorItemMnemonic"));
+        aboutPolicyEditorItem.addActionListener(editor.aboutPolicyEditorButtonAction);
+        helpMenu.add(aboutPolicyEditorItem);
+
+        final JMenuItem policyEditorHelpItem = new JMenuItem(R("PEPolicyEditorHelpItem"));
+        setButtonMnemonic(policyEditorHelpItem, R("PEPolicyEditorHelpItemMnemonic"));
+        policyEditorHelpItem.addActionListener(editor.policyEditorHelpButtonAction);
+        helpMenu.addSeparator();
+        helpMenu.add(policyEditorHelpItem);
+
+        menuBar.add(helpMenu);
         /*
          * JList has default Ctrl-C and Ctrl-V bindings, which we want to override with custom actions
          */

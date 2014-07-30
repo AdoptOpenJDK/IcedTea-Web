@@ -1,3 +1,21 @@
+2014-07-30  Andrew Azores  <aazores@redhat.com>
+            Lukasz Dracz  <ldracz@redhat.com>
+
+    * netx/net/sourceforge/jnlp/resources/Messages.properties
+    (PEHelpMenu, PEAboutPolicyEditorItem, PEPolicyEditorHelpItem,
+    PEAboutDialogTitle, PEAboutDialogContent, PEHelpDialogTitle,
+    PEHelpDialogContent, PEHelpMenuMnemonic, PEAboutPolicyEditorItemMnemonic,
+    PEPolicyEditorHelpItemMnemonic, PEAboutPolicyEditorCloseAccelerator):added
+    * netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+    (policyEditorHelpButtonAction, aboutPolicyEditorButtonAction): added and used
+    to open dialogs
+    (helpMenu, aboutPolicyEditorItem, policyEditorHelpItem): added
+    * netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorAboutDialog.java
+    Implements a frame that uses a textpane which takes html within a scrollpane
+    to show dialogs in.
+    (close, setupLayout): added
+    (CloseKeyListener): added class
+
 2014-07-30  Jie Kang  <jkang@redhat.com>
 
 	* NEWS: added mention of fixes to Java Console and itweb-settings UI as
