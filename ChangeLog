@@ -1,3 +1,22 @@
+2014-07-30  Andrew Azores  <aazores@redhat.com>
+
+	Fixes for coverity issues discovered in RH1121549
+	* plugin/icedteanp/IcedTeaNPPlugin.cc (ITNP_New): print error message and
+	return error if JVM fails to start.
+	(NP_Initialize): fix missing argument to PLUGIN_ERROR when unable to
+	create data directory
+	* plugin/icedteanp/IcedTeaParseProperties.cc (get_log_dir): refactored to
+	reduce duplicate code, use IcedTeaPluginUtils.create_dir, and enhanced
+	warning messages
+	* plugin/icedteanp/IcedTeaPluginUtils.cc (create_dir, is_directory): new
+	functions
+	* plugin/icedteanp/IcedTeaPluginUtils.h: same
+	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc (setProperty): do not
+	erroneously redeclare java_result
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: (is_directory,
+	create_dir) new tests. (file_exists) added assertion that directories
+	satisfy file_exists
+
 2014-07-28  Jie Kang  <jkang@redhat.com>
     Fixed TeeOutputStream to accept multi-byte encodings.
     * netx/net/sourceforge/jnlp/util/logging/TeeOutputStream.java: Now uses

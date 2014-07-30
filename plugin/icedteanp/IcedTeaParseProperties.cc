@@ -123,39 +123,30 @@ string  user_properties_file(){
 	return string(mypasswd->pw_dir)+"/.config/icedtea-web/"+default_file_ITW_deploy_props_name;
 }
 
-string  get_log_dir(){
+string get_log_dir(){
 	string value;
 	if (!read_deploy_property_value("deployment.user.logdir", value)) {
-		int myuid = getuid();
-		struct passwd *mypasswd = getpwuid(myuid);
-		// try pre 1.5  file location
+		string config_dir;
 		if (getenv ("XDG_CONFIG_HOME") != NULL){
-			string r1= string(getenv ("XDG_CONFIG_HOME"))+"/icedtea-web";
-			string r2 = r1+"/"+default_itw_log_dir_name;
-			if (!IcedTeaPluginUtilities::file_exists(r1)){
-				g_mkdir(r1.c_str(), 755);
-			}
-			if (!IcedTeaPluginUtilities::file_exists(r2)){
-				g_mkdir(r2.c_str(), 755);
-			}
-			return r2;
+			config_dir = string(getenv("XDG_CONFIG_HOME"));
+		} else {
+			int myuid = getuid();
+			struct passwd *mypasswd = getpwuid(myuid);
+			config_dir = string(mypasswd->pw_dir) + "/.config";
 		}
-		//if not then use default
-		string r1 = string(mypasswd->pw_dir)+"/.config/icedtea-web";
-		string r2 = r1+"/"+default_itw_log_dir_name;
-		if (!IcedTeaPluginUtilities::file_exists(r1)){
-			g_mkdir(r1.c_str(), 755);
+		string itw_dir = config_dir+"/icedtea-web";
+		string log_dir = itw_dir+"/"+default_itw_log_dir_name;
+		bool created_config = IcedTeaPluginUtilities::create_dir(itw_dir);
+		bool created_log = IcedTeaPluginUtilities::create_dir(log_dir);
+		if (!created_config || !created_log){
+			PLUGIN_ERROR("IcedTea-Web log directory creation failed. IcedTea-Web may fail to work!");
 		}
-		if (!IcedTeaPluginUtilities::file_exists(r2)){
-			g_mkdir(r2.c_str(), 755);
-		}
-		return r2;
+		return log_dir;
 	}
 	return value;
 }
 
-
-string  main_properties_file(){
+string main_properties_file(){
 	return "/etc/.java/deployment/"+default_file_ITW_deploy_props_name;
 }
 

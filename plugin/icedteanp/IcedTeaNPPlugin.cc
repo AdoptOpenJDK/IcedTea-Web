@@ -375,6 +375,10 @@ ITNP_New (NPMIMEType pluginType, NPP instance, uint16_t mode,
 
   // start the jvm if needed
    NPError startup_error = start_jvm_if_needed();
+   if (startup_error != NPERR_NO_ERROR) {
+	   PLUGIN_ERROR ("Failed to start JVM\n");
+	   return startup_error;
+   }
 
   // Initialize data->instance_id.
   //
@@ -2027,7 +2031,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
   NPError np_error =  initialize_data_directory();
   if (np_error != NPERR_NO_ERROR)
     {
-      PLUGIN_ERROR("Unable create data directory %s\n");
+      PLUGIN_ERROR("Unable to create data directory %s\n", data_directory.c_str());
       return np_error;
     }
     

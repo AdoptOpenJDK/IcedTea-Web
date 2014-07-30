@@ -135,6 +135,72 @@ TEST(file_exists) {
 	remove(f1.c_str());
 	bool b = IcedTeaPluginUtilities::file_exists(f1);
 	CHECK_EQUAL(b, false);
+
+	std::string dir = tmpnam(NULL);
+	const int PERMISSIONS_MASK = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH; // 0755
+	bool created_dir = g_mkdir(dir.c_str(), PERMISSIONS_MASK);
+	CHECK_EQUAL(created_dir, false);
+	CHECK_EQUAL(IcedTeaPluginUtilities::file_exists(dir), true);
+}
+
+
+TEST(is_directory) {
+	std::string n = tmpnam(NULL);
+	bool no_file = IcedTeaPluginUtilities::is_directory(n);
+	CHECK_EQUAL(no_file, false);
+
+	std::string f = temporary_file("dummy content");
+	bool is_directory = IcedTeaPluginUtilities::is_directory(f);
+	CHECK_EQUAL(is_directory, false);
+
+	std::string d = tmpnam(NULL);
+	const int PERMISSIONS_MASK = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH; // 0755
+	bool created_test_dir = g_mkdir(d.c_str(), PERMISSIONS_MASK);
+	CHECK_EQUAL(created_test_dir, false);
+	bool is_directory2 = IcedTeaPluginUtilities::is_directory(d);
+	CHECK_EQUAL(is_directory2, true);
+}
+
+
+TEST(create_dir) {
+	FILE* old1 = stdout;
+	FILE* old2 = stderr;
+	char* buf1 = " 	                         ";
+	char* buf2 = "                           ";
+	stdout = fmemopen (buf1, strlen (buf1), "rw");
+	stderr = fmemopen (buf2, strlen (buf2), "rw");
+
+	std::string f1 = tmpnam(NULL);
+	bool res1 = IcedTeaPluginUtilities::create_dir(f1);
+	CHECK_EQUAL(res1, true);
+	CHECK_EQUAL(IcedTeaPluginUtilities::is_directory(f1), true);
+
+	std::string f2 = temporary_file("dummy content");
+	bool res2 = IcedTeaPluginUtilities::create_dir(f2);
+	CHECK_EQUAL(res2, false);
+	CHECK_EQUAL(IcedTeaPluginUtilities::is_directory(f2), false);
+
+	std::string f3 = tmpnam(NULL);
+	const int PERMISSIONS_MASK = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH; // 0755
+	bool created_test_dir = g_mkdir(f3.c_str(), PERMISSIONS_MASK);
+	CHECK_EQUAL(created_test_dir, false);
+	bool res3 = IcedTeaPluginUtilities::create_dir(f3);
+	CHECK_EQUAL(res3, true);
+	CHECK_EQUAL(IcedTeaPluginUtilities::is_directory(f3), true);
+
+	std::string f4 = tmpnam(NULL);
+	const int READONLY_PERMISSIONS_MASK = S_IRUSR | S_IRGRP | S_IROTH; // 0444
+	bool created_test_dir2 = g_mkdir(f4.c_str(), READONLY_PERMISSIONS_MASK);
+	CHECK_EQUAL(created_test_dir2, false);
+	std::string subdir = f4 + "/test";
+	bool res4 = IcedTeaPluginUtilities::create_dir(subdir);
+	CHECK_EQUAL(res4, false);
+	CHECK_EQUAL(IcedTeaPluginUtilities::is_directory(subdir), false);
+
+	fclose(stdout);
+	fclose(stderr);
+	stdout = old1;
+	stderr = old2;
 }
 
 

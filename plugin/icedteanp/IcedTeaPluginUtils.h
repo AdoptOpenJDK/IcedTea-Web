@@ -49,6 +49,7 @@ exception statement from your version. */
 #include <time.h>
 #include <syslog.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 
 #include <fcntl.h>
 #include <cstring>
@@ -430,12 +431,14 @@ class IcedTeaPluginUtilities
         /*cutting whitespaces from end and start of string*/
         static void trim(std::string& str);
         static bool file_exists(std::string filename);
+        static bool is_directory(std::string filename);
         //file-loggers helpers
         static std::string generateLogFileName();
         static void initFileLog();
         static void printDebugStatus();
         static std::string getTmpPath();
         static std::string getRuntimePath();
+        static bool create_dir(std::string);
 };
 
 /*

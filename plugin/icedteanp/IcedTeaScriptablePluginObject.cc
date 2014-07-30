@@ -704,7 +704,7 @@ IcedTeaScriptableJavaObject::setProperty(NPObject *npobj, NPIdentifier name_id, 
                     browser_functions.intfromidentifier(name_id) >= 0) // else if array and requesting index
         {
 
-            JavaResultData* java_result = java_request.getArrayLength(instance_id);
+            java_result = java_request.getArrayLength(instance_id);
             if (java_result->error_occurred)
             {
                 PLUGIN_ERROR("ERROR: Couldn't fetch array length\n");
