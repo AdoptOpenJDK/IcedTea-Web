@@ -46,9 +46,9 @@
 	* plugin/icedteanp/IcedTeaPluginUtils.h: same
 	* plugin/icedteanp/IcedTeaScriptablePluginObject.cc (setProperty): do not
 	erroneously redeclare java_result
-	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: (is_directory,
-	create_dir) new tests. (file_exists) added assertion that directories
-	satisfy file_exists
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc
+	(is_directory, create_dir): new tests.
+	(file_exists): added assertion that directories satisfy file_exists
 
 2014-07-28  Jie Kang  <jkang@redhat.com>
 	
