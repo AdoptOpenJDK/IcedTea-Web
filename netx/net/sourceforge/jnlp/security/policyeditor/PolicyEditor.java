@@ -184,7 +184,7 @@ public class PolicyEditor extends JPanel {
     private Set<CustomPermission> customPermissionsClipboard = null;
 
     private final ActionListener okButtonAction, addCodebaseButtonAction,
-            removeCodebaseButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
+            removeCodebaseButtonAction, newButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
             renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction, copyCodebaseToClipboardButtonAction,
             policyEditorHelpButtonAction, aboutPolicyEditorButtonAction;
     private ActionListener closeButtonAction;
@@ -238,12 +238,9 @@ public class PolicyEditor extends JPanel {
             checkboxMap.put(perm, box);
         }
 
+        setFile(filepath);
         if (filepath != null) {
-            policyEditorController.setFile(new File(filepath));
             openAndParsePolicyFile();
-        } else {
-            resetCodebases();
-            addNewCodebase("");
         }
         setChangesMade(false);
 
@@ -256,7 +253,7 @@ public class PolicyEditor extends JPanel {
                 if (policyEditorController.getFile() == null) {
                     final int choice = fileChooser.showOpenDialog(PolicyEditor.this);
                     if (choice == JFileChooser.APPROVE_OPTION) {
-                        policyEditorController.setFile(fileChooser.getSelectedFile());
+                        PolicyEditor.this.setFile(fileChooser.getSelectedFile().getAbsolutePath());
                     }
                 }
 
@@ -287,28 +284,22 @@ public class PolicyEditor extends JPanel {
         removeCodebaseButton.setText(R("PERemoveCodebase"));
         removeCodebaseButton.addActionListener(removeCodebaseButtonAction);
 
+        newButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (!promptOnSaveChangesMade(false)) return;
+                setFile(null);
+                setChangesMade(false);
+            }
+        };
+
         openButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                if (policyEditorController.changesMade()) {
-                    final int save = JOptionPane.showConfirmDialog(PolicyEditor.this, R("PESaveChanges"));
-                    if (save == JOptionPane.YES_OPTION) {
-                        if (policyEditorController.getFile() == null) {
-                            final int choice = fileChooser.showSaveDialog(PolicyEditor.this);
-                            if (choice == JFileChooser.APPROVE_OPTION) {
-                                policyEditorController.setFile(fileChooser.getSelectedFile());
-                            } else if (choice == JFileChooser.CANCEL_OPTION) {
-                                return;
-                            }
-                        }
-                        savePolicyFile();
-                    } else if (save == JOptionPane.CANCEL_OPTION) {
-                        return;
-                    }
-                }
+                if (!promptOnSaveChangesMade(true)) return;
                 final int choice = fileChooser.showOpenDialog(PolicyEditor.this);
                 if (choice == JFileChooser.APPROVE_OPTION) {
-                    policyEditorController.setFile(fileChooser.getSelectedFile());
+                    PolicyEditor.this.setFile(fileChooser.getSelectedFile().getAbsolutePath());
                     openAndParsePolicyFile();
                 }
             }
@@ -319,7 +310,7 @@ public class PolicyEditor extends JPanel {
             public void actionPerformed(final ActionEvent e) {
                 final int choice = fileChooser.showSaveDialog(PolicyEditor.this);
                 if (choice == JFileChooser.APPROVE_OPTION) {
-                    policyEditorController.setFile(fileChooser.getSelectedFile());
+                    PolicyEditor.this.setFile(fileChooser.getSelectedFile().getAbsolutePath());
                     setChangesMade(true);
                     savePolicyFile();
                 }
@@ -427,6 +418,88 @@ public class PolicyEditor extends JPanel {
         closeButton.addActionListener(closeButtonAction);
 
         setupLayout();
+    }
+
+    /**
+     *
+     * @param async use asynchronous saving, which displays a progress dialog, or use synchronous, which blocks the
+     *              EDT but allows for eg the on-disk file to be changed without resorting to a busy-wait loop
+     * @return false iff the user wishes to cancel the operation and keep the current editor state
+     */
+    private boolean promptOnSaveChangesMade(final boolean async) {
+        if (policyEditorController.changesMade()) {
+            final int save = JOptionPane.showConfirmDialog(this, R("PESaveChanges"));
+            if (save == JOptionPane.YES_OPTION) {
+                if (policyEditorController.getFile() == null) {
+                    final int choice = fileChooser.showSaveDialog(this);
+                    if (choice == JFileChooser.APPROVE_OPTION) {
+                        this.setFile(fileChooser.getSelectedFile().getAbsolutePath());
+                    } else if (choice == JFileChooser.CANCEL_OPTION) {
+                        return false;
+                    }
+                }
+                if (async) {
+                    savePolicyFile();
+                } else {
+                    try {
+                        policyEditorController.savePolicyFile();
+                    } catch (final IOException e) {
+                        showCouldNotSaveDialog();
+                    }
+                }
+            } else if (save == JOptionPane.CANCEL_OPTION) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void setFile(final String filepath) {
+        if (filepath != null) {
+            policyEditorController.setFile(new File(filepath));
+        } else {
+            policyEditorController.setFile(null);
+            resetCodebases();
+            addNewCodebase("");
+        }
+        setParentWindowTitle(getWindowTitleForStatus());
+    }
+
+    private void setParentWindowTitle(final String title) {
+        invokeRunnableOrEnqueueLater(new Runnable() {
+            @Override
+            public void run() {
+                final Window parent = SwingUtilities.getWindowAncestor(PolicyEditor.this);
+                if (!(parent instanceof PolicyEditorWindow)) {
+                    return;
+                }
+                final PolicyEditorWindow window = (PolicyEditorWindow) parent;
+                window.setTitle(title);
+            }
+        });
+    }
+
+    private String getWindowTitleForStatus() {
+        final String filepath;
+        final File file = getFile();
+        if (file != null) {
+            filepath = file.getPath();
+        } else {
+            filepath = null;
+        }
+        final String titleAndPath;
+        if (filepath != null) {
+            titleAndPath = R("PETitleWithPath", filepath);
+        } else {
+            titleAndPath = R("PETitle");
+        }
+        final String result;
+        if (policyEditorController.changesMade()) {
+            result = R("PETitleWithChangesMade", titleAndPath);
+        } else {
+            result = titleAndPath;
+        }
+        return result;
     }
 
     private String getSelectedCodebase() {
@@ -544,7 +617,7 @@ public class PolicyEditor extends JPanel {
                 if (editor.policyEditorController.getFile() == null) {
                     final int choice = editor.fileChooser.showSaveDialog(window);
                     if (choice == JFileChooser.APPROVE_OPTION) {
-                        editor.policyEditorController.setFile(editor.fileChooser.getSelectedFile());
+                        editor.setFile(editor.fileChooser.getSelectedFile().getAbsolutePath());
                     } else if (choice == JFileChooser.CANCEL_OPTION) {
                         return;
                     }
@@ -681,6 +754,11 @@ public class PolicyEditor extends JPanel {
         return true;
     }
 
+
+    public File getFile() {
+        return policyEditorController.getFile();
+    }
+
     /**
      * Display an input dialog, which will disappear when the user enters a valid URL
      * or when the user presses cancel. If an invalid URL is entered, the dialog reappears.
@@ -724,6 +802,7 @@ public class PolicyEditor extends JPanel {
                 list.setSelectedIndex(fIndex);
             }
         });
+        setChangesMade(true);
     }
 
     /**
@@ -887,6 +966,12 @@ public class PolicyEditor extends JPanel {
 
         final JMenu fileMenu = new JMenu(R("PEFileMenu"));
         setButtonMnemonic(fileMenu, R("PEFileMenuMnemonic"));
+
+        final JMenuItem newItem = new JMenuItem(R("PENewMenuItem"));
+        setButtonMnemonic(newItem, R("PENewMenuItemMnemonic"));
+        setMenuItemAccelerator(newItem, R("PENewMenuItemAccelerator"));
+        newItem.addActionListener(editor.newButtonAction);
+        fileMenu.add(newItem);
 
         final JMenuItem openItem = new JMenuItem(R("PEOpenMenuItem"));
         setButtonMnemonic(openItem, R("PEOpenMenuItemMnemonic"));
@@ -1189,6 +1274,12 @@ public class PolicyEditor extends JPanel {
 
     void setChangesMade(final boolean b) {
         policyEditorController.setChangesMade(b);
+        invokeRunnableOrEnqueueLater(new Runnable() {
+            @Override
+            public void run() {
+                setParentWindowTitle(getWindowTitleForStatus());
+            }
+        });
     }
 
     private void resetCodebases() {
@@ -1263,6 +1354,7 @@ public class PolicyEditor extends JPanel {
                 addNewCodebase("");
                 progressIndicator.setVisible(false);
                 progressIndicator.dispose();
+                setChangesMade(false);
             }
         };
         openPolicyFileWorker.execute();
@@ -1313,6 +1405,7 @@ public class PolicyEditor extends JPanel {
                 showChangesSavedDialog();
                 progressIndicator.setVisible(false);
                 progressIndicator.dispose();
+                setChangesMade(false);
             }
         };
         savePolicyFileWorker.execute();

@@ -81,7 +81,6 @@ public class PolicyFileModel {
     }
 
     void setFile(final File file) {
-        Objects.requireNonNull(file);
         this.file = file;
     }
 
@@ -196,9 +195,7 @@ public class PolicyFileModel {
         }
 
         FileUtils.saveFile(sb.toString(), file);
-        if (fileWatcher == null) {
-            fileWatcher = new MD5SumWatcher(file);
-        }
+        fileWatcher = new MD5SumWatcher(file);
         fileWatcher.update();
     }
 

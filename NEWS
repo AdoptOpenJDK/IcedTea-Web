@@ -32,6 +32,7 @@ New in release 1.6 (2014-XX-XX):
   - Fixed bug where clicking "Cancel" on the "Save before Exiting" dialog could result in the editor
     exiting without saving changes
   - Keyboard accelerators and mnemonics greatly improved
+  - "File - New" allows editing a new policy without first selecting the file to save to
 * Temporary Permissions in security dialog now multi-selectable and based on PolicyEditor permissions
 
 New in release 1.5 (2014-XX-XX):

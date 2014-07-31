@@ -162,19 +162,19 @@ public class PolicyEditorController {
             OutputController.getLogger().log(e);
         }
 
-        performingIO = true;
+        setPerformingIO(true);
         policyFile.openAndParsePolicyFile();
 
         setChangesMade(false);
-        performingIO = false;
+        setPerformingIO(false);
     }
 
     public void savePolicyFile() throws FileNotFoundException, IOException {
-        performingIO = true;
+        setPerformingIO(true);
         policyFile.savePolicyFile();
 
         setChangesMade(false);
-        performingIO = false;
+        setPerformingIO(false);
     }
 
 }

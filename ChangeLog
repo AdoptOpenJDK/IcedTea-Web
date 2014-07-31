@@ -1,3 +1,35 @@
+2014-07-31  Andrew Azores  <aazores@redhat.com>
+
+	Added "File - New" action to PolicyEditor
+	* netx/net/sourceforge/jnlp/resources/Messages.properties (PETitle):
+	PolicyEditor, not Policy Editor.
+	(PETitleWithPath): new message used for PolicyEditor window title bar
+	(PETitleWithChangesMade): same
+	(PENewMenuItem): new message
+	(PEAddCodebaseItem): added ellipsis
+	(PEPasteCodebaseItem): same
+	(PENewMenuItemMnemonic): new message
+	(PEAddCodebaseItemAccelerator): C-S-n rather than just C-n
+	(PENewMenuItemAccelerator): new message, C-n
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: added
+	"New" item to "File" menu.
+	(setFile): new method.
+	(newButtonAction): new field
+	(openButtonAction): "save changes made" dialog extracted into new method
+	(promptOnSaveChangesMade): new method
+	(setParentWindowTitle): new method
+	(getWindowTitleForStatus): new method
+	(getFile): new method
+	(createMenuBar): added New item to File menu
+	(removeCodebase): add setChangesMade call
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorController.java
+	(openAndParsePolicyFile): use setPerformingIO rather than direct access
+	(savePolicyFile): same
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyFileModel.java
+	(setFile): allow null file to facilitate "new file" without a location set
+	(saveFile): set new fileWatcher every time, not only if file was
+	previously null
+
 2014-07-30  Andrew Azores  <aazores@redhat.com>
 			Lukasz Dracz  <ldracz@redhat.com>
 
