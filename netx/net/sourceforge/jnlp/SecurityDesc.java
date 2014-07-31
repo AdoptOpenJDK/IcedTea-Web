@@ -16,11 +16,20 @@
 
 package net.sourceforge.jnlp;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.security.*;
 import java.awt.AWTPermission;
+import java.io.FilePermission;
+import java.lang.reflect.Constructor;
+import java.net.SocketPermission;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.AllPermission;
+import java.security.CodeSource;
+import java.security.Permission;
+import java.security.PermissionCollection;
+import java.security.Permissions;
+import java.security.Policy;
+import java.security.URIParameter;
+import java.util.*;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -129,9 +138,33 @@ public class SecurityDesc {
     private final boolean grantAwtPermissions;
 
     /** the JNLP file */
-    private JNLPFile file;
+    private final JNLPFile file;
 
     private final Policy customTrustedPolicy;
+
+    /**
+     * URLPermission is new in Java 8, so we use reflection to check for it to keep compatibility
+     * with Java 6/7. If we can't find the class or fail to construct it then we continue as usual
+     * without.
+     * 
+     * These are saved as fields so that the reflective lookup only needs to be performed once
+     * when the SecurityDesc is constructed, rather than every time a call is made to
+     * {@link SecurityDesc#getSandBoxPermissions()}, which is called frequently.
+     */
+    private static Class<Permission> urlPermissionClass = null;
+    private static Constructor<Permission> urlPermissionConstructor = null;
+
+    static {
+        try {
+            urlPermissionClass = (Class<Permission>) Class.forName("java.net.URLPermission");
+            urlPermissionConstructor = urlPermissionClass.getDeclaredConstructor(new Class[] { String.class });
+        } catch (final ReflectiveOperationException | SecurityException e) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while reflectively finding URLPermission - host is probably not running Java 8+");
+            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
+            urlPermissionClass = null;
+            urlPermissionConstructor = null;
+        }
+    }
 
     // We go by the rules here:
     // http://java.sun.com/docs/books/tutorial/deployment/doingMoreWithRIA/properties.html
@@ -321,8 +354,7 @@ public class SecurityDesc {
      * Returns a PermissionCollection containing the sandbox permissions
      */
     public PermissionCollection getSandBoxPermissions() {
-
-        Permissions permissions = new Permissions();
+        final Permissions permissions = new Permissions();
 
         for (int i = 0; i < sandboxPermissions.length; i++)
             permissions.add(sandboxPermissions[i]);
@@ -345,9 +377,99 @@ public class SecurityDesc {
             permissions.add(new SocketPermission(downloadHost,
                                                  "connect, accept"));
 
+        final Collection<Permission> urlPermissions = getUrlPermissions();
+        for (final Permission permission : urlPermissions) {
+            permissions.add(permission);
+        }
+
         return permissions;
     }
-    
+
+    private Set<Permission> getUrlPermissions() {
+        if (urlPermissionClass == null || urlPermissionConstructor == null) {
+            return Collections.emptySet();
+        }
+        final Set<Permission> permissions = new HashSet<>();
+        for (final JARDesc jar : file.getResources().getJARs()) {
+            try {
+                // Allow applets all HTTP methods (ex POST, GET) with any request headers
+                // on resources anywhere recursively in or below the applet codebase, only on
+                // default ports and ports explicitly specified in resource locations
+                final URI resourceLocation = jar.getLocation().toURI().normalize();
+                final URI host = getHost(resourceLocation);
+                final String hostUriString = host.toString();
+                final String urlPermissionUrlString = appendRecursiveSubdirToCodebaseHostString(hostUriString);
+                final Permission p = urlPermissionConstructor.newInstance(urlPermissionUrlString);
+                permissions.add(p);
+            } catch (final ReflectiveOperationException e) {
+                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?");
+                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
+            } catch (final URISyntaxException e) {
+                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not determine codebase host for resource at " + jar.getLocation() +  " while generating URLPermissions");
+                OutputController.getLogger().log(e);
+            }
+        }
+        try {
+            final URI codebase = file.getCodeBase().toURI().normalize();
+            final URI host = getHost(codebase);
+            final String codebaseHostUriString = host.toString();
+            final String urlPermissionUrlString = appendRecursiveSubdirToCodebaseHostString(codebaseHostUriString);
+            final Permission p = urlPermissionConstructor.newInstance(urlPermissionUrlString);
+            permissions.add(p);
+        } catch (final ReflectiveOperationException e) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?");
+            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
+        } catch (final URISyntaxException e) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not determine codebase host for codebase " + file.getCodeBase() +  "  while generating URLPermissions");
+            OutputController.getLogger().log(e);
+        }
+        return permissions;
+    }
+
+    /**
+     * Gets the host domain part of an applet's codebase. Removes path, query, and fragment, but preserves scheme,
+     * user info, and host. The port used is overridden with the specified port.
+     * @param codebase the applet codebase URL
+     * @param port
+     * @return the host domain of the codebase
+     * @throws URISyntaxException
+     */
+    static URI getHostWithSpecifiedPort(final URI codebase, final int port) throws URISyntaxException {
+        Objects.requireNonNull(codebase);
+        return new URI(codebase.getScheme(), codebase.getUserInfo(), codebase.getHost(), port, null, null, null);
+    }
+
+    /**
+     * Gets the host domain part of an applet's codebase. Removes path, query, and fragment, but preserves scheme,
+     * user info, host, and port.
+     * @param codebase the applet codebase URL
+     * @return the host domain of the codebase
+     * @throws URISyntaxException
+     */
+    static URI getHost(final URI codebase) throws URISyntaxException {
+        Objects.requireNonNull(codebase);
+        return getHostWithSpecifiedPort(codebase, codebase.getPort());
+    }
+
+    /**
+     * Appends a recursive access marker to a codebase host, for granting Java 8 URLPermissions which are no
+     * more restrictive than the existing SocketPermissions
+     * See http://docs.oracle.com/javase/8/docs/api/java/net/URLPermission.html
+     * @param codebaseHost the applet's codebase's host domain URL as a String. Expected to be formatted as eg
+     *                     "http://example.com:8080" or "http://example.com/"
+     * @return the resulting String eg "http://example.com:8080/-
+     */
+    static String appendRecursiveSubdirToCodebaseHostString(final String codebaseHost) {
+        Objects.requireNonNull(codebaseHost);
+        String result = codebaseHost;
+        while (result.endsWith("/")) {
+            result = result.substring(0, result.length() - 1);
+        }
+        // See http://docs.oracle.com/javase/8/docs/api/java/net/URLPermission.html
+        result = result + "/-"; // allow access to any resources recursively on the host domain
+        return result;
+    }
+
     /**
      * Returns all the names of the basic JNLP system properties accessible by RIAs
      */

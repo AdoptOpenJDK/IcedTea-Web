@@ -36,35 +36,173 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import java.net.URI;
 import net.sourceforge.jnlp.mock.DummyJNLPFile;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class SecurityDescTest {
 
     @Test
-    public void testNotNullJnlpFile() {
+    public void testNotNullJnlpFile() throws Exception {
         Throwable t = null;
         try {
-            SecurityDesc securityDesc = new SecurityDesc(new DummyJNLPFile(), SecurityDesc.SANDBOX_PERMISSIONS, "hey!");
+            new SecurityDesc(new DummyJNLPFile(), SecurityDesc.SANDBOX_PERMISSIONS, "hey!");
         } catch (Exception ex) {
             t = ex;
         }
-        Assert.assertNull("securityDesc should not throw exception", t);
+        assertNull("securityDesc should not throw exception", t);
+    }
 
-
+    @Test(expected = NullPointerException.class)
+    public void testNullJnlpFile() throws Exception {
+        new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, "hey!");
     }
 
     @Test
-    public void testNullJnlpFile() {
-        Exception ex = null;
-        try {
-            SecurityDesc securityDesc = new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, "hey!");
-        } catch (Exception eex) {
-            ex = eex;
-        }
-        Assert.assertNotNull("Exception should not be null", ex);
-        Assert.assertTrue("Exception should be " + NullJnlpFileException.class.getName(), ex instanceof NullJnlpFileException);
-
+    public void testAppendRecursiveSubdirToCodebaseHostString() throws Exception {
+        final String urlStr = "http://example.com";
+        final String result = SecurityDesc.appendRecursiveSubdirToCodebaseHostString(urlStr);
+        final String expected = "http://example.com/-";
+        assertEquals(expected, result);
     }
+
+    @Test
+    public void testAppendRecursiveSubdirToCodebaseHostString2() throws Exception {
+        final String urlStr = "http://example.com/";
+        final String result = SecurityDesc.appendRecursiveSubdirToCodebaseHostString(urlStr);
+        final String expected = "http://example.com/-";
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testAppendRecursiveSubdirToCodebaseHostString3() throws Exception {
+        final String urlStr = "http://example.com///";
+        final String result = SecurityDesc.appendRecursiveSubdirToCodebaseHostString(urlStr);
+        final String expected = "http://example.com/-";
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testAppendRecursiveSubdirToCodebaseHostStringWithPort() throws Exception {
+        final String urlStr = "http://example.com:8080";
+        final String result = SecurityDesc.appendRecursiveSubdirToCodebaseHostString(urlStr);
+        final String expected = "http://example.com:8080/-";
+        assertEquals(expected, result);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAppendRecursiveSubdirToCodebaseHostStringWithNull() throws Exception {
+        SecurityDesc.appendRecursiveSubdirToCodebaseHostString(null);
+    }
+
+    @Test
+    public void testGetHostWithSpecifiedPort() throws Exception {
+        final URI codebase = new URI("http://example.com");
+        final URI expected = new URI("http://example.com:80");
+        assertEquals(expected, SecurityDesc.getHostWithSpecifiedPort(codebase, 80));
+    }
+
+    @Test
+    public void testGetHostWithSpecifiedPortWithFtpScheme() throws Exception {
+        final URI codebase = new URI("ftp://example.com");
+        final URI expected = new URI("ftp://example.com:80");
+        assertEquals(expected, SecurityDesc.getHostWithSpecifiedPort(codebase, 80));
+    }
+
+    @Test
+    public void testGetHostWithSpecifiedPortWithUserInfo() throws Exception {
+        final URI codebase = new URI("http://user:password@example.com");
+        final URI expected = new URI("http://user:password@example.com:80");
+        assertEquals(expected, SecurityDesc.getHostWithSpecifiedPort(codebase, 80));
+    }
+
+    @Test
+    public void testGetHostWithSpecifiedPortWithPort() throws Exception {
+        final URI codebase = new URI("http://example.com:8080");
+        final URI expected = new URI("http://example.com:80");
+        assertEquals(expected, SecurityDesc.getHostWithSpecifiedPort(codebase, 80));
+    }
+
+    @Test
+    public void testGetHostWithSpecifiedPortWithPath() throws Exception {
+        final URI codebase = new URI("http://example.com/applet/codebase/");
+        final URI expected = new URI("http://example.com:80");
+        assertEquals(expected, SecurityDesc.getHostWithSpecifiedPort(codebase, 80));
+    }
+
+    @Test
+    public void testGetHostWithSpecifiedPortWithAll() throws Exception {
+        final URI codebase = new URI("ftp://user:password@example.com:8080/applet/codebase/");
+        final URI expected = new URI("ftp://user:password@example.com:80");
+        assertEquals(expected, SecurityDesc.getHostWithSpecifiedPort(codebase, 80));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testGetHostWithSpecifiedPortWithNull() throws Exception {
+        SecurityDesc.getHostWithSpecifiedPort(null, 80);
+    }
+
+    @Test
+    public void testGetHost() throws Exception {
+        final URI codebase = new URI("http://example.com");
+        final URI expected = new URI("http://example.com");
+        assertEquals(expected, SecurityDesc.getHost(codebase));
+    }
+
+    @Test
+    public void testGetHostWithFtpScheme() throws Exception {
+        final URI codebase = new URI("ftp://example.com");
+        final URI expected = new URI("ftp://example.com");
+        assertEquals(expected, SecurityDesc.getHost(codebase));
+    }
+
+    @Test
+    public void testGetHostWithUserInfo() throws Exception {
+        final URI codebase = new URI("http://user:password@example.com");
+        final URI expected = new URI("http://user:password@example.com");
+        assertEquals(expected, SecurityDesc.getHost(codebase));
+    }
+
+    @Test
+    public void testGetHostWithPort() throws Exception {
+        final URI codebase = new URI("http://example.com:8080");
+        final URI expected = new URI("http://example.com:8080");
+        assertEquals(expected, SecurityDesc.getHost(codebase));
+    }
+
+    @Test
+    public void testGetHostWithPath() throws Exception {
+        final URI codebase = new URI("http://example.com/applet/codebase/");
+        final URI expected = new URI("http://example.com");
+        assertEquals(expected, SecurityDesc.getHost(codebase));
+    }
+
+    @Test
+    public void testGetHostWithAll() throws Exception {
+        final URI codebase = new URI("ftp://user:password@example.com:8080/applet/codebase/");
+        final URI expected = new URI("ftp://user:password@example.com:8080");
+        assertEquals(expected, SecurityDesc.getHost(codebase));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testGetHostNull() throws Exception {
+        SecurityDesc.getHost(null);
+    }
+
+    @Test
+    public void testGetHostWithAppendRecursiveSubdirToCodebaseHostString() throws Exception {
+        final URI codebase = new URI("ftp://user:password@example.com:8080/applet/codebase/");
+        final String expected = "ftp://user:password@example.com:8080/-";
+        assertEquals(expected, SecurityDesc.appendRecursiveSubdirToCodebaseHostString(SecurityDesc.getHost(codebase).toString()));
+    }
+
+    @Test
+    public void testGetHostWithSpecifiedPortWithAppendRecursiveSubdirToCodebaseHostString() throws Exception {
+        final URI codebase = new URI("ftp://user:password@example.com:8080/applet/codebase/");
+        final String expected = "ftp://user:password@example.com:80/-";
+        assertEquals(expected, SecurityDesc.appendRecursiveSubdirToCodebaseHostString(SecurityDesc.getHostWithSpecifiedPort(codebase, 80).toString()));
+    }
+
 }

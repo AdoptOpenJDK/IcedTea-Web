@@ -11,6 +11,7 @@ CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 New in release 1.6 (2014-XX-XX):
 * Improved to be able to run with any JDK
 * JDK 6 and older no longer supported
+* JDK 8 support added (URLPermission granted if applicable)
 * Added DE localisation
 * Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK deployment property to control scan of Manifest file 
 * Control Panel

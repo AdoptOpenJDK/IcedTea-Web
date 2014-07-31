@@ -1,5 +1,37 @@
 2014-07-31  Andrew Azores  <aazores@redhat.com>
 
+	Add URLPermission support to SecurityDesc. This is essentially Java 8
+	support, as URLPermission is new to Java 8 and required for many applets
+	to continue working when a Java 8-compatible JVM is in use.
+	* netx/net/sourceforge/jnlp/SecurityDesc.java (urlPermissionClass,
+	urlPermissionConstructor): new static variables for storing references to
+	URLPermission, if available, for reflective construction at runtime
+	(getSandboxPermissions): adds URLPermissions to sandbox permissions set,
+	if available (Java 8+)
+	(getUrlPermissions): new method for getting URLPermissions for the current
+	SecurityDesc
+	(getHostWithSpecifiedPort, appendRecursiveSubdirToCodebaseHostString): new
+	static helper methods for generating URLPermissions' constructor args
+	* tests/netx/unit/net/sourceforge/jnlp/SecurityDescTest.java
+	(testNotNullJnlpFile): cleanup refactor, no semantic change
+	(testNullJnlpFile, testAppendRecursiveSubdirToCodebaseHostString,
+	testAppendRecursiveSubdirToCodebaseHostString2,
+	testAppendRecursiveSubdirToCodebaseHostString3,
+	testAppendRecursiveSubdirToCodebaseHostStringWithPort,
+	testAppendRecursiveSubdirToCodebaseHostStringWithNull,
+	testGetHostWithSpecifiedPort, testGetHostWithSpecifiedPortWithFtpScheme,
+	testGetHostWithSpecifiedPortWithUserInfo,
+	testGetHostWithSpecifiedPOrtWithPort,
+	testGetHostWithSpecifiedPortWithPath, testGetHostWithSpecifiedPortWithAll,
+	testGetHostWithSpecifiedPortWithNull, testGetHost,
+	testGetHostWithFtpScheme, testGetHostWithUserInfo, testGetHostWithPort,
+	testGetHostWithPath, testGetHostWithAll, testGetHostNull,
+	testGetHostWithAppendRecursiveSubdirToCodebaseHostString,
+	testGetHostWithSpecifiedPortWithAppendRecursiveSubdirToCodebaseHostString):
+	new test methods
+
+2014-07-31  Andrew Azores  <aazores@redhat.com>
+
 	Added "File - New" action to PolicyEditor
 	* netx/net/sourceforge/jnlp/resources/Messages.properties (PETitle):
 	PolicyEditor, not Policy Editor.
