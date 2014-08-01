@@ -223,6 +223,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private final SecurityDelegate securityDelegate;
 
+    private ManifestAttributesChecker mac;
+
     /**
      * Create a new JNLPClassLoader from the specified file.
      *
@@ -275,18 +277,10 @@ public class JNLPClassLoader extends URLClassLoader {
         initializeExtensions();
 
         initializeResources();
-        
-        //loading mainfests before resources are initialised may cause waiting for resources
-        file.getManifestsAttributes().setLoader(this);
 
         // initialize permissions
-        initializePermissions();
+        initializeReadJarPermissions();
 
-        setSecurity();
-
-        ManifestAttributesChecker mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
-        mac.checkAll();
-        
         installShutdownHooks();
         
 
@@ -506,7 +500,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Make permission objects for the classpath.
      */
-    void initializePermissions() {
+    void initializeReadJarPermissions() {
         resourcePermissions = new ArrayList<Permission>();
 
         JARDesc jars[] = resources.getJARs();
@@ -516,10 +510,9 @@ public class JNLPClassLoader extends URLClassLoader {
             if (p == null) {
                 OutputController.getLogger().log("Unable to add permission for " + jar.getLocation());
             } else {
+                resourcePermissions.add(p);
                 OutputController.getLogger().log("Permission added: " + p.toString());
             }
-            if (p != null)
-                resourcePermissions.add(p);
         }
     }
 
@@ -592,6 +585,9 @@ public class JNLPClassLoader extends URLClassLoader {
             //Check if main jar is found within extensions
             foundMainJar = foundMainJar || hasMainInExtensions();
 
+            setSecurity();
+            initializeManifestAttributesChecker();
+            mac.checkAll();
             return;
         }
 
@@ -706,7 +702,9 @@ public class JNLPClassLoader extends URLClassLoader {
                 signing = SigningState.NONE;
             }
         }
+        setSecurity();
 
+        final Set<JARDesc> validJars = new HashSet<>();
         boolean containsSignedJar = false, containsUnsignedJar = false;
         for (JARDesc jarDesc : file.getResources().getJARs()) {
             File cachedFile;
@@ -724,14 +722,8 @@ public class JNLPClassLoader extends URLClassLoader {
                 continue; // JAR not found. Keep going.
             }
 
-            final URL codebase;
-            if (file.getCodeBase() != null) {
-                codebase = file.getCodeBase();
-            } else {
-                // FIXME: codebase should be the codebase of the Main Jar not
-                // the location. Although, it still works in the current state.
-                codebase = file.getResources().getMainJAR().getLocation();
-            }
+            validJars.add(jarDesc);
+            final URL codebase = getJnlpFileCodebase();
 
             final SecurityDesc jarSecurity = securityDelegate.getCodebaseSecurityDesc(jarDesc, codebase.getHost());
             if (jarSecurity.getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
@@ -740,14 +732,44 @@ public class JNLPClassLoader extends URLClassLoader {
                 containsSignedJar = true;
             }
 
-            jarLocationSecurityMap.put(jarDesc.getLocation(), jarSecurity);
+            if (containsUnsignedJar && containsSignedJar) {
+                break;
+            }
         }
 
         if (containsSignedJar && containsUnsignedJar) {
             checkPartialSigningWithUser();
         }
 
+        initializeManifestAttributesChecker();
+        mac.checkAll();
+
+        for (JARDesc jarDesc : validJars) {
+            final URL codebase = getJnlpFileCodebase();
+            final SecurityDesc jarSecurity = securityDelegate.getCodebaseSecurityDesc(jarDesc, codebase.getHost());
+            jarLocationSecurityMap.put(jarDesc.getLocation(), jarSecurity);
+        }
+
         activateJars(initialJars);
+    }
+
+    private void initializeManifestAttributesChecker() throws LaunchException {
+        if (mac == null) {
+            file.getManifestsAttributes().setLoader(this);
+            mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
+        }
+    }
+
+    private URL getJnlpFileCodebase() {
+        final URL codebase;
+        if (file.getCodeBase() != null) {
+            codebase = file.getCodeBase();
+        } else {
+            // FIXME: codebase should be the codebase of the Main Jar not
+            // the location. Although, it still works in the current state.
+            codebase = file.getResources().getMainJAR().getLocation();
+        }
+        return codebase;
     }
     
      /***
@@ -757,13 +779,12 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param  name attribute to be found
      */
     public String checkForAttributeInJars(List<JARDesc> jars, Attributes.Name name) {
-       
         if (jars.isEmpty()) {
             return null;
         }
 
         String result = null;
-        
+
         // Check main jar
         JARDesc mainJarDesc = ResourcesDesc.getMainJAR(jars);
         result = getManifestAttribute(mainJarDesc.getLocation(), name);
@@ -771,7 +792,7 @@ public class JNLPClassLoader extends URLClassLoader {
         if (result != null) {
             return result;
         }
-        
+
         // Check first jar
         JARDesc firstJarDesc = jars.get(0);
         result = getManifestAttribute(firstJarDesc.getLocation(),name);
@@ -2375,8 +2396,8 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         public void setRunInSandbox() throws LaunchException {
-            if (promptedForSandbox || classLoader.security != null
-                    || classLoader.jarLocationSecurityMap.size() != 0) {
+            if (runInSandbox && classLoader.security != null
+                    && classLoader.jarLocationSecurityMap.size() != 0) {
                 throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCInit"), R("LRunInSandboxError"), R("LRunInSandboxErrorInfo"));
             }
 

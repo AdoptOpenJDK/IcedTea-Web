@@ -1,3 +1,71 @@
+2014-08-01  Andrew Azores  <aazores@redhat.com>
+
+	Fixed support for signed applets which specify the Permissions attribute
+	as "sandbox" in their manifests. These applets are now properly run
+	sandboxed automatically, rather than requiring the user to click the
+	"Sandbox" run button.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(JNLPClassLoader): manifest attributes checking and security settings
+	moved inside initializeResources
+	(initializePermissions): renamed (initializeReadJarPermissions). Redundant
+	null-check removed
+	(initializeResources): do not set entries in jarLocationSecurityMap until
+	after prompting the user on whether to run the applet as well as
+	performing manifest attribute checks. A new Collection (validJars) is used
+	to hold available and valid JARs between discovering the JARs and applying
+	any security settings to the them
+	(initializeManifestAttributesChecker): new method
+	(getJnlpFileCodebase): new method, extracted from initializeResources
+	(SecurityDelegateImpl.setRunInSandbox): throw exception if already forced
+	to run in sandbox, rather than if already prompted
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java
+	(isLowSecurity): new method
+	(checkAll): Extended Applet Security on Low disables all manifest checks
+	except for Permissions
+	(checkPermissionsAttribute): do not skip checking if Extended Applet
+	Security is Low. Remove try/catch on setRunInSandbox call as this is now
+	supported.
+	(checkApplicationLibraryAllowableCodebaseAttribute): do not display dialog
+	prompts on low security, allow the applet to run without prompt
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPFileTest.java
+	(newSecurityAttributesTest): set JAR manifest to have Permissions:
+	all-permissions, since this is a JNLP and JAR is signed and so 'sandbox'
+	is not actually allowed
+	* tests/test-extensions/net/sourceforge/jnlp/mock/DummyJNLPFile.java:
+	properly initialize 'security' field rather than overriding getSecurity
+	* tests/test-extensions/net/sourceforge/jnlp/mock/DummyJNLPFileWithJar.java:
+	same
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesAllPermissionSigned.html:
+	new tests
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesAllPermissionSigned.jnlp
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesAllPermissionSignedJNLPhref.html
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesAllPermissionUnsigned.html
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesAllPermissionUnsigned.jnlp
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesAllPermissionUnsignedJNLPhref.html
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesSandboxSigned.html
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesSandboxSigned.jnlp
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesSandboxSignedJNLPhref.html
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesSandboxUnsigned.html
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesSandboxUnsigned.jnlp
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedAppletManifestSpecifiesSandboxUnsignedJNLPhref.html
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedApplicationManifestSpecifiesAllPermissionSigned.jnlp
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedApplicationManifestSpecifiesAllPermissionUnsigned.jnlp
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedApplicationManifestSpecifiesSandboxSigned.jnlp
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/resources/PartiallySignedApplicationManifestSpecifiesSandboxUnsigned.jnlp
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/srcs/MANIFEST.MF.1
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/srcs/MANIFEST.MF.2
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/srcs/Makefile
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/srcs/PartiallySignedAppletManifestSpecifiesSandboxSigned.java
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/srcs/PartiallySignedAppletManifestSpecifiesSandboxUnsigned.java
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/testcases/PartiallySignedAppletManifestSpecifiesSandboxTests.java
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/resources/SignedAppletManifestSpecifiesSandbox.html
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/resources/SignedAppletManifestSpecifiesSandboxApplet.jnlp
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/resources/SignedAppletManifestSpecifiesSandboxApplication.jnlp
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/resources/SignedAppletManifestSpecifiesSandboxJnlpHref.html
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/srcs/META-INF/MANIFEST.MF
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/srcs/SignedAppletManifestSpecifiesSandbox.java
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/testcases/SignedAppletManifestSpecifiesSandboxTests.java
+
 2014-08-01  Jiri Vanek  <jvanek@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: casts to

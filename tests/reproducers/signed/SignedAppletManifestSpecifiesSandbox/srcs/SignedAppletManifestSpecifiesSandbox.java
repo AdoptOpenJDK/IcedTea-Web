@@ -1,5 +1,5 @@
-/* 
-Copyright (C) 2012 Red Hat, Inc.
+/* SignedAppletManifestSpecifiesSandbox.java
+Copyright (C) 2014 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -34,42 +34,29 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.sourceforge.jnlp.mock;
 
-import java.net.URL;
-import java.util.Locale;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.ResourcesDesc;
-import net.sourceforge.jnlp.SecurityDesc;
+import java.applet.Applet;
 
+public class SignedAppletManifestSpecifiesSandbox extends Applet {
 
-public class DummyJNLPFile extends JNLPFile {
-    
-    
-    public static final URL JAR_URL;
-    public static final URL CODEBASE_URL;
+    public static void main(final String[] args) {
+        new SignedAppletManifestSpecifiesSandbox().init();
+    }
 
-    static {
+    @Override
+    public void init() {
+        System.out.println("SignedAppletManifestSpecifiesSandbox applet starting");
+        System.out.println("Reading user.home: " + getProp("user.home"));
+        System.out.println("*** APPLET FINISHED ***");
+    }
+
+    private static String getProp(final String key) {
         try {
-            JAR_URL = new URL("http://icedtea.classpath.org/netx/about.jar");
-            CODEBASE_URL = new URL("http://icedtea.classpath.org/netx/");
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            return System.getProperty(key);
+        } catch (final SecurityException se) {
+            se.printStackTrace();
+            return "SECURITY EXCEPTION";
         }
     }
 
-    {
-        this.security = new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
-    }
-
-    @Override
-    public ResourcesDesc getResources() {
-        return new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
-    }
-
-    @Override
-    public URL getCodeBase() {
-        return CODEBASE_URL;
-    }
-    
 }

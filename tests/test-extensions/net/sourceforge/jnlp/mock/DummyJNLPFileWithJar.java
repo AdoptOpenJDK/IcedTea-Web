@@ -38,6 +38,7 @@ public class DummyJNLPFileWithJar extends JNLPFile {
 
         }
         info = new ArrayList<InformationDesc>();
+        this.security = new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
     }
 
     public URL getJarLocation() {
@@ -85,11 +86,6 @@ public class DummyJNLPFileWithJar extends JNLPFile {
     @Override
     public URL getCodeBase() {
         return codeBase;
-    }
-
-    @Override
-    public SecurityDesc getSecurity() {
-        return new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
     }
 
     public void setInfo(List<InformationDesc> info) {

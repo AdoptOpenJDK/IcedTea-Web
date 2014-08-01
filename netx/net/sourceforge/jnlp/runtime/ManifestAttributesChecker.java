@@ -75,19 +75,21 @@ public class ManifestAttributesChecker {
     }
 
     void checkAll() throws LaunchException {
+        checkPermissionsAttribute();
         if (isCheckEnabled()) {
             checkTrustedOnlyAttribute();
             checkCodebaseAttribute();
             checkPermissionsAttribute();
             checkApplicationLibraryAllowableCodebaseAttribute();
         } else {
-            OutputController.getLogger().log("Checking for attributes in manifest is disabled.");
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Manifest attribute checks are disabled."
+                    + " The Permissions attribute will be enforced but other manifest attributes will be ignored.");
         }
     }
 
     public static boolean isCheckEnabled() {
-        String value = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
-        return Boolean.parseBoolean(value);
+        final String deploymentProperty = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+        return Boolean.parseBoolean(deploymentProperty);
     }
 
     /**
@@ -178,15 +180,19 @@ public class ManifestAttributesChecker {
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
      */
     private void checkPermissionsAttribute() throws LaunchException {
-        final ManifestBoolean sandboxForced = file.getManifestsAttributes().isSandboxForced();
-        final AppletSecurityLevel itwSecurityLevel = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
-        if (itwSecurityLevel == AppletSecurityLevel.ALLOW_UNSIGNED || securityDelegate.getRunInSandbox()) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Although 'permissions' attribute of this application is '" + file.getManifestsAttributes().permissionsToString()
-                    + "' Your Extended applets security is at 'low', or you have specifically chosen to run the applet Sandboxed. Continuing");
+        if (securityDelegate.getRunInSandbox()) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "The 'Permissions' attribute of this application is '" + file.getManifestsAttributes().permissionsToString()
+                    + "'. You have chosen the Sandbox run option, which overrides the Permissions manifest attribute, or the applet has already been automatically sandboxed.");
             return;
         }
 
+        final ManifestBoolean sandboxForced = file.getManifestsAttributes().isSandboxForced();
+        // If the attribute is not specified in the manifest, prompt the user. Oracle's spec says that the
+        // attribute is required, but this breaks a lot of existing applets. Therefore, when on the highest
+        // security level, we refuse to run these applets. On the standard security level, we ask. And on the
+        // lowest security level, we simply proceed without asking.
         if (sandboxForced == ManifestBoolean.UNDEFINED) {
+            final AppletSecurityLevel itwSecurityLevel = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
             if (itwSecurityLevel == AppletSecurityLevel.DENY_UNSIGNED) {
                 throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
             }
@@ -196,9 +202,9 @@ public class ManifestAttributesChecker {
                     throw new LaunchException("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have refused to run it.");
                 } else {
                     OutputController.getLogger().log("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have allowed to run it.");
-                    return;
                 }
             }
+            return;
         }
 
         final RequestedPermissionLevel requestedPermissions = file.getRequestedPermissionLevel();
@@ -206,15 +212,7 @@ public class ManifestAttributesChecker {
         if (file instanceof PluginBridge) { // HTML applet
             if (isNoneOrDefault(requestedPermissions)) {
                 if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
-                    // http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
-                    // FIXME: attempting to follow the spec, but it is too late now to actually set the applet
-                    // to run in sandbox. If we do this the applet will not be run at all, rather than run sandboxed!
-                    try {
-                        securityDelegate.setRunInSandbox();
-                    } catch (final LaunchException e) {
-                        OutputController.getLogger().log(e);
-                        throw new LaunchException("The applet is signed but its manifest specifies Sandbox permissions. This is not yet supported. Try running the applet again, but choose the Sandbox run option.", e);
-                    }
+                    securityDelegate.setRunInSandbox();
                 }
             }
         } else { // JNLP
@@ -227,6 +225,10 @@ public class ManifestAttributesChecker {
                 }
             }
         }
+    }
+
+    private static boolean isLowSecurity() {
+        return AppletStartupSecuritySettings.getInstance().getSecurityLevel().equals(AppletSecurityLevel.ALLOW_UNSIGNED);
     }
 
     private static boolean isNoneOrDefault(final RequestedPermissionLevel requested) {
@@ -306,14 +308,14 @@ public class ManifestAttributesChecker {
                 return;
             }
         }
-        ClasspathMatchers att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
 
+        ClasspathMatchers att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
         if (att == null) {
-            boolean a = SecurityDialogs.showMissingALACAttributePanel(file.getTitle(), documentBase, usedUrls);
-            if (!a) {
+            final boolean userApproved = isLowSecurity() || SecurityDialogs.showMissingALACAttributePanel(file.getTitle(), documentBase, usedUrls);
+            if (!userApproved) {
                 throw new LaunchException("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was blocked from running by the user");
             } else {
-                OutputController.getLogger().log("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user");
+                OutputController.getLogger().log("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user or user's security settings");
                 return;
             }
         } else {
@@ -325,11 +327,11 @@ public class ManifestAttributesChecker {
                 }
             }
         }
-        boolean a = SecurityDialogs.showMatchingALACAttributePanel(file, documentBase, usedUrls);
-        if (!a) {
+        final boolean userApproved = isLowSecurity() || SecurityDialogs.showMatchingALACAttributePanel(file, documentBase, usedUrls);
+        if (!userApproved) {
             throw new LaunchException("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, but was blocked from running by the user.");
         } else {
-            OutputController.getLogger().log("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user.");
+            OutputController.getLogger().log("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user or user's security settings.");
         }
     }
 }
