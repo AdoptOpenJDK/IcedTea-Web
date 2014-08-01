@@ -833,14 +833,16 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 PluginDebug.debug("getCachedImageRef() plugin codebase = ", codeBase);
 
                 String resourceName = originalURL.substring(codeBase.length());
-                JNLPClassLoader loader = (JNLPClassLoader) panel.getAppletClassLoader();
+                if (panel.getAppletClassLoader() instanceof JNLPClassLoader) {
+                    JNLPClassLoader loader = (JNLPClassLoader) panel.getAppletClassLoader();
 
-                URL localURL = null;
-                if (loader.resourceAvailableLocally(resourceName)) {
-                    url = loader.getResource(resourceName);
+                    URL localURL = null;
+                    if (loader.resourceAvailableLocally(resourceName)) {
+                        url = loader.getResource(resourceName);
+                    }
+
+                    url = localURL != null ? localURL : url;
                 }
-
-                url = localURL != null ? localURL : url;
             }
 
             PluginDebug.debug("getCachedImageRef() getting img from URL = ", url);
@@ -1504,7 +1506,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 appletPanels.removeElement(p);
                 
                 // Mark classloader unusable
-                ((JNLPClassLoader) cl).decrementLoaderUseCount();
+                if (cl instanceof JNLPClassLoader) {
+                    ((JNLPClassLoader) cl).decrementLoaderUseCount();
+                }
 
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {

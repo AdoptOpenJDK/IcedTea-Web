@@ -1,3 +1,8 @@
+2014-08-01  Jiri Vanek  <jvanek@redhat.com>
+
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: casts to
+	(JNLPClassLoader) DID guarded by instanceof
+
 2014-07-31  Andrew Azores  <aazores@redhat.com>
 
 	Add URLPermission support to SecurityDesc. This is essentially Java 8
