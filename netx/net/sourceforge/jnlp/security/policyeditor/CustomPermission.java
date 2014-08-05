@@ -82,6 +82,14 @@ public class CustomPermission implements Comparable<CustomPermission> {
         this.actions = actions;
     }
 
+    public CustomPermission(final PermissionType type, final PermissionTarget target) {
+        this(type, target, PermissionActions.NONE);
+    }
+
+    public CustomPermission(final PermissionType type, final PermissionTarget target, final PermissionActions actions) {
+        this(type.type, target.target, actions.rawString());
+    }
+
     /**
      * Get a CustomPermission from a policy file permission entry string. This is the full
      * entry string, eg `permission java.io.FilePermission "${user.home}${/}* "read";`
@@ -127,6 +135,28 @@ public class CustomPermission implements Comparable<CustomPermission> {
         sb.append(";");
 
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CustomPermission)) return false;
+
+        final CustomPermission that = (CustomPermission) o;
+
+        if (!actions.equals(that.actions)) return false;
+        if (!target.equals(that.target)) return false;
+        if (!type.equals(that.type)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + target.hashCode();
+        result = 31 * result + actions.hashCode();
+        return result;
     }
 
     @Override

@@ -115,7 +115,6 @@ public class PolicyEditorParsingTest {
         policyFileModel.openAndParsePolicyFile();
         policyFileModel.addCodebase("");
         policyFileModel.addCodebase(codebase);
-        Thread.sleep(100); // policy editor loads asynch, give it some time to populate
         permissions = policyFileModel.getCopyOfPermissions().get(codebase);
     }
 

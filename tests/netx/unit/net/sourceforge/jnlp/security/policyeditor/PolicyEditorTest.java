@@ -58,10 +58,6 @@ public class PolicyEditorTest {
     public void setNewTempfile() throws Exception {
         tempFilePath = File.createTempFile("policyeditor", null).getCanonicalPath();
         editor = new PolicyEditor(tempFilePath);
-        // policy file is loaded async; give it some time before we test its contents
-        do {
-            Thread.sleep(50);
-        } while (editor.isPerformingIO());
     }
 
     @Test
@@ -104,6 +100,21 @@ public class PolicyEditorTest {
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));
         assertTrue("Editor should only have default codebase", codebases.size() == 1);
+    }
+
+    @Test
+    public void testRemoveCodebase() throws Exception {
+        final String urlString = "http://example.com";
+        editor.addNewCodebase(urlString);
+        final Collection<String> codebases = editor.getCodebases();
+        assertTrue("Editor should have default codebase", codebases.contains(""));
+        assertTrue("Editor should have http://example.com", codebases.contains(urlString));
+        assertEquals("Editor should only have two codebases", codebases.size(), 2);
+        editor.removeCodebase(urlString);
+        final Collection<String> afterRemove = editor.getCodebases();
+        assertTrue("Editor should have default codebase", afterRemove.contains(""));
+        assertFalse("Editor should not have http://example.com. Contained: " + afterRemove, afterRemove.contains(urlString));
+        assertEquals("Editor should only have one codebase", afterRemove.size(), 1);
     }
 
     @Test

@@ -37,6 +37,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.policyeditor;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -147,5 +148,30 @@ public class CustomPermissionTest {
         assertTrue("cp1.compareTo(cp2) should be > 0", cp1.compareTo(cp2) > 0);
         assertTrue("cp1.compareTo(cp1) should be 0", cp1.compareTo(cp1) == 0);
         assertTrue("cp2.compareTo(cp3) should be < 0", cp2.compareTo(cp3) < 0);
+    }
+
+    @Test
+    public void testConstructFromEnumsToString() throws Exception {
+        final CustomPermission cp = new CustomPermission(PermissionType.FILE_PERMISSION, PermissionTarget.USER_HOME, PermissionActions.READ);
+        final String permissionString = "permission java.io.FilePermission \"${user.home}\", \"read\";";
+        assertEquals(permissionString, cp.toString());
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+        final CustomPermission cp1 = new CustomPermission(PermissionType.RUNTIME_PERMISSION, PermissionTarget.CLASSLOADER);
+        final CustomPermission cp2 = new CustomPermission(PermissionType.RUNTIME_PERMISSION, PermissionTarget.CLASSLOADER);
+        final CustomPermission cp3 = new CustomPermission(PermissionType.RUNTIME_PERMISSION, PermissionTarget.ACCESS_THREADS);
+        assertEquals(cp1, cp2);
+        assertNotEquals(cp1, cp3);
+    }
+
+    @Test
+    public void testHashcode() throws Exception {
+        final CustomPermission cp1 = new CustomPermission(PermissionType.RUNTIME_PERMISSION, PermissionTarget.CLASSLOADER);
+        final CustomPermission cp2 = new CustomPermission(PermissionType.RUNTIME_PERMISSION, PermissionTarget.CLASSLOADER);
+        final CustomPermission cp3 = new CustomPermission(PermissionType.RUNTIME_PERMISSION, PermissionTarget.ACCESS_THREADS);
+        assertEquals(cp1.hashCode(), cp2.hashCode());
+        assertNotEquals(cp1.hashCode(), cp3.hashCode());
     }
 }

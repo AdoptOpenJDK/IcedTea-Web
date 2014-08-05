@@ -43,6 +43,8 @@ import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -65,8 +67,8 @@ public class PolicyFileModel {
      * the Codebases in the list UI, and the Permission->Boolean maps correspond to the checkboxes associated with
      * each Codebase.
      */
-    private final Map<String, Map<PolicyEditorPermissions, Boolean>> codebasePermissionsMap = new HashMap<>();
-    private final Map<String, Set<CustomPermission>> customPermissionsMap = new HashMap<>();
+    public final Map<String, Map<PolicyEditorPermissions, Boolean>> codebasePermissionsMap = Collections.synchronizedMap(new HashMap<String, Map<PolicyEditorPermissions, Boolean>>());
+    private final Map<String, Set<CustomPermission>> customPermissionsMap = Collections.synchronizedMap(new HashMap<String, Set<CustomPermission>>());
     private MD5SumWatcher fileWatcher;
 
     PolicyFileModel(final String filepath) {
@@ -80,11 +82,11 @@ public class PolicyFileModel {
     PolicyFileModel() {
     }
 
-    void setFile(final File file) {
+    synchronized void setFile(final File file) {
         this.file = file;
     }
 
-    File getFile() {
+    synchronized File getFile() {
         return file;
     }
 
@@ -92,7 +94,7 @@ public class PolicyFileModel {
      * Open the file pointed to by the filePath field. This is either provided by the
      * "-file" command line flag, or if none given, comes from DeploymentConfiguration.
      */
-    void openAndParsePolicyFile() throws IOException {
+     synchronized void openAndParsePolicyFile() throws IOException, InvalidPolicyException {
         fileWatcher = new MD5SumWatcher(file);
         fileWatcher.update();
         codebasePermissionsMap.clear();
@@ -102,51 +104,16 @@ public class PolicyFileModel {
             // User-level policy files are expected to be short enough that loading them in as a String
             // should not actually be *too* bad, and it's easy to work with.
             final String contents = FileUtils.loadFileAsString(file);
-            // Split on newlines, both \r\n and \n style, for platform-independence
-            final String[] lines = contents.split("\\r?\\n+");
-            String codebase = "";
-            boolean openBlock = false, commentBlock = false;
-            for (final String line : lines) {
-                // Matches eg `grant {` as well as `grant codeBase "http://redhat.com" {`
-                final Pattern openBlockPattern = Pattern.compile("grant\\s*\"?\\s*(?:codeBase)?\\s*\"?([^\"\\s]*)\"?\\s*\\{");
-                final Matcher openBlockMatcher = openBlockPattern.matcher(line);
-                if (openBlockMatcher.matches()) {
-                    // Codebase URL
-                    codebase = openBlockMatcher.group(1);
-                    addCodebase(codebase);
-                    openBlock = true;
-                }
 
-                // Matches '};', the closing block delimiter, with any amount of whitespace on either side
-                boolean commentLine = false;
-                if (line.matches("\\s*\\};\\s*")) {
-                    openBlock = false;
-                }
-                // Matches '/*', the start of a block comment
-                if (line.matches(".*/\\*.*")) {
-                    commentBlock = true;
-                }
-                // Matches '*/', the end of a block comment, and '//', a single-line comment
-                if (line.matches(".*\\*/.*")) {
-                    commentBlock = false;
-                }
-                if (line.matches(".*/\\*.*") && line.matches(".*\\*/.*")) {
-                    commentLine = true;
-                }
-                if (line.matches("\\s*//.*")) {
-                    commentLine = true;
-                }
-
-                if (!openBlock || commentBlock || commentLine) {
-                    continue;
-                }
-                final PolicyEditorPermissions perm = PolicyEditorPermissions.fromString(line);
-                if (perm != null) {
-                    codebasePermissionsMap.get(codebase).put(perm, true);
-                } else {
-                    final CustomPermission cPerm = CustomPermission.fromString(line.trim());
-                    if (cPerm != null) {
-                        customPermissionsMap.get(codebase).add(cPerm);
+            final Set<PolicyEntry> entries = parsePolicyString(contents);
+            synchronized (codebasePermissionsMap) {
+                synchronized (customPermissionsMap) {
+                    for (final PolicyEntry entry : entries) {
+                        addCodebase(entry.getCodebase());
+                        for (final PolicyEditorPermissions permission : entry.getPermissions()) {
+                            setPermission(entry.getCodebase(), permission, true);
+                        }
+                        addCustomPermissions(entry.getCodebase(), entry.getCustomPermissions());
                     }
                 }
             }
@@ -159,10 +126,44 @@ public class PolicyFileModel {
         }
     }
 
+    static Set<PolicyEntry> parsePolicyString(final String contents) throws InvalidPolicyException {
+        final Set<PolicyEntry> policyEntries = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+
+        // Split on newlines, both \r\n and \n style, for platform-independence
+        final String[] lines = contents.split("\\r?\\n+");
+        boolean openBlock = false, closeBlock = false;
+        for (final String line : lines) {
+            // Matches eg `grant {` as well as `grant codeBase "http://redhat.com" {`
+            final Pattern openBlockPattern = Pattern.compile("grant\\s*\"?\\s*(?:codeBase)?\\s*\"?[^\"\\s]*\"?\\s*\\{");
+            final Matcher openBlockMatcher = openBlockPattern.matcher(line);
+            if (openBlockMatcher.matches()) {
+                openBlock = true;
+            }
+
+            // Matches '};', the closing block delimiter, with any amount of whitespace on either side
+            if (line.matches("\\s*\\};\\s*")) {
+                closeBlock = true;
+            }
+
+            if (openBlock) {
+                sb.append(line);
+                sb.append('\n');
+            }
+
+            if (openBlock && closeBlock) {
+                openBlock = closeBlock = false;
+                policyEntries.add(PolicyEntry.fromString(sb.toString()));
+                sb = new StringBuilder();
+            }
+        }
+        return policyEntries;
+    }
+
     /**
      * Save the policy model into the file pointed to by the filePath field.
      */
-    void savePolicyFile() throws FileNotFoundException, IOException {
+    synchronized void savePolicyFile() throws FileNotFoundException, IOException {
         final StringBuilder sb = new StringBuilder();
         sb.append(AUTOGENERATED_NOTICE);
         final String currentDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
@@ -171,15 +172,16 @@ public class PolicyFileModel {
         FileLock fileLock = null;
         try {
             fileLock = FileUtils.getFileLock(file.getAbsolutePath(), false, true);
-            final Set<PolicyEditorPermissions> enabledPermissions = new HashSet<>();
-            for (final String codebase : codebasePermissionsMap.keySet()) {
-                enabledPermissions.clear();
-                for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : codebasePermissionsMap.get(codebase).entrySet()) {
-                    if (entry.getValue()) {
-                        enabledPermissions.add(entry.getKey());
+            synchronized (codebasePermissionsMap) {
+                for (final String codebase : codebasePermissionsMap.keySet()) {
+                    final Set<PolicyEditorPermissions> enabledPermissions = new HashSet<>();
+                    for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : codebasePermissionsMap.get(codebase).entrySet()) {
+                        if (entry.getValue()) {
+                            enabledPermissions.add(entry.getKey());
+                        }
                     }
+                    sb.append(new PolicyEntry(codebase, enabledPermissions, customPermissionsMap.get(codebase)).toString());
                 }
-                sb.append(new PolicyEntry(codebase, enabledPermissions, customPermissionsMap.get(codebase)).toString());
             }
         } catch (final IOException e) {
             OutputController.getLogger().log(e);
@@ -199,11 +201,11 @@ public class PolicyFileModel {
         fileWatcher.update();
     }
 
-    boolean hasChanged() throws FileNotFoundException, IOException {
+    synchronized boolean hasChanged() throws FileNotFoundException, IOException {
         return fileWatcher != null && fileWatcher.update();
     }
 
-    Set<String> getCodebases() {
+    synchronized Set<String> getCodebases() {
         return new HashSet<>(codebasePermissionsMap.keySet());
     }
 
@@ -212,10 +214,10 @@ public class PolicyFileModel {
      * @param codebase for which a permissions mapping is required
      * @return true iff there was already an entry for this codebase
      */
-    boolean addCodebase(final String codebase) {
+    synchronized boolean addCodebase(final String codebase) {
         Objects.requireNonNull(codebase);
-        boolean existingCodebase = true;
 
+        boolean existingCodebase = true;
         if (!codebasePermissionsMap.containsKey(codebase)) {
             final Map<PolicyEditorPermissions, Boolean> map = new HashMap<>();
             for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
@@ -224,7 +226,6 @@ public class PolicyFileModel {
             codebasePermissionsMap.put(codebase, map);
             existingCodebase = false;
         }
-
         if (!customPermissionsMap.containsKey(codebase)) {
             final Set<CustomPermission> set = new HashSet<>();
             customPermissionsMap.put(codebase, set);
@@ -234,24 +235,25 @@ public class PolicyFileModel {
         return existingCodebase;
     }
 
-    void clearPermissions() {
+    synchronized void clearPermissions() {
         codebasePermissionsMap.clear();
+        clearCustomPermissions();
     }
 
-    void removeCodebase(final String codebase) {
+    synchronized void removeCodebase(final String codebase) {
         Objects.requireNonNull(codebase);
         codebasePermissionsMap.remove(codebase);
         customPermissionsMap.remove(codebase);
     }
 
-    void setPermission(final String codebase, final PolicyEditorPermissions permission, final boolean state) {
+    synchronized void setPermission(final String codebase, final PolicyEditorPermissions permission, final boolean state) {
         Objects.requireNonNull(codebase);
         Objects.requireNonNull(permission);
         addCodebase(codebase);
         codebasePermissionsMap.get(codebase).put(permission, state);
     }
 
-    boolean getPermission(final String codebase, final PolicyEditorPermissions permission) {
+    synchronized boolean getPermission(final String codebase, final PolicyEditorPermissions permission) {
         Objects.requireNonNull(codebase);
         Objects.requireNonNull(permission);
         if (!codebasePermissionsMap.containsKey(codebase)) {
@@ -260,15 +262,15 @@ public class PolicyFileModel {
         return codebasePermissionsMap.get(codebase).get(permission);
     }
 
-    Map<String, Map<PolicyEditorPermissions, Boolean>> getCopyOfPermissions() {
+    synchronized Map<String, Map<PolicyEditorPermissions, Boolean>> getCopyOfPermissions() {
         return new HashMap<>(codebasePermissionsMap);
     }
 
-    void clearCustomPermissions() {
+    synchronized void clearCustomPermissions() {
         customPermissionsMap.clear();
     }
 
-    void clearCustomCodebase(final String codebase) {
+    synchronized void clearCustomCodebase(final String codebase) {
         Objects.requireNonNull(codebase);
         if (!customPermissionsMap.containsKey(codebase)) {
             return;
@@ -276,14 +278,14 @@ public class PolicyFileModel {
         customPermissionsMap.get(codebase).clear();
     }
 
-    void addCustomPermissions(final String codebase, final Collection<CustomPermission> permissions) {
+    synchronized void addCustomPermissions(final String codebase, final Collection<CustomPermission> permissions) {
         Objects.requireNonNull(codebase);
         Objects.requireNonNull(permissions);
         addCodebase(codebase);
         customPermissionsMap.get(codebase).addAll(permissions);
     }
 
-    Map<String, Set<CustomPermission>> getCopyOfCustomPermissions() {
+    synchronized Map<String, Set<CustomPermission>> getCopyOfCustomPermissions() {
         return new HashMap<>(customPermissionsMap);
     }
 }

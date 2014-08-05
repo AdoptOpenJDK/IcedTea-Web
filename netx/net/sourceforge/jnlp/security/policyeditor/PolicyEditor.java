@@ -47,11 +47,11 @@ import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -66,9 +66,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -179,13 +177,11 @@ public class PolicyEditor extends JPanel {
      * should be the editor so that the dialog is modal.
      */
     private final WeakReference<PolicyEditor> parentPolicyEditor = new WeakReference<>(this);
-    private final PolicyEditorController policyEditorController = new PolicyEditorController();
-    private Map<PolicyEditorPermissions, Boolean> editorPermissionsClipboard = null;
-    private Set<CustomPermission> customPermissionsClipboard = null;
+    public final PolicyEditorController policyEditorController = new PolicyEditorController();
 
     private final ActionListener okButtonAction, addCodebaseButtonAction,
             removeCodebaseButtonAction, newButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
-            renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction, copyCodebaseToClipboardButtonAction,
+            renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction,
             policyEditorHelpButtonAction, aboutPolicyEditorButtonAction;
     private ActionListener closeButtonAction;
 
@@ -240,7 +236,37 @@ public class PolicyEditor extends JPanel {
 
         setFile(filepath);
         if (filepath != null) {
-            openAndParsePolicyFile();
+            try {
+                policyEditorController.openAndParsePolicyFile();
+            } catch (final FileNotFoundException fnfe) {
+                OutputController.getLogger().log(fnfe);
+                FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
+            } catch (final IOException | InvalidPolicyException e) {
+                OutputController.getLogger().log(e);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantOpenFile", policyEditorController.getFile().getPath()));
+                FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
+            }
+            try {
+                invokeRunnableOrEnqueueAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (final String codebase : policyEditorController.getCodebases()) {
+                            final String model;
+                            if (codebase.isEmpty()) {
+                                model = R("PEGlobalSettings");
+                            } else {
+                                model = codebase;
+                            }
+                            if (!listModel.contains(model)) {
+                                listModel.addElement(model);
+                            }
+                        }
+                        addNewCodebase("");
+                    }
+                });
+            } catch (final InvocationTargetException | InterruptedException e) {
+                OutputController.getLogger().log(e);
+            }
         }
         setChangesMade(false);
 
@@ -345,27 +371,35 @@ public class PolicyEditor extends JPanel {
         pasteCodebaseButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                String newCodebase = "";
-                while (!validateCodebase(newCodebase) || policyEditorController.getCopyOfPermissions().containsKey(newCodebase)) {
-                    newCodebase = JOptionPane.showInputDialog(PolicyEditor.this, R("PEPasteCodebase"), "http://");
-                    if (newCodebase == null) {
-                        return;
+                String clipboardCodebase = null;
+                try {
+                    clipboardCodebase = policyEditorController.getCodebaseFromClipboard();
+                    final String newCodebase;
+                    if (getCodebases().contains(clipboardCodebase)) {
+                        String cb = "";
+                        while (!validateCodebase(cb) || policyEditorController.getCopyOfPermissions().containsKey(cb)) {
+                            cb = JOptionPane.showInputDialog(PolicyEditor.this, R("PEPasteCodebase"), "http://");
+                            if (cb == null) {
+                                return;
+                            }
+                        }
+                        newCodebase = cb;
+                    } else {
+                        newCodebase = clipboardCodebase;
                     }
+                    if (validateCodebase(newCodebase)) {
+                        pasteCodebase(newCodebase);
+                    }
+                } catch (final UnsupportedFlavorException ufe) {
+                    OutputController.getLogger().log(ufe);
+                    showClipboardErrorDialog();
+                } catch (final InvalidPolicyException ipe) {
+                    OutputController.getLogger().log(ipe);
+                    showInvalidPolicyExceptionDialog(clipboardCodebase);
+                } catch (final IOException ioe) {
+                    OutputController.getLogger().log(ioe);
+                    showCouldNotAccessClipboardDialog();
                 }
-                pasteCodebase(newCodebase);
-            }
-        };
-
-        copyCodebaseToClipboardButtonAction = new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final String selectedCodebase = getSelectedCodebase();
-                if (selectedCodebase.isEmpty()) {
-                    return;
-                }
-                final Transferable clipboardContents = new StringSelection(selectedCodebase);
-                final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clip.setContents(clipboardContents, null);
             }
         };
 
@@ -811,49 +845,45 @@ public class PolicyEditor extends JPanel {
      * @param newCodebase the new name for the codebase
      */
     public void renameCodebase(final String oldCodebase, final String newCodebase) {
-        // Renaming a codebase shouldn't overwrite a previously copied clipboard
-        final Map<PolicyEditorPermissions, Boolean> editorPermissionsClipboardBackup = editorPermissionsClipboard;
-        final Set<CustomPermission> customPermissionsClipboardBackup = customPermissionsClipboard;
+        final Map<PolicyEditorPermissions, Boolean> permissions = getPermissions(oldCodebase);
+        final Collection<CustomPermission> customPermissions = getCustomPermissions(oldCodebase);
 
-        copyCodebase(oldCodebase);
-        pasteCodebase(newCodebase);
         removeCodebase(oldCodebase);
+        addNewCodebase(newCodebase);
 
-        editorPermissionsClipboard = editorPermissionsClipboardBackup;
-        customPermissionsClipboard = customPermissionsClipboardBackup;
+        for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : permissions.entrySet()) {
+            setPermission(newCodebase, entry.getKey(), entry.getValue());
+        }
+
+        for (final CustomPermission permission : customPermissions) {
+            addCustomPermission(newCodebase, permission);
+        }
+
+        updateCheckboxes(newCodebase);
     }
 
     /**
-     * Copy a codebase to the editor's "clipboard" (not the system clipboard), preserving its permissions
+     * Copy a codebase to the system clipboard, preserving its permissions
      * @param codebase the codebase to copy
      */
     public void copyCodebase(final String codebase) {
         if (!getCodebases().contains(codebase)) {
             return;
         }
-        editorPermissionsClipboard = new HashMap<>(policyEditorController.getCopyOfPermissions().get(codebase));
-
-        final Set<CustomPermission> customPermissions = policyEditorController.getCustomPermissions(codebase);
-        if (customPermissions == null) {
-            customPermissionsClipboard = Collections.emptySet();
-        } else {
-            customPermissionsClipboard = new HashSet<>(policyEditorController.getCustomPermissions(codebase));
-        }
+        policyEditorController.copyCodebaseToClipboard(codebase);
     }
 
     /**
-     * Paste a codebase from the editor's "clipboard" (not the system clipboard)
-     * @param newCodebase the name to paste the codebase with
+     * Paste a codebase entry from the system clipboard with a new codebase name
      */
-    public void pasteCodebase(final String newCodebase) {
-        if (editorPermissionsClipboard == null || customPermissionsClipboard == null) {
-            return;
-        }
+    public void pasteCodebase(final String newCodebase) throws UnsupportedFlavorException, InvalidPolicyException, IOException {
+        final Map<PolicyEditorPermissions, Boolean> permissions = policyEditorController.getPermissionsFromClipboard();
+        final Set<CustomPermission> customPermissions = policyEditorController.getCustomPermissionsFromClipboard();
         addNewCodebase(newCodebase);
-        for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : editorPermissionsClipboard.entrySet()) {
+        for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : permissions.entrySet()) {
             policyEditorController.setPermission(newCodebase, entry.getKey(), entry.getValue());
         }
-        policyEditorController.addCustomPermissions(newCodebase, customPermissionsClipboard);
+        policyEditorController.addCustomPermissions(newCodebase, customPermissions);
         setChangesMade(true);
         updateCheckboxes(newCodebase);
     }
@@ -918,15 +948,18 @@ public class PolicyEditor extends JPanel {
     }
 
     private void updateCheckboxesImpl(final String codebase) {
+        if (!getCodebases().contains(codebase)) {
+            return;
+        }
+        final Map<PolicyEditorPermissions, Boolean> map = policyEditorController.getCopyOfPermissions().get(codebase);
         for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
             final JCheckBox box = checkboxMap.get(perm);
             for (final ActionListener l : box.getActionListeners()) {
                 box.removeActionListener(l);
             }
-            policyEditorController.addCodebase(codebase);
             final boolean state = policyEditorController.getPermission(codebase, perm);
             for (final JCheckBoxWithGroup jg : groupBoxList) {
-                jg.setState(policyEditorController.getCopyOfPermissions().get(codebase));
+                jg.setState(map);
             }
             box.setSelected(state);
             box.addActionListener(new ActionListener() {
@@ -935,7 +968,7 @@ public class PolicyEditor extends JPanel {
                     setChangesMade(true);
                     policyEditorController.setPermission(codebase, perm, box.isSelected());
                     for (JCheckBoxWithGroup jg : groupBoxList) {
-                        jg.setState(policyEditorController.getCopyOfPermissions().get(codebase));
+                        jg.setState(map);
                     }
                 }
             });
@@ -1026,12 +1059,6 @@ public class PolicyEditor extends JPanel {
         setMenuItemAccelerator(copyCodebaseItem, R("PECopyCodebaseItemAccelerator"));
         copyCodebaseItem.addActionListener(editor.copyCodebaseButtonAction);
         codebaseMenu.add(copyCodebaseItem);
-
-        final JMenuItem copyCodebaseToClipboardItem = new JMenuItem(R("PECopyCodebaseToClipboardItem"));
-        setButtonMnemonic(copyCodebaseToClipboardItem, R("PECopyCodebaseToClipboardItemMnemonic"));
-        setMenuItemAccelerator(copyCodebaseToClipboardItem, R("PECopyCodebaseToClipboardItemAccelerator"));
-        copyCodebaseToClipboardItem.addActionListener(editor.copyCodebaseToClipboardButtonAction);
-        codebaseMenu.add(copyCodebaseToClipboardItem);
         menuBar.add(codebaseMenu);
 
         final JMenuItem pasteCodebaseItem = new JMenuItem(R("PEPasteCodebaseItem"));
@@ -1311,6 +1338,7 @@ public class PolicyEditor extends JPanel {
             FileUtils.showReadOnlyDialog(PolicyEditor.this);
         }
 
+
         final Window parentWindow = SwingUtilities.getWindowAncestor(this);
         final JDialog progressIndicator = new IndeterminateProgressDialog(parentWindow, "Loading...");
         final SwingWorker<Void, Void> openPolicyFileWorker = new SwingWorker<Void, Void>() {
@@ -1330,8 +1358,8 @@ public class PolicyEditor extends JPanel {
                 } catch (final FileNotFoundException fnfe) {
                     OutputController.getLogger().log(fnfe);
                     FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
-                } catch (final IOException ioe) {
-                    OutputController.getLogger().log(ioe);
+                } catch (final IOException | InvalidPolicyException e) {
+                    OutputController.getLogger().log(e);
                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantOpenFile", policyEditorController.getFile().getPath()));
                     FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 }
@@ -1437,6 +1465,33 @@ public class PolicyEditor extends JPanel {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PECouldNotSave"), R("Error"), JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
+    private void showClipboardErrorDialog() {
+        invokeRunnableOrEnqueueLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEClipboardError"), R("Error"), JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
+    private void showInvalidPolicyExceptionDialog(final String codebase) {
+        invokeRunnableOrEnqueueLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEInvalidPolicy", codebase), R("Error"), JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
+    private void showCouldNotAccessClipboardDialog() {
+        invokeRunnableOrEnqueueLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEClipboardAccessError"), R("Error"), JOptionPane.ERROR_MESSAGE);
             }
         });
     }

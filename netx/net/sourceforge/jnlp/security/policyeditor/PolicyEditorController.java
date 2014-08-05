@@ -36,6 +36,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -50,7 +55,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class PolicyEditorController {
 
-    private final PolicyFileModel policyFile = new PolicyFileModel();
+    public final PolicyFileModel policyFile = new PolicyFileModel();
     private volatile boolean changesMade = false;
     private volatile boolean performingIO = false;
 
@@ -145,6 +150,14 @@ public class PolicyEditorController {
         return new HashSet<>(policyFile.getCopyOfCustomPermissions().get(codebase));
     }
 
+    public void addPolicyEntry(final PolicyEntry policyEntry) {
+        addCodebase(policyEntry.getCodebase());
+        for (final PolicyEditorPermissions permission : policyEntry.getPermissions()) {
+            setPermission(policyEntry.getCodebase(), permission, true);
+        }
+        addCustomPermissions(policyEntry.getCodebase(), policyEntry.getCustomPermissions());
+    }
+
     public void clearCustomPermissions() {
         setChangesMade(true);
         policyFile.clearCustomPermissions();
@@ -155,7 +168,7 @@ public class PolicyEditorController {
         policyFile.clearCustomCodebase(codebase);
     }
 
-    public void openAndParsePolicyFile() throws IOException {
+    public void openAndParsePolicyFile() throws IOException, InvalidPolicyException {
         try {
             policyFile.getFile().createNewFile();
         } catch (final IOException e) {
@@ -175,6 +188,47 @@ public class PolicyEditorController {
 
         setChangesMade(false);
         setPerformingIO(false);
+    }
+
+    public void copyCodebaseToClipboard(final String codebase) {
+        final Map<PolicyEditorPermissions, Boolean> standardPermissions = policyFile.getCopyOfPermissions().get(codebase);
+        final Set<CustomPermission> customPermissions = policyFile.getCopyOfCustomPermissions().get(codebase);
+
+        final Set<PolicyEditorPermissions> enabledPermissions = new HashSet<>();
+        for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : standardPermissions.entrySet()) {
+            if (entry.getValue()) {
+                enabledPermissions.add(entry.getKey());
+            }
+        }
+        final PolicyEntry entry = new PolicyEntry(codebase, enabledPermissions, customPermissions);
+        final StringSelection clipboardSelection = new StringSelection(entry.toString());
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardSelection, clipboardSelection);
+    }
+
+    private static String getClipboardContentsAsString() throws IOException, UnsupportedFlavorException {
+        final Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        return (String) transferable.getTransferData(DataFlavor.stringFlavor);
+    }
+
+    public static PolicyEntry getPolicyEntryFromClipboard() throws IOException, UnsupportedFlavorException, InvalidPolicyException {
+        return PolicyEntry.fromString(getClipboardContentsAsString());
+    }
+
+    public String getCodebaseFromClipboard() throws IOException, UnsupportedFlavorException, InvalidPolicyException {
+        return getPolicyEntryFromClipboard().getCodebase();
+    }
+
+    public Map<PolicyEditorPermissions, Boolean> getPermissionsFromClipboard() throws IOException, UnsupportedFlavorException, InvalidPolicyException {
+        final Map<PolicyEditorPermissions, Boolean> ret = new HashMap<>();
+        final Set<PolicyEditorPermissions> enabledPermissions = getPolicyEntryFromClipboard().getPermissions();
+        for (final PolicyEditorPermissions permission : PolicyEditorPermissions.values()) {
+            ret.put(permission, enabledPermissions.contains(permission));
+        }
+        return ret;
+    }
+
+    public Set<CustomPermission> getCustomPermissionsFromClipboard() throws IOException, UnsupportedFlavorException, InvalidPolicyException {
+        return getPolicyEntryFromClipboard().getCustomPermissions();
     }
 
 }

@@ -36,9 +36,13 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class represents a codebase entry in a policy file. This is defined as a policy entry block
@@ -65,6 +69,97 @@ public class PolicyEntry {
         this.permissions.remove(null);
         this.customPermissions.addAll(customPermissions);
         this.customPermissions.remove(null);
+    }
+
+    public String getCodebase() {
+        return codebase;
+    }
+
+    public Set<PolicyEditorPermissions> getPermissions() {
+        return permissions;
+    }
+
+    public Set<CustomPermission> getCustomPermissions() {
+        return customPermissions;
+    }
+
+    public static PolicyEntry fromString(final String contents) throws InvalidPolicyException {
+        final List<String> lines = Arrays.asList(contents.split("\\r?\\n+"));
+        if (!validatePolicy(lines)) {
+            throw new InvalidPolicyException();
+        }
+
+        String codebase = "";
+        final Set<PolicyEditorPermissions> permissions = new HashSet<>();
+        final Set<CustomPermission> customPermissions = new HashSet<>();
+
+        boolean openBlock = false, commentBlock = false;
+        for (final String line : lines) {
+            // Matches eg `grant {` as well as `grant codeBase "http://redhat.com" {`
+            final Pattern openBlockPattern = Pattern.compile("grant\\s*\"?\\s*(?:codeBase)?\\s*\"?([^\"\\s]*)\"?\\s*\\{");
+            final Matcher openBlockMatcher = openBlockPattern.matcher(line);
+            if (openBlockMatcher.matches()) {
+                // Codebase URL
+                codebase = openBlockMatcher.group(1);
+                openBlock = true;
+                continue;
+            }
+
+            // Matches '};', the closing block delimiter, with any amount of whitespace on either side
+            boolean commentLine = false;
+            if (line.matches("\\s*\\};\\s*")) {
+                openBlock = false;
+            }
+            // Matches '/*', the start of a block comment
+            if (line.matches(".*/\\*.*")) {
+                commentBlock = true;
+            }
+            // Matches '*/', the end of a block comment, and '//', a single-line comment
+            if (line.matches(".*\\*/.*")) {
+                commentBlock = false;
+            }
+            if (line.matches(".*/\\*.*") && line.matches(".*\\*/.*")) {
+                commentLine = true;
+            }
+            if (line.matches("\\s*//.*")) {
+                commentLine = true;
+            }
+
+            if (!openBlock || commentBlock || commentLine) {
+                continue;
+            }
+
+            final PolicyEditorPermissions perm = PolicyEditorPermissions.fromString(line);
+            if (perm != null) {
+                permissions.add(perm);
+            } else {
+                final CustomPermission cPerm = CustomPermission.fromString(line.trim());
+                if (cPerm != null) {
+                    customPermissions.add(cPerm);
+                }
+            }
+        }
+        return new PolicyEntry(codebase, permissions, customPermissions);
+    }
+
+    public static boolean validatePolicy(final String content) {
+        return validatePolicy(Arrays.asList(content.split("\\r?\\n")));
+    }
+
+    public static boolean validatePolicy(final List<String> lines) {
+        int openerCount = 0, closerCount = 0;
+        for (final String line : lines) {
+            final Pattern openBlockPattern = Pattern.compile("grant\\s*\"?\\s*(?:codeBase)?\\s*\"?([^\"\\s]*)\"?\\s*\\{");
+            final Matcher openBlockMatcher = openBlockPattern.matcher(line);
+            if (openBlockMatcher.matches()) {
+                ++openerCount;
+            }
+
+            if (line.matches("\\s*\\};\\s*")) {
+                ++closerCount;
+            }
+        }
+        return (openerCount == 1) && (closerCount == 1);
     }
 
     @Override
