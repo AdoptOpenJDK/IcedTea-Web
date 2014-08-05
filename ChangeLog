@@ -1,3 +1,14 @@
+2014-08-05  Andrew Azores  <aazores@redhat.com>
+
+	Small bug fix (security hole) for previous PR1769 patch. This patch closes
+	a hole where very specifically formulated partially signed applets could
+	maintain fully signed privileges (all-permissions), even for their
+	unsigned components.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
+	(initializeResources): ensure that the 'signing' field is properly set for
+	partially signed applets and that applets with an external main class are
+	properly detected.
+
 2014-08-01  Andrew Azores  <aazores@redhat.com>
 
 	Fixed support for signed applets which specify the Permissions attribute

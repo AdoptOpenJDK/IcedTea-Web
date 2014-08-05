@@ -579,8 +579,11 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             }
 
-            if (allSigned)
+            if (allSigned) {
                 signing = SigningState.FULL;
+            } else {
+                signing = SigningState.NONE;
+            }
 
             //Check if main jar is found within extensions
             foundMainJar = foundMainJar || hasMainInExtensions();
@@ -678,7 +681,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 // If externalAppletMainClass is true and a LaunchException was not thrown above,
                 // then the main-class can be loaded from the applet codebase, but is obviously not signed
-                if (!jcv.allJarsSigned()) {
+                if (externalAppletMainClass) {
                     checkPartialSigningWithUser();
                 }
 
@@ -733,6 +736,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
 
             if (containsUnsignedJar && containsSignedJar) {
+                signing = SigningState.PARTIAL;
                 break;
             }
         }
@@ -740,6 +744,8 @@ public class JNLPClassLoader extends URLClassLoader {
         if (containsSignedJar && containsUnsignedJar) {
             checkPartialSigningWithUser();
         }
+
+        setSecurity();
 
         initializeManifestAttributesChecker();
         mac.checkAll();
