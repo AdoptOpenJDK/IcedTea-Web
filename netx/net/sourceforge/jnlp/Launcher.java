@@ -224,19 +224,21 @@ public class Launcher {
 
         JNLPRuntime.markNetxRunning();
 
-        //First checks whether offline-allowed tag is specified inside the jnlp
-        //file.
-        if (!file.getInformation().isOfflineAllowed()) {
-            try {
-                //Checks the offline/online status of the system.
-                //If system is offline do not launch.
-                InetAddress.getByName(file.getSourceLocation().getHost());
-
-            } catch (UnknownHostException ue) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "File cannot be launched because offline-allowed tag not specified and system currently offline.");
-                return null;
-            } catch (Exception e) {
-                OutputController.getLogger().log(e);
+        if (!JNLPRuntime.isOfflineForced()) {
+            //Xoffline NOT specified
+            //First checks whether offline-allowed tag is specified inside the jnlp file.
+            if (!file.getInformation().isOfflineAllowed() && !JNLPRuntime.isOnlineDetected()) {
+                {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Remote systems unreachable, and client application is not able to run offline. Exiting.");
+                    return null;
+                }
+            }
+        } else {
+            //Xoffline IS specified
+            if (!file.getInformation().isOfflineAllowed() && !JNLPRuntime.isOnlineDetected()) {
+                {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Remote systems unreachable, and client application is not able to run offline. However, you specified -Xoffline argument. Attmpting to run.");
+                }
             }
         }
 

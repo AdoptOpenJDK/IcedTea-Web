@@ -602,13 +602,6 @@ public class CacheUtil {
             }
             lruHandler.store();
 
-            /*
-             * FIXME: if cacheDir is for example $USER_HOME and they have a folder called http
-             * and/or https. These would get removed.
-             */
-            remove.add(cacheDir + File.separator + "http");
-            remove.add(cacheDir + File.separator + "https");
-
             removeSetOfDirectories(remove);
 
         }

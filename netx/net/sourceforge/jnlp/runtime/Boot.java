@@ -120,6 +120,7 @@ public final class Boot implements PrivilegedAction<Void> {
             + "  -Xnofork              " + R("BXnofork") + "\n"
             + "  -Xclearcache          " + R("BXclearcache") + "\n"
             + "  -Xignoreheaders       " + R("BXignoreheaders") + "\n"
+            + "  -Xoffline             " + R("BXoffline") + "\n"
             + "  -help                 " + R("BOHelp") + "\n";
 
     private static final String doubleArgs = "-basedir -jnlp -arg -param -property -update";
@@ -219,6 +220,7 @@ public final class Boot implements PrivilegedAction<Void> {
      */
     public Void run() {
         JNLPRuntime.setSecurityEnabled(null == getOption("-nosecurity"));
+        JNLPRuntime.setOfflineForced(null != getOption("-Xoffline"));
         JNLPRuntime.initialize(true);
 
         /*

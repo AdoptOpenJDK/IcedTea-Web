@@ -24,7 +24,10 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
+import java.net.InetAddress;
 import java.net.ProxySelector;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.security.AllPermission;
@@ -159,6 +162,12 @@ public class JNLPRuntime {
     
     /** allows 301.302.303.307.308 redirects to be followed when downloading resources*/
     private static boolean allowRedirect = false;;
+    
+    /** when this is true, ITW will not attempt any inet connections and will work only with what is in cache*/
+    private static boolean offlineForced = false;
+
+    private static Boolean onlineDetected = null;
+
 
     /** 
      * Header is not checked and so eg
@@ -379,6 +388,54 @@ public class JNLPRuntime {
         new ParserDelegator();
     }
 
+
+    public static void setOfflineForced(boolean b) {
+        offlineForced = b;
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Forcing of offline set to: " + offlineForced);
+    }
+
+    public static boolean isOfflineForced() {
+        return offlineForced;
+    }
+
+    public static void setOnlineDetected(boolean online) {
+        onlineDetected = online;
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Detected online set to: " + onlineDetected);
+    }
+
+    public static boolean isOnlineDetected() {
+        if (onlineDetected == null) {
+            //"file" protocol do not do online check
+            //sugest online for this case
+            return true;
+        }
+        return onlineDetected;
+    }
+
+    public static boolean isOnline() {
+        if (isOfflineForced()) {
+            return false;
+        }
+        return isOnlineDetected();
+    }
+
+    public static void detectOnline(URL location) {
+        if (onlineDetected != null) {
+            return;
+        }
+        try {
+            if (location.getProtocol().equals("file")) {
+                return;
+            }
+            //Checks the offline/online status of the system.
+            InetAddress.getByName(location.getHost());
+        } catch (UnknownHostException ue) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "The host of " + location.toExternalForm() + " file should be located seems down, or you are simply offline.");
+            JNLPRuntime.setOnlineDetected(false);
+            return;
+        }
+        setOnlineDetected(true);
+    }
    
     /**
      * see <a href="https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java">Double-checked locking in Java</a>

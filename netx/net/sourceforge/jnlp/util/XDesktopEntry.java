@@ -102,8 +102,8 @@ public class XDesktopEntry {
             fileContents += "Vendor=" + sanitize(file.getInformation().getVendor()) + "\n";
         }
 
-        //Shortcut executes the jnlp from cache and system preferred java..
-        fileContents += "Exec=" + "javaws" + " \"" + cacheFile.getAbsolutePath() + "\"\n";
+        //Shortcut executes the jnlp as it was with system preferred java. It should work fine offline
+        fileContents += "Exec=" + "javaws" + " \"" + file.getSourceLocation() + "\"\n";
 
         return new StringReader(fileContents);
 

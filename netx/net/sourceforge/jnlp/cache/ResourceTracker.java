@@ -27,9 +27,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -408,36 +410,6 @@ public class ResourceTracker {
     }
 
     /**
-     * Returns an input stream that reads the contents of the
-     * resource.  For non-cacheable resources, an InputStream that
-     * reads from the source location is returned.  Otherwise the
-     * InputStream reads the cached resource.
-     * <p>
-     * This method will block while the resource is downloaded to
-     * the cache.
-     * </p>
-     *
-     * @param location location of resource which stream will be obtained
-     * @return the stream of the resource
-     * @throws IOException if there was an error opening the stream
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    public InputStream getInputStream(URL location) throws IOException {
-        try {
-            Resource resource = getResource(location);
-            if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR)))
-                waitForResource(location, 0);
-
-            if (resource.getLocalFile() != null)
-                return new FileInputStream(resource.getLocalFile());
-
-            return resource.getLocation().openStream();
-        } catch (InterruptedException ex) {
-            throw new IOException("wait was interrupted");
-        }
-    }
-
-    /**
      * Wait for a group of resources to be downloaded and made
      * available locally.
      *
@@ -804,6 +776,10 @@ public class ResourceTracker {
      * @param resource the resource to initialize
      */
     private void initializeResource(Resource resource) {
+        //verify connection
+        if(!JNLPRuntime.isOfflineForced()){
+            JNLPRuntime.detectOnline(resource.getLocation()/*or doenloadLocation*/);
+        }
         resource.fireDownloadEvent(); // fire CONNECTING
 
         CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
@@ -811,34 +787,43 @@ public class ResourceTracker {
 
         try {
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
-
-            // connect
-            URL finalLocation = findBestUrl(resource);
-
-            if (finalLocation == null) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Attempted to download " + resource.getLocation() + ", but failed to connect!");
-                throw new NullPointerException("finalLocation == null"); // Caught below
+            long size = 0;
+            boolean current = true;
+            //this can be null, as it is always filled in online mode, and never read in offline mode
+            URLConnection connection = null;
+            if (localFile != null) {
+                size = localFile.length();
+            } else if (!JNLPRuntime.isOnline()) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "You are trying to get resource " + resource.getLocation().toExternalForm() + " but you are in offline mode, and it is not in cache. Attempting to continue, but you may expect failure");
             }
+            if (JNLPRuntime.isOnline()) {
+                // connect
+                URL finalLocation = findBestUrl(resource);
 
-            resource.setDownloadLocation(finalLocation);
-            URLConnection connection = finalLocation.openConnection(); // this won't change so should be okay unsynchronized
-            connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
+                if (finalLocation == null) {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Attempted to download " + resource.getLocation() + ", but failed to connect!");
+                    throw new NullPointerException("finalLocation == null"); // Caught below
+                }
 
-            int size = connection.getContentLength();
-            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), connection.getLastModified()) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
-            if (!current) {
-                if (entry.isCached()) {
-                    entry.markForDelete();
-                    entry.store();
-                    // Old entry will still exist. (but removed at cleanup)
-                    localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
-                    CacheEntry newEntry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
-                    newEntry.lock();
-                    entry.unlock();
-                    entry = newEntry;
+                resource.setDownloadLocation(finalLocation);
+                connection = finalLocation.openConnection(); // this won't change so should be okay unsynchronized
+                connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
+
+                size = connection.getContentLength();
+                current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), connection.getLastModified()) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
+                if (!current) {
+                    if (entry.isCached()) {
+                        entry.markForDelete();
+                        entry.store();
+                        // Old entry will still exist. (but removed at cleanup)
+                        localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
+                        CacheEntry newEntry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
+                        newEntry.lock();
+                        entry.unlock();
+                        entry = newEntry;
+                    }
                 }
             }
-
             synchronized (resource) {
                 resource.setLocalFile(localFile);
                 // resource.connection = connection;
@@ -851,7 +836,7 @@ public class ResourceTracker {
             }
 
             // update cache entry
-            if (!current) {
+            if (!current && JNLPRuntime.isOnline()) {
                 entry.setRemoteContentLength(connection.getContentLengthLong());
                 entry.setLastModified(connection.getLastModified());
             }

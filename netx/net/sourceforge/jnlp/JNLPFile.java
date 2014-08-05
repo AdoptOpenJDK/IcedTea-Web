@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp;
 
+import java.io.File;
+import java.io.FileInputStream;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.IOException;
@@ -299,8 +301,8 @@ public class JNLPFile {
         try {
             ResourceTracker tracker = new ResourceTracker(false); // no prefetch
             tracker.addResource(location, version, null, policy);
-
-            return tracker.getInputStream(location);
+            File f = tracker.getCacheFile(location);
+            return new FileInputStream(f);
         } catch (Exception ex) {
             throw new IOException(ex.getMessage());
         }

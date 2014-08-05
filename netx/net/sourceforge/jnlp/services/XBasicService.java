@@ -95,18 +95,8 @@ class XBasicService implements BasicService {
     public boolean isOffline() {
 
         URL url = findFirstURLFromJNLPFile();
-        URLConnection conn = null;
-        try {
-            conn = url.openConnection();
-            conn.getInputStream().close();
-            return false;
-        } catch (IOException exception) {
-            return true;
-        } finally {
-            if (conn != null && conn instanceof HttpURLConnection) {
-                ((HttpURLConnection) conn).disconnect();
-            }
-        }
+        JNLPRuntime.detectOnline(url);
+        return !JNLPRuntime.isOnline();
     }
 
     /**
