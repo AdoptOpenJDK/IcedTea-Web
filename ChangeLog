@@ -1,4 +1,5 @@
 2014-08-05  Jiri Vanek  <jvanek@redhat.com>
+
 	Massively improved offline abilities. Added Xoffline switch to force work without inet connection.
 	* NEWS: updated
 	* netx/net/sourceforge/jnlp/JNLPFile.java: (openURL) is now using properly 
