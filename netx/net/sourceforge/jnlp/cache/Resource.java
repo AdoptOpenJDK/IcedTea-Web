@@ -54,14 +54,14 @@ public class Resource {
     // only once, regardless of UpdatePolicy.  verify and fix.
 
     public enum Status {
-        CONNECT,
+        PRECONNECT,
         CONNECTING,
         CONNECTED,
-        DOWNLOAD,
+        PREDOWNLOAD,
         DOWNLOADING,
         DOWNLOADED,
         ERROR,
-        STARTED // enqueued or being worked on
+        PROCESSING // in queue or being worked on
     }
 
     /** list of weak references of resources currently in use */
@@ -157,7 +157,7 @@ public class Resource {
 
     /**
      * Set the url to use for downloading the resource
-     * @param location
+     * @param downloadLocation
      */
     public void setDownloadLocation(URL downloadLocation) {
         this.downloadLocation = downloadLocation;

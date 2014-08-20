@@ -1,3 +1,13 @@
+2014-08-20  Jie Kang  <jkang@redhat.com>
+
+	Renamed Resource Status Enum fields to better describe their meaning.
+	CONNECT is now PRECONNECT, DOWNLOAD is now PREDOWNLOAD and STARTED is
+	now PROCESSING.
+	* netx/net/sourceforge/jnlp/cache/Resource.java: rename enum usages
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTest.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java: same
+
 2014-08-05  Jiri Vanek  <jvanek@redhat.com>
 
 	Massively improved offline abilities. Added Xoffline switch to force work without inet connection.

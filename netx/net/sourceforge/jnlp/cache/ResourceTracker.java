@@ -16,7 +16,14 @@
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.*;
+import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
+import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
+import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -27,11 +34,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -255,7 +260,7 @@ public class ResourceTracker {
             // they will just 'pass through' the tracker as if they were
             // never added (for example, not affecting the total download size).
             synchronized (resource) {
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, STARTED));
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
             }
             fireDownloadEvent(resource);
             return true;
@@ -271,7 +276,7 @@ public class ResourceTracker {
                     resource.setLocalFile(CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
                     resource.setSize(resource.getLocalFile().length());
                     resource.setTransferred(resource.getLocalFile().length());
-                    resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, STARTED));
+                    resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
                 }
                 fireDownloadEvent(resource);
                 return true;
@@ -506,14 +511,14 @@ public class ResourceTracker {
             if (resource.isSet(ERROR))
                 return true;
 
-            enqueue = !resource.isSet(STARTED);
+            enqueue = !resource.isSet(PROCESSING);
 
             if (!(resource.isSet(CONNECTED) || resource.isSet(CONNECTING)))
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(CONNECT, STARTED));
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT, PROCESSING));
             if (!(resource.isSet(DOWNLOADED) || resource.isSet(DOWNLOADING)))
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOAD, STARTED));
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD, PROCESSING));
 
-            if (!(resource.isSet(DOWNLOAD) || resource.isSet(CONNECT)))
+            if (!(resource.isSet(PREDOWNLOAD) || resource.isSet(PRECONNECT)))
                 enqueue = false;
         }
 
@@ -586,7 +591,7 @@ public class ResourceTracker {
      */
     private void queueResource(Resource resource) {
         synchronized (lock) {
-            if (!(resource.isSet(CONNECT) || resource.isSet(DOWNLOAD)))
+            if (!(resource.isSet(PRECONNECT) || resource.isSet(PREDOWNLOAD)))
                 throw new IllegalResourceDescriptorException("Invalid resource state (resource: " + resource + ")");
 
             queue.add(resource);
@@ -612,7 +617,7 @@ public class ResourceTracker {
         synchronized (resource) {
             // return to queue if we just initalized but it still needs
             // to download (not cached locally / out of date)
-            if (resource.isSet(DOWNLOAD)) // would be DOWNLOADING if connected before this method
+            if (resource.isSet(PREDOWNLOAD)) // would be DOWNLOADING if connected before this method
                 queueResource(resource);
 
             if (resource.isSet(DOWNLOADING))
@@ -828,11 +833,11 @@ public class ResourceTracker {
                 resource.setLocalFile(localFile);
                 // resource.connection = connection;
                 resource.setSize(size);
-                resource.changeStatus(EnumSet.of(CONNECT, CONNECTING), EnumSet.of(CONNECTED));
+                resource.changeStatus(EnumSet.of(PRECONNECT, CONNECTING), EnumSet.of(CONNECTED));
 
                 // check if up-to-date; if so set as downloaded
                 if (current)
-                    resource.changeStatus(EnumSet.of(DOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
+                    resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
             }
 
             // update cache entry
@@ -1010,7 +1015,7 @@ public class ResourceTracker {
      * resource tracker with prefetch enabled.
      * <p>
      * The resource state is advanced before it is returned
-     * (CONNECT-&gt;CONNECTING).
+     * (PRECONNECT-&gt;CONNECTING).
      * </p>
      * <p>
      * Calls to this method should be synchronized on lock.
@@ -1022,9 +1027,9 @@ public class ResourceTracker {
         Resource result;
 
         // pick from queue
-        result = selectByStatus(queue, CONNECT, ERROR); // connect but not error
+        result = selectByStatus(queue, PRECONNECT, ERROR); // connect but not error
         if (result == null)
-            result = selectByStatus(queue, EnumSet.of(DOWNLOAD), EnumSet.of(ERROR, CONNECT, CONNECTING));
+            result = selectByStatus(queue, EnumSet.of(PREDOWNLOAD), EnumSet.of(ERROR, PRECONNECT, CONNECTING));
 
         // remove from queue if found
         if (result != null)
@@ -1038,14 +1043,14 @@ public class ResourceTracker {
             return null;
 
         synchronized (result) {
-            if (result.isSet(CONNECT)) {
-                result.changeStatus(EnumSet.of(CONNECT), EnumSet.of(CONNECTING));
-            } else if (result.isSet(DOWNLOAD)) {
+            if (result.isSet(PRECONNECT)) {
+                result.changeStatus(EnumSet.of(PRECONNECT), EnumSet.of(CONNECTING));
+            } else if (result.isSet(PREDOWNLOAD)) {
                 // only download if *not* connecting, when done connecting
                 // select next will pick up the download part.  This makes
                 // all requested connects happen before any downloads, so
                 // the size is known as early as possible.
-                result.changeStatus(EnumSet.of(DOWNLOAD), EnumSet.of(DOWNLOADING));
+                result.changeStatus(EnumSet.of(PREDOWNLOAD), EnumSet.of(DOWNLOADING));
             }
         }
 
@@ -1079,7 +1084,7 @@ public class ResourceTracker {
                     });
 
                     if (result == null && alternate == null)
-                        alternate = selectByStatus(tracker.resources, EnumSet.of(CONNECTED), EnumSet.of(ERROR, DOWNLOADED, DOWNLOADING, DOWNLOAD));
+                        alternate = selectByStatus(tracker.resources, EnumSet.of(CONNECTED), EnumSet.of(ERROR, DOWNLOADED, DOWNLOADING, PREDOWNLOAD));
                 }
             }
         }
@@ -1098,7 +1103,7 @@ public class ResourceTracker {
 
             // prevents startResource from putting it on queue since
             // we're going to return it.
-            result.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(STARTED));
+            result.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PROCESSING));
 
             tracker.startResource(result);
         }

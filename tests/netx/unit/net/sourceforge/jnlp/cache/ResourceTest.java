@@ -37,10 +37,10 @@
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECT;
+import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOAD;
+import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static org.junit.Assert.assertEquals;
@@ -143,38 +143,38 @@ public class ResourceTest {
     @Test
     public void testSetFlag() throws Exception {
         Resource res = createResource("SetFlag");
-        setStatus(res, EnumSet.of(CONNECT));
+        setStatus(res, EnumSet.of(PRECONNECT));
         assertFalse("Resource should have been initialized", isUninitialized(res));
-        assertTrue("Resource should have had CONNECT set", hasFlag(res, CONNECT));
-        assertTrue("Resource should have only had CONNECT set", hasOnly(res, EnumSet.of(CONNECT)));
+        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
+        assertTrue("Resource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
     }
 
     @Test
     public void testSetMultipleFlags() throws Exception {
         Resource res = createResource("SetFlags");
-        setStatus(res, EnumSet.of(CONNECT, DOWNLOAD));
+        setStatus(res, EnumSet.of(PRECONNECT, PREDOWNLOAD));
         assertFalse("Resource should have been initialized", isUninitialized(res));
-        assertTrue("Resource should have had CONNECT set", hasFlag(res, CONNECT));
-        assertTrue("Resource should have had DOWNLOAD set", hasFlag(res, DOWNLOAD));
-        assertTrue("Resource should have only had CONNECT and DOWNLOAD set", hasOnly(res, EnumSet.of(CONNECT, DOWNLOAD)));
+        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
+        assertTrue("Resource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
+        assertTrue("Resource should have only had PRECONNECT and PREDOWNLOAD set", hasOnly(res, EnumSet.of(PRECONNECT, PREDOWNLOAD)));
     }
 
     @Test
     public void testChangeStatus() throws Exception {
         Resource res = createResource("ChangeStatus");
-        setStatus(res, EnumSet.of(CONNECT));
-        assertTrue("Resource should have had CONNECT set", hasFlag(res, CONNECT));
-        assertTrue("Resource should have only had CONNECT set", hasOnly(res, EnumSet.of(CONNECT)));
+        setStatus(res, EnumSet.of(PRECONNECT));
+        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
+        assertTrue("Resource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
 
-        Collection<Resource.Status> downloadFlags = EnumSet.of(DOWNLOAD, DOWNLOADING, DOWNLOADED);
-        Collection<Resource.Status> connectFlags = EnumSet.of(CONNECT, CONNECTING, CONNECTED);
+        Collection<Resource.Status> downloadFlags = EnumSet.of(PREDOWNLOAD, DOWNLOADING, DOWNLOADED);
+        Collection<Resource.Status> connectFlags = EnumSet.of(PRECONNECT, CONNECTING, CONNECTED);
         changeStatus(res, connectFlags, downloadFlags);
 
-        assertTrue("Resource should have had DOWNLOAD set", hasFlag(res, DOWNLOAD));
+        assertTrue("Resource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
         assertTrue("Resource should have had DOWNLOADING set", hasFlag(res, DOWNLOADING));
         assertTrue("Resource should have had DOWNLOADED set", hasFlag(res, DOWNLOADED));
-        assertTrue("Resource should have only had DOWNLOAD{,ING,ED} flags set", hasOnly(res, downloadFlags));
-        assertFalse("Resource should not have had CONNECT set", hasFlag(res, CONNECT));
+        assertTrue("Resource should have only had PREDOWNLOAD{,ING,ED} flags set", hasOnly(res, downloadFlags));
+        assertFalse("Resource should not have had PRECONNECT set", hasFlag(res, PRECONNECT));
     }
 
     private static Resource createResource(String testName) throws MalformedURLException {
