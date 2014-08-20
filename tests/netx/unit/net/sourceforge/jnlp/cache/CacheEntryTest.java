@@ -41,21 +41,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.util.PropertiesFile;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.PropertiesFile;
+
 public class CacheEntryTest {
 
-    /** A custom subclass that allows supplying a predefined cache file */
+    /** A custom subclass that allows supplying num predefined cache file */
     static class TestCacheEntry extends CacheEntry {
         private File cacheFile;
         public TestCacheEntry(URL location, Version version, File cacheFile) {
@@ -79,10 +83,20 @@ public class CacheEntryTest {
     private URL url;
     private Version version;
 
+    private ByteArrayOutputStream baos;
+    private PrintStream out;
+    private ExecutorService executorService;
+    Object listener = new Object();
+
+    int num = 0;
+
     @Before
     public void setUp() throws MalformedURLException {
         url = new URL("http://example.com/example.jar");
         version = new Version("1.0");
+        baos = new ByteArrayOutputStream();
+        out = new PrintStream(baos);
+        executorService = Executors.newSingleThreadExecutor();
     }
 
     @Test
@@ -208,4 +222,142 @@ public class CacheEntryTest {
         return cachedFile;
     }
 
+    @Test
+    public void testLock() throws IOException {
+        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+        try {
+            entry.lock();
+            assertTrue(entry.isHeldByCurrentThread());
+        } finally {
+            entry.unlock();
+        }
+    }
+
+    @Test
+    public void testUnlock() throws IOException {
+        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+        try {
+            entry.lock();
+        } finally {
+            entry.unlock();
+        }
+        assertTrue(!entry.isHeldByCurrentThread());
+    }
+
+    @Test
+    public void testStoreFailsWithoutLock() throws IOException {
+        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+        long num = 10;
+        entry.setLastModified(num);
+        assertTrue(!entry.store());
+    }
+
+    @Test
+    public void testStoreWorksWithLocK() throws IOException {
+        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+        long num = 10;
+        entry.setLastModified(num);
+        try {
+            entry.lock();
+            assertTrue(entry.store());
+        } finally {
+            entry.unlock();
+        }
+    }
+
+    @Test
+    public void testMultithreadLockPreventsWrite() throws IOException, InterruptedException {
+        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+        Thread a = new Thread(new WriteWorker(10, entry));
+        a.start();
+
+        Thread b = new Thread(new WriteWorker(5, entry));
+        b.start();
+
+        Thread.sleep(2000l);
+
+        synchronized (listener) {
+            num = 1;
+            listener.notifyAll();
+        }
+
+        String out = baos.toString();
+        assertTrue(out.contains(":10:true") && out.contains(":5:false"));
+    }
+
+    @Test
+    public void testMultithreadLockAllowsRead() throws IOException, InterruptedException {
+        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+        Thread a = new Thread(new WriteWorker(10, entry));
+        a.start();
+
+        Thread.sleep(2000l);
+
+        Thread b = new Thread(new ReadWorker(entry));
+        b.start();
+
+        Thread.sleep(1000l);
+
+        synchronized (listener) {
+            num = 1;
+            listener.notifyAll();
+        }
+
+        String out = baos.toString();
+        assertTrue(out.contains(":10:true") && out.contains(":read:10"));
+    }
+
+    private class WriteWorker implements Runnable {
+        long input;
+        TestCacheEntry entry;
+
+        public WriteWorker(long input, TestCacheEntry entry) {
+            this.input = input;
+            this.entry = entry;
+        }
+        @Override
+        public void run() {
+
+            try {
+                boolean result = entry.tryLock();
+                entry.setLastModified(input);
+                result = entry.store();
+                executorService.execute(new WriteRunnable(":" + input + ":" + result));
+                while (num == 0) {
+                    synchronized (listener) {
+                        listener.wait();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                entry.unlock();
+            }
+        }
+    }
+
+    private class WriteRunnable implements Runnable {
+        private String msg;
+        public WriteRunnable(String msg) {
+            this.msg = msg;
+        }
+
+        @Override
+        public void run() {
+            out.println(msg);
+            out.flush();
+        }
+    }
+
+    private class ReadWorker implements Runnable {
+        private TestCacheEntry entry;
+        public ReadWorker(TestCacheEntry entry) {
+            this.entry = entry;
+        }
+        @Override
+        public void run() {
+            long lastModified = entry.getLastModified();
+            executorService.execute(new WriteRunnable(":read:" + lastModified));
+        }
+    }
 }

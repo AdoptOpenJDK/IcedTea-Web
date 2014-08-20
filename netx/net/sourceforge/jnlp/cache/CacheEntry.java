@@ -20,6 +20,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
 import java.net.URL;
+
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -211,9 +212,16 @@ public class CacheEntry {
 
     /**
      * Save the current information for the cache entry.
+     *
+     * @return True if successfuly stored into file, false otherwise
      */
-    protected void store() {
-        properties.store();
+    protected boolean store() {
+        if (properties.isHeldByCurrentThread()) {
+            properties.store();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -227,14 +235,22 @@ public class CacheEntry {
      * Lock cache item.
      */
     protected void lock() {
-        CacheUtil.lockFile(properties);
+        properties.lock();
     }
 
     /**
      * Unlock cache item.
      */
     protected void unlock() {
-        CacheUtil.unlockFile(properties);
+        properties.unlock();
+    }
+
+    protected boolean tryLock() {
+        return properties.tryLock();
+    }
+
+    protected boolean isHeldByCurrentThread() {
+        return properties.isHeldByCurrentThread();
     }
 
 }

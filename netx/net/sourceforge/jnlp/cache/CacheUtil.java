@@ -21,7 +21,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilePermission;
 import java.io.IOException;
@@ -33,10 +32,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -50,7 +47,6 @@ import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
-import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -65,7 +61,6 @@ public class CacheUtil {
     private static final String setCacheDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
     private static final String cacheDir = new File(setCacheDir != null ? setCacheDir : System.getProperty("java.io.tmpdir")).getPath(); // Do this with file to standardize it.
     private static final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-    private static final HashMap<String, FileLock> propertiesLockPool = new HashMap<String, FileLock>();
 
     /**
      * Caches a resource and returns a URL for it in the cache;
@@ -276,17 +271,20 @@ public class CacheUtil {
 
         File cacheFile = null;
         synchronized (lruHandler) {
-            lruHandler.lock();
+            try {
+                lruHandler.lock();
 
-            // We need to reload the cacheOrder file each time
-            // since another plugin/javaws instance may have updated it.
-            lruHandler.load();
-            cacheFile = getCacheFileIfExist(urlToPath(source, ""));
-            if (cacheFile == null) { // We did not find a copy of it.
-                cacheFile = makeNewCacheFile(source, version);
-            } else
-                lruHandler.store();
-            lruHandler.unlock();
+                // We need to reload the cacheOrder file each time
+                // since another plugin/javaws instance may have updated it.
+                lruHandler.load();
+                cacheFile = getCacheFileIfExist(urlToPath(source, ""));
+                if (cacheFile == null) { // We did not find a copy of it.
+                    cacheFile = makeNewCacheFile(source, version);
+                } else
+                    lruHandler.store();
+            } finally {
+                lruHandler.unlock();
+            }
         }
         return cacheFile;
     }
@@ -355,31 +353,33 @@ public class CacheUtil {
      */
     public static File makeNewCacheFile(URL source, Version version) {
         synchronized (lruHandler) {
-            lruHandler.lock();
-            lruHandler.load();
-
             File cacheFile = null;
-            for (long i = 0; i < Long.MAX_VALUE; i++) {
-                String path = cacheDir + File.separator + i;
-                File cDir = new File(path);
-                if (!cDir.exists()) {
-                    // We can use this directory.
-                    try {
-                        cacheFile = urlToPath(source, path);
-                        FileUtils.createParentDir(cacheFile);
-                        File pf = new File(cacheFile.getPath() + ".info");
-                        FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
-                        lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
-                    } catch (IOException ioe) {
-                       OutputController.getLogger().log(ioe);
+            try {
+                lruHandler.lock();
+                lruHandler.load();
+                for (long i = 0; i < Long.MAX_VALUE; i++) {
+                    String path = cacheDir + File.separator + i;
+                    File cDir = new File(path);
+                    if (!cDir.exists()) {
+                        // We can use this directory.
+                        try {
+                            cacheFile = urlToPath(source, path);
+                            FileUtils.createParentDir(cacheFile);
+                            File pf = new File(cacheFile.getPath() + ".info");
+                            FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
+                            lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
+                        } catch (IOException ioe) {
+                            OutputController.getLogger().log(ioe);
+                        }
+
+                        break;
                     }
-
-                    break;
                 }
-            }
 
-            lruHandler.store();
-            lruHandler.unlock();
+                lruHandler.store();
+            } finally {
+                lruHandler.unlock();
+            }
             return cacheFile;
         }
     }
@@ -530,30 +530,31 @@ public class CacheUtil {
      * This will remove all old cache items.
      */
     public static void cleanCache() {
-
         if (okToClearCache()) {
             // First we want to figure out which stuff we need to delete.
             HashSet<String> keep = new HashSet<>();
             HashSet<String> remove = new HashSet<>();
-            lruHandler.load();
-            
-            long maxSize = -1; // Default
             try {
-                maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty("deployment.cache.max.size"));
-            } catch (NumberFormatException nfe) {
-            }
-            
-            maxSize = maxSize << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
-            long curSize = 0;
+                lruHandler.lock();
+                lruHandler.load();
 
-            for (Entry<String, String> e : lruHandler.getLRUSortedEntries()) {
-                // Check if the item is contained in cacheOrder.
-                final String key = e.getKey();
-                final String path = e.getValue();
+                long maxSize = -1; // Default
+                try {
+                    maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty("deployment.cache.max.size"));
+                } catch (NumberFormatException nfe) {
+                }
 
-                File file = new File(path);
-                PropertiesFile pf = new PropertiesFile(new File(path + ".info"));
-                boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
+                maxSize = maxSize << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
+                long curSize = 0;
+
+                for (Entry<String, String> e : lruHandler.getLRUSortedEntries()) {
+                    // Check if the item is contained in cacheOrder.
+                    final String key = e.getKey();
+                    final String path = e.getValue();
+
+                    File file = new File(path);
+                    PropertiesFile pf = new PropertiesFile(new File(path + ".info"));
+                    boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
 
                 /*
                  * This will get me the root directory specific to this cache item.
@@ -563,14 +564,14 @@ public class CacheUtil {
                  *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
                  *  then rstr becomes: /home/user1/.icedtea/cache/0
                  */
-                String rStr = file.getPath().substring(cacheDir.length());
-                rStr = cacheDir + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
-                long len = file.length();
+                    String rStr = file.getPath().substring(cacheDir.length());
+                    rStr = cacheDir + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
+                    long len = file.length();
 
-                if (keep.contains(file.getPath().substring(rStr.length()))) {
-                    lruHandler.removeEntry(key);
-                    continue;
-                }
+                    if (keep.contains(file.getPath().substring(rStr.length()))) {
+                        lruHandler.removeEntry(key);
+                        continue;
+                    }
 
                 /*
                  * we remove entries from our lru if any of the following condition is met.
@@ -580,30 +581,31 @@ public class CacheUtil {
                  *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
                  *  on disk would exceed the maximum size.
                  */
-                if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
-                    lruHandler.removeEntry(key);
-                    remove.add(rStr);
-                    continue;
-                }
-
-                curSize += len;
-                keep.add(file.getPath().substring(rStr.length()));
-
-                for (File f : file.getParentFile().listFiles()) {
-                    if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
-                        try {
-                            FileUtils.recursiveDelete(f, f);
-                        } catch (IOException e1) {
-                            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
-                        }
+                    if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
+                        lruHandler.removeEntry(key);
+                        remove.add(rStr);
+                        continue;
                     }
 
+                    curSize += len;
+                    keep.add(file.getPath().substring(rStr.length()));
+
+                    for (File f : file.getParentFile().listFiles()) {
+                        if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
+                            try {
+                                FileUtils.recursiveDelete(f, f);
+                            } catch (IOException e1) {
+                                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
+                            }
+                        }
+
+                    }
                 }
+                lruHandler.store();
+            } finally {
+                lruHandler.unlock();
             }
-            lruHandler.store();
-
             removeSetOfDirectories(remove);
-
         }
     }
 
@@ -614,40 +616,6 @@ public class CacheUtil {
                 FileUtils.recursiveDelete(f, f);
             } catch (IOException e) {
             }
-        }
-    }
-
-    /**
-     * Lock the property file and add it to our pool of locks.
-     * 
-     * @param properties Property file to lock.
-     */
-    public static void lockFile(PropertiesFile properties) {
-        String storeFilePath = properties.getStoreFile().getPath();
-        try {
-            propertiesLockPool.put(storeFilePath, FileUtils.getFileLock(storeFilePath, false, true));
-        } catch (OverlappingFileLockException e) {
-        } catch (FileNotFoundException e) {
-           OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-        }
-    }
-
-    /**
-     * Unlock the property file and remove it from our pool. Nothing happens if
-     * it wasn't locked.
-     * 
-     * @param properties Property file to unlock.
-     */
-    public static void unlockFile(PropertiesFile properties) {
-        File storeFile = properties.getStoreFile();
-        FileLock fl = propertiesLockPool.get(storeFile.getPath());
-        try {
-            if (fl == null) return;
-            fl.release();
-            fl.channel().close();
-            propertiesLockPool.remove(storeFile.getPath());
-        } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 }

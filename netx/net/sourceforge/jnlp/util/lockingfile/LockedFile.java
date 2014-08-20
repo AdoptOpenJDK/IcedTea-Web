@@ -123,6 +123,19 @@ public class LockedFile {
 
         this.threadLock.lock();
 
+        lockProcess();
+    }
+
+    public boolean tryLock() throws IOException {
+        if (this.threadLock.tryLock()) {
+            lockProcess();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void lockProcess() throws IOException {
         if (this.processLock != null) {
             return;
         }
@@ -140,7 +153,7 @@ public class LockedFile {
      * Unlock access to the file. Lock is reentrant.
      */
     public void unlock() throws IOException {
-        if (JNLPRuntime.isWindows()) {
+        if (JNLPRuntime.isWindows() || !this.threadLock.isHeldByCurrentThread()) {
             return;
         }
         boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
@@ -162,5 +175,9 @@ public class LockedFile {
         } finally {
             this.threadLock.unlock();
         }
+    }
+
+    public boolean isHeldByCurrentThread() {
+        return this.threadLock.isHeldByCurrentThread();
     }
 }

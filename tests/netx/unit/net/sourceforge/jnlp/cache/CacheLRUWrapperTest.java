@@ -40,13 +40,13 @@ package net.sourceforge.jnlp.cache;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import net.sourceforge.jnlp.ServerAccess;
 
-import net.sourceforge.jnlp.util.PropertiesFile;
 import org.junit.AfterClass;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.util.PropertiesFile;
 
 public class CacheLRUWrapperTest {
 
@@ -171,10 +171,12 @@ public class CacheLRUWrapperTest {
 
         clw.lock();
 
-        // clear cache + store file
-        clw.clearLRUSortedEntries();
-        clw.store();
-
-        clw.unlock();
+        try {
+            // clear cache + store file
+            clw.clearLRUSortedEntries();
+            clw.store();
+        } finally {
+            clw.unlock();
+        }
     }
 }

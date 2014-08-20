@@ -36,8 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
-import java.util.Set;
-import static  net.sourceforge.jnlp.runtime.Translator.R;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,12 +48,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This class helps maintain the ordering of most recently use items across
