@@ -134,12 +134,17 @@ public class CacheUtil {
         }
 
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Clearing cache directory: " + cacheDir);
+        lruHandler.lock();
         try {
             cacheDir = cacheDir.getCanonicalFile();
             FileUtils.recursiveDelete(cacheDir, cacheDir);
             cacheDir.mkdir();
+            lruHandler.clearLRUSortedEntries();
+            lruHandler.store();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            lruHandler.unlock();
         }
         return true;
     }

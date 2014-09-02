@@ -1,3 +1,9 @@
+2014-09-02  Jie Kang  <jkang@redhat.com>
+
+	Fixed CacheUtils clearCache method to also clear the Least Recently Used
+	entries.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
+
 2014-08-20  Jie Kang  <jkang@redhat.com>
 
 	Improved CacheEntry locking system to respect threads and processes.
