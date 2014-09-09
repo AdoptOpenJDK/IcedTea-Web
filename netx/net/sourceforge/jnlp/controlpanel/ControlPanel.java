@@ -53,6 +53,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.controlpanel.JVMPanel.JvmValidationResult;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.KeyStores;
@@ -169,7 +170,7 @@ public class ControlPanel extends JFrame {
             return JOptionPane.showConfirmDialog(ControlPanel.this,
                     "<html>"+Translator.R("CPJVMNotokMessage1", s)+"<br/>"
                     + validationResult.formattedText+"<br/>"
-                    + Translator.R("CPJVMNotokMessage2", DeploymentConfiguration.KEY_JRE_DIR, DeploymentConfiguration.USER_DEPLOYMENT_PROPERTIES_FILE)+"</html>",
+                    + Translator.R("CPJVMNotokMessage2", DeploymentConfiguration.KEY_JRE_DIR, PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath())+"</html>",
                     Translator.R("CPJVMconfirmInvalidJdkTitle"),JOptionPane.OK_CANCEL_OPTION);
         }
         return JOptionPane.OK_OPTION;

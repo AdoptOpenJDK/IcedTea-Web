@@ -45,6 +45,7 @@ import javax.swing.JSeparator;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements HyperlinkListener {
@@ -61,7 +62,7 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
         setPreferredSize(d);
         setSize(d);
         initComponents();
-        mainHtmlPane.setText(Translator.R("APPEXTSEChelp"));
+        mainHtmlPane.setText(getDialogueText());
         mainHtmlPane.addHyperlinkListener(ExtendedAppletSecurityHelp.this);
         mainHtmlPane.setCaretPosition(1);
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -151,12 +152,12 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
     }
 
     private void goToIntroSection(java.awt.event.ActionEvent evt) {
-        mainHtmlPane.setText(Translator.R("APPEXTSEChelp"));
+        mainHtmlPane.setText(getDialogueText());
         mainHtmlPane.setCaretPosition(1);
     }
 
     private void goToDialogueSection(java.awt.event.ActionEvent evt) {
-        mainHtmlPane.setText(Translator.R("APPEXTSEChelp"));
+        mainHtmlPane.setText(getDialogueText());
         mainHtmlPane.scrollToReference("dialogue");
     }
 
@@ -178,4 +179,8 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
     private JPanel mainPanel;
     private JScrollPane scrollPane;
     private JSeparator niceSeparator;
+
+    private String getDialogueText() {
+        return Translator.R("APPEXTSEChelp", TextsProvider.ITW_HOME, TextsProvider.ITW_BUGZILLAHOME, TextsProvider.ITW_BUGS, TextsProvider.ITW_EAS);
+    }
 }

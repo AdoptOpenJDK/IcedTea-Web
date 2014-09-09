@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class PolicyEditorAboutDialog extends JFrame {
-    private final String title, content;
+    private final String content;
     private final JScrollPane scrollPane = new JScrollPane();
     private final JTextPane textArea = new JTextPane();
     private final JPanel noWrapPanel = new JPanel();
@@ -39,7 +39,6 @@ public class PolicyEditorAboutDialog extends JFrame {
 
     public PolicyEditorAboutDialog(final String title, final String content) {
         super(title);
-        this.title = title;
         this.content = content;
         setupLayout();
 

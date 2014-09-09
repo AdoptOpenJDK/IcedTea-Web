@@ -37,47 +37,19 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-
 import net.sourceforge.jnlp.ShortcutDesc;
+import static net.sourceforge.jnlp.config.PathsAndFiles.*;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * This class stores the default configuration
  */
 public class Defaults {
     
-    final static String SYSTEM_HOME = System.getProperty("java.home");
-    final static String SYSTEM_SECURITY = SYSTEM_HOME + File.separator + "lib" + File.separator + "security";
-    final static String USER_CONFIG_HOME;
-    public final static String USER_CACHE_HOME;
-    final static String USER_SECURITY;
-    final static String LOCKS_DIR = System.getProperty("java.io.tmpdir") + File.separator
-            + System.getProperty("user.name") + File.separator + "netx" + File.separator
-            + "locks";
-    final static File userFile;
-
-    static {
-        String configHome = System.getProperty("user.home") + File.separator + DeploymentConfiguration.DEPLOYMENT_CONFIG_DIR;
-        String cacheHome = System.getProperty("user.home") + File.separator + DeploymentConfiguration.DEPLOYMENT_CACHE_DIR;
-        String XDG_CONFIG_HOME = System.getenv("XDG_CONFIG_HOME");
-        String XDG_CACHE_HOME = System.getenv("XDG_CACHE_HOME");
-        if (XDG_CONFIG_HOME != null) {
-            configHome = XDG_CONFIG_HOME + File.separator + DeploymentConfiguration.DEPLOYMENT_SUBDIR_DIR;
-        }
-        if (XDG_CACHE_HOME != null) {
-            cacheHome = XDG_CACHE_HOME + File.separator + DeploymentConfiguration.DEPLOYMENT_SUBDIR_DIR;
-        }
-        USER_CONFIG_HOME = configHome;
-        USER_CACHE_HOME = cacheHome;
-        USER_SECURITY = USER_CONFIG_HOME + File.separator + "security";
-        userFile = new File(USER_CONFIG_HOME + File.separator + DeploymentConfiguration.DEPLOYMENT_PROPERTIES);
-    }
 
     /**
      * Get the default settings for deployment
@@ -85,10 +57,10 @@ public class Defaults {
     public static Map<String, Setting<String>> getDefaults() {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkRead(userFile.toString());
+            sm.checkRead(USER_DEPLOYMENT_FILE.getFullPath());
         }
 
-
+       
         /*
          * This is more or less a straight copy from the deployment
          * configuration page, with occasional replacements of "" or no-defaults
@@ -105,12 +77,12 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_USER_CACHE_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_CACHE_HOME + File.separator + "cache"
+                        CACHE_DIR.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_CACHE_HOME + File.separator + "pcache"
+                        PCACHE_DIR.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_CACHE_DIR,
@@ -120,53 +92,53 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_USER_LOG_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_CONFIG_HOME + File.separator + "log"
+                        LOG_DIR.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TMP_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_CACHE_HOME + File.separator + "tmp"
+                        TMP_DIR.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_LOCKS_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        LOCKS_DIR
+                        LOCKS_DIR.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE,
                         BasicValueValidators.getFilePathValidator(),
-                        LOCKS_DIR + File.separator + "netx_running"
+                        MAIN_LOCK.getFullPath()
                 },
                 /* certificates and policy files */
                 {
                         DeploymentConfiguration.KEY_USER_SECURITY_POLICY,
                         BasicValueValidators.getUrlValidator(),
-                        "file://" + USER_SECURITY + File.separator + "java.policy"
+                        "file://" + JAVA_POLICY.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_SECURITY + File.separator + "trusted.cacerts"
+                        USER_CACERTS.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_SECURITY + File.separator + "trusted.jssecacerts"
+                        USER_JSSECAC.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_SECURITY + File.separator + "trusted.certs"
+                        USER_CERTS.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_SECURITY + File.separator + "trusted.jssecerts"
+                        USER_JSSECER.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_SECURITY + File.separator + "trusted.clientcerts"
+                        USER_CLIENTCERT.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY,
@@ -176,27 +148,27 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYSTEM_SECURITY + File.separator + "cacerts"
+                        SYS_CACERT.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYSTEM_SECURITY + File.separator + "jssecacerts"
+                        SYS_JSSECAC.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYSTEM_SECURITY + File.separator + "trusted.certs"
+                        SYS_CERT.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYSTEM_SECURITY + File.separator + "trusted.jssecerts"
+                        SYS_JSSECERT.getFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYSTEM_SECURITY + File.separator + "trusted.clientcerts"
+                        SYS_CLIENTCERT.getFullPath()
                 },
                 /* security access and control */
                 {
@@ -437,13 +409,13 @@ public class Defaults {
                 }
         };
 
-        HashMap<String, Setting<String>> result = new HashMap<String, Setting<String>>();
-        for (int i = 0; i < defaults.length; i++) {
-            String name = (String) defaults[i][0];
-            ValueValidator checker = (ValueValidator) defaults[i][1];
-            String actualValue = (String) defaults[i][2];
+        HashMap<String, Setting<String>> result = new HashMap<>();
+        for (Object[] default1 : defaults) {
+            String name = (String) default1[0];
+            ValueValidator checker = (ValueValidator) default1[1];
+            String actualValue = (String) default1[2];
             boolean locked = false;
-            Setting<String> value = new Setting<String>(name, R("Unknown"), locked, checker, actualValue, actualValue, R("DCSourceInternal"));
+            Setting<String> value = new Setting<>(name, R("Unknown"), locked, checker, actualValue, actualValue, R("DCSourceInternal"));
             result.put(name, value);
         }
 

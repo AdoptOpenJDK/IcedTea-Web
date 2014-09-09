@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 /**
  * This class provides a GUI interface which shows some basic information on
@@ -51,7 +52,7 @@ public class AboutPanel extends NamedBorderPanel {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AboutDialog.display();
+                AboutDialog.display(TextsProvider.ITWEB_SETTINGS);
             }
         });
         c.fill = GridBagConstraints.BOTH;

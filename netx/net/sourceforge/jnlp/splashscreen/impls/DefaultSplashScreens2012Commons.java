@@ -45,6 +45,7 @@ import java.awt.event.MouseEvent;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.BasePainter;
 import net.sourceforge.jnlp.splashscreen.parts.BasicComponentSplashScreen;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 public final class DefaultSplashScreens2012Commons {
 
@@ -68,7 +69,7 @@ public final class DefaultSplashScreens2012Commons {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getY() < painter.getAboutOfset().y && e.getX() > (painter.getAboutOfset().x)) {
-                    AboutDialog.display();
+                    AboutDialog.display(TextsProvider.ITW_PLUGIN);
                 }
             }
         });

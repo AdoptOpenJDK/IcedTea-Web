@@ -39,14 +39,11 @@ package net.sourceforge.jnlp.security.policyeditor;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dialog.ModalityType;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -103,10 +100,16 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import net.sourceforge.jnlp.about.AboutDialog;
+import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -141,26 +144,22 @@ public class PolicyEditor extends JPanel {
     /**
      * Command line switch to print a help message.
      */
-    public static final String HELP_FLAG = "-help";
+    public static final String HELP_FLAG = OptionsDefinitions.OPTIONS.HELP.option;
 
     /**
      * Command line switch to specify the location of the policy file.
      * If not given, then the default DeploymentConfiguration path is used.
      */
-    public static final String FILE_FLAG = "-file";
+    public static final String FILE_FLAG = OptionsDefinitions.OPTIONS.FILE.option;
 
     /**
      * Command line switch to specify a new codebase entry to be made.
      * Can only be used once, presently.
      */
-    public static final String CODEBASE_FLAG = "-codebase";
+    public static final String CODEBASE_FLAG = OptionsDefinitions.OPTIONS.CODEBASE.option;
 
-    private static final String HELP_MESSAGE = "Usage:\t" + R("PEUsage") + "\n\n"
-            + "  " + HELP_FLAG + "\t\t\t" + R("PEHelpFlag") + "\n"
-            + "  " + FILE_FLAG + "\t\t\t" + R("PEFileFlag") + "\n"
-            + "  " + CODEBASE_FLAG + "\t\t" + R("PECodebaseFlag") + "\n";
-
-    private boolean closed = false;
+    
+      private boolean closed = false;
     private final Map<PolicyEditorPermissions, JCheckBox> checkboxMap = new TreeMap<>();
     private final List<JCheckBoxWithGroup> groupBoxList = new ArrayList<>(Group.values().length);
     private final JScrollPane scrollPane = new JScrollPane();
@@ -182,8 +181,8 @@ public class PolicyEditor extends JPanel {
     private final ActionListener okButtonAction, addCodebaseButtonAction,
             removeCodebaseButtonAction, newButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
             renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction,
-            policyEditorHelpButtonAction, aboutPolicyEditorButtonAction;
-    private ActionListener closeButtonAction;
+            policyEditorHelpButtonAction, aboutPolicyEditorButtonAction, aboutItwButtonAction;
+    private final ActionListener closeButtonAction;
 
     private static class JCheckBoxWithGroup extends JCheckBox {
 
@@ -435,7 +434,16 @@ public class PolicyEditor extends JPanel {
         aboutPolicyEditorButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                new PolicyEditorAboutDialog(R("PEAboutDialogTitle"), R("PEAboutDialogContent")).setVisible(true);
+                boolean modal = getModality();
+                AboutDialog.display(modal, TextsProvider.POLICY_EDITOR,AboutDialog.ShowPage.HELP);
+            }
+        };
+        
+         aboutItwButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                boolean modal = getModality();
+                AboutDialog.display(modal, TextsProvider.POLICY_EDITOR);
             }
         };
 
@@ -452,6 +460,22 @@ public class PolicyEditor extends JPanel {
         closeButton.addActionListener(closeButtonAction);
 
         setupLayout();
+    }
+    
+    private boolean getModality() {
+        boolean modal = false;
+        Container parent = PolicyEditor.this;
+        while (true) {
+            if (parent == null) {
+                break;
+            }
+            if (parent instanceof JDialog) {
+                modal = ((JDialog) parent).isModal();
+                break;
+            }
+            parent = parent.getParent();
+        }
+        return modal;
     }
 
     /**
@@ -1086,6 +1110,11 @@ public class PolicyEditor extends JPanel {
         aboutPolicyEditorItem.addActionListener(editor.aboutPolicyEditorButtonAction);
         helpMenu.add(aboutPolicyEditorItem);
 
+        final JMenuItem aboutITW = new JMenuItem(R("CPTabAbout"));
+        //setButtonMnemonic(aboutPolicyEditorItem, R("PEAboutPolicyEditorItemMnemonic"));
+        aboutITW.addActionListener(editor.aboutItwButtonAction);
+        helpMenu.add(aboutITW);
+        
         final JMenuItem policyEditorHelpItem = new JMenuItem(R("PEPolicyEditorHelpItem"));
         setButtonMnemonic(policyEditorHelpItem, R("PEPolicyEditorHelpItemMnemonic"));
         policyEditorHelpItem.addActionListener(editor.policyEditorHelpButtonAction);
@@ -1556,7 +1585,18 @@ public class PolicyEditor extends JPanel {
         final Map<String, String> argsMap = argsToMap(args);
 
         if (argsMap.containsKey(HELP_FLAG)) {
-            System.out.println(HELP_MESSAGE);
+            final TextsProvider helpMessagesProvider = new PolicyEditorTextsProvider("utf-8", new PlainTextFormatter(), true, true);
+            String HELP_MESSAGE = "\n";
+            if (JNLPRuntime.isDebug()) {
+                HELP_MESSAGE = HELP_MESSAGE + helpMessagesProvider.writeToString();
+            } else {
+                HELP_MESSAGE = HELP_MESSAGE
+                        + helpMessagesProvider.prepare().getSynopsis()
+                        + helpMessagesProvider.getFormatter().getNewLine()
+                        + helpMessagesProvider.prepare().getOptions()
+                        + helpMessagesProvider.getFormatter().getNewLine();
+            }
+            OutputController.getLogger().printOut(HELP_MESSAGE);
             return;
         }
 

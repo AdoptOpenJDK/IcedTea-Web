@@ -1,4 +1,4 @@
-/* HTMLPanel.java
+/* 
    Copyright (C) 2008 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -52,12 +52,11 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class HTMLPanel extends JPanel {
 
-    private String id;
-
-    public HTMLPanel(URL url, String identifier) {
+    protected JEditorPane pane = new JEditorPane();
+    
+    public HTMLPanel(URL url) {
         super(new BorderLayout());
-        id = identifier;
-        JEditorPane pane = new JEditorPane();
+        
         try {
              pane = new JEditorPane(url);
         } catch (IOException ex) {
@@ -71,10 +70,7 @@ public class HTMLPanel extends JPanel {
         this.add(scroller, BorderLayout.CENTER);
     }
 
-    public String getIdentifier() {
-        return id;
-    }
-
+ 
     private class UrlHyperlinkListener implements HyperlinkListener {
         @Override
         public void hyperlinkUpdate(HyperlinkEvent event) {

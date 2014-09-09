@@ -3,6 +3,7 @@
 export TOP_BUILD_DIR = $(abs_top_builddir)
 
 export NETX_DIR = $(abs_top_builddir)/netx.build
+export DOCS_DIR=$(TOP_BUILD_DIR)/icedtea-web-docs
 export NETX_SRCDIR = $(abs_top_srcdir)/netx
 export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 
@@ -232,13 +233,13 @@ all-local: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
 clean-local: clean-netx clean-plugin clean-liveconnect \
- clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-tests clean-bootstrap-directory
+ clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-generated-docs clean-tests clean-bootstrap-directory
 	if [ -e stamps ] ; then \
 	  rmdir stamps ; \
 	fi
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
- clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs \
+ clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs clean-generated-docs \
  clean-tests check-local clean-launchers stamps/check-pac-functions.stamp stamps/run-netx-unit-tests.stamp clean-netx-tests \
  clean-junit-runner clean-netx-unit-tests
 
@@ -254,11 +255,10 @@ endif
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor) $(DESTDIR)$(bindir)
 
+# all generated manpages are installed in swarm
 install-data-local:
-	${mkinstalldirs} -d $(DESTDIR)$(mandir)/man1
-	${INSTALL_DATA} $(NETX_SRCDIR)/javaws.1 $(DESTDIR)$(mandir)/man1
-	${INSTALL_DATA} $(NETX_SRCDIR)/itweb-settings.1 $(DESTDIR)$(mandir)/man1
-	${INSTALL_DATA} $(NETX_SRCDIR)/policyeditor.1 $(DESTDIR)$(mandir)/man1
+	${mkinstalldirs} -d $(DESTDIR)$(mandir)
+	cp -r $(DOCS_DIR)/man-$(FULL_VERSION)/man/* $(DESTDIR)$(mandir)/
 if ENABLE_DOCS
 	${mkinstalldirs} $(DESTDIR)$(htmldir)
 	(cd ${abs_top_builddir}/docs/netx; \
@@ -275,13 +275,19 @@ if ENABLE_PLUGIN
 endif
 endif
 
+# all generated manpages must be removed one by one
 uninstall-local:
 	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	rm -f $(DESTDIR)$(mandir)/man1/javaws.1
-	rm -f $(DESTDIR)$(mandir)/man1/itweb-settings.1
-	rm -f $(DESTDIR)$(mandir)/man1/policyeditor.1
+	rm -r $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+	KNOWN_MANS="icedtea-web.1  icedtea-web-plugin.1  itweb-settings.1  javaws.1  policyeditor.1" ; \
+	KNOWN_DIRS="man1 de/man1 pl/man1 cs/man1" ; \
+	for file in $$KNOWN_MANS ; do \
+	  for dir in $$KNOWN_DIRS ; do \
+	    rm -f $(DESTDIR)$(mandir)/$$dir/$$file ; \
+	  done ; \
+	done
 	rm -f $(DESTDIR)$(bindir)/$(javaws)
 	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
 	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
@@ -467,6 +473,42 @@ if !WITH_RHINO
 	sed -i '/RhinoBasedPacEvaluator/ d' $@
 endif
 
+stamps/generate-docs.stamp: stamps/netx.stamp
+	mkdir $(DOCS_DIR) ; \
+	HTML_DOCS_TARGET_DIR=$(DOCS_DIR)/html-$(FULL_VERSION)  ; \
+	PLAIN_DOCS_TARGET_DIR=$(DOCS_DIR)/plain-$(FULL_VERSION)  ; \
+	MAN_DOCS_TARGET_DIR=$(DOCS_DIR)/man-$(FULL_VERSION)/man  ; \
+	mkdir $$HTML_DOCS_TARGET_DIR ; \
+	mkdir $$PLAIN_DOCS_TARGET_DIR ; \
+	mkdir -p $$MAN_DOCS_TARGET_DIR ; \
+	HTML_DOCS_INDEX=$$HTML_DOCS_TARGET_DIR/index.html ; \
+	TP_COMMAND="$(BOOT_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.util.docprovider.TextsProvider" ; \
+	TP_TAIL="false $(FULL_VERSION)" ; \
+	LANG_BACKUP=$$LANG ; \
+	echo "<html><head><title>$(PLUGIN_VERSION)</title></head>" > $$HTML_DOCS_INDEX ; \
+	echo "<body><h3>$(PLUGIN_VERSION) docs:</h3>"  >> $$HTML_DOCS_INDEX ; \
+	for LANG_ID in en_US.UTF-8 cs_CZ.UTF-8 pl_PL.UTF-8 de_DE.UTF-8 ;  do \
+	  ID=`echo "$$LANG_ID" | head -c 2` ; \
+	  ENCOD=`echo "$$LANG_ID" | tail -c 6` ; \
+	  export LANG=$$LANG_ID; \
+	  mkdir $$HTML_DOCS_TARGET_DIR/$$ID ; \
+	  echo "<li><a href='$$ID/icedtea-web.html'>$$LANG_ID</a></li>"  >> $$HTML_DOCS_INDEX ; \
+	  $$TP_COMMAND html $$HTML_DOCS_TARGET_DIR/$$ID false $TP_TAIL ; \
+	  mkdir $$PLAIN_DOCS_TARGET_DIR/$$ID ; \
+	  $$TP_COMMAND plain $$PLAIN_DOCS_TARGET_DIR/$$ID 160 false $TP_TAIL; \
+	  if [ $$ID == "en" ] ; then \
+	    MAN_DESC=$$MAN_DOCS_TARGET_DIR/man1 ; \
+	  else \
+	    MAN_DESC=$$MAN_DOCS_TARGET_DIR/$$ID/man1 ; \
+	  fi ; \
+	  mkdir -p $$MAN_DESC ; \
+	  $$TP_COMMAND man $$ENCOD $$MAN_DESC $$TP_TAIL ; \
+	  $$TP_COMMAND htmlIntro $(NETX_DIR)/net/sourceforge/jnlp/resources/about_$$ID.html $$TP_TAIL; \
+	done ; \
+	export LANG=$$LANG_BACKUP ; \
+	echo "</body></html>"  >> $$HTML_DOCS_INDEX ; \
+	touch $@
+
 stamps/netx-html-gen.stamp:
 	(cd $$NETX_SRCDIR/..; \
 	mkdir -p html-gen; \
@@ -499,7 +541,7 @@ stamps/netx.stamp: netx-source-files.txt stamps/bootstrap-directory.stamp stamps
 	mkdir -p stamps
 	touch $@
 
-stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest
+stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest stamps/generate-docs.stamp
 	(cd $(NETX_DIR) ; \
 	 mkdir -p lib ; \
 	 $(BOOT_DIR)/bin/jar cfm lib/classes.jar \
@@ -607,6 +649,10 @@ endif
 clean-plugin-docs:
 	rm -rf ${abs_top_builddir}/docs/plugin
 	rm -f stamps/plugin-docs.stamp
+
+clean-generated-docs:
+	rm -rf $(DOCS_DIR)
+	rm -f stamps/generate-docs.stamp
 
 
 # check

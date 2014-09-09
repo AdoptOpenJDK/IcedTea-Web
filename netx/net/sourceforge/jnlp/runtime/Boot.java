@@ -39,6 +39,10 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.security.viewer.CertificateViewer;
 import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.docprovider.IcedTeaWebTextsProvider;
+import net.sourceforge.jnlp.util.docprovider.JavaWsTextsProvider;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
@@ -84,45 +88,6 @@ public final class Boot implements PrivilegedAction<Void> {
             + "   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\n"
             + "\n";
 
-    private static final String itwInfoMessage = ""
-            + nameAndVersion
-            + "\n\n*  "
-            + R("BAboutITW")
-            + "\n*  "
-            + R("BFileInfoAuthors")
-            + "\n*  "
-            + R("BFileInfoNews")
-            + "\n*  "
-            + R("BFileInfoCopying");
-
-    private static final String helpMessage = "\n"
-            + "Usage:   " + R("BOUsage") + "\n"
-            + "         " + R("BOUsage2") + "\n"
-            + "\n"
-            + "control-options:" + "\n"
-            + "  -about                " + R("BOAbout") + "\n"
-            + "  -viewer               " + R("BOViewer") + "\n"
-            + "\n"
-            + "run-options:" + "\n"
-            + "  -version              " + R("BOVersion") + "\n"
-            + "  -arg arg              " + R("BOArg") + "\n"
-            + "  -param name=value     " + R("BOParam") + "\n"
-            + "  -property name=value  " + R("BOProperty") + "\n"
-            + "  -update seconds       " + R("BOUpdate") + "\n"
-            + "  -license              " + R("BOLicense") + "\n"
-            + "  -verbose              " + R("BOVerbose") + "\n"
-            + "  -nosecurity           " + R("BONosecurity") + "\n"
-            + "  -noupdate             " + R("BONoupdate") + "\n"
-            + "  -headless             " + R("BOHeadless") + "\n"
-            + "  -strict               " + R("BOStrict") + "\n"
-            + "  -xml                  " + R("BOXml") + "\n"
-            + "  -allowredirect        " + R("BOredirect") + "\n"
-            + "  -Xnofork              " + R("BXnofork") + "\n"
-            + "  -Xclearcache          " + R("BXclearcache") + "\n"
-            + "  -Xignoreheaders       " + R("BXignoreheaders") + "\n"
-            + "  -Xoffline             " + R("BXoffline") + "\n"
-            + "  -help                 " + R("BOHelp") + "\n";
-
     private static final String doubleArgs = "-basedir -jnlp -arg -param -property -update";
 
     private static String args[]; // avoid the hot potato
@@ -133,13 +98,17 @@ public final class Boot implements PrivilegedAction<Void> {
     public static void main(String[] argsIn) {
         args = argsIn;
 
+        if (null != getOption("-verbose")) {
+            JNLPRuntime.setDebug(true);
+        }
+
         if (AppContext.getAppContext() == null) {
             SunToolkit.createNewAppContext();
         }
         if (null != getOption("-headless")) {
             JNLPRuntime.setHeadless(true);
         }
-
+        
         DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
 
         if (null != getOption("-viewer")) {
@@ -150,7 +119,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
-
+        
         if (null != getOption("-version")) {
             OutputController.getLogger().printOutLn(nameAndVersion);
             JNLPRuntime.exit(0);
@@ -162,12 +131,12 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         if (null != getOption("-help")) {
-            OutputController.getLogger().printOutLn(helpMessage);
+            handleMessage();
             JNLPRuntime.exit(0);
         }
 
         if (null != getOption("-about")) {
-                OutputController.getLogger().printOutLn(itwInfoMessage);
+                handleAbout();
             if (null != getOption("-headless")) {
                 JNLPRuntime.exit(0);
             } else {
@@ -177,13 +146,11 @@ public final class Boot implements PrivilegedAction<Void> {
                     OutputController.getLogger().log("Unable to set system look and feel");
                 }
                 OutputController.getLogger().printOutLn(R("BLaunchAbout"));
-                AboutDialog.display();
+                AboutDialog.display(TextsProvider.JAVAWS);
                 return;
             }
         }
 
-        if (null != getOption("-verbose"))
-            JNLPRuntime.setDebug(true);
 
         if (null != getOption("-update")) {
             int value = Integer.parseInt(getOption("-update"));
@@ -213,6 +180,38 @@ public final class Boot implements PrivilegedAction<Void> {
 
         AccessController.doPrivileged(new Boot());
 
+    }
+
+    private static void handleMessage() {
+        final TextsProvider helpMessagesProvider = new JavaWsTextsProvider("utf-8", new PlainTextFormatter(), true, true);
+
+        String helpMessage = "\n";
+        if (JNLPRuntime.isDebug()){
+            helpMessage += helpMessagesProvider.writeToString();
+        } else {
+            helpMessage = helpMessage
+                + helpMessagesProvider.prepare().getSynopsis()
+                + helpMessagesProvider.getFormatter().getNewLine()
+                + helpMessagesProvider.prepare().getOptions()
+                + helpMessagesProvider.getFormatter().getNewLine();
+        }
+        
+        OutputController.getLogger().printOut(helpMessage);
+    }
+
+    private static void handleAbout() {
+        final TextsProvider aboutMessagesProvider = new IcedTeaWebTextsProvider("utf-8", new PlainTextFormatter(), false, true);
+        String itwInfoMessage = ""
+                + nameAndVersion
+                + "\n\n";
+
+        if (JNLPRuntime.isDebug()) {
+            itwInfoMessage += aboutMessagesProvider.writeToString();
+        } else {
+            itwInfoMessage = itwInfoMessage
+                    + aboutMessagesProvider.prepare().getIntroduction();
+        }
+        OutputController.getLogger().printOut(itwInfoMessage);
     }
 
     /**
@@ -270,7 +269,7 @@ public final class Boot implements PrivilegedAction<Void> {
         String location = getJNLPFile();
 
         if (location == null) {
-            OutputController.getLogger().printOutLn(helpMessage);
+            handleMessage();
             JNLPRuntime.exit(1);
         }
 
@@ -298,7 +297,7 @@ public final class Boot implements PrivilegedAction<Void> {
     private static String getJNLPFile() {
 
         if (args.length == 0) {
-            OutputController.getLogger().printOutLn(helpMessage);
+            handleMessage();
             JNLPRuntime.exit(0);
         } else if (args.length == 1) {
             return args[args.length - 1];
@@ -309,7 +308,7 @@ public final class Boot implements PrivilegedAction<Void> {
             if (doubleArgs.indexOf(secondLastArg) == -1) {
                 return lastArg;
             } else {
-                OutputController.getLogger().printOutLn(helpMessage);
+                handleMessage();
                 JNLPRuntime.exit(0);
             }
         }

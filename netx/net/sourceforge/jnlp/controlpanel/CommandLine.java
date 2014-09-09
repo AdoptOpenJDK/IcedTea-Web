@@ -30,8 +30,12 @@ import javax.naming.ConfigurationException;
 
 import net.sourceforge.jnlp.config.ConfiguratonValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.Setting;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -66,9 +70,6 @@ public class CommandLine {
 
     public final String PROGRAM_NAME;
 
-    private static final List<String> allCommands = Arrays.asList(new String[] {
-            "list", "get", "set", "reset", "info", "check"
-    });
 
     DeploymentConfiguration config = null;
 
@@ -90,14 +91,25 @@ public class CommandLine {
     /**
      * Handle the 'help' command
      *
-     * @param args optional
      * @return the result of handling the help command. SUCCESS if no errors occurred.
      */
-    public int handleHelpCommand(List<String> args) {
-        OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " "
-                + allCommands.toString().replace(',', '|').replaceAll(" ", "") + " [help]");
-        OutputController.getLogger().printOutLn(R("CLHelpDescription", PROGRAM_NAME));
+    public int handleHelpCommand() {
+        final TextsProvider helpMessagesProvider = new ItwebSettingsTextsProvider("utf-8", new PlainTextFormatter(), true, true);
+        String helpMessage = "\n";
+
+        if (JNLPRuntime.isDebug()) {
+            helpMessage = helpMessage
+                    + helpMessagesProvider.writeToString();
+        } else {
+            helpMessage = helpMessage
+                    + helpMessagesProvider.prepare().getSynopsis()
+                    + helpMessagesProvider.getFormatter().getNewLine()
+                    + helpMessagesProvider.prepare().getDescription()
+                    + helpMessagesProvider.getFormatter().getNewLine()
+                    + helpMessagesProvider.prepare().getCommands()
+                    + helpMessagesProvider.getFormatter().getNewLine();
+        }
+        OutputController.getLogger().printOut(helpMessage);
         return SUCCESS;
     }
 
@@ -129,7 +141,7 @@ public class CommandLine {
             args.remove("--details");
         }
 
-        if (args.size() != 0) {
+        if (!args.isEmpty()) {
             printListHelp();
             return ERROR;
         }
@@ -370,7 +382,7 @@ public class CommandLine {
             return SUCCESS;
         }
 
-        if (args.size() != 0) {
+        if (!args.isEmpty()) {
             printCheckHelp();
             return ERROR;
         }
@@ -416,36 +428,33 @@ public class CommandLine {
         }
 
         if (commandAndArgs.length == 0) {
-            handleHelpCommand(new ArrayList<String>());
+            handleHelpCommand();
             return ERROR;
         }
 
         String command = commandAndArgs[0];
         String[] argsArray = new String[commandAndArgs.length - 1];
         System.arraycopy(commandAndArgs, 1, argsArray, 0, commandAndArgs.length - 1);
-        List<String> arguments = new ArrayList<String>(Arrays.asList(argsArray));
+        List<String> arguments = new ArrayList<>(Arrays.asList(argsArray));
 
         int val;
-        if (command.equals("help")) {
-            val = handleHelpCommand(arguments);
-        } else if (command.equals("list")) {
+        if (command.equals(OptionsDefinitions.OPTIONS.NODASHHELP.option)) {
+            val = handleHelpCommand();
+        } else if (command.equals(OptionsDefinitions.OPTIONS.LIST.option)) {
             val = handleListCommand(arguments);
-        } else if (command.equals("set")) {
+        } else if (command.equals(OptionsDefinitions.OPTIONS.SET.option)) {
             val = handleSetCommand(arguments);
-        } else if (command.equals("reset")) {
+        } else if (command.equals(OptionsDefinitions.OPTIONS.RESET.option)) {
             val = handleResetCommand(arguments);
-        } else if (command.equals("get")) {
+        } else if (command.equals(OptionsDefinitions.OPTIONS.GET.option)) {
             val = handleGetCommand(arguments);
-        } else if (command.equals("info")) {
+        } else if (command.equals(OptionsDefinitions.OPTIONS.INFO.option)) {
             val = handleInfoCommand(arguments);
-        } else if (command.equals("check")) {
+        } else if (command.equals(OptionsDefinitions.OPTIONS.CHECK.option)) {
             val = handleCheckCommand(arguments);
-        } else if (allCommands.contains(command)) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "INTERNAL ERROR: " + command + " should have been implemented");
-            val = ERROR;
         } else {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownCommand", command));
-            handleHelpCommand(new ArrayList<String>());
+            handleHelpCommand();
             val = ERROR;
         }
 

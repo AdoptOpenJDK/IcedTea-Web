@@ -64,6 +64,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.BasicExceptionDialog;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class JEditorPaneBasedExceptionDialog extends JDialog implements HyperlinkListener {
@@ -221,7 +222,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 try{
-               AboutDialog.display(true);
+               AboutDialog.display(true, TextsProvider.ITW_PLUGIN);
             }catch(Exception ex){
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 JOptionPane.showConfirmDialog(JEditorPaneBasedExceptionDialog.this, ex);
@@ -400,8 +401,8 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
     }
 
     private static String createLink() {
-        return "<a href=\"" + Translator.R(InfoItem.SPLASH + "url") + "\">" +
-                Translator.R(InfoItem.SPLASH + "urlLooks") + "</a>";
+        return "<a href=\"" + TextsProvider.ITW_BUGS + "\">" +
+                TextsProvider.ITW_HOME + "</a>";
     }
 
 

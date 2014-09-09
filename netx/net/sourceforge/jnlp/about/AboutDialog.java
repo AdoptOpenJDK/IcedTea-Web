@@ -45,88 +45,163 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
-public class AboutDialog extends JPanel implements Runnable, ActionListener {
+public final class AboutDialog extends JPanel implements Runnable, ActionListener {
 
-    private static final String about_url = "/net/sourceforge/jnlp/resources/about.html";
+    private static final String about_url_stub = "/net/sourceforge/jnlp/resources/about";
     private static final String authors_url = "/net/sourceforge/jnlp/resources/AUTHORS.html";
     private static final String changelog_url = "/net/sourceforge/jnlp/resources/ChangeLog.html";
     private static final String copying_url = "/net/sourceforge/jnlp/resources/COPYING.html";
     private static final String news_url = "/net/sourceforge/jnlp/resources/NEWS.html";
 
-    private JDialog frame;
+    private final  String app;
+
+    private final JDialog frame;
     private JPanel contentPane;
-    private HTMLPanel aboutPanel, authorsPanel, newsPanel, changelogPanel, copyingPanel;
-    private JButton aboutButton, authorsButton, newsButton, changelogButton, copyingButton;
+    //singletons to not laod/generate them all around
+    private static HTMLPanel aboutPanel, authorsPanel, newsPanel, changelogPanel, copyingPanel, helpPanel;
+    private final JButton aboutButton, authorsButton, newsButton, changelogButton, copyingButton, helpButton;
 
-    public AboutDialog(boolean modal) {
+    private final URL res_authors = getClass().getResource(authors_url);
+    private final URL res_news = getClass().getResource(news_url);
+    private final URL res_changelog = getClass().getResource(changelog_url);
+    private final URL res_copying = getClass().getResource(copying_url);
+
+    public static enum ShowPage{
+        ABOUT /*default*/,
+        AUTHORS,
+        NEWS,
+        CHANGELOG,
+        LICENSE,
+        HELP
+        
+    }
+    private  AboutDialog(boolean modal, String app, ShowPage showPage) {
         super(new GridBagLayout());
-
-        frame = new JDialog((Frame)null, R("AboutDialogueTabAbout") + " IcedTea-Web", modal);
+        this.app = app;
+        frame = new JDialog((Frame) null, R("AboutDialogueTabAbout") + " IcedTea-Web", modal);
         frame.setContentPane(this);
         frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        URL res_about = getClass().getResource(about_url);
-        URL res_authors = getClass().getResource(authors_url);
-        URL res_news = getClass().getResource(news_url);
-        URL res_changelog = getClass().getResource(changelog_url);
-        URL res_copying = getClass().getResource(copying_url);
 
-        aboutPanel = new HTMLPanel(res_about, R("AboutDialogueTabAbout"));
-        authorsPanel = new HTMLPanel(res_authors, R("AboutDialogueTabAuthors"));
-        newsPanel = new HTMLPanel(res_news, R("AboutDialogueTabNews"));
-        changelogPanel = new HTMLPanel(res_changelog, R("AboutDialogueTabChangelog"));
-        copyingPanel = new HTMLPanel(res_copying, R("AboutDialogueTabGPLv2"));
-
-        aboutButton = new JButton(aboutPanel.getIdentifier());
-        aboutButton.setActionCommand(aboutPanel.getIdentifier());
+        aboutButton = new JButton( R("AboutDialogueTabAbout"));
         aboutButton.addActionListener(this);
 
-        authorsButton = new JButton(authorsPanel.getIdentifier());
-        authorsButton.setActionCommand(authorsPanel.getIdentifier());
+        authorsButton = new JButton(R("AboutDialogueTabAuthors"));
         authorsButton.addActionListener(this);
 
-        newsButton = new JButton(newsPanel.getIdentifier());
-        newsButton.setActionCommand(newsPanel.getIdentifier());
+        newsButton = new JButton( R("AboutDialogueTabNews"));
         newsButton.addActionListener(this);
 
-        changelogButton = new JButton(changelogPanel.getIdentifier());
-        changelogButton.setActionCommand(changelogPanel.getIdentifier());
+        changelogButton = new JButton(R("AboutDialogueTabChangelog"));
         changelogButton.addActionListener(this);
 
-        copyingButton = new JButton(copyingPanel.getIdentifier());
-        copyingButton.setActionCommand(copyingPanel.getIdentifier());
+        copyingButton = new JButton(R("AboutDialogueTabGPLv2"));
         copyingButton.addActionListener(this);
+        
+        helpButton = new JButton(R("APPEXTSECguiPanelHelpButton"));
+        helpButton.addActionListener(this);
 
-        contentPane = aboutPanel;
+        
+        switch (showPage) {
+            case ABOUT:
+                actionPerformed(new ActionEvent(aboutButton, 0, ""));
+                break;
+            case AUTHORS:
+                actionPerformed(new ActionEvent(authorsButton, 0, ""));
+                break;
+            case CHANGELOG:
+                actionPerformed(new ActionEvent(changelogButton, 0, ""));
+                break;
+            case HELP:
+                actionPerformed(new ActionEvent(helpButton, 0, ""));
+                break;
+            case LICENSE:
+                actionPerformed(new ActionEvent(copyingButton, 0, ""));
+                break;
+            case NEWS:
+                actionPerformed(new ActionEvent(newsButton, 0, ""));
+                break;
+
+            default:
+                actionPerformed(new ActionEvent(aboutButton, 0, ""));
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String action = e.getActionCommand();
-        if (action.equals(((HTMLPanel) contentPane).getIdentifier()))
-            return;
+        Object action = e.getSource();
 
-        if (action.equals(aboutPanel.getIdentifier())) {
+        if (action.equals(aboutButton)) {
+            if (aboutPanel == null) {
+                String lang = Locale.getDefault().getLanguage();
+                URL about_lang;
+                try {
+                    about_lang = getClass().getResource(about_url_stub + "_" + lang + ".html");
+                    about_lang.openStream().close();
+                } catch (Exception ex) {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
+                    //probably unknown locale, switch to english
+                    about_lang = getClass().getResource(about_url_stub + "_en.html");
+                }
+                aboutPanel = new HTMLPanel(about_lang);
+            }
             contentPane = aboutPanel;
-        } else if (action.equals(authorsPanel.getIdentifier())) {
+        } else if (action.equals(authorsButton)) {
+            if (authorsPanel == null) {
+                authorsPanel = new HTMLPanel(res_authors);
+            }
             contentPane = authorsPanel;
-        } else if (action.equals(newsPanel.getIdentifier())) {
+        } else if (action.equals(newsButton)) {
+            if (newsPanel == null) {
+                newsPanel = new HTMLPanel(res_news);
+            }
             contentPane = newsPanel;
-        } else if (action.equals(changelogPanel.getIdentifier())) {
+        } else if (action.equals(changelogButton)) {
+            if (changelogPanel == null) {
+                changelogPanel = new HTMLPanel(res_changelog);
+            }
             contentPane = changelogPanel;
-        } else if (action.equals(copyingPanel.getIdentifier())) {
+        } else if (action.equals(copyingButton)) {
+            if (copyingPanel == null) {
+                copyingPanel = new HTMLPanel(res_copying);
+            }
             contentPane = copyingPanel;
+        } else if (action.equals(helpButton)) {
+            if (helpPanel == null) {
+                //copy logo and generate resources to tmp dir
+                try {
+                    File f = File.createTempFile("icedtea-web", "help");
+                    f.delete();
+                    f.mkdir();
+                    f.deleteOnExit();
+                    TextsProvider.generateRuntimeHtmlTexts(f);
+                    //detect running application
+                    File target = new File(f, TextsProvider.ITW + "." + HtmlFormatter.SUFFIX);
+                    if (app != null) {
+                        target = new File(f, app + "." + HtmlFormatter.SUFFIX);
+                    }
+                    helpPanel = new InternalHTMLPanel(target.toURI().toURL());
+                } catch (IOException ex) {
+                    OutputController.getLogger().log(ex);
+                }
+            }
+            contentPane = helpPanel;
         }
 
         layoutWindow();
@@ -140,7 +215,7 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy = 0;
         gbc.gridx = 0;
-        gbc.gridwidth = 5;
+        gbc.gridwidth = 6;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         this.add(contentPane, gbc);
@@ -162,6 +237,9 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
 
         gbc.gridx = 4;
         this.add(copyingButton, gbc);
+        
+        gbc.gridx = 5;
+        this.add(helpButton, gbc);
 
         Dimension contentSize = new Dimension(640, 480);
         contentPane.setMinimumSize(contentSize);
@@ -180,12 +258,17 @@ public class AboutDialog extends JPanel implements Runnable, ActionListener {
         frame.setVisible(true);
     }
 
-    public static void display() {
-        display(false);
+    public static void display(String app) {
+        display(false, app);
     }
 
-    public static void display(boolean modal) {
-        SwingUtilities.invokeLater(new AboutDialog(modal));
+    public static void display(boolean modal, String app) {
+        display(modal, app, ShowPage.ABOUT);
     }
-
+    
+    public static void display(boolean modal, String app, ShowPage showPage) {
+        SwingUtilities.invokeLater(new AboutDialog(modal, app, showPage));
+    }
 }
+
+ 

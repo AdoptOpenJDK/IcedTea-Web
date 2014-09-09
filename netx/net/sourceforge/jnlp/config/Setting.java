@@ -173,4 +173,11 @@ public class Setting<T> {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return value.toString();
+    }
+    
+    
+
 }

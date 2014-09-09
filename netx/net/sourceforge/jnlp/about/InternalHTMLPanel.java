@@ -1,4 +1,5 @@
-/*Copyright (C) 2013 Red Hat, Inc.
+/* HTMLPanel.java
+ Copyright (C) 2008 Red Hat, Inc.
 
  This file is part of IcedTea.
 
@@ -33,36 +34,36 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
+package net.sourceforge.jnlp.about;
 
-package net.sourceforge.jnlp.util.logging;
+import java.io.IOException;
+import java.net.URL;
 
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
+public class InternalHTMLPanel extends HTMLPanel {
 
-
-public class UnixSystemLog implements SingleStreamLogger{
-    
-    public UnixSystemLog(){
-    
+    public InternalHTMLPanel(URL url) {
+        super(url);
+        HyperlinkListener[] hl = pane.getHyperlinkListeners();
+        for (HyperlinkListener hyperlinkListener : hl) {
+            pane.removeHyperlinkListener(hyperlinkListener);
+        }
+        pane.addHyperlinkListener(new LocalUrlHyperlinkListener());
     }
-    
-    
-    @Override
-    public void log(String message) {
-        final String s = "IcedTea-Web java error - for more info see itweb-settings debug options or console. See " + TextsProvider.ITW_BUGS + " for help.\nIcedTea-Web java error manual log: \n" + message;
-        try {
-            String[] ss = s.split("\\n"); //exceptions have many lines
-            for (String m : ss) {
-                m = m.replaceAll("\t", "    ");
-                ProcessBuilder pb = new ProcessBuilder("logger", "-p","user.err", "--", m);
-                Process p = pb.start();
-                p.waitFor();
-                OutputController.getLogger().log("System logger called with result of " + p.exitValue());
+
+    private class LocalUrlHyperlinkListener implements HyperlinkListener {
+
+        @Override
+        public void hyperlinkUpdate(HyperlinkEvent event) {
+            if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                try {
+                    pane.setPage(event.getURL());
+                } catch (IOException ex) {
+                }
             }
-        } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
         }
     }
-    
 
 }

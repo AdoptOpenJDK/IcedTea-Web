@@ -1,3 +1,89 @@
+2014-09-09  Jiri Vanek  <jvanek@redhat.com>
+
+	Outdated documentation replaced by documentation generation
+	* Makefile.am: aded (DOCS_DIR) pointing to target directory for generated docs
+	(clean-local) and (.PHONY) now cleaning also clean-generated-docs
+	(install-data-local) removed usage of old man pages, copied all generated
+	man pages
+	(uninstall-local) added removal of javaws_splash.png, all known man pages cleaned
+	(stamps/generate-docs.stamp) new target, generates all known language mutations
+	of all known man pages to correct directories.
+	(stamps/netx-dist.stamp) depends on stamps/generate-docs.stamp
+	(clean-generated-docs) new target, removes DOCS_DIR and stamp
+	* netx/itweb-settings.1: removed
+	* netx/javaws.1: removed
+	* netx/policyeditor.1: removed
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java: new class, contains
+	definitions of all command-line arguments
+	* netx/net/sourceforge/jnlp/about/AboutDialog.java:improved to contains 
+	window with generated localized help. Default welcome screen points to
+	localized mutation (if available). Loading of pages made lazy, and only
+	once per app. run. Added possibility to chose start page.
+	* netx/net/sourceforge/jnlp/about/HTMLPanel.java: get rid of useless id
+	* netx/net/sourceforge/jnlp/about/InternalHTMLPanel.java: extension of
+	HTMLPanel, links are pointing to internal window (in HTMLPanel points to 
+	external browser)
+	* netx/net/sourceforge/jnlp/config/Defaults.java: All files declarations
+	moved to PathsAndFiles. Defaults array now uses those. Iteration in 
+	defaults now done by iterator.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:  All files
+	declarations moved to PathsAndFiles. Configuration now uses those.
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: New file. Gathers
+	all files declared in ITW.
+	* netx/net/sourceforge/jnlp/config/Setting.java: added human readable toString
+	* netx/net/sourceforge/jnlp/controlpanel/AboutPanel.java: set origin - 
+	itweb-settings.
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java: options now uses 
+	OptionsDefinitions and runtime help now uses TextsProvider's instances.
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: uses PathsAndFiles
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: BOUsage and BOUsage2
+	stripped for javaws keyword. Added (BOTrustnone), added IBO and PBO and man
+	families. Removed PEUsage PEHelpFlag PEFileFlag  PECodebaseFlag, PEAboutDialogTitle
+	PEAboutDialogContent CLHelpDescription SPLASHurl SPLASHurlLooks. All urls replaced by variables.
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: fixed BAboutITW,rmeove
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: same
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: same
+	* netx/net/sourceforge/jnlp/resources/about.html: removed. replaced by generated,
+	and localized one.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: Handling of verbose moved to
+	be one of first switches. All runtime helps moved to TextsProvider's instances.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExtendedAppletSecurityHelp.java:
+	added parameter so (R).
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: All runtime
+	helps moved to TextsProvider's instances. About policy editor replaced by About.help
+	Modlaity of About dialog recognized on state of underlying dialogue. Added
+	About icedtea-web menu entry.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorAboutDialog.java:
+	removed unused (title)
+	* netx/net/sourceforge/jnlp/splashscreen/impls/DefaultSplashScreens2012Commons.java:
+	AboutDialog displayed with reason
+	* netx/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialog.java:
+	Links here replaced by TextsProviders constants.
+	* netx/net/sourceforge/jnlp/util/docprovider/IcedTeaWebTextsProvider.java:
+	implementation of TextsProvider for icedtea-web package
+	* netx/net/sourceforge/jnlp/util/docprovider/ItwebPluginTextProvider.java:
+	implementation of TextsProvider for plugin
+	* netx/net/sourceforge/jnlp/util/docprovider/ItwebSettingsTextsProvider.java
+	implementation of TextsProvider for itweb-settings
+	* netx/net/sourceforge/jnlp/util/docprovider/JavaWsTextsProvider.java
+	implementation of TextsProvider for javaws
+	* netx/net/sourceforge/jnlp/util/docprovider/PolicyEditorTextsProvider.java
+	implementation of TextsProvider for policy editor
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java:
+	New abstract class to handle basic operations on texts and defining abstract methods.
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java
+	Definition interface for any Formatter used by TextsProvider
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/HtmlFormatter.java
+	html markup adding Formatter
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ManFormatter.java
+	man pages  markup adding Formatter
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/PlainTextFormatter.java
+	no markup adding Formatter
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java
+	Stub for all formatters needing text substituitons.
+	* netx/net/sourceforge/jnlp/util/logging/UnixSystemLog.java:
+	Links here replaced by TextsProviders constants.
+
 2014-09-02  Jie Kang  <jkang@redhat.com>
 
 	Fixed CacheUtils clearCache method to also clear the Least Recently Used
