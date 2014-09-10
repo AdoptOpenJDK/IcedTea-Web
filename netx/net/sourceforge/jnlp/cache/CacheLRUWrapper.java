@@ -40,8 +40,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -66,11 +64,6 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 public enum CacheLRUWrapper {
     INSTANCE;
 
-    private int lockCount = 0;
-
-    /* lock for the file RecentlyUsed */
-    private FileLock fl = null;
-
     /* location of cache directory */
     private final String setCachePath = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
     String cacheDir = new File(setCachePath != null ? setCachePath : System.getProperty("java.io.tmpdir")).getPath();
@@ -80,9 +73,11 @@ public enum CacheLRUWrapper {
      * recently used items. The items are to be kept with key = (current time
      * accessed) followed by folder of item. value = path to file.
      */
+
+    public static final String CACHE_INDEX_FILE_NAME = "recently_used";
+
     PropertiesFile cacheOrder = new PropertiesFile(
             new File(cacheDir + File.separator + CACHE_INDEX_FILE_NAME));
-    public static final String CACHE_INDEX_FILE_NAME = "recently_used";
 
     private CacheLRUWrapper() {
         File f = cacheOrder.getStoreFile();
@@ -164,8 +159,12 @@ public enum CacheLRUWrapper {
     /**
      * Write file to disk.
      */
-    public synchronized void store() {
-        cacheOrder.store();
+    public synchronized boolean store() {
+        if (cacheOrder.isHeldByCurrentThread()) {
+            cacheOrder.store();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -176,7 +175,9 @@ public enum CacheLRUWrapper {
      * @return true if we successfully added to map, false otherwise.
      */
     public synchronized boolean addEntry(String key, String path) {
-        if (cacheOrder.containsKey(key)) return false;
+        if (cacheOrder.containsKey(key)) {
+            return false;
+        }
         cacheOrder.setProperty(key, path);
         return true;
     }
@@ -188,7 +189,9 @@ public enum CacheLRUWrapper {
      * @return true if we successfully removed key from map, false otherwise.
      */
     public synchronized boolean removeEntry(String key) {
-        if (!cacheOrder.containsKey(key)) return false;
+        if (!cacheOrder.containsKey(key)) {
+            return false;
+        }
         cacheOrder.remove(key);
         return true;
     }
@@ -243,31 +246,14 @@ public enum CacheLRUWrapper {
      * Lock the file to have exclusive access.
      */
     public synchronized void lock() {
-        try {
-            fl = FileUtils.getFileLock(cacheOrder.getStoreFile().getPath(), false, true);
-        } catch (OverlappingFileLockException e) { // if overlap we just increase the count.
-        } catch (Exception e) { // We didn't get a lock..
-            OutputController.getLogger().log(e);
-        }
-        if (fl != null) lockCount++;
+        cacheOrder.lock();
     }
 
     /**
      * Unlock the file.
      */
     public synchronized void unlock() {
-        if (fl != null) {
-            lockCount--;
-            try {
-                if (lockCount == 0) {
-                    fl.release();
-                    fl.channel().close();
-                    fl = null;
-                }
-            } catch (IOException e) {
-                OutputController.getLogger().log(e);
-            }
-        }
+        cacheOrder.unlock();
     }
 
     /**
@@ -280,14 +266,12 @@ public enum CacheLRUWrapper {
         return cacheOrder.getProperty(key);
     }
 
-    /**
-     * Test if we the key provided is in use.
-     * 
-     * @param key key to be tested.
-     * @return true if the key is in use.
-     */
-    public synchronized boolean contains(String key) {
-        return cacheOrder.contains(key);
+    public synchronized boolean containsKey(String key) {
+        return cacheOrder.containsKey(key);
+    }
+
+    public synchronized boolean containsValue(String value) {
+        return cacheOrder.containsValue(value);
     }
 
     /**

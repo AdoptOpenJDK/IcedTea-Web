@@ -37,11 +37,18 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.cache;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -58,6 +65,13 @@ public class CacheLRUWrapperTest {
 
     private final int noEntriesCacheFile = 1000;
 
+    private ByteArrayOutputStream baos;
+    private PrintStream out;
+    private ExecutorService executorService;
+    Object listener = new Object();
+
+    int num = 0;
+
     @BeforeClass
     static public void setupJNLPRuntimeConfig() {
         cacheDirBackup = clw.cacheDir;
@@ -72,14 +86,19 @@ public class CacheLRUWrapperTest {
         clw.cacheDir = cacheDirBackup;
         clw.cacheOrder = cacheOrderBackup;
     }
-    
+
+    @Before
+    public void setup() {
+        baos = new ByteArrayOutputStream();
+        out = new PrintStream(baos);
+        executorService = Executors.newSingleThreadExecutor();
+    }
+
     @Test
     public void testLoadStoreTiming() throws InterruptedException {
 
         final File cacheIndexFile = new File(clw.cacheDir + File.separator + cacheIndexFileName);
         cacheIndexFile.delete();
-        //ensure it exists, so we can lock
-        clw.store();
         try{
         
         int noLoops = 1000;
@@ -131,8 +150,6 @@ public class CacheLRUWrapperTest {
 
         final File cacheIndexFile = new File(clw.cacheDir + File.separator + cacheIndexFileName);
         cacheIndexFile.delete();
-        //ensure it exists, so we can lock
-        clw.store();
         try{
         clw.lock();
         
@@ -179,4 +196,115 @@ public class CacheLRUWrapperTest {
             clw.unlock();
         }
     }
+
+    @Test
+    public void testAddEntry() {
+        String key = "key";
+        String value = "value";
+
+        clw.addEntry(key, value);
+        assertTrue(clw.containsKey(key) && clw.containsValue(value));
+    }
+
+    @Test
+    public void testRemoveEntry() {
+        String key = "key";
+        String value = "value";
+
+        clw.addEntry(key, value);
+        clw.removeEntry(key);
+        assertFalse(clw.containsKey(key) && clw.containsValue(value));
+    }
+
+    @Test
+    public void testLock() throws IOException {
+        try {
+            clw.lock();
+            assertTrue(clw.cacheOrder.isHeldByCurrentThread());
+        } finally {
+            clw.unlock();
+        }
+    }
+
+    @Test
+    public void testUnlock() throws IOException {
+        try {
+            clw.lock();
+        } finally {
+            clw.unlock();
+        }
+        assertTrue(!clw.cacheOrder.isHeldByCurrentThread());
+    }
+
+    @Test
+    public void testStoreFailsWithoutLock() throws IOException {
+        assertTrue(!clw.store());
+    }
+
+    @Test
+    public void testStoreWorksWithLocK() throws IOException {
+        try {
+            clw.lock();
+            assertTrue(clw.store());
+        } finally {
+            clw.unlock();
+        }
+    }
+
+    @Test
+    public void testMultithreadLockPreventsStore() throws IOException, InterruptedException {
+        Thread a = new Thread(new StoreWorker());
+        a.start();
+
+        Thread b = new Thread(new StoreWorker());
+        b.start();
+
+        Thread.sleep(2000l);
+
+        synchronized (listener) {
+            num = 1;
+            listener.notifyAll();
+        }
+
+        String out = baos.toString();
+        System.out.println();
+        assertTrue(out.contains("true") && out.contains("false"));
+    }
+
+    private class StoreWorker implements Runnable {
+
+        public StoreWorker() {
+        }
+        @Override
+        public void run() {
+            try {
+                clw.cacheOrder.tryLock();
+                boolean result = clw.store();
+                executorService.execute(new WriteRunnable(String.valueOf(result)));
+                while (num == 0) {
+                    synchronized (listener) {
+                        listener.wait();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                clw.unlock();
+            }
+        }
+    }
+
+    private class WriteRunnable implements Runnable {
+        private String msg;
+        public WriteRunnable(String msg) {
+            this.msg = msg;
+        }
+
+        @Override
+        public void run() {
+            out.println(msg);
+            out.flush();
+        }
+    }
+
 }

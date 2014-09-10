@@ -1,5 +1,12 @@
 2014-09-10  Jie Kang  <jkang@redhat.com>
 
+    Changed CacheLRUWrapper to use PropertiesFile's provided locking system
+    Added unit tests for CacheLRUWrapper
+    * netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java
+    * tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java
+
+2014-09-10  Jie Kang  <jkang@redhat.com>
+
 	Added unit tests to PropertiesFile.java and refactored existing unit tests
 	to not use external code.
 	* tests/netx/unit/net/sourceforge/jnlp/util/PopertiesFileTest.java
