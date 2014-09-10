@@ -1,3 +1,12 @@
+2014-09-10  Lukasz Dracz  <ldracz@redhat.com>
+
+	Refactor of the cache panel GUI in itweb-settings
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java:
+	Changed slider into a spinner for cache size, changed order of elements
+	in the panel, added a checkbox to limit the cache size,
+	added disabling of components based on whether they are needed
+	* netx/net/sourceforge/jnlp/resources/Messages.properties
+
 2014-09-10  Jie Kang  <jkang@redhat.com>
 
     Changed CacheLRUWrapper to use PropertiesFile's provided locking system

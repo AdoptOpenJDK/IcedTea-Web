@@ -18,33 +18,36 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
+
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.Translator;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.Translator;
+import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 
 /**
  * The actual panel that contains the fields that the user can edit accordingly.
@@ -56,56 +59,153 @@ import net.sourceforge.jnlp.runtime.Translator;
  *
  */
 @SuppressWarnings("serial")
-public class TemporaryInternetFilesPanel extends NamedBorderPanel implements ChangeListener {
+public class TemporaryInternetFilesPanel extends NamedBorderPanel {
 
-    private DeploymentConfiguration config;
-    private int minSize = -1;
-    private int maxSize = 1000;
+    private static enum Properties {
+        CACHE_ENABLED("deployment.javapi.cache.enabled"),
+        USER_CACHEDIR("deployment.user.cachedir"),
+        CACHE_MAX_SIZE("deployment.cache.max.size"),
+        COMPRESSION_ENABLED("deployment.cache.jarcompression");
 
-    /** List of properties used by this panel */
-    public static String[] properties = { "deployment.javapi.cache.enabled", // false == enabled
-            "deployment.user.cachedir",
-            "deployment.cache.max.size", // Specified in MB
-            "deployment.cache.jarcompression", // Allows values 0-9
-    };
+        private final String prop;
+        Properties(final String prop) {
+            this.prop = prop;
+        }
 
-    private JComponent defaultFocusComponent = null;
-    JSpinner spCacheSize;
-    JSlider slCacheSize;
+        @Override
+        public String toString() {
+            return prop;
+        }
+    }
 
-    public TemporaryInternetFilesPanel(DeploymentConfiguration config) {
+    private static final Long CACHE_UNLIMITED_SIZE = Long.valueOf(-1l);
+    private static final Long CACHE_MIN_SIZE = Long.valueOf(0l);
+    private static final Long CACHE_MAX_SIZE = (long) Integer.MAX_VALUE;
+    private static final Long SPINNER_STEP_SIZE = Long.valueOf(10l);
+    private final JSpinner cacheSizeSpinner;
+
+    private static final long BYTES_TO_MEGABYTES = 1024l * 1024l;
+    private final File cacheDir;
+    final long usableDiskSpace;
+
+    private final JCheckBox limitCacheSizeCheckBox;
+    private final JLabel cacheSizeWarningLabel;
+    private final DeploymentConfiguration config;
+    private final JComboBox<ComboItem> cbCompression;
+    private final JButton bLocation;
+    private final JTextField location;
+    private final JLabel locationDescription;
+    private final JLabel lCompression;
+    private final JLabel lCacheSize;
+    private final JButton bViewFiles;
+    private final JPanel diskSpacePanel;
+
+    public TemporaryInternetFilesPanel(final DeploymentConfiguration config) {
         super(Translator.R("CPHeadTempInternetFiles"));
         this.config = config;
         setLayout(new BorderLayout());
+        cacheSizeSpinner = new JSpinner();
+        limitCacheSizeCheckBox = new JCheckBox(Translator.R("TIFPLimitCacheSize"));
+        cacheSizeWarningLabel = new JLabel();
+        lCacheSize = new JLabel(Translator.R("TIFPCacheSize") + ":");
+
+        ComboItem[] compressionOptions = {new ComboItem(Translator.R("TIFPNone"), "0"),
+                new ComboItem("1", "1"),
+                new ComboItem("2", "2"),
+                new ComboItem("3", "3"),
+                new ComboItem("4", "4"),
+                new ComboItem("5", "5"),
+                new ComboItem("6", "6"),
+                new ComboItem("7", "7"),
+                new ComboItem("8", "8"),
+                new ComboItem(Translator.R("TIFPMax"), "9"),};
+        cbCompression = new JComboBox<>(compressionOptions);
+        lCompression = new JLabel(Translator.R("TIFPCompressionLevel") + ":"); // Sets compression level for jar files.
+
+        bLocation = new JButton(Translator.R("TIFPChange") + "...");
+        location = new JTextField(this.config.getProperty(Properties.USER_CACHEDIR.toString()));
+        locationDescription = new JLabel(Translator.R("TIFPLocationLabel") + ":");
+        bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
+
+        diskSpacePanel = new JPanel();
+        diskSpacePanel.setLayout(new GridBagLayout());
+
+        cacheDir = new File(config.getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR));
+        usableDiskSpace = cacheDir.getUsableSpace() / BYTES_TO_MEGABYTES; // getUsableSpace returns bytes
 
         addComponents();
+        if (limitCacheSizeCheckBox.isSelected()) {
+            showCacheSizeSpinnerGUIElements(true);
+
+            if (parseLong(cacheSizeSpinner.getValue().toString()) == 0) {
+                showCompressionAndLocationGUIElements(false);
+            } else {
+                showCompressionAndLocationGUIElements(true);
+            }
+
+        } else {
+            showCacheSizeSpinnerGUIElements(false);
+            showCompressionAndLocationGUIElements(true);
+        }
     }
 
     /**
      * Add components to panel.
      */
     private void addComponents() {
-        JPanel topPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
 
-        JLabel description = new JLabel("<html>" + Translator.R("CPTempInternetFilesDescription") + "<hr /></html>");
+        JLabel description = new JLabel(Translator.R("CPTempInternetFilesDescription"));
 
-        JCheckBox enableCaching = new JCheckBox(Translator.R("TIFPEnableCache"), !Boolean.parseBoolean(this.config.getProperty(properties[0])));
-        enableCaching.addItemListener(new ItemListener() {
+        // This section deals with how to use the disk space.
+        cbCompression.setSelectedIndex(parseInt(this.config.getProperty(Properties.COMPRESSION_ENABLED.toString())));
+        cbCompression.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                config.setProperty(properties[0], String.valueOf(!(e.getStateChange() == ItemEvent.SELECTED)));
+                config.setProperty(Properties.COMPRESSION_ENABLED.toString(), ((ComboItem) e.getItem()).getValue());
             }
         });
 
+        //Override getNextValue and getPreviousValue to make it jump to the closest increment/decrement of step size
+        final Long configCacheSize = parseLong(this.config.getProperty(Properties.CACHE_MAX_SIZE.toString()));
+        final Long initialCacheSize = configCacheSize < CACHE_MIN_SIZE ? CACHE_MIN_SIZE : configCacheSize;
+        final SpinnerNumberModel snmCacheSize = new PowerOfSpinnerNumberModel(initialCacheSize, TemporaryInternetFilesPanel.CACHE_MIN_SIZE, TemporaryInternetFilesPanel.CACHE_MAX_SIZE, TemporaryInternetFilesPanel.SPINNER_STEP_SIZE);
+        cacheSizeSpinner.setModel(snmCacheSize);
+
+        final SpinnerChangeListener listener = new SpinnerChangeListener();
+        cacheSizeSpinner.addChangeListener(listener);
+        cacheSizeSpinner.setToolTipText(Translator.R("TIFPCacheSizeSpinnerTooltip", CACHE_MIN_SIZE, CACHE_MAX_SIZE));
+
+        limitCacheSizeCheckBox.setSelected(configCacheSize >= CACHE_MIN_SIZE);
+        limitCacheSizeCheckBox.addItemListener(new CheckboxItemListener());
+
+
+        c.gridx = 0;
+        c.weightx = 1;
+        c.gridy = 0;
+        diskSpacePanel.add(limitCacheSizeCheckBox, c);
+        c.gridy = 1;
+        diskSpacePanel.add(lCacheSize, c);
+        c.gridx = 1;
+        c.weightx = 1;
+        c.gridwidth = 2;
+        diskSpacePanel.add(cacheSizeSpinner, c);
+        c.gridwidth = 1;
+        c.gridy = 2;
+        c.gridx = 0;
+        diskSpacePanel.add(cacheSizeWarningLabel, c);
+
+        c.gridx = 0;
+        c.gridy = 3;
+        diskSpacePanel.add(lCompression, c);
+        c.gridx = 1;
+        c.gridwidth = 2;
+        diskSpacePanel.add(cbCompression, c);
+
         // This displays the option for changing location of cache
         // User can NOT edit the text field must do it through dialog.
-        JPanel locationPanel = new NamedBorderPanel(Translator.R("TIFPLocation"), new GridBagLayout());
-        JLabel locationDescription = new JLabel(Translator.R("TIFPLocationLabel") + ":");
-        final JTextField location = new JTextField(this.config.getProperty(properties[1]));
         location.setEditable(false); // Can not c&p into the location field.
-        JButton bLocation = new JButton(Translator.R("TIFPChange") + "...");
         bLocation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -119,129 +219,198 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel implements Cha
                     String result = fileChooser.getSelectedFile().getAbsolutePath();
                     File dirLocation = new File(result);
                     boolean canWrite = dirLocation.canWrite();
-                    while (!canWrite && dirLocation != null){ // File does not exist, or no permission.
-                        
+                    while (!canWrite && dirLocation != null) { // File does not exist, or no permission.
+
                         if (dirLocation.exists()) {
                             JOptionPane.showMessageDialog(null, "No permission to write to this location.");
                             return;
                         }
-                        
+
                         dirLocation = dirLocation.getParentFile();
                         canWrite = dirLocation.canWrite();
                     }
-                    
+
                     if (canWrite) {
                         location.setText(result);
-                        config.setProperty(properties[1], result);
+                        config.setProperty(Properties.USER_CACHEDIR.toString(), result);
                     }
                 }
             }
         });
 
-        c.weightx = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.gridx = 0;
-        c.gridy = 0;
-        locationPanel.add(locationDescription, c);
-        c.gridwidth = 1;
-        c.gridy = 1;
-        locationPanel.add(location, c);
-        c.gridx = 1;
-        c.weightx = 0;
-        locationPanel.add(bLocation, c);
-
-        // This section deals with how to use the disk space.
-        JPanel diskSpacePanel = new NamedBorderPanel(Translator.R("TIFPDiskSpace"), new GridBagLayout());
-        JLabel lCompression = new JLabel(Translator.R("TIFPCompressionLevel")); // Sets compression level for jar files.
-        ComboItem[] compressionOptions = { new ComboItem(Translator.R("TIFPNone"), "0"),
-                new ComboItem("1", "1"),
-                new ComboItem("2", "2"),
-                new ComboItem("3", "3"),
-                new ComboItem("4", "4"),
-                new ComboItem("5", "5"),
-                new ComboItem("6", "6"),
-                new ComboItem("7", "7"),
-                new ComboItem("8", "8"),
-                new ComboItem(Translator.R("TIFPMax"), "9"), };
-        JComboBox<ComboItem> cbCompression = new JComboBox<>(compressionOptions);
-        cbCompression.setSelectedIndex(Integer.parseInt(this.config.getProperty(properties[3])));
-        cbCompression.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                config.setProperty(properties[3], ((ComboItem) e.getItem()).getValue());
-            }
-        });
-
-        JLabel lCacheSize = new JLabel(Translator.R("TIFPCacheSize") + ":");
-        slCacheSize = new JSlider(minSize, maxSize, Integer.parseInt(this.config.getProperty(properties[2])));
-        slCacheSize.setMinorTickSpacing(50);
-        slCacheSize.setPaintTicks(true);
-        SpinnerNumberModel snmCacheSize = new SpinnerNumberModel(Integer.parseInt(this.config.getProperty(properties[2])), minSize, maxSize, 1);
-        spCacheSize = new JSpinner(snmCacheSize);
-
-        slCacheSize.addChangeListener(this);
-        spCacheSize.addChangeListener(this);
-
-        c.gridy = 0;
-        c.gridx = 0;
-        c.weightx = 1;
-        diskSpacePanel.add(lCompression, c);
-        c.gridx = 1;
-        c.weightx = 0;
-        diskSpacePanel.add(cbCompression, c);
-        c.gridy = 1;
-        c.gridx = 0;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.weightx = 1;
-        diskSpacePanel.add(lCacheSize, c);
-        c.gridwidth = 1;
-        c.gridy = 2;
-        diskSpacePanel.add(slCacheSize, c);
-        c.gridx = 1;
-        diskSpacePanel.add(spCacheSize, c);
-
-        JPanel buttonDeleteRestore = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-        JButton bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
         bViewFiles.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 CacheViewer.showCacheDialog(config);
             }
         });
-        buttonDeleteRestore.add(bViewFiles);
 
-        c.weighty = 0;
+        c.gridy = 4;
         c.gridx = 0;
-        c.gridy = 0;
-        topPanel.add(enableCaching, c);
-        c.gridy = 1;
-        topPanel.add(locationPanel, c);
-        c.gridy = 2;
-        topPanel.add(diskSpacePanel, c);
-        c.weighty = 1;
-        c.gridy = 3;
-        topPanel.add(buttonDeleteRestore, c);
-        add(description, BorderLayout.NORTH);
-        add(topPanel, BorderLayout.CENTER);
+        c.weightx = 1;
+        c.gridwidth = 1;
+        diskSpacePanel.add(locationDescription, c);
+        c.gridy = 5;
+        c.gridwidth = 1;
+        diskSpacePanel.add(location, c);
+        c.gridx = 1;
+        c.weightx = 0.5;
+        diskSpacePanel.add(bLocation, c);
+        c.gridx = 2;
+        diskSpacePanel.add(bViewFiles, c);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(description, BorderLayout.NORTH);
+        panel.add(diskSpacePanel, BorderLayout.CENTER);
+        add(panel, BorderLayout.CENTER);
+
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(final ComponentEvent componentEvent) {
+                listener.stateChanged(null);
+            }
+        });
+
     }
 
-    /**
-     * Give focus to the default button.
-     */
-    public void focusOnDefaultButton() {
-        if (defaultFocusComponent != null) {
-            defaultFocusComponent.requestFocusInWindow();
+    private static class PowerOfSpinnerNumberModel extends SpinnerNumberModel {
+        private final List<Long> powersOf;
+
+        public PowerOfSpinnerNumberModel(final Long initialCacheSize, final Long cacheMinSize, final Long cacheMaxSize, final Long spinnerStepSize) {
+            super(initialCacheSize, cacheMinSize, cacheMaxSize, spinnerStepSize);
+            powersOf = new ArrayList<>();
+            final int powersListSize = (int) Math.floor(Math.log(cacheMaxSize) / Math.log(spinnerStepSize) + 1);
+
+            for (int i = 0; i < powersListSize; i++) {
+                final long powerOfTen = (long) Math.pow(spinnerStepSize, i);
+                powersOf.add(powerOfTen);
+            }
+        }
+
+        @Override
+        public Long getNextValue() {
+            final Number raw = (Number) super.getValue();
+            if (super.getNextValue() == null) {
+                return (Long) getMaximum();
+            }
+
+            final Long original = raw.longValue();
+            final Long result = original - (original % powersOf.get(String.valueOf(original).length() - 1)) + powersOf.get(String.valueOf(original).length() - 1);
+            if (result < (Long) getMaximum()) {
+                return result;
+            }
+
+            return (Long) getMaximum();
+        }
+
+        @Override
+        public Long getPreviousValue() {
+            final Number raw = (Number) super.getValue();
+            final Long original = raw.longValue();
+            if (super.getPreviousValue() == null) {
+                if (original > 0) {
+                    return original - 1;
+                }
+
+                return (Long) getMinimum();
+            }
+
+            final Long result;
+            if (powersOf.contains(original)) {
+                result = original - powersOf.get(String.valueOf(original).length() - 2);
+                return result;
+            } else {
+
+                if (original % powersOf.get(String.valueOf(original).length() - 1) == 0) {
+                    result = original - powersOf.get(String.valueOf(original).length() - 1);
+                } else {
+                    result = original - original % powersOf.get(String.valueOf(original).length() - 1);
+                }
+
+                if (result > Long.valueOf(0)) {
+                    return result;
+                }
+            }
+
+            return Long.valueOf(0);
+        }
+
+    }
+
+    private class SpinnerChangeListener implements ChangeListener {
+
+        @Override
+        public void stateChanged(final ChangeEvent e) {
+            final long cacheSizeSpinnerValue = (long) cacheSizeSpinner.getValue();
+
+            if (limitCacheSizeCheckBox.isSelected()) {
+                showCompressionAndLocationGUIElements(true);
+
+                if (cacheSizeSpinnerValue > usableDiskSpace) {
+                    cacheSizeSpinner.setToolTipText(null);
+                    cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerValueTooLargeWarning", usableDiskSpace));
+                } else if (cacheSizeSpinnerValue == 0) {
+                    cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSetToNoCaching"));
+                    showCompressionAndLocationGUIElements(false);
+                } else {
+                    cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerLargeValueWarning", usableDiskSpace));
+                }
+
+                config.setProperty(Properties.CACHE_MAX_SIZE.toString(), Long.valueOf(cacheSizeSpinnerValue).toString());
+            } else {
+                showCacheSizeSpinnerGUIElements(false);
+                showCompressionAndLocationGUIElements(true);
+            }
         }
     }
 
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        Object o = e.getSource();
-        if (o instanceof JSlider)
-            spCacheSize.setValue(((JSlider) o).getValue());
-        else if (o instanceof JSpinner)
-            slCacheSize.setValue((Integer) ((JSpinner) o).getValue());
+    private class CheckboxItemListener implements ItemListener {
+        @Override
+        public void itemStateChanged(final ItemEvent e) {
+            final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+            showCacheSizeSpinnerGUIElements(selected);
 
-        config.setProperty(properties[2], spCacheSize.getValue().toString());
+            if (parseLong(cacheSizeSpinner.getValue().toString()) == 0 && selected) {
+                showCompressionAndLocationGUIElements(false);
+            } else {
+                showCompressionAndLocationGUIElements(true);
+            }
+
+            if (selected) {
+                config.setProperty(Properties.CACHE_MAX_SIZE.toString(), cacheSizeSpinner.getValue().toString());
+            } else {
+                config.setProperty(Properties.CACHE_MAX_SIZE.toString(), Long.toString(CACHE_UNLIMITED_SIZE));
+            }
+
+            config.setProperty(Properties.CACHE_ENABLED.toString(), String.valueOf(!selected));
+        }
+    }
+
+    private void showCompressionAndLocationGUIElements(boolean bool) {
+        cbCompression.setEnabled(bool);
+        lCompression.setEnabled(bool);
+        bLocation.setEnabled(bool);
+        location.setEnabled(bool);
+        locationDescription.setEnabled(bool);
+        bViewFiles.setEnabled(bool);
+    }
+
+    private void showCacheSizeSpinnerGUIElements(boolean bool){
+        lCacheSize.setEnabled(bool);
+        cacheSizeSpinner.setEnabled(bool);
+        cacheSizeWarningLabel.setEnabled(bool);
+
+        if(bool == false) {
+            cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerLargeValueWarning", usableDiskSpace));
+        } else {
+
+            final long cacheSizeSpinnerValue = (long) cacheSizeSpinner.getValue();
+            if(cacheSizeSpinnerValue > usableDiskSpace) {
+                cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerValueTooLargeWarning", usableDiskSpace));
+            } else if (cacheSizeSpinnerValue == 0) {
+                cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSetToNoCaching"));
+            }
+        }
     }
 }
