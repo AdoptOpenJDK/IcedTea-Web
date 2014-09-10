@@ -37,116 +37,159 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
-import net.sourceforge.jnlp.cache.CacheLRUWrapper;
+import java.nio.file.Files;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 public class PropertiesFileTest {
 
-    private int lockCount = 0;
+    private PropertiesFile propertiesFile;
 
-    /* lock for the file RecentlyUsed */
-    private FileLock fl = null;
-
-    private final String cacheDir = new File(JNLPRuntime.getConfiguration()
-            .getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR)).getPath();
-
-    // does no DeploymentConfiguration exist for this file name? 
-    private final String cacheIndexFileName = CacheLRUWrapper.CACHE_INDEX_FILE_NAME;
-
-    private final PropertiesFile cacheIndexFile = new PropertiesFile(new File(cacheDir + File.separatorChar + cacheIndexFileName));
-    private final int noEntriesCacheFile = 1000;
-
-    @BeforeClass
-    static public void setupJNLPRuntimeConfig() {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, System.getProperty("java.io.tmpdir"));
+    @Before
+    public void setup() throws IOException {
+        File lru = Files.createTempFile("properties_file", ".tmp").toFile();
+        lru.createNewFile();
+        lru.deleteOnExit();
+        propertiesFile = new PropertiesFile(lru);
     }
 
-    private void fillCacheIndexFile(int noEntries) {
+    @Test
+    public void testSetProperty() {
+        propertiesFile.setProperty("key", "value");
+        assertTrue(propertiesFile.containsKey("key") && propertiesFile.containsValue("value"));
+    }
 
-        // fill cache index file
-        for(int i = 0; i < noEntries; i++) {
-            String path = cacheDir + File.separatorChar + i + File.separatorChar + "test" + i + ".jar";
-            String key = String.valueOf(System.currentTimeMillis());
-            cacheIndexFile.setProperty(key, path);
+    @Test
+    public void testGetProperty() {
+        propertiesFile.setProperty("key", "value");
+        String v = propertiesFile.getProperty("key");
+        assertEquals("value", v);
+    }
+
+    @Test
+    public void testGetDefaultProperty() {
+        String v = propertiesFile.getProperty("key", "default");
+        assertEquals("default", v);
+    }
+
+    @Test
+    public void testStore() throws IOException {
+        String key = "key";
+        String value = "value";
+        propertiesFile.setProperty(key, value);
+        try {
+            propertiesFile.lock();
+            propertiesFile.store();
+        } finally {
+            propertiesFile.unlock();
         }
+
+        File f = propertiesFile.getStoreFile();
+        String output = new String(Files.readAllBytes(f.toPath()));
+        assertTrue(output.contains(key + "=" + value));
     }
 
     @Test
     public void testReloadAfterStore() {
-
-        lock();
-
-        boolean reloaded = false;
-
-        // 1. clear cache entries + store
-        clearCacheIndexFile();
-
-        // 2. load cache file
-        reloaded = cacheIndexFile.load();
-        assertTrue("File was not reloaded!", reloaded);
-
-        // 3. add some cache entries and store
-        fillCacheIndexFile(noEntriesCacheFile);
-        cacheIndexFile.store();
-        reloaded = cacheIndexFile.load();
-        assertTrue("File was not reloaded!", reloaded);
-
-        unlock();
-    }
-    
-    private void clearCacheIndexFile() {
-
-        lock();
-
-        // clear cache + store file
-        cacheIndexFile.clear();
-        cacheIndexFile.store();
-
-        unlock();
-    }
-
-    
-    // add locking, because maybe some JNLP runtime user is running. copy/paste from CacheLRUWrapper
-
-    /**
-     * Lock the file to have exclusive access.
-     */
-    private void lock() {
         try {
-            fl = FileUtils.getFileLock(cacheIndexFile.getStoreFile().getPath(), false, true);
-        } catch (OverlappingFileLockException e) { // if overlap we just increase the count.
-        } catch (Exception e) { // We didn't get a lock..
-            e.printStackTrace();
+            boolean reloaded;
+            propertiesFile.lock();
+
+            // 1. clear entries + store
+            clearPropertiesFile();
+
+            // 2. load from file
+            reloaded = propertiesFile.load();
+            assertTrue("File was not reloaded!", reloaded);
+
+            // 3. add some entries and store
+            fillProperties(10);
+
+            propertiesFile.store();
+            reloaded = propertiesFile.load();
+
+            assertTrue("File was not reloaded!", reloaded);
+        } finally {
+            propertiesFile.unlock();
         }
-        if (fl != null) lockCount++;
     }
-    
-    /**
-     * Unlock the file.
-     */
-    private void unlock() {
-        if (fl != null) {
-            lockCount--;
-            try {
-                if (lockCount == 0) {
-                    fl.release();
-                    fl.channel().close();
-                    fl = null;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+    private void fillProperties(int noEntries) {
+        for(int i = 0; i < noEntries; i++) {
+            propertiesFile.setProperty(String.valueOf(i), String.valueOf(i));
         }
+    }
+
+    private void clearPropertiesFile() {
+        try {
+            propertiesFile.lock();
+
+            // clear cache + store file
+            propertiesFile.clear();
+            propertiesFile.store();
+        } finally {
+            propertiesFile.unlock();
+        }
+    }
+
+    @Test
+    public void testLoad() throws InterruptedException {
+        try {
+            propertiesFile.lock();
+
+            propertiesFile.setProperty("key", "value");
+            propertiesFile.store();
+
+            propertiesFile.setProperty("shouldNotRemainAfterLoad", "def");
+            propertiesFile.load();
+
+            assertFalse(propertiesFile.contains("shouldNotRemainAfterLoad"));
+        } finally {
+            propertiesFile.unlock();
+
+        }
+    }
+
+    @Test
+    public void testLoadWithNoChanges() throws InterruptedException {
+        try {
+            propertiesFile.lock();
+
+            propertiesFile.setProperty("key", "value");
+            propertiesFile.store();
+
+            Thread.sleep(1000l);
+
+            assertFalse(propertiesFile.load());
+        } finally {
+            propertiesFile.unlock();
+        }
+    }
+
+    @Test
+    public void testLock() throws IOException {
+        try {
+            propertiesFile.lock();
+            assertTrue(propertiesFile.isHeldByCurrentThread());
+        } finally {
+            propertiesFile.unlock();
+        }
+    }
+
+    @Test
+    public void testUnlock() throws IOException {
+        try {
+            propertiesFile.lock();
+        } finally {
+            propertiesFile.unlock();
+        }
+        assertTrue(!propertiesFile.isHeldByCurrentThread());
     }
 }

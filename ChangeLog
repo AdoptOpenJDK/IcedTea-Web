@@ -1,3 +1,9 @@
+2014-09-10  Jie Kang  <jkang@redhat.com>
+
+	Added unit tests to PropertiesFile.java and refactored existing unit tests
+	to not use external code.
+	* tests/netx/unit/net/sourceforge/jnlp/util/PopertiesFileTest.java
+
 2014-09-09  Jiri Vanek  <jvanek@redhat.com>
 
 	Outdated documentation replaced by documentation generation
