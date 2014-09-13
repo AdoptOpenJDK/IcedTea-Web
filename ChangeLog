@@ -1,3 +1,16 @@
+2014-09-13  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties
+	(CertWarnHTTPSAcceptTip, CertWarnHTTPSRejectTip): new messages more
+	applicable for HTTPS cert warning dialogs
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java:
+	distinguish between HTTPS cert warnings and signed applet cert warnings.
+	Display appropriate text labels and buttons corresponding to either case.
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissionsButton.java:
+	remove assertions for non-null file, securityDelegate, and linkedButton.
+	Instead, if any are null, simply disable this component and do not add
+	component listeners dependent upon these fields.
+
 2014-09-10  Lukasz Dracz  <ldracz@redhat.com>
 
 	Refactor of the cache panel GUI in itweb-settings

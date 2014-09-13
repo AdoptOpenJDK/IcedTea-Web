@@ -49,7 +49,6 @@ import java.net.URL;
 import java.security.Permission;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -64,6 +63,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class TemporaryPermissionsButton extends JButton {
 
@@ -75,22 +75,32 @@ public class TemporaryPermissionsButton extends JButton {
     private final Collection<Permission> temporaryPermissions = new HashSet<>();
 
     public TemporaryPermissionsButton(final JNLPFile file, final SecurityDelegate securityDelegate, final JButton linkedButton) {
+        /* If any of the above parameters are null, then the button cannot function - in particular, a null SecurityDelegate
+         * would prevent temporary permissions from being able to be added; a null JNLPFile would prevent PolicyEditor from
+         * being launched with a sensible codebase for the current applet; and a null JButton would prevent the Sandbox button
+         * from being automatically invoked when a set of temporary permissions are selected by the user.
+         */
         super("\u2630");
-        Objects.requireNonNull(file);
-        Objects.requireNonNull(securityDelegate);
-        Objects.requireNonNull(linkedButton);
         this.menu = createPolicyPermissionsMenu();
         this.linkedButton = linkedButton;
         this.file = file;
         this.securityDelegate = securityDelegate;
 
-        linkedButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                securityDelegate.addPermissions(temporaryPermissions);
-            }
-        });
-        addMouseListener(new PolicyEditorPopupListener(this));
+        if (file == null || securityDelegate == null || linkedButton == null) {
+            this.setEnabled(false);
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Temporary Permissions Button disabled due to null fields."
+                    + " file: " + file
+                    + ", securityDelegate: " + securityDelegate
+                    + ", linkedButton: " + linkedButton);
+        } else {
+            linkedButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    securityDelegate.addPermissions(temporaryPermissions);
+                }
+            });
+            addMouseListener(new PolicyEditorPopupListener(this));
+        }
     }
 
     private JPopupMenu createPolicyPermissionsMenu() {
