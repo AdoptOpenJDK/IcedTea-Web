@@ -1,5 +1,15 @@
 2014-09-15  Jie Kang  <jkang@redhat.com>
 
+    Moved translator responsibility from JNLPRuntime to Translator
+    * netx/net/sourceforge/jnlp/runtime/Translator.java:
+    * netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+    (getMessage): moved from JNLPRuntime to Translator
+    * netx/net/sourceforge/jnlp/runtime/TranslatorTest.java:
+    added tests for translating using a ResourceBundle
+
+
+2014-09-15  Jie Kang  <jkang@redhat.com>
+
     * netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java
     (getLRUSortedEntries): now creates a deeper copy of cacheOrder list
 

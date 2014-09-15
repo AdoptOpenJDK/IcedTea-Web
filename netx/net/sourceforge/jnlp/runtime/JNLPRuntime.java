@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,10 +37,8 @@ import java.security.KeyStore;
 import java.security.Policy;
 import java.security.Security;
 import java.text.DateFormat;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.jnlp.ServiceManager;
 import javax.naming.ConfigurationException;
@@ -67,8 +67,8 @@ import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.LogConfig;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.net.www.protocol.jar.URLJarFile;
 
 /**
@@ -92,10 +92,6 @@ import sun.net.www.protocol.jar.URLJarFile;
  */
 public class JNLPRuntime {
 
-    static {
-        loadResources();
-    }
-
     /**
      * java-abrt-connector can print out specific application String method, it is good to save visited urls for reproduce purposes.
      * For javaws we can read the destination jnlp from commandline
@@ -103,9 +99,6 @@ public class JNLPRuntime {
      * have caused the crash. Thats why the individual urls are added, not replaced.
      */
     private static String history = "";
-
-    /** the localized resource strings */
-    private static ResourceBundle resources;
 
     /** the security manager */
     private static JNLPSecurityManager security;
@@ -231,7 +224,7 @@ public class JNLPRuntime {
                 //where deployment.system.config points is not readable
                 throw new RuntimeException(getConfiguration().getLoadingException());
             }
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, getMessage("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
         }
         KeyStores.setConfiguration(getConfiguration());
 
@@ -453,16 +446,16 @@ public class JNLPRuntime {
                 config.load();
                 config.copyTo(System.getProperties());
             } catch (ConfigurationException ex) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("RConfigurationError"));
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("RConfigurationError"));
                 //mark this exceptionas we can die on it later
                 config.setLoadingException(ex);
                 //to be sure - we MUST die - http://docs.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/properties.html
             }catch(Exception t){
                 //all exceptions are causing InstantiatizationError so this do it much more readble
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, t);
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("RFailingToDefault"));
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("RFailingToDefault"));
                 if (!JNLPRuntime.isHeadless()){
-                    JOptionPane.showMessageDialog(null, getMessage("RFailingToDefault")+"\n"+t.toString());
+                    JOptionPane.showMessageDialog(null, R("RFailingToDefault")+"\n"+t.toString());
                 }
                 //try to survive this unlikely exception
                 config.resetToDefaults();
@@ -678,37 +671,8 @@ public class JNLPRuntime {
         return indicator;
     }
 
-    /**
-     * Returns the localized resource string identified by the
-     * specified key. If the message is empty, a null is
-     * returned.
-     */
-    public static String getMessage(String key) {
-        try {
-            String result = resources.getString(key);
-            if (result.length() == 0)
-                return null;
-            else
-                return result;
-        } catch (Exception ex) {
-            if (!key.equals("RNoResource"))
-                return getMessage("RNoResource", new Object[] { key });
-            else
-                return "Missing resource: " + key;
-        }
-    }
-    
     public static String getLocalisedTimeStamp(Date timestamp) {
         return DateFormat.getInstance().format(timestamp);
-    }
-
-    /**
-     * Returns the localized resource string using the specified arguments.
-     *
-     * @param args the formatting arguments to the resource string
-     */
-    public static String getMessage(String key, Object... args) {
-        return MessageFormat.format(getMessage(key), args);
     }
 
     /**
@@ -751,17 +715,6 @@ public class JNLPRuntime {
             if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless")))
                 headless = true;
         } catch (SecurityException ex) {
-        }
-    }
-
-    /**
-     * Load the resources.
-     */
-    private static void loadResources() {
-        try {
-            resources = ResourceBundle.getBundle("net.sourceforge.jnlp.resources.Messages");
-        } catch (Exception ex) {
-            throw new IllegalStateException("Missing resource bundle in netx.jar:net/sourceforge/jnlp/resource/Messages.properties");
         }
     }
 

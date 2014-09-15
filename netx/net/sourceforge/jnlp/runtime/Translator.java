@@ -16,16 +16,32 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
 /**
  * Utility class to provide simple methods to help localize messages
  */
-public class Translator {
+public enum Translator {
 
-    /**
-     * @return the localized string for the message
-     */
-    public static String R(String message, Object... params) {
-        return JNLPRuntime.getMessage(message, params);
+    INSTANCE;
+
+    /** the localized resource strings */
+    private ResourceBundle resources;
+
+    private Translator() {
+        try {
+            resources = ResourceBundle.getBundle("net.sourceforge.jnlp.resources.Messages");
+        } catch (Exception ex) {
+            throw new IllegalStateException("No bundles found for Locale: " + Locale.getDefault().toString() +
+                    "and missing base resource bundle in netx.jar:net/sourceforge/jnlp/resource/Messages.properties");
+        }
+    }
+
+    public static Translator getInstance() {
+        return Translator.INSTANCE;
     }
 
     /**
@@ -34,7 +50,49 @@ public class Translator {
      * @return a string representing the localized message
      */
     public static String R(String message) {
-        return JNLPRuntime.getMessage(message);
+        return R(message, new Object[0]);
     }
 
+    /**
+     * @return the localized string for the message
+     */
+    public static String R(String message, Object... params) {
+        return getInstance().getMessage(message, params);
+    }
+
+    protected void loadResourceBundle(ResourceBundle bundle) {
+        this.resources = bundle;
+    }
+
+    /**
+     * Returns the localized resource string using the specified arguments.
+     *
+     * @param args the formatting arguments to the resource string
+     */
+    private String getMessage(String key, Object... args) {
+        return MessageFormat.format(getMessage(key), args);
+    }
+
+    /**
+     * Returns the localized resource string identified by the
+     * specified key. If the message is empty, a null is
+     * returned.
+     */
+    private String getMessage(String key) {
+        try {
+            String result = resources.getString(key);
+            if (result.length() == 0)
+                return "";
+            else
+                return result;
+        } catch (NullPointerException e) {
+            return getMessage("RNoResource", new Object[]{key});
+        } catch (MissingResourceException | ClassCastException e) {
+            if (key == "RNoResource") {
+                return "No localized text found";
+            } else {
+                return getMessage("RNoResource", new Object[]{key});
+            }
+        }
+    }
 }
