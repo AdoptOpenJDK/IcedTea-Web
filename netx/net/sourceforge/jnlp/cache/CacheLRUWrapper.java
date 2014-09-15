@@ -40,6 +40,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -227,7 +228,12 @@ public enum CacheLRUWrapper {
     //although Properties are pretending to be <object,Object> they are always <String,String>
     //bug in jdk?
     public synchronized List<Entry<String, String>> getLRUSortedEntries() {
-        List<Entry<String, String>> entries = new ArrayList(cacheOrder.entrySet());
+        List<Entry<String, String>> entries = new ArrayList<>();
+
+        for (Entry e : cacheOrder.entrySet()) {
+            entries.add(new AbstractMap.SimpleImmutableEntry<String, String>(e));
+        }
+
         // sort by keys in descending order.
         Collections.sort(entries, new Comparator<Entry<String, String>>() {
             @Override
