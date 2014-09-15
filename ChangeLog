@@ -1,3 +1,11 @@
+2014-09-15  Lukasz Dracz  <ldracz@redhat.com>
+
+	Fix itweb-settings Cache Panel Tooltip
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java:
+	Tooltip appears when spinner is enabled and hovered over
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Removed not needed html tags
+
 2014-09-15  Jie Kang  <jkang@redhat.com>
 
     Moved translator responsibility from JNLPRuntime to Translator

@@ -348,7 +348,6 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
                 showCompressionAndLocationGUIElements(true);
 
                 if (cacheSizeSpinnerValue > usableDiskSpace) {
-                    cacheSizeSpinner.setToolTipText(null);
                     cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerValueTooLargeWarning", usableDiskSpace));
                 } else if (cacheSizeSpinnerValue == 0) {
                     cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSetToNoCaching"));
@@ -402,9 +401,11 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         cacheSizeWarningLabel.setEnabled(bool);
 
         if(bool == false) {
+            cacheSizeSpinner.setToolTipText(null);
             cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerLargeValueWarning", usableDiskSpace));
         } else {
 
+            cacheSizeSpinner.setToolTipText(Translator.R("TIFPCacheSizeSpinnerTooltip", CACHE_MIN_SIZE, CACHE_MAX_SIZE));
             final long cacheSizeSpinnerValue = (long) cacheSizeSpinner.getValue();
             if(cacheSizeSpinnerValue > usableDiskSpace) {
                 cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerValueTooLargeWarning", usableDiskSpace));
