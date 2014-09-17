@@ -143,7 +143,7 @@ public class HtmlFormatter extends ReplacingTextFormatter {
 
     @Override
     public String getOption(String key, String value) {
-        return "<li><b>" + key + " </b> - " + process(value) + ".</li>";
+        return "<li><b>" + key + " </b> - " + process(value) + "</li>";
     }
 
 }

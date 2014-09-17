@@ -41,6 +41,7 @@ package net.sourceforge.jnlp.util.docprovider;
 import java.io.IOException;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.Translator;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
@@ -58,35 +59,34 @@ public class JavaWsTextsProvider extends TextsProvider {
     @Override
     public String getIntroduction() {
         return super.getIntroduction()
-                + getFormatter().wrapParagraph(getFormatter().process(getId() + " - a Java Web Start client"));
+                + getFormatter().wrapParagraph(getFormatter().process(getId() + " " + Translator.R("JWSintro")));
     }
 
     @Override
     public String getSynopsis() {
         return super.getSynopsis()
-                + getFormatter().wrapParagraph(getFormatter().process("@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE@" + R("BOUsage") + "@NWLINE_BOLD_OPEN@javaws @BOLD_CLOSE@" + R("BOUsage2")));
+                + getFormatter().wrapParagraph(getFormatter().process(getFormatter().getBold(" " + getId() + " ") + R("BOUsage") + getFormatter().getBreakAndBold() + getId() + " " + getFormatter().getBoldClosing() + R("BOUsage2")));
     }
 
     @Override
     public String getDescription() {
         return super.getDescription()
                 + getFormatter().wrapParagraph(getFormatter().process(
-                                "@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE@"
-                                + "is an implementation of a JNLP  client. It uses a JNLP (Java Network Launch Protocol) file to securely run a remote Java application or a Java applet.  This implementation of"
-                                + "@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE@" + "is from the IcedTea project and is based on the NetX project."
-                                + "@NWLINE@@NWLINE@"
-                                + "A JNLP file is an xml file that describes how to securely run a remote Java application or a Java applet."));
+                                getFormatter().getBold(getId() + " ")
+                                + Translator.R("JWSdescL1", getFormatter().getBold(getId()+" "))
+                                + getFormatter().getNewLine()+ getFormatter().getNewLine()
+                                + Translator.R("JWSdescL2")));
     }
 
     @Override
     public String getOptions() {
         String title = super.getOptions();
-        String add1 = "When specifying options, the name of the jnlp file must be the last argument to javaws - all the options must preceede it.";
-        String add2 = "The jnlp-file can either be a url or a local path.";
+        String add1 = Translator.R("JWSoptionsL1");
+        String add2 = Translator.R("JWSoptionsL2");
         String adds = getFormatter().wrapParagraph(add1 + getFormatter().getNewLine() + add2);
-        String runtime = getFormatter().getBold("run-options:") + getFormatter().getNewLine()
+        String runtime = getFormatter().getBold(Translator.R("JWSoptionsTitle1")) + getFormatter().getNewLine()
                 + optionsToString(OptionsDefinitions.getJavaWsRuntimeOptions());
-        String control = getFormatter().getBold("control-options:") + getFormatter().getNewLine()
+        String control = getFormatter().getBold(Translator.R("JWSoptionsTitle2")) + getFormatter().getNewLine()
                 + optionsToString(OptionsDefinitions.getJavaWsControlOptions());
         return title + adds + getFormatter().wrapParagraph(control) + getFormatter().wrapParagraph(runtime);
     }
@@ -95,9 +95,16 @@ public class JavaWsTextsProvider extends TextsProvider {
     public String getExamples() {
         return super.getExamples()
                 + getFormatter().wrapParagraph(
-                        getFormatter().getOption(getId() + " -about", " Shows basic help and about informations")
-                        + getFormatter().getOption(getId() + " -about -headless", " Shows basic help and about informations in commandline")
-                        + getFormatter().getOption(getId() + "  -Xnofork -Xignoreheaders -allowredirect -Xoffline http://mypage.web/dangerous.jnlp", " Will start dangerous.jnlp application, originally form mypage.web, without downloading it, without headers check and in forced single VM"));
+                        getFormatter().getOption(getId() + " "
+                                + OptionsDefinitions.OPTIONS.ABOUT.option, Translator.R("JWSexampleL1"))
+                        + getFormatter().getOption(getId() + " "
+                                + OptionsDefinitions.OPTIONS.ABOUT.option + " "
+                                + OptionsDefinitions.OPTIONS.HEADLESS.option, Translator.R("JWSexampleL2"))
+                        + getFormatter().getOption(getId() + "  "
+                                + OptionsDefinitions.OPTIONS.NOFORK.option + " "
+                                + OptionsDefinitions.OPTIONS.NOHEADERS.option + " "
+                                + OptionsDefinitions.OPTIONS.REDIRECT.option + " "
+                                + OptionsDefinitions.OPTIONS.OFFLINE.option + " http://mypage.web/dangerous.jnlp", Translator.R("JWSexampleL3", "dangerous.jnlp", "mypage.web")));
     }
 
     @Override

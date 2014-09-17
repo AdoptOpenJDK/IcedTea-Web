@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.util.docprovider;
 import java.io.IOException;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 /**
@@ -60,29 +61,22 @@ public class PolicyEditorTextsProvider extends TextsProvider {
     public String getIntroduction() {
         return super.getIntroduction()
                 + getFormatter().wrapParagraph(
-                        getFormatter().process(getId() + " - view and modify security policy settings for @BOLD_OPEN@javaws @BOLD_CLOSE@and the @BOLD_OPEN@browser plugin@BOLD_CLOSE@"));
+                        getFormatter().process(getId() + " "+Translator.R("PEintro")));
     }
 
     @Override
     public String getSynopsis() {
         return super.getSynopsis()
-                + getFormatter().wrapParagraph(getFormatter().process("@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE_NWLINE_BOLD_OPEN@" + getId() + " [-file] @BOLD_CLOSE@policy_file @BOLD_OPEN@[-codebase] @BOLD_CLOSE@url"));
+                + getFormatter().wrapParagraph(getFormatter().process("@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE_NWLINE_BOLD_OPEN@" + getId() + " [-file] @BOLD_CLOSE@"+Translator.R("PEsynopseP1")+" @BOLD_OPEN@[-codebase] @BOLD_CLOSE@"+Translator.R("PEsynopseP2")));
     }
 
     @Override
     public String getDescription() {
         return super.getDescription()
-                + getFormatter().wrapParagraph(getFormatter().process("@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE@"
-                                + "is a GUI application with small command line support to view and edit applet security policy"
-                                + " settings used by the icedtea-web implementation of"
-                                + "@BOLD_OPEN@ javaws @BOLD_CLOSE@and the @BOLD_OPEN@ browser plugin. @BOLD_CLOSE@It is intended"
-                                + " as a simpler, easier to use, and more accessible alternative to the standard"
-                                + " @BOLD_OPEN@ JDK Policy Tool. @BOLD_CLOSE@Administrators and power users who need fine grained control over"
-                                + " policy files should probably use Policy Tool instead of PolicyEditor."
-                                + "@NWLINE@@NWLINE@"
-                                + "If executed without any arguments, no file is opened, and saving the file will"
-                                + " result in a prompt on where to save it. Otherwise, if a file path is given as"
-                                + " a command line argument, then that file path will be opened and parsed as  policy file."));
+                + getFormatter().wrapParagraph(getFormatter().process(getFormatter().getBold(getId() + " ")
+                                + Translator.R("PEdescL1")
+                                + getFormatter().getNewLine() + getFormatter().getNewLine()
+                                + Translator.R("PEdescL2")));
     }
 
     @Override
@@ -96,13 +90,13 @@ public class PolicyEditorTextsProvider extends TextsProvider {
         String title = super.getExamples();
         String s = "";
         if (expandVariables) {
-            s = s + getFormatter().getOption(getId() + " -file " + PathsAndFiles.JAVA_POLICY.getFullPath(), "Show GUI and opens the default policy file.");
+            s = s + getFormatter().getOption(getId() + " -file " + PathsAndFiles.JAVA_POLICY.getFullPath(), Translator.R("PEexampleL1"));
 
         } else {
-            s = s + getFormatter().getOption(getId() + " -file " + PathsAndFiles.JAVA_POLICY.toString(), "Show GUI and opens the default policy file.");
+            s = s + getFormatter().getOption(getId() + " -file " + PathsAndFiles.JAVA_POLICY.toString(), Translator.R("PEexampleL1"));
         }
         return title + getFormatter().wrapParagraph(
-                getFormatter().getOption(getId(), "Show the GUI editor with no file opened") + s);
+                getFormatter().getOption(getId(), Translator.R("PEexampleL2")) + s);
     }
 
     @Override

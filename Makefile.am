@@ -493,9 +493,9 @@ stamps/generate-docs.stamp: stamps/netx.stamp
 	  export LANG=$$LANG_ID; \
 	  mkdir $$HTML_DOCS_TARGET_DIR/$$ID ; \
 	  echo "<li><a href='$$ID/icedtea-web.html'>$$LANG_ID</a></li>"  >> $$HTML_DOCS_INDEX ; \
-	  $$TP_COMMAND html $$HTML_DOCS_TARGET_DIR/$$ID false $TP_TAIL ; \
+	  $$TP_COMMAND html $$HTML_DOCS_TARGET_DIR/$$ID false $$TP_TAIL ; \
 	  mkdir $$PLAIN_DOCS_TARGET_DIR/$$ID ; \
-	  $$TP_COMMAND plain $$PLAIN_DOCS_TARGET_DIR/$$ID 160 false $TP_TAIL; \
+	  $$TP_COMMAND plain $$PLAIN_DOCS_TARGET_DIR/$$ID 160 false $$TP_TAIL; \
 	  if [ $$ID == "en" ] ; then \
 	    MAN_DESC=$$MAN_DOCS_TARGET_DIR/man1 ; \
 	  else \

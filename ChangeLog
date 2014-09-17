@@ -1,3 +1,13 @@
+2014-09-17  Jiri Vanek  <jvanek@redhat.com>
+
+	Javaws and PolicyEditor made localizable
+	* Makefile.am: usage of $TP_TAIL fixed to be correctly $$TP_TAIL
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added PE and JWS
+	families
+	* netx/net/sourceforge/jnlp/util/docprovider/JavaWsTextsProvider.java: and
+	* netx/net/sourceforge/jnlp/util/docprovider/PolicyEditorTextsProvider.java:
+	all strings moved to properties. Minor reformatting.
+
 2014-09-15  Lukasz Dracz  <ldracz@redhat.com>
 
 	Fix itweb-settings Cache Panel Tooltip
