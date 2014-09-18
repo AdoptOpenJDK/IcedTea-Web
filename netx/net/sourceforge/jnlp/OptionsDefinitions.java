@@ -71,6 +71,7 @@ public class OptionsDefinitions {
         NOHEADERS("-Xignoreheaders", "BXignoreheaders"),
         OFFLINE("-Xoffline", "BXoffline"),
         TRUSTNONE("-Xtrustnone","BOTrustnone"),
+        JNLP("-jnlp","BOJnlp", NumberOfArguments.ONE),
         //itweb settings
         NODASHHELP("help", "IBOHelp"),
         LIST("list", "IBOList"),
@@ -200,7 +201,8 @@ public class OptionsDefinitions {
             OPTIONS.NOFORK,
             OPTIONS.NOHEADERS,
             OPTIONS.OFFLINE,
-            OPTIONS.TRUSTNONE});
+            OPTIONS.TRUSTNONE,
+            OPTIONS.JNLP});
     }
 
     public static List<OPTIONS> getJavaWsOptions() {

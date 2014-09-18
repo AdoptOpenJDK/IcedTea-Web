@@ -83,7 +83,7 @@ public class Launcher {
 
     private ParserSettings parserSettings = new ParserSettings();
 
-    private Map<String, String[]> extra = null;
+    private Map<String, List<String>> extra = null;
 
     /**
      * Create a launcher with the runtime's default update policy
@@ -191,7 +191,7 @@ public class Launcher {
      * the values for keys "arguments", "parameters", and "properties" are
      * used.
      */
-    public void setInformationToMerge(Map<String, String[]> input) {
+    public void setInformationToMerge(Map<String, List<String>> input) {
         this.extra = input;
     }
 
@@ -295,22 +295,22 @@ public class Launcher {
      * @throws LaunchException if an exception occurs while extracting
      * extra information
      */
-    private void mergeExtraInformation(JNLPFile file, Map<String, String[]> extra) throws LaunchException {
+    private void mergeExtraInformation(JNLPFile file, Map<String, List<String>> extra) throws LaunchException {
         if (extra == null) {
             return;
         }
 
-        String[] properties = extra.get("properties");
+        List<String> properties = extra.get("properties");
         if (properties != null) {
             addProperties(file, properties);
         }
 
-        String[] arguments = extra.get("arguments");
+        List<String> arguments = extra.get("arguments");
         if (arguments != null && file.isApplication()) {
             addArguments(file, arguments);
         }
 
-        String[] parameters = extra.get("parameters");
+        List<String> parameters = extra.get("parameters");
         if (parameters != null && file.isApplet()) {
             addParameters(file, parameters);
         }
@@ -321,18 +321,18 @@ public class Launcher {
      * @throws LaunchException if an exception occurs while extracting
      * extra information
      */
-    private void addProperties(JNLPFile file, String[] props) throws LaunchException {
+    private void addProperties(JNLPFile file, List<String> props) throws LaunchException {
         ResourcesDesc resources = file.getResources();
 
-        for (int i = 0; i < props.length; i++) {
+        for (String input : props) {
             // allows empty property, not sure about validity of that.
-            int equals = props[i].indexOf("=");
+            int equals = input.indexOf("=");
             if (equals == -1) {
-                throw launchError(new LaunchException(R("BBadProp", props[i])));
+                throw launchError(new LaunchException(R("BBadProp", input)));
             }
 
-            String key = props[i].substring(0, equals);
-            String value = props[i].substring(equals + 1, props[i].length());
+            String key = input.substring(0, equals);
+            String value = input.substring(equals + 1, input.length());
 
             resources.addResource(new PropertyDesc(key, value));
         }
@@ -344,18 +344,18 @@ public class Launcher {
      * @throws LaunchException if an exception occurs while extracting
      * extra information
      */
-    private void addParameters(JNLPFile file, String[] params) throws LaunchException {
+    private void addParameters(JNLPFile file, List<String> params) throws LaunchException {
         AppletDesc applet = file.getApplet();
 
-        for (int i = 0; i < params.length; i++) {
+        for (String input : params) {
             // allows empty param, not sure about validity of that.
-            int equals = params[i].indexOf("=");
+            int equals = input.indexOf("=");
             if (equals == -1) {
-                throw launchError(new LaunchException(R("BBadParam", params[i])));
+                throw launchError(new LaunchException(R("BBadParam", input)));
             }
 
-            String name = params[i].substring(0, equals);
-            String value = params[i].substring(equals + 1, params[i].length());
+            String name = input.substring(0, equals);
+            String value = input.substring(equals + 1, input.length());
 
             applet.addParameter(name, value);
         }
@@ -365,11 +365,11 @@ public class Launcher {
      * Add the arguments to the JNLP file; only call if file is
      * actually an application (not installer).
      */
-    private void addArguments(JNLPFile file, String[] args) {
+    private void addArguments(JNLPFile file, List<String> args) {
         ApplicationDesc app = file.getApplication();
 
-        for (int i = 0; i < args.length; i++) {
-            app.addArgument(args[i]);
+        for (String input : args ) {
+            app.addArgument(input);
         }
     }
 

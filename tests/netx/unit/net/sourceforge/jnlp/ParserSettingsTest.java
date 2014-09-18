@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,25 +51,37 @@ public class ParserSettingsTest {
     }
 
     @Test
-    public void testNoArgsSameAsDefault() {
-        ParserSettings defaultSettings, noArgs;
-        defaultSettings = new ParserSettings();
-        noArgs = ParserSettings.setGlobalParserSettingsFromArgs(new String[0]);
-
-        Assert.assertTrue("isExtensionAllowed should have been equal", defaultSettings.isExtensionAllowed() == noArgs.isExtensionAllowed());
-        Assert.assertTrue("isStrict should have been equal", defaultSettings.isStrict() == noArgs.isStrict());
-        Assert.assertTrue("isMalformedXmlAllowed should have been equal", defaultSettings.isMalformedXmlAllowed() == noArgs.isMalformedXmlAllowed());
+    public void testSetGlobalParserSettings() {
+        ParserSettings globalSettings, settings;
+        settings = new ParserSettings(false, false, false);
+        ParserSettings.setGlobalParserSettings(settings);
+        globalSettings = ParserSettings.getGlobalParserSettings();
+        Assert.assertEquals(settings.isStrict(), globalSettings.isStrict());
+        Assert.assertEquals(settings.isMalformedXmlAllowed(), globalSettings.isMalformedXmlAllowed());
+        Assert.assertEquals(settings.isExtensionAllowed(), globalSettings.isExtensionAllowed());
     }
 
     @Test
-    public void testWithArgs() {
-        ParserSettings settings = ParserSettings.setGlobalParserSettingsFromArgs(new String[] {
-           "-strict",
-           "-xml",
-        });
-        Assert.assertTrue("isStrict should have been true", settings.isStrict() == true);
-        Assert.assertTrue("isMalformedXmlAllowed should have been false", settings.isMalformedXmlAllowed() == false);
-        Assert.assertTrue("isExtensionAllowed should have been true", settings.isExtensionAllowed() == true);
+    public void testSetGlobalParserSettingsFromOptionParser() {
+        String args[] = {"-xml", "-strict"};
+
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
+        ParserSettings globalSettings = ParserSettings.getGlobalParserSettings();
+
+        Assert.assertEquals(settings.isStrict(), globalSettings.isStrict());
+        Assert.assertEquals(settings.isExtensionAllowed(), globalSettings.isExtensionAllowed());
+        Assert.assertEquals(settings.isMalformedXmlAllowed(), globalSettings.isMalformedXmlAllowed());
     }
 
+    @Test
+    public void testSetGlobalParserSettingsFromOptionParserHasSameOptionsAsOptionParser() {
+        String args[] = {"-xml", "-strict"};
+
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
+
+        Assert.assertEquals(settings.isStrict(), optionParser.hasOption(OptionsDefinitions.OPTIONS.STRICT));
+        Assert.assertEquals(settings.isMalformedXmlAllowed(), !optionParser.hasOption(OptionsDefinitions.OPTIONS.XML));
+    }
 }

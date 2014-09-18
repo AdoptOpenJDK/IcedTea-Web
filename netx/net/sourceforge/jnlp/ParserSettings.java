@@ -37,8 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import java.util.Arrays;
-import java.util.List;
+import net.sourceforge.jnlp.util.optionparser.OptionParser;
 
 /**
  * Contains settings to be used by the Parser while parsing JNLP files.
@@ -99,12 +98,11 @@ public class ParserSettings {
      * at boot on the command line. These settings are also stored so they
      * can be retrieved at a later time.
      */
-    public static ParserSettings setGlobalParserSettingsFromArgs(String[] cmdArgs) {
-        List<String> argList = Arrays.asList(cmdArgs);
-        boolean strict = argList.contains("-strict");
-        boolean malformedXmlAllowed = !argList.contains("-xml");
-
-        globalParserSettings = new ParserSettings(strict, true, malformedXmlAllowed);
+    public static ParserSettings setGlobalParserSettingsFromOptionParser(OptionParser optionParser) {
+        ParserSettings settings = new
+                ParserSettings(optionParser.hasOption(OptionsDefinitions.OPTIONS.STRICT), true,
+                !optionParser.hasOption(OptionsDefinitions.OPTIONS.XML));
+        setGlobalParserSettings(settings);
         return globalParserSettings;
     }
 

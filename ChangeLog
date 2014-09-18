@@ -1,3 +1,39 @@
+2014-09-18  Lukasz Dracz  <ldracz@redhat.com>
+
+	Added New Option Parser and used in boot of javaws
+	* netx/net/sourceforge/jnlp/Launcher.java:
+	(addProperties, addArguments, addParameters) refactored to take in
+	a List<String> instead of String[] 
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java:
+	added JNLP to enum OPTIONS
+	* netx/net/sourceforge/jnlp/ParserSettings.java
+	(setGlobalParserSettingsFromOptionParser): refactored to take in 
+	an OptionParser instead of args 
+	* netx/net/sourceforge/jnlp/runtime/Boot.java:
+	Uses OptionParser to parse arguments for options and check whether
+	an option is present. (getJNLPFile): changed to use OptionParser,
+	and look for one main argument or one value from the JNLP option, if
+	not present then throws an InvalidArgumentException
+	* netx/net/sourceforge/jnlp/util/optionparser/InvalidArgumentException.java:
+	added
+	* netx/net/sourceforge/jnlp/util/optionparser/OptionParser.java:
+	new file, a common parser for options and their values
+	(parseContents): called in OptionParser constructor, parses and populates
+	values in a map based on their option
+	(findMainArg): Takes arguments and parses them backwards to find the
+	first value that is eligible to be a main arg (not an option or a value
+	for an option with one value)
+	(addMainArg): adds the specified arg to main and removes it from its
+	current placement in the map
+	(stringEqualsOption): used to determine whether a string fits an option
+	keyword irrespective if it has a leading dash or is followed by a equals char
+	* tests/netx/unit/net/sourceforge/jnlp/ParserSettingsTest.java:
+	(testSetGlobalParserSettingsFromOptionParser, 
+	testSetGlobalParserSettingsFromOptionParserHasSameOptionsAsOptionParser):
+	added
+	* tests/netx/unit/net/sourceforge/jnlp/util/optionparser/OptionParserTest.java:
+	new file to test parser works as intended
+
 2014-09-17  Jiri Vanek  <jvanek@redhat.com>
 
 	Javaws and PolicyEditor made localizable
