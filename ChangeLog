@@ -1,5 +1,10 @@
 2014-09-19  Jie Kang  <jkang@redhat.com>
 
+    Modified Makefile.am to use whitelist when processing reproducers.
+    * Makefile.am: Now filters reproducers using netx-dist-tests-whitelist
+
+2014-09-19  Jie Kang  <jkang@redhat.com>
+
     Added three keys to DeploymentConfiguration. Max cache size, cache enable,
     and cache compression enable.
     * netx/net/sourceforge/jnlp/CacheUtil.java: now uses keys

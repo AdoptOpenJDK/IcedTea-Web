@@ -691,19 +691,28 @@ stamps/junit-jnlp-dist-dirs: junit-jnlp-dist-simple.txt stamps/junit-jnlp-dist-s
 	mkdir -p $(REPRODUCERS_BUILD_DIR)
 	touch $@
 
-junit-jnlp-dist-custom.txt:
+junit-jnlp-dist-custom.txt: $(REPRODUCERS_CLASS_WHITELIST)
 	cd $(REPRODUCERS_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/ ; \
-	find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/$@
+	whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
+	for x in $$whiteListed ; do \
+	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/$@ || true ; \
+	done
 
-junit-jnlp-dist-simple.txt:
+junit-jnlp-dist-simple.txt: $(REPRODUCERS_CLASS_WHITELIST)
 	cd $(REPRODUCERS_TESTS_SRCDIR)/simple/ ; \
-	find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/$@
+	whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
+	for x in $$whiteListed ; do \
+	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/$@ || true ; \
+	done
 
-stamps/junit-jnlp-dist-signed.stamp: 
+stamps/junit-jnlp-dist-signed.stamp: $(REPRODUCERS_CLASS_WHITELIST)
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
 	  pushd $(REPRODUCERS_TESTS_SRCDIR)/$$which/ ; \
-	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" > $(abs_top_builddir)/junit-jnlp-dist-$$which.txt ; \
+	  whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
+	    for x in $$whiteListed ; do \
+	      find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/junit-jnlp-dist-$$which.txt ; \
+	    done ; \
 	  popd ; \
 	done ; \
 	mkdir -p stamps && \
@@ -874,6 +883,7 @@ stamps/compile-reproducers-testcases.stamp: stamps/netx-dist.stamp stamps/plugin
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
+	    echo "compiling" $$dir ; \
 	    $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	      -d $(TEST_EXTENSIONS_TESTS_DIR) \
 	      -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
