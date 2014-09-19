@@ -1,3 +1,13 @@
+2014-09-19  Jiri Vanek  <jvanek@redhat.com>
+
+	Translator made immutable
+	* netx/net/sourceforge/jnlp/runtime/Translator.java: changed form enum to class,
+	initialization handled by holder pattern, resources made final, removed 
+	loadResourceBundle, getMessage made protected.
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/TranslatorTest.java: (setup)
+	(and all tests) now uses special instance based on fake resources. Added
+	two tests to test singleton instance itself.	
+
 2014-09-18  Lukasz Dracz  <ldracz@redhat.com>
 
 	Added New Option Parser and used in boot of javaws

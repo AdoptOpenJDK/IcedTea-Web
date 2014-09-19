@@ -9,11 +9,26 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import org.junit.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class TranslatorTest {
+
+    private static class TestableTranslator extends Translator {
+
+        public TestableTranslator(ResourceBundle bundle) {
+            super(bundle);
+        }
+
+        public String translate(String message, Object... params) {
+            return super.getMessage(message, params);
+        }
+    }
+    TestableTranslator translator;
+    
+    
 
     @Before
     public void setup() throws IOException {
@@ -31,30 +46,41 @@ public class TranslatorTest {
         ClassLoader loader = new URLClassLoader(new URL[] {u});
 
         ResourceBundle bundle = ResourceBundle.getBundle("test", Locale.getDefault(), loader);
-        Translator.getInstance().loadResourceBundle(bundle);
+        translator = new TestableTranslator(bundle);
     }
 
     @Test
     public void testTranslateNonExistingMessage() {
-        String message = Translator.R("doesn't-exist");
+        String message = translator.translate("doesn't-exist");
         assertEquals("no-resource", message);
     }
 
     @Test
     public void testTranslateNullMessage() {
-        String message = Translator.R(null);
+        String message = translator.translate(null);
         assertEquals("no-resource", message);
     }
 
     @Test
     public void testTranslateMessage() {
-        String message = Translator.R("key");
+        String message = translator.translate("key");
         assertEquals("value", message);
     }
 
     @Test
     public void testTranslateMessageWithArgs() {
-        String message = Translator.R("argkey", new Object[] {"Hello"});
+        String message = translator.translate("argkey", new Object[] {"Hello"});
         assertEquals("value Hello", message);
+    }
+    
+      @Test
+    public void singletonTest1() {
+        String message = Translator.R("key");
+          Assert.assertNotEquals("value", message);
+    }
+      @Test
+    public void singletonTest2() {
+        String message = Translator.R("unknown-key");
+          Assert.assertTrue(message.contains("unknown-key"));
     }
 }

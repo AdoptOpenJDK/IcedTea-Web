@@ -24,24 +24,43 @@ import java.util.ResourceBundle;
 /**
  * Utility class to provide simple methods to help localize messages
  */
-public enum Translator {
+public class Translator {
 
-    INSTANCE;
+    private static class TranslatorHolder {
 
-    /** the localized resource strings */
-    private ResourceBundle resources;
+        //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+        //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+        private static final Translator INSTANCE = new Translator();
 
-    private Translator() {
-        try {
-            resources = ResourceBundle.getBundle("net.sourceforge.jnlp.resources.Messages");
-        } catch (Exception ex) {
-            throw new IllegalStateException("No bundles found for Locale: " + Locale.getDefault().toString() +
-                    "and missing base resource bundle in netx.jar:net/sourceforge/jnlp/resource/Messages.properties");
+        private static Translator getTransaltor() {
+            return TranslatorHolder.INSTANCE;
         }
     }
 
+    /**
+     * the localized resource strings
+     */
+    private final ResourceBundle resources;
+
+    Translator() {
+        this("net.sourceforge.jnlp.resources.Messages");
+    }
+
+    Translator(String s) {
+        try {
+            resources = ResourceBundle.getBundle(s);
+        } catch (Exception ex) {
+            throw new IllegalStateException("No bundles found for Locale: " + Locale.getDefault().toString()
+                    + "and missing base resource bundle in netx.jar:net/sourceforge/jnlp/resource/Messages.properties");
+        }
+    }
+
+    Translator(ResourceBundle resources) {
+        this.resources = resources;
+    }
+
     public static Translator getInstance() {
-        return Translator.INSTANCE;
+        return TranslatorHolder.getTransaltor();
     }
 
     /**
@@ -60,16 +79,13 @@ public enum Translator {
         return getInstance().getMessage(message, params);
     }
 
-    protected void loadResourceBundle(ResourceBundle bundle) {
-        this.resources = bundle;
-    }
-
+   
     /**
      * Returns the localized resource string using the specified arguments.
      *
      * @param args the formatting arguments to the resource string
      */
-    private String getMessage(String key, Object... args) {
+    protected String getMessage(String key, Object... args) {
         return MessageFormat.format(getMessage(key), args);
     }
 
