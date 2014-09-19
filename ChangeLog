@@ -1,3 +1,12 @@
+2014-09-19  Jie Kang  <jkang@redhat.com>
+
+    Added three keys to DeploymentConfiguration. Max cache size, cache enable,
+    and cache compression enable.
+    * netx/net/sourceforge/jnlp/CacheUtil.java: now uses keys
+    * netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java:
+    now uses keys
+    * netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
+
 2014-09-19  Jiri Vanek  <jvanek@redhat.com>
 
 	Translator made immutable

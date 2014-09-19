@@ -16,6 +16,13 @@
 
 package net.sourceforge.jnlp.config;
 
+import static net.sourceforge.jnlp.config.PathsAndFiles.JAVA_DEPLOYMENT_PROP_FILE;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CACHE_HOME;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CONFIG_HOME;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DEPLOYMENT_FILE;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_SECURITY;
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,13 +39,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import javax.naming.ConfigurationException;
 import javax.swing.JOptionPane;
-import net.sourceforge.jnlp.cache.CacheLRUWrapper;
-import static net.sourceforge.jnlp.config.PathsAndFiles.*;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import net.sourceforge.jnlp.cache.CacheLRUWrapper;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -90,6 +96,12 @@ public final class DeploymentConfiguration {
     public static final String KEY_USER_CACHE_DIR = "deployment.user.cachedir";
     public static final String KEY_USER_PERSISTENCE_CACHE_DIR = "deployment.user.pcachedir";
     public static final String KEY_SYSTEM_CACHE_DIR = "deployment.system.cachedir";
+
+    public static final String  KEY_CACHE_MAX_SIZE = "deployment.cache.max.size";
+
+    public static final String KEY_CACHE_ENABLED = "deployment.javapi.cache.enabled";
+    public static final String KEY_CACHE_COMPRESSION_ENABLED = "deployment.cache.jarcompression";
+
     public static final String KEY_USER_LOG_DIR = "deployment.user.logdir";
     public static final String KEY_USER_TMP_DIR = "deployment.user.tmp";
     /** the directory containing locks for single instance applications */

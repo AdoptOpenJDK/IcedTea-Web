@@ -18,13 +18,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
-import java.awt.*;
+import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.Translator;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -45,9 +44,11 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import static java.lang.Integer.parseInt;
-import static java.lang.Long.parseLong;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.Translator;
 
 /**
  * The actual panel that contains the fields that the user can edit accordingly.
@@ -60,23 +61,6 @@ import static java.lang.Long.parseLong;
  */
 @SuppressWarnings("serial")
 public class TemporaryInternetFilesPanel extends NamedBorderPanel {
-
-    private static enum Properties {
-        CACHE_ENABLED("deployment.javapi.cache.enabled"),
-        USER_CACHEDIR("deployment.user.cachedir"),
-        CACHE_MAX_SIZE("deployment.cache.max.size"),
-        COMPRESSION_ENABLED("deployment.cache.jarcompression");
-
-        private final String prop;
-        Properties(final String prop) {
-            this.prop = prop;
-        }
-
-        @Override
-        public String toString() {
-            return prop;
-        }
-    }
 
     private static final Long CACHE_UNLIMITED_SIZE = Long.valueOf(-1l);
     private static final Long CACHE_MIN_SIZE = Long.valueOf(0l);
@@ -123,14 +107,14 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         lCompression = new JLabel(Translator.R("TIFPCompressionLevel") + ":"); // Sets compression level for jar files.
 
         bLocation = new JButton(Translator.R("TIFPChange") + "...");
-        location = new JTextField(this.config.getProperty(Properties.USER_CACHEDIR.toString()));
+        location = new JTextField(this.config.getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR));
         locationDescription = new JLabel(Translator.R("TIFPLocationLabel") + ":");
         bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
 
         diskSpacePanel = new JPanel();
         diskSpacePanel.setLayout(new GridBagLayout());
 
-        cacheDir = new File(config.getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR));
+        cacheDir = new File(this.config.getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR));
         usableDiskSpace = cacheDir.getUsableSpace() / BYTES_TO_MEGABYTES; // getUsableSpace returns bytes
 
         addComponents();
@@ -159,16 +143,16 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         JLabel description = new JLabel(Translator.R("CPTempInternetFilesDescription"));
 
         // This section deals with how to use the disk space.
-        cbCompression.setSelectedIndex(parseInt(this.config.getProperty(Properties.COMPRESSION_ENABLED.toString())));
+        cbCompression.setSelectedIndex(parseInt(this.config.getProperty(DeploymentConfiguration.KEY_CACHE_COMPRESSION_ENABLED)));
         cbCompression.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                config.setProperty(Properties.COMPRESSION_ENABLED.toString(), ((ComboItem) e.getItem()).getValue());
+                config.setProperty(DeploymentConfiguration.KEY_CACHE_COMPRESSION_ENABLED, ((ComboItem) e.getItem()).getValue());
             }
         });
 
         //Override getNextValue and getPreviousValue to make it jump to the closest increment/decrement of step size
-        final Long configCacheSize = parseLong(this.config.getProperty(Properties.CACHE_MAX_SIZE.toString()));
+        final Long configCacheSize = parseLong(this.config.getProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE));
         final Long initialCacheSize = configCacheSize < CACHE_MIN_SIZE ? CACHE_MIN_SIZE : configCacheSize;
         final SpinnerNumberModel snmCacheSize = new PowerOfSpinnerNumberModel(initialCacheSize, TemporaryInternetFilesPanel.CACHE_MIN_SIZE, TemporaryInternetFilesPanel.CACHE_MAX_SIZE, TemporaryInternetFilesPanel.SPINNER_STEP_SIZE);
         cacheSizeSpinner.setModel(snmCacheSize);
@@ -232,7 +216,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
 
                     if (canWrite) {
                         location.setText(result);
-                        config.setProperty(Properties.USER_CACHEDIR.toString(), result);
+                        config.setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, result);
                     }
                 }
             }
@@ -356,7 +340,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
                     cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerLargeValueWarning", usableDiskSpace));
                 }
 
-                config.setProperty(Properties.CACHE_MAX_SIZE.toString(), Long.valueOf(cacheSizeSpinnerValue).toString());
+                config.setProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE, Long.valueOf(cacheSizeSpinnerValue).toString());
             } else {
                 showCacheSizeSpinnerGUIElements(false);
                 showCompressionAndLocationGUIElements(true);
@@ -377,12 +361,12 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
             }
 
             if (selected) {
-                config.setProperty(Properties.CACHE_MAX_SIZE.toString(), cacheSizeSpinner.getValue().toString());
+                config.setProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE, cacheSizeSpinner.getValue().toString());
             } else {
-                config.setProperty(Properties.CACHE_MAX_SIZE.toString(), Long.toString(CACHE_UNLIMITED_SIZE));
+                config.setProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE, Long.toString(CACHE_UNLIMITED_SIZE));
             }
 
-            config.setProperty(Properties.CACHE_ENABLED.toString(), String.valueOf(!selected));
+            config.setProperty(DeploymentConfiguration.KEY_CACHE_ENABLED, String.valueOf(!selected));
         }
     }
 
