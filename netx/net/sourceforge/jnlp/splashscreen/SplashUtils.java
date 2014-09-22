@@ -94,7 +94,7 @@ public class SplashUtils {
         if (ae == null) {
             return;
         }
-        SplashController p = ae.getSplashControler();
+        SplashController p = ae.getSplashController();
         showError(ex, p);
     }
 

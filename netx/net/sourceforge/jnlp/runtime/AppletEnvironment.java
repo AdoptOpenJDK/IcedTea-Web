@@ -138,9 +138,12 @@ public class AppletEnvironment implements AppletContext, AppletStub {
      * container must be SplashContoler
      * 
      */
-    public SplashController getSplashControler() {
-        
-        return (SplashController)cont;
+    public SplashController getSplashController() {
+        if (cont instanceof SplashController) {
+            return (SplashController) cont;
+        } else {
+            return null;
+        }
     }
 
     /**

@@ -40,6 +40,8 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.sourceforge.jnlp.runtime.AppletEnvironment;
+import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.splashscreen.impls.*;
 import org.junit.Assert;
@@ -251,5 +253,13 @@ public class SplashUtilsTest {
       field.setAccessible(true);
       field.set(null, newValue);
    }
+     
+    @Test
+    public void assertNulsAreOkInShow() {
+        SplashUtils.showError(null, (AppletEnvironment)null);
+        SplashUtils.showError(null, (AppletInstance)null);
+        SplashUtils.showError(null, (SplashController)null);
+    }
+     
 
 }

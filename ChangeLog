@@ -1,3 +1,13 @@
+2014-09-22  Jiri Vanek  <jvanek@redhat.com>
+
+	Preventing rare class cast exception in erroneous detached applets
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: getSplashControler
+	renamed to getSplashController. (getSplashController) added check for 
+	SplashController instance. Returning null if not so.
+	* netx/net/sourceforge/jnlp/splashscreen/SplashUtils.java: adapted to renaming
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/SplashUtilsTest.java:
+	added (assertNulsAreOkInShow) test to check null values for showError methods
+
 2014-09-19  Jie Kang  <jkang@redhat.com>
 
     Modified Makefile.am to use whitelist when processing reproducers.
