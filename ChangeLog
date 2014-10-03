@@ -1,3 +1,8 @@
+2014-10-03  Lukasz Dracz  <ldracz@redhat.com>
+
+    IcedTea-Web Splashscreen allows zero or one hyphens preceding headless option
+    * launcher/launchers.in: regex matching for headless
+
 2014-09-22  Jiri Vanek  <jvanek@redhat.com>
 
 	Preventing rare class cast exception in erroneous detached applets

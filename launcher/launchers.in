@@ -53,7 +53,7 @@ while [ "$#" -gt "0" ]; do
     *)
       ARGS[$j]="$1"
       j=$((j+1))
-      if [ "$1" = "-headless" ] ; then
+      if [[ "$1" =~ ^[-]{0,1}headless ]] ; then   
         SPLASH="false"
       fi
       ;;
