@@ -40,6 +40,7 @@ package net.sourceforge.jnlp.cache;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,13 +49,13 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.CacheTestUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 public class CacheEntryTest {
@@ -85,10 +86,6 @@ public class CacheEntryTest {
 
     private ByteArrayOutputStream baos;
     private PrintStream out;
-    private ExecutorService executorService;
-    Object listener = new Object();
-
-    int num = 0;
 
     @Before
     public void setUp() throws MalformedURLException {
@@ -96,7 +93,6 @@ public class CacheEntryTest {
         version = new Version("1.0");
         baos = new ByteArrayOutputStream();
         out = new PrintStream(baos);
-        executorService = Executors.newSingleThreadExecutor();
     }
 
     @Test
@@ -222,7 +218,7 @@ public class CacheEntryTest {
         return cachedFile;
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testLock() throws IOException {
         TestCacheEntry entry = new TestCacheEntry(url, version, null);
         try {
@@ -233,7 +229,7 @@ public class CacheEntryTest {
         }
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testUnlock() throws IOException {
         TestCacheEntry entry = new TestCacheEntry(url, version, null);
         try {
@@ -244,7 +240,7 @@ public class CacheEntryTest {
         assertTrue(!entry.isHeldByCurrentThread());
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testStoreFailsWithoutLock() throws IOException {
         TestCacheEntry entry = new TestCacheEntry(url, version, null);
         long num = 10;
@@ -252,7 +248,7 @@ public class CacheEntryTest {
         assertTrue(!entry.store());
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testStoreWorksWithLocK() throws IOException {
         TestCacheEntry entry = new TestCacheEntry(url, version, null);
         long num = 10;
@@ -265,99 +261,120 @@ public class CacheEntryTest {
         }
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testMultithreadLockPreventsWrite() throws IOException, InterruptedException {
+        int numThreads = 100;
+        CountDownLatch doneSignal = new CountDownLatch(numThreads);
+        CountDownLatch writersDoneSignal = new CountDownLatch(numThreads);
+
         TestCacheEntry entry = new TestCacheEntry(url, version, null);
-        Thread a = new Thread(new WriteWorker(10, entry));
-        a.start();
+        Thread[] list = new Thread[numThreads];
 
-        Thread b = new Thread(new WriteWorker(5, entry));
-        b.start();
+        for (int i=0; i<numThreads; i++) {
+            list[i] = new Thread(new WriteWorker(i, entry, doneSignal, writersDoneSignal));
+        }
 
-        Thread.sleep(2000l);
+        for (int i=0; i<numThreads; i++) {
+            list[i].start();
+        }
 
-        synchronized (listener) {
-            num = 1;
-            listener.notifyAll();
+        //Wait for all children to finish
+        for (int i = 0; i < numThreads; i++) {
+            list[i].join();
         }
 
         String out = baos.toString();
-        assertTrue(out.contains(":10:true") && out.contains(":5:false"));
+        assertTrue(CacheTestUtils.stringContainsOnlySingleInstance(out, "true") && out.contains("false"));
     }
 
-    @Test
+
+    @Test(timeout = 2000l)
     public void testMultithreadLockAllowsRead() throws IOException, InterruptedException {
+        int numThreads = 2;
+        int numWriterThreads = 1;
+
+        CountDownLatch doneSignal = new CountDownLatch(numThreads);
+        CountDownLatch writersDoneSignal = new CountDownLatch(numWriterThreads);
+
         TestCacheEntry entry = new TestCacheEntry(url, version, null);
-        Thread a = new Thread(new WriteWorker(10, entry));
-        a.start();
 
-        Thread.sleep(2000l);
+        Thread writerThread = new Thread(new WriteWorker(10, entry, doneSignal, writersDoneSignal));
+        writerThread.start();
 
-        Thread b = new Thread(new ReadWorker(entry));
-        b.start();
+        Thread readerThread = new Thread(new ReadWorker(entry, writersDoneSignal, doneSignal));
+        readerThread.start();
 
-        Thread.sleep(1000l);
-
-        synchronized (listener) {
-            num = 1;
-            listener.notifyAll();
-        }
+        writerThread.join();
+        readerThread.join();
 
         String out = baos.toString();
         assertTrue(out.contains(":10:true") && out.contains(":read:10"));
     }
 
     private class WriteWorker implements Runnable {
-        long input;
-        TestCacheEntry entry;
+        private final long input;
+        private final TestCacheEntry entry;
+        private final CountDownLatch doneSignal;
+        private final CountDownLatch writersDoneSignal;
 
-        public WriteWorker(long input, TestCacheEntry entry) {
+        public WriteWorker(long input, TestCacheEntry entry, CountDownLatch doneSignal, CountDownLatch writersDoneSignal) {
             this.input = input;
             this.entry = entry;
+            this.doneSignal = doneSignal;
+            this.writersDoneSignal = writersDoneSignal;
         }
         @Override
         public void run() {
-
             try {
-                boolean result = entry.tryLock();
+                entry.tryLock();
                 entry.setLastModified(input);
-                result = entry.store();
-                executorService.execute(new WriteRunnable(":" + input + ":" + result));
-                while (num == 0) {
-                    synchronized (listener) {
-                        listener.wait();
-                    }
+                boolean result = entry.store();
+                synchronized (out) {
+                    out.println(":" + input + ":" + result);
+                    out.flush();
                 }
+                //Let parent know outputting is done
+                doneSignal.countDown();
+                writersDoneSignal.countDown();
+                //Wait until everyone is done before continuing to clw.unlock()
+                doneSignal.await();
             } catch (Exception e) {
                 e.printStackTrace();
+                fail();
             } finally {
                 entry.unlock();
             }
         }
     }
 
-    private class WriteRunnable implements Runnable {
-        private String msg;
-        public WriteRunnable(String msg) {
-            this.msg = msg;
-        }
-
-        @Override
-        public void run() {
-            out.println(msg);
-            out.flush();
-        }
-    }
-
     private class ReadWorker implements Runnable {
-        private TestCacheEntry entry;
-        public ReadWorker(TestCacheEntry entry) {
+        private final TestCacheEntry entry;
+
+        private final CountDownLatch writersDone;
+        private final CountDownLatch doneSignal;
+
+        public ReadWorker(TestCacheEntry entry, CountDownLatch writersDone, CountDownLatch doneSignal) {
             this.entry = entry;
+            this.writersDone = writersDone;
+            this.doneSignal = doneSignal;
         }
+
         @Override
         public void run() {
-            long lastModified = entry.getLastModified();
-            executorService.execute(new WriteRunnable(":read:" + lastModified));
+            try {
+                writersDone.await();
+
+                long lastModified = entry.getLastModified();
+                synchronized (out) {
+                    out.println(":read:" + lastModified);
+                    out.flush();
+                    doneSignal.countDown();
+                    doneSignal.await();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                fail();
+            }
         }
     }
 }

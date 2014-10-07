@@ -150,7 +150,7 @@ public class LockedFile {
     }
 
     /**
-     * Unlock access to the file. Lock is reentrant.
+     * Unlock access to the file. Lock is reentrant. Does not do anything if not holding the lock.
      */
     public void unlock() throws IOException {
         if (JNLPRuntime.isWindows() || !this.threadLock.isHeldByCurrentThread()) {

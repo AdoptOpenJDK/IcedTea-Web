@@ -44,8 +44,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -53,6 +52,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.util.CacheTestUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 public class CacheLRUWrapperTest {
@@ -67,10 +67,6 @@ public class CacheLRUWrapperTest {
 
     private ByteArrayOutputStream baos;
     private PrintStream out;
-    private ExecutorService executorService;
-    Object listener = new Object();
-
-    int num = 0;
 
     @BeforeClass
     static public void setupJNLPRuntimeConfig() {
@@ -91,7 +87,6 @@ public class CacheLRUWrapperTest {
     public void setup() {
         baos = new ByteArrayOutputStream();
         out = new PrintStream(baos);
-        executorService = Executors.newSingleThreadExecutor();
     }
 
     @Test
@@ -99,36 +94,35 @@ public class CacheLRUWrapperTest {
 
         final File cacheIndexFile = new File(clw.cacheDir + File.separator + cacheIndexFileName);
         cacheIndexFile.delete();
-        try{
-        
-        int noLoops = 1000;
+        try {
+            int noLoops = 1000;
 
-        long time[] = new long[noLoops];
+            long time[] = new long[noLoops];
 
-        clw.lock();
-        clearCacheIndexFile();
+            clw.lock();
+            clearCacheIndexFile();
 
-        fillCacheIndexFile(noEntriesCacheFile);
-        clw.store();
+            fillCacheIndexFile(noEntriesCacheFile);
+            clw.store();
 
-        // FIXME: wait a second, because of file modification timestamp only provides accuracy on seconds.
-        Thread.sleep(1000);
+            // FIXME: wait a second, because of file modification timestamp only provides accuracy on seconds.
+            Thread.sleep(1000);
 
-        long sum = 0;
-        for(int i=0; i < noLoops - 1; i++) {
-            time[i]= System.nanoTime();
-            clw.load();
-            time[i+1]= System.nanoTime();
-            if(i==0)
-                continue;
-            sum = sum + time[i] - time[i-1];
-        }
-        
-        double avg = sum / time.length;
-        ServerAccess.logErrorReprint("Average = " + avg + "ns");
+            long sum = 0;
+            for(int i=0; i < noLoops - 1; i++) {
+                time[i]= System.nanoTime();
+                clw.load();
+                time[i+1]= System.nanoTime();
+                if(i==0)
+                    continue;
+                sum = sum + time[i] - time[i-1];
+            }
 
-        // wait more than 100 microseconds for noLoops = 1000 and noEntries=1000 is bad
-        assertTrue("load() must not take longer than 100 µs, but took in avg " + avg/1000 + "µs", avg < 100 * 1000);
+            double avg = sum / time.length;
+            ServerAccess.logErrorReprint("Average = " + avg + "ns");
+
+            // wait more than 100 microseconds for noLoops = 1000 and noEntries=1000 is bad
+            assertTrue("load() must not take longer than 100 µs, but took in avg " + avg/1000 + "µs", avg < 100 * 1000);
         } finally {
             clw.unlock();
             cacheIndexFile.delete();
@@ -216,7 +210,7 @@ public class CacheLRUWrapperTest {
         assertFalse(clw.containsKey(key) && clw.containsValue(value));
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testLock() throws IOException {
         try {
             clw.lock();
@@ -226,7 +220,7 @@ public class CacheLRUWrapperTest {
         }
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testUnlock() throws IOException {
         try {
             clw.lock();
@@ -236,12 +230,12 @@ public class CacheLRUWrapperTest {
         assertTrue(!clw.cacheOrder.isHeldByCurrentThread());
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testStoreFailsWithoutLock() throws IOException {
         assertTrue(!clw.store());
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testStoreWorksWithLocK() throws IOException {
         try {
             clw.lock();
@@ -251,41 +245,51 @@ public class CacheLRUWrapperTest {
         }
     }
 
-    @Test
+    @Test(timeout = 2000l)
     public void testMultithreadLockPreventsStore() throws IOException, InterruptedException {
-        Thread a = new Thread(new StoreWorker());
-        a.start();
+        int numThreads = 100;
+        CountDownLatch doneSignal = new CountDownLatch(numThreads);
 
-        Thread b = new Thread(new StoreWorker());
-        b.start();
+        Thread[] list = new Thread[numThreads];
 
-        Thread.sleep(2000l);
+        for (int i = 0; i < numThreads; i++) {
+            list[i] = new Thread(new StoreWorker(doneSignal));
+        }
 
-        synchronized (listener) {
-            num = 1;
-            listener.notifyAll();
+        for (int i = 0; i < numThreads; i++) {
+            list[i].start();
+        }
+
+        //Wait for all children to finish
+        for (int i = 0; i < numThreads; i++) {
+            list[i].join();
         }
 
         String out = baos.toString();
-        System.out.println();
-        assertTrue(out.contains("true") && out.contains("false"));
+
+        assertTrue(CacheTestUtils.stringContainsOnlySingleInstance(out, "true") && out.contains("false"));
     }
 
     private class StoreWorker implements Runnable {
 
-        public StoreWorker() {
+        private final CountDownLatch doneSignal;
+
+        public StoreWorker(CountDownLatch doneSignal) {
+            this.doneSignal = doneSignal;
         }
         @Override
         public void run() {
             try {
                 clw.cacheOrder.tryLock();
                 boolean result = clw.store();
-                executorService.execute(new WriteRunnable(String.valueOf(result)));
-                while (num == 0) {
-                    synchronized (listener) {
-                        listener.wait();
-                    }
+                synchronized (out) {
+                    out.println(String.valueOf(result));
+                    out.flush();
                 }
+                //Let parent know outputting is done
+                doneSignal.countDown();
+                //Wait until able to continue to clw.unlock()
+                doneSignal.await();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -293,18 +297,4 @@ public class CacheLRUWrapperTest {
             }
         }
     }
-
-    private class WriteRunnable implements Runnable {
-        private String msg;
-        public WriteRunnable(String msg) {
-            this.msg = msg;
-        }
-
-        @Override
-        public void run() {
-            out.println(msg);
-            out.flush();
-        }
-    }
-
 }

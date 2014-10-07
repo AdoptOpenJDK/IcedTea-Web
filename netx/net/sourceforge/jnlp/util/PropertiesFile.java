@@ -192,6 +192,10 @@ public class PropertiesFile extends Properties {
         return false;
     }
 
+    /**
+     * Unlocks the file. Does not do anything if not holding the lock.
+     */
+
     public void unlock() {
         try {
             lockedFile.unlock();

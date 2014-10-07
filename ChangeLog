@@ -1,5 +1,18 @@
 2014-10-07  Jie Kang  <jkang@redhat.com>
 
+	Modified unit tests for CacheEntry and CacheLRUWrapper to prevent blocking.
+	* netx/net/sourceforge/jnlp/cache/CacheEntry.java: comments for unlocking
+	* netx/net/sourceforge/jnlp/util/PropertiesFile.java: same
+	* netx/net/sourceforge/jnlp/util/lockingfile/LockedFile.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheEntryTest.java: fixed
+	multi-threaded tests to prevent blocking, and added timeout to threaded
+	tests to prevent tests from blocking test runs
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheTestUtils.java: utilities
+	for cache tests
+
+2014-10-07  Jie Kang  <jkang@redhat.com>
+
 	Changed ResourceTracker to use cached thread pool as opposed to manual
 	thread management
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:

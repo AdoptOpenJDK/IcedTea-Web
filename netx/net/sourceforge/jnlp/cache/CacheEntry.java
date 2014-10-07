@@ -239,7 +239,7 @@ public class CacheEntry {
     }
 
     /**
-     * Unlock cache item.
+     * Unlock cache item. Does not do anything if not holding the lock.
      */
     protected void unlock() {
         properties.unlock();
