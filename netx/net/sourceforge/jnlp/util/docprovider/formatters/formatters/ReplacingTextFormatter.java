@@ -39,6 +39,17 @@ public abstract class ReplacingTextFormatter implements Formatter {
             return Boot.version;
         }
     }
+
+    @Override
+    public String getNewLine(int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(getNewLine());
+        }
+        return sb.toString();
+    }
+    
+    
     
     
 

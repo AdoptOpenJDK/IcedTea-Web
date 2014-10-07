@@ -98,25 +98,25 @@ public class PathsAndFiles {
      * PIPES_DIR and both Plugin Dirs  are not instatiated to be used. Do exists  only for documentation purposes.
      * Maintained by native part of ITW. Or outside ITW.
      */
-    public static final InfrastructureFileDescriptor PIPES_DIR = new RuntimeFileDescriptor("icedteaplugin-user-*", "contains in and out pipe for native2java communication and (if enabled) debugging pipe.", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor MOZILA_USER = new HomeFileDescriptor(ICEDTEA_SO, ".mozilla/plugins", "Location of plugin library for user's purposes on mozilla compliant browser", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/mozilla/plugins/", "",  "Location of plugin library for global purposes  on mozilla compliant browser, 64b systems", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/mozilla/plugins/", "",  "Location of plugin library for global purposes  on mozilla compliant browser, 32b systems", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "Location of plugin library for global purposes  on opera compliant browser, 64b systems", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "Location of plugin library for global purposes  on opera compliant browser, 32b systems", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor PIPES_DIR = new RuntimeFileDescriptor("icedteaplugin-user-*", "FILEpipe", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor MOZILA_USER = new HomeFileDescriptor(ICEDTEA_SO, ".mozilla/plugins", "FILEmozillauser", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/mozilla/plugins/", "",  "FILEmozillaglobal64", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/mozilla/plugins/", "",  "FILEmozillaglobal32", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "FILEopera64", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "FILEopera32", Target.PLUGIN);
     
-    public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "contains cached runtime entries (and my be changed by you).", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "contains saved application data.", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "(may be set to different location by you) contains file log files (if enabled).  itw-cplugin-date_time.log for native part of plugin, itw-javantx-date_time.log for everything else.", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(APPLET_TRUST_SETTINGS, "File responsible for various actions on applets and apps based on their codebase based on users actions.", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentCofigFileDescriptor(APPLET_TRUST_SETTINGS, "File responsible for various actions on applets and apps based on their codebase based on admins actions.", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentCofigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "Global deployment properties.", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "contains temporary runtime files.", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "FILEappdata", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentCofigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentCofigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
-    public static final InfrastructureFileDescriptor LOCKS_DIR = new TmpUsrFileDescriptor("locks", "netx", "location of netx locks.", Target.JAVAWS);
-    public static final InfrastructureFileDescriptor MAIN_LOCK = new TmpUsrFileDescriptor("netx_running", "netx" + File.separator + "locks", "location of netx locks.", Target.JAVAWS);
+    public static final InfrastructureFileDescriptor LOCKS_DIR = new TmpUsrFileDescriptor("locks", "netx", "FILElocksdir", Target.JAVAWS);
+    public static final InfrastructureFileDescriptor MAIN_LOCK = new TmpUsrFileDescriptor("netx_running", "netx" + File.separator + "locks", "FILEmainlock", Target.JAVAWS);
 
-    public static final InfrastructureFileDescriptor JAVA_POLICY = new UserSecurityConfigFileDescriptor("java.policy", "contains granted permissions for selected unsigned apps.", Target.JAVAWS, Target.POLICY_EDITOR);
+    public static final InfrastructureFileDescriptor JAVA_POLICY = new UserSecurityConfigFileDescriptor("java.policy", "FILEpolicy", Target.JAVAWS, Target.POLICY_EDITOR);
     public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts");
     public static final InfrastructureFileDescriptor USER_JSSECAC = new UserCacertsFileDescriptor("trusted.jssecacerts");
     public static final InfrastructureFileDescriptor USER_CERTS = new UserCacertsFileDescriptor("trusted.certs");
@@ -129,7 +129,14 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor SYS_JSSECERT = new SystemJavaSecurityFileDescriptor("trusted.jssecerts");
     public static final InfrastructureFileDescriptor SYS_CLIENTCERT = new SystemJavaSecurityFileDescriptor("trusted.clientcerts");
 
-    public static final InfrastructureFileDescriptor JAVA_DEPLOYMENT_PROP_FILE = new SystemJavaLibFileDescriptor(DEPLOYMENT_CONFIG_FILE, "java-global deployment properties file. May be affected by " + DeploymentConfiguration.KEY_JRE_DIR + ".", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor JAVA_DEPLOYMENT_PROP_FILE = new SystemJavaLibFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEjavadp", Target.JAVAWS, Target.ITWEB_SETTINGS){
+
+        @Override
+        public String getDescription() {
+             return Translator.R(descriptionKey, DeploymentConfiguration.KEY_JRE_DIR);
+        }
+        
+    };
     public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DEPLOYMENT_PROPERTIES, "Users main deployment properties file.", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
     private static enum Target {
@@ -185,7 +192,7 @@ public class PathsAndFiles {
         public final String fileName;
         public final String pathStub;
         public final String systemPathStub;
-        private final String descriptionKey;
+        protected final String descriptionKey;
         private final Target[] target;
 
         private InfrastructureFileDescriptor(String fileName, String pathStub, String systemPathStub, String descriptionKey, Target... target) {
@@ -298,7 +305,7 @@ public class PathsAndFiles {
     private static class SystemJavaSecurityFileDescriptor extends SystemJavaLibFileDescriptor {
 
         private SystemJavaSecurityFileDescriptor(String fileName) {
-            super(fileName, "security", "contains  various system java-wide stored certificates.", Target.JAVAWS);
+            super(fileName, "security", "FILEjavacerts", Target.JAVAWS);
         }
 
     }
@@ -365,7 +372,7 @@ public class PathsAndFiles {
     private static class UserCacertsFileDescriptor extends UserSecurityConfigFileDescriptor {
 
         private UserCacertsFileDescriptor(String fileName) {
-            super(fileName, "contains  various users stored certificates.", Target.JAVAWS);
+            super(fileName, "FILEusercerts", Target.JAVAWS);
         }
 
     }

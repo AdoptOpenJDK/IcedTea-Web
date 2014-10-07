@@ -1,9 +1,25 @@
-2014-09-22  Jiri Vanek  <jvanek@redhat.com>
+2014-10-07  Jiri Vanek  <jvanek@redhat.com>
+
+	Files, arguments types and icedtea-web man page made localizable
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java: (NumberOfArguments)
+	sentences moved to properties
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: same
+	* netx/net/sourceforge/jnlp/util/docprovider/IcedTeaWebTextsProvider.java: same
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added families of
+	ITW, NOA and FILE
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java:
+	added getNewLine override with argument, number of new lines to be generated
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java
+	getNewLine(int i)  implemented
+	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/formatters/formatters/FormatterTest.java
+	getNewLine(int i) tested for all formatters
+	
+2014-10-07  Jiri Vanek  <jvanek@redhat.com>
 
 	Option parser now accept 0-n hyphens    
 	* launcher/launchers.in: regex matching for headless changed to * instead of 0-1
 	* netx/net/sourceforge/jnlp/util/optionparser/OptionParser.java: added new
-	method to removeLeadiingHyphens. (stringEqualsOption) now sanitize both inputs
+	method to removeLeadingHyphens. (stringEqualsOption) now sanitize both inputs
 	by it.
 	* tests/netx/unit/net/sourceforge/jnlp/util/optionparser/OptionParserTest.java:
 	Added tests to verify none or more leading hyphens are correctly recognized.

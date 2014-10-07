@@ -10,6 +10,8 @@ public interface Formatter {
 
     public String getNewLine();
     
+    public String getNewLine(int count);
+    
     public String getBold(String s);
 
     public String getBoldOpening();

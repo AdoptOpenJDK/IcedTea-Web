@@ -137,11 +137,11 @@ public class OptionsDefinitions {
     }
 
     private enum NumberOfArguments {
-        NONE("No argument expected"),
-        ONE("Exactly one argument expected"),
-        ONE_OR_MORE("Expected one or more arguments"),
-        EQUALS_CHAR("Expected -param=value vaue declaration");
-        
+        NONE("NOAnone"),
+        ONE("NOAone"),
+        ONE_OR_MORE("NOAonemore"),
+        EQUALS_CHAR("NOAequalschar");
+
         String messageKey;
 
         NumberOfArguments(String messageKey) {
