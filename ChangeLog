@@ -1,3 +1,14 @@
+2014-09-22  Jiri Vanek  <jvanek@redhat.com>
+
+	Option parser now accept 0-n hyphens    
+	* launcher/launchers.in: regex matching for headless changed to * instead of 0-1
+	* netx/net/sourceforge/jnlp/util/optionparser/OptionParser.java: added new
+	method to removeLeadiingHyphens. (stringEqualsOption) now sanitize both inputs
+	by it.
+	* tests/netx/unit/net/sourceforge/jnlp/util/optionparser/OptionParserTest.java:
+	Added tests to verify none or more leading hyphens are correctly recognized.
+	Added tests to verify hyphens elsewhere will not confuse parser.
+
 2014-10-03  Lukasz Dracz  <ldracz@redhat.com>
 
     IcedTea-Web Splashscreen allows zero or one hyphens preceding headless option

@@ -397,4 +397,23 @@ public class OptionParserTest {
         assertEquals(3, values.indexOf("yellow"));
         assertEquals("red", parser.getMainArg());
     }
+    
+    @Test
+    public void testOptionsSyntaxPositive() {
+        assertTrue(OptionParser.stringEqualsOption("headless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertTrue(OptionParser.stringEqualsOption("-headless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertTrue(OptionParser.stringEqualsOption("--headless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertTrue(OptionParser.stringEqualsOption("---headless", OptionsDefinitions.OPTIONS.HEADLESS));
+    }
+    
+    @Test
+    public void testOptionsSyntaxNegative() {
+        assertFalse(OptionParser.stringEqualsOption(" -headless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertFalse(OptionParser.stringEqualsOption("h-eadless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertFalse(OptionParser.stringEqualsOption("headless-", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertFalse(OptionParser.stringEqualsOption("- -headless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertFalse(OptionParser.stringEqualsOption("--- ---headless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertFalse(OptionParser.stringEqualsOption("- ---headless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertFalse(OptionParser.stringEqualsOption("--- -headless", OptionsDefinitions.OPTIONS.HEADLESS));
+    }
 }

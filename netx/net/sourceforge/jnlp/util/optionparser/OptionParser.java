@@ -164,13 +164,14 @@ public class OptionParser {
         return mainArg;
     }
 
-    private boolean stringEqualsOption(String input, OptionsDefinitions.OPTIONS opt) {
-        String option = opt.option.replaceAll("^-","").split("=")[0];
-        input = input.replaceAll("^-","").split("=")[0];
-        if (input.equals(option)) {
-            return true;
-        }
-        return false;
+    protected static boolean stringEqualsOption(String input, OptionsDefinitions.OPTIONS opt) {
+        String option = removeLeadingHyphens(opt.option).split("=")[0];
+        input = removeLeadingHyphens(input).split("=")[0];
+        return input.equals(option);
+    }
+    
+    private static String removeLeadingHyphens(final String input) {
+        return input.replaceAll("^-*", "");
     }
 
     public boolean hasOption(OptionsDefinitions.OPTIONS option) {
