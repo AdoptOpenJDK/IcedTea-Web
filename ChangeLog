@@ -1,3 +1,9 @@
+2014-10-07  Jie Kang  <jkang@redhat.com>
+
+	Changed ResourceTracker to use cached thread pool as opposed to manual
+	thread management
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
+
 2014-10-07  Jiri Vanek  <jvanek@redhat.com>
 
 	Files, arguments types and icedtea-web man page made localizable

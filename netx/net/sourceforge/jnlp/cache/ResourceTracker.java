@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.jar.Pack200.Unpacker;
@@ -126,11 +128,7 @@ public class ResourceTracker {
     /** notified on initialization or download of a resource */
     private static final Object lock = new Object(); // used to lock static structures
 
-    /** max threads */
-    private static final int maxThreads = 5;
-    
-    /** running threads */
-    private static int threads = 0;
+    private static final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     /** weak list of resource trackers with resources to prefetch */
     private static final WeakList<ResourceTracker> prefetchTrackers =
@@ -141,10 +139,6 @@ public class ResourceTracker {
 
     private static final ConcurrentHashMap<Resource, DownloadOptions> downloadOptions =
         new ConcurrentHashMap<>();
-
-    /** resource trackers threads are working for (used for load balancing across multi-tracker downloads) */
-    private final static ArrayList<ResourceTracker> active =
-            new ArrayList<>(); //
 
     /** the resources known about by this resource tracker */
     private final List<Resource> resources = new ArrayList<>();
@@ -198,7 +192,6 @@ public class ResourceTracker {
             OutputController.getLogger().log(ex);
         }
         Resource resource = Resource.getResource(location, version, updatePolicy);
-        boolean downloaded = false;
 
         synchronized (resources) {
             if (resources.contains(resource))
@@ -216,12 +209,12 @@ public class ResourceTracker {
         // should really be synchronized on resources, but the worst
         // case should be that the resource will be updated once even
         // if unnecessary.
-        downloaded = checkCache(resource, updatePolicy);
+        boolean downloaded = checkCache(resource, updatePolicy);
 
-        synchronized (lock) {
-            if (!downloaded)
-                if (prefetch && threads == 0) // existing threads do pre-fetch when queue empty
-                    startThread();
+        if (!downloaded) {
+            if (prefetch) {
+                startDownloadThread();
+            }
         }
     }
 
@@ -541,19 +534,13 @@ public class ResourceTracker {
     }
 
     /**
-     * Start a new download thread if there are not too many threads
-     * already running.
+     * Start a new download thread.
      * <p>
      * Calls to this method should be synchronized on lock.
      * </p>
      */
-    protected void startThread() {
-        if (threads < maxThreads) {
-            threads++;
-
-            Thread thread = new Thread(new Downloader(), "DownloaderThread" + threads);
-            thread.start();
-        }
+    protected void startDownloadThread() {
+        threadPool.execute(new Downloader());
     }
 
     /**
@@ -563,25 +550,9 @@ public class ResourceTracker {
      * </p>
      */
     private void endThread() {
-        threads--;
-
-        if (threads < 0) {
-            // this should never happen but try to recover
-            threads = 0;
-
-            if (queue.size() > 0) // if any on queue make sure a thread is running
-                startThread(); // look into whether this could create a loop
-
-            throw new RuntimeException("tracker threads < 0");
-        }
-
-        if (threads == 0) {
-            synchronized (prefetchTrackers) {
-                queue.trimToSize(); // these only accessed by threads so no sync needed
-                active.clear(); // no threads so no trackers actively downloading
-                active.trimToSize();
-                prefetchTrackers.trimToSize();
-            }
+        synchronized (prefetchTrackers) {
+            queue.trimToSize(); // these only accessed by threads so no sync needed
+            prefetchTrackers.trimToSize();
         }
     }
 
@@ -595,7 +566,7 @@ public class ResourceTracker {
                 throw new IllegalResourceDescriptorException("Invalid resource state (resource: " + resource + ")");
 
             queue.add(resource);
-            startThread();
+            startDownloadThread();
         }
     }
 
@@ -1035,8 +1006,8 @@ public class ResourceTracker {
         if (result != null)
             queue.remove(result);
 
-        // prefetch if nothing found so far and this is the last thread
-        if (result == null && threads == 1)
+        // prefetch if nothing found so far
+        if (result == null)
             result = getPrefetch();
 
         if (result == null)
@@ -1113,7 +1084,6 @@ public class ResourceTracker {
 
     static Resource selectByFilter(Collection<Resource> source, Filter<Resource> filter) {
         Resource result = null;
-        int score = Integer.MAX_VALUE;
 
         for (Resource resource : source) {
             boolean selectable;
@@ -1123,19 +1093,7 @@ public class ResourceTracker {
             }
 
             if (selectable) {
-                int activeCount = 0;
-
-                for (ResourceTracker rt : active) {
-                    if (rt == resource.getTracker())
-                        activeCount++;
-                }
-
-                // try to spread out the downloads so that a slow host
-                // won't monopolize the downloads
-                if (activeCount < score) {
                     result = resource;
-                    score = activeCount;
-                }
             }
         }
 
@@ -1268,27 +1226,18 @@ public class ResourceTracker {
         public void run() {
             while (true) {
                 synchronized (lock) {
-                    // remove from active list, used for load balancing
-                    if (resource != null)
-                        active.remove(resource.getTracker());
-
                     resource = selectNextResource();
 
                     if (resource == null) {
                         endThread();
                         break;
                     }
-
-                    // add to active list, used for load balancing
-                    active.add(resource.getTracker());
                 }
 
                 try {
-
-                    // Resource processing involves writing to files 
+                    // Resource processing involves writing to files
                     // (cache entry trackers, the files themselves, etc.)
                     // and it therefore needs to be privileged
-
                     final Resource fResource = resource;
                     AccessController.doPrivileged(new PrivilegedAction<Void>() {
                         @Override
@@ -1297,7 +1246,6 @@ public class ResourceTracker {
                             return null;
                         }
                     });
-
                 } catch (Exception ex) {
                     OutputController.getLogger().log(ex);
                 }
