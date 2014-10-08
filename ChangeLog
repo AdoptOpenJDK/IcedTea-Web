@@ -1,13 +1,13 @@
 2014-10-08  Lukasz Dracz  <ldracz@redhat.com>
 
-        Standardize all options to use hyphens
-        * netx/net/sourceforge/jnlp/OptionsDefinitions.java:
-        itweb-settings options changed to have hyphens in front,
-        added new enum to NumberOfArguments
-        (getItwsettingsCommands): added headless, changed nodashhelp to help
-        * netx/net/sourceforge/jnlp/controlpanel/CommandLine.java
-        * netx/net/sourceforge/jnlp/resources/Messages.properties:
-        (BOHelp, IBOCheck): modified (NOAevennumberorequalschar): added
+	Standardize all options to use hyphens
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java:
+	itweb-settings options changed to have hyphens in front,
+	added new enum to NumberOfArguments
+	(getItwsettingsCommands): added headless, changed nodashhelp to help
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(BOHelp, IBOCheck): modified (NOAevennumberorequalschar): added
 
 2014-10-08  Jiri Vanek  <jvanek@redhat.com>
 
