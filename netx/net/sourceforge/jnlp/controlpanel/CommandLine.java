@@ -438,7 +438,7 @@ public class CommandLine {
         List<String> arguments = new ArrayList<>(Arrays.asList(argsArray));
 
         int val;
-        if (command.equals(OptionsDefinitions.OPTIONS.NODASHHELP.option)) {
+        if (command.equals(OptionsDefinitions.OPTIONS.HELP.option)) {
             val = handleHelpCommand();
         } else if (command.equals(OptionsDefinitions.OPTIONS.LIST.option)) {
             val = handleListCommand(arguments);

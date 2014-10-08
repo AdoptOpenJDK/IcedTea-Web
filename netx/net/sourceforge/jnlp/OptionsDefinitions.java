@@ -73,14 +73,13 @@ public class OptionsDefinitions {
         TRUSTNONE("-Xtrustnone","BOTrustnone"),
         JNLP("-jnlp","BOJnlp", NumberOfArguments.ONE),
         //itweb settings
-        NODASHHELP("help", "IBOHelp"),
-        LIST("list", "IBOList"),
-        GET("get", "name", "IBOGet"),
-        INFO("info", "name", "IBOInfo"),
-        SET("set", "name value", "IBOSet"),
-        RESETALL("reset", "all", "IBOResetAll"),
-        RESET("reset", "name", "IBOReset"),
-        CHECK("check", "name", "IBOCheck"),
+        LIST("-list", "IBOList"),
+        GET("-get", "name", "IBOGet", NumberOfArguments.ONE_OR_MORE),
+        INFO("-info", "name", "IBOInfo", NumberOfArguments.ONE_OR_MORE),
+        SET("-set", "name value", "IBOSet", NumberOfArguments.EVEN_NUMBER_OR_WITHEQUALCHAR),
+        RESETALL("-reset", "all", "IBOResetAll"),
+        RESET("-reset", "name", "IBOReset", NumberOfArguments.ONE_OR_MORE),
+        CHECK("-check", "name", "IBOCheck"),
         //policyeditor
         //-help
         FILE("-file", "policy_file", "PBOFile"),
@@ -123,6 +122,10 @@ public class OptionsDefinitions {
             return numberOfArguments == NumberOfArguments.EQUALS_CHAR;
         }
 
+        public boolean hasEvenNumberOrWithEqualsChar() {
+            return numberOfArguments == NumberOfArguments.EVEN_NUMBER_OR_WITHEQUALCHAR;
+        }
+
         public boolean hasOneOrMoreArguments() {
             return numberOfArguments == NumberOfArguments.ONE_OR_MORE;
         }
@@ -140,6 +143,7 @@ public class OptionsDefinitions {
         NONE("NOAnone"),
         ONE("NOAone"),
         ONE_OR_MORE("NOAonemore"),
+        EVEN_NUMBER_OR_WITHEQUALCHAR("NOAevennumberorequalschar"),
         EQUALS_CHAR("NOAequalschar");
 
         String messageKey;
@@ -155,13 +159,14 @@ public class OptionsDefinitions {
 
     public static List<OPTIONS> getItwsettingsCommands() {
         return Arrays.asList(new OPTIONS[]{
-            OPTIONS.NODASHHELP,
+            OPTIONS.HELP,
             OPTIONS.LIST,
             OPTIONS.GET,
             OPTIONS.INFO,
             OPTIONS.SET,
-            OPTIONS.RESETALL,
             OPTIONS.RESET,
+            OPTIONS.RESETALL,
+            OPTIONS.HEADLESS,
             OPTIONS.CHECK
         });
     }
@@ -210,7 +215,7 @@ public class OptionsDefinitions {
         l.addAll(getJavaWsRuntimeOptions());
         l.addAll(getJavaWsControlOptions());
         //trustall is not returned by getJavaWsRuntimeOptions
-        //or getJavaWsControlOptions, as it is not desitred in documentation
+        //or getJavaWsControlOptions, as it is not desired in documentation
         l.add(OPTIONS.TRUSTALL);
         return l;
     }
