@@ -1,3 +1,18 @@
+2014-10-08  Jiri Vanek  <jvanek@redhat.com>
+
+	itw-plugin and itweb-settings documentation made localizable
+	* Makefile.am: documentation root (DOCS_DIR) is now icedtea-web-docs/$(FULL_VERSION)
+	(install-data-local) now can copy all man pages more simply  and from new DOCS_DIR
+	(stamps/generate-docs.stamp) is adapted to new DOCS_DIR
+	* netx/net/sourceforge/jnlp/controlpanel/NetworkSettingsPanel.java: minor fixes
+	like removal of redeclared deployment properties and switch on strings
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added missing brackets
+	behind @@ hints, all icedtea-web replaced by IcedTea-Web, (CBCheckOkSignedOk)
+	removed double space, added families of ITWS and ITWP
+	* netx/net/sourceforge/jnlp/util/docprovider/ItwebPluginTextProvider.java: and
+	* netx/net/sourceforge/jnlp/util/docprovider/ItwebSettingsTextsProvider.java:
+	all texts moved to properties
+
 2014-10-07  Jie Kang  <jkang@redhat.com>
 
 	Modified unit tests for CacheEntry and CacheLRUWrapper to prevent blocking.

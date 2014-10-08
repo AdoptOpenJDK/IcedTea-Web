@@ -3,7 +3,7 @@
 export TOP_BUILD_DIR = $(abs_top_builddir)
 
 export NETX_DIR = $(abs_top_builddir)/netx.build
-export DOCS_DIR=$(TOP_BUILD_DIR)/icedtea-web-docs
+export DOCS_DIR=$(TOP_BUILD_DIR)/icedtea-web-docs/$(FULL_VERSION)
 export NETX_SRCDIR = $(abs_top_srcdir)/netx
 export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 
@@ -258,7 +258,7 @@ endif
 # all generated manpages are installed in swarm
 install-data-local:
 	${mkinstalldirs} -d $(DESTDIR)$(mandir)
-	cp -r $(DOCS_DIR)/man-$(FULL_VERSION)/man/* $(DESTDIR)$(mandir)/
+	cp -r $(DOCS_DIR)/man/* $(DESTDIR)$(mandir)/
 if ENABLE_DOCS
 	${mkinstalldirs} $(DESTDIR)$(htmldir)
 	(cd ${abs_top_builddir}/docs/netx; \
@@ -474,13 +474,13 @@ if !WITH_RHINO
 endif
 
 stamps/generate-docs.stamp: stamps/netx.stamp
-	mkdir $(DOCS_DIR) ; \
-	HTML_DOCS_TARGET_DIR=$(DOCS_DIR)/html-$(FULL_VERSION)  ; \
-	PLAIN_DOCS_TARGET_DIR=$(DOCS_DIR)/plain-$(FULL_VERSION)  ; \
-	MAN_DOCS_TARGET_DIR=$(DOCS_DIR)/man-$(FULL_VERSION)/man  ; \
+	mkdir -p $(DOCS_DIR) ; \
+	HTML_DOCS_TARGET_DIR=$(DOCS_DIR)/html  ; \
+	PLAIN_DOCS_TARGET_DIR=$(DOCS_DIR)/plain ; \
+	MAN_DOCS_TARGET_DIR=$(DOCS_DIR)/man  ; \
 	mkdir $$HTML_DOCS_TARGET_DIR ; \
 	mkdir $$PLAIN_DOCS_TARGET_DIR ; \
-	mkdir -p $$MAN_DOCS_TARGET_DIR ; \
+	mkdir $$MAN_DOCS_TARGET_DIR ; \
 	HTML_DOCS_INDEX=$$HTML_DOCS_TARGET_DIR/index.html ; \
 	TP_COMMAND="$(BOOT_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.util.docprovider.TextsProvider" ; \
 	TP_TAIL="false $(FULL_VERSION)" ; \

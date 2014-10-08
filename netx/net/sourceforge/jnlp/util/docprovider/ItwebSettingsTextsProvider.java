@@ -45,9 +45,11 @@ import java.util.List;
 import java.util.Map;
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.config.Setting;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 public class ItwebSettingsTextsProvider extends TextsProvider {
@@ -65,25 +67,28 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
     public String getIntroduction() {
         return super.getIntroduction()
                 + getFormatter().wrapParagraph(
-                        getFormatter().process(getId() + " - view and modify settings for @BOLD_OPEN@javaws @BOLD_CLOSE@and the @BOLD_OPEN@browser plugin@BOLD_CLOSE@"));
+                        getFormatter().process(getId() + " " + Translator.R("ITWSintro")));
     }
 
     @Override
     public String getSynopsis() {
         return super.getSynopsis()
-                + getFormatter().wrapParagraph(getFormatter().process("@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE_NWLINE_BOLD_OPEN@" + getId() + " @BOLD_CLOSE@command arguments"));
+                + getFormatter().wrapParagraph(
+                        getFormatter().getBoldOpening() + getId() + " "
+                        + getFormatter().getBoldCloseNwlineBoldOpen()
+                        + getId() + " " + getFormatter().getBoldClosing()
+                        + Translator.R("ITWSsynops"));
     }
 
     @Override
     public String getDescription() {
         return super.getDescription()
-                + getFormatter().wrapParagraph(getFormatter().process("@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE@"
-                                + "is a command line and a GUI program to modify and edit settings used by the icedtea-web implementation of"
-                                + "@BOLD_OPEN@ " + JAVAWS + " @BOLD_CLOSE@and the @BOLD_OPEN@browser plugin@BOLD_CLOSE@."
-                                + "@NWLINE@@NWLINE@"
-                                + "If executed without any arguments, it starts up a GUI. Otherwise, it tries to do what is specified in the argument."
-                                + "@NWLINE@@NWLINE@"
-                                + "The command-line allows quickly searching, making a copy of and modifying specific settings without having to hunt through a UI."));
+                + getFormatter().wrapParagraph(getFormatter().getBold(getId() + " ") + getFormatter().process(
+                                Translator.R("IWSdescL1")
+                                + getFormatter().getNewLine() + getFormatter().getNewLine()
+                                + Translator.R("IWSdescL2")
+                                + getFormatter().getNewLine() + getFormatter().getNewLine()
+                                + Translator.R("IWSdescL3")));
 
     }
 
@@ -102,8 +107,8 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
     public String getExamples() {
         return super.getExamples()
                 + getFormatter().wrapParagraph(
-                        getFormatter().getOption(getId(), "Show the GUI editor")
-                        + getFormatter().getOption(getId() + "  reset deployment.proxy.type", " Resets the value of 'deployment.proxy.type' setting."))
+                        getFormatter().getOption(getId(), Translator.R("IWSexampleL1"))
+                        + getFormatter().getOption(getId() + "  " + OptionsDefinitions.OPTIONS.RESET.option + " " + DeploymentConfiguration.KEY_PROXY_TYPE, " " + Translator.R("IWSexampleL2", DeploymentConfiguration.KEY_PROXY_TYPE)))
                 + getFormatter().getNewLine()
                 + getFormatter().wrapParagraph(getKpMinorTitle() + getFormatter().getNewLine()
                         + getFormatter().wrapParagraph(getProperties()));
@@ -151,7 +156,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
                 if (defaultValue.equals(setValue)) {
                     value = defaultValue;
                 } else {
-                    value = setValue + " (default: " + defaultValue + ")";
+                    value = setValue + " (" + Translator.R("ITWSdefault") + ": " + defaultValue + ")";
                 }
             } else {
                 if (fileAcronom == null) {
@@ -167,9 +172,9 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
 
     public String getKpMinorTitle() {
         if (expandVariables) {
-            return getFormatter().getBold("Known properties (key, value and default value (if different)):");
+            return getFormatter().getBold(Translator.R("IWSexampleL3") + " " + Translator.R("IWSexampleL31"));
         } else {
-            return getFormatter().getBold("Known properties (key and default value):");
+            return getFormatter().getBold(Translator.R("IWSexampleL3") + " " + Translator.R("IWSexampleL32"));
         }
     }
 }

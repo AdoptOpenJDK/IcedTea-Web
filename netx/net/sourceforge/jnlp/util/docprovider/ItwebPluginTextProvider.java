@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.util.docprovider;
 
 import java.io.IOException;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 /**
@@ -59,7 +60,7 @@ public class ItwebPluginTextProvider extends TextsProvider {
     public String getIntroduction() {
         return super.getIntroduction()
                 + getFormatter().wrapParagraph(
-                        getFormatter().process(getId() + " - allow to run  @BOLD_OPEN@java applets @BOLD_CLOSE@in your favourite @BOLD_OPEN@browser@BOLD_CLOSE@"));
+                        getFormatter().process(getId() + " " + Translator.R("ITWPintro")));
     }
 
     @Override
@@ -105,13 +106,14 @@ public class ItwebPluginTextProvider extends TextsProvider {
             }
         }
         return super.getSynopsis()
-                + getFormatter().process("@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE@is working in your browser, once your browser knows about this files.") + getFormatter().getNewLine()
+                + getFormatter().getBold(getId() + " ") + getFormatter().process(Translator.R("ITWPsynopsL1")) + getFormatter().getNewLine()
                 + getFormatter().wrapParagraph(
-                        getFormatter().process("The " + PathsAndFiles.ICEDTEA_SO + " must be placed, or linked iniside specific direcotries. See ") + getFormatter().getUrl(ITW_PLUGIN_URL) + getFormatter().getNewLine()
-                        + getFormatter().process("@BOLD_OPEN@ Mozzila compliant browsers @BOLD_CLOSE@like Firefox, Midori, Epiphany, Chrome or Chromium use:") + getFormatter().getNewLine()
+                        getFormatter().process(Translator.R("ITWPsynopsL2", PathsAndFiles.ICEDTEA_SO, getFormatter().getUrl(ITW_PLUGIN_URL))) + getFormatter().getNewLine()
+                        + getFormatter().process(Translator.R("ITWPsynopsL3")) + getFormatter().getNewLine()
                         + mozillas)
-                + getFormatter().wrapParagraph(getFormatter().process("@BOLD_OPEN@ Opera family browsers @BOLD_CLOSE@like Opera use:") + getFormatter().getNewLine()
-                        + operas);
+                + getFormatter().wrapParagraph(getFormatter().process(Translator.R("ITWPsynopsL4")) + getFormatter().getNewLine()
+                        + operas)
+                + getFormatter().wrapParagraph(Translator.R("ITWPtrademarks"));
     }
 
     @Override
@@ -138,7 +140,7 @@ public class ItwebPluginTextProvider extends TextsProvider {
     }
 
     public static void main(String[] args) throws IOException {
-        TextsProvider.main(new String[]{"all", "true", "3.51.a"});
+        TextsProvider.main(new String[]{"all", "false", "3.51.a"});
     }
 
     @Override

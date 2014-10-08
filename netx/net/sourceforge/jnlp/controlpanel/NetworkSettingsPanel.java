@@ -58,17 +58,19 @@ import net.sourceforge.jnlp.runtime.Translator;
 @SuppressWarnings("serial")
 public class NetworkSettingsPanel extends JPanel implements ActionListener {
 
-    private DeploymentConfiguration config;
+    private final DeploymentConfiguration config;
 
     private JPanel description;
-    private ArrayList<JPanel> proxyPanels = new ArrayList<JPanel>(); // The stuff with editable fields
+    private final ArrayList<JPanel> proxyPanels = new ArrayList<>(); // The stuff with editable fields
 
     /** List of properties used by this panel */
-    public static String[] properties = { "deployment.proxy.type",
-            "deployment.proxy.http.host",
-            "deployment.proxy.http.port",
-            "deployment.proxy.bypass.local",
-            "deployment.proxy.auto.config.url", };
+    public static String[] properties = {
+        DeploymentConfiguration.KEY_PROXY_TYPE,
+        DeploymentConfiguration.KEY_PROXY_HTTP_HOST,
+        DeploymentConfiguration.KEY_PROXY_HTTP_PORT,
+        DeploymentConfiguration.KEY_PROXY_BYPASS_LOCAL,
+        DeploymentConfiguration.KEY_PROXY_AUTO_CONFIG_URL
+    };
 
     /**
      * Creates a new instance of the network settings panel.
@@ -259,18 +261,23 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
      */
     private void setState() {
         ((CardLayout) this.description.getLayout()).show(this.description, config.getProperty(properties[0]));
-        if (config.getProperty(properties[0]).equals("0")) {
-            for (JPanel panel : proxyPanels)
-                enablePanel(panel, false);
-        } else if (config.getProperty(properties[0]).equals("1")) {
-            enablePanel(proxyPanels.get(1), false);
-            enablePanel(proxyPanels.get(0), true);
-        } else if (config.getProperty(properties[0]).equals("2")) {
-            enablePanel(proxyPanels.get(0), false);
-            enablePanel(proxyPanels.get(1), true);
-        } else if (config.getProperty(properties[0]).equals("3")) {
-            for (JPanel panel : proxyPanels)
-                enablePanel(panel, false);
+        switch (config.getProperty(properties[0])) {
+            case "0":
+                for (JPanel panel : proxyPanels)
+                    enablePanel(panel, false);
+                break;
+            case "1":
+                enablePanel(proxyPanels.get(1), false);
+                enablePanel(proxyPanels.get(0), true);
+                break;
+            case "2":
+                enablePanel(proxyPanels.get(0), false);
+                enablePanel(proxyPanels.get(1), true);
+                break;
+            case "3":
+                for (JPanel panel : proxyPanels)
+                    enablePanel(panel, false);
+                break;
         }
     }
     
@@ -280,6 +287,7 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
      */
     public static PlainDocument getPortNumberDocument(){
         return new PlainDocument(){
+            @Override
             public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
                 if (str != null) {
                     try {
@@ -294,7 +302,6 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
                                 , JOptionPane.WARNING_MESSAGE);
                     }
                 }
-                return;
             }
         };
     }
