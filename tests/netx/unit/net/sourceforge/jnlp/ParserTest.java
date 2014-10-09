@@ -1413,4 +1413,30 @@ public class ParserTest {
 
         Assert.assertEquals(overwrittenCodebase.toExternalForm(), parser.getCodeBase().toExternalForm());
     }
+    
+    
+    @Test
+    public void testEmptyCodebase() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp spec=\"1.5+\"\n"
+                + "codebase=\"\"  aaa=\"\" "
+                + ">\n"
+                + "</jnlp>";
+
+        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        Parser parser = new Parser(file, null, root, defaultParser, null);
+        ParseException eex = null;
+        //non codebase element is unaffected
+        URL u = parser.getURL(root, "aaa", null);
+        Assert.assertEquals(null, u);
+        try {
+            parser.getURL(root, "codebase", null);
+        } catch (ParseException ex) {
+            eex = ex;
+        }
+        Assert.assertEquals(true, eex != null);
+        Assert.assertEquals(true, eex instanceof ParseException);
+    }
 }

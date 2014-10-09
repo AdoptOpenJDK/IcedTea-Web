@@ -285,7 +285,13 @@ public class SecurityDialogs {
 
         SecurityDialogMessage message = new SecurityDialogMessage();
         message.dialogType = DialogType.MISSING_ALACA;
-        message.extras = new Object[]{title, codeBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
+         String urlToShow = "unknown url";
+         if (codeBase != null) {
+             urlToShow = codeBase.toString();
+         } else {
+             OutputController.getLogger().log("Warning, null codebase wants to show in ALACA!");
+         }
+        message.extras = new Object[]{title, urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         Object selectedValue = getUserResponse(message);
         return getIntegerResponseAsBoolean(selectedValue);
     } 

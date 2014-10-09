@@ -39,6 +39,8 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * @version $Revision: 1.13 $
  */
 class Parser {
+    
+    private static String CODEBASE = "codebase";
 
     // defines netx.jnlp.Node class if using Tiny XML or Nano XML
 
@@ -143,7 +145,7 @@ class Parser {
         this.spec = getVersion(root, "spec", "1.0+");
 
         try {
-            this.codebase = addSlash(getURL(root, "codebase", base));
+            this.codebase = addSlash(getURL(root, CODEBASE, base));
         } catch (ParseException e) {
             //If parsing fails, continue by overriding the codebase with the one passed in
         }
@@ -1065,10 +1067,20 @@ class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     public URL getURL(Node node, String name, URL base) throws ParseException {
-        String href = getAttribute(node, name, null);
-        if (href == null)
+        String href = null;
+        if (CODEBASE.equals(name)) {
+            href = getCleanAttribute(node, name);
+            //in case of null code can throw an exception later
+            //some bogus jnlps have codebase as "" and expect it behaving as "."
+            if (href != null && href.trim().isEmpty()) {
+                href = ".";
+            }
+        } else {
+            href = getAttribute(node, name, null);
+        }
+        if (href == null) {
             return null; // so that code can throw an exception if attribute was required
-
+        }
         try {
             if (base == null)
                 return new URL(href);
@@ -1254,11 +1266,17 @@ class Parser {
     public String getAttribute(Node node, String name, String defaultValue) {
         // SAX
         // String result = ((Element) node).getAttribute(name);
-        String result = node.getAttribute(name);
+        String result = getCleanAttribute(node, name);
 
-        if (result == null || result.length() == 0)
+        if (result == null || result.length() == 0) {
             return defaultValue;
+        }
 
+        return result;
+    }
+
+    private String getCleanAttribute(Node node, String name) {
+        String result = node.getAttribute(name);
         return result;
     }
 

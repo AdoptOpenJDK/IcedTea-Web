@@ -1,3 +1,15 @@
+2014-10-09  Jiri Vanek  <jvanek@redhat.com>
+
+	Empty "" codebase now behaves as "." codebase
+	* file netx/net/sourceforge/jnlp/Parser.java: introduced CODEBASE constant
+	to avoid duplicated String getAttribute  split to getCleanAttribute, which
+	get the pure attribute, and remaining getAttribute keep adding null in case
+	of empty
+	* file netx/net/sourceforge/jnlp/security/SecurityDialogs.java: added 
+	workaround about possible null codebase
+	* file tests/netx/unit/net/sourceforge/jnlp/ParserTest.java: added test for
+	empty codebase
+
 2014-10-08  Lukasz Dracz  <ldracz@redhat.com>
 
 	Standardize all options to use hyphens
