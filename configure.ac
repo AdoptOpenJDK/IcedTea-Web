@@ -64,7 +64,6 @@ dnl IT605 - NetX depends on sun.misc.HexDumpEncoder
 dnl IT570 - NetX depends on sun.applet.AppletViewPanel
 dnl IT571 - NetX depends on com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager.java
 dnl IT573 - Plugin depends on sun.awt,X11.XEmbeddedFrame.java
-dnl IT574 - Plugin depends on sun.misc.Ref
 dnl IT575 - Plugin depends on com.sun/jndi.toolkit.url.UrlUtil
 dnl IT576 - Plugin depends on sun.applet.AppletImageRef
 dnl IT578 - Remove need for patching AppletPanel for Plugin/Webstart
@@ -83,7 +82,6 @@ IT_CHECK_FOR_CLASS(COM_SUN_NET_SSL_INTERNAL_SSL_X509EXTENDEDTRUSTMANAGER,
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILE, [sun.net.www.protocol.jar.URLJarFile])
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILECALLBACK, [sun.net.www.protocol.jar.URLJarFileCallBack])
 IT_CHECK_FOR_CLASS(SUN_AWT_X11_XEMBEDDEDFRAME, [sun.awt.X11.XEmbeddedFrame])
-IT_CHECK_FOR_CLASS(SUN_MISC_REF, [sun.misc.Ref])
 IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.UrlUtil])
 IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef])
 IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY

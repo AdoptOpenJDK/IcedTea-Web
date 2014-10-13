@@ -94,7 +94,7 @@ public class NonEditableTableModel extends DefaultTableModel {
      * @param rowCount the number of rows the table holds
      * @see DefaultTableModel#DefaultTableModel(Vector,int)
      */
-    public NonEditableTableModel(final Vector<?> columnNames, final int rowCount) {
+    public NonEditableTableModel(final Vector columnNames, final int rowCount) {
         super(columnNames, rowCount);
     }
 
@@ -106,7 +106,7 @@ public class NonEditableTableModel extends DefaultTableModel {
      * @param columnNames {@code vector} containing the names of the new columns
      * @see DefaultTableModel#DefaultTableModel(Vector,Vector)
      */
-    public NonEditableTableModel(final Vector<?> data, final Vector<?> columnNames) {
+    public NonEditableTableModel(final Vector data, final Vector columnNames) {
         super(data, columnNames);
     }
 

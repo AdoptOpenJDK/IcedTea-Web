@@ -137,7 +137,7 @@ public class PathsAndFiles {
         }
         
     };
-    public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DEPLOYMENT_PROPERTIES, "Users main deployment properties file.", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
     private static enum Target {
         JAVAWS, PLUGIN, ITWEB_SETTINGS, POLICY_EDITOR;

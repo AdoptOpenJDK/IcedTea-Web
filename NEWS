@@ -24,6 +24,7 @@ New in release 1.6 (2014-XX-XX):
   - RH1091563: [abrt] icedtea-web-1.5-2.fc20: Uncaught exception java.lang.ClassCastException in method sun.applet.PluginAppletViewer$8.run()
   - Dropped support for long unmaintained -basedir argument
   - Returned support for -jnlp argument
+  - RH1095311, PR574 -  References class sun.misc.Ref removed in OpenJDK 9 - fixed, and so buildable on JDK9
 * Plugin
   - PR1743 - Intermittant deadlock in PluginRequestProcessor
   - RH1121549: coverity defects

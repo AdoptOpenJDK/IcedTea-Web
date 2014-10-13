@@ -115,7 +115,6 @@ import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 import sun.awt.X11.XEmbeddedFrame;
-import sun.misc.Ref;
 
 import com.sun.jndi.toolkit.url.UrlUtil;
 import java.net.HttpURLConnection;
@@ -819,7 +818,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     /**
      * Get an image ref.
      */
-    private synchronized Ref getCachedImageRef(URL url) {
+    private synchronized AppletImageRef getCachedImageRef(URL url) {
         PluginDebug.debug("getCachedImageRef() searching for ", url);
 
         try {

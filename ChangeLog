@@ -1,3 +1,12 @@
+2014-10-13  Fridrich Strba  <fridrich.strba@suse.com>
+
+	Removed all references to deprecated sun.misc.Ref
+	* configure.ac: removed check for a sun.misc.Ref
+	* netx/net/sourceforge/jnlp/util/ui/NonEditableTableModel.java: all occurrences
+	of Vector<?> replaced by Vector. JDK9 compliant style.
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: (getCachedImageRef)
+	type of return value changed from Ref to AppletImageRef. Adapted imports.
+
 2014-10-09  Jiri Vanek  <jvanek@redhat.com>
 
 	Empty "" codebase now behaves as "." codebase
