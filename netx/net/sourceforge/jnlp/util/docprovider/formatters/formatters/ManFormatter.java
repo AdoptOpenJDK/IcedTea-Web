@@ -128,11 +128,6 @@ public class ManFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getUrl(String url, String look) {
-        return url;
-    }
-
-    @Override
     public String getSeeAlso(String s) {
         return ".BR " + s + " (1)" + PlainTextFormatter.getLineSeparator();
     }

@@ -27,6 +27,7 @@ public interface Formatter {
     public String getTitle(String name);
 
     public String getUrl(String url);
+
     public String getUrl(String url, String  appearence);
     
     public String getOption(String key, String  value);

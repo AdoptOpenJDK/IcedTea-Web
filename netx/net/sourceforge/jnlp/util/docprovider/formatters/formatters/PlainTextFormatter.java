@@ -75,11 +75,6 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getUrl(String url, String appearence) {
-        return url;
-    }
-
-    @Override
     public String getSeeAlso(String s) {
         return "  * " + s + getNewLine();
     }

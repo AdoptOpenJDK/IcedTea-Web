@@ -28,6 +28,15 @@ public abstract class ReplacingTextFormatter implements Formatter {
     public String getUrl(String url) {
         return getUrl(url, url);
     }
+
+    @Override
+    public String getUrl(String url, String look) {
+        if (look == null || look.trim().length() == 0 || url.equals(look)) {
+            return url;
+        } else {
+            return look + " (" + url + ")";
+        }
+    }
   
     public String getVersion() {
         if (Boot.version == null) {

@@ -1,5 +1,17 @@
 2014-10-17  Jiri Vanek  <jvanek@redhat.com>
 
+	Plain and main text formatters have more human readable urls
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java: only added formatting line
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ManFormatter.java:
+	removed overriding getUrl
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/PlainTextFormatter.java:
+	same
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java
+	Implemented general getUrl for plaintexts in format readable (url), except 
+	cases where  readable do not exists or is same as url.
+
+2014-10-17  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed jdk8 javadoc generation error
 	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java: invalid link
 	#allCommands replaced by plain optionsDefinitions.getItwsettingsCommands
