@@ -1,5 +1,12 @@
 2014-10-17  Jiri Vanek  <jvanek@redhat.com>
 
+	Jacoco boot class loading moved from custom built to upstreamed form
+	* Makefile.am: (JACOCO_AGENT_JAVAWS_SWITCH) and (JACOCO_AGENT_PLUGIN_SWITCH)
+	moved from xboot=true to inclbootstrapclasses=true which is now supported
+	by upstream.
+
+2014-10-17  Jiri Vanek  <jvanek@redhat.com>
+
 	Plain and main text formatters have more human readable urls
 	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java: only added formatting line
 	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ManFormatter.java:
