@@ -1,3 +1,9 @@
+2014-10-17  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed jdk8 javadoc generation error
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java: invalid link
+	#allCommands replaced by plain optionsDefinitions.getItwsettingsCommands
+
 2014-10-13  Fridrich Strba  <fridrich.strba@suse.com>
 
 	Removed all references to deprecated sun.misc.Ref

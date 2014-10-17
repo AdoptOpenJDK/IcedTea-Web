@@ -42,8 +42,8 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * Encapsulates a command line interface to the deployment configuration.
  * <p>
  * The central method is {@link #handle(String[])}, which calls one of the
- * various 'handle' methods. The commands listed in {@link #allCommands} are
- * supported. For each supported command, a method handleCOMMANDCommand exists.
+ * various 'handle' methods. The commands listed in OptionsDefinitions.getItwsettingsCommands
+ * are supported. For each supported command, a method handleCOMMANDCommand exists.
  * This method actually takes action based on the command. Generally, a
  * printCOMMANDHelp method also exists, and prints out the help message for
  * that specific command. For example, see {@link #handleListCommand(List)}
