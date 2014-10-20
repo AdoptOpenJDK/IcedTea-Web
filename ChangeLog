@@ -13,9 +13,9 @@
 	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: same
 	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java:
 	added license
-	* /netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/HtmlFormatter.java:
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/HtmlFormatter.java:
 	same
-	* /netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ManFormatter.java:
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ManFormatter.java:
 	same
 	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java:
 	Added license.  (process) All but @BOLD_OPEN@ and @BOLD_CLOSE@ support removed
