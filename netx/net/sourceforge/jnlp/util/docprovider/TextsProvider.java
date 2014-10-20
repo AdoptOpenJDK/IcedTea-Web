@@ -175,7 +175,7 @@ public abstract class TextsProvider {
             String controlledBy = "";
             for (Map.Entry<String, Setting<String>> entry : defs) {
                 if (matchSttingsValueWithInfrastrucutreFile(entry.getValue(), f)) {
-                    controlledBy = " Controlled by @BOLD_OPEN@" + entry.getKey() + "@BOLD_CLOSE@";
+                    controlledBy = " Controlled by " + getFormatter().getBold(entry.getKey());
                     break;
                 }
             }

@@ -1,3 +1,20 @@
+2014-10-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Support only @BOLD_OPEN@ and @BOLD_CLOSE@ in documentation
+	* netx/net/sourceforge/jnlp/util/docprovider/PolicyEditorTextsProvider.java:
+	Replace @@ usage by calls to methods
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: same
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java:
+	added license
+	* /netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/HtmlFormatter.java:
+	same
+	* /netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ManFormatter.java:
+	same
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java:
+	Added license.  (process) All but @BOLD_OPEN@ and @BOLD_CLOSE@ support removed
+	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatterTest.java
+	Added test for process method
+
 2014-10-17  Jiri Vanek  <jvanek@redhat.com>
 
 	Jacoco boot class loading moved from custom built to upstreamed form

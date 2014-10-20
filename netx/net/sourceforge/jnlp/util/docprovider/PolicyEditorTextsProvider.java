@@ -67,7 +67,8 @@ public class PolicyEditorTextsProvider extends TextsProvider {
     @Override
     public String getSynopsis() {
         return super.getSynopsis()
-                + getFormatter().wrapParagraph(getFormatter().process("@BOLD_OPEN@ " + getId() + " @BOLD_CLOSE_NWLINE_BOLD_OPEN@" + getId() + " [-file] @BOLD_CLOSE@"+Translator.R("PEsynopseP1")+" @BOLD_OPEN@[-codebase] @BOLD_CLOSE@"+Translator.R("PEsynopseP2")));
+                + getFormatter().wrapParagraph(getFormatter().process(getFormatter().getBoldOpening() + " " + getId() + " " + 
+                        getFormatter().getBoldCloseNwlineBoldOpen() + getId() + " [-file] " + getFormatter().getBoldClosing() + Translator.R("PEsynopseP1") + " "+getFormatter().getBold("[-codebase] ") + Translator.R("PEsynopseP2")));
     }
 
     @Override
