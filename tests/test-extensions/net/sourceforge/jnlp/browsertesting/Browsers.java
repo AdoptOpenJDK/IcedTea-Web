@@ -37,6 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browsertesting;
 
+import java.io.File;
+import net.sourceforge.jnlp.browsertesting.browsers.LinuxBrowser;
+
 /**
  * When all represent all configured browser, one represens one random
  * (the first found) configured browser. Each other represents inidivdual browsers
@@ -46,6 +49,18 @@ public enum Browsers {
 
    none, all, one, opera, googleChrome, chromiumBrowser, firefox, midori,epiphany;
 
+    public static final String CHROMIUM;
+
+    static {
+        final String def = "chromium";
+        final String alt = "chromium-browser";
+        if (new File(LinuxBrowser.DEFAULT_BIN_PATH, alt).exists()) {
+            CHROMIUM = alt;
+        } else {
+            CHROMIUM = def;
+        }
+    }
+
     public String toExec() {
         switch (this) {
             case opera:
@@ -53,7 +68,7 @@ public enum Browsers {
             case googleChrome:
                 return "google-chrome";
             case chromiumBrowser:
-                return "chromium-browser";
+                return CHROMIUM;
             case firefox:
                 return "firefox";
             case midori:

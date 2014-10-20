@@ -1,5 +1,12 @@
 2014-10-20  Jiri Vanek  <jvanek@redhat.com>
 
+	Added support for chromium binary (along with older chromium-browser one)
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/Browsers.java:
+	(static) check if legacy chromium-browser do exists. If so use it, otherwise
+	use newer chromium only
+
+2014-10-20  Jiri Vanek  <jvanek@redhat.com>
+
 	Support only @BOLD_OPEN@ and @BOLD_CLOSE@ in documentation
 	* netx/net/sourceforge/jnlp/util/docprovider/PolicyEditorTextsProvider.java:
 	Replace @@ usage by calls to methods
