@@ -73,9 +73,27 @@ public class PolicyFileModelTest {
         assertEquals(new File(tempFilePath), model.getFile());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testSetFileNull() throws Exception {
         model.setFile(null);
+
+        assertEquals(null, model.getFile());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testOpenAndParsePolicyFileWithFileNull() throws Exception {
+        model.setFile(null);
+
+        assertEquals(null, model.getFile());
+        model.openAndParsePolicyFile();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testSavePolicyFileWithFileNull() throws Exception {
+        model.setFile(null);
+
+        assertEquals(null, model.getFile());
+        model.savePolicyFile();
     }
 
     @Test

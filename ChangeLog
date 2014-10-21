@@ -1,3 +1,8 @@
+2014-10-21  Lukasz Dracz  <ldracz@redhat.com>
+
+	PolicyFileModel null file tests added
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyFileModelTest.java
+
 2014-10-20  Jiri Vanek  <jvanek@redhat.com>
 
 	Added support for chromium binary (along with older chromium-browser one)
