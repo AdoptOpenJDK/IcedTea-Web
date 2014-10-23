@@ -1,3 +1,11 @@
+2014-10-17  Jiri Vanek  <jvanek@redhat.com>
+
+	Unittests coverage adapted to latest jacoco
+	* Makefile.am: (JACOCO_AGENT_SWITCH) is now using both  JACOCO_ADVANCED_EXCLUDE)
+	and inclbootstrapclasses=true too. (JACOCO_AGENT_JAVAWS_SWITCH) and
+	(JACOCO_AGENT_PLUGIN_SWITCH) are using JACOCO_AGENT_SWITCH instead of copypasting
+	values.
+
 2014-10-21  Lukasz Dracz  <ldracz@redhat.com>
 
 	PolicyFileModel null file tests added
