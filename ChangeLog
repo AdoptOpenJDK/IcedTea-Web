@@ -1,4 +1,4 @@
-2014-10-17  Jiri Vanek  <jvanek@redhat.com>
+2014-10-21  Jiri Vanek  <jvanek@redhat.com>
 
 	Unittests coverage adapted to latest jacoco
 	* Makefile.am: (JACOCO_AGENT_SWITCH) is now using both  JACOCO_ADVANCED_EXCLUDE)
