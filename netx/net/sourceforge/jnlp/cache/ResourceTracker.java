@@ -396,8 +396,18 @@ public class ResourceTracker {
 
             if (location.getProtocol().equalsIgnoreCase("file")) {
                 File file = UrlUtils.decodeUrlAsFile(location);
-                if (file.exists())
+                if (file.exists()) {
                     return file;
+                }
+                // try plain, not decoded file now
+                // sometimes the jnlp app developers are encoding for us
+                // so we end up encoding already encoded file. See RH1154177
+                file = new File(location.getPath());
+                if (file.exists()) {
+                    return file;
+                }
+                // have it sense to try also filename with whole query here?
+                // => location.getFile() ?
             }
 
             return null;

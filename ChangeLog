@@ -1,5 +1,11 @@
 2014-10-21  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed case when already decoded file is wonted from cache (RH1154177)
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: (getCacheFile) if
+	all previous attempts to get cached file, plain url.getPath is tried.
+
+2014-10-21  Jiri Vanek  <jvanek@redhat.com>
+
 	Unittests coverage adapted to latest jacoco
 	* Makefile.am: (JACOCO_AGENT_SWITCH) is now using both  JACOCO_ADVANCED_EXCLUDE)
 	and inclbootstrapclasses=true too. (JACOCO_AGENT_JAVAWS_SWITCH) and
