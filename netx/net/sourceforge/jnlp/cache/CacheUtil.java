@@ -16,8 +16,6 @@
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -26,7 +24,6 @@ import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -45,6 +42,9 @@ import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
+import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -99,11 +99,9 @@ public class CacheUtil {
         } else {
             try {
                 // this is what URLClassLoader does
-                URLConnection conn = location.openConnection();
+                URLConnection conn = ConnectionFactory.getConnectionFactory().openConnection(location);
                 result = conn.getPermission();
-                if (conn instanceof HttpURLConnection) {
-                    ((HttpURLConnection) conn).disconnect();
-                }                
+                 ConnectionFactory.getConnectionFactory().disconnect(conn);                
             } catch (java.io.IOException ioe) {
                 // should try to figure out the permission
                 OutputController.getLogger().log(ioe);

@@ -62,8 +62,7 @@ exception statement from your version. */
 
 package sun.applet;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
+import com.sun.jndi.toolkit.url.UrlUtil;
 import java.applet.Applet;
 import java.applet.AppletContext;
 import java.applet.AudioClip;
@@ -100,26 +99,24 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
 import javax.swing.SwingUtilities;
-
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NetxPanel;
 import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
+import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 import sun.awt.X11.XEmbeddedFrame;
-
-import com.sun.jndi.toolkit.url.UrlUtil;
-import java.net.HttpURLConnection;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /*
  */
@@ -473,14 +470,12 @@ public class PluginAppletViewer extends XEmbeddedFrame
         PluginAppletPanelFactory factory = new PluginAppletPanelFactory();
         AppletMessageHandler amh = new AppletMessageHandler("appletviewer");
         URL url = new URL(documentBase);
-        URLConnection conn = url.openConnection();
+        URLConnection conn = ConnectionFactory.getConnectionFactory().openConnection(url);
         /* The original URL may have been redirected - this
          * sets it to whatever URL/codebase we ended up getting
          */
         url = conn.getURL();
-        if (conn instanceof  HttpURLConnection){
-            ((HttpURLConnection)conn).disconnect();
-        }
+        ConnectionFactory.getConnectionFactory().disconnect(conn);
 
         PluginParameters params = new PluginParameterParser().parse(width, height, paramString);
 
@@ -1550,11 +1545,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
         SecurityManager security = System.getSecurityManager();
         if (security != null) {
             try {
-                URLConnection conn = url.openConnection();
+                URLConnection conn = ConnectionFactory.getConnectionFactory().openConnection(url);
                 java.security.Permission perm = conn.getPermission();
-                if (conn instanceof HttpURLConnection) {
-                    ((HttpURLConnection) conn).disconnect();
-                }
+                ConnectionFactory.getConnectionFactory().disconnect(conn);
                 if (perm != null) {
                     security.checkPermission(perm);
                 }

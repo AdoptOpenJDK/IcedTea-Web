@@ -1,3 +1,18 @@
+2014-10-24  Jiri Vanek  <jvanek@redhat.com>
+
+	Opening of connections moved into factory
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java:
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java:
+	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java:
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java:
+	all calls to url.openConnection(), replaced by
+	ConnectionFactory.getConnectionFactory().openConnection(url) and all calls
+	to if (conn instanceof  HttpURLConnection){((HttpURLConnection)conn).disconnect();}
+	by ConnectionFactory.getConnectionFactory().disconnect(conn);
+	* netx/net/sourceforge/jnlp/security/ConnectionFactory.java: new class
+	singleton responsible for opening and closing of connections. Have debugging
+	feature to download https connections one by one (needs tweeking)
+ 
 2014-10-21  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed case when already decoded file is wonted from cache (RH1154177)

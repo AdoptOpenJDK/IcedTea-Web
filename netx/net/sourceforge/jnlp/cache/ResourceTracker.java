@@ -58,6 +58,7 @@ import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.event.DownloadEvent;
 import net.sourceforge.jnlp.event.DownloadListener;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.util.HttpUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
@@ -622,7 +623,7 @@ public class ResourceTracker {
         try {
             // create out second in case in does not exist
             URL realLocation = resource.getDownloadLocation();
-            con = realLocation.openConnection();
+            con = ConnectionFactory.getConnectionFactory().openConnection(realLocation);
             con.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
             con.connect();
@@ -679,8 +680,7 @@ public class ResourceTracker {
                 out.close();
 
                 // explicitly close the URLConnection.
-                if (con instanceof HttpURLConnection)
-                    ((HttpURLConnection) con).disconnect();
+                ConnectionFactory.getConnectionFactory().disconnect(con);
 
                 if (packgz || gzip) {
                     // TODO why not set this otherwise?
@@ -792,7 +792,7 @@ public class ResourceTracker {
                 }
 
                 resource.setDownloadLocation(finalLocation);
-                connection = finalLocation.openConnection(); // this won't change so should be okay unsynchronized
+                connection = ConnectionFactory.getConnectionFactory().openConnection(finalLocation); // this won't change so should be okay not-synchronized
                 connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
                 size = connection.getContentLength();
@@ -836,9 +836,7 @@ public class ResourceTracker {
             resource.fireDownloadEvent(); // fire CONNECTED
 
             // explicitly close the URLConnection.
-            if (connection instanceof HttpURLConnection) {
-                ((HttpURLConnection) connection).disconnect();
-            }
+           ConnectionFactory.getConnectionFactory().disconnect(connection);           
         } catch (Exception ex) {
             OutputController.getLogger().log(ex);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
@@ -896,7 +894,7 @@ public class ResourceTracker {
      */
     static CodeWithRedirect getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, RequestMethods requestMethod) throws IOException {
         CodeWithRedirect result = new CodeWithRedirect();
-        URLConnection connection = url.openConnection();
+        URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(url);
 
         for (Map.Entry<String, String> property : requestProperties.entrySet()) {
             connection.addRequestProperty(property.getKey(), property.getValue());
@@ -927,9 +925,7 @@ public class ResourceTracker {
         if (possibleRedirect != null && possibleRedirect.trim().length() > 0) {
             result.URL = new URL(possibleRedirect);
         }
-        if (connection instanceof HttpURLConnection) {
-            ((HttpURLConnection) connection).disconnect();
-        }
+        ConnectionFactory.getConnectionFactory().disconnect(connection);
 
         return result;
 
