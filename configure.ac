@@ -28,6 +28,14 @@ AC_ARG_ENABLE([docs],
 AM_CONDITIONAL([ENABLE_DOCS], [test x$ENABLE_DOCS = xyes])
 AC_MSG_RESULT(${ENABLE_DOCS})
 
+AC_MSG_CHECKING([whether to filter by whitelisting on directory name when processing, compiling and running reproducers])
+AC_ARG_ENABLE([whitelist-processing],
+	      [AS_HELP_STRING([--enable-whitelist-processing],
+	      		      [Enable whitelist filter on directory name when processing, compiling and running reproducers. Otherwise filter on testcase name when running reproducers])],
+	      [ENABLE_WHITELIST="${enableval}"], [ENABLE_WHITELIST='no'])
+AM_CONDITIONAL([ENABLE_WHITELIST], [test x$ENABLE_WHITELIST = xyes])
+AC_MSG_RESULT(${ENABLE_WHITELIST})
+
 AC_PATH_PROG([BIN_BASH], [bash],, [/bin])
 if test x"$BIN_BASH" = x ; then
     AC_MSG_ERROR([/bin/bash is used in runtime and for about generation. Dying sooner rather then later])

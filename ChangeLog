@@ -1,3 +1,13 @@
+2014-10-29  Jie Kang  <jkang@redhat.com>
+
+	Configue switch for whitelist processing added. 
+	'configure --enable-whitelist-processing': Process white-listed
+	reproducers based on directory name and run all processed reproducers.
+	'configure': Process all reproducers and run reproducers white-listed
+	on test-case name.
+	* Makefile.am: support for --enable-whitelist-processing switch
+	* configure.ac: added switch --enable-whitelist-processing
+
 2014-10-24  Jiri Vanek  <jvanek@redhat.com>
 
 	Opening of connections moved into factory

@@ -178,6 +178,14 @@ JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m
 endif
 endif
 
+if ENABLE_WHITELIST
+COMPILE_WHITELIST_FILTER=`cat $(REPRODUCERS_CLASS_WHITELIST)`
+RUN_WHITELIST_FILTER=.*
+else
+COMPILE_WHITELIST_FILTER=.*
+RUN_WHITELIST_FILTER=`cat $(REPRODUCERS_CLASS_WHITELIST)`
+endif
+
 if WITH_RHINO
   RHINO_TESTS=stamps/check-pac-functions.stamp
 else
@@ -691,26 +699,23 @@ stamps/junit-jnlp-dist-dirs: junit-jnlp-dist-simple.txt stamps/junit-jnlp-dist-s
 	mkdir -p $(REPRODUCERS_BUILD_DIR)
 	touch $@
 
-junit-jnlp-dist-custom.txt: $(REPRODUCERS_CLASS_WHITELIST)
+junit-jnlp-dist-custom.txt:
 	cd $(REPRODUCERS_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/ ; \
-	whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
-	for x in $$whiteListed ; do \
+	for x in $(COMPILE_WHITELIST_FILTER) ; do \
 	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/$@ || true ; \
 	done
 
-junit-jnlp-dist-simple.txt: $(REPRODUCERS_CLASS_WHITELIST)
+junit-jnlp-dist-simple.txt:
 	cd $(REPRODUCERS_TESTS_SRCDIR)/simple/ ; \
-	whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
-	for x in $$whiteListed ; do \
+	for x in $(COMPILE_WHITELIST_FILTER) ; do \
 	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/$@ || true ; \
 	done
 
-stamps/junit-jnlp-dist-signed.stamp: $(REPRODUCERS_CLASS_WHITELIST)
+stamps/junit-jnlp-dist-signed.stamp:
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
 	  pushd $(REPRODUCERS_TESTS_SRCDIR)/$$which/ ; \
-	  whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
-	    for x in $$whiteListed ; do \
+	    for x in $(COMPILE_WHITELIST_FILTER) ; do \
 	      find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/junit-jnlp-dist-$$which.txt ; \
 	    done ; \
 	  popd ; \
@@ -864,14 +869,18 @@ stamps/test-extensions-compile.stamp: stamps/netx-dist.stamp stamps/plugin.stamp
 	touch $@
 
 test-extensions-tests-source-files.txt:
-	find $(TEST_EXTENSIONS_TESTS_SRCDIR) -name '*.java' | sort > $@
+	for x in $(COMPILE_WHITELIST_FILTER) ; do \
+	  find $(TEST_EXTENSIONS_TESTS_SRCDIR) -name '*.java' | grep $$x | sort > $@ ; \
+	done
 
 stamps/test-extensions-tests-compile.stamp: stamps/junit-jnlp-dist-dirs test-extensions-tests-source-files.txt  stamps/test-extensions-compile.stamp
 	mkdir -p $(TEST_EXTENSIONS_TESTS_DIR);
-	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	 -d $(TEST_EXTENSIONS_TESTS_DIR) \
-	 -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
-	 @test-extensions-tests-source-files.txt && \
+	for x in `cat $(abs_top_srcdir)/test-extensions-tests-source-file.txt` ; do \
+	  $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	   -d $(TEST_EXTENSIONS_TESTS_DIR) \
+	   -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \
+	   $$x ; \
+	done ; \
 	mkdir -p stamps && \
 	touch $@
 
@@ -914,23 +923,23 @@ stamps/copy-reproducers-resources.stamp: stamps/junit-jnlp-dist-dirs
 	mkdir -p stamps && \
 	touch $@
 
-$(REPRODUCERS_CLASS_NAMES): $(REPRODUCERS_CLASS_WHITELIST)
-	whiteListed=`cat $(REPRODUCERS_CLASS_WHITELIST)`; \
+$(REPRODUCERS_CLASS_NAMES):
+	whiteListed=$(RUN_WHITELIST_FILTER); \
 	cd $(TEST_EXTENSIONS_TESTS_DIR) ; \
 	class_names= ; \
 	for test in `find -type f` ; do \
 	  class_name=`echo $$test | sed -e 's|\.class$$||' -e 's|^\./||'` ; \
 	  class_name=`echo $$class_name | sed -e 's|/|.|g' ` ; \
-	  INLCUDE="NO" ; \
+	  INCLUDE="NO" ; \
 	  for x in $$whiteListed ; do \
 	    q=`expr match "$$class_name" "$$x"`; \
 	    r=$$? ; \
 	    if [ $$r = 0  ]; then \
 	      echo "$$class_name will be included in reproducers testcases because of $$x pattern in $(REPRODUCERS_CLASS_WHITELIST). Matching was  $$q"; \
-	      INLCUDE="YES" ; \
+	      INCLUDE="YES" ; \
 	    fi; \
 	  done; \
-	  if [ "$$INLCUDE" = "YES"  ]; then \
+	  if [ "$$INCLUDE" = "YES" ]; then \
 	    class_names="$$class_names $$class_name" ; \
 	  else \
 	    echo "$$class_name had no match in $(REPRODUCERS_CLASS_WHITELIST). Excluding"; \
