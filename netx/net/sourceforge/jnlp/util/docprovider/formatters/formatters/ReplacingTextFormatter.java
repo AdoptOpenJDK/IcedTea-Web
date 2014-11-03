@@ -37,16 +37,23 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.Translator;
 
 public abstract class ReplacingTextFormatter implements Formatter {
-    
+
     public static String backupVersion;
+    public static final Pattern BOLD_OPEN_PATTERN = Pattern.compile("<\\s*[Bb]\\s*>");
+    public static final Pattern BOLD_CLOSE_PATTERN = Pattern.compile("<\\s*/\\s*[Bb]\\s*>");
 
     @Override
-    public String process(String s) {
-        return s.replace("@BOLD_OPEN@", getBoldOpening()).replace("@BOLD_CLOSE@", getBoldClosing());
+    public String process(String s1) {
+        Matcher m1 = BOLD_OPEN_PATTERN.matcher(s1);
+        String s2 = m1.replaceAll(getBoldOpening());
+        Matcher m2 = BOLD_CLOSE_PATTERN.matcher(s2);
+        return (m2.replaceAll(getBoldClosing()));
     }
 
     protected String localizeTitle(String s) {

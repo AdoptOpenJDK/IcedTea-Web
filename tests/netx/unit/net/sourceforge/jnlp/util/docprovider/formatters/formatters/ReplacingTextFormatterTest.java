@@ -114,18 +114,55 @@ public class ReplacingTextFormatterTest {
             }
         };
      
-     
+
     @Test
     public void upperCaseNoSpaces() {
-        String s = tr.process("aaa @BOLD_OPEN@ bbb @BOLD_CLOSE@ ccc");
+        String s = tr.process("aaa <B> bbb </B> ccc");
         Assert.assertEquals("aaa OPEN bbb CLOSE ccc", s);
     }
-   
     @Test
+    public void lowercaseNoSpaces() {
+        String s = tr.process("aaa <b> bbb </b> ccc");
+        Assert.assertEquals("aaa OPEN bbb CLOSE ccc", s);
+    }
+    
+    
+    @Test
+    public void lowercaseSpaces() {
+        String s = tr.process("aaa <  b  > bbb <  /     b > ccc");
+        Assert.assertEquals("aaa OPEN bbb CLOSE ccc", s);
+    }
+    
+     @Test
+    public void uppercaseSpaces() {
+        String s = tr.process("aaa <   B  > bbb <  /     B > ccc");
+        Assert.assertEquals("aaa OPEN bbb CLOSE ccc", s);
+    }
+
+    
+    @Test
+    public void mixedCases1() {
+        String s = tr.process("aaa <B> bbb </b> ccc");
+        Assert.assertEquals("aaa OPEN bbb CLOSE ccc", s);
+    }
+    @Test
+    public void mixedSpace2() {
+        String s = tr.process("aaa <b> bbb </B> ccc");
+        Assert.assertEquals("aaa OPEN bbb CLOSE ccc", s);
+    }
+
+  @Test
     public void illegal1() {
-        String s = tr.process("aa @BOLD_OPEN@ ccc @BOLD_close@  @BOLD@");
+        String s = tr.process("aaa <b style=\"blah\"> bbb </B> ccc");
+        Assert.assertFalse(s.contains("OPEN"));
+        Assert.assertTrue(s.contains("CLOSE"));
+    }   
+    
+    @Test
+    public void illegal2() {
+        String s = tr.process("</B abc> ccc <b>");
         Assert.assertFalse(s.contains("CLOSE"));
         Assert.assertTrue(s.contains("OPEN"));
     }   
-    
+
 }

@@ -52,6 +52,13 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     private final boolean includeXmlHeader;
     public  static final String SUFFIX = "html";
 
+    @Override
+    public String process(String s) {
+        //the texts in properties are already using html markup
+        return s;
+    }
+
+    
     public HtmlFormatter(boolean allowContext, boolean allowLogo, boolean includeXmlHeader) {
         this.allowContext = allowContext;
         this.allowLogo = allowLogo;

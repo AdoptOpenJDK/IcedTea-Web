@@ -1,3 +1,14 @@
+2014-11-03  Jiri Vanek  <jvanek@redhat.com>
+
+	Get rid of @BOLD_OPEN@ and @BOLD_CLOSE@ in favor of <B> and </B>
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: ssia
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/HtmlFormatter.java:
+	now overrides process, as input is expected to be html (aka text with B tags).
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java:
+	(process) using regexes to replace B tags
+	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatterTest.java:
+	adapted to new logic,added tests
+
 2014-10-29  Jie Kang  <jkang@redhat.com>
 
 	Configue switch for whitelist processing added. 
