@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.util.optionparser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import net.sourceforge.jnlp.OptionsDefinitions;
@@ -53,7 +54,7 @@ public class OptionParserTest {
         String[] args = {"-update", "blob"};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
-        String value = parser.getValue(OptionsDefinitions.OPTIONS.UPDATE);
+        String value = parser.getParam(OptionsDefinitions.OPTIONS.UPDATE);
         assertEquals("blob", value);
     }
 
@@ -62,7 +63,7 @@ public class OptionParserTest {
         String[] args = {"-arg", "blob", "meow"};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.indexOf("blob"));
         assertEquals(1, values.indexOf("meow"));
         assertEquals(2, values.size());
@@ -73,11 +74,11 @@ public class OptionParserTest {
         String[] args = {"-param", "blob", "-arg", "yelp"};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.PARAM);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.PARAM);
         assertEquals(0, values.indexOf("blob"));
         assertEquals(1, values.size());
 
-        values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.indexOf("yelp"));
         assertEquals(1, values.size());
 
@@ -88,7 +89,7 @@ public class OptionParserTest {
         String[] args = {};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.size());
     }
 
@@ -97,7 +98,7 @@ public class OptionParserTest {
         String[] args = {"-arg"};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.size());
     }
 
@@ -106,7 +107,7 @@ public class OptionParserTest {
         String[] args = {"-arg", "poke", "blob", "-arg", "meep"};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(3, values.size());
         assertEquals(0, values.indexOf("poke"));
         assertEquals(1, values.indexOf("blob"));
@@ -118,11 +119,11 @@ public class OptionParserTest {
         String[] args = {"-param", "poke", "blob", "-arg", "meep", "feep", "blurp"};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.PARAM);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.PARAM);
         assertEquals(2, values.size());
         assertEquals(0, values.indexOf("poke"));
         assertEquals(1, values.indexOf("blob"));
-        values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(3, values.size());
         assertEquals(0, values.indexOf("meep"));
         assertEquals(1, values.indexOf("feep"));
@@ -161,30 +162,10 @@ public class OptionParserTest {
         String[] args = {"-arg", "-update=green", "-version",
                 "-headless", "-arg", "-about",
                 "-arg", "blah1", "blah2", "blah3", "-noupdate", "-arg",
-                "blah4", "blah5", "blah6", "File.jnlp"};
+                "blah4", "blah5", "blah6", "-headless", "File.jnlp"};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        parser.findMainArg();
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(6, values.size());
-        assertTrue(parser.mainArgExists());
-        assertEquals("File.jnlp",parser.getMainArg());
-        assertEquals(0, values.indexOf("blah1"));
-        assertEquals(1, values.indexOf("blah2"));
-        assertEquals(2, values.indexOf("blah3"));
-        assertEquals(3, values.indexOf("blah4"));
-        assertEquals(4, values.indexOf("blah5"));
-        assertEquals(5, values.indexOf("blah6"));
-    }
 
-    @Test
-    public void testMultipleOptionsWithMainArgAsLastNotOptionValue() {
-        String[] args = {"-arg", "-update=green", "-version",
-                "-arg", "-about",
-                "-arg", "blah1", "blah2", "blah3","-Xtrustall", "-arg",
-                "blah4", "blah5", "blah6", "File.jnlp", "-headless", "-noupdate"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        parser.findMainArg();
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(6, values.size());
         assertTrue(parser.mainArgExists());
         assertEquals("File.jnlp",parser.getMainArg());
@@ -194,8 +175,6 @@ public class OptionParserTest {
         assertEquals(3, values.indexOf("blah4"));
         assertEquals(4, values.indexOf("blah5"));
         assertEquals(5, values.indexOf("blah6"));
-        assertTrue(parser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS));
-        assertTrue(parser.hasOption(OptionsDefinitions.OPTIONS.NOUPDATE));
     }
 
     @Test
@@ -214,7 +193,7 @@ public class OptionParserTest {
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
         assertTrue(parser.mainArgExists());
-        assertEquals("File.jnlp",parser.getMainArg());
+        assertEquals("File.jnlp", parser.getMainArg());
     }
 
     @Test
@@ -223,7 +202,7 @@ public class OptionParserTest {
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
         assertTrue(parser.mainArgExists());
-        assertEquals("File.jnlp",parser.getMainArg());
+        assertEquals("File.jnlp", parser.getMainArg());
     }
 
     @Test
@@ -232,7 +211,7 @@ public class OptionParserTest {
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
 
         assertTrue(parser.mainArgExists());
-        assertEquals("File.jnlp",parser.getMainArg());
+        assertEquals("File.jnlp", parser.getMainArg());
         assertTrue(parser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS));
     }
 
@@ -250,14 +229,14 @@ public class OptionParserTest {
     public void testMultipleArgTagSurroundingMainArgAfterNoArgOption() {
         String[] args = {"-arg", "blue", "green", "red", "-headless", "File.jnlp", "-arg", "yellow", "purple"};
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.indexOf("blue"));
         assertEquals(1, values.indexOf("green"));
         assertEquals(2, values.indexOf("red"));
         assertEquals(3, values.indexOf("yellow"));
         assertEquals(4, values.indexOf("purple"));
         assertTrue(parser.mainArgExists());
-        assertEquals("File.jnlp",parser.getMainArg());
+        assertEquals("File.jnlp", parser.getMainArg());
         assertTrue(parser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS));
     }
 
@@ -266,67 +245,16 @@ public class OptionParserTest {
         String[] args = {"ar-g", "blue", "green", "red"};
 
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(values.size(), 0);
     }
 
     @Test
-    public void testOptionHavingDashIsOptional() {
-        String[] args = {"arg", "blue", "green", "red"};
+    public void testGetParamsWithNoValueHasNoValues() {
+        String[] args = {"-arg"};
 
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(0, values.indexOf("blue"));
-        assertEquals(1, values.indexOf("green"));
-        assertEquals(2, values.indexOf("red"));
-    }
-
-    @Test
-    public void testOptionHavingDashIsOptionalWithMainArg() {
-        String[] args = {"arg", "blue", "green", "red", "File.jnlp"};
-
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        parser.findMainArg();
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(0, values.indexOf("blue"));
-        assertEquals(1, values.indexOf("green"));
-        assertEquals(2, values.indexOf("red"));
-        assertTrue(parser.mainArgExists());
-        assertEquals("File.jnlp",parser.getMainArg());
-    }
-
-    @Test
-    public void testMultipleOptionsHavingDashIsOptional() {
-        String[] args = {"arg", "blue", "green", "red", "headless", "arg", "purple", "magenta", "yellow", "verbose"};
-
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(0, values.indexOf("blue"));
-        assertEquals(1, values.indexOf("green"));
-        assertEquals(2, values.indexOf("red"));
-        assertEquals(3, values.indexOf("purple"));
-        assertEquals(4, values.indexOf("magenta"));
-        assertEquals(5, values.indexOf("yellow"));
-        assertTrue(parser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE));
-        assertTrue(parser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS));
-
-    }
-
-    @Test
-    public void testGetValuesEqualsSignFormatWithNoDash() {
-        String[] args = {"arg=blue"};
-
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(0, values.indexOf("blue"));
-    }
-
-    @Test
-    public void testGetValuesWithNoValueHasNoValues() {
-        String[] args = {"arg"};
-
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.size());
     }
 
@@ -335,7 +263,7 @@ public class OptionParserTest {
         String[] args = {"-arg", "blue", "a-rg", "-headless", "-arg", "green", "-ar-g"};
 
         OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(4, values.size());
         assertEquals(0, values.indexOf("blue"));
         assertEquals(1, values.indexOf("a-rg"));
@@ -344,64 +272,9 @@ public class OptionParserTest {
     }
 
     @Test
-    public void testFindMainArgCanHaveADash() {
-        String[] args = {"-headless", "-arg", "blue", "green", "-File.jnlp"};
-
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        parser.findMainArg();
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(2, values.size());
-        assertEquals(0, values.indexOf("blue"));
-        assertEquals(1, values.indexOf("green"));
-        assertEquals("-File.jnlp", parser.getMainArg());
-    }
-
-    @Test
-    public void testFindMainArgDoesNotTakeAwayFromOptionWithOnlyOneValueAtEnd() {
-        String[] args = {"-headless", "-arg", "blue", "green", "-File.jnlp", "-update", "25"};
-
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        parser.findMainArg();
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(2, values.size());
-        assertEquals(0, values.indexOf("blue"));
-        assertEquals(1, values.indexOf("green"));
-        assertEquals("-File.jnlp", parser.getMainArg());
-    }
-
-    @Test
-    public void testFindMainArgDoesNotTakeOptionLookingForManyValuesWithOnlyOneValueAtEnd() {
-        String[] args = {"-headless", "-arg", "blue", "green", "-File.jnlp", "-arg", "yellow"};
-
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        parser.findMainArg();
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(3, values.size());
-        assertEquals(0, values.indexOf("blue"));
-        assertEquals(1, values.indexOf("green"));
-        assertEquals(2, values.indexOf("yellow"));
-        assertEquals("-File.jnlp", parser.getMainArg());
-    }
-
-    @Test
-    public void testFindMainArgWillTakeOptionLookingForManyValuesWithManyValueAtEnd() {
-        String[] args = {"-headless", "-arg", "blue", "green", "-File.jnlp", "-arg", "yellow", "red"};
-
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
-        parser.findMainArg();
-        List<String> values = parser.getValues(OptionsDefinitions.OPTIONS.ARG);
-        assertEquals(4, values.size());
-        assertEquals(0, values.indexOf("blue"));
-        assertEquals(1, values.indexOf("green"));
-        assertEquals(2, values.indexOf("-File.jnlp"));
-        assertEquals(3, values.indexOf("yellow"));
-        assertEquals("red", parser.getMainArg());
-    }
-    
-    @Test
     public void testOptionsSyntaxPositive() {
-        assertTrue(OptionParser.stringEqualsOption("headless", OptionsDefinitions.OPTIONS.HEADLESS));
         assertTrue(OptionParser.stringEqualsOption("-headless", OptionsDefinitions.OPTIONS.HEADLESS));
+        assertTrue(OptionParser.stringEqualsOption("headless", OptionsDefinitions.OPTIONS.HEADLESS));
         assertTrue(OptionParser.stringEqualsOption("--headless", OptionsDefinitions.OPTIONS.HEADLESS));
         assertTrue(OptionParser.stringEqualsOption("---headless", OptionsDefinitions.OPTIONS.HEADLESS));
     }
@@ -415,5 +288,145 @@ public class OptionParserTest {
         assertFalse(OptionParser.stringEqualsOption("--- ---headless", OptionsDefinitions.OPTIONS.HEADLESS));
         assertFalse(OptionParser.stringEqualsOption("- ---headless", OptionsDefinitions.OPTIONS.HEADLESS));
         assertFalse(OptionParser.stringEqualsOption("--- -headless", OptionsDefinitions.OPTIONS.HEADLESS));
+    }
+
+    @Test
+    public void testOptionWithEqualsParamIsValid() {
+        String[] args = {"-arg=blue"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals(1, values.size());
+        assertEquals(0, values.indexOf("blue"));
+    }
+
+    @Test
+    public void testMultipleOptionWithEqualsParamIsValid() {
+        String[] args = {"-arg=blue", "-property=red", "-param=green"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals(1, values.size());
+        assertEquals(0, values.indexOf("blue"));
+        values = parser.getParams(OptionsDefinitions.OPTIONS.PROPERTY);
+        assertEquals(1, values.size());
+        assertEquals(0, values.indexOf("red"));
+        values = parser.getParams(OptionsDefinitions.OPTIONS.PARAM);
+        assertEquals(1, values.size());
+        assertEquals(0, values.indexOf("green"));
+    }
+
+    @Test
+    public void testSameOptionWithEqualsParamMultipleTimesIsValid() {
+        String[] args = {"-arg=blue", "-arg=red", "-arg=green"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals(3, values.size());
+        assertEquals(0, values.indexOf("blue"));
+        assertEquals(1, values.indexOf("red"));
+        assertEquals(2, values.indexOf("green"));
+    }
+
+    @Test
+    public void testParamsCanHaveEqualsSigns() {
+        String[] args = {"-arg", "colour=red", "height=50", "width=222", "circular=true"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals(4, values.size());
+        assertEquals(0, values.indexOf("colour=red"));
+        assertEquals(1, values.indexOf("height=50"));
+        assertEquals(2, values.indexOf("width=222"));
+        assertEquals(3, values.indexOf("circular=true"));
+    }
+
+    @Test
+    public void testParamsCanHaveDashes() {
+        String[] args = {"-arg", "-red", "-koala", "-panda", "-grizzly"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals(4, values.size());
+        assertEquals(0, values.indexOf("-red"));
+        assertEquals(1, values.indexOf("-koala"));
+        assertEquals(2, values.indexOf("-panda"));
+        assertEquals(3, values.indexOf("-grizzly"));
+    }
+
+    @Test
+    public void testParamsCanHaveDashesAndEqualsSigns() {
+        String[] args = {"-arg", "-red=colour", "-koala=animal", "-panda=bear", "-grizzly=bear"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals(4, values.size());
+        assertEquals(0, values.indexOf("-red=colour"));
+        assertEquals(1, values.indexOf("-koala=animal"));
+        assertEquals(2, values.indexOf("-panda=bear"));
+        assertEquals(3, values.indexOf("-grizzly=bear"));
+    }
+
+    @Test
+    public void testMainArgAfterNoArgOption() {
+        String[] args = {"-arg", "-red=colour", "-headless", "File.jnlp", "-arg", "-grizzly=bear"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        assertEquals("File.jnlp", parser.getMainArg());
+    }
+
+    @Test
+    public void testMainArgAfterOneArgOption() {
+        String[] args = {"-arg", "-red=colour", "-update", "200", "File.jnlp", "-arg", "-grizzly=bear"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        assertEquals("File.jnlp", parser.getMainArg());
+    }
+
+    @Test
+    public void testMainArgAfterManyArgsOptionIsNotAccepted() {
+        String[] args = {"-arg", "-red=colour", "-arg", "200", "File.jnlp", "-arg", "-grizzly=bear"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        assertFalse(parser.mainArgExists());
+        assertNotEquals("File.jnlp", parser.getMainArg());
+    }
+
+    @Test
+    public void testOptionWithMultipleEqualSignsOnlyParsesFirstEquals() {
+        String[] args = {"-arg=grizzly=panda=goldfish=mouse"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
+
+        assertEquals(1, values.size());
+        assertEquals(0, values.indexOf("grizzly=panda=goldfish=mouse"));
+    }
+
+    @Test
+    public void testGetParam() {
+        String[] args = {"-arg", "blue"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        String value = parser.getParam(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals("blue", value);
+    }
+
+    @Test
+    public void testGetParamWithManyParams() {
+        String[] args = {"-arg", "blue", "red", "green"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        String value = parser.getParam(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals("blue", value);
+    }
+
+    @Test
+    public void testGetParamWithNoParams() {
+        String[] args = {"-arg"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+
+        String value = parser.getParam(OptionsDefinitions.OPTIONS.ARG);
+        assertEquals("", value);
     }
 }

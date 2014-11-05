@@ -76,7 +76,7 @@ public class OptionsDefinitions {
         LIST("-list", "IBOList"),
         GET("-get", "name", "IBOGet", NumberOfArguments.ONE_OR_MORE),
         INFO("-info", "name", "IBOInfo", NumberOfArguments.ONE_OR_MORE),
-        SET("-set", "name value", "IBOSet", NumberOfArguments.EVEN_NUMBER_OR_WITHEQUALCHAR),
+        SET("-set", "name value", "IBOSet", NumberOfArguments.ONE_OR_MORE),
         RESETALL("-reset", "all", "IBOResetAll"),
         RESET("-reset", "name", "IBOReset", NumberOfArguments.ONE_OR_MORE),
         CHECK("-check", "name", "IBOCheck"),
@@ -117,13 +117,9 @@ public class OptionsDefinitions {
         public boolean hasNoArguments() {
             return numberOfArguments == NumberOfArguments.NONE;
         }
-        
-        public boolean expectsEqualsChar() {
-            return numberOfArguments == NumberOfArguments.EQUALS_CHAR;
-        }
 
-        public boolean hasEvenNumberOrWithEqualsChar() {
-            return numberOfArguments == NumberOfArguments.EVEN_NUMBER_OR_WITHEQUALCHAR;
+        public boolean hasEvenNumberSupportingEqualsChar() {
+            return numberOfArguments == NumberOfArguments.EVEN_NUMBER_SUPPORTS_EQUALS_CHAR;
         }
 
         public boolean hasOneOrMoreArguments() {
@@ -143,8 +139,7 @@ public class OptionsDefinitions {
         NONE("NOAnone"),
         ONE("NOAone"),
         ONE_OR_MORE("NOAonemore"),
-        EVEN_NUMBER_OR_WITHEQUALCHAR("NOAevennumberorequalschar"),
-        EQUALS_CHAR("NOAequalschar");
+        EVEN_NUMBER_SUPPORTS_EQUALS_CHAR("NOAevennumber");
 
         String messageKey;
 

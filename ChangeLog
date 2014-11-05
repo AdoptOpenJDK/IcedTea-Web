@@ -1,3 +1,26 @@
+2014-11-05  Lukasz Dracz  <ldracz@redhat.com>
+
+	Option parser refactored to use Parsed Option
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java:
+	enum EQUALS_CHAR removed, EVEN_NUMBER_OR_WITHEQUALCHAR renamed
+	to EVEN_NUMBER_SUPPORTS_EQUALS_CHAR 
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	* netx/net/sourceforge/jnlp/runtime/Boot.java:
+	removed first check of JNLP option being not present
+	* netx/net/sourceforge/jnlp/util/optionparser/OptionParser.java:
+	refactored to use a List of ParsedOption instead of map,
+	refactored parseContents to be split into smaller methods and made
+	parsing more strict but easier to read/maintain
+	(shouldAddParam, isOneArgumentNotFull, oneOrMoreArguments, addOptionToList,
+	argumentToOption): added
+	(getValue, getValues): renamed to (getParam, getParams)
+	(findMainArg):removed, main args only looked for in parseContents
+	* tests/netx/unit/net/sourceforge/jnlp/util/optionparser/OptionParserTest.java:
+	removed tests that were no longer valid and added new ones based on the
+	change in option parser functionality
+	* netx/net/sourceforge/jnlp/util/optionparser/ParsedOption.java:
+	added
+
 2014-11-03  Jiri Vanek  <jvanek@redhat.com>
 
 	Get rid of @BOLD_OPEN@ and @BOLD_CLOSE@ in favor of <B> and </B>

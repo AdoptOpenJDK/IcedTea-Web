@@ -98,10 +98,6 @@ public final class Boot implements PrivilegedAction<Void> {
     public static void main(String[] argsIn) {
         optionParser = new OptionParser(argsIn, OptionsDefinitions.getJavaWsOptions());
 
-        if (!optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP)) {
-            optionParser.findMainArg();
-        }
-
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
             JNLPRuntime.setDebug(true);
         }
@@ -157,7 +153,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.UPDATE)) {
-            int value = Integer.parseInt(optionParser.getValue(OptionsDefinitions.OPTIONS.UPDATE));
+            int value = Integer.parseInt(optionParser.getParam(OptionsDefinitions.OPTIONS.UPDATE));
             JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000l));
         }
 
@@ -238,9 +234,9 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         Map<String, List<String>> extra = new HashMap<String, List<String>>();
-        extra.put("arguments", optionParser.getValues(OptionsDefinitions.OPTIONS.ARG));
-        extra.put("parameters", optionParser.getValues(OptionsDefinitions.OPTIONS.PARAM));
-        extra.put("properties", optionParser.getValues(OptionsDefinitions.OPTIONS.PROPERTY));
+        extra.put("arguments", optionParser.getParams(OptionsDefinitions.OPTIONS.ARG));
+        extra.put("parameters", optionParser.getParams(OptionsDefinitions.OPTIONS.PARAM));
+        extra.put("properties", optionParser.getParams(OptionsDefinitions.OPTIONS.PROPERTY));
 
         ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
 
@@ -305,11 +301,11 @@ public final class Boot implements PrivilegedAction<Void> {
      * Gets the JNLP file from the command line arguments, or exits upon error.
      */
     private static String getJNLPFile() throws InvalidArgumentException {
-        if (optionParser.getMainArgs().size() > 1 || (optionParser.mainArgExists()
-                && optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP))) {
-              throw new InvalidArgumentException(optionParser.getMainArg());
+        if (optionParser.getMainArgs().size() > 1 ||
+                (optionParser.mainArgExists() && optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP))) {
+              throw new InvalidArgumentException(optionParser.getMainArgs().toString());
         } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP)) {
-            return optionParser.getValue(OptionsDefinitions.OPTIONS.JNLP);
+            return optionParser.getParam(OptionsDefinitions.OPTIONS.JNLP);
         } else if (optionParser.mainArgExists()) {
             return optionParser.getMainArg();
         }

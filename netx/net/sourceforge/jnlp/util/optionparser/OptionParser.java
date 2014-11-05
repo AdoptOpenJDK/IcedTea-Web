@@ -36,13 +36,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.optionparser;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import net.sourceforge.jnlp.OptionsDefinitions;
 
 /** Parses for options (passed in as arguments)
  *  To use add entries to OPTIONS enum in OptionsDefinitions
@@ -52,137 +50,92 @@ import java.util.Map;
 public class OptionParser {
 
     private final String[] args;
-    private final Map<OptionsDefinitions.OPTIONS, List<String>> parsedOptions;
+    private final List<ParsedOption> parsedOptions;
     private final List<OptionsDefinitions.OPTIONS> possibleOptions;
-    private final String MAINARG = "mainArg";
-    //null represents all values that are parsed that don't have a corresponding option which are potential main args
-    private final OptionsDefinitions.OPTIONS mainArg = null;
-    private List<String> result;
-
+    //List of all possible main arguments
+    private final List<String> mainArgumentList = new ArrayList<>();
 
     public OptionParser(String[] args, List<OptionsDefinitions.OPTIONS> options) {
         this.args = Arrays.copyOf(args, args.length);
         this.possibleOptions = options;
 
-        result = new ArrayList<String>();
-        parsedOptions = new HashMap<>();
-        result = parseContents(args, result);
+        parsedOptions = new ArrayList<>();
+        parseContents();
 
     }
 
-    private List<String> parseContents(final String[] args, List<String> result) {
-        String lastOption = "";
-        int i = 0;
-        while (i < args.length) {
-            if (isOption(args[i])) {
-                result.clear();
-                if (args[i].contains("=")) {
-                    result.add(args[i].split("=")[1]);
-                    lastOption = args[i].split("=")[0];
-                    parsedOptions.put(getOption(lastOption), new ArrayList<String>(result));
-                } else {
-                    lastOption = args[i];
-                    if (parsedOptions.keySet().contains(getOption(lastOption))) {
-                        if (getOption(lastOption).hasOneOrMoreArguments()) {
-                            result = new ArrayList<>(parsedOptions.get(getOption(lastOption)));
-                        }
-                    }
-                    if (getOption(lastOption).hasNoArguments()) {
-                        parsedOptions.put(getOption(lastOption), null);
-                        lastOption = MAINARG;
-                    }
-                }
+    private void parseContents() {
+        ParsedOption lastOption = null;
+        for (String arg : args) {
+            if (isOption(arg)) {
+                lastOption = addOptionToList(arg);
+            } else if (shouldAddParam(lastOption)) {
+                lastOption.addParam(arg);
             } else {
-                result.add(args[i]);
-                parsedOptions.put(getOption(lastOption), new ArrayList<String>(result));
-                if (getOption(lastOption) != null) {
-                    if (getOption(lastOption).hasOneArgument()) {
-                        lastOption = MAINARG;
-                        result.clear();
-                    }
-                }
-            }
-            i++;
-        }
-        return result;
-    }
-
-    public void findMainArg() {
-        int i = args.length - 1;
-        if (!(parsedOptions.keySet().contains(mainArg))) {
-            while (i >= 0) {
-                if (!isOption(args[i])) {
-                    if(i > 1) {
-                        if(isOption(args[i - 1])) {
-                            if(!getOption(args[i - 1]).hasOneArgument() && !getOption(args[i -1]).hasOneOrMoreArguments()) {
-                                addMainArg(i);
-                                break;
-                            }
-                        } else {
-                            addMainArg(i);
-                            break;
-                        }
-                    } else {
-                        addMainArg(i);
-                        break;
-                    }
-                }
-                i--;
+                mainArgumentList.add(arg);
             }
         }
     }
 
-    private void addMainArg(final int i) {
-        for (OptionsDefinitions.OPTIONS op : parsedOptions.keySet()) {
-            if (!(parsedOptions.get(op) == null)) {
-                if (parsedOptions.get(op).contains(args[i])) {
-                    result.clear();
-                    result.add(args[i]);
-                    parsedOptions.get(op).remove(parsedOptions.get(op).indexOf(args[i]));
-                    break;
-                }
+    private boolean shouldAddParam(final ParsedOption lastOption) {
+        return lastOption != null &&
+                (oneOrMoreArguments(lastOption) || isOneArgumentNotFull(lastOption));
+    }
+
+    private boolean isOneArgumentNotFull(final ParsedOption lastOption) {
+        return lastOption.getOption().hasOneArgument() && lastOption.getParams().size() == 0;
+    }
+
+    private boolean oneOrMoreArguments(final ParsedOption lastOption) {
+        return lastOption.getOption().hasOneOrMoreArguments();
+    }
+
+    private ParsedOption addOptionToList(final String arg) {
+        ParsedOption option = new ParsedOption(argumentToOption(arg));
+        if (arg.contains("=")) {
+            option.addParam(arg.split("=", 2)[1]);
+        }
+        parsedOptions.add(option);
+        return option;
+    }
+
+    private OptionsDefinitions.OPTIONS argumentToOption(final String arg) {
+        for (OptionsDefinitions.OPTIONS opt : possibleOptions) {
+            if (stringEqualsOption(arg, opt)) {
+                return opt;
             }
         }
-        parsedOptions.put(mainArg, result);
+        return null;
     }
 
     private boolean isOption(String input) {
-        for(OptionsDefinitions.OPTIONS opt : possibleOptions){
-            if (stringEqualsOption(input, opt)) {
+        if (argumentToOption(input) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    protected static boolean stringEqualsOption(String input, OptionsDefinitions.OPTIONS opt) {
+        String option = removeLeadingHyphens(opt.option);
+        input = removeLeadingHyphens(input).split("=")[0];
+        return input.equals(option);
+    }
+
+    private static String removeLeadingHyphens(final String input) {
+        return input.replaceAll("^-*", "");
+    }
+
+    public boolean hasOption(OptionsDefinitions.OPTIONS option) {
+        for (ParsedOption parsed : parsedOptions) {
+            if (option == parsed.getOption()) {
                 return true;
             }
         }
         return false;
     }
 
-    private OptionsDefinitions.OPTIONS getOption(String input) {
-        for(OptionsDefinitions.OPTIONS opt : possibleOptions){
-            if (stringEqualsOption(input, opt)) {
-                return opt;
-            }
-        }
-        return mainArg;
-    }
-
-    protected static boolean stringEqualsOption(String input, OptionsDefinitions.OPTIONS opt) {
-        String option = removeLeadingHyphens(opt.option).split("=")[0];
-        input = removeLeadingHyphens(input).split("=")[0];
-        return input.equals(option);
-    }
-    
-    private static String removeLeadingHyphens(final String input) {
-        return input.replaceAll("^-*", "");
-    }
-
-    public boolean hasOption(OptionsDefinitions.OPTIONS option) {
-        if (parsedOptions.containsKey(option)) {
-                    return true;
-        }
-        return false;
-    }
-
     public boolean mainArgExists() {
-        if (parsedOptions.keySet().contains(mainArg)) {
+        if (mainArgumentList.size() > 0) {
             return true;
         }
         return false;
@@ -190,29 +143,32 @@ public class OptionParser {
 
     public String getMainArg() {
         if (mainArgExists()) {
-            return parsedOptions.get(mainArg).toArray()[0].toString();
+            return mainArgumentList.get(0);
         }
         return "";
     }
 
     public List<String> getMainArgs() {
-        if (mainArgExists()) {
-            return parsedOptions.get(mainArg);
-        }
-        return new ArrayList<>();
+        return new ArrayList<>(mainArgumentList);
     }
 
-    public String getValue(OptionsDefinitions.OPTIONS option) {
-        if (parsedOptions.get(option) != null) {
-            return parsedOptions.get(option).toString().substring(1, parsedOptions.get(option).toString().length() - 1);
+    public String getParam(OptionsDefinitions.OPTIONS option) {
+        List<String> params = getParams(option);
+        if (params.size() > 0) {
+            return getParams(option).get(0);
         }
         return "";
     }
 
-    public List<String> getValues(OptionsDefinitions.OPTIONS option) {
-        if (parsedOptions.get(option) != null) {
-            return parsedOptions.get(option);
+    public List<String> getParams(OptionsDefinitions.OPTIONS option) {
+        List<String> result = new ArrayList<>();
+        for (ParsedOption parsed : parsedOptions) {
+            if (parsed.getOption() == option) {
+                for (String param : parsed.getParams()) {
+                    result.add(param);
+                }
+            }
         }
-        return new ArrayList<>();
+        return result;
     }
 }
