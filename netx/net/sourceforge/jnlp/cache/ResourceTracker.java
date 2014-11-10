@@ -16,13 +16,13 @@
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
-import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
+import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 
 import java.io.BufferedInputStream;
@@ -50,7 +50,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
-import java.util.jar.Pack200.Unpacker;
 import java.util.zip.GZIPInputStream;
 
 import net.sourceforge.jnlp.DownloadOptions;
@@ -116,14 +115,14 @@ public class ResourceTracker {
     //   lock, prefetch, this.resources, each resource, listeners
     public static enum RequestMethods{
         HEAD, GET, TESTING_UNDEF;
-        
+
     private static final RequestMethods[] requestMethods = {RequestMethods.HEAD, RequestMethods.GET};
 
         public static RequestMethods[] getValidRequestMethods() {
             return requestMethods;
         }
-    
-    
+
+
     }
 
     /** notified on initialization or download of a resource */
@@ -455,7 +454,7 @@ public class ResourceTracker {
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean waitForResource(URL location, long timeout) throws InterruptedException {
-        return wait(new Resource[] { getResource(location) }, timeout);
+        return wait(new Resource[]{getResource(location)}, timeout);
     }
 
     /**
@@ -609,128 +608,37 @@ public class ResourceTracker {
             downloadResource(resource);
     }
 
-    /**
-     * Downloads a resource to a file, uncompressing it if required
-     *
-     * @param resource the resource to download
-     */
     private void downloadResource(Resource resource) {
-        resource.fireDownloadEvent(); // fire DOWNLOADING
-        URLConnection con = null;
-        CacheEntry origEntry = new CacheEntry(resource.getLocation(), resource.getDownloadVersion()); // This is where the jar file will be.
-        origEntry.lock();
+        resource.fireDownloadEvent();
+
+        URLConnection connection = null;
+        URL downloadFrom = resource.getDownloadLocation(); //Where to download from
+        URL downloadTo = resource.getLocation(); //Where to download to
 
         try {
-            // create out second in case in does not exist
-            URL realLocation = resource.getDownloadLocation();
-            con = ConnectionFactory.getConnectionFactory().openConnection(realLocation);
-            con.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
-            con.connect();
+            connection = getDownloadConnection(downloadFrom);
 
-            /*
-             * We dont really know what we are downloading. If we ask for
-             * foo.jar, the server might send us foo.jar.pack.gz or foo.jar.gz
-             * instead. So we save the file with the appropriate extension
-             */
-            URL downloadLocation = resource.getLocation();
+            String contentEncoding = connection.getContentEncoding();
 
-            String contentEncoding = con.getContentEncoding();
-
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading" + resource.getLocation() + " using " +
-                        realLocation + " (encoding : " + contentEncoding + ")");
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading " + downloadTo + " using " +
+                    downloadFrom + " (encoding : " + contentEncoding + ") ");
 
             boolean packgz = "pack200-gzip".equals(contentEncoding) ||
-                                realLocation.getPath().endsWith(".pack.gz");
+                    downloadFrom.getPath().endsWith(".pack.gz");
             boolean gzip = "gzip".equals(contentEncoding);
 
             // It's important to check packgz first. If a stream is both
             // pack200 and gz encoded, then con.getContentEncoding() could
             // return ".gz", so if we check gzip first, we would end up
             // treating a pack200 file as a jar file.
+
             if (packgz) {
-                downloadLocation = new URL(downloadLocation.toString() + ".pack.gz");
+                downloadPackGzFile(resource, connection, new URL(downloadFrom + ".pack.gz"), downloadTo);
             } else if (gzip) {
-                downloadLocation = new URL(downloadLocation.toString() + ".gz");
-            }
-
-            File downloadLocationFile = CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion());
-            CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
-            // This is where extracted version will be, or downloaded file if not compressed.
-            File finalFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
-
-            if (!downloadEntry.isCurrent(con.getLastModified())) {
-                // Make sure we don't re-download the file. however it will wait as if it was downloading.
-                // (This is fine because file is not ready yet anyways)
-                byte buf[] = new byte[1024];
-                int rlen;
-
-                long contentLength = con.getContentLengthLong();
-                long lastModified = con.getLastModified();
-
-                InputStream in = new BufferedInputStream(con.getInputStream());
-                OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion());
-
-                while (-1 != (rlen = in.read(buf))) {
-                    resource.incrementTransferred(rlen);
-                    out.write(buf, 0, rlen);
-                }
-
-                in.close();
-                out.close();
-
-                // explicitly close the URLConnection.
-                ConnectionFactory.getConnectionFactory().disconnect(con);
-
-                if (packgz || gzip) {
-                    // TODO why not set this otherwise?
-                    downloadEntry.setRemoteContentLength(contentLength);
-                    downloadEntry.setLastModified(lastModified);
-                }
-
-                /*
-                 * If the file was compressed, uncompress it.
-                 */
-                if (packgz) {
-                    GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                            .getCacheFile(downloadLocation, resource.getDownloadVersion())));
-                    InputStream inputStream = new BufferedInputStream(gzInputStream);
-
-                    JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(CacheUtil
-                            .getCacheFile(resource.getLocation(), resource.getDownloadVersion())));
-
-                    Unpacker unpacker = Pack200.newUnpacker();
-                    unpacker.unpack(inputStream, outputStream);
-
-                    outputStream.close();
-                    inputStream.close();
-                    gzInputStream.close();
-                } else if (gzip) {
-                    GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                            .getCacheFile(downloadLocation, resource.getDownloadVersion())));
-                    InputStream inputStream = new BufferedInputStream(gzInputStream);
-
-                    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(CacheUtil
-                            .getCacheFile(resource.getLocation(), resource.getDownloadVersion())));
-
-                    while (-1 != (rlen = inputStream.read(buf))) {
-                        outputStream.write(buf, 0, rlen);
-                    }
-
-                    outputStream.close();
-                    inputStream.close();
-                    gzInputStream.close();
-                }
+                downloadGZipFile(resource, connection, new URL(downloadFrom + ".gz"), downloadTo);
             } else {
-                resource.setTransferred(downloadLocationFile.length());
-            }
-
-            if (!downloadLocationFile.getPath().equals(finalFile.getPath())) {
-                origEntry.setOriginalContentLength(downloadEntry.getRemoteContentLength());
-                origEntry.store();
-
-                downloadEntry.markForDelete();
-                downloadEntry.store();
+                downloadFile(resource, connection, downloadTo);
             }
 
             resource.changeStatus(EnumSet.of(DOWNLOADING), EnumSet.of(DOWNLOADED));
@@ -742,23 +650,115 @@ public class ResourceTracker {
             OutputController.getLogger().log(ex);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             synchronized (lock) {
-                lock.notifyAll(); // wake up wait's to check for completion
+                lock.notifyAll();
             }
             resource.fireDownloadEvent(); // fire ERROR
         } finally {
-            origEntry.unlock();
-            if (con != null) {
-                if (con instanceof HttpURLConnection) {
-                    ((HttpURLConnection) con).disconnect();
-                }
+            if (connection != null) {
+                ConnectionFactory.getConnectionFactory().disconnect(connection);
             }
         }
+    }
+
+    private URLConnection getDownloadConnection(URL location) throws IOException {
+        URLConnection con = ConnectionFactory.getConnectionFactory().openConnection(location);
+        con.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
+        con.connect();
+        return con;
+    }
+
+    private void downloadPackGzFile(Resource resource, URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
+        downloadFile(resource, connection, downloadFrom);
+
+        uncompressPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
+        storeEntryFields(new CacheEntry(downloadTo, resource.getDownloadVersion()), connection.getContentLength(), connection.getLastModified());
+    }
+
+    private void downloadGZipFile(Resource resource, URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
+        downloadFile(resource, connection, downloadFrom);
+
+        uncompressGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
+        storeEntryFields(new CacheEntry(downloadTo, resource.getDownloadVersion()), connection.getContentLength(), connection.getLastModified());
+    }
+
+    private void downloadFile(Resource resource, URLConnection connection, URL downloadLocation) throws IOException {
+        CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading file: " + downloadLocation + " into: " + downloadEntry.getCacheFile().getCanonicalPath());
+        if (!downloadEntry.isCurrent(connection.getLastModified())) {
+            writeDownloadToFile(resource, downloadLocation, new BufferedInputStream(connection.getInputStream()));
+        } else {
+            resource.setTransferred(CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion()).length());
+        }
+
+        storeEntryFields(downloadEntry, connection.getContentLengthLong(), connection.getLastModified());
+    }
+
+    private void storeEntryFields(CacheEntry entry, long contentLength, long lastModified) {
+        entry.lock();
+        try {
+            entry.setRemoteContentLength(contentLength);
+            entry.setLastModified(lastModified);
+            entry.store();
+        } finally {
+            entry.unlock();
+        }
+    }
+
+    private void writeDownloadToFile(Resource resource, URL downloadLocation, InputStream in) throws IOException {
+        byte buf[] = new byte[1024];
+        int rlen;
+        OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion());
+        while (-1 != (rlen = in.read(buf))) {
+            resource.incrementTransferred(rlen);
+            out.write(buf, 0, rlen);
+        }
+
+        in.close();
+        out.close();
+    }
+
+    private void uncompressGzip(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Extracting gzip: " + compressedLocation + " to " + uncompressedLocation);
+        byte buf[] = new byte[1024];
+        int rlen;
+
+        GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
+                .getCacheFile(compressedLocation, version)));
+        InputStream inputStream = new BufferedInputStream(gzInputStream);
+
+        BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(CacheUtil
+                .getCacheFile(uncompressedLocation, version)));
+
+        while (-1 != (rlen = inputStream.read(buf))) {
+            outputStream.write(buf, 0, rlen);
+        }
+
+        outputStream.close();
+        inputStream.close();
+        gzInputStream.close();
+    }
+
+    private void uncompressPackGz(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Extracting packgz: " + compressedLocation + " to " + uncompressedLocation);
+        GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
+                .getCacheFile(compressedLocation, version)));
+        InputStream inputStream = new BufferedInputStream(gzInputStream);
+
+        JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(CacheUtil
+                .getCacheFile(uncompressedLocation, version)));
+
+        Pack200.Unpacker unpacker = Pack200.newUnpacker();
+        unpacker.unpack(inputStream, outputStream);
+
+        outputStream.close();
+        inputStream.close();
+        gzInputStream.close();
     }
 
     /**
      * Open a URL connection and get the content length and other
      * fields.
-     * 
+     *
      * @param resource the resource to initialize
      */
     private void initializeResource(Resource resource) {
@@ -836,7 +836,7 @@ public class ResourceTracker {
             resource.fireDownloadEvent(); // fire CONNECTED
 
             // explicitly close the URLConnection.
-           ConnectionFactory.getConnectionFactory().disconnect(connection);           
+           ConnectionFactory.getConnectionFactory().disconnect(connection);
         } catch (Exception ex) {
             OutputController.getLogger().log(ex);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
@@ -849,7 +849,6 @@ public class ResourceTracker {
         }
     }
 
-    
     static int getUrlResponseCode(URL url, Map<String, String> requestProperties, RequestMethods requestMethod) throws IOException {
         return getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod).result;
     }
@@ -875,7 +874,6 @@ public class ResourceTracker {
         }
 
         /**
-         * 
          * @return  whether the return code is OK one - anything except <200,300)
          */
         public boolean isInvalid() {
@@ -906,7 +904,7 @@ public class ResourceTracker {
 
             int responseCode = httpConnection.getResponseCode();
 
-            /* Fully consuming current request helps with connection re-use 
+            /* Fully consuming current request helps with connection re-use
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
             HttpUtils.consumeAndCloseConnectionSilently(httpConnection);
 
@@ -947,9 +945,10 @@ public class ResourceTracker {
         }
 
         List<URL> urls = new ResourceUrlCreator(resource, options).getUrls();
+         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Finding best URL for: " + resource.getLocation() + " : " + options.toString());
          OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "All possible urls for "
                  + resource.toString() + " : " + urls);
-        
+
          for (RequestMethods requestMethod : RequestMethods.getValidRequestMethods()) {
              for (int i = 0; i < urls.size(); i++) {
                  URL url = urls.get(i);
@@ -973,7 +972,7 @@ public class ResourceTracker {
                      } else {
                          OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
                          return url; /* This is the best URL */
-                     } 
+                     }
                  } catch (IOException e) {
                      // continue to next candidate
                      OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "While processing " + url.toString() + " by " + requestMethod + " for resource " + resource.toString() + " got " + e + ": ");
@@ -1218,7 +1217,7 @@ public class ResourceTracker {
         public RedirectionException(Throwable cause) {
             super(cause);
         }
-        
+
     }
 
     // inner classes
@@ -1248,7 +1247,7 @@ public class ResourceTracker {
                     AccessController.doPrivileged(new PrivilegedAction<Void>() {
                         @Override
                         public Void run() {
-                            processResource(fResource);                            
+                            processResource(fResource);
                             return null;
                         }
                     });

@@ -159,12 +159,14 @@ public class CacheEntry {
      */
     public boolean isCurrent(long lastModified) {
         boolean cached = isCached();
+        OutputController.getLogger().log("isCurrent:isCached " + cached);
 
         if (!cached) {
             return false;
         }
         try {
             long cachedModified = Long.parseLong(properties.getProperty(KEY_LAST_MODIFIED));
+            OutputController.getLogger().log("isCurrent:lastModified cache:" + cachedModified +  " actual:" + lastModified);
             return lastModified > 0 && lastModified <= cachedModified;
         } catch (Exception ex){
             OutputController.getLogger().log(ex);
@@ -191,6 +193,8 @@ public class CacheEntry {
             }
 
             long remoteLength = Long.parseLong(properties.getProperty(KEY_CONTENT_LENGTH, "-1"));
+
+            OutputController.getLogger().log("isCached: remote:" + remoteLength + " cached:" + cachedLength);
 
             if (remoteLength >= 0 && cachedLength != remoteLength)
                 return false;

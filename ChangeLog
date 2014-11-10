@@ -1,3 +1,18 @@
+2014-11-10  Jie Kang  <jkang@redhat.com>
+
+    Refactored downloading of resources
+    * netx/net/sourceforge/jnlp/cache/CacheEntry.java: added logging messages
+    * netx/net/sourceforge/jnlp/cache/ResourceTracker.java
+    (downloadResource): refactored into multiple methods
+    (getDownloadConnection): new method to get and setup URLConnection
+    (downloadPackGzFile): new method to download .pack.gz files
+    (downloadGZipFile): new method to download .gz files
+    (uncompressPackGz): new method to uncompress .pack.gz files
+    (uncompressGZip): new method to uncompress .gz files
+    (downloadFile): new method to download files
+    (writeDownloadToFile): new method to write download into file, byte-by-byte
+    (storeEntryFields): new method to store cache entry fields after download
+
 2014-11-05  Lukasz Dracz  <ldracz@redhat.com>
 
 	Option parser refactored to use Parsed Option
