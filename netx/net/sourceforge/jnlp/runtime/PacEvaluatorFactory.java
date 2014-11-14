@@ -37,7 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -55,19 +54,13 @@ public class PacEvaluatorFactory {
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
-        InputStream in = cl.getResourceAsStream("net/sourceforge/jnlp/build.properties");
         Properties properties = null;
-        try {
+        try (InputStream in = cl.getResourceAsStream("net/sourceforge/jnlp/build.properties")) {
             properties = new Properties();
             properties.load(in);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "PAC provider is broken or don't exists. This is ok unless your applicatin is using JavaScript.");
             OutputController.getLogger().log(e);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                OutputController.getLogger().log(e);
-            }
         }
 
         if (properties == null) {

@@ -1,5 +1,11 @@
 2014-11-14  Jiri Vanek  <jvanek@redhat.com>
 
+	Making loading of PAC provider more lenient
+	* netx/net/sourceforge/jnlp/runtime/PacEvaluatorFactory.java: (getPacEvaluator)
+	changed to autocloseable, general Exception (instead IOException only) is catch.
+
+2014-11-14  Jiri Vanek  <jvanek@redhat.com>
+
 	Connection factory fixed for offline usage
 	* netx/net/sourceforge/jnlp/security/ConnectionFactory.java: (disconnect) got
 	null check 
