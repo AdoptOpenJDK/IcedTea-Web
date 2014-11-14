@@ -97,13 +97,17 @@ public class ConnectionFactory {
     }
 
     public void disconnect(URLConnection conn) {
-        OutputController.getLogger().log("Disconnecting " + conn.toString());
-        if (conn instanceof HttpsURLConnection) {
-            closeHttpsConnection((HttpsURLConnection) conn);
-        } else {
-            if (conn instanceof HttpURLConnection) {
-                ((HttpURLConnection) conn).disconnect();
+        if (conn != null) {
+            OutputController.getLogger().log("Disconnecting " + conn.toString());
+            if (conn instanceof HttpsURLConnection) {
+                closeHttpsConnection((HttpsURLConnection) conn);
+            } else {
+                if (conn instanceof HttpURLConnection) {
+                    ((HttpURLConnection) conn).disconnect();
+                }
             }
+        } else {
+            OutputController.getLogger().log("\"Disconnecting\" null connection. This is ok if you are offline.");
         }
     }
 

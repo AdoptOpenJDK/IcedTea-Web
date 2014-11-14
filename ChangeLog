@@ -1,3 +1,9 @@
+2014-11-14  Jiri Vanek  <jvanek@redhat.com>
+
+	Connection factory fixed for offline usage
+	* netx/net/sourceforge/jnlp/security/ConnectionFactory.java: (disconnect) got
+	null check 
+
 2014-11-10  Jie Kang  <jkang@redhat.com>
 
     Refactored downloading of resources
