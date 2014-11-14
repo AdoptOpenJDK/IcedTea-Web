@@ -323,18 +323,12 @@ public class Launcher {
      */
     private void addProperties(JNLPFile file, List<String> props) throws LaunchException {
         ResourcesDesc resources = file.getResources();
-
         for (String input : props) {
-            // allows empty property, not sure about validity of that.
-            int equals = input.indexOf("=");
-            if (equals == -1) {
-                throw launchError(new LaunchException(R("BBadProp", input)));
+            try{
+                resources.addResource(PropertyDesc.fromString(input));
+            }catch (LaunchException ex){
+                throw launchError(ex);
             }
-
-            String key = input.substring(0, equals);
-            String value = input.substring(equals + 1, input.length());
-
-            resources.addResource(new PropertyDesc(key, value));
         }
     }
 

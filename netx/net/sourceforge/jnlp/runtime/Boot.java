@@ -33,6 +33,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -133,6 +134,17 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP)) {
             handleMessage();
             JNLPRuntime.exit(0);
+        }
+        List<String> properties = optionParser.getParams(OptionsDefinitions.OPTIONS.PROPERTY);
+        if (properties != null) {
+            for (String prop : properties) {
+                try {
+                    PropertyDesc propDesc = PropertyDesc.fromString(prop);
+                    JNLPRuntime.getConfiguration().setProperty(propDesc.getKey(), propDesc.getValue());
+                } catch (LaunchException ex) {
+                    OutputController.getLogger().log(ex);
+                }
+            }
         }
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.ABOUT)) {

@@ -1,5 +1,17 @@
 2014-11-14  Jiri Vanek  <jvanek@redhat.com>
 
+	http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-June/028399.html (long thread)
+	* netx/net/sourceforge/jnlp/Launcher.java: using PropertyDesc.fromString to
+	add resources.
+	* netx/net/sourceforge/jnlp/PropertyDesc.java: New method fromString to handle
+	parsing
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: is now merging the properties
+	to main configuration.
+	* tests/netx/unit/net/sourceforge/jnlp/PropertyDescTest.java: new file. Added
+	tests for fromString.
+
+2014-11-14  Jiri Vanek  <jvanek@redhat.com>
+
 	Making loading of PAC provider more lenient
 	* netx/net/sourceforge/jnlp/runtime/PacEvaluatorFactory.java: (getPacEvaluator)
 	changed to autocloseable, general Exception (instead IOException only) is catch.
