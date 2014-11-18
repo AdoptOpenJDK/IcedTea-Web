@@ -1696,6 +1696,13 @@ stamps/bootstrap-directory.stamp: stamps/native-ecj.stamp
 	  echo "echo \"jarsigner not exist on your system, signed part of reproducers test will fail\"" >> $(BOOT_DIR)/bin/jarsigner ;\
 	  chmod 777 $(BOOT_DIR)/bin/jarsigner ;\
 	fi
+	if [ -e "$(PACK200)" ] ; then \
+	  ln -sf $(PACK200) $(BOOT_DIR)/bin/pack200 ;\
+	else \
+	  echo "#! /bin/sh" > $(BOOT_DIR)/bin/pack200 ;\
+	  echo "echo \"pack200 does not exist on your system, custom reproducer for pack200 will fail\"" >> $(BOOT_DIR)/bin/pack200 ;\
+	  chmod 777 $(BOOT_DIR)/bin/pack200 ;\
+	fi
 	mkdir -p $(BOOT_DIR)/jre/lib && \
 	ln -s $(SYSTEM_JRE_DIR)/lib/rt.jar $(BOOT_DIR)/jre/lib && \
 	if [ -e $(SYSTEM_JRE_DIR)/lib/jsse.jar ] ; then \

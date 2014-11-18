@@ -1,3 +1,19 @@
+2014-11-18  Jie Kang  <jkang@redhat.com>
+
+	Added reproducer for packgz compressed applets.
+	* acinclude.m4: Added check for pack200 in jdk bin
+	* configure.ac: Added check of pack200 during configure
+	* Makefile.am: Added use of pack200 if existing
+	* netx/net/sourceforge/jnlp/PluginBridge: Added use of pack/version
+	from jnlp file when launched through browser
+	* tests/reproducers/custom/PackGZip/resources/PackGZip.jnlp: packgz
+	reproducer
+	* tests/reproducers/custom/PackGZip/resources/PackGZipApplet.html:
+	* tests/reproducers/custom/PackGZip/resources/PackGZipJNLP.html:
+	* tests/reproducers/custom/PackGZip/srcs/Makefile:
+	* tests/reproducers/custom/PackGZip/srcs/PackGZip.java:
+	* tests/reproducers/custom/PackGZip/testcases/PackGzipTest.java:
+
 2014-11-14  Jiri Vanek  <jvanek@redhat.com>
 
 	http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-June/028399.html (long thread)

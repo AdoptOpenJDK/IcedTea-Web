@@ -774,6 +774,36 @@ AC_DEFUN_ONCE([IT_FIND_KEYTOOL],
   AC_SUBST(KEYTOOL)
 ])
 
+AC_DEFUN_ONCE([IT_FIND_PACK200],
+[
+  AC_REQUIRE([IT_CHECK_FOR_JDK])
+  AC_MSG_CHECKING([for pack200])
+  AC_ARG_WITH([pack200],
+              [AS_HELP_STRING(--with-pack200,specify location of pack200 for custom part of run-netx-dist)],
+  [
+    if test "${withval}" = "yes" ; then 
+      PACK200=${SYSTEM_JDK_DIR}/bin/pack200  
+    else 
+      PACK200="${withval}"
+    fi
+  ],
+  [
+    PACK200=${SYSTEM_JDK_DIR}/bin/pack200
+  ])
+  if ! test -f "${PACK200}"; then
+    AC_PATH_PROG(PACK200, pack200)
+  fi
+  if ! test -f "${PACK200}"; then
+    PACK200=""
+  fi
+  if test -z "${PACK200}" ; then
+     AC_MSG_WARN("pack200 not found so custom part of run-netx-dist will fail")
+  fi
+  AC_MSG_RESULT(${PACK200})
+  AC_SUBST(PACK200)
+])
+
+
 AC_DEFUN_ONCE([IT_FIND_JARSIGNER],
 [
   AC_REQUIRE([IT_CHECK_FOR_JDK])

@@ -54,8 +54,8 @@ public class PluginBridge extends JNLPFile {
     private List<String> codeBaseFolders = new ArrayList<String>();
     private String[] cacheJars = new String[0];
     private String[] cacheExJars = new String[0];
-    private boolean usePack;
-    private boolean useVersion;
+    private boolean usePack = false;
+    private boolean useVersion = false;
     private boolean useJNLPHref;
 
     /**
@@ -130,6 +130,9 @@ public class PluginBridge extends JNLPFile {
                      this.jars.add(fileName);
                  }
 
+                usePack = jnlpFile.getDownloadOptions().useExplicitPack();
+                useVersion = jnlpFile.getDownloadOptions().useExplicitVersion();
+
                 // Store any extensions listed in the JNLP file to be returned later on, namely in getResources()
                 extensionJars = Arrays.asList(jnlpFile.getResources().getExtensions());
             } catch (MalformedURLException e) {
@@ -198,8 +201,6 @@ public class PluginBridge extends JNLPFile {
             security = null;
 
         this.uniqueKey = params.getUniqueKey(codebase);
-        usePack = false;
-        useVersion = false;
         String jargs = params.getJavaArguments();
         if (!jargs.isEmpty()) {
             for (String s : jargs.split(" ")) {
