@@ -1165,9 +1165,9 @@ public class XMLElement {
      *             filtered xml file.
      */
     public void sanitizeInput(Reader isr, OutputStream pout) {
+        StringBuilder line = new StringBuilder();
         try {
             PrintStream out = new PrintStream(pout);
-
             this.sanitizeCharReadTooMuch = '\0';
             this.reader = isr;
             this.parserLineNr = 0;
@@ -1200,14 +1200,12 @@ public class XMLElement {
                     // what's in the buffer
                     out.print(ch);
                     out.flush();
-                    if (JNLPRuntime.isDebug()) {
-                        if (ch == 10) {
-                            OutputController.getLogger().printOutLn("");
-                            OutputController.getLogger().printOut("line: " + newline + " ");
-                            newline++;
-                        } else {
-                            OutputController.getLogger().printOut(ch+"");
-                        }
+                    if (ch == 10) {
+                        OutputController.getLogger().log(line.toString());
+                        line = new StringBuilder("line: " + newline + " ");
+                        newline++;
+                    } else {
+                        line.append(ch);
                     }
                     break;
                 } else if (i == 10) {
@@ -1232,44 +1230,41 @@ public class XMLElement {
                             out.print('!');
                             out.print('-');
                             this.sanitizeCharReadTooMuch = ch;
-                            if (JNLPRuntime.isDebug()) {
-                                OutputController.getLogger().printOut("<");
-                                OutputController.getLogger().printOut("!");
-                                OutputController.getLogger().printOut("-");
-                            }
+                            line.append("<");
+                            line.append("!");
+                            line.append("-");
                         }
                     } else {
                         out.print('<');
                         out.print('!');
                         this.sanitizeCharReadTooMuch = ch;
-                        if (JNLPRuntime.isDebug()) {
-                              OutputController.getLogger().printOut("<");
-                              OutputController.getLogger().printOut("!");
-                        }
+                        line.append("<");
+                        line.append("!");
                     }
                 }
                 // Otherwise we haven't hit a comment, and we should write ch.
                 else {
                     out.print(ch);
-                    if (JNLPRuntime.isDebug()) {
-                        if (ch == 10) {
-                            OutputController.getLogger().printOutLn("");
-                            OutputController.getLogger().printOut("line: " + newline + " ");
-                            newline++;
-                        } else {
-                            OutputController.getLogger().printOut(ch+"");
-                        }
+                    if (ch == 10) {
+                        OutputController.getLogger().log(line.toString());
+                        line = new StringBuilder("line: " + newline + " ");
+                        newline++;
+                    } else {
+                        line.append(ch);
                     }
                 }
                 prev = next;
             }
-
             out.close();
             isr.close();
         } catch (Exception e) {
             // Print the stack trace here -- xml.parseFromReader() will
             // throw the ParseException if something goes wrong.
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+        } finally {
+            OutputController.getLogger().log("");//force new line in all cases
+            OutputController.getLogger().log(line.toString()); //flush remaining line
+
         }
     }
 }
