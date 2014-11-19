@@ -1,3 +1,17 @@
+2014-11-19  Jie Kang  <jkang@redhat.com>
+
+	Fixed PluginMessage dates to use localized date from icedteanp-side.
+	See PR2063
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPaneModel.java:
+	Sort-by-date compares using timestamp
+	* netx/net/sourceforge/jnlp/util/logging/headers/Header.java:
+	'date' is a string for the localized date and 'timestamp' is a Date
+	for sort-by-date comparison
+	* netx/net/sourceforge/jnlp/util/logging/headers/PluginHeader.java:
+	no longer has timestamp field, uses Header's timestamp field
+	* netx/net/sourceforge/jnlp/util/logging/headers/PluginMessage.java:
+	'date' acquired directly from icedteanp-side (strftime) without formatting 
+
 2014-11-18  Jie Kang  <jkang@redhat.com>
 
 	Added reproducer for packgz compressed applets.

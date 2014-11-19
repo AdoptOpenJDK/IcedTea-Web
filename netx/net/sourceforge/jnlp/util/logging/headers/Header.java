@@ -48,7 +48,8 @@ public class Header {
     public String user = default_user;
     public boolean application = true;
     public Level level = Level.WARNING_ALL;
-    public Date date = new Date();
+    public Date timestamp  = new Date();
+    public String date = timestamp.toString();
     public boolean isC = false;//false=> java
     public boolean isClientApp = false;//false=> ITW
     public String caller = "unknown";
@@ -70,7 +71,8 @@ public class Header {
     public Header(Level level, StackTraceElement[] stack, Thread thread, Date d, boolean isC) {
         this.application = JNLPRuntime.isWebstartApplication();
         this.level = level;
-        this.date = d;
+        this.timestamp = d;
+        this.date = timestamp.toString();
         this.isC = isC;
         if (stack != null) {
             this.caller = getCallerClass(stack);

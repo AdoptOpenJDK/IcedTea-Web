@@ -37,13 +37,11 @@ exception statement from your version. *
  */
 package net.sourceforge.jnlp.util.logging.headers;
 
-import java.util.Date;
 import java.util.regex.Pattern;
 
 public class PluginHeader extends Header {
 
     public boolean preinit;
-    public Date originalTimeStamp;
     static final String PLUGIN_DEBUG = "plugindebug ";
     static final String PLUGIN_DEBUG_PREINIT = "preinit_plugindebug ";
     static final String PLUGIN_ERROR = "pluginerror ";

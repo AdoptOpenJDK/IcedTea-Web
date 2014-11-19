@@ -288,7 +288,7 @@ public class ConsoleOutputPaneModel {
                     Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
                         @Override
                         public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().date.compareTo(o2.getHeader().date);
+                            return o1.getHeader().timestamp.compareTo(o2.getHeader().timestamp);
                         }
                     });
                     break;

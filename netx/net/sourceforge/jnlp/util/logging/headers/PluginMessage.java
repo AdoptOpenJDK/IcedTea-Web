@@ -66,11 +66,11 @@ public class PluginMessage  implements MessageWithHeader{
                 p.level = OutputController.Level.WARNING_ALL;
             }
             String[] init = PluginHeader.whiteSpaces.split(s);
-            p.originalTimeStamp = new Date(Long.parseLong(init[1]) / 1000);
+            p.timestamp = new Date(Long.parseLong(init[1]) / 1000);
             String[] main = PluginHeader.bracketsPattern.split(s);
             p.user = main[1];
             p.caller = main[5];
-            p.date = FileLog.getPluginSharedFormatter().parse(main[4]);
+            p.date = main[4];
             String[] threads = PluginHeader.threadsPattern.split(main[6]);
             p.thread1 = threads[2];
             p.thread2 = threads[4];
