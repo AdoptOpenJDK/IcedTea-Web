@@ -1,3 +1,10 @@
+2014-11-25  Jie Kang  <jkang@redhat.com>
+
+	Fixed newly failing unit test: JavaConsoleTest:CreatePluginHeaderTestNotOK
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/JavaConsoleTest.java
+	(CreatePluginHeaderTestNotOK): Added a new failing string
+	(CreatePluginHeaderTestOK): Old string from NotOk moved to this test
+
 2014-11-19  Jiri Vanek  <jvanek@redhat.com>
 
 	Logging jnlp file into console
