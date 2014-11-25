@@ -475,7 +475,12 @@ public class Launcher {
             }
 
             if (isLocal && haveHref) {
-                file = new JNLPFile(file.getSourceLocation(), parserSettings);
+                JNLPFile fileFromHref = new JNLPFile(file.getSourceLocation(), parserSettings);
+                if (fileFromHref.getCodeBase() == null) {
+                    fileFromHref.codeBase = file.getCodeBase();
+                }
+                file = fileFromHref;
+
             }
             return file;
         } catch (Exception ex) {

@@ -1,3 +1,8 @@
+2014-11-25  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java: (fromUrl) file from href get
+	substituted codebase from previous one if it is missing in new one.
+
 2014-11-25  Jie Kang  <jkang@redhat.com>
 
 	Fixed newly failing unit test: JavaConsoleTest:CreatePluginHeaderTestNotOK
