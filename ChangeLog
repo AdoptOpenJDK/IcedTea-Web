@@ -1,5 +1,10 @@
 2014-11-25  Jiri Vanek  <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: (checkAll)
+	permissions atribute is now also skipped when attribute checks are disabled
+
+2014-11-25  Jiri Vanek  <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/Launcher.java: (fromUrl) file from href get
 	substituted codebase from previous one if it is missing in new one.
 

@@ -75,15 +75,14 @@ public class ManifestAttributesChecker {
     }
 
     void checkAll() throws LaunchException {
-        checkPermissionsAttribute();
         if (isCheckEnabled()) {
+            checkPermissionsAttribute();
             checkTrustedOnlyAttribute();
             checkCodebaseAttribute();
             checkPermissionsAttribute();
             checkApplicationLibraryAllowableCodebaseAttribute();
         } else {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Manifest attribute checks are disabled."
-                    + " The Permissions attribute will be enforced but other manifest attributes will be ignored.");
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Manifest attribute checks are disabled.");
         }
     }
 
