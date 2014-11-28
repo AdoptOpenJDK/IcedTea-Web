@@ -1,3 +1,8 @@
+2014-11-28  Jie Kang  <jkang@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java
+	(testDownloadResource): new test for downloading basic resource
+
 2014-11-25  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: (checkAll)

@@ -39,6 +39,8 @@ package net.sourceforge.jnlp.cache;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,27 +51,30 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
-
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerLauncher;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.ServerLauncher;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 public class ResourceTrackerTest {
 
     public static ServerLauncher testServer;
     public static ServerLauncher testServerWithBrokenHead;
+    public static ServerLauncher downloadServer;
     private static PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
     private static final String nameStub1 = "itw-server";
@@ -438,5 +443,49 @@ public class ResourceTrackerTest {
     private void assertVersion(URL u) {
         Assert.assertTrue(u.getPath().contains("-2.0"));
         Assert.assertTrue(u.getQuery().contains("version-id=1.0"));
+    }
+
+    private static String cacheDir;
+
+    @BeforeClass
+    public static void setupDownloadServer() throws IOException {
+        File dir = new File(System.getProperty("java.io.tmpdir"), "itw-down");
+        dir.mkdirs();
+        dir.deleteOnExit();
+        redirectErr();
+        downloadServer = ServerAccess.getIndependentInstance(dir.getAbsolutePath(), ServerAccess.findFreePort());
+        redirectErrBack();
+
+        cacheDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
+    }
+
+    @AfterClass
+    public static void teardownDownloadServer() {
+        downloadServer.stop();
+
+        CacheUtil.clearCache();
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, cacheDir);
+    }
+
+    @Test
+    public void testDownloadResource() throws IOException {
+        String s = "hello";
+        File f = downloadServer.getDir();
+        File temp = new File(f, "resource");
+        temp.createNewFile();
+        Files.write(temp.toPath(), s.getBytes());
+        temp.deleteOnExit();
+
+        URL url = downloadServer.getUrl("resource");
+
+        ResourceTracker rt = new ResourceTracker();
+        rt.addResource(url, null, null, UpdatePolicy.FORCE);
+        File downloadFile = rt.getCacheFile(url);
+
+        assertTrue(downloadFile.exists() && downloadFile.isFile());
+
+        String output = new String(Files.readAllBytes(downloadFile.toPath()));
+        assertEquals(s, output);
     }
 }
