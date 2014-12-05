@@ -58,6 +58,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.ShortcutDesc;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
@@ -73,8 +76,10 @@ import net.sourceforge.jnlp.util.FileUtils;
  */
 public class AccessWarningPane extends SecurityDialogPanel {
 
-    JCheckBox alwaysAllow;
-    Object[] extras;
+    private JCheckBox alwaysAllow;
+    private Object[] extras;
+    private JCheckBox desktopCheck;
+    private JCheckBox menuCheck;
 
     public AccessWarningPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
@@ -175,10 +180,42 @@ public class AccessWarningPane extends SecurityDialogPanel {
         alwaysAllow = new JCheckBox(R("AlwaysAllowAction"));
         alwaysAllow.setEnabled(false);
 
-        JPanel infoPanel = new JPanel(new GridLayout(4, 1));
+        JPanel infoPanel = new JPanel(new GridLayout(4+desktop(), 1));
         infoPanel.add(nameLabel);
         infoPanel.add(publisherLabel);
         infoPanel.add(fromLabel);
+        if (type == AccessType.CREATE_DESTKOP_SHORTCUT) {
+            if (file.getInformation() != null &&  file.getInformation().getShortcut() != null && file.getInformation().getShortcut().onDesktop()) {
+                desktopCheck = new JCheckBox("Desktop icon shortcut (applications wont to)");
+                desktopCheck.setSelected(true);
+            } else {
+                desktopCheck = new JCheckBox("Desktop icon shortcut (applications dont wonts to, but you still can)");
+                desktopCheck.setSelected(false);
+            }
+
+            if (file.getInformation() != null && file.getInformation().getShortcut() !=null && file.getInformation().getShortcut().toMenu()) {
+                if (file.getInformation().getShortcut() != null && file.getInformation().getShortcut().getMenu() != null && file.getInformation().getShortcut().getMenu().getSubMenu() != null) {
+                    menuCheck = new JCheckBox("Menu icon shortcut (applications will try to include to submenu '"
+                            + file.getInformation().getShortcut().getMenu().getSubMenu()
+                            + "')");
+                } else {
+                    menuCheck = new JCheckBox("Menu icon shortcut (applications wont to)");
+                }
+                menuCheck.setSelected(true);
+            } else {
+                menuCheck = new JCheckBox("Menu icon shortcut (applications dont wonts to, but you still can)");
+                menuCheck.setSelected(false);
+            }
+            infoPanel.add(new JLabel("<html>___________________________________________________</html>"));
+            infoPanel.add(desktopCheck);
+            infoPanel.add(menuCheck);
+            infoPanel.add(new JLabel("Your curernt setting is: "
+                    + ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT))
+                    + ". You can change it in itweb-settings in '" + R("CPTabDesktopIntegration") + "' panel."));
+            infoPanel.add(new JLabel("You can manage existing menu entries in itweb-settings in '" +R("CPTabMenuShortcuts") + "' panel"));
+            infoPanel.validate();
+
+        }
         infoPanel.add(alwaysAllow);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
@@ -187,8 +224,20 @@ public class AccessWarningPane extends SecurityDialogPanel {
 
         JButton run = new JButton(R("ButAllow"));
         JButton cancel = new JButton(R("ButCancel"));
-        run.addActionListener(createSetValueListener(parent, 0));
         run.addActionListener(new CheckBoxListener());
+        if (type == AccessType.CREATE_DESTKOP_SHORTCUT) {
+            //override the stupid createSetValueListener mechanism
+            run.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    parent.setValue(getModifier());
+                    parent.dispose();
+                }
+            });
+        } else {
+            run.addActionListener(createSetValueListener(parent, 0));            
+        }
         cancel.addActionListener(createSetValueListener(parent, 1));
         initialFocusComponent = cancel;
         buttonPanel.add(run);
@@ -203,7 +252,33 @@ public class AccessWarningPane extends SecurityDialogPanel {
 
     }
 
+    private int getModifier() {
+        if (parent.getAccessType() == AccessType.CREATE_DESTKOP_SHORTCUT) {
+            if (menuCheck.isSelected() && desktopCheck.isSelected()){
+                return 70;
+            }
+            if (menuCheck.isSelected()){
+                return 30;
+            }
+            if (desktopCheck.isSelected()){
+                return 20;
+            }
+            return 0;
+        } else {
+            return 0;
+        }
+    }
+
+    private int desktop() {
+        if (parent.getAccessType() == AccessType.CREATE_DESTKOP_SHORTCUT) {
+            return 6;
+        } else {
+            return 0;
+        }
+    }
+
     private class CheckBoxListener implements ActionListener {
+
         @Override
         public void actionPerformed(ActionEvent e) {
             if (alwaysAllow != null && alwaysAllow.isSelected()) {

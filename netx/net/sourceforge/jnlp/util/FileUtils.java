@@ -19,7 +19,6 @@ package net.sourceforge.jnlp.util;
 import java.awt.Component;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -77,7 +76,7 @@ public final class FileUtils {
     /**
      * list of characters not allowed in filenames
      */
-    private static final char INVALID_CHARS[] = { '\\', '/', ':', '*', '?', '"', '<', '>', '|' };
+    public static final char INVALID_CHARS[] = {'\\', '/', ':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ','};
 
     private static final char SANITIZED_CHAR = '_';
 
@@ -91,11 +90,18 @@ public final class FileUtils {
      *         file path
      */
     public static String sanitizePath(String path) {
+        return sanitizePath(path, SANITIZED_CHAR);
+    }
 
-        for (int i = 0; i < INVALID_CHARS.length; i++)
-            if (INVALID_CHARS[i] != File.separatorChar)
-                if (-1 != path.indexOf(INVALID_CHARS[i]))
-                    path = path.replace(INVALID_CHARS[i], SANITIZED_CHAR);
+    public static String sanitizePath(String path, char substitute) {
+
+        for (int i = 0; i < INVALID_CHARS.length; i++) {
+            if (INVALID_CHARS[i] != File.separatorChar) {
+                if (-1 != path.indexOf(INVALID_CHARS[i])) {
+                    path = path.replace(INVALID_CHARS[i], substitute);
+                }
+            }
+        }
 
         return path;
     }
@@ -108,10 +114,16 @@ public final class FileUtils {
      * @return a sanitized version of the input
      */
     public static String sanitizeFileName(String filename) {
+        return sanitizeFileName(filename, SANITIZED_CHAR);
+    }
 
-        for (int i = 0; i < INVALID_CHARS.length; i++)
-            if (-1 != filename.indexOf(INVALID_CHARS[i]))
-                filename = filename.replace(INVALID_CHARS[i], SANITIZED_CHAR);
+    public static String sanitizeFileName(String filename, char substitute) {
+
+        for (int i = 0; i < INVALID_CHARS.length; i++) {
+            if (-1 != filename.indexOf(INVALID_CHARS[i])) {
+                filename = filename.replace(INVALID_CHARS[i], substitute);
+            }
+        }
 
         return filename;
     }

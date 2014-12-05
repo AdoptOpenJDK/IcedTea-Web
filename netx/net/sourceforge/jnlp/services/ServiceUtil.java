@@ -260,13 +260,13 @@ public class ServiceUtil {
             Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                 @Override
                 public Boolean run() {
-                    boolean b = SecurityDialogs.showAccessWarningDialog(tmpType,
+                    boolean b = SecurityDialogs.showAccessWarningDialogB(tmpType,
                                 tmpApp.getJNLPFile(), tmpExtras);
-                    return Boolean.valueOf(b);
+                    return b;
                 }
             });
 
-            return b.booleanValue();
+            return b;
         }
 
         return true; //allow

@@ -134,8 +134,15 @@ public class SecurityDialogs {
      * @param file the jnlp file associated with the requesting application.
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static boolean showAccessWarningDialog(AccessType accessType, JNLPFile file) {
-        return showAccessWarningDialog(accessType, file, null);
+    public static boolean showAccessWarningDialogB(AccessType accessType, JNLPFile file) {
+        return showAccessWarningDialogB(accessType, file, null);
+    }
+    
+    /**
+     * unlike showAccessWarningDialogB this is returning raw int code
+     */
+     public static int showAccessWarningDialogI(AccessType accessType, JNLPFile file) {
+        return showAccessWarningDialogI(accessType, file, null);
     }
 
     /**
@@ -148,11 +155,19 @@ public class SecurityDialogs {
      * passed to the dialog labels.
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static boolean showAccessWarningDialog(final AccessType accessType,
+    public static boolean showAccessWarningDialogB(final AccessType accessType,
+                        final JNLPFile file, final Object[] extras) {
+        return getIntegerResponseAsBoolean(showAccessWarningDialogI(accessType, file, extras));
+    }
+             
+    /**
+     * unlike showAccessWarningDialogB this is returning raw int code
+     */
+    public static int showAccessWarningDialogI(final AccessType accessType,
             final JNLPFile file, final Object[] extras) {
 
         if (!shouldPromptUser()) {
-            return false;
+            return 1;
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
@@ -164,7 +179,10 @@ public class SecurityDialogs {
 
         Object selectedValue = getUserResponse(message);
 
-        return getIntegerResponseAsBoolean(selectedValue);
+        if (selectedValue instanceof Integer) {
+            return ((Integer)selectedValue);
+        }
+        return 1;
     }
 
     /**

@@ -141,11 +141,6 @@ public class ApplicationInstance {
      */
     public void initialize() {
         installEnvironment();
-
-        //Fixme: -Should check whether a desktop entry already exists for
-        //        for this jnlp file, and do nothing if it exists.
-        //       -If no href is specified in the jnlp tag, it should
-        //        default to using the one passed in as an argument.
         addMenuAndDesktopEntries();
     }
 
@@ -157,21 +152,31 @@ public class ApplicationInstance {
         XDesktopEntry entry = new XDesktopEntry(file);
         ShortcutDesc sd = file.getInformation().getShortcut();
         File possibleDesktopFile = entry.getLinuxDesktopIconFile();
+        File possibleMenuFile = entry.getLinuxMenuIconFile();
+        //if one of menu or desktop exists, do not bother user
+        boolean exists = false;
         if (possibleDesktopFile.exists()) {
             OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
-                    + possibleDesktopFile.getAbsolutePath() + " already exists. Not proceeding with desktop additions");
+                    + possibleDesktopFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+            exists = true;
+            if (JNLPRuntime.isOnline()) {
+                entry.createDesktopShortcuts(false, true); //update
+            }
+        }
+        if (possibleMenuFile.exists()) {
+            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
+                    + possibleMenuFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+            exists = true;
+            if (JNLPRuntime.isOnline()) {
+                entry.createDesktopShortcuts(true, false); //update
+            }
+        }
+        if (exists){
             return;
         }
-        if (shouldCreateShortcut(sd)) {
-            entry.createDesktopShortcut();
-        }
-
-        if (sd != null && sd.getMenu() != null) {
-            /*
-             * Sun's WebStart implementation doesnt seem to do anything under GNOME
-             */
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "ApplicationInstance.addMenuAndDesktopEntries():"
-                    + " Adding menu entries NOT IMPLEMENTED");
+        IconsCreationDescriptor ics = shouldCreateShortcut(sd);
+        if (ics.isAtLeastSomething()) {
+            entry.createDesktopShortcuts(ics.isMenu(), ics.isDesktop());
         }
 
     }
@@ -183,13 +188,15 @@ public class ApplicationInstance {
      * @param sd the ShortcutDesc element from the JNLP file
      * @return true if a desktop shortcut should be created
      */
-    private boolean shouldCreateShortcut(ShortcutDesc sd) {
+    private IconsCreationDescriptor shouldCreateShortcut(ShortcutDesc sd) {
         if (JNLPRuntime.isTrustAll()) {
-            return (sd != null && sd.onDesktop());
+            if (sd ==null){
+                return new IconsCreationDescriptor(false);
+            }
+            return new IconsCreationDescriptor(sd.onDesktop(), sd.getMenu() != null);
         }
         String currentSetting = JNLPRuntime.getConfiguration()
                 .getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT);
-        boolean createShortcut = false;
 
         /*
          * check configuration and possibly prompt user to find out if a
@@ -197,28 +204,73 @@ public class ApplicationInstance {
          */
         switch (currentSetting) {
             case ShortcutDesc.CREATE_NEVER:
-                createShortcut = false;
-                break;
+                return new IconsCreationDescriptor(false);
             case ShortcutDesc.CREATE_ALWAYS:
-                createShortcut = true;
-                break;
+                return new IconsCreationDescriptor(true);
             case ShortcutDesc.CREATE_ASK_USER:
-                if (SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
-                    createShortcut = true;
-                }   break;
+                return new IconsCreationDescriptor(SecurityDialogs.showAccessWarningDialogI(AccessType.CREATE_DESTKOP_SHORTCUT, file));
             case ShortcutDesc.CREATE_ASK_USER_IF_HINTED:
-                if (sd != null && sd.onDesktop()) {
-                    if (SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file)) {
-                        createShortcut = true;
-                    }
-                }   break;
+                if (sd != null && (sd.onDesktop() || sd.toMenu())) {
+                    return new IconsCreationDescriptor(SecurityDialogs.showAccessWarningDialogI(AccessType.CREATE_DESTKOP_SHORTCUT, file));
+                }
             case ShortcutDesc.CREATE_ALWAYS_IF_HINTED:
-                if (sd != null && sd.onDesktop()) {
-                    createShortcut = true;
-                }   break;
+                if (sd != null && (sd.onDesktop() || sd.toMenu())) {
+                    return new IconsCreationDescriptor(true);
+                }
         }
 
-        return createShortcut;
+        return new IconsCreationDescriptor(false);
+    }
+    
+    private static class IconsCreationDescriptor{
+
+        private final  boolean desktop;
+        private  final  boolean menu;
+
+        public IconsCreationDescriptor(boolean whoCares) {
+            this(whoCares, whoCares);
+        }
+        public IconsCreationDescriptor(boolean desktop, boolean menu) {
+            this.desktop=desktop;
+            this.menu=menu;
+        }
+        public IconsCreationDescriptor(int encodedDialogOutput) {
+            //due to limitations of AccessWarningPane the returned value is int
+            //in normal case it returns "By convention" 0 = Yes. 1 = No, 2 = Cancel
+            //See SecurityDoialogPanel.createSetValueListener
+            //for this case hacked
+            //0 cancel or nothing selected
+            //70 for both selected
+            //30 for menu only selected
+            //20 for desktop only
+            //see AccessWarningPane.getModifier
+            if (encodedDialogOutput == 70) {
+                desktop = true;
+                menu = true;
+            } else if (encodedDialogOutput == 30) {
+                desktop = false;
+                menu = true;
+            } else if (encodedDialogOutput == 20) {
+                desktop = true;
+                menu = false;
+            } else {
+                desktop = false;
+                menu = false;
+            }
+        }
+        
+        public boolean isAtLeastSomething(){
+            return desktop || menu;
+        }
+
+        public boolean isDesktop() {
+            return desktop;
+        }
+
+        public boolean isMenu() {
+            return menu;
+        }
+        
     }
 
     /**

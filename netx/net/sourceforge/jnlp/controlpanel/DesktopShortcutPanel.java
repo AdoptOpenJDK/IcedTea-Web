@@ -28,6 +28,7 @@ import java.awt.event.ItemListener;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import net.sourceforge.jnlp.ShortcutDesc;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -56,6 +57,11 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
         addComponents();
     }
 
+
+    public static ComboItem deploymentJavawsShortcutToComboItem(String i) {
+        return new ComboItem(ShortcutDesc.deploymentJavawsShortcutToString(i), i);
+    }
+
     /**
      * Add components to panel.
      */
@@ -63,16 +69,16 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
         GridBagConstraints c = new GridBagConstraints();
         JLabel description = new JLabel("<html>" + Translator.R("CPDesktopIntegrationDescription") + "<hr /></html>");
         JComboBox<ComboItem> shortcutComboOptions = new JComboBox<>();
-        ComboItem[] items = { new ComboItem(Translator.R("DSPNeverCreate"), "NEVER"),
-                new ComboItem(Translator.R("DSPAlwaysAllow"), "ALWAYS"),
-                new ComboItem(Translator.R("DSPAskUser"), "ASK_USER"),
-                new ComboItem(Translator.R("DSPAskIfHinted"), "ASK_IF_HINTED"),
-                new ComboItem(Translator.R("DSPAlwaysIfHinted"), "ALWAYS_IF_HINTED") };
+        ComboItem[] items = {deploymentJavawsShortcutToComboItem(ShortcutDesc.CREATE_NEVER),
+            deploymentJavawsShortcutToComboItem(ShortcutDesc.CREATE_ALWAYS),
+            deploymentJavawsShortcutToComboItem(ShortcutDesc.CREATE_ASK_USER),
+            deploymentJavawsShortcutToComboItem(ShortcutDesc.CREATE_ASK_USER_IF_HINTED),
+            deploymentJavawsShortcutToComboItem(ShortcutDesc.CREATE_ALWAYS_IF_HINTED)};
 
-        shortcutComboOptions.setActionCommand("deployment.javaws.shortcut"); // The configuration property this combobox affects.
+        shortcutComboOptions.setActionCommand(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT); // The configuration property this combobox affects.
         for (int j = 0; j < items.length; j++) {
             shortcutComboOptions.addItem(items[j]);
-            if (config.getProperty("deployment.javaws.shortcut").equals(items[j].getValue())) {
+            if (config.getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT).equals(items[j].getValue())) {
                 shortcutComboOptions.setSelectedIndex(j);
             }
         }

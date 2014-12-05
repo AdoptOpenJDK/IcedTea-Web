@@ -53,6 +53,7 @@ public class PathsAndFiles {
 
     private static final String CONFIG_HOME;
     private static final String CACHE_HOME;
+    private static final String DATA_HOME;
     private static final String RUNTIME_HOME;
     public static final String USER_CONFIG_HOME;
     public static final String USER_CACHE_HOME;
@@ -60,6 +61,7 @@ public class PathsAndFiles {
     private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static final String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
     private static final String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";
+    private static final String XDG_DATA_HOME = "XDG_DATA_HOME";
     private static final String TMP_PROP = "java.io.tmpdir";
     private static final String HOME_PROP = "user.home";
     private static final String JAVA_PROP = "java.home";
@@ -70,10 +72,12 @@ public class PathsAndFiles {
     static {
         String configHome = System.getProperty(HOME_PROP) + File.separator + ".config";
         String cacheHome = System.getProperty(HOME_PROP) + File.separator + ".cache";
+        String dataHome = System.getProperty(HOME_PROP) +  File.separator + ".local" + File.separator + "share";
         String runtimeHome = System.getProperty(TMP_PROP);
         String xdg_config_home = System.getenv(XDG_CONFIG_HOME_VAR);
         String xdg_cache_home = System.getenv(XDG_CACHE_HOME_VAR);
         String xdg_runtime_home = System.getenv(XDG_RUNTIME_DIR_VAR);
+        String xdg_data_home = System.getenv(XDG_DATA_HOME);
         if (xdg_config_home != null) {
             CONFIG_HOME = xdg_config_home;
         } else {
@@ -88,6 +92,11 @@ public class PathsAndFiles {
             RUNTIME_HOME = xdg_runtime_home;
         } else {
             RUNTIME_HOME = runtimeHome;
+        }
+         if (xdg_data_home != null) {
+           DATA_HOME = xdg_data_home;
+        } else {
+            DATA_HOME = dataHome;
         }
         USER_CONFIG_HOME = CONFIG_HOME + File.separator + DEPLOYMENT_SUBDIR_DIR;
         USER_CACHE_HOME = CACHE_HOME + File.separator + DEPLOYMENT_SUBDIR_DIR;
@@ -108,6 +117,10 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "FILEappdata", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    //javaws is saving here, itweb-settings may modify them
+    public static final InfrastructureFileDescriptor ICONS_DIR = new ItwConfigFileDescriptor("icons", "FILEicons", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    //javaws is saving here, itweb-settings may modify them
+    public static final InfrastructureFileDescriptor MENUS_DIR = new MenuFileDescriptor("javaws", "FILEmenus", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentCofigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentCofigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
@@ -309,6 +322,30 @@ public class PathsAndFiles {
         }
 
     }
+    
+    private static class DataFileDescriptor extends InfrastructureFileDescriptor {
+
+        private DataFileDescriptor(String fileName, String sp, String description, Target... target) {
+            super(fileName, sp, DATA_HOME, description, target);
+        }
+
+        @Override
+        public String getSystemPathStubAcronym() {
+            return VARIABLE + "" + XDG_DATA_HOME;
+        }
+
+    }
+
+    /**
+     * http://standards.freedesktop.org/menu-spec/menu-spec-1.0.html#paths
+     */
+    private static class MenuFileDescriptor extends DataFileDescriptor {
+
+        private MenuFileDescriptor(String fileName, String description, Target... target) {
+            super(fileName, "applications", description, target);
+        }
+    }
+
 
     private static class RuntimeFileDescriptor extends InfrastructureFileDescriptor {
 

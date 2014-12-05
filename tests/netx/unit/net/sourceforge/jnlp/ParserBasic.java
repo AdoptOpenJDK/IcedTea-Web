@@ -138,7 +138,7 @@ public class ParserBasic extends NoStdOutErrTest{
 
         ShortcutDesc shortcut = info.getShortcut();
         Assert.assertNotNull(shortcut);
-        Assert.assertTrue(shortcut.isOnline());
+        Assert.assertTrue(shortcut.isOnlineValue());
         Assert.assertTrue(shortcut.onDesktop());
         MenuDesc menu = shortcut.getMenu();
         Assert.assertNotNull(menu);

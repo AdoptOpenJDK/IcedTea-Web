@@ -803,7 +803,7 @@ class Parser {
 
         ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, showOnDesktop);
         if (menu != null) {
-            shortcut.addMenu(menu);
+            shortcut.setMenu(menu);
         }
         return shortcut;
     }

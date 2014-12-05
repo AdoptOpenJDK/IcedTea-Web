@@ -1,3 +1,37 @@
+2014-12-05  Jiri Vanek  <jvanek@redhat.com>
+
+	Added support for menu shortcuts.
+	*/netx/net/sourceforge/jnlp/Parser.java: used setMenu instead of addMenu
+	*/netx/net/sourceforge/jnlp/ShortcutDesc.java: removed isOnline support,
+	added onDesktop and toMenu support. addMenu renamed to setMenu.
+	Added deploymentJavawsShortcutToString, just for comfortableness.
+	*/netx/net/sourceforge/jnlp/config/PathsAndFiles.java: Added support for
+	XDG_DATA_HOME, declared ICONS_DIR and MENUS_DIR
+	*/netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java: removed
+	duplicated logic of deploymentJavawsShortcutToString/comboboxItem and 
+	hardcoded calls  to depolyment.
+	*/netx/net/sourceforge/jnlp/resources/Messages.properties: added 
+	CPTabMenuShortcuts, FILEicons, FILEmenus. adapted SDesktopShortcut
+	*/netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: 
+	removed retired fixme, now it do not ask for shortcut creation if menu or
+	desktop entry exists.  Added menu support and removed not-implemented call.
+	Added temporary IconsCreationDescriptor qiockfix for dialog->logic information
+	rtransfer. Used where needed.
+	*/netx/net/sourceforge/jnlp/security/SecurityDialogs.java:  Added boolean
+	and integer workarounds around showAccessWarningDialog
+	*/netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java: Added
+	menu support.
+	Is now coding more sophisticated return value if are about desktop creations.
+	*/netx/net/sourceforge/jnlp/services/ServiceUtil.java:  Adapted to
+	showAccessWarningDialog changes
+	*/netx/net/sourceforge/jnlp/util/FileUtils.java: INVALID_CHARS extended
+	for more linux one and most windows ones.
+	*/netx/net/sourceforge/jnlp/util/XDesktopEntry.java: added logic to place
+	menu shortcut.
+	*/tests/netx/unit/net/sourceforge/jnlp/ParserBasic.java: Is now testing only 
+	presence of isOnline instead if it is used.
+
+
 2014-11-28  Jie Kang  <jkang@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java
