@@ -47,7 +47,10 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URLDecoder;
+import java.security.cert.CRL;
+import java.util.Date;
 import java.util.StringTokenizer;
+
 import net.sourceforge.jnlp.cache.ResourceTracker;
 
 /**
@@ -70,6 +73,7 @@ public class TinyHttpdImpl extends Thread {
     private final File testDir;
     private boolean canRun = true;
     private boolean supportingHeadRequest = true;
+    private boolean supportLastModified = false;
 
     public TinyHttpdImpl(Socket socket, File dir) {
         this(socket, dir, true);
@@ -93,6 +97,14 @@ public class TinyHttpdImpl extends Thread {
 
     public boolean isSupportingHeadRequest() {
         return this.supportingHeadRequest;
+    }
+
+    public void setSupportLastModified(boolean supportLastModified) {
+        this.supportLastModified = supportLastModified;
+    }
+
+    public boolean isSupportingLastModified() {
+        return this.supportLastModified;
     }
 
     public int getPort() {
@@ -161,7 +173,11 @@ public class TinyHttpdImpl extends Thread {
                     } else {
                         contentType += "text/html";
                     }
-                    writer.writeBytes(HTTP_OK + "Content-Length:" + resourceLength + CRLF + contentType + CRLF + CRLF);
+                    String lastModified = "";
+                    if (supportLastModified) {
+                        lastModified = "Last-Modified: " + new Date(resource.lastModified()) + CRLF;
+                    }
+                    writer.writeBytes(HTTP_OK + "Content-Length:" + resourceLength + CRLF + lastModified + contentType + CRLF + CRLF);
 
                     if (isGetRequest) {
                         if (slowSend) {
