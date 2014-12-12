@@ -1,3 +1,13 @@
+2014-12-12  Jie Kang  <jkang@redhat.com>
+
+	JDK7 like refactroing of JNLPClassLoader
+	* netx/net/sourceforge/jnlp/config/Defaults.java: KEY_STRICT_JNLP_CLASSLOADER
+	added
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: deployment.jnlpclassloader.strict
+	declared
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: minor refactoring, and usage
+	of KEY_STRICT_JNLP_CLASSLOADER instead of hardcoded strict=true.
+
 2014-12-08  Jie Kang  <jkang@redhat.com>
 
 	Added last-modified information to TinyHttpdImpl

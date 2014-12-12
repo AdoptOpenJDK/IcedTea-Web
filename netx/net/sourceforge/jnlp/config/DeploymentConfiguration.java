@@ -150,6 +150,7 @@ public final class DeploymentConfiguration {
     /** Boolean. Only install the custom authenticator if true */
     public static final String KEY_SECURITY_INSTALL_AUTHENTICATOR = "deployment.security.authenticator";
 
+    public static final String KEY_STRICT_JNLP_CLASSLOADER = "deployment.jnlpclassloader.strict";
     /*
      * Networking
      */

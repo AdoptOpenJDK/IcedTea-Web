@@ -212,7 +212,12 @@ public class Defaults {
                         String.valueOf(true)
                 },
                 {
-                        DeploymentConfiguration.KEY_SECURITY_INSTALL_AUTHENTICATOR,
+                        DeploymentConfiguration.KEY_STRICT_JNLP_CLASSLOADER,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(true)
+                },
+                                {
+                        DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(true)
                 },
