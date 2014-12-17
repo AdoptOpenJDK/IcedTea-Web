@@ -875,7 +875,7 @@ test-extensions-tests-source-files.txt:
 
 stamps/test-extensions-tests-compile.stamp: stamps/junit-jnlp-dist-dirs test-extensions-tests-source-files.txt  stamps/test-extensions-compile.stamp
 	mkdir -p $(TEST_EXTENSIONS_TESTS_DIR);
-	for x in `cat $(abs_top_srcdir)/test-extensions-tests-source-file.txt` ; do \
+	for x in `cat $(abs_top_builddir)/test-extensions-tests-source-files.txt` ; do \
 	  $(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	   -d $(TEST_EXTENSIONS_TESTS_DIR) \
 	   -classpath $(JUNIT_JAR):$(NETX_DIR)/lib/classes.jar:$(TEST_EXTENSIONS_DIR) \

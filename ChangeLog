@@ -1,4 +1,9 @@
-2014-12-12  Jie Kang  <jkang@redhat.com>
+2014-12-17  Jie Kang  <jkang@redhat.com>
+
+	Fixed typo in Makefile.am for test-extensions-tests compilation
+	* Makefile.am:
+
+2014-12-12  Jiri Vanek  <jvanek@redhat.com>
 
 	JDK7 like refactroing of JNLPClassLoader
 	* netx/net/sourceforge/jnlp/config/Defaults.java: KEY_STRICT_JNLP_CLASSLOADER
