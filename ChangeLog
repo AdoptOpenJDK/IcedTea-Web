@@ -1,3 +1,46 @@
+2014-12-18  Jiri Vanek  <jvanek@redhat.com>
+
+	Added support for generating shortcuts also for applets.
+	* Makefile.am: javaws_bin and javaws_name passed to plugin
+	* netx/net/sourceforge/jnlp/JNLPFile: (openURL) made public and added javadoc.
+	Added unifying methods to generate  title and vendor to be reused in  jnlp
+	and shortcuts: createJnlpVendorValue, createJnlpVendor, createJnlpTitleValue, 
+	createJnlpTitle.
+	* netx/net/sourceforge/jnlp/OptionsDefinitions: Added unimplemented -html param
+	* netx/net/sourceforge/jnlp/PluginBridge: able to be final fields made final.
+	Jnlp href file is stored for debugging purposes. Added override annotations.
+	Added possibility to generate jnlp xml file from itself (toJnlp). Added function
+	(fixCommonIsuses) to enable usage of jnlpHref as mian jnlp file if used in shortcut.
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles:
+	Declared GEN_JNLPS_DIR for saving generated jnlp shortcut.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: declared 
+	ButAdvancedOptions, AlwaysForbidAction, BOHtml, FILEjnlps keys and whole
+	family of EXAW	keys.
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance: now use AccessWarningPaneComplexReturn
+	instead of removed IconsCreationDescriptor.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs: AccessWarningDialog family
+	of methods adapted to handle boolean, integer and AccessWarningPaneComplexReturn
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane: reworked
+	to support controls of shortcut creation and saving buttons.
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPaneComplexReturn:
+	New class to store information about shortcuts and saving of result. Used
+	from AccessWarningPane instead of integer.
+	* netx/net/sourceforge/jnlp/util/StreamUtils: added possibility to control 
+	encoding.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry: Included possibility to create
+	shrotcut from applet, based on the AccessWarningPaneComplexReturn. Is trying
+	to use also favico if no more suitable icons found.
+	* netx/net/sourceforge/jnlp/util/optionparser/OptionParser: added to-be-removed 
+	hack to die if -html  is found.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: made aware of JAVAWS_BIN and JAVAWS_NAME
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest: tested class stripping
+	and fixing of common issues.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest: backedUpStream
+	made final.
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/JavaConsoleTest: Fixed 
+	timezone depending test to be timezone independent. 
+
+
 2014-12-17  Jie Kang  <jkang@redhat.com>
 
 	Fixed typo in Makefile.am for test-extensions-tests compilation

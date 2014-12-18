@@ -72,6 +72,7 @@ public class OptionsDefinitions {
         OFFLINE("-Xoffline", "BXoffline"),
         TRUSTNONE("-Xtrustnone","BOTrustnone"),
         JNLP("-jnlp","BOJnlp", NumberOfArguments.ONE),
+        HTML("-html","BOHtml", NumberOfArguments.ONE),
         //itweb settings
         LIST("-list", "IBOList"),
         GET("-get", "name", "IBOGet", NumberOfArguments.ONE_OR_MORE),
@@ -202,7 +203,9 @@ public class OptionsDefinitions {
             OPTIONS.NOHEADERS,
             OPTIONS.OFFLINE,
             OPTIONS.TRUSTNONE,
-            OPTIONS.JNLP});
+            OPTIONS.JNLP,
+            OPTIONS.HTML
+        });
     }
 
     public static List<OPTIONS> getJavaWsOptions() {

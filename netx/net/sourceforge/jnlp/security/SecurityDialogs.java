@@ -58,6 +58,7 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityAction
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import static net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation.getStoredAction;
+import net.sourceforge.jnlp.security.dialogs.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -138,32 +139,66 @@ public class SecurityDialogs {
         return showAccessWarningDialogB(accessType, file, null);
     }
     
+     public static boolean showAccessWarningDialogB(AccessType accessType, JNLPFile file,  final Object[] extras) {
+        Object o = showAccessWarningDialog(accessType, file, extras);
+        if (o instanceof Boolean){
+            return (Boolean) o;
+        }
+        if (o instanceof Integer){
+            return getIntegerResponseAsBoolean((Boolean)o);
+        }
+        if (o instanceof AccessWarningPaneComplexReturn){
+            return getIntegerResponseAsBoolean(((AccessWarningPaneComplexReturn)o).getRegularReturn());
+        }
+        return false;
+    }
+    
     /**
      * unlike showAccessWarningDialogB this is returning raw int code
      */
      public static int showAccessWarningDialogI(AccessType accessType, JNLPFile file) {
-        return showAccessWarningDialogI(accessType, file, null);
+        Object o = showAccessWarningDialog(accessType, file, null);
+        if (o instanceof Boolean){
+            boolean b =(Boolean) o;
+            if (b){
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+        if (o instanceof Integer){
+            return (Integer)o;
+        }
+        if (o instanceof AccessWarningPaneComplexReturn){
+            return ((AccessWarningPaneComplexReturn)o).getRegularReturn();
+        }
+        return 1;
+    }
+     
+      public static AccessWarningPaneComplexReturn showAccessWarningDialogComplexReturn(AccessType accessType, JNLPFile file) {
+        Object o = showAccessWarningDialog(accessType, file, null);
+        if (o instanceof AccessWarningPaneComplexReturn){
+            return (AccessWarningPaneComplexReturn)o;
+        }
+          if (o instanceof Boolean) {
+              boolean b = (Boolean) o;
+              if (b) {
+                  return new AccessWarningPaneComplexReturn(0);
+              } else {
+                  return new AccessWarningPaneComplexReturn(1);
+              }
+          }
+          if (o instanceof Integer) {
+              return new AccessWarningPaneComplexReturn((int) o);
+          }
+       return new  AccessWarningPaneComplexReturn(1);
     }
 
-    /**
-     * Shows a warning dialog for different types of system access (i.e. file
-     * open/save, clipboard read/write, printing, etc).
-     *
-     * @param accessType the type of system access requested.
-     * @param file the jnlp file associated with the requesting application.
-     * @param extras an optional array of Strings (typically) that gets
-     * passed to the dialog labels.
-     * @return true if permission was granted by the user, false otherwise.
-     */
-    public static boolean showAccessWarningDialogB(final AccessType accessType,
-                        final JNLPFile file, final Object[] extras) {
-        return getIntegerResponseAsBoolean(showAccessWarningDialogI(accessType, file, extras));
-    }
-             
+                 
     /**
      * unlike showAccessWarningDialogB this is returning raw int code
      */
-    public static int showAccessWarningDialogI(final AccessType accessType,
+    public static Object showAccessWarningDialog(final AccessType accessType,
             final JNLPFile file, final Object[] extras) {
 
         if (!shouldPromptUser()) {
@@ -177,12 +212,9 @@ public class SecurityDialogs {
         message.file = file;
         message.extras = extras;
 
-        Object selectedValue = getUserResponse(message);
+        return getUserResponse(message);
 
-        if (selectedValue instanceof Integer) {
-            return ((Integer)selectedValue);
-        }
-        return 1;
+      
     }
 
     /**

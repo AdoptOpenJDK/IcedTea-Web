@@ -292,9 +292,11 @@ public class JNLPFile {
 
     /**
      * Open the jnlp file URL from the cache if there, otherwise
-     * download to the cache.  Called from constructor.
+     * download to the cache. 
+     * Unless file is find in cache, this method blocks until it is downloaded.
+     * This is the best way in itw how to download and cache file
      */
-    private static InputStream openURL(URL location, Version version, UpdatePolicy policy) throws IOException {
+    public static InputStream openURL(URL location, Version version, UpdatePolicy policy) throws IOException {
         if (location == null || policy == null)
             throw new IllegalArgumentException(R("NullParameter"));
 
@@ -304,7 +306,7 @@ public class JNLPFile {
             File f = tracker.getCacheFile(location);
             return new FileInputStream(f);
         } catch (Exception ex) {
-            throw new IOException(ex.getMessage());
+            throw new IOException(ex);
         }
     }
 
@@ -1036,6 +1038,48 @@ public class JNLPFile {
                 }
             }
         }
+    }    
+    
+    public String createJnlpVendorValue() {
+        final String location;
+        if (getSourceLocation() != null) {
+            location = getSourceLocation().toString();
+        } else if (getCodeBase() != null) {
+            location = getCodeBase().toString();
+        } else {
+            location = "unknown";
+        }
+        return location;
+    }
+
+    public String createJnlpVendor() {
+        return "Generated from applet from " + createJnlpVendorValue();
+    }
+
+    public String createJnlpTitleValue() {
+        final String location;
+        if (getSourceLocation() != null) {
+            location = new File(getSourceLocation().getFile()).getName();
+        } else if (getCodeBase() != null) {
+            location = new File(getCodeBase().getFile()).getName();
+        } else {
+            location = "unknown";
+        }
+        return location;
+    }
+
+    public String createJnlpTitle() {
+        //case when creating name from already created name
+        String shortenedTitle = getTitle();
+        int i = shortenedTitle.lastIndexOf("(");
+        if (i >= 2) { // not cutting immidiately...
+            shortenedTitle = shortenedTitle.substring(0, i - 1);
+        }
+        if (createJnlpTitleValue().startsWith(shortenedTitle)) {
+            return createJnlpTitleValue();
+        }
+        return getTitle() + " from " + createJnlpTitleValue();
+
     }
 }
 

@@ -100,6 +100,9 @@ public class OptionParser {
     }
 
     private OptionsDefinitions.OPTIONS argumentToOption(final String arg) {
+        if (stringEqualsOption(arg, OptionsDefinitions.OPTIONS.HTML)) {
+                throw new IllegalArgumentException("-html switch is not yet supported");
+            }
         for (OptionsDefinitions.OPTIONS opt : possibleOptions) {
             if (stringEqualsOption(arg, opt)) {
                 return opt;

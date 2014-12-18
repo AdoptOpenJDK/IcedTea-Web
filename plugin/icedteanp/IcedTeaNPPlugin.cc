@@ -131,6 +131,10 @@ static DIR *data_directory_descriptor;
 // Fully-qualified appletviewer default  executable and rt.jar
 static const char* appletviewer_default_executable = ICEDTEA_WEB_JRE "/bin/java";
 static const char* appletviewer_default_rtjar = ICEDTEA_WEB_JRE "/lib/rt.jar";
+//javaws name and binary
+static const char* javaws_bin_property = "-Dicedtea-web.bin.location=" JAVAWS_BIN;
+static const char* javaws_name_property = "-Dicedtea-web.bin.name=" JAVAWS_NAME;
+
 
 // Applet viewer input channel (needs to be static because it is used in plugin_in_pipe_callback)
 static GIOChannel* in_from_appletviewer = NULL;
@@ -1480,7 +1484,9 @@ plugin_start_appletviewer (ITNPPluginData* data)
   // Construct command line parameters
 
   command_line.push_back(get_plugin_executable());
-
+  //for javaws shortcuts
+  command_line.push_back(javaws_bin_property);
+  command_line.push_back(javaws_name_property);
   //Add JVM args to command_line
   for (int i = 0; i < jvm_args->size(); i++)
   {

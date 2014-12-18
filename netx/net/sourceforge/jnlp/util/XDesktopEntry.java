@@ -40,12 +40,14 @@ import java.util.Map.Entry;
 
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.StreamEater;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.dialogs.AccessWarningPaneComplexReturn;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}
@@ -85,7 +87,8 @@ public class XDesktopEntry {
     //in pixels
     private static final int[] VALID_ICON_SIZES = new int[] { 16, 22, 32, 48, 64, 128 };
     //browsers we try to find  on path for html shortcut
-    public static  final String[] BROWSERS = new String[] {"firefox", "midori", "epiphany", "chromium", "chrome", "konqueror"};
+    public static final String[] BROWSERS = new String[]{"firefox", "midori", "epiphany", "chromium", "chrome", "konqueror"};
+    public static final String FAVICON = "favicon.ico";
 
     /**
      * Create a XDesktopEntry for the given JNLP file
@@ -103,8 +106,19 @@ public class XDesktopEntry {
      * Returns the contents of the {@link XDesktopEntry} through the
      * {@link Reader} interface.
      */
-    public Reader getContentsAsReader(boolean menu) {
+    public Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
 
+        File generatedJnlp = null;
+        if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF)) {
+            try {
+                String content = ((PluginBridge) file).toJnlp(isSigned, info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF, info.isFixHref());
+                generatedJnlp = getGeneratedJnlpFileName();
+                FileUtils.saveFile(content, generatedJnlp);
+            } catch (Exception ex) {
+                OutputController.getLogger().log(ex);
+            }
+        }
+        
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
         fileContents += "Name=" + getDesktopIconName() + "\n";
@@ -133,12 +147,34 @@ public class XDesktopEntry {
             fileContents += "Vendor=" + sanitize(file.getInformation().getVendor()) + "\n";
         }
 
-        String exec = getJavaWsBin();
-        if (!JNLPRuntime.isWebstartApplication()) {
-            exec = getBrowserBin();
+        if (JNLPRuntime.isWebstartApplication()) {
+            fileContents += "Exec="
+                    + getJavaWsBin() + " \"" + file.getSourceLocation() + "\"\n";
+            OutputController.getLogger().log("Using " + getJavaWsBin() + " as binary for " + file.getSourceLocation());
+        } else {
+            if (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER) {
+                String browser = info.getBrowser();
+                if (browser == null) {
+                    browser = getBrowserBin();
+                }
+                fileContents += "Exec="
+                        + browser + " \"" + file.getSourceLocation() + "\"\n";
+                OutputController.getLogger().log("Using " + browser + " as binary for " + file.getSourceLocation());
+            } else if ((info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP
+                    || info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF) && generatedJnlp != null) {
+                fileContents += "Exec="
+                        + getJavaWsBin() + " \"" + generatedJnlp.getAbsolutePath() + "\"\n";
+                OutputController.getLogger().log("Using " + getJavaWsBin() + " (generated) as binary for " + file.getSourceLocation() + " to " + generatedJnlp.getAbsolutePath());
+            } else if (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JAVAWS_HTML) {
+                fileContents += "Exec="
+                        + getJavaWsBin() + " -html  \"" + file.getSourceLocation() + "\"\n";
+                OutputController.getLogger().log("Using " + getJavaWsBin() + " -html as binary for " + file.getSourceLocation());
+            } else {
+                fileContents += "Exec="
+                        + getBrowserBin() + " \"" + file.getSourceLocation() + "\"\n";
+                OutputController.getLogger().log("Using " + getBrowserBin() + " as binary for " + file.getSourceLocation());
+            }
         }
-        fileContents += "Exec=" + exec + " \"" + file.getSourceLocation() + "\"\n";
-        OutputController.getLogger().log("Using " + exec + " as binary for " + file.getSourceLocation());
 
         return new StringReader(fileContents);
 
@@ -227,7 +263,7 @@ public class XDesktopEntry {
 
     public File getShortcutTmpFile() {
         String userTmp = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_TMP_DIR);
-        File shortcutFile = new File(userTmp + File.separator + getDesktopIconName() + ".desktop");
+        File shortcutFile = new File(userTmp + File.separator + FileUtils.sanitizeFileName(file.getTitle()) + ".desktop");
         return shortcutFile;
     }
 
@@ -244,38 +280,51 @@ public class XDesktopEntry {
     /**
      * Create a desktop shortcut for this desktop entry
      */
-    public void createDesktopShortcuts(boolean menu, boolean desktop) {
+    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned) {
+        boolean isDesktop = false;
+        if (desktop != null && desktop.isCreate()) {
+            isDesktop = true;
+        }
+        boolean isMenu = false;
+        if (menu != null && menu.isCreate()) {
+            isMenu = true;
+        }
         try {
-            if (menu || desktop) {
-            cacheIcon();
+            if (isMenu || isDesktop) {
+                try {
+                    cacheIcon();
+                } catch (NonFileProtocolException ex) {
+                    OutputController.getLogger().log(ex);
+                    //default icon will be used later
+                }
             }
-            if (desktop){
-                installDesktopLauncher();
+            if (isDesktop) {
+                installDesktopLauncher(desktop, isSigned);
             }
-            if (menu){
-                installMenuLauncher();
-            } 
+            if (isMenu) {
+                installMenuLauncher(menu, isSigned);
+            }
         } catch (Exception e) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
-    }     
+    }
 
     /**
      * Install this XDesktopEntry into the user's menu.
      */
-    private void installMenuLauncher() {
+    private void installMenuLauncher(AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
         //TODO add itweb-settings tab which alows to remove inidividual items/icons
         try {
             File f = getLinuxMenuIconFile();
             try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f),
-                    Charset.forName("UTF-8")); Reader reader = getContentsAsReader(true)) {
-                
+                    Charset.forName("UTF-8")); Reader reader = getContentsAsReader(true, info, isSigned)) {
+
                 char[] buffer = new char[1024];
                 int ret = 0;
                 while (-1 != (ret = reader.read(buffer))) {
                     writer.write(buffer, 0, ret);
                 }
-                
+
             }
             OutputController.getLogger().log("Menu item created: " + f.getAbsolutePath());
         } catch (FileNotFoundException e) {
@@ -288,7 +337,7 @@ public class XDesktopEntry {
     /**
      * Install this XDesktopEntry into the user's desktop as a launcher.
      */
-    private void installDesktopLauncher() {
+    private void installDesktopLauncher(AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
         File shortcutFile = getShortcutTmpFile();
         try {
 
@@ -301,7 +350,7 @@ public class XDesktopEntry {
             try ( /*
              * Write out a Java String (UTF-16) as a UTF-8 file
              */ OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile),
-                     Charset.forName("UTF-8")); Reader reader = getContentsAsReader(false)) {
+                     Charset.forName("UTF-8")); Reader reader = getContentsAsReader(false, info, isSigned)) {
                 
                 char[] buffer = new char[1024];
                 int ret = 0;
@@ -339,10 +388,38 @@ public class XDesktopEntry {
         }
     }
 
+
+    public void refreshExistingShortcuts(boolean desktop, boolean menu) {
+        //TODO TODO TODO TODO TODO TODO TODO TODO 
+        //check existing jnlp files
+        //check luncher 
+        //get where it poiints
+        //try all supported  shortcuts methods
+        //choose the one which have most similar result to exisitng ones
+
+    }
+
+    public File getGeneratedJnlpFileName() {
+        String name = FileUtils.sanitizeFileName(file.createJnlpTitle());
+        while (name.endsWith(".jnlp")) {
+            name = name.substring(0, name.length() - 5);
+        }
+        name += ".jnlp";
+        return new File(findAndVerifyGeneratedJnlpDir(), name);
+    }
+
+    private class NonFileProtocolException extends Exception {
+
+        private NonFileProtocolException(String unable_to_cache_icon) {
+            super(unable_to_cache_icon);
+        }
+
+    }
+
     /**
      * Cache the icon for the desktop entry
      */
-    private void cacheIcon() throws IOException {
+    private void cacheIcon() throws IOException, NonFileProtocolException {
 
         URL uiconLocation = file.getInformation().getIconLocation(IconDesc.SHORTCUT, iconSize,
                 iconSize);
@@ -352,13 +429,33 @@ public class XDesktopEntry {
                     iconSize);
         }
 
+        String location = null;
         if (uiconLocation != null) {
-            String location = CacheUtil.getCachedResource(uiconLocation, null, UpdatePolicy.SESSION)
+            location = CacheUtil.getCachedResource(uiconLocation, null, UpdatePolicy.SESSION)
                     .toString();
             if (!location.startsWith("file:")) {
-                throw new RuntimeException("Unable to cache icon");
+                throw new NonFileProtocolException("Unable to cache icon");
             }
-            
+        } else {
+            //try favicon.ico
+            try {
+                URL favico = new URL(
+                        file.getCodeBase().getProtocol(),
+                        file.getCodeBase().getHost(),
+                        file.getCodeBase().getPort(),
+                        "/" + FAVICON);
+                JNLPFile.openURL(favico, null, UpdatePolicy.ALWAYS);
+                location = CacheUtil.getCachedResource(favico, null, UpdatePolicy.SESSION)
+                        .toString();
+                if (!location.startsWith("file:")) {
+                    throw new NonFileProtocolException("Unable to cache icon");
+                }
+            } catch (IOException ex) {
+                //favicon 404 or similar
+                OutputController.getLogger().log(ex);
+            }
+        }
+        if (location != null) {
             String origLocation = location.substring("file:".length());
             this.iconLocation = origLocation;
             // icons are never unisntalled by itw. however, system clears them on its own.. soemtimes.
@@ -366,33 +463,44 @@ public class XDesktopEntry {
             // copy icon somewhere where -Xclearcache can not
             PathsAndFiles.ICONS_DIR.getFile().mkdirs();
             File source = new File(origLocation);
-            File target = new File(PathsAndFiles.ICONS_DIR.getFile(), source.getName());
+            String targetName = source.getName();
+            if (targetName.equals(FAVICON)) {
+                targetName = file.getCodeBase().getHost() + ".ico";
+            }
+            File target = new File(PathsAndFiles.ICONS_DIR.getFile(), targetName);
             Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
             this.iconLocation = target.getAbsolutePath();
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + origLocation);
         }
     }
 
-    public String getDesktopIconName() {
-        return sanitize(file.getTitle());
+    private String getDesktopIconName() {
+        return sanitize(file.createJnlpTitle());
     }
 
     public File getLinuxDesktopIconFile() {
         return new File(findFreedesktopOrgDesktopPathCatch() + "/" + getDesktopIconName() + ".desktop");
     }
-    
+
     public File getLinuxMenuIconFile() {
         return new File(findAndVerifyJavawsMenuDir() + "/" + getDesktopIconName() + ".desktop");
     }
-    
+
+    private static String findAndVerifyGeneratedJnlpDir() {
+        return findAndVerifyBasicDir(PathsAndFiles.GEN_JNLPS_DIR.getFile(), " directroy for stroing generated jnlps cannot be created. You may expect failure");
+    }
+
     private static String findAndVerifyJavawsMenuDir() {
-        File f = PathsAndFiles.MENUS_DIR.getFile();
+        return findAndVerifyBasicDir(PathsAndFiles.MENUS_DIR.getFile(), " directroy for stroing menu entry cannot be created. You may expect failure");
+    }
+
+    private static String findAndVerifyBasicDir(File f, String message) {
         String fPath = f.getAbsolutePath();
-        if (!f.exists()){
-            if (!f.mkdirs()){
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, fPath + " directroy for stroing menu entry cannot be created. You may expect failure");
+        if (!f.exists()) {
+            if (!f.mkdirs()) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, fPath + message);
             }
-        };
+        }
         return fPath;
     }
 
@@ -424,11 +532,8 @@ public class XDesktopEntry {
     }
 
     private static String getFreedesktopOrgDesktopPathFrom(File userDirs) throws IOException {
-        BufferedReader r = new BufferedReader(new FileReader(userDirs));
-        try {
+        try (BufferedReader r = new BufferedReader(new FileReader(userDirs))) {
             return getFreedesktopOrgDesktopPathFrom(r);
-        } finally {
-            r.close();
         }
 
     }

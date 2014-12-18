@@ -324,6 +324,8 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	   $(DEFS) $(VERSION_DEFS) \
 	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
 	  -DPLUGIN_NAME="\"IcedTea-Web Plugin\"" \
+	  -DJAVAWS_BIN="\"$(bindir)/$(javaws)\"" \
+	  -DJAVAWS_NAME="\"$(javaws)\"" \
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
 	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
@@ -374,6 +376,8 @@ stamps/cpp-unit-tests-compile.stamp: $(CPP_UNITTEST_FRAMEWORK_LIB) $(CPP_UNITTES
 	   $(DEFS) $(VERSION_DEFS) \
 	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
 	  -DPLUGIN_NAME="\"IcedTea-Web Plugin\"" \
+	  -DJAVAWS_BIN="\"$(bindir)/$(javaws)\"" \
+	  -DJAVAWS_NAME="\"$(javaws)\"" \
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
 	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
@@ -1342,6 +1346,8 @@ $(COVERABLE_PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	   $(DEFS) $(VERSION_DEFS) \
 	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
 	  -DPLUGIN_NAME="\"IcedTea-Web Plugin with jacoco coverage agent\"" \
+	  -DJAVAWS_BIN="\"$(bindir)/$(javaws)\"" \
+	  -DJAVAWS_NAME="\"$(javaws)\"" \
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
 	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \

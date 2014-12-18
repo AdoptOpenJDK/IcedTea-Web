@@ -82,9 +82,16 @@ public class StreamUtils {
         return readStreamAsString(stream, false);
     }
     
-    public static String readStreamAsString(InputStream stream, boolean includeEndOfLines)
-            throws IOException {
-        InputStreamReader is = new InputStreamReader(stream);
+    public static String readStreamAsString(InputStream stream, String encoding)  throws IOException {
+        return readStreamAsString(stream, false, encoding);
+    }
+    
+    public static String readStreamAsString(InputStream stream, boolean includeEndOfLines) throws IOException {
+        return readStreamAsString(stream, includeEndOfLines, "UTF-8");
+    }
+            
+    public static String readStreamAsString(InputStream stream, boolean includeEndOfLines, String encoding) throws IOException {
+        InputStreamReader is = new InputStreamReader(stream, encoding);
         StringBuilder sb = new StringBuilder();
         BufferedReader br = new BufferedReader(is);
         while (true) {

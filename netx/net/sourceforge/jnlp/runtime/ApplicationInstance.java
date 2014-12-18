@@ -38,6 +38,7 @@ import net.sourceforge.jnlp.event.ApplicationEvent;
 import net.sourceforge.jnlp.event.ApplicationListener;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.security.dialogs.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.XDesktopEntry;
@@ -145,7 +146,7 @@ public class ApplicationInstance {
     }
 
     /**
-     * Creates menu and desktop entries if required by the jnlp file
+     * Creates menu and desktop entries if required by the jnlp file or settings
      */
 
     private void addMenuAndDesktopEntries() {
@@ -153,6 +154,7 @@ public class ApplicationInstance {
         ShortcutDesc sd = file.getInformation().getShortcut();
         File possibleDesktopFile = entry.getLinuxDesktopIconFile();
         File possibleMenuFile = entry.getLinuxMenuIconFile();
+        File generatedJnlp = entry.getGeneratedJnlpFileName();
         //if one of menu or desktop exists, do not bother user
         boolean exists = false;
         if (possibleDesktopFile.exists()) {
@@ -160,7 +162,7 @@ public class ApplicationInstance {
                     + possibleDesktopFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
             exists = true;
             if (JNLPRuntime.isOnline()) {
-                entry.createDesktopShortcuts(false, true); //update
+                entry.refreshExistingShortcuts(false, true); //update
             }
         }
         if (possibleMenuFile.exists()) {
@@ -168,15 +170,23 @@ public class ApplicationInstance {
                     + possibleMenuFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
             exists = true;
             if (JNLPRuntime.isOnline()) {
-                entry.createDesktopShortcuts(true, false); //update
+                entry.refreshExistingShortcuts(true, false); //update
+            }
+        }
+        if (generatedJnlp.exists()) {
+            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): generated file - "
+                    + generatedJnlp.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+            exists = true;
+            if (JNLPRuntime.isOnline()) {
+                entry.refreshExistingShortcuts(true, true); //update
             }
         }
         if (exists){
             return;
         }
-        IconsCreationDescriptor ics = shouldCreateShortcut(sd);
-        if (ics.isAtLeastSomething()) {
-            entry.createDesktopShortcuts(ics.isMenu(), ics.isDesktop());
+        AccessWarningPaneComplexReturn ics = getComplexReturn(sd);
+        if (ics.getRegularReturnAsBoolean()) {
+            entry.createDesktopShortcuts(ics.getMenu(), ics.getDekstop(), isSigned());
         }
 
     }
@@ -188,12 +198,23 @@ public class ApplicationInstance {
      * @param sd the ShortcutDesc element from the JNLP file
      * @return true if a desktop shortcut should be created
      */
-    private IconsCreationDescriptor shouldCreateShortcut(ShortcutDesc sd) {
+    private AccessWarningPaneComplexReturn getComplexReturn(ShortcutDesc sd) {
         if (JNLPRuntime.isTrustAll()) {
-            if (sd ==null){
-                return new IconsCreationDescriptor(false);
+            boolean mainResult = (sd != null && (sd.onDesktop() || sd.getMenu() != null));
+            AccessWarningPaneComplexReturn r = new AccessWarningPaneComplexReturn(mainResult?0:1);
+            if (mainResult){
+                if (sd.onDesktop()){
+                    r.setDekstop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
+                    r.getDekstop().setBrowser(XDesktopEntry.getBrowserBin());
+                    r.getDekstop().setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER);
+                }
+                if (sd.getMenu() != null){
+                    r.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(true));
+                    r.getMenu().setBrowser(XDesktopEntry.getBrowserBin());
+                    r.getMenu().setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER);
+                }
             }
-            return new IconsCreationDescriptor(sd.onDesktop(), sd.getMenu() != null);
+            return r;
         }
         String currentSetting = JNLPRuntime.getConfiguration()
                 .getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT);
@@ -204,76 +225,25 @@ public class ApplicationInstance {
          */
         switch (currentSetting) {
             case ShortcutDesc.CREATE_NEVER:
-                return new IconsCreationDescriptor(false);
+                return new AccessWarningPaneComplexReturn(1);
             case ShortcutDesc.CREATE_ALWAYS:
-                return new IconsCreationDescriptor(true);
+                return new AccessWarningPaneComplexReturn(0);
             case ShortcutDesc.CREATE_ASK_USER:
-                return new IconsCreationDescriptor(SecurityDialogs.showAccessWarningDialogI(AccessType.CREATE_DESTKOP_SHORTCUT, file));
+                return SecurityDialogs.showAccessWarningDialogComplexReturn(AccessType.CREATE_DESTKOP_SHORTCUT, file);
             case ShortcutDesc.CREATE_ASK_USER_IF_HINTED:
                 if (sd != null && (sd.onDesktop() || sd.toMenu())) {
-                    return new IconsCreationDescriptor(SecurityDialogs.showAccessWarningDialogI(AccessType.CREATE_DESTKOP_SHORTCUT, file));
+                    return SecurityDialogs.showAccessWarningDialogComplexReturn(AccessType.CREATE_DESTKOP_SHORTCUT, file);
                 }
             case ShortcutDesc.CREATE_ALWAYS_IF_HINTED:
                 if (sd != null && (sd.onDesktop() || sd.toMenu())) {
-                    return new IconsCreationDescriptor(true);
+                    return new AccessWarningPaneComplexReturn(0);
                 }
         }
 
-        return new IconsCreationDescriptor(false);
+        return new AccessWarningPaneComplexReturn(1);
     }
     
-    private static class IconsCreationDescriptor{
-
-        private final  boolean desktop;
-        private  final  boolean menu;
-
-        public IconsCreationDescriptor(boolean whoCares) {
-            this(whoCares, whoCares);
-        }
-        public IconsCreationDescriptor(boolean desktop, boolean menu) {
-            this.desktop=desktop;
-            this.menu=menu;
-        }
-        public IconsCreationDescriptor(int encodedDialogOutput) {
-            //due to limitations of AccessWarningPane the returned value is int
-            //in normal case it returns "By convention" 0 = Yes. 1 = No, 2 = Cancel
-            //See SecurityDoialogPanel.createSetValueListener
-            //for this case hacked
-            //0 cancel or nothing selected
-            //70 for both selected
-            //30 for menu only selected
-            //20 for desktop only
-            //see AccessWarningPane.getModifier
-            if (encodedDialogOutput == 70) {
-                desktop = true;
-                menu = true;
-            } else if (encodedDialogOutput == 30) {
-                desktop = false;
-                menu = true;
-            } else if (encodedDialogOutput == 20) {
-                desktop = true;
-                menu = false;
-            } else {
-                desktop = false;
-                menu = false;
-            }
-        }
-        
-        public boolean isAtLeastSomething(){
-            return desktop || menu;
-        }
-
-        public boolean isDesktop() {
-            return desktop;
-        }
-
-        public boolean isMenu() {
-            return menu;
-        }
-        
-    }
-
-    /**
+     /**
      * Releases the application's resources before it is collected.
      * Only collectable if classloader and thread group are
      * also collectable so basically is almost never called (an

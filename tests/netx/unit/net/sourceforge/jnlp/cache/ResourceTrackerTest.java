@@ -75,7 +75,7 @@ public class ResourceTrackerTest {
     public static ServerLauncher testServer;
     public static ServerLauncher testServerWithBrokenHead;
     public static ServerLauncher downloadServer;
-    private static PrintStream[] backedUpStream = new PrintStream[4];
+    private static final PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
     private static final String nameStub1 = "itw-server";
     private static final String nameStub2 = "test-file";

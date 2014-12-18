@@ -44,20 +44,27 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ShortcutDesc;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -65,6 +72,7 @@ import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.XDesktopEntry;
 
 /**
  * Provides a panel to show inside a SecurityDialog. These dialogs are
@@ -76,11 +84,12 @@ import net.sourceforge.jnlp.util.FileUtils;
  */
 public class AccessWarningPane extends SecurityDialogPanel {
 
-    private JCheckBox alwaysAllow;
     private Object[] extras;
     private JCheckBox desktopCheck;
     private JCheckBox menuCheck;
-
+    HtmlShortcutPanel htmlPanelDesktop;
+    HtmlShortcutPanel htmlPanelMenu;
+    RememberPanel rememberPanel;
     public AccessWarningPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
         addComponents();
@@ -177,71 +186,133 @@ public class AccessWarningPane extends SecurityDialogPanel {
         JLabel fromLabel = new JLabel(R("From") + ":   " + from);
         fromLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        alwaysAllow = new JCheckBox(R("AlwaysAllowAction"));
-        alwaysAllow.setEnabled(false);
 
-        JPanel infoPanel = new JPanel(new GridLayout(4+desktop(), 1));
-        infoPanel.add(nameLabel);
-        infoPanel.add(publisherLabel);
-        infoPanel.add(fromLabel);
+        final JButton run = new JButton(R("ButAllow"));
+        final JButton cancel = new JButton(R("ButCancel"));
+        
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        infoPanel.add(nameLabel, c);
+        c.gridy++;
+        infoPanel.add(publisherLabel, c);
+        c.gridy++;
+        infoPanel.add(fromLabel,c);
+        c.gridy++;
         if (type == AccessType.CREATE_DESTKOP_SHORTCUT) {
             if (file.getInformation() != null &&  file.getInformation().getShortcut() != null && file.getInformation().getShortcut().onDesktop()) {
-                desktopCheck = new JCheckBox("Desktop icon shortcut (applications wont to)");
+                desktopCheck = new JCheckBox(R("EXAWdesktopWants"));
                 desktopCheck.setSelected(true);
             } else {
-                desktopCheck = new JCheckBox("Desktop icon shortcut (applications dont wonts to, but you still can)");
+                desktopCheck = new JCheckBox(R("EXAWdesktopDontWants"));
                 desktopCheck.setSelected(false);
             }
 
             if (file.getInformation() != null && file.getInformation().getShortcut() !=null && file.getInformation().getShortcut().toMenu()) {
                 if (file.getInformation().getShortcut() != null && file.getInformation().getShortcut().getMenu() != null && file.getInformation().getShortcut().getMenu().getSubMenu() != null) {
-                    menuCheck = new JCheckBox("Menu icon shortcut (applications will try to include to submenu '"
-                            + file.getInformation().getShortcut().getMenu().getSubMenu()
-                            + "')");
+                    menuCheck = new JCheckBox(R("EXAWsubmenu",file.getInformation().getShortcut().getMenu().getSubMenu()));
                 } else {
-                    menuCheck = new JCheckBox("Menu icon shortcut (applications wont to)");
+                    menuCheck = new JCheckBox(R("EXAWmenuWants"));
                 }
                 menuCheck.setSelected(true);
             } else {
-                menuCheck = new JCheckBox("Menu icon shortcut (applications dont wonts to, but you still can)");
+                menuCheck = new JCheckBox(R("EXAWmenuDontWants"));
                 menuCheck.setSelected(false);
             }
-            infoPanel.add(new JLabel("<html>___________________________________________________</html>"));
-            infoPanel.add(desktopCheck);
-            infoPanel.add(menuCheck);
-            infoPanel.add(new JLabel("Your curernt setting is: "
-                    + ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT))
-                    + ". You can change it in itweb-settings in '" + R("CPTabDesktopIntegration") + "' panel."));
-            infoPanel.add(new JLabel("You can manage existing menu entries in itweb-settings in '" +R("CPTabMenuShortcuts") + "' panel"));
-            infoPanel.validate();
+            infoPanel.add(new JLabel("<html>___________________________________________________</html>"),c);
+            c.gridy++;
+            infoPanel.add(desktopCheck,c);
+            c.gridy++;
+            if (!JNLPRuntime.isWebstartApplication()) {
+                htmlPanelDesktop = new HtmlShortcutPanel();
+                infoPanel.add(htmlPanelDesktop, c);
+                htmlPanelDesktop.setVisible(false);
+                c.gridy++;
+            }
+            ActionListener al = new ActionListener() {
 
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (desktopCheck.isSelected() || menuCheck.isSelected()){
+                        run.setEnabled(true);
+                        cancel.setEnabled(false);
+                    } else {
+                        run.setEnabled(false);
+                        cancel.setEnabled(true);
+                    }
+                    
+                }
+            };
+            desktopCheck.addActionListener(al);
+            menuCheck.addActionListener(al);
+            al.actionPerformed(null);
+            infoPanel.add(menuCheck,c);
+            c.gridy++;
+            if (!JNLPRuntime.isWebstartApplication()) {
+                htmlPanelMenu = new HtmlShortcutPanel();
+                infoPanel.add(htmlPanelMenu, c);
+                htmlPanelMenu.setVisible(false);
+                c.gridy++;
+            }
+            infoPanel.add(new JLabel(R("EXAWsettingsInfo",
+                    ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT)),
+                    R("CPTabDesktopIntegration"))),c);
+            c.gridy++;
+            infoPanel.add(new JLabel(R("EXAWsettingsManage", R("CPTabMenuShortcuts"))),c);
+            c.gridy++;
+            infoPanel.validate();
         }
-        infoPanel.add(alwaysAllow);
+        rememberPanel = new RememberPanel();
+        infoPanel.add(rememberPanel,c);
+        c.gridy++;
         infoPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
         //run and cancel buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        JButton run = new JButton(R("ButAllow"));
-        JButton cancel = new JButton(R("ButCancel"));
-        run.addActionListener(new CheckBoxListener());
-        if (type == AccessType.CREATE_DESTKOP_SHORTCUT) {
-            //override the stupid createSetValueListener mechanism
-            run.addActionListener(new ActionListener() {
+        JButton showAdvanced = new JButton(R("ButAdvancedOptions"));
+        showAdvanced.addActionListener(new ActionListener() {
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    parent.setValue(getModifier());
-                    parent.dispose();
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                negateVisibility(rememberPanel);
+                negateVisibility(htmlPanelDesktop);
+                negateVisibility(htmlPanelMenu);
+                AccessWarningPane.this.parent.pack();
+                
+            }
+
+            private void negateVisibility(JComponent a) {
+                if (a != null){
+                    a.setVisible(!a.isVisible());
                 }
-            });
-        } else {
-            run.addActionListener(createSetValueListener(parent, 0));            
+            }
         }
-        cancel.addActionListener(createSetValueListener(parent, 1));
+        );
+        //override the  createSetValueListener mechanism
+        //TODO get rid of createSetValueListener completely.
+        run.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.setValue(getModifier(0)); //according to  createSetValueListener 0 is ok and 1 cancel
+                parent.dispose();
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.setValue(getModifier(1)); //according to  createSetValueListener 0 is ok and 1 cancel
+                parent.dispose();
+            }
+        });
         initialFocusComponent = cancel;
         buttonPanel.add(run);
         buttonPanel.add(cancel);
+        buttonPanel.add(showAdvanced);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         //all of the above
@@ -249,43 +320,164 @@ public class AccessWarningPane extends SecurityDialogPanel {
         add(topPanel);
         add(infoPanel);
         add(buttonPanel);
+        
+        rememberPanel.setVisible(false);
+        this.parent.pack();
 
     }
 
-    private int getModifier() {
-        if (parent.getAccessType() == AccessType.CREATE_DESTKOP_SHORTCUT) {
-            if (menuCheck.isSelected() && desktopCheck.isSelected()){
-                return 70;
-            }
-            if (menuCheck.isSelected()){
-                return 30;
-            }
-            if (desktopCheck.isSelected()){
-                return 20;
-            }
-            return 0;
-        } else {
-            return 0;
+    private AccessWarningPaneComplexReturn getModifier(int button) {
+        AccessWarningPaneComplexReturn ar = new AccessWarningPaneComplexReturn(button);
+        if (htmlPanelDesktop != null && desktopCheck != null) {
+            ar.setDekstop(htmlPanelDesktop.getShortcutResult(desktopCheck.isSelected()));
         }
+        if (htmlPanelMenu != null && menuCheck != null) {
+            ar.setMenu(htmlPanelMenu.getShortcutResult(menuCheck.isSelected()));
+        }
+        if (rememberPanel != null) {
+            ar.setRember(rememberPanel.getShortcutResult());
+        }
+        return ar;
     }
 
-    private int desktop() {
-        if (parent.getAccessType() == AccessType.CREATE_DESTKOP_SHORTCUT) {
-            return 6;
-        } else {
-            return 0;
+    private class RememberPanel extends JPanel {
+        // TODO: somehow tell the ApplicationInstance
+        // to stop asking for permission
+        // will be implemented likeALACAcanrember decission 
+        // must be encoded in similar way as AWP is doing
+
+        final JRadioButton byApp = new JRadioButton(R("EXAWrememberByApp"));
+        final JRadioButton byPage = new JRadioButton(R("EXAWrememberByPage"));
+        final JRadioButton dont = new JRadioButton(R("EXAWdontRemember"), true);
+
+        public RememberPanel() {
+            super(new FlowLayout(FlowLayout.CENTER, 1, 5));
+            this.setBorder(new EmptyBorder(0, 0, 0, 0));
+            this.add(byApp);
+            this.add(byPage);
+            this.add(dont);
+            byApp.setToolTipText(R("EXAWrememberByAppTooltip"));
+            byPage.setToolTipText(R("EXAWrememberByPageTooltip"));
+            dont.setToolTipText(R("EXAWdontRememberTooltip"));
+            final ButtonGroup bg = new ButtonGroup();
+            bg.add(byApp);
+            bg.add(byPage);
+            bg.add(dont);
+            this.validate();
+
         }
-    }
 
-    private class CheckBoxListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (alwaysAllow != null && alwaysAllow.isSelected()) {
-                // TODO: somehow tell the ApplicationInstance
-                // to stop asking for permission
+        public AccessWarningPaneComplexReturn.RemeberType getShortcutResult() {
+            if (byApp.isSelected()) {
+                return AccessWarningPaneComplexReturn.RemeberType.REMEMBER_BY_APP;
+            } else if (byPage.isSelected()) {
+                return AccessWarningPaneComplexReturn.RemeberType.REMEMBER_BY_DOMAIN;
+            } else if (dont.isSelected()) {
+                return AccessWarningPaneComplexReturn.RemeberType.REMEMBER_DONT;
+            } else {
+                return AccessWarningPaneComplexReturn.RemeberType.REMEMBER_DONT;
             }
         }
+
+    }
+
+    private class HtmlShortcutPanel extends JPanel {
+
+        final JRadioButton browser = new JRadioButton(R("EXAWbrowser"), true);
+        final JComboBox<String> browsers = new JComboBox<>(XDesktopEntry.BROWSERS);
+        final JRadioButton jnlpGen = new JRadioButton(R("EXAWgenjnlp"));
+        final JRadioButton jnlpHref = new JRadioButton(R("EXAWjnlphref"));
+        final JRadioButton javawsHtml = new JRadioButton(R("EXAWhtml"));
+        final JCheckBox fix = new JCheckBox(R("EXAWfixhref"));
+        final ActionListener modifySecondaryControls = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (browser.isSelected()) {
+                    browsers.setEnabled(true);
+                } else {
+                    browsers.setEnabled(false);
+                }
+                if (jnlpHref.isSelected()) {
+                    fix.setEnabled(true);
+                    fix.setSelected(true);
+                } else {
+                    fix.setEnabled(false);
+                    fix.setSelected(false);
+                }
+            }
+        };
+
+        public HtmlShortcutPanel() {
+            super(new FlowLayout(FlowLayout.CENTER, 1, 5));
+            this.setBorder(new EmptyBorder(0, 0, 0, 0));
+            addMainComponents();
+            setTooltips();
+            ButtonGroup bg = createRadiosGroup();
+            // init checkbox
+            modifySecondaryControls.actionPerformed(null);
+            this.validate();
+
+        }
+
+        public AccessWarningPaneComplexReturn.ShortcutResult getShortcutResult(boolean mainResolution) {
+            AccessWarningPaneComplexReturn.ShortcutResult r = new AccessWarningPaneComplexReturn.ShortcutResult(mainResolution);
+            r.setBrowser((String) browsers.getSelectedItem());
+            r.setFixHref(fix.isSelected());
+            if (browser.isSelected()) {
+                r.setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER);
+            } else if (jnlpGen.isSelected()) {
+                r.setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP);
+            } else if (jnlpHref.isSelected()) {
+                r.setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF);
+            } else if (javawsHtml.isSelected()) {
+                r.setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JAVAWS_HTML);
+            }
+            return r;
+        }
+
+        private ButtonGroup createRadiosGroup() {
+            ButtonGroup bg = new ButtonGroup();
+            bg.add(browser);
+            bg.add(jnlpGen);
+            bg.add(jnlpHref);
+            bg.add(javawsHtml);
+            setCheckboxModifierListener();
+            return bg;
+        }
+
+        private void setCheckboxModifierListener() {
+            browser.addActionListener(modifySecondaryControls);
+            jnlpGen.addActionListener(modifySecondaryControls);
+            jnlpHref.addActionListener(modifySecondaryControls);
+            javawsHtml.addActionListener(modifySecondaryControls);
+        }
+
+        private void addMainComponents() {
+            this.add(browser);
+            browsers.setEditable(true);
+            browsers.setSelectedItem(XDesktopEntry.getBrowserBin());
+            this.add(browsers);
+            this.add(jnlpGen);
+            this.add(jnlpHref);
+            this.add(javawsHtml);
+            this.add(fix);
+            if (parent.getFile() instanceof PluginBridge && ((PluginBridge)(parent.getFile())).haveDebugJnlp()){
+                jnlpHref.setEnabled(true);
+            } else {
+                jnlpHref.setEnabled(false);
+            }
+        }
+
+        private void setTooltips() {
+            browser.setToolTipText(R("EXAWbrowserTolltip"));
+            browsers.setToolTipText(R("EXAWbrowsersTolltip"));
+            jnlpGen.setToolTipText(R("EXAWgeneratedTolltip"));
+            jnlpHref.setToolTipText(R("EXAWhrefTolltip"));
+            javawsHtml.setToolTipText(R("EXAWhtmlTolltip"));
+            fix.setToolTipText(R("EXAWfixTolltip"));
+        }
+
     }
 
 }

@@ -16,7 +16,8 @@ import org.junit.Test;
 
 public class JavaConsoleTest {
 
-    private static final String TEST_TIME = "Tue Nov 19 09:43:50 "+TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)+" 2013";
+    //note this time is in EST timezone, and so is expecting the string output below
+    private static final String TEST_TIME = "Tue Nov 19 09:43:50 "+TimeZone.getTimeZone("EST").getDisplayName(false, TimeZone.SHORT)+" 2013";
     private static final String S1 = "plugindebug 1384850630162925 [jvanek][ITW-C-PLUGIN][MESSAGE_DEBUG]["+TEST_TIME+"][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1204] ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0:   PIPE: plugin read: plugin PluginProxyInfo reference 1 http://www.walter-fendt.de:80";
     private static final String S2 = "plugindebugX 1384850630162954 [jvanek][ITW-Cplugindebug 1384850630163008 [jvanek][ITW-C-PLUGIN][MESSAGE_DEBUG]["+TEST_TIME+"][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1124] ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0: parts[0]=plugin, parts[1]=PluginProxyInfo, reference, parts[3]=1, parts[4]=http://www.walter-fendt.de:80 -- decoded_url=http://www.walter-fendt.de:80";
     private static final String S3 = "preinit_pluginerror 1384850630163298 [jvanek][ITW-C-PLUGIN][MESSAGE_DEBUG]["+TEST_TIME+"][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1134] ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0: Proxy info: plugin PluginProxyInfo reference 1 DIRECT";
@@ -51,9 +52,9 @@ public class JavaConsoleTest {
         Assert.assertTrue(p3.header.thread1.equals("140513434003264"));
         Assert.assertTrue(p3.header.thread2.equals("0x7fcbd531f8c0"));
         Assert.assertTrue(p1.restOfMessage.equals("  PIPE: plugin read: plugin PluginProxyInfo reference 1 http://www.walter-fendt.de:80"));
-        Assert.assertEquals(p2.restOfMessage, "0 EST 2013][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1124] " +
+        Assert.assertEquals("0 EST 2013][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1124] " +
                 "ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0: parts[0]=plugin, parts[1]=PluginProxyInfo, reference, parts[3]=1, " +
-                "parts[4]=http://www.walter-fendt.de:80 -- decoded_url=http://www.walter-fendt.de:80");
+                "parts[4]=http://www.walter-fendt.de:80 -- decoded_url=http://www.walter-fendt.de:80", p2.restOfMessage);
         Assert.assertTrue(p3.restOfMessage.equals("Proxy info: plugin PluginProxyInfo reference 1 DIRECT"));
 
     }
