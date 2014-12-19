@@ -1,3 +1,9 @@
+2014-12-19  Jie Kang  <jkang@redhat.com>
+
+	* tests/test-extensions-tests/net/sourceforge/jnlp/TinyHttpdImplTest.java:
+	added testLastModifiedHeader and testLastModifiedHeaderNotIncluded tests
+	to test the LAs-Modified functionality in internal test server.
+
 2014-12-18  Jiri Vanek  <jvanek@redhat.com>
 
 	Added support for generating shortcuts also for applets.

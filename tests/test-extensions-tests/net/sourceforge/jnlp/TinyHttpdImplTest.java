@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -142,6 +143,26 @@ public class TinyHttpdImplTest {
     }
 
     @Test
+    public void testLastModifiedHeader() throws IOException, InterruptedException {
+        mServer.setSupportLastModified(true);
+
+        String head = getTinyHttpdImplResponse("HEAD", "/simpletest1.jnlp");
+        headTestHelper(head, CONTENT_JNLP);
+        Assert.assertTrue(head.contains("Last-Modified: "));
+
+        mServer.setSupportLastModified(false);
+    }
+
+    @Test
+    public void testLastModifiedHeaderNotIncluded() throws IOException, InterruptedException {
+        mServer.setSupportLastModified(false);
+
+        String head = getTinyHttpdImplResponse("HEAD", "/simpletest1.jnlp");
+        headTestHelper(head, CONTENT_JNLP);
+        Assert.assertTrue(!head.contains("Last-Modified: "));
+    }
+
+    @Test
     public void SlowSendTest() throws Exception {
         // This test is VERY SLOW due to the extremely slow sending speed TinyHttpdImpl uses when XslowX is specified.
         // Running time will be over two minutes.
@@ -214,5 +235,4 @@ public class TinyHttpdImplTest {
 
         return builder.toString();
     }
-
 }
