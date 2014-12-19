@@ -25,6 +25,7 @@ New in release 1.6 (2014-XX-XX):
   - Dropped support for long unmaintained -basedir argument
   - Returned support for -jnlp argument
   - RH1095311, PR574 -  References class sun.misc.Ref removed in OpenJDK 9 - fixed, and so buildable on JDK9
+  - Added support for menu shortcuts - both javaws applications/applets and html applets are supported
 * Plugin
   - PR1743 - Intermittant deadlock in PluginRequestProcessor
   - RH1121549: coverity defects
