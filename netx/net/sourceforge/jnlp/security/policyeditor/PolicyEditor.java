@@ -144,7 +144,7 @@ public class PolicyEditor extends JPanel {
     /**
      * Command line switch to print a help message.
      */
-    public static final String HELP_FLAG = OptionsDefinitions.OPTIONS.HELP.option;
+    public static final String HELP_FLAG = OptionsDefinitions.OPTIONS.HELP1.option;
 
     /**
      * Command line switch to specify the location of the policy file.

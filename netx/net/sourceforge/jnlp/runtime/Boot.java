@@ -47,6 +47,7 @@ import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextForm
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.InvalidArgumentException;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.sourceforge.jnlp.util.optionparser.UnevenParameterException;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
@@ -96,7 +97,7 @@ public final class Boot implements PrivilegedAction<Void> {
     /**
      * Launch the JNLP file specified by the command-line arguments.
      */
-    public static void main(String[] argsIn) {
+    public static void main(String[] argsIn) throws UnevenParameterException {
         optionParser = new OptionParser(argsIn, OptionsDefinitions.getJavaWsOptions());
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
@@ -131,7 +132,7 @@ public final class Boot implements PrivilegedAction<Void> {
             JNLPRuntime.exit(0);
         }
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP)) {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP1)) {
             handleMessage();
             JNLPRuntime.exit(0);
         }

@@ -429,4 +429,39 @@ public class OptionParserTest {
         String value = parser.getParam(OptionsDefinitions.OPTIONS.ARG);
         assertEquals("", value);
     }
+
+    @Test
+    public void testGetNumberOfOptions() {
+        String[] args = {"-arg", "-version", "-param", "-property", "-update"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        assertEquals(5, parser.getNumberOfOptions());
+    }
+
+    @Test
+    public void testGetNumberOfOptionsWithOtherOptions() {
+        String[] args = {"-arg", "-version", "-param", "-property", "-update", "-set", "-reset"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        assertEquals(5, parser.getNumberOfOptions());
+    }
+
+    @Test
+    public void testEvenNumberSupportsEqualsChar() {
+        String[] args = {"-set", "yes", "no", "blue=red", "green", "orange", "yellow=purple=roseyred"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.SET);
+        assertEquals("yes", values.get(0));
+        assertEquals("no", values.get(1));
+        assertEquals("blue", values.get(2));
+        assertEquals("red", values.get(3));
+        assertEquals("green", values.get(4));
+        assertEquals("orange", values.get(5));
+        assertEquals("yellow", values.get(6));
+        assertEquals("purple=roseyred", values.get(7));
+    }
+
+    @Test(expected = UnevenParameterException.class)
+    public void testEvenNumberSupportsEqualsCharThrowsExceptionWhenParametersIsUneven() {
+        String[] args = {"-set", "yes", "no", "blue=red", "green"};
+        OptionParser parser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+    }
 }

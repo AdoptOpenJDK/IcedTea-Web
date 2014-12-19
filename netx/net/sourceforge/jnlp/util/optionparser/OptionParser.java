@@ -41,6 +41,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /** Parses for options (passed in as arguments)
  *  To use add entries to OPTIONS enum in OptionsDefinitions
@@ -54,13 +57,18 @@ public class OptionParser {
     private final List<OptionsDefinitions.OPTIONS> possibleOptions;
     //List of all possible main arguments
     private final List<String> mainArgumentList = new ArrayList<>();
+    private boolean evenNumberFound;
 
-    public OptionParser(String[] args, List<OptionsDefinitions.OPTIONS> options) {
+    public OptionParser(String[] args, List<OptionsDefinitions.OPTIONS> options) throws UnevenParameterException {
         this.args = Arrays.copyOf(args, args.length);
         this.possibleOptions = options;
 
+        evenNumberFound = false;
         parsedOptions = new ArrayList<>();
         parseContents();
+        if (evenNumberFound) {
+            checkOptionHasEvenNumber();
+        }
 
     }
 
@@ -71,12 +79,23 @@ public class OptionParser {
                 lastOption = addOptionToList(arg);
             } else if (shouldAddParam(lastOption)) {
                 lastOption.addParam(arg);
+            } else if (isEvenNumberSupportingEqualsChars(lastOption)) {
+                evenNumberFound = true;
+                handleEvenNumberSupportingEqualsChar(lastOption, arg);
             } else {
                 mainArgumentList.add(arg);
             }
         }
     }
 
+    private void handleEvenNumberSupportingEqualsChar(final ParsedOption lastOption, String arg) {
+        if (arg.contains("=")) {
+            lastOption.addParam(arg.split("=")[0]);
+            lastOption.addParam(arg.split("=", 2)[1]);
+        } else {
+            lastOption.addParam(arg);
+        }
+    }
     private boolean shouldAddParam(final ParsedOption lastOption) {
         return lastOption != null &&
                 (oneOrMoreArguments(lastOption) || isOneArgumentNotFull(lastOption));
@@ -90,6 +109,11 @@ public class OptionParser {
         return lastOption.getOption().hasOneOrMoreArguments();
     }
 
+    private boolean isEvenNumberSupportingEqualsChars(final ParsedOption lastOption) {
+        return lastOption != null &&
+                lastOption.getOption().hasEvenNumberSupportingEqualsChar();
+    }
+
     private ParsedOption addOptionToList(final String arg) {
         ParsedOption option = new ParsedOption(argumentToOption(arg));
         if (arg.contains("=")) {
@@ -97,6 +121,16 @@ public class OptionParser {
         }
         parsedOptions.add(option);
         return option;
+    }
+
+    private void checkOptionHasEvenNumber() throws UnevenParameterException {
+        for (ParsedOption option : parsedOptions) {
+            if (isEvenNumberSupportingEqualsChars(option)) {
+                if (option.getParams().size() % 2 != 0){
+                    throw new UnevenParameterException(R("OPUnevenParams", option.getOption().option));
+                }
+            }
+        }
     }
 
     private OptionsDefinitions.OPTIONS argumentToOption(final String arg) {
@@ -173,5 +207,9 @@ public class OptionParser {
             }
         }
         return result;
+    }
+
+    public int getNumberOfOptions() {
+        return parsedOptions.size();
     }
 }

@@ -53,7 +53,7 @@ public class OptionsDefinitions {
         VIEWER("-viewer", "BOViewer"),
         CLEARCACHE("-Xclearcache", "BXclearcache"),
         LICENSE("-license", "BOLicense"),
-        HELP("-help", "BOHelp"),
+        HELP1("-help", "BOHelp1"),
         //javaws run-options
         VERSION("-version", "BOVersion"),
         ARG("-arg", "arg", "BOArg", NumberOfArguments.ONE_OR_MORE),
@@ -61,6 +61,7 @@ public class OptionsDefinitions {
         PROPERTY("-property", "name=value", "BOProperty", NumberOfArguments.ONE_OR_MORE),
         UPDATE("-update", "seconds", "BOUpdate", NumberOfArguments.ONE),
         VERBOSE("-verbose", "BOVerbose"),
+        DETAILS("-details", "BOVerbose"), //backward compatibility for itweb settings
         NOSEC("-nosecurity", "BONosecurity"),
         NOUPDATE("-noupdate", "BONoupdate"),
         HEADLESS("-headless", "BOHeadless"),
@@ -77,10 +78,11 @@ public class OptionsDefinitions {
         LIST("-list", "IBOList"),
         GET("-get", "name", "IBOGet", NumberOfArguments.ONE_OR_MORE),
         INFO("-info", "name", "IBOInfo", NumberOfArguments.ONE_OR_MORE),
-        SET("-set", "name value", "IBOSet", NumberOfArguments.ONE_OR_MORE),
+        SET("-set", "name value", "IBOSet", NumberOfArguments.EVEN_NUMBER_SUPPORTS_EQUALS_CHAR),
         RESETALL("-reset", "all", "IBOResetAll"),
         RESET("-reset", "name", "IBOReset", NumberOfArguments.ONE_OR_MORE),
         CHECK("-check", "name", "IBOCheck"),
+        HELP2("-help", "BOHelp2"),
         //policyeditor
         //-help
         FILE("-file", "policy_file", "PBOFile"),
@@ -155,7 +157,7 @@ public class OptionsDefinitions {
 
     public static List<OPTIONS> getItwsettingsCommands() {
         return Arrays.asList(new OPTIONS[]{
-            OPTIONS.HELP,
+            OPTIONS.HELP2,
             OPTIONS.LIST,
             OPTIONS.GET,
             OPTIONS.INFO,
@@ -163,13 +165,14 @@ public class OptionsDefinitions {
             OPTIONS.RESET,
             OPTIONS.RESETALL,
             OPTIONS.HEADLESS,
-            OPTIONS.CHECK
+            OPTIONS.CHECK,
+            OPTIONS.VERBOSE
         });
     }
 
     public static List<OPTIONS> getPolicyEditorOptions() {
         return Arrays.asList(new OPTIONS[]{
-            OPTIONS.HELP,
+            OPTIONS.HELP1,
             OPTIONS.FILE,
             OPTIONS.CODEBASE}
         );
@@ -181,7 +184,7 @@ public class OptionsDefinitions {
             OPTIONS.VIEWER,
             OPTIONS.CLEARCACHE,
             OPTIONS.LICENSE,
-            OPTIONS.HELP}
+            OPTIONS.HELP1}
         );
     }
 

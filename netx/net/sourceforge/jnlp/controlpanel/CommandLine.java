@@ -22,7 +22,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -37,16 +36,17 @@ import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.optionparser.OptionParser;
 
 /**
  * Encapsulates a command line interface to the deployment configuration.
  * <p>
- * The central method is {@link #handle(String[])}, which calls one of the
+ * The central method is {@link #handle()}, which calls one of the
  * various 'handle' methods. The commands listed in OptionsDefinitions.getItwsettingsCommands
  * are supported. For each supported command, a method handleCOMMANDCommand exists.
  * This method actually takes action based on the command. Generally, a
  * printCOMMANDHelp method also exists, and prints out the help message for
- * that specific command. For example, see {@link #handleListCommand(List)}
+ * that specific command. For example, see {@link #handleListCommand()}
  * and {@link #printListHelp()}.
  * </p>
  * Sample usage:
@@ -70,13 +70,15 @@ public class CommandLine {
 
     public final String PROGRAM_NAME;
 
+    private OptionParser optionParser;
 
     DeploymentConfiguration config = null;
 
     /**
      * Creates a new instance
      */
-    public CommandLine() {
+    public CommandLine(OptionParser optionParser) {
+        this.optionParser = optionParser;
         PROGRAM_NAME = System.getProperty("icedtea-web.bin.name");
 
         config = new DeploymentConfiguration();
@@ -125,32 +127,24 @@ public class CommandLine {
     /**
      * Handles the 'list' command
      *
-     * @param args the arguments to the list command
      * @return result of handling the command. SUCCESS if no errors occurred.
      */
-    public int handleListCommand(List<String> args) {
-        if (args.contains("help")) {
+    public int handleListCommand() {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
             printListHelp();
             return SUCCESS;
         }
 
-        boolean verbose = false;
 
-        if (args.contains("--details")) {
-            verbose = true;
-            args.remove("--details");
-        }
-
-        if (!args.isEmpty()) {
-            printListHelp();
-            return ERROR;
+        if (optionParser.getMainArgs().contains("details") || optionParser.getMainArgs().contains("verbose")) {
+            JNLPRuntime.setDebug(true);
         }
 
         Map<String, Setting<String>> all = config.getRaw();
         for (String key : all.keySet()) {
             Setting<String> value = all.get(key);
             OutputController.getLogger().printOutLn(key + ": " + value.getValue());
-            if (verbose) {
+            if (JNLPRuntime.isDebug()) {
                 OutputController.getLogger().printOutLn("\t" + R("CLDescription", value.getDescription()));
             }
         }
@@ -169,33 +163,31 @@ public class CommandLine {
     /**
      * Handles the 'get' command.
      *
-     * @param args the arguments to the get command
      * @return an integer representing success (SUCCESS) or error handling the
      * get command.
      */
-    public int handleGetCommand(List<String> args) {
-        if (args.contains("help")) {
+    public int handleGetCommand() {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
             printGetHelp();
             return SUCCESS;
         }
 
-        if (args.size() != 1) {
-            printGetHelp();
-            return ERROR;
-        }
-
+        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.GET);
         Map<String, Setting<String>> all = config.getRaw();
 
-        String key = args.get(0);
-        String value = null;
-        if (all.containsKey(key)) {
-            value = all.get(key).getValue();
-            OutputController.getLogger().printOutLn(value);
-            return SUCCESS;
-        } else {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", key));
+        List<String> unknownProperties = new ArrayList<>(args);
+        unknownProperties.removeAll(all.keySet());
+        if (unknownProperties.size() > 0) {
+            for (String property : unknownProperties) {
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", property));
+            }
             return ERROR;
         }
+        for (String key : args) {
+            String value = all.get(key).getValue();
+            OutputController.getLogger().printOutLn(key+": "+value);
+        }
+        return SUCCESS;
     }
 
     /**
@@ -210,39 +202,36 @@ public class CommandLine {
     /**
      * Handles the 'set' command
      *
-     * @param args the arguments to the set command
      * @return an integer indicating success (SUCCESS) or error in handling
      * the command
      */
-    public int handleSetCommand(List<String> args) {
-        if (args.contains("help")) {
+    public int handleSetCommand() {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
             printSetHelp();
             return SUCCESS;
         }
 
-        if (args.size() != 2) {
-            printSetHelp();
-            return ERROR;
-        }
+        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.SET);
 
-        String key = args.get(0);
-        String value = args.get(1);
+        String key = "";
+        String value;
 
-        if (config.getRaw().containsKey(key)) {
-            Setting<String> old = config.getRaw().get(key);
-            if (old.getValidator() != null) {
-                try {
-                    old.getValidator().validate(value);
-                } catch (IllegalArgumentException e) {
-                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()));
-                    OutputController.getLogger().log(e);
-                    return ERROR;
+        for (String arg : args) {
+            if (isKey(arg)) {
+                key = arg;
+            } else {
+                value = arg;
+
+                if (configContains(key)) {
+                    if (validateValue(key, value) == ERROR) {
+                        return ERROR;
+                    }
+                    config.setProperty(key, value);
+                } else {
+                    OutputController.getLogger().printOutLn(R("CLWarningUnknownProperty", key));
+                    config.setProperty(key, value);
                 }
             }
-            config.setProperty(key, value);
-        } else {
-            OutputController.getLogger().printOutLn(R("CLWarningUnknownProperty", key));
-            config.setProperty(key, value);
         }
 
         try {
@@ -252,6 +241,29 @@ public class CommandLine {
             return ERROR;
         }
 
+        return SUCCESS;
+    }
+
+    private boolean isKey(final String arg) {
+        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.SET);
+        return args.indexOf(arg) % 2 == 0;
+    }
+
+    private boolean configContains(final String arg) {
+        return config.getRaw().containsKey(arg);
+    }
+
+    private int validateValue(final String key, final String value) {
+        Setting<String> old = config.getRaw().get(key);
+        if (old.getValidator() != null) {
+            try {
+                old.getValidator().validate(value);
+            } catch (IllegalArgumentException e) {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()));
+                OutputController.getLogger().log(e);
+                return ERROR;
+            }
+        }
         return SUCCESS;
     }
 
@@ -267,33 +279,30 @@ public class CommandLine {
     /**
      * Handles the 'reset' command
      *
-     * @param args the arguments to the reset command
      * @return an integer indicating success (SUCCESS) or error in handling
      * the command
      */
-    public int handleResetCommand(List<String> args) {
-        if (args.contains("help")) {
+    public int handleResetCommand() {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
             printResetHelp();
             return SUCCESS;
         }
 
-        if (args.size() != 1) {
-            printResetHelp();
-            return ERROR;
-        }
-
-        String key = args.get(0);
+        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.RESET);
 
         boolean resetAll = false;
-        if (key.equals("all")) {
+        if (args.contains("all")) {
             resetAll = true;
+            if (args.size() > 1) {
+                for (String arg : args) {
+                    if (!arg.equals("all")) {
+                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownCommand", arg));
+                    }
+                }
+            }
         }
 
         Map<String, Setting<String>> all = config.getRaw();
-        if (!resetAll && !all.containsKey(key)) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", key));
-            return ERROR;
-        }
 
         if (resetAll) {
             for (String aKey: all.keySet()) {
@@ -301,8 +310,15 @@ public class CommandLine {
                 setting.setValue(setting.getDefaultValue());
             }
         } else {
-            Setting<String> setting = all.get(key);
-            setting.setValue(setting.getDefaultValue());
+            for (String key : args) {
+                if (!all.containsKey(key)) {
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", key));
+                    return ERROR;
+                } else {
+                    Setting<String> setting = all.get(key);
+                    setting.setValue(setting.getDefaultValue());
+                }
+            }
         }
 
         try {
@@ -327,37 +343,33 @@ public class CommandLine {
     /**
      * Handles the 'info' command
      *
-     * @param args the arguments to the info command
      * @return an integer indicating success (SUCCESS) or error in handling
      * the command
      */
-    public int handleInfoCommand(List<String> args) {
-        if (args.contains("help")) {
+    public int handleInfoCommand() {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
             printInfoHelp();
             return SUCCESS;
         }
 
-        if (args.size() != 1) {
-            printInfoHelp();
-            return ERROR;
-        }
+        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.INFO);
 
         Map<String, Setting<String>> all = config.getRaw();
 
-        String key = args.get(0);
-        Setting<String> value = all.get(key);
-        if (value == null) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLNoInfo"));
-            return ERROR;
-        } else {
-            OutputController.getLogger().printOutLn(R("CLDescription", value.getDescription()));
-            OutputController.getLogger().printOutLn(R("CLValue", value.getValue()));
-            if (value.getValidator() != null) {
-                OutputController.getLogger().printOutLn("\t" + R("VVPossibleValues", value.getValidator().getPossibleValues()));
+        for (String key : args) {
+            Setting<String> value = all.get(key);
+            if (value == null) {
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLNoInfo"));
+            } else {
+                OutputController.getLogger().printOutLn(R("CLDescription", value.getDescription()));
+                OutputController.getLogger().printOutLn(R("CLValue", value.getValue()));
+                if (value.getValidator() != null) {
+                    OutputController.getLogger().printOutLn("\t" + R("VVPossibleValues", value.getValidator().getPossibleValues()));
+                }
+                OutputController.getLogger().printOutLn(R("CLValueSource", value.getSource()));
             }
-            OutputController.getLogger().printOutLn(R("CLValueSource", value.getSource()));
-            return SUCCESS;
         }
+        return SUCCESS;
     }
 
     /**
@@ -372,15 +384,16 @@ public class CommandLine {
     /**
      * Handles the 'check' command
      *
-     * @param args the arguments to the check command.
      * @return an integer indicating success (SUCCESS) or error in handling
      * the command
      */
-    public int handleCheckCommand(List<String> args) {
-        if (args.contains("help")) {
+    public int handleCheckCommand() {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
             printCheckHelp();
             return SUCCESS;
         }
+
+        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.CHECK);
 
         if (!args.isEmpty()) {
             printCheckHelp();
@@ -416,49 +429,64 @@ public class CommandLine {
      * into two pieces: the first element is assumend to be the command, and
      * everything after is taken to be the argument to the command.
      *
-     * @param commandAndArgs A string array representing the command and
-     * arguments to take action on
      * @return an integer representing an error code or SUCCESS if no problems
      * occurred.
      */
-    public int handle(String[] commandAndArgs) {
-
-        if (commandAndArgs == null) {
-            throw new NullPointerException("command is null");
-        }
-
-        if (commandAndArgs.length == 0) {
-            handleHelpCommand();
-            return ERROR;
-        }
-
-        String command = commandAndArgs[0];
-        String[] argsArray = new String[commandAndArgs.length - 1];
-        System.arraycopy(commandAndArgs, 1, argsArray, 0, commandAndArgs.length - 1);
-        List<String> arguments = new ArrayList<>(Arrays.asList(argsArray));
-
+    public int handle() {
         int val;
-        if (command.equals(OptionsDefinitions.OPTIONS.HELP.option)) {
+        if (hasUnrecognizedCommands()) {
+            for (String unknown : optionParser.getMainArgs()) {
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownCommand", unknown));
+            }
+            handleHelpCommand();
+            val = ERROR;
+        } else if (getNumberOfOptions() > 1) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnexpectedNumberOfCommands"));
             val = handleHelpCommand();
-        } else if (command.equals(OptionsDefinitions.OPTIONS.LIST.option)) {
-            val = handleListCommand(arguments);
-        } else if (command.equals(OptionsDefinitions.OPTIONS.SET.option)) {
-            val = handleSetCommand(arguments);
-        } else if (command.equals(OptionsDefinitions.OPTIONS.RESET.option)) {
-            val = handleResetCommand(arguments);
-        } else if (command.equals(OptionsDefinitions.OPTIONS.GET.option)) {
-            val = handleGetCommand(arguments);
-        } else if (command.equals(OptionsDefinitions.OPTIONS.INFO.option)) {
-            val = handleInfoCommand(arguments);
-        } else if (command.equals(OptionsDefinitions.OPTIONS.CHECK.option)) {
-            val = handleCheckCommand(arguments);
+        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.LIST)) {
+            val = handleListCommand();
+        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.SET)) {
+            val = handleSetCommand();
+        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.RESET)) {
+            val = handleResetCommand();
+        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.GET)) {
+            val = handleGetCommand();
+        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.INFO)) {
+            val = handleInfoCommand();
+        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CHECK)) {
+            val = handleCheckCommand();
+        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+            val = handleHelpCommand();
         } else {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownCommand", command));
             handleHelpCommand();
             val = ERROR;
         }
-
         return val;
+    }
+
+    private boolean hasUnrecognizedCommands() {
+        int size = optionParser.getMainArgs().size();
+        return !(isDetailsValid()) && size > 0;
+    }
+
+    private boolean isDetailsValid() {
+        int size = optionParser.getMainArgs().size();
+        return (optionParser.getMainArgs().contains("details") && size == 1
+                && optionParser.hasOption(OptionsDefinitions.OPTIONS.LIST) && getNumberOfOptions() == 1);
+    }
+
+    private int getNumberOfOptions() {
+        int number = optionParser.getNumberOfOptions();
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+            number--;
+        }
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
+            number--;
+        }
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
+            number--;
+        }
+        return number;
     }
 
     /**
@@ -466,17 +494,29 @@ public class CommandLine {
      * @param args the command line arguments to this program
      */
     public static void main(String[] args) throws Exception {
-        DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
-        if (args.length == 0) {
-            ControlPanel.main(new String[] {});
-        } else {
-            CommandLine cli = new CommandLine();
-            int result = cli.handle(args);
+        try {
+            OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+            if (optionParser.hasOption(OptionsDefinitions.OPTIONS.DETAILS) || optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)){
+                JNLPRuntime.setDebug(true);
+            }
+            if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
+                JNLPRuntime.setHeadless(true);
+            }
+            DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
+            if (args.length == 0) {
+                ControlPanel.main(new String[] {});
+            } else {
+                CommandLine cli = new CommandLine(optionParser);
+                int result = cli.handle();
 
-            // instead of returning, use JNLPRuntime.exit() so we can pass back
-            // error codes indicating success or failure. Otherwise using
-            // this program for scripting will become much more challenging
-            JNLPRuntime.exit(result);
+                // instead of returning, use JNLPRuntime.exit() so we can pass back
+                // error codes indicating success or failure. Otherwise using
+                // this program for scripting will become much more challenging
+                JNLPRuntime.exit(result);
+            }
+        } catch (Exception e) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, e);
+            JNLPRuntime.exit(1);
         }
     }
 }

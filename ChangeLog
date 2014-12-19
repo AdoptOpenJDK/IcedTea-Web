@@ -1,3 +1,29 @@
+2014-12-19  Lukasz Dracz  <ldracz@redhat.com>
+
+	IcedTea-Web settings made to use OptionParser
+	* netx/net/sourceforge/jnlp/OptionsDefinitions: HELP split to HELP1 and HELP2
+	HELP1 for javaws and policyediotr, HELP2 for itweb settings. SET changed to 
+	EVEN_NUMBER_SUPPORTS_EQUALS_CHAR type. ItwebSettings added VERBOSE
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine: Rewritten touse OptionParser
+	Fixed usage of verbose.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: adapted IBOList, IBOGet
+	IBOInfo, IBOSet, IBOReset, IBOCheck. Added OPUnevenParams, CLUnexpectedNumberOfCommands.
+	BOHelp removed, and replaced by its copy BOHelp1. Added BOHelp2.
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties:
+	BOHelp removed, and replaced by its copy BOHelp1.
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties:
+	BOHelp removed, and replaced by its copy BOHelp1.
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties:
+	BOHelp removed, and replaced by its copy BOHelp1.
+	* netx/net/sourceforge/jnlp/runtime/Boot: Used HELP1,  and UnevenParameterException
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor: Used HELP1
+	* netx/net/sourceforge/jnlp/util/optionparser/OptionParser: Added handling of 
+	handleEvenNumberSupportingEqualsChar
+	* netx/net/sourceforge/jnlp/util/optionparser/UnevenParameterException: 
+	new exception to be thrown in case of parsing of EVEN_NUMBER_SUPPORTS_EQUALS_CHAR
+	* tests/netx/unit/net/sourceforge/jnlp/util/optionparser/OptionParserTest:
+	Added tests for new functions
+
 2014-12-19  Jie Kang  <jkang@redhat.com>
 
 	* tests/test-extensions-tests/net/sourceforge/jnlp/TinyHttpdImplTest.java:
