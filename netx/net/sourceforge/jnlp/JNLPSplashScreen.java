@@ -64,11 +64,12 @@ public class JNLPSplashScreen extends JDialog {
 
     URL splashImageUrl;
     Image splashImage;
-    private final JNLPFile file;
+    private JNLPFile file;
     public static final  int DEF_WIDTH=635;
     public static final  int DEF_HEIGHT=480;
     private SplashPanel componetSplash;
     private boolean splashImageLoaded=false;
+    private SplashPanel splash;
 
     public JNLPSplashScreen(ResourceTracker resourceTracker, final JNLPFile file) {
 
@@ -105,7 +106,7 @@ public class JNLPSplashScreen extends JDialog {
 
             if (splashImage == null) {
                 this.setLayout(new BorderLayout());
-                SplashPanel splash = SplashUtils.getSplashScreen(DEF_WIDTH, DEF_HEIGHT);
+                splash = SplashUtils.getSplashScreen(DEF_WIDTH, DEF_HEIGHT);
                 if (splash != null) {
                     splash.startAnimation();
                     splash.setInformationElement(InformationElement.createFromJNLP(file));
@@ -118,6 +119,15 @@ public class JNLPSplashScreen extends JDialog {
             splashImageLoaded = true;
         }
     }
+
+    public void setFile(JNLPFile file) {
+        this.file = file;
+        if (splash != null) {
+            splash.setInformationElement(InformationElement.createFromJNLP(file));
+        }
+    }
+    
+    
 
     public boolean isSplashImageLoaded() {
         return splashImageLoaded;
@@ -164,5 +174,15 @@ public class JNLPSplashScreen extends JDialog {
 
     public void stopAnimation() {
         if (isCustomSplashscreen()) componetSplash.stopAnimation();
+    }
+
+    public void setErrorSplash(Throwable ex) {
+        if (splash != null){
+            this.remove(splash.getSplashComponent());
+            splash = SplashUtils.getErrorSplashScreen(splash.getSplashWidth(), splash.getSplashHeight(), ex);
+            this.add(splash.getSplashComponent());
+            this.componetSplash = splash;
+            this.validate();
+    }
     }
 }

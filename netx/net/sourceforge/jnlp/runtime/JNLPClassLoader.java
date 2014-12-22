@@ -1668,7 +1668,7 @@ public class JNLPClassLoader extends URLClassLoader {
                             new PrivilegedExceptionAction<Class<?>>() {
                                 @Override
                                 public Class<?> run() throws ClassNotFoundException {
-                                    return JNLPClassLoader.super.findClass(fName);
+                                        return JNLPClassLoader.super.findClass(fName);
                                 }
                             }, getAccessControlContextForClassLoading());
                 } else {

@@ -39,17 +39,17 @@ package net.sourceforge.jnlp;
 
 import java.net.URL;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
- * Represents plugin applet parameters, backed by a Hashtable.
+ * Represents plugin applet parameters, backed by a HashMap.
  */
 
 public class PluginParameters {
-    private final Hashtable<String, String> parameters;
+    private final Map<String, String> parameters;
 
     public PluginParameters(Map<String, String> params) {
         this.parameters = createParameterTable(params);
@@ -75,12 +75,7 @@ public class PluginParameters {
         return Collections.unmodifiableMap(parameters);
     }
 
-    /**
-     * Used for compatibility with Hashtable-expecting classes.
-     * 
-     * @return the underlying hashtable.
-     */
-    Hashtable<String, String> getUnderlyingHashtable() {
+    public  Map<String, String> getUnderlyingMap() {
         return parameters;
     }
 
@@ -199,9 +194,9 @@ public class PluginParameters {
      * @param rawParams the properties, before parameter aliasing rules.
      * @return the resulting parameter table
      */
-    static Hashtable<String, String> createParameterTable(
+    static Map<String, String> createParameterTable(
             Map<String, String> rawParams) {
-        Hashtable<String, String> params = new Hashtable<String, String>();
+        Map<String, String> params = new HashMap<String, String>();
 
         for (Map.Entry<String, String> entry : rawParams.entrySet()) {
             String key = entry.getKey().toLowerCase();

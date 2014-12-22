@@ -102,6 +102,12 @@ else
   RHINO_RUNTIME=
 endif
 
+# support for javaws -html needs plugin.jar on classpath. rest of javaws works of course without it.
+if ENABLE_PLUGIN
+  PLUGIN_RUNTIME=:$(datadir)/$(PACKAGE_NAME)/plugin.jar
+else
+  PLUGIN_RUNTIME
+endif
 export RUNTIME = $(BOOT_DIR)/jre/lib/rt.jar:$(BOOT_DIR)/jre/lib/jsse.jar$(RHINO_RUNTIME):$(BOOT_DIR)/jre/lib/resources.jar
 
 # Flags
@@ -118,9 +124,12 @@ export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) 
 #    IllegalAccessException
 #  - we want full privileges
 #
-export LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar$(RHINO_RUNTIME):$(TAGSOUP_JAR)"
-export PLUGIN_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME):$(TAGSOUP_JAR)"'
-export PLUGIN_COVERAGE_BOOTCLASSPATH='"-Xbootclasspath/a:$(datadir)/$(PACKAGE_NAME)/netx.jar:$(datadir)/$(PACKAGE_NAME)/plugin.jar$(RHINO_RUNTIME):$(JACOCO_CLASSPATH):$(TAGSOUP_JAR)"'
+export UNIFIED_CLASSPATH=$(datadir)/$(PACKAGE_NAME)/netx.jar$(PLUGIN_RUNTIME)$(RHINO_RUNTIME):$(TAGSOUP_JAR)
+export UNIFIED_BOOTCLASSPATH=-Xbootclasspath/a:$(UNIFIED_CLASSPATH)
+# note javaws, itwebsettings and policyeditor (== LAUNCHER_BOOTCLASSPATH) must be always able to compileand run *without* plugin
+export LAUNCHER_BOOTCLASSPATH="$(UNIFIED_BOOTCLASSPATH)"
+export PLUGIN_BOOTCLASSPATH='"$(UNIFIED_BOOTCLASSPATH)"'
+export PLUGIN_COVERAGE_BOOTCLASSPATH='"$(UNIFIED_BOOTCLASSPATH):$(JACOCO_CLASSPATH)"'
 
 # Fake update version to work with the Deployment Toolkit script used by Oracle
 # http://download.oracle.com/javase/tutorial/deployment/deploymentInDepth/depltoolkit_index.html

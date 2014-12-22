@@ -3,7 +3,6 @@ package net.sourceforge.jnlp;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import org.junit.Test;
@@ -16,7 +15,7 @@ public class PluginParametersTest {
         // http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/using_tags.html#in-nav
 
         Map<String, String> rawParams;
-        Hashtable<String, String> params;
+        Map<String, String> params;
 
         rawParams = new HashMap<String, String>();
         rawParams.put("code", "codeValue");
@@ -77,7 +76,7 @@ public class PluginParametersTest {
     @Test
     public void testAttributeParseCodeAttribute() {
         Map<String, String> rawParams;
-        Hashtable<String, String> params;
+        Map<String, String> params;
 
         // Simple test of object tag being set
         rawParams = new HashMap<String, String>();

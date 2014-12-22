@@ -28,7 +28,6 @@ import java.util.*;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -38,7 +37,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.13 $
  */
-class Parser {
+public class Parser {
     
     private static String CODEBASE = "codebase";
 
@@ -1067,7 +1066,7 @@ class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     public URL getURL(Node node, String name, URL base) throws ParseException {
-        String href = null;
+        String href;
         if (CODEBASE.equals(name)) {
             href = getCleanAttribute(node, name);
             //in case of null code can throw an exception later
@@ -1078,7 +1077,11 @@ class Parser {
         } else {
             href = getAttribute(node, name, null);
         }
-        if (href == null) {
+        return getURL(href, node.getNodeName(), base, strict);
+    }
+    
+    public static URL getURL(String href, String nodeName, URL base, boolean strict) throws ParseException {
+         if (href == null) {
             return null; // so that code can throw an exception if attribute was required
         }
         try {
@@ -1096,7 +1099,7 @@ class Parser {
                 // check for going above the codebase
                 if (!result.toString().startsWith(base.toString()) &&  !base.toString().startsWith(result.toString())){
                     if (strict) {
-                        throw new ParseException(R("PUrlNotInCodebase", node.getNodeName(), href, base));
+                        throw new ParseException(R("PUrlNotInCodebase", nodeName, href, base));
                     }
                 }
                 return result;
@@ -1104,9 +1107,9 @@ class Parser {
 
         } catch (MalformedURLException ex) {
             if (base == null)
-                throw new ParseException(R("PBadNonrelativeUrl", node.getNodeName(), href));
+                throw new ParseException(R("PBadNonrelativeUrl", nodeName, href));
             else
-                throw new ParseException(R("PBadRelativeUrl", node.getNodeName(), href, base));
+                throw new ParseException(R("PBadRelativeUrl", nodeName, href, base));
         }
     }
 
@@ -1280,6 +1283,9 @@ class Parser {
         return result;
     }
 
+    
+    public static final String MALFORMED_PARSER_CLASS = "net.sourceforge.jnlp.MalformedXMLParser";
+    public static final String NORMAL_PARSER_CLASS = "net.sourceforge.jnlp.XMLParser";
     /**
      * Return the root node from the XML document in the specified
      * input stream.
@@ -1287,11 +1293,11 @@ class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     public static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
-        String className = null;
+        String className;
         if (settings.isMalformedXmlAllowed()) {
-            className = "net.sourceforge.jnlp.MalformedXMLParser";
+            className = MALFORMED_PARSER_CLASS;
         } else {
-            className = "net.sourceforge.jnlp.XMLParser";
+            className = NORMAL_PARSER_CLASS;
         }
 
         try {
@@ -1299,7 +1305,7 @@ class Parser {
             try {
                 klass = Class.forName(className);
             } catch (ClassNotFoundException e) {
-                klass = Class.forName("net.sourceforge.jnlp.XMLParser");
+                klass = Class.forName(NORMAL_PARSER_CLASS);
             }
             Object instance = klass.newInstance();
             Method m = klass.getMethod("getRootNode", InputStream.class);

@@ -46,7 +46,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
@@ -54,13 +53,28 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class PluginStreamHandler {
 
-    private BufferedReader pluginInputReader;
-    private BufferedWriter pluginOutputWriter;
+    public static final PluginStreamHandler DummyHandler = new PluginStreamHandler(
+            new InputStream() {
 
-    private RequestQueue queue = new RequestQueue();
+                @Override
+                public int read() throws IOException {
+                    return 0;
+                }
+            }, new OutputStream() {
+
+                @Override
+                public void write(int b) throws IOException {
+                    //
+                }
+            });
+
+    private final BufferedReader pluginInputReader;
+    private final BufferedWriter pluginOutputWriter;
+
+    private final RequestQueue queue = new RequestQueue();
 
 
-    private PluginMessageConsumer consumer;
+    private final PluginMessageConsumer consumer;
     private volatile boolean shuttingDown = false;
 
 
@@ -84,6 +98,7 @@ public class PluginStreamHandler {
 
         Thread listenerThread = new Thread("PluginStreamHandlerListenerThread") {
 
+            @Override
             public void run() {
 
                 while (true) {
@@ -159,10 +174,9 @@ public class PluginStreamHandler {
         String[] privileges = null;
         String rest = "";
         String[] msgComponents = new String[2];
-        int pos = 0;
         int oldPos = 0;
 
-        pos = readPair(message, oldPos, msgComponents);
+        int pos = readPair(message, oldPos, msgComponents);
         if (msgComponents[0] == null || msgComponents[1] == null) {
             return;
         }
@@ -229,11 +243,14 @@ public class PluginStreamHandler {
             final int freference = reference;
             final String frest = rest;
 
-            if (type.equals("instance")) {
-                PluginAppletViewer.handleMessage(identifier, freference, frest);
-            } else if (type.equals("context")) {
-                PluginDebug.debug("Sending to PASC: ", identifier, "/", reference, " and ", rest);
-                AppletSecurityContextManager.handleMessage(identifier, reference, src, privileges, rest);
+            switch (type) {
+                case "instance":
+                    PluginAppletViewer.handleMessage(identifier, freference, frest);
+                    break;
+                case "context":
+                    PluginDebug.debug("Sending to PASC: ", identifier, "/", reference, " and ", rest);
+                    AppletSecurityContextManager.handleMessage(identifier, reference, src, privileges, rest);
+                    break;
             }
         } catch (Exception e) {
             throw new PluginException(this, identifier, reference, e);
@@ -241,21 +258,23 @@ public class PluginStreamHandler {
     }
 
     private void handlePluginMessage(String message) {
-        if (message.equals("plugin showconsole")) {
-            if (JavaConsole.isEnabled()){
-                JavaConsole.getConsole().showConsoleLater();
-            } else {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("DPJavaConsoleDisabledHint"));
-            }
-        } else if (message.equals("plugin hideconsole")) {
-            if (JavaConsole.isEnabled()){
-                JavaConsole.getConsole().hideConsoleLater();
-            } else {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("DPJavaConsoleDisabledHint"));
-            }
-        } else {
-            // else this is something that was specifically requested
-            finishCallRequest(message);
+        switch (message) {
+            case "plugin showconsole":
+                if (JavaConsole.isEnabled()){
+                    JavaConsole.getConsole().showConsoleLater();
+                } else {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("DPJavaConsoleDisabledHint"));
+                }   break;
+            case "plugin hideconsole":
+                if (JavaConsole.isEnabled()){
+                    JavaConsole.getConsole().hideConsoleLater();
+                } else {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("DPJavaConsoleDisabledHint"));
+                }   break;
+            default:
+                // else this is something that was specifically requested
+                finishCallRequest(message);
+                break;
         }
     }
 
@@ -375,7 +394,6 @@ public class PluginStreamHandler {
                 JNLPRuntime.exit(1);
             }
         }
-
-        return;
     }
+    
 }

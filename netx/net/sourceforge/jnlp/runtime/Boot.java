@@ -16,8 +16,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
 import java.io.File;
 import java.net.URL;
 import java.security.AccessController;
@@ -26,11 +24,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.UIManager;
-
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PropertyDesc;
@@ -50,6 +45,8 @@ import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.jnlp.util.optionparser.UnevenParameterException;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * This is the main entry point for the JNLP client. The main
@@ -231,44 +228,24 @@ public final class Boot implements PrivilegedAction<Void> {
      * The privileged part (jdk1.3 compatibility).
      */
     public Void run() {
-        JNLPRuntime.setSecurityEnabled(!optionParser.hasOption(OptionsDefinitions.OPTIONS.NOSEC));
-        JNLPRuntime.setOfflineForced(optionParser.hasOption(OptionsDefinitions.OPTIONS.OFFLINE));
-        JNLPRuntime.initialize(true);
-
-        /*
-         * FIXME
-         * This should have been done with the rest of the argument parsing
-         * code. But we need to know what the cache and base directories are,
-         * and baseDir is initialized here
-         */
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CLEARCACHE)) {
-            CacheUtil.clearCache();
-            return null;
-        }
 
         Map<String, List<String>> extra = new HashMap<String, List<String>>();
-        extra.put("arguments", optionParser.getParams(OptionsDefinitions.OPTIONS.ARG));
-        extra.put("parameters", optionParser.getParams(OptionsDefinitions.OPTIONS.PARAM));
-        extra.put("properties", optionParser.getParams(OptionsDefinitions.OPTIONS.PROPERTY));
 
-        ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
-
-        try {
-            Launcher launcher = new Launcher(false);
-            launcher.setParserSettings(settings);
-            launcher.setInformationToMerge(extra);
-            launcher.launch(getFileLocation());
-        } catch (LaunchException ex) {
-            // default handler prints this
-        } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
-            fatalError(R("RUnexpected", ex.toString(), ex.getStackTrace()[0]));
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
+            boolean run = new HtmlBoot(optionParser).run(extra);
+            if (!run) {
+                return null;
+            }
+        } else {
+            boolean run = new JnlpBoot(optionParser).run(extra);
+            if (!run) {
+                return null;
+            }
         }
-
         return null;
     }
 
-    private static void fatalError(String message) {
+    static void fatalError(String message) {
         OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "netx: " + message);
         JNLPRuntime.exit(1);
     }
@@ -277,11 +254,11 @@ public final class Boot implements PrivilegedAction<Void> {
      * Returns the url of file to open; does not return if no file was
      * specified, or if the file location was invalid.
      */
-    private static URL getFileLocation() {
+    static URL getFileLocation() {
 
         String location = null;
         try {
-            location = getJNLPFile();
+            location = getMainFile();
         } catch (InvalidArgumentException e) {
             OutputController.getLogger().log(e);
             fatalError("Invalid argument: "+e);
@@ -301,7 +278,12 @@ public final class Boot implements PrivilegedAction<Void> {
                 // TODO: Should be toURI().toURL()
                 url = new File(location).toURL(); // Why use file.getCanonicalFile?
             else
-                url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
+                if (ServiceUtil.getBasicService() != null){
+                    OutputController.getLogger().log("Warning, null basicService");
+                    url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
+                } else {
+                    url = new URL(location);
+                }
         } catch (Exception e) {
             OutputController.getLogger().log(e);
             fatalError("Invalid jnlp file " + location);
@@ -313,12 +295,17 @@ public final class Boot implements PrivilegedAction<Void> {
     /**
      * Gets the JNLP file from the command line arguments, or exits upon error.
      */
-    private static String getJNLPFile() throws InvalidArgumentException {
-        if (optionParser.getMainArgs().size() > 1 ||
-                (optionParser.mainArgExists() && optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP))) {
+    private static String getMainFile() throws InvalidArgumentException {
+        if (optionParser.getMainArgs().size() > 1 
+                || (optionParser.mainArgExists() && optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP))
+                || (optionParser.mainArgExists() && optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML))
+                || (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP) && optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML))
+                ) {
               throw new InvalidArgumentException(optionParser.getMainArgs().toString());
         } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP)) {
             return optionParser.getParam(OptionsDefinitions.OPTIONS.JNLP);
+        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
+            return optionParser.getParam(OptionsDefinitions.OPTIONS.HTML);
         } else if (optionParser.mainArgExists()) {
             return optionParser.getMainArg();
         }
@@ -328,4 +315,27 @@ public final class Boot implements PrivilegedAction<Void> {
         return null;
     }
 
+    static ParserSettings init(Map<String, List<String>> extra) {
+        JNLPRuntime.setSecurityEnabled(!optionParser.hasOption(OptionsDefinitions.OPTIONS.NOSEC));
+        JNLPRuntime.setOfflineForced(optionParser.hasOption(OptionsDefinitions.OPTIONS.OFFLINE));
+        JNLPRuntime.initialize(true);
+
+        /*
+         * FIXME
+         * This should have been done with the rest of the argument parsing
+         * code. But we need to know what the cache and base directories are,
+         * and baseDir is initialized here
+         */
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CLEARCACHE)) {
+            CacheUtil.clearCache();
+            return null;
+        }
+
+        extra.put("arguments", optionParser.getParams(OptionsDefinitions.OPTIONS.ARG));
+        extra.put("parameters", optionParser.getParams(OptionsDefinitions.OPTIONS.PARAM));
+        extra.put("properties", optionParser.getParams(OptionsDefinitions.OPTIONS.PROPERTY));
+
+        return ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
+    }
+    
 }

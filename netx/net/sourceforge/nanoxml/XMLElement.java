@@ -30,10 +30,16 @@
 
 package net.sourceforge.nanoxml;
 
-import java.io.*;
-import java.util.*;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -101,7 +107,7 @@ public class XMLElement {
      *     <li>The keys and the values are strings.</li>
      * </ul></dd></dl>
      */
-    private Hashtable<String, Object> attributes;
+    private Map<String, Object> attributes;
 
     /**
      * Child elements of the element.
@@ -153,7 +159,7 @@ public class XMLElement {
      *     <li>The values are char arrays</li>
      * </ul></dd></dl>
      */
-    private Hashtable<String, char[]> entities;
+    private Map<String, char[]> entities;
 
     /**
      * The line number where the element starts.
@@ -213,7 +219,7 @@ public class XMLElement {
      * Creates and initializes a new XML element.
      * <p>
      * Calling the construction is equivalent to:
-     * <ul><li>{@code new XMLElement(new Hashtable(), false, true)}</li></ul>
+     * <ul><li>{@code new XMLElement(new HashMap(), false, true)}</li></ul>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>{@linkplain #countChildren} =&gt; 0</li>
@@ -226,7 +232,7 @@ public class XMLElement {
      * </ul></dd></dl>
      */
     public XMLElement() {
-        this(new Hashtable<String, char[]>(), false, true, true);
+        this(new HashMap<String, char[]>(), false, true, true);
     }
 
     /**
@@ -265,7 +271,7 @@ public class XMLElement {
      *     <li>{@linkplain #getName} =&gt; null</li>
      * </ul></dd></dl>
      */
-    protected XMLElement(Hashtable<String, char[]> entities,
+    protected XMLElement(Map<String, char[]> entities,
                          boolean skipLeadingWhitespace,
                          boolean fillBasicConversionTable,
                          boolean ignoreCase) {
@@ -273,13 +279,12 @@ public class XMLElement {
         this.ignoreCase = ignoreCase;
         this.name = null;
         this.contents = "";
-        this.attributes = new Hashtable<String, Object>();
-        this.children = new Vector<XMLElement>();
+        this.attributes = new HashMap<>();
+        this.children = new Vector<>();
         this.entities = entities;
         this.lineNr = 0;
-        Enumeration<String> e = this.entities.keys();
-        while (e.hasMoreElements()) {
-            String key = e.nextElement();
+        Set<String> e = this.entities.keySet();
+        for(String key: e) {
             Object value = this.entities.get(key);
             if (value instanceof String) {
                 entities.put(key, ((String) value).toCharArray());
@@ -366,7 +371,7 @@ public class XMLElement {
      * </ul></dd></dl>
      */
     public Enumeration<String> enumerateAttributeNames() {
-        return this.attributes.keys();
+        return new Vector(this.attributes.keySet()).elements();
     }
 
     /**
@@ -1166,8 +1171,7 @@ public class XMLElement {
      */
     public void sanitizeInput(Reader isr, OutputStream pout) {
         StringBuilder line = new StringBuilder();
-        try {
-            PrintStream out = new PrintStream(pout);
+        try (PrintStream out = new PrintStream(pout)) {
             this.sanitizeCharReadTooMuch = '\0';
             this.reader = isr;
             this.parserLineNr = 0;
@@ -1255,7 +1259,6 @@ public class XMLElement {
                 }
                 prev = next;
             }
-            out.close();
             isr.close();
         } catch (Exception e) {
             // Print the stack trace here -- xml.parseFromReader() will

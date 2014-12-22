@@ -49,7 +49,7 @@ import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
  */
 public class PluginBridge extends JNLPFile {
 
-    private PluginParameters params;
+    private final PluginParameters params;
     final private Set<String> jars = new HashSet<>();
     private List<ExtensionDesc> extensionJars = new ArrayList<>();
     //Folders can be added to the code-base through the archive tag
@@ -247,6 +247,12 @@ public class PluginBridge extends JNLPFile {
     public boolean useJNLPHref() {
         return useJNLPHref;
     }
+
+    public PluginParameters getParams() {
+        return params;
+    }
+    
+    
 
     @Override
     public RequestedPermissionLevel getRequestedPermissionLevel() {

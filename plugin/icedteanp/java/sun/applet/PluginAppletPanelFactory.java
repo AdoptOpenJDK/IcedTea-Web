@@ -70,6 +70,7 @@ import java.security.PrivilegedAction;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.NetxPanel;
+import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -83,10 +84,11 @@ class PluginAppletPanelFactory {
                                    final int identifier,
                                    final long handle,
                                    final URL doc,
-                                   final PluginParameters params) {
+                                   final PluginParameters params,
+                                   final PluginBridge pb) {
         final NetxPanel panel = AccessController.doPrivileged(new PrivilegedAction<NetxPanel>() {
             public NetxPanel run() {
-                NetxPanel panel = new NetxPanel(doc, params);
+                NetxPanel panel = new NetxPanel(doc, params, pb);
                 OutputController.getLogger().log("Using NetX panel");
                 PluginDebug.debug(params.toString());
                 return panel;

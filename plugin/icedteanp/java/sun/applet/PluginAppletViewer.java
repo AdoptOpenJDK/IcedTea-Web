@@ -90,7 +90,6 @@ import java.security.AllPermission;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
@@ -102,6 +101,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NetxPanel;
+import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -467,7 +467,6 @@ public class PluginAppletViewer extends XEmbeddedFrame
                             "Params = ", paramString);
         JNLPRuntime.saveHistory(documentBase);
 
-        PluginAppletPanelFactory factory = new PluginAppletPanelFactory();
         AppletMessageHandler amh = new AppletMessageHandler("appletviewer");
         URL url = new URL(documentBase);
         URLConnection conn = ConnectionFactory.getConnectionFactory().openConnection(url);
@@ -479,25 +478,29 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
         PluginParameters params = new PluginParameterParser().parse(width, height, paramString);
 
-        // Let user know we are starting up
-        streamhandler.write("instance " + identifier + " status " + amh.getMessage("status.start"));
-        factory.createPanel(streamhandler, identifier, handle, url, params);
+       // Let user know we are starting up
+       streamhandler.write("instance " + identifier + " status " + amh.getMessage("status.start"));
+       initialize(params, handle, url, identifier, null);
+    }
+    
+    public static AppletPanel initialize(PluginParameters params, long handle, URL url, int identifier, PluginBridge pb) {
+        PluginAppletPanelFactory factory = new PluginAppletPanelFactory();
+        AppletPanel p = factory.createPanel(streamhandler, identifier, handle, url, params, pb);
 
         long maxTimeToSleep = APPLET_TIMEOUT;
         appletsLock.lock();
         try {
-            while (!applets.containsKey(identifier) &&
-                    maxTimeToSleep > 0) { // Map is populated only by reFrame
+            while (!applets.containsKey(identifier)
+                    && maxTimeToSleep > 0) { // Map is populated only by reFrame
                 maxTimeToSleep -= waitTillTimeout(appletsLock, appletAdded,
-                                                  maxTimeToSleep);
+                        maxTimeToSleep);
             }
-        }
-        finally {
+        } finally {
             appletsLock.unlock();
         }
 
         // If wait exceeded maxWait, we timed out. Throw an exception
-        if (maxTimeToSleep <= 0)  {
+        if (maxTimeToSleep <= 0) {
             // Caught in handleMessage
             throw new RuntimeException("Applet initialization timeout");
         }
@@ -509,12 +512,13 @@ public class PluginAppletViewer extends XEmbeddedFrame
         waitForAppletInit(applets.get(identifier).panel);
 
         // Should we proceed with reframing?
-         PluginDebug.debug("Init complete");
+        PluginDebug.debug("Init complete");
 
         if (updateStatus(identifier, PAV_INIT_STATUS.REFRAME_COMPLETE).equals(PAV_INIT_STATUS.INACTIVE)) {
             destroyApplet(identifier);
-            return;
+            return null;
         }
+        return p;
     }
 
     /**
@@ -1367,7 +1371,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     /**
      * System parameters.
      */
-    static Hashtable<String, String> systemParam = new Hashtable<String, String>();
+    static Map<String, String> systemParam = new HashMap<String, String>();
 
     static {
         systemParam.put("codebase", "codebase");

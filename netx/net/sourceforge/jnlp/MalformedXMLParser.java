@@ -45,7 +45,6 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
@@ -88,7 +87,7 @@ public class MalformedXMLParser extends XMLParser {
      * version of the input XML
      * @throws ParseException
      */
-    private InputStream xmlizeInputStream(InputStream original) throws ParseException {
+    public  static InputStream xmlizeInputStream(InputStream original) throws ParseException {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 

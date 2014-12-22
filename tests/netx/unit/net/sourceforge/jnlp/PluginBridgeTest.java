@@ -30,7 +30,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Hashtable;
 import java.util.List;
 
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -57,17 +56,19 @@ public class PluginBridgeTest {
     }
 
     private class MockJNLPFile extends JNLPFile {
+        @Override
         public AppletDesc getApplet() {
             return new AppletDesc(null, null, null, 0, 0, new HashMap<String, String>());
         }
 
+        @Override
         public ResourcesDesc getResources() {
             return new ResourcesDesc(null, null, null, null);
         }
     }
 
     static private PluginParameters createValidParamObject() {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("code", ""); // Avoids an exception being thrown
         return new PluginParameters(params);
     }
@@ -215,7 +216,7 @@ public class PluginBridgeTest {
         Assert.assertTrue(jars.length == 2);
 
         //Resource can be in any order
-        List<String> resourceLocations = new ArrayList<String>();
+        List<String> resourceLocations = new ArrayList<>();
         resourceLocations.add(jars[0].getLocation().toExternalForm());
         resourceLocations.add(jars[1].getLocation().toExternalForm());
 
@@ -323,6 +324,7 @@ public class PluginBridgeTest {
     public void stripClassNoClass() throws Exception {
          Assert.assertEquals("blah.class.someclass", PluginBridge.strippClass("blah.class.someclass"));
     }
+    
     @Test
     public void stripClassClass() throws Exception {
          Assert.assertEquals("blah.class.someclass", PluginBridge.strippClass("blah.class.someclass.class"));

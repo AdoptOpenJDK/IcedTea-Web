@@ -65,11 +65,11 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
     // null values in because if we did, we couldn't use null checks to see
     // if a key was absent before a putIfAbsent. 
     private static final ConcurrentMap<String, Boolean> appContextCreated =
-        new ConcurrentHashMap<String, Boolean>();
+        new ConcurrentHashMap<>();
 
-    public NetxPanel(URL documentURL, PluginParameters params) {
-        super(documentURL, params.getUnderlyingHashtable());
-
+    public NetxPanel(URL documentURL, PluginParameters params, PluginBridge bridge) {
+        super(documentURL, params.getUnderlyingMap());
+        this.bridge = bridge;
         this.parameters = params;
         this.initialized = false;
 
@@ -80,6 +80,10 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
                 uKeyToTG.put(uniqueKey, tg);
             }
         }
+    }
+
+    public AppletInstance getAppInst() {
+        return appInst;
     }
 
     @Override
@@ -98,32 +102,17 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
     protected void ourRunLoader() {
 
         try {
-            bridge = new PluginBridge(getBaseURL(),
-                                getDocumentBase(),
-                                getJarFiles(),
-                                getCode(),
-                                getWidth(),
-                                getHeight(),
-                                parameters);
-
-            doInit = true;
-            dispatchAppletEvent(APPLET_LOADING, null);
-            status = APPLET_LOAD;
-
-            Launcher l = new Launcher(false);
-
-            // May throw LaunchException:
-            appInst = (AppletInstance) l.launch(bridge, this);
-            setApplet(appInst.getApplet());
-
-            if (getApplet() != null) {
-                // Stick it in the frame
-                getApplet().setStub(this);
-                getApplet().setVisible(false);
-                add("Center", getApplet());
-                showAppletStatus("loaded");
-                validate();
+            if (bridge == null) {
+                bridge = new PluginBridge(getBaseURL(),
+                        getDocumentBase(),
+                        getJarFiles(),
+                        getCode(),
+                        getWidth(),
+                        getHeight(),
+                        parameters);
             }
+            init(bridge);
+
         } catch (Exception e) {
             status = APPLET_ERROR;
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
@@ -213,5 +202,27 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
     public int getSplashHeigth() {
         return splashController.getSplashHeigth();
     }
-   
+
+    public void init(PluginBridge bridge) throws LaunchException {
+        doInit = true;
+        dispatchAppletEvent(APPLET_LOADING, null);
+        status = APPLET_LOAD;
+
+        Launcher l = new Launcher(false);
+
+        // May throw LaunchException:
+        appInst = (AppletInstance) l.launch(bridge, this);
+        setApplet(appInst.getApplet());
+
+        if (getApplet() != null) {
+            // Stick it in the frame
+            getApplet().setStub(this);
+            getApplet().setVisible(false);
+            add("Center", getApplet());
+            showAppletStatus("loaded");
+            validate();
+        }
+
+    }        
+
 }

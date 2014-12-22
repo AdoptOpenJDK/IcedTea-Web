@@ -54,7 +54,7 @@ import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -136,7 +136,7 @@ class Signature {
     public Signature(String signature, ClassLoader cl) {
         this.signature = signature;
         currentIndex = 0;
-        typeList = new ArrayList<Class<?>>(10);
+        typeList = new ArrayList<>(10);
 
         String elem;
         while (currentIndex < signature.length()) {
@@ -201,35 +201,27 @@ class Signature {
     }
 
     public static Class<?> primitiveNameToType(String name) {
-        if (name.equals("void")) {
-            return Void.TYPE;
-        }
-        else if (name.equals("boolean")) {
-            return Boolean.TYPE;
-        }
-        else if (name.equals("byte")) {
-            return Byte.TYPE;
-        }
-        else if (name.equals("char")) {
-            return Character.TYPE;
-        }
-        else if (name.equals("short")) {
-            return Short.TYPE;
-        }
-        else if (name.equals("int")) {
-            return Integer.TYPE;
-        }
-        else if (name.equals("long")) {
-            return Long.TYPE;
-        }
-        else if (name.equals("float")) {
-            return Float.TYPE;
-        }
-        else if (name.equals("double")) {
-            return Double.TYPE;
-        }
-        else {
-            return null;
+        switch (name) {
+            case "void":
+                return Void.TYPE;
+            case "boolean":
+                return Boolean.TYPE;
+            case "byte":
+                return Byte.TYPE;
+            case "char":
+                return Character.TYPE;
+            case "short":
+                return Short.TYPE;
+            case "int":
+                return Integer.TYPE;
+            case "long":
+                return Long.TYPE;
+            case "float":
+                return Float.TYPE;
+            case "double":
+                return Double.TYPE;
+            default:
+                return null;
         }
     }
 
@@ -240,8 +232,8 @@ class Signature {
 
 public class PluginAppletSecurityContext {
 
-    private static Hashtable<ClassLoader, URL> classLoaders = new Hashtable<ClassLoader, URL>();
-    private static Hashtable<Integer, ClassLoader> instanceClassLoaders = new Hashtable<Integer, ClassLoader>();
+    private static Map<ClassLoader, URL> classLoaders = new HashMap<>();
+    private static Map<Integer, ClassLoader> instanceClassLoaders = new HashMap<>();
 
     private PluginObjectStore store = PluginObjectStore.getInstance();
     private Throwable throwable = null;
@@ -311,7 +303,7 @@ public class PluginAppletSecurityContext {
             int low = Integer.parseInt(bytes[0]);
             int high = Integer.parseInt(bytes[1]);
             int full = ((high << 8) & 0x0ff00) | (low & 0x0ff);
-            return new Character((char) full);
+            return (char) full;
         } else if (c == Short.TYPE || c == Short.class) {
             return new Short(s);
         }
@@ -351,7 +343,7 @@ public class PluginAppletSecurityContext {
     }    
 
     public static Map<String, String> getLoaderInfo() {
-        Hashtable<String, String> map = new Hashtable<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         for (ClassLoader loader : PluginAppletSecurityContext.classLoaders.keySet()) {
             map.put(loader.getClass().getName(), classLoaders.get(loader).toString());
@@ -753,11 +745,10 @@ public class PluginAppletSecurityContext {
                 Integer classID = parseCall(args[1], null, Integer.class);
                 Integer superclassID = parseCall(args[2], null, Integer.class);
 
-                boolean result = false;
                 Class<?> clz = (Class<?>) store.getObject(classID);
                 Class<?> sup = (Class<?>) store.getObject(superclassID);
 
-                result = sup.isAssignableFrom(clz);
+                boolean result = sup.isAssignableFrom(clz);
 
                 write(reference, "IsAssignableFrom " + (result ? "1" : "0"));
             } else if (message.startsWith("IsInstanceOf")) {
@@ -765,11 +756,10 @@ public class PluginAppletSecurityContext {
                 Integer objectID = parseCall(args[1], null, Integer.class);
                 Integer classID = parseCall(args[2], null, Integer.class);
 
-                boolean result = false;
                 Object o = store.getObject(objectID);
                 Class<?> c = (Class<?>) store.getObject(classID);
 
-                result = c.isInstance(o);
+                boolean result = c.isInstance(o);
 
                 write(reference, "IsInstanceOf " + (result ? "1" : "0"));
             } else if (message.startsWith("GetStringUTFLength")) {
@@ -797,14 +787,13 @@ public class PluginAppletSecurityContext {
                 Integer stringID = parseCall(args[1], null, Integer.class);
 
                 String o;
-                byte[] b = null;
                 StringBuffer buf = null;
                 o = (String) store.getObject(stringID);
-                b = o.getBytes("UTF-8");
+                byte[] b = o.getBytes("UTF-8");
                 buf = new StringBuffer(b.length * 2);
                 buf.append(b.length);
                 for (int i = 0; i < b.length; i++) {
-                    buf.append(" " + Integer.toString(((int) b[i]) & 0x0ff, 16));
+                    buf.append(" ").append(Integer.toString(((int) b[i]) & 0x0ff, 16));
                 }
 
                 write(reference, "GetStringUTFChars " + buf);
@@ -813,15 +802,14 @@ public class PluginAppletSecurityContext {
                 Integer stringID = parseCall(args[1], null, Integer.class);
 
                 String o;
-                byte[] b = null;
                 StringBuffer buf = null;
                 o = (String) store.getObject(stringID);
                 // FIXME: LiveConnect uses UCS-2.
-                b = o.getBytes("UTF-16LE");
+                byte[] b = o.getBytes("UTF-16LE");
                 buf = new StringBuffer(b.length * 2);
                 buf.append(b.length);
                 for (int i = 0; i < b.length; i++) {
-                    buf.append(" " + Integer.toString(((int) b[i]) & 0x0ff, 16));
+                    buf.append(" ").append(Integer.toString(((int) b[i]) & 0x0ff, 16));
                 }
 
                 PluginDebug.debug("Java: GetStringChars: ", o);
@@ -832,14 +820,13 @@ public class PluginAppletSecurityContext {
                 Integer objectID = parseCall(args[1], null, Integer.class);
 
                 String o;
-                byte[] b = null;
                 StringBuffer buf = null;
                 o = store.getObject(objectID).toString();
-                b = o.getBytes("UTF-8");
+                byte[] b = o.getBytes("UTF-8");
                 buf = new StringBuffer(b.length * 2);
                 buf.append(b.length);
                 for (int i = 0; i < b.length; i++) {
-                    buf.append(" " + Integer.toString(((int) b[i]) & 0x0ff, 16));
+                    buf.append(" ").append(Integer.toString(((int) b[i]) & 0x0ff, 16));
                 }
 
                 write(reference, "GetToStringValue " + buf);
@@ -1036,7 +1023,6 @@ public class PluginAppletSecurityContext {
                 String[] args = message.split(" ");
                 int length = new Integer(args[1]);
                 byte[] byteArray = new byte[length];
-                String ret = null;
                 int i = 0;
                 int j = 2;
                 int c;
@@ -1045,7 +1031,7 @@ public class PluginAppletSecurityContext {
                     byteArray[i++] = (byte) c;
                 }
 
-                ret = new String(byteArray, "UTF-8");
+                String ret = new String(byteArray, "UTF-8");
                 PluginDebug.debug("NEWSTRINGUTF: ", ret);
 
                 store.reference(ret);
@@ -1149,7 +1135,6 @@ public class PluginAppletSecurityContext {
     public void checkPermission(String jsSrc, Class<?> target, AccessControlContext acc) throws AccessControlException {
         // NPRuntime does not allow cross-site calling. We therefore always
         // allow this, for the time being
-        return;
     }
 
     private void write(int reference, String message) {
@@ -1248,12 +1233,11 @@ public class PluginAppletSecurityContext {
 
         Class<?> c = (Class<?>) store.getObject(classID);
         Method m = null;
-        Constructor<?> cs = null;
 
         try {
             if (methodName.equals("<init>")
                                         || methodName.equals("<clinit>")) {
-                cs = c.getConstructor(signature.getClassArray());
+                Constructor<?> cs = c.getConstructor(signature.getClassArray());
                 store.reference(cs);
             } else {
                 m = c.getMethod(methodName, signature.getClassArray());
@@ -1316,12 +1300,15 @@ public class PluginAppletSecurityContext {
         Permissions grantedPermissions = new Permissions();
 
         for (String privilege : nsPrivilegeList) {
-            if (privilege.equals("UniversalBrowserRead")) {
-                BrowserReadPermission bp = new BrowserReadPermission();
-                grantedPermissions.add(bp);
-            } else if (privilege.equals("UniversalJavaPermission")) {
-                AllPermission ap = new AllPermission();
-                grantedPermissions.add(ap);
+            switch (privilege) {
+                case "UniversalBrowserRead":
+                    BrowserReadPermission bp = new BrowserReadPermission();
+                    grantedPermissions.add(bp);
+                    break;
+                case "UniversalJavaPermission":
+                    AllPermission ap = new AllPermission();
+                    grantedPermissions.add(ap);
+                    break;
             }
         }
 

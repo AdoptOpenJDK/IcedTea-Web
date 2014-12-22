@@ -33,16 +33,21 @@
 package sun.applet;
 
 import java.applet.Applet;
+import java.applet.AppletContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.Map;
+import net.sourceforge.jnlp.NetxPanel;
 
 public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
 
-    public AppletViewerPanelAccess(URL documentURL, Hashtable<String, String> atts) {
-        super(documentURL, atts);
+    public AppletViewerPanelAccess(URL documentURL, Map<String, String> atts) {
+        // note, this is copy.
+        // But th eonly usecasein applet outside ITW is get on parameters
+        super(documentURL, new Hashtable<>(atts));
     }
 
     protected URL getDocumentURL() {
@@ -78,6 +83,14 @@ public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
         super.run();
     }
 
+    @Override
+    public AppletContext getAppletContext() {
+        if (getParent() instanceof AppletContext) {
+            return super.getAppletContext();
+        }
+        return ((NetxPanel)this).getAppInst().getAppletEnvironment();
+    }
+    
     /**
      * NOTE. We cannot override private method, and this call is unused and useless.
      * But kept for record of troubles to run on any openjdk.

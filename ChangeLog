@@ -1,4 +1,66 @@
-2014-12-18  Jiri Vanek  <jvanek@redhat.com>
+2014-12-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Added -html switch for javaws to run applets out of browser in applets sandbox
+	* Makefile.am: if plugin is enabled, then plugin.jar is placed to (booth)classpaths
+	* NEWS: mentioned -html switch
+	* netx/net/sourceforge/jnlp/Launcher.java: removed unused imports
+	* netx/net/sourceforge/jnlp/MalformedXMLParser.java: same, also (xmlizeInputStream)
+	made public static
+	* netx/net/sourceforge/jnlp/NetxPanel.java: used diamonds, constructor is
+	accepting plugin bridge, appletInstance got geter, (ourRunLoader) initialize
+	PuginBridge if it is not set in advance. Logic to init it. moved to separate
+	method (init).
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java: implemented -html. Now takes
+	one or more args.
+	* netx/net/sourceforge/jnlp/Parser.java: made public, static getUrl separated 
+	from internal getUrl. reused MalformedXMLParser and XMLParser classes moved
+	to String constants.
+	* netx/net/sourceforge/jnlp/PluginBridge.java: params made final and getter added.
+	* netx/net/sourceforge/jnlp/PluginParameters.java: Removed hashtable
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: BNoCodeOrObjectApplet
+	fixed (mentioned jnlp_href), added HTMLnoneFound, HTMLmoreThenOne. Adapted BOHtml
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: (getMainFile) now supports html
+	init moved out of (run). Logic to lunch javaws moved to separate class
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: minor formating
+	* netx/net/sourceforge/jnlp/util/optionparser/OptionParser.java: added fnuction
+	to allow element addition to allow minor cheating if needed.
+	* netx/net/sourceforge/nanoxml/XMLElement.java: removed hashtable, used
+	diamonds, final and try-with-resources
+	* netx/sun/applet/AppletViewerPanelAccess.java: Copied map to hashtable in super,
+	added special hack to access AppletContext for out-of-browser applets.
+	* plugin/icedteanp/java/sun/applet/PluginAppletPanelFactory.java: can pass
+	PluginBridge inside.
+	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java: removed
+	hashtable, used string in switches, used diamonds
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: some logic extracted
+	to initialize. Removed hashtable.
+	* plugin/icedteanp/java/sun/applet/PluginMain.java:  Removed hashtable. 
+	Init logic moved to more methods (initSecurityContext). New method javawsHtmlMain
+	to encapsulate all plugin.jar calls.
+	* plugin/icedteanp/java/sun/applet/PluginStreamHandler.java: Added inner DummyHandler
+	doing nothing for  -html run.
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: final possible
+	fields made final;
+	* tests/netx/unit/net/sourceforge/jnlp/PluginParametersTest.java: hashtable
+	removal.
+	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java: enabled hot swap of file,
+	enabled switch to error screen.
+	* netx/net/sourceforge/jnlp/runtime/HtmlBoot.java:  new class, contains logic
+	to lunch from html
+	* netx/net/sourceforge/jnlp/runtime/JnlpBoot.java: new class, into which
+	original logic from boot.run was moved.
+	* netx/net/sourceforge/jnlp/runtime/html/AppletExtractor.java: new class,
+	responsible for parsing of html page and search for applets
+	* netx/net/sourceforge/jnlp/runtime/html/AppletParser.java: new class, 
+	responsible for construction of PluginBridge from parsed xml (applet-like)
+	element
+	* netx/net/sourceforge/jnlp/runtime/html/AppletsFilter.java: new class, responsible
+	for providing correct applets from page
+	* netx/net/sourceforge/jnlp/runtime/html/ElementValidator.java: new simple
+	interface used for searching in html document, to fire if element is/is not appelt
+	* netx/net/sourceforge/jnlp/util/Reflect.java: this class is long unused. removed.
+
+2014-12-19  Jiri Vanek  <jvanek@redhat.com>
 
 	* NEWS: mentioned menus
 
