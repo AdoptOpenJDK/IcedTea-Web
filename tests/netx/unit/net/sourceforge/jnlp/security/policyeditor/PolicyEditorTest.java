@@ -265,23 +265,4 @@ public class PolicyEditorTest {
         }
     }
 
-    @Test
-    public void testArgsToMap() throws Exception {
-        final String[] args = new String[] {
-                "-codebase", "http://example.com http://icedtea.classpath.org",
-                "-file", "/tmp/some-policy-file.tmp",
-                "-help"
-        };
-        Map<String, String> map = PolicyEditor.argsToMap(args);
-        assertTrue("Args map should contain help flag", map.containsKey("-help"));
-        assertTrue("Value for -help should be null but was " + map.get("-help"),
-                map.get("-help") == null);
-        assertTrue("Args map should contain file flag", map.containsKey("-file"));
-        assertTrue("Value for -file should be /tmp/some-policy-file.tmp but was " + map.get("-file"),
-                map.get("-file").equals("/tmp/some-policy-file.tmp"));
-        assertTrue("Args map should contain codebase flag", map.containsKey("-codebase"));
-        assertTrue("Value for codebase flag should be \"http://example.com http://icedtea.classpath.org\" but was " + map.get("-codebase"),
-                map.get("-codebase").equals("http://example.com http://icedtea.classpath.org"));
-    }
-
 }

@@ -85,8 +85,8 @@ public class OptionsDefinitions {
         HELP2("-help", "BOHelp2"),
         //policyeditor
         //-help
-        FILE("-file", "policy_file", "PBOFile"),
-        CODEBASE("-codebase", "url", "PBOCodebase");
+        FILE("-file", "policy_file", "PBOFile", NumberOfArguments.ONE),
+        CODEBASE("-codebase", "url", "PBOCodebase", NumberOfArguments.ONE_OR_MORE);
 
         public final String option;
 

@@ -1,3 +1,12 @@
+2014-01-21  Lukasz Dracz  <ldracz@redhat.com>
+
+	Change PolicyEditor to use OptionParser
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(argsToMap): removed
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java:
+	(testArgsToMap): removed
+
 2014-12-20  Jiri Vanek  <jvanek@redhat.com>
 
 	Added -html switch for javaws to run applets out of browser in applets sandbox

@@ -111,6 +111,7 @@ import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.optionparser.OptionParser;
 
 /**
  * This class provides a policy editing tool as a simpler alternate to
@@ -1582,9 +1583,9 @@ public class PolicyEditor extends JPanel {
      * -help will print a help message and immediately return (no editor instance opens)
      */
     public static void main(final String[] args) {
-        final Map<String, String> argsMap = argsToMap(args);
+        final OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
 
-        if (argsMap.containsKey(HELP_FLAG)) {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP1)) {
             final TextsProvider helpMessagesProvider = new PolicyEditorTextsProvider("utf-8", new PlainTextFormatter(), true, true);
             String HELP_MESSAGE = "\n";
             if (JNLPRuntime.isDebug()) {
@@ -1609,19 +1610,18 @@ public class PolicyEditor extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                String filepath = argsMap.get(FILE_FLAG);
-                if (filepath == null && args.length == 1) {
+                String filepath = optionParser.getParam(OptionsDefinitions.OPTIONS.FILE);
+                if (optionParser.getMainArgs().size() == 0) {
+                    filepath = null;
+                } else if (filepath == "") {
                     // maybe the user just forgot the -file flag, so try to open anyway
-                    filepath = args[0];
+                    filepath = optionParser.getMainArg();
                 }
                 final PolicyEditorWindow frame = getPolicyEditorFrame(filepath);
                 frame.asWindow().setVisible(true);
-                final String codebaseStr = argsMap.get(CODEBASE_FLAG);
-                if (codebaseStr != null) {
-                    final String[] urls = codebaseStr.split(" ");
-                    for (final String url : urls) {
-                        frame.getPolicyEditor().addNewCodebase(url);
-                    }
+                final List<String> codebases = optionParser.getParams(OptionsDefinitions.OPTIONS.CODEBASE);
+                for (final String url : codebases) {
+                    frame.getPolicyEditor().addNewCodebase(url);
                 }
             }
         });
@@ -1635,39 +1635,6 @@ public class PolicyEditor extends JPanel {
      */
     public static PolicyEditor createInstance(final String filepath) {
         return new PolicyEditor(filepath);
-    }
-
-    /**
-     * Create a Map out of argv
-     * @param args command line flags and parameters given to the program
-     * @return a Map representation of the command line arguments
-     */
-    static Map<String, String> argsToMap(final String[] args) {
-        final List<String> argsList = Arrays.<String> asList(args);
-        final Map<String, String> map = new HashMap<>();
-
-        if (argsList.contains(HELP_FLAG)) {
-            map.put(HELP_FLAG, null);
-        }
-
-        if (argsList.contains(FILE_FLAG)) {
-            map.put(FILE_FLAG, argsList.get(argsList.indexOf(FILE_FLAG) + 1));
-        }
-
-        if (argsList.contains(CODEBASE_FLAG)) {
-            final int flagIndex = argsList.indexOf(CODEBASE_FLAG);
-            final StringBuilder sb = new StringBuilder();
-            for (int i = flagIndex + 1; i < argsList.size(); ++i) {
-                final String str = argsList.get(i);
-                if (str.equals(HELP_FLAG) || str.equals(CODEBASE_FLAG) || str.equals(FILE_FLAG)) {
-                    break;
-                }
-                sb.append(str);
-                sb.append(" ");
-            }
-            map.put(CODEBASE_FLAG, sb.toString().trim());
-        }
-        return map;
     }
 
 }
