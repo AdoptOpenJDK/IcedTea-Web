@@ -1,3 +1,11 @@
+2014-01-23  Jiri Vanek  <jvanek@redhat.com>
+
+	Returned accidentally removed creation of shortcuts for jnlp applications.
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java: filling
+	of AccessWarningPaneComplexReturn no longer depnds on existence of htmlPanels.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: (BROWSERS) opera added
+	to list of recognized browsers
+
 2014-01-22  Jie Kang  <jkang@redhat.com>
 
 	Add quotes to Docs paths in Makefile.am

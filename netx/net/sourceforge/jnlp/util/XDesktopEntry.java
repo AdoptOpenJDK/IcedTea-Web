@@ -87,7 +87,7 @@ public class XDesktopEntry {
     //in pixels
     private static final int[] VALID_ICON_SIZES = new int[] { 16, 22, 32, 48, 64, 128 };
     //browsers we try to find  on path for html shortcut
-    public static final String[] BROWSERS = new String[]{"firefox", "midori", "epiphany", "chromium", "chrome", "konqueror"};
+    public static final String[] BROWSERS = new String[]{"firefox", "midori", "epiphany", "opera", "chromium", "chrome", "konqueror"};
     public static final String FAVICON = "favicon.ico";
 
     /**

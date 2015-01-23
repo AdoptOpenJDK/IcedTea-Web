@@ -328,11 +328,23 @@ public class AccessWarningPane extends SecurityDialogPanel {
 
     private AccessWarningPaneComplexReturn getModifier(int button) {
         AccessWarningPaneComplexReturn ar = new AccessWarningPaneComplexReturn(button);
-        if (htmlPanelDesktop != null && desktopCheck != null) {
-            ar.setDekstop(htmlPanelDesktop.getShortcutResult(desktopCheck.isSelected()));
+        if (desktopCheck != null) {
+            if (htmlPanelDesktop != null) {
+                //html
+                ar.setDekstop(htmlPanelDesktop.getShortcutResult(desktopCheck.isSelected()));
+            } else {
+                //jnlp
+                ar.setDekstop(new AccessWarningPaneComplexReturn.ShortcutResult(desktopCheck.isSelected()));
+            }
         }
-        if (htmlPanelMenu != null && menuCheck != null) {
-            ar.setMenu(htmlPanelMenu.getShortcutResult(menuCheck.isSelected()));
+        if (menuCheck != null) {
+            if (htmlPanelMenu != null) {
+                //html
+                ar.setMenu(htmlPanelMenu.getShortcutResult(menuCheck.isSelected()));
+            } else {
+                //jnlp
+                ar.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(menuCheck.isSelected()));
+            }
         }
         if (rememberPanel != null) {
             ar.setRember(rememberPanel.getShortcutResult());
