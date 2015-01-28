@@ -23,6 +23,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
@@ -47,7 +48,6 @@ import net.sourceforge.jnlp.util.WeakList;
  * @version $Revision: 1.9 $
  */
 public class Resource {
-
     // todo: fix resources to handle different versions
 
     // todo: IIRC, any resource is checked for being up-to-date
@@ -96,6 +96,9 @@ public class Resource {
     
     /** Update policy for this resource */
     private final UpdatePolicy updatePolicy;
+
+    /** Download options for this resource */
+    private DownloadOptions downloadOptions;
 
     /**
      * Create a resource.
@@ -414,6 +417,14 @@ public class Resource {
         }
     }
 
+    public void setDownloadOptions(DownloadOptions downloadOptions) {
+        this.downloadOptions = downloadOptions;
+    }
+
+    public DownloadOptions getDownloadOptions() {
+        return this.downloadOptions;
+    }
+
     @Override
     public int hashCode() {
         // FIXME: should probably have a better hashcode than this, but considering
@@ -440,7 +451,4 @@ public class Resource {
     public String toString() {
         return "location=" + location.toString() + " state=" + getStatusString();
     }
-    
-    
-
 }

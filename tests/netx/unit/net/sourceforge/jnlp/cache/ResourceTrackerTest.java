@@ -47,14 +47,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -72,13 +70,10 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class ResourceTrackerTest {
 
-    public static ServerLauncher testServer;
-    public static ServerLauncher testServerWithBrokenHead;
     public static ServerLauncher downloadServer;
     private static final PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
-    private static final String nameStub1 = "itw-server";
-    private static final String nameStub2 = "test-file";
+
 
     private static Resource createResource(final String name) throws MalformedURLException {
         return Resource.getResource(new URL("http://example.com/" + name + ".jar"), new Version("1.0"), UpdatePolicy.ALWAYS);
@@ -230,8 +225,6 @@ public class ResourceTrackerTest {
         System.setErr(backedUpStream[1]);
         OutputController.getLogger().setOut(backedUpStream[2]);
         OutputController.getLogger().setErr(backedUpStream[3]);
-
-
     }
 
     @BeforeClass
@@ -242,207 +235,6 @@ public class ResourceTrackerTest {
     @AfterClass
     public static void offDebug() {
         JNLPRuntime.setDebug(false);
-    }
-
-    @BeforeClass
-    public static void startServer() throws Exception {
-        redirectErr();
-        testServer = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
-        redirectErrBack();
-    }
-
-    @BeforeClass
-    public static void startServer2() throws Exception {
-        redirectErr();
-        testServerWithBrokenHead = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
-        testServerWithBrokenHead.setSupportingHeadRequest(false);
-        redirectErrBack();
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        testServer.stop();
-    }
-
-    @AfterClass
-    public static void stopServer2() {
-        testServerWithBrokenHead.stop();
-    }
-
-    @Test
-    public void getUrlResponseCodeTestWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestNotWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
-            f.delete();
-            i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestGetRequestOnNotWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.GET);
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceTracker.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.GET);
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestGetRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.GET);
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.GET);
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestWrongRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            Exception exception = null;
-            try {
-                ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.TESTING_UNDEF);
-            } catch (Exception ex) {
-                exception = ex;
-            }
-            Assert.assertNotNull(exception);
-            exception = null;
-            f.delete();
-            try {
-                ResourceTracker.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.TESTING_UNDEF);
-            } catch (Exception ex) {
-                exception = ex;
-            }
-            Assert.assertNotNull(exception);;
-        } finally {
-            redirectErrBack();
-        }
-
-    }
-
-    @Test
-    public void findBestUrltest() throws Exception {
-        redirectErr();
-        try {
-            File fileForServerWithHeader = File.createTempFile(nameStub1, nameStub2);
-            File versionedFileForServerWithHeader = new File(fileForServerWithHeader.getParentFile(), fileForServerWithHeader.getName() + "-2.0");
-            versionedFileForServerWithHeader.createNewFile();
-
-            File fileForServerWithoutHeader = File.createTempFile(nameStub1, nameStub2);
-            File versionedFileForServerWithoutHeader = new File(fileForServerWithoutHeader.getParentFile(), fileForServerWithoutHeader.getName() + "-2.0");
-            versionedFileForServerWithoutHeader.createNewFile();
-
-            ResourceTracker rt = new ResourceTracker();
-            Resource r1 = Resource.getResource(testServer.getUrl(fileForServerWithHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r2 = Resource.getResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r3 = Resource.getResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), new Version("1.0"), UpdatePolicy.NEVER);
-            Resource r4 = Resource.getResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), new Version("1.0"), UpdatePolicy.NEVER);
-            assertOnServerWithHeader(rt.findBestUrl(r1));
-            assertVersionedOneOnServerWithHeader(rt.findBestUrl(r3));
-            assertOnServerWithoutHeader(rt.findBestUrl(r2));
-            assertVersionedOneOnServerWithoutHeader(rt.findBestUrl(r4));
-
-            fileForServerWithHeader.delete();
-            Assert.assertNull(rt.findBestUrl(r1));
-            assertVersionedOneOnServerWithHeader(rt.findBestUrl(r3));
-            assertOnServerWithoutHeader(rt.findBestUrl(r2));
-            assertVersionedOneOnServerWithoutHeader(rt.findBestUrl(r4));
-
-            versionedFileForServerWithHeader.delete();
-            Assert.assertNull(rt.findBestUrl(r1));
-            Assert.assertNull(rt.findBestUrl(r3));
-            assertOnServerWithoutHeader(rt.findBestUrl(r2));
-            assertVersionedOneOnServerWithoutHeader(rt.findBestUrl(r4));
-
-            versionedFileForServerWithoutHeader.delete();
-            Assert.assertNull(rt.findBestUrl(r1));
-            Assert.assertNull(rt.findBestUrl(r3));
-            assertOnServerWithoutHeader(rt.findBestUrl(r2));
-            Assert.assertNull(rt.findBestUrl(r4));
-
-
-            fileForServerWithoutHeader.delete();
-            Assert.assertNull(rt.findBestUrl(r1));
-            Assert.assertNull(rt.findBestUrl(r3));
-            Assert.assertNull(rt.findBestUrl(r2));
-            Assert.assertNull(rt.findBestUrl(r4));
-        } finally {
-            redirectErrBack();
-        }
-
-    }
-
-    private void assertOnServerWithHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServer.getPort());
-    }
-
-    private void assertVersionedOneOnServerWithHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServer.getPort());
-        assertVersion(u);
-    }
-
-    private void assertOnServerWithoutHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServerWithBrokenHead.getPort());
-    }
-
-    private void assertVersionedOneOnServerWithoutHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServerWithBrokenHead.getPort());
-        assertVersion(u);
-    }
-
-    private void assertCommonComponentsOfUrl(URL u) {
-        Assert.assertTrue(u.getProtocol().equals("http"));
-        Assert.assertTrue(u.getHost().equals("localhost"));
-        Assert.assertTrue(u.getPath().contains(nameStub1));
-        Assert.assertTrue(u.getPath().contains(nameStub2));
-        ServerAccess.logOutputReprint(u.toExternalForm());
-    }
-
-    private void assertPort(URL u, int port) {
-        Assert.assertTrue(u.getPort() == port);
-    }
-
-    private void assertVersion(URL u) {
-        Assert.assertTrue(u.getPath().contains("-2.0"));
-        Assert.assertTrue(u.getQuery().contains("version-id=1.0"));
     }
 
     private static String cacheDir;

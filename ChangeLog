@@ -1,3 +1,29 @@
+2015-01-28  Jie Kang  <jkang@redhat.com>
+
+	Refactor initialize/download runnable out of ResourceTracker and add tests
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: moved Downloader
+	runnable into ResourceDownloader along with initialize and download
+	functions and their sub-functions. Removed prefetchTracker system and
+	queue. Moved downloadOptions into Resource.java. 
+	* netx/net/sourceforge/jnlp/cache/Resource.java: added downloadOptions
+	field and getter/setter
+	* netx/net/sourceforge/jnlp/cache/ResourceDownloader.java:
+	(getUrlResponseCode), (getUrlResponseCodeWithRedirectonResult)
+	(initializeResource), (findBestUrl), (downloadResource),
+	(getDownloadConnection), (downloadPackGzFile), (downloadGZipFile),
+	(downloadFile), (storeEntryFields), (writeDownloadToFile)(uncompressGzip), 
+	(uncompressPackGz): new Runnable class for initializing and downloading
+	resources. Code	from ResourceTracker.java
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java:
+	tests for downloading/initializing functions and their subfunctions moved
+	to ResourceDownloaderTest.java
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceDownloaderTest.java:
+	relevant tests from ResourceTrackerTest.java moved here.
+	(testDownloadResource), (testDownloadPackGzResource)
+	(testDownloadVersionedResource), (testDownloadVersionedPackGzResource)
+	(testDownloadLocalResourceFails), (testDownloadNotExistingResourceFails):
+	New tests added
+
 2014-01-23  Jiri Vanek  <jvanek@redhat.com>
 
 	Returned accidentally removed creation of shortcuts for jnlp applications.
