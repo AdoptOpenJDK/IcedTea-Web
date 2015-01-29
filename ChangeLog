@@ -1,3 +1,13 @@
+2015-01-29  Jie Kang  <jkang@redhat.com>
+
+	Fix accessing Java array elements from Javascript. PR1298. Fix provided by
+	Marcin Cieslak
+	* AUTHORS : Add Marcin Cieslak to authors.
+	* NEWS : Add fix to news
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: (javaObjectResultToNPVariant) add
+	jclass_name parameter to javaObjectResultToNPVariant function and use to
+	determine type of object.
+
 2015-01-28  Jie Kang  <jkang@redhat.com>
 
 	Refactor initialize/download runnable out of ResourceTracker and add tests

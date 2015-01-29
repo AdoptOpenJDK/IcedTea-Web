@@ -863,7 +863,7 @@ javaJSObjectResultToNPVariant(const std::string& js_id, NPVariant* variant)
 }
 
 static bool
-javaObjectResultToNPVariant(NPP instance, const std::string& jobject_id, NPVariant* variant)
+javaObjectResultToNPVariant(NPP instance, const std::string& jclass_name, const std::string& jobject_id, NPVariant* variant)
 {
     // Reference the class object so we can construct an NPObject with it and the instance
 
@@ -878,12 +878,14 @@ javaObjectResultToNPVariant(NPP instance, const std::string& jobject_id, NPVaria
     std::string jclass_id = *jclass_result->return_string;
 
     NPObject* obj;
-    if (jclass_id.at(0) == '[') // array
+    if (jclass_name.at(0) == '[') // array
     {
+        PLUGIN_DEBUG( "javaObjectResultToNPVariant Array detected: \"%s\"\n", jclass_name.c_str());
         obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, jclass_id,
                 jobject_id, true);
     } else
     {
+        PLUGIN_DEBUG( "javaObjectResultToNPVariant Scalar object: \"%s\"\n", jclass_name.c_str());
         obj = IcedTeaScriptableJavaObject::get_scriptable_java_object(instance, jclass_id,
                 jobject_id, false);
     }
@@ -924,7 +926,8 @@ IcedTeaPluginUtilities::javaResultToNPVariant(NPP instance,
             return javaStringResultToNPVariant(jobject_id, variant);
         } else // Else this needs a java object wrapper
         {
-            return javaObjectResultToNPVariant(instance, jobject_id, variant);
+            return javaObjectResultToNPVariant(instance, *jclassname_result->return_string,
+                   jobject_id, variant);
         }
     }
 

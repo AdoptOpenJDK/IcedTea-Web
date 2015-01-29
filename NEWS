@@ -29,6 +29,7 @@ New in release 1.6 (2014-XX-XX):
   - added support for -html switch for javaws. Now you can run most of the applets without browser at all
 * Plugin
   - PR1743 - Intermittant deadlock in PluginRequestProcessor
+  - PR1298 - LiveConnect - problem setting array elements (applet variables) from JS
   - RH1121549: coverity defects
   - Resolves method overloading correctly with superclass heirarchy distance
 * PolicyEditor
