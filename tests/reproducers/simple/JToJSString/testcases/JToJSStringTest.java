@@ -80,7 +80,6 @@ public class JToJSStringTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    @KnownToFail
     @Bug(id = { "PR1794" })
     public void StringArrayTest() throws Exception {
         javaToJSTest("/JToJSString.html", "abc");
@@ -96,7 +95,6 @@ public class JToJSStringTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    @KnownToFail
     @Bug(id = { "PR1794" })
     public void jnlpStringArrayAppletTest() throws Exception {
         javaToJSTest("/JToJSStringJnlpApplet.html", "abc");

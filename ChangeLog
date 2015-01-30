@@ -1,3 +1,9 @@
+2015-01-30  Jie Kang  <jkang@redhat.com>
+
+	Remove KnownToFail annotation from JToJSString reproducer tests.
+	* tests/reproducers/simple/JToJSString/testcases/JToJSStringTest.java:
+	(StringArrayTest)(jnlpStringArrayAppletTest): annotations removed
+
 2015-01-29  Jie Kang  <jkang@redhat.com>
 
 	Fix accessing Java array elements from Javascript. PR1298. Fix provided by
