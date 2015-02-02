@@ -1,3 +1,10 @@
+2015-02-02  Omair Majid  <omajid@redhat.com>
+
+	* configure.ac: Search for hamcrest jar.
+	* Makefile.am: Initialize JUNIT_RUNTIME with JUNIT_JAR and/or
+	HAMCREST_JAR. Adjust all code using JUNIT_JAR to use JUNIT_RUNTIME
+	or HAMCREST_JAR explicitly.
+
 2015-01-30  Jie Kang  <jkang@redhat.com>
 
 	Remove KnownToFail annotation from JToJSString reproducer tests.

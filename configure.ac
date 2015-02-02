@@ -118,6 +118,8 @@ IT_FIND_OPTIONAL_JAR([rhino], RHINO,
     [/usr/share/java/js.jar /usr/share/rhino-1.6/lib/js.jar])
 IT_FIND_OPTIONAL_JAR([junit], JUNIT,
     [/usr/share/java/junit4.jar /usr/share/junit-4/lib/junit.jar])
+IT_FIND_OPTIONAL_JAR([hamcrest], HAMCREST,
+    [/usr/share/java/hamcrest/all.jar /usr/share/java/hamcrest-core.jar])
 IT_FIND_OPTIONAL_JAR([emma], EMMA,
     [/usr/share/java/emma.jar])
 IT_FIND_OPTIONAL_JAR([jacoco], JACOCO,
