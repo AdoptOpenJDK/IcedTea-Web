@@ -6,6 +6,7 @@ export NETX_DIR = $(abs_top_builddir)/netx.build
 export DOCS_DIR=$(TOP_BUILD_DIR)/icedtea-web-docs/$(FULL_VERSION)
 export NETX_SRCDIR = $(abs_top_srcdir)/netx
 export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
+export ICONS_DEST_DIR=$(DESTDIR)$(datadir)/pixmaps
 
 export REPORT_STYLES_DIRNAME=report-styles
 
@@ -267,13 +268,14 @@ clean-local: clean-netx clean-plugin clean-liveconnect \
  clean-junit-runner clean-netx-unit-tests
 
 install-exec-local:
-	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir)
+	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir) $(ICONS_DEST_DIR)
 if ENABLE_PLUGIN
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) $(DESTDIR)$(libdir)
 	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+	${INSTALL_DATA} $(abs_top_srcdir)/javaws.png $(ICONS_DEST_DIR)/
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor) $(DESTDIR)$(bindir)
@@ -304,6 +306,7 @@ uninstall-local:
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	rm -r $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+	rm -r $(ICONS_DEST_DIR)/javaws.png
 	KNOWN_MANS="icedtea-web.1  icedtea-web-plugin.1  itweb-settings.1  javaws.1  policyeditor.1" ; \
 	KNOWN_DIRS="man1 de/man1 pl/man1 cs/man1" ; \
 	for file in $$KNOWN_MANS ; do \

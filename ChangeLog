@@ -1,3 +1,11 @@
+2014-02-06  Jiri Vanek  <jvanek@redhat.com>
+
+	Also javaws.png icon is being installed in make install.
+	* Makefile.am: declared ICONS_DEST_DIR with value pointing to icons dir
+	(install-exec-local) ICONS_DEST_DIR added to list of created directories
+	javaws.png installed into ICONS_DEST_DIR. (uninstall-local) javaws.png
+	removed from ICONS_DEST_DIR.
+
 2015-02-02  Omair Majid  <omajid@redhat.com>
 
 	* configure.ac: Search for hamcrest jar.
