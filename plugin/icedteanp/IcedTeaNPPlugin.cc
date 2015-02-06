@@ -64,7 +64,15 @@ exception statement from your version. */
 #define PLUGIN_FULL_NAME PLUGIN_NAME " (using " PLUGIN_VERSION ")"
 #define PLUGIN_DESC "The <a href=\"" PACKAGE_URL "\">" PLUGIN_NAME "</a> executes Java applets."
 
-#ifdef HAVE_JAVA8
+#ifdef HAVE_JAVA9
+ #define JPI_VERSION "1.9.0_" JDK_UPDATE_VERSION
+ #define PLUGIN_APPLET_MIME_DESC \
+  "application/x-java-applet;version=1.8:class,jar:IcedTea;"\
+  "application/x-java-applet;version=1.9:class,jar:IcedTea;"
+ #define PLUGIN_BEAN_MIME_DESC \
+  "application/x-java-bean;version=1.8:class,jar:IcedTea;" \
+  "application/x-java-bean;version=1.9:class,jar:IcedTea;"
+#elif HAVE_JAVA8
  #define JPI_VERSION "1.8.0_" JDK_UPDATE_VERSION
  #define PLUGIN_APPLET_MIME_DESC \
   "application/x-java-applet;version=1.8:class,jar:IcedTea;"

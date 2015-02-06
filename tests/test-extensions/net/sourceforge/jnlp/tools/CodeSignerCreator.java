@@ -204,7 +204,7 @@ public class CodeSignerCreator {
             String className = null;
             if (javaVersion.startsWith("1.7")) {
                 className = "sun.security.x509.CertAndKeyGen";
-            } else if (javaVersion.startsWith("1.8")) {
+            } else if (javaVersion.startsWith("1.8") || javaVersion.startsWith("1.9")) {
                 className = "sun.security.tools.keytool.CertAndKeyGen";
             } else {
                 throw new AssertionError("Unrecognized Java Version");

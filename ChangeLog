@@ -1,3 +1,19 @@
+2014-02-06  Fridrich Strba <fridrich.strba@suse.com>
+
+	Removed bootstrap, made buildable with modular JDK
+	* AUTHORS: Fridrich added
+	* Makefile.am: defined composeclasspath to create always valid classpath elements
+	EMMA_JAVA_ARGS and EMMA_MODIFIED_FILES renamed to COVERAGE_JAVA_ARG and
+	COVERAGE_MODIFIED_FILES. Removed RHINO_RUNTIME, BOOT_DIR. PLUGIN_RUNTIME 
+	renamed to PLUGIN_JAR. All manual constructions of classpath replaced by
+	composeclasspath. All BOOT_ definition replaced by SYSTEM_JRE_DIR and
+	SYSTEM_JDK_DIR. Removed all legacy emma targets. Removed all bootstrap targets.
+	* acinclude.m4: added check for jdk9
+	* configure.ac: removed check for emma
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: added support for jdk9 mimetypes
+	* tests/test-extensions/net/sourceforge/jnlp/tools/CodeSignerCreator.java:
+	made aware of jdk9
+	
 2014-02-06  Jiri Vanek  <jvanek@redhat.com>
 
 	Also javaws.png icon is being installed in make install.

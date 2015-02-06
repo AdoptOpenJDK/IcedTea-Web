@@ -734,15 +734,20 @@ AC_DEFUN_ONCE([IT_CHECK_JAVA_VERSION],
   AC_MSG_RESULT($JAVA_VERSION)
   HAVE_JAVA7=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.7) print "yes"}'`
   HAVE_JAVA8=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.8) print "yes"}'`
+  HAVE_JAVA9=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.9) print "yes"}'`
   if test -z "$HAVE_JAVA7"; then
     AC_MSG_ERROR([JDK7 or newer is required, detected was: $JAVA_VERSION])
   fi
   if ! test -z "$HAVE_JAVA8"; then
     VERSION_DEFS="-DHAVE_JAVA8"
   fi
+  if ! test -z "$HAVE_JAVA9"; then
+    VERSION_DEFS="-DHAVE_JAVA9"
+  fi
   AC_SUBST(VERSION_DEFS)
   AM_CONDITIONAL([HAVE_JAVA7], test x"${HAVE_JAVA7}" = "xyes")
   AM_CONDITIONAL([HAVE_JAVA8], test x"${HAVE_JAVA8}" = "xyes")
+  AM_CONDITIONAL([HAVE_JAVA9], test x"${HAVE_JAVA9}" = "xyes")
 ])
 
 AC_DEFUN_ONCE([IT_FIND_KEYTOOL],
