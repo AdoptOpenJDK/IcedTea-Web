@@ -1,3 +1,13 @@
+2014-02-09  Jie Kang  <jkang@redhat.com>
+
+	Fix javascript url error in JSToJSet reproducer.
+	* tests/reproducers/simple/JSToJSet/resources/JSToJSet.html: added quotes
+	around scriptable paramter.
+	* tests/reproducers/simple/JSToJSet/resources/JSToJava_Set.js: decode url
+	before using it
+	* tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java:
+	KnownToFail annotations removed from tests that now pass correctly.
+
 2015-02-06  Fridrich Strba <fridrich.strba@suse.com>
 
 	Removed bootstrap, made buildable with modular JDK

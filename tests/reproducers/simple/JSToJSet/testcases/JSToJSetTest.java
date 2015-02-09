@@ -176,7 +176,6 @@ public class JSToJSetTest extends BrowserTest {
     @Test
     @TestInBrowsers(testIn = { Browsers.all })
     @NeedsDisplay
-    @KnownToFail
     @Bug(id = { "PR1298" })
     public void AppletJSToJSet_intArrayElement_Test() throws Exception {
         jsToJavaSetSpecialTest("_intArray[0]", "1", TestType.ARRAY_ELEMENT);

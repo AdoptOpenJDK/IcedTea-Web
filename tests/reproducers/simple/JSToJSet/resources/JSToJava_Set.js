@@ -5,7 +5,8 @@ function JSCar(mph, color) {
 }
 
 function attemptSetTests() {
-    var urlArgs = document.URL.split("?");
+    var decodedUrl = decodeURI(document.URL);
+    var urlArgs = decodedUrl.split("?");
     var testParams = urlArgs[1].split(";");
     var field = testParams[0];
     var value = testParams[1];
@@ -26,7 +27,6 @@ function attemptSetTests() {
         if (field === "_JSObject") {
             value = new JSCar(100, "red");
         }
-
     } else if (value.indexOf('[') != -1) {
 
         var elem = value.substring(1);
@@ -34,9 +34,9 @@ function attemptSetTests() {
         value[0] = elem;
     }
 
-    eval('applet.' + field + '= value');
+    eval('applet.' + field + ' = value');
 
-    // modifiing _intArray[0] into _intArray
+    // modifying _intArray[0] into _intArray
     // _DoubleArray[0] into _DoubleArray
     var nameEnd = field.indexOf('[');
     if (nameEnd != -1) {
