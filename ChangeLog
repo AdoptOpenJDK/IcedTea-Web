@@ -1,4 +1,4 @@
-2014-02-06  Fridrich Strba <fridrich.strba@suse.com>
+2015-02-06  Fridrich Strba <fridrich.strba@suse.com>
 
 	Removed bootstrap, made buildable with modular JDK
 	* AUTHORS: Fridrich added
@@ -14,7 +14,7 @@
 	* tests/test-extensions/net/sourceforge/jnlp/tools/CodeSignerCreator.java:
 	made aware of jdk9
 	
-2014-02-06  Jiri Vanek  <jvanek@redhat.com>
+2015-02-06  Jiri Vanek  <jvanek@redhat.com>
 
 	Also javaws.png icon is being installed in make install.
 	* Makefile.am: declared ICONS_DEST_DIR with value pointing to icons dir
