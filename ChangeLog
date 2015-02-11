@@ -1,4 +1,14 @@
-2014-02-09  Jie Kang  <jkang@redhat.com>
+2015-02-11  Jiri Vanek  <jvanek@redhat.com>
+
+	Saving/Loading of icon made resistent against URLs with invalid/without target
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: getCachedResource split
+	into getCachedResourceFile and getCachedResourceURL (which is jsut transforming
+	file from getCachedResourceFile to URL)
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: (cacheIcon) calls to 
+	getCachedResource replaced by calls to getCachedResourceURL and added null
+	checks. New method of cantCache to unify NonFileProtocolException throw.
+
+2015-02-09  Jie Kang  <jkang@redhat.com>
 
 	Fix javascript url error in JSToJSet reproducer.
 	* tests/reproducers/simple/JSToJSet/resources/JSToJSet.html: added quotes

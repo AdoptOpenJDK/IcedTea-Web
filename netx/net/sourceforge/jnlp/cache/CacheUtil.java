@@ -70,18 +70,37 @@ public class CacheUtil {
      *
      * @param location location of the resource
      * @param version the version, or {@code null}
+     * @param policy how to handle update
      * @return either the location in the cache or the original location
      */
-    public static URL getCachedResource(URL location, Version version, UpdatePolicy policy) {
-        ResourceTracker rt = new ResourceTracker();
-        rt.addResource(location, version, null, policy);
+    public static URL getCachedResourceURL(URL location, Version version, UpdatePolicy policy) {
         try {
-            File f = rt.getCacheFile(location);
+            File f = getCachedResourceFile(location, version, policy);
+            //url was ponting to nowhere eg 404
+            if (f == null){
+                //originally  f.toUrl was throwing NPE
+                return null;
+                //returning null seems to be better
+            }
             // TODO: Should be toURI().toURL()
             return f.toURL();
         } catch (MalformedURLException ex) {
             return location;
         }
+    }
+    
+    /**
+     * This is returning File object of cached resource originally from URL
+     * @param location original location of blob
+     * @param version
+     * @param policy
+     * @return location in ITW cache on filesystem 
+     */
+    public static File  getCachedResourceFile(URL location, Version version, UpdatePolicy policy) {
+        ResourceTracker rt = new ResourceTracker();
+        rt.addResource(location, version, null, policy);
+        File f = rt.getCacheFile(location);
+        return f;
     }
 
     /**

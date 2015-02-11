@@ -431,10 +431,14 @@ public class XDesktopEntry {
 
         String location = null;
         if (uiconLocation != null) {
-            location = CacheUtil.getCachedResource(uiconLocation, null, UpdatePolicy.SESSION)
-                    .toString();
+            //this throws npe, if url (specified in jnlp) points to 404
+            URL urlLocation = CacheUtil.getCachedResourceURL(uiconLocation, null, UpdatePolicy.SESSION);
+            if (urlLocation == null) {
+                cantCache();
+            }
+            location = urlLocation.toString();
             if (!location.startsWith("file:")) {
-                throw new NonFileProtocolException("Unable to cache icon");
+                cantCache();
             }
         } else {
             //try favicon.ico
@@ -445,10 +449,14 @@ public class XDesktopEntry {
                         file.getCodeBase().getPort(),
                         "/" + FAVICON);
                 JNLPFile.openURL(favico, null, UpdatePolicy.ALWAYS);
-                location = CacheUtil.getCachedResource(favico, null, UpdatePolicy.SESSION)
-                        .toString();
+                //this MAY throw npe, if url (specified in jnlp) points to 404
+                URL urlLocation = CacheUtil.getCachedResourceURL(favico, null, UpdatePolicy.SESSION);
+                if (urlLocation == null) {
+                    cantCache();
+                }
+                location = urlLocation.toString();
                 if (!location.startsWith("file:")) {
-                    throw new NonFileProtocolException("Unable to cache icon");
+                    cantCache();
                 }
             } catch (IOException ex) {
                 //favicon 404 or similar
@@ -472,6 +480,10 @@ public class XDesktopEntry {
             this.iconLocation = target.getAbsolutePath();
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + origLocation);
         }
+    }
+
+    private void cantCache() throws NonFileProtocolException {
+        throw new NonFileProtocolException("Unable to cache icon");
     }
 
     private String getDesktopIconName() {
