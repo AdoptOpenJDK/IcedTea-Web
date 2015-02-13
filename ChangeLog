@@ -1,3 +1,15 @@
+2015-02-13  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed few small errors in jacoco processing after removal of bootstrap.
+	* Makefile.am: (JACOCO_CLASSPATH) changed to be space delimited, to be used
+	via joinsegments. (JACOCO_OPERATOR_EXEC) using joinsegments on JACOCO_CLASSPATH.
+	(UNIFIED_CLASSPATH) split to new *_SEGMENTS and call of joinsegments on it.
+	Similarly with UNIFIED_JACOCO_CLASSPATH/(_SEGMENTS). Adapted 
+	PLUGIN_COVERAGE_BOOTCLASSPATH. (stamps/compile-jacoco-operator.stamp) uses
+	composeclasspath on JACOCO_CLASSPATH. (stamps/compile-jacoco-operator.stamp)
+	nw_bootclasspath adapted. (stamps/run-reproducers-test-code-coverage-jacoco.stamp)
+	added missing comma in CLASSPATH=$(call joinsegment, ... ) call.
+
 2015-02-13  Jie Kang  <jkang@redhat.com>
 
 	* .hgignore: added netx-dist-tests-whitelist to prevent unintentional commits

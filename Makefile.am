@@ -77,14 +77,15 @@ export JACOCO_AGENTRT=org.jacoco.agent.rt.jar
 export JACOCO_CORE=org.jacoco.core.jar
 export JACOCO_JAVAWS_RESULTS=$(TEST_EXTENSIONS_DIR)/jacoco_javaws.exec
 export JACOCO_PLUGIN_RESULTS=$(TEST_EXTENSIONS_DIR)/jacoco_plugin.exec
-export JACOCO_CLASSPATH=$(JACOCO_PATH)/$(JACOCO_CORE):$(JACOCO_PATH)/$(JACOCO_AGENT):$(JACOCO_PATH)/$(JACOCO_REPORT):$(JACOCO_PATH)/$(JACOCO_AGENTRT):$(JACOCO_PATH)/$(JACOCO_ANT):$(ASM_JAR)
+# space separated fragments for composeclasspath
+export JACOCO_CLASSPATH=$(JACOCO_PATH)/$(JACOCO_CORE) $(JACOCO_PATH)/$(JACOCO_AGENT) $(JACOCO_PATH)/$(JACOCO_REPORT) $(JACOCO_PATH)/$(JACOCO_AGENTRT) $(JACOCO_PATH)/$(JACOCO_ANT) $(ASM_JAR)
 export JACOCO_AGENT_SWITCH_BODY=-javaagent:$(JACOCO_PATH)/$(JACOCO_AGENTRT)
 export JACOCO_BASE_EXCLUDE=org.junit.*:junit.*
 export JACOCO_ADVANCED_EXCLUDE=:*jacoco*:java.lang.*:java.reflect.*:java.util.*:sun.reflect.*
 export JACOCO_AGENT_SWITCH="$(JACOCO_AGENT_SWITCH_BODY)=excludes=$(JACOCO_BASE_EXCLUDE)$(JACOCO_ADVANCED_EXCLUDE),inclbootstrapclasses=true"
 export JACOCO_AGENT_JAVAWS_SWITCH=\"$(JACOCO_AGENT_SWITCH),destfile=$(JACOCO_JAVAWS_RESULTS)\"
 export JACOCO_AGENT_PLUGIN_SWITCH=\"$(JACOCO_AGENT_SWITCH),destfile=$(JACOCO_PLUGIN_RESULTS)\"
-export JACOCO_OPERATOR_EXEC=$(SYSTEM_JRE_DIR)/bin/java $(COVERAGE_JAVA_ARGS) -cp $(JACOCO_OPERATOR_DIR):$(JACOCO_CLASSPATH):. org.jacoco.operator.Main
+export JACOCO_OPERATOR_EXEC=$(SYSTEM_JRE_DIR)/bin/java $(COVERAGE_JAVA_ARGS) -cp $(call joinsegments, $(JACOCO_OPERATOR_DIR) $(JACOCO_CLASSPATH) .) org.jacoco.operator.Main
 
 # linking variables
 export PLUGIN_LINK_NAME=libjavaplugin.so
@@ -135,12 +136,15 @@ export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) 
 #    IllegalAccessException
 #  - we want full privileges
 #
-export UNIFIED_CLASSPATH=$(call joinsegments, $(datadir)/$(PACKAGE_NAME)/netx.jar $(PLUGIN_JAR) $(RHINO_JAR) $(TAGSOUP_JAR))
+export UNIFIED_CLASSPATH_SEGMENTS=$(datadir)/$(PACKAGE_NAME)/netx.jar $(PLUGIN_JAR) $(RHINO_JAR) $(TAGSOUP_JAR)
+export UNIFIED_JACOCO_CLASSPATH_SEGMENTS=$(UNIFIED_CLASSPATH_SEGMENTS) $(JACOCO_CLASSPATH)
+export UNIFIED_CLASSPATH=$(call joinsegments, $(UNIFIED_CLASSPATH_SEGMENTS))
+export UNIFIED_JACOCO_CLASSPATH=$(call joinsegments, $(UNIFIED_JACOCO_CLASSPATH_SEGMENTS))
 export UNIFIED_BOOTCLASSPATH=-Xbootclasspath/a:$(UNIFIED_CLASSPATH)
-# note javaws, itwebsettings and policyeditor (== LAUNCHER_BOOTCLASSPATH) must be always able to compileand run *without* plugin
+# note javaws, itwebsettings and policyeditor (== LAUNCHER_BOOTCLASSPATH) must be always able to compile and run *without* plugin
 export LAUNCHER_BOOTCLASSPATH="$(UNIFIED_BOOTCLASSPATH)"
 export PLUGIN_BOOTCLASSPATH='"$(UNIFIED_BOOTCLASSPATH)"'
-export PLUGIN_COVERAGE_BOOTCLASSPATH='"$(UNIFIED_BOOTCLASSPATH):$(JACOCO_CLASSPATH)"'
+export PLUGIN_COVERAGE_BOOTCLASSPATH='"-Xbootclasspath/a:$(UNIFIED_JACOCO_CLASSPATH)"'
 
 # Fake update version to work with the Deployment Toolkit script used by Oracle
 # http://download.oracle.com/javase/tutorial/deployment/deploymentInDepth/depltoolkit_index.html
@@ -1168,7 +1172,7 @@ if WITH_JACOCO
 	mkdir -p $(JACOCO_OPERATOR_DIR) && \
 	$(SYSTEM_JDK_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	  -d $(JACOCO_OPERATOR_DIR) \
-	  -classpath $(JACOCO_CLASSPATH) \
+	  $(call composeclasspath, $(JACOCO_CLASSPATH)) \
 	  @jacoco-operator-source-files.txt ;
 else 
 	echo "Sorry, jacoco coverage report generator  cant be compiled without jacoco installed. Try installing jacoco or specify with-jacoco value" ;
@@ -1256,7 +1260,7 @@ if WITH_JACOCO
 	javaws_backup=$(DESTDIR)$(bindir)/javaws_backup ; \
 	mv $(DESTDIR)$(bindir)/javaws $$javaws_backup ;  \
 	echo "patching $(javaws)" ; \
-	nw_bootclasspath="$(LAUNCHER_BOOTCLASSPATH):$(JACOCO_CLASSPATH)" ; \
+	nw_bootclasspath="-Xbootclasspath/a:$(UNIFIED_JACOCO_CLASSPATH)" ; \
 	cat $$javaws_backup | sed "s|COMMAND.k.=\"..JAVA.\"|COMMAND[k]=\"\\$$\\{JAVA\\}\" ;  k=1 ; COMMAND[k]=$(JACOCO_AGENT_JAVAWS_SWITCH)|" | sed "s,$(LAUNCHER_BOOTCLASSPATH),$$nw_bootclasspath," > $(DESTDIR)$(bindir)/$(javaws) ; \
 	chmod 777 $(DESTDIR)$(bindir)/$(javaws) ; \
 	echo "backuping plugin in $(DESTDIR)/$(libdir)$(BUILT_PLUGIN_LIBRARY)" ; \
@@ -1278,7 +1282,7 @@ if WITH_JACOCO
 	  done ; \
 	cd $(TEST_EXTENSIONS_DIR) ; \
 	class_names=`cat $(REPRODUCERS_CLASS_NAMES)` ; \
-	CLASSPATH=$(call joinsegments $(NETX_DIR)/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) . $(TEST_EXTENSIONS_DIR) $(JACOCO_CLASSPATH) $(TEST_EXTENSIONS_TESTS_DIR) $(TEST_EXTENSIONS_SRCDIR)) ; \
+	CLASSPATH=$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) . $(TEST_EXTENSIONS_DIR) $(JACOCO_CLASSPATH) $(TEST_EXTENSIONS_TESTS_DIR) $(TEST_EXTENSIONS_SRCDIR)) ; \
 	  $(SYSTEM_JRE_DIR)/bin/java $(JACOCO_AGENT_SWITCH) $(REPRODUCERS_DPARAMETERS) \
 	 -Xbootclasspath/a:$$CLASSPATH CommandLine $$class_names ; \
 	if [ -f $(JACOCO_JAVAWS_RESULTS) ] ; then \
