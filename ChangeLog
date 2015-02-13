@@ -1,3 +1,7 @@
+2015-02-13  Jie Kang  <jkang@redhat.com>
+
+	* .hgignore: added netx-dist-tests-whitelist to prevent unintentional commits
+
 2015-02-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Added better support for not-matching detected jdk when version forced.
