@@ -17,6 +17,10 @@
 package net.sourceforge.jnlp;
 
 import java.util.*;
+import javax.swing.JOptionPane;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * <p>
@@ -39,6 +43,61 @@ import java.util.*;
  * @version $Revision: 1.5 $
  */
 public class Version {
+    
+    /**
+     * This is special case of version, used only for checking jre version. If
+     * jre do not match, in strict not-headless mode the dialog with
+     * confirrmation appears If jre do not match, in strict headless mode the
+     * exception is thrown If jre match, or non-strict mode is run, then only
+     * message is printed
+     *
+     */
+    public static class JreVersion extends Version {
+
+        public static boolean warned = false;
+
+        public JreVersion(String v, boolean strict) {
+            this(v, strict, JNLPRuntime.isHeadless());
+        }
+
+        /*
+         *  for testing purposes
+         */
+        JreVersion(String v, boolean strict, boolean headless) {
+            super(v);
+            boolean match = matchesJreVersion();
+            if (!match) {
+                String s = Translator.R("JREversionDontMatch", getJreVersion(), v);
+                String e = "Strict run is  deffined, and your JRE - " + getJreVersion() + " - dont match requested JRE(s) - " + v;
+                if (strict) {
+                    if (!headless) {
+                        if (!warned) {
+                            int r = JOptionPane.showConfirmDialog(null, s + "\n" + Translator.R("JREContinueDialogSentence2"), Translator.R("JREContinueDialogSentenceTitle"), JOptionPane.YES_NO_OPTION);
+                            if (r == JOptionPane.NO_OPTION) {
+                                throw new RuntimeException(e);
+                            }
+                            warned = true;
+                        }
+                    } else {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, s);
+                }
+            } else {
+                OutputController.getLogger().log("good - your JRE - " + getJreVersion() + " - match requested JRE - " + v);
+            }
+        }
+
+        public boolean matchesJreVersion() {
+            return matches(getJreVersion());
+        }
+
+        private String getJreVersion() {
+            return System.getProperty("java.version");
+        }
+
+    }
 
     // to do: web start does not match versions with a "-" like
     // "1.4-beta1" using the + modifier, change to mimic that
@@ -49,13 +108,13 @@ public class Version {
     // "*" and "+" modifiers.
 
     /** separates parts of a version string */
-    private static String seperators = ".-_";
+    private static final String seperators = ".-_";
 
     /** magic key for whether a version part was created due to normalization */
-    private static String emptyString = new String("<EMPTY>"); // not intern'ed
+    private static final String emptyString = new String("<EMPTY>"); // not intern'ed
 
     /** contains all the versions matched */
-    private String versionString;
+    private final String versionString;
 
     /**
      * Create a Version object based on a version string (ie,

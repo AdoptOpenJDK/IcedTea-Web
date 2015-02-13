@@ -352,7 +352,7 @@ public class Parser {
         // require version attribute
         getRequiredAttribute(node, "version", null);
 
-        return new JREDesc(version, location, vmArgs, initialHeap, maxHeap, resources);
+        return new JREDesc(new Version.JreVersion(version.toString(), strict), location, vmArgs, initialHeap, maxHeap, resources);
     }
 
     /**

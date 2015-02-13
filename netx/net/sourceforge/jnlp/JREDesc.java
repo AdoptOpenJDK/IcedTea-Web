@@ -34,7 +34,7 @@ public class JREDesc {
     private static final Pattern heapPattern= Pattern.compile("\\d+[kmg]?");
 
     /** the platform version or the product version if location is not null */
-    final private Version version;
+    final private Version.JreVersion version;
 
     /** the location of a JRE product or null */
     final private URL location;
@@ -61,7 +61,7 @@ public class JREDesc {
      * @param maximumHeapSize maximum head size
      * @param resources list of ResourceDesc objects
      */
-    public JREDesc(Version version, URL location,
+    public JREDesc(Version.JreVersion version, URL location,
             String vmArgs, String initialHeapSize,
             String maximumHeapSize, List<ResourcesDesc> resources) throws ParseException {
         this.version = version;
@@ -77,7 +77,7 @@ public class JREDesc {
      * determine if this version corresponds to a platform or
      * product version.
      */
-    public Version getVersion() {
+    public Version.JreVersion getVersion() {
         return version;
     }
 

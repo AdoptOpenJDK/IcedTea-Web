@@ -1,6 +1,19 @@
+2015-02-13  Jiri Vanek  <jvanek@redhat.com>
+
+	Added better support for not-matching detected jdk when version forced.
+	* netx/net/sourceforge/jnlp/JREDesc.java: is using JreVersion instead of pure Version
+	* netx/net/sourceforge/jnlp/Parser.java: (getJRE) JREDesc is constructed with JreVersion
+	* netx/net/sourceforge/jnlp/Version.java:  made immutable, added specialized
+	inner class, tho handle JRE version.
+	* /tests/netx/unit/net/sourceforge/jnlp/VersionTest.java: added tests for
+	main cases cornerCases, testMatchesMinus, multiplePossibilities and tests for
+	new class jreVersionTestOk, jreVersionTestFails1, jreVersionTestFails2.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added JRE family
+	of warnings for JreVersion
+
 2015-02-11  Jiri Vanek  <jvanek@redhat.com>
 
-	Saving/Loading of icon made resistent against URLs with invalid/without target
+	Saving/Loading of icon made resistant against URLs with invalid/without target
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: getCachedResource split
 	into getCachedResourceFile and getCachedResourceURL (which is jsut transforming
 	file from getCachedResourceFile to URL)
