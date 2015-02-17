@@ -416,18 +416,23 @@ public class JNLPRuntime {
         if (onlineDetected != null) {
             return;
         }
-        try {
-            if (location.getProtocol().equals("file")) {
-                return;
-            }
-            //Checks the offline/online status of the system.
-            InetAddress.getByName(location.getHost());
-        } catch (UnknownHostException ue) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "The host of " + location.toExternalForm() + " file should be located seems down, or you are simply offline.");
-            JNLPRuntime.setOnlineDetected(false);
-            return;
+
+        JNLPRuntime.setOnlineDetected(isConnectable(location));
+    }
+
+    public static boolean isConnectable(URL location) {
+        if (location.getProtocol().equals("file")) {
+            return true;
         }
-        setOnlineDetected(true);
+
+        try {
+            InetAddress.getByName(location.getHost());
+        } catch (UnknownHostException e) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "The host of " + location.toExternalForm() + " file seems down, or you are simply offline.");
+            return false;
+        }
+
+        return true;
     }
    
     /**

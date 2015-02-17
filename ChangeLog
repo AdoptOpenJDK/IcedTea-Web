@@ -1,3 +1,18 @@
+2015-02-17  Jie Kang  <jkang@redhat.com>
+
+	Refactor initializeResources in ResourceDownloader.
+	* netx/net/sourceforge/jnlp/cache/Resource.java: (isConnectable) new method
+	checking if we can connect to the resources URL
+	* netx/net/sourceforge/jnlp/cache/ResourceDownloader.java:
+	(initializeResources), (initializeOnlineResource), (initializeFromURL),
+	(initializeOfflineResource) refactored methods to handle offline and online
+	cases separately
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: (isConnectable) new
+	method checking if we can connect to URL argument
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceDownloaderTest.java:
+	(testDownloadLocalResourceFails): test modified to expect error status
+	on failure instead of uncaught exception
+
 2015-02-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed few small errors in jacoco processing after removal of bootstrap.

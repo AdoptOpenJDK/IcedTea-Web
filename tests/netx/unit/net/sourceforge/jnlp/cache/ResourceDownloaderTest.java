@@ -436,7 +436,7 @@ public class ResourceDownloaderTest {
         assertEquals(expected, actual);
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testDownloadLocalResourceFails() throws IOException {
         String expected = "local-resource";
         File localFile = Files.createTempFile("download-local", ".temp").toFile();
@@ -453,6 +453,8 @@ public class ResourceDownloaderTest {
 
         resource.setStatusFlag(Resource.Status.PRECONNECT);
         resourceDownloader.run();
+
+        assertTrue(resource.hasFlags(EnumSet.of(Resource.Status.ERROR)));
     }
 
     @Test

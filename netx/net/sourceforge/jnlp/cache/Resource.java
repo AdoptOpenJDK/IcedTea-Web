@@ -25,6 +25,7 @@ import java.util.Set;
 
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
@@ -423,6 +424,10 @@ public class Resource {
 
     public DownloadOptions getDownloadOptions() {
         return this.downloadOptions;
+    }
+
+    public boolean isConnectable() {
+        return JNLPRuntime.isConnectable(this.location);
     }
 
     @Override

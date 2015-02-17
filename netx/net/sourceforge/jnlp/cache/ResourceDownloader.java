@@ -110,58 +110,57 @@ public class ResourceDownloader implements Runnable {
         }
     }
 
-    /**
-     * Open a URL connection and get the content length and other
-     * fields.
-     */
     private void initializeResource() {
-        //verify connection
-        if(!JNLPRuntime.isOfflineForced()){
-            JNLPRuntime.detectOnline(resource.getLocation()/*or doenloadLocation*/);
+        if (!JNLPRuntime.isOfflineForced() && resource.isConnectable()) {
+            initializeOnlineResource();
+        } else {
+            initializeOfflineResource();
         }
+    }
 
+    private void initializeOnlineResource() {
+        try {
+            URL finalLocation = findBestUrl(resource);
+            if (finalLocation != null) {
+                initializeFromURL(finalLocation);
+            } else {
+                initializeOfflineResource();
+            }
+        } catch (Exception e) {
+            OutputController.getLogger().log(e);
+            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
+            synchronized (lock) {
+                lock.notifyAll(); // wake up wait's to check for completion
+            }
+            resource.fireDownloadEvent(); // fire ERROR
+        }
+    }
+
+    private void initializeFromURL(URL location) throws IOException {
         CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
-
         try {
+            resource.setDownloadLocation(location);
+            URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location); // this won't change so should be okay not-synchronized
+            connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
+
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
-            long size = 0;
-            boolean current = true;
-            //this can be null, as it is always filled in online mode, and never read in offline mode
-            URLConnection connection = null;
-            if (localFile != null) {
-                size = localFile.length();
-            } else if (!JNLPRuntime.isOnline()) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "You are trying to get resource " + resource.getLocation().toExternalForm() + " but you are in offline mode, and it is not in cache. Attempting to continue, but you may expect failure");
-            }
-            if (JNLPRuntime.isOnline()) {
-                // connect
-                URL finalLocation = findBestUrl(resource);
+            long size = connection.getContentLengthLong();
 
-                if (finalLocation == null) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Attempted to download " + resource.getLocation() + ", but failed to connect!");
-                    throw new NullPointerException("finalLocation == null"); // Caught below
-                }
-
-                resource.setDownloadLocation(finalLocation);
-                connection = ConnectionFactory.getConnectionFactory().openConnection(finalLocation); // this won't change so should be okay not-synchronized
-                connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
-
-                size = connection.getContentLength();
-                current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), connection.getLastModified()) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
-                if (!current) {
-                    if (entry.isCached()) {
-                        entry.markForDelete();
-                        entry.store();
-                        // Old entry will still exist. (but removed at cleanup)
-                        localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
-                        CacheEntry newEntry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
-                        newEntry.lock();
-                        entry.unlock();
-                        entry = newEntry;
-                    }
+            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), connection.getLastModified()) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
+            if (!current) {
+                if (entry.isCached()) {
+                    entry.markForDelete();
+                    entry.store();
+                    // Old entry will still exist. (but removed at cleanup)
+                    localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
+                    CacheEntry newEntry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
+                    newEntry.lock();
+                    entry.unlock();
+                    entry = newEntry;
                 }
             }
+
             synchronized (resource) {
                 resource.setLocalFile(localFile);
                 // resource.connection = connection;
@@ -174,7 +173,7 @@ public class ResourceDownloader implements Runnable {
             }
 
             // update cache entry
-            if (!current && JNLPRuntime.isOnline()) {
+            if (!current) {
                 entry.setRemoteContentLength(connection.getContentLengthLong());
                 entry.setLastModified(connection.getLastModified());
             }
@@ -189,16 +188,40 @@ public class ResourceDownloader implements Runnable {
 
             // explicitly close the URLConnection.
             ConnectionFactory.getConnectionFactory().disconnect(connection);
-        } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
-            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
-            synchronized (lock) {
-                lock.notifyAll(); // wake up wait's to check for completion
-            }
-            resource.fireDownloadEvent(); // fire ERROR
         } finally {
             entry.unlock();
         }
+    }
+
+    private void initializeOfflineResource() {
+        CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
+        entry.lock();
+
+        try {
+            File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+
+            if (localFile != null && localFile.exists()) {
+                long size = localFile.length();
+
+                synchronized (resource) {
+                    resource.setLocalFile(localFile);
+                    resource.setSize(size);
+                    resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
+                }
+            } else {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "You are trying to get resource " + resource.getLocation().toExternalForm() + " but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure");
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
+            }
+
+            synchronized (lock) {
+                lock.notifyAll(); // wake up wait's to check for completion
+            }
+            resource.fireDownloadEvent(); // fire CONNECTED or ERROR
+
+        } finally {
+            entry.unlock();
+        }
+
     }
 
     /**
