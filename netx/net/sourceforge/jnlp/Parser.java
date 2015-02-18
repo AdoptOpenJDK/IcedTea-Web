@@ -495,7 +495,7 @@ public class Parser {
         Locale locales[] = getLocales(node);
 
         // create information
-        InformationDesc info = new InformationDesc(locales);
+        InformationDesc info = new InformationDesc(locales, strict);
 
         // step through the elements
         Node child = node.getFirstChild();

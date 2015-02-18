@@ -426,7 +426,16 @@ public class JNLPFile {
      * through the specified locale.
      */
     public InformationDesc getInformation(final Locale locale) {
-        return new InformationDesc(new Locale[] { locale }) {
+        boolean strict = false;
+        if (this.info != null) {
+            for (InformationDesc infoDesc : this.info) {
+                if (infoDesc.strict) {
+                    strict = true;
+                    break;
+                }
+            }
+        }
+        return new InformationDesc(new Locale[] { locale }, strict) {
             @Override
             protected List<Object> getItems(Object key) {
                 List<Object> result = new ArrayList<Object>();

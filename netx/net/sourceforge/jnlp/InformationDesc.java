@@ -47,19 +47,24 @@ public class InformationDesc {
     public static final Object DEFAULT = "default";
 
     /** the locales for the information */
-    private Locale locales[];
+    final private Locale locales[];
 
     /** the data as list of key,value pairs */
     private List<Object> info;
 
-
+    final boolean strict;
     /**
      * Create an information element object.
      *
      * @param locales the locales the information is for
      */
-    public InformationDesc(Locale locales[]) {
+    public InformationDesc(Locale locales[], boolean strict) {
         this.locales = locales;
+        this.strict = strict;
+    }
+    
+    InformationDesc(Locale locales[]) {
+        this(locales, false);
     }
 
     /**
@@ -186,7 +191,12 @@ public class InformationDesc {
      * Returns whether offline execution allowed.
      */
     public boolean isOfflineAllowed() {
-        return null != getItem("offline-allowed");
+        if (strict) {
+            return null != getItem("offline-allowed");
+        } else {
+            // by deault itw ignore this switch. Most applications are missusing it
+            return true;
+        }
     }
 
     /**

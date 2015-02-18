@@ -61,9 +61,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +100,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
@@ -180,7 +179,7 @@ public class PolicyEditor extends JPanel {
     public final PolicyEditorController policyEditorController = new PolicyEditorController();
 
     private final ActionListener okButtonAction, addCodebaseButtonAction,
-            removeCodebaseButtonAction, newButtonAction, openButtonAction, saveAsButtonAction, viewCustomButtonAction,
+            removeCodebaseButtonAction, newButtonAction, openButtonAction, openDefaultButtonAction, saveAsButtonAction, viewCustomButtonAction,
             renameCodebaseButtonAction, copyCodebaseButtonAction, pasteCodebaseButtonAction,
             policyEditorHelpButtonAction, aboutPolicyEditorButtonAction, aboutItwButtonAction;
     private final ActionListener closeButtonAction;
@@ -328,6 +327,15 @@ public class PolicyEditor extends JPanel {
                     PolicyEditor.this.setFile(fileChooser.getSelectedFile().getAbsolutePath());
                     openAndParsePolicyFile();
                 }
+            }
+        };
+        
+         openDefaultButtonAction = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (!promptOnSaveChangesMade(true)) return;
+                    PolicyEditor.this.setFile(PathsAndFiles.JAVA_POLICY.getFullPath());
+                    openAndParsePolicyFile();
             }
         };
 
@@ -1037,6 +1045,12 @@ public class PolicyEditor extends JPanel {
         openItem.addActionListener(editor.openButtonAction);
         fileMenu.add(openItem);
 
+        final JMenuItem openDefaultItem = new JMenuItem(R("PEOpenDefaultMenuItem"));
+        setButtonMnemonic(openDefaultItem, R("PEOpenDefaultMenuItemMnemonic"));
+        setMenuItemAccelerator(openDefaultItem, R("PEOpenDefaultMenuItemAccelerator"));
+        openDefaultItem.addActionListener(editor.openDefaultButtonAction);
+        fileMenu.add(openDefaultItem);
+
         final JMenuItem saveItem = new JMenuItem(R("PESaveMenuItem"));
         setButtonMnemonic(saveItem, R("PESaveMenuItemMnemonic"));
         setMenuItemAccelerator(saveItem, R("PESaveMenuItemAccelerator"));
@@ -1048,7 +1062,7 @@ public class PolicyEditor extends JPanel {
         setMenuItemAccelerator(saveAsItem, R("PESaveAsMenuItemAccelerator"));
         saveAsItem.addActionListener(editor.saveAsButtonAction);
         fileMenu.add(saveAsItem);
-
+        
         final JMenuItem exitItem = new JMenuItem(R("PEExitMenuItem"));
         setButtonMnemonic(exitItem, R("PEExitMenuItemMnemonic"));
         setMenuItemAccelerator(exitItem, R("PEExitMenuItemAccelerator"));

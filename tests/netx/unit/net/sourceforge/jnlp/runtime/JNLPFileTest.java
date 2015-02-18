@@ -338,7 +338,7 @@ public class JNLPFileTest extends NoStdOutErrTest {
 
     private void setTitle(final DummyJNLPFileWithJar jnlpFile, final String title) {
         jnlpFile.setInfo(Arrays.asList(new InformationDesc[]{
-                    new InformationDesc(new Locale[]{}) {
+                    new InformationDesc(new Locale[]{}, false) {
                         @Override
                         public String getTitle() {
                             return title;

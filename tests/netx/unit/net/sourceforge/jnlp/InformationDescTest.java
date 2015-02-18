@@ -159,8 +159,16 @@ public class InformationDescTest {
 
     @Test
     public void testIsOfflineAllowed() {
-        InformationDesc info = new InformationDesc(new Locale[0]);
+        InformationDesc info = new InformationDesc(new Locale[0], true);
         assertFalse(info.isOfflineAllowed());
+        info.addItem("offline-allowed", new Object());
+        assertTrue(info.isOfflineAllowed());
+    }
+    
+     @Test
+    public void testIsOfflineAllowedNotStrict() {
+        InformationDesc info = new InformationDesc(new Locale[0], false);
+        assertTrue(info.isOfflineAllowed());
         info.addItem("offline-allowed", new Object());
         assertTrue(info.isOfflineAllowed());
     }
