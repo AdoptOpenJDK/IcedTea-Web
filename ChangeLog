@@ -1,3 +1,11 @@
+2015-02-24  Jiri Vanek  <jvanek@redhat.com>
+
+	Marking threads in ResourceTracker's threadPool as daemons, so the dont prevent shutdown.
+	* netx/net/sourceforge/jnlp/cache/CachedDaemonThreadPoolProvider.java: new file,
+	implementation of ExecutorService singleton, whose threads are daemons.
+	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: (startDownloadThread)
+	now calls CachedDaemonThreadPoolProvider
+
 2015-02-18  Jiri Vanek  <jvanek@redhat.com>
 
 	Added menuentry to PolicyEditor to allow quicky open default java.policy

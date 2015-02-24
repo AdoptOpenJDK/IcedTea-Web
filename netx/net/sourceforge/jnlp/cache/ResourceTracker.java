@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
@@ -101,11 +99,9 @@ public class ResourceTracker {
             return requestMethods;
         }
     }
-
-    /** notified on initialization or download of a resource */
+    
+      /** notified on initialization or download of a resource */
     private static final Object lock = new Object(); // used to lock static structures
-
-    private static final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     /** the resources known about by this resource tracker */
     private final List<Resource> resources = new ArrayList<>();
@@ -510,7 +506,7 @@ public class ResourceTracker {
      * </p>
      */
     protected void startDownloadThread(Resource resource) {
-        threadPool.execute(new ResourceDownloader(resource, lock));
+        CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
     }
 
     static Resource selectByFilter(Collection<Resource> source, Filter<Resource> filter) {
