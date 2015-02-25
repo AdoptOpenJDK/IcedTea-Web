@@ -193,12 +193,16 @@ JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m
 endif
 endif
 
+# if you create netx-dist-tests-whitelist in top directory, and place "expr match" regexes
+# (separate by one of IFS's values (most commonly space)) into it, you can control reproducers which compile or/xor run.
+# if you need declare space in your regex, use \s as described in "expr match" documentation
+ECHO_WHITELIST=if [ -f $(REPRODUCERS_CLASS_WHITELIST) ] ; then cat $(REPRODUCERS_CLASS_WHITELIST) ; else echo ".*" ; fi
 if ENABLE_WHITELIST
-COMPILE_WHITELIST_FILTER=`cat $(REPRODUCERS_CLASS_WHITELIST)`
+COMPILE_WHITELIST_FILTER=`$(ECHO_WHITELIST)`
 RUN_WHITELIST_FILTER=.*
 else
 COMPILE_WHITELIST_FILTER=.*
-RUN_WHITELIST_FILTER=`cat $(REPRODUCERS_CLASS_WHITELIST)`
+RUN_WHITELIST_FILTER=`$(ECHO_WHITELIST)`
 endif
 
 if WITH_RHINO
