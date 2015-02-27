@@ -65,6 +65,7 @@ public class ManifestAttributesChecker {
     private final JNLPFile file;
     private final SigningState signing;
     private final SecurityDelegate securityDelegate;
+    public static final String MANIFEST_CHECK_DISABLED_MESSAGE = "Manifest attribute checks are disabled.";
 
     public ManifestAttributesChecker(final SecurityDesc security, final JNLPFile file,
             final SigningState signing, final SecurityDelegate securityDelegate) throws LaunchException {
@@ -82,7 +83,7 @@ public class ManifestAttributesChecker {
             checkPermissionsAttribute();
             checkApplicationLibraryAllowableCodebaseAttribute();
         } else {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Manifest attribute checks are disabled.");
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, MANIFEST_CHECK_DISABLED_MESSAGE);
         }
     }
 

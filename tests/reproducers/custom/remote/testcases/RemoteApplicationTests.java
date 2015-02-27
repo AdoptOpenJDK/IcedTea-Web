@@ -1,4 +1,4 @@
-/* RemoteApplicationTests.java
+/* 
  Copyright (C) 2011 Red Hat, Inc.
 
  This file is part of IcedTea.
@@ -40,7 +40,6 @@ import java.util.Collections;
 import java.util.List;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.Remote;
 import org.junit.Test;
@@ -106,7 +105,7 @@ public class RemoteApplicationTests {
     @NeedsDisplay
     public void orawebCernChRemoteTest() throws Exception {
         RemoteApplicationSettings.RemoteApplicationTestcaseSettings settings = new RemoteApplicationSettings.OrawebCernCh();
-        ProcessResult pr = server.executeJavawsUponUrl(ll, settings.getUrl());
+        ProcessResult pr = server.executeJavawsUponUrl(settings.modifyParams(ll), settings.getUrl());
         settings.evaluate(pr);
     }
 
