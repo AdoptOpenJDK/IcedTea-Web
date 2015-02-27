@@ -3,15 +3,10 @@ package net.sourceforge.jnlp.cache;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,14 +14,11 @@ import java.nio.file.Files;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.jar.Attributes;
-import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.jar.Pack200;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.smartcardio.ATR;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -40,9 +32,10 @@ import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
-public class ResourceDownloaderTest {
+public class ResourceDownloaderTest extends NoStdOutErrTest{
 
     public static ServerLauncher testServer;
     public static ServerLauncher testServerWithBrokenHead;
@@ -342,8 +335,6 @@ public class ResourceDownloaderTest {
     private Resource setupResource(String fileName, String text) throws IOException {
         File f = setupFile(fileName, text);
         URL url = downloadServer.getUrl(fileName);
-        System.out.println(url);
-
         Resource resource = Resource.getResource(url, null, UpdatePolicy.NEVER);
         return resource;
     }

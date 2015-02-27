@@ -66,9 +66,10 @@ import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
-public class ResourceTrackerTest {
+public class ResourceTrackerTest extends NoStdOutErrTest{
 
     public static ServerLauncher downloadServer;
     private static final PrintStream[] backedUpStream = new PrintStream[4];

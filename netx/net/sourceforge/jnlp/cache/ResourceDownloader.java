@@ -375,14 +375,14 @@ public class ResourceDownloader implements Runnable {
     private void writeDownloadToFile(Resource resource, URL downloadLocation, InputStream in) throws IOException {
         byte buf[] = new byte[1024];
         int rlen;
-        OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion());
-        while (-1 != (rlen = in.read(buf))) {
-            resource.incrementTransferred(rlen);
-            out.write(buf, 0, rlen);
+        try (OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {
+            while (-1 != (rlen = in.read(buf))) {
+                resource.incrementTransferred(rlen);
+                out.write(buf, 0, rlen);
+            }
+            
+            in.close();
         }
-
-        in.close();
-        out.close();
     }
 
     private void uncompressGzip(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
@@ -390,38 +390,38 @@ public class ResourceDownloader implements Runnable {
         byte buf[] = new byte[1024];
         int rlen;
 
-        GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                .getCacheFile(compressedLocation, version)));
-        InputStream inputStream = new BufferedInputStream(gzInputStream);
-
-        BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(CacheUtil
-                .getCacheFile(uncompressedLocation, version)));
-
-        while (-1 != (rlen = inputStream.read(buf))) {
-            outputStream.write(buf, 0, rlen);
+        try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
+                .getCacheFile(compressedLocation, version)))) {
+            InputStream inputStream = new BufferedInputStream(gzInputStream);
+            
+            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(CacheUtil
+                    .getCacheFile(uncompressedLocation, version)));
+            
+            while (-1 != (rlen = inputStream.read(buf))) {
+                outputStream.write(buf, 0, rlen);
+            }
+            
+            outputStream.close();
+            inputStream.close();
         }
-
-        outputStream.close();
-        inputStream.close();
-        gzInputStream.close();
     }
 
     private void uncompressPackGz(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Extracting packgz: " + compressedLocation + " to " + uncompressedLocation);
 
-        GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                    .getCacheFile(compressedLocation, version)));
-        InputStream inputStream = new BufferedInputStream(gzInputStream);
-
-        JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(CacheUtil
-                .getCacheFile(uncompressedLocation, version)));
-
-        Pack200.Unpacker unpacker = Pack200.newUnpacker();
-        unpacker.unpack(inputStream, outputStream);
-
-        outputStream.close();
-        inputStream.close();
-        gzInputStream.close();
+        try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
+                .getCacheFile(compressedLocation, version)))) {
+            InputStream inputStream = new BufferedInputStream(gzInputStream);
+            
+            JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(CacheUtil
+                    .getCacheFile(uncompressedLocation, version)));
+            
+            Pack200.Unpacker unpacker = Pack200.newUnpacker();
+            unpacker.unpack(inputStream, outputStream);
+            
+            outputStream.close();
+            inputStream.close();
+        }
     }
 
     /**

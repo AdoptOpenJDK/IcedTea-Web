@@ -1,18 +1,17 @@
 package net.sourceforge.jnlp.cache;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 
 import org.junit.Test;
 
-public class ResourceUrlCreatorTest {
+public class ResourceUrlCreatorTest extends NoStdOutErrTest{
 
     private static final Version VERSION_11 = new Version("1.1");
     private static final Version VERSION_20 = new Version("2.0");

@@ -1,5 +1,15 @@
 2015-02-27  Jiri Vanek  <jvanek@redhat.com>
 
+	Silenced to verbose unittests
+	* netx/net/sourceforge/jnlp/cache/ResourceDownloader.java: refactored to use 
+	try-with-resources
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: become NoStdOutErrTest
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceDownloaderTest.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceUrlCreatorTest.java: same
+
+2015-02-27  Jiri Vanek  <jvanek@redhat.com>
+
 	All manifests in reproducers' jars have now Application-Name attribute
 	* Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp) added logic
 	to include Application-Name: $reproducerName key: value to each non-custom
