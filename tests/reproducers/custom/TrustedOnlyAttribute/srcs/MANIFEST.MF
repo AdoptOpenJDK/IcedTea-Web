@@ -1,1 +1,3 @@
 Trusted-only: true
+Application-Name: TrustedOnlyAttribute
+

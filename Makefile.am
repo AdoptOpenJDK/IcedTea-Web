@@ -771,6 +771,16 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 	      else \
 	        $(SYSTEM_JDK_DIR)/bin/jar cf "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar" * ; \
 	      fi; \
+	      AN="Application-Name:" ; \
+	      grep $$AN $(META_MANIFEST) 2>/dev/null >/dev/null ; \
+	      GREP_R=$$?; \
+	      if [ ! -f $(META_MANIFEST) -o  $$GREP_R -ne 0  ]; \
+	      then \
+	       TMP_MANIFEST=`mktemp` ; \
+	       echo "$$AN $$dir" > $$TMP_MANIFEST ; \
+	       $(SYSTEM_JDK_DIR)/bin/jar ufm "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$TMP_MANIFEST ; \
+	       rm -f $$TMP_MANIFEST ; \
+	      fi ; \
 	      cd "$$d" ; \
 	    fi; \
 	  done ; \

@@ -1,8 +1,17 @@
 2015-02-27  Jiri Vanek  <jvanek@redhat.com>
 
+	All manifests in reproducers' jars have now Application-Name attribute
+	* Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp) added logic
+	to include Application-Name: $reproducerName key: value to each non-custom
+	manifest file
+	* tests/reproducers/*/MANIFEST.MF*: all custom manifests enhanced by the same
+	key: value. They do not relay on it.
+  
+2015-02-27  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed third party tests.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: (JREversionDontMatch)
-	don't changed to does not. The aposthrophe was causing last variable to not expanding.
+	don't changed to does not. The apostrophe was causing last variable to not expanding.
 	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: shared
 	string moved to constant of MANIFEST_CHECK_DISABLED_MESSAGE
 	* tests/reproducers/custom/remote/testcases/RemoteApplicationSettings.java:
