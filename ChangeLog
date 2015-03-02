@@ -1,3 +1,9 @@
+2015-03-02  Jie Kang  <jkang@redhat.com>
+
+	Use temporary cache in PluginBridge unit tests
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: sets
+	temporary cache in @BeforeClass and unsets in @AfterClass
+
 2015-02-27  Jiri Vanek  <jvanek@redhat.com>
 
 	Silenced to verbose unittests

@@ -24,6 +24,7 @@ package net.sourceforge.jnlp;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,11 +33,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
+
+import org.junit.AfterClass;
 import org.junit.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PluginBridgeTest extends NoStdOutErrTest{
@@ -72,6 +79,20 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         Map<String, String> params = new HashMap<>();
         params.put("code", ""); // Avoids an exception being thrown
         return new PluginParameters(params);
+    }
+
+    private static String originalCacheDir;
+
+    @BeforeClass
+    public static void setup() {
+        originalCacheDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
+    }
+
+    @AfterClass
+    public static void teardown() {
+        CacheUtil.clearCache();
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, originalCacheDir);
     }
 
     @Test
