@@ -221,7 +221,12 @@ public class RemoteApplicationSettings {
 
      @Test
      public void testJREversionDontMatchRemoval(){
-         Assert.assertTrue(removeJreVersionWarning("Warning - your JRE - 1.8 - do not match requested JRE - {0}").isEmpty());
+         Assert.assertTrue(removeJreVersionWarning(Translator.R("JREversionDontMatch", "1.8.0-pre.whatever", "{0}")).isEmpty());
+         Assert.assertTrue(removeJreVersionWarning(Translator.R("JREversionDontMatch", "{0}", "{1}")).isEmpty());
+         Assert.assertTrue(removeJreVersionWarning(Translator.R("JREversionDontMatch", "1.3.0-pre-pac", "1.8.0-pre.whatever}")).isEmpty());
+         Assert.assertTrue(removeJreVersionWarning(Translator.R("JREversionDontMatch", "", "")).isEmpty());
+         Assert.assertTrue(removeJreVersionWarning(Translator.R("JREversionDontMatch", " - - - - ", " - - - ")).isEmpty());
+         Assert.assertFalse(removeJreVersionWarning("AA\n"+Translator.R("JREversionDontMatch", "1.3+", "1.7")+"\nBB").equals("AA\nBB"));
      }
 
     public static class Arbores extends NearlyNoOutputsOnWrongJRE {
