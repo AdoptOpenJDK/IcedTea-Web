@@ -1,3 +1,10 @@
+2015-03-03  Jie Kang  <jkang@redhat.com>
+
+	Fix DeadLockTest reproducers
+	* tests/reproducers/simple/deadlocktest/testcases/DeadLockTestTest.java:
+	(testSimpletest1lunchFork), (testSimpletest1lunchNoFork) removed division
+	by two in final assert
+
 2015-03-02  Jie Kang  <jkang@redhat.com>
 
 	Use temporary cache in PluginBridge unit tests

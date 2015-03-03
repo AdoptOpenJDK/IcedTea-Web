@@ -120,7 +120,7 @@ public class DeadLockTestTest {
         ServerAccess.logOutputReprint("java66: " + afterKill.size());
         Assert.assertEquals("assert that just old javas remians", 0, (before.size() - afterKill.size()));
         // div by two is caused by jav in java process hierarchy
-        Assert.assertEquals("launched JVMs must be exactly 2, was " + (during.size() - before.size()) / 2, 2, (during.size() - before.size()) / 2);
+        Assert.assertEquals("launched JVMs must be exactly 2, was " + (during.size() - before.size()), 2, (during.size() - before.size()));
     }
 
     @Test
@@ -142,7 +142,7 @@ public class DeadLockTestTest {
         ServerAccess.logOutputReprint("java99: " + afterKill.size());
         Assert.assertEquals("assert that just old javas remians", 0, (before.size() - afterKill.size()));
         // div by two is caused by jav in java process hierarchy
-        Assert.assertEquals("launched JVMs must be exactly 1, was  " + (during.size() - before.size()) / 2, 1, (during.size() - before.size()) / 2);
+        Assert.assertEquals("launched JVMs must be exactly 1, was  " + (during.size() - before.size()), 1, (during.size() - before.size()));
     }
 
     /**
