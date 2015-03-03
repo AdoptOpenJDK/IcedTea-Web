@@ -38,6 +38,7 @@ import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class VersionedJarTest {
@@ -46,8 +47,17 @@ public class VersionedJarTest {
     private static final String VERSIONED = "Versioned jar was accessed.";
     private static final String FAILURE = "net.sourceforge.jnlp.LaunchException";
 
+    @BeforeClass
+    public static void clearCache() throws Exception{
+        //to speedup individual methods
+        server.executeJavawsClearCache();
+    }
+    
     @Test
     public void testDisabledVersionParameter() throws Exception {
+        //if testEnabledVersionParameter is run before this onne, then it fails
+        server.executeJavawsClearCache();
+        //the versioning is realted only to downloading of resources, so afaik this behaviour is correct
         ProcessResult pr = server.executeJavawsHeadless("/VersionedJarDisabled.jnlp");
         Assert.assertFalse("Stdout should NOT contain '" + VERSIONED + "', but did.", pr.stdout.contains(VERSIONED));
         Assert.assertTrue("Stderr should contain '" +FAILURE + "', but did not.", pr.stderr.contains(FAILURE));
@@ -55,6 +65,7 @@ public class VersionedJarTest {
 
     @Test
     public void testEnabledVersionParameter() throws Exception {
+        server.executeJavawsClearCache();
         ProcessResult pr = server.executeJavawsHeadless("/VersionedJarEnabled.jnlp");
         Assert.assertTrue("Stdout should contain '" + VERSIONED + "', but did not.", pr.stdout.contains(VERSIONED));
         Assert.assertFalse("Stderr should NOT contain '" +FAILURE + "', but did.", pr.stderr.contains(FAILURE));

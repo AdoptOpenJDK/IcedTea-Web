@@ -46,6 +46,7 @@ import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import net.sourceforge.jnlp.browsertesting.Browser;
 import net.sourceforge.jnlp.browsertesting.BrowserFactory;
@@ -522,6 +523,9 @@ public class ServerAccess {
     }
     public ProcessResult executeJavawsHeadless(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
         return executeJavawsHeadless(null, resource,stdoutl,stderrl,null);
+    }
+    public ProcessResult executeJavawsClearCache() throws Exception {
+         return executeProcess(Arrays.asList(new String[]{getJavawsLocation(), OptionsDefinitions.OPTIONS.CLEARCACHE.option,  ServerAccess.HEADLES_OPTION}));
     }
      
     /**

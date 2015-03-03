@@ -1,3 +1,13 @@
+2015-02-27  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed CacheReproducerTest and VersionedJarTest tests
+	* tests/reproducers/signed/CacheReproducer/testcases/CacheReproducerTest.java:
+	fixed
+	* tests/reproducers/simple/VersionedJar__V1/testcases/VersionedJarTest.java:
+	fixed
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: introduced 
+	executeJavawsClearCache shortcut method to executeJavawsHeadless
+
 2015-03-03  Jie Kang  <jkang@redhat.com>
 
 	Fix DeadLockTest reproducers

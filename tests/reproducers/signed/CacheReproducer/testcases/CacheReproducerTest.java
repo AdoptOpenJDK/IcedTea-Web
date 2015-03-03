@@ -51,6 +51,7 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.config.Defaults;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.tools.MessageProperties;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -60,7 +61,6 @@ import org.junit.Test;
 public class CacheReproducerTest {
 
     private static final ServerAccess server = new ServerAccess();
-    private static final List<String> clear = Arrays.asList(new String[]{server.getJavawsLocation(), "-Xclearcache",  ServerAccess.HEADLES_OPTION});
     private static final List<String> trustedVerboses = Arrays.asList(new String[]{"-Xtrustall", ServerAccess.HEADLES_OPTION,"-verbose"});
     private static final List<String> verbosed = Arrays.asList(new String[]{"-verbose", ServerAccess.HEADLES_OPTION});
 
@@ -70,7 +70,7 @@ public class CacheReproducerTest {
     private static final Pattern corruptPatern = Pattern.compile(corruptRegex);
     private static final String corruptString = "156dsf1562kd5";
 
-    private static final File icedteaCache = new File(Defaults.USER_CACHE_HOME, "cache");
+    private static final File icedteaCache = new File(PathsAndFiles.USER_CACHE_HOME, "cache");
     private static final File icedteaCacheFile = new File(icedteaCache, "recently_used");
     private static final File netxLock = new File(System.getProperty("java.io.tmpdir"),
             System.getProperty("user.name") + File.separator +
@@ -476,7 +476,7 @@ public class CacheReproducerTest {
     }
 
     private static ProcessResult tryToClearcache() throws Exception {
-        ProcessResult pr1 = ServerAccess.executeProcess(clear);
+        ProcessResult pr1 = server.executeJavawsClearCache();
         return pr1;
     }
 }
