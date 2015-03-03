@@ -43,7 +43,6 @@ import java.util.Set;
 import javax.naming.ConfigurationException;
 import javax.swing.JOptionPane;
 
-import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -757,12 +756,12 @@ public final class DeploymentConfiguration {
             errors += moveLegacyToCurrent(legacySecurity, currentSecurity);
 
             String legacyCache = LEGACY_USER_HOME + File.separator + "cache";
-            String currentCache = Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_CACHE_DIR).getDefaultValue();
+            String currentCache = PathsAndFiles.CACHE_DIR.getFullPath();
             errors += moveLegacyToCurrent(legacyCache, currentCache);
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Adapting " + CacheLRUWrapper.CACHE_INDEX_FILE_NAME + " to new destination");
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Adapting " + PathsAndFiles.CACHE_INDEX_FILE_NAME + " to new destination");
             //replace all legacyCache by currentCache in new recently_used
             try {
-                File f = new File(currentCache, CacheLRUWrapper.CACHE_INDEX_FILE_NAME);
+                File f = PathsAndFiles.RECENTLY_USED_FILE.getFile();
                 String s = FileUtils.loadFileAsString(f);
                 s = s.replace(legacyCache, currentCache);
                 FileUtils.saveFile(s, f);

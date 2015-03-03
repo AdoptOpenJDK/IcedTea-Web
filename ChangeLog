@@ -1,4 +1,21 @@
-2015-02-27  Jiri Vanek  <jvanek@redhat.com>
+2015-03-03  Jiri Vanek  <jvanek@redhat.com>
+
+	Changing enum CacheLRUWrapper singleton to instantiatible one. recently_used
+	moved to PathsAndFiles.
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: changed form enum to
+	class. Added testing constructors. Fields encapsualted and made final.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:is now using
+	PathsAndFiles.CACHE_DIR
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: defined CACHE_INDEX_FILE_NAME
+	as recently_used and declared InfrastructureFileDescriptor RECENTLY_USED_FILE
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java: moved to PathsAndFiles
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added description
+	of RECENTLY_USED_FILE, FILErecentlyUsed
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java: now using
+	fake instance
+	* tests/reproducers/signed/CacheReproducer/testcases/CacheReproducerTest.java:
+	same + fixed
+2015-03-03  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed CacheReproducerTest and VersionedJarTest tests
 	* tests/reproducers/signed/CacheReproducer/testcases/CacheReproducerTest.java:

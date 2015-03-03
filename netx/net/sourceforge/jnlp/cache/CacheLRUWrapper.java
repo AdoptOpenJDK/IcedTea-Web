@@ -49,8 +49,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -59,33 +58,44 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * This class helps maintain the ordering of most recently use items across
  * multiple jvm instances.
  * 
- * @author <a href="mailto:Andrew%20Su%20&lt;asu@redhat.com&gt;">Andrew Su (asu@redhat.com</a>, <a href="mailto:Andrew%20Su%20&lt;andrew.su@utoronto.ca&gt;">andrew.su@utoronto.ca)</a>
- * 
  */
-public enum CacheLRUWrapper {
-    INSTANCE;
-
-    /* location of cache directory */
-    private final String setCachePath = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
-    String cacheDir = new File(setCachePath != null ? setCachePath : System.getProperty("java.io.tmpdir")).getPath();
-
+public class CacheLRUWrapper {
+    
     /*
      * back-end of how LRU is implemented This file is to keep track of the most
      * recently used items. The items are to be kept with key = (current time
      * accessed) followed by folder of item. value = path to file.
      */
+    
+    private final PropertiesFile recentlyUsedPropertiesFile;
+    private final File cacheDir;
+    private final File recentlyUsedFile;
 
-    public static final String CACHE_INDEX_FILE_NAME = "recently_used";
-
-    PropertiesFile cacheOrder = new PropertiesFile(
-            new File(cacheDir + File.separator + CACHE_INDEX_FILE_NAME));
-
-    private CacheLRUWrapper() {
-        File f = cacheOrder.getStoreFile();
-        if (!f.exists()) {
+    public CacheLRUWrapper() {
+     this(PathsAndFiles.RECENTLY_USED_FILE.getFile());
+    }
+    
+    /**
+     * testing constructor
+     * @param recentlyUsed file to be used as recently_used file. its parent will be used as cache dir
+     */
+    public CacheLRUWrapper(final File recentlyUsed) {
+        this(recentlyUsed, recentlyUsed.getParentFile());
+    }
+    
+    /**
+     * testing constructor
+     * @param recentlyUsed file to be used as recently_used file
+     * @param cacheDir dir with cache
+     */
+    public CacheLRUWrapper(final File recentlyUsed, final File cacheDir) {
+        recentlyUsedPropertiesFile = new PropertiesFile(recentlyUsed);
+        recentlyUsedFile = recentlyUsed;
+        this.cacheDir = cacheDir;
+        if (!recentlyUsed.exists()) {
             try {
-                FileUtils.createParentDir(f);
-                FileUtils.createRestrictedFile(f, true);
+                FileUtils.createParentDir(recentlyUsed);
+                FileUtils.createRestrictedFile(recentlyUsed, true);
             } catch (IOException e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
@@ -98,14 +108,39 @@ public enum CacheLRUWrapper {
      * @return an instance of the policy
      */
     public static CacheLRUWrapper getInstance() {
-        return INSTANCE;
+        return  CacheLRUWrapperHolder.INSTANCE;
     }
+
+    /**
+     * @return the recentlyUsedPropertiesFile
+     */
+    public PropertiesFile getRecentlyUsedPropertiesFile() {
+        return recentlyUsedPropertiesFile;
+    }
+
+    /**
+     * @return the cacheDir
+     */
+    public File getCacheDir() {
+        return cacheDir;
+    }
+
+    /**
+     * @return the recentlyUsedFile
+     */
+    public File getRecentlyUsedFile() {
+        return recentlyUsedFile;
+    }
+    
+   private static class CacheLRUWrapperHolder{
+       private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper();
+   }
 
     /**
      * Update map for keeping track of recently used items.
      */
     public synchronized void load() {
-        boolean loaded = cacheOrder.load();
+        boolean loaded = getRecentlyUsedPropertiesFile().load();
         /* 
          * clean up possibly corrupted entries
          */
@@ -118,13 +153,13 @@ public enum CacheLRUWrapper {
     }
 
     /**
-     * check content of cacheOrder and remove invalid/corrupt entries
+     * check content of recentlyUsedPropertiesFile and remove invalid/corrupt entries
      *
      * @return true, if cache was corrupted and affected entry removed
      */
     private boolean checkData () {
         boolean modified = false;
-        Set<Entry<Object, Object>> q = cacheOrder.entrySet();
+        Set<Entry<Object, Object>> q = getRecentlyUsedPropertiesFile().entrySet();
         for (Iterator<Entry<Object, Object>> it = q.iterator(); it.hasNext();) {
             Entry<Object, Object> currentEntry = it.next();
 
@@ -144,7 +179,7 @@ public enum CacheLRUWrapper {
 
             // 2. check path format - does the path look correct?
             if (path != null) {
-                if (path.indexOf(cacheDir) < 0) {
+                if (!path.contains(cacheDir.getAbsolutePath())) {
                     it.remove();
                     modified = true;
                 }
@@ -161,8 +196,8 @@ public enum CacheLRUWrapper {
      * Write file to disk.
      */
     public synchronized boolean store() {
-        if (cacheOrder.isHeldByCurrentThread()) {
-            cacheOrder.store();
+        if (getRecentlyUsedPropertiesFile().isHeldByCurrentThread()) {
+            getRecentlyUsedPropertiesFile().store();
             return true;
         }
         return false;
@@ -176,10 +211,10 @@ public enum CacheLRUWrapper {
      * @return true if we successfully added to map, false otherwise.
      */
     public synchronized boolean addEntry(String key, String path) {
-        if (cacheOrder.containsKey(key)) {
+        if (getRecentlyUsedPropertiesFile().containsKey(key)) {
             return false;
         }
-        cacheOrder.setProperty(key, path);
+        getRecentlyUsedPropertiesFile().setProperty(key, path);
         return true;
     }
 
@@ -190,15 +225,15 @@ public enum CacheLRUWrapper {
      * @return true if we successfully removed key from map, false otherwise.
      */
     public synchronized boolean removeEntry(String key) {
-        if (!cacheOrder.containsKey(key)) {
+        if (!recentlyUsedPropertiesFile.containsKey(key)) {
             return false;
         }
-        cacheOrder.remove(key);
+        getRecentlyUsedPropertiesFile().remove(key);
         return true;
     }
 
     private String getIdForCacheFolder(String folder) {
-        int len = cacheDir.length();
+        int len = getCacheDir().getAbsolutePath().length();
         int index = folder.indexOf(File.separatorChar, len + 1);
         return folder.substring(len + 1, index);
     }
@@ -210,12 +245,12 @@ public enum CacheLRUWrapper {
      * @return true if we successfully updated value, false otherwise.
      */
     public synchronized boolean updateEntry(String oldKey) {
-        if (!cacheOrder.containsKey(oldKey)) return false;
-        String value = cacheOrder.getProperty(oldKey);
+        if (!recentlyUsedPropertiesFile.containsKey(oldKey)) return false;
+        String value = getRecentlyUsedPropertiesFile().getProperty(oldKey);
         String folder = getIdForCacheFolder(value);
 
-        cacheOrder.remove(oldKey);
-        cacheOrder.setProperty(Long.toString(System.currentTimeMillis()) + "," + folder, value);
+        getRecentlyUsedPropertiesFile().remove(oldKey);
+        getRecentlyUsedPropertiesFile().setProperty(Long.toString(System.currentTimeMillis()) + "," + folder, value);
         return true;
     }
 
@@ -230,7 +265,7 @@ public enum CacheLRUWrapper {
     public synchronized List<Entry<String, String>> getLRUSortedEntries() {
         List<Entry<String, String>> entries = new ArrayList<>();
 
-        for (Entry e : cacheOrder.entrySet()) {
+        for (Entry e : getRecentlyUsedPropertiesFile().entrySet()) {
             entries.add(new AbstractMap.SimpleImmutableEntry<String, String>(e));
         }
 
@@ -252,14 +287,14 @@ public enum CacheLRUWrapper {
      * Lock the file to have exclusive access.
      */
     public synchronized void lock() {
-        cacheOrder.lock();
+        getRecentlyUsedPropertiesFile().lock();
     }
 
     /**
      * Unlock the file.
      */
     public synchronized void unlock() {
-        cacheOrder.unlock();
+        getRecentlyUsedPropertiesFile().unlock();
     }
 
     /**
@@ -269,15 +304,15 @@ public enum CacheLRUWrapper {
      * @return value of given key, null otherwise.
      */
     public synchronized String getValue(String key) {
-        return cacheOrder.getProperty(key);
+        return getRecentlyUsedPropertiesFile().getProperty(key);
     }
 
     public synchronized boolean containsKey(String key) {
-        return cacheOrder.containsKey(key);
+        return getRecentlyUsedPropertiesFile().containsKey(key);
     }
 
     public synchronized boolean containsValue(String value) {
-        return cacheOrder.containsValue(value);
+        return getRecentlyUsedPropertiesFile().containsValue(value);
     }
 
     /**
@@ -292,6 +327,6 @@ public enum CacheLRUWrapper {
     }
 
     void clearLRUSortedEntries() {
-        cacheOrder.clear();
+        getRecentlyUsedPropertiesFile().clear();
     }
 }

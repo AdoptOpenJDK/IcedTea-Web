@@ -46,42 +46,43 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.CountDownLatch;
 
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.CacheTestUtils;
-import net.sourceforge.jnlp.util.PropertiesFile;
 
 public class CacheLRUWrapperTest {
 
-    private static final CacheLRUWrapper clw = CacheLRUWrapper.getInstance();
-    private static String cacheDirBackup;
-    private static PropertiesFile cacheOrderBackup;
     // does no DeploymentConfiguration exist for this file name? 
-    private static  final String cacheIndexFileName = CacheLRUWrapper.CACHE_INDEX_FILE_NAME + "_testing";
+    private static final String cacheIndexFileName = PathsAndFiles.CACHE_INDEX_FILE_NAME + "_testing";
+    private static final File javaTmp = new File(System.getProperty("java.io.tmpdir"));
+    private static final File tmpCache;
+
+    static {
+        try {
+            tmpCache = File.createTempFile("itw", "CacheLRUWrapperTest", javaTmp);
+            tmpCache.delete();
+            tmpCache.mkdir();
+            tmpCache.deleteOnExit();
+            if (!tmpCache.isDirectory()) {
+                throw new IOException("Unsuccess to create tmpfile, remove it and createsame directory");
+            }
+
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
+    }
+    private static final CacheLRUWrapper clw = new CacheLRUWrapper(new File(tmpCache, cacheIndexFileName));
 
     private final int noEntriesCacheFile = 1000;
 
     private ByteArrayOutputStream baos;
     private PrintStream out;
 
-    @BeforeClass
-    static public void setupJNLPRuntimeConfig() {
-        cacheDirBackup = clw.cacheDir;
-        cacheOrderBackup = clw.cacheOrder;
-        clw.cacheDir=System.getProperty("java.io.tmpdir");
-        clw.cacheOrder = new PropertiesFile( new File(clw.cacheDir + File.separator + cacheIndexFileName));
-        
-    }
-    
-    @AfterClass
-    static public void restoreJNLPRuntimeConfig() {
-        clw.cacheDir = cacheDirBackup;
-        clw.cacheOrder = cacheOrderBackup;
-    }
+
 
     @Before
     public void setup() {
@@ -92,7 +93,7 @@ public class CacheLRUWrapperTest {
     @Test
     public void testLoadStoreTiming() throws InterruptedException {
 
-        final File cacheIndexFile = new File(clw.cacheDir + File.separator + cacheIndexFileName);
+        final File cacheIndexFile = clw.getRecentlyUsedFile();
         cacheIndexFile.delete();
         try {
             int noLoops = 1000;
@@ -133,7 +134,7 @@ public class CacheLRUWrapperTest {
 
         // fill cache index file
         for(int i = 0; i < noEntries; i++) {
-            String path = clw.cacheDir + File.separatorChar + i + File.separatorChar + "test" + i + ".jar";
+            String path = clw.getRecentlyUsedFile().getAbsolutePath() + File.separatorChar + i + File.separatorChar + "test" + i + ".jar";
             String key = clw.generateKey(path);
             clw.addEntry(key, path);
         }
@@ -142,7 +143,7 @@ public class CacheLRUWrapperTest {
     @Test
     public void testModTimestampAfterStore() throws InterruptedException {
 
-        final File cacheIndexFile = new File(clw.cacheDir + File.separator + cacheIndexFileName);
+        final File cacheIndexFile = clw.getRecentlyUsedFile();
         cacheIndexFile.delete();
         try{
         clw.lock();
@@ -214,7 +215,7 @@ public class CacheLRUWrapperTest {
     public void testLock() throws IOException {
         try {
             clw.lock();
-            assertTrue(clw.cacheOrder.isHeldByCurrentThread());
+            assertTrue(clw.getRecentlyUsedPropertiesFile().isHeldByCurrentThread());
         } finally {
             clw.unlock();
         }
@@ -227,7 +228,7 @@ public class CacheLRUWrapperTest {
         } finally {
             clw.unlock();
         }
-        assertTrue(!clw.cacheOrder.isHeldByCurrentThread());
+        assertTrue(!clw.getRecentlyUsedPropertiesFile().isHeldByCurrentThread());
     }
 
     @Test(timeout = 2000l)
@@ -280,7 +281,7 @@ public class CacheLRUWrapperTest {
         @Override
         public void run() {
             try {
-                clw.cacheOrder.tryLock();
+                clw.getRecentlyUsedPropertiesFile().tryLock();
                 boolean result = clw.store();
                 synchronized (out) {
                     out.println(String.valueOf(result));

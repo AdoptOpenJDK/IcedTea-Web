@@ -68,6 +68,7 @@ public class PathsAndFiles {
     private static final String USER_PROP = "user.name";
     private static final String VARIABLE = JNLPRuntime.isWindows() ? "%" : "$";
     public static final String ICEDTEA_SO = "IcedTeaPlugin.so";
+    public static final String CACHE_INDEX_FILE_NAME = "recently_used";
 
     static {
         String configHome = System.getProperty(HOME_PROP) + File.separator + ".config";
@@ -115,6 +116,7 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "FILEopera32", Target.PLUGIN);
     
     public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "FILEappdata", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS);
     //javaws is saving here, itweb-settings may modify them
