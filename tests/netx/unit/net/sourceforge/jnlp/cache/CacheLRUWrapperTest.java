@@ -75,7 +75,7 @@ public class CacheLRUWrapperTest {
         }
 
     }
-    private static final CacheLRUWrapper clw = new CacheLRUWrapper(new File(tmpCache, cacheIndexFileName));
+    private static final CacheLRUWrapper clw = new CacheLRUWrapper(new File(tmpCache, cacheIndexFileName), tmpCache);
 
     private final int noEntriesCacheFile = 1000;
 

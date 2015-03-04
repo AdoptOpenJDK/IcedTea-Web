@@ -1,3 +1,12 @@
+2015-03-04  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed broken CacheUtil.
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: removed misleading one
+	parameter constructor.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: adapted to new CacheLRUWrapper
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java: adapted
+	to new constructor.
+
 2015-03-03  Jiri Vanek  <jvanek@redhat.com>
 
 	Changing enum CacheLRUWrapper singleton to instantiatible one. recently_used

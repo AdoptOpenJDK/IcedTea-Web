@@ -69,20 +69,12 @@ public class CacheLRUWrapper {
     
     private final PropertiesFile recentlyUsedPropertiesFile;
     private final File cacheDir;
-    private final File recentlyUsedFile;
-
+    
     public CacheLRUWrapper() {
-     this(PathsAndFiles.RECENTLY_USED_FILE.getFile());
+     this(PathsAndFiles.RECENTLY_USED_FILE.getFile(), PathsAndFiles.CACHE_DIR.getFile());
     }
     
-    /**
-     * testing constructor
-     * @param recentlyUsed file to be used as recently_used file. its parent will be used as cache dir
-     */
-    public CacheLRUWrapper(final File recentlyUsed) {
-        this(recentlyUsed, recentlyUsed.getParentFile());
-    }
-    
+        
     /**
      * testing constructor
      * @param recentlyUsed file to be used as recently_used file
@@ -90,7 +82,6 @@ public class CacheLRUWrapper {
      */
     public CacheLRUWrapper(final File recentlyUsed, final File cacheDir) {
         recentlyUsedPropertiesFile = new PropertiesFile(recentlyUsed);
-        recentlyUsedFile = recentlyUsed;
         this.cacheDir = cacheDir;
         if (!recentlyUsed.exists()) {
             try {
@@ -129,7 +120,7 @@ public class CacheLRUWrapper {
      * @return the recentlyUsedFile
      */
     public File getRecentlyUsedFile() {
-        return recentlyUsedFile;
+        return recentlyUsedPropertiesFile.getStoreFile();
     }
     
    private static class CacheLRUWrapperHolder{
@@ -179,7 +170,7 @@ public class CacheLRUWrapper {
 
             // 2. check path format - does the path look correct?
             if (path != null) {
-                if (!path.contains(cacheDir.getAbsolutePath())) {
+                if (!path.contains(getCacheDir().getAbsolutePath())) {
                     it.remove();
                     modified = true;
                 }

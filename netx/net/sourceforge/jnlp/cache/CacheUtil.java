@@ -58,9 +58,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 public class CacheUtil {
 
-    private static final String setCacheDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
-    private static final String cacheDir = new File(setCacheDir != null ? setCacheDir : System.getProperty("java.io.tmpdir")).getPath(); // Do this with file to standardize it.
-    private static final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+
 
     /**
      * Caches a resource and returns a URL for it in the cache;
@@ -144,8 +142,9 @@ public class CacheUtil {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("CCannotClearCache"));
             return false;
         }
-
-        File cacheDir = new File(CacheUtil.cacheDir);
+        
+        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+        File cacheDir = lruHandler.getCacheDir();
         if (!(cacheDir.isDirectory())) {
             return false;
         }
@@ -292,6 +291,7 @@ public class CacheUtil {
             throw new IllegalArgumentException(R("CNotCacheable", source));
 
         File cacheFile = null;
+        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             try {
                 lruHandler.lock();
@@ -318,6 +318,7 @@ public class CacheUtil {
      * @return File if we have searched before, {@code null} otherwise.
      */
     private static File getCacheFileIfExist(File urlPath) {
+        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             File cacheFile = null;
             List<Entry<String, String>> entries = lruHandler.getLRUSortedEntries();
@@ -340,7 +341,7 @@ public class CacheUtil {
      * Get the path to file minus the cache directory and indexed folder.
      */
     private static String pathToURLPath(String path) {
-        int len = cacheDir.length();
+        int len = CacheLRUWrapper.getInstance().getCacheDir().getAbsolutePath().length();
         int index = path.indexOf(File.separatorChar, len + 1);
         return path.substring(index);
     }
@@ -352,6 +353,7 @@ public class CacheUtil {
     public static String getCacheParentDirectory(String filePath) {
         String path = filePath;
         String tempPath = "";
+        String cacheDir = CacheLRUWrapper.getInstance().getCacheDir().getAbsolutePath();
 
         while(path.startsWith(cacheDir) && !path.equals(cacheDir)){
                 tempPath = new File(path).getParent();
@@ -374,13 +376,14 @@ public class CacheUtil {
      * @return the file location in the cache.
      */
     public static File makeNewCacheFile(URL source, Version version) {
+        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             File cacheFile = null;
             try {
                 lruHandler.lock();
                 lruHandler.load();
                 for (long i = 0; i < Long.MAX_VALUE; i++) {
-                    String path = cacheDir + File.separator + i;
+                    String path = lruHandler.getCacheDir().getAbsolutePath() + File.separator + i;
                     File cDir = new File(path);
                     if (!cDir.exists()) {
                         // We can use this directory.
@@ -552,6 +555,7 @@ public class CacheUtil {
      * This will remove all old cache items.
      */
     public static void cleanCache() {
+        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         if (okToClearCache()) {
             // First we want to figure out which stuff we need to delete.
             HashSet<String> keep = new HashSet<>();
@@ -586,8 +590,8 @@ public class CacheUtil {
                  *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
                  *  then rstr becomes: /home/user1/.icedtea/cache/0
                  */
-                    String rStr = file.getPath().substring(cacheDir.length());
-                    rStr = cacheDir + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
+                    String rStr = file.getPath().substring(lruHandler.getCacheDir().getAbsolutePath().length());
+                    rStr =lruHandler.getCacheDir().getAbsolutePath() + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
                     long len = file.length();
 
                     if (keep.contains(file.getPath().substring(rStr.length()))) {
