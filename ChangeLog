@@ -1,3 +1,15 @@
+2015-03-05  Jie Kang  <jkang@redhat.com>
+
+	Use jnlp_href parameter instead of attribute in	applet tag for reproducers.
+	This is to maintain compatibility with midori and epiphany browsers that
+	don't support jnlp_href as an applet tag's attribute
+	* tests/reproducer/simple/JSToJGet/resources/JSToJGet.html:
+	* tests/reproducer/simple/JSToJSet/resources/JSToJSet.html:
+	* tests/reproducer/simple/JavascriptFuncParam/resources/JavascriptFuncParam.html:
+	* tests/reproducer/simple/JavascriptGet/resources/JavascriptGet.html:
+	* tests/reproducer/simple/JavascriptSet/resources/JavascriptSet.html:
+	All tests now use parameter tag for jnlp_href
+
 2015-03-04  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed broken CacheUtil.
