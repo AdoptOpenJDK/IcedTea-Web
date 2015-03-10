@@ -1,3 +1,28 @@
+2015-03-10  Jiri Vanek  <jvanek@redhat.com>
+
+	Removed invalid URLs, empty codebases and enbaled js tests for opera
+	* tests/reproducers/simple/JSToJFuncParam/resources/jstoj-funcparam.jnlp
+	* tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java
+	* tests/reproducers/simple/JSToJFuncResol/resources/jstoj-funcresol.jnlp
+	* tests/reproducers/simple/JSToJFuncReturn/resources/jstoj-funcreturn.jnlp
+	* tests/reproducers/simple/JSToJGet/resources/jstoj-get.jnlp
+	* tests/reproducers/simple/JSToJGet/testcases/JSToJGetTest.java
+	* tests/reproducers/simple/JSToJSet/resources/jstoj-set.jnlp
+	* tests/reproducers/simple/JSToJSet/testcases/JSToJSetTest.java
+	* tests/reproducers/simple/JSToJTypeConv/resources/jstoj-typeconv.jnlp
+	* tests/reproducers/simple/JSToJTypeConv/testcases/JSToJTypeConvTest.java
+	* tests/reproducers/simple/JToJSString/testcases/JToJSStringTest.java
+	* tests/reproducers/simple/JavascriptFuncParam/resources/javascript-funcparam.jnlp
+	* tests/reproducers/simple/JavascriptFuncParam/testcases/JavascriptFuncParamTest.java
+	* tests/reproducers/simple/JavascriptFuncReturn/resources/JavascriptFuncReturn.jnlp
+	* tests/reproducers/simple/JavascriptFuncReturn/testcases/JavascriptFuncReturnTest.java
+	* tests/reproducers/simple/JavascriptGet/resources/javascript-get.jnlp
+	* tests/reproducers/simple/JavascriptGet/testcases/JavascriptGetTest.java
+	* tests/reproducers/simple/JavascriptSet/resources/javascript-set.jnlp
+	* tests/reproducers/simple/JavascriptSet/testcases/JavascriptSetTest.java
+	* tests/reproducers/simple/JavawsAWTRobotFindsButton/resources/javaws-awtrobot-finds-button.jnlp
+	* tests/reproducers/simple/JavawsAWTRobotUsageSample/resources/javaws-awtrobot-usage-sample.jnlp
+
 2015-03-05  Jie Kang  <jkang@redhat.com>
 
 	Use jnlp_href parameter instead of attribute in	applet tag for reproducers.

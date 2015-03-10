@@ -1,6 +1,6 @@
 
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="" href="jstoj-funcreturn.jnlp">
+<jnlp spec="1.0+" codebase="." href="jstoj-funcreturn.jnlp">
     <information>
         <title>JavaScript to Java LiveConnect - FuncReturn</title>
         <vendor>RedHat</vendor>
@@ -9,8 +9,7 @@
     </information>
     <resources>
         <!-- Application Resources -->
-        <j2se version="1.6+"
-              href="http://java.sun.com/products/autodl/j2se"/>
+        <j2se version="1.6+" />
         <jar href="JSToJFuncReturn.jar" main="true" />
 
     </resources>

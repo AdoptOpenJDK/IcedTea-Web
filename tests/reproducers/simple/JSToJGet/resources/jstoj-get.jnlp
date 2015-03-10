@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="" href="jstoj-get.jnlp">
+<jnlp spec="1.0+" codebase="." href="jstoj-get.jnlp">
     <information>
         <title>JavaScript to Java LiveConnect - Get</title>
         <vendor>RedHat</vendor>
@@ -8,7 +8,7 @@
     </information>
     <resources>
         <!-- Application Resources -->
-        <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+        <j2se version="1.6+" />
         <jar href="JSToJGet.jar" main="true" />
     </resources>
     <applet-desc 

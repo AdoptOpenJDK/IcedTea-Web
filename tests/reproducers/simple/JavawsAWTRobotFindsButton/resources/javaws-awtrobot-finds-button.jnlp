@@ -45,7 +45,7 @@ exception statement from your version.
     </information>
     <resources>
         <!-- Application Resources -->
-        <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+        <j2se version="1.6+" />
         <jar href="JavawsAWTRobotFindsButton.jar" main="true" />
     </resources>
     <applet-desc 

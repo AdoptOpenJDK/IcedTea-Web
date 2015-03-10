@@ -50,7 +50,7 @@ import org.junit.Test;
 
 public class JToJSStringTest extends BrowserTest {
     // the JS<->J tests tend to make Opera unusable
-    private static final boolean doNotRunInOpera = true;
+    private static final boolean doNotRunInOpera = false;
 
     private static final String initStr = "init";
     private static final String afterStr = "afterTests";

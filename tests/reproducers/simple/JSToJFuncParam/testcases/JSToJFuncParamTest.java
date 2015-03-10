@@ -50,7 +50,7 @@ import org.junit.Test;
 public class JSToJFuncParamTest extends BrowserTest {
 
     // the JS<->J tests tend to make Opera unusable
-    public final boolean doNotRunInOpera = true;
+    public final boolean doNotRunInOpera = false;
 
     private final String initStr = "JSToJFuncParam applet initialized.";
     private final String afterStr = "afterTests";

@@ -52,7 +52,7 @@ import org.junit.Test;
 public class JSToJSetTest extends BrowserTest {
 
     // the JS<->J tests tend to make Opera unusable
-    public final boolean doNotRunInOpera = true;
+    public final boolean doNotRunInOpera = false;
 
     private final String initStr = "JSToJSet applet initialized.";
     private final String afterStr = "afterTests";

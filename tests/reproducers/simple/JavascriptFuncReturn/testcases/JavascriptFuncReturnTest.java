@@ -48,7 +48,7 @@ import org.junit.Test;
 
 public class JavascriptFuncReturnTest extends BrowserTest {
 
-    public final boolean doNotRunInOpera = true;
+    public final boolean doNotRunInOpera = false;
 
     private final String initStr = "JToJSFuncReturn applet initialized.";
     private final String afterStr = "afterTests";

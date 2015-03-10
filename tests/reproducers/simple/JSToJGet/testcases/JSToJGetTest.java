@@ -50,7 +50,7 @@ import org.junit.Test;
 public class JSToJGetTest extends BrowserTest {
 
     // the JS<->J tests tend to make Opera unusable
-    public final boolean doNotRunInOpera = true;
+    public final boolean doNotRunInOpera = false;
 
     public String passStr = " - passed.";
     public String failValStr = " - failed, value mismatch.";
