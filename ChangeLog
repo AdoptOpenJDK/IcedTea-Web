@@ -1,5 +1,12 @@
 2015-03-10  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed locale tests
+	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java :
+	not existing BOHelp replaced by BOHelp1. (getProperties) if used classlaoder
+	is null then system one is used.
+
+2015-03-10  Jiri Vanek  <jvanek@redhat.com>
+
 	Removed invalid URLs, empty codebases and enbaled js tests for opera
 	* tests/reproducers/simple/JSToJFuncParam/resources/jstoj-funcparam.jnlp
 	* tests/reproducers/simple/JSToJFuncParam/testcases/JSToJFuncParamTest.java

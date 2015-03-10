@@ -36,6 +36,7 @@ exception statement from your version.
  */
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,7 +55,7 @@ import org.junit.Test;
 
 public class LocalesTestTest {
 
-    private static ServerAccess server = new ServerAccess();
+    private static final ServerAccess server = new ServerAccess();
     String[] keys = {
         "BOUsage",
         "BOUsage2",
@@ -71,7 +72,7 @@ public class LocalesTestTest {
         "BOViewer",
         "BXnofork",
         "BXclearcache",
-        "BOHelp"};
+        "BOHelp1"};
 
     /**
      * this will prepare new set of variables with wanted locale, which can be
@@ -130,7 +131,14 @@ public class LocalesTestTest {
     }
 
     public ResourceBundle getProperties(String s) throws IOException {
-        return new PropertyResourceBundle(this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/resources/Messages" + s + ".properties"));
+        ClassLoader cl = this.getClass().getClassLoader();
+        ServerAccess.logOutputReprint(cl==null?"null":cl.toString());
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+            ServerAccess.logOutputReprint(cl==null?"null":cl.toString());
+        }
+        InputStream q = cl.getResourceAsStream("net/sourceforge/jnlp/resources/Messages" + s + ".properties");
+        return new PropertyResourceBundle(q);
 
     }
     //just launching javaws -about to see if messages are corectly localised
