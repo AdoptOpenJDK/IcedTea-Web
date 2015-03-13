@@ -1,5 +1,16 @@
 2015-03-13  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixing xdg tests
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: some elements made
+	public - DEPLOYMENT_SUBDIR_DIR and XDG*VAR
+	* tests/reproducers/simple/simpletest1/testcases/XDGspecificationTests.java:
+	fixed issues with permissions attribute dialogue (faked deployment.properties
+	everywhere), fixed issues with same key in set copmmand everywhere, added 
+	test for duplicated key in set, fixed issue with remianing icons and generated
+	jnlps
+
+2015-03-13  Jiri Vanek  <jvanek@redhat.com>
+
 	Docs now include possible options for each property
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added key of IWSpossible
 	* netx/net/sourceforge/jnlp/util/docprovider/ItwebSettingsTextsProvider.java:

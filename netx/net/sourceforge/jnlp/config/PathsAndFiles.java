@@ -49,7 +49,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 
 public class PathsAndFiles {
 
-    private static final String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
+    public static final String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
 
     private static final String CONFIG_HOME;
     private static final String CACHE_HOME;
@@ -58,9 +58,9 @@ public class PathsAndFiles {
     public static final String USER_CONFIG_HOME;
     public static final String USER_CACHE_HOME;
     public static final String USER_SECURITY;
-    private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
-    private static final String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
-    private static final String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";
+    public static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
+    public static final String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
+    public static final String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";
     private static final String XDG_DATA_HOME = "XDG_DATA_HOME";
     private static final String TMP_PROP = "java.io.tmpdir";
     private static final String HOME_PROP = "user.home";
