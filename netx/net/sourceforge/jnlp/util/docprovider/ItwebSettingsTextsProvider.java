@@ -48,6 +48,7 @@ import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.config.Setting;
+import net.sourceforge.jnlp.config.ValueValidator;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
@@ -164,6 +165,10 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
                 } else {
                     value = fileAcronom;
                 }
+            }
+            ValueValidator v = entry.getValue().getValidator();
+            if (v != null && v.getPossibleValues() != null && !v.getPossibleValues().trim().isEmpty()) {
+                value = value + " (" + Translator.R("IWSpossible") + " " + v.getPossibleValues() + ")";
             }
             sb.append(getFormatter().getOption(entry.getKey(), value));
         }

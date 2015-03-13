@@ -1,5 +1,12 @@
 2015-03-13  Jiri Vanek  <jvanek@redhat.com>
 
+	Docs now include possible options for each property
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added key of IWSpossible
+	* netx/net/sourceforge/jnlp/util/docprovider/ItwebSettingsTextsProvider.java:
+	added hunk adding posibilites behainf each property
+
+2015-03-13  Jiri Vanek  <jvanek@redhat.com>
+
 	* tests/reproducers/signed/GifarBase/resources/gifar_application.jnlp: removed
 	dangling element
 	* tests/reproducers/signed/GifarBase/srcs/GifarMain.java: formating
