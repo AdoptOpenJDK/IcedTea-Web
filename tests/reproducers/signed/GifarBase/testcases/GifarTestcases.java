@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
 import net.sourceforge.jnlp.ClosingListener;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
@@ -57,8 +58,8 @@ import org.junit.Test;
 
 public class GifarTestcases extends BrowserTest {
 
-    List<String> trustIgnore = Arrays.asList(new String[]{ServerAccess.HEADLES_OPTION, "-Xtrustall", "-Xignoreheaders"});
-    List<String> trust = Arrays.asList(new String[]{ServerAccess.HEADLES_OPTION, "-Xtrustall"});
+    List<String> trustIgnore = Arrays.asList(new String[]{ServerAccess.HEADLES_OPTION, OptionsDefinitions.OPTIONS.TRUSTALL.option, OptionsDefinitions.OPTIONS.NOHEADERS.option});
+    List<String> trust = Arrays.asList(new String[]{ServerAccess.HEADLES_OPTION, OptionsDefinitions.OPTIONS.TRUSTALL.option});
     RulesFolowingClosingListener.ContainsRule exceptionRule = new RulesFolowingClosingListener.ContainsRule(InvalidJarHeaderException.class.getName());
     RulesFolowingClosingListener.ContainsRule okRule = new RulesFolowingClosingListener.ContainsRule("Image loaded");
     RulesFolowingClosingListener.ContainsRule sucideRule = new RulesFolowingClosingListener.ContainsRule("gifar killing himself");

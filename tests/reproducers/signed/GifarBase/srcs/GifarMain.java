@@ -186,7 +186,7 @@ public class GifarMain extends JApplet {
         System.out.println("gifar will be destroyed");
     }
 
-    public static void main(String args[]) {
+   public static void main(String[] args){
         final JFrame f = new JFrame();
         f.setLayout(new BorderLayout());
         f.setSize(250, 200);

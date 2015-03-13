@@ -1,3 +1,13 @@
+2015-03-13  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/reproducers/signed/GifarBase/resources/gifar_application.jnlp: removed
+	dangling element
+	* tests/reproducers/signed/GifarBase/srcs/GifarMain.java: formating
+	* tests/reproducers/signed/GifarBase/testcases/GifarTestcases.java: used
+	constants instead of hardcoded values
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: same
+
+
 2015-03-10  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed locale tests
