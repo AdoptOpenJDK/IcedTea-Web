@@ -69,7 +69,7 @@ public class CodeBaseManifestEntrySignedMatching extends BrowserTest {
     public static String getMessage(int i) {
         try {
             String s = "";//_cs, _de, _pl
-            PropertyResourceBundle props = new PropertyResourceBundle(CodeBaseManifestEntrySignedMatching.class.getClassLoader().getResourceAsStream("net/sourceforge/jnlp/resources/Messages" + s + ".properties"));
+            PropertyResourceBundle props = new PropertyResourceBundle(CodeBaseManifestEntrySignedMatching.class.getResourceAsStream("/net/sourceforge/jnlp/resources/Messages" + s + ".properties"));
             return props.getString(keys[i]);
         } catch (IOException ex) {
             throw new RuntimeException(ex);

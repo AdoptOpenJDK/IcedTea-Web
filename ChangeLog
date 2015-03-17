@@ -1,3 +1,10 @@
+2015-03-17  Jie Kang  <jkang@redhat.com>
+
+	Fix resource loading in CodebaseManifestEntry reproducers
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedMatching.java:
+	Now uses Class.getResourceAsStream which will use system class loader
+	if necessary
+
 2015-03-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixing xdg tests
@@ -24,7 +31,6 @@
 	* tests/reproducers/signed/GifarBase/testcases/GifarTestcases.java: used
 	constants instead of hardcoded values
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: same
-
 
 2015-03-10  Jiri Vanek  <jvanek@redhat.com>
 
