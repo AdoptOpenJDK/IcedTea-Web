@@ -1,3 +1,16 @@
+2015-03-17  Jie Kang  <jkang@redhat.com>
+
+	Escape apostrophes in Messages.properties
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties:
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties:
+	Apostrophes escaped using two apostrophes as specified in MessageFormat
+	java class. Used in Translator class to format values
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/TranslatorTest.java:
+	Test added making sure escaped apostrophes work properly
+	* tests/reprocers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedMatching.java:
+	(getMessage) Uses MessageFormat to format values from Messages.properties
+
 2015-03-17  Jiri Vanek  <jvanek@redhat.com>
 
 	Removed forgotten occurrence of netx-dist-tests-whitelist and so fixing make dist

@@ -37,6 +37,7 @@
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PropertyResourceBundle;
@@ -70,7 +71,8 @@ public class CodeBaseManifestEntrySignedMatching extends BrowserTest {
         try {
             String s = "";//_cs, _de, _pl
             PropertyResourceBundle props = new PropertyResourceBundle(CodeBaseManifestEntrySignedMatching.class.getResourceAsStream("/net/sourceforge/jnlp/resources/Messages" + s + ".properties"));
-            return props.getString(keys[i]);
+            //Bundle messages need to be formatted
+            return MessageFormat.format(props.getString(keys[i]), new Object[0]);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

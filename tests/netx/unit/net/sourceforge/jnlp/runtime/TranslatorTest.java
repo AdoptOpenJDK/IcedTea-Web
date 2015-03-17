@@ -26,9 +26,8 @@ public class TranslatorTest {
             return super.getMessage(message, params);
         }
     }
+
     TestableTranslator translator;
-    
-    
 
     @Before
     public void setup() throws IOException {
@@ -39,6 +38,7 @@ public class TranslatorTest {
         FileOutputStream fos = new FileOutputStream(f);
         String message = "key=value\n"
                 + "argkey=value {0}\n"
+                + "apostrophekey=keywith''\n"
                 + "RNoResource=no-resource\n";
         fos.write(message.getBytes());
 
@@ -72,15 +72,23 @@ public class TranslatorTest {
         String message = translator.translate("argkey", new Object[] {"Hello"});
         assertEquals("value Hello", message);
     }
-    
-      @Test
+
+    @Test
+    public void testTranslateMessageWithApostrophe() {
+        //Message format requires apostrophes to be escaped by using two ''
+        //The properties files follow this requirement
+        String message = translator.translate("apostrophekey");
+        assertEquals("keywith'", message);
+    }
+
+    @Test
     public void singletonTest1() {
         String message = Translator.R("key");
-          Assert.assertNotEquals("value", message);
+        Assert.assertNotEquals("value", message);
     }
-      @Test
+    @Test
     public void singletonTest2() {
         String message = Translator.R("unknown-key");
-          Assert.assertTrue(message.contains("unknown-key"));
+        Assert.assertTrue(message.contains("unknown-key"));
     }
 }
