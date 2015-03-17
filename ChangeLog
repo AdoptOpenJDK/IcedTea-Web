@@ -1,3 +1,8 @@
+2015-03-17  Jiri Vanek  <jvanek@redhat.com>
+
+	Removed forgotten occurrence of netx-dist-tests-whitelist and so fixing make dist
+	* Makefile.am: (EXTRA_DIST) lost netx-dist-tests-whitelist.
+
 2015-03-17  Jie Kang  <jkang@redhat.com>
 
 	Fix resource loading in CodebaseManifestEntry reproducers
