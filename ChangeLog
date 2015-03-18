@@ -1,3 +1,14 @@
+2015-03-18  Jiri Vanek  <jvanek@redhat.com>
+
+	Added support for Entry-Point manifest
+	* netx/net/sourceforge/jnlp/JNLPFile.java: defined ENTRY_POINT. Added methods
+	to get raw manifest, or list of possible entry points.
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: Added logic
+	to check real main class against manifest attribute.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java: Existing tests made
+	aware about Entry-Point. Added tests for splitEntryPoints. All occurences of
+	claslaoder repalced by classloader.
+
 2015-03-17  Jie Kang  <jkang@redhat.com>
 
 	Escape apostrophes in Messages.properties

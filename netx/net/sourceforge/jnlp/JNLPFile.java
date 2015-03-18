@@ -900,6 +900,8 @@ public class JNLPFile {
         public static final String CODEBASE = "Codebase";
         public static final String TRUSTED_ONLY = "Trusted-Only";
         public static final String TRUSTED_LIBRARY = "Trusted-Library";
+        public static final String ENTRY_POINT="Entry-Point";
+        
         private JNLPClassLoader loader;
 
 
@@ -925,6 +927,18 @@ public class JNLPFile {
             return loader.getMainClass();
         }
         
+         /**
+         *
+         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#entry_pt
+         */
+        public String[] getEntryPoints() {
+            return splitEntryPoints(getEntryPointString());
+        }
+        
+        public String getEntryPointString() {
+            return getAttribute(ENTRY_POINT);
+        }
+
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
          */
@@ -1047,8 +1061,8 @@ public class JNLPFile {
                 }
             }
         }
-    }    
-    
+    }
+
     public String createJnlpVendorValue() {
         final String location;
         if (getSourceLocation() != null) {
@@ -1088,7 +1102,18 @@ public class JNLPFile {
             return createJnlpTitleValue();
         }
         return getTitle() + " from " + createJnlpTitleValue();
-
+    }
+    
+    //not private for testing purposes
+    static String[] splitEntryPoints(String entryPointString) {
+        if (entryPointString == null || entryPointString.trim().isEmpty()) {
+            return null;
+        }
+        String[] result = entryPointString.trim().split("\\s+");
+        if (result.length == 0) {
+            return null;
+        }
+        return result;
     }
 }
 

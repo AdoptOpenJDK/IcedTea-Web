@@ -1414,7 +1414,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         panel.sendEvent(AppletPanel.APPLET_DISPOSE);
 
         /**
-         * Fixed #4501142: Classlaoder sharing policy doesn't
+         * Fixed #4501142: Classloader sharing policy doesn't
          * take "archive" into account. This will be overridden
          * by Java Plug-in.         [stanleyh]
          */

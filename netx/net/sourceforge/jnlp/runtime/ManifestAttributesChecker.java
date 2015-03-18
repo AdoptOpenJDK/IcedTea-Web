@@ -82,6 +82,7 @@ public class ManifestAttributesChecker {
             checkCodebaseAttribute();
             checkPermissionsAttribute();
             checkApplicationLibraryAllowableCodebaseAttribute();
+            checkEntryPoint();
         } else {
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, MANIFEST_CHECK_DISABLED_MESSAGE);
         }
@@ -90,6 +91,36 @@ public class ManifestAttributesChecker {
     public static boolean isCheckEnabled() {
         final String deploymentProperty = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
         return Boolean.parseBoolean(deploymentProperty);
+    }
+    
+    /*
+     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#entry_pt
+     */
+    private void checkEntryPoint() throws LaunchException {
+        if (signing == SigningState.NONE) {
+            return; /*when app is not signed at all, then skip this check*/
+        }
+        if (file.getLaunchInfo() == null) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Entry-Point can not be checked now, because of not existing launch info.");
+            return;
+        }
+        if (file.getLaunchInfo().getMainClass() == null) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Entry-Point can not be checked now, because of unknown main class.");
+            return;
+        }
+        final String[] eps = file.getManifestsAttributes().getEntryPoints();
+        String mainClass = file.getLaunchInfo().getMainClass();
+        if (eps == null) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Entry-Point manifest attribute for yours '" + mainClass + "'not found. Continuing.");
+            return;
+        }
+        for (String ep : eps) {
+            if (ep.equals(mainClass)) {
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Entry-Point of " + ep + " mathches " + mainClass + " continuing.");
+                return;
+            }
+        }
+        throw new LaunchException("None of the entry points specified: '" + file.getManifestsAttributes().getEntryPointString() + "' matched the main class " + mainClass + " and apelt is signed. This is a security error and the app will not be launched.");
     }
 
     /**

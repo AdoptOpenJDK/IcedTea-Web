@@ -13,7 +13,8 @@ New in release 1.6 (2014-XX-XX):
 * Improved to be able to run with any JDK
 * JDK 6 and older no longer supported
 * JDK 8 support added (URLPermission granted if applicable)
-* Added DE localisation
+* JDK 9 supported 
+* Added support for Entry-Point manifest attribute
 * Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK deployment property to control scan of Manifest file 
 * starting arguments now accept also -- abbreviations
 * Control Panel

@@ -360,4 +360,25 @@ public class JNLPFileTest extends NoStdOutErrTest{
         JNLPFile jnlpFile = new JNLPFile(is, codeBase, new ParserSettings(false, false, false));
         Assert.assertEquals(SecurityDesc.RequestedPermissionLevel.NONE, jnlpFile.getRequestedPermissionLevel());
     }
+    
+    @Test
+    public void splitEmptyEntryPointsReturnsTests() throws Exception {
+        Assert.assertArrayEquals(null, JNLPFile.splitEntryPoints("  "));
+        Assert.assertArrayEquals(null, JNLPFile.splitEntryPoints(null));
+    }
+
+    @Test
+    public void ensureSingleEntryPointIsParsed() throws Exception {
+        Assert.assertArrayEquals(new String[]{"a.b.c"}, JNLPFile.splitEntryPoints("  a.b.c  "));
+        Assert.assertArrayEquals(new String[]{"a.b.c"}, JNLPFile.splitEntryPoints("a.b.c"));
+        Assert.assertArrayEquals(new String[]{"a.b.c"}, JNLPFile.splitEntryPoints("  a.b.c"));
+        Assert.assertArrayEquals(new String[]{"a.b.c"}, JNLPFile.splitEntryPoints("a.b.c  "));
+    }
+
+    @Test
+    public void ensureMultipleEntryPointsAreParsed() throws Exception {
+        Assert.assertArrayEquals(new String[]{"a.b.c", "cde"}, JNLPFile.splitEntryPoints("  a.b.c     cde"));
+        Assert.assertArrayEquals(new String[]{"a.b.c", "cde"}, JNLPFile.splitEntryPoints("  a.b.c cde    "));
+        Assert.assertArrayEquals(new String[]{"a.b.c", "cde"}, JNLPFile.splitEntryPoints("a.b.c         cde    "));
+    }
 }

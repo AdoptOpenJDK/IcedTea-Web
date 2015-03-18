@@ -49,9 +49,9 @@ import org.junit.BeforeClass;
  * static instance. On opposite, if junit creates the instance, then itw see this one.
  *
  * Explanation is that junit classloader (fresh for each test-class)  is creating
- * special classlaoder for itw (or better itw is creating its own one). The itw 
- * classlaoder is then branch...or leaf of junit classlaoder. So any class loaded
- * by junit classlaoder is visible from itw, but not vice verse.
+ * special classloader for itw (or better itw is creating its own one). The itw 
+ * classloader is then branch...or leaf of junit classloader. So any class loaded
+ * by junit classloader is visible from itw, but not vice verse.
  */
 public class NoStdOutErrTest {
 
