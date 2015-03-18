@@ -17,6 +17,9 @@ New in release 1.6 (2014-XX-XX):
 * Added support for Entry-Point manifest attribute
 * Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK deployment property to control scan of Manifest file 
 * starting arguments now accept also -- abbreviations
+* Added new documentation
+* Added support for menu shortcuts - both javaws applications/applets and html applets are supported
+* added support for -html switch for javaws. Now you can run most of the applets without browser at all
 * Control Panel
   - PR1856: ControlPanel UI improvement for lower resolutions (800*600)
 * NetX
@@ -26,8 +29,6 @@ New in release 1.6 (2014-XX-XX):
   - Dropped support for long unmaintained -basedir argument
   - Returned support for -jnlp argument
   - RH1095311, PR574 -  References class sun.misc.Ref removed in OpenJDK 9 - fixed, and so buildable on JDK9
-  - Added support for menu shortcuts - both javaws applications/applets and html applets are supported
-  - added support for -html switch for javaws. Now you can run most of the applets without browser at all
 * Plugin
   - PR1743 - Intermittant deadlock in PluginRequestProcessor
   - PR1298 - LiveConnect - problem setting array elements (applet variables) from JS

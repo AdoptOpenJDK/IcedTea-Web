@@ -1,5 +1,9 @@
 2015-03-18  Jiri Vanek  <jvanek@redhat.com>
 
+	* NEWS: mentioned documentation. -html and menu shortcuts moved to general.
+
+2015-03-18  Jiri Vanek  <jvanek@redhat.com>
+
 	Added support for Entry-Point manifest
 	* netx/net/sourceforge/jnlp/JNLPFile.java: defined ENTRY_POINT. Added methods
 	to get raw manifest, or list of possible entry points.
