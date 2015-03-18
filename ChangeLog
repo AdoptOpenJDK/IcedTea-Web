@@ -1,3 +1,9 @@
+2015-03-18  Andrew Azores  <aazores@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: (main)
+	Fixed a bug where a local string variable was compared to the empty string
+	using ==.
+
 2015-03-18  Jiri Vanek  <jvanek@redhat.com>
 
 	* NEWS: mentioned documentation. -html and menu shortcuts moved to general.

@@ -1627,7 +1627,7 @@ public class PolicyEditor extends JPanel {
                 String filepath = optionParser.getParam(OptionsDefinitions.OPTIONS.FILE);
                 if (optionParser.getMainArgs().size() == 0) {
                     filepath = null;
-                } else if (filepath == "") {
+                } else if (filepath.isEmpty()) {
                     // maybe the user just forgot the -file flag, so try to open anyway
                     filepath = optionParser.getMainArg();
                 }
