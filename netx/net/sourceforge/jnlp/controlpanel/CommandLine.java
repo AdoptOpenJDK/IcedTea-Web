@@ -213,24 +213,28 @@ public class CommandLine {
 
         List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.SET);
 
-        String key = "";
+        String key = null;
         String value;
+        boolean isArgKey = false;
 
         for (String arg : args) {
-            if (isKey(arg)) {
-                key = arg;
-            } else {
-                value = arg;
+            isArgKey = !isArgKey;
 
-                if (configContains(key)) {
-                    if (validateValue(key, value) == ERROR) {
-                        return ERROR;
-                    }
-                    config.setProperty(key, value);
-                } else {
-                    OutputController.getLogger().printOutLn(R("CLWarningUnknownProperty", key));
-                    config.setProperty(key, value);
+            if (isArgKey) {
+                key = arg;
+                continue;
+            }
+
+            value = arg;
+
+            if (configContains(key)) {
+                if (validateValue(key, value) == ERROR) {
+                    return ERROR;
                 }
+                config.setProperty(key, value);
+            } else {
+                OutputController.getLogger().printOutLn(R("CLWarningUnknownProperty", key));
+                config.setProperty(key, value);
             }
         }
 
@@ -242,11 +246,6 @@ public class CommandLine {
         }
 
         return SUCCESS;
-    }
-
-    private boolean isKey(final String arg) {
-        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.SET);
-        return args.indexOf(arg) % 2 == 0;
     }
 
     private boolean configContains(final String arg) {

@@ -1,3 +1,13 @@
+2015-03-23  Lukasz Dracz  <ldracz@redhat.com>
+
+	Fix itweb-settings set command to allow duplicate strings
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java:
+	Fixed a bug where the set command would only use the first of
+	duplicate strings due to the use of index for sorting into
+	keys and values
+	* tests/netx/unit/net/sourceforge/jnlp/controlpanel/CommandLineTest.java:
+	Added tests for set command
+
 2015-03-18  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: (main)
