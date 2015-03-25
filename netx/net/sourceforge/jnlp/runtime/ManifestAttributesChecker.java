@@ -37,7 +37,9 @@ exception statement from your version.
 package net.sourceforge.jnlp.runtime;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.jnlp.ExtensionDesc;
@@ -59,13 +61,15 @@ import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
+import static net.sourceforge.jnlp.config.BasicValueValidators.splitCombination;
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 public class ManifestAttributesChecker {
 
     private final SecurityDesc security;
     private final JNLPFile file;
     private final SigningState signing;
     private final SecurityDelegate securityDelegate;
-    public static final String MANIFEST_CHECK_DISABLED_MESSAGE = "Manifest attribute checks are disabled.";
 
     public ManifestAttributesChecker(final SecurityDesc security, final JNLPFile file,
             final SigningState signing, final SecurityDelegate securityDelegate) throws LaunchException {
@@ -75,24 +79,66 @@ public class ManifestAttributesChecker {
         this.securityDelegate = securityDelegate;
     }
 
+    public enum MANIFEST_ATTRIBUTES_CHECK {
+        ALL,
+        NONE,
+        PERMISSIONS,
+        CODEBASE,
+        TRUSTED,
+        ALAC,
+        ENTRYPOINT
+    }
+
     void checkAll() throws LaunchException {
-        if (isCheckEnabled()) {
-            checkPermissionsAttribute();
-            checkTrustedOnlyAttribute();
-            checkCodebaseAttribute();
-            checkPermissionsAttribute();
-            checkApplicationLibraryAllowableCodebaseAttribute();
-            checkEntryPoint();
+        List<MANIFEST_ATTRIBUTES_CHECK> attributesCheck = getAttributesCheck();
+        if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.NONE)) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("MACDisabledMessage"));
         } else {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, MANIFEST_CHECK_DISABLED_MESSAGE);
+
+            if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.TRUSTED) ||
+                    attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
+                checkTrustedOnlyAttribute();
+            } else {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("MACCheckSkipped", "Trusted-Only", "TRUSTED"));
+            }
+
+            if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.CODEBASE) ||
+                    attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
+                checkCodebaseAttribute();
+            } else {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("MACCheckSkipped", "Codebase", "CODEBASE"));
+            }
+
+            if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS) ||
+                    attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
+                checkPermissionsAttribute();
+            } else {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("MACCheckSkipped", "Permissions", "PERMISSIONS"));
+            }
+
+            if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALAC) ||
+                   attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
+                checkApplicationLibraryAllowableCodebaseAttribute();
+            } else {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("MACCheckSkipped", "Application Library Allowable Codebase", "ALAC"));
+            }
+
         }
     }
 
-    public static boolean isCheckEnabled() {
+    public static List<MANIFEST_ATTRIBUTES_CHECK> getAttributesCheck() {
         final String deploymentProperty = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
-        return Boolean.parseBoolean(deploymentProperty);
+        String[] attributesCheck = splitCombination(deploymentProperty);
+        List<MANIFEST_ATTRIBUTES_CHECK> manifestAttributesCheckList = new ArrayList<>();
+        for (String attribute : attributesCheck) {
+            for (MANIFEST_ATTRIBUTES_CHECK manifestAttribute  : MANIFEST_ATTRIBUTES_CHECK.values()) {
+                if (manifestAttribute.toString().equals(attribute)) {
+                    manifestAttributesCheckList.add(manifestAttribute);
+                }
+            }
+        }
+        return manifestAttributesCheckList;
     }
-    
     /*
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#entry_pt
      */
@@ -159,16 +205,16 @@ public class ManifestAttributesChecker {
                 || (isSandboxed && SecurityDesc.SANDBOX_PERMISSIONS.equals(desc));
         final String signedMsg;
         if (isFullySigned && !isSandboxed) {
-            signedMsg = Translator.R("STOAsignedMsgFully");
+            signedMsg = R("STOAsignedMsgFully");
         } else if (isFullySigned && isSandboxed) {
-            signedMsg = Translator.R("STOAsignedMsgAndSandbox");
+            signedMsg = R("STOAsignedMsgAndSandbox");
         } else {
-            signedMsg = Translator.R("STOAsignedMsgPartiall");
+            signedMsg = R("STOAsignedMsgPartiall");
         }
         OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG,
                 "Trusted Only manifest attribute is \"true\". " + signedMsg + " and requests permission level: " + securityType);
         if (!(isFullySigned && requestsCorrectPermissions)) {
-            throw new LaunchException(Translator.R("STrustedOnlyAttributeFailure", signedMsg, securityType));
+            throw new LaunchException(R("STrustedOnlyAttributeFailure", signedMsg, securityType));
         }
     }
 
@@ -177,30 +223,30 @@ public class ManifestAttributesChecker {
      */
     private void checkCodebaseAttribute() throws LaunchException {
         if (file.getCodeBase() == null || file.getCodeBase().getProtocol().equals("file")) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("CBCheckFile"));
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("CBCheckFile"));
             return;
         }
         final Object securityType = security.getSecurityType();
         final URL codebase = UrlUtils.guessCodeBase(file);
         final ClasspathMatchers codebaseAtt = file.getManifestsAttributes().getCodebase();
         if (codebaseAtt == null) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("CBCheckNoEntry"));
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("CBCheckNoEntry"));
             return;
         }
         if (securityType.equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
             if (codebaseAtt.matches(codebase)) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("CBCheckUnsignedPass"));
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CBCheckUnsignedPass"));
             } else {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("CBCheckUnsignedFail"));
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("CBCheckUnsignedFail"));
             }
         } else {
             if (codebaseAtt.matches(codebase)) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("CBCheckOkSignedOk"));
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CBCheckOkSignedOk"));
             } else {
                 if (file instanceof PluginBridge) {
-                    throw new LaunchException(Translator.R("CBCheckSignedAppletDontMatchException", file.getManifestsAttributes().getCodebase().toString(), codebase));
+                    throw new LaunchException(R("CBCheckSignedAppletDontMatchException", file.getManifestsAttributes().getCodebase().toString(), codebase));
                 } else {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("CBCheckSignedFail"));
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("CBCheckSignedFail"));
                 }
             }
         }

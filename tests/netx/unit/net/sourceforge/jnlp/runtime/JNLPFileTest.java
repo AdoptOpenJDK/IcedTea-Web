@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.runtime;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -60,14 +61,14 @@ import org.junit.Test;
 public class JNLPFileTest extends NoStdOutErrTest {
 
     private static AppletSecurityLevel level;
-    private static boolean attCheckValue;
+    private static List<ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK> attCheckValue;
 
     @BeforeClass
     public static void setPermissions() {
         level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
-        attCheckValue = ManifestAttributesChecker.isCheckEnabled();
+        attCheckValue = ManifestAttributesChecker.getAttributesCheck();
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, String.valueOf(true));
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL));
     }
 
     @AfterClass

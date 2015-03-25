@@ -1,3 +1,33 @@
+2015-03-25  Lukasz Dracz  <ldracz@redhat.com>
+
+	Change Manifest Attributes Checker to check combinations of attributes
+	* netx/net/sourceforge/jnlp/config/BasicValueValidators.java:
+	Added MultipleStringValueValidator that validates single and combination
+	of string values. Added ManifestAttributesCheckValidator uses
+	MultipleStringValueValidator with the appropriate Manifest Attributes
+	options
+	* netx/net/sourceforge/jnlp/config/Defaults.java:
+	Changed manifest attributes check validator to ManifestAttributesCheckValidator
+	and made have default value of ALL
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	(MACDisabledMessage, MACCheckSkipped): added
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java:
+	MANIFEST_ATTRIBUTES_CHECK enum added,
+	changed logic to allow combinations of attributes to be checked,
+	Translator.R made into static import
+	* tests/netx/unit/net/sourceforge/jnlp/config/BasicValueValidatorsTests.java:
+	(testMultipleStringValueValidator, testMultipleStringValueValidatorCantMixSingleAndComboValues,
+	testManifestAttributesCheckValidator): added
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPFileTest.java:
+	Changed to work with new ManifestAttributesChecker, set to ALL which is equivalent to
+	the old value of true
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/testcases/PartiallySignedAppletManifestSpecifiesSandboxTests.java:
+	Added BeforeClass and AfterClass handling of deployment.properties file to ensure PERMISSIONS
+	and ALLOW_UNSIGNED are active for tests to pass then reverted to previous values for next tests
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/testcases/SignedAppletManifestSpecifiesSandboxTests.java:
+	Added BeforeClass and AfterClass handling of deployment.properties file to ensure PERMISSIONS
+	is set for tests to pass then reverted to previous values for next tests
+
 2015-03-23  Lukasz Dracz  <ldracz@redhat.com>
 
 	Fix itweb-settings set command to allow duplicate strings

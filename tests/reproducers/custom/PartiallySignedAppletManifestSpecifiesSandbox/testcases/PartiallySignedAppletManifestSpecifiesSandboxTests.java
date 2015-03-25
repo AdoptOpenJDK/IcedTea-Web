@@ -36,6 +36,10 @@ exception statement from your version.
  */
 
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
@@ -44,6 +48,10 @@ import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.FileUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PartiallySignedAppletManifestSpecifiesSandboxTests extends BrowserTest {
@@ -55,6 +63,52 @@ public class PartiallySignedAppletManifestSpecifiesSandboxTests extends BrowserT
     private static final String STACKTRACE_EX_TYPE = "AccessControlException";
     private static final String STACKTRACE_NOT_GRANT_PERMISSIONS_TYPE = "Cannot grant permissions to unsigned jars";
     private static final String USER_HOME = System.getProperty("user.home");
+
+    private static File deployFile;
+    private static String attributesCheck;
+    private static String securityLevel;
+
+    @BeforeClass
+    public static void setupDeploymentProperties() throws IOException {
+        deployFile = PathsAndFiles.USER_DEPLOYMENT_FILE.getFile();
+        String properties = FileUtils.loadFileAsString(deployFile);
+
+        for (String line : properties.split("\n")) {
+            if (line.contains("deployment.manifest.attribute.check")) {
+                attributesCheck = line;
+                properties = properties.replace(line, "deployment.manifest.attributes.check=PERMISSIONS\n");
+            }
+            if (line.contains("deployment.security.level")) {
+                securityLevel = line;
+                properties = properties.replace(line, "deployment.security.level=ALLOW_UNSIGNED\n");
+            }
+        }
+        if (attributesCheck == null) {
+            properties += "deployment.manifest.attributes.check=PERMISSIONS\n";
+        }
+        if (securityLevel == null) {
+            properties += "deployment.security.level=ALLOW_UNSIGNED\n";
+        }
+
+        FileUtils.saveFile(properties, deployFile);
+    }
+
+    @AfterClass
+    public static void setbackDeploymentProperties() throws IOException {
+        String properties = FileUtils.loadFileAsString(deployFile);
+        if (attributesCheck != null) {
+            properties = properties.replace("deployment.manifest.attributes.check=PERMISSIONS\n", attributesCheck);
+        } else {
+            properties = properties.replace("deployment.manifest.attributes.check=PERMISSIONS\n", "");
+        }
+
+        if (securityLevel != null) {
+            properties = properties.replace("deployment.security.level=ALLOW_UNSIGNED\n", securityLevel);
+        } else {
+            properties = properties.replace("deployment.security.level=ALLOW_UNSIGNED\n", "");
+        }
+        FileUtils.saveFile(properties, deployFile);
+    }
 
     @Test
     @NeedsDisplay

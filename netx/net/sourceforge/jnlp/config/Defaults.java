@@ -43,6 +43,8 @@ import java.util.Map;
 import net.sourceforge.jnlp.ShortcutDesc;
 import static net.sourceforge.jnlp.config.PathsAndFiles.*;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
+import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
+
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
@@ -409,8 +411,8 @@ public class Defaults {
                 //enable manifest-attributes checks
                 {
                         DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
-                        BasicValueValidators.getBooleanValidator(),
-                        String.valueOf(true)
+                        BasicValueValidators.getManifestAttributeCheckValidator(),
+                        String.valueOf("ALL")
                 }
         };
 

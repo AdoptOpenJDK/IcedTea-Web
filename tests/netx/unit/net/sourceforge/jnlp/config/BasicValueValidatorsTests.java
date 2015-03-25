@@ -130,4 +130,55 @@ public class BasicValueValidatorsTests {
             Assert.assertTrue(ex instanceof IllegalArgumentException);
         }
     }
+
+    @Test
+    public void testMultipleStringValueValidator() {
+        String[] singleValues = {
+            "SINGLE", "ONLY", "NONE"
+        };
+        String[] multipleValues = {
+            "MULTIPLE", "COMBO", "ONE", "TWO", "THREE"
+        };
+        ValueValidator multipleValidator = BasicValueValidators.getMultipleStringValidator(singleValues, multipleValues);
+
+        multipleValidator.validate("SINGLE");
+        multipleValidator.validate("ONLY");
+        multipleValidator.validate("NONE");
+        multipleValidator.validate("MULTIPLE");
+        multipleValidator.validate("MULTIPLE,COMBO,TWO");
+        multipleValidator.validate("THREE,ONE,COMBO,MULTIPLE");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMultipleStringValueValidatorCantMixSingleAndComboValues() {
+        String[] singleValues = {
+                "SINGLE", "ONLY", "NONE"
+        };
+        String[] multipleValues = {
+                "MULTIPLE", "COMBO", "ONE", "TWO", "THREE"
+        };
+        ValueValidator multipleValidator = BasicValueValidators.getMultipleStringValidator(singleValues, multipleValues);
+
+        multipleValidator.validate("SINGLE,COMBO");
+    }
+
+    @Test
+    public void testManifestAttributeCheckValidator() {
+        ValueValidator multipleValidator = BasicValueValidators.getManifestAttributeCheckValidator();
+
+        multipleValidator.validate("ALL");
+        multipleValidator.validate("PERMISSIONS");
+        multipleValidator.validate("NONE");
+        multipleValidator.validate("ALAC");
+        multipleValidator.validate("CODEBASE");
+        multipleValidator.validate("CODEBASE,ALAC,PERMISSIONS");
+        multipleValidator.validate("TRUSTED,ALAC,CODEBASE");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testManifestAttributeCheckValidatorCantMixSingleAndComboValues() {
+        ValueValidator multipleValidator = BasicValueValidators.getManifestAttributeCheckValidator();
+
+        multipleValidator.validate("ALL,CODEBASE,NONE");
+    }
 }
