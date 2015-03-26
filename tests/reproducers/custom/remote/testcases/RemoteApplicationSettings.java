@@ -41,12 +41,9 @@ import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ProcessResult;
-import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.runtime.Translator;
 import org.junit.Assert;
 import org.junit.Test;
-
-;
 
 public class RemoteApplicationSettings {
 
@@ -78,7 +75,8 @@ public class RemoteApplicationSettings {
         URL u;
 
         public String clean(String s){
-            s = s.replace(ManifestAttributesChecker.MANIFEST_CHECK_DISABLED_MESSAGE,"");
+            s = s.replace(Translator.R("MACDisabledMessage"),"");
+            s = s.replace(Translator.R("MACCheckSkipped", ".*", ".*"), "");
             s = s.replace(JNLPFile.TITLE_NOT_FOUND, "");
             s = s.replaceAll("Fontconfig warning.*", "");
             return  s.replaceAll("\\s*" + JNLPFile.TITLE_NOT_FOUND + "\\s*", "").trim();
