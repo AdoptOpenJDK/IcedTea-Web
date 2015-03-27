@@ -45,14 +45,54 @@ import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.FileUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+
+import java.io.File;
+import java.io.IOException;
 
 public class TrustedOnlyAttributeTest extends BrowserTest {
 
     private static final String RUNNING_STRING = "TrustedOnlyAttribute applet running";
     private static final String CLOSE_STRING = AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING;
+
+    private static File deployFile;
+    private static String attributesCheck;
+
+    @BeforeClass
+    public static void setupDeploymentProperties() throws IOException {
+        deployFile = PathsAndFiles.USER_DEPLOYMENT_FILE.getFile();
+        String properties = FileUtils.loadFileAsString(deployFile);
+
+        for (String line : properties.split("\n")) {
+            if (line.contains("deployment.manifest.attribute.check")) {
+                attributesCheck = line;
+                properties = properties.replace(line, "deployment.manifest.attributes.check=TRUSTED\n");
+            }
+        }
+        if (attributesCheck == null) {
+            properties += "deployment.manifest.attributes.check=TRUSTED\n";
+        }
+
+        FileUtils.saveFile(properties, deployFile);
+    }
+
+    @AfterClass
+    public static void setbackDeploymentProperties() throws IOException {
+        String properties = FileUtils.loadFileAsString(deployFile);
+        if (attributesCheck != null) {
+            properties = properties.replace("deployment.manifest.attributes.check=TRUSTED\n", attributesCheck);
+        } else {
+            properties = properties.replace("deployment.manifest.attributes.check=TRUSTED\n", "");
+        }
+
+        FileUtils.saveFile(properties, deployFile);
+    }
 
     @NeedsDisplay
     @Test

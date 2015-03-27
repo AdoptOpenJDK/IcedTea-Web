@@ -1,3 +1,9 @@
+2015-03-25  Lukasz Dracz  <ldracz@redhat.com>
+
+	* tests/reproducers/custom/TrustedOnlyAttribute/testcases/TrustedOnlyAttributeTest.java:
+	added BeforeClass and AfterClass hunks which adapt USER_DEPLOYMENT_FILE for
+	test's needs.
+
 2015-03-27  Jiri Vanek  <jvanek@redhat.com>
 
 	* Makefile.am: (stamps/generate-docs.stamp) fixed redundant false in version
