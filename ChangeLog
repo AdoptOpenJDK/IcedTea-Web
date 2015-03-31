@@ -1,3 +1,7 @@
+2015-03-31  Jiri Vanek  <jvanek@redhat.com>
+
+	* Messages.properties: (FILElogs) adapted to more suit current docs.
+
 2015-03-25  Lukasz Dracz  <ldracz@redhat.com>
 
 	* tests/reproducers/custom/TrustedOnlyAttribute/testcases/TrustedOnlyAttributeTest.java:
