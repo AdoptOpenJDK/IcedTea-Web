@@ -1,3 +1,22 @@
+2015-04-01  Jiri Vanek  <jvanek@redhat.com>
+
+	PathsAndFiles definitions made aware of deployment.properties which can change them
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: (CacheLRUWrapper) used
+	gette rinstead of field for RECENTLY_USED_FILE
+	* netx/net/sourceforge/jnlp/config/Defaults.java: all getFullPath replaced 
+	by getDefaultFullPath.
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: removed read
+	from properties and repalced by getters from PathsAndFiles.
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java: same
+	* tests/reproducers/signed/CacheReproducer/testcases/CacheReproducerTest.java: same
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: Or setup-able InfrastructureFileDescriptor
+	now can return their non-default value by overriden getFullPath and reading
+	from properties.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added BUTControlledBy
+	of Controlled by and BUTmodified of modified
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: now uses new
+	Messages.properties keys
+
 2015-03-31  Jiri Vanek  <jvanek@redhat.com>
 
 	PolicyEditor now honor verbose switch

@@ -323,7 +323,7 @@ public class CachePane extends JPanel {
             }
 
             private void updateRecentlyUsed(File f) {
-                File recentlyUsedFile = PathsAndFiles.RECENTLY_USED_FILE.getFile();
+                File recentlyUsedFile = PathsAndFiles.getRecentlyUsedFile().getFile();
                 PropertiesFile pf = new PropertiesFile(recentlyUsedFile);
                 pf.load();
                 Enumeration<Object> en = pf.keys();

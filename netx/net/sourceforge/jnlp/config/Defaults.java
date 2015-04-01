@@ -59,6 +59,7 @@ public class Defaults {
     public static Map<String, Setting<String>> getDefaults() {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
+            sm.checkRead(USER_DEPLOYMENT_FILE.getDefaultFullPath());
             sm.checkRead(USER_DEPLOYMENT_FILE.getFullPath());
         }
 
@@ -79,12 +80,12 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_USER_CACHE_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        CACHE_DIR.getFullPath()
+                        CACHE_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        PCACHE_DIR.getFullPath()
+                        PCACHE_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_CACHE_DIR,
@@ -94,53 +95,53 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_USER_LOG_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        LOG_DIR.getFullPath()
+                        LOG_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TMP_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        TMP_DIR.getFullPath()
+                        TMP_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_LOCKS_DIR,
                         BasicValueValidators.getFilePathValidator(),
-                        LOCKS_DIR.getFullPath()
+                        LOCKS_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE,
                         BasicValueValidators.getFilePathValidator(),
-                        MAIN_LOCK.getFullPath()
+                        MAIN_LOCK.getDefaultFullPath()
                 },
                 /* certificates and policy files */
                 {
                         DeploymentConfiguration.KEY_USER_SECURITY_POLICY,
                         BasicValueValidators.getUrlValidator(),
-                        "file://" + JAVA_POLICY.getFullPath()
+                        "file://" + JAVA_POLICY.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_CACERTS.getFullPath()
+                        USER_CACERTS.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_JSSECAC.getFullPath()
+                        USER_JSSECAC.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_CERTS.getFullPath()
+                        USER_CERTS.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_JSSECER.getFullPath()
+                        USER_JSSECER.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        USER_CLIENTCERT.getFullPath()
+                        USER_CLIENTCERT.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY,
@@ -150,27 +151,27 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYS_CACERT.getFullPath()
+                        SYS_CACERT.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYS_JSSECAC.getFullPath()
+                        SYS_JSSECAC.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYS_CERT.getFullPath()
+                        SYS_CERT.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYS_JSSECERT.getFullPath()
+                        SYS_JSSECERT.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS,
                         BasicValueValidators.getFilePathValidator(),
-                        SYS_CLIENTCERT.getFullPath()
+                        SYS_CLIENTCERT.getDefaultFullPath()
                 },
                 /* security access and control */
                 {

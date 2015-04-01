@@ -16,11 +16,6 @@
 
 package net.sourceforge.jnlp.config;
 
-import static net.sourceforge.jnlp.config.PathsAndFiles.JAVA_DEPLOYMENT_PROP_FILE;
-import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CACHE_HOME;
-import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CONFIG_HOME;
-import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DEPLOYMENT_FILE;
-import static net.sourceforge.jnlp.config.PathsAndFiles.USER_SECURITY;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.BufferedOutputStream;
@@ -287,12 +282,12 @@ public final class DeploymentConfiguration {
     public void load(boolean fixIssues) throws ConfigurationException {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkRead(USER_DEPLOYMENT_FILE.getFullPath());
+            sm.checkRead(PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath());
         }
 
         File systemConfigFile = findSystemConfigFile();
 
-        load(systemConfigFile, USER_DEPLOYMENT_FILE.getFile(), fixIssues);
+        load(systemConfigFile, PathsAndFiles.USER_DEPLOYMENT_FILE.getFile(), fixIssues);
     }
 
     void load(File systemConfigFile, File userFile, boolean fixIssues) throws ConfigurationException {
@@ -475,7 +470,7 @@ public final class DeploymentConfiguration {
 
         String jrePath = null;
         try {
-            Map<String, Setting<String>> tmpProperties = parsePropertiesFile(USER_DEPLOYMENT_FILE.getFile());
+            Map<String, Setting<String>> tmpProperties = parsePropertiesFile(PathsAndFiles.USER_DEPLOYMENT_FILE.getFile());
             Setting<String> jreSetting = tmpProperties.get(KEY_JRE_DIR);
             if (jreSetting != null) {
                 jrePath = jreSetting.getValue();
@@ -490,7 +485,7 @@ public final class DeploymentConfiguration {
             jreFile = new File(jrePath + File.separator + "lib"
                     + File.separator + DEPLOYMENT_CONFIG_FILE);
         } else {
-            jreFile = JAVA_DEPLOYMENT_PROP_FILE.getFile();
+            jreFile = PathsAndFiles.JAVA_DEPLOYMENT_PROP_FILE.getFile();
         }
         if (jreFile.isFile()) {
             return jreFile;
@@ -735,24 +730,24 @@ public final class DeploymentConfiguration {
         int errors = 0;
         String PRE_15_DEPLOYMENT_DIR = ".icedtea";
         String LEGACY_USER_HOME = System.getProperty("user.home") + File.separator + PRE_15_DEPLOYMENT_DIR;
-        File configDir = new File(USER_CONFIG_HOME);
-        File cacheDir = new File(USER_CACHE_HOME);
+        File configDir = new File(PathsAndFiles.USER_CONFIG_HOME);
+        File cacheDir = new File(PathsAndFiles.USER_CACHE_HOME);
         File legacyUserDir = new File(LEGACY_USER_HOME);
         if (legacyUserDir.exists()) {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Legacy configuration and cache found. Those will be now transported to new locations");
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, USER_CONFIG_HOME + " and " + USER_CACHE_HOME);
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, PathsAndFiles.USER_CONFIG_HOME + " and " + PathsAndFiles.USER_CACHE_HOME);
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "You should not see this message next time you run icedtea-web!");
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Your custom dirs will not be touched and will work");
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "-----------------------------------------------");
 
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Preparing new directories:");
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + USER_CONFIG_HOME);
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + PathsAndFiles.USER_CONFIG_HOME);
             errors += resultToStd(configDir.mkdirs());
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + USER_CACHE_HOME);
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + PathsAndFiles.USER_CACHE_HOME);
             errors += resultToStd(cacheDir.mkdirs());
 
             String legacySecurity = LEGACY_USER_HOME + File.separator + "security";
-            String currentSecurity = USER_SECURITY;
+            String currentSecurity = PathsAndFiles.USER_SECURITY;
             errors += moveLegacyToCurrent(legacySecurity, currentSecurity);
 
             String legacyCache = LEGACY_USER_HOME + File.separator + "cache";
@@ -761,7 +756,7 @@ public final class DeploymentConfiguration {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Adapting " + PathsAndFiles.CACHE_INDEX_FILE_NAME + " to new destination");
             //replace all legacyCache by currentCache in new recently_used
             try {
-                File f = PathsAndFiles.RECENTLY_USED_FILE.getFile();
+                File f = PathsAndFiles.getRecentlyUsedFile().getFile();
                 String s = FileUtils.loadFileAsString(f);
                 s = s.replace(legacyCache, currentCache);
                 FileUtils.saveFile(s, f);
@@ -779,11 +774,11 @@ public final class DeploymentConfiguration {
             errors += moveLegacyToCurrent(legacyLogDir, currentLogDir);
 
             String legacyProperties = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES;
-            String currentProperties = USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES;
+            String currentProperties = PathsAndFiles.USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES;
             errors += moveLegacyToCurrent(legacyProperties, currentProperties);
 
             String legacyPropertiesOld = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES + ".old";
-            String currentPropertiesOld = USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES + ".old";
+            String currentPropertiesOld = PathsAndFiles.USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES + ".old";
             errors += moveLegacyToCurrent(legacyPropertiesOld, currentPropertiesOld);
 
 
@@ -801,19 +796,19 @@ public final class DeploymentConfiguration {
             if (errors != 0) {
                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "There occureed " + errors + " errors");
                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Please double check content of old data in " + LEGACY_USER_HOME + " with ");
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "new " + USER_CONFIG_HOME + " and " + USER_CACHE_HOME);
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "new " + PathsAndFiles.USER_CONFIG_HOME + " and " + PathsAndFiles.USER_CACHE_HOME);
                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "To disable this check again, please remove " + LEGACY_USER_HOME);
             }
 
         } else {
             OutputController.getLogger().log("System is already following XDG .cache and .config specifications");
             try {
-                OutputController.getLogger().log("config: " + USER_CONFIG_HOME + " file exists: " + configDir.exists());
+                OutputController.getLogger().log("config: " + PathsAndFiles.USER_CONFIG_HOME + " file exists: " + configDir.exists());
             } catch (Exception ex) {
                 OutputController.getLogger().log(ex);
             }
             try {
-                OutputController.getLogger().log("cache: " + USER_CACHE_HOME + " file exists:" + cacheDir.exists());
+                OutputController.getLogger().log("cache: " + PathsAndFiles.USER_CACHE_HOME + " file exists:" + cacheDir.exists());
             } catch (Exception ex) {
                 OutputController.getLogger().log(ex);
             }

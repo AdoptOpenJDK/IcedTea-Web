@@ -115,10 +115,41 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "FILEopera64", Target.PLUGIN);
     public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "FILEopera32", Target.PLUGIN);
     
-    public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "FILEappdata", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS) {
+    
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+        }
+
+    };
+    
+
+    // this one is depnding on CACHE_DIR, so initialize it lazily
+    public static InfrastructureFileDescriptor getRecentlyUsedFile() {
+        return RECENTLY_USED_FILE_HOLDER.RECENTLY_USED_FILE;
+    }
+
+    private static class RECENTLY_USED_FILE_HOLDER {
+        static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    }
+    
+    public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "FILEappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
+
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR);
+        }
+    };
+    public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS){
+
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_LOG_DIR);
+        }
+    
+        
+    };
     //javaws is saving here, itweb-settings may modify them
     public static final InfrastructureFileDescriptor ICONS_DIR = new ItwConfigFileDescriptor("icons", "FILEicons", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor GEN_JNLPS_DIR = new ItwConfigFileDescriptor("generated_jnlps", "FILEjnlps", Target.PLUGIN, Target.ITWEB_SETTINGS);
@@ -127,25 +158,88 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentCofigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentCofigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
+        
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_TMP_DIR);
+        }
+        
+    };
+    public static final InfrastructureFileDescriptor LOCKS_DIR = new TmpUsrFileDescriptor("locks", "netx", "FILElocksdir", Target.JAVAWS) {
 
-    public static final InfrastructureFileDescriptor LOCKS_DIR = new TmpUsrFileDescriptor("locks", "netx", "FILElocksdir", Target.JAVAWS);
-    public static final InfrastructureFileDescriptor MAIN_LOCK = new TmpUsrFileDescriptor("netx_running", "netx" + File.separator + "locks", "FILEmainlock", Target.JAVAWS);
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_LOCKS_DIR);
+        }
+        
+    };
+    public static final InfrastructureFileDescriptor MAIN_LOCK = new TmpUsrFileDescriptor("netx_running", "netx" + File.separator + "locks", "FILEmainlock", Target.JAVAWS) {
 
-    public static final InfrastructureFileDescriptor JAVA_POLICY = new UserSecurityConfigFileDescriptor("java.policy", "FILEpolicy", Target.JAVAWS, Target.POLICY_EDITOR);
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE);
+        }
+        
+    };
+    public static final InfrastructureFileDescriptor JAVA_POLICY = new UserSecurityConfigFileDescriptor("java.policy", "FILEpolicy", Target.JAVAWS, Target.POLICY_EDITOR){
+
+                   @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
+        }
+
+        @Override
+        public File getFile() {
+            throw new IllegalStateException("Only getFullPath should be used. This is returning URL String.");
+        }
+        
+        @Override
+        public File getDefaultFile() {
+            throw new IllegalStateException("Only getDefaultFullPath should be used. This is returning URL String.");
+        }
+        
+    };
     public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts");
     public static final InfrastructureFileDescriptor USER_JSSECAC = new UserCacertsFileDescriptor("trusted.jssecacerts");
     public static final InfrastructureFileDescriptor USER_CERTS = new UserCacertsFileDescriptor("trusted.certs");
     public static final InfrastructureFileDescriptor USER_JSSECER = new UserCacertsFileDescriptor("trusted.jssecerts");
     public static final InfrastructureFileDescriptor USER_CLIENTCERT = new UserCacertsFileDescriptor("trusted.clientcerts");
 
-    public static final InfrastructureFileDescriptor SYS_CACERT = new SystemJavaSecurityFileDescriptor("cacerts");
-    public static final InfrastructureFileDescriptor SYS_JSSECAC = new SystemJavaSecurityFileDescriptor("jssecacerts");
-    public static final InfrastructureFileDescriptor SYS_CERT = new SystemJavaSecurityFileDescriptor("trusted.certs");
-    public static final InfrastructureFileDescriptor SYS_JSSECERT = new SystemJavaSecurityFileDescriptor("trusted.jssecerts");
-    public static final InfrastructureFileDescriptor SYS_CLIENTCERT = new SystemJavaSecurityFileDescriptor("trusted.clientcerts");
+    public static final InfrastructureFileDescriptor SYS_CACERT = new SystemJavaSecurityFileDescriptor("cacerts") {
+        
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS);
+        }
+        
+    };
+    public static final InfrastructureFileDescriptor SYS_JSSECAC = new SystemJavaSecurityFileDescriptor("jssecacerts") {
+      
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS);
+        }
 
-    public static final InfrastructureFileDescriptor JAVA_DEPLOYMENT_PROP_FILE = new SystemJavaLibFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEjavadp", Target.JAVAWS, Target.ITWEB_SETTINGS){
+    };
+    public static final InfrastructureFileDescriptor SYS_CERT = new SystemJavaSecurityFileDescriptor("trusted.certs");
+    public static final InfrastructureFileDescriptor SYS_JSSECERT = new SystemJavaSecurityFileDescriptor("trusted.jssecerts") {
+
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS);
+        }
+        
+    };
+    public static final InfrastructureFileDescriptor SYS_CLIENTCERT = new SystemJavaSecurityFileDescriptor("trusted.clientcerts") {
+
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS);
+        }
+
+    };
+    public static final InfrastructureFileDescriptor JAVA_DEPLOYMENT_PROP_FILE = new SystemJavaLibFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEjavadp", Target.JAVAWS, Target.ITWEB_SETTINGS) {
 
         @Override
         public String getDescription() {
@@ -183,7 +277,7 @@ public class PathsAndFiles {
             }
 
         }
-
+        r.add(getRecentlyUsedFile());
         return r;
     }
 
@@ -218,36 +312,74 @@ public class PathsAndFiles {
             this.descriptionKey = descriptionKey;
             this.target = target;
         }
-
         public File getFile() {
-            return new File(getFullPath());
-        }
-
-        public String getStub() {
-            return clean(pathStub + File.separator + fileName);
+             return new File(getFullPath());
         }
 
         public String getDir() {
+            return getFile().getParent();
+        }
+
+        //setupable files may override this (and maybe also getDir if needed)
+        public String getFullPath() {
+            return getDefaultFullPath();
+        }
+        //its not recommended to override default locations methods
+        
+        public File getDefaultFile() {
+            return new File(getDefaultFullPath());
+        }
+
+        public String getDefaultDir() {
             return clean(systemPathStub + File.separator + pathStub);
         }
 
-        public String getFullPath() {
+        public String getDefaultFullPath() {
             return clean(systemPathStub + File.separator + pathStub + File.separator + fileName);
         }
 
-        public String getSystemPathStubAcronym() {
+        //returns path acronym for default location
+        protected String getSystemPathStubAcronym() {
             return systemPathStub;
         }
 
+        /**
+         * This remaining part of file declaration, when acronym is removed.
+         * See getDirViaAcronym.
+         * 
+         * @return 
+         */
+        private String getStub() {
+            return clean(pathStub + File.separator + fileName);
+        }
+          
         @Override
         public String toString() {
             return clean(getSystemPathStubAcronym() + File.separator + getStub());
         }
         
+        /**
+         * For documentation purposes, the descriptor may be created as VARIABLE/custom/path.
+         * 
+         * This is whole part, which is considered as setup-able.
+         * @return 
+         */
         public String getDirViaAcronym() {
             return clean(getSystemPathStubAcronym() + File.separator + pathStub);
         }
 
+        /**
+         * Remove garbage from paths.
+         * 
+         * Currently this methods unify all multiple occurrences of separators
+         * to single one. Eg /path/to//file will become /path/to/file.
+         * 
+         * Those artifacts maybe spread during various s=path+deparator+subdir+separator
+         * file=s+separator+filename
+         * 
+         * @param s string to be cleaned
+         * @return cleaned string
+         */
         private String clean(String s) {
             while (s.contains(File.separator + File.separator)) {
                 s = s.replace(File.separator + File.separator, File.separator);
@@ -440,5 +572,9 @@ public class PathsAndFiles {
         }
 
     };
+    
+    private static String gcpd(String key) {
+        return JNLPRuntime.getConfiguration().getProperty(key);
+    }
 
 }

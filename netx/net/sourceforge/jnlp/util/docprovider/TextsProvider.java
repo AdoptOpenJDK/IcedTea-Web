@@ -54,6 +54,7 @@ import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.config.Setting;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ManFormatter;
@@ -172,14 +173,19 @@ public abstract class TextsProvider {
         });
         for (PathsAndFiles.InfrastructureFileDescriptor f : files) {
             String path = expandVariables ? f.getFullPath() : f.toString();
+            String modified = "";
+            if (!f.getFullPath().equals(f.getDefaultFullPath()) && expandVariables){
+                modified=getFormatter().getBold("["+Translator.R("BUTmodified")+"] ");
+            }
             String controlledBy = "";
             for (Map.Entry<String, Setting<String>> entry : defs) {
                 if (matchSttingsValueWithInfrastrucutreFile(entry.getValue(), f)) {
-                    controlledBy = " Controlled by " + getFormatter().getBold(entry.getKey());
+                    controlledBy = " " + Translator.R("BUTControlledBy", getFormatter().getBold(entry.getKey()));
+                    
                     break;
                 }
             }
-            sb.append(getFormatter().getOption(path, f.getDescription() + controlledBy));
+            sb.append(getFormatter().getOption(path, modified+f.getDescription() + controlledBy));
         }
         return formatter.wrapParagraph(sb.toString());
     }
@@ -188,7 +194,7 @@ public abstract class TextsProvider {
         if (entry == null || entry.getDefaultValue() == null) {
             return false;
         }
-        return entry.getDefaultValue().equals(f.getFullPath()) || entry.getDefaultValue().equals("file://" + f.getFullPath());
+        return entry.getDefaultValue().equals(f.getDefaultFullPath()) || entry.getDefaultValue().equals("file://" + f.getDefaultFullPath());
 
     }
 
