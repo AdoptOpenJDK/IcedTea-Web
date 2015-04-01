@@ -1598,6 +1598,10 @@ public class PolicyEditor extends JPanel {
      */
     public static void main(final String[] args) {
         final OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
+            JNLPRuntime.setDebug(true);
+        }
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP1)) {
             final TextsProvider helpMessagesProvider = new PolicyEditorTextsProvider("utf-8", new PlainTextFormatter(), true, true);

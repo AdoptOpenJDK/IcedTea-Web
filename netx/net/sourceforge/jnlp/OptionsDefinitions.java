@@ -174,7 +174,9 @@ public class OptionsDefinitions {
         return Arrays.asList(new OPTIONS[]{
             OPTIONS.HELP1,
             OPTIONS.FILE,
-            OPTIONS.CODEBASE}
+            OPTIONS.CODEBASE,
+            OPTIONS.VERBOSE
+            }
         );
     }
 

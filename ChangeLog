@@ -1,5 +1,13 @@
 2015-03-31  Jiri Vanek  <jvanek@redhat.com>
 
+	PolicyEditor now honor verbose switch
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java: OPTIONS.VERBOSE added to
+	list of PolicyEditor's commands
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor: (main) set 
+	debug to true, if verbose is presented.
+
+2015-03-31  Jiri Vanek  <jvanek@redhat.com>
+
 	* Messages.properties: (FILElogs) adapted to more suit current docs.
 
 2015-03-25  Lukasz Dracz  <ldracz@redhat.com>
