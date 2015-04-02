@@ -51,14 +51,14 @@ public class SecurityDialogsTest {
     public void testGetIntegerResponseAsBoolean() throws Exception {
         Object nullRef = null;
         Object objRef = new Object();
-        Float floatRef = new Float(0.0f);
-        Double doubleRef = new Double(0.0d);
-        Long longRef = new Long(0);
-        Byte byteRef = new Byte((byte)0);
-        Short shortRef = new Short((short)0);
+        Float floatRef = 0.0f;
+        Double doubleRef = 0.0d;
+        Long longRef = (long) 0;
+        Byte byteRef = (byte)0;
+        Short shortRef = (short)0;
         String strRef = "0";
-        Integer intRef1 = new Integer(5);
-        Integer intRef2 = new Integer(0);
+        Integer intRef1 = 5;
+        Integer intRef2 = 0;
 
         assertFalse("null reference should have resulted in false", getIntegerResponseAsBoolean(nullRef));
         assertFalse("Object reference should have resulted in false", getIntegerResponseAsBoolean(objRef));
@@ -76,16 +76,16 @@ public class SecurityDialogsTest {
     public void testGetIntegerResponseAsAppletAction() throws Exception {
         Object nullRef = null;
         Object objRef = new Object();
-        Float floatRef = new Float(0.0f);
-        Double doubleRef = new Double(0.0d);
-        Long longRef = new Long(0);
-        Byte byteRef = new Byte((byte) 0);
-        Short shortRef = new Short((short) 0);
+        Float floatRef = 0.0f;
+        Double doubleRef = 0.0d;
+        Long longRef = (long) 0;
+        Byte byteRef = (byte) 0;
+        Short shortRef = (short) 0;
         String strRef = "0";
-        Integer intRef1 = new Integer(0);
-        Integer intRef2 = new Integer(1);
-        Integer intRef3 = new Integer(2);
-        Integer intRef4 = new Integer(3);
+        Integer intRef1 = 0;
+        Integer intRef2 = 1;
+        Integer intRef3 = 2;
+        Integer intRef4 = 3;
 
         assertEquals("null reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(nullRef), CANCEL);
         assertEquals("Object reference should have resulted in CANCEL", getIntegerResponseAsAppletAction(objRef), CANCEL);

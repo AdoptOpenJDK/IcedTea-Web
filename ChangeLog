@@ -1,3 +1,10 @@
+2015-04-02  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/security/KeyStoresTest.java: new file,
+	added tests for getKeyStoreLocation API.
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java: minor
+	cleanup on redundant autoboxing.
+
 2015-04-01  Jiri Vanek  <jvanek@redhat.com>
 
 	PathsAndFiles definitions made aware of deployment.properties which can change them
