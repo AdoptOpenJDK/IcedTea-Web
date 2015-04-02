@@ -217,7 +217,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
 
                     if (canWrite) {
                         location.setText(result);
-                        config.setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, result);
+                        PathsAndFiles.CACHE_DIR.setValue(result);
                     }
                 }
             }

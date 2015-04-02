@@ -118,8 +118,8 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS) {
     
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_CACHE_DIR;
         }
 
     };
@@ -144,15 +144,15 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "FILEappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
 
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR;
         }
     };
     public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS){
 
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_LOG_DIR);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_LOG_DIR;
         }
     
         
@@ -168,32 +168,32 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
         
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_TMP_DIR);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_TMP_DIR;
         }
         
     };
     public static final InfrastructureFileDescriptor LOCKS_DIR = new TmpUsrFileDescriptor("locks", "netx", "FILElocksdir", Target.JAVAWS) {
 
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_LOCKS_DIR);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_LOCKS_DIR;
         }
         
     };
     public static final InfrastructureFileDescriptor MAIN_LOCK = new TmpUsrFileDescriptor("netx_running", "netx" + File.separator + "locks", "FILEmainlock", Target.JAVAWS) {
 
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE;
         }
         
     };
     public static final InfrastructureFileDescriptor JAVA_POLICY = new UserSecurityConfigFileDescriptor("java.policy", "FILEpolicy", Target.JAVAWS, Target.POLICY_EDITOR){
 
                    @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_SECURITY_POLICY;
         }
 
         @Override
@@ -209,74 +209,74 @@ public class PathsAndFiles {
     };
     public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts") {
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_JSSECAC = new UserCacertsFileDescriptor("trusted.jssecacerts") {
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_CERTS = new UserCacertsFileDescriptor("trusted.certs") {
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_TRUSTED_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_JSSECER = new UserCacertsFileDescriptor("trusted.jssecerts") {
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_CLIENTCERT = new UserCacertsFileDescriptor("trusted.clientcerts") {
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor SYS_CACERT = new SystemJavaSecurityFileDescriptor("cacerts") {
         
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS;
         }
         
     };
     public static final InfrastructureFileDescriptor SYS_JSSECAC = new SystemJavaSecurityFileDescriptor("jssecacerts") {
       
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor SYS_CERT = new SystemJavaSecurityFileDescriptor("trusted.certs"){
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS;
         }
     };
     public static final InfrastructureFileDescriptor SYS_JSSECERT = new SystemJavaSecurityFileDescriptor("trusted.jssecerts") {
 
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
         }
         
     };
     public static final InfrastructureFileDescriptor SYS_CLIENTCERT = new SystemJavaSecurityFileDescriptor("trusted.clientcerts") {
 
         @Override
-        public String getFullPath() {
-            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS);
+        public String getPropertiesKey() {
+            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
         }
 
     };
@@ -353,20 +353,38 @@ public class PathsAndFiles {
             this.descriptionKey = descriptionKey;
             this.target = target;
         }
+
+       /** setup-able files have to override this
+         * if they don't, they are read only, and set value will fail
+         * if it is desired to write value of property, then override and use known key.
+         * @return null by default. Should return key to configuration if overriden.
+         */
+        protected  String getPropertiesKey() {
+            return null;
+        }
+
         public File getFile() {
              return new File(getFullPath());
         }
 
-        public String getDir() {
-            return getFile().getParent();
+        public void setValue(String value) {
+            String key = getPropertiesKey();
+            if (key == null) {
+                throw new IllegalStateException("This file is read only");
+            } else {
+                JNLPRuntime.getConfiguration().setProperty(key, value);
+            }
         }
 
-        //setupable files may override this (and maybe also getDir if needed)
         public String getFullPath() {
-            return getDefaultFullPath();
+            String key = getPropertiesKey();
+            if (key == null) {
+                return getDefaultFullPath();
+            } else {
+                return JNLPRuntime.getConfiguration().getProperty(key);
+            }
         }
-        //its not recommended to override default locations methods
-        
+
         public File getDefaultFile() {
             return new File(getDefaultFullPath());
         }
@@ -624,8 +642,4 @@ public class PathsAndFiles {
 
     };
     
-    private static String gcpd(String key) {
-        return JNLPRuntime.getConfiguration().getProperty(key);
-    }
-
 }

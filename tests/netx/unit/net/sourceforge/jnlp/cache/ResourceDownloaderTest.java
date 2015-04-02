@@ -312,7 +312,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest{
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
+       PathsAndFiles.CACHE_DIR.setValue(System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
     }
 
     @AfterClass
@@ -320,7 +320,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest{
         downloadServer.stop();
 
         CacheUtil.clearCache();
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, cacheDir);
+        PathsAndFiles.CACHE_DIR.setValue(cacheDir);
     }
 
     private File setupFile(String fileName, String text) throws IOException {

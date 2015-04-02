@@ -71,7 +71,7 @@ public class CacheLRUWrapper {
     private final File cacheDir;
     
     public CacheLRUWrapper() {
-     this(PathsAndFiles.getRecentlyUsedFile().getFile(), PathsAndFiles.CACHE_DIR.getFile());
+        this(PathsAndFiles.getRecentlyUsedFile().getFile(), PathsAndFiles.CACHE_DIR.getFile());
     }
     
         

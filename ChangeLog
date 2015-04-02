@@ -1,5 +1,26 @@
 2015-04-02  Jiri Vanek  <jvanek@redhat.com>
 
+	InfrastructureFileDescriptor got setter
+	*netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: minor formating
+	*netx/net/sourceforge/jnlp/config/PathsAndFiles.java: all getFullPath replaced by
+	getPropertiesKey, and instead of config, value, returns key. Added setValue,
+	solution. Adapted getFullPath. (gcpd) removed. (getDir) removed - is now
+	confusing.
+	*netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java: setter into
+	property KEY_USER_LOG_DIR replaced by setter into LOG_DIR.
+	*netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java: 
+	same for KEY_USER_CACHE_DIR -> CACHE_DIR
+	*netx/net/sourceforge/jnlp/util/docprovider/ItwebPluginTextProvider.java: 
+	All browser directories adapted to missing getDir.
+	*tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java:
+	KEY_USER_CACHE_DIR -> CACHE_DIR
+	*tests/netx/unit/net/sourceforge/jnlp/cache/ResourceDownloaderTest.java:
+	KEY_USER_CACHE_DIR -> CACHE_DIR
+	*tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java: 
+	KEY_USER_CACHE_DIR -> CACHE_DIR
+
+2015-04-02  Jiri Vanek  <jvanek@redhat.com>
+
 	All reading from file properties repalced by getter from PathsAndFiles
 	*netx/net/sourceforge/jnlp/cache/CacheUtil.java: read from KEY_USER_NETX_RUNNING_FILE
 	property replaced by get from MAIN_LOCK.

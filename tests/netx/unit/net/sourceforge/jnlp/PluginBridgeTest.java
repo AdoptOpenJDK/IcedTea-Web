@@ -87,13 +87,13 @@ public class PluginBridgeTest extends NoStdOutErrTest{
     @BeforeClass
     public static void setup() {
         originalCacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
     }
 
     @AfterClass
     public static void teardown() {
         CacheUtil.clearCache();
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, originalCacheDir);
+        PathsAndFiles.CACHE_DIR.setValue(originalCacheDir);
     }
 
     @Test

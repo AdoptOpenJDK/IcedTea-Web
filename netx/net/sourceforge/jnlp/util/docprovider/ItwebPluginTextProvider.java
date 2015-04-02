@@ -71,7 +71,7 @@ public class ItwebPluginTextProvider extends TextsProvider {
 
         String mozillas;
         if (expandVariables) {
-            mozillas = getFormatter().getOption(PathsAndFiles.MOZILA_USER.getDir(), PathsAndFiles.MOZILA_USER.getDescription());
+            mozillas = getFormatter().getOption(PathsAndFiles.MOZILA_USER.getFile().getParent(), PathsAndFiles.MOZILA_USER.getDescription());
         } else {
             mozillas = getFormatter().getOption(PathsAndFiles.MOZILA_USER.getDirViaAcronym(), PathsAndFiles.MOZILA_USER.getDescription());
         }
@@ -79,14 +79,14 @@ public class ItwebPluginTextProvider extends TextsProvider {
             if (expandVariables) {
                 mozillas += getFormatter().getOption(PathsAndFiles.MOZILA_GLOBAL_64.getDirViaAcronym(), PathsAndFiles.MOZILA_GLOBAL_64.getDescription());
             } else {
-                mozillas += getFormatter().getOption(PathsAndFiles.MOZILA_GLOBAL_64.getDir(), PathsAndFiles.MOZILA_GLOBAL_64.getDescription());
+                mozillas += getFormatter().getOption(PathsAndFiles.MOZILA_GLOBAL_64.getFile().getParent(), PathsAndFiles.MOZILA_GLOBAL_64.getDescription());
             }
         }
         if (!expandVariables || !jdkArch.endsWith("64")) {
             if (expandVariables) {
                 mozillas += getFormatter().getOption(PathsAndFiles.MOZILA_GLOBAL_32.getDirViaAcronym(), PathsAndFiles.MOZILA_GLOBAL_32.getDescription());
             } else {
-                mozillas += getFormatter().getOption(PathsAndFiles.MOZILA_GLOBAL_32.getDir(), PathsAndFiles.MOZILA_GLOBAL_32.getDescription());
+                mozillas += getFormatter().getOption(PathsAndFiles.MOZILA_GLOBAL_32.getFile().getParent(), PathsAndFiles.MOZILA_GLOBAL_32.getDescription());
             }
         }
 
@@ -95,14 +95,14 @@ public class ItwebPluginTextProvider extends TextsProvider {
             if (expandVariables) {
                 operas += getFormatter().getOption(PathsAndFiles.OPERA_64.getDirViaAcronym(), PathsAndFiles.OPERA_64.getDescription());
             } else {
-                operas += getFormatter().getOption(PathsAndFiles.OPERA_64.getDir(), PathsAndFiles.OPERA_64.getDescription());
+                operas += getFormatter().getOption(PathsAndFiles.OPERA_64.getFile().getParent(), PathsAndFiles.OPERA_64.getDescription());
             }
         }
         if (!expandVariables || !jdkArch.endsWith("64")) {
             if (expandVariables) {
                 operas += getFormatter().getOption(PathsAndFiles.OPERA_32.getDirViaAcronym(), PathsAndFiles.OPERA_32.getDescription());
             } else {
-                operas += getFormatter().getOption(PathsAndFiles.OPERA_32.getDir(), PathsAndFiles.OPERA_32.getDescription());
+                operas += getFormatter().getOption(PathsAndFiles.OPERA_32.getFile().getParent(), PathsAndFiles.OPERA_32.getDescription());
             }
         }
         return super.getSynopsis()

@@ -107,7 +107,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             }
 
             private void save() {
-                config.setProperty(DeploymentConfiguration.KEY_USER_LOG_DIR, logsDestination.getText());
+                PathsAndFiles.LOG_DIR.setValue(logsDestination.getText());
             }
         });
         final JButton logsDestinationReset = new JButton(Translator.R("CPFilesLogsDestDirResert"));
