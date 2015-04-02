@@ -72,7 +72,7 @@ public class CacheReproducerTest {
     private static final int PERMANENT_FILES = 1;
     
     private static final File icedteaCache = PathsAndFiles.CACHE_DIR.getFile();
-    private static final File icedteaCacheFile = PathsAndFiles.getRECENTLY_USED_FILE().getFile();
+    private static final File icedteaCacheFile = PathsAndFiles.getRecentlyUsedFile().getFile();
     private static final File netxLock = PathsAndFiles.MAIN_LOCK.getFile();
 
     String testS = "#netx file\n"
