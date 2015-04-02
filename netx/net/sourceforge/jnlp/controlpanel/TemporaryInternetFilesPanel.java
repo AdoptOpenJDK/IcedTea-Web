@@ -48,6 +48,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 
 /**
@@ -62,10 +63,10 @@ import net.sourceforge.jnlp.runtime.Translator;
 @SuppressWarnings("serial")
 public class TemporaryInternetFilesPanel extends NamedBorderPanel {
 
-    private static final Long CACHE_UNLIMITED_SIZE = Long.valueOf(-1l);
-    private static final Long CACHE_MIN_SIZE = Long.valueOf(0l);
+    private static final Long CACHE_UNLIMITED_SIZE = -1l;
+    private static final Long CACHE_MIN_SIZE = 0l;
     private static final Long CACHE_MAX_SIZE = (long) Integer.MAX_VALUE;
-    private static final Long SPINNER_STEP_SIZE = Long.valueOf(10l);
+    private static final Long SPINNER_STEP_SIZE = 10l;
     private final JSpinner cacheSizeSpinner;
 
     private static final long BYTES_TO_MEGABYTES = 1024l * 1024l;
@@ -107,14 +108,14 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         lCompression = new JLabel(Translator.R("TIFPCompressionLevel") + ":"); // Sets compression level for jar files.
 
         bLocation = new JButton(Translator.R("TIFPChange") + "...");
-        location = new JTextField(this.config.getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR));
+        location = new JTextField(PathsAndFiles.CACHE_DIR.getFullPath());
         locationDescription = new JLabel(Translator.R("TIFPLocationLabel") + ":");
         bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
 
         diskSpacePanel = new JPanel();
         diskSpacePanel.setLayout(new GridBagLayout());
 
-        cacheDir = new File(this.config.getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR));
+        cacheDir = PathsAndFiles.CACHE_DIR.getFile();
         usableDiskSpace = cacheDir.getUsableSpace() / BYTES_TO_MEGABYTES; // getUsableSpace returns bytes
 
         addComponents();

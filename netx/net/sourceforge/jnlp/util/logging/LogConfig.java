@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.util.logging;
 
 import java.io.File;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
@@ -66,7 +67,7 @@ public class LogConfig {
             logToSysLog = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSYSTEMLOG));
 
             // Get log directory, create it if it doesn't exist. If unable to create and doesn't exist, don't log.
-            icedteaLogDir = config.getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
+            icedteaLogDir = PathsAndFiles.LOG_DIR.getFullPath();
             if (icedteaLogDir != null) {
                 File f = new File(icedteaLogDir);
                 if (f.isDirectory() || f.mkdirs()) {
@@ -74,6 +75,8 @@ public class LogConfig {
                 } else {
                     enableLogging = false;
                 }
+            } else {
+                enableLogging = false;
             }
     }
 

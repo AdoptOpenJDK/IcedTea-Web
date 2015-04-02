@@ -36,6 +36,7 @@ import java.util.List;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
@@ -85,7 +86,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
 
     @BeforeClass
     public static void setup() {
-        originalCacheDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+        originalCacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
     }
 
@@ -312,7 +313,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         Assert.assertTrue(jars.length == 2);
 
         //Resource can be in any order
-        List<String> resourceLocations = new ArrayList<String>();
+        List<String> resourceLocations = new ArrayList<>();
         resourceLocations.add(jars[0].getLocation().toExternalForm());
         resourceLocations.add(jars[1].getLocation().toExternalForm());
 

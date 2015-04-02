@@ -36,10 +36,8 @@
  */
 package net.sourceforge.jnlp.security;
 
-import java.io.File;
 import java.security.Permission;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,54 +62,51 @@ public class KeyStoresTest {
     //TODO once setConfig is removed, ensure SM is enforced also from PathsAndFiles
     @Test
     public void getKeyStoreUserLocationTest() {
-        String s;
+        PathsAndFiles.InfrastructureFileDescriptor s;
         System.setSecurityManager(null);
-        KeyStores.setConfiguration(JNLPRuntime.getConfiguration());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CA_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_CACERTS.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_CACERTS.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_CERTS.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_CERTS.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_CLIENTCERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_CLIENTCERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.JSSE_CA_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_JSSECAC.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_JSSECAC.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.JSSE_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_JSSECER.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_JSSECER.getFile());
     }
 
     @Test
     public void getKeyStoreSystemLocationTest() {
-        String s;
+        PathsAndFiles.InfrastructureFileDescriptor s;
         System.setSecurityManager(null);
-        KeyStores.setConfiguration(JNLPRuntime.getConfiguration());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_CACERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_CACERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_CERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_CERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CLIENT_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_CLIENTCERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_CLIENTCERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.JSSE_CA_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_JSSECAC.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_JSSECAC.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.JSSE_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_JSSECERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_JSSECERT.getFile());
     }
 
     @Test
     public void getKeyStoreUserLocationTestSM() {
         DummySM dm = new DummySM();
         System.setSecurityManager(dm);
-        String s;
-        KeyStores.setConfiguration(JNLPRuntime.getConfiguration());
+        PathsAndFiles.InfrastructureFileDescriptor s;
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CA_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_CACERTS.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_CACERTS.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_CERTS.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_CERTS.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_CLIENTCERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_CLIENTCERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.JSSE_CA_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_JSSECAC.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_JSSECAC.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.JSSE_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.USER_JSSECER.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.USER_JSSECER.getFile());
         Assert.assertEquals(true, dm.called);
     }
 
@@ -119,18 +114,17 @@ public class KeyStoresTest {
     public void getKeyStoreSystemLocationTestSM() {
         DummySM dm = new DummySM();
         System.setSecurityManager(dm);
-        String s;
-        KeyStores.setConfiguration(JNLPRuntime.getConfiguration());
+        PathsAndFiles.InfrastructureFileDescriptor s;
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_CACERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_CACERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_CERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_CERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CLIENT_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_CLIENTCERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_CLIENTCERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.JSSE_CA_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_JSSECAC.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_JSSECAC.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.JSSE_CERTS);
-        Assert.assertEquals(new File(s), PathsAndFiles.SYS_JSSECERT.getFile());
+        Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_JSSECERT.getFile());
         Assert.assertEquals(true, dm.called);
     } 
 

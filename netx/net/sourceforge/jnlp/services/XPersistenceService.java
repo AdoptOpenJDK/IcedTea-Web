@@ -22,7 +22,7 @@ import java.util.*;
 import javax.jnlp.*;
 
 import net.sourceforge.jnlp.cache.*;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -83,8 +83,7 @@ class XPersistenceService implements PersistenceService {
      * @return the file
      */
     protected File toCacheFile(URL location) throws MalformedURLException {
-        String pcache = JNLPRuntime.getConfiguration()
-                .getProperty(DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR);
+        String pcache =  PathsAndFiles.PCACHE_DIR.getFullPath();
         return CacheUtil.urlToPath(location, pcache);
     }
 

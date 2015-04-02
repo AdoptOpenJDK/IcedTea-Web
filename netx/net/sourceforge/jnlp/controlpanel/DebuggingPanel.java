@@ -38,8 +38,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 
@@ -61,7 +61,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             
     };
     
-     private DeploymentConfiguration config;
+     private final DeploymentConfiguration config;
 
     /**
      * Create a new instance of the debugging panel.
@@ -86,7 +86,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
         final JLabel debuggingDescription = new JLabel("<html>" + Translator.R("CPDebuggingDescription") + "<hr /><br /></html>");
         final JLabel logsDestinationTitle = new JLabel(Translator.R("CPFilesLogsDestDir")+": ");
-        final JTextField logsDestination = new JTextField(config.getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR));
+        final JTextField logsDestination = new JTextField(PathsAndFiles.LOG_DIR.getFullPath());
         logsDestination.getDocument().addDocumentListener(new DocumentListener() {
 
 
@@ -115,7 +115,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                logsDestination.setText(Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_LOG_DIR).getDefaultValue());
+                logsDestination.setText(PathsAndFiles.LOG_DIR.getDefaultFullPath());
             }
         });
 

@@ -61,6 +61,7 @@ import net.sourceforge.jnlp.cache.DefaultDownloadIndicator;
 import net.sourceforge.jnlp.cache.DownloadIndicator;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
@@ -226,7 +227,6 @@ public class JNLPRuntime {
             }
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
         }
-        KeyStores.setConfiguration(getConfiguration());
 
         isWebstartApplication = isApplication;
 
@@ -762,8 +762,7 @@ public class JNLPRuntime {
         try {
             String message = "This file is used to check if netx is running";
 
-            File netxRunningFile = new File(JNLPRuntime.getConfiguration()
-                    .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
+            File netxRunningFile = PathsAndFiles.MAIN_LOCK.getFile();
             if (!netxRunningFile.exists()) {
                 FileUtils.createParentDir(netxRunningFile);
                 FileUtils.createRestrictedFile(netxRunningFile, true);
@@ -815,8 +814,7 @@ public class JNLPRuntime {
             fileLock.release();
             fileLock.channel().close();
             fileLock = null;
-            OutputController.getLogger().log("Release shared lock on " + JNLPRuntime.getConfiguration()
-                        .getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
+            OutputController.getLogger().log("Release shared lock on " + PathsAndFiles.MAIN_LOCK.getFullPath());
         } catch (IOException e) {
             OutputController.getLogger().log(e);
         }

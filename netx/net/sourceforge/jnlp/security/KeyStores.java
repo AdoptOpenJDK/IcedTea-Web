@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -80,8 +80,6 @@ public final class KeyStores {
 
     public static final Map<Integer,String> keystoresPaths=new HashMap<Integer, String>();
 
-    private static DeploymentConfiguration config = null;
-
     private static final String KEYSTORE_TYPE = "JKS";
     /** the default password used to protect the KeyStores */
     private static final String DEFAULT_PASSWORD = "changeit";
@@ -89,17 +87,7 @@ public final class KeyStores {
     public static char[] getPassword() {
         return DEFAULT_PASSWORD.toCharArray();
     }
-
-    /** Set the configuration object to use for getting KeyStore paths */
-    public static void setConfiguration(DeploymentConfiguration newConfig) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new AllPermission());
-        }
-
-        config = newConfig;
-    }
-
+  
     /**
      * Returns a KeyStore corresponding to the appropriate level level (user or
      * system) and type.
@@ -134,7 +122,7 @@ public final class KeyStores {
             sm.checkPermission(new AllPermission());
         }
 
-        String location = getKeyStoreLocation(level, type);
+        String location = getKeyStoreLocation(level, type).getFullPath();
         KeyStore ks = null;
         try {
             ks = createKeyStoreFromFile(new File(location), create, DEFAULT_PASSWORD);
@@ -252,54 +240,40 @@ public final class KeyStores {
      * @param type the specified type of the key store to be returned.
      * @return the location of the key store.
      */
-    public static final String getKeyStoreLocation(Level level, Type type) {
-        String configKey = null;
+    public static final PathsAndFiles.InfrastructureFileDescriptor getKeyStoreLocation(Level level, Type type) {
         switch (level) {
             case SYSTEM:
                 switch (type) {
                     case JSSE_CA_CERTS:
-                        configKey = DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
-                        break;
+                        return PathsAndFiles.SYS_JSSECAC;
                     case CA_CERTS:
-                        configKey = DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS;
-                        break;
+                        return PathsAndFiles.SYS_CACERT;
                     case JSSE_CERTS:
-                        configKey = DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
-                        break;
+                        return PathsAndFiles.SYS_JSSECERT;
                     case CERTS:
-                        configKey = DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS;
-                        break;
+                         return PathsAndFiles.SYS_CERT;
                     case CLIENT_CERTS:
-                        configKey = DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
-                        break;
+                        return PathsAndFiles.SYS_CLIENTCERT;
                 }
                 break;
             case USER:
                 switch (type) {
                     case JSSE_CA_CERTS:
-                        configKey = DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS;
-                        break;
+                        return PathsAndFiles.USER_JSSECAC;
                     case CA_CERTS:
-                        configKey = DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS;
-                        break;
+                        return PathsAndFiles.USER_CACERTS;
                     case JSSE_CERTS:
-                        configKey = DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS;
-                        break;
+                        return PathsAndFiles.USER_JSSECER;
                     case CERTS:
-                        configKey = DeploymentConfiguration.KEY_USER_TRUSTED_CERTS;
-                        break;
+                        return PathsAndFiles.USER_CERTS;
                     case CLIENT_CERTS:
-                        configKey = DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS;
-                        break;
+                        return PathsAndFiles.USER_CLIENTCERT;
                 }
                 break;
         }
 
-        if (configKey == null) {
-            throw new RuntimeException("Unspported");
-        }
+        throw new RuntimeException("Unspported");
 
-        return config.getProperty(configKey);
     }
 
     /**

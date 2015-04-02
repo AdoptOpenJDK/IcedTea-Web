@@ -1,5 +1,53 @@
 2015-04-02  Jiri Vanek  <jvanek@redhat.com>
 
+	All reading from file properties repalced by getter from PathsAndFiles
+	*netx/net/sourceforge/jnlp/cache/CacheUtil.java: read from KEY_USER_NETX_RUNNING_FILE
+	property replaced by get from MAIN_LOCK.
+	*netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: similarly for
+	KEY_USER_PERSISTENCE_CACHE_DIR -> PCACHE_DIR and KEY_USER_LOG_DIR -> LOG_DIR
+	and KEY_USER_TMP_DIR -> TMP_DIR
+	*netx/net/sourceforge/jnlp/config/PathsAndFiles.java: added overrides of getFullPath
+	to  RECENTLY_USED_FILE, SYS_CER and all USER keystores. All fields in InfrastructureFileDescriptor
+	made private final, and reasonable ones got protected setters.
+	*netx/net/sourceforge/jnlp/controlpanel/CachePane.java: KEY_USER_CACHE_DIR ->
+	CACHE_DIR, KEY_USER_NETX_RUNNING_FILE -> MAIN_LOCK. Config param removed.
+	*netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java: adapted to
+	configless constructor
+	*netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: same
+	*netx/net/sourceforge/jnlp/controlpanel/PolicyPanel.java: same
+	*netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java: KEY_USER_LOG_DIR
+	-> LOG_DIR, config made final.
+	*netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java: 
+	removed redundant boxing, KEY_USER_CACHE_DIR -> CACHE_DIR
+	*netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java: KEY_USER_SECURITY_POLICY
+	-> JAVA_POLICY. getPolicyFromConfig splited into  getPolicyFromConfig and
+	getPolicyFromUrl
+	*netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: read from KEY_USER_NETX_RUNNING_FILE
+	property replaced by get from MAIN_LOCK.
+	*netx/net/sourceforge/jnlp/security/KeyStores.java: removed config field and its filling.
+	(getKeyStoreLocation) all keystores properties replaced by correct PahtsAndFiles.
+	*netx/net/sourceforge/jnlp/security/SecurityUtil.java:  adapted to getKeyStoreLocation
+	changed return type
+	*netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same 
+	*netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissionsButton.java: same
+	*netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: same
+	*netx/net/sourceforge/jnlp/services/SingleInstanceLock.java: KEY_USER_LOCKS_DIR
+	-> LOCKS_DIR 
+	*netx/net/sourceforge/jnlp/services/XPersistenceService.java: 
+	KEY_USER_PERSISTENCE_CACHE_DIR -> PCACHE_DIR
+	*netx/net/sourceforge/jnlp/util/XDesktopEntry.java: KEY_USER_TMP_DIR -> TMP_DIR
+	*netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: adapted
+	to existence of file protocol by new method removeFileProtocol
+	*netx/net/sourceforge/jnlp/util/logging/LogConfig.java: KEY_USER_LOG_DIR -> LOG_DIR
+	*tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: KEY_USER_CACHE_DIR ->
+	CACHE_DIR
+	*tests/netx/unit/net/sourceforge/jnlp/cache/ResourceDownloaderTest.java: same
+	*tests/netx/unit/net/sourceforge/jnlp/cache/ResourceTrackerTest.java: same
+	*tests/netx/unit/net/sourceforge/jnlp/security/KeyStoresTest.java: adapted to 
+	getKeyStoreLocation
+
+2015-04-02  Jiri Vanek  <jvanek@redhat.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/security/KeyStoresTest.java: new file,
 	added tests for getKeyStoreLocation API.
 	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java: minor

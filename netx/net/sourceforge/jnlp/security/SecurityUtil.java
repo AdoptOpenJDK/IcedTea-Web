@@ -51,7 +51,7 @@ public class SecurityUtil {
     private static final char[] password = "changeit".toCharArray();
 
     public static String getTrustedCertsFilename() throws Exception {
-        return KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS);
+        return KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFullPath();
     }
 
     public static char[] getTrustedCertsPassword() {

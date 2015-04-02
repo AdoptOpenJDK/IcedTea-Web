@@ -60,7 +60,6 @@ import javax.swing.table.TableRowSorter;
 import net.sourceforge.jnlp.cache.CacheDirectory;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.DirectoryNode;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -70,7 +69,6 @@ import net.sourceforge.jnlp.util.ui.NonEditableTableModel;
 
 public class CachePane extends JPanel {
     JDialog parent;
-    DeploymentConfiguration config;
     private final String location;
     private JComponent defaultFocusComponent;
     DirectoryNode root;
@@ -88,13 +86,11 @@ public class CachePane extends JPanel {
      * Creates a new instance of the CachePane.
      * 
      * @param parent The parent dialog that uses this pane.
-     * @param config The DeploymentConfiguration file.
      */
-    public CachePane(JDialog parent, DeploymentConfiguration config) {
+    public CachePane(JDialog parent) {
         super(new BorderLayout());
         this.parent = parent;
-        this.config = config;
-        location = config.getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+        location = PathsAndFiles.CACHE_DIR.getFullPath();
 
         addComponents();
     }
@@ -272,7 +268,7 @@ public class CachePane extends JPanel {
             public void run() {
                 try {
                     FileLock fl = null;
-                    File netxRunningFile = new File(config.getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
+                    File netxRunningFile = PathsAndFiles.MAIN_LOCK.getFile();
                     if (!netxRunningFile.exists()) {
                         try {
                             FileUtils.createParentDir(netxRunningFile);

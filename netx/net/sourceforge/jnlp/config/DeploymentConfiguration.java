@@ -766,11 +766,11 @@ public final class DeploymentConfiguration {
             }
 
             String legacyPcahceDir = LEGACY_USER_HOME + File.separator + "pcache";
-            String currentPcacheDir = Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR).getDefaultValue();
+            String currentPcacheDir = PathsAndFiles.PCACHE_DIR.getDefaultFullPath();
             errors += moveLegacyToCurrent(legacyPcahceDir, currentPcacheDir);
 
             String legacyLogDir = LEGACY_USER_HOME + File.separator + "log";
-            String currentLogDir = Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_LOG_DIR).getDefaultValue();
+            String currentLogDir = PathsAndFiles.LOG_DIR.getDefaultFullPath();
             errors += moveLegacyToCurrent(legacyLogDir, currentLogDir);
 
             String legacyProperties = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES;
@@ -787,7 +787,7 @@ public final class DeploymentConfiguration {
             errors += moveLegacyToCurrent(legacyAppletTrust, currentAppletTrust);
 
             String legacyTmp = LEGACY_USER_HOME + File.separator + "tmp";
-            String currentTmp = Defaults.getDefaults().get(DeploymentConfiguration.KEY_USER_TMP_DIR).getDefaultValue();
+            String currentTmp = PathsAndFiles.TMP_DIR.getDefaultFullPath();
             errors += moveLegacyToCurrent(legacyTmp, currentTmp);
 
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Removing now empty " + LEGACY_USER_HOME);

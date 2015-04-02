@@ -23,6 +23,7 @@ import java.security.*;
 import java.util.Enumeration;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -60,7 +61,7 @@ public class JNLPPolicy extends Policy {
         systemPolicy = Policy.getPolicy();
 
         systemJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY);
-        userJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
+        userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
 
         String jre = System.getProperty("java.home");
         jreExtDir = jre + File.separator + "lib" + File.separator + "ext";
@@ -170,19 +171,23 @@ public class JNLPPolicy extends Policy {
      * @return a policy based on the configuration set by the user
      */
     private Policy getPolicyFromConfig(String key) {
-        Policy policy = null;
-        String policyLocation = null;
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-        policyLocation = config.getProperty(key);
+        String policyLocation = config.getProperty(key);
+        return getPolicyFromUrl(policyLocation);
+    }
+    
+    /**
+     * Constructs a delegate policy based on a config setting
+     * @param key a KEY_* in DeploymentConfiguration
+     * @return a policy based on the configuration set by the user
+     */
+    private Policy getPolicyFromUrl(String policyLocation) {
+        Policy policy = null;
         if (policyLocation != null) {
             try {
                 URI policyUri = new URI(policyLocation);
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
-            } catch (IllegalArgumentException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-            } catch (NoSuchAlgorithmException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-            } catch (URISyntaxException e) {
+            } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }

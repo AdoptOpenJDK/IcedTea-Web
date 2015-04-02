@@ -353,7 +353,7 @@ public class CertWarningPane extends SecurityDialogPanel {
                     KeyStore ks = KeyStores.getKeyStore(Level.USER, Type.CERTS);
                     X509Certificate c = (X509Certificate) parent.getCertVerifier().getPublisher(null);
                     CertificateUtils.addToKeyStore(c, ks);
-                    File keyStoreFile = new File(KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS));
+                    File keyStoreFile = KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFile();
                     if (!keyStoreFile.isFile()) {
                         FileUtils.createRestrictedFile(keyStoreFile, true);
                     }

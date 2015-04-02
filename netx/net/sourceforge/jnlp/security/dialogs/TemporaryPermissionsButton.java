@@ -57,9 +57,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
@@ -160,7 +159,7 @@ public class TemporaryPermissionsButton extends JButton {
     private class PolicyEditorLaunchListener implements ActionListener {
         @Override
         public void actionPerformed(final ActionEvent e) {
-            final String rawFilepath = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_SECURITY_POLICY);
+            final String rawFilepath = PathsAndFiles.JAVA_POLICY.getFullPath();
             String filepath;
             try {
                 filepath = new URL(rawFilepath).getPath();

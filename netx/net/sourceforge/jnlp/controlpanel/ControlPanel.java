@@ -360,7 +360,7 @@ public class ControlPanel extends JFrame {
     }
 
     private JPanel createPolicySettingsPanel() {
-        return new PolicyPanel(this, this.config);
+        return new PolicyPanel(this);
     }
 
     private JPanel createJVMSettingsPanel() {
@@ -429,7 +429,6 @@ public class ControlPanel extends JFrame {
             // ignore; not a big deal
         }
 
-        KeyStores.setConfiguration(config);
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override

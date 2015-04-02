@@ -64,6 +64,7 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
@@ -249,7 +250,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         downloadServer = ServerAccess.getIndependentInstance(dir.getAbsolutePath(), ServerAccess.findFreePort());
         redirectErrBack();
 
-        cacheDir = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR);
+        cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_USER_CACHE_DIR, System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
     }
 

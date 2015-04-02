@@ -44,7 +44,6 @@ import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.StreamEater;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.dialogs.AccessWarningPaneComplexReturn;
@@ -262,7 +261,7 @@ public class XDesktopEntry {
     }
 
     public File getShortcutTmpFile() {
-        String userTmp = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_TMP_DIR);
+        String userTmp = PathsAndFiles.TMP_DIR.getFullPath();
         File shortcutFile = new File(userTmp + File.separator + FileUtils.sanitizeFileName(file.getTitle()) + ".desktop");
         return shortcutFile;
     }

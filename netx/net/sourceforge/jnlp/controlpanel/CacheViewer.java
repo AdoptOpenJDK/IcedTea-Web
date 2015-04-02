@@ -72,7 +72,7 @@ public class CacheViewer extends JDialog {
         c.weighty = 1;
         c.gridx = 0;
         c.gridy = 0;
-        topPanel = new CachePane(this, this.config);
+        topPanel = new CachePane(this);
         contentPane.add(topPanel, c);
 
         pack();

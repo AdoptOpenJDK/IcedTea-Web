@@ -174,7 +174,9 @@ public abstract class TextsProvider {
         for (PathsAndFiles.InfrastructureFileDescriptor f : files) {
             String path = expandVariables ? f.getFullPath() : f.toString();
             String modified = "";
-            if (!f.getFullPath().equals(f.getDefaultFullPath()) && expandVariables){
+            String fGetFullPath=removeFileProtocol(f.getFullPath());
+            String fGetDefaultFullPath=removeFileProtocol(f.getDefaultFullPath());
+            if (!fGetFullPath.equals(fGetDefaultFullPath) && expandVariables){
                 modified=getFormatter().getBold("["+Translator.R("BUTmodified")+"] ");
             }
             String controlledBy = "";
@@ -679,6 +681,16 @@ public abstract class TextsProvider {
      */
     public void setSeeAlso(boolean seeAlso) {
         this.seeAlso = seeAlso;
+    }
+
+    private String removeFileProtocol(String s) {
+        if (s == null){
+            return s;
+        }
+        if (s.startsWith("file://")){
+            s = s.substring(7);
+        }
+        return s;
     }
 
 }

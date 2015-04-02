@@ -28,8 +28,7 @@ import java.net.BindException;
 import java.net.ServerSocket;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 
 /**
@@ -130,8 +129,7 @@ class SingleInstanceLock {
      * may or may not exist.
      */
     private File getLockFile() {
-        File baseDir = new File(JNLPRuntime.getConfiguration()
-                .getProperty(DeploymentConfiguration.KEY_USER_LOCKS_DIR));
+        File baseDir = PathsAndFiles.LOCKS_DIR.getFile();
 
         if (!baseDir.isDirectory()) {
             if (!baseDir.getParentFile().isDirectory() && !baseDir.getParentFile().mkdirs()) {

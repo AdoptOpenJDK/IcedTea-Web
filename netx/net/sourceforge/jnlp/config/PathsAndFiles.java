@@ -131,7 +131,14 @@ public class PathsAndFiles {
     }
 
     private static class RECENTLY_USED_FILE_HOLDER {
-        static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS);
+        static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS){
+
+            @Override
+            public String getFullPath() {
+                return clean(CACHE_DIR.getFullPath()+File.separator+this.getFileName());
+            }
+          
+        };
     }
     
     public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "FILEappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
@@ -200,12 +207,41 @@ public class PathsAndFiles {
         }
         
     };
-    public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts");
-    public static final InfrastructureFileDescriptor USER_JSSECAC = new UserCacertsFileDescriptor("trusted.jssecacerts");
-    public static final InfrastructureFileDescriptor USER_CERTS = new UserCacertsFileDescriptor("trusted.certs");
-    public static final InfrastructureFileDescriptor USER_JSSECER = new UserCacertsFileDescriptor("trusted.jssecerts");
-    public static final InfrastructureFileDescriptor USER_CLIENTCERT = new UserCacertsFileDescriptor("trusted.clientcerts");
+    public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts") {
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS);
+        }
 
+    };
+    public static final InfrastructureFileDescriptor USER_JSSECAC = new UserCacertsFileDescriptor("trusted.jssecacerts") {
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS);
+        }
+
+    };
+    public static final InfrastructureFileDescriptor USER_CERTS = new UserCacertsFileDescriptor("trusted.certs") {
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_CERTS);
+        }
+
+    };
+    public static final InfrastructureFileDescriptor USER_JSSECER = new UserCacertsFileDescriptor("trusted.jssecerts") {
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS);
+        }
+
+    };
+    public static final InfrastructureFileDescriptor USER_CLIENTCERT = new UserCacertsFileDescriptor("trusted.clientcerts") {
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS);
+        }
+
+    };
     public static final InfrastructureFileDescriptor SYS_CACERT = new SystemJavaSecurityFileDescriptor("cacerts") {
         
         @Override
@@ -222,7 +258,12 @@ public class PathsAndFiles {
         }
 
     };
-    public static final InfrastructureFileDescriptor SYS_CERT = new SystemJavaSecurityFileDescriptor("trusted.certs");
+    public static final InfrastructureFileDescriptor SYS_CERT = new SystemJavaSecurityFileDescriptor("trusted.certs"){
+        @Override
+        public String getFullPath() {
+            return gcpd(DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS);
+        }
+    };
     public static final InfrastructureFileDescriptor SYS_JSSECERT = new SystemJavaSecurityFileDescriptor("trusted.jssecerts") {
 
         @Override
@@ -243,7 +284,7 @@ public class PathsAndFiles {
 
         @Override
         public String getDescription() {
-             return Translator.R(descriptionKey, DeploymentConfiguration.KEY_JRE_DIR);
+             return Translator.R(getDescriptionKey(), DeploymentConfiguration.KEY_JRE_DIR);
         }
         
     };
@@ -299,10 +340,10 @@ public class PathsAndFiles {
 
     public static class InfrastructureFileDescriptor {
 
-        public final String fileName;
-        public final String pathStub;
-        public final String systemPathStub;
-        protected final String descriptionKey;
+        private final String fileName;
+        private final String pathStub;
+        private final String systemPathStub;
+        private final String descriptionKey;
         private final Target[] target;
 
         private InfrastructureFileDescriptor(String fileName, String pathStub, String systemPathStub, String descriptionKey, Target... target) {
@@ -343,6 +384,16 @@ public class PathsAndFiles {
             return systemPathStub;
         }
 
+        protected String getFileName() {
+            return fileName;
+        }
+
+        protected String getDescriptionKey() {
+            return descriptionKey;
+        }
+        
+        
+
         /**
          * This remaining part of file declaration, when acronym is removed.
          * See getDirViaAcronym.
@@ -380,7 +431,7 @@ public class PathsAndFiles {
          * @param s string to be cleaned
          * @return cleaned string
          */
-        private String clean(String s) {
+        protected String clean(String s) {
             while (s.contains(File.separator + File.separator)) {
                 s = s.replace(File.separator + File.separator, File.separator);
 

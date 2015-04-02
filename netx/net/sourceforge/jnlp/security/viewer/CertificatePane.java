@@ -394,8 +394,7 @@ public class CertificatePane extends JPanel {
                     } else {
                         CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
                     }
-                    File keyStoreFile = new File(KeyStores
-                                        .getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
+                    File keyStoreFile = KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType).getFile();
                     if (!keyStoreFile.isFile()) {
                         FileUtils.createRestrictedFile(keyStoreFile, true);
                     }
@@ -485,8 +484,7 @@ public class CertificatePane extends JPanel {
                                                         JOptionPane.YES_NO_OPTION);
                         if (i == 0) {
                             keyStore.deleteEntry(alias);
-                            File keyStoreFile = new File(KeyStores
-                                                        .getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType));
+                            File keyStoreFile = KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType).getFile();
                             if (!keyStoreFile.isFile()) {
                                 FileUtils.createRestrictedFile(keyStoreFile, true);
                             }

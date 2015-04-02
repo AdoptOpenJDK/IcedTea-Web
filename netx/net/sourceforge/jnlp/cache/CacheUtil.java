@@ -40,6 +40,7 @@ import javax.jnlp.DownloadServiceListener;
 
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -170,7 +171,7 @@ public class CacheUtil {
      * @return true if the cache can be cleared at this time without problems
      */
     private static boolean okToClearCache() {
-        File otherJavawsRunning = new File(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE));
+        File otherJavawsRunning = PathsAndFiles.MAIN_LOCK.getFile();
         FileLock locking = null;
         try {
             if (otherJavawsRunning.isFile()) {
