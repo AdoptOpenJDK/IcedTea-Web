@@ -37,9 +37,7 @@ exception statement from your version.
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
@@ -48,10 +46,10 @@ import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
-
-import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.tools.DeploymentPropetiesModifier;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -66,37 +64,17 @@ public class SignedAppletManifestSpecifiesSandboxTests extends BrowserTest {
     private static final String JNLP_EXPECTED_STDOUT = "Initialization Error";
     private static final String JNLP_EXPECTED_STDERR = "net.sourceforge.jnlp.LaunchException";
 
-    private static File deployFile;
-    private static String attributesCheck;
+    private static DeploymentPropetiesModifier deploymentPropetiesModifier;
 
     @BeforeClass
     public static void setupDeploymentProperties() throws IOException {
-        deployFile = PathsAndFiles.USER_DEPLOYMENT_FILE.getFile();
-        String properties = FileUtils.loadFileAsString(deployFile);
-
-        for (String line : properties.split("\n")) {
-            if (line.contains("deployment.manifest.attribute.check")) {
-                attributesCheck = line;
-                properties = properties.replace(line, "deployment.manifest.attributes.check=PERMISSIONS\n");
-            }
-        }
-        if (attributesCheck == null) {
-            properties += "deployment.manifest.attributes.check=PERMISSIONS\n";
-        }
-
-        FileUtils.saveFile(properties, deployFile);
+        deploymentPropetiesModifier = new DeploymentPropetiesModifier();
+        deploymentPropetiesModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
     }
 
     @AfterClass
     public static void setbackDeploymentProperties() throws IOException {
-        String properties = FileUtils.loadFileAsString(deployFile);
-        if (attributesCheck != null) {
-            properties = properties.replace("deployment.manifest.attributes.check=PERMISSIONS\n", attributesCheck);
-        } else {
-            properties = properties.replace("deployment.manifest.attributes.check=PERMISSIONS\n", "");
-        }
-
-        FileUtils.saveFile(properties, deployFile);
+        deploymentPropetiesModifier.restoreProperties();
     }
 
     @Test

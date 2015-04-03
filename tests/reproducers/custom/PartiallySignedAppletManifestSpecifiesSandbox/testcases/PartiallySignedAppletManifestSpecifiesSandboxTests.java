@@ -47,8 +47,12 @@ import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
+import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.sourceforge.jnlp.tools.DeploymentPropetiesModifier;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -64,50 +68,22 @@ public class PartiallySignedAppletManifestSpecifiesSandboxTests extends BrowserT
     private static final String STACKTRACE_NOT_GRANT_PERMISSIONS_TYPE = "Cannot grant permissions to unsigned jars";
     private static final String USER_HOME = System.getProperty("user.home");
 
-    private static File deployFile;
-    private static String attributesCheck;
-    private static String securityLevel;
+    private static DeploymentPropetiesModifier permissionsModifier;
+    private static DeploymentPropetiesModifier securityLevelModifier;
 
     @BeforeClass
     public static void setupDeploymentProperties() throws IOException {
-        deployFile = PathsAndFiles.USER_DEPLOYMENT_FILE.getFile();
-        String properties = FileUtils.loadFileAsString(deployFile);
+        permissionsModifier = new DeploymentPropetiesModifier();
+        permissionsModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,  ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
 
-        for (String line : properties.split("\n")) {
-            if (line.contains("deployment.manifest.attribute.check")) {
-                attributesCheck = line;
-                properties = properties.replace(line, "deployment.manifest.attributes.check=PERMISSIONS\n");
-            }
-            if (line.contains("deployment.security.level")) {
-                securityLevel = line;
-                properties = properties.replace(line, "deployment.security.level=ALLOW_UNSIGNED\n");
-            }
-        }
-        if (attributesCheck == null) {
-            properties += "deployment.manifest.attributes.check=PERMISSIONS\n";
-        }
-        if (securityLevel == null) {
-            properties += "deployment.security.level=ALLOW_UNSIGNED\n";
-        }
-
-        FileUtils.saveFile(properties, deployFile);
+        securityLevelModifier = new DeploymentPropetiesModifier();
+        securityLevelModifier.setProperties(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
     }
 
     @AfterClass
     public static void setbackDeploymentProperties() throws IOException {
-        String properties = FileUtils.loadFileAsString(deployFile);
-        if (attributesCheck != null) {
-            properties = properties.replace("deployment.manifest.attributes.check=PERMISSIONS\n", attributesCheck);
-        } else {
-            properties = properties.replace("deployment.manifest.attributes.check=PERMISSIONS\n", "");
-        }
-
-        if (securityLevel != null) {
-            properties = properties.replace("deployment.security.level=ALLOW_UNSIGNED\n", securityLevel);
-        } else {
-            properties = properties.replace("deployment.security.level=ALLOW_UNSIGNED\n", "");
-        }
-        FileUtils.saveFile(properties, deployFile);
+        securityLevelModifier.restoreProperties();
+        permissionsModifier.restoreProperties();
     }
 
     @Test

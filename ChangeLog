@@ -1,3 +1,15 @@
+2015-04-03  Lukasz Dracz  <ldracz@redhat.com>
+
+	Added tool for manipulating deployment-properties during tests run
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/testcases/PartiallySignedAppletManifestSpecifiesSandboxTests.java:
+	is now using DeploymentPropetiesModifier
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedMatching.java:
+	same
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/testcases/SignedAppletManifestSpecifiesSandboxTests.java:
+	same
+	* tests/test-extensions/net/sourceforge/jnlp/tools/DeploymentPropetiesModifier.java:
+	new tool to manipualte deployment properties in runtime.
+
 2015-04-02  Jiri Vanek  <jvanek@redhat.com>
 
 	InfrastructureFileDescriptor got setter
