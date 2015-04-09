@@ -82,7 +82,8 @@ public class JavaWsTextsProvider extends TextsProvider {
         String title = super.getOptions();
         String add1 = Translator.R("JWSoptionsL1");
         String add2 = Translator.R("JWSoptionsL2");
-        String adds = getFormatter().wrapParagraph(add1 + getFormatter().getNewLine() + add2);
+        String add3 = Translator.R("JWSoptionsL3");
+        String adds = getFormatter().wrapParagraph(add1 + getFormatter().getNewLine() + add2 + getFormatter().getNewLine() + add3);
         String runtime = getFormatter().getBold(Translator.R("JWSoptionsTitle1")) + getFormatter().getNewLine()
                 + optionsToString(OptionsDefinitions.getJavaWsRuntimeOptions());
         String control = getFormatter().getBold(Translator.R("JWSoptionsTitle2")) + getFormatter().getNewLine()

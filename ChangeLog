@@ -1,3 +1,12 @@
+2015-04-09  Lukasz Dracz  <ldracz@redhat.com>
+
+	fix lines displayed in javaws help
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: 
+	(JWSoptionsL1): modified
+	(JWSoptionsL3): added
+	* netx/net/sourceforge/jnlp/util/docprovider/JavaWsTextsProvider.java:
+	added a third line for javaws help
+
 2015-04-03  Lukasz Dracz  <ldracz@redhat.com>
 
 	Added tool for manipulating deployment-properties during tests run
