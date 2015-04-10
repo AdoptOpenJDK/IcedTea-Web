@@ -86,7 +86,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
         final JLabel debuggingDescription = new JLabel("<html>" + Translator.R("CPDebuggingDescription") + "<hr /><br /></html>");
         final JLabel logsDestinationTitle = new JLabel(Translator.R("CPFilesLogsDestDir")+": ");
-        final JTextField logsDestination = new JTextField(PathsAndFiles.LOG_DIR.getFullPath());
+        final JTextField logsDestination = new JTextField(PathsAndFiles.LOG_DIR.getFullPath(config));
         logsDestination.getDocument().addDocumentListener(new DocumentListener() {
 
 
@@ -107,7 +107,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             }
 
             private void save() {
-                PathsAndFiles.LOG_DIR.setValue(logsDestination.getText());
+                PathsAndFiles.LOG_DIR.setValue(logsDestination.getText(), config);
             }
         });
         final JButton logsDestinationReset = new JButton(Translator.R("CPFilesLogsDestDirResert"));

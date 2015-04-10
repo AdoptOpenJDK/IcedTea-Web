@@ -70,14 +70,13 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
     private final JSpinner cacheSizeSpinner;
 
     private static final long BYTES_TO_MEGABYTES = 1024l * 1024l;
-    private final File cacheDir;
-    final long usableDiskSpace;
 
     private final JCheckBox limitCacheSizeCheckBox;
     private final JLabel cacheSizeWarningLabel;
     private final DeploymentConfiguration config;
     private final JComboBox<ComboItem> cbCompression;
     private final JButton bLocation;
+    private final JButton resetLocation;
     private final JTextField location;
     private final JLabel locationDescription;
     private final JLabel lCompression;
@@ -108,15 +107,13 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         lCompression = new JLabel(Translator.R("TIFPCompressionLevel") + ":"); // Sets compression level for jar files.
 
         bLocation = new JButton(Translator.R("TIFPChange") + "...");
-        location = new JTextField(PathsAndFiles.CACHE_DIR.getFullPath());
+        resetLocation = new JButton(Translator.R("CPFilesLogsDestDirResert"));
+        location = new JTextField(PathsAndFiles.CACHE_DIR.getFullPath(config));
         locationDescription = new JLabel(Translator.R("TIFPLocationLabel") + ":");
         bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
 
         diskSpacePanel = new JPanel();
         diskSpacePanel.setLayout(new GridBagLayout());
-
-        cacheDir = PathsAndFiles.CACHE_DIR.getFile();
-        usableDiskSpace = cacheDir.getUsableSpace() / BYTES_TO_MEGABYTES; // getUsableSpace returns bytes
 
         addComponents();
         if (limitCacheSizeCheckBox.isSelected()) {
@@ -187,7 +184,15 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         c.gridx = 1;
         c.gridwidth = 2;
         diskSpacePanel.add(cbCompression, c);
-
+        resetLocation.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                location.setText(PathsAndFiles.CACHE_DIR.getDefaultFullPath());
+                //background engine is clever. Will reset for us if it will see default path here
+                PathsAndFiles.CACHE_DIR.setValue(PathsAndFiles.CACHE_DIR.getDefaultFullPath(), config); 
+                showCacheSizeSpinnerGUIElements(limitCacheSizeCheckBox.isSelected());
+            }
+        });
         // This displays the option for changing location of cache
         // User can NOT edit the text field must do it through dialog.
         location.setEditable(false); // Can not c&p into the location field.
@@ -217,7 +222,8 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
 
                     if (canWrite) {
                         location.setText(result);
-                        PathsAndFiles.CACHE_DIR.setValue(result);
+                        PathsAndFiles.CACHE_DIR.setValue(result, config);
+                        showCacheSizeSpinnerGUIElements(limitCacheSizeCheckBox.isSelected());
                     }
                 }
             }
@@ -226,7 +232,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         bViewFiles.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CacheViewer.showCacheDialog();
+                CacheViewer.showCacheDialog(config);
             }
         });
 
@@ -240,8 +246,11 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         diskSpacePanel.add(location, c);
         c.gridx = 1;
         c.weightx = 0.5;
-        diskSpacePanel.add(bLocation, c);
+        diskSpacePanel.add(resetLocation, c);
         c.gridx = 2;
+        c.weightx = 0.5;
+        diskSpacePanel.add(bLocation, c);
+        c.gridx = 3;
         diskSpacePanel.add(bViewFiles, c);
 
         JPanel panel = new JPanel();
@@ -257,6 +266,11 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
             }
         });
 
+    }
+
+    private long getCurrentUsableSpace() {
+        long usableDiskSpace = new File(PathsAndFiles.CACHE_DIR.getFullPath(config)).getUsableSpace() / BYTES_TO_MEGABYTES; // getUsableSpace returns bytes
+        return usableDiskSpace;
     }
 
     private static class PowerOfSpinnerNumberModel extends SpinnerNumberModel {
@@ -327,6 +341,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
 
         @Override
         public void stateChanged(final ChangeEvent e) {
+            final long usableDiskSpace = getCurrentUsableSpace();
             final long cacheSizeSpinnerValue = (long) cacheSizeSpinner.getValue();
 
             if (limitCacheSizeCheckBox.isSelected()) {
@@ -374,6 +389,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
     private void showCompressionAndLocationGUIElements(boolean bool) {
         cbCompression.setEnabled(bool);
         lCompression.setEnabled(bool);
+        resetLocation.setEnabled(bool);
         bLocation.setEnabled(bool);
         location.setEnabled(bool);
         locationDescription.setEnabled(bool);
@@ -384,7 +400,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         lCacheSize.setEnabled(bool);
         cacheSizeSpinner.setEnabled(bool);
         cacheSizeWarningLabel.setEnabled(bool);
-
+        long usableDiskSpace = getCurrentUsableSpace();
         if(bool == false) {
             cacheSizeSpinner.setToolTipText(null);
             cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerLargeValueWarning", usableDiskSpace));

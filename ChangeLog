@@ -1,5 +1,22 @@
 2015-04-10  Jiri Vanek  <jvanek@redhat.com>
 
+	ok/apply/cancel mechanism in itweb-settings fixed to work again. Added rest button for cache path.
+	*netx/net/sourceforge/jnlp/config/InfrastructureFileDescriptor.java: added
+	setValue and getFullPaths  overloads with DeploymentConfiguration param to 
+	allow itweb-settings work with two copies of properties.
+	*netx/net/sourceforge/jnlp/controlpanel/CachePane.java: returned config.
+	Calls to PathsAndFiles made with this config.
+	*netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java: same
+	*netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: same
+	*netx/net/sourceforge/jnlp/controlpanel/PolicyPanel.java: same
+	*netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java: Calls to
+	PathsAndFiles made with config.
+	*netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java: usableDiskSpace
+	removed, and replaced by dynamic getter to react on change of cache dir.
+	Added button resting cache to default.
+
+2015-04-10  Jiri Vanek  <jvanek@redhat.com>
+
 	Cache now uses PathsAndFiles instances instead of various duplications
 	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: using InfrastructureFileDescriptor
 	instead of copied Files. Same with recentlyUsedPropertiesFile. Both made final privat

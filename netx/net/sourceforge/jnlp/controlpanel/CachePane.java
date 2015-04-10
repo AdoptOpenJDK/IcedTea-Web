@@ -60,6 +60,7 @@ import javax.swing.table.TableRowSorter;
 import net.sourceforge.jnlp.cache.CacheDirectory;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.DirectoryNode;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -68,7 +69,8 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.ui.NonEditableTableModel;
 
 public class CachePane extends JPanel {
-    JDialog parent;
+    final JDialog parent;
+    final DeploymentConfiguration config;
     private final String location;
     private JComponent defaultFocusComponent;
     DirectoryNode root;
@@ -87,10 +89,11 @@ public class CachePane extends JPanel {
      * 
      * @param parent The parent dialog that uses this pane.
      */
-    public CachePane(JDialog parent) {
+    public CachePane(JDialog parent, DeploymentConfiguration config) {
         super(new BorderLayout());
         this.parent = parent;
-        location = PathsAndFiles.CACHE_DIR.getFullPath();
+        this.config = config;
+        location = PathsAndFiles.CACHE_DIR.getFullPath(config);
 
         addComponents();
     }
@@ -268,7 +271,7 @@ public class CachePane extends JPanel {
             public void run() {
                 try {
                     FileLock fl = null;
-                    File netxRunningFile = PathsAndFiles.MAIN_LOCK.getFile();
+                    File netxRunningFile = new File(PathsAndFiles.MAIN_LOCK.getFullPath(config));
                     if (!netxRunningFile.exists()) {
                         try {
                             FileUtils.createParentDir(netxRunningFile);
@@ -319,7 +322,7 @@ public class CachePane extends JPanel {
             }
 
             private void updateRecentlyUsed(File f) {
-                File recentlyUsedFile = PathsAndFiles.getRecentlyUsedFile().getFile();
+                File recentlyUsedFile = new File(PathsAndFiles.getRecentlyUsedFile().getFullPath(config));
                 PropertiesFile pf = new PropertiesFile(recentlyUsedFile);
                 pf.load();
                 Enumeration<Object> en = pf.keys();

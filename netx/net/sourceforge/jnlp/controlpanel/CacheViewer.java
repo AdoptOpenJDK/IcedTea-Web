@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.sourceforge.jnlp.controlpanel;
 
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -46,16 +45,21 @@ public class CacheViewer extends JDialog {
 
     private boolean initialized = false;
     private static final String dialogTitle = Translator.R("CVCPDialogTitle");
+    private final DeploymentConfiguration config; // Configuration file which contains all the settings.
     CachePane topPanel;
 
     /**
      * Creates a new instance of the cache viewer.
-     * 
+     *
+     * @param config Deployment configuration file.
      */
-    public CacheViewer() {
+    public CacheViewer(DeploymentConfiguration config) {
         super((Frame) null, dialogTitle, true); // Don't need a parent.
+        this.config = config;
+        if (config == null) {
+            throw new IllegalArgumentException("config: " + config);
+        }
         setIconImages(ImageResources.INSTANCE.getApplicationImages());
-
         /* Prepare for adding components to dialog box */
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridBagLayout());
@@ -66,7 +70,7 @@ public class CacheViewer extends JDialog {
         c.weighty = 1;
         c.gridx = 0;
         c.gridy = 0;
-        topPanel = new CachePane(this);
+        topPanel = new CachePane(this, this.config);
         contentPane.add(topPanel, c);
 
         pack();
@@ -119,9 +123,11 @@ public class CacheViewer extends JDialog {
 
     /**
      * Display the cache viewer.
+     *
+     * @param config Configuration file.
      */
-    public static void showCacheDialog() {
-        CacheViewer psd = new CacheViewer();
+    public static void showCacheDialog(final DeploymentConfiguration config) {
+        CacheViewer psd = new CacheViewer(config);
         psd.setResizable(true);
         psd.centerDialog();
         psd.setVisible(true);

@@ -56,6 +56,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
@@ -73,16 +74,18 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 public class PolicyPanel extends NamedBorderPanel {
 
     private PolicyEditorWindow policyEditor = null;
+    private final DeploymentConfiguration config;
 
-    public PolicyPanel(final JFrame frame) {
+    public PolicyPanel(final JFrame frame, final DeploymentConfiguration config) {
         super(R("CPHeadPolicy"), new GridBagLayout());
+        this.config = config;
         addComponents(frame);
     }
 
     private void addComponents(final JFrame frame) {
         JLabel aboutLabel = new JLabel("<html>" + R("CPPolicyDetail") + "</html>");
 
-        final String fileUrlString = PathsAndFiles.JAVA_POLICY.getFullPath();
+        final String fileUrlString = PathsAndFiles.JAVA_POLICY.getFullPath(config);
         final JButton simpleEditorButton = new JButton(R("CPButSimpleEditor"));
         simpleEditorButton.addActionListener(new LaunchSimplePolicyEditorAction(frame, fileUrlString));
 

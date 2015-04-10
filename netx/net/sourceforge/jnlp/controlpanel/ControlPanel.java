@@ -170,7 +170,7 @@ public class ControlPanel extends JFrame {
             return JOptionPane.showConfirmDialog(ControlPanel.this,
                     "<html>"+Translator.R("CPJVMNotokMessage1", s)+"<br/>"
                     + validationResult.formattedText+"<br/>"
-                    + Translator.R("CPJVMNotokMessage2", DeploymentConfiguration.KEY_JRE_DIR, PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath())+"</html>",
+                    + Translator.R("CPJVMNotokMessage2", DeploymentConfiguration.KEY_JRE_DIR, PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath(config))+"</html>",
                     Translator.R("CPJVMconfirmInvalidJdkTitle"),JOptionPane.OK_CANCEL_OPTION);
         }
         return JOptionPane.OK_OPTION;
@@ -360,7 +360,7 @@ public class ControlPanel extends JFrame {
     }
 
     private JPanel createPolicySettingsPanel() {
-        return new PolicyPanel(this);
+        return new PolicyPanel(this, this.config);
     }
 
     private JPanel createJVMSettingsPanel() {
