@@ -1,3 +1,19 @@
+2015-04-10  Lukasz Dracz  <ldracz@redhat.com>
+
+	add DeploymentPropertiesModifierTests
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/testcases/PartiallySignedAppletManifestSpecifiesSandboxTests.java:
+	Changed spelling of DeploymentPropertiesModifier	
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedMatching.java
+	Changed spelling of DeploymentPropertiesModifier
+	* tests/reproducers/signed/SignedAppletManifestSpecifiesSandbox/testcases/SignedAppletManifestSpecifiesSandboxTests.java
+	Changed spelling of DeploymentPropertiesModifier
+	* tests/test-extensions-tests/net/sourceforge/jnlp/tools/DeploymentPropertiesModifierTest.java:
+	Added tests for DeploymentPropertiesModifier
+	* tests/test-extensions/net/sourceforge/jnlp/tools/DeploymentPropertiesModifier.java:
+	added proper spelling of this file	
+	* tests/test-extensions/net/sourceforge/jnlp/tools/DeploymentPropetiesModifier.java:
+	removed due to spelling error and added proper spelling of the same file
+
 2015-04-10  Jie Kang  <jkang@redhat.com>
 	Kill processes in Integration Tests more cleanly
 	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:

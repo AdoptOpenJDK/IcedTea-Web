@@ -51,7 +51,7 @@ import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
-import net.sourceforge.jnlp.tools.DeploymentPropetiesModifier;
+import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -72,11 +72,11 @@ public class CodeBaseManifestEntrySignedMatching extends BrowserTest {
         /*5*/ "CBCheckSignedAppletDontMatchException",
         /*6*/ "CBCheckSignedFail"};
 
-    private static DeploymentPropetiesModifier codebaseModifier;
+    private static DeploymentPropertiesModifier codebaseModifier;
 
     @BeforeClass
     public static void setupDeploymentProperties() throws IOException {
-        codebaseModifier = new DeploymentPropetiesModifier();
+        codebaseModifier = new DeploymentPropertiesModifier();
         codebaseModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.CODEBASE.toString());
     }
 

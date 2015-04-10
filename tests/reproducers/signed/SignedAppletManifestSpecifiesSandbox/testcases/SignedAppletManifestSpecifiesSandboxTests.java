@@ -48,7 +48,7 @@ import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
-import net.sourceforge.jnlp.tools.DeploymentPropetiesModifier;
+import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -64,17 +64,17 @@ public class SignedAppletManifestSpecifiesSandboxTests extends BrowserTest {
     private static final String JNLP_EXPECTED_STDOUT = "Initialization Error";
     private static final String JNLP_EXPECTED_STDERR = "net.sourceforge.jnlp.LaunchException";
 
-    private static DeploymentPropetiesModifier deploymentPropetiesModifier;
+    private static DeploymentPropertiesModifier deploymentPropertiesModifier;
 
     @BeforeClass
     public static void setupDeploymentProperties() throws IOException {
-        deploymentPropetiesModifier = new DeploymentPropetiesModifier();
-        deploymentPropetiesModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
+        deploymentPropertiesModifier = new DeploymentPropertiesModifier();
+        deploymentPropertiesModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
     }
 
     @AfterClass
     public static void setbackDeploymentProperties() throws IOException {
-        deploymentPropetiesModifier.restoreProperties();
+        deploymentPropertiesModifier.restoreProperties();
     }
 
     @Test

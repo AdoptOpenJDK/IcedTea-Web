@@ -43,7 +43,7 @@ import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 
-public class DeploymentPropetiesModifier {
+public class DeploymentPropertiesModifier {
 
     private final InfrastructureFileDescriptor src;
     private String savedValue;
@@ -51,11 +51,11 @@ public class DeploymentPropetiesModifier {
     private String requestedValue;
     private boolean isPropertiesSet;
 
-    public DeploymentPropetiesModifier() {
+    public DeploymentPropertiesModifier() {
         this(PathsAndFiles.USER_DEPLOYMENT_FILE);
     }
 
-    public DeploymentPropetiesModifier(InfrastructureFileDescriptor src) {
+    public DeploymentPropertiesModifier(InfrastructureFileDescriptor src) {
         this.src = src;
         isPropertiesSet = false;
     }

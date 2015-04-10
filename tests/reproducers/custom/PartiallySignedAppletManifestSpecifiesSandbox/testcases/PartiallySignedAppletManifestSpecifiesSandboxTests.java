@@ -37,7 +37,6 @@ exception statement from your version.
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 
 import net.sourceforge.jnlp.ProcessResult;
@@ -49,11 +48,9 @@ import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
-import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-import net.sourceforge.jnlp.tools.DeploymentPropetiesModifier;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -68,15 +65,15 @@ public class PartiallySignedAppletManifestSpecifiesSandboxTests extends BrowserT
     private static final String STACKTRACE_NOT_GRANT_PERMISSIONS_TYPE = "Cannot grant permissions to unsigned jars";
     private static final String USER_HOME = System.getProperty("user.home");
 
-    private static DeploymentPropetiesModifier permissionsModifier;
-    private static DeploymentPropetiesModifier securityLevelModifier;
+    private static DeploymentPropertiesModifier permissionsModifier;
+    private static DeploymentPropertiesModifier securityLevelModifier;
 
     @BeforeClass
     public static void setupDeploymentProperties() throws IOException {
-        permissionsModifier = new DeploymentPropetiesModifier();
+        permissionsModifier = new DeploymentPropertiesModifier();
         permissionsModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,  ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
 
-        securityLevelModifier = new DeploymentPropetiesModifier();
+        securityLevelModifier = new DeploymentPropertiesModifier();
         securityLevelModifier.setProperties(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
     }
 
