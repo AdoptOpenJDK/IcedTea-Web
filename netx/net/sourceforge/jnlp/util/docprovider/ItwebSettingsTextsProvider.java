@@ -46,6 +46,7 @@ import java.util.Map;
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.config.Setting;
 import net.sourceforge.jnlp.config.ValueValidator;
@@ -135,11 +136,11 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
                 return o1.getKey().compareTo(o2.getKey());
             }
         });
-        List<PathsAndFiles.InfrastructureFileDescriptor> files = PathsAndFiles.getAllFiles();
+        List<InfrastructureFileDescriptor> files = PathsAndFiles.getAllFiles();
         for (Map.Entry<String, Setting<String>> entry : defaults) {
             String defaultValue = entry.getValue().getDefaultValue();
             String fileAcronom = null;
-            for (PathsAndFiles.InfrastructureFileDescriptor f : files) {
+            for (InfrastructureFileDescriptor f : files) {
                 if (matchSttingsValueWithInfrastrucutreFile(entry.getValue(), f)) {
                     fileAcronom = f.toString();
                     break;

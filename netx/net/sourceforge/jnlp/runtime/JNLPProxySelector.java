@@ -106,7 +106,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             pacEvaluator = PacEvaluatorFactory.getPacEvaluator(autoConfigUrl);
         }
 
-        bypassList = new ArrayList<String>();
+        bypassList = new ArrayList<>();
         String proxyBypass = config.getProperty(DeploymentConfiguration.KEY_PROXY_BYPASS_LIST);
         if (proxyBypass != null) {
             StringTokenizer tokenizer = new StringTokenizer(proxyBypass, ",");

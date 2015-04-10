@@ -145,7 +145,7 @@ public class CacheUtil {
         }
         
         CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-        File cacheDir = lruHandler.getCacheDir();
+        File cacheDir = lruHandler.getCacheDir().getFile();
         if (!(cacheDir.isDirectory())) {
             return false;
         }
@@ -342,7 +342,7 @@ public class CacheUtil {
      * Get the path to file minus the cache directory and indexed folder.
      */
     private static String pathToURLPath(String path) {
-        int len = CacheLRUWrapper.getInstance().getCacheDir().getAbsolutePath().length();
+        int len = CacheLRUWrapper.getInstance().getCacheDir().getFullPath().length();
         int index = path.indexOf(File.separatorChar, len + 1);
         return path.substring(index);
     }
@@ -354,7 +354,7 @@ public class CacheUtil {
     public static String getCacheParentDirectory(String filePath) {
         String path = filePath;
         String tempPath = "";
-        String cacheDir = CacheLRUWrapper.getInstance().getCacheDir().getAbsolutePath();
+        String cacheDir = CacheLRUWrapper.getInstance().getCacheDir().getFullPath();
 
         while(path.startsWith(cacheDir) && !path.equals(cacheDir)){
                 tempPath = new File(path).getParent();
@@ -384,7 +384,7 @@ public class CacheUtil {
                 lruHandler.lock();
                 lruHandler.load();
                 for (long i = 0; i < Long.MAX_VALUE; i++) {
-                    String path = lruHandler.getCacheDir().getAbsolutePath() + File.separator + i;
+                    String path = lruHandler.getCacheDir().getFullPath()+ File.separator + i;
                     File cDir = new File(path);
                     if (!cDir.exists()) {
                         // We can use this directory.
@@ -591,8 +591,8 @@ public class CacheUtil {
                  *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
                  *  then rstr becomes: /home/user1/.icedtea/cache/0
                  */
-                    String rStr = file.getPath().substring(lruHandler.getCacheDir().getAbsolutePath().length());
-                    rStr =lruHandler.getCacheDir().getAbsolutePath() + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
+                    String rStr = file.getPath().substring(lruHandler.getCacheDir().getFullPath().length());
+                    rStr = lruHandler.getCacheDir().getFullPath()+ rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
                     long len = file.length();
 
                     if (keep.contains(file.getPath().substring(rStr.length()))) {

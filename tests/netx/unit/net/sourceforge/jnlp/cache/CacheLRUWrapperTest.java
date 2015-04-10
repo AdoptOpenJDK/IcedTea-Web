@@ -50,6 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.CacheTestUtils;
 
@@ -59,6 +60,7 @@ public class CacheLRUWrapperTest {
     private static final String cacheIndexFileName = PathsAndFiles.CACHE_INDEX_FILE_NAME + "_testing";
     private static final File javaTmp = new File(System.getProperty("java.io.tmpdir"));
     private static final File tmpCache;
+    private static final File tmpIndexFile;
 
     static {
         try {
@@ -69,13 +71,37 @@ public class CacheLRUWrapperTest {
             if (!tmpCache.isDirectory()) {
                 throw new IOException("Unsuccess to create tmpfile, remove it and createsame directory");
             }
-
+            tmpIndexFile = new File(tmpCache, cacheIndexFileName);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
 
     }
-    private static final CacheLRUWrapper clw = new CacheLRUWrapper(new File(tmpCache, cacheIndexFileName), tmpCache);
+    
+    private static class DummyInfrastructureFileDescriptor extends InfrastructureFileDescriptor{
+        private final File backend;
+
+        
+        private DummyInfrastructureFileDescriptor(File backend) {
+            super();
+            this.backend=backend;
+        }
+
+        @Override
+        public File getFile() {
+            return backend;
+        }
+
+        @Override
+        public String getFullPath() {
+            return backend.getAbsolutePath();
+        }
+        
+    }
+    
+    private static final CacheLRUWrapper clw = new CacheLRUWrapper(
+            new DummyInfrastructureFileDescriptor(tmpIndexFile),
+            new DummyInfrastructureFileDescriptor(tmpCache));
 
     private final int noEntriesCacheFile = 1000;
 
@@ -93,7 +119,7 @@ public class CacheLRUWrapperTest {
     @Test
     public void testLoadStoreTiming() throws InterruptedException {
 
-        final File cacheIndexFile = clw.getRecentlyUsedFile();
+        final File cacheIndexFile = clw.getRecentlyUsedFile().getFile();
         cacheIndexFile.delete();
         try {
             int noLoops = 1000;
@@ -134,7 +160,7 @@ public class CacheLRUWrapperTest {
 
         // fill cache index file
         for(int i = 0; i < noEntries; i++) {
-            String path = clw.getRecentlyUsedFile().getAbsolutePath() + File.separatorChar + i + File.separatorChar + "test" + i + ".jar";
+            String path = clw.getRecentlyUsedFile().getFullPath() + File.separatorChar + i + File.separatorChar + "test" + i + ".jar";
             String key = clw.generateKey(path);
             clw.addEntry(key, path);
         }
@@ -143,7 +169,7 @@ public class CacheLRUWrapperTest {
     @Test
     public void testModTimestampAfterStore() throws InterruptedException {
 
-        final File cacheIndexFile = clw.getRecentlyUsedFile();
+        final File cacheIndexFile = clw.getRecentlyUsedFile().getFile();
         cacheIndexFile.delete();
         try{
         clw.lock();

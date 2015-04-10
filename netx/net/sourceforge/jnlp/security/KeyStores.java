@@ -52,6 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
+
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -240,7 +242,7 @@ public final class KeyStores {
      * @param type the specified type of the key store to be returned.
      * @return the location of the key store.
      */
-    public static final PathsAndFiles.InfrastructureFileDescriptor getKeyStoreLocation(Level level, Type type) {
+    public static final InfrastructureFileDescriptor getKeyStoreLocation(Level level, Type type) {
         switch (level) {
             case SYSTEM:
                 switch (type) {

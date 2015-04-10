@@ -226,7 +226,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         bViewFiles.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CacheViewer.showCacheDialog(config);
+                CacheViewer.showCacheDialog();
             }
         });
 

@@ -38,13 +38,14 @@ exception statement from your version.
 package net.sourceforge.jnlp.tools;
 
 import java.io.IOException;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 
 public class DeploymentPropetiesModifier {
 
-    private final PathsAndFiles.InfrastructureFileDescriptor src;
+    private final InfrastructureFileDescriptor src;
     private String savedValue;
     private String requestedProperty;
     private String requestedValue;
@@ -54,7 +55,7 @@ public class DeploymentPropetiesModifier {
         this(PathsAndFiles.USER_DEPLOYMENT_FILE);
     }
 
-    public DeploymentPropetiesModifier(PathsAndFiles.InfrastructureFileDescriptor src) {
+    public DeploymentPropetiesModifier(InfrastructureFileDescriptor src) {
         this.src = src;
         isPropertiesSet = false;
     }

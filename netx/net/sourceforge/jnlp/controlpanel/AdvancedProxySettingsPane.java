@@ -53,7 +53,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 public class AdvancedProxySettingsPane extends JPanel {
 
     private JDialog parent;
-    private DeploymentConfiguration config;
+    private final DeploymentConfiguration config;
 
     /** List of properties used by this panel */
     public static String[] properties = { "deployment.proxy.http.host",

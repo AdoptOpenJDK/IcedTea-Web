@@ -43,7 +43,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 @SuppressWarnings("serial")
 public class SecuritySettingsPanel extends NamedBorderPanel implements ActionListener {
 
-    private DeploymentConfiguration config;
+    private final DeploymentConfiguration config;
 
     // NOTE: All the ones listed with "Default" are in Oracle's implementation.
     // Not shown on deployments.properties webpage. Add support for these later!

@@ -30,6 +30,7 @@ import java.nio.file.Files;
 
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.jnlp.util.optionparser.UnevenParameterException;
@@ -37,7 +38,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class CommandLineTest {
+public class CommandLineTest extends NoStdOutErrTest{
 
     public static final int ERROR = 1;
     public static final int SUCCESS = 0;
@@ -91,7 +92,7 @@ public class CommandLineTest {
         ByteArrayOutputStream outStream = getOutputControllerStream();
 
         String[] args = {
-                "set", "unknown", "ALLOW_UNSIGNED"
+                "set", "unknown", "does_not_matter"
         };
         OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
@@ -150,7 +151,7 @@ public class CommandLineTest {
     @Test
     public void testSetPropertyWithIncorrectValue() throws IOException {
         String[] args = {
-                "set", "deployment.security.level", "ALLOW_ONLY_SAFE_APPLETS"
+                "set", "deployment.security.level", "INTENTIONALLY_INCORRECT"
         };
 
         OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());

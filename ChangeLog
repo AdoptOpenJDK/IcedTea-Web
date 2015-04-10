@@ -1,3 +1,38 @@
+2015-04-10  Jiri Vanek  <jvanek@redhat.com>
+
+	Cache now uses PathsAndFiles instances instead of various duplications
+	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: using InfrastructureFileDescriptor
+	instead of copied Files. Same with recentlyUsedPropertiesFile. Both made final privat
+	and accessible only via getter. (getRecentlyUsedPropertiesFile) redesigned, to use cached 
+	PropertiesFile. If underlying InfrastructureFileDescriptor changes, the cached
+	PropertiesFile is closed and new created and returned.
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: Are using getters from 
+	CacheLRUWrapper singleton to atomic approach. Not storing those values anymore.
+	* netx/net/sourceforge/jnlp/config/InfrastructureFileDescriptor.java: Moved out
+	from inner class in PathsAndFiles
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java:Lost InfrastructureFileDescriptor
+	in favour of outer one.
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java: config
+	made final
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsPane.java: same
+	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java: same
+	* netx/net/sourceforge/jnlp/controlpanel/JVMPanel.java: same
+	* netx/net/sourceforge/jnlp/controlpanel/SecuritySettingsPanel.java: same
+	* netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java: removed config
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java: adapted to above
+	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java: moved to diamond
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: adapted to InfrastructureFileDescriptor
+	* netx/net/sourceforge/jnlp/util/docprovider/ItwebSettingsTextsProvider.java: same 
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: same
+	* sun/applet/PluginProxySelector.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/security/KeyStoresTest.java: same
+	* tests/test-extensions/net/sourceforge/jnlp/tools/DeploymentPropetiesModifier.java:
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheLRUWrapperTest.java: is now
+	using dummy InfrastructureFileDescriptor to allow fake CacheLRUWrapper tests
+	* tests/netx/unit/net/sourceforge/jnlp/controlpanel/CommandLineTest.java: small
+	fixes to unlcear strings
+
 2015-04-09  Lukasz Dracz  <ldracz@redhat.com>
 
 	fix lines displayed in javaws help

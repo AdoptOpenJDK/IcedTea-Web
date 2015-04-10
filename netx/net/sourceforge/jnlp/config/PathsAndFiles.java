@@ -290,7 +290,7 @@ public class PathsAndFiles {
     };
     public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
-    private static enum Target {
+    static enum Target {
         JAVAWS, PLUGIN, ITWEB_SETTINGS, POLICY_EDITOR;
     }
 
@@ -338,132 +338,6 @@ public class PathsAndFiles {
         return getAllFiles(Target.PLUGIN);
     }
 
-    public static class InfrastructureFileDescriptor {
-
-        private final String fileName;
-        private final String pathStub;
-        private final String systemPathStub;
-        private final String descriptionKey;
-        private final Target[] target;
-
-        private InfrastructureFileDescriptor(String fileName, String pathStub, String systemPathStub, String descriptionKey, Target... target) {
-            this.fileName = fileName;
-            this.pathStub = pathStub;
-            this.systemPathStub = systemPathStub;
-            this.descriptionKey = descriptionKey;
-            this.target = target;
-        }
-
-       /** setup-able files have to override this
-         * if they don't, they are read only, and set value will fail
-         * if it is desired to write value of property, then override and use known key.
-         * @return null by default. Should return key to configuration if overriden.
-         */
-        protected  String getPropertiesKey() {
-            return null;
-        }
-
-        public File getFile() {
-             return new File(getFullPath());
-        }
-
-        public void setValue(String value) {
-            String key = getPropertiesKey();
-            if (key == null) {
-                throw new IllegalStateException("This file is read only");
-            } else {
-                JNLPRuntime.getConfiguration().setProperty(key, value);
-            }
-        }
-
-        public String getFullPath() {
-            String key = getPropertiesKey();
-            if (key == null) {
-                return getDefaultFullPath();
-            } else {
-                return JNLPRuntime.getConfiguration().getProperty(key);
-            }
-        }
-
-        public File getDefaultFile() {
-            return new File(getDefaultFullPath());
-        }
-
-        public String getDefaultDir() {
-            return clean(systemPathStub + File.separator + pathStub);
-        }
-
-        public String getDefaultFullPath() {
-            return clean(systemPathStub + File.separator + pathStub + File.separator + fileName);
-        }
-
-        //returns path acronym for default location
-        protected String getSystemPathStubAcronym() {
-            return systemPathStub;
-        }
-
-        protected String getFileName() {
-            return fileName;
-        }
-
-        protected String getDescriptionKey() {
-            return descriptionKey;
-        }
-        
-        
-
-        /**
-         * This remaining part of file declaration, when acronym is removed.
-         * See getDirViaAcronym.
-         * 
-         * @return 
-         */
-        private String getStub() {
-            return clean(pathStub + File.separator + fileName);
-        }
-          
-        @Override
-        public String toString() {
-            return clean(getSystemPathStubAcronym() + File.separator + getStub());
-        }
-        
-        /**
-         * For documentation purposes, the descriptor may be created as VARIABLE/custom/path.
-         * 
-         * This is whole part, which is considered as setup-able.
-         * @return 
-         */
-        public String getDirViaAcronym() {
-            return clean(getSystemPathStubAcronym() + File.separator + pathStub);
-        }
-
-        /**
-         * Remove garbage from paths.
-         * 
-         * Currently this methods unify all multiple occurrences of separators
-         * to single one. Eg /path/to//file will become /path/to/file.
-         * 
-         * Those artifacts maybe spread during various s=path+deparator+subdir+separator
-         * file=s+separator+filename
-         * 
-         * @param s string to be cleaned
-         * @return cleaned string
-         */
-        protected String clean(String s) {
-            while (s.contains(File.separator + File.separator)) {
-                s = s.replace(File.separator + File.separator, File.separator);
-
-            }
-            return s;
-        }
-
-        /**
-         * @return the translated description
-         */
-        public String getDescription() {
-            return Translator.R(descriptionKey);
-        }
-    }
 
     private static class HomeFileDescriptor extends InfrastructureFileDescriptor {
 

@@ -44,7 +44,7 @@ public class AdvancedProxySettingsDialog extends JDialog {
 
     private boolean initialized = false;
     private static final String dialogTitle = Translator.R("APSDialogTitle");
-    private DeploymentConfiguration config; // Configuration file which contains all the settings.
+    private final DeploymentConfiguration config; // Configuration file which contains all the settings.
 
     AdvancedProxySettingsPane topPanel;
 

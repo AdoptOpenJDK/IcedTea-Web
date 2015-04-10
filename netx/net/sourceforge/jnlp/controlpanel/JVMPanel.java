@@ -75,7 +75,7 @@ public class JVMPanel extends NamedBorderPanel {
             this.formattedText = formattedText;
         }
     }
-    private DeploymentConfiguration config;
+    private final DeploymentConfiguration config;
     private File lastPath = new File("/usr/lib/jvm/java/jre/");
     JTextField testFieldArgumentsExec;
 

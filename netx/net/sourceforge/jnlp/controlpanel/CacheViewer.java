@@ -46,20 +46,14 @@ public class CacheViewer extends JDialog {
 
     private boolean initialized = false;
     private static final String dialogTitle = Translator.R("CVCPDialogTitle");
-    private DeploymentConfiguration config; // Configuration file which contains all the settings.
     CachePane topPanel;
 
     /**
      * Creates a new instance of the cache viewer.
      * 
-     * @param config Deployment configuration file.
      */
-    public CacheViewer(DeploymentConfiguration config) {
+    public CacheViewer() {
         super((Frame) null, dialogTitle, true); // Don't need a parent.
-        this.config = config;
-        if (config == null) {
-            throw new IllegalArgumentException("config: " + config);
-        }
         setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
         /* Prepare for adding components to dialog box */
@@ -125,11 +119,9 @@ public class CacheViewer extends JDialog {
 
     /**
      * Display the cache viewer.
-     * 
-     * @param config Configuration file.
      */
-    public static void showCacheDialog(final DeploymentConfiguration config) {
-        CacheViewer psd = new CacheViewer(config);
+    public static void showCacheDialog() {
+        CacheViewer psd = new CacheViewer();
         psd.setResizable(true);
         psd.centerDialog();
         psd.setVisible(true);

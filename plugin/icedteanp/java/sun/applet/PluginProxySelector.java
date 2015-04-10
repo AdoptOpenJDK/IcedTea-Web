@@ -63,7 +63,7 @@ import net.sourceforge.jnlp.util.TimedHashMap;
 
 public class PluginProxySelector extends JNLPProxySelector {
 
-    private TimedHashMap<String, Proxy> proxyCache = new TimedHashMap<String, Proxy>();
+    private TimedHashMap<String, Proxy> proxyCache = new TimedHashMap<>();
 
     public PluginProxySelector(DeploymentConfiguration config) {
         super(config);

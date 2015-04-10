@@ -42,7 +42,7 @@ import net.sourceforge.jnlp.runtime.Translator;
  */
 public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListener {
 
-    private DeploymentConfiguration config;
+    private final DeploymentConfiguration config;
 
     /**
      * Create a new instance of the desktop shortcut settings panel.

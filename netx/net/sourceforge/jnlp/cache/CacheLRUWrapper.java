@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -67,11 +68,11 @@ public class CacheLRUWrapper {
      * accessed) followed by folder of item. value = path to file.
      */
     
-    private final PropertiesFile recentlyUsedPropertiesFile;
-    private final File cacheDir;
+    private final InfrastructureFileDescriptor recentlyUsedPropertiesFile;
+    private final InfrastructureFileDescriptor cacheDir;
     
     public CacheLRUWrapper() {
-        this(PathsAndFiles.getRecentlyUsedFile().getFile(), PathsAndFiles.CACHE_DIR.getFile());
+        this(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
     }
     
         
@@ -80,13 +81,13 @@ public class CacheLRUWrapper {
      * @param recentlyUsed file to be used as recently_used file
      * @param cacheDir dir with cache
      */
-    public CacheLRUWrapper(final File recentlyUsed, final File cacheDir) {
-        recentlyUsedPropertiesFile = new PropertiesFile(recentlyUsed);
+    public CacheLRUWrapper(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
+        recentlyUsedPropertiesFile = recentlyUsed;
         this.cacheDir = cacheDir;
-        if (!recentlyUsed.exists()) {
+        if (!recentlyUsed.getFile().exists()) {
             try {
-                FileUtils.createParentDir(recentlyUsed);
-                FileUtils.createRestrictedFile(recentlyUsed, true);
+                FileUtils.createParentDir(recentlyUsed.getFile());
+                FileUtils.createRestrictedFile(recentlyUsed.getFile(), true);
             } catch (IOException e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
@@ -102,25 +103,44 @@ public class CacheLRUWrapper {
         return  CacheLRUWrapperHolder.INSTANCE;
     }
 
+    
+    private PropertiesFile cachedRecentlyUsedPropertiesFile = null ;
     /**
      * @return the recentlyUsedPropertiesFile
      */
-    public PropertiesFile getRecentlyUsedPropertiesFile() {
-        return recentlyUsedPropertiesFile;
+    synchronized PropertiesFile getRecentlyUsedPropertiesFile() {
+        if (cachedRecentlyUsedPropertiesFile == null) {
+            //no properties file yet, create it
+            cachedRecentlyUsedPropertiesFile = new PropertiesFile(recentlyUsedPropertiesFile.getFile());
+            return cachedRecentlyUsedPropertiesFile;
+        } 
+        if (recentlyUsedPropertiesFile.getFile().equals(cachedRecentlyUsedPropertiesFile.getStoreFile())){
+            //The underlying InfrastructureFileDescriptor is still pointing to the same file, use current properties file
+            return cachedRecentlyUsedPropertiesFile;
+        } else {
+            //the InfrastructureFileDescriptor was set to different location, move to it
+            if (cachedRecentlyUsedPropertiesFile.tryLock()) {
+                cachedRecentlyUsedPropertiesFile.store();
+                cachedRecentlyUsedPropertiesFile.unlock();
+            }
+            cachedRecentlyUsedPropertiesFile = new PropertiesFile(recentlyUsedPropertiesFile.getFile());
+            return cachedRecentlyUsedPropertiesFile;
+        }
+        
     }
 
     /**
      * @return the cacheDir
      */
-    public File getCacheDir() {
+    public InfrastructureFileDescriptor getCacheDir() {
         return cacheDir;
     }
 
     /**
      * @return the recentlyUsedFile
      */
-    public File getRecentlyUsedFile() {
-        return recentlyUsedPropertiesFile.getStoreFile();
+    public InfrastructureFileDescriptor getRecentlyUsedFile() {
+        return recentlyUsedPropertiesFile;
     }
     
    private static class CacheLRUWrapperHolder{
@@ -170,7 +190,7 @@ public class CacheLRUWrapper {
 
             // 2. check path format - does the path look correct?
             if (path != null) {
-                if (!path.contains(getCacheDir().getAbsolutePath())) {
+                if (!path.contains(getCacheDir().getFullPath())) {
                     it.remove();
                     modified = true;
                 }
@@ -185,6 +205,7 @@ public class CacheLRUWrapper {
 
     /**
      * Write file to disk.
+     * @return true if properties were successfully stored, false otherwise
      */
     public synchronized boolean store() {
         if (getRecentlyUsedPropertiesFile().isHeldByCurrentThread()) {
@@ -202,10 +223,11 @@ public class CacheLRUWrapper {
      * @return true if we successfully added to map, false otherwise.
      */
     public synchronized boolean addEntry(String key, String path) {
-        if (getRecentlyUsedPropertiesFile().containsKey(key)) {
+        PropertiesFile props = getRecentlyUsedPropertiesFile();
+        if (props.containsKey(key)) {
             return false;
         }
-        getRecentlyUsedPropertiesFile().setProperty(key, path);
+        props.setProperty(key, path);
         return true;
     }
 
@@ -216,15 +238,16 @@ public class CacheLRUWrapper {
      * @return true if we successfully removed key from map, false otherwise.
      */
     public synchronized boolean removeEntry(String key) {
-        if (!recentlyUsedPropertiesFile.containsKey(key)) {
+        PropertiesFile props = getRecentlyUsedPropertiesFile();
+        if (!props.containsKey(key)) {
             return false;
         }
-        getRecentlyUsedPropertiesFile().remove(key);
+        props.remove(key);
         return true;
     }
 
     private String getIdForCacheFolder(String folder) {
-        int len = getCacheDir().getAbsolutePath().length();
+        int len = getCacheDir().getFullPath().length();
         int index = folder.indexOf(File.separatorChar, len + 1);
         return folder.substring(len + 1, index);
     }
@@ -236,12 +259,15 @@ public class CacheLRUWrapper {
      * @return true if we successfully updated value, false otherwise.
      */
     public synchronized boolean updateEntry(String oldKey) {
-        if (!recentlyUsedPropertiesFile.containsKey(oldKey)) return false;
-        String value = getRecentlyUsedPropertiesFile().getProperty(oldKey);
+        PropertiesFile props = getRecentlyUsedPropertiesFile();
+        if (!props.containsKey(oldKey)) {
+            return false;
+        }
+        String value = props.getProperty(oldKey);
         String folder = getIdForCacheFolder(value);
 
-        getRecentlyUsedPropertiesFile().remove(oldKey);
-        getRecentlyUsedPropertiesFile().setProperty(Long.toString(System.currentTimeMillis()) + "," + folder, value);
+        props.remove(oldKey);
+        props.setProperty(Long.toString(System.currentTimeMillis()) + "," + folder, value);
         return true;
     }
 
@@ -257,7 +283,7 @@ public class CacheLRUWrapper {
         List<Entry<String, String>> entries = new ArrayList<>();
 
         for (Entry e : getRecentlyUsedPropertiesFile().entrySet()) {
-            entries.add(new AbstractMap.SimpleImmutableEntry<String, String>(e));
+            entries.add(new AbstractMap.SimpleImmutableEntry<>(e));
         }
 
         // sort by keys in descending order.

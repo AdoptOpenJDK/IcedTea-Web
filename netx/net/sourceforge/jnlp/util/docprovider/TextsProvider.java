@@ -52,7 +52,7 @@ import java.util.Map;
 import java.util.Set;
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.OptionsDefinitions;
-import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.Setting;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
@@ -161,17 +161,17 @@ public abstract class TextsProvider {
         }
     }
 
-    protected String getFiles(List<PathsAndFiles.InfrastructureFileDescriptor> files) {
+    protected String getFiles(List<InfrastructureFileDescriptor> files) {
         StringBuilder sb = new StringBuilder();
         Set<Map.Entry<String, Setting<String>>> defs = Defaults.getDefaults().entrySet();
-        Collections.sort(files, new Comparator<PathsAndFiles.InfrastructureFileDescriptor>() {
+        Collections.sort(files, new Comparator<InfrastructureFileDescriptor>() {
 
             @Override
-            public int compare(PathsAndFiles.InfrastructureFileDescriptor o1, PathsAndFiles.InfrastructureFileDescriptor o2) {
+            public int compare(InfrastructureFileDescriptor o1, InfrastructureFileDescriptor o2) {
                 return o1.toString().compareTo(o2.toString());
             }
         });
-        for (PathsAndFiles.InfrastructureFileDescriptor f : files) {
+        for (InfrastructureFileDescriptor f : files) {
             String path = expandVariables ? f.getFullPath() : f.toString();
             String modified = "";
             String fGetFullPath=removeFileProtocol(f.getFullPath());
@@ -192,7 +192,7 @@ public abstract class TextsProvider {
         return formatter.wrapParagraph(sb.toString());
     }
 
-    protected boolean matchSttingsValueWithInfrastrucutreFile(Setting<String> entry, PathsAndFiles.InfrastructureFileDescriptor f) {
+    protected boolean matchSttingsValueWithInfrastrucutreFile(Setting<String> entry, InfrastructureFileDescriptor f) {
         if (entry == null || entry.getDefaultValue() == null) {
             return false;
         }
