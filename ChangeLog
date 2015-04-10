@@ -1,3 +1,12 @@
+2015-04-10  Jie Kang  <jkang@redhat.com>
+	Kill processes in Integration Tests more cleanly
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	use SIGUSR1 instead of SIGINT, don't destroy process after sending signal
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	reduce timeout from 20 seconds to 10
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Firefox.java:
+	remove usage of softkiller to close tabs (softkiller no longer works)
+
 2015-04-10  Jiri Vanek  <jvanek@redhat.com>
 
 	ok/apply/cancel mechanism in itweb-settings fixed to work again. Added rest button for cache path.
