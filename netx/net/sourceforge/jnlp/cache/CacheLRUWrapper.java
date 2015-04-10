@@ -283,7 +283,7 @@ public class CacheLRUWrapper {
         List<Entry<String, String>> entries = new ArrayList<>();
 
         for (Entry e : getRecentlyUsedPropertiesFile().entrySet()) {
-            entries.add(new AbstractMap.SimpleImmutableEntry<>(e));
+            entries.add(new AbstractMap.SimpleImmutableEntry(e));
         }
 
         // sort by keys in descending order.
