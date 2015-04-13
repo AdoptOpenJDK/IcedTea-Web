@@ -1,5 +1,16 @@
 2015-04-13  Jiri Vanek  <jvanek@redhat.com>
 
+	Removed redundant occurrence of default keystore password
+	*/netx/net/sourceforge/jnlp/security/KeyStores.java: removed redundant DEFAULT_PASSWORD
+	*/netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: call to KeyStores.getPassword
+ 	replaced by SecurityUtil.getTrustedCertsPassword
+	*/netx/net/sourceforge/jnlp/security/CertificateUtils.java: same
+	*/netx/net/sourceforge/jnlp/security/SecurityUtil.java: same
+	*/netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same
+	*/netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: same
+
+2015-04-13  Jiri Vanek  <jvanek@redhat.com>
+
 	reverted "Kill processes in Integration Tests more cleanly"
 	It needs to be revisited.
 

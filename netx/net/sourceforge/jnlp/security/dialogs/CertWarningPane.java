@@ -360,7 +360,7 @@ public class CertWarningPane extends SecurityDialogPanel {
 
                     OutputStream os = new FileOutputStream(keyStoreFile);
                     try {
-                        ks.store(os, KeyStores.getPassword());
+                        ks.store(os, SecurityUtil.getTrustedCertsPassword());
                     } finally {
                         os.close();
                     }

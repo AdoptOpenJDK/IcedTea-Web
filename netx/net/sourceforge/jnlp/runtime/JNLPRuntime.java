@@ -65,6 +65,7 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
+import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
@@ -269,7 +270,7 @@ public class JNLPRuntime {
             SSLContext context = SSLContext.getInstance("SSL");
             KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS);
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-            kmf.init(ks, KeyStores.getPassword());
+            kmf.init(ks, SecurityUtil.getTrustedCertsPassword());
             TrustManager[] trust = new TrustManager[] { getSSLSocketTrustManager() };
             context.init(kmf.getKeyManagers(), trust, null);
             sslSocketFactory = context.getSocketFactory();

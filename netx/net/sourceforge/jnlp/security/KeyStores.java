@@ -83,12 +83,6 @@ public final class KeyStores {
     public static final Map<Integer,String> keystoresPaths=new HashMap<Integer, String>();
 
     private static final String KEYSTORE_TYPE = "JKS";
-    /** the default password used to protect the KeyStores */
-    private static final String DEFAULT_PASSWORD = "changeit";
-
-    public static char[] getPassword() {
-        return DEFAULT_PASSWORD.toCharArray();
-    }
   
     /**
      * Returns a KeyStore corresponding to the appropriate level level (user or
@@ -127,7 +121,7 @@ public final class KeyStores {
         String location = getKeyStoreLocation(level, type).getFullPath();
         KeyStore ks = null;
         try {
-            ks = createKeyStoreFromFile(new File(location), create, DEFAULT_PASSWORD);
+            ks = createKeyStoreFromFile(new File(location), create);
             //hashcode is used instead of instance so when no references are left
             //to keystore, then this will not be blocker for garbage collection
             keystoresPaths.put(ks.hashCode(),location);
@@ -329,11 +323,9 @@ public final class KeyStores {
      * it returns an empty but initialized KeyStore
      *
      * @param file the file to load information from
-     * @param password the password to unlock the KeyStore file.
      * @return a KeyStore containing data from the file
      */
-    private static final KeyStore createKeyStoreFromFile(File file, boolean createIfNotFound,
-            String password) throws IOException, KeyStoreException, NoSuchAlgorithmException,
+    private static final KeyStore createKeyStoreFromFile(File file, boolean createIfNotFound) throws IOException, KeyStoreException, NoSuchAlgorithmException,
             CertificateException {
         FileInputStream fis = null;
         KeyStore ks = null;
@@ -347,9 +339,9 @@ public final class KeyStores {
                 FileUtils.createRestrictedFile(file, true);
 
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                ks.load(null, password.toCharArray());
+                ks.load(null, SecurityUtil.getTrustedCertsPassword());
                 FileOutputStream fos = new FileOutputStream(file);
-                ks.store(fos, password.toCharArray());
+                ks.store(fos,SecurityUtil.getTrustedCertsPassword());
                 fos.close();
             }
 
@@ -358,10 +350,10 @@ public final class KeyStores {
             if (file.exists()) {
                 fis = new FileInputStream(file);
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                ks.load(fis, password.toCharArray());
+                ks.load(fis, SecurityUtil.getTrustedCertsPassword());
             } else {
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                ks.load(null, password.toCharArray());
+                ks.load(null, SecurityUtil.getTrustedCertsPassword());
             }
         } finally {
             if (fis != null) {

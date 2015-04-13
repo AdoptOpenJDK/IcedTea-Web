@@ -48,14 +48,14 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class SecurityUtil {
 
-    private static final char[] password = "changeit".toCharArray();
+    private static final char[] DEFAULT_PASSWORD = "changeit".toCharArray();
 
     public static String getTrustedCertsFilename() throws Exception {
         return KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFullPath();
     }
 
     public static char[] getTrustedCertsPassword() {
-        return password;
+        return DEFAULT_PASSWORD;
     }
 
     /**
@@ -179,9 +179,9 @@ public class SecurityUtil {
             //made directory, or directory exists
             if (madeDir || dir.isDirectory()) {
                 KeyStore ks = KeyStore.getInstance("JKS");
-                ks.load(null, password);
+                ks.load(null, getTrustedCertsPassword());
                 FileOutputStream fos = new FileOutputStream(certFile);
-                ks.store(fos, password);
+                ks.store(fos, getTrustedCertsPassword());
                 fos.close();
                 return true;
             } else {
@@ -208,7 +208,7 @@ public class SecurityUtil {
                 if (file.exists()) {
                     fis = new FileInputStream(file);
                     ks = KeyStore.getInstance("JKS");
-                    ks.load(fis, password);
+                    ks.load(fis, getTrustedCertsPassword());
                 }
             } catch (Exception e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
