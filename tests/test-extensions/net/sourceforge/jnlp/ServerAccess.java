@@ -108,7 +108,7 @@ public class ServerAccess {
      * timeout in ms to let process to finish, before assassin will kill it.
      * This can be changed in runtime, but will affect all following tasks
      */
-    public static long PROCESS_TIMEOUT = 10 * 1000;//ms
+    public static long PROCESS_TIMEOUT = 20 * 1000;//ms
     /**
      * this flag is indicating whether output of executeProcess should be logged. By default true.
      */
