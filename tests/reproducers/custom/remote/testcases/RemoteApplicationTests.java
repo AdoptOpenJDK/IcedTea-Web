@@ -42,6 +42,9 @@ import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.Remote;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 @Remote
@@ -50,6 +53,19 @@ public class RemoteApplicationTests {
     private static ServerAccess server = new ServerAccess();
     private final List<String> l = Collections.unmodifiableList(Arrays.asList(new String[]{"-Xtrustall"}));
     private final List<String> ll = Collections.unmodifiableList(Arrays.asList(new String[]{"-Xtrustall", "-Xnofork"}));
+
+    private static final long defaultTimeout = server.PROCESS_TIMEOUT;
+
+    @BeforeClass
+    public static void setup() {
+        //Remote applications need to download files and take a little longer (20s)
+        server.PROCESS_TIMEOUT = 20 * 1000l;
+    }
+
+    @AfterClass
+    public static void teardown() {
+        server.PROCESS_TIMEOUT = defaultTimeout;
+    }
 
     @Test
     @NeedsDisplay
