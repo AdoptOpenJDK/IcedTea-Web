@@ -339,9 +339,9 @@ public final class KeyStores {
                 FileUtils.createRestrictedFile(file, true);
 
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                ks.load(null, SecurityUtil.getTrustedCertsPassword());
+                SecurityUtil.loadKeyStore(ks, null);
                 FileOutputStream fos = new FileOutputStream(file);
-                ks.store(fos,SecurityUtil.getTrustedCertsPassword());
+                SecurityUtil.keyStoreStore(ks, fos);
                 fos.close();
             }
 
@@ -350,10 +350,10 @@ public final class KeyStores {
             if (file.exists()) {
                 fis = new FileInputStream(file);
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                ks.load(fis, SecurityUtil.getTrustedCertsPassword());
+                SecurityUtil.loadKeyStore(ks, fis);
             } else {
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                ks.load(null, SecurityUtil.getTrustedCertsPassword());
+                SecurityUtil.loadKeyStore(ks, null);
             }
         } finally {
             if (fis != null) {

@@ -40,7 +40,17 @@ package net.sourceforge.jnlp.security;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.Key;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import javax.net.ssl.KeyManagerFactory;
 
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
@@ -54,7 +64,7 @@ public class SecurityUtil {
         return KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFullPath();
     }
 
-    public static char[] getTrustedCertsPassword() {
+    private static char[] getTrustedCertsPassword() {
         return DEFAULT_PASSWORD;
     }
 
@@ -179,9 +189,9 @@ public class SecurityUtil {
             //made directory, or directory exists
             if (madeDir || dir.isDirectory()) {
                 KeyStore ks = KeyStore.getInstance("JKS");
-                ks.load(null, getTrustedCertsPassword());
+                loadKeyStore(ks, null);
                 FileOutputStream fos = new FileOutputStream(certFile);
-                ks.store(fos, getTrustedCertsPassword());
+                keyStoreStore(ks, fos);
                 fos.close();
                 return true;
             } else {
@@ -208,7 +218,7 @@ public class SecurityUtil {
                 if (file.exists()) {
                     fis = new FileInputStream(file);
                     ks = KeyStore.getInstance("JKS");
-                    ks.load(fis, getTrustedCertsPassword());
+                    loadKeyStore(ks, fis);
                 }
             } catch (Exception e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
@@ -276,5 +286,27 @@ public class SecurityUtil {
         }
 
         return caks;
+    }
+    
+    
+    public static void initKeyManagerFactory(KeyManagerFactory kmf, KeyStore ks) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        kmf.init(ks, SecurityUtil.getTrustedCertsPassword());
+
+    }
+
+    public static void setKeyEntry(KeyStore ks, String alias, Key key, Certificate[] certChain) throws KeyStoreException {
+         ks.setKeyEntry(alias, key, SecurityUtil.getTrustedCertsPassword(), certChain);
+    }
+
+    public static Key getKey(KeyStore ks, String alias) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        return ks.getKey(alias, getTrustedCertsPassword());
+    }
+
+    public static void loadKeyStore(KeyStore ks, InputStream is) throws IOException, NoSuchAlgorithmException, CertificateException {
+        ks.load(is, SecurityUtil.getTrustedCertsPassword());
+    }
+
+    public static void keyStoreStore(KeyStore ks, OutputStream fos) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+        ks.store(fos,SecurityUtil.getTrustedCertsPassword());
     }
 }

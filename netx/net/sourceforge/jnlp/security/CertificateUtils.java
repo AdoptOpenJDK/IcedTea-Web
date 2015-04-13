@@ -147,7 +147,7 @@ public class CertificateUtils {
             alias = new BigInteger(20, random).toString();
         } while (ks.getCertificate(alias) != null);
 
-        ks.setKeyEntry(alias, key, SecurityUtil.getTrustedCertsPassword(), certChain);
+        SecurityUtil.setKeyEntry(ks, alias, key, certChain);
     }
 
     /**
@@ -196,7 +196,7 @@ public class CertificateUtils {
     public static void dumpPKCS12(String alias, File file, KeyStore ks, char[] password)
             throws Exception {
         Certificate[] certChain = ks.getCertificateChain(alias);
-        Key key = ks.getKey(alias, SecurityUtil.getTrustedCertsPassword());
+        Key key = SecurityUtil.getKey(ks, alias);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(null, null);

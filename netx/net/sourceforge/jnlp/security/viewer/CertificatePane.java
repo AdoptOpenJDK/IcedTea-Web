@@ -401,7 +401,7 @@ public class CertificatePane extends JPanel {
 
                     OutputStream os = new FileOutputStream(keyStoreFile);
                     try {
-                        ks.store(os, SecurityUtil.getTrustedCertsPassword());
+                        SecurityUtil.keyStoreStore(ks, os);
                     } finally {
                         os.close();
                     }
@@ -489,7 +489,7 @@ public class CertificatePane extends JPanel {
                                 FileUtils.createRestrictedFile(keyStoreFile, true);
                             }
                             FileOutputStream fos = new FileOutputStream(keyStoreFile);
-                            keyStore.store(fos, SecurityUtil.getTrustedCertsPassword());
+                            SecurityUtil.keyStoreStore(keyStore, fos);
                             fos.close();
                         }
                     }
