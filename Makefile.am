@@ -52,7 +52,6 @@ export EXPORTED_TEST_CERT_SUFFIX=crt
 export TEST_CERT_ALIAS=icedteaweb
 export PUBLIC_KEYSTORE_STUB=icedtea-web/security/trusted.certs
 export PUBLIC_KEYSTORE_PASS=changeit
-export SOFTKILLER=softkiller
 
 export JUNIT_RUNNER_JAR=$(abs_top_builddir)/junit-runner.jar
 export UNIT_CLASS_NAMES = $(abs_top_builddir)/unit_class_names
@@ -980,14 +979,9 @@ $(REPRODUCERS_CLASS_NAMES):
 	done ; \
 	echo $$class_names > $(REPRODUCERS_CLASS_NAMES)
 
-$(TESTS_DIR)/$(SOFTKILLER):
-	cd  $(TESTS_SRCDIR)/$(SOFTKILLER); \
-	$(MAKE) ; \
-	mv $(SOFTKILLER) $(TESTS_DIR)/
-
 stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
  javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop launcher.build/$(policyeditor) policyeditor.desktop \
- stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public $(TESTS_DIR)/softkiller \
+ stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
  stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp\
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES) stamps/process-custom-reproducers.stamp
 	cd $(TEST_EXTENSIONS_DIR) ; \
@@ -1404,10 +1398,7 @@ clean_tests_reports:
 	rm -f $(TESTS_DIR)/summary_unit.txt
 	rm -f $(TESTS_DIR)/summary_reproducers.txt
 
-clean-$(SOFTKILLER):
-	rm -f $(TESTS_DIR)/softkiller
- 
-clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public clean-custom-reproducers clean-$(SOFTKILLER)
+clean-netx-dist-tests: clean_tests_reports netx-dist-tests-remove-cert-from-public clean-custom-reproducers
 	rm -f test-extensions-source-files.txt
 	rm -f test-extensions-tests-source-files.txt
 	rm -f $(TEST_EXTENSIONS_COMPATIBILITY_SYMLINK)
@@ -1473,7 +1464,6 @@ clean-test-code-coverage-tools-jacoco:
 	rm -f stamps/compile-jacoco-operator.stamp;
 	rm -f jacoco-operator-source-files.txt
 	rm -f stamps/build-fake-plugin.stamp
-
 
 # plugin tests
 

@@ -200,17 +200,16 @@ public class ProcessAssasin extends Thread {
             String pid = (f.get(p)).toString();
             if (reactingProcess != null) {
                 reactingProcess.beforeKill(pid);
-            };
-            sigInt(pid);
-            //sigTerm(pid);
-            //sigKill(pid);
+            }
+//            sigInt(pid);
+            sigTerm(pid);
+//            sigKill(pid);
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         } finally {
-            p.destroy();
             if (reactingProcess != null) {
                 reactingProcess.afterKill("");
-            };
+            }
         }
     }
 
@@ -240,27 +239,4 @@ public class ProcessAssasin extends Thread {
     void setReactingProcess(ReactingProcess reactingProcess) {
         this.reactingProcess = reactingProcess;
     }
-
-    public static void closeWindow(String pid) throws Exception {
-        List<String> ll = new ArrayList<String>(2);
-        ll.add(ServerAccess.getInstance().getDir().getParent() + "/softkiller");
-        ll.add(pid);
-        ServerAccess.executeProcess(ll); //sync, but  acctually release
-        //before affected application "close"
-        Thread.sleep(100);
-
-    }
-
-    public static void closeWindows(String s) throws Exception {
-        closeWindows(s, 10);
-    }
-    
-    public static void closeWindows(String s, int count) throws Exception {
-        //each close closes just one tab...
-        for (int i = 0; i < count; i++) {
-            ProcessAssasin.closeWindow(s);
-        }
-    }
-
-
 }

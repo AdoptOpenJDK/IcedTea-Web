@@ -1,4 +1,18 @@
 2015-04-13  Jie Kang  <jkang@redhat.com>
+	Kill processes in Integration Tests more cleanly; revised
+    * Makefile.am:
+    remove all instances of softkiller (softkiller no longer works)
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	use SIGTERM instead of SIGINT, don't destroy process after sending signal
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	reduce timeout from 20 seconds to 10
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Firefox.java:
+	remove usage of softkiller to close tabs
+    * tests/softkiller/Makefile:
+    * tests/softkiller/softkiller.c:
+    remove softkiller
+
+2015-04-13  Jie Kang  <jkang@redhat.com>
 	Add reproducers for jnlp_href attribute
 	* tests/reproducers/simple/JnlpHrefAttribute/resources/JnlpHrefAttribute.html:
 	* tests/reproducers/simple/JnlpHrefAttribute/resources/JnlpHrefAttribute.jnlp:	
