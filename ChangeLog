@@ -1,3 +1,12 @@
+2015-04-13  Jie Kang  <jkang@redhat.com>
+	Add reproducers for jnlp_href attribute
+	* tests/reproducers/simple/JnlpHrefAttribute/resources/JnlpHrefAttribute.html:
+	* tests/reproducers/simple/JnlpHrefAttribute/resources/JnlpHrefAttribute.jnlp:	
+	* tests/reproducers/simple/JnlpHrefAttribute/srcs/JnlpHrefAttribute.java:
+	* tests/reproducers/simple/JnlpHrefAttribute/testcases/JnlpHrefAttributeTest.java:
+	Added test for firefox/opera that succeeds with attribute and test for
+	midori/epiphany that fails with attribute
+
 2015-04-13  Jiri Vanek  <jvanek@redhat.com>
 
 	set single place for keystore operations
