@@ -340,17 +340,12 @@ public final class KeyStores {
 
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
                 SecurityUtil.loadKeyStore(ks, null);
-                FileOutputStream fos = new FileOutputStream(file);
-                SecurityUtil.keyStoreStore(ks, fos);
-                fos.close();
+                SecurityUtil.storeKeyStore(ks, file);
             }
 
-            // TODO catch exception when password is incorrect and prompt user
-
             if (file.exists()) {
-                fis = new FileInputStream(file);
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                SecurityUtil.loadKeyStore(ks, fis);
+                SecurityUtil.loadKeyStore(ks, file);
             } else {
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
                 SecurityUtil.loadKeyStore(ks, null);

@@ -399,12 +399,8 @@ public class CertificatePane extends JPanel {
                         FileUtils.createRestrictedFile(keyStoreFile, true);
                     }
 
-                    OutputStream os = new FileOutputStream(keyStoreFile);
-                    try {
-                        SecurityUtil.keyStoreStore(ks, os);
-                    } finally {
-                        os.close();
-                    }
+                    SecurityUtil.storeKeyStore(ks, keyStoreFile);
+
                     repopulateTables();
                 } catch (Exception ex) {
                     // TODO: handle exception
@@ -488,9 +484,7 @@ public class CertificatePane extends JPanel {
                             if (!keyStoreFile.isFile()) {
                                 FileUtils.createRestrictedFile(keyStoreFile, true);
                             }
-                            FileOutputStream fos = new FileOutputStream(keyStoreFile);
-                            SecurityUtil.keyStoreStore(keyStore, fos);
-                            fos.close();
+                            SecurityUtil.storeKeyStore(keyStore, keyStoreFile);
                         }
                     }
                     repopulateTables();

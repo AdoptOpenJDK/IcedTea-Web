@@ -1,3 +1,15 @@
+2015-04-15  Jiri Vanek  <jvanek@redhat.com>
+
+	User is now prompted on unknown password to keystore
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: Operations above keystores
+	moved to calls to SecurityUtil.storeKeyStore/loadKeyStore
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: same 
+	* netx/net/sourceforge/jnlp/security/SecurityUtil.java: (initKeyManagerFactory)
+	(setKeyEntry) (getKey) (loadKeyStore) (setKeyEntry/storeKeyStore) refactored
+	to use unified call to unlockKeystore. Added inner class KeystorePasswordAttempter
+	which is reponsible for attempting several passwrods and to ask user if fail.
+
 2015-04-13  Jie Kang  <jkang@redhat.com>
 
 	Increase server timeout for remote reproducers

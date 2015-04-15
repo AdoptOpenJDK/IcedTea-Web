@@ -357,13 +357,7 @@ public class CertWarningPane extends SecurityDialogPanel {
                     if (!keyStoreFile.isFile()) {
                         FileUtils.createRestrictedFile(keyStoreFile, true);
                     }
-
-                    OutputStream os = new FileOutputStream(keyStoreFile);
-                    try {
-                        SecurityUtil.keyStoreStore(ks, os);
-                    } finally {
-                        os.close();
-                    }
+                    SecurityUtil.storeKeyStore(ks, keyStoreFile);
                     OutputController.getLogger().log("certificate is now permanently trusted");
                 } catch (Exception ex) {
                     // TODO: Let NetX show a dialog here notifying user
