@@ -1,5 +1,23 @@
 2015-04-15  Jiri Vanek  <jvanek@redhat.com>
 
+	KeystorePasswordAttempter moved to outer class. Added comments and prevention
+	about possible null password writing to keystore.  KeystorePasswordAttempter
+	made much more object-like.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added KSresultUntilNow
+	KSinvalidPassword KSheadlesWarning KSnwPassHelp keys for keystore prompt
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: operation on keystores
+	moved from stream to file
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same +
+	removal of unused fields and imports
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: same
+	* netx/net/sourceforge/jnlp/security/SecurityUtil.java: same. Also get rid
+	of default password - moved to KeystorePasswordAttempter. (initKeyManagerFactory)
+	(setKeyEntry) (getKey) (loadKeyStore) (storeKeyStore) moved from enum and switch to 
+	runnable like approach.
+	* netx/net/sourceforge/jnlp/security/KeystorePasswordAttempter.java: moved from inner
+	
+2015-04-15  Jiri Vanek  <jvanek@redhat.com>
+
 	User is now prompted on unknown password to keystore
 	* netx/net/sourceforge/jnlp/security/KeyStores.java: Operations above keystores
 	moved to calls to SecurityUtil.storeKeyStore/loadKeyStore
@@ -8,7 +26,7 @@
 	* netx/net/sourceforge/jnlp/security/SecurityUtil.java: (initKeyManagerFactory)
 	(setKeyEntry) (getKey) (loadKeyStore) (setKeyEntry/storeKeyStore) refactored
 	to use unified call to unlockKeystore. Added inner class KeystorePasswordAttempter
-	which is reponsible for attempting several passwrods and to ask user if fail.
+	which is responsible for attempting several passwords and to ask user if fail.
 
 2015-04-13  Jie Kang  <jkang@redhat.com>
 

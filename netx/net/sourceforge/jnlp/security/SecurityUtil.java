@@ -41,9 +41,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -51,12 +48,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.net.ssl.KeyManagerFactory;
-import javax.swing.JOptionPane;
-import jdk.nashorn.internal.runtime.StoredScript;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
@@ -64,15 +56,11 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class SecurityUtil {
 
-    private static final char[] DEFAULT_PASSWORD = "changeit".toCharArray();
-
+  
     public static String getTrustedCertsFilename() throws Exception {
         return KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFullPath();
     }
 
-    private static char[] getTrustedCertsPassword() {
-        return DEFAULT_PASSWORD;
-    }
 
     /**
      * Extracts the CN field from a Certificate principal string. Or, if it
@@ -291,10 +279,22 @@ public class SecurityUtil {
         return caks;
     }
     
-    
-    public static void initKeyManagerFactory(KeyManagerFactory kmf, KeyStore ks) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
+     public static void initKeyManagerFactory(KeyManagerFactory kmf, KeyStore ks) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
         try {
-            KeystorePasswordAttempter.INSTANCE.unlockKeystore(KeystorePasswordAttempter.UNLOCK_TYPE.initKeyManagerFactory, kmf, ks, null, null, null, null);
+            KeystorePasswordAttempter.INSTANCE.unlockKeystore(
+                    new KeystorePasswordAttempter.KeystoreOperation(kmf, ks) {
+
+                        @Override
+                        String getId() {
+                            return "'init keymanager-factory'";
+                        }
+
+                        @Override
+                        Key operateKeystore(char[] pass) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
+                            kmf.init(ks, pass);
+                            return null;
+                        }
+                    });
         } catch (IOException | CertificateException ex) {
             throw unexpectedException(ex);
         }
@@ -302,7 +302,20 @@ public class SecurityUtil {
 
     public static void setKeyEntry(KeyStore ks, String alias, Key key, Certificate[] certChain) throws KeyStoreException {
         try {
-            KeystorePasswordAttempter.INSTANCE.unlockKeystore(KeystorePasswordAttempter.UNLOCK_TYPE.setKeyEntry, null, ks, alias, key, certChain, null);
+            KeystorePasswordAttempter.INSTANCE.unlockKeystore(
+                    new KeystorePasswordAttempter.KeystoreOperation(ks, alias, key, certChain) {
+
+                @Override
+                String getId() {
+                    return "'set key entry'";
+                }
+
+                @Override
+                Key operateKeystore(char[] pass) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
+                    ks.setKeyEntry(alias, key, pass, certChain);
+                    return null;
+                }
+            });
         } catch (NoSuchAlgorithmException | UnrecoverableKeyException | IOException | CertificateException ex) {
             throw unexpectedException(ex);
         }
@@ -310,7 +323,19 @@ public class SecurityUtil {
 
     public static Key getKey(KeyStore ks, String alias) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
         try {
-            return KeystorePasswordAttempter.INSTANCE.unlockKeystore(KeystorePasswordAttempter.UNLOCK_TYPE.getKey, null, ks, alias, null, null, null);
+            return KeystorePasswordAttempter.INSTANCE.unlockKeystore(
+                    new KeystorePasswordAttempter.KeystoreOperation(ks, alias, null, null) {
+
+                        @Override
+                        String getId() {
+                            return "'get key'";
+                        }
+
+                        @Override
+                        Key operateKeystore(char[] pass) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
+                            return ks.getKey(alias, pass);
+                        }
+                    });
         } catch (IOException | CertificateException ex) {
             throw unexpectedException(ex);
         }
@@ -318,7 +343,26 @@ public class SecurityUtil {
 
     public static void loadKeyStore(KeyStore ks, File f) throws IOException, NoSuchAlgorithmException, CertificateException {
         try {
-            KeystorePasswordAttempter.INSTANCE.unlockKeystore(KeystorePasswordAttempter.UNLOCK_TYPE.loadKeyStore, null, ks, null, null, null, f);
+            KeystorePasswordAttempter.INSTANCE.unlockKeystore(
+                    new KeystorePasswordAttempter.KeystoreOperation(ks, f) {
+
+                        @Override
+                        String getId() {
+                            return "'load keystore'";
+                        }
+
+                        @Override
+                        Key operateKeystore(char[] pass) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
+                            if (f == null) {
+                                ks.load(null, pass);
+                            } else {
+                                try (FileInputStream fis = new FileInputStream(f)) {
+                                    ks.load(fis, pass);
+                                }
+                            }
+                            return null;
+                        }
+                    });
         } catch (KeyStoreException | UnrecoverableKeyException ex) {
             throw unexpectedException(ex);
         }
@@ -327,7 +371,26 @@ public class SecurityUtil {
 
     public static void storeKeyStore(KeyStore ks, File f) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         try {
-            KeystorePasswordAttempter.INSTANCE.unlockKeystore(KeystorePasswordAttempter.UNLOCK_TYPE.storeKeyStore, null, ks, null, null, null,  f);
+            KeystorePasswordAttempter.INSTANCE.unlockKeystore(
+                    new KeystorePasswordAttempter.KeystoreOperation(ks, f) {
+
+                        @Override
+                        String getId() {
+                            return "'store keystore'";
+                        }
+
+                        @Override
+                        Key operateKeystore(char[] pass) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
+                            if (f == null) {
+                                ks.store(null, pass);
+                            } else {
+                                try (FileOutputStream fos = new FileOutputStream(f)) {
+                                    ks.store(fos, pass);
+                                }
+                            }
+                            return null;
+                        }
+                    });
         } catch (UnrecoverableKeyException ex) {
             throw unexpectedException(ex);
         }
@@ -335,118 +398,6 @@ public class SecurityUtil {
 
     private static RuntimeException unexpectedException(Exception ex) {
         return new RuntimeException("This usage of KeystorePasswordAttempter shopuld not throw this kind of exception", ex);
-    }
-
-    private static class KeystorePasswordAttempter {
-
-        private static enum UNLOCK_TYPE {
-
-            initKeyManagerFactory, setKeyEntry, getKey, loadKeyStore, storeKeyStore;
-        }
-
-        private static class SavedPassword {
-
-            private final char[] pass;
-
-            public SavedPassword(char[] pass) {
-                this.pass = pass;
-            }
-        }
-
-        private static final KeystorePasswordAttempter INSTANCE = new KeystorePasswordAttempter(getTrustedCertsPassword());
-        private final List<SavedPassword> passes;
-
-        private KeystorePasswordAttempter(char[]  
-            ... initialPasswords) {
-            passes = new ArrayList<>(initialPasswords.length);
-            for (char[] pass : initialPasswords) {
-                passes.add(new SavedPassword(pass));
-            }
-        }
-
-        private Key unlockKeystore(UNLOCK_TYPE type, KeyManagerFactory kmf, KeyStore ks, String alias, Key key, Certificate[] certChain, File f) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
-            Exception firstEx = null;
-            String messages = "";
-            for (int i = 0; i < passes.size(); i++) {
-                SavedPassword pass = passes.get(i);
-                try {
-                    switch (type) {
-                        case initKeyManagerFactory:
-                            kmf.init(ks, pass.pass);
-                            return null;
-                        case setKeyEntry:
-                            ks.setKeyEntry(alias, key, pass.pass, certChain);
-                            return null;
-                        case getKey:
-                            return ks.getKey(alias, pass.pass);
-                        case loadKeyStore:
-                            if (f == null) {
-                                ks.load(null, pass.pass);
-                            } else {
-                                try (FileInputStream fis = new FileInputStream(f)) {
-                                    ks.load(fis, pass.pass);
-                                }
-                            }
-                            return null;
-                        case storeKeyStore:
-                            if (f == null) {
-                                ks.store(null, pass.pass);
-                            } else {
-                                try (FileOutputStream fos = new FileOutputStream(f)) {
-                                    ks.store(fos, pass.pass);
-                                }
-                            }
-                            return null;
-                        default:
-                            throw new IllegalArgumentException("Unknow attempt during unlocking keystore");
-                    }
-                } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | IOException | CertificateException ex) {
-                    if (firstEx == null) {
-                        firstEx = ex;
-                    }
-                    messages += "'" + ex.getMessage() + "' ";
-                    OutputController.getLogger().log(ex);
-                    //tried all known, ask for new or finally die
-                    if (i + 1 == passes.size()) {
-                        String s1 = "Got " + messages + " during keystore operation " + type.toString() + ". Attempt " + (i + 1);
-                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, s1);
-                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Invalid password?");
-                        if (JNLPRuntime.isHeadless()) {
-                            OutputController.getLogger().log("Headless mode currently dont support runtime-passwords");
-                            finish(firstEx);
-                        } else {
-                            String s = JOptionPane.showInputDialog(s1 + "\n" + "Type new password and press ok. Give up by pressing anything else.");
-                            if (s == null) {
-                                finish(firstEx);
-                            }
-                            passes.add(new SavedPassword(s.toCharArray()));
-
-                        }
-                        //user already read all messages, now sho only last one
-                        messages = "";
-                    }
-                }
-
-            }
-            return null;
-        }
-
-        private void finish(Exception ex) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
-            if (ex instanceof KeyStoreException) {
-                throw (KeyStoreException) ex;
-            } else if (ex instanceof NoSuchAlgorithmException) {
-                throw (NoSuchAlgorithmException) ex;
-            } else if (ex instanceof UnrecoverableKeyException) {
-                throw (UnrecoverableKeyException) ex;
-            } else if (ex instanceof IOException) {
-                throw (IOException) ex;
-            } else if (ex instanceof CertificateException) {
-                throw (CertificateException) ex;
-            } else {
-                throw new RuntimeException("Unexpected exception", ex);
-            }
-        }
-
     }
 
 }
