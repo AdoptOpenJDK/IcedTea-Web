@@ -73,56 +73,30 @@ public final class JNLPMatcher {
      *            the reader stream of the launching JNLP file
      * @param isTemplate
      *            a boolean that specifies if appTemplateFile is a template
+     * @param p settings of parser
      * @throws JNLPMatcherException
      *             if IOException, XMLParseException is thrown during parsing;
      *             Or launchJNLP/appTemplate is null
      */
-    public JNLPMatcher(Reader appTemplate, Reader launchJNLP,
-            boolean isTemplate) throws JNLPMatcherException {
+    public JNLPMatcher(InputStream appTemplate, InputStream launchJNLP,
+            boolean isTemplate, ParserSettings p) throws JNLPMatcherException {
 
         if (appTemplate == null && launchJNLP == null)
-            throw new JNLPMatcherException(
-                    "Template JNLP file and Launching JNLP file are both null.");
+            throw new JNLPMatcherException("Template JNLP file and Launching JNLP file are both null.");
         else if (appTemplate == null)
             throw new JNLPMatcherException("Template JNLP file is null.");
         else if (launchJNLP == null)
             throw new JNLPMatcherException("Launching JNLP file is null.");
-        
-        //Declare variables for signed JNLP file
-        ByteArrayOutputStream poutTemplate= null;
-      
-        //Declare variables for launching JNLP file 
-        ByteArrayOutputStream poutJNLPFile = null;
-        
-        try {
-            XMLElement appTemplateXML = new XMLElement();
-            XMLElement launchJNLPXML = new XMLElement();
-
-            // Remove the comments and CDATA from the JNLP file
-            poutTemplate = new ByteArrayOutputStream();
-            appTemplateXML.sanitizeInput(appTemplate, poutTemplate);
-
-            poutJNLPFile = new ByteArrayOutputStream();
-            launchJNLPXML.sanitizeInput(launchJNLP, poutJNLPFile);
-
-            // Parse both files
-            appTemplateXML.parseFromReader(new StringReader(poutTemplate.toString()));
-            launchJNLPXML.parseFromReader(new StringReader(poutJNLPFile.toString()));
-
-            // Initialize parent nodes
-            this.appTemplateNode = new Node(appTemplateXML);
-            this.launchJNLPNode = new Node(launchJNLPXML);
-            this.isTemplate = isTemplate;
-
-        } catch (Exception e) {
-            throw new JNLPMatcherException(
-                    "Failed to create an instance of JNLPVerify with specified InputStreamReader",
-                    e);
-        } finally {
-            // Close all stream
-            closeOutputStream(poutTemplate);
             
-            closeOutputStream(poutJNLPFile);
+        try {
+            this.appTemplateNode = Parser.getRootNode(appTemplate, p);
+            this.launchJNLPNode = Parser.getRootNode(launchJNLP, p);
+            this.isTemplate = isTemplate;
+        } catch (Exception e) {
+            throw new JNLPMatcherException("Failed to create an instance of JNLPVerify with specified InputStreamReader", e);
+        } finally {
+            closeInputStream(appTemplate);
+            closeInputStream(launchJNLP);
 
         }
     }
@@ -155,10 +129,8 @@ public final class JNLPMatcher {
             Node templateNode = appTemplate;
             Node launchNode = launchJNLP;
             // Store children of Node
-            List<Node> appTemplateChild = new LinkedList<Node>(Arrays.asList(templateNode
-                    .getChildNodes()));
-            List<Node> launchJNLPChild = new LinkedList<Node>(Arrays.asList(launchNode
-                    .getChildNodes()));
+            List<Node> appTemplateChild = new LinkedList<>(Arrays.asList(templateNode.getChildNodes()));
+            List<Node> launchJNLPChild = new LinkedList<>(Arrays.asList(launchNode.getChildNodes()));
 
             // Compare only if both Nodes have the same name, else return false
             if (templateNode.getNodeName().equals(launchNode.getNodeName())) {
@@ -170,12 +142,10 @@ public final class JNLPMatcher {
 
                     for (int i = 0; i < childLength;) {
                         for (int j = 0; j < childLength; j++) {
-                            boolean isSame = matchNodes(appTemplateChild.get(i),
-                                    launchJNLPChild.get(j));
-
-                            if (!isSame && j == childLength - 1)
+                            boolean isSame = matchNodes(appTemplateChild.get(i), launchJNLPChild.get(j));
+                            if (!isSame && j == childLength - 1) {
                                 return false;
-                            else if (isSame) { // If both child matches, remove them from the list of children
+                            } else if (isSame) { // If both child matches, remove them from the list of children
                                 appTemplateChild.remove(i);
                                 launchJNLPChild.remove(j);
                                 --childLength;
@@ -187,11 +157,13 @@ public final class JNLPMatcher {
                     if (!templateNode.getNodeValue().equals(launchNode.getNodeValue())) {
 
                         // If it's a template and the template's value is NOT '*'
-                        if (isTemplate && !templateNode.getNodeValue().equals("*"))
+                        if (isTemplate && !templateNode.getNodeValue().equals("*")) {
                             return false;
+                        }
                         // Else if it's not a template, then return false
-                        else if (!isTemplate)
+                        else if (!isTemplate) {
                             return false;
+                        }
                     }
                     // Compare attributes of both Nodes
                     return matchAttributes(templateNode, launchNode);
@@ -233,15 +205,15 @@ public final class JNLPMatcher {
                         boolean isSame = templateNode.getAttribute(attribute).equals( // Check if the Attribute values match
                                 launchNode.getAttribute(attribute));
 
-                        if (!isTemplate && !isSame)
+                        if (!isTemplate && !isSame) {
                             return false;
-                        else if (isTemplate && !isSame
-                                && !templateNode.getAttribute(attribute).equals("*"))
+                        } else if (isTemplate && !isSame && !templateNode.getAttribute(attribute).equals("*")) {
                             return false;
-
-                    } else
+                        }
+                    } else {
                         // If attributes names do not match, return false
                         return false;
+                    }
                 }
                 return true;
             }

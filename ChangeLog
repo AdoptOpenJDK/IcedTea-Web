@@ -1,5 +1,17 @@
 2015-04-15  Jiri Vanek  <jvanek@redhat.com>
 
+	jnlp-signing mechanism now uses general parser (and so also tagsoup if enabled)
+	* netx/net/sourceforge/jnlp/JNLPMatcher.java: removed redundant code to laod xmls
+	and used Parser.getRootNode rather. Added same brackets to if statements. Added
+	parameter of ParserSettings to 
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: same.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTest.java: refactored to
+	autoclseable and to never use tagsoup.
+	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTestMallformedAllowed.java:
+	new file, copy of JNLPMatcherTest. But always using tagsoup (if available)
+
+2015-04-15  Jiri Vanek  <jvanek@redhat.com>
+
 	KeystorePasswordAttempter moved to outer class. Added comments and prevention
 	about possible null password writing to keystore.  KeystorePasswordAttempter
 	made much more object-like.

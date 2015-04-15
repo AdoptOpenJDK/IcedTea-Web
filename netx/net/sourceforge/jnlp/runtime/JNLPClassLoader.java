@@ -18,11 +18,10 @@ package net.sourceforge.jnlp.runtime;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.SocketPermission;
 import java.net.URL;
@@ -967,12 +966,6 @@ public class JNLPClassLoader extends URLClassLoader {
         List<JARDesc> desc = new ArrayList<>();
         desc.add(jarDesc);
 
-        // Initialize streams
-        InputStream inStream = null;
-        InputStreamReader inputReader = null;
-        FileReader fr = null;
-        InputStreamReader jnlpReader = null;
-
         try {
             // NOTE: verification should have happened by now. In other words,
             // calling jcv.verifyJars(desc, tracker) here should have no affect.
@@ -982,41 +975,27 @@ public class JNLPClassLoader extends URLClassLoader {
                     String jeName = je.getName().toUpperCase();
 
                     if (jeName.equals(TEMPLATE) || jeName.equals(APPLICATION)) {
-
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Creating Jar InputStream from JarEntry");
-
-                        inStream = jarFile.getInputStream(je);
-                        inputReader = new InputStreamReader(inStream);
-
+                        InputStream inStream = jarFile.getInputStream(je);
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Creating File InputStream from lauching JNLP file");
-
                         JNLPFile jnlp = this.getJNLPFile();
-                        URL url = jnlp.getFileLocation();
-                        File jn = null;
-
+                        File jn;
                         // If the file is on the local file system, use original path, otherwise find cached file
-                        if (url.getProtocol().toLowerCase().equals("file"))
-                            jn = new File(url.getPath());
-                        else
-                            jn = CacheUtil.getCacheFile(url, null);
-
-                        fr = new FileReader(jn);
-                        jnlpReader = fr;
-
-                        // Initialize JNLPMatcher class
-                        JNLPMatcher matcher;
-
-                        if (jeName.equals(APPLICATION)) { // If signed application was found
-                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "APPLICATION.JNLP has been located within signed JAR. Starting verfication...");
-                           
-                            matcher = new JNLPMatcher(inputReader, jnlpReader, false);
-                        } else { // Otherwise template was found
-                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verfication...");
-                            
-                            matcher = new JNLPMatcher(inputReader, jnlpReader,
-                                    true);
+                        if (jnlp.getFileLocation().getProtocol().toLowerCase().equals("file")) {
+                            jn = new File(jnlp.getFileLocation().getPath());
+                        } else {
+                            jn = CacheUtil.getCacheFile(jnlp.getFileLocation(), null);
                         }
 
+                        InputStream jnlpStream = new FileInputStream(jn);
+                        JNLPMatcher matcher;
+                        if (jeName.equals(APPLICATION)) { // If signed application was found
+                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "APPLICATION.JNLP has been located within signed JAR. Starting verfication...");
+                            matcher = new JNLPMatcher(inStream, jnlpStream, false, jnlp.getParserSettings());
+                        } else { // Otherwise template was found
+                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verfication...");
+                            matcher = new JNLPMatcher(inStream, jnlpStream, true, jnlp.getParserSettings());
+                        }
                         // If signed JNLP file does not matches launching JNLP file, throw JNLPMatcherException
                         if (!matcher.isMatch())
                             throw new JNLPMatcherException("Signed Application did not match launching JNLP File");
@@ -1054,15 +1033,7 @@ public class JNLPClassLoader extends URLClassLoader {
              * skip the check for a signed JNLP file
              */
             
-        } finally {
-
-            //Close all streams
-            StreamUtils.closeSilently(inStream);
-            StreamUtils.closeSilently(inputReader);
-            StreamUtils.closeSilently(fr);
-            StreamUtils.closeSilently(jnlpReader);
         }
-
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Ending check for signed JNLP file...");
     }
 

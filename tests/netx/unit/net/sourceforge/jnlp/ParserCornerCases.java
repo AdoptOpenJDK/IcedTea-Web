@@ -39,6 +39,7 @@ package net.sourceforge.jnlp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import net.sourceforge.jnlp.annotations.KnownToFail;
 
@@ -207,5 +208,30 @@ public class ParserCornerCases {
         Parser p = new Parser(null, null, root, defaultParser);
         //defaultis used
         Assert.assertEquals("1.0+", p.getSpecVersion().toString());
+    }
+    
+    @Test
+    public void testCommentInElements3_malformedOff() throws JNLPMatcherException, IOException, ParseException {
+        //heving comment inside element declaration is invalid but internal parser can handle it
+         try (InputStream fileStream = ClassLoader.getSystemClassLoader()
+                 .getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
+             Node root = Parser.getRootNode(fileStream, new ParserSettings(false, true, false));
+             String a = root.getChildNodes()[2].getAttribute("main-class");
+             Assert.assertEquals("*", a);
+
+        }
+    }
+    
+      @Test
+      @KnownToFail
+    public void testCommentInElements3_malformedOn() throws JNLPMatcherException, IOException, ParseException {
+        //heving comment inside element declaration is invalid anyway, so tagsoup can be excused for failing in this case
+         try (InputStream fileStream = ClassLoader.getSystemClassLoader()
+                 .getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
+             Node root = Parser.getRootNode(fileStream, new ParserSettings(false, true, true));
+             String a = root.getChildNodes()[2].getAttribute("main-class");
+             Assert.assertEquals("*", a);
+
+        }
     }
 }
