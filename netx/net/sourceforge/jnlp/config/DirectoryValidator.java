@@ -28,7 +28,7 @@ public class DirectoryValidator {
 
         /**
          * Wraps results so we can make some statistics or convert to message 
-         * @param results 
+         * @param results results to be checked
          */
         public DirectoryCheckResults(List<DirectoryCheckResult> results) {
             this.results = results;
@@ -136,6 +136,7 @@ public class DirectoryValidator {
         
         /**
          * count passes of this result (0-3, both inclusive).
+         * @return  how many times it passed
          */
         public int getPasses() {
             int subdirs = 0;
@@ -150,6 +151,7 @@ public class DirectoryValidator {
         
         /**
          * count failures of this result (0-3, both inclusive). 
+         * @return how many failures appeared
          */
         public int getFailures() {
             int max = 3;
@@ -200,7 +202,7 @@ public class DirectoryValidator {
     /**
      * Creates DirectoryValidator to ensure given directories
      * 
-     * @param dirsToCheck 
+     * @param dirsToCheck dirs to check 
      */
     public DirectoryValidator(List<File> dirsToCheck) {
         this.dirsToCheck = dirsToCheck;
@@ -220,7 +222,7 @@ public class DirectoryValidator {
      * </ul>
      */
     public DirectoryValidator() {
-        dirsToCheck = new ArrayList<File>(6);
+        dirsToCheck = new ArrayList<>(6);
         DeploymentConfiguration dc = JNLPRuntime.getConfiguration();
         String[] keys = new String[]{
             DeploymentConfiguration.KEY_USER_CACHE_DIR,
@@ -257,13 +259,14 @@ public class DirectoryValidator {
      * (both gui and headless) should not stop to work, but continue to run with
      * hope that corrupted dirs will not be necessary
      * </p>
+     * @return  result of directory checks
      */
     public DirectoryCheckResults ensureDirs() {
         return ensureDirs(dirsToCheck);
     }
 
     static DirectoryCheckResults ensureDirs(List<File> dirs) {
-        List<DirectoryCheckResult> result = new ArrayList<DirectoryCheckResult>(dirs.size());
+        List<DirectoryCheckResult> result = new ArrayList<>(dirs.size());
         for (File f : dirs) {
             if (f.exists()) {
                 DirectoryCheckResult r = testDir(f, true, true);

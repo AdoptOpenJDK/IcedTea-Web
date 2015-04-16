@@ -31,6 +31,7 @@ public interface LaunchHandler {
      * Called when the application could not be launched due to a
      * fatal error, such as the inability to find the main class or
      * non-parseable XML.
+     * @param exception to be re-thrown as launch error
      */
     public void launchError(LaunchException exception);
 
@@ -40,6 +41,7 @@ public interface LaunchHandler {
      * is not strictly correct yet does not necessarily prohibit the
      * system from attempting to launch the application.
      *
+     * @param warning exception to be consummed as warning
      * @return true if the launch should continue, false to abort
      */
     public boolean launchWarning(LaunchException warning);
@@ -48,6 +50,7 @@ public interface LaunchHandler {
      * Called when a security validation error occurs while
      * launching the application.
      *
+     * @param error to be rethrown as launch error
      * @return true to allow the application to continue, false to stop it.
      */
     public boolean validationError(LaunchException error);

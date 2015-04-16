@@ -55,7 +55,6 @@ import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
 import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
 import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
 import net.sourceforge.jnlp.security.dialogs.CertsInfoPane;
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.MatchingALACAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MissingALACAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MissingPermissionsAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MoreInfoPane;
@@ -63,7 +62,6 @@ import net.sourceforge.jnlp.security.dialogs.PasswordAuthenticationPane;
 import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.security.dialogs.SingleCertInfoPane;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningDialog;
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -362,7 +360,7 @@ public class SecurityDialog extends JDialog {
         super.dispose();
     }
 
-    private final List<ActionListener> listeners = new CopyOnWriteArrayList<ActionListener>();
+    private final List<ActionListener> listeners = new CopyOnWriteArrayList<>();
 
     /**
      * Notify all the listeners that the user has made a decision using this
@@ -378,6 +376,7 @@ public class SecurityDialog extends JDialog {
      * Adds an {@link ActionListener} which will be notified if the user makes a
      * choice using this SecurityDialog. The listener should use {@link #getValue()}
      * to actually get the user's response.
+     * @param listener another action listener to be listen to
      */
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);

@@ -91,8 +91,8 @@ public class CacheUtil {
     /**
      * This is returning File object of cached resource originally from URL
      * @param location original location of blob
-     * @param version
-     * @param policy
+     * @param version version of resource
+     * @param policy update policy of resource
      * @return location in ITW cache on filesystem 
      */
     public static File  getCachedResourceFile(URL location, Version version, UpdatePolicy policy) {
@@ -210,7 +210,7 @@ public class CacheUtil {
      *
      * @param source the source {@link URL}
      * @param version the versions to check for
-     * @param lastModifed
+     * @param lastModifed time in milis since epoch of last modfication
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
@@ -265,12 +265,12 @@ public class CacheUtil {
         if (source == null)
             return false;
 
-        if (source.getProtocol().equals("file"))
+        if (source.getProtocol().equals("file")){
             return false;
-
-        if (source.getProtocol().equals("jar"))
+        }
+        if (source.getProtocol().equals("jar")){
             return false;
-
+        }
         return true;
     }
 
@@ -350,10 +350,11 @@ public class CacheUtil {
     /**
      * Returns the parent directory of the cached resource.
      * @param filePath The path of the cached resource directory.
+     * @return parent dir of cache
      */
     public static String getCacheParentDirectory(String filePath) {
         String path = filePath;
-        String tempPath = "";
+        String tempPath;
         String cacheDir = CacheLRUWrapper.getInstance().getCacheDir().getFullPath();
 
         while(path.startsWith(cacheDir) && !path.equals(cacheDir)){
@@ -416,7 +417,8 @@ public class CacheUtil {
      *
      * @param source the remote location
      * @param version the file version to write to
-     * @return the stream towrite to resource
+     * @return the stream to write to resource
+     * @throws java.io.IOException if IO breaks
      */
     public static OutputStream getOutputStream(URL source, Version version) throws IOException {
         File localFile = getCacheFile(source, version);

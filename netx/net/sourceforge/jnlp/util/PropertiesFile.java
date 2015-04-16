@@ -67,9 +67,10 @@ public class PropertiesFile extends Properties {
     }
 
     /**
-     * Returns the value of the specified key, or null if the key
+     * @return the value of the specified key, or null if the key
      * does not exist.
      */
+    @Override
     public String getProperty(String key) {
         if (lastStore == 0)
             load();
@@ -78,9 +79,10 @@ public class PropertiesFile extends Properties {
     }
 
     /**
-     * Returns the value of the specified key, or the default value
+     * @return the value of the specified key, or the default value
      * if the key does not exist.
      */
+    @Override
     public String getProperty(String key, String defaultValue) {
         if (lastStore == 0)
             load();
@@ -93,6 +95,7 @@ public class PropertiesFile extends Properties {
      *
      * @return the previous value
      */
+    @Override
     public Object setProperty(String key, String value) {
         if (lastStore == 0)
             load();
@@ -101,7 +104,7 @@ public class PropertiesFile extends Properties {
     }
 
     /**
-     * Returns the file backing this properties object.
+     * @return the file backing this properties object.
      */
     public File getStoreFile() {
         return lockedFile.getFile();

@@ -176,6 +176,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
 
     /**
      * {@inheritDoc}
+     * @return list of proxies on URI
      */
     @Override
     public List<Proxy> select(URI uri) {
@@ -187,7 +188,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             return proxies;
         }
 
-        List<Proxy> proxies = new ArrayList<Proxy>();
+        List<Proxy> proxies = new ArrayList<>();
 
         switch (proxyType) {
             case PROXY_TYPE_MANUAL:
@@ -219,26 +220,23 @@ public abstract class JNLPProxySelector extends ProxySelector {
         try {
             String scheme = uri.getScheme();
             /* scheme can be http/https/ftp/socket */
-
-            if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ftp")) {
-                URL url = uri.toURL();
-                if (bypassLocal && isLocalHost(url.getHost())) {
+            switch (scheme) {
+                case "http":
+                case "https":
+                case "ftp":
+                    URL url = uri.toURL();
+                    if (bypassLocal && isLocalHost(url.getHost())) {
+                        return true;
+                    }   if (bypassList.contains(url.getHost())) {
                     return true;
-                }
-
-                if (bypassList.contains(url.getHost())) {
+                }   break;
+                case "socket":
+                    String host = uri.getHost();
+                    if (bypassLocal && isLocalHost(host)) {
+                        return true;
+                    }   if (bypassList.contains(host)) {
                     return true;
-                }
-            } else if (scheme.equals("socket")) {
-                String host = uri.getHost();
-
-                if (bypassLocal && isLocalHost(host)) {
-                    return true;
-                }
-
-                if (bypassList.contains(host)) {
-                    return true;
-                }
+                }   break;
             }
         } catch (MalformedURLException e) {
             return false;
@@ -248,8 +246,9 @@ public abstract class JNLPProxySelector extends ProxySelector {
     }
 
     /**
-     * Returns true if the host is the hostname or the IP address of the
+     * @return true if the host is the hostname or the IP address of the
      * localhost
+     * @param  host host to verify
      */
     private boolean isLocalHost(String host) {
 
@@ -284,7 +283,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * Returns a list of proxies by using the information in the deployment
      * configuration
      *
-     * @param uri
+     * @param uri uri to read
      * @return a List of Proxy objects
      */
     private List<Proxy> getFromConfiguration(URI uri) {
@@ -298,6 +297,17 @@ public abstract class JNLPProxySelector extends ProxySelector {
     /**
      * Returns a list of proxies by using the arguments
      *
+     * @param uri name and code says it all
+     * @param sameProxy name and code says it all
+     * @param sameProxyIncludesSocket name and code says it all
+     * @param proxyHttpsHost name and code says it all
+     * @param proxyHttpsPort name and code says it all
+     * @param proxyHttpHost name and code says it all
+     * @param proxyHttpPort name and code says it all
+     * @param proxyFtpHost name and code says it all
+     * @param proxyFtpPort name and code says it all
+     * @param proxySocks4Host name and code says it all
+     * @param proxySocks4Port name and code says it all
      * @return a List of Proxy objects
      */
     protected static List<Proxy> getFromArguments(URI uri,
@@ -307,7 +317,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             String proxyFtpHost, int proxyFtpPort,
             String proxySocks4Host, int proxySocks4Port) {
 
-        List<Proxy> proxies = new ArrayList<Proxy>();
+        List<Proxy> proxies = new ArrayList<>();
 
         String scheme = uri.getScheme();
 
@@ -342,7 +352,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             socksProxyAdded = true;
         }
 
-        if (proxies.size() == 0) {
+        if (proxies.isEmpty()) {
             proxies.add(Proxy.NO_PROXY);
         }
 
@@ -354,6 +364,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * http://en.wikipedia.org/wiki/Proxy_auto-config#The_PAC_file for more
      * information.
      *
+     * @param uri uri to PAC
      * @return a List of valid Proxy objects
      */
     protected List<Proxy> getFromPAC(URI uri) {
@@ -361,7 +372,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
         }
 
-        List<Proxy> proxies = new ArrayList<Proxy>();
+        List<Proxy> proxies = new ArrayList<>();
 
         try {
             String proxiesString = pacEvaluator.getProxies(uri.toURL());
@@ -391,7 +402,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * case of malformed input, an empty list may be returned
      */
     public static List<Proxy> getProxiesFromPacResult(String pacString) {
-        List<Proxy> proxies = new ArrayList<Proxy>();
+        List<Proxy> proxies = new ArrayList<>();
 
         String[] tokens = pacString.split(";");
         for (String token: tokens) {

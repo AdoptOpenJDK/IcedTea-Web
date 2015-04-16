@@ -22,7 +22,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -34,22 +33,22 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 public class ExtensionDesc {
 
     /** the extension name */
-    private String name;
+    private final String name;
 
     /** the required extension version */
-    private Version version;
+    private final Version version;
 
     /** the location of the extension JNLP file */
-    private URL location;
+    private final URL location;
 
     /** the JNLPFile the extension refers to */
     private JNLPFile file;
 
     /** map from ext-part to local part */
-    private Map<String, String> extToPart = new HashMap<String, String>();
+    private final Map<String, String> extToPart = new HashMap<>();
 
     /** eager ext parts */
-    private List<String> eagerExtParts = new ArrayList<String>();
+    private final List<String> eagerExtParts = new ArrayList<>();
 
     /**
      * Create an extention descriptor.
@@ -82,7 +81,8 @@ public class ExtensionDesc {
     }
 
     /**
-     * Returns the parts in the extension JNLP file mapped to the
+     * @param thisPart unimplemented
+     * @return the parts in the extension JNLP file mapped to the
      * part of the main file.
      */
     public String[] getExtensionParts(String thisPart) {
@@ -91,21 +91,21 @@ public class ExtensionDesc {
     }
 
     /**
-     * Returns the name of the extension.
+     * @return the name of the extension.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns the required version of the extension JNLP file.
+     * @return the required version of the extension JNLP file.
      */
     public Version getVersion() {
         return version;
     }
 
     /**
-     * Returns the location of the extension JNLP file.
+     * @return the location of the extension JNLP file.
      */
     public URL getLocation() {
         return location;
@@ -133,7 +133,7 @@ public class ExtensionDesc {
     }
 
     /**
-     * Returns a JNLPFile for the extension, or null if the JNLP
+     * @return a JNLPFile for the extension, or null if the JNLP
      * file has not been resolved.
      */
     public JNLPFile getJNLPFile() {

@@ -63,7 +63,7 @@ import net.sourceforge.jnlp.util.TimedHashMap;
 
 public class PluginProxySelector extends JNLPProxySelector {
 
-    private TimedHashMap<String, Proxy> proxyCache = new TimedHashMap<>();
+    private final TimedHashMap<String, Proxy> proxyCache = new TimedHashMap<>();
 
     public PluginProxySelector(DeploymentConfiguration config) {
         super(config);
@@ -78,7 +78,7 @@ public class PluginProxySelector extends JNLPProxySelector {
     @Override
     protected List<Proxy> getFromBrowser(URI uri) {
 
-        List<Proxy> proxyList = new ArrayList<Proxy>();
+        List<Proxy> proxyList = new ArrayList<>();
 
         // check cache first
         Proxy cachedProxy = checkCache(uri);
@@ -133,7 +133,10 @@ public class PluginProxySelector extends JNLPProxySelector {
         return proxyList;
     }
 
-    /** For tests to override */
+    /** For tests to override.
+     * @param uri of proxy
+     * @return information about proxy
+     */
     protected Object getProxyFromRemoteCallToBrowser(String uri) {
         return PluginAppletViewer.requestPluginProxyInfo(uri);
     }

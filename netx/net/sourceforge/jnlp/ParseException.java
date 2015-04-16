@@ -16,8 +16,6 @@
 
 package net.sourceforge.jnlp;
 
-import java.io.*;
-
 /**
  * Thrown to indicate that an error has occurred while parsing a
  * JNLP file.
@@ -33,6 +31,7 @@ public class ParseException extends Exception {
    
     /**
      * Create a parse exception with the specified message.
+     * @param message to be shown in exception
      */
     public ParseException(String message) {
         super(message);
@@ -41,6 +40,8 @@ public class ParseException extends Exception {
     /**
      * Create a parse exception with the specified message and
      * cause.
+     * @param message to be used by exception
+     * @param cause cause of exception
      */
     public ParseException(String message, Throwable cause) {
         super(message, cause);

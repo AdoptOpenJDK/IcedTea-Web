@@ -68,6 +68,8 @@ public class SecurityUtil {
      *
      * This is a simple (and hence 'wrong') version. See
      * http://www.ietf.org/rfc/rfc2253.txt for all the gory details.
+     * @param principal string, CN to be extracted from
+     * @return extracted CN
      */
     public static String getCN(String principal) {
 
@@ -167,6 +169,7 @@ public class SecurityUtil {
      * If it does not exist, it tries to create an empty keystore.
      * @return true if the trusted.certs file exists or a new trusted.certs
      * was created successfully, otherwise false.
+     * @throws java.lang.Exception if check goes wrong
      */
     public static boolean checkTrustedCertsFile() throws Exception {
 
@@ -195,8 +198,9 @@ public class SecurityUtil {
     }
 
     /**
-     * Returns the keystore associated with the user's trusted.certs file,
+     * @return the keystore associated with the user's trusted.certs file,
      * or null otherwise.
+     * @throws java.lang.Exception if getting fails
      */
     public static KeyStore getUserKeyStore() throws Exception {
 
@@ -223,8 +227,9 @@ public class SecurityUtil {
     }
 
     /**
-     * Returns the keystore associated with the JDK cacerts file,
-         * or null otherwise.
+     * @return the keystore associated with the JDK cacerts file,
+     * or null otherwise.
+     * @throws java.lang.Exception if get fails
      */
     public static KeyStore getCacertsKeyStore() throws Exception {
 
@@ -250,8 +255,9 @@ public class SecurityUtil {
     }
 
     /**
-     * Returns the keystore associated with the system certs file,
+     * @return the keystore associated with the system certs file,
      * or null otherwise.
+     * @throws java.lang.Exception if get goes wrong
      */
     public static KeyStore getSystemCertStore() throws Exception {
 

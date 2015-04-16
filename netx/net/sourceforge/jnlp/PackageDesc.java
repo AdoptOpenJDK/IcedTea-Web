@@ -25,13 +25,13 @@ package net.sourceforge.jnlp;
 public class PackageDesc {
 
     /** the package name */
-    private String name;
+    private final String name;
 
     /** the part required by the package */
-    private String part;
+    private final String part;
 
     /** whether the package includes subpackages */
-    private boolean recursive;
+    private final boolean recursive;
 
     /**
      * Create a package descriptor.
@@ -47,9 +47,10 @@ public class PackageDesc {
     }
 
     /**
-     * Returns whether the specified class is part of this package.
+     * @return whether the specified class is part of this package.
      *
      * @param className the fully qualified class name
+
      */
     public boolean matches(String className) {
         // form 1: exact class
@@ -72,21 +73,21 @@ public class PackageDesc {
     }
 
     /**
-     * Returns the package name.
+     * @return the package name.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns the part name.
+     * @return the part name.
      */
     public String getPart() {
         return part;
     }
 
     /**
-     * Returns whether subpackages should be matched by this
+     * @return whether subpackages should be matched by this
      * package.
      */
     public boolean isRecursive() {

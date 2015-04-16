@@ -334,6 +334,7 @@ public class BasicValueValidators {
      * one), within the given range. The values are inclusive.
      * @param low the lowest valid value
      * @param high the highest valid value
+     * @return value validator for given range
      */
     public static ValueValidator getRangedIntegerValidator(int low, int high) {
         return new RangedIntegerValidator(low, high);
@@ -343,6 +344,7 @@ public class BasicValueValidators {
      * Returns a {@link ValueValidator} that checks if an object is a string from
      * one of the provided Strings.
      * @param validValues an array of Strings which are considered valid
+     * @return validator for given strings
      */
     public static ValueValidator getStringValidator(String[] validValues) {
         return new StringValueValidator(validValues);
@@ -355,13 +357,14 @@ public class BasicValueValidators {
      * @param singleValues an array of Strings which are considered valid only by themselves
      * @param comboValues an array of Strings which are considered valid in any combination
      *                    with themselves
+     * @return validator forgiven strings
      */
     public static ValueValidator getMultipleStringValidator(String[] singleValues, String[] comboValues) {
         return new MultipleStringValueValidator(singleValues, comboValues);
     }
 
     /**
-     * Returns a {@link ValueValidator} that checks if an object is a string
+     * @return a {@link ValueValidator} that checks if an object is a string
      * from the possible single or combination ManifestAttributeCheck values
      */
     public static ValueValidator getManifestAttributeCheckValidator() {

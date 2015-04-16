@@ -229,6 +229,8 @@ public class JNLPClassLoader extends URLClassLoader {
      * Create a new JNLPClassLoader from the specified file.
      *
      * @param file the JNLP file
+     * @param policy update policy of loader
+     * @throws net.sourceforge.jnlp.LaunchException if app can not be loaded
      */
     protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy) throws LaunchException {
         this(file, policy, null, false);
@@ -393,6 +395,9 @@ public class JNLPClassLoader extends URLClassLoader {
      * 
      * @param file the file to load classes for
      * @param policy the update policy to use when downloading resources
+     * @param enableCodeBase true if codebase can be searched (ok for applets,false for apps)
+     * @return  existing classloader. creates new if none reliable exists
+     * @throws net.sourceforge.jnlp.LaunchException  when launch is doomed
      */
     public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase) throws LaunchException {
         return getInstance(file, policy, null, enableCodeBase);
@@ -404,6 +409,9 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param file the file to load classes for
      * @param policy the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
+     * @param enableCodeBase ue if codebase can be searched (ok for applets,false for apps)
+     * @return  existing classloader. creates new if none reliable exists
+     * @throws net.sourceforge.jnlp.LaunchException  when launch is doomed
      */
     public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
         JNLPClassLoader loader;
@@ -447,9 +455,16 @@ public class JNLPClassLoader extends URLClassLoader {
      * location.
      *
      * @param location the file's location
+     * @param uniqueKey key to manage applets/applications in shared vm
      * @param version the file's version
+     * @param settings settings of parser
      * @param policy the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
+     * @param enableCodeBase whether to enable codebase search or not
+     * @return classlaoder of this appp
+     * @throws java.io.IOException when IO fails
+     * @throws net.sourceforge.jnlp.ParseException  when parsing fails
+     * @throws net.sourceforge.jnlp.LaunchException  when launch is doomed
      */
     public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version, ParserSettings settings, UpdatePolicy policy, String mainName, boolean enableCodeBase)
             throws IOException, ParseException, LaunchException {
@@ -794,6 +809,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * 
      * @param jars Jars that are checked to see if they contain the main class
      * @param  name attribute to be found
+     * @return value of attribute if found
      */
     public String checkForAttributeInJars(List<JARDesc> jars, Attributes.Name name) {
         if (jars.isEmpty()) {
@@ -905,6 +921,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Gets the name of the main method if specified in the manifest
      *
      * @param location The JAR location
+     * @param attribute name of the attribute to find
      * @return the attribute value, null if there isn't one of if there was an error
      */
     public String getManifestAttribute(URL location, Attributes.Name  attribute) {
@@ -933,7 +950,7 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Returns true if this loader has the main jar
+     * @return true if this loader has the main jar
      */
     public boolean hasMainJar() {
         return this.foundMainJar;
@@ -1085,6 +1102,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     /**
      * Sets the JNLP app this group is for; can only be called once.
+     * @param app application to be ser to this group
      */
     public void setApplication(ApplicationInstance app) {
         if (this.app != null) {
@@ -1096,14 +1114,14 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Returns the JNLP app for this classloader
+     * @return the JNLP app for this classloader
      */
     public ApplicationInstance getApplication() {
         return app;
     }
 
     /**
-     * Returns the JNLP file the classloader was created from.
+     * @return the JNLP file the classloader was created from.
      */
     public JNLPFile getJNLPFile() {
         return file;
@@ -1188,6 +1206,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Adds to the specified list of JARS any other JARs that need
      * to be loaded at the same time as the JARs specified (ie, are
      * in the same part).
+     * @param jars jar archives to be added
      */
     protected void fillInPartJars(List<JARDesc> jars) {
         for (JARDesc desc : jars) {
@@ -1367,6 +1386,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
     /**
      * Try to find the library path from another peer classloader.
+     * @param lib library to be found
+     * @return location of library
      */
     protected String findLibraryExt(String lib) {
         for (JNLPClassLoader loader : loaders) {
@@ -1402,6 +1423,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
     /**
      * Find the loaded class in this loader or any of its extension loaders.
+     * @param name name of class
+     * @return the class found by name
      */
     protected Class<?> findLoadedClassAll(String name) {
         for (JNLPClassLoader loader : loaders) {
@@ -1863,6 +1886,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     // this part compatibility with previous classloader
     /**
+     * @return title if available.  Substitutions if not.
      * @deprecated
      */
     @Deprecated
@@ -1880,6 +1904,7 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
+     * @return  location if jnlp
      * @deprecated
      */
     @Deprecated

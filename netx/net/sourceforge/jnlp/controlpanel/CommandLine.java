@@ -76,6 +76,7 @@ public class CommandLine {
 
     /**
      * Creates a new instance
+     * @param optionParser used to parse applications arguments
      */
     public CommandLine(OptionParser optionParser) {
         this.optionParser = optionParser;
@@ -491,6 +492,7 @@ public class CommandLine {
     /**
      * The starting point of the program
      * @param args the command line arguments to this program
+     * @throws java.lang.Exception when it goes wrong
      */
     public static void main(String[] args) throws Exception {
         try {

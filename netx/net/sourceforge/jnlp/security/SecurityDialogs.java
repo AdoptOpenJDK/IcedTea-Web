@@ -155,6 +155,9 @@ public class SecurityDialogs {
     
     /**
      * unlike showAccessWarningDialogB this is returning raw int code
+     * @param accessType type of dialogue
+     * @param file file for which thsi dialogue is built for
+     * @return return from dialogue
      */
      public static int showAccessWarningDialogI(AccessType accessType, JNLPFile file) {
         Object o = showAccessWarningDialog(accessType, file, null);
@@ -197,6 +200,10 @@ public class SecurityDialogs {
                  
     /**
      * unlike showAccessWarningDialogB this is returning raw int code
+     * @param accessType type of dialogue
+     * @param file file for which thsi dialogue is built for
+     * @param extras aditional parameters to dialogue
+     * @return return from dialogue
      */
     public static Object showAccessWarningDialog(final AccessType accessType,
             final JNLPFile file, final Object[] extras) {
@@ -399,7 +406,7 @@ public class SecurityDialogs {
         // result 0 = Yes, 1 = No, 2 = Cancel
         if (selectedValue instanceof Integer) {
             // If the selected value can be cast to Integer, use that value
-            return ((Integer) selectedValue).intValue();
+            return ((Integer) selectedValue);
         } else {
             // Otherwise default to "cancel"
             return 2;
@@ -508,7 +515,7 @@ public class SecurityDialogs {
         boolean isInteger = ref instanceof Integer;
         if (isInteger) {
             Integer i = (Integer) ref;
-            return i.intValue() == 0;
+            return i == 0;
         }
         return false;
     }

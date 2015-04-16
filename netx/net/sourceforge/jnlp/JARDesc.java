@@ -70,21 +70,21 @@ public class JARDesc {
     }
 
     /**
-     * Returns the URL of the JAR file.
+     * @return the URL of the JAR file.
      */
     public URL getLocation() {
         return location;
     }
 
     /**
-     * Returns the required version of the JAR file.
+     * @return the required version of the JAR file.
      */
     public Version getVersion() {
         return version;
     }
 
     /**
-     * Returns the part name, or null if not specified in the JNLP
+     * @return the part name, or null if not specified in the JNLP
      * file.
      */
     public String getPart() {
@@ -92,7 +92,7 @@ public class JARDesc {
     }
 
     /**
-     * Returns true if the JAR file contains native code
+     * @return true if the JAR file contains native code
      * libraries.
      */
     public boolean isNative() {
@@ -103,7 +103,7 @@ public class JARDesc {
     // where !lazy would no longer imply eager.
 
     /**
-     * Returns true if the JAR file should be downloaded before
+     * @return true if the JAR file should be downloaded before
      * starting the application.
      */
     public boolean isEager() {
@@ -111,14 +111,14 @@ public class JARDesc {
     }
 
     /**
-     * Returns true if the JAR file should be downloaded on demand.
+     * @return true if the JAR file should be downloaded on demand.
      */
     public boolean isLazy() {
         return lazy;
     }
 
     /**
-     * Returns true if the JNLP file defined this JAR as containing
+     * @return true if the JNLP file defined this JAR as containing
      * the main class.  If no JARs were defined as the main JAR then
      * the first JAR should be used to locate the main class.
      *

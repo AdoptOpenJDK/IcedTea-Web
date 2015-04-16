@@ -148,8 +148,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
     private int identifier;
 
     // Instance identifier -> PluginAppletViewer object.
-    private static ConcurrentMap<Integer, PluginAppletViewer> applets =
-            new ConcurrentHashMap<Integer, PluginAppletViewer>();
+    private static final ConcurrentMap<Integer, PluginAppletViewer> applets =
+            new ConcurrentHashMap<>();
     private static final ReentrantLock appletsLock = new ReentrantLock();
     // CONDITION PREDICATE: !applets.containsKey(identifier)
     private static final Condition appletAdded = appletsLock.newCondition();
@@ -158,8 +158,8 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     private static PluginCallRequestFactory requestFactory;
 
-    private static ConcurrentMap<Integer, PAV_INIT_STATUS> status =
-            new ConcurrentHashMap<Integer, PAV_INIT_STATUS>();
+    private static final ConcurrentMap<Integer, PAV_INIT_STATUS> status =
+            new ConcurrentHashMap<>();
     private static final ReentrantLock statusLock = new ReentrantLock();
     // CONDITION PREDICATE: !status.get(identifier).equals(PAV_INIT_STATUS.INIT_COMPLETE)
     private static final Condition initComplete = statusLock.newCondition();
@@ -220,9 +220,12 @@ public class PluginAppletViewer extends XEmbeddedFrame
         }
 
         appletsLock.lock();
-        applets.put(identifier, appletFrame);
-        appletAdded.signalAll();
-        appletsLock.unlock();
+        try {
+            applets.put(identifier, appletFrame);
+            appletAdded.signalAll();
+        } finally {
+            appletsLock.unlock();
+        }
 
         PluginDebug.debug(panel, " framed");
         return appletFrame;
@@ -362,8 +365,11 @@ public class PluginAppletViewer extends XEmbeddedFrame
             AppletPanel src = (AppletPanel) evt.getSource();
 
             panelLock.lock();
-            panelLive.signalAll();
-            panelLock.unlock();
+            try {
+                panelLive.signalAll();
+            } finally {
+                panelLock.unlock();
+            }
             switch (evt.getID()) {
                 case AppletPanel.APPLET_RESIZE: {
                     if (src != null) {
@@ -523,6 +529,9 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     /**
      * Handle an incoming message from the plugin.
+     * @param identifier id of plugin
+     * @param reference reference id of message
+     * @param message text itself
      */
     public static void handleMessage(int identifier, int reference, String message) {
 
@@ -600,12 +609,14 @@ public class PluginAppletViewer extends XEmbeddedFrame
             }
         }
 
-        // Else set to given status
 
         statusLock.lock();
-        status.put(identifier, newStatus);
-        initComplete.signalAll();
-        statusLock.unlock();
+        try {
+            status.put(identifier, newStatus);
+            initComplete.signalAll();
+        } finally {
+            statusLock.unlock();
+        }
 
         return prev;
     }
@@ -783,7 +794,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
      * Methods for java.applet.AppletContext
      */
 
-    private static Map<URL, AudioClip> audioClips = new HashMap<URL, AudioClip>();
+    final private static Map<URL, AudioClip> audioClips = new HashMap<>();
 
     /**
      * Get an audio clip.
@@ -800,7 +811,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         }
     }
 
-    private static Map<URL, AppletImageRef> imageRefs = new HashMap<URL, AppletImageRef>();
+    final private static Map<URL, AppletImageRef> imageRefs = new HashMap<>();
 
     /**
      * Get an image.
@@ -867,7 +878,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
         imageRefs.clear();
     }
 
-    private static Vector<NetxPanel> appletPanels = new Vector<NetxPanel>();
+    final private static Vector<NetxPanel> appletPanels = new Vector<>();
 
     /**
      * Get an applet by name.
@@ -1371,7 +1382,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     /**
      * System parameters.
      */
-    static Map<String, String> systemParam = new HashMap<String, String>();
+    private final static Map<String, String> systemParam = new HashMap<>();
 
     static {
         systemParam.put("codebase", "codebase");
@@ -1538,6 +1549,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
 
     /**
      * How many applets are running?
+     * @return number of applets run in this JVM
      */
 
     public static int countApplets() {

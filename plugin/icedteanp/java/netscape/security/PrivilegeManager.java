@@ -58,7 +58,7 @@ public class PrivilegeManager {
     /**
      * Stub for enablePrivilege. Not used by IcedTea-Web, kept for compatibility
      * 
-     * @param privilege
+     * @param privilege  privilege to eb enabled
      */
     public static void  enablePrivilege(String privilege) {
         PluginDebug.debug("netscape.security.enablePrivilege stub called");
@@ -67,7 +67,7 @@ public class PrivilegeManager {
     /**
      * Stub for disablePrivilege. Not used by IcedTea-Web, kept for compatibility
      * 
-     * @param privilege
+     * @param privilege privilege to be disabled
      */
     public static void  disablePrivilege(String privilege) {
         PluginDebug.debug("netscape.security.disablePrivilege stub called");

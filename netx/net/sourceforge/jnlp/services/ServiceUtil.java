@@ -55,7 +55,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 public class ServiceUtil {
 
     /**
-     * Returns the BasicService reference, or null if the service is
+     * @return the BasicService reference, or null if the service is
      * unavailable.
      */
     public static BasicService getBasicService() {
@@ -63,7 +63,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns the ClipboardService reference, or null if the service is
+     * @return the ClipboardService reference, or null if the service is
      * unavailable.
      */
     public static ClipboardService getClipboardService() {
@@ -71,7 +71,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns the DownloadService reference, or null if the service is
+     * @return the DownloadService reference, or null if the service is
      * unavailable.
      */
     public static DownloadService getDownloadService() {
@@ -79,7 +79,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns the ExtensionInstallerService reference, or null if the service is
+     * @return the ExtensionInstallerService reference, or null if the service is
      * unavailable.
      */
     public static ExtensionInstallerService getExtensionInstallerService() {
@@ -87,7 +87,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns the FileOpenService reference, or null if the service is
+     * @return the FileOpenService reference, or null if the service is
      * unavailable.
      */
     public static FileOpenService getFileOpenService() {
@@ -95,7 +95,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns the FileSaveService reference, or null if the service is
+     * @return the FileSaveService reference, or null if the service is
      * unavailable.
      */
     public static FileSaveService getFileSaveService() {
@@ -103,7 +103,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns the PersistenceService reference, or null if the service is
+     * @return the PersistenceService reference, or null if the service is
      * unavailable.
      */
     public static PersistenceService getPersistenceService() {
@@ -111,7 +111,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns the PrintService reference, or null if the service is
+     * @return the PrintService reference, or null if the service is
      * unavailable.
      */
     public static PrintService getPrintService() {
@@ -119,7 +119,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Returns the SingleInstanceService reference, or null if the service is
+     * @return the SingleInstanceService reference, or null if the service is
      * unavailable.
      */
     public static SingleInstanceService getSingleInstanceService() {
@@ -176,8 +176,8 @@ public class ServiceUtil {
             if (JNLPRuntime.isDebug()) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "call privileged method: " + method.getName());
                 if (args != null) {
-                    for (int i = 0; i < args.length; i++) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "           arg: " + args[i]);
+                    for (Object arg : args) {
+                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "           arg: " + arg);
                     }
                 }
             }
@@ -306,27 +306,23 @@ public class ServiceUtil {
 
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 
-        for (int i = 0; i < stack.length; i++) {
-
+        for (StackTraceElement stack1 : stack) {
             Class<?> c = null;
-
             try {
-                c = Class.forName(stack[i].getClassName());
+                c = Class.forName(stack1.getClassName());
             } catch (Exception e1) {
                 OutputController.getLogger().log(e1);
                 try {
-                    c = Class.forName(stack[i].getClassName(), false,
-                            app.getClassLoader());
-                } catch (Exception e2) {
+                    c = Class.forName(stack1.getClassName(), false, app.getClassLoader());
+                }catch (Exception e2) {
                     OutputController.getLogger().log(e2);
                 }
             }
-
             // Everything up to the desired class/method must be trusted
             if (c == null || // class not found
                     (c.getProtectionDomain().getCodeSource() != null && // class is not in bootclasspath
                     c.getProtectionDomain().getCodeSource().getCodeSigners() == null) // class is trusted
-            ) {
+                    ) {
                 return false;
             }
         }

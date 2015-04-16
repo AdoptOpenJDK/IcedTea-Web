@@ -60,17 +60,15 @@ public class UpdatePolicy {
     }
 
     /**
-     * Returns whether the resource should be checked for being
+     * @return whether the resource should be checked for being
      * up-to-date.
+     * @param entry entry which shoul;d be cared
      */
     public boolean shouldUpdate(CacheEntry entry) {
         long updated = entry.getLastUpdated();
         long current = System.currentTimeMillis();
 
-        if (current - updated >= timeDiff)
-            return true;
-        else
-            return false;
+        return current - updated >= timeDiff;
     }
 
 }

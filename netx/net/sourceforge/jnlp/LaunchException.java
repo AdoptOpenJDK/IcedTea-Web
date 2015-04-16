@@ -56,22 +56,28 @@ public class LaunchException extends Exception {
     private static final long serialVersionUID = 7283827853612357423L;
 
     /** the file being launched */
-    private JNLPFile file;
+    private final JNLPFile file;
 
     /** the category of the exception */
-    private String category;
+    final private String category;
 
     /** summary */
-    private String summary;
+    final private String summary;
 
     /** description of the action that was taking place */
-    private String description;
+    final private String description;
 
     /** severity of the warning/error */
-    private String severity;
+    final private String severity;
 
     /**
      * Creates a LaunchException without detail message.
+     * @param file jnlp-file which caused exception
+     * @param cause cause of exception
+     * @param severity severity of exception
+     * @param category category of exception
+     * @param summary short summary of exception
+     * @param description full description of exception
      */
     public LaunchException(JNLPFile file, Exception cause, String severity, String category, String summary, String description) {
         super(severity + ": " + category + ": " + summary + " "
@@ -87,17 +93,30 @@ public class LaunchException extends Exception {
 
     /**
      * Creates a LaunchException with a cause.
+     * @param cause cause of exception
      */
     public LaunchException(Throwable cause) {
         super(cause);
+        this.file = null;
+        this.category = null;
+        this.summary = null;
+        this.description = null;
+        this.severity = null;
         saveLaunchException(this);
     }
 
     /**
      * Creates a LaunchException with a cause and detail message
+     * @param message text of exception
+     * @param cause cause of exception
      */
     public LaunchException(String message, Throwable cause) {
         super(message, cause);
+        this.file = null;
+        this.category = null;
+        this.summary = null;
+        this.description = null;
+        this.severity = null;
         saveLaunchException(this);
     }
 
@@ -109,18 +128,23 @@ public class LaunchException extends Exception {
      */
     public LaunchException(String message) {
         super(message);
+        this.file = null;
+        this.category = null;
+        this.summary = null;
+        this.description = null;
+        this.severity = null;
         saveLaunchException(this);
     }
 
     /**
-     * Returns the JNLPFile being launched.
+     * @return the JNLPFile being launched.
      */
     public JNLPFile getFile() {
         return file;
     }
 
     /**
-     * Returns the category string, a short description of the
+     * @return the category string, a short description of the
      * exception suitable for displaying in a window title.
      */
     public String getCategory() {
@@ -128,14 +152,14 @@ public class LaunchException extends Exception {
     }
 
     /**
-     * Returns a one-sentence summary of the problem.
+     * @return a one-sentence summary of the problem.
      */
     public String getSummary() {
         return summary;
     }
 
     /**
-     * Return a description of the exception and the action being
+     * @return a description of the exception and the action being
      * performed when the exception occurred.
      */
     public String getDescription() {
@@ -143,7 +167,7 @@ public class LaunchException extends Exception {
     }
 
     /**
-     * Returns a short description of the severity of the problem.
+     * @return a short description of the severity of the problem.
      */
     public String getSeverity() {
         return severity;

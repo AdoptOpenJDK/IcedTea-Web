@@ -46,6 +46,7 @@ public class HttpUtils {
     /**
      * Ensure a HttpURLConnection is fully read, required for correct behavior.
      * Captured IOException is consumed and printed
+     * @param c the connection to be closed silently
      */
     public static void consumeAndCloseConnectionSilently(HttpURLConnection c) {
         try {
@@ -58,19 +59,14 @@ public class HttpUtils {
     /**
      * Ensure a HttpURLConnection is fully read, required for correct behavior
      * 
-     * @throws IOException
+     * @param c connection to be closed
+     * @throws IOException if connection fade
      */
     public static void consumeAndCloseConnection(HttpURLConnection c) throws IOException {
-        InputStream in = null;
-        try {
-            in = c.getInputStream();
+        try (InputStream in = c.getInputStream()) {
             byte[] throwAwayBuffer = new byte[256];
             while (in.read(throwAwayBuffer) > 0) {
                 /* ignore contents */
-            }
-        } finally {
-            if (in != null) {
-                in.close();
             }
         }
     }

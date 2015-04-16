@@ -54,13 +54,14 @@ public class ManageJnlpResources {
      * @param ref Path of the launch or extension JNLP File containing the
      * resource. If null, main JNLP's file location will be used instead.
      * @param part The name of the part.
+     * @param version version of jar
      * @return jars found.
      */
     public static JARDesc[] findJars(final JNLPClassLoader rootClassLoader, final URL ref, final String part, final Version version) {
         JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(rootClassLoader, ref);
 
         if (foundLoader != null) {
-            List<JARDesc> foundJars = new ArrayList<JARDesc>();
+            List<JARDesc> foundJars = new ArrayList<>();
             ResourcesDesc resources = foundLoader.getJNLPFile().getResources();
 
             for (JARDesc eachJar : resources.getJARs(part)) {
@@ -94,6 +95,7 @@ public class ManageJnlpResources {
      * @param ref Path of the launch or extension JNLP File containing the
      * resource. If null, main JNLP's file location will be used instead.
      * @param part The name of the path.
+     * @param version version of jar to be downlaoded
      */
     public static void downloadJars(final JNLPClassLoader classLoader, final URL ref, final String part, final Version version) {
         JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(classLoader, ref);

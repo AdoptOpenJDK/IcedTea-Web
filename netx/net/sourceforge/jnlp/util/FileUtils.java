@@ -133,7 +133,8 @@ public final class FileUtils {
      * readable or writable by anyone other than the owner. The parent
      * directories are not created; they must exist before this is called.
      *
-     * @throws IOException
+     * @param directory directory to be created
+     * @throws IOException if IO fails
      */
     public static void createRestrictedDirectory(File directory) throws IOException {
         createRestrictedFile(directory, true, true);
@@ -144,7 +145,9 @@ public final class FileUtils {
      * writable by anyone other than the owner. If writeableByOnwer is false,
      * even the owner can not write to it.
      *
-     * @throws IOException
+     * @param file path to file
+     * @param writableByOwner true if can be writable by owner
+     * @throws IOException if IO fails
      */
     public static void createRestrictedFile(File file, boolean writableByOwner) throws IOException {
         createRestrictedFile(file, false, writableByOwner);
@@ -154,7 +157,7 @@ public final class FileUtils {
      * Tries to create the ancestor directories of file f. Throws
      * an IOException if it can't be created (but not if it was
      * already there).
-     * @param f
+     * @param f file to provide parent directory
      * @param eMsg - the message to use for the exception. null
      * if the file name is to be used.
      * @throws IOException if the directory can't be created and doesn't exist.
@@ -171,7 +174,7 @@ public final class FileUtils {
      * Tries to create the ancestor directories of file f. Throws
      * an IOException if it can't be created (but not if it was
      * already there).
-     * @param f
+     * @param f file which parent will be created
      * @throws IOException if the directory can't be created and doesn't exist.
      */
     public static void createParentDir(File f) throws IOException {
@@ -213,9 +216,7 @@ public final class FileUtils {
      */
     private static void createRestrictedFile(File file, boolean isDir, boolean writableByOwner) throws IOException {
 
-        File tempFile = null;
-
-        tempFile = new File(file.getCanonicalPath() + ".temp");
+        File tempFile = new File(file.getCanonicalPath() + ".temp");
 
         if (isDir) {
             if (!tempFile.mkdir()) {
@@ -312,7 +313,7 @@ public final class FileUtils {
         if (file == null || file.getParentFile() == null || !file.getParentFile().exists()) {
             return null;
         }
-        final List<File> policyDirectory = new ArrayList<File>();
+        final List<File> policyDirectory = new ArrayList<>();
         policyDirectory.add(file.getParentFile());
         final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
         final DirectoryCheckResults result = validator.ensureDirs();
@@ -490,8 +491,8 @@ public final class FileUtils {
 
         if (file.isDirectory()) {
             File[] children = file.listFiles();
-            for (int i = 0; i < children.length; i++) {
-                recursiveDelete(children[i], base);
+            for (File children1 : children) {
+                recursiveDelete(children1, base);
             }
         }
         if (!file.delete()) {
@@ -544,7 +545,7 @@ public final class FileUtils {
      * 
      * @param content which will be saved as it is saved in this String
      * @param f file to be saved. No warnings provided
-     * @throws IOException
+     * @throws IOException if save fails
      */
     public static void saveFile(String content, File f) throws IOException {
         saveFile(content, f, "utf-8");
@@ -556,13 +557,13 @@ public final class FileUtils {
      * @param content which will be saved as it is saved in this String
      * @param f file to be saved. No warnings provided
      * @param encoding of output byte representation
-     * @throws IOException
+     * @throws IOException if save fails
      */
     public static void saveFile(String content, File f, String encoding) throws IOException {
-        Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), encoding));
-        output.write(content);
-        output.flush();
-        output.close();
+        try (Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), encoding))) {
+            output.write(content);
+            output.flush();
+        }
     }
 
     /**

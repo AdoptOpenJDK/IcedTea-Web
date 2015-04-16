@@ -19,17 +19,18 @@ package net.sourceforge.jnlp;
 public class MenuDesc {
 
     /** the submenu for this menu entry */
-    private String subMenu;
+    private final String subMenu;
 
     /**
      * Create a new menu descriptor
+     * @param subMenu sub-menu of this menu if any or null.
      */
     public MenuDesc(String subMenu) {
         this.subMenu = subMenu;
     }
 
     /**
-     * Returns the submenu for this menu entry.
+     * @return the submenu for this menu entry.
      */
     public String getSubMenu() {
         return subMenu;

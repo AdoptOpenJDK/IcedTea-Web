@@ -337,6 +337,7 @@ public final class DeploymentConfiguration {
 
     /**
      * Copies the current configuration into the target
+     * @param target properties where to copy actual ones
      */
     public void copyTo(Properties target) {
         Set<String> names = getAllPropertyNames();

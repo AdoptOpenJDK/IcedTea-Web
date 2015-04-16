@@ -28,22 +28,22 @@ import java.util.*;
 public class AppletDesc implements LaunchDesc {
 
     /** the applet name */
-    private String name;
+    private final String name;
 
     /** the main class name and package */
-    private String mainClass;
+    private final String mainClass;
 
     /** the document base */
-    private URL documentBase;
+    private final URL documentBase;
 
     /** the width */
-    private int width;
+    private final int width;
 
     /** the height */
-    private int height;
+    private final int height;
 
     /** the parameters */
-    private Map<String, String> parameters;
+    private final Map<String, String> parameters;
 
     /**
      * Create an Applet descriptor.
@@ -62,18 +62,18 @@ public class AppletDesc implements LaunchDesc {
         this.documentBase = documentBase;
         this.width = width;
         this.height = height;
-        this.parameters = new HashMap<String, String>(parameters);
+        this.parameters = new HashMap<>(parameters);
     }
 
     /**
-     * Returns the applet name
+     * @return the applet name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns the main class name in the dot-separated form (eg: foo.bar.Baz)
+     * @return the main class name in the dot-separated form (eg: foo.bar.Baz)
      */
     @Override
     public String getMainClass() {
@@ -81,31 +81,31 @@ public class AppletDesc implements LaunchDesc {
     }
 
     /**
-     * Returns the document base
+     * @return the document base
      */
     public URL getDocumentBase() {
         return documentBase;
     }
 
     /**
-     * Returns the width
+     * @return the width
      */
     public int getWidth() {
         return width;
     }
 
     /**
-     * Returns the height
+     * @return the height
      */
     public int getHeight() {
         return height;
     }
 
     /**
-     * Returns the applet parameters
+     * @return  the applet parameters
      */
     public Map<String, String> getParameters() {
-        return new HashMap<String, String>(parameters);
+        return new HashMap<>(parameters);
     }
 
     /**
@@ -113,6 +113,8 @@ public class AppletDesc implements LaunchDesc {
      * exists then it is overwritten with the new value.  Adding a
      * parameter will have no effect on already-running applets
      * launched from this JNLP file.
+     * @param name key of value
+     * @param value value to be added
      */
     public void addParameter(String name, String value) {
         parameters.put(name, value);

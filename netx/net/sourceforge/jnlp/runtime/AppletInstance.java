@@ -39,10 +39,14 @@ public class AppletInstance extends ApplicationInstance {
     private Applet applet;
 
     /** the applet environment */
-    private AppletEnvironment environment;
+    final private AppletEnvironment environment;
 
     /**
      * Create a New Task based on the Specified URL
+     * @param file pluginbrifge to build instance on
+     * @param group thread group of this instance
+     * @param loader classlaoder for this instance
+     * @param applet applet of this instance
      */
     public AppletInstance(JNLPFile file, ThreadGroup group, ClassLoader loader, Applet applet) {
         super(file, group, loader);
@@ -54,6 +58,7 @@ public class AppletInstance extends ApplicationInstance {
 
     /**
      * Set the applet of this launched application; can only be called once.
+     * @param applet to be set
      */
     public void setApplet(Applet applet) {
         if (this.applet != null) {
@@ -64,7 +69,12 @@ public class AppletInstance extends ApplicationInstance {
     }
 
     /**
-     *
+     * Create a New Task based on the Specified URL
+     * @param file pluginbrifge to build instance on
+     * @param group thread group of this instance
+     * @param loader classlaoder for this instance
+     * @param applet applet of this instance
+     * @param cont Container where to place applet
      */
     public AppletInstance(JNLPFile file, ThreadGroup group, ClassLoader loader, Applet applet, Container cont) {
         super(file, group, loader);
@@ -75,6 +85,7 @@ public class AppletInstance extends ApplicationInstance {
     /**
      * Sets whether the applet is resizable or not.  Applets default
      * to being not resizable.
+     * @param resizable boolean to allwo resizing
      */
     public void setResizable(boolean resizable) {
         Container c = environment.getAppletFrame();
@@ -83,7 +94,7 @@ public class AppletInstance extends ApplicationInstance {
     }
 
     /**
-     * Returns whether the applet is resizable.
+     * @return whether the applet is resizable.
      */
     public boolean isResizable() {
         Container c = environment.getAppletFrame();
@@ -94,21 +105,22 @@ public class AppletInstance extends ApplicationInstance {
     }
 
     /**
-     * Returns the application title.
+     * @return the application title.
      */
+    @Override
     public String getTitle() {
         return getJNLPFile().getApplet().getName();
     }
 
     /**
-     * Returns the applet environment.
+     * @return the applet environment.
      */
     public AppletEnvironment getAppletEnvironment() {
         return environment;
     }
 
     /**
-     * Returns the applet.
+     *  @return the applet.
      */
     public Applet getApplet() {
         return applet;
@@ -117,6 +129,7 @@ public class AppletInstance extends ApplicationInstance {
     /**
      * Stop the application and destroy its resources.
      */
+    @Override
     public void destroy() {
         if (appletStopped)
             return;

@@ -45,22 +45,22 @@ public class IconDesc {
     public static final Object SHORTCUT = "shortcut";
 
     /** the location of the icon */
-    private URL location;
+    private final URL location;
 
     /** the type of icon*/
-    private Object kind;
+    private final Object kind;
 
     /** the width, or -1 if unknown*/
-    private int width;
+    private final int width;
 
     /** the height, or -1 if unknown*/
-    private int height;
+    private final int height;
 
     /** the depth, or -1 if unknown*/
-    private int depth;
+    private final int depth;
 
     /** the size, or -1 if unknown*/
-    private int size;
+    private final int size;
 
     /**
      * Creates an icon descriptor with the specified information.
@@ -82,21 +82,21 @@ public class IconDesc {
     }
 
     /**
-     * Returns the location of the icon.
+     * @return the location of the icon.
      */
     public URL getLocation() {
         return location;
     }
 
     /**
-     * Returns the icon type.
+     * @return the icon type.
      */
     public Object getKind() {
         return kind;
     }
 
     /**
-     * Returns the icon width or -1 if not specified in the
+     * @return the icon width or -1 if not specified in the
      * JNLPFile.
      */
     public int getWidth() {
@@ -104,7 +104,7 @@ public class IconDesc {
     }
 
     /**
-     * Returns the icon height or -1 if not specified in the
+     * @return the icon height or -1 if not specified in the
      * JNLPFile.
      */
     public int getHeight() {
@@ -112,14 +112,14 @@ public class IconDesc {
     }
 
     /**
-     * Returns the icon size or -1 if not specified in the JNLPFile.
+     * @return the icon size or -1 if not specified in the JNLPFile.
      */
     public int getSize() {
         return size;
     }
 
     /**
-     * Returns the icon depth or -1 if not specified in the
+     * @return the icon depth or -1 if not specified in the
      * JNLPFile.
      */
     public int getDepth() {

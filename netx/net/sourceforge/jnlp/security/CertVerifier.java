@@ -48,40 +48,45 @@ import java.util.List;
 public interface CertVerifier {
 
     /**
-     * Return if the publisher is already trusted
+     * @return  if the publisher is already trusted
      */
     public boolean getAlreadyTrustPublisher();
 
     /**
-     * Return if the root is in CA certs
+     * @return  if the root is in CA certs
      */
     public boolean getRootInCacerts();
 
     /**
-     * Return if there are signing issues with the certificate being verified
+     * @return  if there are signing issues with the certificate being verified
+     * @param certPath to be validated
      */
     public boolean hasSigningIssues(CertPath certPath);
 
     /**
-     * Get the details regarding issue with this certificate
+     * @return  the details regarding issue with this certificate
+     * @param certPath certificate
      */
     public List<String> getDetails(CertPath certPath);
 
     /**
-     * Return a valid certificate path to this certificate being verified
-     * @return The CertPath
+     * @return  a valid certificate path to this certificate being verified
+     * @param certPath to be read
      */
     public CertPath getCertPath(CertPath certPath);
 
     /**
-     * Returns the application's publisher's certificate.
+     * @return the application's publisher's certificate.
+     * @param certPath to be read for publisher
      */
     public abstract Certificate getPublisher(CertPath certPath);
 
     /**
-     * Returns the application's root's certificate. This
+     * @return  the application's root's certificate. This
      * may return the same certificate as getPublisher(CertPath certPath) in
      * the event that the application is self signed.
+     * @param certPath certificate
+     *  
      */
     public abstract Certificate getRoot(CertPath certPath);
 }

@@ -136,6 +136,7 @@ public class ResourceTracker {
      *
      * @param location the location of the resource
      * @param version the resource version
+     * @param options options to control download
      * @param updatePolicy whether to check for updates if already in cache
      */
     public void addResource(URL location, Version version, DownloadOptions options, UpdatePolicy updatePolicy) {
@@ -384,17 +385,17 @@ public class ResourceTracker {
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean waitForResources(URL urls[], long timeout) throws InterruptedException {
-        Resource resources[] = new Resource[urls.length];
+        Resource lresources[] = new Resource[urls.length];
 
-        synchronized (resources) {
+        synchronized (lresources) {
             // keep the lock so getResource doesn't have to aquire it each time
             for (int i = 0; i < urls.length; i++) {
-                resources[i] = getResource(urls[i]);
+                lresources[i] = getResource(urls[i]);
             }
         }
 
-        if (resources.length > 0)
-            return wait(resources, timeout);
+        if (lresources.length > 0)
+            return wait(lresources, timeout);
 
         return true;
     }
@@ -504,6 +505,7 @@ public class ResourceTracker {
      * <p>
      * Calls to this method should be synchronized on lock.
      * </p>
+     * @param resource  resource to be download
      */
     protected void startDownloadThread(Resource resource) {
         CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));

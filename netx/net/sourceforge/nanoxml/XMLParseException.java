@@ -57,7 +57,7 @@ public class XMLParseException
      * <ul><li>{@code lineNr > 0 || lineNr == NO_LINE}
      * </ul></dd></dl>
      */
-    private int lineNr;
+    private final int lineNr;
 
     /**
      * Creates an exception.
@@ -112,6 +112,7 @@ public class XMLParseException
      * Where the error occurred, or {@code NO_LINE} if the line number is
      * unknown.
      *
+     * @return  line in source where exception occurred
      * @see net.sourceforge.nanoxml.XMLParseException#NO_LINE
      */
     public int getLineNr() {

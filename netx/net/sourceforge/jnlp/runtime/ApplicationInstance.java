@@ -386,7 +386,7 @@ public class ApplicationInstance {
     }
 
     /**
-     * Returns whether or not this application is signed.
+     * @return whether or not this application is signed.
      */
     public boolean isSigned() {
         return isSigned;

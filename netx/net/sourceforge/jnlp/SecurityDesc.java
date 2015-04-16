@@ -308,7 +308,7 @@ public class SecurityDesc {
     }
 
     /**
-     * Returns the permissions type, one of: ALL_PERMISSIONS,
+     * @return the permissions type, one of: ALL_PERMISSIONS,
      * SANDBOX_PERMISSIONS, J2EE_PERMISSIONS.
      */
     public Object getSecurityType() {
@@ -316,7 +316,7 @@ public class SecurityDesc {
     }
 
     /**
-     * Returns a PermissionCollection containing the basic
+     * @return a PermissionCollection containing the basic
      * permissions granted depending on the security type.
      *
      * @param cs the CodeSource to get permissions for
@@ -337,8 +337,9 @@ public class SecurityDesc {
 
         // add j2ee to sandbox if needed
         if (J2EE_PERMISSIONS.equals(type))
-            for (int i = 0; i < j2eePermissions.length; i++)
-                permissions.add(j2eePermissions[i]);
+            for (Permission j2eePermission : j2eePermissions) {
+                permissions.add(j2eePermission);
+        }
 
         return permissions;
     }
@@ -351,13 +352,14 @@ public class SecurityDesc {
     }
 
     /**
-     * Returns a PermissionCollection containing the sandbox permissions
+     * @return a PermissionCollection containing the sandbox permissions
      */
     public PermissionCollection getSandBoxPermissions() {
         final Permissions permissions = new Permissions();
 
-        for (int i = 0; i < sandboxPermissions.length; i++)
-            permissions.add(sandboxPermissions[i]);
+        for (Permission sandboxPermission : sandboxPermissions) {
+            permissions.add(sandboxPermission);
+        }
 
         if (grantAwtPermissions) {
             permissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
@@ -367,8 +369,8 @@ public class SecurityDesc {
                 throw new NullJnlpFileException("Can not return sandbox permissions, file is null");
             }
             if (file.isApplication()) {
-                for (int i = 0; i < jnlpRIAPermissions.length; i++) {
-                    permissions.add(jnlpRIAPermissions[i]);
+                for (Permission jnlpRIAPermission : jnlpRIAPermissions) {
+                    permissions.add(jnlpRIAPermission);
                 }
             }
         }
@@ -471,7 +473,7 @@ public class SecurityDesc {
     }
 
     /**
-     * Returns all the names of the basic JNLP system properties accessible by RIAs
+     * @return all the names of the basic JNLP system properties accessible by RIAs
      */
     public static String[] getJnlpRIAPermissions() {
         String[] jnlpPermissions = new String[jnlpRIAPermissions.length];

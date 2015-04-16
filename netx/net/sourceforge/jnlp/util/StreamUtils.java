@@ -65,6 +65,9 @@ public class StreamUtils {
 
     /**
      * Copy an input stream's contents into an output stream.
+     * @param input input stream
+     * @param output stream where to copy input
+     * @throws java.io.IOException if IO fails
      */
     public static void copyStream(InputStream input, OutputStream output)
             throws IOException {

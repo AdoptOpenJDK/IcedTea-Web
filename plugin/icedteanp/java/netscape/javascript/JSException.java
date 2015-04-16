@@ -98,6 +98,8 @@ public class JSException extends RuntimeException {
      * Constructs a JSException with a wrapped JavaScript exception object.
      * This constructor needs to be public so that Java users can throw
      * exceptions to JS cleanly.
+     * @param wrappedExceptionType type of exception
+     * @param wrappedException actual exception
      */
     public JSException(int wrappedExceptionType, Object wrappedException) {
         super();
@@ -109,6 +111,10 @@ public class JSException extends RuntimeException {
      * Constructs a JSException with a detail message and all the
      * other info that usually comes with a JavaScript error.
      * @param s the detail message
+     * @param filename source file where exception raised
+     * @param lineno line where exception raised
+     * @param source source text of exception
+     * @param tokenIndex index on line where exception raised
      *
      * @deprecated Not for public use in future versions.
      */
@@ -126,6 +132,7 @@ public class JSException extends RuntimeException {
     /**
      * Instance method getWrappedExceptionType returns the int mapping of the
      * type of the wrappedException Object.
+     * @return  type of exception
      */
     public int getWrappedExceptionType() {
         return wrappedExceptionType;
@@ -133,6 +140,7 @@ public class JSException extends RuntimeException {
 
     /**
      * Instance method getWrappedException.
+     * @return actual exception
      */
     public Object getWrappedException() {
         return wrappedException;

@@ -27,7 +27,7 @@ import java.util.*;
 public class ApplicationDesc implements LaunchDesc {
 
     /** the main class name and package */
-    private String mainClass;
+    private final String mainClass;
 
     /** the arguments */
     private String arguments[];
@@ -44,7 +44,7 @@ public class ApplicationDesc implements LaunchDesc {
     }
 
     /**
-     * Returns the main class name
+     * @return the main class name
      */
     @Override
     public String getMainClass() {
@@ -52,7 +52,7 @@ public class ApplicationDesc implements LaunchDesc {
     }
 
     /**
-     * Returns the arguments
+     * @return the arguments
      */
     public String[] getArguments() {
         return arguments.clone();
@@ -60,9 +60,10 @@ public class ApplicationDesc implements LaunchDesc {
 
     /**
      * Add an argument to the end of the arguments.
+     * @param arg argument of command
      */
     public void addArgument(String arg) {
-        List<String> l = new ArrayList<String>(Arrays.asList(arguments));
+        List<String> l = new ArrayList<>(Arrays.asList(arguments));
         l.add(arg);
 
         arguments = l.toArray(arguments);

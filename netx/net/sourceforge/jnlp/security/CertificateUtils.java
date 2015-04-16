@@ -70,6 +70,11 @@ public class CertificateUtils {
     /**
      * Adds the X509Certficate in the file to the KeyStore. Note that it does
      * not update the copy of the KeyStore on disk.
+     * @param file file with certificate
+     * @param ks keystore to save to
+     * @throws java.security.cert.CertificateException if certificate is wrong
+     * @throws java.io.IOException if IO fails
+     * @throws java.security.KeyStoreException if keystore fails
      */
     public static final void addToKeyStore(File file, KeyStore ks) throws CertificateException,
             IOException, KeyStoreException {
@@ -92,16 +97,17 @@ public class CertificateUtils {
     /**
      * Adds an X509Certificate to the KeyStore. Note that it does not update the
      * copy of the KeyStore on disk.
+     * @param cert certificate to import
+     * @param ks keystore to save to
+     * @throws java.security.KeyStoreException if keystore fails
      */
     public static final void addToKeyStore(X509Certificate cert, KeyStore ks)
             throws KeyStoreException {
 
         OutputController.getLogger().log("Importing " + cert.getSubjectX500Principal().getName());
 
-        String alias = null;
-
         // does this certificate already exist?
-        alias = ks.getCertificateAlias(cert);
+        String alias = ks.getCertificateAlias(cert);
         if (alias != null) {
             return;
         }
@@ -133,10 +139,8 @@ public class CertificateUtils {
 
     public static void addPKCS12ToKeyStore(Certificate[] certChain, Key key, KeyStore ks)
             throws KeyStoreException {
-        String alias = null;
-
         // does this certificate already exist?
-        alias = ks.getCertificateAlias(certChain[0]);
+        String alias = ks.getCertificateAlias(certChain[0]);
         if (alias != null) {
             return;
         }
@@ -157,22 +161,19 @@ public class CertificateUtils {
      * @return true if the certificate is present in one of the keystores, false otherwise
      */
     public static final boolean inKeyStores(X509Certificate c, KeyStore[] keyStores) {
-        for (int i = 0; i < keyStores.length; i++) {
+        for (KeyStore keyStore : keyStores) {
             try {
                 // Check against all certs
-                Enumeration<String> aliases = keyStores[i].aliases();
+                Enumeration<String> aliases = keyStore.aliases();
                 while (aliases.hasMoreElements()) {
-
                     // Verify against this entry
                     String alias = aliases.nextElement();
-
-                    if (c.equals(keyStores[i].getCertificate(alias))) {
-                    OutputController.getLogger().log(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStores[i].hashCode())));
+                    if (c.equals(keyStore.getCertificate(alias))) {
+                        OutputController.getLogger().log(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore.hashCode())));
                         return true;
                     } // else continue
                 }
-
-            } catch (KeyStoreException e) {
+            }catch (KeyStoreException e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
                 // continue
             }
@@ -183,6 +184,10 @@ public class CertificateUtils {
     /**
      * Writes the certificate in base64 encoded from to the print stream.
      * See http://tools.ietf.org/html/rfc4945#section-6.1 for more information
+     * @param cert sertifcate to export
+     * @param out stream to print it to
+     * @throws java.io.IOException if io fails
+     * @throws java.security.cert.CertificateException if certificate fails
      */
     public static void dump(Certificate cert, PrintStream out) throws IOException,
             CertificateException {

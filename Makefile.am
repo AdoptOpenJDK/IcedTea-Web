@@ -648,11 +648,12 @@ clean-docs: clean-netx-docs clean-plugin-docs
 
 stamps/netx-docs.stamp:
 if ENABLE_DOCS
-	$(SYSTEM_JDK_DIR)/bin/javadoc $(JAVADOC_MEM_OPTS) $(JAVADOC_OPTS) \
+	$(SYSTEM_JDK_DIR)/bin/javadoc $(JAVADOC_MEM_OPTS) $(	_OPTS) \
 	 -d ${abs_top_builddir}/docs/netx -sourcepath $(NETX_SRCDIR) \
 	 -doctitle 'IcedTea-Web: NetX API Specification' \
 	 -windowtitle 'IcedTea-Web: NetX ' \
 	 -header '<strong>IcedTea-Web<br/>NetX</strong>' \
+	 $(call composeclasspath, $(TAGSOUP_JAR) $(RHINO_JAR)) \
 	 $(NETX_PKGS)
 endif
 	mkdir -p stamps
@@ -670,6 +671,7 @@ if ENABLE_PLUGIN
 	 -doctitle 'IcedTea-Web: Plugin API Specification' \
 	 -windowtitle 'IcedTea-Web: Plugin ' \
 	 -header '<strong>IcedTea-Web<br/>Plugin</strong>' \
+	 $(call composeclasspath, $(TAGSOUP_JAR) $(RHINO_JAR)) \
 	 $(PLUGIN_PKGS)
 endif
 endif

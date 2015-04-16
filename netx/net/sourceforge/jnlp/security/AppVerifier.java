@@ -78,13 +78,17 @@ public interface AppVerifier {
      * @param certs Any possible signer and their respective information regarding this app.
      * @param signedJars A map of all the jars of this app and the number of
      * signed entries each one has.
+     * @return true if jar is fully signed
      */
     public boolean isFullySigned(Map<CertPath, CertInformation> certs,
             Map<String, Integer> signedJars);
 
     /**
      * Prompt the user with requests for trusting the certificates used by this app
-     * @throws LaunchException
+     * @param securityDelegate parental security
+     * @param jcv jar verifier
+     * @param file jnlp fiel to provide information
+     * @throws LaunchException if it fails to verify
      */
     public void checkTrustWithUser(SecurityDelegate securityDelegate, JarCertVerifier jcv, JNLPFile file)
             throws LaunchException;

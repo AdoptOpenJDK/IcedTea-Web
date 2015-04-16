@@ -27,19 +27,19 @@ import java.util.*;
 public class ResourcesDesc {
 
     /** the locales of these resources */
-    private Locale locales[];
+    private final Locale locales[];
 
     /** the OS for these resources */
-    private String os[];
+    private final String os[];
 
     /** the arch for these resources */
-    private String arch[];
+    private final String arch[];
 
     /** the JNLPFile this information is for */
-    private JNLPFile jnlpFile;
+    private final JNLPFile jnlpFile;
 
     /** list of jars, packages, properties, and extensions */
-    private List<Object> resources = new ArrayList<Object>();
+    private final List<Object> resources = new ArrayList<>();
 
     // mixed list makes easier for lookup code
 
@@ -60,11 +60,11 @@ public class ResourcesDesc {
     }
 
     /**
-     * Returns the JVMs.
+     * @return the JVMs.
      */
     public JREDesc[] getJREs() {
-        List<JREDesc> resources = getResources(JREDesc.class);
-        return resources.toArray(new JREDesc[resources.size()]);
+        List<JREDesc> lresources = getResources(JREDesc.class);
+        return lresources.toArray(new JREDesc[lresources.size()]);
     }
 
     public static JARDesc getMainJAR(JARDesc jars[] ) {
@@ -85,7 +85,7 @@ public class ResourcesDesc {
         }
     }
     /**
-     * Returns the main JAR for these resources.  There first JAR
+     * @return the main JAR for these resources.  There first JAR
      * is returned if no JARs are specified as the main JAR, and if
      * there are no JARs defined then null is returned.
      */
@@ -94,45 +94,45 @@ public class ResourcesDesc {
     }
 
     /**
-     * Returns all of the JARs.
+     * @return all of the JARs.
      */
     public JARDesc[] getJARs() {
-        List<JARDesc> resources = getResources(JARDesc.class);
-        return resources.toArray(new JARDesc[resources.size()]);
+        List<JARDesc> lresources = getResources(JARDesc.class);
+        return lresources.toArray(new JARDesc[lresources.size()]);
     }
 
     /**
-     * Returns the JARs with the specified part name.
+     * @return the JARs with the specified part name.
      *
      * @param partName the part name, null and "" equivalent
      */
     public JARDesc[] getJARs(String partName) {
-        List<JARDesc> resources = getResources(JARDesc.class);
+        List<JARDesc> lresources = getResources(JARDesc.class);
 
-        for (int i = resources.size(); i-- > 0;) {
-            JARDesc jar = resources.get(i);
+        for (int i = lresources.size(); i-- > 0;) {
+            JARDesc jar = lresources.get(i);
 
             if (!("" + jar.getPart()).equals("" + partName))
-                resources.remove(i);
+                lresources.remove(i);
         }
 
-        return resources.toArray(new JARDesc[resources.size()]);
+        return lresources.toArray(new JARDesc[lresources.size()]);
     }
 
     /**
-     * Returns the Extensions.
+     * @return the Extensions.
      */
     public ExtensionDesc[] getExtensions() {
-        List<ExtensionDesc> resources = getResources(ExtensionDesc.class);
-        return resources.toArray(new ExtensionDesc[resources.size()]);
+        List<ExtensionDesc> lresources = getResources(ExtensionDesc.class);
+        return lresources.toArray(new ExtensionDesc[lresources.size()]);
     }
 
     /**
-     * Returns the Packages.
+     * @return the Packages.
      */
     public PackageDesc[] getPackages() {
-        List<PackageDesc> resources = getResources(PackageDesc.class);
-        return resources.toArray(new PackageDesc[resources.size()]);
+        List<PackageDesc> lresources = getResources(PackageDesc.class);
+        return lresources.toArray(new PackageDesc[lresources.size()]);
     }
 
     /**
@@ -142,33 +142,33 @@ public class ResourcesDesc {
      * @return the PackageDesc objects matching the class name
      */
     public PackageDesc[] getPackages(String className) {
-        List<PackageDesc> resources = getResources(PackageDesc.class);
+        List<PackageDesc> lresources = getResources(PackageDesc.class);
 
-        for (int i = resources.size(); i-- > 0;) {
-            PackageDesc pk = resources.get(i);
+        for (int i = lresources.size(); i-- > 0;) {
+            PackageDesc pk = lresources.get(i);
 
             if (!pk.matches(className))
-                resources.remove(i);
+                lresources.remove(i);
         }
 
-        return resources.toArray(new PackageDesc[resources.size()]);
+        return lresources.toArray(new PackageDesc[lresources.size()]);
     }
 
     /**
-     * Returns the Properties as a list.
+     * @return the Properties as a list.
      */
     public PropertyDesc[] getProperties() {
-        List<PropertyDesc> resources = getResources(PropertyDesc.class);
-        return resources.toArray(new PropertyDesc[resources.size()]);
+        List<PropertyDesc> lresources = getResources(PropertyDesc.class);
+        return lresources.toArray(new PropertyDesc[lresources.size()]);
     }
 
     /**
-     * Returns the properties as a map.
+     * @return the properties as a map.
      */
     public Map<String, String> getPropertiesMap() {
-        Map<String, String> properties = new HashMap<String, String>();
-        List<PropertyDesc> resources = getResources(PropertyDesc.class);
-        for (PropertyDesc prop : resources) {
+        Map<String, String> properties = new HashMap<>();
+        List<PropertyDesc> lresources = getResources(PropertyDesc.class);
+        for (PropertyDesc prop : lresources) {
             properties.put(prop.getKey(), prop.getValue());
         }
 
@@ -176,7 +176,7 @@ public class ResourcesDesc {
     }
 
     /**
-     * Returns the os required by these resources, or null if no
+     * @return the os required by these resources, or null if no
      * locale was specified in the JNLP file.
      */
     public String[] getOS() {
@@ -184,7 +184,7 @@ public class ResourcesDesc {
     }
 
     /**
-     * Returns the architecture required by these resources, or null
+     * @return the architecture required by these resources, or null
      * if no locale was specified in the JNLP file.
      */
     public String[] getArch() {
@@ -192,7 +192,7 @@ public class ResourcesDesc {
     }
 
     /**
-     * Returns the locale required by these resources, or null if no
+     * @return the locale required by these resources, or null if no
      * locale was specified in the JNLP file.
      */
     public Locale[] getLocales() {
@@ -200,17 +200,19 @@ public class ResourcesDesc {
     }
 
     /**
-     * Returns the JNLPFile the resources are for.
+     * @return the JNLPFile the resources are for.
      */
     public JNLPFile getJNLPFile() {
         return jnlpFile;
     }
 
     /**
-     * Returns all resources of the specified type.
+     * @param <T> type of resource to be found
+     * @param type resource to be found
+     * @return all resources of the specified type.
      */
     public <T> List<T> getResources(Class<T> type) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
 
         for (Object resource : resources) {
             if (type.isAssignableFrom(resource.getClass()))
@@ -222,6 +224,7 @@ public class ResourcesDesc {
 
     /**
      * Add a resource.
+     * @param resource to be added
      */
     public void addResource(Object resource) {
         // if this is going to stay public it should probably take an

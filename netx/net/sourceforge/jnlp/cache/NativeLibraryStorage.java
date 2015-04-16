@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -20,8 +19,8 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * Be sure to call cleanupTemporayFolder when finished with the object.
  */
 public class NativeLibraryStorage {
-    private ResourceTracker tracker;
-    private List<File> nativeSearchDirectories = new ArrayList<File>();
+    private final ResourceTracker tracker;
+    private final List<File> nativeSearchDirectories = new ArrayList<>();
 
     /* Temporary directory to store native jar entries, added to our search path */
     private File jarEntryDirectory = null;
@@ -52,6 +51,7 @@ public class NativeLibraryStorage {
     /**
      * Adds the {@link File} to the search path of this {@link NativeLibraryStorage}
      * when trying to find a native library
+     * @param directory directory to be added
      */
     public void addSearchDirectory(File directory) {
         nativeSearchDirectories.add(directory);
@@ -64,7 +64,8 @@ public class NativeLibraryStorage {
     /**
      * Looks in the search directories for 'fileName',
      * returning a path to the found file if it exists.
-     * Returns null otherwise.
+     * @param fileName name of library to be found
+     * @return path to library if found, null otherwise.
      */
     public File findLibrary(String fileName) {
         for (File dir : getSearchDirectories()) {
@@ -81,6 +82,7 @@ public class NativeLibraryStorage {
      * Search for and enable any native code contained in a JAR by copying the
      * native files into the filesystem. Called in the security context of the
      * classloader.
+     * @param jarLocation location of jar to be searched
      */
     public void addSearchJar(URL jarLocation) {
         OutputController.getLogger().log("Activate native: " + jarLocation);
@@ -89,40 +91,39 @@ public class NativeLibraryStorage {
             return;
 
         try {
-            JarFile jarFile = new JarFile(localFile, false);
-            Enumeration<JarEntry> entries = jarFile.entries();
-
-            while (entries.hasMoreElements()) {
-                JarEntry e = entries.nextElement();
-
-                if (e.isDirectory()) {
-                    continue;
-                }
-
-                String name = new File(e.getName()).getName();
-                boolean isLibrary = false;
-
-                for (String suffix : NATIVE_LIBRARY_EXTENSIONS) {
-                    if (name.endsWith(suffix)) {
-                        isLibrary = true;
-                        break;
+            try (JarFile jarFile = new JarFile(localFile, false)) {
+                Enumeration<JarEntry> entries = jarFile.entries();
+                
+                while (entries.hasMoreElements()) {
+                    JarEntry e = entries.nextElement();
+                    
+                    if (e.isDirectory()) {
+                        continue;
                     }
+                    
+                    String name = new File(e.getName()).getName();
+                    boolean isLibrary = false;
+                    
+                    for (String suffix : NATIVE_LIBRARY_EXTENSIONS) {
+                        if (name.endsWith(suffix)) {
+                            isLibrary = true;
+                            break;
+                        }
+                    }
+                    if (!isLibrary) {
+                        continue;
+                    }
+                    
+                    ensureNativeStoreDirectory();
+                    
+                    File outFile = new File(jarEntryDirectory, name);
+                    if (!outFile.isFile()) {
+                        FileUtils.createRestrictedFile(outFile, true);
+                    }
+                    CacheUtil.streamCopy(jarFile.getInputStream(e),
+                            new FileOutputStream(outFile));
                 }
-                if (!isLibrary) {
-                    continue;
-                }
-
-                ensureNativeStoreDirectory();
-
-                File outFile = new File(jarEntryDirectory, name);
-                if (!outFile.isFile()) {
-                    FileUtils.createRestrictedFile(outFile, true);
-                }
-                CacheUtil.streamCopy(jarFile.getInputStream(e),
-                                     new FileOutputStream(outFile));
             }
-
-            jarFile.close();
         } catch (IOException ex) {
             OutputController.getLogger().log(ex);
         }

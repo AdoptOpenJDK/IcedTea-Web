@@ -16,12 +16,12 @@
 
 package net.sourceforge.jnlp;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
-import java.net.*;
-import java.util.*;
+import java.net.URL;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 
 /**
  * The J2SE/Java element.
@@ -57,9 +57,11 @@ public class JREDesc {
      * @param version the platform version or the product version
      * if location is not null
      * @param location the location of a JRE product or null
-     * @param initialHeapSize inital heap size
+     * @param vmArgs arguments to VM
+     * @param initialHeapSize initial heap size
      * @param maximumHeapSize maximum head size
      * @param resources list of ResourceDesc objects
+     * @throws net.sourceforge.jnlp.ParseException is something goes wrong
      */
     public JREDesc(Version.JreVersion version, URL location,
             String vmArgs, String initialHeapSize,
@@ -73,7 +75,7 @@ public class JREDesc {
     }
 
     /**
-     * Returns the JRE version.  Use isPlatformVersion to
+     * @return the JRE version.  Use isPlatformVersion to
      * determine if this version corresponds to a platform or
      * product version.
      */
@@ -82,7 +84,7 @@ public class JREDesc {
     }
 
     /**
-     * Returns true if the JRE version is a Java platform version
+     * @return true if the JRE version is a Java platform version
      * (java.specification.version property) or false if it is a
      * product version (java.version property).
      */
@@ -91,35 +93,35 @@ public class JREDesc {
     }
 
     /**
-     * Returns the JRE version string.
+     * @return the JRE version string.
      */
     public URL getLocation() {
         return location;
     }
 
     /**
-     * Returns the maximum heap size in bytes.
+     * @return the maximum heap size in bytes.
      */
     public String getMaximumHeapSize() {
         return maximumHeapSize;
     }
 
     /**
-     * Returns the initial heap size in bytes.
+     * @return the initial heap size in bytes.
      */
     public String getInitialHeapSize() {
         return initialHeapSize;
     }
 
     /**
-     * Returns the resources defined for this JRE.
+     * @return the resources defined for this JRE.
      */
     public List<ResourcesDesc> getResourcesDesc() {
         return resources;
     }
 
     /**
-     * Returns the additional arguments to pass to the Java VM
+     * @return the additional arguments to pass to the Java VM
      * Can be null
      */
     public String getVMArgs() {
@@ -128,7 +130,7 @@ public class JREDesc {
 
     /**
      * Check for valid heap size string
-     * @return trimed heapSize if correct
+     * @return trimmed heapSize if correct
      * @throws ParseException if heapSize is invalid
      */
     static String checkHeapSize(String heapSize) throws ParseException {

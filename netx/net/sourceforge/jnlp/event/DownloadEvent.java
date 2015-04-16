@@ -31,10 +31,10 @@ import net.sourceforge.jnlp.cache.*;
 public class DownloadEvent extends EventObject {
 
     /** the tracker */
-    transient private ResourceTracker tracker;
+    final transient private ResourceTracker tracker;
 
     /** the resource */
-    transient private Resource resource;
+    final transient private Resource resource;
 
     /**
      * Creates a launch event for the specified application
@@ -51,14 +51,14 @@ public class DownloadEvent extends EventObject {
     }
 
     /**
-     * Returns the tracker that owns the resource.
+     * @return the tracker that owns the resource.
      */
     public ResourceTracker getTracker() {
         return tracker;
     }
 
     /**
-     * Returns the location of the resource being downloaded.
+     * @return the location of the resource being downloaded.
      */
     public URL getResourceLocation() {
         return resource.getLocation();

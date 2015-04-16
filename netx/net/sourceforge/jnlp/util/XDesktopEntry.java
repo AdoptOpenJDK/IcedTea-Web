@@ -62,7 +62,7 @@ import net.sourceforge.jnlp.security.dialogs.AccessWarningPaneComplexReturn;
  *    Mate/gnome 2/xfce - no meter of exec or icon put icon to defined/"others" Category
  *                      - name is as expected Name's value
  *                      - if removed, xfce kept icon until login/logout
- *    kde 4 - unknown Cathegory is sorted to Lost & Found -thats bad
+ *    kde 4 - unknown Cathegory is sorted to Lost &amp; Found -thats bad
  *          - if icon is not found, nothing shows
  *          - name is GENERIC NAME and then little name
  *    Gnome 3 shell - exec must be valid program!
@@ -104,6 +104,10 @@ public class XDesktopEntry {
     /**
      * Returns the contents of the {@link XDesktopEntry} through the
      * {@link Reader} interface.
+     * @param menu whether to create this icon to menu
+     * @param info result of user's interference
+     * @param isSigned whether the app is signed
+     * @return reader with desktop shortcut specification
      */
     public Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
 
@@ -254,7 +258,7 @@ public class XDesktopEntry {
     }
 
     /**
-     * Get the size of the icon (in pixels) for the desktop shortcut
+     * @return the size of the icon (in pixels) for the desktop shortcut
      */
     public int getIconSize() {
         return iconSize;
@@ -278,6 +282,9 @@ public class XDesktopEntry {
 
     /**
      * Create a desktop shortcut for this desktop entry
+     * @param menu how to create in menu
+     * @param desktop how to create on desktop
+     * @param isSigned if it is signed
      */
     public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned) {
         boolean isDesktop = false;

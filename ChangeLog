@@ -1,5 +1,10 @@
 2015-04-15  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed javadoc warnings and errors to pass doclint
+	* /netx: nearly all files in main package get rid of doclint errors
+
+2015-04-15  Jiri Vanek  <jvanek@redhat.com>
+
 	jnlp-signing mechanism now uses general parser (and so also tagsoup if enabled)
 	* netx/net/sourceforge/jnlp/JNLPMatcher.java: removed redundant code to laod xmls
 	and used Parser.getRootNode rather. Added same brackets to if statements. Added

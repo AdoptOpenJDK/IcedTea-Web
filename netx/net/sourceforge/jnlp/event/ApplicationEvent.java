@@ -29,7 +29,7 @@ import net.sourceforge.jnlp.runtime.*;
 public class ApplicationEvent extends EventObject {
 
     /** the application instance */
-    transient private ApplicationInstance application;
+    final transient private ApplicationInstance application;
 
     /**
      * Creates a launch event for the specified application
@@ -44,7 +44,7 @@ public class ApplicationEvent extends EventObject {
     }
 
     /**
-     * Returns the application instance.
+     * @return  the application instance.
      */
     public ApplicationInstance getApplication() {
         return application;

@@ -80,15 +80,17 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
     }
 
     /**
-     * Return the update rate.
+     * @return the update rate.
      */
+    @Override
     public int getUpdateRate() {
         return 150; //ms
     }
 
     /**
-     * Return the initial delay before obtaining a listener.
+     * @return the initial delay before obtaining a listener.
      */
+    @Override
     public int getInitialDelay() {
         return 300; //ms
     }
@@ -100,7 +102,9 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
      * @param app the downloading application, or null if N/A
      * @param downloadName name identifying the download to the user
      * @param resources initial urls to display (not required)
+     * @return donload service listener attached to this app. instance
      */
+    @Override
     public DownloadServiceListener getListener(ApplicationInstance app, String downloadName, URL resources[]) {
         DownloadPanel result = new DownloadPanel(downloadName);
 
@@ -154,11 +158,13 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
      * calling the getDownloadListener method from the shared
      * download info window.
      */
+    @Override
     public void disposeListener(final DownloadServiceListener listener) {
         if (!(listener instanceof DownloadPanel))
             return;
 
         ActionListener hider = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 synchronized(dialogMutex) {
                     dialog.getContentPane().remove((DownloadPanel) listener);
@@ -203,15 +209,15 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         /** used  instead of detailsButton button in case of one jar*/
         private JLabel delimiter = new JLabel("");  
         /** all already created progress bars*/
-        private List<ProgressPanel> progressPanels = new ArrayList<ProgressPanel>();
+        private List<ProgressPanel> progressPanels = new ArrayList<>();
         private States state=States.ONE_JAR;
         private ProgressPanel mainProgressPanel;
         
         /** list of URLs being downloaded */
-        private List<URL> urls = new ArrayList<URL>();
+        private List<URL> urls = new ArrayList<>();
 
         /** list of ProgressPanels */
-        private List<ProgressPanel> panels = new ArrayList<ProgressPanel>();
+        private List<ProgressPanel> panels = new ArrayList<>();
 
         /**
          * Create a new download panel for with the specified download
@@ -309,6 +315,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                               final long readSoFar, final long total,
                               final int overallPercent) {
             Runnable r = new Runnable() {
+                @Override
                 public void run() {
                     if (!urls.contains(url))
                         addProgressPanel(url, version);
@@ -351,6 +358,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         /**
          * Called when a download failed.
          */
+        @Override
         public void downloadFailed(URL url, String version) {
             update(url, version, -1, -1, -1);
         }
@@ -358,6 +366,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         /**
          * Called when a download has progressed.
          */
+        @Override
         public void progress(URL url, String version, long readSoFar, long total, int overallPercent) {
             update(url, version, readSoFar, total, overallPercent);
         }
@@ -365,6 +374,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         /**
          * Called when an archive is patched.
          */
+        @Override
         public void upgradingArchive(URL url, String version, int patchPercent, int overallPercent) {
             update(url, version, patchPercent, 100, overallPercent);
         }
@@ -372,6 +382,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         /**
          * Called when a download is being validated.
          */
+        @Override
         public void validating(URL url, String version, long entry, long total, int overallPercent) {
             update(url, version, entry, total, overallPercent);
         }
@@ -382,11 +393,11 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
      * A progress bar with the URL next to it.
      */
     static class ProgressPanel extends JPanel {
-        private JPanel bar = new JPanel();
+        final private JPanel bar = new JPanel();
 
         private long total;
         private long readSoFar;
-        private Dimension size = new Dimension(80, 15);
+        final private Dimension size = new Dimension(80, 15);
 
         ProgressPanel() {
             bar.setMinimumSize(size);
@@ -427,6 +438,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
             this.total = total;
         }
 
+        @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
 

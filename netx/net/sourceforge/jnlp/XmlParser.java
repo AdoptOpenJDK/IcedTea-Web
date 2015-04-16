@@ -67,7 +67,7 @@ class XMLParser {
      *
      * @param input the {@link InputStream} containing the XML
      * @return a {@link Node} representing the root of the parsed XML
-     * @throws ParseException
+     * @throws ParseException if parsing fails
      */
     public Node getRootNode(InputStream input) throws ParseException {
 
@@ -101,6 +101,7 @@ class XMLParser {
             // it to the parser.
             new Thread(
                     new Runnable() {
+                        @Override
                         public void run() {
                             (new XMLElement()).sanitizeInput(isr, pout);
                             try {

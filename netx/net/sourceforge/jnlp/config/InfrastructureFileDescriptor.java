@@ -86,8 +86,9 @@ public class InfrastructureFileDescriptor {
     
     /**
      * overload version for control panel, which is saving to internal copy.
-     * @param value
-     * @param config 
+     * @param value new path of file
+     * @param config  config where t write this value (note, usually JNLPRuntime.getConfiguration()
+     * so you don't need it, but our config gui tool is using two sets to allow undo.
      */
     public void setValue(String value, DeploymentConfiguration config) {
         String key = getPropertiesKey();
@@ -100,8 +101,9 @@ public class InfrastructureFileDescriptor {
     
     /**
      * overload version for control panel, which is saving to internal copy.
-     * @param config
-     * @return 
+     * @param config config from where to readthis value (note, usually JNLPRuntime.getConfiguration()
+     * so you don't need it, but our config gui tool is using two sets to allow undo.
+     * @return configured property or default
      */
     public String getFullPath(DeploymentConfiguration config) {
         String key = getPropertiesKey();
@@ -156,7 +158,7 @@ public class InfrastructureFileDescriptor {
      * For documentation purposes, the descriptor may be created as VARIABLE/custom/path.
      *
      * This is whole part, which is considered as setup-able.
-     * @return
+     * @return directory acronym for nice docs
      */
     public String getDirViaAcronym() {
         return clean(getSystemPathStubAcronym() + File.separator + pathStub);

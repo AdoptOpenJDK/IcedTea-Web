@@ -184,6 +184,7 @@ public class JNLPRuntime {
      * Returns whether the JNLP runtime environment has been
      * initialized. Once initialized, some properties such as the
      * base directory cannot be changed. Before
+     * @return whether this runtime was already initialilsed
      */
     public static boolean isInitialized() {
         return initialized;
@@ -312,7 +313,7 @@ public class JNLPRuntime {
         try {
 
             Class<?> trustManagerClass;
-            Constructor<?> tmCtor = null;
+            Constructor<?> tmCtor;
 
             if (System.getProperty("java.version").startsWith("1.6")) { // Java 6
                 try {
@@ -483,7 +484,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns true if a webstart application has been initialized, and false
+     * @return true if a webstart application has been initialized, and false
      * for a plugin applet.
      */
     public static boolean isWebstartApplication() {
@@ -491,7 +492,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns whether the JNLP client will use any AWT/Swing
+     * @return whether the JNLP client will use any AWT/Swing
      * components.
      */
     public static boolean isHeadless() {
@@ -499,7 +500,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns whether we are verifying code signing.
+     * @return whether we are verifying code signing.
      */
     public static boolean isVerifying() {
         return verify;
@@ -511,6 +512,7 @@ public class JNLPRuntime {
      * AWT are disabled such that the client can be used in
      * headless mode ({@code java.awt.headless=true}).
      *
+     * @param enabled true if application do not wont/need gui or X at all
      * @throws IllegalStateException if the runtime was previously initialized
      */
     public static void setHeadless(boolean enabled) {
@@ -529,9 +531,11 @@ public class JNLPRuntime {
     
 
     /**
-         * Sets whether we will verify code signing.
-         * @throws IllegalStateException if the runtime was previously initialized
-         */
+     * Sets whether we will verify code signing.
+     *
+     * @param enabled true if app should verify signatures
+     * @throws IllegalStateException if the runtime was previously initialized
+     */
     public static void setVerify(boolean enabled) {
         checkInitialized();
         verify = enabled;
@@ -539,6 +543,7 @@ public class JNLPRuntime {
 
     /**
      * Returns whether the secure runtime environment is enabled.
+     * @return true if security manager is created
      */
     public static boolean isSecurityEnabled() {
         return securityEnabled;
@@ -580,6 +585,7 @@ public class JNLPRuntime {
      * Set a class that can exit the JVM; if not set then any class
      * can exit the JVM.
      *
+     * @param exitClass a class that can exit the JVM
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setExitClass(Class<?> exitClass) {
@@ -597,7 +603,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Return the current Application, or null if none can be
+     * @return the current Application, or null if none can be
      * determined.
      */
     public static ApplicationInstance getApplication() {
@@ -605,7 +611,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Return whether debug statements for the JNLP client code
+     * @return whether debug statements for the JNLP client code
      * should be printed.
      */
     public static boolean isDebug() {
@@ -620,6 +626,7 @@ public class JNLPRuntime {
      * Sets whether debug statements for the JNLP client code
      * should be printed to the standard output.
      *
+     * @param enabled set to true if you need full debug output
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDebug(boolean enabled) {
@@ -631,6 +638,7 @@ public class JNLPRuntime {
     /**
      * Sets the default update policy.
      *
+     * @param policy global update policy of environment
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDefaultUpdatePolicy(UpdatePolicy policy) {
@@ -639,7 +647,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns the default update policy.
+     * @return the default update policy.
      */
     public static UpdatePolicy getDefaultUpdatePolicy() {
         return updatePolicy;
@@ -647,6 +655,7 @@ public class JNLPRuntime {
 
     /**
      * Sets the default launch handler.
+     * @param handler default handler
      */
     public static void setDefaultLaunchHandler(LaunchHandler handler) {
         checkExitClass();
@@ -655,6 +664,7 @@ public class JNLPRuntime {
 
     /**
      * Returns the default launch handler.
+     * @return default handler
      */
     public static LaunchHandler getDefaultLaunchHandler() {
         return handler;
@@ -663,6 +673,7 @@ public class JNLPRuntime {
     /**
      * Sets the default download indicator.
      *
+     * @param indicator where to show progress
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDefaultDownloadIndicator(DownloadIndicator indicator) {
@@ -671,7 +682,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns the default download indicator.
+     * @return the default download indicator.
      */
     public static DownloadIndicator getDefaultDownloadIndicator() {
         return indicator;
@@ -682,7 +693,7 @@ public class JNLPRuntime {
     }
 
     /**
-     * Returns {@code true} if the current runtime will fork
+     * @return {@code true} if the current runtime will fork
      */
     public static boolean getForksAllowed() {
         return forksAllowed;
@@ -767,11 +778,8 @@ public class JNLPRuntime {
             if (!netxRunningFile.exists()) {
                 FileUtils.createParentDir(netxRunningFile);
                 FileUtils.createRestrictedFile(netxRunningFile, true);
-                FileOutputStream fos = new FileOutputStream(netxRunningFile);
-                try {
+                try (FileOutputStream fos = new FileOutputStream(netxRunningFile)) {
                     fos.write(message.getBytes());
-                } finally {
-                    fos.close();
                 }
             }
 
@@ -796,6 +804,7 @@ public class JNLPRuntime {
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread("JNLPRuntimeShutdownHookThread") {
+            @Override
             public void run() {
                 markNetxStopped();
                 CacheUtil.cleanCache();

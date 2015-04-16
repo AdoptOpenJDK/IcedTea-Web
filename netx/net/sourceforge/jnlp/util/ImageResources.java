@@ -54,7 +54,7 @@ public enum ImageResources {
 
     private static final String APPLICATION_ICON_PATH = "net/sourceforge/jnlp/resources/netx-icon.png";
 
-    private final Map<String, Image> cache = new HashMap<String, Image>();
+    private final Map<String, Image> cache = new HashMap<>();
 
     private ImageResources() {}
 
@@ -88,10 +88,10 @@ public enum ImageResources {
     }
 
     /**
-     * Returns an appropriate image, or null if there are errors loading the image.
+     * @return an appropriate image, or null if there are errors loading the image.
      */
     public List<Image> getApplicationImages() {
-        List<Image> images = new ArrayList<Image>();
+        List<Image> images = new ArrayList<>();
         Image appImage = getApplicationImage();
         if (appImage != null) {
             images.add(appImage);

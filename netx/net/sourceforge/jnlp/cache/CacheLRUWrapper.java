@@ -317,7 +317,7 @@ public class CacheLRUWrapper {
     /**
      * Return the value of given key.
      * 
-     * @param key
+     * @param key key of property
      * @return value of given key, null otherwise.
      */
     public synchronized String getValue(String key) {

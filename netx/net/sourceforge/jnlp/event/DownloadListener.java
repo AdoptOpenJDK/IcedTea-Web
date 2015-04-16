@@ -32,16 +32,19 @@ public interface DownloadListener extends EventListener {
 
     /**
      * Called when a resource is checked for being up-to-date.
+     * @param downloadEvent information about started update
      */
     public void updateStarted(DownloadEvent downloadEvent);
 
     /**
      * Called when a download starts.
+     * @param downloadEvent  information about started download
      */
     public void downloadStarted(DownloadEvent downloadEvent);
 
     /**
      * Called when a download completed or there was an error.
+     * @param downloadEvent  information about finished download
      */
     public void downloadCompleted(DownloadEvent downloadEvent);
 

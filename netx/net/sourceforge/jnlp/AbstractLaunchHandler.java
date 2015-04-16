@@ -50,6 +50,7 @@ public abstract class AbstractLaunchHandler implements LaunchHandler {
 
     /**
      * Print a message
+     * @param ex exception to be printed out
      */
     protected void printMessage(LaunchException ex) {
         StringBuilder result = new StringBuilder();

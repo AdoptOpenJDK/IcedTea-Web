@@ -19,10 +19,10 @@ package net.sourceforge.jnlp;
 public final class AssociationDesc {
 
     /** the extensions this application wants to register with */
-    private String[] extensions;
+    private final String[] extensions;
 
     /** the mime type for the association */
-    private String mimeType;
+    private final String mimeType;
 
     public AssociationDesc(String mimeType, String[] extensions) throws ParseException {
         checkMimeType(mimeType);
@@ -31,14 +31,14 @@ public final class AssociationDesc {
     }
 
     /**
-     * Return the extensions for this association
+     * @return the extensions for this association
      */
     public String[] getExtensions() {
         return extensions;
     }
 
     /**
-     * Return the mimetype for this association
+     * @return the mimetype for this association
      */
     public String getMimeType() {
         return mimeType;

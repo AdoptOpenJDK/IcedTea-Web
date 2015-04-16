@@ -54,7 +54,7 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
     // We use this so that we can create exactly one thread group
     // for all panels with the same uKey.
     private static final Map<String, ThreadGroup> uKeyToTG =
-        new HashMap<String, ThreadGroup>();
+        new HashMap<>();
     private static final Object TGMapMutex = new Object();
 
     // This map is actually a set (unfortunately there is no ConcurrentSet

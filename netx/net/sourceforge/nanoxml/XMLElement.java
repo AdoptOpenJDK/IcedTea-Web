@@ -353,7 +353,7 @@ public class XMLElement {
     }
 
     /**
-     * Returns the number of child elements of the element.
+     * @return the number of child elements of the element.
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>{@code result >= 0}</li>
@@ -364,7 +364,7 @@ public class XMLElement {
     }
 
     /**
-     * Enumerates the attribute names.
+     * @return Enumeration of the attribute names.
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>{@code result != null}</li>
@@ -375,7 +375,7 @@ public class XMLElement {
     }
 
     /**
-     * Enumerates the child elements.
+     * @return Enumeration the child elements.
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
      * <ul><li>{@code result != null}</li>
@@ -386,7 +386,7 @@ public class XMLElement {
     }
 
     /**
-     * Returns the PCDATA content of the object. If there is no such content,
+     * @return the PCDATA content of the object. If there is no such content,
      * {@code null} is returned.
      */
     public String getContent() {
@@ -394,7 +394,7 @@ public class XMLElement {
     }
 
     /**
-     * Returns the line nr in the source data on which the element is found.
+     * @return the line nr in the source data on which the element is found.
      * This method returns {@code 0} there is no associated source data.
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
@@ -406,7 +406,7 @@ public class XMLElement {
     }
 
     /**
-     * Returns an attribute of the element.
+     * @return an attribute of the element.
      * <p>
      * If the attribute doesn't exist, {@code null} is returned.
      *
@@ -517,6 +517,7 @@ public class XMLElement {
      * <p>
      * You should override this method when subclassing XMLElement.
      * </p>
+     * @return next element in tree based on global settings
      */
     protected XMLElement createAnotherElement() {
         return new XMLElement(this.entities,
@@ -567,6 +568,7 @@ public class XMLElement {
      * <ul><li>The next character read from the reader won't be an identifier
      *         character.</li>
      * </ul></dd></dl>
+     * @throws java.io.IOException if something goes wrong
      */
     protected void scanIdentifier(StringBuffer result)
             throws IOException {
@@ -586,6 +588,7 @@ public class XMLElement {
      * This method scans an identifier from the current reader.
      *
      * @return the next character following the whitespace.
+     * @throws java.io.IOException if something goes wrong
      */
     protected char scanWhitespace()
             throws IOException {
@@ -608,11 +611,13 @@ public class XMLElement {
      * <p>
      * The scanned whitespace is appended to {@code result}.
      *
+     * @param result where to append scanned text
      * @return the next character following the whitespace.
      *
      * <dl><dt><b>Preconditions:</b></dt><dd>
      * <ul><li>{@code result != null}</li>
      * </ul></dd></dl>
+     * @throws java.io.IOException if something goes wrong
      */
     protected char scanWhitespace(StringBuffer result)
             throws IOException {
@@ -641,6 +646,8 @@ public class XMLElement {
      * <ul><li>{@code string != null}</li>
      *     <li>the next char read is the string delimiter</li>
      * </ul></dd></dl>
+     * @param string where to append the result
+     * @throws java.io.IOException if something goes wrong
      */
     protected void scanString(StringBuffer string)
             throws IOException {
@@ -671,6 +678,8 @@ public class XMLElement {
      * <dl><dt><b>Preconditions:</b></dt><dd>
      * <ul><li>{@code data != null}</li>
      * </ul></dd></dl>
+     * @param data where to append data
+     * @throws java.io.IOException if something goes wrong
      */
     protected void scanPCData(StringBuffer data)
             throws IOException {
@@ -700,6 +709,9 @@ public class XMLElement {
      * <ul><li>{@code buf != null}</li>
      *     <li>The first &lt; has already been read.</li>
      * </ul></dd></dl>
+     * @param buf buffer where to append data
+     * @return whether the CDATA were ok
+     * @throws java.io.IOException if something goes wrong
      */
     protected boolean checkCDATA(StringBuffer buf)
             throws IOException {
@@ -754,6 +766,7 @@ public class XMLElement {
      * <dl><dt><b>Preconditions:</b></dt><dd>
      * <ul><li>The first &lt;!-- has already been read.</li>
      * </ul></dd></dl>
+     * @throws java.io.IOException if something goes wrong
      */
     protected void skipComment()
             throws IOException {
@@ -795,6 +808,7 @@ public class XMLElement {
      * <ul><li>The first &lt;! has already been read.</li>
      *     <li>{@code bracketLevel &gt;= 0}</li>
      * </ul></dd></dl>
+     * @throws java.io.IOException if something goes wrong
      */
     protected void skipSpecialTag(int bracketLevel)
             throws IOException {
@@ -852,6 +866,8 @@ public class XMLElement {
      * <dl><dt><b>Preconditions:</b></dt><dd>
      * <ul><li>{@code literal != null}</li>
      * </ul></dd></dl>
+     * @return true if literal was ok
+     * @throws java.io.IOException  if something goes wrong
      */
     protected boolean checkLiteral(String literal)
             throws IOException {
@@ -866,6 +882,8 @@ public class XMLElement {
 
     /**
      * Reads a character from a reader.
+     * @return the read char
+     * @throws java.io.IOException if something goes wrong
      */
     protected char readChar()
             throws IOException {
@@ -895,13 +913,14 @@ public class XMLElement {
      * <ul><li>The first &lt; has already been read.</li>
      *     <li>{@code elt != null}</li>
      * </ul></dd></dl>
+     * @throws java.io.IOException if something goes wrong
      */
     protected void scanElement(XMLElement elt)
             throws IOException {
         StringBuffer buf = new StringBuffer();
         this.scanIdentifier(buf);
-        String name = buf.toString();
-        elt.setName(name);
+        String lname = buf.toString();
+        elt.setName(lname);
         char ch = this.scanWhitespace();
         while ((ch != '>') && (ch != '/')) {
             buf.setLength(0);
@@ -988,8 +1007,8 @@ public class XMLElement {
             throw this.expectedInput("/");
         }
         this.unreadChar(this.scanWhitespace());
-        if (!this.checkLiteral(name)) {
-            throw this.expectedInput(name);
+        if (!this.checkLiteral(lname)) {
+            throw this.expectedInput(lname);
         }
         if (this.scanWhitespace() != '>') {
             throw this.expectedInput(">");
@@ -1007,6 +1026,7 @@ public class XMLElement {
      * <ul><li>The first &amp; has already been read.</li>
      *     <li>{@code buf != null}</li>
      * </ul></dd></dl>
+     * @throws java.io.IOException if something goes wrong
      */
     protected void resolveEntity(StringBuffer buf)
             throws IOException {
@@ -1063,6 +1083,7 @@ public class XMLElement {
      * <dl><dt><b>Preconditions:</b></dt><dd>
      * <ul><li>{@code name != null}</li>
      * </ul></dd></dl>
+     * @return exception to be thrown
      */
     protected XMLParseException invalidValueSet(String name) {
         String msg = "Invalid value set (entity name = \"" + name + "\")";
@@ -1080,6 +1101,7 @@ public class XMLElement {
      * <ul><li>{@code name != null}</li>
      *     <li>{@code value != null}</li>
      * </ul></dd></dl>
+     * @return exception to be used
      */
     protected XMLParseException invalidValue(String name,
                                              String value) {
@@ -1091,6 +1113,7 @@ public class XMLElement {
     /**
      * Creates a parse exception for when the end of the data input has been
      * reached.
+     * @return  exception to be used
      */
     protected XMLParseException unexpectedEndOfData() {
         String msg = "Unexpected end of data reached";
@@ -1106,6 +1129,7 @@ public class XMLElement {
      * <ul><li>{@code context != null}</li>
      *     <li>{@code context.length() &gt; 0}</li>
      * </ul></dd></dl>
+     * @return exception to be used
      */
     protected XMLParseException syntaxError(String context) {
         String msg = "Syntax error while parsing " + context;
@@ -1123,6 +1147,7 @@ public class XMLElement {
      * <ul><li>{@code charSet != null}</li>
      *     <li>{@code charSet.length() &gt; 0}</li>
      * </ul></dd></dl>
+     * @return exception to be used
      */
     protected XMLParseException expectedInput(String charSet) {
         String msg = "Expected: " + charSet;
@@ -1140,6 +1165,7 @@ public class XMLElement {
      * <ul><li>{@code charSet != null}</li>
      *     <li>{@code charSet.length() &gt; 0}</li>
      * </ul></dd></dl>
+     * @return exception to be used
      */
     protected XMLParseException expectedInput(String charSet, char ch) {
         String msg = "Expected: '" + charSet + "'" + " but got: '" + ch + "'";
@@ -1150,6 +1176,7 @@ public class XMLElement {
      * Creates a parse exception for when an entity could not be resolved.
      *
      * @param name The name of the entity.
+     * @return exception to be used
      *
      * <dl><dt><b>Preconditions:</b></dt><dd>
      * <ul><li>{@code name != null}</li>
@@ -1165,8 +1192,8 @@ public class XMLElement {
      * Reads an xml file and removes the comments, leaving only relevant
      * xml code.
      *
-     * @param isr The reader of the {@link InputStream} containing the xml.
-     * @param pout The {@link PipedOutputStream} that will be receiving the
+     * @param isr The reader of the {@link java.io.InputStream} containing the xml.
+     * @param pout The {@link java.io.PipedOutputStream} that will be receiving the
      *             filtered xml file.
      */
     public void sanitizeInput(Reader isr, OutputStream pout) {

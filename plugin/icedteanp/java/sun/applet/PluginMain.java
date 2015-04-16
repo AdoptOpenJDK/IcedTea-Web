@@ -73,7 +73,6 @@ import java.net.CookieManager;
 import java.net.ProxySelector;
 import java.net.URL;
 import java.net.URLStreamHandler;
-import java.security.Permission;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -119,6 +118,8 @@ public class PluginMain {
 
     /**
      * The main entry point into AppletViewer.
+     * @param args regular command-line arguments to be passed from native part
+     * @throws java.io.IOException if IO issues occur
      */
     public static void main(String args[])
             throws IOException {

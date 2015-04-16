@@ -73,6 +73,8 @@ public class Translator {
     }
 
     /**
+     * @param message key to be found in properties
+     * @param params params to be expanded to message
      * @return the localized string for the message
      */
     public static String R(String message, Object... params) {
@@ -81,9 +83,9 @@ public class Translator {
 
    
     /**
-     * Returns the localized resource string using the specified arguments.
-     *
-     * @param args the formatting arguments to the resource string
+     * @return the localized resource string using the specified arguments.
+     * @param key key to be found in properties
+     * @param args params to be expanded to message
      */
     protected String getMessage(String key, Object... args) {
         return MessageFormat.format(getMessage(key), args);

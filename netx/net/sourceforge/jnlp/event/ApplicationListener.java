@@ -29,6 +29,7 @@ public interface ApplicationListener extends EventListener {
 
     /**
      * Invoked when the application is destroyed.
+     * @param applicationEvent information about destruction
      */
     public void applicationDestroyed(ApplicationEvent applicationEvent);
 

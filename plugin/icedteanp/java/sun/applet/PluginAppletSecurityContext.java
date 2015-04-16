@@ -1286,7 +1286,7 @@ public class PluginAppletSecurityContext {
     }
 
     /**
-     * Returns a "closed" AccessControlContext i.e. no permissions to get out of sandbox.
+     * @return a "closed" AccessControlContext i.e. no permissions to get out of sandbox.
      */
     public AccessControlContext getClosedAccessControlContext() {
         // Deny everything

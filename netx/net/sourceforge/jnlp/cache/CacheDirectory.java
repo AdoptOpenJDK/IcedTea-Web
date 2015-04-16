@@ -70,7 +70,7 @@ public final class CacheDirectory {
      * @return An ArrayList of DirectoryNode.
      */
     public static ArrayList<DirectoryNode> getLeafData(DirectoryNode root) {
-        ArrayList<DirectoryNode> temp = new ArrayList<DirectoryNode>();
+        ArrayList<DirectoryNode> temp = new ArrayList<>();
         for (DirectoryNode f : root.getChildren()) {
             if (f.isDir())
                 temp.addAll(getLeafData(f));
@@ -104,13 +104,13 @@ public final class CacheDirectory {
     /**
      * This will recursively remove the parent folders if they are empty. 
      * 
-     * @param fileNode
+     * @param fileNode node of file which parent is going to be cleaned
      */
     public static void cleanParent(DirectoryNode fileNode) {
         DirectoryNode parent = fileNode.getParent();
         if (parent.getParent() == null)
             return; // Don't delete the root.
-        if (parent.getChildren().size() == 0) {
+        if (parent.getChildren().isEmpty()) {
             FileUtils.deleteWithErrMesg(parent.getFile());
             parent.getParent().removeChild(parent);
             cleanParent(parent);

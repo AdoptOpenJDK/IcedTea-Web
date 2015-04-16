@@ -111,6 +111,7 @@ public final class JSObject {
 
     /**
      * it is illegal to construct a JSObject manually
+     * @param jsobj_addr integer to become jsobject
      */
     public JSObject(int jsobj_addr) {
         this((long) jsobj_addr);
@@ -118,6 +119,7 @@ public final class JSObject {
 
     /**
      * it is illegal to construct a JSObject manually
+     * @param jsobj_addr string to become jsobject
      */
     public JSObject(String jsobj_addr) {
         this(Long.parseLong(jsobj_addr));
@@ -158,6 +160,8 @@ public final class JSObject {
     /**
      * Retrieves a named member of a JavaScript object.
      * Equivalent to "this.<i>name</i>" in JavaScript.
+     * @param name name of the memebr to be searched in
+     * @return object which is member of name
      */
     public Object getMember(String name) {
         PluginDebug.debug("JSObject.getMember ", name);
@@ -170,6 +174,8 @@ public final class JSObject {
     /**
      * Retrieves an indexed member of a JavaScript object.
      * Equivalent to "this[<i>index</i>]" in JavaScript.
+     * @param index as in array-like touch in javascript array
+     * @return object on index position
      */
     //    public Object         getMember(int index) { return getSlot(index); }
     public Object getSlot(int index) {
@@ -181,6 +187,8 @@ public final class JSObject {
     /**
      * Sets a named member of a JavaScript object.
      * Equivalent to "this.<i>name</i> = <i>value</i>" in JavaScript.
+     * @param name name of the member
+     * @param value value to best to the named member
      */
     public void setMember(String name, Object value) {
         PluginDebug.debug("JSObject.setMember ", name, " ", value);
@@ -191,6 +199,8 @@ public final class JSObject {
     /**
      * Sets an indexed member of a JavaScript object.
      * Equivalent to "this[<i>index</i>] = <i>value</i>" in JavaScript.
+     * @param index as in array-like touch in javascript array
+     * @param value value to be set on the index palce
      */
     //    public void           setMember(int index, Object value) {
     //        setSlot(index, value);
@@ -203,6 +213,7 @@ public final class JSObject {
 
     /**
      * Removes a named member of a JavaScript object.
+     * @param name name of member of given name
      */
     public void removeMember(String name) {
         PluginDebug.debug("JSObject.removeMember ", name);
@@ -213,6 +224,9 @@ public final class JSObject {
     /**
      * Calls a JavaScript method.
      * Equivalent to "this.<i>methodName</i>(<i>args</i>[0], <i>args</i>[1], ...)" in JavaScript.
+     * @param methodName - name of the method to be called
+     * @param args parameters for method
+     * @return result of method call
      */
     public Object call(String methodName, Object args[]) {
         if (args == null)
@@ -230,6 +244,8 @@ public final class JSObject {
      * Evaluates a JavaScript expression. The expression is a string
      * of JavaScript source code which will be evaluated in the context
      * given by "this".
+     * @param s expression to be evaluated
+     * @return result of evaluation
      */
     public Object eval(String s) {
         PluginDebug.debug("JSObject.eval ", s);
@@ -238,7 +254,9 @@ public final class JSObject {
 
     /**
      * Converts a JSObject to a String.
+     * @return string representation of this object
      */
+    @Override
     public String toString() {
         PluginDebug.debug("JSObject.toString");
         return PluginAppletViewer.javascriptToString(internal);
@@ -250,12 +268,13 @@ public final class JSObject {
 
     /**
      * get a JSObject for the window containing the given applet
+     * @param applet applet which will be searched for window
+     * @return the JSObject representing window of applet
      */
     public static JSObject getWindow(Applet applet) {
         PluginDebug.debug("JSObject.getWindow");
         // FIXME: handle long case as well.
-        long internal = 0;
-        internal = ((PluginAppletViewer)
+        long internal = ((PluginAppletViewer)
                     applet.getAppletContext()).getWindow();
         PluginDebug.debug("GOT IT: ", internal);
         return new JSObject(internal);
@@ -265,6 +284,7 @@ public final class JSObject {
      * Finalization decrements the reference count on the corresponding
      * JavaScript object.
      */
+    @Override
     protected void finalize() {
 
         // Proceed if this is a valid object (0L == default long == invalid)

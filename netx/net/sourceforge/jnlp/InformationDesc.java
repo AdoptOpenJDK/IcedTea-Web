@@ -57,6 +57,7 @@ public class InformationDesc {
      * Create an information element object.
      *
      * @param locales the locales the information is for
+     * @param strict whether parser was strict
      */
     public InformationDesc(Locale locales[], boolean strict) {
         this.locales = locales;
@@ -68,28 +69,28 @@ public class InformationDesc {
     }
 
     /**
-     * Returns the application's title.
+     * @return the application's title.
      */
     public String getTitle() {
         return (String) getItem("title");
     }
 
     /**
-     * Returns the application's vendor.
+     * @return the application's vendor.
      */
     public String getVendor() {
         return (String) getItem("vendor");
     }
 
     /**
-     * Returns the application's homepage.
+     * @return the application's homepage.
      */
     public URL getHomepage() {
         return (URL) getItem("homepage");
     }
 
     /**
-     * Returns the default description for the application.
+     * @return the default description for the application.
      */
     public String getDescription() {
         String result = getDescription(DEFAULT);
@@ -106,7 +107,7 @@ public class InformationDesc {
     }
 
     /**
-     * Returns the application's description of the specified type.
+     * @return the application's description of the specified type.
      *
      * @param kind one of Information.SHORT, Information.ONE_LINE,
      * Information.TOOLTIP, Information.DEFAULT
@@ -120,7 +121,7 @@ public class InformationDesc {
     }
 
       /**
-     * Returns the application's description of the specified type.
+     * @return the application's description of the specified type.
      *
      * @param kind one of Information.SHORT, Information.ONE_LINE,
      * Information.TOOLTIP, Information.DEFAULT
@@ -160,15 +161,14 @@ public class InformationDesc {
             return null;
 
         IconDesc best = null;
-        for (int i = 0; i < icons.length; i++) {
-            if (icons[i].getWidth() >= width &&
-                    icons[i].getHeight() >= height) {
-                if (best == null)
-                    best = icons[i];
-
-                if (icons[i].getWidth() <= best.getWidth() && // Use <= so last specified of
-                        icons[i].getHeight() <= best.getHeight()) // equivalent icons is chosen.
-                    best = icons[i];
+        for (IconDesc icon : icons) {
+            if (icon.getWidth() >= width && icon.getHeight() >= height) {
+                if (best == null) {
+                    best = icon;
+                }
+                if (icon.getWidth() <= best.getWidth() && icon.getHeight() <= best.getHeight()) {
+                    best = icon;
+                }
             }
         }
 
@@ -181,14 +181,14 @@ public class InformationDesc {
     }
 
     /**
-     * Returns the locales for the information.
+     * @return the locales for the information.
      */
     public Locale[] getLocales() {
         return locales;
     }
 
     /**
-     * Returns whether offline execution allowed.
+     * @return whether offline execution allowed.
      */
     public boolean isOfflineAllowed() {
         if (strict) {
@@ -200,7 +200,7 @@ public class InformationDesc {
     }
 
     /**
-     * Returns whether the resources specified in the JNLP file may
+     * @return whether the resources specified in the JNLP file may
      * be shared by more than one instance in the same JVM
      * (JNLP extension).  This is an extension to the JNLP spec and
      * will always return false for standard JNLP files.
@@ -210,7 +210,7 @@ public class InformationDesc {
     }
 
     /**
-     * Returns the associations specified in the JNLP file
+     * @return the associations specified in the JNLP file
      */
     public AssociationDesc[] getAssociations() {
         List<Object> associations = getItems("association");
@@ -219,14 +219,14 @@ public class InformationDesc {
     }
 
     /**
-     * Returns the shortcut specified by this JNLP file
+     * @return the shortcut specified by this JNLP file
      */
     public ShortcutDesc getShortcut() {
         return (ShortcutDesc) getItem("shortcut");
     }
 
     /**
-     * Returns the related-contents specified by this JNLP file
+     * @return the related-contents specified by this JNLP file
      */
     public RelatedContentDesc[] getRelatedContents() {
         List<Object> relatedContents = getItems("related-content");
@@ -235,24 +235,26 @@ public class InformationDesc {
     }
 
     /**
-     * Returns the last item matching the specified key.
+     * @param key key to find item
+     * @return the last item matching the specified key.
      */
     protected Object getItem(Object key) {
         List<Object> items = getItems(key);
-        if (items.size() == 0)
+        if (items.isEmpty())
             return null;
         else
             return items.get(items.size() - 1);
     }
 
     /**
-     * Returns all items matching the specified key.
+     * @param key key to find item
+     * @return all items matching the specified key.
      */
     protected List<Object> getItems(Object key) {
         if (info == null)
             return Collections.emptyList();
 
-        List<Object> result = new ArrayList<Object>();
+        List<Object> result = new ArrayList<>();
         for (int i = 0; i < info.size(); i += 2)
             if (info.get(i).equals(key))
                 result.add(info.get(i + 1));
@@ -263,10 +265,12 @@ public class InformationDesc {
     /**
      * Add an information item (description, icon, etc) under a
      * specified key name.
+     * @param key key to place value to
+     * @param value value to be placed to key
      */
     protected void addItem(String key, Object value) {
         if (info == null)
-            info = new ArrayList<Object>();
+            info = new ArrayList<>();
 
         info.add(key);
         info.add(value);

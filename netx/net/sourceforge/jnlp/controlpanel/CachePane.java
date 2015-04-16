@@ -88,6 +88,7 @@ public class CachePane extends JPanel {
      * Creates a new instance of the CachePane.
      * 
      * @param parent The parent dialog that uses this pane.
+     * @param config configuration tobe worked on
      */
     public CachePane(JDialog parent, DeploymentConfiguration config) {
         super(new BorderLayout());
@@ -127,7 +128,7 @@ public class CachePane extends JPanel {
         cacheTable.setFillsViewportHeight(true);
         JScrollPane scrollPane = new JScrollPane(cacheTable);
 
-        TableRowSorter<TableModel> tableSorter = new TableRowSorter<TableModel>(model);
+        TableRowSorter<TableModel> tableSorter = new TableRowSorter<>(model);
         final Comparator<Comparable<?>> comparator = new Comparator<Comparable<?>>() { // General purpose Comparator
             @Override
             @SuppressWarnings("unchecked")
@@ -187,7 +188,7 @@ public class CachePane extends JPanel {
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
-        List<JButton> buttons = new ArrayList<JButton>();
+        List<JButton> buttons = new ArrayList<>();
 
         this.deleteButton = new JButton(Translator.R("CVCPButDelete"));
         deleteButton.addActionListener(new ActionListener() {
@@ -418,7 +419,7 @@ public class CachePane extends JPanel {
     private ArrayList<Object[]> generateData(DirectoryNode root) {
         root = new DirectoryNode("Root", location, null);
         CacheDirectory.getDirStructure(root);
-        ArrayList<Object[]> data = new ArrayList<Object[]>();
+        ArrayList<Object[]> data = new ArrayList<>();
 
         for (DirectoryNode identifier : root.getChildren()) {
             for (DirectoryNode type : identifier.getChildren()) {

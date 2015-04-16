@@ -65,28 +65,28 @@ public final class ShortcutDesc {
     }
 
     /**
-     * Returns whether the shortcut requires being online
+     * @return whether the shortcut requires being online
      */
     public boolean isOnline() {
         throw new RuntimeException("icedtea-web is not saving  online-enforcing attribute. See Xoffline impelmentations if needed.");
     }
      /**
       * For testing purposes. Verify if it have been parsed out correctly.
-     * Returns whether the shortcut requires being online.
+     * @return whether the shortcut requires being online.
      */
     boolean isOnlineValue() {
         return requiresOnline;
     }
 
     /**
-     * Return whether the shortcut should be placed on the desktop
+     * @return whether the shortcut should be placed on the desktop
      */
     public boolean onDesktop() {
         return onDesktop;
     }
     
      /**
-     * Return whether the shortcut should be placed to the menus
+     * @return whether the shortcut should be placed to the menus
      */
     public boolean toMenu() {
         return getMenu() != null;
@@ -102,7 +102,7 @@ public final class ShortcutDesc {
     }
 
     /**
-     * Returns the menu this shortcut should be added to
+     * @return the menu this shortcut should be added to
      */
     public MenuDesc getMenu() {
         return menu;

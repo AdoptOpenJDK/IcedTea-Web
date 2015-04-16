@@ -44,6 +44,7 @@ public interface DownloadIndicator {
      * @param app JNLP application downloading the files, or null if not applicable
      * @param downloadName name identifying the download to the user
      * @param resources initial urls to display, empty if none known at start
+     * @return dedicated listener
      */
     public DownloadServiceListener getListener(ApplicationInstance app,
                                                String downloadName,

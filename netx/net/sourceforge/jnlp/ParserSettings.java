@@ -57,7 +57,11 @@ public class ParserSettings {
         this(false, true, true);
     }
 
-    /** Create a new ParserSettings object */
+    /** Create a new ParserSettings object
+     * @param strict true if parser should be stric
+     * @param extensionAllowed true if extensions are allowed
+     * @param malformedXmlAllowed true if xml sanitizer should be used
+     */
     public ParserSettings(boolean strict, boolean extensionAllowed, boolean malformedXmlAllowed) {
         this.isStrict = strict;
         this.extensionAllowed = extensionAllowed;
@@ -80,7 +84,7 @@ public class ParserSettings {
     }
 
     /**
-     * Return the global parser settings in use.
+     * @return the global parser settings in use.
      */
     public static ParserSettings getGlobalParserSettings() {
         return globalParserSettings;
@@ -88,13 +92,15 @@ public class ParserSettings {
 
     /**
      * Set the global ParserSettings to match the given settings.
+     * @param parserSettings to be used
      */
     public static void setGlobalParserSettings(ParserSettings parserSettings) {
         globalParserSettings = parserSettings;
     }
 
     /**
-     * Return the ParserSettings to be used according to arguments specified
+     * @param optionParser to be read as source for globaPArserSettings
+     * @return the ParserSettings to be used according to arguments specified
      * at boot on the command line. These settings are also stored so they
      * can be retrieved at a later time.
      */

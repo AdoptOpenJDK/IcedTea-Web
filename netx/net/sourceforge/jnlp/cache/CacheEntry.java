@@ -120,6 +120,7 @@ public class CacheEntry {
     /**
      * Set the length of the original content that was cached. May be different
      * from the actual cache entry size due to (de)compression.
+     * @param contentLength length of content
      */
     public void setOriginalContentLength(long contentLength) {
         setLongKey(KEY_CONTENT_ORIGINAL_LENGTH, contentLength);

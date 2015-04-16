@@ -93,6 +93,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
     /**
      * Launch the JNLP file specified by the command-line arguments.
+     * @param argsIn launching arguments
      */
     public static void main(String[] argsIn) throws UnevenParameterException {
         optionParser = new OptionParser(argsIn, OptionsDefinitions.getJavaWsOptions());
@@ -227,9 +228,10 @@ public final class Boot implements PrivilegedAction<Void> {
     /**
      * The privileged part (jdk1.3 compatibility).
      */
+    @Override
     public Void run() {
 
-        Map<String, List<String>> extra = new HashMap<String, List<String>>();
+        Map<String, List<String>> extra = new HashMap<>();
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
             boolean run = new HtmlBoot(optionParser).run(extra);

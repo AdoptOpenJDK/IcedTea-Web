@@ -65,10 +65,11 @@ import org.xml.sax.XMLReader;
 public class MalformedXMLParser extends XMLParser {
 
     /**
-     * Parses the data from an {@link InputStream} to create a XML tree.
+     * Parses the data from an {@link java.io.InputStream} to create a XML tree.
      * Returns a {@link Node} representing the root of the tree.
      *
-     * @param input the {@link InputStream} to read data from
+     * @param input the {@link java.io.InputStream} to read data from
+     * @return root node of document
      * @throws ParseException if an exception occurs while parsing the input
      */
     @Override
@@ -82,10 +83,10 @@ public class MalformedXMLParser extends XMLParser {
      * Reads malformed XML from the InputStream original and returns a new
      * InputStream which can be used to read a well-formed version of the input
      *
-     * @param original
+     * @param original original input
      * @return an {@link InputStream} which can be used to read a well-formed
      * version of the input XML
-     * @throws ParseException
+     * @throws ParseException if an exception occurs while parsing the input
      */
     public  static InputStream xmlizeInputStream(InputStream original) throws ParseException {
         try {

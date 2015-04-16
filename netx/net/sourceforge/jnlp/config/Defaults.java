@@ -55,6 +55,7 @@ public class Defaults {
 
     /**
      * Get the default settings for deployment
+     * @return the default settings for deployment
      */
     public static Map<String, Setting<String>> getDefaults() {
         SecurityManager sm = System.getSecurityManager();

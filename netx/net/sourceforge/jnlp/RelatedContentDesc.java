@@ -49,7 +49,7 @@ public class RelatedContentDesc {
     }
 
     /**
-     * Returns the title of this content..
+     * @return the title of this content..
      */
     public String getTitle() {
         return title;
@@ -57,20 +57,21 @@ public class RelatedContentDesc {
 
     /**
      * Set the description of this related content
+     * @param description to be set
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * Returns the description of the related content
+     * @return the description of the related content
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Returns the location of the related content. Not null
+     * @return the location of the related content. Not null
      */
     public URL getLocation() {
         return location;
@@ -78,13 +79,14 @@ public class RelatedContentDesc {
 
     /**
      * Set the icon for this related content
+     * @param icon set to be used
      */
     public void setIconDesc(IconDesc icon) {
         this.icon = icon;
     }
 
     /**
-     * Returns the icon descriptor for the realted content
+     * @return the icon descriptor for the realted content
      */
     public IconDesc getIcon() {
         return icon;

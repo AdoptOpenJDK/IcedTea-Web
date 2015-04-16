@@ -47,7 +47,7 @@ import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
  * Allows reuse of code that expects a JNLPFile object,
  * while overriding behaviour specific to applets.
  */
-public class PluginBridge extends JNLPFile {
+public final class PluginBridge extends JNLPFile {
 
     private final PluginParameters params;
     final private Set<String> jars = new HashSet<>();
@@ -63,6 +63,14 @@ public class PluginBridge extends JNLPFile {
 
     /**
      * Creates a new PluginBridge using a default JNLPCreator.
+     * @param codebase as specified in attribute
+     * @param documentBase as specified in attribute
+     * @param jar jar attribute value
+     * @param main main method attribute value
+     * @param width width of appelt as specified in attribute
+     * @param height height of applet as specified in attribute
+     * @param params parameters as parsed from source html
+     * @throws java.lang.Exception general exception as anything can happen
      */
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
                         int width, int height, PluginParameters params)
@@ -108,7 +116,7 @@ public class PluginBridge extends JNLPFile {
                 if (fileLocation == null){
                     fileLocation = jnlp;
                 }
-                JNLPFile jnlpFile = null;
+                JNLPFile jnlpFile;
 
                 if (params.getJNLPEmbedded() != null) {
                     InputStream jnlpInputStream = new ByteArrayInputStream(decodeBase64String(params.getJNLPEmbedded()));
@@ -163,7 +171,7 @@ public class PluginBridge extends JNLPFile {
             }
         } else {
             // Should we populate this list with applet attribute tags?
-            info = new ArrayList<InformationDesc>();
+            info = new ArrayList<>();
             useJNLPHref = false;
         }
 
@@ -179,12 +187,12 @@ public class PluginBridge extends JNLPFile {
                 versions = cacheVersion.split(",");
             }
 
-            String[] jars = cacheArchive.split(",");
-            cacheJars = new String[jars.length];
+            String[] ljars = cacheArchive.split(",");
+            cacheJars = new String[ljars.length];
 
-            for (int i = 0; i < jars.length; i++) {
+            for (int i = 0; i < ljars.length; i++) {
 
-                cacheJars[i] = jars[i].trim();
+                cacheJars[i] = ljars[i].trim();
 
                 if (versions.length > 0) {
                     cacheJars[i] += ";" + versions[i].trim();
@@ -226,10 +234,13 @@ public class PluginBridge extends JNLPFile {
             for (String s : jargs.split(" ")) {
                 String[] parts = s.trim().split("=");
                 if (parts.length == 2 && Boolean.valueOf(parts[1])) {
-                    if ("-Djnlp.packEnabled".equals(parts[0])) {
-                        usePack = true;
-                    } else if ("-Djnlp.versionEnabled".equals(parts[0])) {
-                        useVersion = true;
+                    if (null != parts[0]) switch (parts[0]) {
+                        case "-Djnlp.packEnabled":
+                            usePack = true;
+                            break;
+                        case "-Djnlp.versionEnabled":
+                            useVersion = true;
+                            break;
                     }
                 }
             }
@@ -272,6 +283,7 @@ public class PluginBridge extends JNLPFile {
 
     /**
      * {@inheritDoc }
+     * @return  options of download
      */
     @Override
     public DownloadOptions getDownloadOptions() {
@@ -396,14 +408,14 @@ public class PluginBridge extends JNLPFile {
     }
 
     /**
-     * Returns the list of folders to be added to the codebase
+     * @return the list of folders to be added to the codebase
      */
     public List<String> getCodeBaseFolders() {
         return new ArrayList<>(codeBaseFolders);
     }
 
     /**
-     * Returns the resources section of the JNLP file for the
+     * @return the resources section of the JNLP file for the
      * specified locale, os, and arch.
      */
     @Override

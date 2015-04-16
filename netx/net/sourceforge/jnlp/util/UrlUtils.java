@@ -161,8 +161,8 @@ public class UrlUtils {
      * You can use sanitizeLastSlash and see also unittests
      * Both unix and windows salshes are supported
      * 
-     * @param src
-     * @return 
+     * @param src src to be stripped
+     * @return  src without file
      */
     public static URL removeFileName(final URL src) {
         URL nsrc = normalizeUrlAndStripParams(src);
@@ -184,8 +184,8 @@ public class UrlUtils {
 
     /**
      * Small utility function creating li list from collection of urls
-     * @param remoteUrls
-     * @return 
+     * @param remoteUrls list of urls
+     * @return String containing html item list of those urls
      */
     public static String setOfUrlsToHtmlList(Iterable<URL> remoteUrls) {
         StringBuilder sb = new StringBuilder();
@@ -207,9 +207,9 @@ public class UrlUtils {
      * 
      * 
      * When input is like 
-     * @param in
-     * @return
-     * @throws MalformedURLException 
+     * @param in url t be sanitized
+     * @return url without trailing slash (if any)
+     * @throws MalformedURLException if original url was wrong 
      */
     public static URL sanitizeLastSlash(URL in) throws MalformedURLException {
         if (in == null) {
@@ -235,9 +235,9 @@ public class UrlUtils {
      * So protcol://som.url/some/path/ is same as protcol://som.url/some/path.
      * Even protcol://som.url/some/path\ is same as protcol://som.url/some/path/
      * 
-     * @param u1
-     * @param u2
-     * @return 
+     * @param u1 first url to comapre
+     * @param u2 second
+     * @return  true if urls are equals no matter of trailing slash
      */
     public static boolean equalsIgnoreLastSlash(URL u1, URL u2) {
         try {

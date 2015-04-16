@@ -161,7 +161,7 @@ public class Resource {
 
     /**
      * Set the url to use for downloading the resource
-     * @param downloadLocation
+     * @param downloadLocation url to be donloaded
      */
     public void setDownloadLocation(URL downloadLocation) {
         this.downloadLocation = downloadLocation;
@@ -183,7 +183,7 @@ public class Resource {
     }
     
     /**
-     * Returns the local file currently being downloaded
+     * @return the local file currently being downloaded
      */
     public File getLocalFile() {
     	return localFile;
@@ -191,20 +191,21 @@ public class Resource {
     
     /**
      * Sets the local file to be downloaded
+     * @param localFile location of stored resource
      */
     public void setLocalFile(File localFile) {
     	this.localFile = localFile;
     }
     
     /**
-     * Returns the requested version
+     * @return the requested version
      */
     public Version getRequestVersion() {
     	return requestVersion;
     }
     
     /**
-     * Returns the version downloaded from server
+     * @return the version downloaded from server
      */
     public Version getDownloadVersion() {
     	return downloadVersion;
@@ -212,13 +213,14 @@ public class Resource {
     
     /**
      * Sets the version downloaded from server
+     * @param downloadVersion version of downloaded resource
      */
     public void setDownloadVersion(Version downloadVersion) {
     	this.downloadVersion = downloadVersion;
     }
     
     /**
-     * Returns the amount in bytes transferred
+     * @return the amount in bytes transferred
      */
     public long getTransferred() {
     	return transferred;
@@ -226,6 +228,7 @@ public class Resource {
     
     /**
      * Sets the amount transferred
+     * @param transferred set the whole transfered amount to this value
      */
     public void setTransferred(long transferred) {
     	this.transferred = transferred;
@@ -233,6 +236,7 @@ public class Resource {
     
     /**
      * Increments the amount transferred (in bytes)
+     * @param incTrans transfered amount in last transfer
      */
     public void incrementTransferred(long incTrans) {
     	transferred += incTrans;
@@ -248,13 +252,14 @@ public class Resource {
 
     /**
      * Sets the size of the resource
+     * @param size desired size of resource
      */
     public void setSize(long size) {
         this.size = size;
     }
 
     /**
-     * Returns the status of the resource
+     * @return the status of the resource
      */
     public Set<Status> getCopyOfStatus() {
         return EnumSet.copyOf(status);
@@ -284,7 +289,7 @@ public class Resource {
     }
 
     /**
-     * Returns the update policy for this resource
+     * @return the update policy for this resource
      */
     public UpdatePolicy getUpdatePolicy() {
         return this.updatePolicy;
@@ -378,6 +383,8 @@ public class Resource {
     /**
      * Removes the tracker to the list of trackers monitoring this
      * resource.
+     * 
+     * @param tracker tracker to be removed
      */
     public void removeTracker(ResourceTracker tracker) {
         synchronized (trackers) {

@@ -55,7 +55,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     private Container cont;
 
     /** weak references to the audio clips */
-    private WeakList<AppletAudioClip> weakClips = new WeakList<AppletAudioClip>();
+    private final WeakList<AppletAudioClip> weakClips = new WeakList<>();
 
     /** whether the applet has been started / displayed */
     private boolean appletStarted = false;
@@ -66,6 +66,9 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     /**
      * Create a new applet environment for the applet specified by
      * the JNLP file.
+     * @param file jnlp file base to construct environment
+     * @param appletInstance applet for this environment
+     * @param cont container to place this applet to
      */
     public AppletEnvironment(JNLPFile file, final AppletInstance appletInstance, Container cont) {
         this.file = file;
@@ -78,6 +81,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     /**
      * Create a new applet environment for the applet specified by
      * the JNLP file, in a new frame.
+     * @param file jnlp file base to construct environment
+     * @param appletInstance applet for this environment
      */
     public AppletEnvironment(JNLPFile file, final AppletInstance appletInstance) {
         this(file, appletInstance, null);
@@ -126,7 +131,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     }
 
     /**
-     * Returns the frame that contains the applet.  Disposing this
+     * @return the frame that contains the applet.  Disposing this
      * frame will destroy the applet.
      */
     public Container getAppletFrame() {
@@ -135,8 +140,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     }
 
      /**
-     * container must be SplashContoler
-     * 
+     * container must be SplashContoler.
+     * @return container
      */
     public SplashController getSplashController() {
         if (cont instanceof SplashController) {
@@ -198,10 +203,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
                         cont.repaint();
                     }
                 });
-            } catch (InterruptedException ie) {
-
-            } catch (InvocationTargetException ite) {
-
+            } catch (InterruptedException | InvocationTargetException ie) {
+                OutputController.getLogger().log(ie);
             }
         } catch (Exception ex) {
             OutputController.getLogger().log(ex);
@@ -229,6 +232,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
 
     /**
      * Set the applet of this environment; can only be called once.
+     * @param applet source of this environment
      */
     public void setApplet(Applet applet) {
         if (this.applet != null) {
@@ -250,7 +254,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     }
 
     /**
-     * Returns an audio clip.
+     * @param location source of clip
+     * @return an audio clip.
      */
     @Override
     public AudioClip getAudioClip(URL location) {
@@ -265,7 +270,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     }
 
     /**
-     * Return an image loaded from the specified location.
+     * @return  an image loaded from the specified location.
+     * @param location location of image
      */
     @Override
     public Image getImage(URL location) {
@@ -279,6 +285,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
 
     /**
      * Not implemented yet.
+     * @param uRL url of document
      */
     @Override
     public void showDocument(java.net.URL uRL) {
@@ -288,6 +295,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
 
     /**
      * Not implemented yet.
+     * @param uRL source of document
+     * @param str who know what
      */
     @Override
     public void showDocument(java.net.URL uRL, java.lang.String str) {
@@ -297,6 +306,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
 
     /**
      * Not implemented yet.
+     * @param  str  id of applet
      */
     @Override
     public void showStatus(java.lang.String str) {

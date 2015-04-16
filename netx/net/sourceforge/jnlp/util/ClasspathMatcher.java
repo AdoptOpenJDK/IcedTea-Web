@@ -33,8 +33,8 @@ public class ClasspathMatcher {
         /**
          * space separated list of ClasspathMatcher source strings
          *
-         * @param s
-         * @return
+         * @param s string to be read 
+         * @return returns compiled matcher
          */
         public static ClasspathMatchers compile(String s) {
             return compile(s, false);
@@ -45,7 +45,7 @@ public class ClasspathMatcher {
                 return new ClasspathMatchers(new ArrayList<ClasspathMatcher>(0), includePath);
             }
             String[] splitted = s.trim().split("\\s+");
-            ArrayList<ClasspathMatcher> matchers = new ArrayList<ClasspathMatcher>(splitted.length);
+            ArrayList<ClasspathMatcher> matchers = new ArrayList<>(splitted.length);
             for (String string : splitted) {
                 matchers.add(ClasspathMatcher.compile(string.trim()));
             }
@@ -231,22 +231,14 @@ public class ClasspathMatcher {
         //the most easy part - dot in url
         int indexofFirstDot = source.indexOf(".");
         if (indexofFirstDot >= 0) {
-            if (indexOfProtocolMark < indexofFirstDot) {
-                return true;
-            } else {
-                return false;
-            }
+            return indexOfProtocolMark < indexofFirstDot;
         }
 
         //more nasty part - path specified
         String degradedProtocol = source.replace(PROTOCOL_DELIMITER, "%%%");
         int indexofFirstPath = degradedProtocol.indexOf(PATH_DELIMITER);
         if (indexofFirstPath >= 0) {
-            if (indexOfProtocolMark < indexofFirstPath) {
-                return true;
-            } else {
-                return false;
-            }
+            return indexOfProtocolMark < indexofFirstPath;
         }
         //no path? no dot? it must be it!
         return true;

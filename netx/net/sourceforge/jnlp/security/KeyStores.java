@@ -79,7 +79,7 @@ public final class KeyStores {
         CLIENT_CERTS,
     }
 
-    public static final Map<Integer,String> keystoresPaths=new HashMap<Integer, String>();
+    public static final Map<Integer,String> keystoresPaths=new HashMap<>();
 
     private static final String KEYSTORE_TYPE = "JKS";
   
@@ -93,7 +93,7 @@ public final class KeyStores {
      * @return a KeyStore containing certificates from the appropriate
      */
     public static final KeyStore getKeyStore(Level level, Type type) {
-        boolean create = false;
+        boolean create;
         if (level == Level.USER) {
             create = true;
         } else {
@@ -109,6 +109,7 @@ public final class KeyStores {
      * @param level whether the KeyStore desired is a user-level or system-level
      * KeyStore
      * @param type the type of KeyStore desired
+     * @param create true if keystore can be created
      * @return a KeyStore containing certificates from the appropriate
      */
     public static final KeyStore getKeyStore(Level level, Type type, boolean create) {
@@ -145,11 +146,9 @@ public final class KeyStores {
      * @return an array of KeyStore containing trusted Certificates
      */
     public static final KeyStore[] getCertKeyStores() {
-        List<KeyStore> result = new ArrayList<KeyStore>(10);
-        KeyStore ks = null;
-
+        List<KeyStore> result = new ArrayList<>(10);
         /* System-level JSSE certificates */
-        ks = getKeyStore(Level.SYSTEM, Type.JSSE_CERTS);
+        KeyStore ks = getKeyStore(Level.SYSTEM, Type.JSSE_CERTS);
         if (ks != null) {
             result.add(ks);
         }
@@ -178,11 +177,9 @@ public final class KeyStores {
      * @return an array of KeyStore containing trusted CA certificates
      */
     public static final KeyStore[] getCAKeyStores() {
-        List<KeyStore> result = new ArrayList<KeyStore>(10);
-        KeyStore ks = null;
-
+        List<KeyStore> result = new ArrayList<>(10);
         /* System-level JSSE CA certificates */
-        ks = getKeyStore(Level.SYSTEM, Type.JSSE_CA_CERTS);
+        KeyStore ks = getKeyStore(Level.SYSTEM, Type.JSSE_CA_CERTS);
         if (ks != null) {
             result.add(ks);
         }
@@ -212,10 +209,9 @@ public final class KeyStores {
      * authentication certificates
      */
     public static KeyStore[] getClientKeyStores() {
-        List<KeyStore> result = new ArrayList<KeyStore>();
-        KeyStore ks = null;
+        List<KeyStore> result = new ArrayList<>();
 
-        ks = getKeyStore(Level.SYSTEM, Type.CLIENT_CERTS);
+        KeyStore ks = getKeyStore(Level.SYSTEM, Type.CLIENT_CERTS);
         if (ks != null) {
             result.add(ks);
         }
