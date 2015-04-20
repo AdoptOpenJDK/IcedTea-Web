@@ -574,7 +574,7 @@ public class JarCertVerifier implements CertVerifier {
                 NetscapeCertTypeExtension extn = new NetscapeCertTypeExtension(
                         encoded);
 
-                Boolean val = extn
+                Boolean val = (Boolean) extn
                         .get(NetscapeCertTypeExtension.OBJECT_SIGNING);
                 if (!val) {
                     if (bad != null) {
