@@ -219,7 +219,7 @@ endif
 
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
-export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in policyeditor.desktop.in  \
+export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in policyeditor.desktop.in icedteaweb-completion \
  itweb-settings.desktop.in launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS
 
 # reproducers `D`shortcuts

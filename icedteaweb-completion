@@ -1,0 +1,44 @@
+#/bin/bash
+#place this file over to /etc/bash_completion.d/ to make this file useful
+#Note: If you do not have bash-completion you will need to install it
+_itweb-settings()
+{
+    local cur prev opts base
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # Icedtea-web settings Options
+    opts="-check -get -headless -help -info -list -reset -set -verbose"
+
+    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+    return 0
+}
+complete -F _itweb-settings itweb-settings
+
+_policyeditor()
+{
+    local cur prev opts base
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # PolicyEditor Options
+    opts="-codebase -file -help"
+
+    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+    return 0
+}
+complete -F _policyeditor policyeditor
+
+_javaws()
+{
+    local cur prev opts base
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # JavaWs Options
+    opts="-about -help -license -viewer -Xclearcache -allowredirect -arg -headless -html -jnlp -nosecurity -noupdate -param -property -strict -update -verbose -version -Xignoreheaders -xml -Xnofork -Xoffline -Xtrustnone"
+
+    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+    return 0
+}
+complete -F _javaws javaws

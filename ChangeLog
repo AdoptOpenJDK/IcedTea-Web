@@ -1,5 +1,13 @@
 2015-04-20  Lukasz Dracz  <ldracz@redhat.com>
 
+	Add Tab Completion for icedtea-web
+	* Makefile.am:
+	Added to tarball generated
+	* icedteaweb-completion:
+	Added bash completion file
+
+2015-04-20  Lukasz Dracz  <ldracz@redhat.com>
+
 	add Boolean Cast for JarCertVerifier
 	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java:
 	Added a Boolean cast that was needed for Java 7 to work
