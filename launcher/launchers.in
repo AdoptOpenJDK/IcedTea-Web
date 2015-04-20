@@ -7,7 +7,7 @@ CLASSNAME=@MAIN_CLASS@
 BINARY_LOCATION=@BIN_LOCATION@
 SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
 PROGRAM_NAME=@PROGRAM_NAME@
-CP=@JRE@/lib/rt.jar:@JRE@/lib/ext/jfxrt.jar
+CP=@JRE@/lib/rt.jar:@JRE@/lib/jfxrt.jar
 
 CONFIG_HOME=$XDG_CONFIG_HOME
 if [ "x$CONFIG_HOME" = "x" ] ; then
@@ -27,7 +27,7 @@ fi;
 if [ "x$CUSTOM_JRE" != "x" ] ; then
   if [ -e  "$CUSTOM_JRE" -a -e "$CUSTOM_JRE/bin/java" -a -e "$CUSTOM_JRE/lib/rt.jar" ] ; then
     JAVA=$CUSTOM_JRE/bin/java
-    CP=$CUSTOM_JRE/lib/rt.jar:$CUSTOM_JRE/lib/ext/jfxrt.jar
+    CP=$CUSTOM_JRE/lib/rt.jar:$CUSTOM_JRE/lib/jfxrt.jar
   else
     echo "Your custom JRE $CUSTOM_JRE read from deployment.properties under key $PROPERTY_NAME as $CUSTOM_JRE is not valid. Using default ($JAVA, $CP) in attempt to start. Please fix this."
   fi
