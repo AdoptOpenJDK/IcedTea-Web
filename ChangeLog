@@ -1,4 +1,9 @@
-2015-04-20  Jiri Vanek  <jvanek@redhat.com>
+2015-04-23  Jiri Vanek  <jvanek@redhat.com>
+
+	* javac.in: removed. Its usage gone out with removal of bootstrap.
+	* configure.ac: removed depndence on it
+
+2015-04-23  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed loading of deployment.properties during 1.4 migration to 1.5 fs.
 	* netx/net/sourceforge/jnlp/config/Defaults.java: hardcoded value of ALL fixed
