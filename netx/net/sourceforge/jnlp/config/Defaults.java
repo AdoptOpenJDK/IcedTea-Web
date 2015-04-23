@@ -414,7 +414,7 @@ public class Defaults {
                 {
                         DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
                         BasicValueValidators.getManifestAttributeCheckValidator(),
-                        String.valueOf("ALL")
+                        String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL)
                 }
         };
 

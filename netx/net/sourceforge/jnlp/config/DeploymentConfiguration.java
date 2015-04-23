@@ -214,6 +214,10 @@ public final class DeploymentConfiguration {
      */
     public static final String KEY_PLUGIN_JVM_ARGUMENTS= "deployment.plugin.jvm.arguments";
     public static final String KEY_JRE_DIR= "deployment.jre.dir";
+    
+    
+    public static final String TRANSFER_TITLE = "Legacy configuration and cache found. Those will be now transported to new locations";
+    
     private ConfigurationException loadingException = null;
 
     public void setLoadingException(ConfigurationException ex) {
@@ -238,6 +242,8 @@ public final class DeploymentConfiguration {
 
     /** The system's subdirResult deployment.config file */
     private File systemPropertiesFile = null;
+    /** Source of always right and only path to file (even if underlying path changes) */
+    private final InfrastructureFileDescriptor userDeploymentFileDescriptor;
     /** The user's subdirResult deployment.config file */
     private File userPropertiesFile = null;
     
@@ -248,6 +254,11 @@ public final class DeploymentConfiguration {
     private Map<String, Setting<String>> unchangeableConfiguration;
 
     public DeploymentConfiguration() {
+        this(PathsAndFiles.USER_DEPLOYMENT_FILE);
+    }
+    
+     public DeploymentConfiguration(InfrastructureFileDescriptor configFile) {
+        userDeploymentFileDescriptor = configFile;
         currentConfiguration = new HashMap<>();
         unchangeableConfiguration = new HashMap<>();
     }
@@ -262,15 +273,6 @@ public final class DeploymentConfiguration {
         load(true);
     }
 
-    public static File getAppletTrustUserSettingsPath() {
-        return PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile();
-    }
-
-     public static File getAppletTrustGlobalSettingsPath() {
-          return PathsAndFiles.APPLET_TRUST_SETTINGS_SYS.getFile();
-        
-    }
-
     /**
      * Initialize this deployment configuration by reading configuration files.
      * Generally, it will try to continue and ignore errors it finds (such as file not found).
@@ -282,12 +284,12 @@ public final class DeploymentConfiguration {
     public void load(boolean fixIssues) throws ConfigurationException {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkRead(PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath());
+            sm.checkRead(userDeploymentFileDescriptor.getFullPath());
         }
 
         File systemConfigFile = findSystemConfigFile();
 
-        load(systemConfigFile, PathsAndFiles.USER_DEPLOYMENT_FILE.getFile(), fixIssues);
+        load(systemConfigFile, userDeploymentFileDescriptor.getFile(), fixIssues);
     }
 
     void load(File systemConfigFile, File userFile, boolean fixIssues) throws ConfigurationException {
@@ -471,7 +473,7 @@ public final class DeploymentConfiguration {
 
         String jrePath = null;
         try {
-            Map<String, Setting<String>> tmpProperties = parsePropertiesFile(PathsAndFiles.USER_DEPLOYMENT_FILE.getFile());
+            Map<String, Setting<String>> tmpProperties = parsePropertiesFile(userDeploymentFileDescriptor.getFile());
             Setting<String> jreSetting = tmpProperties.get(KEY_JRE_DIR);
             if (jreSetting != null) {
                 jrePath = jreSetting.getValue();
@@ -731,11 +733,12 @@ public final class DeploymentConfiguration {
         int errors = 0;
         String PRE_15_DEPLOYMENT_DIR = ".icedtea";
         String LEGACY_USER_HOME = System.getProperty("user.home") + File.separator + PRE_15_DEPLOYMENT_DIR;
+        String legacyProperties = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES;
         File configDir = new File(PathsAndFiles.USER_CONFIG_HOME);
         File cacheDir = new File(PathsAndFiles.USER_CACHE_HOME);
         File legacyUserDir = new File(LEGACY_USER_HOME);
         if (legacyUserDir.exists()) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Legacy configuration and cache found. Those will be now transported to new locations");
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, TRANSFER_TITLE);
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, PathsAndFiles.USER_CONFIG_HOME + " and " + PathsAndFiles.USER_CACHE_HOME);
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "You should not see this message next time you run icedtea-web!");
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Your custom dirs will not be touched and will work");
@@ -746,18 +749,34 @@ public final class DeploymentConfiguration {
             errors += resultToStd(configDir.mkdirs());
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + PathsAndFiles.USER_CACHE_HOME);
             errors += resultToStd(cacheDir.mkdirs());
+            //move this first, the creation of config singleton may happen anytime...
+            //but must not before USER_DEPLOYMENT_FILE is moved and should not in this block
+            String currentProperties = PathsAndFiles.USER_DEPLOYMENT_FILE.getDefaultFullPath();
+            errors += moveLegacyToCurrent(legacyProperties, currentProperties);
+
+            String legacyPropertiesOld = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES + ".old";
+            String currentPropertiesOld = currentProperties + ".old";
+            errors += moveLegacyToCurrent(legacyPropertiesOld, currentPropertiesOld);
 
             String legacySecurity = LEGACY_USER_HOME + File.separator + "security";
-            String currentSecurity = PathsAndFiles.USER_SECURITY;
+            String currentSecurity = PathsAndFiles.USER_DEFAULT_SECURITY_DIR;
             errors += moveLegacyToCurrent(legacySecurity, currentSecurity);
+            
+            String legacyAppletTrust = LEGACY_USER_HOME + File.separator + APPLET_TRUST_SETTINGS;
+            String currentAppletTrust = PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getDefaultFullPath();
+            errors += moveLegacyToCurrent(legacyAppletTrust, currentAppletTrust);
+
+            //note - all here use default path. Any call to getFullPAth will invoke creation of config singleton
+            // but: we DO copy only defaults. There is no need to copy nondefaults!
+            // nond-efault will be used thanks to config singleton read from copied deployment.properties
 
             String legacyCache = LEGACY_USER_HOME + File.separator + "cache";
-            String currentCache = PathsAndFiles.CACHE_DIR.getFullPath();
+            String currentCache = PathsAndFiles.CACHE_DIR.getDefaultFullPath();
             errors += moveLegacyToCurrent(legacyCache, currentCache);
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Adapting " + PathsAndFiles.CACHE_INDEX_FILE_NAME + " to new destination");
             //replace all legacyCache by currentCache in new recently_used
             try {
-                File f = PathsAndFiles.getRecentlyUsedFile().getFile();
+                File f = PathsAndFiles.getRecentlyUsedFile().getDefaultFile();
                 String s = FileUtils.loadFileAsString(f);
                 s = s.replace(legacyCache, currentCache);
                 FileUtils.saveFile(s, f);
@@ -773,19 +792,6 @@ public final class DeploymentConfiguration {
             String legacyLogDir = LEGACY_USER_HOME + File.separator + "log";
             String currentLogDir = PathsAndFiles.LOG_DIR.getDefaultFullPath();
             errors += moveLegacyToCurrent(legacyLogDir, currentLogDir);
-
-            String legacyProperties = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES;
-            String currentProperties = PathsAndFiles.USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES;
-            errors += moveLegacyToCurrent(legacyProperties, currentProperties);
-
-            String legacyPropertiesOld = LEGACY_USER_HOME + File.separator + DEPLOYMENT_PROPERTIES + ".old";
-            String currentPropertiesOld = PathsAndFiles.USER_CONFIG_HOME + File.separator + DEPLOYMENT_PROPERTIES + ".old";
-            errors += moveLegacyToCurrent(legacyPropertiesOld, currentPropertiesOld);
-
-
-            String legacyAppletTrust = LEGACY_USER_HOME + File.separator + APPLET_TRUST_SETTINGS;
-            String currentAppletTrust = getAppletTrustUserSettingsPath().getAbsolutePath();
-            errors += moveLegacyToCurrent(legacyAppletTrust, currentAppletTrust);
 
             String legacyTmp = LEGACY_USER_HOME + File.separator + "tmp";
             String currentTmp = PathsAndFiles.TMP_DIR.getDefaultFullPath();

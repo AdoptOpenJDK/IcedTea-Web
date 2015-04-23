@@ -85,6 +85,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityActions;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
@@ -244,8 +245,8 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         if (askBeforeActionCheckBox.isSelected()) {
             UnsignedAppletActionEntry[] items = model.back.toArray();
             String s = Translator.R("APPEXTSECguiPanelConfirmDeletionOf", items.length) + ": \n";
-            for (int i = 0; i < items.length; i++) {
-                s += appletItemToCaption(items[i], "  ") + "\n";
+            for (UnsignedAppletActionEntry item : items) {
+                s += appletItemToCaption(item, "  ") + "\n";
             }
             int a = JOptionPane.showConfirmDialog(this, s);
             if (a != JOptionPane.OK_OPTION) {
@@ -514,8 +515,8 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         mainTabPanel.add(globalPanel);
         mainTabPanel.setTitleAt(0, Translator.R("APPEXTSECguiPanelCustomDefs"));
         mainTabPanel.setTitleAt(1, Translator.R("APPEXTSECguiPanelGlobalDefs"));
-        mainTabPanel.setToolTipTextAt(0, DeploymentConfiguration.getAppletTrustUserSettingsPath().getAbsolutePath());
-        mainTabPanel.setToolTipTextAt(1, DeploymentConfiguration.getAppletTrustGlobalSettingsPath().getAbsolutePath());
+        mainTabPanel.setToolTipTextAt(0, PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().getAbsolutePath());
+        mainTabPanel.setToolTipTextAt(1, PathsAndFiles.APPLET_TRUST_SETTINGS_SYS.getFile().getAbsolutePath());
         mainTabPanel.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -609,8 +610,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             bw.close();
             UnsignedAppletActionStorageExtendedImpl copy = new UnsignedAppletActionStorageExtendedImpl(f);
             UnsignedAppletActionEntry[] items = copy.toArray();
-            for (int i = 0; i < items.length; i++) {
-                UnsignedAppletActionEntry unsignedAppletActionEntry = items[i];
+            for (UnsignedAppletActionEntry unsignedAppletActionEntry : items) {
                 if (unsignedAppletActionEntry.getDocumentBase() != null && !unsignedAppletActionEntry.getDocumentBase().getRegEx().trim().isEmpty()) {
                     Pattern p = Pattern.compile(unsignedAppletActionEntry.getDocumentBase().getRegEx());
                     p.matcher("someInput").find();
@@ -624,7 +624,6 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
                     throw new RuntimeException(Translator.R("APPEXTSECguiPanelEmptyCode"));
                 }
                 UnsignedAppletActionEntry.createArchivesString(UnsignedAppletActionEntry.createArchivesList(UnsignedAppletActionEntry.createArchivesString(unsignedAppletActionEntry.getArchives())));
-
             }
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelTableValid"));
         } catch (Exception ex) {

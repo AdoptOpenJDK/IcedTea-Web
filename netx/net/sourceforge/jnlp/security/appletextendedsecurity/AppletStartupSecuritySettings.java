@@ -35,11 +35,9 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
-import javax.naming.ConfigurationException;
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
 import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
 
@@ -63,7 +61,7 @@ public class AppletStartupSecuritySettings {
      */
     public UnsignedAppletActionStorage getUnsignedAppletActionGlobalStorage() {
         if (globalInstance == null) {
-            globalInstance = new UnsignedAppletActionStorageImpl(DeploymentConfiguration.getAppletTrustGlobalSettingsPath());
+            globalInstance = new UnsignedAppletActionStorageImpl(PathsAndFiles.APPLET_TRUST_SETTINGS_SYS.getFile());
         }
         return globalInstance;
     }
@@ -74,7 +72,7 @@ public class AppletStartupSecuritySettings {
      */
     public UnsignedAppletActionStorage getUnsignedAppletActionCustomStorage() {
         if (customInstance == null) {
-            customInstance = new UnsignedAppletActionStorageImpl(DeploymentConfiguration.getAppletTrustUserSettingsPath());
+            customInstance = new UnsignedAppletActionStorageImpl(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         }
         return customInstance;
     }

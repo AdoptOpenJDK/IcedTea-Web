@@ -57,7 +57,7 @@ public class PathsAndFiles {
     private static final String RUNTIME_HOME;
     public static final String USER_CONFIG_HOME;
     public static final String USER_CACHE_HOME;
-    public static final String USER_SECURITY;
+    public static final String USER_DEFAULT_SECURITY_DIR;
     public static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     public static final String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
     public static final String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";
@@ -67,6 +67,7 @@ public class PathsAndFiles {
     private static final String JAVA_PROP = "java.home";
     private static final String USER_PROP = "user.name";
     private static final String VARIABLE = JNLPRuntime.isWindows() ? "%" : "$";
+    private static final String securityWord = "security";
     public static final String ICEDTEA_SO = "IcedTeaPlugin.so";
     public static final String CACHE_INDEX_FILE_NAME = "recently_used";
 
@@ -101,7 +102,7 @@ public class PathsAndFiles {
         }
         USER_CONFIG_HOME = CONFIG_HOME + File.separator + DEPLOYMENT_SUBDIR_DIR;
         USER_CACHE_HOME = CACHE_HOME + File.separator + DEPLOYMENT_SUBDIR_DIR;
-        USER_SECURITY = USER_CONFIG_HOME + File.separator + "security";
+        USER_DEFAULT_SECURITY_DIR = USER_CONFIG_HOME + File.separator + securityWord;
     }
 
     /**
@@ -297,14 +298,21 @@ public class PathsAndFiles {
     public static List<InfrastructureFileDescriptor> getAllFiles() {
         return getAllFiles(null);
     }
+    
+    public static List<InfrastructureFileDescriptor> getAllSecurityFiles() {
+        return getAllFiles(null, UserSecurityConfigFileDescriptor.class);
+    }
 
     private static List<InfrastructureFileDescriptor> getAllFiles(Target desired) {
+        return getAllFiles(desired, InfrastructureFileDescriptor.class);
+    }
+    private static List<InfrastructureFileDescriptor> getAllFiles(Target desired, Class c) {
         List<InfrastructureFileDescriptor> r = new ArrayList<>();
         Field[] all = PathsAndFiles.class.getDeclaredFields();
         for (Field field : all) {
             try {
                 Object o = field.get(null);
-                if (o instanceof InfrastructureFileDescriptor) {
+                if (c.isInstance(o)) {
                     InfrastructureFileDescriptor i = (InfrastructureFileDescriptor) o;
                     for (Target targe : i.target) {
                         if (desired == null || targe == desired) {
@@ -396,7 +404,7 @@ public class PathsAndFiles {
     private static class SystemJavaSecurityFileDescriptor extends SystemJavaLibFileDescriptor {
 
         private SystemJavaSecurityFileDescriptor(String fileName) {
-            super(fileName, "security", "FILEjavacerts", Target.JAVAWS);
+            super(fileName, securityWord, "FILEjavacerts", Target.JAVAWS);
         }
 
     }
@@ -479,7 +487,7 @@ public class PathsAndFiles {
     private static class UserSecurityConfigFileDescriptor extends ItwConfigFileDescriptor {
 
         private UserSecurityConfigFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, "security", description, target);
+            super(fileName, securityWord, description, target);
         }
 
     }

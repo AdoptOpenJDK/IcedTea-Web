@@ -56,7 +56,6 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.controlpanel.JVMPanel.JvmValidationResult;
 import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -265,7 +264,7 @@ public class ControlPanel extends JFrame {
                 new SettingsPanel(Translator.R("CPTabSecurity"), createSecuritySettingsPanel()),
                 //todo refactor to work with tmp file and apply as asu designed it
                 new SettingsPanel(Translator.R("CPTabPolicy"), createPolicySettingsPanel()),
-                new SettingsPanel(Translator.R("APPEXTSECControlPanelExtendedAppletSecurityTitle"), new UnsignedAppletsTrustingListPanel(DeploymentConfiguration.getAppletTrustGlobalSettingsPath(), DeploymentConfiguration.getAppletTrustUserSettingsPath(), this.config))
+                new SettingsPanel(Translator.R("APPEXTSECControlPanelExtendedAppletSecurityTitle"), new UnsignedAppletsTrustingListPanel(PathsAndFiles.APPLET_TRUST_SETTINGS_SYS.getFile(), PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile(), this.config))
         };
 
         // Add panels.

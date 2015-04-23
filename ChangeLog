@@ -1,3 +1,21 @@
+2015-04-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed loading of deployment.properties during 1.4 migration to 1.5 fs.
+	* netx/net/sourceforge/jnlp/config/Defaults.java: hardcoded value of ALL fixed
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: reused
+	first line of transfer moved to (TRANSFER_TITLE). Added possibility to specify
+	destination of source file. (move14AndOlderFilesTo15Structure) order of moving
+	files reorder, so deployment.properties go first and sensitive files after, setupable
+	files first. Used getDefaultFullPAth insted of getFullPath where suitable (everywhere in this method)
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: encapsualted security string,
+	generalized getAllFiles,a dd getAllSwcurityFiles
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: Removed redundant
+	calls to DeplymentConfiguration. Used PathsAndFiles rather.
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java: same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/AppletStartupSecuritySettings.java: 
+	* tests/reproducers/simple/simpletest1/testcases/XDGspecificationTests.java: 
+	(fakeExtendedSecurity) adapted to new deployment.manifest.attributes.check schema
+
 2015-04-20  Lukasz Dracz  <ldracz@redhat.com>
 
 	Add Tab Completion for icedtea-web

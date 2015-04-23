@@ -56,6 +56,7 @@ import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import org.junit.Assert;
 import org.junit.After;
@@ -90,7 +91,7 @@ public class XDGspecificationTests extends BrowserTest {
     static {
         String configHome = System.getProperty("user.home") + File.separator + ".config";
         String cacheHome = System.getProperty("user.home") + File.separator + ".cache";
-        ;
+
         String XDG_CONFIG_HOME_value = System.getenv(PathsAndFiles.XDG_CONFIG_HOME_VAR);
         String XDG_CACHE_HOME_value = System.getenv(PathsAndFiles.XDG_CACHE_HOME_VAR);
         if (XDG_CONFIG_HOME_value != null) {
@@ -165,7 +166,7 @@ public class XDGspecificationTests extends BrowserTest {
         config.mkdirs();
         File cache = new File(base, "cache");
         cache.mkdirs();
-        List<Backup> l = new ArrayList<Backup>();
+        List<Backup> l = new ArrayList<>();
         mv(oldRoot, base, l);
         mv(realCache, cache, l);
         mv(realConfig, config, l);
@@ -206,7 +207,7 @@ public class XDGspecificationTests extends BrowserTest {
     private String[] removeXdgVAlues() {
         Map<String, String> p = System.getenv();
         Set<Entry<String, String>> r = p.entrySet();
-        List<Entry<String, String>> rr = new ArrayList<Entry<String, String>>(r);
+        List<Entry<String, String>> rr = new ArrayList<>(r);
         Collections.sort(rr, new Comparator<Entry<String, String>>() {
 
             @Override
@@ -214,7 +215,7 @@ public class XDGspecificationTests extends BrowserTest {
                 return o1.getKey().compareTo(o2.getKey());
             }
         });
-        List<String> l = new ArrayList<String>(p.size());
+        List<String> l = new ArrayList<>(p.size());
         int i = 0;
         int c = 0;
         for (Iterator<Entry<String, String>> it = rr.iterator(); it.hasNext(); i++) {
@@ -244,7 +245,7 @@ public class XDGspecificationTests extends BrowserTest {
         boolean config = false;
         Map<String, String> p = System.getenv();
         Set<Entry<String, String>> r = p.entrySet();
-        List<Entry<String, String>> rr = new ArrayList<Entry<String, String>>(r);
+        List<Entry<String, String>> rr = new ArrayList<>(r);
         Collections.sort(rr, new Comparator<Entry<String, String>>() {
 
             @Override
@@ -252,22 +253,25 @@ public class XDGspecificationTests extends BrowserTest {
                 return o1.getKey().compareTo(o2.getKey());
             }
         });
-        List<String> l = new ArrayList<String>(p.size() + 2);
+        List<String> l = new ArrayList<>(p.size() + 2);
         int i = 0;
         for (Iterator<Entry<String, String>> it = rr.iterator(); it.hasNext(); i++) {
             Entry<String, String> entry = it.next();
             String v = entry.getValue();
             String s = entry.getKey() + "=" + v;
-            if (entry.getKey().equals(PathsAndFiles.XDG_CACHE_HOME_VAR)) {
-                ServerAccess.logOutputReprint(entry.getKey() + " was " + v);
-                v = cacheF.getAbsolutePath();
-                ServerAccess.logOutputReprint("set " + v);
-                cache = true;
-            } else if (entry.getKey().equals(PathsAndFiles.XDG_CONFIG_HOME_VAR)) {
-                ServerAccess.logOutputReprint(entry.getKey() + " was " + v);
-                v = configF.getAbsolutePath();
-                ServerAccess.logOutputReprint("set " + v);
-                config = true;
+            switch (entry.getKey()) {
+                case PathsAndFiles.XDG_CACHE_HOME_VAR:
+                    ServerAccess.logOutputReprint(entry.getKey() + " was " + v);
+                    v = cacheF.getAbsolutePath();
+                    ServerAccess.logOutputReprint("set " + v);
+                    cache = true;
+                    break;
+                case PathsAndFiles.XDG_CONFIG_HOME_VAR:
+                    ServerAccess.logOutputReprint(entry.getKey() + " was " + v);
+                    v = configF.getAbsolutePath();
+                    ServerAccess.logOutputReprint("set " + v);
+                    config = true;
+                    break;
             }
             s = entry.getKey() + "=" + v;
             l.add(s);
@@ -346,7 +350,6 @@ public class XDGspecificationTests extends BrowserTest {
             Assert.assertTrue("creation of old config by renaming " + currentConfigCache + " to " + oldIcedTea + " failed", a);
             assertOldConfigFilesInHome(true, true, true);
             assertNotConfigFilesInHome(true, true, true);
-            ;
         } finally {
             ServerAccess.PROCESS_TIMEOUT = t;
             deleteRecursively(tmp);
@@ -367,27 +370,24 @@ public class XDGspecificationTests extends BrowserTest {
     }
 
     private static List<File> getContentOfDirectory(File f) {
-        List<File> result = new ArrayList<File>();
+        List<File> result = new ArrayList<>();
         if (f == null || !f.exists() || !f.isDirectory()) {
             return result;
         }
         File[] files = f.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+        for (File file : files) {
             if (file.isDirectory()) {
                 result.addAll(getContentOfDirectory(file));
             } else {
                 result.add(file);
             }
-
         }
         return result;
     }
 
     private static String listToString(List<File>... l) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < l.length; i++) {
-            List<File> list = l[i];
+        for (List<File> list : l) {
             for (File s : list) {
                 sb.append(s.getAbsolutePath()).append('\n');
             }
@@ -494,8 +494,8 @@ public class XDGspecificationTests extends BrowserTest {
     //runs
     private static final RulesFolowingClosingListener.ContainsRule simpletests1Run = new RulesFolowingClosingListener.ContainsRule("Good simple javaws exapmle");
     private static final RulesFolowingClosingListener.ContainsRule simpletests2Run = new RulesFolowingClosingListener.ContainsRule("Correct exception");
-    private static final RulesFolowingClosingListener.ContainsRule moving = new RulesFolowingClosingListener.ContainsRule("Legacy configuration and cache found. Those will be now transported to new location");
-    private static final RulesFolowingClosingListener.NotContainsRule notMoving = new RulesFolowingClosingListener.NotContainsRule("Legacy configuration and cache found. Those will be now transported to new location");
+    private static final RulesFolowingClosingListener.ContainsRule moving = new RulesFolowingClosingListener.ContainsRule(DeploymentConfiguration.TRANSFER_TITLE);
+    private static final RulesFolowingClosingListener.NotContainsRule notMoving = new RulesFolowingClosingListener.NotContainsRule(DeploymentConfiguration.TRANSFER_TITLE);
     private static final RulesFolowingClosingListener.ContainsRule unknownProperty = new RulesFolowingClosingListener.ContainsRule("WARNING: Unknown property name");
     private static final RulesFolowingClosingListener.ContainsRule applet1Run = new RulesFolowingClosingListener.ContainsRule("applet was started");
     //javaws/plugin files
@@ -532,6 +532,11 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessResult pr = pw.execute();
             Assert.assertTrue(simpletests1Run.toPassingString(), simpletests1Run.evaluate(pr.stdout));
             Assert.assertTrue(notMoving.toPassingString(), notMoving.evaluate(pr.stdout));
+            itwDoesNotComplainAboutOldConfig(pr); //no old config
+            assertMainFilesInHome(true, false, false);
+            assertOldNotMainFilesInHome(true, true, true);
+            ProcessResult pr2 = pw.execute();
+            itwDoesNotComplainAboutOldConfig(pr2);
             assertMainFilesInHome(true, false, false);
             assertOldNotMainFilesInHome(true, true, true);
         } finally {
@@ -550,8 +555,15 @@ public class XDGspecificationTests extends BrowserTest {
             fakeExtendedSecurity(ff);
             ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), null, server.getUrl("simpletest1.jnlp"), (ContentReaderListener) null, null, setXdgVAlues(f));
             ProcessResult pr = pw.execute();
+            itwDoesNotComplainAboutOldConfig(pr); //no old config
             Assert.assertTrue(simpletests1Run.toPassingString(), simpletests1Run.evaluate(pr.stdout));
             Assert.assertTrue(notMoving.toPassingString(), notMoving.evaluate(pr.stdout));
+            assertMainFiles(listToString(getContentOfDirectory(f)), true, false, false);
+            assertOldNotMainFilesInHome(true, true, true);
+            ProcessResult pr2 = pw.execute();
+            itwDoesNotComplainAboutOldConfig(pr2); //no old config
+            Assert.assertTrue(simpletests1Run.toPassingString(), simpletests1Run.evaluate(pr2.stdout));
+            Assert.assertTrue(notMoving.toPassingString(), notMoving.evaluate(pr2.stdout));
             assertMainFiles(listToString(getContentOfDirectory(f)), true, false, false);
             assertOldNotMainFilesInHome(true, true, true);
         } finally {
@@ -571,8 +583,15 @@ public class XDGspecificationTests extends BrowserTest {
             fakeExtendedSecurity(ff);
             ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), null, server.getUrl("simpletest1.jnlp"), (ContentReaderListener) null, null, setXdgVAlues(f));
             ProcessResult pr = pw.execute();
+            itwDoesNotComplainAboutOldConfig(pr);
             Assert.assertTrue(simpletests1Run.toPassingString(), simpletests1Run.evaluate(pr.stdout));
             Assert.assertTrue(notMoving.toPassingString(), notMoving.evaluate(pr.stdout));
+            assertMainFiles(listToString(getContentOfDirectory(f)), true, false, false);
+            assertOldNotMainFilesInHome(true, true, true);
+            ProcessResult pr3 = pw.execute();
+            itwDoesNotComplainAboutOldConfig(pr3);
+            Assert.assertTrue(simpletests1Run.toPassingString(), simpletests1Run.evaluate(pr3.stdout));
+            Assert.assertTrue(notMoving.toPassingString(), notMoving.evaluate(pr3.stdout));
             assertMainFiles(listToString(getContentOfDirectory(f)), true, false, false);
             assertOldNotMainFilesInHome(true, true, true);
         } finally {
@@ -580,6 +599,20 @@ public class XDGspecificationTests extends BrowserTest {
         }
     }
 
+    private static void itwDoesNotComplainAboutOldConfig(ProcessResult pr) {
+        itwDoesNotComplainAboutOldConfig(pr.stdout);
+    }
+    private static void itwDoesNotComplainAboutOldConfig(String stdout) {
+        Assert.assertFalse(stdout.contains(DeploymentConfiguration.TRANSFER_TITLE));
+    }
+    
+    private static void itwDoesComplainAboutOldConfig(ProcessResult pr) {
+        itwDoesComplainAboutOldConfig(pr.stdout);
+    }
+    private static void itwDoesComplainAboutOldConfig(String stdout) {
+        Assert.assertTrue(stdout.contains(DeploymentConfiguration.TRANSFER_TITLE));
+    }
+    
     private static void assertOldMainFiles(String s, boolean s1, boolean s2, boolean a1) {
         if (a1) {
             Assert.assertTrue(appletJarInside.toPassingString(), appletJarInside.evaluate(s));
@@ -1017,8 +1050,8 @@ public class XDGspecificationTests extends BrowserTest {
             boolean a = file.mkdirs();
             Assert.assertTrue("creation of directories for " + file + " failed", a);
         }
-        File f = new File(file, "deployment.properties");
-        ServerAccess.saveFile("deployment.security.level = ALLOW_UNSIGNED\ndeployment.manifest.attributes.check=false", f);
+        File f = new File(file, PathsAndFiles.USER_DEPLOYMENT_FILE.getDefaultFile().getName());
+        ServerAccess.saveFile("deployment.security.level=ALLOW_UNSIGNED\ndeployment.manifest.attributes.check=NONE", f);
     }
 
     /*
