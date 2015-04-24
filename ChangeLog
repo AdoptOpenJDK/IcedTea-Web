@@ -1,5 +1,16 @@
 2015-04-23  Jiri Vanek  <jvanek@redhat.com>
 
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/testcases/PartiallySignedAppletManifestSpecifiesSandboxTests.java: 
+	used new MultipleDeploymentPropertiesModifier
+	* tests/test-extensions-tests/net/sourceforge/jnlp/tools/DeploymentPropertiesModifierTest.java: 
+	add new inner class, MultipleDeploymentPropertiesModifier able to gather and apply/revert in bulk
+	normal DeploymentPropertiesModifier
+	* tests/test-extensions/net/sourceforge/jnlp/tools/DeploymentPropertiesModifier.java: 
+	Added testMultipleDeploymentPropertiesModifier, test to new MultipleDeploymentPropertiesModifier
+	class
+
+2015-04-23  Jiri Vanek  <jvanek@redhat.com>
+
 	* javac.in: removed. Its usage gone out with removal of bootstrap.
 	* configure.ac: removed depndence on it
 

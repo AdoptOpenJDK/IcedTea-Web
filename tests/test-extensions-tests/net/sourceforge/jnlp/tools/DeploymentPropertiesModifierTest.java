@@ -35,19 +35,20 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package tools;
+package net.sourceforge.jnlp.tools;
 
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.util.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DeploymentPropertiesModifierTest {
@@ -154,6 +155,58 @@ public class DeploymentPropertiesModifierTest {
 
         dpm2.restoreProperties();
         dpm1.restoreProperties();
+    }
+    
+     @Test
+    public void testMultipleDeploymentPropertiesModifier() throws IOException {
+        File tempUserFile = File.createTempFile("userDeploy", "");
+        tempUserFile.deleteOnExit();
+
+        String content = "a.b=12\nc.d=34\ne.f=56\ng.h=78\ni.j=90";
+        FileUtils.saveFile(content, tempUserFile);
+        deploymentFile = tempUserFile;
+        DummyInfrastructureFileDescriptor deploymentInfrastructure = new DummyInfrastructureFileDescriptor(deploymentFile);
+
+        DeploymentPropertiesModifier.MultipleDeploymentPropertiesModifier dpm1
+                = new DeploymentPropertiesModifier.MultipleDeploymentPropertiesModifier(deploymentInfrastructure,
+                        new AbstractMap.SimpleEntry<>("c.d", "22"),
+                        new AbstractMap.SimpleEntry<>("i.j", "44")
+                );
+        dpm1.setProperties();
+        String propertiesChanged = FileUtils.loadFileAsString(deploymentFile);
+        Assert.assertNotEquals(content, propertiesChanged);
+        Assert.assertTrue(propertiesChanged.contains("12"));
+        Assert.assertFalse(propertiesChanged.contains("34"));
+        Assert.assertTrue(propertiesChanged.contains("22"));
+        Assert.assertTrue(propertiesChanged.contains("56"));
+        Assert.assertTrue(propertiesChanged.contains("78"));
+        Assert.assertFalse(propertiesChanged.contains("90"));
+        Assert.assertTrue(propertiesChanged.contains("44"));
+        Assert.assertTrue(propertiesChanged.contains("a.b"));
+        Assert.assertTrue(propertiesChanged.contains("c.d"));
+        Assert.assertTrue(propertiesChanged.contains("e.f"));
+        Assert.assertTrue(propertiesChanged.contains("g.h"));
+        Assert.assertTrue(propertiesChanged.contains("i.j"));
+        
+        dpm1.restoreProperties();
+        String propertiesResored = FileUtils.loadFileAsString(deploymentFile);
+        
+        Assert.assertNotEquals(content, propertiesChanged);
+        Assert.assertTrue(propertiesResored.contains("12"));
+        Assert.assertTrue(propertiesResored.contains("34"));
+        Assert.assertFalse(propertiesResored.contains("22"));
+        Assert.assertTrue(propertiesResored.contains("56"));
+        Assert.assertTrue(propertiesResored.contains("78"));
+        Assert.assertTrue(propertiesResored.contains("90"));
+        Assert.assertFalse(propertiesResored.contains("44"));
+        Assert.assertTrue(propertiesResored.contains("a.b"));
+        Assert.assertTrue(propertiesResored.contains("c.d"));
+        Assert.assertTrue(propertiesResored.contains("e.f"));
+        Assert.assertTrue(propertiesResored.contains("g.h"));
+        Assert.assertTrue(propertiesResored.contains("i.j"));
+        
+        // /n at the end of last line may not matter
+        assertEquals(content.trim(), propertiesResored.trim());
     }
 
     private static class DummyInfrastructureFileDescriptor extends InfrastructureFileDescriptor {

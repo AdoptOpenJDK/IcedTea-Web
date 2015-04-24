@@ -38,12 +38,53 @@ exception statement from your version.
 package net.sourceforge.jnlp.tools;
 
 import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 
 public class DeploymentPropertiesModifier {
+   
+    
+    /**
+     * for advanced users, less verbose, less fool-proof multi-impl
+     */
+    public static class MultipleDeploymentPropertiesModifier {
+
+        private final InfrastructureFileDescriptor src;
+        private final AbstractMap.SimpleEntry<String, String>[] keyValue;
+        private List<DeploymentPropertiesModifier> modifications;
+
+        public MultipleDeploymentPropertiesModifier(AbstractMap.SimpleEntry<String, String>... keyValue) {
+            this(PathsAndFiles.USER_DEPLOYMENT_FILE, keyValue);
+        }
+
+        public MultipleDeploymentPropertiesModifier(InfrastructureFileDescriptor src, HashMap.SimpleEntry<String, String>... keyValue) {
+            this.src = src;
+            this.keyValue = keyValue;
+        }
+
+        public void setProperties() throws IOException {
+            modifications = new ArrayList<>(keyValue.length);
+            for (AbstractMap.SimpleEntry<String, String> keyValue1 : keyValue) {
+                DeploymentPropertiesModifier dm = new DeploymentPropertiesModifier(src);
+                dm.setProperties(keyValue1.getKey(), keyValue1.getValue());
+                //adding to beggining, soe restoring goes from last. Not necessary, but nice.
+                modifications.add(0, dm);
+            }
+        }
+
+        public void restoreProperties() throws IOException {
+            for (DeploymentPropertiesModifier dm : modifications) {
+                dm.restoreProperties();
+            }
+        }
+
+    }
 
     private final InfrastructureFileDescriptor src;
     private String savedValue;
@@ -62,7 +103,7 @@ public class DeploymentPropertiesModifier {
 
     public void setProperties(String property, String value) throws IOException {
         if (isPropertiesSet) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Properties can be set only once. Revert and use naother instance.");            
         }
         isPropertiesSet = true;
         requestedProperty = property;
@@ -73,7 +114,7 @@ public class DeploymentPropertiesModifier {
 
     public void restoreProperties() throws IOException {
         if (!isPropertiesSet) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Prperties must be set before they can be reverted");
         }
         isPropertiesSet = false;
 

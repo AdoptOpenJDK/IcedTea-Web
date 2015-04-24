@@ -38,6 +38,7 @@ exception statement from your version.
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.Bug;
@@ -65,22 +66,21 @@ public class PartiallySignedAppletManifestSpecifiesSandboxTests extends BrowserT
     private static final String STACKTRACE_NOT_GRANT_PERMISSIONS_TYPE = "Cannot grant permissions to unsigned jars";
     private static final String USER_HOME = System.getProperty("user.home");
 
-    private static DeploymentPropertiesModifier permissionsModifier;
-    private static DeploymentPropertiesModifier securityLevelModifier;
-
+    private static DeploymentPropertiesModifier.MultipleDeploymentPropertiesModifier modifier;
+    
     @BeforeClass
     public static void setupDeploymentProperties() throws IOException {
-        permissionsModifier = new DeploymentPropertiesModifier();
-        permissionsModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,  ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
-
-        securityLevelModifier = new DeploymentPropertiesModifier();
-        securityLevelModifier.setProperties(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        modifier = new DeploymentPropertiesModifier.MultipleDeploymentPropertiesModifier(
+                new AbstractMap.SimpleEntry<>(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString()),
+                new AbstractMap.SimpleEntry<>(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars()
+                )
+        );
+        modifier.setProperties();
     }
 
     @AfterClass
     public static void setbackDeploymentProperties() throws IOException {
-        securityLevelModifier.restoreProperties();
-        permissionsModifier.restoreProperties();
+        modifier.restoreProperties();
     }
 
     @Test
