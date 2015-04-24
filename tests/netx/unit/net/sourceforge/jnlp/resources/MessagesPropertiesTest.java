@@ -182,7 +182,12 @@ public class MessagesPropertiesTest {
                             || (val1.trim().equals("std. err"))
                             || (val1.trim().equals("std. out"))
                             || (val1.trim().equals("Policy Editor"))
-                            || (val1.trim().equals("Java Reflection")))
+                            || (val1.trim().equals("Java Reflection"))
+                            || (val1.trim().equals("javaws html"))
+                            || (val1.trim().matches("Minimum: .* Maximum: .*"))
+                            || (val1.trim().equals("jnlp href"))
+                            || (val1.trim().equals("GNU Lesser General Public License."))
+                                         )
                     {
                         errLog("Warning! Items equals for: " + key + " = " + val1 + " but are in allowed subset");
                     } else {

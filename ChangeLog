@@ -1,3 +1,9 @@
+2015-04-24  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed resource test to pass for CZ localization
+	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java:
+	added four more items to whitelist.
+
 2015-04-24  Alexandr Kolouch  <skolnag@gmail.com>
 
 	Added Czech translation for 1.6.
