@@ -119,7 +119,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
 
     @Override
     public String getFiles() {
-        return super.getFiles() + getFiles(PathsAndFiles.getAllItWebSettingsFiles());
+        return super.getFiles() + getFiles(PathsAndFiles.getAllItWebSettingsFiles()) + getFilesAppendix();
 
     }
 

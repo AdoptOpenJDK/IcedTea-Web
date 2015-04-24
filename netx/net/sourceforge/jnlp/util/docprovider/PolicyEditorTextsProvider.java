@@ -102,7 +102,7 @@ public class PolicyEditorTextsProvider extends TextsProvider {
 
     @Override
     public String getFiles() {
-        return super.getFiles() + getFiles(PathsAndFiles.getAllPEFiles());
+        return super.getFiles() + getFiles(PathsAndFiles.getAllPEFiles()) + getFilesAppendix();
 
     }
 

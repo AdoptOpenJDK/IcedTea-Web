@@ -155,7 +155,7 @@ public abstract class TextsProvider {
 
     protected String getFilesAppendix() {
         if (!expandVariables) {
-            return getFormatter().wrapParagraph("Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.");
+            return getFormatter().wrapParagraph(Translator.R("ITWTBdirs"));
         } else {
             return "";
         }
@@ -251,16 +251,14 @@ public abstract class TextsProvider {
     public String getBugs() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(getFormatter().process("There arent any known bugs. If you come across one, please file it at"));
+        sb.append(getFormatter().process(Translator.R("ITWTBbugs")+":"));
         sb.append(getFormatter().getNewLine());
         sb.append(getFormatter().getUrl(ITW_BUGS));
         sb.append(getFormatter().getNewLine());
         sb.append(getFormatter().getUrl(ITW_BUGZILLAHOME));
         sb.append(getFormatter().getNewLine());
         sb.append(getFormatter().getNewLine());
-        sb.append(getFormatter().process("Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true)"));
-        sb.append(getFormatter().process(" mode and include that output (best is from java console) with URL to jnlp or html file"));
-        sb.append(getFormatter().process(" (or the jnlp/html file or application itself)  when filing out the bug report."));
+        sb.append(getFormatter().process(Translator.R("ITWTBdebug")));
         sb.append(getFormatter().getNewLine());
         if (forceTitles) {
             return getFormatter().getTitle(ManFormatter.KnownSections.BUGS) + getFormatter().wrapParagraph(sb.toString());
@@ -273,11 +271,11 @@ public abstract class TextsProvider {
         if (forceTitles) {
             return getFormatter().getTitle(ManFormatter.KnownSections.AUTHOR)
                     + getFormatter().wrapParagraph(
-                            getFormatter().process("Written and maintained by the IcedTea contributors")
+                            getFormatter().process(Translator.R("ITWTBdebug"))
                             + getFormatter().getNewLine());
         } else {
             return getFormatter().wrapParagraph(
-                    getFormatter().process("Written and maintained by the IcedTea contributors")
+                    getFormatter().process(Translator.R("ITWTBdebug"))
                     + getFormatter().getNewLine());
         }
     }

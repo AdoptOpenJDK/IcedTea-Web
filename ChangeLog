@@ -1,3 +1,14 @@
+2015-04-24  Jiri Vanek  <jvanek@redhat.com>
+
+	Messages from TextsProvider moved to properties
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added family ITWTB
+	with fourproeprties.
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: is now using
+	those properties instead of hardcoded values
+	* netx/net/sourceforge/jnlp/util/docprovider/ItwebSettingsTextsProvider.java:
+	* netx/net/sourceforge/jnlp/util/docprovider/PolicyEditorTextsProvider.java:
+	now includes getFilesAppendix in (getFiles)
+
 2015-04-24  Alexandr Kolouch  <skolnag@gmail.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: various improvements
