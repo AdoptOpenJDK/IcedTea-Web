@@ -1,3 +1,8 @@
+2015-04-27  Lukasz Dracz  <ldracz@redhat.com>
+
+	Removed Executable Permissions from bash completion
+	* icedteaweb-completion
+
 2015-04-24  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed resource test to pass for CZ localization
