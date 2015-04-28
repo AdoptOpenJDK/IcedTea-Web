@@ -1,3 +1,10 @@
+2015-04-28  Jiri Vanek  <jvanek@redhat.com>
+
+	Improved JDK9 detection
+	* acinclude.m4: (IT_CHECK_FOR_JDK) if found jdk is link, then it is printed
+	out also as resolved. (IT_CHECK_FOR_JRE) same, plus except classical JDK/jre
+	verification, also modular JRE is checked.
+
 2015-04-27  Lukasz Dracz  <ldracz@redhat.com>
 
 	Removed Executable Permissions from bash completion

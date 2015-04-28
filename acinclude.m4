@@ -65,9 +65,11 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
        fi
     done
   fi
-  AC_MSG_RESULT(${SYSTEM_JDK_DIR})
   if ! test -d "${SYSTEM_JDK_DIR}"; then
-    AC_MSG_ERROR("A JDK home directory could not be found.")
+    AC_MSG_ERROR("A JDK home directory could not be found. ${SYSTEM_JDK_DIR}")
+  else
+    READ=`readlink -f ${SYSTEM_JDK_DIR}`
+    AC_MSG_RESULT(${SYSTEM_JDK_DIR} (link to ${READ}))
   fi
   AC_SUBST(SYSTEM_JDK_DIR)
 ])
@@ -87,13 +89,25 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JRE],
                SYSTEM_JRE_DIR=
              ])
   if test -z "${SYSTEM_JRE_DIR}" ; then
-    if test -d "${SYSTEM_JDK_DIR}/jre" ; then
-      SYSTEM_JRE_DIR="${SYSTEM_JDK_DIR}/jre"
+    SYSTEM_JRE_DIR_EIGHT_AND_LESS="${SYSTEM_JDK_DIR}/jre"
+    SYSTEM_JRE_DIR_MODULAR="${SYSTEM_JDK_DIR}"
+    # try jdk8 or older compliant
+    if test -d "${SYSTEM_JRE_DIR_EIGHT_AND_LESS}" -a -e "${SYSTEM_JRE_DIR_EIGHT_AND_LESS}/bin/java" -a -e "${SYSTEM_JRE_DIR_EIGHT_AND_LESS}/lib/rt.jar" ; then
+      SYSTEM_JRE_DIR="${SYSTEM_JRE_DIR_EIGHT_AND_LESS}"
+    fi
+    # still not found?
+    if test -z "${SYSTEM_JRE_DIR}" ; then
+      # try modular, jdk9 or higher compliant
+      if test -d "${SYSTEM_JRE_DIR_MODULAR}" -a -f "${SYSTEM_JRE_DIR_MODULAR}/bin/java" -a -d "${SYSTEM_JRE_DIR_MODULAR}/lib/modules" ; then
+        SYSTEM_JRE_DIR="${SYSTEM_JRE_DIR_MODULAR}"
+      fi
     fi
   fi
-  AC_MSG_RESULT(${SYSTEM_JRE_DIR})
   if ! test -d "${SYSTEM_JRE_DIR}"; then
-    AC_MSG_ERROR("A JRE home directory could not be found.")
+    AC_MSG_ERROR("A JRE home directory could not be found. ${SYSTEM_JRE_DIR}")
+  else
+    READ=`readlink -f ${SYSTEM_JRE_DIR}`
+    AC_MSG_RESULT(${SYSTEM_JRE_DIR} (link to ${READ}))
   fi
   AC_SUBST(SYSTEM_JRE_DIR)
 ])
