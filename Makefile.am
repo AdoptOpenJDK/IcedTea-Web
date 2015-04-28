@@ -534,7 +534,7 @@ stamps/generate-docs.stamp: stamps/netx.stamp
 	  fi ; \
 	  mkdir -p "$$MAN_DESC" ; \
 	  $$TP_COMMAND man $$ENCOD "$$MAN_DESC" $$TP_TAIL ; \
-	  $$TP_COMMAND htmlIntro "$(NETX_DIR)/net/sourceforge/jnlp/resources/about_$$ID.html" "$$TP_TAIL"; \
+	  $$TP_COMMAND htmlIntro "$(NETX_DIR)/net/sourceforge/jnlp/resources/about_$$ID.html" $$TP_TAIL; \
 	done ; \
 	export LANG=$$LANG_BACKUP ; \
 	echo "</body></html>"  >> $$HTML_DOCS_INDEX ; \

@@ -1,5 +1,11 @@
 2015-04-28  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed incorrect usage of apostrophes in intro generation
+	* Makefile.am: (stamps/generate-docs.stamp) fixed redundant false in version
+	appearing in doc intro
+
+2015-04-28  Jiri Vanek  <jvanek@redhat.com>
+
 	1.6 post-branch operations
 	* configure.ac: bumped (AC_INIT) to 1.7pre
 	* NEWS: Added 1.7 section, Bumped date of 1.6 release to 2015
