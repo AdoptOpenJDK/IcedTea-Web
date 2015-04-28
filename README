@@ -7,7 +7,7 @@ implementation of Java Web Start, originally based on the NetX
 project.
 
 Homepage (wiki):
-  http://icedtea.classpath.org/
+  http://icedtea.classpath.org/wiki/IcedTea-Web
 
 Bugs (bugzilla):
   http://icedtea.classpath.org/bugzilla
@@ -25,14 +25,23 @@ Anonymous Mercurial checkout:
 NetX
 ====
 
-NetX provides a drop-in replacement for javaws (Java Web Start). Since
-upstream NetX is dormant, we will be hosting and modifying the sources
-in the IcedTea-Web repository, particularly in the netx/net/sourceforge/jnlp
-directory.
+NetX provides a drop-in replacement for javaws (Java Web Start). Since upstream
+NetX is dead, we forked the code into the netx/net/sourceforge/jnlp package,
+whole implementation is still in this package, NetX is kept referenced
+However, as icedtea-web has evolved to complex set of tools, extensions and tests,
+it has now only a few lines of code shared with the original implementation. 
 
 IcedTea's NetX currently supports verification of signed jars, trusted
 certificate storing, system certificate store checking, and provides
-the services specified by the jnlp API.
+the services specified by the jnlp API. 
+
+In addition it also provides:
+ * full desktop integration
+ * offline run
+ * own appletviewer
+ * many extended security features
+ * own policy editor and much more.
+For full list read NEWS and Changelog
 
 The Browser Plugin
 ==================
@@ -48,12 +57,12 @@ IcedTea-Web is built using the standard:
 
 $ ./autogen.sh (if building from Mercurial rather than a tarball)
 $ ./configure
-$ gmake
-$ gmake install
+$ make
+$ make install
 
 incantation.  The build requirements are as follows:
 
-* A bootstrap JDK.  At present, only IcedTea6 is supported.
+* A bootstrap JDK.  You can use any java JDK7 or higher compatible.
 * A C compiler (for the launchers).
 * libX11
 * zlib-devel
@@ -61,33 +70,28 @@ incantation.  The build requirements are as follows:
 Additionally, the plugin requires:
 
 * A C++ compiler
-* firefox-devel 
-* xulrunner-devel
+* npapi headers - depending on your distribution: firefox-devel or xulrunner-devel or NPAPI-SDK ...
+
+Some distributions do not provide correct NPAPI headers so you can use those: 
+https://bitbucket.org/mgorny/npapi-sdk/downloads.
 
 The plugin can be disabled by passing --disable-plugin.
 
 The following optional dependencies enable additional features
 
-* rhino (enables support for using proxy auto config files)
+* rhino (enables support for using proxy auto config files evaluating javascript)
+* tagsoup (enables cleanup of not well formed JNLP files)
 * junit4 (enables unit tests)
+* jacoco (enables codecoverage)
+
+
 
 See ./configure --help if you need to override the defaults.
 
-The following locations are checked for a JDK:
-    * /usr/lib/jvm/java-openjdk
-    * /usr/lib/jvm/icedtea6
-    * /usr/lib/jvm/java-6-openjdk
-    * /usr/lib/jvm/openjdk
-    * /usr/lib/jvm/java-icedtea
-    * /usr/lib/jvm/java-gcj
-    * /usr/lib/jvm/gcj-jdk
-    * /usr/lib/jvm/cacao
-in the order given above.  
+Check IT_CHECK_FOR_JDK in acinclude.m4 to see the default search paths for JDKs.
 
 At present, some of these options fail due to sun.* classes required
-by IcedTea-Web.  Upstream OpenJDK will only be able to compile
-IcedTea-Web if the patch applet_hole.patch from IcedTea has been
-applied.
+by IcedTea-Web.
 
 Most targets in IcedTea-Web create stamp files in the stamps directory
 to determine what and when dependencies were compiled.  Each target
@@ -100,44 +104,45 @@ Build Modification Options
 The build process may be modified by passing the following options
 to configure:
 
+To configure jdk used for build and runtime, 
+* --with-jdk-home and --with-jre-home are your best friends.
+If you are using jdk without jre, it may force you to use  both those switches
+to point to same location. 
+
 * --disable-docs: Don't build the Javadoc documentation.
-* --with-gcj: Compile ecj to native code with gcj prior to building.
+* --with-gcj: Compile ecj to native code with gcj prior to building. (deprecated)
 * --with-ecj: Specify the location of a 'ecj' binary.  By default, the path
-  is checked for ecj, ecj-3.1, ecj-3.2 and ecj-3.3.
+  is checked for ecj, ecj-3.1, ecj-3.2 and ecj-3.3. (deprecated)
 * --with-javac: Specify the location of a 'javac' binary.  By default, the path
-  is checked for javac.
+  is checked for javac.  (deprecated)
 * --with-jar: Specify the location of a 'jar' binary.  By default, the path
-  is checked for gjar and jar.
-* --with-ecj-jar: Specify the location of an ecj JAR file.  By default, the
-  following paths are checked:
-    - /usr/share/java/eclipse-ecj.jar
-    - /usr/share/java/ecj.jar
-    - /usr/share/eclipse-ecj-3.{2,3,4,5}/lib/ecj.jar
+  is checked for gjar and jar. (deprecated)
+ --with-ecj-jar: Specify the location of an ecj JAR file.  (deprecated)
 
 Other options may be supplied which enable or disable new features.
 These are documented fully in the relevant section below.
 
 * --disable-plugin: Don't build the browser plugin.
 * --with-rhino: Specify the location of rhino jar
-* --with-junit: Specify the location of the junit 4 jar
+* --with-tagsoup: Specify the location of the tagsoup jar
+* --with-jacoco: Specify the location of the jacoco jar
 
-Rhino Support
-=============
+Rhino and Tagsoup Support
+=========================
 
 IcedTea-Web needs rhino for using Proxy Auto Config (PAC) files. If rhino is
 not found, or explicitly disabled, then support for PAC files will be disabled.
-
-By default, the following paths are checked for rhino:
-  - /usr/share/java/js.jar
-  - /usr/share/rhino-1.6/lib/js.jar
-  - /usr/share/java/rhino.jar
 
 If a rhino jar is not found, rhino support is disabled. The --with-rhino build
 option can be used to specify the location of the jar file. To explicitly
 disable rhino use --with-rhino=no.
 
-JUnit Support
-=============
+Tagsoup is used in similar way, and it is library used to fix malformed JNLP files.
+
+Check acinclude.m4 to see the default search paths.
+
+JUnit and Jacoco Support
+========================
 
 JUnit is needed for running some tests. It has no run-time impact.
 
@@ -153,11 +158,20 @@ tests match the output of other tests. A simple 'Passed:' or 'FAILED:' is
 printed out, followed by <TestClass>.<testMethod>. This is also the format used
 by JTreg.
 
+Jacoco is used in similar way and can be used to measure code-coverage both for
+junit tests and for reproducer. For plugin a fake binary is created and used.
+
+Check acinclude.m4 and Makefile.am to see the default behavior.
+
 Testing
 =======
 
 A set of automated tests is supplied for IcedTea-Web. They can be run by using
-'make check'. Currently, this only tests a few parts of IcedTea-Web.
+'make check' or "make run-netx-dist-tests"
+'make check' runs a set of unit tests are that always supposed to pass.
+'make run-next-dist-tets' runs the reproducer test suite which requires
+you to install IcedTea-Web first. (if you want to use it in your personal space,
+use --prefix to specify final path)
 
 The number and type of tests run by 'make check' may be affected by the build
 options, including JUnit support and rhino support.
@@ -165,9 +179,9 @@ options, including JUnit support and rhino support.
 A test suite is supplied for the browser plugin.  It can be built
 using 'make plugin-tests' and run by loading the HTML page specified
 into a browser with the plugin installed.
+See http://icedtea.classpath.org/wiki/Reproducers for more.
 
 For debugging, the environment variable ICEDTEAPLUGIN_DEBUG should be
-set to 'true'.  This will produce output on the console from the C++
-side, and output from the Java side in $HOME/.icedteaplugin/java.stdout
-and $HOME/.icedteaplugin/java.stderr.  It also starts the debug server
-on port 8787.
+set to 'true'. It also starts the debug server on port 8787. If you set it to
+suspend  java will wait for debugger to join before launching main class.
+You can set verbosity and logging levels via itweb-settings 
