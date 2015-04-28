@@ -8,7 +8,9 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
-New in release 1.6 (2014-XX-XX):
+New in release 1.7 (2015-XX-XX):
+
+New in release 1.6 (2015-XX-XX):
 * Massively improved offline abilities. Added Xoffline switch to force work without inet connection.
 * Improved to be able to run with any JDK
 * JDK 6 and older no longer supported
