@@ -1629,11 +1629,13 @@ public class PolicyEditor extends JPanel {
             @Override
             public void run() {
                 String filepath = optionParser.getParam(OptionsDefinitions.OPTIONS.FILE);
-                if (optionParser.getMainArgs().size() == 0) {
-                    filepath = null;
-                } else if (filepath.isEmpty()) {
-                    // maybe the user just forgot the -file flag, so try to open anyway
-                    filepath = optionParser.getMainArg();
+                if (filepath.isEmpty()) {
+                    if (optionParser.getMainArgs().size() == 0) {
+                        filepath = null;
+                    } else {
+                        // maybe the user just forgot the -file flag, so try to open anyway
+                        filepath = optionParser.getMainArg();
+                    }
                 }
                 final PolicyEditorWindow frame = getPolicyEditorFrame(filepath);
                 frame.asWindow().setVisible(true);

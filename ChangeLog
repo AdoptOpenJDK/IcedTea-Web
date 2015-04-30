@@ -1,3 +1,10 @@
+2015-04-30  Jie Kang  <jkang@redhat.com>
+
+	Fix policyeditor file flag to work when used standalone
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java:
+	(main): filepath no longer set to null when file flag has parameter and
+	there is no main argument
+
 2015-04-28  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed incorrect usage of apostrophes in intro generation
