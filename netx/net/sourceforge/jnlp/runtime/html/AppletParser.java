@@ -85,8 +85,9 @@ public class AppletParser {
                 docBase,
                 getArchives(), 
                 getMain(), 
-                new Integer(source.getAttribute("width")),
-                new Integer(source.getAttribute("height")),
+                //removing all chars from number - like whitespace, px and so on...
+                new Integer(sanitizeSize(source.getAttribute("width"))),
+                new Integer(sanitizeSize(source.getAttribute("height"))),
                 createParams());
     }
 
@@ -117,7 +118,13 @@ public class AppletParser {
         //push all attributes to map
         NamedNodeMap atts = source.getAttributes();
         for (int i = 0; i < atts.getLength(); i++) {
-            data.put(atts.item(i).getNodeName(), atts.item(i).getTextContent());
+            String name = atts.item(i).getNodeName();
+            String value = atts.item(i).getTextContent();
+            if (name.trim().equalsIgnoreCase("width")
+                    || name.trim().equalsIgnoreCase("height")) {
+                value = sanitizeSize(value);
+            }
+            data.put(name, value);
         }
         return new PluginParameters(data);
     }
@@ -163,6 +170,14 @@ public class AppletParser {
             }
         }
         return s;
+    }
+
+    static String sanitizeSize(String attribute) {
+        if (attribute == null) {
+            return "1";
+        }
+        //remove all nondigits
+        return attribute.replaceAll("[^0-9]+", "");
     }
 
 }

@@ -1,3 +1,11 @@
+2015-05-22  Jiri Vanek  <jvanek@redhat.com>
+
+	Removed garbage from htmls' width and height
+	* netx/net/sourceforge/jnlp/runtime/html/AppletParser.java: new method
+	(sanitizeSize) which remove all non digit content from string
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/html/AppletParserTest.java:
+	new file, test for (sanitizeSize)
+
 2015-04-30  Jie Kang  <jkang@redhat.com>
 
 	Fix policyeditor file flag to work when used standalone
