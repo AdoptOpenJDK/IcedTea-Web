@@ -362,7 +362,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
 
     ;
     
-    private static int countOccurences(String str, String findStr) {
+    public static int countOccurences(String str, String findStr) {
         int lastIndex = 0;
         int count = 0;
         while (lastIndex != -1) {

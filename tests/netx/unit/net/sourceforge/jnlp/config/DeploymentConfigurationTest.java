@@ -37,15 +37,22 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
 import javax.naming.ConfigurationException;
+import net.sourceforge.jnlp.PluginBridgeTest;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.Assert;
 
 import org.junit.Test;
 
-public class DeploymentConfigurationTest {
+public class DeploymentConfigurationTest extends NoStdOutErrTest{
 
     @Test
     public void testLoad() throws ConfigurationException {
@@ -68,5 +75,88 @@ public class DeploymentConfigurationTest {
 
         assertTrue(target.size() != 0);
     }
+    
+    @Test
+    public void testPersistedComments() throws ConfigurationException, IOException {
+        final File f = File.createTempFile("proeprties", "withComments");
+        f.deleteOnExit();
+        FileUtils.saveFile("#commented1=val1\nproeprty2=val2\n#commented3=val3\nproeprty4=val4", f);
+        DeploymentConfiguration dc = new DeploymentConfiguration(new InfrastructureFileDescriptor(){
+            
+            @Override
+            public String getFullPath() {
+                return f.getAbsolutePath();
+            }
+            
+        });
+        dc.load();
+        Assert.assertEquals("val2", dc.getProperty("proeprty2"));
+        Assert.assertEquals("val4", dc.getProperty("proeprty4"));
+        Assert.assertEquals(null, dc.getProperty("commented1"));
+        Assert.assertEquals(null, dc.getProperty("commented3"));
+        
+        dc.save();
+        
+        String s = FileUtils.loadFileAsString(f);
+        Assert.assertTrue(s.contains("#"+DeploymentConfiguration.DEPLOYMENT_COMMENT));
+        String date = new Date().toString().substring(0, 10); //every propertiews file have header and date by default
+        Assert.assertTrue(s.contains("#"+date)); //check day part of date...
+        Assert.assertTrue(s.contains("#commented1"));
+        Assert.assertTrue(s.contains("proeprty2"));
+        Assert.assertTrue(s.contains("#commented3"));
+        Assert.assertTrue(s.contains("proeprty4"));
+        Assert.assertTrue(s.contains("val1"));
+        Assert.assertTrue(s.contains("val2"));
+        Assert.assertTrue(s.contains("val3"));
+        Assert.assertTrue(s.contains("val4"));
+      
+        }
+    
+    
+    
+    @Test
+    public void testEnsurePersistedCommentsDoNotMultiplyHeaderAndDate() throws ConfigurationException, IOException {
+        final File f = File.createTempFile("proeprties", "withComments");
+        f.deleteOnExit();
+        FileUtils.saveFile("#commented1=val1\nproeprty2=val2\n#commented3=val3\nproeprty4=val4", f);
+        DeploymentConfiguration dc = new DeploymentConfiguration(new InfrastructureFileDescriptor() {
 
+            @Override
+            public String getFullPath() {
+                return f.getAbsolutePath();
+            }
+
+        });
+        String s = null;
+        for (int x = 0; x < 10; x++) {
+            dc.load();
+            Assert.assertEquals("val2", dc.getProperty("proeprty2"));
+            Assert.assertEquals("val4", dc.getProperty("proeprty4"));
+            Assert.assertEquals(null, dc.getProperty("commented1"));
+            Assert.assertEquals(null, dc.getProperty("commented3"));
+
+            dc.save();
+
+            s = FileUtils.loadFileAsString(f);
+            for (int y = 0; x < x; x++) {
+                //ensure salt
+                Assert.assertTrue(s.contains("#id" + y + "id"));
+            }
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, DeploymentConfiguration.DEPLOYMENT_COMMENT));
+            String date = new Date().toString().substring(0, 10); //every propertiews file have header and date by default
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, date)); //check day part of date...
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, "#commented1"));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, "proeprty2"));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, "#commented3"));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, "proeprty4"));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, "val1"));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, "val2"));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, "val3"));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurences(s, "val4"));
+            //insert some salt to check if it really iterates
+            FileUtils.saveFile(s + "\n#id" + x + "id", f);
+        }
+        System.out.println(s);
     }
+
+}

@@ -1,5 +1,19 @@
 2015-05-22  Jiri Vanek  <jvanek@redhat.com>
 
+	Comments in deployment.properties now persists saving via itweb-settings
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: (loadComments)
+	new method. Saves every line starting with # char except date and
+	DEPLOYMENT_COMMENT. (load) This method is called before every load, and read lines
+	are stored. (save) Saved comments are inserted to other comments before call to 
+	store.
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: (countOccurences)
+	made public so it can be reused
+	* tests/netx/unit/net/sourceforge/jnlp/config/DeploymentConfigurationTest.java:
+	added tests to verify preserving of comments and non-multiplying date and
+	DEPLOYMENT_COMMENT
+
+2015-05-22  Jiri Vanek  <jvanek@redhat.com>
+
 	Removed garbage from htmls' width and height
 	* netx/net/sourceforge/jnlp/runtime/html/AppletParser.java: new method
 	(sanitizeSize) which remove all non digit content from string

@@ -30,6 +30,8 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileLock;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -55,6 +57,8 @@ public final class DeploymentConfiguration {
     public static final String APPLET_TRUST_SETTINGS = ".appletTrustSettings";
 
     public static final String DEPLOYMENT_COMMENT = "Netx deployment configuration";
+    public String userComments;
+    public String systemComments;
 
     public static final int JNLP_ASSOCIATION_NEVER = 0;
     public static final int JNLP_ASSOCIATION_NEW_ONLY = 1;
@@ -231,7 +235,7 @@ public final class DeploymentConfiguration {
     public void resetToDefaults() {
         currentConfiguration = Defaults.getDefaults();
     }
-    
+
 
     public enum ConfigType {
         System, User
@@ -308,6 +312,7 @@ public final class DeploymentConfiguration {
                 /* Second, read the System level deployment.properties file */
                 systemProperties = loadProperties(ConfigType.System, systemPropertiesFile,
                         systemPropertiesMandatory);
+                systemComments=loadComments(systemPropertiesFile);
             }
             if (systemProperties != null) {
                 mergeMaps(initialProperties, systemProperties);
@@ -326,6 +331,7 @@ public final class DeploymentConfiguration {
          */
         userPropertiesFile = userFile;
         Map<String, Setting<String>> userProperties = loadProperties(ConfigType.User, userPropertiesFile, false);
+        userComments=loadComments(userPropertiesFile);
         if (userProperties != null) {
             mergeMaps(initialProperties, userProperties);
         }
@@ -631,7 +637,11 @@ public final class DeploymentConfiguration {
 
         FileUtils.createParentDir(userPropertiesFile);
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(userPropertiesFile))) {
-            toSave.store(out, DEPLOYMENT_COMMENT);
+            String comments = DEPLOYMENT_COMMENT;
+            if (userComments.length() > 0) {
+                comments = comments + System.lineSeparator() + userComments;
+            }
+            toSave.store(out, comments); ;
         }
     }
 
@@ -855,5 +865,44 @@ public final class DeploymentConfiguration {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "ERROR");
             return 1;
         }
+    }
+    
+    //standard date.toString format
+    public static final SimpleDateFormat pattern = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+    
+    private static String loadComments(File path) {
+        StringBuilder r = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            while (true) {
+                String s = br.readLine();
+                if (s == null) {
+                    break;
+                }
+                s = s.trim();
+                if (s.startsWith("#")) {
+                    String decommented = s.substring(1);
+                    if (decommented.isEmpty()){
+                        continue;
+                    }
+                    if (decommented.equals(DEPLOYMENT_COMMENT)){
+                        continue;
+                    }
+                    //there is always also date
+                    Date dd = null;
+                    try {
+                        dd = pattern.parse(decommented);
+                    } catch (Exception ex) {
+                        //we really dont care, failure is our decision point
+                    }
+                    if (dd == null){
+                        r.append(decommented).append("\n");
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            OutputController.getLogger().log(ex);
+        }
+        
+        return r.toString().trim();
     }
 }
