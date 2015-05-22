@@ -156,7 +156,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest{
             //insert some salt to check if it really iterates
             FileUtils.saveFile(s + "\n#id" + x + "id", f);
         }
-        System.out.println(s);
+        //System.out.println(s);
     }
 
 }
