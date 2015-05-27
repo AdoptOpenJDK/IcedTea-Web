@@ -1,3 +1,13 @@
+2015-05-27  Jiri Vanek  <jvanek@redhat.com>
+
+	Improved caching of files obtained via query
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: now consider also query(if any)
+	when creating file-name for item to be cached
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java: fixed old
+	tests due to change and added two new tests to test change.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceDownloaderTest.java:
+	removed unused import.
+
 2015-05-22  Jiri Vanek  <jvanek@redhat.com>
 
 	Comments in deployment.properties now persists saving via itweb-settings

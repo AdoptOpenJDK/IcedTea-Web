@@ -481,6 +481,9 @@ public class CacheUtil {
         path.append(location.getHost());
         path.append(File.separatorChar);
         path.append(location.getPath().replace('/', File.separatorChar));
+        if (location.getQuery() != null && !location.getQuery().trim().isEmpty()) {
+            path.append(".").append(location.getQuery());
+        }
 
         return new File(FileUtils.sanitizePath(path.toString()));
     }

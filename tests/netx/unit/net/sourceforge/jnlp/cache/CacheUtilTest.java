@@ -58,7 +58,24 @@ public class CacheUtilTest {
     @Test
     public void testUrlToPath() throws Exception {
         final URL u = new URL("https://example.com/applet/some:weird*applet?.jar");
-        final File expected = new File("/tmp/https/example.com/applet/some_weird_applet");
+        //stuf behind querry is kept
+        final File expected = new File("/tmp/https/example.com/applet/some_weird_applet..jar");
+        Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
+    }
+    
+    
+    @Test
+    public void testUrlToPathWithQuery() throws Exception {
+        final URL u = new URL("https://example.com/applet/applet.php?id=applet5");
+        //querry is kept and sanitized
+        final File expected = new File("/tmp/https/example.com/applet/applet.php.id_applet5");
+        Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
+    }
+    @Test
+    public void testUrlToPathWithoutQuery() throws Exception {
+        final URL u = new URL("https://example.com/applet/applet.php");
+        //no doubledot is caused by patch adding query to file
+        final File expected = new File("/tmp/https/example.com/applet/applet.php");
         Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
     }
 }
