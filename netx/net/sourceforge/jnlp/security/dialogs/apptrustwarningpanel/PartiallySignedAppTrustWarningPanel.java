@@ -55,6 +55,7 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.security.dialogs.TemporaryPermissionsButton;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
@@ -64,15 +65,14 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     private final JButton sandboxButton;
     private final JButton advancedOptionsButton;
 
-    public PartiallySignedAppTrustWarningPanel(JNLPFile file, ActionChoiceListener actionChoiceListener,
-            SecurityDialog securityDialog, SecurityDelegate securityDelegate) {
-        super(file, actionChoiceListener);
+    public PartiallySignedAppTrustWarningPanel(JNLPFile file, SecurityDialog securityDialog, SecurityDelegate securityDelegate) {
+        super(file);
         this.jcv = (JarCertVerifier) securityDialog.getCertVerifier();
         this.INFO_PANEL_HEIGHT = 250;
 
         sandboxButton = new JButton();
         sandboxButton.setText(R("ButSandbox"));
-        sandboxButton.addActionListener(chosenActionSetter(ExecuteAppletAction.SANDBOX));
+        sandboxButton.addActionListener(rememberPanel.chosenActionSetter(ExecuteAppletAction.SANDBOX));
 
         advancedOptionsButton = new TemporaryPermissionsButton(file, securityDelegate, sandboxButton);
 
@@ -80,9 +80,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         buttons.add(2, advancedOptionsButton);
 
         addComponents();
-        if (securityDialog != null) {
-            securityDialog.setMinimumSize(new Dimension(600, 400));
-        }
+        securityDialog.setMinimumSize(new Dimension(600, 400));
     }
 
     private String getAppletInfo() {
@@ -142,7 +140,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
 
     @Override
     protected String getTopPanelText() {
-        return htmlWrap(R(getTopPanelTextKey()));
+        return RememberPanel.htmlWrap(R(getTopPanelTextKey()));
     }
 
     @Override
@@ -159,12 +157,12 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
                 text += "<br>" + R("SUnsignedRejectedBefore", rememberedEntry.getLocalisedTimeStamp());
             }
         }
-        return htmlWrap(text);
+        return RememberPanel.htmlWrap(text);
     }
 
     @Override
     protected String getQuestionPanelText() {
-        return htmlWrap(R(getQuestionPanelTextKey()));
+        return RememberPanel.htmlWrap(R(getQuestionPanelTextKey()));
     }
 
 }

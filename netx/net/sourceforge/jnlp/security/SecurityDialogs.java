@@ -59,7 +59,7 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import static net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation.getStoredAction;
 import net.sourceforge.jnlp.security.dialogs.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
+import net.sourceforge.jnlp.security.dialogs.remember.AppSigningWarningAction;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -234,7 +234,11 @@ public class SecurityDialogs {
     public static AppSigningWarningAction showUnsignedWarningDialog(JNLPFile file) {
 
         if (!shouldPromptUser()) {
-            return new AppSigningWarningAction(ExecuteAppletAction.NO, false);
+            if (JNLPRuntime.isTrustAll()) {
+                return new AppSigningWarningAction(ExecuteAppletAction.YES, false);
+            } else {
+                return new AppSigningWarningAction(ExecuteAppletAction.NO, false);
+            }
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();

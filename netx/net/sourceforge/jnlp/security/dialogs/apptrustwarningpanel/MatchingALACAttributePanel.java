@@ -54,6 +54,7 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityAction
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 /**
@@ -65,8 +66,8 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
     private final String codebase;
     private final String remoteUrls;
 
-    public MatchingALACAttributePanel(SecurityDialog x, JNLPFile file, String codebase, String remoteUrls, ActionChoiceListener actionChoiceListener) {
-        super(file, actionChoiceListener);
+    public MatchingALACAttributePanel(SecurityDialog x, JNLPFile file, String codebase, String remoteUrls) {
+        super(file);
         this.title = super.getAppletTitle();
         this.codebase = codebase;
         this.remoteUrls = remoteUrls;
@@ -85,7 +86,7 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
 
     @Override
     protected String getTopPanelText() {
-        return htmlWrap(Translator.R("ALACAMatchingMainTitle", title, codebase, remoteUrls));
+        return RememberPanel.htmlWrap(Translator.R("ALACAMatchingMainTitle", title, codebase, remoteUrls));
     }
 
     @Override
@@ -114,16 +115,10 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
     }
 
     public static void main(String[] args) throws MalformedURLException, IOException, ParseException {
-        Set<URL> s = new HashSet<URL>();
+        Set<URL> s = new HashSet<>();
         s.add(new URL("http:/blah.com/blah"));
         s.add(new URL("http:/blah.com/blah/blah"));
-        MatchingALACAttributePanel w = new MatchingALACAttributePanel(null, new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")), "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s), new ActionChoiceListener() {
-
-            @Override
-            public void actionChosen(AppSigningWarningAction action) {
-
-            }
-        });
+        MatchingALACAttributePanel w = new MatchingALACAttributePanel(null, new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")), "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
         JFrame f = new JFrame();
         f.setSize(600, 400);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

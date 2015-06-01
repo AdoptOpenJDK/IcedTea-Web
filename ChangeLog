@@ -1,3 +1,28 @@
+2015-06-01  Jiri Vanek  <jvanek@redhat.com>
+
+	Remember panel extracted so it can be reused
+	*/netx/net/sourceforge/jnlp/security/SecurityDialogs.java: now correctly behaves on Xtrustall
+	*/netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	result is using diamond
+	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
+	Simplified constructors, getting dialogue and jnlpfile is all they need
+	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	extracted remember panel and related stuff. Made to use extracted one
+	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/MatchingALACAttributePanel.java:
+	same
+	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	same
+	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
+	same
+	*/netx/net/sourceforge/jnlp/security/dialogs/remember/ActionChoiceListener.java:
+	new class. Extracted stuff from AppTrustWarningPanel
+	*/netx/net/sourceforge/jnlp/security/dialogs/remember/AppSigningWarningAction.java:
+	new class. Extracted stuff from AppTrustWarningPanel
+	*/netx/net/sourceforge/jnlp/security/dialogs/remember/RememberPanel.java:
+	new class. Extracted stuff from AppTrustWarningPanel
+	*/tests/netx/unit/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanelTest.java:
+	minor, adapted to match current codebase
+
 2015-05-27  Jiri Vanek  <jvanek@redhat.com>
 
 	Improved caching of files obtained via query

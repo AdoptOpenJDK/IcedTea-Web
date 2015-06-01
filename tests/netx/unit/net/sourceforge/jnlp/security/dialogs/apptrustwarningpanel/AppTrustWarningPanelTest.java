@@ -1,7 +1,5 @@
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +8,7 @@ import java.util.Map;
 import javax.swing.JButton;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -48,7 +47,7 @@ public class AppTrustWarningPanelTest {
         mockPluginBridge = new PluginBridge(mockCodebase, mockDocumentBase, mockJar,
                 mockMainClass, mockWidth, mockHeight, mockParameters);
 
-        panelList.add(new UnsignedAppletTrustWarningPanel(null, mockPluginBridge, null));
+        panelList.add(new UnsignedAppletTrustWarningPanel(null, mockPluginBridge));
     }
 
     @Test
@@ -109,7 +108,7 @@ public class AppTrustWarningPanelTest {
     public void testHtmlWrap() throws Exception {
         final String testText = "This is some text";
         final String expectedResult = "<html>This is some text</html>";
-        final String actualResult = UnsignedAppletTrustWarningPanel.htmlWrap(testText);
+        final String actualResult = RememberPanel.htmlWrap(testText);
         assertEquals("htmlWrap should properly wrap text with HTML tags", expectedResult, actualResult);
     }
 

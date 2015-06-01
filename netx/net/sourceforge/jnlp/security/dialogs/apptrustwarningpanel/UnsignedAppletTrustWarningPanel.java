@@ -49,12 +49,13 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityAction
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 
 
 public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
-    public UnsignedAppletTrustWarningPanel(SecurityDialog securityDialog, final JNLPFile file, final ActionChoiceListener listener) {
-        super(file, listener);
+    public UnsignedAppletTrustWarningPanel(SecurityDialog securityDialog, final JNLPFile file) {
+        super(file);
         this.INFO_PANEL_HEIGHT = 250;
         addComponents();
         if (securityDialog != null) {
@@ -82,7 +83,7 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
     @Override
     protected String getTopPanelText() {
-        return htmlWrap(R(getTopPanelTextKey()));
+        return RememberPanel.htmlWrap(R(getTopPanelTextKey()));
     }
 
     @Override
@@ -97,16 +98,16 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
                 text += "<br>" + R("SUnsignedRejectedBefore", rememberedEntry.getLocalisedTimeStamp());
             }
         }
-        return htmlWrap(text);
+        return RememberPanel.htmlWrap(text);
     }
 
     @Override
     protected String getQuestionPanelText() {
-        return htmlWrap(R(getQuestionPanelTextKey()));
+        return RememberPanel.htmlWrap(R(getQuestionPanelTextKey()));
     }
     
     public static void main(String[] args) throws Exception {
-        UnsignedAppletTrustWarningPanel w = new UnsignedAppletTrustWarningPanel(null, new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")), null);
+        UnsignedAppletTrustWarningPanel w = new UnsignedAppletTrustWarningPanel(null, new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")));
         JFrame f = new JFrame();
         f.setSize(600, 400);
         f.add(w, BorderLayout.CENTER);

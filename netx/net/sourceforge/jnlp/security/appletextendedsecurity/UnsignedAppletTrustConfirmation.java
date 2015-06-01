@@ -50,9 +50,9 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningPanel.AppSigningWarningAction;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialogs;
+import net.sourceforge.jnlp.security.dialogs.remember.AppSigningWarningAction;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -177,7 +177,7 @@ public class UnsignedAppletTrustConfirmation {
             return ((PluginBridge) file).getArchiveJars();
 
         List<JARDesc> jars = Arrays.asList(file.getResources().getJARs());
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (JARDesc jar : jars) {
             result.add(jar.getLocation().toString());
         }
