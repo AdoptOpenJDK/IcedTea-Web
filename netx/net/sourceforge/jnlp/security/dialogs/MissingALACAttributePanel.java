@@ -64,6 +64,8 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.YesNo;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -111,9 +113,7 @@ public class MissingALACAttributePanel extends SecurityDialogPanel {
                     if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                         Desktop.getDesktop().browse(e.getURL().toURI());
                     }
-                } catch (IOException ex) {
-                    OutputController.getLogger().log(ex);
-                } catch (URISyntaxException ex) {
+                } catch (IOException | URISyntaxException ex) {
                     OutputController.getLogger().log(ex);
                 }
             }
@@ -134,8 +134,8 @@ public class MissingALACAttributePanel extends SecurityDialogPanel {
         Dimension d = new Dimension(buttonWidth, buttonHeight);
         yes.setPreferredSize(d);
         no.setPreferredSize(d);
-        yes.addActionListener(createSetValueListener(parent, 0));
-        no.addActionListener(createSetValueListener(parent, 1));
+        yes.addActionListener(SetValueHandler.createSetValueListener(parent, YesNo.yes()));
+        no.addActionListener(SetValueHandler.createSetValueListener(parent, YesNo.no()));
         initialFocusComponent = no;
         buttonPanel.add(yes);
         buttonPanel.add(no);
@@ -149,7 +149,7 @@ public class MissingALACAttributePanel extends SecurityDialogPanel {
     }
 
     public static void main(String[] args) throws MalformedURLException {
-        Set<URL> s = new HashSet<URL>();
+        Set<URL> s = new HashSet<>();
         s.add(new URL("http:/blah.com/blah"));
         s.add(new URL("http:/blah.com/blah/blah"));
         MissingALACAttributePanel w = new MissingALACAttributePanel(null, "HelloWorld", "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));

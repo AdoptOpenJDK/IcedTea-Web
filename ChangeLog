@@ -1,5 +1,85 @@
 2015-06-01  Jiri Vanek  <jvanek@redhat.com>
 
+	SecurityDialog return type changed from Object (mostly int) to regular type
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: removed handling
+	of integer results/inputs
+	* netx/net/sourceforge/jnlp/security/JNLPAppVerifier.java: AppletAction usage
+	replaced by YesNoSandbox
+	* netx/net/sourceforge/jnlp/security/PluginAppVerifier.java: same
+	* netx/net/sourceforge/jnlp/security/JNLPAuthenticator.java: usages of Object[]
+	replaced by regular type
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: value changed from
+	Object to DialogResult
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessage.java: same for
+	userResponse, class made public
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: removed redundant
+	AppletAction and all to/from int/boolean conversion methods. All Object returns
+	repalced by proper class/interface. Removed redundant showAppletWarning
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java: adapted
+	to removed AppletAction and new BasicDialogValue
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
+	added override annotations.
+	* netx/net/sourceforge/jnlp/security/dialogresults/AccessWarningPaneComplexReturn.java:
+	class extracted from netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPaneComplexReturn.java
+	Made to implement DialogResult
+	* netx/net/sourceforge/jnlp/security/dialogresults/BasicDialogValue.java:
+	New class, which  keeps together main utility methods and base classes of
+	dialog return.
+	* netx/net/sourceforge/jnlp/security/dialogresults/DialogResult.java:
+	new class, main interface of SecurityDialog return. 
+	* netx/net/sourceforge/jnlp/security/dialogresults/NamePassword.java:
+	Implementation of SecurityDialog for dialog asking for username and password.
+	* netx/net/sourceforge/jnlp/security/dialogresults/SetValueHandler.java:
+	extracted from SecurityDialogPanel. Have DialogResult instead of Object.
+	It is base implementation of any click to button.
+	* netx/net/sourceforge/jnlp/security/dialogresults/Yes.java:
+	Wrapper for return from dialog, which can return only and only yes.
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesCancel.java:
+	Wrapper for return from dialog, which can return only and only yes or cancel
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesNo.java:
+	Wrapper for return from dialog, which can return only and only yes or no
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesNoCancel.java:
+	Wrapper for return from dialog, which can return only and only yes, no or cancel
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesNoSandbox.java:
+	Wrapper for return from dialog, which can return only and only yes, no or sandbox
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java: get rid of 
+	int buttons, replaced by YesNo.
+	* netx/net/sourceforge/jnlp/security/dialogs/AppletWarningPane.java: get rid of 
+	int buttons, replaced by YesNoCancel.
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: get rid of 
+	int buttons, replaced by YesNoSadnbox
+	* netx/net/sourceforge/jnlp/security/dialogs/CertsInfoPane.java: get rid of 
+	int buttons, replaced by Yes.
+	* netx/net/sourceforge/jnlp/security/dialogs/MoreInfoPane.java: same
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingALACAttributePanel.java:
+	get rid of int buttons, replaced by YesNo.
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingPermissionsAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/PasswordAuthenticationPane.java:
+	get rid of Object[] return, replaced by NamePassword.
+	* netx/net/sourceforge/jnlp/security/dialogs/SecurityDialogPanel.java: get rid
+	of inner SetValueHandler
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberPanel.java: included
+	wrappers, which allows compilation and pass tests. Must be fixed in next changesets.
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java: adapted to DialogResult
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: changed import
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java:
+	removed. Tests were checking int conversions from legacy model.
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogresults/AccessWarningPaneComplexReturnTest.java:
+	new tests for new class
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogresults/YesCancelTest.java:
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogresults/YesNoCancelTest.java:
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogresults/YesNoSandboxTest.java:
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogresults/YesNoTestTest.java:
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogresults/YesTest.java:
+	same
+
+2015-06-01  Jiri Vanek  <jvanek@redhat.com>
+
 	Remember panel extracted so it can be reused
 	*/netx/net/sourceforge/jnlp/security/SecurityDialogs.java: now correctly behaves on Xtrustall
 	*/netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:

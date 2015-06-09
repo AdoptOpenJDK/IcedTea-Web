@@ -54,6 +54,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.Yes;
 
 /**
  * Provides the panel for the More Info dialog. This dialog shows details about an
@@ -63,7 +65,7 @@ import net.sourceforge.jnlp.security.SecurityDialog;
  */
 public class MoreInfoPane extends SecurityDialogPanel {
 
-    private boolean showSignedJNLPWarning;
+    private final boolean showSignedJNLPWarning;
 
     public MoreInfoPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
@@ -108,7 +110,7 @@ public class MoreInfoPane extends SecurityDialogPanel {
         JButton certDetails = new JButton(R("SCertificateDetails"));
         certDetails.addActionListener(new CertInfoButtonListener());
         JButton close = new JButton(R("ButClose"));
-        close.addActionListener(createSetValueListener(parent, 0));
+        close.addActionListener(SetValueHandler.createSetValueListener(parent, new Yes()));
         buttonsPanel.add(certDetails, BorderLayout.WEST);
         buttonsPanel.add(close, BorderLayout.EAST);
         buttonsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));

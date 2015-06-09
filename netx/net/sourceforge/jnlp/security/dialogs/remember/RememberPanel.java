@@ -51,6 +51,7 @@ import javax.swing.JRadioButton;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 
 public class RememberPanel extends JPanel {
 
@@ -159,7 +160,8 @@ public class RememberPanel extends JPanel {
                 Container p = RememberPanel.this.getParent();
                 while (p != null) {
                     if (p instanceof SecurityDialog) {
-                        ((SecurityDialog) p).setValue(action);
+                        //TODO this must not set value, this must return something absolutely different
+                        ((SecurityDialog) p).setValue(new Garbage(action));
                         ((SecurityDialog) p).dispose();
                         break;
                     }
@@ -167,5 +169,37 @@ public class RememberPanel extends JPanel {
                 }
             }
         };
+    }
+    
+    //TODO remove this wrapper!
+    public static class Garbage implements DialogResult{
+        
+        final AppSigningWarningAction action;
+
+        public Garbage(AppSigningWarningAction action) {
+            this.action = action;
+        }
+
+        public AppSigningWarningAction getAction() {
+            return action;
+        }
+        
+        
+
+        @Override
+        public int getButtonIndex() {
+            return 2;
+        }
+
+        @Override
+        public boolean toBoolean() {
+         return action.getAction() == ExecuteAppletAction.ALWAYS || action.getAction() == ExecuteAppletAction.YES;
+        }
+
+        @Override
+        public String writeValue() {
+            throw new UnsupportedOperationException("never supported yet.");
+        }
+        
     }
 }

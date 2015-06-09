@@ -50,6 +50,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.YesNoCancel;
 
 public class AppletWarningPane extends SecurityDialogPanel {
 
@@ -96,9 +98,9 @@ public class AppletWarningPane extends SecurityDialogPanel {
         yes.setPreferredSize(d);
         no.setPreferredSize(d);
         cancel.setPreferredSize(d);
-        yes.addActionListener(createSetValueListener(parent, 0));
-        no.addActionListener(createSetValueListener(parent, 1));
-        cancel.addActionListener(createSetValueListener(parent, 2));
+        yes.addActionListener(SetValueHandler.createSetValueListener(parent,  YesNoCancel.yes()));
+        no.addActionListener(SetValueHandler.createSetValueListener(parent,  YesNoCancel.no()));
+        cancel.addActionListener(SetValueHandler.createSetValueListener(parent,  YesNoCancel.cancel()));
         initialFocusComponent = cancel;
         buttonPanel.add(yes);
         buttonPanel.add(no);

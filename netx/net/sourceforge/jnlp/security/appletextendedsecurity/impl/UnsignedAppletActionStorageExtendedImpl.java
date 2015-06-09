@@ -68,6 +68,7 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
 
     public void clear() {
         doLocked(new Runnable() {
+            @Override
             public void run() {
                 try {
                     items.clear();
@@ -81,6 +82,7 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
 
     public void removeByBehaviour(final ExecuteAppletAction unsignedAppletAction) {
         doLocked(new Runnable() {
+            @Override
             public void run() {
                 try {
                     readContents();

@@ -51,6 +51,7 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.NamePassword;
 
 /**
  * Modal non-minimizable dialog to request http authentication credentials
@@ -80,7 +81,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
      * Initialized the dialog components
      */
 
-    public void addComponents() {
+    public final void addComponents() {
 
         JLabel jlInfo = new JLabel("");
         jlInfo.setText("<html>" + R("SAuthenticationPrompt", type, host, prompt)  + "</html>");
@@ -159,7 +160,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
         ActionListener acceptActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.setValue(new Object[] { jtfUserName.getText(), jpfPassword.getPassword() });
+                parent.setValue(new NamePassword(jtfUserName.getText(), jpfPassword.getPassword()));
                 parent.dispose();
             }
         };

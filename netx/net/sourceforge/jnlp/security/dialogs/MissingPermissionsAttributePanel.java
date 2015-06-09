@@ -61,6 +61,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.YesNo;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class MissingPermissionsAttributePanel extends SecurityDialogPanel {
@@ -127,8 +130,8 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel {
         Dimension d = new Dimension(buttonWidth, buttonHeight);
         yes.setPreferredSize(d);
         no.setPreferredSize(d);
-        yes.addActionListener(createSetValueListener(parent, 0));
-        no.addActionListener(createSetValueListener(parent, 1));
+        yes.addActionListener(SetValueHandler.createSetValueListener(parent, YesNo.yes()));
+        no.addActionListener(SetValueHandler.createSetValueListener(parent, YesNo.no()));
         initialFocusComponent = no;
         buttonPanel.add(yes);
         buttonPanel.add(no);

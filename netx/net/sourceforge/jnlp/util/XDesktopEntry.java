@@ -46,7 +46,7 @@ import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.dialogs.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}

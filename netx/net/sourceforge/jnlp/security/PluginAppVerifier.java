@@ -48,7 +48,8 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-import net.sourceforge.jnlp.security.SecurityDialogs.AppletAction;
+import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
@@ -167,10 +168,10 @@ public class PluginAppVerifier implements AppVerifier {
                         dialogType = AccessType.UNVERIFIED;
                     }
 
-                    AppletAction action = SecurityDialogs.showCertWarningDialog(
+                    YesNoSandbox action = SecurityDialogs.showCertWarningDialog(
                             dialogType, file, jcv, securityDelegate);
-                    if (action != AppletAction.CANCEL) {
-                        if (action == AppletAction.SANDBOX) {
+                    if (action != null && action.toBoolean()) {
+                        if (action.compareValue(BasicDialogValue.Primitive.SANDBOX)) {
                             securityDelegate.setRunInSandbox();
                         }
                         alreadyApprovedByUser.add(cPath);

@@ -38,8 +38,6 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.dialogs;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -75,17 +73,6 @@ public abstract class SecurityDialogPanel extends JPanel {
         return "<html>" + s + "</html>";
     }
 
-    /**
-     * Create an ActionListener suitable for use with buttons. When this {@link ActionListener}
-     * is invoked, it will set the value of the {@link SecurityDialog} and then dispossed.
-     *
-     * @param buttonIndex the index of the button. By convention 0 = Yes. 1 = No, 2 = Cancel
-     * @return the ActionListener instance.
-     */
-    protected ActionListener createSetValueListener(SecurityDialog dialog, int buttonIndex) {
-        return new SetValueHandler(dialog, buttonIndex);
-    }
-
     @Override
     public void setVisible(boolean aFlag) {
         super.setVisible(aFlag);
@@ -98,24 +85,4 @@ public abstract class SecurityDialogPanel extends JPanel {
         }
     }
 
-    /**
-     * Creates a handler that sets a dialog's value and then disposes it when activated
-     *
-     */
-    private static class SetValueHandler implements ActionListener {
-
-        Integer buttonIndex;
-        SecurityDialog dialog;
-
-        public SetValueHandler(SecurityDialog dialog, int buttonIndex) {
-            this.dialog = dialog;
-            this.buttonIndex = buttonIndex;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            dialog.setValue(buttonIndex);
-            dialog.dispose();
-        }
-    }
 }

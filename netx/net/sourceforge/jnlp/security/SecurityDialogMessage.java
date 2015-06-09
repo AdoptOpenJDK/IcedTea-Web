@@ -45,12 +45,13 @@ import javax.swing.JDialog;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 
 /**
  * Represents a message to the security framework to show a specific security
  * dialog
  */
-final class SecurityDialogMessage {
+public final class SecurityDialogMessage {
 
     /*
      * These fields contain information need to display the correct dialog type
@@ -67,7 +68,7 @@ final class SecurityDialogMessage {
      * Volatile because this is shared between threads and we dont want threads
      * to use a cached value of this.
      */
-    public volatile Object userResponse;
+    public volatile DialogResult userResponse;
 
     /*
      * These two fields are used to block/unblock the application or the applet.

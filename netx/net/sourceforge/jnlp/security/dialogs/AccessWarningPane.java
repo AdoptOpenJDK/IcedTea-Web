@@ -1,4 +1,4 @@
-/* AccessWarningPane.java
+/* 
    Copyright (C) 2008 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -71,6 +71,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 
@@ -90,6 +92,7 @@ public class AccessWarningPane extends SecurityDialogPanel {
     HtmlShortcutPanel htmlPanelDesktop;
     HtmlShortcutPanel htmlPanelMenu;
     RememberPanel rememberPanel;
+
     public AccessWarningPane(SecurityDialog x, CertVerifier certVerifier) {
         super(x, certVerifier);
         addComponents();
@@ -297,7 +300,7 @@ public class AccessWarningPane extends SecurityDialogPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.setValue(getModifier(0)); //according to  createSetValueListener 0 is ok and 1 cancel
+                parent.setValue(getModifier(BasicDialogValue.Primitive.YES));
                 parent.dispose();
             }
         });
@@ -305,7 +308,7 @@ public class AccessWarningPane extends SecurityDialogPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.setValue(getModifier(1)); //according to  createSetValueListener 0 is ok and 1 cancel
+                parent.setValue(getModifier(BasicDialogValue.Primitive.NO));
                 parent.dispose();
             }
         });
@@ -326,7 +329,7 @@ public class AccessWarningPane extends SecurityDialogPanel {
 
     }
 
-    private AccessWarningPaneComplexReturn getModifier(int button) {
+    private AccessWarningPaneComplexReturn getModifier(BasicDialogValue.Primitive button) {
         AccessWarningPaneComplexReturn ar = new AccessWarningPaneComplexReturn(button);
         if (desktopCheck != null) {
             if (htmlPanelDesktop != null) {

@@ -58,8 +58,12 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityAction
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import static net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation.getStoredAction;
-import net.sourceforge.jnlp.security.dialogs.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogresults.NamePassword;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.security.dialogs.remember.AppSigningWarningAction;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -109,24 +113,6 @@ public class SecurityDialogs {
         SIGNING_ERROR
     }
 
-    public static enum AppletAction {
-        RUN,
-        SANDBOX,
-        CANCEL;
-        public static AppletAction fromInteger(int i) {
-            switch (i) {
-                case 0:
-                    return RUN;
-                case 1:
-                    return SANDBOX;
-                case 2:
-                    return CANCEL;
-                default:
-                    return CANCEL;
-            }
-        }
-    }
-
     /**
      * Shows a warning dialog for different types of system access (i.e. file
      * open/save, clipboard read/write, printing, etc).
@@ -135,81 +121,11 @@ public class SecurityDialogs {
      * @param file the jnlp file associated with the requesting application.
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static boolean showAccessWarningDialogB(AccessType accessType, JNLPFile file) {
-        return showAccessWarningDialogB(accessType, file, null);
-    }
-    
-     public static boolean showAccessWarningDialogB(AccessType accessType, JNLPFile file,  final Object[] extras) {
-        Object o = showAccessWarningDialog(accessType, file, extras);
-        if (o instanceof Boolean){
-            return (Boolean) o;
-        }
-        if (o instanceof Integer){
-            return getIntegerResponseAsBoolean((Boolean)o);
-        }
-        if (o instanceof AccessWarningPaneComplexReturn){
-            return getIntegerResponseAsBoolean(((AccessWarningPaneComplexReturn)o).getRegularReturn());
-        }
-        return false;
-    }
-    
-    /**
-     * unlike showAccessWarningDialogB this is returning raw int code
-     * @param accessType type of dialogue
-     * @param file file for which thsi dialogue is built for
-     * @return return from dialogue
-     */
-     public static int showAccessWarningDialogI(AccessType accessType, JNLPFile file) {
-        Object o = showAccessWarningDialog(accessType, file, null);
-        if (o instanceof Boolean){
-            boolean b =(Boolean) o;
-            if (b){
-                return 0;
-            } else {
-                return 1;
-            }
-        }
-        if (o instanceof Integer){
-            return (Integer)o;
-        }
-        if (o instanceof AccessWarningPaneComplexReturn){
-            return ((AccessWarningPaneComplexReturn)o).getRegularReturn();
-        }
-        return 1;
-    }
-     
-      public static AccessWarningPaneComplexReturn showAccessWarningDialogComplexReturn(AccessType accessType, JNLPFile file) {
-        Object o = showAccessWarningDialog(accessType, file, null);
-        if (o instanceof AccessWarningPaneComplexReturn){
-            return (AccessWarningPaneComplexReturn)o;
-        }
-          if (o instanceof Boolean) {
-              boolean b = (Boolean) o;
-              if (b) {
-                  return new AccessWarningPaneComplexReturn(0);
-              } else {
-                  return new AccessWarningPaneComplexReturn(1);
-              }
-          }
-          if (o instanceof Integer) {
-              return new AccessWarningPaneComplexReturn((int) o);
-          }
-       return new  AccessWarningPaneComplexReturn(1);
-    }
-
-                 
-    /**
-     * unlike showAccessWarningDialogB this is returning raw int code
-     * @param accessType type of dialogue
-     * @param file file for which thsi dialogue is built for
-     * @param extras aditional parameters to dialogue
-     * @return return from dialogue
-     */
-    public static Object showAccessWarningDialog(final AccessType accessType,
+    public static AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType,
             final JNLPFile file, final Object[] extras) {
 
         if (!shouldPromptUser()) {
-            return 1;
+            return new AccessWarningPaneComplexReturn(false);
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
@@ -219,7 +135,7 @@ public class SecurityDialogs {
         message.file = file;
         message.extras = extras;
 
-        return getUserResponse(message);
+        return (AccessWarningPaneComplexReturn) getUserResponse(message);
 
       
     }
@@ -246,7 +162,7 @@ public class SecurityDialogs {
         message.accessType = AccessType.UNSIGNED;
         message.file = file;
 
-        return (AppSigningWarningAction) getUserResponse(message);
+        return  ((RememberPanel.Garbage) getUserResponse(message)).getAction();
     }
 
     /**
@@ -264,11 +180,11 @@ public class SecurityDialogs {
      * wants the applet to run with only sandbox permissions, or CANCEL if the
      * user did not accept running the applet
      */
-    public static AppletAction showCertWarningDialog(AccessType accessType,
+    public static YesNoSandbox showCertWarningDialog(AccessType accessType,
             JNLPFile file, CertVerifier certVerifier, SecurityDelegate securityDelegate) {
 
         if (!shouldPromptUser()) {
-            return AppletAction.CANCEL;
+            return YesNoSandbox.no();
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
@@ -278,9 +194,9 @@ public class SecurityDialogs {
         message.certVerifier = certVerifier;
         message.extras = new Object[] { securityDelegate };
 
-        Object selectedValue = getUserResponse(message);
+        DialogResult selectedValue = getUserResponse(message);
 
-        return getIntegerResponseAsAppletAction(selectedValue);
+        return (YesNoSandbox) selectedValue;
     }
 
     /**
@@ -305,7 +221,7 @@ public class SecurityDialogs {
         message.certVerifier = certVerifier;
         message.extras = new Object[] { securityDelegate };
 
-        return (AppSigningWarningAction) getUserResponse(message);
+        return ((RememberPanel.Garbage) getUserResponse(message)).getAction();
     }
 
     /**
@@ -320,7 +236,7 @@ public class SecurityDialogs {
      * @return an array of objects representing user's authentication tokens
      * @throws SecurityException if the caller does not have the appropriate permissions.
      */
-    public static Object[] showAuthenicationPrompt(String host, int port, String prompt, String type) {
+    public static NamePassword showAuthenicationPrompt(String host, int port, String prompt, String type) {
 
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -334,8 +250,8 @@ public class SecurityDialogs {
         message.dialogType = DialogType.AUTHENTICATION;
         message.extras = new Object[] { host, port, prompt, type };
 
-        Object response = getUserResponse(message);
-        return (Object[]) response;
+        DialogResult response = getUserResponse(message);
+        return (NamePassword) response;
     }
 
      public static boolean  showMissingALACAttributePanel(String title, URL codeBase, Set<URL> remoteUrls) {
@@ -353,8 +269,8 @@ public class SecurityDialogs {
              OutputController.getLogger().log("Warning, null codebase wants to show in ALACA!");
          }
         message.extras = new Object[]{title, urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
-        Object selectedValue = getUserResponse(message);
-        return getIntegerResponseAsBoolean(selectedValue);
+        DialogResult selectedValue = getUserResponse(message);
+        return selectedValue.toBoolean();
     } 
      
      public static boolean showMatchingALACAttributePanel(JNLPFile file, URL codeBase, Set<URL> remoteUrls) {
@@ -379,7 +295,7 @@ public class SecurityDialogs {
          SecurityDialogMessage message = new SecurityDialogMessage();
          message.dialogType = DialogType.MATCHING_ALACA;
          message.extras = new Object[]{file, codeBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
-         AppSigningWarningAction selectedValue = (AppSigningWarningAction) getUserResponse(message);
+         AppSigningWarningAction selectedValue = ((RememberPanel.Garbage) getUserResponse(message)).getAction();
 
          if (selectedValue != null) {
              OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue.getAction());
@@ -392,31 +308,6 @@ public class SecurityDialogs {
 
     }
      
-    /**
-     * FIXME This is unused. Remove it?
-     * @return (0, 1, 2) =&gt; (Yes, No, Cancel)
-     */
-    public static int showAppletWarning() {
-
-        if (!shouldPromptUser()) {
-            return 2;
-        }
-
-        SecurityDialogMessage message = new SecurityDialogMessage();
-        message.dialogType = DialogType.APPLET_WARNING;
-
-        Object selectedValue = getUserResponse(message);
-
-        // result 0 = Yes, 1 = No, 2 = Cancel
-        if (selectedValue instanceof Integer) {
-            // If the selected value can be cast to Integer, use that value
-            return ((Integer) selectedValue);
-        } else {
-            // Otherwise default to "cancel"
-            return 2;
-        }
-    }
-
      public static boolean showMissingPermissionsAttributeDialogue(String title, URL codeBase) {
 
          if (!shouldPromptUser()) {
@@ -426,8 +317,8 @@ public class SecurityDialogs {
          SecurityDialogMessage message = new SecurityDialogMessage();
          message.dialogType = DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING;
          message.extras = new Object[]{title, codeBase.toExternalForm()};
-         Object selectedValue = getUserResponse(message);
-         return SecurityDialogs.getIntegerResponseAsBoolean(selectedValue);
+         DialogResult selectedValue = getUserResponse(message);
+         return selectedValue.toBoolean();
     }
     /**
      * Posts the message to the SecurityThread and gets the response. Blocks
@@ -440,7 +331,7 @@ public class SecurityDialogs {
      * type of message, but generally an Integer corresponding to the value 0
      * indicates success/proceed, and everything else indicates failure
      */
-    private static Object getUserResponse(final SecurityDialogMessage message) {
+    private static DialogResult getUserResponse(final SecurityDialogMessage message) {
         /*
          * Want to show a security warning, while blocking the client
          * application. This would be easy except there is a bug in showing
@@ -505,30 +396,7 @@ public class SecurityDialogs {
             }
 
         }
-
         return message.userResponse;
-    }
-
-    /**
-     * Returns true iff the given Object reference can be cast to Integer and that Integer's
-     * intValue is 0.
-     * @param ref the Integer (hopefully) reference
-     * @return whether the given reference is both an Integer type and has intValue of 0
-     */
-    public static boolean getIntegerResponseAsBoolean(Object ref) {
-        boolean isInteger = ref instanceof Integer;
-        if (isInteger) {
-            Integer i = (Integer) ref;
-            return i == 0;
-        }
-        return false;
-    }
-
-    public static AppletAction getIntegerResponseAsAppletAction(Object ref) {
-        if (ref instanceof Integer) {
-            return AppletAction.fromInteger((Integer) ref);
-        }
-        return AppletAction.CANCEL;
     }
 
     /**

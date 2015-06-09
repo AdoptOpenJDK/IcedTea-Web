@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.security;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import net.sourceforge.jnlp.security.dialogresults.NamePassword;
 
 public class JNLPAuthenticator extends Authenticator {
 
@@ -55,11 +56,11 @@ public class JNLPAuthenticator extends Authenticator {
         int port = getRequestingPort();
         String prompt = getRequestingPrompt();
 
-        Object[] response = SecurityDialogs.showAuthenicationPrompt(host, port, prompt, type);
+        NamePassword response = SecurityDialogs.showAuthenicationPrompt(host, port, prompt, type);
         if (response == null) {
             return null;
         } else {
-            return new PasswordAuthentication((String) response[0], (char[]) response[1]);
+            return new PasswordAuthentication(response.getName(), response.getPassword());
         }
     }
 

@@ -51,6 +51,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
 import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
 import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
@@ -100,11 +101,7 @@ public class SecurityDialog extends JDialog {
     /** Whether or not this object has been fully initialized */
     private boolean initialized = false;
 
-    /**
-     * the return value of this dialog. result: 0 = Yes, 1 = No, 2 = Cancel,
-     * null = Window closed.
-     */
-    private Object value;
+    private DialogResult value;
 
     /** Should show signed JNLP file warning */
     private boolean requiresSignedJNLPWarning;
@@ -340,12 +337,12 @@ public class SecurityDialog extends JDialog {
         panel.requestFocusOnDefaultButton();
     }
 
-    public void setValue(Object value) {
+    public void setValue(DialogResult value) {
         OutputController.getLogger().log("Setting value:" + value);
         this.value = value;
     }
 
-    public Object getValue() {
+    public DialogResult getValue() {
         OutputController.getLogger().log("Returning value:" + value);
         return value;
     }
@@ -366,7 +363,7 @@ public class SecurityDialog extends JDialog {
      * Notify all the listeners that the user has made a decision using this
      * security dialog.
      */
-    public void notifySelectionMade() {
+    private void notifySelectionMade() {
         for (ActionListener listener : listeners) {
             listener.actionPerformed(null);
         }
@@ -386,5 +383,4 @@ public class SecurityDialog extends JDialog {
     {
         return requiresSignedJNLPWarning;
     }
-
 }

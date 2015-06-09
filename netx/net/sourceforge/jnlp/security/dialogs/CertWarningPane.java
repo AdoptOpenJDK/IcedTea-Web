@@ -73,6 +73,8 @@ import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -271,12 +273,12 @@ public class CertWarningPane extends SecurityDialogPanel {
 
         sandbox.setEnabled(!alwaysTrust.isSelected());
 
-        run.addActionListener(createSetValueListener(parent, 0));
+        run.addActionListener(SetValueHandler.createSetValueListener(parent, YesNoSandbox.yes()));
         run.addActionListener(new CheckBoxListener());
 
-        sandbox.addActionListener(createSetValueListener(parent, 1));
+        sandbox.addActionListener(SetValueHandler.createSetValueListener(parent, YesNoSandbox.sandbox()));
 
-        cancel.addActionListener(createSetValueListener(parent, 2));
+        cancel.addActionListener(SetValueHandler.createSetValueListener(parent, YesNoSandbox.no()));
 
         initialFocusComponent = cancel;
         buttonPanel.add(run);
