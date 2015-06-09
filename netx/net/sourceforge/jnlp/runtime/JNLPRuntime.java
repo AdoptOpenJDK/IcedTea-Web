@@ -151,6 +151,9 @@ public class JNLPRuntime {
 
     /** all security dialogs will be consumed and pretented as being verified by user and allowed.*/
     private static boolean trustAll=false;
+    
+    /** flag keeping rest of jnlpruntime live that javaws was lunched as -html */
+    private static boolean html=false;
 
     /** all security dialogs will be consumed and we will pretend the Sandbox option was chosen */
     private static boolean trustNone = false;
@@ -828,6 +831,14 @@ public class JNLPRuntime {
         } catch (IOException e) {
             OutputController.getLogger().log(e);
         }
+    }
+
+    public static void setHtml(boolean html) {
+        JNLPRuntime.html = html;
+    }
+
+    public static boolean isHtml() {
+        return html;
     }
 
     static void setTrustAll(boolean b) {

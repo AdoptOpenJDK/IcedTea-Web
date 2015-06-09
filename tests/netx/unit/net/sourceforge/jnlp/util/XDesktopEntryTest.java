@@ -37,15 +37,25 @@
 package net.sourceforge.jnlp.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import net.sourceforge.jnlp.InformationDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridgeTest;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -74,6 +84,32 @@ public class XDesktopEntryTest {
     private static final String src8 = XDesktopEntry.XDG_DESKTOP_DIR + " = " + des8;
     private static final String src9 = XDesktopEntry.XDG_DESKTOP_DIR + " = " + des9;
     private static Map<String, String> backupedEnv;
+    private static boolean wasHtml;
+    private static boolean wasJavaws;
+
+    @BeforeClass
+    public static void saveJnlpRuntimeHtml() {
+        wasHtml = JNLPRuntime.isHtml();
+        wasJavaws = JNLPRuntime.isWebstartApplication();
+    }
+
+    private static void setIsWebstart(boolean value) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field field = JNLPRuntime.class.getDeclaredField("isWebstartApplication");
+        field.setAccessible(true);
+        field.set(null, value);
+    }
+
+    @After
+    public void restoreJnlpRuntimeHtml() throws Exception {
+        JNLPRuntime.setHtml(wasHtml);
+        setIsWebstart(wasJavaws);
+    }
+
+    @AfterClass
+    public static void restoreJnlpRuntimeHtmlFinally() throws Exception {
+        JNLPRuntime.setHtml(wasHtml);
+        setIsWebstart(wasJavaws);
+    }
 
     @BeforeClass
     public static void ensureHomeVaribale() throws NoSuchFieldException, IllegalAccessException, IllegalArgumentException, ClassNotFoundException {
@@ -84,7 +120,7 @@ public class XDesktopEntryTest {
             backupedEnv = null;
         } else {
             backupedEnv = env;
-            Map<String,String> m = new HashMap<String,String>(env);
+            Map<String, String> m = new HashMap<>(env);
             m.put(HOME, System.getProperty("user.home"));
             fakeEnvironment(m);
             ServerAccess.logOutputReprint("Hacked environment");
@@ -102,7 +138,7 @@ public class XDesktopEntryTest {
         }
     }
 
-    private static void fakeEnvironment(Map<String,String> m) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+    private static void fakeEnvironment(Map<String, String> m) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
         Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
         Field env = processEnvironmentClass.getDeclaredField("theUnmodifiableEnvironment");
         env.setAccessible(true);
@@ -123,13 +159,13 @@ public class XDesktopEntryTest {
     @Test
     public void getFreedesktopOrgDesktopPathFromtestSimple() throws IOException {
         String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src1)));
-        Assert.assertEquals(s, des1);
+        Assert.assertEquals(des1, s);
     }
 
     @Test
     public void getFreedesktopOrgDesktopPathFromtestSpaced() throws IOException {
         String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src2)));
-        Assert.assertEquals(s, des1);
+        Assert.assertEquals(des1, s);
     }
 
     @Test(expected = IOException.class)
@@ -160,6 +196,7 @@ public class XDesktopEntryTest {
         String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src8)));
         Assert.assertEquals(s, des8res);
     }
+
     @Test
     public void getFreedesktopOrgDesktopPathFromtestSpacedWithHomeAndMixedQuotes() throws IOException {
         String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src9)));
@@ -181,4 +218,68 @@ public class XDesktopEntryTest {
             ServerAccess.logOutputReprint(entry.getKey() + " = " + entry.getValue());
         }
     }
+
+    @Test
+    public void allFilesHaveSameName() throws IOException {
+        JNLPFile jnlpf = new DummyJnlpWithTitle();
+        XDesktopEntry xde = new XDesktopEntry(jnlpf);
+        File f1 = xde.getShortcutTmpFile();
+        File f2 = xde.getLinuxDesktopIconFile();
+        File f3 = xde.getLinuxMenuIconFile();
+        Assert.assertEquals(f1.getName(), f2.getName());
+        Assert.assertEquals(f2.getName(), f3.getName());
+    }
+
+    private void testHtmlOccurences(boolean html, boolean javaws, boolean menu, AccessWarningPaneComplexReturn.ShortcutResult.Shortcut type, int occurences) throws Exception {
+        JNLPRuntime.setHtml(html);
+        setIsWebstart(javaws);
+        JNLPFile jnlpf = new DummyJnlpWithTitle();
+        XDesktopEntry xde = new XDesktopEntry(jnlpf);
+        AccessWarningPaneComplexReturn.ShortcutResult a = new AccessWarningPaneComplexReturn.ShortcutResult(true);
+        a.setBrowser("blah");
+        a.setFixHref(false);
+        a.setShortcutType(type);
+        Reader r = xde.getContentsAsReader(menu, a, true);
+        String s = FileUtils.getContentOfReader(r);
+        Assert.assertEquals(occurences, PluginBridgeTest.countOccurences(s, "-html"));
+    }
+
+    @Test
+    public void htmlSwitchCorrectAccordingToJnlpRuntimeAndShortcutType() throws Exception {
+        AccessWarningPaneComplexReturn.ShortcutResult.Shortcut[] v = AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.values();
+        for (AccessWarningPaneComplexReturn.ShortcutResult.Shortcut w : v) {
+            int var1 = 0;
+            if (w == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JAVAWS_HTML) {
+                var1 = 1;
+            }
+            testHtmlOccurences(true, true, true, w, 1);
+            testHtmlOccurences(true, false, false, w, var1);
+            testHtmlOccurences(true, false, true, w, var1);
+            testHtmlOccurences(true, true, false, w, 1);
+            testHtmlOccurences(false, true, true, w, 0);
+            testHtmlOccurences(false, false, false, w, var1);
+            testHtmlOccurences(false, true, false, w, 0);
+            testHtmlOccurences(false, false, true, w, var1);
+        }
+    }
+
+    private static class DummyJnlpWithTitle extends DummyJNLPFileWithJar {
+
+        public DummyJnlpWithTitle() throws MalformedURLException {
+            super(new File("/some/path/blah.jar"));
+        }
+
+        @Override
+        public InformationDesc getInformation() {
+            return new InformationDesc(null, false) {
+
+                @Override
+                public String getTitle() {
+                    return "Demo App";
+                }
+
+            };
+        }
+
+    };
 }

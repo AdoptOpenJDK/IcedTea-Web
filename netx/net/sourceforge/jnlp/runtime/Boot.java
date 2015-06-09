@@ -177,6 +177,9 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.TRUSTALL)) {
             JNLPRuntime.setTrustAll(true);
         }
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
+            JNLPRuntime.setHtml(true);
+        }
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.TRUSTNONE)) {
             JNLPRuntime.setTrustNone(true);
         }

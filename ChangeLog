@@ -1,5 +1,18 @@
 2015-06-09  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed issue, when desktop/menu shortcut created during -html mode, was not created like it
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: setHtml(true) used when
+	commandline contains html switch
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: added html field and setter and getter
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: (getContentsAsReader) now
+	add -html if jnlpruntime.isHtml. Partially reworked logging of this method.
+	* tests/netx/unit/net/sourceforge/jnlp/util/XDesktopEntryTest.java: added tests for new
+	functionality
+	* Changelog: occurence of tab asterix slash replaced by tab asterix space in file
+	declarations
+
+2015-06-09  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed bug when generated desktop icon was not matched and user was asked for recreation
 	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: (getShortcutTmpFile)
 	(getLinuxDesktopIconFile) (getLinuxMenuIconFile) now generate file name by
@@ -89,26 +102,26 @@
 2015-06-01  Jiri Vanek  <jvanek@redhat.com>
 
 	Remember panel extracted so it can be reused
-	*/netx/net/sourceforge/jnlp/security/SecurityDialogs.java: now correctly behaves on Xtrustall
-	*/netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: now correctly behaves on Xtrustall
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
 	result is using diamond
-	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
 	Simplified constructors, getting dialogue and jnlpfile is all they need
-	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
 	extracted remember panel and related stuff. Made to use extracted one
-	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/MatchingALACAttributePanel.java:
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/MatchingALACAttributePanel.java:
 	same
-	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
 	same
-	*/netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
 	same
-	*/netx/net/sourceforge/jnlp/security/dialogs/remember/ActionChoiceListener.java:
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/ActionChoiceListener.java:
 	new class. Extracted stuff from AppTrustWarningPanel
-	*/netx/net/sourceforge/jnlp/security/dialogs/remember/AppSigningWarningAction.java:
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/AppSigningWarningAction.java:
 	new class. Extracted stuff from AppTrustWarningPanel
-	*/netx/net/sourceforge/jnlp/security/dialogs/remember/RememberPanel.java:
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberPanel.java:
 	new class. Extracted stuff from AppTrustWarningPanel
-	*/tests/netx/unit/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanelTest.java:
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanelTest.java:
 	minor, adapted to match current codebase
 
 2015-05-27  Jiri Vanek  <jvanek@redhat.com>
@@ -340,25 +353,25 @@
 2015-04-13  Jiri Vanek  <jvanek@redhat.com>
 
 	set single place for keystore operations
-	*/netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: usage of keystore moved
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: usage of keystore moved
 	to utility method
-	*/netx/net/sourceforge/jnlp/security/CertificateUtils.java: same
-	*/netx/net/sourceforge/jnlp/security/KeyStores.java: same 
-	*/netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same
-	*/netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: same
-	*/netx/net/sourceforge/jnlp/security/SecurityUtil.java: added five new methods
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java: same
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: same 
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: same
+	* netx/net/sourceforge/jnlp/security/SecurityUtil.java: added five new methods
 	wrapping work on keystores
 
 2015-04-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Removed redundant occurrence of default keystore password
-	*/netx/net/sourceforge/jnlp/security/KeyStores.java: removed redundant DEFAULT_PASSWORD
-	*/netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: call to KeyStores.getPassword
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: removed redundant DEFAULT_PASSWORD
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: call to KeyStores.getPassword
  	replaced by SecurityUtil.getTrustedCertsPassword
-	*/netx/net/sourceforge/jnlp/security/CertificateUtils.java: same
-	*/netx/net/sourceforge/jnlp/security/SecurityUtil.java: same
-	*/netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same
-	*/netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: same
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java: same
+	* netx/net/sourceforge/jnlp/security/SecurityUtil.java: same
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: same
 
 2015-04-13  Jiri Vanek  <jvanek@redhat.com>
 
@@ -1174,34 +1187,34 @@
 2014-12-05  Jiri Vanek  <jvanek@redhat.com>
 
 	Added support for menu shortcuts.
-	*/netx/net/sourceforge/jnlp/Parser.java: used setMenu instead of addMenu
-	*/netx/net/sourceforge/jnlp/ShortcutDesc.java: removed isOnline support,
+	* netx/net/sourceforge/jnlp/Parser.java: used setMenu instead of addMenu
+	* netx/net/sourceforge/jnlp/ShortcutDesc.java: removed isOnline support,
 	added onDesktop and toMenu support. addMenu renamed to setMenu.
 	Added deploymentJavawsShortcutToString, just for comfortableness.
-	*/netx/net/sourceforge/jnlp/config/PathsAndFiles.java: Added support for
+	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: Added support for
 	XDG_DATA_HOME, declared ICONS_DIR and MENUS_DIR
-	*/netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java: removed
+	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java: removed
 	duplicated logic of deploymentJavawsShortcutToString/comboboxItem and 
 	hardcoded calls  to depolyment.
-	*/netx/net/sourceforge/jnlp/resources/Messages.properties: added 
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added 
 	CPTabMenuShortcuts, FILEicons, FILEmenus. adapted SDesktopShortcut
-	*/netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: 
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: 
 	removed retired fixme, now it do not ask for shortcut creation if menu or
 	desktop entry exists.  Added menu support and removed not-implemented call.
 	Added temporary IconsCreationDescriptor qiockfix for dialog->logic information
 	rtransfer. Used where needed.
-	*/netx/net/sourceforge/jnlp/security/SecurityDialogs.java:  Added boolean
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:  Added boolean
 	and integer workarounds around showAccessWarningDialog
-	*/netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java: Added
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java: Added
 	menu support.
 	Is now coding more sophisticated return value if are about desktop creations.
-	*/netx/net/sourceforge/jnlp/services/ServiceUtil.java:  Adapted to
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java:  Adapted to
 	showAccessWarningDialog changes
-	*/netx/net/sourceforge/jnlp/util/FileUtils.java: INVALID_CHARS extended
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: INVALID_CHARS extended
 	for more linux one and most windows ones.
-	*/netx/net/sourceforge/jnlp/util/XDesktopEntry.java: added logic to place
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: added logic to place
 	menu shortcut.
-	*/tests/netx/unit/net/sourceforge/jnlp/ParserBasic.java: Is now testing only 
+	* tests/netx/unit/net/sourceforge/jnlp/ParserBasic.java: Is now testing only 
 	presence of isOnline instead if it is used.
 
 

@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.io.Reader;
 import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -575,8 +576,15 @@ public final class FileUtils {
      * @throws IOException if connection can't be established or resource does not exist
      */
     public static String getContentOfStream(InputStream is, String encoding) throws IOException {
+         try {
+            return getContentOfReader(new InputStreamReader(is, encoding));
+        } finally {
+            is.close();
+        }
+    }
+     public static String getContentOfReader(Reader r) throws IOException {
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding));
+            BufferedReader br = new BufferedReader(r);
             StringBuilder sb = new StringBuilder();
             while (true) {
                 String s = br.readLine();
@@ -588,7 +596,7 @@ public final class FileUtils {
             }
             return sb.toString();
         } finally {
-            is.close();
+            r.close();
         }
 
     }

@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.StreamEater;
 import net.sourceforge.jnlp.cache.CacheUtil;
@@ -149,36 +150,42 @@ public class XDesktopEntry {
         if (file.getInformation().getVendor() != null) {
             fileContents += "Vendor=" + sanitize(file.getInformation().getVendor()) + "\n";
         }
-
+        String exec;
+        String title = "xdesktop writing";
         if (JNLPRuntime.isWebstartApplication()) {
-            fileContents += "Exec="
-                    + getJavaWsBin() + " \"" + file.getSourceLocation() + "\"\n";
-            OutputController.getLogger().log("Using " + getJavaWsBin() + " as binary for " + file.getSourceLocation());
+            String htmlSwitch = "";
+            if (JNLPRuntime.isHtml()){
+                htmlSwitch = " "+OptionsDefinitions.OPTIONS.HTML.option;
+            }
+            exec = "Exec="
+                    + getJavaWsBin() + htmlSwitch + " \"" + file.getSourceLocation() + "\"\n";
+            fileContents += exec;
         } else {
             if (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER) {
                 String browser = info.getBrowser();
                 if (browser == null) {
                     browser = getBrowserBin();
                 }
-                fileContents += "Exec="
+                exec = "Exec="
                         + browser + " \"" + file.getSourceLocation() + "\"\n";
-                OutputController.getLogger().log("Using " + browser + " as binary for " + file.getSourceLocation());
+                fileContents += exec;
             } else if ((info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP
                     || info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF) && generatedJnlp != null) {
-                fileContents += "Exec="
+                exec =  "Exec="
                         + getJavaWsBin() + " \"" + generatedJnlp.getAbsolutePath() + "\"\n";
-                OutputController.getLogger().log("Using " + getJavaWsBin() + " (generated) as binary for " + file.getSourceLocation() + " to " + generatedJnlp.getAbsolutePath());
+                fileContents += exec;
+                title = title + " (generated jnlp)";
             } else if (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JAVAWS_HTML) {
-                fileContents += "Exec="
+                exec =  "Exec="
                         + getJavaWsBin() + " -html  \"" + file.getSourceLocation() + "\"\n";
-                OutputController.getLogger().log("Using " + getJavaWsBin() + " -html as binary for " + file.getSourceLocation());
+                fileContents += exec;
             } else {
-                fileContents += "Exec="
+                exec = "Exec="
                         + getBrowserBin() + " \"" + file.getSourceLocation() + "\"\n";
-                OutputController.getLogger().log("Using " + getBrowserBin() + " as binary for " + file.getSourceLocation());
+                fileContents += exec;
             }
         }
-
+        OutputController.getLogger().log(title + " " + exec);
         return new StringReader(fileContents);
 
     }
