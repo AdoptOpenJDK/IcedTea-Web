@@ -1,3 +1,11 @@
+2015-06-09  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed bug when generated desktop icon was not matched and user was asked for recreation
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: (getShortcutTmpFile)
+	(getLinuxDesktopIconFile) (getLinuxMenuIconFile) now generate file name by
+	same way. By new method getDesktopIconFileName which is using sanitizing 
+	getDesktopIconName.
+
 2015-06-01  Jiri Vanek  <jvanek@redhat.com>
 
 	SecurityDialog return type changed from Object (mostly int) to regular type

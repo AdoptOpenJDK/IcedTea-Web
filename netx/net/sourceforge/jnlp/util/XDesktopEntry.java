@@ -266,7 +266,7 @@ public class XDesktopEntry {
 
     public File getShortcutTmpFile() {
         String userTmp = PathsAndFiles.TMP_DIR.getFullPath();
-        File shortcutFile = new File(userTmp + File.separator + FileUtils.sanitizeFileName(file.getTitle()) + ".desktop");
+        File shortcutFile = new File(userTmp + File.separator + getDesktopIconFileName());
         return shortcutFile;
     }
 
@@ -497,11 +497,15 @@ public class XDesktopEntry {
     }
 
     public File getLinuxDesktopIconFile() {
-        return new File(findFreedesktopOrgDesktopPathCatch() + "/" + getDesktopIconName() + ".desktop");
+        return new File(findFreedesktopOrgDesktopPathCatch() + "/" + getDesktopIconFileName());
     }
 
     public File getLinuxMenuIconFile() {
-        return new File(findAndVerifyJavawsMenuDir() + "/" + getDesktopIconName() + ".desktop");
+        return new File(findAndVerifyJavawsMenuDir() + "/" + getDesktopIconFileName());
+    }
+    
+    private String getDesktopIconFileName() {
+        return getDesktopIconName() + ".desktop";
     }
 
     private static String findAndVerifyGeneratedJnlpDir() {
