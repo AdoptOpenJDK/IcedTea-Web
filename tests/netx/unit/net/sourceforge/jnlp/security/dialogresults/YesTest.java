@@ -50,7 +50,7 @@ public class YesTest {
         Assert.assertTrue(y.toBoolean());
 
     }
-     @Test(expected = Exception.class)
+
     public void yesReadOk() {
         Yes yy = Yes.readValue(BasicDialogValue.Primitive.YES.toString());
 

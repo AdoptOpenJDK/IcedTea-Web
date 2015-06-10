@@ -1,3 +1,8 @@
+2015-06-10  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogresults/YesTest.java:
+	fixed yesReadOk tests, which accidentally expected exception, but should not.
+
 2015-06-09  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed issue, when desktop/menu shortcut created during -html mode, was not created like it
