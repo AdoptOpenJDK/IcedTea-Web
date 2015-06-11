@@ -132,11 +132,10 @@ public class SecurityDialogs {
             }
         }
 
-        final SecurityDialogMessage message = new SecurityDialogMessage();
+        final SecurityDialogMessage message = new SecurityDialogMessage(file);
 
         message.dialogType = DialogType.ACCESS_WARNING;
         message.accessType = accessType;
-        message.file = file;
         message.extras = extras;
 
         return (AccessWarningPaneComplexReturn) getUserResponse(message);
@@ -161,10 +160,9 @@ public class SecurityDialogs {
             }
         }
 
-        final SecurityDialogMessage message = new SecurityDialogMessage();
+        final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.UNSIGNED_WARNING;
         message.accessType = AccessType.UNSIGNED;
-        message.file = file;
 
         return  ((RememberPanel.Garbage) getUserResponse(message)).getAction();
     }
@@ -195,10 +193,9 @@ public class SecurityDialogs {
               }
         }
 
-        final SecurityDialogMessage message = new SecurityDialogMessage();
+        final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.CERT_WARNING;
         message.accessType = accessType;
-        message.file = file;
         message.certVerifier = certVerifier;
         message.extras = new Object[] { securityDelegate };
 
@@ -226,10 +223,9 @@ public class SecurityDialogs {
             }
         }
 
-        final SecurityDialogMessage message = new SecurityDialogMessage();
+        final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.PARTIALLYSIGNED_WARNING;
         message.accessType = AccessType.PARTIALLYSIGNED;
-        message.file = file;
         message.certVerifier = certVerifier;
         message.extras = new Object[] { securityDelegate };
 
@@ -261,7 +257,7 @@ public class SecurityDialogs {
             sm.checkPermission(requestPermission);
         }
 
-        final SecurityDialogMessage message = new SecurityDialogMessage();
+        final SecurityDialogMessage message = new SecurityDialogMessage(null);
 
         message.dialogType = DialogType.AUTHENTICATION;
         message.extras = new Object[] { host, port, prompt, type };
@@ -270,7 +266,7 @@ public class SecurityDialogs {
         return (NamePassword) response;
     }
 
-     public static boolean  showMissingALACAttributePanel(String title, URL codeBase, Set<URL> remoteUrls) {
+     public static boolean  showMissingALACAttributePanel(JNLPFile file, URL codeBase, Set<URL> remoteUrls) {
 
          if (!shouldPromptUser()) {
              if (JNLPRuntime.isTrustAll()) {
@@ -280,7 +276,7 @@ public class SecurityDialogs {
              }
          }
 
-        SecurityDialogMessage message = new SecurityDialogMessage();
+        SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.MISSING_ALACA;
          String urlToShow = "unknown url";
          if (codeBase != null) {
@@ -288,12 +284,12 @@ public class SecurityDialogs {
          } else {
              OutputController.getLogger().log("Warning, null codebase wants to show in ALACA!");
          }
-        message.extras = new Object[]{title, urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
+        message.extras = new Object[]{urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         DialogResult selectedValue = getUserResponse(message);
         return selectedValue.toBoolean();
     } 
      
-     public static boolean showMatchingALACAttributePanel(JNLPFile file, URL codeBase, Set<URL> remoteUrls) {
+     public static boolean showMatchingALACAttributePanel(JNLPFile file, URL documentBase, Set<URL> remoteUrls) {
 
         ExecuteAppletAction storedAction = getStoredAction(file, AppletSecurityActions.MATCHING_ALACA_ACTION);
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Stored action for matching alaca at " + file.getCodeBase() +" was " + storedAction);
@@ -316,9 +312,9 @@ public class SecurityDialogs {
             }
         }
 
-         SecurityDialogMessage message = new SecurityDialogMessage();
+         SecurityDialogMessage message = new SecurityDialogMessage(file);
          message.dialogType = DialogType.MATCHING_ALACA;
-         message.extras = new Object[]{file, codeBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
+         message.extras = new Object[]{documentBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
          AppSigningWarningAction selectedValue = ((RememberPanel.Garbage) getUserResponse(message)).getAction();
 
          if (selectedValue != null) {
@@ -332,7 +328,7 @@ public class SecurityDialogs {
 
     }
      
-     public static boolean showMissingPermissionsAttributeDialogue(String title, URL codeBase) {
+     public static boolean showMissingPermissionsAttributeDialogue(JNLPFile file) {
 
          if (!shouldPromptUser()) {
              if (JNLPRuntime.isTrustAll()) {
@@ -342,9 +338,8 @@ public class SecurityDialogs {
              }
          }
 
-         SecurityDialogMessage message = new SecurityDialogMessage();
+         SecurityDialogMessage message = new SecurityDialogMessage(file);
          message.dialogType = DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING;
-         message.extras = new Object[]{title, codeBase.toExternalForm()};
          DialogResult selectedValue = getUserResponse(message);
          return selectedValue.toBoolean();
     }

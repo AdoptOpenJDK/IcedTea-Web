@@ -1,3 +1,17 @@
+2015-06-11  Jiri Vanek  <jvanek@redhat.com>
+
+	make jnlpfile nearly mandatory argument of message and adapt various re-declarations accordingly
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: adapted to new api
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: all (SecurityDialog) made private
+	(getPanel) adapted to new apis
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessage.java: file made final
+	and only default constructor is the one with file.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: All constructions
+	of SecurityDialogMessage adapted to new constructor. All sets, where information from
+	file were dulicated, replaced by calls to file
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java: 
+	showMissingPermissionsAttributeDialogue's constructor adapted.
+
 2015-06-10  Jiri Vanek  <jvanek@redhat.com>
 
 	Security dialogs got, moreover, unified dealing with trustNone/All and headless

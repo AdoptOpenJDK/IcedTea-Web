@@ -274,7 +274,7 @@ public class ManifestAttributesChecker {
                 throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
             }
             if (itwSecurityLevel == AppletSecurityLevel.ASK_UNSIGNED) {
-                final boolean userApproved = SecurityDialogs.showMissingPermissionsAttributeDialogue(file.getTitle(), file.getCodeBase());
+                final boolean userApproved = SecurityDialogs.showMissingPermissionsAttributeDialogue(file);
                 if (!userApproved) {
                     throw new LaunchException("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have refused to run it.");
                 } else {
@@ -388,7 +388,7 @@ public class ManifestAttributesChecker {
 
         ClasspathMatchers att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
         if (att == null) {
-            final boolean userApproved = isLowSecurity() || SecurityDialogs.showMissingALACAttributePanel(file.getTitle(), documentBase, usedUrls);
+            final boolean userApproved = isLowSecurity() || SecurityDialogs.showMissingALACAttributePanel(file, documentBase, usedUrls);
             if (!userApproved) {
                 throw new LaunchException("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was blocked from running by the user");
             } else {

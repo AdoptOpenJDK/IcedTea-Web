@@ -127,7 +127,7 @@ public class SecurityDialog extends JDialog {
     /**
      * Construct a SecurityDialog to display some sort of access warning
      */
-    SecurityDialog(DialogType dialogType, AccessType accessType,
+    private SecurityDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file) {
         this(dialogType, accessType, file, null, null, null);
     }
@@ -135,7 +135,7 @@ public class SecurityDialog extends JDialog {
     /**
      * Create a SecurityDialog to display a certificate-related warning
      */
-    SecurityDialog(DialogType dialogType, AccessType accessType,
+    private SecurityDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file, CertVerifier certVerifier) {
         this(dialogType, accessType, file, certVerifier, null, null);
     }
@@ -143,7 +143,7 @@ public class SecurityDialog extends JDialog {
     /**
      * Create a SecurityDialog to display a certificate-related warning
      */
-    SecurityDialog(DialogType dialogType, AccessType accessType,
+    private SecurityDialog(DialogType dialogType, AccessType accessType,
                 CertVerifier certVerifier) {
         this(dialogType, accessType, null, certVerifier, null, null);
     }
@@ -152,7 +152,7 @@ public class SecurityDialog extends JDialog {
      * Create a SecurityDialog to display some sort of access warning
      * with more information
      */
-    SecurityDialog(DialogType dialogType, AccessType accessType,
+    private SecurityDialog(DialogType dialogType, AccessType accessType,
                         JNLPFile file, Object[] extras) {
         this(dialogType, accessType, file, null, null, extras);
     }
@@ -161,7 +161,7 @@ public class SecurityDialog extends JDialog {
      * Create a SecurityWarningDailog to display information about a single
      * certificate
      */
-    SecurityDialog(DialogType dialogType, X509Certificate c) {
+    private SecurityDialog(DialogType dialogType, X509Certificate c) {
         this(dialogType, null, null, null, c, null);
     }
 
@@ -317,11 +317,11 @@ public class SecurityDialog extends JDialog {
         else if (dialogType == DialogType.AUTHENTICATION)
             panel = new PasswordAuthenticationPane(this, extras);
         else if (dialogType == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING)
-            panel = new MissingPermissionsAttributePanel(this, (String) extras[0], (String) extras[1]);
+            panel = new MissingPermissionsAttributePanel(this, file.getTitle(), file.getCodeBase().toExternalForm());
         else if (dialogType == DialogType.MISSING_ALACA)
-            panel = new MissingALACAttributePanel(this, (String) extras[0], (String) extras[1], (String) extras[2]);
+            panel = new MissingALACAttributePanel(this, file.getTitle(), (String) extras[0], (String) extras[1]);
         else if (dialogType == DialogType.MATCHING_ALACA)
-            panel = AppTrustWarningDialog.matchingAlaca(this, (JNLPFile) extras[0], (String) extras[1], (String) extras[2]);
+            panel = AppTrustWarningDialog.matchingAlaca(this, file, (String) extras[0], (String) extras[1]);
 
         add(panel, BorderLayout.CENTER);
     }
@@ -333,8 +333,9 @@ public class SecurityDialog extends JDialog {
     private void selectDefaultButton() {
         if (panel == null) {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "initial value panel is null");
+        } else {
+            panel.requestFocusOnDefaultButton();
         }
-        panel.requestFocusOnDefaultButton();
     }
 
     public void setValue(DialogResult value) {

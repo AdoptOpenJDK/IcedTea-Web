@@ -277,7 +277,7 @@ public class SecurityDialogsTest {
         Assert.assertEquals(r.b, r7);
         boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(new DummyJnlpWithTitleAndUrls(), url, new HashSet<URL>());
         Assert.assertEquals(r.b, r8);
-        boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(null, null);
+        boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(null);
         Assert.assertEquals(r.b, r9);
     }
 
@@ -376,7 +376,7 @@ public class SecurityDialogsTest {
         }
         try {
             metcounter++;
-            SecurityDialogs.showMissingPermissionsAttributeDialogue(null, null);
+            SecurityDialogs.showMissingPermissionsAttributeDialogue(null);
         } catch (NullPointerException ex) {
             npecounter++;
         }

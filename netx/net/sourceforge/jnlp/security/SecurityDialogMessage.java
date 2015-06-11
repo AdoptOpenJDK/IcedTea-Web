@@ -53,13 +53,20 @@ import net.sourceforge.jnlp.security.dialogresults.DialogResult;
  */
 public final class SecurityDialogMessage {
 
+
+    public SecurityDialogMessage(JNLPFile file) {
+        this.file = file;
+    }
+
     /*
      * These fields contain information need to display the correct dialog type
      */
 
     public DialogType dialogType;
     public AccessType accessType;
-    public JNLPFile file;
+    //all informations dilaogs needs are in file. 
+    //The only known exception is, and should remain, showAuthenicationPrompt
+    public final JNLPFile file;
     public CertVerifier certVerifier;
     public X509Certificate certificate;
     public Object[] extras;
@@ -77,6 +84,7 @@ public final class SecurityDialogMessage {
      */
 
     public Semaphore lock;
+    //if dialog slip out of awt thread, fake modal dialog is created. This is keeping it.
     public JDialog toDispose;
 
 }
