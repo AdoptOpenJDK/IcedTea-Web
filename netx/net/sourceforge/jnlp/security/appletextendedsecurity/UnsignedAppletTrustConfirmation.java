@@ -36,6 +36,8 @@
 
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
+import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.net.URL;

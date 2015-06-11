@@ -33,8 +33,10 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.security.appletextendedsecurity;
+package net.sourceforge.jnlp.security.dialogs.remember;
 
+import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;

@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
+import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -172,14 +173,12 @@ public class UnsignedAppletActionEntry {
             return null;
         }
         String[] items = commedArchives.trim().split(",");
-        List<String> r = new ArrayList<String>(items.length);
-        for (int i = 0; i < items.length; i++) {
-            String string = items[i];
+        List<String> r = new ArrayList<>(items.length);
+        for (String string : items) {
             if (string.trim().isEmpty()) {
                 continue;
             }
             r.add(string);
-
         }
         return r;
 

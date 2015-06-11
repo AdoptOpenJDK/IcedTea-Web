@@ -33,7 +33,7 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.security.appletextendedsecurity;
+package net.sourceforge.jnlp.security.dialogs.remember;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +73,7 @@ public class AppletSecurityActions implements Iterable<ExecuteAppletAction>{
     }
 
 
-    static AppletSecurityActions fromString(String s) {
+    public static AppletSecurityActions fromString(String s) {
         if (s == null) {
             s = "";
         }

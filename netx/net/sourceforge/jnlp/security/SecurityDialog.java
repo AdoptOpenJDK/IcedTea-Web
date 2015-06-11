@@ -293,36 +293,53 @@ public class SecurityDialog extends JDialog {
         return cert;
     }
 
-    /**
+    /*
+     * find appropriate JPanel to this Dialog, based on {@link DialogType}.
+     */
+    private SecurityDialogPanel getPanel() {
+        return getPanel(this);
+    }
+    
+    /*
+     * find appropriate JPanel to given Dialog, based on {@link DialogType}.
+     */
+    private static SecurityDialogPanel getPanel(SecurityDialog sd) {
+        SecurityDialogPanel lpanel = null;
+        if (sd.dialogType == DialogType.CERT_WARNING) {
+            lpanel = new CertWarningPane(sd, sd.certVerifier, (SecurityDelegate) sd.extras[0]);
+        } else if (sd.dialogType == DialogType.MORE_INFO) {
+            lpanel = new MoreInfoPane(sd, sd.certVerifier);
+        } else if (sd.dialogType == DialogType.CERT_INFO) {
+            lpanel = new CertsInfoPane(sd, sd.certVerifier);
+        } else if (sd.dialogType == DialogType.SINGLE_CERT_INFO) {
+            lpanel = new SingleCertInfoPane(sd, sd.certVerifier);
+        } else if (sd.dialogType == DialogType.ACCESS_WARNING) {
+            lpanel = new AccessWarningPane(sd, sd.extras, sd.certVerifier);
+        } else if (sd.dialogType == DialogType.APPLET_WARNING) {
+            lpanel = new AppletWarningPane(sd, sd.certVerifier);
+        } else if (sd.dialogType == DialogType.PARTIALLYSIGNED_WARNING) {
+            lpanel = AppTrustWarningDialog.partiallySigned(sd, sd.file, (SecurityDelegate) sd.extras[0]);
+        } else if (sd.dialogType == DialogType.UNSIGNED_WARNING) {
+            lpanel = AppTrustWarningDialog.unsigned(sd, sd.file); // Only necessary for applets on 'high security' or above
+        } else if (sd.dialogType == DialogType.AUTHENTICATION) {
+            lpanel = new PasswordAuthenticationPane(sd, sd.extras);
+        } else if (sd.dialogType == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING) {
+            lpanel = new MissingPermissionsAttributePanel(sd, sd.file.getTitle(), sd.file.getCodeBase().toExternalForm());
+        } else if (sd.dialogType == DialogType.MISSING_ALACA) {
+            lpanel = new MissingALACAttributePanel(sd, sd.file.getTitle(), (String) sd.extras[0], (String) sd.extras[1]);
+        } else if (sd.dialogType == DialogType.MATCHING_ALACA) {
+            lpanel = AppTrustWarningDialog.matchingAlaca(sd, sd.file, (String) sd.extras[0], (String) sd.extras[1]);
+        } else {
+            throw new RuntimeException("Unknown value of " + sd.dialogType + ". Panel will be null. Tahts not allowed.");
+        }
+        return lpanel;
+    }
+
+    /*
      * Adds the appropriate JPanel to this Dialog, based on {@link DialogType}.
      */
     private void installPanel() {
-
-        if (dialogType == DialogType.CERT_WARNING)
-            panel = new CertWarningPane(this, this.certVerifier, (SecurityDelegate) extras[0]);
-        else if (dialogType == DialogType.MORE_INFO)
-            panel = new MoreInfoPane(this, this.certVerifier);
-        else if (dialogType == DialogType.CERT_INFO)
-            panel = new CertsInfoPane(this, this.certVerifier);
-        else if (dialogType == DialogType.SINGLE_CERT_INFO)
-            panel = new SingleCertInfoPane(this, this.certVerifier);
-        else if (dialogType == DialogType.ACCESS_WARNING)
-            panel = new AccessWarningPane(this, extras, this.certVerifier);
-        else if (dialogType == DialogType.APPLET_WARNING)
-            panel = new AppletWarningPane(this, this.certVerifier);
-        else if (dialogType == DialogType.PARTIALLYSIGNED_WARNING)
-            panel = AppTrustWarningDialog.partiallySigned(this, file, (SecurityDelegate) extras[0]);
-        else if (dialogType == DialogType.UNSIGNED_WARNING) // Only necessary for applets on 'high security' or above
-            panel = AppTrustWarningDialog.unsigned(this, file);
-        else if (dialogType == DialogType.AUTHENTICATION)
-            panel = new PasswordAuthenticationPane(this, extras);
-        else if (dialogType == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING)
-            panel = new MissingPermissionsAttributePanel(this, file.getTitle(), file.getCodeBase().toExternalForm());
-        else if (dialogType == DialogType.MISSING_ALACA)
-            panel = new MissingALACAttributePanel(this, file.getTitle(), (String) extras[0], (String) extras[1]);
-        else if (dialogType == DialogType.MATCHING_ALACA)
-            panel = AppTrustWarningDialog.matchingAlaca(this, file, (String) extras[0], (String) extras[1]);
-
+        panel = getPanel();
         add(panel, BorderLayout.CENTER);
     }
 

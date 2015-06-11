@@ -1,5 +1,50 @@
 2015-06-11  Jiri Vanek  <jvanek@redhat.com>
 
+	AppletSecurityActions, ExecuteAppletAction, AppletSecurityActionsTest moved to remember package
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java:
+	adapted imports
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
+	same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
+	same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/MatchingALACAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/AppSigningWarningAction.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberPanel.java
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java
+	same
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: (getPanel) extracted
+	from (installPanel). It now throws exception if panel is about to be null.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionEntry.java:
+	used diamond
+	* net/sourceforge/jnlp/security/appletextendedsecurity/AppletSecurityActions.java:
+	moved to
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/AppletSecurityActions.java:
+	here
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExecuteAppletAction.java:
+	moved to
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/ExecuteAppletAction.java:
+	here
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/AppletSecurityActionsTest.java:
+	moved to
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/remember/AppletSecurityActionsTest.java:
+	here
+2015-06-11  Jiri Vanek  <jvanek@redhat.com>
+
 	make jnlpfile nearly mandatory argument of message and adapt various re-declarations accordingly
 	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: adapted to new api
 	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: all (SecurityDialog) made private

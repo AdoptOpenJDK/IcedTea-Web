@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
 import net.sourceforge.jnlp.util.lockingfile.LockingReaderWriter;

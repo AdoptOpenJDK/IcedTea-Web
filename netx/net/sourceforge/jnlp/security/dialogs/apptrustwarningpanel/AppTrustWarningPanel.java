@@ -65,7 +65,7 @@ import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import static net.sourceforge.jnlp.runtime.Translator.R;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.util.ScreenFinder;

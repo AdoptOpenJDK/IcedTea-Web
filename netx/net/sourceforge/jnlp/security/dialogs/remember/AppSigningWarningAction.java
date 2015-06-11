@@ -36,8 +36,6 @@
  */
 package net.sourceforge.jnlp.security.dialogs.remember;
 
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
-
 /*
  * Details of decided action.
  */

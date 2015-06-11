@@ -50,7 +50,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.appletextendedsecurity.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 
 public class RememberPanel extends JPanel {
