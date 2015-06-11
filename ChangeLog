@@ -1,5 +1,20 @@
 2015-06-10  Jiri Vanek  <jvanek@redhat.com>
 
+	Security dialogs got, moreover, unified dealing with trustNone/All and headless
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: setTrustAll setTrustNone
+	made public so it can be used in testing.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: all calls to show
+	security dialog now have correct introduction based on shouldPromptUser with
+	resolution based on trustAll. (shouldPromptUser) now takes also headless to
+	accounting.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	(checkUnsignedWithUserIfRequired) now react trustAll and trustNone 
+	(checkPartiallySignedWithUserIfRequired) now react also trustAll
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java: new
+	file, tests verifying adapted logic
+
+2015-06-10  Jiri Vanek  <jvanek@redhat.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/security/dialogresults/YesTest.java:
 	fixed yesReadOk tests, which accidentally expected exception, but should not.
 

@@ -841,7 +841,7 @@ public class JNLPRuntime {
         return html;
     }
 
-    static void setTrustAll(boolean b) {
+    public static void setTrustAll(boolean b) {
         trustAll=b;
     }
 
@@ -849,7 +849,7 @@ public class JNLPRuntime {
         return trustAll;
     }
 
-    static void setTrustNone(final boolean b) {
+    public static void setTrustNone(final boolean b) {
         trustNone = b;
     }
 

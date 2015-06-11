@@ -125,7 +125,11 @@ public class SecurityDialogs {
             final JNLPFile file, final Object[] extras) {
 
         if (!shouldPromptUser()) {
-            return new AccessWarningPaneComplexReturn(false);
+            if (JNLPRuntime.isTrustAll()) {
+                return new AccessWarningPaneComplexReturn(true);
+            } else {
+                return new AccessWarningPaneComplexReturn(false);
+            }
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
@@ -184,7 +188,11 @@ public class SecurityDialogs {
             JNLPFile file, CertVerifier certVerifier, SecurityDelegate securityDelegate) {
 
         if (!shouldPromptUser()) {
-            return YesNoSandbox.no();
+              if (JNLPRuntime.isTrustAll()) {
+                  return YesNoSandbox.yes();
+              } else {
+                  return YesNoSandbox.no();
+              }
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
@@ -211,7 +219,11 @@ public class SecurityDialogs {
             SecurityDelegate securityDelegate) {
 
         if (!shouldPromptUser()) {
-            return new AppSigningWarningAction(ExecuteAppletAction.NO, false);
+            if (JNLPRuntime.isTrustAll()) {
+                return new AppSigningWarningAction(ExecuteAppletAction.YES, false);
+            } else {
+                return new AppSigningWarningAction(ExecuteAppletAction.NO, false);
+            }
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage();
@@ -238,6 +250,10 @@ public class SecurityDialogs {
      */
     public static NamePassword showAuthenicationPrompt(String host, int port, String prompt, String type) {
 
+        if (!shouldPromptUser()){
+            return null;
+        }
+        
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             NetPermission requestPermission
@@ -256,9 +272,13 @@ public class SecurityDialogs {
 
      public static boolean  showMissingALACAttributePanel(String title, URL codeBase, Set<URL> remoteUrls) {
 
-        if (!shouldPromptUser()) {
-            return false;
-        }
+         if (!shouldPromptUser()) {
+             if (JNLPRuntime.isTrustAll()) {
+                 return true;
+             } else {
+                 return false;
+             }
+         }
 
         SecurityDialogMessage message = new SecurityDialogMessage();
         message.dialogType = DialogType.MISSING_ALACA;
@@ -274,7 +294,7 @@ public class SecurityDialogs {
     } 
      
      public static boolean showMatchingALACAttributePanel(JNLPFile file, URL codeBase, Set<URL> remoteUrls) {
-         
+
         ExecuteAppletAction storedAction = getStoredAction(file, AppletSecurityActions.MATCHING_ALACA_ACTION);
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Stored action for matching alaca at " + file.getCodeBase() +" was " + storedAction);
         
@@ -288,8 +308,12 @@ public class SecurityDialogs {
         }
         
 
-        if (!shouldPromptUser()) {
-            return false;
+         if (!shouldPromptUser()) {
+               if (JNLPRuntime.isTrustAll()) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
          SecurityDialogMessage message = new SecurityDialogMessage();
@@ -311,7 +335,11 @@ public class SecurityDialogs {
      public static boolean showMissingPermissionsAttributeDialogue(String title, URL codeBase) {
 
          if (!shouldPromptUser()) {
-             return false;
+             if (JNLPRuntime.isTrustAll()) {
+                 return true;
+             } else {
+                 return false;
+             }
          }
 
          SecurityDialogMessage message = new SecurityDialogMessage();
@@ -403,12 +431,16 @@ public class SecurityDialogs {
      * Returns whether the current runtime configuration allows prompting user
      * for security warnings.
      *
-     * @return true if security warnings should be shown to the user.
+     * @return true if security warnings should be shown to the user. false of 
+     * otherwise or runtime is headless
      */
     private static boolean shouldPromptUser() {
         return AccessController.doPrivileged(new PrivilegedAction<Boolean >() {
             @Override
             public Boolean run() {
+                if (JNLPRuntime.isHeadless()){
+                    return false;
+                }
                 return Boolean.valueOf(JNLPRuntime.getConfiguration()
                         .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER));
             }
