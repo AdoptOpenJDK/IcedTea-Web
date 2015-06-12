@@ -36,9 +36,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
-import java.awt.Dimension;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import java.awt.Dimension;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
@@ -52,8 +52,10 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.security.dialogs.TemporaryPermissionsButton;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.tools.CertInformation;
@@ -66,14 +68,14 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     private final JButton advancedOptionsButton;
 
     public PartiallySignedAppTrustWarningPanel(JNLPFile file, SecurityDialog securityDialog, SecurityDelegate securityDelegate) {
-        super(file);
+        super(file, securityDialog);
         this.jcv = (JarCertVerifier) securityDialog.getCertVerifier();
         this.INFO_PANEL_HEIGHT = 250;
 
         sandboxButton = new JButton();
         sandboxButton.setText(R("ButSandbox"));
-        sandboxButton.addActionListener(rememberPanel.chosenActionSetter(ExecuteAppletAction.SANDBOX));
-
+        sandboxButton.addActionListener(SetValueHandler.createSetValueListener(parent,
+                 YesNoSandbox.sandbox()));
         advancedOptionsButton = new TemporaryPermissionsButton(file, securityDelegate, sandboxButton);
 
         buttons.add(1, sandboxButton);
@@ -148,9 +150,9 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         String text = getAppletInfo();
         text += "<br><br>" + R(getInfoPanelTextKey(), file.getCodeBase(), file.getSourceLocation());
         text += "<br><br>" + getSigningInfo();
-        UnsignedAppletActionEntry rememberedEntry = UnsignedAppletTrustConfirmation.getStoredEntry(file, AppletSecurityActions.UNSIGNED_APPLET_ACTION);
+        UnsignedAppletActionEntry rememberedEntry = UnsignedAppletTrustConfirmation.getStoredEntry(file,  this.getClass());
         if (rememberedEntry != null) {
-            ExecuteAppletAction rememberedAction = rememberedEntry.getAppletSecurityActions().getUnsignedAppletAction();
+            ExecuteAppletAction rememberedAction = rememberedEntry.getAppletSecurityActions().getAction(this.getClass());
             if (rememberedAction == ExecuteAppletAction.YES) {
                 text += "<br>" + R("SUnsignedAllowedBefore", rememberedEntry.getLocalisedTimeStamp());
             } else if (rememberedAction == ExecuteAppletAction.NO) {
@@ -163,6 +165,11 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     @Override
     protected String getQuestionPanelText() {
         return RememberPanel.htmlWrap(R(getQuestionPanelTextKey()));
+    }
+    
+         @Override
+    public DialogResult readValue(String s) {
+        return YesNoSandbox.readValue(s);
     }
 
 }

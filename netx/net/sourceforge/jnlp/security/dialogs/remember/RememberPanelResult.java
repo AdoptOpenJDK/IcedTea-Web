@@ -1,5 +1,5 @@
-/* 
- Copyright (C) 2009 Red Hat, Inc.
+/*
+ Copyright (C) 2008-2010 Red Hat, Inc.
 
  This file is part of IcedTea.
 
@@ -33,36 +33,32 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
- */
-package net.sourceforge.jnlp.security.dialogresults;
+*/
 
-import java.util.EnumSet;
+package net.sourceforge.jnlp.security.dialogs.remember;
 
-public class YesNoCancel extends YesNo {
 
-    public static YesNoCancel yes() {
-        return new YesNoCancel(BasicDialogValue.Primitive.YES);
+public class RememberPanelResult {
+    
+    //when null, then information was not available
+    private final Boolean remember;
+    private final Boolean codebase;
+
+    public RememberPanelResult(Boolean remember, Boolean codebase) {
+        this.remember = remember;
+        this.codebase = codebase;
     }
 
-    public static YesNoCancel no() {
-        return new YesNoCancel(BasicDialogValue.Primitive.NO);
+    public boolean isRemember() {
+        return remember;
     }
 
-    public static YesNoCancel cancel() {
-        return new YesNoCancel(BasicDialogValue.Primitive.CANCEL);
+    public boolean isCodebase() {
+        return codebase;
     }
-
-    public static YesNoCancel readValue(String s) {
-        return new YesNoCancel(BasicDialogValue.Primitive.valueOf(s));
-    }
-
-    private YesNoCancel(BasicDialogValue.Primitive valueOf) {
-        super(valueOf);
-    }
-
-    @Override
-    public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
-        return BasicDialogValue.YesNoCancel;
-    }
-
+    
+    
+    
+    
+    
 }

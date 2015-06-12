@@ -41,9 +41,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
+import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.lockingfile.LockingReaderWriter;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
 
@@ -131,7 +132,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     @Override
-    public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives, Integer id) {
+    public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives, Class<? extends RememberableDialog> id) {
         List<UnsignedAppletActionEntry> results = getMatchingItems(documentBase, codeBase, archives);
         if (results == null || results.isEmpty()) {
             return null;
@@ -155,7 +156,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     public List<UnsignedAppletActionEntry> getMatchingItems(String documentBase, String codeBase, List<String> archives) {
-        List<UnsignedAppletActionEntry> result = new ArrayList<UnsignedAppletActionEntry>();
+        List<UnsignedAppletActionEntry> result = new ArrayList<>();
         lock();
         try {
             readContents();
@@ -232,17 +233,17 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     @Override
-    public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase, Integer id) {
+    public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase, Class<? extends RememberableDialog> id) {
         return getMatchingItem(documentBase, null, null, id);
     }
-
+    
     @Override
-    public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase, Integer id) {
+    public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase, Class<? extends RememberableDialog> id) {
         return getMatchingItem(null, codeBase, null, id);
     }
 
     @Override
-    public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase, Integer id) {
+    public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase, Class<? extends RememberableDialog> id) {
         return getMatchingItem(documentBase, codeBase, null, id);
     }
 }

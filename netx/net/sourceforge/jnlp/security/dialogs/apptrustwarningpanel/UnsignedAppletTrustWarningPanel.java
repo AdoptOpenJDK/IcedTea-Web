@@ -36,16 +36,17 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
+import static net.sourceforge.jnlp.runtime.Translator.R;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.net.URL;
-import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
@@ -55,7 +56,7 @@ import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
     public UnsignedAppletTrustWarningPanel(SecurityDialog securityDialog, final JNLPFile file) {
-        super(file);
+        super(file, securityDialog);
         this.INFO_PANEL_HEIGHT = 250;
         addComponents();
         if (securityDialog != null) {
@@ -89,9 +90,9 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
     @Override
     protected String getInfoPanelText() {
         String text = R(getInfoPanelTextKey(), file.getCodeBase(), file.getSourceLocation());
-        UnsignedAppletActionEntry rememberedEntry = UnsignedAppletTrustConfirmation.getStoredEntry(file, AppletSecurityActions.UNSIGNED_APPLET_ACTION);
+        UnsignedAppletActionEntry rememberedEntry = UnsignedAppletTrustConfirmation.getStoredEntry(file,  this.getClass());
         if (rememberedEntry != null) {
-            ExecuteAppletAction rememberedAction = rememberedEntry.getAppletSecurityActions().getUnsignedAppletAction();
+            ExecuteAppletAction rememberedAction = rememberedEntry.getAppletSecurityActions().getAction(this.getClass());
             if (rememberedAction == ExecuteAppletAction.YES) {
                 text += "<br>" + R("SUnsignedAllowedBefore", rememberedEntry.getLocalisedTimeStamp());
             } else if (rememberedAction == ExecuteAppletAction.NO) {

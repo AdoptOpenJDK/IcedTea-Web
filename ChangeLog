@@ -1,3 +1,8 @@
+2015-06-12  Jiri Vanek  <jvanek@redhat.com>
+
+	Implemented general solution for remembering of various dialogues
+	* todo: changelog and javadoc and news
+
 2015-06-11  Jiri Vanek  <jvanek@redhat.com>
 
 	AppletSecurityActions, ExecuteAppletAction, AppletSecurityActionsTest moved to remember package

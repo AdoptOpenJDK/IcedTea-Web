@@ -1,7 +1,3 @@
-package net.sourceforge.jnlp.security.dialogresults;
-
-import java.util.Objects;
-
 /* 
  Copyright (C) 2008 Red Hat, Inc.
 
@@ -38,6 +34,10 @@ import java.util.Objects;
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
+package net.sourceforge.jnlp.security.dialogresults;
+
+import java.util.Objects;
+
 public class AccessWarningPaneComplexReturn implements DialogResult {
 
     public static AccessWarningPaneComplexReturn readValue(String s) {
@@ -45,8 +45,14 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
         BasicDialogValue.Primitive regularReturn = BasicDialogValue.Primitive.valueOf(sq[0]);
         //the replace is fixing case of not existing shortcuts at all
         sq = s.replace("()", "( )").split("[()]");
-        ShortcutResult d = ShortcutResult.readValue(sq[1]);
-        ShortcutResult m = ShortcutResult.readValue(sq[3]);
+        ShortcutResult d = null;
+        if (sq.length > 1) {
+            d = ShortcutResult.readValue(sq[1]);
+        }
+        ShortcutResult m = null;
+        if (sq.length > 3) {
+            m = ShortcutResult.readValue(sq[3]);
+        }
         AccessWarningPaneComplexReturn a = new AccessWarningPaneComplexReturn(regularReturn);
         a.dekstop = d;
         a.menu = m;
@@ -71,7 +77,7 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
     public static class ShortcutResult {
 
         public static ShortcutResult readValue(String s) {
-            if (s.trim().isEmpty()){
+            if (s.trim().isEmpty()) {
                 return null;
             }
             String[] sq = s.split(",");
@@ -100,12 +106,12 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof ShortcutResult)){
+            if (!(obj instanceof ShortcutResult)) {
                 return false;
             }
-            ShortcutResult sr =  (ShortcutResult) obj;
+            ShortcutResult sr = (ShortcutResult) obj;
             return this.create == sr.create && this.fixHref == sr.fixHref
-                    && this.browser.equals(sr.browser) &&  this.shortcutType == sr.shortcutType;
+                    && this.browser.equals(sr.browser) && this.shortcutType == sr.shortcutType;
         }
 
         @Override
@@ -117,20 +123,19 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
             hash = 89 * hash + (this.create ? 1 : 0);
             return hash;
         }
-        
 
         private String browser = "not_found_browser";
         private boolean fixHref = false;
         private Shortcut shortcutType = null;
         private final boolean create;
 
-        ShortcutResult(String browser, boolean fixHref,Shortcut shortcutType, boolean create){
+        ShortcutResult(String browser, boolean fixHref, Shortcut shortcutType, boolean create) {
             this.browser = browser;
             this.fixHref = fixHref;
             this.shortcutType = shortcutType;
             this.create = create;
         }
-        
+
         public ShortcutResult(boolean create) {
             this.create = create;
         }
@@ -171,9 +176,9 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
 
     public AccessWarningPaneComplexReturn(boolean b) {
         if (b) {
-            this.regularReturn =  YesNo.yes();
+            this.regularReturn = YesNo.yes();
         } else {
-            this.regularReturn =  YesNo.no();
+            this.regularReturn = YesNo.no();
         }
     }
 
@@ -202,7 +207,7 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
         if (regularReturn == null) {
             return false;
         }
-       return regularReturn.toBoolean();
+        return regularReturn.toBoolean();
     }
 
     public YesNo getRegularReturn() {
@@ -218,15 +223,4 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
         }
     }
 
-       public static enum RemeberType {
-//TODO  - remove!
-            REMEMBER_BY_APP, REMEMBER_BY_DOMAIN, REMEMBER_DONT;
-        }
-       //same
-       private RemeberType rember;
-//same
-    public void setRember(RemeberType rember) {
-        this.rember = rember;
-    }
-       
 }

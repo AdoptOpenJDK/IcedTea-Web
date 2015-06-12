@@ -35,13 +35,13 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 
 /**
  * 

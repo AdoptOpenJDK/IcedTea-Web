@@ -39,22 +39,18 @@ import net.sourceforge.jnlp.runtime.Translator;
 
 public enum ExecuteAppletAction {
 
-    ALWAYS, NEVER, YES, SANDBOX, NO, UNSET;
+    ALWAYS, NEVER, YES, NO;
 
     public String toChar() {
         switch (this) {
             case ALWAYS:
                 return "A";
-            case NEVER:
-                return "N";
             case YES:
                 return "y";
-            case SANDBOX:
-                return "s";
+            case NEVER:
+                return "N";
             case NO:
                 return "n";
-            case UNSET:
-                return "X";
         }
         throw new RuntimeException("Unknown ExecuteUnsignedApplet");
     }
@@ -67,24 +63,21 @@ public enum ExecuteAppletAction {
                 return Translator.R("APPEXTSECunsignedAppletActionNever");
             case YES:
                 return Translator.R("APPEXTSECunsignedAppletActionYes");
-            case SANDBOX:
-                return Translator.R("APPEXTSECunsignedAppletActionSandbox");
+//                return Translator.R("APPEXTSECunsignedAppletActionSandbox"); deal with this string later
             case NO:
                 return Translator.R("APPEXTSECunsignedAppletActionNo");
-            case UNSET:
-                return Translator.R("APPEXTSECunsetAppletAction");
         }
         throw new RuntimeException("Unknown UnsignedAppletAction");
     }
 
     public static ExecuteAppletAction fromString(String s) {
-        if (s.length() == 0){
-            throw new RuntimeException("Undefined zero-length ExecuteAppletAction String representatio");    
+        if (s.length() == 0) {
+            throw new RuntimeException("Undefined zero-length ExecuteAppletAction String representatio");
         }
         return fromChar(s.charAt(0));
-        
+
     }
-    
+
     public static ExecuteAppletAction fromChar(char s) {
         switch (s) {
             case 'A':
@@ -93,12 +86,8 @@ public enum ExecuteAppletAction {
                 return ExecuteAppletAction.NEVER;
             case 'y':
                 return ExecuteAppletAction.YES;
-            case 's':
-                return ExecuteAppletAction.SANDBOX;
             case 'n':
                 return ExecuteAppletAction.NO;
-            case 'X':
-                return ExecuteAppletAction.UNSET;
         }
         throw new RuntimeException("Unknown ExecuteUnsignedApplet for " + s);
     }

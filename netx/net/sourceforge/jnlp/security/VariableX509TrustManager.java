@@ -59,6 +59,7 @@ import javax.net.ssl.X509TrustManager;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.security.util.HostnameChecker;
 import sun.security.validator.ValidatorException;
@@ -414,11 +415,15 @@ final public class VariableX509TrustManager {
         return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             @Override
             public Boolean run() {
-                return SecurityDialogs.showCertWarningDialog(
+                YesNoSandbox r = SecurityDialogs.showCertWarningDialog(
                         AccessType.UNVERIFIED, null,
                         new HttpsCertVerifier(chain, authType,
-                                              isTrusted, hostMatched,
-                                hostName), null).compareValue(BasicDialogValue.Primitive.YES);
+                                isTrusted, hostMatched,
+                                hostName), null);
+                if (r == null) {
+                    return false;
+                }
+                return r.compareValue(BasicDialogValue.Primitive.YES);
             }
         });
     }

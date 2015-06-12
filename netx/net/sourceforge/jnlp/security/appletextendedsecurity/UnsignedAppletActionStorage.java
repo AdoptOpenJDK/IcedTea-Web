@@ -36,6 +36,7 @@
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
 import java.util.List;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 
 /**
  * This is abstract access to white/blacklist created from some permanent storage.
@@ -69,7 +70,7 @@ public interface UnsignedAppletActionStorage {
      * @param id of AppletSecurityAction's ExecuteAppletAction to be used for "strong" search
      * @return a matching unsigned applet action entry
      */
-    public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives, Integer id);
+    public UnsignedAppletActionEntry getMatchingItem(String documentBase, String codeBase, List<String> archives, Class<? extends RememberableDialog> id);
 
     /**
      * Shortcut {@code getMatchingItem(documentBase, null, null, null)}
@@ -78,7 +79,7 @@ public interface UnsignedAppletActionStorage {
      * @param id of AppletSecurityAction's ExecuteAppletAction to be used for "strong" search
      * @return a matching unsigned applet action entry
      */
-    public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase, Integer id);
+    public UnsignedAppletActionEntry getMatchingItemByDocumentBase(String documentBase, Class<? extends RememberableDialog> id);
 
     /**
      * Shortcut {@code getMatchingItem(null, codeBase, null, null)}
@@ -87,7 +88,7 @@ public interface UnsignedAppletActionStorage {
      * @param id of AppletSecurityAction's ExecuteAppletAction to be used for "strong" search
      * @return a matching unsigned applet action entry
      */
-    public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase, Integer id);
+    public UnsignedAppletActionEntry getMatchingItemByCodeBase(String codeBase, Class<? extends RememberableDialog> id);
 
     /**
      * Shortcut {@code getMatchingItem(documentBase, codeBase, null, null)}
@@ -97,7 +98,7 @@ public interface UnsignedAppletActionStorage {
      * @param id of AppletSecurityAction's ExecuteAppletAction to be used for "strong" search
      * @return a matching unsigned applet action entry
      */
-    public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase, Integer id);
+    public UnsignedAppletActionEntry getMatchingItemByBases(String documentBase, String codeBase, Class<? extends RememberableDialog> id);
 
     /**
      * Will add new record. Note that regexes are stored for bases matching.

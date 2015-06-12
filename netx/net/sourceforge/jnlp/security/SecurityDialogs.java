@@ -54,16 +54,12 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import static net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation.getStoredAction;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.NamePassword;
+import net.sourceforge.jnlp.security.dialogresults.YesNo;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
-import net.sourceforge.jnlp.security.dialogs.remember.AppSigningWarningAction;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -150,21 +146,23 @@ public class SecurityDialogs {
      * @param file the file to be base as information source for this dialogue
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static AppSigningWarningAction showUnsignedWarningDialog(JNLPFile file) {
+    public static YesNoSandboxLimited showUnsignedWarningDialog(JNLPFile file) {
 
         if (!shouldPromptUser()) {
             if (JNLPRuntime.isTrustAll()) {
-                return new AppSigningWarningAction(ExecuteAppletAction.YES, false);
+                return YesNoSandboxLimited.yes();
             } else {
-                return new AppSigningWarningAction(ExecuteAppletAction.NO, false);
+                return YesNoSandboxLimited.no();
             }
         }
 
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.UNSIGNED_WARNING;
         message.accessType = AccessType.UNSIGNED;
+        
+        DialogResult r = getUserResponse(message);
 
-        return  ((RememberPanel.Garbage) getUserResponse(message)).getAction();
+        return  (YesNoSandboxLimited) r;
     }
 
     /**
@@ -212,14 +210,14 @@ public class SecurityDialogs {
      * @param securityDelegate the delegate for security atts.
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static AppSigningWarningAction showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier,
+    public static YesNoSandbox showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier,
             SecurityDelegate securityDelegate) {
 
         if (!shouldPromptUser()) {
             if (JNLPRuntime.isTrustAll()) {
-                return new AppSigningWarningAction(ExecuteAppletAction.YES, false);
+                return YesNoSandbox.yes();
             } else {
-                return new AppSigningWarningAction(ExecuteAppletAction.NO, false);
+                return YesNoSandbox.no();
             }
         }
 
@@ -229,7 +227,8 @@ public class SecurityDialogs {
         message.certVerifier = certVerifier;
         message.extras = new Object[] { securityDelegate };
 
-        return ((RememberPanel.Garbage) getUserResponse(message)).getAction();
+        DialogResult r = getUserResponse(message);
+        return (YesNoSandbox) r;
     }
 
     /**
@@ -263,6 +262,7 @@ public class SecurityDialogs {
         message.extras = new Object[] { host, port, prompt, type };
 
         DialogResult response = getUserResponse(message);
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at  was " + response);
         return (NamePassword) response;
     }
 
@@ -286,23 +286,16 @@ public class SecurityDialogs {
          }
         message.extras = new Object[]{urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         DialogResult selectedValue = getUserResponse(message);
+
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue);
+        
+        if (selectedValue == null){
+            return false;
+        }
         return selectedValue.toBoolean();
     } 
      
      public static boolean showMatchingALACAttributePanel(JNLPFile file, URL documentBase, Set<URL> remoteUrls) {
-
-        ExecuteAppletAction storedAction = getStoredAction(file, AppletSecurityActions.MATCHING_ALACA_ACTION);
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Stored action for matching alaca at " + file.getCodeBase() +" was " + storedAction);
-        
-        if (storedAction != null){
-            if (storedAction == ExecuteAppletAction.ALWAYS){
-                return true;
-            }
-            if (storedAction == ExecuteAppletAction.NEVER){
-                return false;
-            }
-        }
-        
 
          if (!shouldPromptUser()) {
                if (JNLPRuntime.isTrustAll()) {
@@ -312,18 +305,17 @@ public class SecurityDialogs {
             }
         }
 
-         SecurityDialogMessage message = new SecurityDialogMessage(file);
-         message.dialogType = DialogType.MATCHING_ALACA;
-         message.extras = new Object[]{documentBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
-         AppSigningWarningAction selectedValue = ((RememberPanel.Garbage) getUserResponse(message)).getAction();
+        SecurityDialogMessage message = new SecurityDialogMessage(file);
+        message.dialogType = DialogType.MATCHING_ALACA;
+        message.extras = new Object[]{documentBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
+        DialogResult selectedValue = getUserResponse(message);
 
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue);
+        
          if (selectedValue != null) {
-             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue.getAction());
-             UnsignedAppletTrustConfirmation.updateAppletAction(file, selectedValue.getAction(), selectedValue.rememberForCodeBase(), AppletSecurityActions.MATCHING_ALACA_ACTION);
-             return selectedValue.getAction() == ExecuteAppletAction.ALWAYS || selectedValue.getAction() == ExecuteAppletAction.YES;
+             return selectedValue.toBoolean();
          }
 
-         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + null);
          return false;
 
     }
@@ -341,7 +333,13 @@ public class SecurityDialogs {
          SecurityDialogMessage message = new SecurityDialogMessage(file);
          message.dialogType = DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING;
          DialogResult selectedValue = getUserResponse(message);
-         return selectedValue.toBoolean();
+         OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for missing permissions at " + file.getCodeBase() + " was " + selectedValue);
+        
+         if (selectedValue != null) {
+             return selectedValue.toBoolean();
+         }
+
+         return false;
     }
     /**
      * Posts the message to the SecurityThread and gets the response. Blocks

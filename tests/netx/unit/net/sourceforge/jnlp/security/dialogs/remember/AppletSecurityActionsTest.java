@@ -35,86 +35,129 @@
  */
 package net.sourceforge.jnlp.security.dialogs.remember;
 
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.MatchingALACAttributePanel;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 public class AppletSecurityActionsTest {
 
+    //before 1.7 only those two were remebered. Using in legacy parsing tests
+    public static final Class UATWA = UnsignedAppletTrustWarningPanel.class;
+    public static final Class MACA = MatchingALACAttributePanel.class;
+
+    @Test
+    public void parseMultipleItemsCorrectLegacy() throws Exception {
+        AppletSecurityActions a1 = AppletSecurityActions.fromString("ANynsXsnyNA");
+        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction(UATWA));
+        assertEquals(ExecuteAppletAction.NEVER, a1.getAction(MACA));
+        assertEquals(2, a1.getActions().size());
+    }
+
     @Test
     public void parseMultipleItemsCorrect() throws Exception {
-        AppletSecurityActions a1 = AppletSecurityActions.fromString("ANynsXsnyNA");
-        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction(0));
-        assertEquals(ExecuteAppletAction.NEVER, a1.getAction(1));
-        assertEquals(ExecuteAppletAction.YES, a1.getAction(2));
-        assertEquals(ExecuteAppletAction.NO, a1.getAction(3));
-        assertEquals(ExecuteAppletAction.SANDBOX, a1.getAction(4));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(5));
-        assertEquals(ExecuteAppletAction.SANDBOX, a1.getAction(6));
-        assertEquals(ExecuteAppletAction.NO, a1.getAction(7));
-        assertEquals(ExecuteAppletAction.YES, a1.getAction(8));
-        assertEquals(ExecuteAppletAction.NEVER, a1.getAction(9));
-        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction(10));
-        assertEquals(11, a1.getActions().size());
+        AppletSecurityActions a1 = AppletSecurityActions.fromString("c1:A{};c2:N{};c3:y{};c4:n{};c8:n{};c9:y{};c10:N{};c11:A{};");
+        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction("c1"));
+        assertEquals(ExecuteAppletAction.NEVER, a1.getAction("c2"));
+        assertEquals(ExecuteAppletAction.YES, a1.getAction("c3"));
+        assertEquals(ExecuteAppletAction.NO, a1.getAction("c4"));
+        assertEquals(ExecuteAppletAction.NO, a1.getAction("c8"));
+        assertEquals(ExecuteAppletAction.YES, a1.getAction("c9"));
+        assertEquals(ExecuteAppletAction.NEVER, a1.getAction("c10"));
+        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction("c11"));
+        assertEquals(8, a1.getActions().size());
+    }
+
+    @Test
+    public void checkToString() throws Exception {
+        AppletSecurityActions as = new AppletSecurityActions();
+        as.setAction("c1", new SavedRememberAction(ExecuteAppletAction.ALWAYS, ""));
+        as.setAction("c2", new SavedRememberAction(ExecuteAppletAction.ALWAYS, null));
+        as.setAction("c3", new SavedRememberAction(ExecuteAppletAction.ALWAYS, "item"));
+        String saveString = as.toShortString();
+        //order is not guaranted
+        Assert.assertTrue(saveString.contains("c3:A{item};"));
+        Assert.assertTrue(saveString.contains("c1:A{};"));
+        Assert.assertTrue(saveString.contains("c2:A{};"));
+    }
+
+    @Test
+    public void checkToStringIsParsableBack() throws Exception {
+        AppletSecurityActions as = new AppletSecurityActions();
+        as.setAction("c1", new SavedRememberAction(ExecuteAppletAction.ALWAYS, ""));
+        as.setAction("c2", new SavedRememberAction(ExecuteAppletAction.NEVER, null));
+        as.setAction("c3", new SavedRememberAction(ExecuteAppletAction.YES, "item"));
+        as.setAction("c2", new SavedRememberAction(ExecuteAppletAction.NO, "item2"));
+        as.setAction("c3", new SavedRememberAction(ExecuteAppletAction.NO, null));
+        Assert.assertTrue(as.getRealCount() == 3);
+        String saveString = as.toShortString();
+        AppletSecurityActions a2 = AppletSecurityActions.fromString(saveString);
+        Assert.assertTrue(as.getRealCount() == a2.getRealCount());
+        SavedRememberAction c1 = a2.getActionEntry("c1");
+        Assert.assertTrue(c1.getSavedValue() == null  || c1.getSavedValue().equals(""));
+        Assert.assertTrue(c1.getAction().equals(ExecuteAppletAction.ALWAYS));
+        SavedRememberAction c2 = a2.getActionEntry("c2");
+        Assert.assertTrue(c2.getSavedValue().equals("item2"));
+        Assert.assertTrue(c2.getAction().equals(ExecuteAppletAction.NO));
+        SavedRememberAction c3 = a2.getActionEntry("c3");
+        Assert.assertTrue(c3.getSavedValue() == null || c3.getSavedValue().equals("")); //not yet  decided
+        Assert.assertTrue(c3.getAction().equals(ExecuteAppletAction.NO));
     }
 
     @Test
     public void parseEmpty() throws Exception {
         AppletSecurityActions a1 = AppletSecurityActions.fromString("");
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(0));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(10));
+        assertEquals(null, a1.getAction(UATWA));
+        assertEquals(null, a1.getAction(MACA));
         assertEquals(0, a1.getActions().size());
     }
 
     @Test
     public void parseOkSetAndGetZero() throws Exception {
         AppletSecurityActions a1 = AppletSecurityActions.fromString("");
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(0));
+        assertEquals(null, a1.getAction(MACA));
         assertEquals(0, a1.getActions().size());
-        a1.setAction(0, ExecuteAppletAction.YES);
-        assertEquals(ExecuteAppletAction.YES, a1.getAction(0));
+        a1.setAction(MACA, new SavedRememberAction(ExecuteAppletAction.YES, "aa"));
+        assertEquals(ExecuteAppletAction.YES, a1.getAction(MACA));
+        assertEquals("aa",  a1.getActionEntry(MACA).getSavedValue());
         assertEquals(1, a1.getActions().size());
     }
 
     @Test
     public void parseOkSetAndGet() throws Exception {
-        AppletSecurityActions a1 = AppletSecurityActions.fromString("s");
-        assertEquals(ExecuteAppletAction.SANDBOX, a1.getAction(0));
+        AppletSecurityActions a1 = AppletSecurityActions.fromString("A");
+        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction(UATWA));
         assertEquals(1, a1.getActions().size());
-        a1.setAction(0, ExecuteAppletAction.NO);
-        assertEquals(ExecuteAppletAction.NO, a1.getAction(0));
+        a1.setAction(UATWA, new SavedRememberAction(ExecuteAppletAction.NO, "U1"));
+        assertEquals(ExecuteAppletAction.NO, a1.getAction(UATWA));
         assertEquals(1, a1.getActions().size());
-        a1.setAction(1, ExecuteAppletAction.YES);
-        assertEquals(ExecuteAppletAction.NO, a1.getAction(0));
-        assertEquals(ExecuteAppletAction.YES, a1.getAction(1));
+        a1.setAction(MACA, new SavedRememberAction(ExecuteAppletAction.YES,"M1"));
+        assertEquals(ExecuteAppletAction.NO, a1.getAction(UATWA));
+        assertEquals(ExecuteAppletAction.YES, a1.getAction(MACA));
         assertEquals(2, a1.getActions().size());
-        a1.setAction(0, ExecuteAppletAction.NO);
-        assertEquals(ExecuteAppletAction.NO, a1.getAction(0));
+        a1.setAction(UATWA, new SavedRememberAction(ExecuteAppletAction.NO, "U2"));
+        assertEquals(ExecuteAppletAction.NO, a1.getAction(UATWA));
         assertEquals(2, a1.getActions().size());
-        a1.setAction(4, ExecuteAppletAction.NEVER);
-        assertEquals(ExecuteAppletAction.NO, a1.getAction(0));
-        assertEquals(ExecuteAppletAction.YES, a1.getAction(1));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(2));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(3));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(3));
-        assertEquals(ExecuteAppletAction.NEVER, a1.getAction(4));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(5));//default again
-        assertEquals(5, a1.getActions().size());
+        a1.setAction("Another", new SavedRememberAction(ExecuteAppletAction.NEVER,"A1"));
+        assertEquals(ExecuteAppletAction.NO, a1.getAction(UATWA));
+        assertEquals(ExecuteAppletAction.YES, a1.getAction(MACA));
+        assertEquals(ExecuteAppletAction.NEVER, a1.getAction("Another"));
+        assertEquals(3, a1.getActions().size());
 
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = NullPointerException.class)
     public void parseNotOkGet() throws Exception {
         AppletSecurityActions a1 = AppletSecurityActions.fromString("ANynsXsnyNA");
-        a1.getAction(-1);
+        a1.getAction((Class)null);
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = NullPointerException.class)
     public void parseNotOkSet() throws Exception {
         AppletSecurityActions a1 = AppletSecurityActions.fromString("ANynsXsnyNA");
-        a1.setAction(-1, ExecuteAppletAction.NO);
+        a1.setAction((Class)null, new SavedRememberAction(ExecuteAppletAction.NO, ""));
     }
 
     @Test(expected = RuntimeException.class)
@@ -125,10 +168,10 @@ public class AppletSecurityActionsTest {
     @Test
     public void parseMultipleItemsFillMissing() throws Exception {
         AppletSecurityActions a1 = AppletSecurityActions.fromString("AN");
-        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction(0));
-        assertEquals(ExecuteAppletAction.NEVER, a1.getAction(1));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(2));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(3));
+        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction(UATWA));
+        assertEquals(ExecuteAppletAction.NEVER, a1.getAction(MACA));
+        assertEquals(null, a1.getAction("unset"));
+        assertEquals(null, a1.getAction("unset"));
         //note, getters do not increase length
         assertEquals(2, a1.getActions().size());
     }
@@ -136,22 +179,22 @@ public class AppletSecurityActionsTest {
     @Test
     public void parseMultipleItemsSpaceEnd() throws Exception {
         AppletSecurityActions a1 = AppletSecurityActions.fromString("ANXs AAA");
-        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction(0));
-        assertEquals(ExecuteAppletAction.NEVER, a1.getAction(1));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(2));
-        assertEquals(ExecuteAppletAction.SANDBOX, a1.getAction(3));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(4));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(5));
-        assertEquals(ExecuteAppletAction.UNSET, a1.getAction(10));
-        assertEquals(4, a1.getActions().size());
+        assertEquals(ExecuteAppletAction.ALWAYS, a1.getAction(UATWA));
+        assertEquals(ExecuteAppletAction.NEVER, a1.getAction(MACA));
+        assertEquals(null, a1.getAction("no1"));
+        assertEquals(null, a1.getAction("no2"));
+        assertEquals(null, a1.getAction("no3"));
+        assertEquals(null, a1.getAction("no4"));
+        assertEquals(null, a1.getAction("no5"));
+        assertEquals(2, a1.getActions().size());
     }
-    
+
     @Test
     public void testIterator() throws Exception {
         AppletSecurityActions a1 = AppletSecurityActions.fromString("ANXs AAA");
         int i = 0;
-        for (ExecuteAppletAction eaa : a1) {
-            assertEquals(a1.getAction(i), eaa);
+        for (SavedRememberAction eaa : a1) {
+            Assert.assertTrue(a1.getActions().contains(eaa.getAction()));
             i++;
         }
         assertEquals(a1.getRealCount(), i);

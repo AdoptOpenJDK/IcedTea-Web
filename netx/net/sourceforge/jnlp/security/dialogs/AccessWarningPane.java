@@ -73,6 +73,9 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 
@@ -84,7 +87,7 @@ import net.sourceforge.jnlp.util.XDesktopEntry;
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
  */
-public class AccessWarningPane extends SecurityDialogPanel {
+public class AccessWarningPane extends SecurityDialogPanel implements RememberableDialog{
 
     private Object[] extras;
     private JCheckBox desktopCheck;
@@ -294,8 +297,6 @@ public class AccessWarningPane extends SecurityDialogPanel {
             }
         }
         );
-        //override the  createSetValueListener mechanism
-        //TODO get rid of createSetValueListener completely.
         run.addActionListener(new ActionListener() {
 
             @Override
@@ -349,17 +350,10 @@ public class AccessWarningPane extends SecurityDialogPanel {
                 ar.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(menuCheck.isSelected()));
             }
         }
-        if (rememberPanel != null) {
-            ar.setRember(rememberPanel.getShortcutResult());
-        }
         return ar;
     }
 
     private class RememberPanel extends JPanel {
-        // TODO: somehow tell the ApplicationInstance
-        // to stop asking for permission
-        // will be implemented likeALACAcanrember decission 
-        // must be encoded in similar way as AWP is doing
 
         final JRadioButton byApp = new JRadioButton(R("EXAWrememberByApp"));
         final JRadioButton byPage = new JRadioButton(R("EXAWrememberByPage"));
@@ -382,16 +376,15 @@ public class AccessWarningPane extends SecurityDialogPanel {
 
         }
 
-        public AccessWarningPaneComplexReturn.RemeberType getShortcutResult() {
-            if (byApp.isSelected()) {
-                return AccessWarningPaneComplexReturn.RemeberType.REMEMBER_BY_APP;
-            } else if (byPage.isSelected()) {
-                return AccessWarningPaneComplexReturn.RemeberType.REMEMBER_BY_DOMAIN;
-            } else if (dont.isSelected()) {
-                return AccessWarningPaneComplexReturn.RemeberType.REMEMBER_DONT;
-            } else {
-                return AccessWarningPaneComplexReturn.RemeberType.REMEMBER_DONT;
-            }
+        private boolean isRemembered(){
+            return !dont.isSelected();
+        }
+        private boolean isRememebredForCodebase(){
+            return byPage.isSelected();
+        }
+
+        private RememberPanelResult getResult() {
+            return new RememberPanelResult(isRemembered(), isRememebredForCodebase());
         }
 
     }
@@ -494,5 +487,29 @@ public class AccessWarningPane extends SecurityDialogPanel {
         }
 
     }
+    
+    
+     @Override
+    public RememberPanelResult getRemeberAction() {
+       return rememberPanel.getResult();
+    }
+
+    @Override
+    public DialogResult getValue() {
+        return parent.getValue();
+    }
+    
+    @Override
+    public JNLPFile getFile() {
+        return parent.getFile();
+    }
+
+    @Override
+    public DialogResult readValue(String s) {
+        return AccessWarningPaneComplexReturn.readValue(s);
+    }
+    
+    
+    
 
 }

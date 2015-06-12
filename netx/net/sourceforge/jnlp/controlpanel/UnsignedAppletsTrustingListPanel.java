@@ -47,6 +47,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -87,13 +88,13 @@ import javax.swing.table.TableRowSorter;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
 import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageExtendedImpl;
+import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
+import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -729,20 +730,16 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             @Override
             public TableCellEditor getCellEditor(int row, int column) {
                 int columnx = convertColumnIndexToModel(column);
-                if (columnx == 0 || columnx == 1) {
-                    return new DefaultCellEditor(new JComboBox<>(new ExecuteAppletAction[] {
-                            ExecuteAppletAction.ALWAYS,
-                            ExecuteAppletAction.NEVER,
-                            ExecuteAppletAction.YES,
-                            ExecuteAppletAction.NO,
-                            ExecuteAppletAction.UNSET }));
+                if (columnx == 0) {
+                    //FIXME add proper editor her egoes jbutton, popupr dialog
+                    return new DefaultCellEditor(new JTextField());
                 }
-                if (columnx == 3) {
+                if (columnx == 2) {
                     column = convertColumnIndexToModel(column);
                     row = convertRowIndexToModel(row);
                     return new DefaultCellEditor(new MyTextField((UrlRegEx) (model.getValueAt(row, column))));
                 }
-                if (columnx == 4) {
+                if (columnx == 3) {
                     column = convertColumnIndexToModel(column);
                     row = convertRowIndexToModel(row);
                     return new DefaultCellEditor(new MyTextField((UrlRegEx) (model.getValueAt(row, column))));
@@ -753,19 +750,19 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             @Override
             public TableCellRenderer getCellRenderer(int row, int column) {
                 int columnx = convertColumnIndexToModel(column);
-                if (columnx == 2) {
+                if (columnx == 1) {
                     column = convertColumnIndexToModel(column);
                     row = convertRowIndexToModel(row);
                     return new UrlRegexCellRenderer.MyDateCellRenderer((Date) (model.getValueAt(row, column)));
                 }
-                if (columnx == 3) {
+                if (columnx == 2) {
                     if (!filterRegexesCheckBox.isSelected()) {
                         column = convertColumnIndexToModel(column);
                         row = convertRowIndexToModel(row);
                         return new UrlRegexCellRenderer((UrlRegEx) (model.getValueAt(row, column)));
                     }
                 }
-                if (columnx == 4) {
+                if (columnx == 3) {
                     if (!filterRegexesCheckBox.isSelected()) {
                         column = convertColumnIndexToModel(column);
                         row = convertRowIndexToModel(row);
@@ -799,10 +796,10 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             for (UnsignedAppletActionEntry unsignedAppletActionEntry : items) {
                 AppletSecurityActions actions = unsignedAppletActionEntry.getAppletSecurityActions();
                  for (int j = 0; j < actions.getRealCount(); j++) {
-                    ExecuteAppletAction action = actions.getAction(j);
-                    if (action == unsignedAppletAction) {
-                        toBeDeleted.add(unsignedAppletActionEntry);
-                    }
+//                    ExecuteAppletAction action = actions.getAction(j);
+//                    if (action == unsignedAppletAction) {
+//                        toBeDeleted.add(unsignedAppletActionEntry);
+//                    }
                 }
             }
             String s = Translator.R("APPEXTSECguiPanelConfirmDeletionOf", toBeDeleted.size()) + ": \n";
@@ -940,8 +937,9 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
-                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                AppletSecurityActions as = (AppletSecurityActions) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                Collection<ExecuteAppletAction> l = as.getActions();
+                for (ExecuteAppletAction o : l) {
                     if (o.equals(ExecuteAppletAction.ALWAYS) || o.equals(ExecuteAppletAction.NEVER)) {
                         return true;
                     }
@@ -954,8 +952,9 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
-                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                AppletSecurityActions as = (AppletSecurityActions) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                Collection<ExecuteAppletAction> l = as.getActions();
+                for (ExecuteAppletAction o : l) {
                     if (o.equals(ExecuteAppletAction.ALWAYS)) {
                         return true;
                     }
@@ -969,8 +968,9 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
-                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                AppletSecurityActions as = (AppletSecurityActions) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                Collection<ExecuteAppletAction> l = as.getActions();
+                for (ExecuteAppletAction o : l) {
                     if (o.equals(ExecuteAppletAction.NEVER)) {
                         return true;
                     }
@@ -983,8 +983,9 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
-                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                AppletSecurityActions as = (AppletSecurityActions) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                Collection<ExecuteAppletAction> l = as.getActions();
+                for (ExecuteAppletAction o : l) {
                     if (o.equals(ExecuteAppletAction.YES) || o.equals(ExecuteAppletAction.NO)) {
                         return true;
                     }
@@ -997,8 +998,9 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
-                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                AppletSecurityActions as = (AppletSecurityActions) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                Collection<ExecuteAppletAction> l = as.getActions();
+                for (ExecuteAppletAction o : l) {
                     if (o.equals(ExecuteAppletAction.YES)) {
                         return true;
                     }
@@ -1012,8 +1014,9 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
             @Override
             public boolean include(Entry<? extends UnsignedAppletActionTableModel, ? extends Integer> entry) {
-                for (int i = 0; i < AppletSecurityActions.REMEMBER_COLUMNS_COUNT; i++) {
-                    ExecuteAppletAction o = (ExecuteAppletAction) entry.getModel().getValueAt(entry.getIdentifier(), i);
+                AppletSecurityActions as = (AppletSecurityActions) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                Collection<ExecuteAppletAction> l = as.getActions();
+                for (ExecuteAppletAction o : l) {
                     if (o.equals(ExecuteAppletAction.NO)) {
                         return true;
                     }

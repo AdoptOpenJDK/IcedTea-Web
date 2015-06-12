@@ -38,31 +38,38 @@ package net.sourceforge.jnlp.security.dialogresults;
 
 import java.util.EnumSet;
 
-public class YesNoCancel extends YesNo {
+/**
+ * Special case for AppTrustWarningPanel extensions.
+ * Its behaviour is same as YesNo, but if soem extension Need sandbox, it can safely use
+ * YesNoSandbox, and it will be correctly eaten.
+ * 
+ */
 
-    public static YesNoCancel yes() {
-        return new YesNoCancel(BasicDialogValue.Primitive.YES);
+public class YesNoSandboxLimited extends YesNoSandbox {
+
+    public static YesNoSandboxLimited yes() {
+        return new YesNoSandboxLimited(BasicDialogValue.Primitive.YES);
     }
 
-    public static YesNoCancel no() {
-        return new YesNoCancel(BasicDialogValue.Primitive.NO);
+    public static YesNoSandboxLimited no() {
+        return new YesNoSandboxLimited(BasicDialogValue.Primitive.NO);
     }
 
-    public static YesNoCancel cancel() {
-        return new YesNoCancel(BasicDialogValue.Primitive.CANCEL);
+    public static YesNoSandboxLimited sandbox() {
+        return new YesNoSandboxLimited(BasicDialogValue.Primitive.SANDBOX);
     }
 
-    public static YesNoCancel readValue(String s) {
-        return new YesNoCancel(BasicDialogValue.Primitive.valueOf(s));
+    public static YesNoSandboxLimited readValue(String s) {
+        return new YesNoSandboxLimited(BasicDialogValue.Primitive.valueOf(s));
     }
 
-    private YesNoCancel(BasicDialogValue.Primitive valueOf) {
+    private YesNoSandboxLimited(BasicDialogValue.Primitive valueOf) {
         super(valueOf);
     }
 
     @Override
     public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
-        return BasicDialogValue.YesNoCancel;
+        return BasicDialogValue.YesNo;
     }
 
 }

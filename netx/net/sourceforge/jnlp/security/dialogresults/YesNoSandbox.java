@@ -38,7 +38,7 @@ package net.sourceforge.jnlp.security.dialogresults;
 
 import java.util.EnumSet;
 
-public class YesNoSandbox extends BasicDialogValue.PrimitivesSubset {
+public class YesNoSandbox extends YesNo {
 
     public static YesNoSandbox yes() {
         return new YesNoSandbox(BasicDialogValue.Primitive.YES);
@@ -56,7 +56,7 @@ public class YesNoSandbox extends BasicDialogValue.PrimitivesSubset {
         return new YesNoSandbox(BasicDialogValue.Primitive.valueOf(s));
     }
 
-    private YesNoSandbox(BasicDialogValue.Primitive valueOf) {
+    protected YesNoSandbox(BasicDialogValue.Primitive valueOf) {
         super(valueOf);
     }
 

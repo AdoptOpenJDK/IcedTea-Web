@@ -34,14 +34,52 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-
 package net.sourceforge.jnlp.security.dialogs.remember;
 
-/*
- * Callback for when action is decided.
- */
-public interface ActionChoiceListener {
 
-    void actionChosen(AppSigningWarningAction action);
+
+public class SavedRememberAction {
+    private final ExecuteAppletAction action;
+    private final String savedValue;
+
+    public SavedRememberAction(ExecuteAppletAction action, String savedValue) {
+        this.action = action;
+        this.savedValue = savedValue;
+    }
+
+    public ExecuteAppletAction getAction() {
+        return action;
+    }
+
+    public String getSavedValue() {
+        return savedValue;
+    }
+
+     @Override
+    public String toString() {
+        return toShortString();
+    }
+
+    public String toLongString() {
+        String s=sanitizeSavedValue();
+        return action.toString()+"{"+s+"}";
+    }
+
+    private String sanitizeSavedValue() {
+        String s=savedValue;
+        if (savedValue==null || savedValue.trim().isEmpty()){
+            s="";
+        }
+        return s;
+    }
+
+    public String toShortString() {
+        String s=sanitizeSavedValue();
+        return action.toChar()+"{"+s+"}";
+    }
+
+    public boolean isRemember() {
+        return action == ExecuteAppletAction.ALWAYS || action == ExecuteAppletAction.NEVER;
+    }
     
 }

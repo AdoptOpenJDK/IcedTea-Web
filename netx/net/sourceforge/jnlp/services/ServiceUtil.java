@@ -42,6 +42,7 @@ import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
+import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -260,9 +261,12 @@ public class ServiceUtil {
             Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                 @Override
                 public Boolean run() {
-                    boolean b = SecurityDialogs.showAccessWarningDialog(tmpType,
-                                tmpApp.getJNLPFile(), tmpExtras).toBoolean();
-                    return b;
+                    AccessWarningPaneComplexReturn r = SecurityDialogs.showAccessWarningDialog(tmpType,
+                            tmpApp.getJNLPFile(), tmpExtras);
+                    if (r == null) {
+                        return false;
+                    }
+                    return r.toBoolean();
                 }
             });
 

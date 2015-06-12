@@ -34,7 +34,6 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-
 package net.sourceforge.jnlp.security.dialogresults;
 
 import java.util.EnumSet;
@@ -94,18 +93,38 @@ public abstract class BasicDialogValue {
         public BasicDialogValue.Primitive getValue() {
             return value;
         }
-        
+
         public boolean compareValue(Primitive with) {
-            if (getValue() == null && with ==null){
+            if (getValue() == null && with == null) {
                 return true;
             }
             checkValue(with);
             return getValue() == with;
         }
 
+        public boolean compareValue(PrimitivesSubset with) {
+            if (with == null) {
+                return false;
+            }
+            return compareValue(with.getValue());
+        }
+
         @Override
         public int getButtonIndex() {
             return BasicDialogValue.Primitive.NO.getLegacyButton();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof PrimitivesSubset) {
+                return this.compareValue(((PrimitivesSubset) obj));
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return getValue().hashCode();
         }
 
     }

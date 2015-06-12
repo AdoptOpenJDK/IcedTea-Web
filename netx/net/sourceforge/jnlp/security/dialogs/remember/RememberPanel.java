@@ -37,11 +37,11 @@
 package net.sourceforge.jnlp.security.dialogs.remember;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
 import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -49,25 +49,30 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import static net.sourceforge.jnlp.runtime.Translator.R;
-import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
-public class RememberPanel extends JPanel {
+public class RememberPanel extends JPanel implements RemeberActionProvider {
 
     protected JCheckBox permanencyCheckBox;
     protected JRadioButton applyToAppletButton;
     protected JRadioButton applyToCodeBaseButton;
     private final URL codebase;
-    protected ActionChoiceListener actionChoiceListener;
 
     public RememberPanel(URL codebase) {
+        this((codebase == null) ? null : codebase.toExternalForm());
+
+    }
+
+    public RememberPanel(String codebase) {
         super(new GridLayout(2 /*rows*/, 1 /*column*/));
-        this.codebase = codebase;
-        this.actionChoiceListener = getActionChoiceListener();
+        this.codebase = initCodebase(codebase);
         this.add(createCheckBoxPanel(), BorderLayout.WEST);
         this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         this.add(createMatchOptionsPanel());
         this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        if (this.codebase == null) {
+            applyToCodeBaseButton.setVisible(false);
+        }
 
     }
 
@@ -124,81 +129,21 @@ public class RememberPanel extends JPanel {
         return applyToCodeBaseButton.isSelected();
     }
 
-    public ActionListener chosenActionSetter(final ExecuteAppletAction action) {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ExecuteAppletAction realAction;
 
-                if (action == ExecuteAppletAction.YES) {
-                    realAction = isAlwaysSelected() ? ExecuteAppletAction.ALWAYS : ExecuteAppletAction.YES;
-                } else if (action == ExecuteAppletAction.NO) {
-                    realAction = isAlwaysSelected() ? ExecuteAppletAction.NEVER : ExecuteAppletAction.NO;
-                } else {
-                    realAction = action;
-                }
-
-                boolean applyToCodeBase = isCodebaseSelected();
-                actionChoiceListener.actionChosen(new AppSigningWarningAction(realAction, applyToCodeBase));
+    private URL initCodebase(String codebase) {
+        if (codebase != null) {
+            try {
+                return new URL(codebase);
+            } catch (MalformedURLException ex) {
+                OutputController.getLogger().log(ex);
             }
-        };
+        }
+        return null;
     }
 
-    private ActionChoiceListener getActionChoiceListener() {
-        if (actionChoiceListener == null) {
-            actionChoiceListener = createActionChoiceListener();
-        }
-        return actionChoiceListener;
+    @Override
+    public RememberPanelResult getRememberAction() {
+        return new RememberPanelResult(permanencyCheckBox.isSelected(), applyToCodeBaseButton.isSelected());
     }
 
-    private ActionChoiceListener createActionChoiceListener() {
-        return new ActionChoiceListener() {
-            @Override
-            public void actionChosen(final AppSigningWarningAction action) {
-                //in this moment, panel is placed on some dialogue
-                Container p = RememberPanel.this.getParent();
-                while (p != null) {
-                    if (p instanceof SecurityDialog) {
-                        //TODO this must not set value, this must return something absolutely different
-                        ((SecurityDialog) p).setValue(new Garbage(action));
-                        ((SecurityDialog) p).dispose();
-                        break;
-                    }
-                    p = p.getParent();
-                }
-            }
-        };
-    }
-    
-    //TODO remove this wrapper!
-    public static class Garbage implements DialogResult{
-        
-        final AppSigningWarningAction action;
-
-        public Garbage(AppSigningWarningAction action) {
-            this.action = action;
-        }
-
-        public AppSigningWarningAction getAction() {
-            return action;
-        }
-        
-        
-
-        @Override
-        public int getButtonIndex() {
-            return 2;
-        }
-
-        @Override
-        public boolean toBoolean() {
-         return action.getAction() == ExecuteAppletAction.ALWAYS || action.getAction() == ExecuteAppletAction.YES;
-        }
-
-        @Override
-        public String writeValue() {
-            throw new UnsupportedOperationException("never supported yet.");
-        }
-        
-    }
 }

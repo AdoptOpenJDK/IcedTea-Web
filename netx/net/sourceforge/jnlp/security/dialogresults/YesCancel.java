@@ -38,12 +38,12 @@ package net.sourceforge.jnlp.security.dialogresults;
 
 import java.util.EnumSet;
 
-public class YesCancel extends BasicDialogValue.PrimitivesSubset {
+public class YesCancel extends Yes {
 
     public static YesCancel yes() {
         return new YesCancel(BasicDialogValue.Primitive.YES);
     }
-
+ 
     public static YesCancel cancel() {
         return new YesCancel(BasicDialogValue.Primitive.CANCEL);
     }

@@ -53,6 +53,15 @@ public class Yes extends BasicDialogValue.PrimitivesSubset {
     public Yes() {
         super(BasicDialogValue.Primitive.YES);
     }
+    
+    /**
+     * To allow inheritance.
+     * Overriders have to override getAllowedValues to work.
+     * This one fails with anything else then Yes
+     */
+    protected Yes(BasicDialogValue.Primitive p) {
+        super(p);
+    }
 
     @Override
     public int getButtonIndex() {
@@ -63,5 +72,12 @@ public class Yes extends BasicDialogValue.PrimitivesSubset {
     public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
         return BasicDialogValue.Yes;
     }
+
+    @Override
+    public String toString() {
+        return writeValue();
+    }
+    
+    
 
 }

@@ -38,7 +38,7 @@ package net.sourceforge.jnlp.security.dialogresults;
 
 import java.util.EnumSet;
 
-public class YesNo extends BasicDialogValue.PrimitivesSubset {
+public class YesNo extends Yes {
 
     public static YesNo yes() {
         return new YesNo(BasicDialogValue.Primitive.YES);

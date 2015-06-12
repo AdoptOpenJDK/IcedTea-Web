@@ -36,44 +36,75 @@
 package net.sourceforge.jnlp.security.dialogs.remember;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.MatchingALACAttributePanel;
+import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
-public class AppletSecurityActions implements Iterable<ExecuteAppletAction>{
+//from legacy, just wrapper around map
+public class AppletSecurityActions implements Iterable<SavedRememberAction> {
 
-    private final List<ExecuteAppletAction> actions = new ArrayList<>();
-    public static final int UNSIGNED_APPLET_ACTION = 0;
-    public static final int MATCHING_ALACA_ACTION = 1;
-    /** well this si not nice. We can iterate through all the records to find
-    * longest remembered item, but it is unnecessary overhead. The new record is
-    * added willingly with some effort. Should be easy to inc also this
-    */ 
-    public static final int REMEMBER_COLUMNS_COUNT = /*2*/
-        Collections.max(Arrays.asList(UNSIGNED_APPLET_ACTION, MATCHING_ALACA_ACTION))+1;
+    private final Map<String, SavedRememberAction> actions = new HashMap<>();
 
-
-    public static AppletSecurityActions createDefault() {
-        AppletSecurityActions asas = new AppletSecurityActions();
-        asas.setUnsignedAppletAction(ExecuteAppletAction.UNSET);
-        asas.setMatchingAlacaAction(ExecuteAppletAction.UNSET);
-        return asas;
-    }
     /*
      * quick setup method when new item , with one action, is added
      */
-    public static AppletSecurityActions fromAction(int id, ExecuteAppletAction s) {
-        if (s == null){
-            s = ExecuteAppletAction.UNSET;
-        }
+    public static AppletSecurityActions fromAction(Class<? extends RememberableDialog> id, SavedRememberAction s) {
         AppletSecurityActions asas = new AppletSecurityActions();
         asas.setAction(id, s);
         return asas;
     }
 
-
+    /**
+     *
+     * ClassName:ACTION{savedvalue};ClassName:ACTION{savedvalue};... eg
+     * MatchingALACAttributePanel:A{true};PartiallySignedAppTrustWarningPanel:a{S};
+     *
+     * @param s
+     * @return
+     */
     public static AppletSecurityActions fromString(String s) {
+        if (s == null) {
+            s = "";
+        }
+        s = s.trim();
+        AppletSecurityActions asas = new AppletSecurityActions();
+        if (s.isEmpty()) {
+            return asas;
+        }
+        if (s.contains(";") || s.contains(":") || s.contains("{") || s.contains("}")) {
+            String[] ss = s.split("};");
+            for (String string : ss) {
+                string = string.trim();
+                if (string.isEmpty()) {
+                    continue;
+                }
+                int nameIndex = string.indexOf(":");
+                int valueIndex = string.indexOf("{");
+                if (nameIndex < 0 || valueIndex < 0) {
+                    continue;
+                }
+                String name = string.substring(0, nameIndex);
+                String action = string.substring(nameIndex + 1, valueIndex);
+                String value = string.substring(valueIndex + 1); //rather null if empty? if it si null, and expected, then NPE should never be thrown
+                if (value.isEmpty()) {
+                    value = null; //or empty string is better. What if saved value really is empty string?
+                    //Special sequence for null?
+                }
+                asas.actions.put(name, new SavedRememberAction(ExecuteAppletAction.fromChar(action.charAt(0)), value));
+            }
+            return asas;
+        } else {
+            return readLegacySave(s);
+        }
+    }
+
+    private static AppletSecurityActions readLegacySave(String s) {
         if (s == null) {
             s = "";
         }
@@ -82,45 +113,87 @@ public class AppletSecurityActions implements Iterable<ExecuteAppletAction>{
         //does " A"  means UNSET(1)+ALWAYS(2)  or ALWAYS(1)+UNSET(2)
         //or UNSET(1)+UNSET(2)?
         AppletSecurityActions asas = new AppletSecurityActions();
-        for (char x : s.toCharArray()){
-            if (Character.isWhitespace(x)){
+        int i = 0;
+        for (char x : s.toCharArray()) {
+            if (Character.isWhitespace(x)) {
                 break;
             }
-            asas.actions.add(ExecuteAppletAction.fromChar(x));
+            if (x == 2) {
+                //only two elements were known for 1.6 or older
+                break;
+            }
+            //unset is no op now
+            if (x == 'X') {
+                i++;
+                continue;
+            }
+            if (x == 's' || x == 'S') {
+                continue;
+            }
+            char nwX = x;
+            if (x == 's') {
+                nwX = 'y';
+            }
+            if (x == 'S') {
+                nwX = 'A';
+            }
+            ExecuteAppletAction q = ExecuteAppletAction.fromChar(nwX);
+            if (i == 0) {
+                SavedRememberAction sa = new SavedRememberAction(q, legacyToCurrent(x));//maybe better switch then toChar?
+                asas.actions.put(classToKey(UnsignedAppletTrustWarningPanel.class), sa);
+            } else if (i == 1) {
+                SavedRememberAction sa = new SavedRememberAction(q, legacyToCurrent(x));//maybe better switch then toChar?
+                asas.actions.put(classToKey(MatchingALACAttributePanel.class), sa);
+            } else {
+                OutputController.getLogger().log("Unknown saved legacy item on position " + i + " of char: " + x);
+            }
+            i++;
         }
         return asas;
     }
 
-    public ExecuteAppletAction getAction(int i) {
-        if (i>= actions.size()){
-            return ExecuteAppletAction.UNSET;
+    private static String legacyToCurrent(char q) {
+        switch (q) {
+            case 'y':
+            case 'A':
+                return "YES";
+            case 'n':
+            case 'N':
+                return "NO";
+            case 's':
+            case 'S':
+                return "SANDBOX";
         }
-        return actions.get(i);
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    public void setAction(int i, ExecuteAppletAction a) {
-        while (actions.size() <= i){
-            actions.add(ExecuteAppletAction.UNSET);
+
+    public ExecuteAppletAction getAction(Class clazz) {
+        return getAction(classToKey(clazz));
+    }
+
+    public ExecuteAppletAction getAction(String clazz) {
+        SavedRememberAction o = getActionEntry(clazz);
+        if (o == null) {
+            return null;
         }
-        actions.set(i,a);
+        return o.getAction();
     }
 
-
-    public ExecuteAppletAction getUnsignedAppletAction() {
-        return getAction(UNSIGNED_APPLET_ACTION);
+    public SavedRememberAction getActionEntry(Class clazz) {
+        return getActionEntry(classToKey(clazz));
     }
 
-    public void setUnsignedAppletAction(ExecuteAppletAction a) {
-       setAction(UNSIGNED_APPLET_ACTION,a);
+    public SavedRememberAction getActionEntry(String clazz) {
+        return actions.get(clazz);
+
     }
 
-
-    public ExecuteAppletAction getMatchingAlacaAction() {
-        return getAction(MATCHING_ALACA_ACTION);
+    public void setAction(Class clazz, SavedRememberAction a) {
+        setAction(classToKey(clazz), a);
     }
-    
-    public void setMatchingAlacaAction(ExecuteAppletAction a) {
-        setAction(MATCHING_ALACA_ACTION, a);
+
+    public void setAction(String i, SavedRememberAction a) {
+        actions.put(i, a);
     }
 
     @Override
@@ -130,17 +203,18 @@ public class AppletSecurityActions implements Iterable<ExecuteAppletAction>{
 
     public String toLongString() {
         StringBuilder sb = new StringBuilder();
-        for (ExecuteAppletAction executeAppletAction : actions) {
-            sb.append(executeAppletAction.toString()).append("; ");
+        Collection<Entry<String, SavedRememberAction>> l = getEntries();
+        for (Entry<String, SavedRememberAction> a : l) {
+            sb.append(a.getKey()).append(":").append(a.getValue().toLongString());
         }
         return sb.toString();
     }
 
-
     public String toShortString() {
         StringBuilder sb = new StringBuilder();
-        for (ExecuteAppletAction executeAppletAction : actions) {
-            sb.append(executeAppletAction.toChar());
+        Collection<Entry<String, SavedRememberAction>> l = getEntries();
+        for (Entry<String, SavedRememberAction> a : l) {
+            sb.append(a.getKey()).append(":").append(a.getValue().toShortString()).append(";");
         }
         return sb.toString();
     }
@@ -149,18 +223,40 @@ public class AppletSecurityActions implements Iterable<ExecuteAppletAction>{
         return actions.size();
     }
 
-
     /**
-     * stub for testing 
-     * @return 
+     * stub for testing
+     *
+     * @return
      */
-    List<ExecuteAppletAction> getActions() {
-        return actions;
+    public Collection<ExecuteAppletAction> getActions() {
+        Collection<SavedRememberAction> col = actions.values();
+        List<ExecuteAppletAction> l = new ArrayList<>(col.size());
+        for (SavedRememberAction savedRememberAction : col) {
+            l.add(savedRememberAction.getAction());
+        }
+        return l;
+    }
+
+    public Collection<Entry<String, SavedRememberAction>> getEntries() {
+        return actions.entrySet();
     }
 
     @Override
-    public Iterator<ExecuteAppletAction> iterator() {
-        return actions.iterator();
+    public Iterator<SavedRememberAction> iterator() {
+        return actions.values().iterator();
+    }
+
+    /*
+     Simple wrapper. What there wil be need of changing this logic
+     */
+    private static String classToKey(Class clazz) {
+        return clazz.getSimpleName();
+    }
+
+    public void refresh(String aValue) {
+        AppletSecurityActions nev = fromString(aValue);
+        actions.clear();
+        actions.putAll(nev.actions);
     }
 
 }

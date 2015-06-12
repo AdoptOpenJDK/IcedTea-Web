@@ -65,9 +65,15 @@ import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import static net.sourceforge.jnlp.runtime.Translator.R;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
+import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.YesNo;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -79,7 +85,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * plugin applets. New implementations should be added to the unit test at
  * unit/net/sourceforge/jnlp/security/AppTrustWarningPanelTest
  */
-public abstract class AppTrustWarningPanel extends JPanel {
+public abstract class AppTrustWarningPanel extends JPanel implements RememberableDialog{
 
     protected int PANE_WIDTH = 500;
 
@@ -94,16 +100,15 @@ public abstract class AppTrustWarningPanel extends JPanel {
     protected JButton helpButton;
     protected RememberPanel rememberPanel;
 
-
     protected JNLPFile file;
-
-
+    protected SecurityDialog parent;
 
     /*
      * Subclasses should call addComponents() IMMEDIATELY after calling the super() constructor!
      */
-    public AppTrustWarningPanel(JNLPFile file) {
+    public AppTrustWarningPanel(JNLPFile file, SecurityDialog securityDialog) {
         this.file = file;
+        this.parent = securityDialog;
         rememberPanel = new RememberPanel(file.getCodeBase());
         this.buttons = new ArrayList<>();
 
@@ -111,9 +116,12 @@ public abstract class AppTrustWarningPanel extends JPanel {
         rejectButton = new JButton(R("ButCancel"));
         helpButton = new JButton(R("APPEXTSECguiPanelHelpButton"));
 
-        allowButton.addActionListener(rememberPanel.chosenActionSetter(ExecuteAppletAction.YES));
-        rejectButton.addActionListener(rememberPanel.chosenActionSetter(ExecuteAppletAction.NO));
 
+        allowButton.addActionListener(SetValueHandler.createSetValueListener(parent,
+                YesNoSandboxLimited.yes()));
+        rejectButton.addActionListener(SetValueHandler.createSetValueListener(parent,
+                YesNoSandboxLimited.no()));
+        
         helpButton.addActionListener(getHelpButtonAction());
 
         buttons.add(allowButton);
@@ -161,8 +169,6 @@ public abstract class AppTrustWarningPanel extends JPanel {
             }
         };
     }
-
-
 
     private void setupTopPanel() {
         final String topLabelText = getTopPanelText();
@@ -240,7 +246,6 @@ public abstract class AppTrustWarningPanel extends JPanel {
         add(questionPanel);
     }
 
-   
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
@@ -263,8 +268,9 @@ public abstract class AppTrustWarningPanel extends JPanel {
     }
 
     /**
-     * Creates the actual GUI components, and adds it to this panel. This should be called by all subclasses
-     * IMMEDIATELY after calling the super() constructor!
+     * Creates the actual GUI components, and adds it to this panel. This should
+     * be called by all subclasses IMMEDIATELY after calling the super()
+     * constructor!
      */
     protected final void addComponents() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -275,4 +281,23 @@ public abstract class AppTrustWarningPanel extends JPanel {
         setupButtonAndCheckBoxPanel();
     }
 
+    @Override
+    public RememberPanelResult getRemeberAction() {
+        return rememberPanel.getRememberAction();
+    }
+
+    @Override
+    public JNLPFile getFile() {
+        return file;
+    }
+
+    @Override
+    public DialogResult getValue() {
+        return parent.getValue();
+    }
+    
+          @Override
+    public DialogResult readValue(String s) {
+        return YesNoSandboxLimited.readValue(s);
+    }
 }

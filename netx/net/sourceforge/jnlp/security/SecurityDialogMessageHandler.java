@@ -41,6 +41,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberDialog;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
+import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
 
 import sun.awt.AppContext;
 
@@ -63,7 +67,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * {@link SecurityDialogMessage#userResponse} to the appropriate value.
  * </p>
  */
-public final class SecurityDialogMessageHandler implements Runnable {
+public class SecurityDialogMessageHandler implements Runnable {
 
     /** the queue of incoming messages to show security dialogs */
     private BlockingQueue<SecurityDialogMessage> queue = new LinkedBlockingQueue<SecurityDialogMessage>();
@@ -96,31 +100,50 @@ public final class SecurityDialogMessageHandler implements Runnable {
      * @param message the message indicating what type of security dialog to
      * show
      */
-    private void handleMessage(SecurityDialogMessage message) {
-        final SecurityDialogMessage msg = message;
+    protected void handleMessage(final SecurityDialogMessage message) {
 
         final SecurityDialog dialog = new SecurityDialog(message.dialogType,
                 message.accessType, message.file, message.certVerifier, message.certificate, message.extras);
+        
+        final RememberableDialog found = RememberDialog.getInstance().findRememberablePanel(dialog);
+        SavedRememberAction action = null;
+        if (found!=null){
+        action = RememberDialog.getInstance().getRememberedState(found);
+        }
+        if (action != null && action.isRemember()) {
+            message.userResponse = found.readValue(action.getSavedValue());
+            UnsignedAppletTrustConfirmation.updateAppletAction(found.getFile(), action, null, (Class<RememberableDialog>) found.getClass());
+            unlockMessagesClient(message);
+        } else {
+            dialog.addActionListener(new ActionListener() {
 
-        dialog.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (found == null) {
+                        message.userResponse = dialog.getValue();
+                    } else {
+                        message.userResponse = found.getValue();
+                        RememberDialog.getInstance().setOrUpdateRememberedState(dialog);
+                    }
+                    unlockMessagesClient(message);
+                }
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                msg.userResponse = dialog.getValue();
-                /* Allow the client to continue on the other side */
-                if (msg.toDispose != null) {
-                    msg.toDispose.dispose();
-                }
-                if (msg.lock != null) {
-                    msg.lock.release();
-                }
-            }
-        });
-        dialog.setVisible(true);
+            });
+            dialog.setVisible(true);
+        }
 
     }
 
-    /**
+    protected void unlockMessagesClient(final SecurityDialogMessage msg) {
+        /* Allow the client to continue on the other side */
+        if (msg.toDispose != null) {
+            msg.toDispose.dispose();
+        }
+        if (msg.lock != null) {
+            msg.lock.release();
+        }
+    }
+        /**
      * Post a message to the security event queue. This message will be picked
      * up by the security thread and used to show the appropriate security
      * dialog.

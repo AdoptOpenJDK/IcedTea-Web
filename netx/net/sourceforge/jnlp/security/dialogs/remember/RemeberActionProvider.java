@@ -34,26 +34,12 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
+
 package net.sourceforge.jnlp.security.dialogs.remember;
 
-/*
- * Details of decided action.
- */
-public class AppSigningWarningAction {
-    private final ExecuteAppletAction action;
-    private final boolean applyToCodeBase;
 
-    public AppSigningWarningAction(ExecuteAppletAction action, boolean applyToCodeBase) {
-        this.action = action;
-        this.applyToCodeBase = applyToCodeBase;
-    }
-
-    public ExecuteAppletAction getAction() {
-        return action;
-    }
-
-    public boolean rememberForCodeBase() {
-        return applyToCodeBase;
-    }
+public interface RemeberActionProvider {
+    
+    public RememberPanelResult getRememberAction();
     
 }

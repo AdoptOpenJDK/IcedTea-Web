@@ -38,10 +38,10 @@ package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
+import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
+import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
 
 public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActionStorageImpl {
@@ -90,12 +90,12 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
                         UnsignedAppletActionEntry unsignedAppletActionEntry = items.get(i);
                         AppletSecurityActions actions = unsignedAppletActionEntry.getAppletSecurityActions();
                         for (int j = 0; j < actions.getRealCount(); j++) {
-                            ExecuteAppletAction action = actions.getAction(j);
-                            if (action == unsignedAppletAction) {
-                                items.remove(i);
-                                i--;
-                                break; //actions loop
-                            }
+//                            ExecuteAppletAction action = actions.getAction(j);
+//                            if (action == unsignedAppletAction) {
+//                                items.remove(i);
+//                                i--;
+//                                break; //actions loop
+//                            }
                         }
                     }
                     writeContents();
@@ -155,6 +155,7 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
 
     public void modify(final UnsignedAppletActionEntry source, final int columnIndex, final Object aValue) {
         Runnable r = new Runnable() {
+            @Override
             public void run() {
 
                 try {
@@ -163,21 +164,18 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
                     }
 
                     if (columnIndex == 0) {
-                        source.getAppletSecurityActions().setUnsignedAppletAction((ExecuteAppletAction) aValue);
+                        source.getAppletSecurityActions().refresh((String) aValue);
                     }
                     if (columnIndex == 1) {
-                        source.getAppletSecurityActions().setMatchingAlacaAction((ExecuteAppletAction) aValue);
-                    }
-                    if (columnIndex == 2) {
                         source.setTimeStamp((Date) aValue);
                     }
-                    if (columnIndex == 3) {
+                    if (columnIndex == 2) {
                         source.setDocumentBase(new UrlRegEx((String) aValue));
                     }
-                    if (columnIndex == 4) {
+                    if (columnIndex == 3) {
                         source.setCodeBase(new UrlRegEx((String) aValue));
                     }
-                    if (columnIndex == 5) {
+                    if (columnIndex == 4) {
                         source.setArchives(UnsignedAppletActionEntry.createArchivesList((String) aValue));
                     }
 

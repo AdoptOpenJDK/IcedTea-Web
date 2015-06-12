@@ -185,7 +185,7 @@ public class ApplicationInstance {
             return;
         }
         AccessWarningPaneComplexReturn ics = getComplexReturn(sd);
-        if (ics.toBoolean()) {
+        if (ics !=null && ics.toBoolean()) {
             entry.createDesktopShortcuts(ics.getMenu(), ics.getDekstop(), isSigned());
         }
 
