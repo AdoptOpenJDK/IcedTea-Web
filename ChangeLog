@@ -1,7 +1,107 @@
 2015-06-12  Jiri Vanek  <jvanek@redhat.com>
 
+	Updated NEWS, added javadoc fo security package. Added changelog entry for last commit
+	* NEWS: mentioned major work in last month and half
+	* netx/net/sourceforge/jnlp/security/package-info.java: new file, describing
+	flow of SecurityDialogMessage
+	* ChangeLog: added content to previous item
+
+2015-06-12  Jiri Vanek  <jvanek@redhat.com>
+
 	Implemented general solution for remembering of various dialogues
-	* todo: changelog and javadoc and news
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java:
+	removed columns for separate remember actions. Replaced by single column with all
+	remembered actions.
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
+	same
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: removed
+	APPEXTSECunsetAppletAction, APPEXTSECguiTableModelTableColumnActionUA,
+	APPEXTSECguiTableModelTableColumnActionMatchALACA
+	added APPEXTSECguiTableModelTableColumnRD
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: added null check
+	for ics
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessageHandler.java: removed
+	final keyword from class definition. Extension is necessary for testing.
+	(handleMessage) made protected and added logic for remembering actions.
+	Unlocking of message moved to unlockMessagesClient method.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: (showPartiallySignedWarningDialog)
+	moved to return YesNoSandbox
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java: same in
+	(doPrivileged)
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionEntry.java:
+	adapted imports
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionStorage.java:
+	All usages of id retyped from int to Class extends RememberableDialog
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	Class rewritten to handle new saving/loading schema. Support for legacy structure kept.
+	* netx/net/sourceforge/jnlp/security/dialogresults/AccessWarningPaneComplexReturn.java:
+	adapted to be able to read various malformed shortcut definitions. Removed RemeberType
+	* netx/net/sourceforge/jnlp/security/dialogresults/BasicDialogValue.java:
+	added various equals and hashcode methods.
+	* netx/net/sourceforge/jnlp/security/dialogresults/Yes.java:
+	made extendable, added toString
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesCancel.java:
+	extends Yes
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesNo.java:
+	extends Yes
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesNoCancel.java:
+	extends YesNo
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesNoSandbox.java:
+	extends YesNo
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesNoSandboxLimited.java:
+	New class. Extends YesNoSandbox, but accept only YesNo by default. Used in 
+	AppTrustWarningPanel, which by default accept only YES and NO, but is extended
+	by PartiallySignedAppTrustWarningPanel, which add also SANDBOX. 
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java:
+	implements RememberableDialog, removed RemeberType usage
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingALACAttributePanel.java:
+	implements RememberableDialog
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingPermissionsAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/MatchingALACAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	uses class instead of id in additional info obtaining methods.
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/ActionChoiceListener.java:
+	removed,useless
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/AppSigningWarningAction.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/AppletSecurityActions.java:
+	Class rewritten to handle new saving/loading schema. Support for legacy structure kept.
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/ExecuteAppletAction.java:
+	removed Sandbox and Unset support.
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RemeberActionProvider.java:
+	new file, general interface to provide values for remembering/
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberDialog.java:
+	new file for general utility methods for remembering logic.
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberPanel.java:
+	cleaned from legacy code
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberPanelResult.java:
+	new file. Keeper of remembered information.
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberableDialog.java:
+	interface identifying rememberable panels.
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/SavedRememberAction.java:
+	new class. Wrapper around remembered value and remembered decision.
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java:
+	adapted call to showAccessWarningDialog
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java:
+	Added tests for saved actions, adapted old tests
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/LegacyUnsignedAppletActionStorageImplTest.java:
+	copy of original UnsignedAppletActionStorageImplTest
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java:
+	new file, tests for parser of new schema
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/remember/AppletSecurityActionsTest.java:
+	adapted to new methods.
+	* tests/netx/unit/net/sourceforge/jnlp/util/XDesktopEntryTest.java: adapted
+
 
 2015-06-11  Jiri Vanek  <jvanek@redhat.com>
 

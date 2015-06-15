@@ -9,6 +9,23 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.7 (2015-XX-XX):
+* comments in deployment.properties now should persists load/save
+* fixed bug in caching of files with query
+* fixed issues with recreating of existing shortcut
+* trustAll/trustNone now processed correctly
+* headless no longer shows dialogues
+* more dialogs got remember me possibility
+  - MissingALACAttributePanel
+  - AccessWarning
+  - MissingPermissionsAttributePanel
+  - MatchingALACAttributePanel
+  - UnsignedAppletTrustWarningPanel
+  - PartiallySignedAppTrustWarningPanel
+* NetX
+  - fixed issues with -html shortcuts
+  - fixed issue with -html receiving garbage in width and height
+* PolicyEditor
+  - file flag made to work when used standalone
 
 New in release 1.6 (2015-XX-XX):
 * Massively improved offline abilities. Added Xoffline switch to force work without inet connection.
