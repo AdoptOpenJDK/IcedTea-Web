@@ -1,5 +1,20 @@
 2015-06-16  Jiri Vanek  <jvanek@redhat.com>
 
+	Removed redeclared line.separator
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEntry.java:
+	newline constructed using PlainTextFormatter.getLineSeparator()
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyFileModel.java:
+	same for append call
+	* net/sourceforge/jnlp/util/logging/TeeOutputStream.java:
+	same for lineSeparator
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorParsingTest.java:
+	same for LINEBREAK
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/PlainTextFormatter.java:
+	constant of LINE_SEPARATOR removed, (getLineSeparator) now returns line.separator
+	property, obtained via doPrivlidged block. (getNewLine) adapted
+
+2015-06-16  Jiri Vanek  <jvanek@redhat.com>
+
 	Improved security package javadoc description
 	* netx/net/sourceforge/jnlp/security/package-info.java: fixed linguistic
 	issues in graph, added title, added description of implementing RememberableDialog

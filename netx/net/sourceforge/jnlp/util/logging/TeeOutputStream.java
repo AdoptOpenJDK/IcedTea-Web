@@ -41,6 +41,7 @@ package net.sourceforge.jnlp.util.logging;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 
 import net.sourceforge.jnlp.util.logging.OutputController.Level;
 import net.sourceforge.jnlp.util.logging.headers.Header;
@@ -53,11 +54,9 @@ import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 public final class TeeOutputStream extends PrintStream implements SingleStreamLogger{
 
     // Everthing written to TeeOutputStream is written to our log too
-    
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private final boolean isError;
-    private final String lineSeparator = System.getProperty("line.separator");
-
+    
     public TeeOutputStream(PrintStream stdStream, boolean isError) {
         super(stdStream);
         this.isError = isError;
@@ -116,7 +115,7 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
     private void appendByte(int b) {
         byteArrayOutputStream.write(b);
         String s = byteArrayOutputStream.toString();
-        if (s.endsWith(lineSeparator)) {
+        if (s.endsWith(PlainTextFormatter.getLineSeparator())) {
             flushLog();
         }
     }
@@ -124,7 +123,7 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
     private void appendByteArray(byte[] b, int off, int len) {
         byteArrayOutputStream.write(b, off, len);
         String s = new String(b, off, len);
-        if (s.endsWith(lineSeparator)) {
+        if (s.endsWith(PlainTextFormatter.getLineSeparator())) {
             flushLog();
         }
     }
@@ -143,4 +142,5 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
         copy.write(this.byteArrayOutputStream.toByteArray());
         return copy;
     }
+
 }

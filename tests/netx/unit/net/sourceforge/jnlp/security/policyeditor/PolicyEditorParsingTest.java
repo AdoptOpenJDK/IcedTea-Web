@@ -39,6 +39,7 @@ import java.io.File;
 import java.util.Map;
 import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -50,7 +51,7 @@ public class PolicyEditorParsingTest {
     private PolicyFileModel policyFileModel = new PolicyFileModel();
     private Map<PolicyEditorPermissions, Boolean> permissions;
 
-    private static final String LINEBREAK = System.getProperty("line.separator");
+    private static final String LINEBREAK = PlainTextFormatter.getLineSeparator();
 
     private static final String READ_PERMISSION = "permission java.io.FilePermission \"${user.home}\", \"read\";";
     private static final String WRITE_PERMISSION = "permission java.io.FilePermission \"${user.home}\", \"write\";";

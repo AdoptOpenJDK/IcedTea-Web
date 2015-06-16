@@ -46,15 +46,14 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 public class PlainTextFormatter extends ReplacingTextFormatter {
 
-    private static final String LINE_SEPARATOR = java.security.AccessController.doPrivileged(
-            new sun.security.action.GetPropertyAction("line.separator"));
 
     private final Map<String, Integer> LongestKeys = new TreeMap<>();
     private String currentSection = "none";
     public  static final String SUFFIX = "txt";
     
     public static String getLineSeparator() {
-        return LINE_SEPARATOR;
+        return java.security.AccessController.doPrivileged(
+                new sun.security.action.GetPropertyAction("line.separator"));
     }
 
     private final String pargraohIndentation;
@@ -98,7 +97,7 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
 
     @Override
     public String getNewLine() {
-        return LINE_SEPARATOR;
+        return getLineSeparator();
     }
 
     @Override

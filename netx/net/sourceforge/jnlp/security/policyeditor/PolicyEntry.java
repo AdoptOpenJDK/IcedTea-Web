@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 
 /**
  * This class represents a codebase entry in a policy file. This is defined as a policy entry block
@@ -169,7 +170,7 @@ public class PolicyEntry {
         if (codebase.isEmpty() && permissions.isEmpty() && customPermissions.isEmpty()) {
             return "";
         }
-        final String newline = System.getProperty("line.separator");
+        final String newline = PlainTextFormatter.getLineSeparator();
         final StringBuilder result = new StringBuilder();
 
         result.append(newline);
