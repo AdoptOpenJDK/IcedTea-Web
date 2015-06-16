@@ -1,3 +1,9 @@
+2015-06-16  Jiri Vanek  <jvanek@redhat.com>
+
+	Improved security package javadoc description
+	* netx/net/sourceforge/jnlp/security/package-info.java: fixed linguistic
+	issues in graph, added title, added description of implementing RememberableDialog
+
 2015-06-12  Jiri Vanek  <jvanek@redhat.com>
 
 	Updated NEWS, added javadoc fo security package. Added changelog entry for last commit
