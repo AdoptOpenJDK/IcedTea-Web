@@ -36,6 +36,7 @@
 
 package net.sourceforge.jnlp.util.logging;
 
+import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 
@@ -56,7 +57,7 @@ public class UnixSystemLog implements SingleStreamLogger{
                 m = m.replaceAll("\t", "    ");
                 ProcessBuilder pb = new ProcessBuilder("logger", "-p","user.err", "--", m);
                 Process p = pb.start();
-                p.waitFor();
+                StreamUtils.waitForSafely(p);
                 OutputController.getLogger().log("System logger called with result of " + p.exitValue());
             }
         } catch (Exception ex) {

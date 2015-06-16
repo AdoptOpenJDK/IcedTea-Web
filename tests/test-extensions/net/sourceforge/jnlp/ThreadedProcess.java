@@ -39,6 +39,7 @@ package net.sourceforge.jnlp;
 
 import java.io.File;
 import java.util.List;
+import net.sourceforge.jnlp.util.StreamUtils;
 
 /**
  *
@@ -141,7 +142,8 @@ public class ThreadedProcess extends Thread {
                 p = r.exec(args.toArray(new String[0]), variables, dir);
             }
             try {
-                exitCode = p.waitFor();
+                StreamUtils.waitForSafely(p);
+                exitCode = p.exitValue();
                 Thread.sleep(500); //this is giving to fast done proecesses's e/o readers time to read all. I would like to know better solution :-/
                 while(assasin.isKilling() && !assasin.haveKilled()){
                     Thread.sleep(100);

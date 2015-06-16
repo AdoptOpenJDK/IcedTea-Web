@@ -56,7 +56,7 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
     // Everthing written to TeeOutputStream is written to our log too
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private final boolean isError;
-    
+
     public TeeOutputStream(PrintStream stdStream, boolean isError) {
         super(stdStream);
         this.isError = isError;
@@ -142,5 +142,4 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
         copy.write(this.byteArrayOutputStream.toByteArray());
         return copy;
     }
-
 }

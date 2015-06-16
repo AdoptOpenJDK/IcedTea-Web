@@ -42,7 +42,6 @@ import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.StreamEater;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -380,15 +379,11 @@ public class XDesktopEntry {
             String[] execString = new String[] { "xdg-desktop-icon", "install", "--novendor",
                     shortcutFile.getCanonicalPath() };
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Execing: " + Arrays.toString(execString));
-            Process installer = Runtime.getRuntime().exec(execString);
-            new StreamEater(installer.getInputStream()).start();
-            new StreamEater(installer.getErrorStream()).start();
+            ProcessBuilder pb = new ProcessBuilder(execString);
+            pb.inheritIO();
+            Process installer = pb.start();
 
-            try {
-                installer.waitFor();
-            } catch (InterruptedException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-            }
+            StreamUtils.waitForSafely(installer);
 
             if (!shortcutFile.delete()) {
                 throw new IOException("Unable to delete temporary file:" + shortcutFile);

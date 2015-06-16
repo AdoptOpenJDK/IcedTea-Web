@@ -43,6 +43,7 @@ import net.sourceforge.jnlp.services.ServiceUtil;
 import javax.swing.SwingUtilities;
 import javax.swing.text.html.parser.ParserDelegator;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
+import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 import sun.awt.SunToolkit;
@@ -368,9 +369,8 @@ public class Launcher {
 
   
     /**
-     * Launches the JNLP file in a new JVM instance.  The launched
-     * application's output is sent to the system out and it's
-     * standard input channel is closed.
+     * Launches the JNLP file in a new JVM instance. 
+     * All streams are properly redirected.
      *
      * @param vmArgs the arguments to pass to the new JVM. Can be empty but
      *        must not be null.
@@ -397,9 +397,8 @@ public class Launcher {
     }
 
     /**
-     * Launches the JNLP file in a new JVM instance.  The launched
-     * application's output is sent to the system out and it's
-     * standard input channel is closed.
+     * Launches the JNLP file in a new JVM instance.
+     * All streams are properly redirected.
      *
      * @param url the URL of the JNLP file to launch
      * @throws LaunchException if there was an exception
@@ -412,8 +411,7 @@ public class Launcher {
 
     /**
      * Launches the JNLP file at the specified location in a new JVM
-     * instance.  The launched application's output is sent to the
-     * system out and it's standard input channel is closed.
+     * instance. All streams are properly redirected.
      * @param vmArgs the arguments to pass to the jvm
      * @param javawsArgs the arguments to pass to javaws (aka Netx)
      * @throws LaunchException if there was an exception
@@ -421,7 +419,7 @@ public class Launcher {
     public void launchExternal(List<String> vmArgs, List<String> javawsArgs) throws LaunchException {
         try {
 
-            List<String> commands = new LinkedList<String>();
+            List<String> commands = new LinkedList<>();
 
             // this property is set by the javaws launcher to point to the javaws binary
             String pathToWebstartBinary = System.getProperty("icedtea-web.bin.location");
@@ -434,11 +432,10 @@ public class Launcher {
 
             String[] command = commands.toArray(new String[] {});
 
-            Process p = Runtime.getRuntime().exec(command);
-            new StreamEater(p.getErrorStream()).start();
-            new StreamEater(p.getInputStream()).start();
-            p.getOutputStream().close();
-
+            ProcessBuilder pb = new ProcessBuilder(command);
+            pb.inheritIO();
+            Process p =pb.start();
+            StreamUtils.waitForSafely(p);
         } catch (NullPointerException ex) {
             throw launchError(new LaunchException(null, null, R("LSFatal"), R("LCExternalLaunch"), R("LNetxJarMissing"), R("LNetxJarMissingInfo")));
         } catch (Exception ex) {

@@ -35,6 +35,7 @@ import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -268,12 +269,9 @@ class XBasicService implements BasicService {
 
         try {
             Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", "type " + command });
-            p.waitFor();
+            StreamUtils.waitForSafely(p);
             return (p.exitValue() == 0);
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-            return false;
-        } catch (InterruptedException e) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             return false;
         }

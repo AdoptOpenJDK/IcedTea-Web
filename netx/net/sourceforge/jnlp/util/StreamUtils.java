@@ -111,4 +111,26 @@ public class StreamUtils {
 
         return sb.toString();
     }
+    
+    /**
+     * This should be workaround for https://en.wikipedia.org/wiki/Spurious_wakeup which real can happen in case of processes.
+     * See http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2015-June/032350.html thread
+     * @param p process to be waited for
+     */
+    public static void waitForSafely(Process p) {
+        boolean pTerminated = false;
+        while (!pTerminated) {
+            try {
+                p.waitFor();
+            } catch (InterruptedException e) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, e);
+            }
+            try {
+                p.exitValue();
+                pTerminated = true;
+            } catch (IllegalThreadStateException e) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, e);
+            }
+        }
+    }
 }

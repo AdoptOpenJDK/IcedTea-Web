@@ -251,7 +251,7 @@ public class JVMPanel extends NamedBorderPanel {
         Integer r = null;
         try {
             p = sb.start();
-            p.waitFor();
+            StreamUtils.waitForSafely(p);
             processErrorStream = StreamUtils.readStreamAsString(p.getErrorStream());
             processStdOutStream = StreamUtils.readStreamAsString(p.getInputStream());
             r = p.exitValue();

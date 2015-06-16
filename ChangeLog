@@ -1,5 +1,21 @@
 2015-06-16  Jiri Vanek  <jvanek@redhat.com>
 
+	runtime.exec replaced by ProcessBuilder. All waits for proeces amde safe
+	* netx/net/sourceforge/jnlp/Launcher.java: runtime.exec replaced by process builder.
+	All streams correctly redirected
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: same
+	* netx/net/sourceforge/jnlp/StreamEater.java: no longer used, removed
+	* netx/net/sourceforge/jnlp/util/StreamUtils.java: Added new utility method
+	waitForSafely
+	* netx/net/sourceforge/jnlp/controlpanel/JVMPanel.java: now uses waitForSafely
+	* netx/net/sourceforge/jnlp/services/XBasicService.java: same
+	* netx/net/sourceforge/jnlp/util/logging/UnixSystemLog.java: same
+	* tests/test-extensions/net/sourceforge/jnlp/ThreadedProcess.java: same
+	* netx/net/sourceforge/jnlp/util/logging/TeeOutputStream.java: cleaned whitespaces
+
+
+2015-06-16  Jiri Vanek  <jvanek@redhat.com>
+
 	Removed dual panel in panel misleading declaration in AppTrustWarningDialog
 	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
 	no longer extends SecurityDdialog. Static methods are now only simple factory methods
