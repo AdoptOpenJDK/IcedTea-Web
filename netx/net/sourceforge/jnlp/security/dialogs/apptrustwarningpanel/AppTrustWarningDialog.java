@@ -39,33 +39,23 @@ package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 
 /**
  * A panel that confirms that the user is OK with unsigned code running.
  */
-public class AppTrustWarningDialog extends SecurityDialogPanel {
+public class AppTrustWarningDialog  {
 
-    private AppTrustWarningDialog(final SecurityDialog dialog) {
-        super(dialog);
+    public static AppTrustWarningPanel unsigned(final SecurityDialog dialog, final JNLPFile file) {
+        return new UnsignedAppletTrustWarningPanel(dialog, file);
+
     }
 
-    public static AppTrustWarningDialog unsigned(final SecurityDialog dialog, final JNLPFile file) {
-        final AppTrustWarningDialog warningDialog = new AppTrustWarningDialog(dialog);
-        warningDialog.add(new UnsignedAppletTrustWarningPanel(dialog, file));
-        return warningDialog;
-    }
-
-    public static AppTrustWarningDialog partiallySigned(final SecurityDialog dialog, final JNLPFile file, final SecurityDelegate securityDelegate) {
-        final AppTrustWarningDialog warningDialog = new AppTrustWarningDialog(dialog);
-        warningDialog.add(new PartiallySignedAppTrustWarningPanel(file, dialog, securityDelegate));
-        return warningDialog;
+    public static AppTrustWarningPanel partiallySigned(final SecurityDialog dialog, final JNLPFile file, final SecurityDelegate securityDelegate) {
+        return new PartiallySignedAppTrustWarningPanel(file, dialog, securityDelegate);
     }
     
-    public static AppTrustWarningDialog matchingAlaca(SecurityDialog x, JNLPFile file, String codebase, String remoteUrls) {
-        final AppTrustWarningDialog warningDialog = new AppTrustWarningDialog(x);
-        warningDialog.add(new MatchingALACAttributePanel(x, file, codebase, remoteUrls));
-        return warningDialog;
+    public static AppTrustWarningPanel matchingAlaca(SecurityDialog x, JNLPFile file, String codebase, String remoteUrls) {
+        return new MatchingALACAttributePanel(x, file, codebase, remoteUrls);
     }
 
 }

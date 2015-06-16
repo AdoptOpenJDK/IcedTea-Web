@@ -1,5 +1,15 @@
 2015-06-16  Jiri Vanek  <jvanek@redhat.com>
 
+	Removed dual panel in panel misleading declaration in AppTrustWarningDialog
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningDialog.java:
+	no longer extends SecurityDdialog. Static methods are now only simple factory methods
+	creating concrete extensions of AppTrustWarningPanel
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	now extends SecurityDialogPanel instead of JPanel. Removed SecurityDialog parent,
+	now inherited, added call to super with securityDialog parameter
+	
+2015-06-16  Jiri Vanek  <jvanek@redhat.com>
+
 	Removed redeclared line.separator
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEntry.java:
 	newline constructed using PlainTextFormatter.getLineSeparator()

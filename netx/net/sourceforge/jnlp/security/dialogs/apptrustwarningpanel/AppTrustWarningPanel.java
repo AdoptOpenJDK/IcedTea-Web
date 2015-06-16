@@ -69,8 +69,8 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
-import net.sourceforge.jnlp.security.dialogresults.YesNo;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
+import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
@@ -85,7 +85,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * plugin applets. New implementations should be added to the unit test at
  * unit/net/sourceforge/jnlp/security/AppTrustWarningPanelTest
  */
-public abstract class AppTrustWarningPanel extends JPanel implements RememberableDialog{
+public abstract class AppTrustWarningPanel extends SecurityDialogPanel implements RememberableDialog{
 
     protected int PANE_WIDTH = 500;
 
@@ -101,12 +101,12 @@ public abstract class AppTrustWarningPanel extends JPanel implements Rememberabl
     protected RememberPanel rememberPanel;
 
     protected JNLPFile file;
-    protected SecurityDialog parent;
 
     /*
      * Subclasses should call addComponents() IMMEDIATELY after calling the super() constructor!
      */
     public AppTrustWarningPanel(JNLPFile file, SecurityDialog securityDialog) {
+        super(securityDialog);
         this.file = file;
         this.parent = securityDialog;
         rememberPanel = new RememberPanel(file.getCodeBase());
@@ -217,9 +217,7 @@ public abstract class AppTrustWarningPanel extends JPanel implements Rememberabl
                     if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                         Desktop.getDesktop().browse(e.getURL().toURI());
                     }
-                } catch (IOException ex) {
-                    OutputController.getLogger().log(ex);
-                } catch (URISyntaxException ex) {
+                } catch (IOException | URISyntaxException ex) {
                     OutputController.getLogger().log(ex);
                 }
             }
