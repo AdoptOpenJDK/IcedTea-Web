@@ -508,8 +508,15 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
     public DialogResult readValue(String s) {
         return AccessWarningPaneComplexReturn.readValue(s);
     }
-    
-    
-    
+
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return new AccessWarningPaneComplexReturn(false);
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return new AccessWarningPaneComplexReturn(true);
+    }
 
 }

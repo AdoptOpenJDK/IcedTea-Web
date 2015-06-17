@@ -294,8 +294,19 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
         return parent.getValue();
     }
     
-          @Override
+    @Override
     public DialogResult readValue(String s) {
         return YesNoSandboxLimited.readValue(s);
     }
+
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return YesNoSandboxLimited.no();
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return YesNoSandboxLimited.yes();
+    }
+
 }

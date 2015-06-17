@@ -200,94 +200,116 @@ public class SecurityDialogsTest {
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, seclevel);
     }
 
-    @Test(timeout = 1000)//if gui pops up
+    @Test(timeout = 10000)//if gui pops up
     public void testDialogsHeadlessTrustAllPrompt() throws Exception {
         JNLPRuntime.setHeadless(true);
         JNLPRuntime.setTrustAll(true);
         JNLPRuntime.setTrustNone(false); //ignored
         setPrompt(true); //should not metter becasue is headless
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
-        testAllDialogs(ExpectedResults.PositiveResults);
-        checkUnsignedActing(true);
-        setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        checkUnsignedActing(true);
-        setAS(AppletSecurityLevel.DENY_ALL);
-        checkUnsignedActing(false, true);
-        setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        checkUnsignedActing(false, true);
+        try {
+            fakeQueue();
+            testAllDialogs(ExpectedResults.PositiveResults);
+            checkUnsignedActing(true);
+            setAS(AppletSecurityLevel.ASK_UNSIGNED);
+            checkUnsignedActing(true, false);
+            setAS(AppletSecurityLevel.DENY_ALL);
+            checkUnsignedActing(false);
+            setAS(AppletSecurityLevel.DENY_UNSIGNED);
+            checkUnsignedActing(false);
+        } finally {
+            resetQueue();
+        }
     }
 
-    @Test(timeout = 1000)//if gui pops up
+    @Test(timeout = 10000)//if gui pops up
     public void testDialogsHeadlessTrustNonePrompt() throws Exception {
         JNLPRuntime.setHeadless(true);
         JNLPRuntime.setTrustAll(false);
         JNLPRuntime.setTrustNone(false); //used by Unsigne
         setPrompt(true); //should not metter becasue is headless
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
-        testAllDialogs(ExpectedResults.NegativeResults);
-        checkUnsignedActing(true);
-        setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        checkUnsignedActing(false);
-        setAS(AppletSecurityLevel.DENY_ALL);
-        checkUnsignedActing(false);
-        setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        checkUnsignedActing(false);
+        fakeQueue();
+        try {
+            fakeQueue();
+            testAllDialogs(ExpectedResults.NegativeResults);
+            checkUnsignedActing(true);
+            setAS(AppletSecurityLevel.ASK_UNSIGNED);
+            checkUnsignedActing(false);
+            setAS(AppletSecurityLevel.DENY_ALL);
+            checkUnsignedActing(false);
+            setAS(AppletSecurityLevel.DENY_UNSIGNED);
+            checkUnsignedActing(false);
+        } finally {
+            resetQueue();
+        }
     }
 
-    @Test(timeout = 1000)//if gui pops up
+    @Test(timeout = 10000)//if gui pops up
     public void testDialogsNotHeadlessTrustAllDontPrompt() throws Exception {
         JNLPRuntime.setHeadless(false); //should not metter as is nto asking
         JNLPRuntime.setTrustAll(true);
         JNLPRuntime.setTrustNone(false); //ignored
         setPrompt(false);
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
-        testAllDialogs(ExpectedResults.PositiveResults);
-        checkUnsignedActing(true);
-        setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        checkUnsignedActing(true);
-        setAS(AppletSecurityLevel.DENY_ALL);
-        checkUnsignedActing(false, true);
-        setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        checkUnsignedActing(false, true);
+        try {
+            fakeQueue();
+            testAllDialogs(ExpectedResults.PositiveResults);
+            checkUnsignedActing(true);
+            setAS(AppletSecurityLevel.ASK_UNSIGNED);
+            checkUnsignedActing(true, false);
+            setAS(AppletSecurityLevel.DENY_ALL);
+            checkUnsignedActing(false);
+            setAS(AppletSecurityLevel.DENY_UNSIGNED);
+            checkUnsignedActing(false);
+        } finally {
+            resetQueue();
+        }
     }
 
-    @Test(timeout = 1000)//if gui pops up
+    @Test(timeout = 10000)//if gui pops up
     public void testDialogsNotHeadlessTrustNoneDontPrompt() throws Exception {
         JNLPRuntime.setHeadless(false); //should not metter as is nto asking
         JNLPRuntime.setTrustAll(false);
         JNLPRuntime.setTrustNone(false); //ignored
         setPrompt(false);
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
-        testAllDialogs(ExpectedResults.NegativeResults);
-        checkUnsignedActing(true);
-        setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        checkUnsignedActing(false);
-        setAS(AppletSecurityLevel.DENY_ALL);
-        checkUnsignedActing(false);
-        setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        checkUnsignedActing(false);
+        try {
+            fakeQueue();
+            testAllDialogs(ExpectedResults.NegativeResults);
+            checkUnsignedActing(true);
+            setAS(AppletSecurityLevel.ASK_UNSIGNED);
+            checkUnsignedActing(false);
+            setAS(AppletSecurityLevel.DENY_ALL);
+            checkUnsignedActing(false);
+            setAS(AppletSecurityLevel.DENY_UNSIGNED);
+            checkUnsignedActing(false);
+        } finally {
+            resetQueue();
+        }
     }
 
     private void testAllDialogs(ExpectedResults r) throws MalformedURLException {
         //anything but  shoertcut
-        AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(SecurityDialogs.AccessType.PRINTER, null, null);
+        AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(SecurityDialogs.AccessType.PRINTER, crtJnlpF(), null);
         Assert.assertEquals(r.p, r1.getRegularReturn().getValue());
         //shortcut
-        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(SecurityDialogs.AccessType.CREATE_DESTKOP_SHORTCUT, null, null);
+        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(SecurityDialogs.AccessType.CREATE_DESTKOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(r.p, r2.getRegularReturn().getValue());
-        YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(null);
+        YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
         Assert.assertEquals(r.ea, r3);
-        YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, null, null, null);
-        Assert.assertEquals(r.p, r4.getValue());
-        YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(null, null, null);
-        Assert.assertEquals(r.ea, r5);
+        //cant emualte security delegate now
+        //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
+        //Assert.assertEquals(r.p, r4.getValue());
+        //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
+        //Assert.assertEquals(r.ea, r5);
         NamePassword r6 = SecurityDialogs.showAuthenicationPrompt(null, 123456, null, null);
         Assert.assertEquals(r.np, r6);
-        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(null, null, null);
+        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
         Assert.assertEquals(r.b, r7);
         boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
         Assert.assertEquals(r.b, r8);
-        boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(null);
+        boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
         Assert.assertEquals(r.b, r9);
     }
 
@@ -425,7 +447,7 @@ public class SecurityDialogsTest {
         Assert.assertEquals(b2, ex2);
     }
 
-    @Test
+    @Test(timeout = 10000)//if gui pops up
     public void testDialogsNotHeadlessTrustNonePrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
         JNLPRuntime.setTrustAll(false);//should notmetter
@@ -436,7 +458,7 @@ public class SecurityDialogsTest {
         checkUnsignedNPE(false);
     }
 
-    @Test
+    @Test(timeout = 10000)//if gui pops up
     public void testNormaDialogsNotHeadlessTrustAllPrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
         JNLPRuntime.setTrustAll(true);
@@ -446,7 +468,7 @@ public class SecurityDialogsTest {
         countNPES();
     }
 
-    @Test
+    @Test(timeout = 10000)//if gui pops up
     public void testUnsignedDialogsNotHeadlessTrustAllPrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
         JNLPRuntime.setTrustAll(true);
@@ -455,14 +477,19 @@ public class SecurityDialogsTest {
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
         checkUnsignedActing(true);
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        checkUnsignedActing(true);
-        setAS(AppletSecurityLevel.DENY_ALL);
-        checkUnsignedActing(false, true);
-        setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        checkUnsignedActing(false, true);
+        try {
+            fakeQueue();
+            checkUnsignedActing(true, false);
+            setAS(AppletSecurityLevel.DENY_ALL);
+            checkUnsignedActing(false);
+            setAS(AppletSecurityLevel.DENY_UNSIGNED);
+            checkUnsignedActing(false);
+        } finally {
+            resetQueue();
+        }
     }
 
-    @Test
+    @Test(timeout = 10000)//if gui pops up
     public void testUnsignedDialogsNotHeadlessTrustNonePrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
         JNLPRuntime.setTrustAll(false);
@@ -470,23 +497,27 @@ public class SecurityDialogsTest {
         setPrompt(true); //ignored
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
         boolean r10 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r10);
-        checkUnsignedNPE(true, false);
+        Assert.assertEquals(true, r10);
+        checkUnsignedNPE(false);
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        boolean r11 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r11);
-        checkUnsignedNPE(true, false);
-        setAS(AppletSecurityLevel.DENY_ALL);
-        boolean r12 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r12);
-        checkUnsignedNPE(true, false);
-        setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        boolean r13 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r13);
-        checkUnsignedNPE(true, false);
+        try {
+//            boolean r11 = testUnsignedBehaviour();
+//            Assert.assertEquals(false, r11);
+            checkUnsignedNPE(true);
+            setAS(AppletSecurityLevel.DENY_ALL);
+            boolean r12 = testUnsignedBehaviour();
+            Assert.assertEquals(false, r12);
+            checkUnsignedNPE(true, false);
+            setAS(AppletSecurityLevel.DENY_UNSIGNED);
+            boolean r13 = testUnsignedBehaviour();
+            Assert.assertEquals(false, r13);
+            checkUnsignedNPE(true, false);
+        } finally {
+            resetQueue();
+        }
     }
 
-    @Test
+    @Test(timeout = 10000)//if gui pops up
     public void testUnsignedDialogsNotHeadlessTrustNoneTrustAllPrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
         JNLPRuntime.setTrustAll(true);
@@ -494,23 +525,28 @@ public class SecurityDialogsTest {
         setPrompt(true); //ignored
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
         boolean a = testUnsignedBehaviour();
-        Assert.assertFalse(a);
-        checkUnsignedNPE(true, false);
+        Assert.assertTrue(a);
+        checkUnsignedNPE(false);
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        boolean r10 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r10);
-        checkUnsignedNPE(true, false);
-        setAS(AppletSecurityLevel.DENY_ALL);
-        boolean r11 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r11);
-        checkUnsignedNPE(true, false);
-        setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        boolean r12 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r12);
-        checkUnsignedNPE(true, false);
+        try {
+            fakeQueue();
+            boolean r10 = testUnsignedBehaviour();
+            Assert.assertEquals(false, r10);
+            checkUnsignedNPE(false);
+            setAS(AppletSecurityLevel.DENY_ALL);
+            boolean r11 = testUnsignedBehaviour();
+            Assert.assertEquals(false, r11);
+            checkUnsignedNPE(false);
+            setAS(AppletSecurityLevel.DENY_UNSIGNED);
+            boolean r12 = testUnsignedBehaviour();
+            Assert.assertEquals(false, r12);
+            checkUnsignedNPE(false);
+        } finally {
+            resetQueue();
+        }
     }
 
-    @Test
+    @Test(timeout = 10000)//if gui pops up
     public void testUnsignedDialogsNotHeadlessPrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
         JNLPRuntime.setTrustAll(false);
@@ -562,7 +598,7 @@ public class SecurityDialogsTest {
 
     }
 
-    @Test
+    @Test(timeout = 10000)//if gui pops up
     public void testRemeberBehaviour() throws Exception {
         File f = PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile();
         try {

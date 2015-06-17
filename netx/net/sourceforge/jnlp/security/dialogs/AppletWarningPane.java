@@ -50,6 +50,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
 import net.sourceforge.jnlp.security.dialogresults.YesNoCancel;
 
@@ -113,6 +114,16 @@ public class AppletWarningPane extends SecurityDialogPanel {
         add(infoPanel);
         add(buttonPanel);
 
+    }
+
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return YesNoCancel.no();
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return YesNoCancel.yes();
     }
 
 }

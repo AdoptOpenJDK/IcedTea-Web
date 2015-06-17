@@ -202,12 +202,12 @@ public class UnsignedAppletTrustConfirmation {
 
     public static void checkUnsignedWithUserIfRequired(JNLPFile file) throws LaunchException {
 
-        if (unsignedAppletsAreForbidden() || JNLPRuntime.isTrustNone()) {
+        if (unsignedAppletsAreForbidden()) {
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Not running unsigned applet at " + file.getCodeBase() +" because unsigned applets are disallowed by security policy.");
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletPolicyDenied"));
         }
 
-        if (!unsignedConfirmationIsRequired() || JNLPRuntime.isTrustAll()) {
+        if (!unsignedConfirmationIsRequired()) {
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running unsigned applet at " + file.getCodeBase() +" does not require confirmation according to security policy.");
             return;
         }
@@ -224,16 +224,6 @@ public class UnsignedAppletTrustConfirmation {
 
     public static void checkPartiallySignedWithUserIfRequired(SecurityDelegate securityDelegate, JNLPFile file,
             CertVerifier certVerifier) throws LaunchException {
-
-        if (JNLPRuntime.isTrustNone()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running partially signed applet at " + file.getCodeBase() + " with only Sandbox permissions due to -Xtrustnone flag");
-            securityDelegate.setRunInSandbox();
-            return;
-        }
-        if (JNLPRuntime.isTrustAll()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running partially signed applet at " + file.getCodeBase() + " due to -Xtrustall flag");
-            return;
-        }
 
         if (!unsignedConfirmationIsRequired()) {
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running partially signed applet at " + file.getCodeBase() + " does not require confirmation according to security policy.");

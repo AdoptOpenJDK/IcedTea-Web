@@ -191,4 +191,15 @@ public class MissingALACAttributePanel extends SecurityDialogPanel implements  R
     public DialogResult readValue(String s) {
         return YesNo.readValue(s);
     }
+
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return YesNo.no();
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return YesNo.yes();
+    }
+
 }

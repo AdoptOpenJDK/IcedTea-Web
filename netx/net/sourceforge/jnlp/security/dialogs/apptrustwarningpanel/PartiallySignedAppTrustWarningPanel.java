@@ -172,4 +172,14 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         return YesNoSandbox.readValue(s);
     }
 
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return YesNoSandbox.sandbox();
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return YesNoSandbox.yes();
+    }
+
 }

@@ -39,8 +39,12 @@ package net.sourceforge.jnlp.security;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
@@ -70,7 +74,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 public class SecurityDialogMessageHandler implements Runnable {
 
     /** the queue of incoming messages to show security dialogs */
-    private BlockingQueue<SecurityDialogMessage> queue = new LinkedBlockingQueue<SecurityDialogMessage>();
+    private BlockingQueue<SecurityDialogMessage> queue = new LinkedBlockingQueue<>();
 
     /**
      * Runs the message handler loop. This waits for incoming security messages
@@ -105,33 +109,61 @@ public class SecurityDialogMessageHandler implements Runnable {
         final SecurityDialog dialog = new SecurityDialog(message.dialogType,
                 message.accessType, message.file, message.certVerifier, message.certificate, message.extras);
         
+        if (processAutomatedAnswers(message, dialog)){
+            return;
+        }
+
         final RememberableDialog found = RememberDialog.getInstance().findRememberablePanel(dialog);
         SavedRememberAction action = null;
         if (found!=null){
-        action = RememberDialog.getInstance().getRememberedState(found);
+            action = RememberDialog.getInstance().getRememberedState(found);
         }
         if (action != null && action.isRemember()) {
             message.userResponse = found.readValue(action.getSavedValue());
             UnsignedAppletTrustConfirmation.updateAppletAction(found.getFile(), action, null, (Class<RememberableDialog>) found.getClass());
             unlockMessagesClient(message);
         } else {
-            dialog.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (found == null) {
-                        message.userResponse = dialog.getValue();
-                    } else {
-                        message.userResponse = found.getValue();
-                        RememberDialog.getInstance().setOrUpdateRememberedState(dialog);
-                    }
-                    unlockMessagesClient(message);
-                }
-
-            });
-            dialog.setVisible(true);
+            
+            if (!shouldPromptUser() || isHeadless()) {
+                message.userResponse =  dialog.getDefaultNegativeAnswer();
+                unlockMessagesClient(message);
+            } else {
+                processMessageInGui(dialog, found, message);
+            }
         }
 
+    }
+
+    private boolean processAutomatedAnswers(final SecurityDialogMessage message, final SecurityDialog dialog) {
+        if (isXtrustNone()) {
+            message.userResponse =  dialog.getDefaultNegativeAnswer();
+            unlockMessagesClient(message);
+            return true;
+        }
+        if (isXtrustAll()) {
+            message.userResponse =  dialog.getDefaultPositiveAnswer();
+            unlockMessagesClient(message);
+            return true;
+        }
+        return false;
+    }
+
+    private void processMessageInGui(final SecurityDialog dialog, final RememberableDialog found, final SecurityDialogMessage message) {
+        dialog.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (found == null) {
+                    message.userResponse = dialog.getValue();
+                } else {
+                    message.userResponse = found.getValue();
+                    RememberDialog.getInstance().setOrUpdateRememberedState(dialog);
+                }
+                unlockMessagesClient(message);
+            }
+            
+        });
+        dialog.setVisible(true);
     }
 
     protected void unlockMessagesClient(final SecurityDialogMessage msg) {
@@ -161,6 +193,65 @@ public class SecurityDialogMessageHandler implements Runnable {
         } catch (InterruptedException e) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
+    }
+    
+    
+    /**
+     * Returns whether the current runtime configuration allows prompting user
+     * for security warnings.
+     *
+     * @return true if security warnings should be shown to the user.
+     */
+    private static boolean shouldPromptUser() {
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            @Override
+            public Boolean run() {
+                return Boolean.valueOf(JNLPRuntime.getConfiguration()
+                        .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER));
+            }
+        });
+    }
+    
+     /**
+     * Returns whether the current runtime configuration is headless
+     *
+     * @return true X is used
+     */
+    private static boolean isHeadless() {
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            @Override
+            public Boolean run() {
+                return JNLPRuntime.isHeadless();
+            }
+        });
+    }
+
+     /**
+     * Returns whether the current runtime configuration is trustAll
+     *
+     * @return true if xtrustall was specified
+     */
+    private static boolean isXtrustAll() {
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            @Override
+            public Boolean run() {
+                return JNLPRuntime.isTrustAll();
+            }
+        });
+    }
+
+     /**
+     * Returns whether the current runtime configuration is trustNone
+     *
+     * @return true if xtrustnone was specified
+     */
+    private static boolean isXtrustNone() {
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            @Override
+            public Boolean run() {
+                return JNLPRuntime.isTrustNone();
+            }
+        });
     }
 
 }

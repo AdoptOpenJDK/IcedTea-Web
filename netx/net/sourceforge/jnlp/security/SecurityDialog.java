@@ -401,4 +401,13 @@ public class SecurityDialog extends JDialog {
     {
         return requiresSignedJNLPWarning;
     }
+
+    DialogResult getDefaultNegativeAnswer() {
+        return panel.getDefaultNegativeAnswer();
+    }
+
+    DialogResult getDefaultPositiveAnswer() {
+        return  panel.getDefaultPositiveAnswer();
+    }
+
 }

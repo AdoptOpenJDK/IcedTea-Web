@@ -1059,16 +1059,11 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws LaunchException if the user does not approve every dialog prompt.
      */
     private void checkTrustWithUser() throws LaunchException {
-        if (JNLPRuntime.isTrustNone()) {
-            if (!securityDelegate.getRunInSandbox()) {
-                setRunInSandbox();
-            }
+        
+        if (securityDelegate.getRunInSandbox()) {
             return;
         }
-        if (JNLPRuntime.isTrustAll() || securityDelegate.getRunInSandbox()) {
-            return;
-        }
-
+        
         if (getSigningState() == SigningState.FULL && jcv.isFullySigned() && !jcv.getAlreadyTrustPublisher()) {
             jcv.checkTrustWithUser(securityDelegate, file);
         }
@@ -2431,7 +2426,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         @Override
         public void promptUserOnPartialSigning() throws LaunchException {
-            if (promptedForPartialSigning || JNLPRuntime.isTrustAll()) {
+            if (promptedForPartialSigning) {
                 return;
             }
             promptedForPartialSigning = true;

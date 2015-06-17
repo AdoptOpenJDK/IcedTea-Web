@@ -183,5 +183,14 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
         return YesNo.readValue(s);
     }
 
-   
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return YesNo.no();
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return YesNo.yes();
+    }
+
 }

@@ -73,6 +73,7 @@ import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -362,6 +363,16 @@ public class CertWarningPane extends SecurityDialogPanel {
                 }
             }
         }
+    }
+
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return YesNoSandbox.sandbox();
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return YesNoSandbox.yes();
     }
 
 }

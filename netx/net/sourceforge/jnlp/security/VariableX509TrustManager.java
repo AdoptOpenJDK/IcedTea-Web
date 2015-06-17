@@ -409,10 +409,7 @@ final public class VariableX509TrustManager {
     private boolean askUser(final X509Certificate[] chain, final String authType,
                             final boolean isTrusted, final boolean hostMatched,
                             final String hostName) {
-        if (JNLPRuntime.isTrustAll()){
-            return true;
-        }
-        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+         return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             @Override
             public Boolean run() {
                 YesNoSandbox r = SecurityDialogs.showCertWarningDialog(

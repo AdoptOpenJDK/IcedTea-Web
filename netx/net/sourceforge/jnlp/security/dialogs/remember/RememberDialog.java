@@ -75,6 +75,9 @@ public class RememberDialog {
     }
 
     public RememberableDialog findRememberablePanel(Container search) {
+        if (search==null){
+            return null;
+        }
         //Breadth-first important
         for (Component comp : search.getComponents()) {
             if (comp instanceof RememberableDialog) {

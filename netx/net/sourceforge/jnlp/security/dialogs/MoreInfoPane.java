@@ -54,6 +54,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
 import net.sourceforge.jnlp.security.dialogresults.Yes;
 
@@ -127,4 +128,15 @@ public class MoreInfoPane extends SecurityDialogPanel {
                                 parent);
         }
     }
+
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return null;
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return new Yes();
+    }
+
 }

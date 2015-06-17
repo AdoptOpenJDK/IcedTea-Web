@@ -1,5 +1,43 @@
 2015-06-16  Jiri Vanek  <jvanek@redhat.com>
 
+	All headless, xtrustatAll/None, shouldPrompt dialogue decisions moved into shared place
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (checkTrustWithUser)
+	(promptUserOnPartialSigning) calls to trusts removed.
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: added getDefaultNegativeAnswer
+	getDefaultPositiveAnswer stubs to access panel.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessageHandler.java:
+	all trust/shouldPrompt/headless decisions moved to this place. Small modularization done.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: all 
+	trust/shouldPrompt/headless removed
+	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java: same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java: implemented
+	abstract methods of  getDefaultNegativeAnswer getDefaultPositiveAnswer
+	* netx/net/sourceforge/jnlp/security/dialogs/AppletWarningPane.java: same
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: same
+	* netx/net/sourceforge/jnlp/security/dialogs/CertsInfoPane.java: same
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingALACAttributePanel.java: same
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingPermissionsAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/MoreInfoPane.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/PasswordAuthenticationPane.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/SecurityDialogPanel.java: same
+	and added javadoc to htmlWrap
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberDialog.java:
+	added null check to (findRememberablePanel)
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java:
+	heavily adapted (all tests now use fakeQeue). Timeout moved to 10s.
+
+
+2015-06-16  Jiri Vanek  <jvanek@redhat.com>
+
 	runtime.exec replaced by ProcessBuilder. All waits for proeces amde safe
 	* netx/net/sourceforge/jnlp/Launcher.java: runtime.exec replaced by process builder.
 	All streams correctly redirected

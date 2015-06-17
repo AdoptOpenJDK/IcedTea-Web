@@ -51,13 +51,11 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.NamePassword;
-import net.sourceforge.jnlp.security.dialogresults.YesNo;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -120,14 +118,6 @@ public class SecurityDialogs {
     public static AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType,
             final JNLPFile file, final Object[] extras) {
 
-        if (!shouldPromptUser()) {
-            if (JNLPRuntime.isTrustAll()) {
-                return new AccessWarningPaneComplexReturn(true);
-            } else {
-                return new AccessWarningPaneComplexReturn(false);
-            }
-        }
-
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
 
         message.dialogType = DialogType.ACCESS_WARNING;
@@ -147,14 +137,6 @@ public class SecurityDialogs {
      * @return true if permission was granted by the user, false otherwise.
      */
     public static YesNoSandboxLimited showUnsignedWarningDialog(JNLPFile file) {
-
-        if (!shouldPromptUser()) {
-            if (JNLPRuntime.isTrustAll()) {
-                return YesNoSandboxLimited.yes();
-            } else {
-                return YesNoSandboxLimited.no();
-            }
-        }
 
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.UNSIGNED_WARNING;
@@ -183,14 +165,6 @@ public class SecurityDialogs {
     public static YesNoSandbox showCertWarningDialog(AccessType accessType,
             JNLPFile file, CertVerifier certVerifier, SecurityDelegate securityDelegate) {
 
-        if (!shouldPromptUser()) {
-              if (JNLPRuntime.isTrustAll()) {
-                  return YesNoSandbox.yes();
-              } else {
-                  return YesNoSandbox.no();
-              }
-        }
-
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.CERT_WARNING;
         message.accessType = accessType;
@@ -212,14 +186,6 @@ public class SecurityDialogs {
      */
     public static YesNoSandbox showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier,
             SecurityDelegate securityDelegate) {
-
-        if (!shouldPromptUser()) {
-            if (JNLPRuntime.isTrustAll()) {
-                return YesNoSandbox.yes();
-            } else {
-                return YesNoSandbox.no();
-            }
-        }
 
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.PARTIALLYSIGNED_WARNING;
@@ -244,10 +210,6 @@ public class SecurityDialogs {
      * @throws SecurityException if the caller does not have the appropriate permissions.
      */
     public static NamePassword showAuthenicationPrompt(String host, int port, String prompt, String type) {
-
-        if (!shouldPromptUser()){
-            return null;
-        }
         
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -267,14 +229,6 @@ public class SecurityDialogs {
     }
 
      public static boolean  showMissingALACAttributePanel(JNLPFile file, URL codeBase, Set<URL> remoteUrls) {
-
-         if (!shouldPromptUser()) {
-             if (JNLPRuntime.isTrustAll()) {
-                 return true;
-             } else {
-                 return false;
-             }
-         }
 
         SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.MISSING_ALACA;
@@ -297,14 +251,6 @@ public class SecurityDialogs {
      
      public static boolean showMatchingALACAttributePanel(JNLPFile file, URL documentBase, Set<URL> remoteUrls) {
 
-         if (!shouldPromptUser()) {
-               if (JNLPRuntime.isTrustAll()) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
         SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.MATCHING_ALACA;
         message.extras = new Object[]{documentBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
@@ -321,14 +267,6 @@ public class SecurityDialogs {
     }
      
      public static boolean showMissingPermissionsAttributeDialogue(JNLPFile file) {
-
-         if (!shouldPromptUser()) {
-             if (JNLPRuntime.isTrustAll()) {
-                 return true;
-             } else {
-                 return false;
-             }
-         }
 
          SecurityDialogMessage message = new SecurityDialogMessage(file);
          message.dialogType = DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING;
@@ -418,26 +356,6 @@ public class SecurityDialogs {
 
         }
         return message.userResponse;
-    }
-
-    /**
-     * Returns whether the current runtime configuration allows prompting user
-     * for security warnings.
-     *
-     * @return true if security warnings should be shown to the user. false of 
-     * otherwise or runtime is headless
-     */
-    private static boolean shouldPromptUser() {
-        return AccessController.doPrivileged(new PrivilegedAction<Boolean >() {
-            @Override
-            public Boolean run() {
-                if (JNLPRuntime.isHeadless()){
-                    return false;
-                }
-                return Boolean.valueOf(JNLPRuntime.getConfiguration()
-                        .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER));
-            }
-        });
     }
     
 }

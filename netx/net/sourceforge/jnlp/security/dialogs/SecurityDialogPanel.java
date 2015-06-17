@@ -43,6 +43,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 
 /**
  * Provides a JPanel for use in JNLP warning dialogs.
@@ -68,6 +69,8 @@ public abstract class SecurityDialogPanel extends JPanel {
 
     /**
      * Needed to get word wrap working in JLabels.
+     * @param s string to be wrapped to html tag
+     * @return 
      */
     protected String htmlWrap(String s) {
         return "<html>" + s + "</html>";
@@ -84,5 +87,10 @@ public abstract class SecurityDialogPanel extends JPanel {
             initialFocusComponent.requestFocusInWindow();
         }
     }
+
+    public abstract DialogResult getDefaultNegativeAnswer() ;
+
+    public abstract DialogResult getDefaultPositiveAnswer();
+
 
 }
