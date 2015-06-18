@@ -832,8 +832,9 @@ public final class DeploymentConfiguration {
         }
         //this call should endure even if (ever) will migration code be removed
         DirectoryValidator.DirectoryCheckResults r = new DirectoryValidator().ensureDirs();
-        if (!JNLPRuntime.isHeadless()) {
-            if (r.getFailures() > 0) {
+        if (r.getFailures() > 0) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, r.getMessage());
+            if (!JNLPRuntime.isHeadless()) {
                 JOptionPane.showMessageDialog(null, r.getMessage());
             }
         }

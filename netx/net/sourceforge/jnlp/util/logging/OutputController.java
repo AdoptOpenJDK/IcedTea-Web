@@ -35,6 +35,9 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -105,6 +108,8 @@ public class OutputController {
     private List<MessageWithHeader> messageQue = new LinkedList<MessageWithHeader>();
     private MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
     Thread consumerThread;
+     /*stdin reader for headless dialogues*/
+    private BufferedReader br;
 
     //bounded to instance
     private class MessageQueConsumer implements Runnable {
@@ -404,6 +409,13 @@ public class OutputController {
 
     void setSysLog(SingleStreamLogger sysLog) {
         SystemLogHolder.INSTANCE = sysLog;
+    }
+    
+    public synchronized String readLine() throws IOException {
+        if (br == null) {
+            br = new BufferedReader(new InputStreamReader(System.in));
+        }
+        return br.readLine();
     }
     
     

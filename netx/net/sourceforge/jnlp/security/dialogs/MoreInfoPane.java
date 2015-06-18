@@ -139,4 +139,13 @@ public class MoreInfoPane extends SecurityDialogPanel {
         return new Yes();
     }
 
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return Yes.readValue(what);
+    }
+
+    @Override
+    public String helpToStdIn() {
+        return new Yes().getAllowedValues().toString();
+    }
 }

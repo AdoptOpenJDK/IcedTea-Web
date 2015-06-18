@@ -182,4 +182,13 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         return YesNoSandbox.yes();
     }
 
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return YesNoSandbox.readValue(what);
+    }
+    @Override
+    public String helpToStdIn() {
+        return YesNoSandbox.sandbox().getAllowedValues().toString();
+    }
+    
 }

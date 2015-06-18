@@ -193,4 +193,14 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
         return YesNo.yes();
     }
 
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return YesNo.readValue(what);
+    }
+    
+    @Override
+    public String helpToStdIn() {
+        return YesNo.no().getAllowedValues().toString();
+    }
+
 }

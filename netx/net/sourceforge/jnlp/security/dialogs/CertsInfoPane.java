@@ -360,4 +360,14 @@ public class CertsInfoPane extends SecurityDialogPanel {
     public DialogResult getDefaultPositiveAnswer() {
         return new Yes();
     }
+    
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return Yes.readValue(what);
+    }
+    
+    @Override
+    public String helpToStdIn() {
+        return new Yes().getAllowedValues().toString();
+    }
 }

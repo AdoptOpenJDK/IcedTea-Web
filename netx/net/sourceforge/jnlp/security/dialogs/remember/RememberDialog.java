@@ -48,12 +48,26 @@ public class RememberDialog {
 
     public void setOrUpdateRememberedState(SecurityDialog dialog) {
         RememberableDialog found = findRememberablePanel(dialog);
+        if (found == null) {
+            return;
+        }
         String value =  BasicDialogValue.writeNUll();
         if (found.getValue()!=null){
             value = found.getValue().writeValue();
         }
         SavedRememberAction action = new SavedRememberAction(createAction(found.getRemeberAction().isRemember(), found.getValue()), value);
-        UnsignedAppletTrustConfirmation.updateAppletAction(found.getFile(), action, found.getRemeberAction().isCodebase(), (Class<RememberableDialog>) found.getClass());
+        setOrUpdateRememberedState(dialog, found.getRemeberAction().isCodebase(), action);
+    }
+    
+    /*
+     * for headless dialogues
+     */
+     public void setOrUpdateRememberedState(SecurityDialog dialog, boolean wholeCodebase, SavedRememberAction action) {
+        RememberableDialog found = findRememberablePanel(dialog);
+        if (found == null) {
+            return;
+        }
+        UnsignedAppletTrustConfirmation.updateAppletAction(found.getFile(), action, wholeCodebase, (Class<RememberableDialog>) found.getClass());
     }
 
     public SavedRememberAction getRememberedState(SecurityDialog dialog) {
@@ -95,7 +109,7 @@ public class RememberDialog {
         return null;
     }
 
-    private ExecuteAppletAction createAction(boolean pernament, DialogResult value) {
+    public static ExecuteAppletAction createAction(boolean pernament, DialogResult value) {
         if (value == null){
             return ExecuteAppletAction.NO; 
         }

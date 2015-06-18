@@ -69,7 +69,8 @@ public class NamePassword implements DialogResult {
     
 
      public static NamePassword readValue(String s) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        int  i = s.indexOf(" ");
+        return new NamePassword(s.substring(0,i), s.substring(i+1).toCharArray());
     }
 
     @Override

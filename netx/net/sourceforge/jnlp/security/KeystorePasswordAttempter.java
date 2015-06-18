@@ -167,17 +167,20 @@ class KeystorePasswordAttempter {
                     OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, s1);
                     OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("KSinvalidPassword"));
                     if (JNLPRuntime.isHeadless()) {
-                        OutputController.getLogger().log(Translator.R("KSheadlesWarning"));
-                        finish(firstEx);
+                        OutputController.getLogger().printOutLn(s1 + "\n" + Translator.R("KSheadlesWarning"));
+                        String s = OutputController.getLogger().readLine();
+                        if (s == null || s.trim().isEmpty()) {
+                            finish(firstEx);
+                        }
+                        //if input is null or empty , exception is thrown from finish method
+                        addPnewPassword(s, localPases);
                     } else {
                         String s = JOptionPane.showInputDialog(s1 + "\n" + Translator.R("KSnwPassHelp"));
                         if (s == null) {
                             finish(firstEx);
                         }
                         //if input is null, exception is thrown from finish method
-                        SavedPassword users = new SavedPassword(s.toCharArray());
-                        passes.add(users);
-                        localPases.add(users);
+                        addPnewPassword(s, localPases);
                     }
                     //user already read all messages, now show only last one
                     messages = "";
@@ -185,6 +188,12 @@ class KeystorePasswordAttempter {
             }
         }
         return null;
+    }
+
+    private void addPnewPassword(String s, List<SavedPassword> localPases) {
+        SavedPassword users = new SavedPassword(s.toCharArray());
+        passes.add(users);
+        localPases.add(users);
     }
 
     private void finish(Exception ex) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {

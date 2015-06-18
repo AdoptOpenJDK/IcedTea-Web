@@ -50,6 +50,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.NamePassword;
@@ -193,6 +194,16 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
     @Override
     public DialogResult getDefaultPositiveAnswer() {
         return null;
+    }
+
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return NamePassword.readValue(what);
+    }
+
+    @Override
+    public String helpToStdIn() {
+        return Translator.R("PAPstdinInfo");
     }
 
 }

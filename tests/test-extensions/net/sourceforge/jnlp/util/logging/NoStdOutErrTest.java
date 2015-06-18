@@ -37,6 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.logging;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import net.sourceforge.jnlp.ServerAccess;
 import org.junit.AfterClass;
@@ -60,7 +63,16 @@ public class NoStdOutErrTest {
     /*
      * "printed" exceptions are otherwise  consumed via junit if thrown :-/
      */
+    private static Object origOut;
+    private static Object origErr;
 
+    private static PrintStream dummy = new PrintStream(new OutputStream() {
+                @Override
+                public void write(int b) {
+                    //DO NOTHING
+                }
+            });
+    
     @BeforeClass
     public static synchronized void disableStds() {
         try {
@@ -73,6 +85,7 @@ public class NoStdOutErrTest {
             OutputController.getLogger().flush();
             origialStds = LogConfig.getLogConfig().isLogToStreams();
             invokeSetLogToStreams(false);
+            removeStreams();
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         }
@@ -83,6 +96,7 @@ public class NoStdOutErrTest {
         try {
             OutputController.getLogger().flush();
             invokeSetLogToStreams(origialStds);
+            resetStreams();
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         }
@@ -93,6 +107,34 @@ public class NoStdOutErrTest {
             Method lcs = LogConfig.class.getDeclaredMethod(setLogToStreams, boolean.class);
             lcs.setAccessible(true);
             lcs.invoke(LogConfig.getLogConfig(), state);
+        } catch (Exception ex) {
+            ServerAccess.logException(ex);
+        }
+    }
+    
+    private static synchronized void removeStreams() {
+        try {
+            Field lcs1 = OutputController.class.getDeclaredField("outLog");
+            lcs1.setAccessible(true);
+            origOut = lcs1.get(OutputController.getLogger());
+            Field lcs2 = OutputController.class.getDeclaredField("errLog");
+            lcs2.setAccessible(true);
+            origErr = lcs1.get(OutputController.getLogger());
+            lcs1.set(OutputController.getLogger(), new PrintStreamLogger(dummy));
+            lcs2.set(OutputController.getLogger(), new PrintStreamLogger(dummy));
+        } catch (Exception ex) {
+            ServerAccess.logException(ex);
+        }
+    }
+    
+    private static synchronized void resetStreams() {
+        try {
+            Field lcs1 = OutputController.class.getDeclaredField("outLog");
+            lcs1.setAccessible(true);
+            Field lcs2 = OutputController.class.getDeclaredField("errLog");
+            lcs2.setAccessible(true);
+            lcs1.set(OutputController.getLogger(), origOut);
+            lcs2.set(OutputController.getLogger(), origErr);
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         }

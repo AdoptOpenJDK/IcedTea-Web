@@ -309,4 +309,14 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
         return YesNoSandboxLimited.yes();
     }
 
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return YesNoSandboxLimited.readValue(what);
+    }
+    
+    @Override
+    public String helpToStdIn() {
+        return YesNoSandboxLimited.yes().getAllowedValues().toString();
+    }
+    
 }

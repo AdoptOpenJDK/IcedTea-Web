@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.security.dialogresults;
 
+import java.util.EnumSet;
 import java.util.Objects;
 
 public class AccessWarningPaneComplexReturn implements DialogResult {
@@ -102,6 +103,11 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
         public static enum Shortcut {
 
             BROWSER, GENERATED_JNLP, JNLP_HREF, JAVAWS_HTML;
+            
+            public static String allValues() {
+                EnumSet<Shortcut> all = EnumSet.of(BROWSER, GENERATED_JNLP, JNLP_HREF, JAVAWS_HTML);
+                return all.toString();
+            }
         }
 
         @Override

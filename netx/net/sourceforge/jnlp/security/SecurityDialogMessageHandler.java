@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import java.io.IOException;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.AccessController;
@@ -45,7 +47,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
@@ -124,9 +128,11 @@ public class SecurityDialogMessageHandler implements Runnable {
             unlockMessagesClient(message);
         } else {
             
-            if (!shouldPromptUser() || isHeadless()) {
+            if (!shouldPromptUser()) {
                 message.userResponse =  dialog.getDefaultNegativeAnswer();
                 unlockMessagesClient(message);
+            } else if (isHeadless()) {
+                processMessageInHeadless(dialog, message);
             } else {
                 processMessageInGui(dialog, found, message);
             }
@@ -164,6 +170,65 @@ public class SecurityDialogMessageHandler implements Runnable {
             
         });
         dialog.setVisible(true);
+    }
+
+    private void processMessageInHeadless(final SecurityDialog dialog, final SecurityDialogMessage message) {
+        try {
+            boolean keepGoing = true;
+            boolean repeatAll = true;
+            do {
+                try {
+                    if (repeatAll){
+                        OutputController.getLogger().printOutLn(dialog.getText());
+                    }
+                    OutputController.getLogger().printOutLn(Translator.R("HeadlessDialogues"));
+                    OutputController.getLogger().printOutLn(dialog.helpToStdIn());
+                    String s = OutputController.getLogger().readLine();
+                    if (s == null) {
+                         throw new IOException("Stream closed");
+                    }
+                    if (s.trim().toLowerCase().equals("exit")) {
+                        JNLPRuntime.exit(0);
+                    }
+                    boolean codebase = false;
+                    boolean remember = false;
+                    if (s.startsWith("RC ")){
+                        codebase = true;
+                        remember = true;
+                        s=s.substring(3);
+                    }
+                    if (s.startsWith("R ")){
+                        remember = true;
+                        s=s.substring(2);
+                    }
+                    message.userResponse = dialog.readFromStdIn(s);
+                    keepGoing = false;
+                    try {
+                        String value = BasicDialogValue.writeNUll();
+                        if (message.userResponse != null) {
+                            value = message.userResponse.writeValue();
+                        }
+                        RememberDialog.getInstance().setOrUpdateRememberedState(dialog, codebase, new SavedRememberAction(RememberDialog.createAction(remember, message.userResponse), value));
+                    } catch (Exception ex) {    
+                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
+                    }
+                } catch (IOException eex) {
+                    OutputController.getLogger().log(eex);
+                    keepGoing = false;
+                } catch (IllegalArgumentException eeex){
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, eeex.toString());
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, eeex);
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HDwrongValue"));
+                    repeatAll = false;
+                } catch (Exception ex) {
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, ex.toString());
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                    repeatAll = true;
+                }
+            } while (keepGoing);
+        } finally {
+            unlockMessagesClient(message);
+        }
     }
 
     protected void unlockMessagesClient(final SecurityDialogMessage msg) {

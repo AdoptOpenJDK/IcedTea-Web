@@ -36,8 +36,10 @@
  */
 package net.sourceforge.jnlp.security;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,8 +58,8 @@ import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexRetur
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.NamePassword;
 import net.sourceforge.jnlp.security.dialogresults.YesNo;
-import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -65,7 +67,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SecurityDialogsTest {
+public class SecurityDialogsTest extends NoStdOutErrTest {
 
     private static boolean wasHeadless;
     private static boolean wasTrustAll;
@@ -212,11 +214,11 @@ public class SecurityDialogsTest {
             testAllDialogs(ExpectedResults.PositiveResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(true, false);
+            checkUnsignedActing(true, null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
         } finally {
             resetQueue();
         }
@@ -230,17 +232,20 @@ public class SecurityDialogsTest {
         setPrompt(true); //should not metter becasue is headless
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
         fakeQueue();
+        InputStream backup = System.in;
         try {
             fakeQueue();
-            testAllDialogs(ExpectedResults.NegativeResults);
+            System.setIn(new ByteArrayInputStream(new byte[0]));
+            testAllDialogsNullResaults();
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
         } finally {
+            System.setIn(backup);
             resetQueue();
         }
     }
@@ -257,11 +262,11 @@ public class SecurityDialogsTest {
             testAllDialogs(ExpectedResults.PositiveResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(true, false);
+            checkUnsignedActing(true, null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
         } finally {
             resetQueue();
         }
@@ -279,11 +284,11 @@ public class SecurityDialogsTest {
             testAllDialogs(ExpectedResults.NegativeResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
         } finally {
             resetQueue();
         }
@@ -313,18 +318,46 @@ public class SecurityDialogsTest {
         Assert.assertEquals(r.b, r9);
     }
 
-    private void checkUnsignedActing(boolean b) throws MalformedURLException {
+    private void testAllDialogsNullResaults() throws MalformedURLException {
+        //anything but  shoertcut
+        AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(SecurityDialogs.AccessType.PRINTER, crtJnlpF(), null);
+        Assert.assertEquals(null, r1);
+        //shortcut
+        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(SecurityDialogs.AccessType.CREATE_DESTKOP_SHORTCUT, crtJnlpF(), null);
+        Assert.assertEquals(null, r2);
+        YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
+        Assert.assertEquals(null, r3);
+        //cant emualte security delegate now
+        //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
+        //Assert.assertEquals(r.p, r4.getValue());
+        //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
+        //Assert.assertEquals(r.ea, r5);
+        NamePassword r6 = SecurityDialogs.showAuthenicationPrompt(null, 123456, null, null);
+        Assert.assertEquals(null, r6);
+        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
+        Assert.assertEquals(false, r7);
+        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
+        Assert.assertEquals(false, r8);
+        boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
+        Assert.assertEquals(false, r9);
+    }
+
+    private void checkUnsignedActing(Boolean b) throws MalformedURLException {
         checkUnsignedActing(b, b);
     }
 
     /*
      *  testPartiallySignedBehaviour(); needs security delegate to set sandbox, so somtetimes results are strange
      */
-    private void checkUnsignedActing(boolean b1, boolean b2) throws MalformedURLException {
-        boolean r10 = testUnsignedBehaviour();
-        Assert.assertEquals(b1, r10);
-        boolean r11 = testPartiallySignedBehaviour();
-        Assert.assertEquals(b2, r11);
+    private void checkUnsignedActing(Boolean b1, Boolean b2) throws MalformedURLException {
+        if (b1 != null) {
+            boolean r10 = testUnsignedBehaviour();
+            Assert.assertEquals(b1.booleanValue(), r10);
+        }
+        if (b2 != null) {
+            boolean r11 = testPartiallySignedBehaviour();
+            Assert.assertEquals(b2.booleanValue(), r11);
+        }
     }
 
     private boolean testUnsignedBehaviour() throws MalformedURLException {
@@ -419,32 +452,43 @@ public class SecurityDialogsTest {
         Assert.assertEquals(metcounter, npecounter + allowedRuns);
     }
 
-    private void checkUnsignedNPE(boolean b) throws MalformedURLException {
+    private void checkUnsignedNPE(Boolean b) throws MalformedURLException {
         checkUnsignedNPE(b, b);
     }
 
     /*
      testPartiallySignedBehaviour(); needs security delegate to set sandbox, so somtetimes results are strange
      */
-    private void checkUnsignedNPE(boolean b1, boolean b2) throws MalformedURLException {
+    private void checkUnsignedNPE(Boolean b1, Boolean b2) throws MalformedURLException {
         int metcounter = 0;
+        int maxcount = 0;
         boolean ex1 = false;
         boolean ex2 = false;
-        try {
-            metcounter++;
-            testPartiallySignedBehaviour();
-        } catch (NullPointerException ex) {
-            ex1 = true;
+        if (b1 != null) {
+            maxcount++;
+            try {
+                metcounter++;
+                testPartiallySignedBehaviour();
+            } catch (NullPointerException ex) {
+                ex1 = true;
+            }
         }
-        try {
-            metcounter++;
-            testUnsignedBehaviour();
-        } catch (NullPointerException ex) {
-            ex2 = true;
+        if (b2 != null) {
+            maxcount++;
+            try {
+                metcounter++;
+                testUnsignedBehaviour();
+            } catch (NullPointerException ex) {
+                ex2 = true;
+            }
         }
-        Assert.assertEquals(2, metcounter);
-        Assert.assertEquals(b1, ex1);
-        Assert.assertEquals(b2, ex2);
+        Assert.assertEquals(maxcount, metcounter);
+        if (b1 != null) {
+            Assert.assertEquals(b1.booleanValue(), ex1);
+        }
+        if (b2 != null) {
+            Assert.assertEquals(b2.booleanValue(), ex2);
+        }
     }
 
     @Test(timeout = 10000)//if gui pops up
@@ -479,11 +523,11 @@ public class SecurityDialogsTest {
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
         try {
             fakeQueue();
-            checkUnsignedActing(true, false);
+            checkUnsignedActing(true, null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false);
+            checkUnsignedActing(false, null);
         } finally {
             resetQueue();
         }
@@ -532,15 +576,15 @@ public class SecurityDialogsTest {
             fakeQueue();
             boolean r10 = testUnsignedBehaviour();
             Assert.assertEquals(false, r10);
-            checkUnsignedNPE(false);
+            checkUnsignedNPE(null, false);
             setAS(AppletSecurityLevel.DENY_ALL);
             boolean r11 = testUnsignedBehaviour();
             Assert.assertEquals(false, r11);
-            checkUnsignedNPE(false);
+            checkUnsignedNPE(null, false);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
             boolean r12 = testUnsignedBehaviour();
             Assert.assertEquals(false, r12);
-            checkUnsignedNPE(false);
+            checkUnsignedNPE(null, false);
         } finally {
             resetQueue();
         }

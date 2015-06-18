@@ -68,16 +68,19 @@ import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ShortcutDesc;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogresults.YesNo;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.XDesktopEntry;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 
 /**
  * Provides a panel to show inside a SecurityDialog. These dialogs are
@@ -519,4 +522,21 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         return new AccessWarningPaneComplexReturn(true);
     }
 
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return AccessWarningPaneComplexReturn.readValue(what);
+    }
+
+    @Override
+    public String helpToStdIn() {
+        if (parent.getAccessType() == AccessType.CREATE_DESTKOP_SHORTCUT){
+            return Translator.R("AWPstdoutHint1") + PlainTextFormatter.getLineSeparator()
+                    + Translator.R("AWPstdoutHint2") + PlainTextFormatter.getLineSeparator()
+                    + Translator.R("AWPstdoutHint3", AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.allValues()) + PlainTextFormatter.getLineSeparator()
+                    + Translator.R("AWPstdoutHint1") + PlainTextFormatter.getLineSeparator();
+        } else {
+            return YesNo.yes().getAllowedValues().toString();
+        }
+    }
+    
 }

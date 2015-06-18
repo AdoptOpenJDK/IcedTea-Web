@@ -223,24 +223,7 @@ public class SecurityDialog extends JDialog {
     }
 
     private void initDialog() {
-        String dialogTitle = "";
-        if (dialogType == DialogType.CERT_WARNING) {
-            if (accessType == AccessType.VERIFIED)
-                dialogTitle = "Security Approval Required";
-            else
-                dialogTitle = "Security Warning";
-        } else if (dialogType == DialogType.MORE_INFO)
-            dialogTitle = "More Information";
-        else if (dialogType == DialogType.CERT_INFO)
-            dialogTitle = "Details - Certificate";
-        else if (dialogType == DialogType.ACCESS_WARNING)
-            dialogTitle = "Security Warning";
-        else if (dialogType == DialogType.APPLET_WARNING)
-            dialogTitle = "Applet Warning";
-        else if (dialogType == DialogType.PARTIALLYSIGNED_WARNING)
-            dialogTitle = "Security Warning";
-        else if (dialogType == DialogType.AUTHENTICATION)
-            dialogTitle = "Authentication Required";
+        String dialogTitle = createTitle();
 
         setTitle(dialogTitle);
         setModalityType(ModalityType.MODELESS);
@@ -277,6 +260,31 @@ public class SecurityDialog extends JDialog {
         addWindowFocusListener(adapter);
     }
 
+    private String createTitle() {
+        return createTitle(dialogType, accessType);
+    }
+    private static String createTitle(DialogType dtype, AccessType atype) {
+        String dialogTitle = "";
+        if (dtype == DialogType.CERT_WARNING) {
+            if (atype == AccessType.VERIFIED)
+                dialogTitle = "Security Approval Required";
+            else
+                dialogTitle = "Security Warning";
+        } else if (dtype == DialogType.MORE_INFO)
+            dialogTitle = "More Information";
+        else if (dtype == DialogType.CERT_INFO)
+            dialogTitle = "Details - Certificate";
+        else if (dtype == DialogType.ACCESS_WARNING)
+            dialogTitle = "Security Warning";
+        else if (dtype == DialogType.APPLET_WARNING)
+            dialogTitle = "Applet Warning";
+        else if (dtype == DialogType.PARTIALLYSIGNED_WARNING)
+            dialogTitle = "Security Warning";
+        else if (dtype == DialogType.AUTHENTICATION)
+            dialogTitle = "Authentication Required";
+        return dialogTitle;
+    }
+
     public AccessType getAccessType() {
         return accessType;
     }
@@ -303,31 +311,35 @@ public class SecurityDialog extends JDialog {
     /*
      * find appropriate JPanel to given Dialog, based on {@link DialogType}.
      */
-    private static SecurityDialogPanel getPanel(SecurityDialog sd) {
+    static SecurityDialogPanel getPanel(SecurityDialog sd) {
+        return getPanel(sd.dialogType, sd);
+    }
+    
+    static SecurityDialogPanel getPanel(DialogType type, SecurityDialog sd) {
         SecurityDialogPanel lpanel = null;
-        if (sd.dialogType == DialogType.CERT_WARNING) {
+        if (type == DialogType.CERT_WARNING) {
             lpanel = new CertWarningPane(sd, sd.certVerifier, (SecurityDelegate) sd.extras[0]);
-        } else if (sd.dialogType == DialogType.MORE_INFO) {
+        } else if (type == DialogType.MORE_INFO) {
             lpanel = new MoreInfoPane(sd, sd.certVerifier);
-        } else if (sd.dialogType == DialogType.CERT_INFO) {
+        } else if (type == DialogType.CERT_INFO) {
             lpanel = new CertsInfoPane(sd, sd.certVerifier);
-        } else if (sd.dialogType == DialogType.SINGLE_CERT_INFO) {
+        } else if (type == DialogType.SINGLE_CERT_INFO) {
             lpanel = new SingleCertInfoPane(sd, sd.certVerifier);
-        } else if (sd.dialogType == DialogType.ACCESS_WARNING) {
+        } else if (type == DialogType.ACCESS_WARNING) {
             lpanel = new AccessWarningPane(sd, sd.extras, sd.certVerifier);
-        } else if (sd.dialogType == DialogType.APPLET_WARNING) {
+        } else if (type == DialogType.APPLET_WARNING) {
             lpanel = new AppletWarningPane(sd, sd.certVerifier);
-        } else if (sd.dialogType == DialogType.PARTIALLYSIGNED_WARNING) {
+        } else if (type == DialogType.PARTIALLYSIGNED_WARNING) {
             lpanel = AppTrustWarningDialog.partiallySigned(sd, sd.file, (SecurityDelegate) sd.extras[0]);
-        } else if (sd.dialogType == DialogType.UNSIGNED_WARNING) {
+        } else if (type == DialogType.UNSIGNED_WARNING) {
             lpanel = AppTrustWarningDialog.unsigned(sd, sd.file); // Only necessary for applets on 'high security' or above
-        } else if (sd.dialogType == DialogType.AUTHENTICATION) {
+        } else if (type == DialogType.AUTHENTICATION) {
             lpanel = new PasswordAuthenticationPane(sd, sd.extras);
-        } else if (sd.dialogType == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING) {
+        } else if (type == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING) {
             lpanel = new MissingPermissionsAttributePanel(sd, sd.file.getTitle(), sd.file.getCodeBase().toExternalForm());
-        } else if (sd.dialogType == DialogType.MISSING_ALACA) {
+        } else if (type == DialogType.MISSING_ALACA) {
             lpanel = new MissingALACAttributePanel(sd, sd.file.getTitle(), (String) sd.extras[0], (String) sd.extras[1]);
-        } else if (sd.dialogType == DialogType.MATCHING_ALACA) {
+        } else if (type == DialogType.MATCHING_ALACA) {
             lpanel = AppTrustWarningDialog.matchingAlaca(sd, sd.file, (String) sd.extras[0], (String) sd.extras[1]);
         } else {
             throw new RuntimeException("Unknown value of " + sd.dialogType + ". Panel will be null. Tahts not allowed.");
@@ -408,6 +420,18 @@ public class SecurityDialog extends JDialog {
 
     DialogResult getDefaultPositiveAnswer() {
         return  panel.getDefaultPositiveAnswer();
+    }
+
+    String getText() {
+        return panel.getText();
+    }
+
+    DialogResult readFromStdIn(String what){
+        return panel.readFromStdIn(what);
+    }
+
+    String helpToStdIn(){
+        return panel.helpToStdIn();
     }
 
 }

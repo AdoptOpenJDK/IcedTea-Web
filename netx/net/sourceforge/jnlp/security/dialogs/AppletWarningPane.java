@@ -126,4 +126,13 @@ public class AppletWarningPane extends SecurityDialogPanel {
         return YesNoCancel.yes();
     }
 
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return YesNoCancel.readValue(what);
+    }
+    @Override
+    public String helpToStdIn() {
+        return YesNoCancel.cancel().getAllowedValues().toString();
+    }
+
 }
