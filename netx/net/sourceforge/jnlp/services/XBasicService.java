@@ -166,7 +166,7 @@ class XBasicService implements BasicService {
 
         if (url.toString().endsWith(".jnlp")) {
             try {
-                new Launcher().launchExternal(url);
+                new Launcher(false).launchExternal(url);
                 return true;
             } catch (Exception ex) {
                 return false;

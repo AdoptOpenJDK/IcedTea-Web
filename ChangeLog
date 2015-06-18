@@ -1,5 +1,15 @@
 2015-06-18  Jiri Vanek  <jvanek@redhat.com>
 
+	JnlpBoot and XBasicService are called with exitOnException true now.
+	All other then boolean constructor of Launcher made private. True/False enforced and reconsidered
+	* netx/net/sourceforge/jnlp/Launcher.java: All other then boolean constructor
+	of Launcher made private.
+	* netx/net/sourceforge/jnlp/runtime/JnlpBoot.java: (run) new Launcher called with
+	true rather then false
+	* netx/net/sourceforge/jnlp/services/XBasicService.java: (lunchUrl) same
+
+2015-06-18  Jiri Vanek  <jvanek@redhat.com>
+
 	All dialogs are able to accept answer from standard input and thus works in headless mode
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: turned headless/logic
 	order. Headless is now only hanging output, not behavior.

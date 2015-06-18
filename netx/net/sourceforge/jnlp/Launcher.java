@@ -88,7 +88,7 @@ public class Launcher {
      * Create a launcher with the runtime's default update policy
      * and launch handler.
      */
-    public Launcher() {
+    private Launcher() {
         this(null, null);
 
         if (handler == null) {
@@ -118,7 +118,7 @@ public class Launcher {
      *
      * @param handler the handler to use or null for no handler.
      */
-    public Launcher(LaunchHandler handler) {
+    private Launcher(LaunchHandler handler) {
         this(handler, null);
     }
 
@@ -129,7 +129,7 @@ public class Launcher {
      * @param handler the handler to use or null for no handler.
      * @param policy the update policy to use or null for default policy.
      */
-    public Launcher(LaunchHandler handler, UpdatePolicy policy) {
+    private Launcher(LaunchHandler handler, UpdatePolicy policy) {
         if (policy == null)
             policy = JNLPRuntime.getDefaultUpdatePolicy();
 
