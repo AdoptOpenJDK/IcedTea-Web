@@ -52,7 +52,7 @@ exception statement from your version.
     <j2se version="1.6+"/>
     <jar href="RunInSandbox.jar" main="true"/>
   </resources>
-
-  <applet-desc main-class="RunInSandbox">
-  </applet-desc>
+  <application-desc main-class="RunInSandbox">
+  </application-desc>
+  
 </jnlp>

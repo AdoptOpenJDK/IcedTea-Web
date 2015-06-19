@@ -549,7 +549,7 @@ public class ServerAccess {
             otherargs = new ArrayList<>(1);
         }
         List<String> headlesList = new ArrayList<>(otherargs);
-        headlesList.add(HEADLES_OPTION);
+        headlesList.add(0, HEADLES_OPTION);
         return executeJavaws(headlesList, resource,stdoutl,stderrl,vars);
     }
 

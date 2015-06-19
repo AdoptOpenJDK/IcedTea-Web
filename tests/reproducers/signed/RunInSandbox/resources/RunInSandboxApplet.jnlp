@@ -53,6 +53,6 @@ exception statement from your version.
     <jar href="RunInSandbox.jar" main="true"/>
   </resources>
 
-  <application-desc main-class="RunInSandbox">
-  </application-desc>
+  <applet-desc main-class="RunInSandbox">
+  </applet-desc>
 </jnlp>

@@ -6,11 +6,11 @@ public class RunInSandbox extends Applet {
     public void start() {
         System.out.println("RunInSandbox read: " + read("user.home"));
         System.out.println("*** APPLET FINISHED ***");
-        System.exit(0);
     }
 
     public static void main(String[] args) {
         new RunInSandbox().start();
+        System.exit(0);
     }
 
     private String read(String key) {

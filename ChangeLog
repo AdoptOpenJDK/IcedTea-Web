@@ -1,3 +1,18 @@
+2015-06-19  Jiri Vanek  <jvanek@redhat.com>
+
+	Partially signed reproducer adapted to new schema and enhanced
+	* tests/reproducers/signed/RunInSandbox/resources/RunInSandboxApplet.jnlp:
+	moved from app to applet
+	* tests/reproducers/signed/RunInSandbox/resources/RunInSandboxApplication.jnlp:
+	moved from applet to app
+	* tests/reproducers/signed/RunInSandbox/srcs/RunInSandbox.java: system exit not
+	called in case of applet
+	* tests/reproducers/signed/RunInSandbox/testcases/RunInSandboxTest.java: added
+	manipulation with certificates to simulate proper environment
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: fixed small bug	
+	headless switch now moved to start of argument list, not to the end. Being on end
+	was killing -html or -jnlp  arg functionality (arg was -headless then)
+
 2015-06-18  Jiri Vanek  <jvanek@redhat.com>
 
 	JnlpBoot and XBasicService are called with exitOnException true now.
