@@ -46,7 +46,8 @@ exception statement from your version.
   </information>
   <resources>
     <j2se version="1.4+"/>
-    <jar href="/StripHttpPathParams.jar?i=1234abcd"/>
+    <jar href="/StripHttpPathParams.jar?i=abcd"/>
+    <jar href="/StripHttpPathParams.jar?"/>
   </resources>
   <application-desc main-class="StripHttpPathParams">
   </application-desc>

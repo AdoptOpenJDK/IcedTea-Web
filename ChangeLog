@@ -1,5 +1,17 @@
 2015-06-19  Jiri Vanek  <jvanek@redhat.com>
 
+	Cache reproducer adapted to newest state
+	* tests/reproducers/simple/AbsolutePathsAndQueryStrings/resources/AbsolutePathsAndQueryStrings.html:
+	used correct query,a s test rely on it
+	* tests/reproducers/simple/AbsolutePathsAndQueryStrings/resources/AbsolutePathsAndQueryStrings.jnlp:
+	same
+	* tests/reproducers/simple/AbsolutePathsAndQueryStrings/testcases/AbsolutePathsAndQueryStrings.java:
+	(testCaching) adapted to query in cache and correclty made depndent on
+	testAbsolutePathAndQueryStringWebstart
+
+
+2015-06-19  Jiri Vanek  <jvanek@redhat.com>
+
 	Added experimental usage of headless dialogues to reproducers suite
 	* tests/reproducers/signed/RunInSandbox/testcases/RunInSandboxTest.java:
 	added four tests popuping and answering headless dialogue
