@@ -1,5 +1,18 @@
 2015-06-19  Jiri Vanek  <jvanek@redhat.com>
 
+	Added experimental usage of headless dialogues to reproducers suite
+	* tests/reproducers/signed/RunInSandbox/testcases/RunInSandboxTest.java:
+	added four tests popuping and answering headless dialogue
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessWrapper.java:
+	use diamonds, added methods setWriter alllowing to set StdInWriter of
+	ThreadedProcess
+	* tests/test-extensions/net/sourceforge/jnlp/ThreadedProcess.java:
+	added setWriter method, which allows to set writer to to underlying process
+	stdin. (run) if writer is not null, thenstdin writer  thread is started and
+	it writes writer to underlying process.
+
+2015-06-19  Jiri Vanek  <jvanek@redhat.com>
+
 	Partially signed reproducer adapted to new schema and enhanced
 	* tests/reproducers/signed/RunInSandbox/resources/RunInSandboxApplet.jnlp:
 	moved from app to applet

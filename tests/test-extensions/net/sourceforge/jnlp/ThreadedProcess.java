@@ -37,7 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import net.sourceforge.jnlp.util.StreamUtils;
 
@@ -61,6 +66,7 @@ public class ThreadedProcess extends Thread {
      */
     private boolean destoyed = false;
     private ProcessAssasin assasin;
+    private InputStream writer;
 
     public boolean isDestoyed() {
         return destoyed;
@@ -86,6 +92,11 @@ public class ThreadedProcess extends Thread {
         return variables;
     }
 
+    public void setWriter(InputStream writer) {
+        this.writer = writer;
+    }
+
+    
 
 
     public ThreadedProcess(List<String> args) {
@@ -142,6 +153,30 @@ public class ThreadedProcess extends Thread {
                 p = r.exec(args.toArray(new String[0]), variables, dir);
             }
             try {
+                if (writer != null){
+                    Thread t = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try (
+                                    BufferedReader br = new BufferedReader(new InputStreamReader(writer, "utf-8"));
+                                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "utf-8"))) {
+                                while (true) {
+                                    String s = br.readLine();
+                                    if (s == null) {
+                                        break;
+                                    }
+                                    bw.write(s + System.lineSeparator());
+                                    bw.flush();
+
+                                }
+                            } catch (Exception ex) {
+                                ServerAccess.logException(ex);
+                            }
+                        }
+                    });
+                    t.start();
+                }
                 StreamUtils.waitForSafely(p);
                 exitCode = p.exitValue();
                 Thread.sleep(500); //this is giving to fast done proecesses's e/o readers time to read all. I would like to know better solution :-/

@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Collections;
 import java.util.Arrays;
 import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.ProcessWrapper;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.Browsers;
@@ -68,6 +69,7 @@ public class RunInSandboxTest extends BrowserTest {
     private final List<String> TRUSTNONE = Collections.unmodifiableList(Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.TRUSTNONE.option}));
     private final List<String> TRUSTALLHTML = Collections.unmodifiableList(Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.TRUSTALL.option, OptionsDefinitions.OPTIONS.HTML.option}));
     private final List<String> TRUSTNONEHTML = Collections.unmodifiableList(Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.TRUSTNONE.option, OptionsDefinitions.OPTIONS.HTML.option}));
+    private final List<String> HEADLESS = Collections.unmodifiableList(Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.HEADLESS.option}));
     private static final String appletCloseString = AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING;
 
     private static final String ItwAlias = "icedteaweb_signed";
@@ -227,9 +229,62 @@ public class RunInSandboxTest extends BrowserTest {
     
     
     //end of must HAVE cert
+    
+    //and those must NOT have cert, and are trying to answer dialogues
+    
+    @Test
+    public void testStandardJnlpApplicationLaunchWithAnswerYes() throws Exception {
+        deleteCertificate();
+        ProcessWrapper pw =  new ProcessWrapper(server.getJavawsLocation(), HEADLESS, server.getUrl("RunInSandboxApplication.jnlp"));
+        pw.setWriter("YES\n");
+        ProcessResult pr = pw.execute();
+        assertReadProperty(pr);
+        assertProperClose(pr);
+    }
+    
+    @Test
+    public void testStandardJnlpApplicationLaunchWithAnswerSandbox() throws Exception {
+        deleteCertificate();
+        ProcessWrapper pw =  new ProcessWrapper(server.getJavawsLocation(), HEADLESS, server.getUrl("RunInSandboxApplication.jnlp"));
+        pw.setWriter("SANDBOX\n");
+        ProcessResult pr = pw.execute();
+        assertNotReadProperty(pr);
+        assertAccessControlException(pr);
+        assertProperClose(pr);
+    }
+    
+    @Test
+    public void testStandardJnlpApplicationLaunchWithAnswerNo() throws Exception {
+        deleteCertificate();
+        ProcessWrapper pw =  new ProcessWrapper(server.getJavawsLocation(), HEADLESS, server.getUrl("RunInSandboxApplication.jnlp"));
+        pw.setWriter("NO\n");
+        ProcessResult pr = pw.execute();
+        assertNotReadProperty(pr);
+        assertNotAccessControlException(pr);
+        assertNotProperClose(pr);
+        assertLaunchException(pr);
+    }
+    
+      @Test
+    public void testStandardJnlpApplicationLaunchWithAnswerEOF() throws Exception {
+        deleteCertificate();
+        ProcessWrapper pw =  new ProcessWrapper(server.getJavawsLocation(), HEADLESS, server.getUrl("RunInSandboxApplication.jnlp"));
+        pw.setWriter("");
+        ProcessResult pr = pw.execute();
+        assertNotReadProperty(pr);
+        assertNotAccessControlException(pr);
+        assertNotProperClose(pr);
+        assertLaunchException(pr);
+    }
+    
+    //end of tests
 
     private void assertProperClose(ProcessResult pr) {
         assertTrue("applet should have closed correctly", pr.stdout.contains(appletCloseString));
+    }
+    
+    private void assertNotProperClose(ProcessResult pr) {
+        assertFalse("applet must not have closed correctly", pr.stdout.contains(appletCloseString));
     }
 
     private void assertReadProperty(ProcessResult pr) {
@@ -243,6 +298,16 @@ public class RunInSandboxTest extends BrowserTest {
     private void assertAccessControlException(ProcessResult pr) {
         String ace = "java.security.AccessControlException: access denied (\"java.util.PropertyPermission\" \"user.home\" \"read\")";
         assertTrue("applet should have throw AccessControlException", pr.stdout.contains(ace));
+    }
+    
+    private void assertNotAccessControlException(ProcessResult pr) {
+        String ace = "java.security.AccessControlException: access denied (\"java.util.PropertyPermission\" \"user.home\" \"read\")";
+        assertFalse("applet must not throw AccessControlException", pr.stdout.contains(ace));
+    }
+     
+    private void assertLaunchException(ProcessResult pr) {
+        String ace = "LaunchException";
+        assertTrue("applet should have throw LaunchException", pr.stderr.contains(ace));
     }
 
 }

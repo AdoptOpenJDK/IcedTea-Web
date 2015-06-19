@@ -37,9 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.jnlp.browsertesting.ReactingProcess;
@@ -56,10 +59,11 @@ public class ProcessWrapper {
 
     private List<String> args;
     private File dir;
-    private final List<ContentReaderListener> stdoutl = new ArrayList<ContentReaderListener>(1);
-    private final List<ContentReaderListener> stderrl = new ArrayList<ContentReaderListener>(1);
+    private final List<ContentReaderListener> stdoutl = new ArrayList<>(1);
+    private final List<ContentReaderListener> stderrl = new ArrayList<>(1);
     private String[] vars;
     private ReactingProcess reactingProcess;
+    private InputStream writer;
 
     public ProcessWrapper() {
     }
@@ -73,9 +77,9 @@ public class ProcessWrapper {
         Assert.assertNotNull(toBeExecuted);
         Assert.assertTrue(toBeExecuted.trim().length() > 1);
         if (otherargs == null) {
-            otherargs = new ArrayList<String>(1);
+            otherargs = new ArrayList<>(1);
         }
-        List<String> urledArgs = new ArrayList<String>(otherargs);
+        List<String> urledArgs = new ArrayList<>(otherargs);
         urledArgs.add(0, toBeExecuted);
         urledArgs.add(s);
         this.args = urledArgs;
@@ -204,7 +208,7 @@ public class ProcessWrapper {
     public ProcessResult execute() throws Exception {
         if (reactingProcess !=null ){
             reactingProcess.beforeProcess("");
-        };
+        }
         ThreadedProcess t = new ThreadedProcess(args, dir, vars);
         if (ServerAccess.PROCESS_LOG) {
             String connectionMesaage = createConnectionMessage(t);
@@ -215,6 +219,7 @@ public class ProcessWrapper {
         pa.setReactingProcess(reactingProcess);
         setUpClosingListener(stdoutl, pa, t);
         setUpClosingListener(stderrl, pa, t);
+        t.setWriter(writer);
         pa.start();
         t.start();
         while (t.getP() == null && t.deadlyException == null) {
@@ -251,7 +256,7 @@ public class ProcessWrapper {
         }
         if (reactingProcess != null) {
             reactingProcess.afterProcess("");
-        };
+        }
         return pr;
     }
 
@@ -271,5 +276,13 @@ public class ProcessWrapper {
     
      void setReactingProcess(ReactingProcess reactingProcess) {
         this.reactingProcess = reactingProcess;
+    }
+
+    public void setWriter(InputStream writer) {
+        this.writer = writer;
+    }
+     
+     public void setWriter(String writer) {
+        setWriter(new ByteArrayInputStream(writer.getBytes(StandardCharsets.UTF_8)));
     }
 }
