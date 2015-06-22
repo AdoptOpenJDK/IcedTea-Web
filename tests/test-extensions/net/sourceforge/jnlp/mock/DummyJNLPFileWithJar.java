@@ -29,23 +29,24 @@ public class DummyJNLPFileWithJar extends JNLPFile {
         this(-1, jarFiles);
     }
     
-    public DummyJNLPFileWithJar(URL... jarFiles) throws MalformedURLException {
-        this(-1, jarFiles);
+    public DummyJNLPFileWithJar(URL codebaseRewritter, URL... jarFiles) throws MalformedURLException {
+        this(-1, codebaseRewritter, jarFiles);
     }
     public DummyJNLPFileWithJar(int main, File... jarFiles) throws MalformedURLException {
-        this(main, filesToUrls(jarFiles));
+        this(main, jarFiles[0].getParentFile().toURI().toURL(), filesToUrls(jarFiles));
+
     }
     
     private static URL[] filesToUrls(File[] f) throws MalformedURLException{
         URL[] r = new URL[f.length];
         for (int i = 0; i < f.length; i++) {
-            r[i]=f[i].getParentFile().toURI().toURL();
+            r[i]=f[i].toURI().toURL();
         }
         return r;
     }
     
-    public DummyJNLPFileWithJar(int main, URL... jarFiles) throws MalformedURLException {
-        codeBase = jarFiles[0];
+    public DummyJNLPFileWithJar(int main, URL codebaseRewritter, URL... jarFiles) throws MalformedURLException {
+        codeBase = codebaseRewritter;
         this.jarFiles = jarFiles;
         jarDescs = new JARDesc[jarFiles.length];
 
