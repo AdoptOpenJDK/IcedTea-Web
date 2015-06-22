@@ -69,7 +69,7 @@ public class UnsignedAppletTrustConfirmationTest {
     private static class DummyJnlpWithTitleAndUrls extends DummyJNLPFileWithJar {
 
         public DummyJnlpWithTitleAndUrls(URL u) throws MalformedURLException {
-            super(u);
+            super(null, u);
         }
 
         @Override
