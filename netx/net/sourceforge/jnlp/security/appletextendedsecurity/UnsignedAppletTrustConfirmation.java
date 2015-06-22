@@ -133,7 +133,7 @@ public class UnsignedAppletTrustConfirmation {
         return fileNames;
     }
 
-    public static void updateAppletAction(JNLPFile file, SavedRememberAction behaviour, Boolean rememberForCodeBase, Class<RememberableDialog> id) {
+    public static void updateAppletAction(JNLPFile file, SavedRememberAction behaviour, Boolean rememberForCodeBase, Class<? extends RememberableDialog> id) {
         UnsignedAppletActionStorage userActionStorage = securitySettings.getUnsignedAppletActionCustomStorage();
 
         userActionStorage.lock(); // We should ensure this operation is atomic

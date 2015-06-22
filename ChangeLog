@@ -1,3 +1,16 @@
+
+	DummyJNLPFileWithJar enhanced to accept urls only, added test to UnsignedAppletTrustConfirmationTest
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	(updateAppletAction) fixed wrong type, Class<RememberableDialog> become
+	 Class<? extends RememberableDialog>
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java:
+	Added updateAppletActionTest1
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedMatching.java:
+	moved to diamond
+	* tests/test-extensions/net/sourceforge/jnlp/mock/DummyJNLPFileWithJar.java:
+	constructors hierarchy enhanced to accept also plain URLs as resources.
+	They are dummy anyway
+
 2015-06-19  Jiri Vanek  <jvanek@redhat.com>
 
 	Cache reproducer adapted to newest state
