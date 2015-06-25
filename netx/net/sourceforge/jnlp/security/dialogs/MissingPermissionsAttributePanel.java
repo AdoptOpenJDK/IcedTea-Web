@@ -132,11 +132,6 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
 
         JButton yes = new JButton(Translator.R("ButYes"));
         JButton no = new JButton(Translator.R("ButNo"));
-        int buttonWidth = yes.getMinimumSize().width;
-        int buttonHeight = yes.getMinimumSize().height;
-        Dimension d = new Dimension(buttonWidth, buttonHeight);
-        yes.setPreferredSize(d);
-        no.setPreferredSize(d);
         rememberPanel = new RememberPanel(codebase);
         yes.addActionListener(SetValueHandler.createSetValueListener(parent, YesNo.yes()));
         no.addActionListener(SetValueHandler.createSetValueListener(parent, YesNo.no()));

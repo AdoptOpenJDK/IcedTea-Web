@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.security.dialogs;
 
+import java.awt.BorderLayout;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.Dimension;
@@ -47,6 +48,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -156,7 +158,9 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
         setMaximumSize(new Dimension(1024, 150));
 
         setSize(400, 150);
-        parent.setLocationRelativeTo(null);
+        if (parent!=null){
+            parent.setLocationRelativeTo(null);
+        }
         initialFocusComponent = jtfUserName;
 
         ActionListener acceptActionListener = new ActionListener() {
@@ -204,6 +208,16 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
     @Override
     public String helpToStdIn() {
         return Translator.R("PAPstdinInfo");
+    }
+    
+    
+    public static void main(String[] args) {
+        PasswordAuthenticationPane w = new PasswordAuthenticationPane(null, new Object[]{"host",666,"prompt","type"});
+        JFrame f = new JFrame();
+        f.setSize(400, 200);
+        f.add(w, BorderLayout.CENTER);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
     }
 
 }

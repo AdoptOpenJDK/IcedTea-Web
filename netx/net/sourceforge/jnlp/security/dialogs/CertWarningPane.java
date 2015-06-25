@@ -261,17 +261,7 @@ public class CertWarningPane extends SecurityDialogPanel {
         }
 
         alwaysTrust.addActionListener(new ButtonDisableListener(sandbox));
-        int buttonWidth = Math.max(run.getMinimumSize().width,
-                sandbox.getMinimumSize().width);
-        buttonWidth = Math.max(buttonWidth, cancel.getMinimumSize().width);
-        int buttonHeight = run.getMinimumSize().height;
-        Dimension d = new Dimension(buttonWidth, buttonHeight);
-
-        run.setPreferredSize(d);
-        sandbox.setPreferredSize(d);
-        advancedOptions.setPreferredSize(new Dimension(advancedOptions.getMinimumSize().width, buttonHeight));
-        cancel.setPreferredSize(d);
-
+ 
         sandbox.setEnabled(!alwaysTrust.isSelected());
 
         run.addActionListener(SetValueHandler.createSetValueListener(parent, YesNoSandbox.yes()));

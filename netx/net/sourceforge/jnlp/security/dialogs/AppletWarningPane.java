@@ -46,8 +46,10 @@ import java.awt.Font;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
@@ -90,15 +92,9 @@ public class AppletWarningPane extends SecurityDialogPanel {
         //run and cancel buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        JButton yes = new JButton("Yes");
-        JButton no = new JButton("No");
-        JButton cancel = new JButton("Cancel");
-        int buttonWidth = cancel.getMinimumSize().width;
-        int buttonHeight = cancel.getMinimumSize().height;
-        Dimension d = new Dimension(buttonWidth, buttonHeight);
-        yes.setPreferredSize(d);
-        no.setPreferredSize(d);
-        cancel.setPreferredSize(d);
+        JButton yes = new JButton(Translator.R("ButYes"));
+        JButton no = new JButton(Translator.R("ButNo"));
+        JButton cancel = new JButton(Translator.R("ButCancel"));
         yes.addActionListener(SetValueHandler.createSetValueListener(parent,  YesNoCancel.yes()));
         no.addActionListener(SetValueHandler.createSetValueListener(parent,  YesNoCancel.no()));
         cancel.addActionListener(SetValueHandler.createSetValueListener(parent,  YesNoCancel.cancel()));
@@ -133,6 +129,15 @@ public class AppletWarningPane extends SecurityDialogPanel {
     @Override
     public String helpToStdIn() {
         return YesNoCancel.cancel().getAllowedValues().toString();
+    }
+    
+     public static void main(String[] args)  {
+        AppletWarningPane w = new AppletWarningPane(null, null);
+         JFrame f = new JFrame();
+        f.setSize(600, 400);
+        f.add(w, BorderLayout.CENTER);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
     }
 
 }

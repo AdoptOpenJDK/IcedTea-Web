@@ -1,3 +1,19 @@
+2015-06-25  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed to short buttons for localized text - RH1231441
+	* NEWS: mentioned RH1231441
+	* netx/net/sourceforge/jnlp/security/dialogs/AppletWarningPane.java: removed
+	set of preferred sizes to minimal size. added debugging main method
+	* netx/net/sourceforge/jnlp/security/dialogs/PasswordAuthenticationPane.java
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: removed
+	set of preferred sizes to minimal size. 
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingALACAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingPermissionsAttributePanel.java:
+	same
+
+2015-06-20  Jiri Vanek  <jvanek@redhat.com>
 
 	DummyJNLPFileWithJar enhanced to accept urls only, added test to UnsignedAppletTrustConfirmationTest
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
