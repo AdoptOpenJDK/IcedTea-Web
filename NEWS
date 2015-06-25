@@ -14,8 +14,8 @@ New in release 1.7 (2015-XX-XX):
 * fixed issues with recreating of existing shortcut
 * trustAll/trustNone now processed correctly
 * headless no longer shows dialogues
-* more dialogs got remember me possibility
 * RH1231441 Unable to read the text of the buttons of the security dialogue
+* more dialogs got remember me possibility
   - MissingALACAttributePanel
   - AccessWarning
   - MissingPermissionsAttributePanel
