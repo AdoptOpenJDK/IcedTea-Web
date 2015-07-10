@@ -1,5 +1,11 @@
 2015-07-10  Jiri Vanek  <jvanek@redhat.com>
 
+	Added script to clone reproducer skeleton
+	* tests/reproducers/cloneReproducer.sh: new file. Helping script which can
+	prepare new reproducer from old one by simple copy and sed.
+
+2015-07-10  Jiri Vanek  <jvanek@redhat.com>
+
 	Added tests for signed applet/app using Permission attribute
 	* tests/reproducers/signed/SandboxSignedAllPerm/resources/SandboxSignedAllPerm.html
 	* tests/reproducers/signed/SandboxSignedAllPerm/resources/SandboxSignedAllPerm.jnlp
