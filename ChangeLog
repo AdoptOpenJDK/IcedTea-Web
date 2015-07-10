@@ -1,3 +1,52 @@
+2015-07-10  Jiri Vanek  <jvanek@redhat.com>
+
+	Added tests for signed applet/app using Permission attribute
+	* tests/reproducers/signed/SandboxSignedAllPerm/resources/SandboxSignedAllPerm.html
+	* tests/reproducers/signed/SandboxSignedAllPerm/resources/SandboxSignedAllPerm.jnlp
+	* tests/reproducers/signed/SandboxSignedAllPerm/resources/SandboxSignedAllPerm_applet.jnlp
+	* tests/reproducers/signed/SandboxSignedAllPerm/resources/SandboxSignedAllPerm_applet_security.jnlp
+	* tests/reproducers/signed/SandboxSignedAllPerm/resources/SandboxSignedAllPerm_security.jnlp
+	* tests/reproducers/signed/SandboxSignedAllPerm/srcs/META-INF/MANIFEST.MF
+	contains Permissions: all-permissions
+	* tests/reproducers/signed/SandboxSignedAllPerm/srcs/SandboxSignedAllPerm.java
+	* tests/reproducers/signed/SandboxSignedAllPerm/testcases/SandboxSignedAllPermTest.java
+	testcases with permissions in manifest check on
+	* tests/reproducers/signed/SandboxSignedInvalid/resources/SandboxSignedInvalid.html
+	* tests/reproducers/signed/SandboxSignedInvalid/resources/SandboxSignedInvalid.jnlp
+	* tests/reproducers/signed/SandboxSignedInvalid/resources/SandboxSignedInvalid_applet.jnlp
+	* tests/reproducers/signed/SandboxSignedInvalid/resources/SandboxSignedInvalid_applet_security.jnlp
+	* tests/reproducers/signed/SandboxSignedInvalid/resources/SandboxSignedInvalid_security.jnlp
+	* tests/reproducers/signed/SandboxSignedInvalid/srcs/META-INF/MANIFEST.MF
+	contains Permissions: invalidValue
+	* tests/reproducers/signed/SandboxSignedInvalid/srcs/SandboxSignedInvalid.java
+	* tests/reproducers/signed/SandboxSignedInvalid/testcases/SandboxSignedInvalidTest.java
+	testcases with permissions in manifest check on
+	* tests/reproducers/signed/SandboxSignedMissing/resources/SandboxSignedMissing.html
+	* tests/reproducers/signed/SandboxSignedMissing/resources/SandboxSignedMissing.jnlp
+	* tests/reproducers/signed/SandboxSignedMissing/resources/SandboxSignedMissing_applet.jnlp
+	* tests/reproducers/signed/SandboxSignedMissing/resources/SandboxSignedMissing_applet_security.jnlp
+	* tests/reproducers/signed/SandboxSignedMissing/resources/SandboxSignedMissing_security.jnlp
+	* tests/reproducers/signed/SandboxSignedMissing/srcs/META-INF/MANIFEST.MF
+	does not contains Permissions
+	* tests/reproducers/signed/SandboxSignedMissing/srcs/SandboxSignedMissing.java
+	* tests/reproducers/signed/SandboxSignedMissing/testcases/SandboxSignedMissingTest.java
+	testcases with permissions in manifest check on
+	* tests/reproducers/signed/SandboxSignedMissing/testcases/SandboxSignedMissingTestHighSecurity.java
+	testcases with permissions in manifest check on and on high security => interactive tests
+	with autoreply
+	* tests/reproducers/signed/SandboxSignedSandbox/resources/SandboxSignedSandbox.html
+	* tests/reproducers/signed/SandboxSignedSandbox/resources/SandboxSignedSandbox.jnlp
+	* tests/reproducers/signed/SandboxSignedSandbox/resources/SandboxSignedSandbox_applet.jnlp
+	* tests/reproducers/signed/SandboxSignedSandbox/resources/SandboxSignedSandbox_applet_security.jnlp
+	* tests/reproducers/signed/SandboxSignedSandbox/resources/SandboxSignedSandbox_security.jnlp
+	* tests/reproducers/signed/SandboxSignedSandbox/srcs/META-INF/MANIFEST.MF
+	contains Permissions: sandbox
+	* tests/reproducers/signed/SandboxSignedSandbox/srcs/SandboxSignedSandbox.java
+	* tests/reproducers/signed/SandboxSignedSandbox/testcases/SandboxSignedSandboxTest.java
+	testcases with permissions in manifest check on. Contains two failing tests
+	currently itw with snadbox in manifest and jnlp not requesting permissions fails.
+	Bug to be fixed
+
 2015-06-25  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed to short buttons for localized text - RH1231441
