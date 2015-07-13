@@ -1,3 +1,53 @@
+2015-07-13  Jiri Vanek  <jvanek@redhat.com>
+
+	Added tests for unsigned applet/app using Permission attribute
+	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/resources/SandboxUnsignedAllPerm.html
+	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/resources/SandboxUnsignedAllPerm.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/resources/SandboxUnsignedAllPerm_applet.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/resources/SandboxUnsignedAllPerm_applet_security.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/resources/SandboxUnsignedAllPerm_security.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/srcs/META-INF/MANIFEST.MF
+	contains Permissions: all-permissions
+	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/srcs/SandboxUnsignedAllPerm.java
+	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/testcases/SandboxUnsignedAllPermTest.java
+	testcases with permissions in manifest check on. There is probably an bug in impl.
+	The applet should not run at all, or javaws without permissions should runin sandbox too.
+	* tests/reproducers/unsigned/SandboxUnsignedInvalid/resources/SandboxUnsignedInvalid.html
+	* tests/reproducers/unsigned/SandboxUnsignedInvalid/resources/SandboxUnsignedInvalid.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedInvalid/resources/SandboxUnsignedInvalid_applet.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedInvalid/resources/SandboxUnsignedInvalid_applet_security.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedInvalid/resources/SandboxUnsignedInvalid_security.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedInvalid/srcs/META-INF/MANIFEST.MF
+	contains Permissions: invalidValue
+	* tests/reproducers/unsigned/SandboxUnsignedInvalid/srcs/SandboxUnsignedInvalid.java
+	* tests/reproducers/unsigned/SandboxUnsignedInvalid/testcases/SandboxUnsignedInvalidTest.java
+	testcases with permissions in manifest check on
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/resources/SandboxUnsignedMissing.html
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/resources/SandboxUnsignedMissing.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/resources/SandboxUnsignedMissing_applet.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/resources/SandboxUnsignedMissing_applet_security.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/resources/SandboxUnsignedMissing_security.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/srcs/META-INF/MANIFEST.MF
+	does not contains Permissions
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/srcs/SandboxUnsignedMissing.java
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/testcases/SandboxUnsignedMissingTest.java
+	testcases with permissions in manifest check on
+	* tests/reproducers/unsigned/SandboxUnsignedMissing/testcases/SandboxUnsignedMissingTestHighSecurity.java
+	testcases with permissions in manifest check on and on high security => interactive tests
+	with autoreply
+	* tests/reproducers/unsigned/SandboxUnsignedSandbox/resources/SandboxUnsignedSandbox.html
+	* tests/reproducers/unsigned/SandboxUnsignedSandbox/resources/SandboxUnsignedSandbox.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedSandbox/resources/SandboxUnsignedSandbox_applet.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedSandbox/resources/SandboxUnsignedSandbox_applet_security.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedSandbox/resources/SandboxUnsignedSandbox_security.jnlp
+	* tests/reproducers/unsigned/SandboxUnsignedSandbox/srcs/META-INF/MANIFEST.MF
+	contains Permissions: sandbox
+	* tests/reproducers/unsigned/SandboxUnsignedSandbox/srcs/SandboxUnsignedSandbox.java
+	* tests/reproducers/unsigned/SandboxUnsignedSandbox/testcases/SandboxUnsignedSandboxTest.java
+	testcases with permissions in manifest check on.
+	* tests/reproducers/cloneReproducer.sh: small fix to support blue/red background for
+	unsigned/signed html applets
+
 2015-07-10  Jiri Vanek  <jvanek@redhat.com>
 
 	Added script to clone reproducer skeleton
