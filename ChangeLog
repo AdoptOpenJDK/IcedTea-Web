@@ -1,3 +1,10 @@
+2015-07-14  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed AccessClassInPackageTest
+	* tests/reproducers/simple/AccessClassInPackage/testcases/AccessClassInPackageTest.java:
+	(AccessClassInPackageSUNSEC) and (AccessClassInPackageNETSF) now correctly expect
+	non-zero return value of child javaws
+
 2015-07-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed codebase reproducers

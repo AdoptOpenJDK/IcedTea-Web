@@ -83,10 +83,14 @@ public class AccessClassInPackageTest {
     }
 
     private void commonPitfall(ProcessResult pr) {
+        commonPitfall(pr, 0);
+    }
+    
+    private void commonPitfall(ProcessResult pr, int i) {
         String cc = "ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `" + cc + "`, but did", pr.stderr.contains(cc));
         Assert.assertFalse("AccessClassInPackageTestLunch1 should not be terminated, but was", pr.wasTerminated);
-        Assert.assertEquals((Integer) 0, pr.returnValue);
+        Assert.assertEquals((Integer) i, pr.returnValue);
     }
 
     private void testShouldPass(ProcessResult pr, String s) {
@@ -118,7 +122,7 @@ public class AccessClassInPackageTest {
     @Test
     public void AccessClassInPackageNETSF() throws Exception {
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[2]);
-        commonPitfall(pr);
+        commonPitfall(pr, 1);
         testShouldFail(pr, badExceptions[2]);
         testShouldNOTPass(pr, pass[2]);
     }
@@ -126,8 +130,7 @@ public class AccessClassInPackageTest {
     @Test
     public void AccessClassInPackageSUNSEC() throws Exception {
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + files[3]);
-        commonPitfall(pr);
-        commonPitfall(pr);
+        commonPitfall(pr, 1);
         testShouldFail(pr, badExceptions[3]);
         testShouldNOTPass(pr, pass[3]);
     }
