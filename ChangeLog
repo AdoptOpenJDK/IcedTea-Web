@@ -1,5 +1,17 @@
 2015-07-13  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed codebase reproducers
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedMatching.java:
+	improved (getMessage) to take message directly via Translator
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedNotMatching.java:
+	now ensures deployment.manifest.attributes.check have always CODEBASE value
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntryUnsignedMatching.java:
+	same
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntryUnsignedNotMatching.java:
+	same
+
+2015-07-13  Jiri Vanek  <jvanek@redhat.com>
+
 	Added tests for unsigned applet/app using Permission attribute
 	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/resources/SandboxUnsignedAllPerm.html
 	* tests/reproducers/unsigned/SandboxUnsignedAllPerm/resources/SandboxUnsignedAllPerm.jnlp

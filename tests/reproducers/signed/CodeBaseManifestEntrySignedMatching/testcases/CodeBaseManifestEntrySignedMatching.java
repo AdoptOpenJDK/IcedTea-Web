@@ -51,6 +51,7 @@ import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.AfterClass;
@@ -86,15 +87,8 @@ public class CodeBaseManifestEntrySignedMatching extends BrowserTest {
     }
 
     public static String getMessage(int i) {
-        try {
-            String s = "";//_cs, _de, _pl
-            PropertyResourceBundle props = new PropertyResourceBundle(CodeBaseManifestEntrySignedMatching.class.getResourceAsStream("/net/sourceforge/jnlp/resources/Messages" + s + ".properties"));
-            //Bundle messages need to be formatted
-            return MessageFormat.format(props.getString(keys[i]), new Object[0]);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+        return Translator.R(keys[i]);
+     }
     //may broke if run on non default locales
     //as those messages are localised
     public static final boolean CHECK_MESSAGES = true;

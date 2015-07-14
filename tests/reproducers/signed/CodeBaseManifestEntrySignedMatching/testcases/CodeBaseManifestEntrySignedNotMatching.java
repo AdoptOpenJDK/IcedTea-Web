@@ -35,7 +35,6 @@
  exception statement from your version.
  */
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +47,12 @@ import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
+import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CodeBaseManifestEntrySignedNotMatching extends BrowserTest {
@@ -59,6 +62,19 @@ public class CodeBaseManifestEntrySignedNotMatching extends BrowserTest {
     public static final String GENERAL_NAME = "CodeBaseManifestEntry";
     public static final String SIGNATURE = "SignedNotMatching";
 
+    private static DeploymentPropertiesModifier codebaseModifier;
+    
+    @BeforeClass
+    public static void setupDeploymentProperties() throws IOException {
+        codebaseModifier = new DeploymentPropertiesModifier();
+        codebaseModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.CODEBASE.toString());
+    }
+
+    @AfterClass
+    public static void setbackDeploymentProperties() throws IOException {
+        codebaseModifier.restoreProperties();
+    }
+    
     public void checkMessage(ProcessResult pr, int i) {
         CodeBaseManifestEntrySignedMatching.checkMessage(pr, i);
     }

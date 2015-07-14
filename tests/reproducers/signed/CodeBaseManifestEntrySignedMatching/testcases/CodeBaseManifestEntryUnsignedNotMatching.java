@@ -48,8 +48,13 @@ import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
+import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.util.FileUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CodeBaseManifestEntryUnsignedNotMatching extends BrowserTest {
@@ -59,6 +64,19 @@ public class CodeBaseManifestEntryUnsignedNotMatching extends BrowserTest {
     public static final String GENERAL_NAME = "CodeBaseManifestEntry";
     public static final String SIGNATURE = "UnsignedNotMatching";
 
+    private static DeploymentPropertiesModifier codebaseModifier;
+    
+    @BeforeClass
+    public static void setupDeploymentProperties() throws IOException {
+        codebaseModifier = new DeploymentPropertiesModifier();
+        codebaseModifier.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.CODEBASE.toString());
+    }
+
+    @AfterClass
+    public static void setbackDeploymentProperties() throws IOException {
+        codebaseModifier.restoreProperties();
+    }    
+    
     public void checkMessage(ProcessResult pr, int i) {
         CodeBaseManifestEntrySignedMatching.checkMessage(pr, i);
     }
