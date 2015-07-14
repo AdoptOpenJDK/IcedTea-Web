@@ -45,6 +45,7 @@ import net.sourceforge.jnlp.ClosingListener;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
@@ -151,36 +152,40 @@ public class GifarTestcases extends BrowserTest {
     @NeedsDisplay
     public void GifarViaJnlp_application() throws Exception {
         ProcessResult pr = server.executeJavaws(trust, "gifar_application.jnlp");
-        Assert.assertEquals((Integer) 0, pr.returnValue);
         Assert.assertFalse("stdout " + okRule.toFailingString() + " but did", okRule.evaluate(pr.stdout));
         Assert.assertTrue("stderr " + exceptionRule.toPassingString() + " but did'nt", exceptionRule.evaluate(pr.stderr));
+        Assert.assertEquals((Integer) 1, pr.returnValue);
     }
 
     @Test
     @NeedsDisplay
+    //this test is known to fail on jdk8+ which do nto alow some "gif" instances on classpath
+    @KnownToFail
     public void GifarViaJnlp_application_ignoreHeaders() throws Exception {
         ProcessResult pr = server.executeJavaws(trustIgnore, "gifar_application.jnlp");
-        Assert.assertEquals((Integer) 0, pr.returnValue);
         Assert.assertTrue("stdout " + okRule.toPassingString() + " but didn't", okRule.evaluate(pr.stdout));
         Assert.assertFalse("stderr " + exceptionRule.toFailingString() + " but did", exceptionRule.evaluate(pr.stderr));
+        Assert.assertEquals((Integer) 0, pr.returnValue);
     }
 
     @Test
     @NeedsDisplay
     public void GifarViaJnlp_applet() throws Exception {
         ProcessResult pr = server.executeJavaws(trust, "gifar_applet.jnlp");
-        Assert.assertEquals((Integer) 0, pr.returnValue);
         Assert.assertFalse("stdout " + okRule.toFailingString() + " but did", okRule.evaluate(pr.stdout));
         Assert.assertTrue("stderr " + exceptionRule.toPassingString() + " but didn't", exceptionRule.evaluate(pr.stderr));
+        Assert.assertEquals((Integer) 1, pr.returnValue);
     }
 
     @Test
     @NeedsDisplay
+    //this test is known to fail on jdk8+ which do nto alow some "gif" instances on classpath
+    @KnownToFail
     public void GifarViaJnlp_applet_ignoreHeaders() throws Exception {
         ProcessResult pr = server.executeJavaws(trustIgnore, "gifar_applet.jnlp");
-        Assert.assertEquals((Integer) 0, pr.returnValue);
         Assert.assertTrue("stdout " + okRule.toPassingString() + " but didn't", okRule.evaluate(pr.stdout));
         Assert.assertFalse("stderr " + exceptionRule.toFailingString() + " but did", exceptionRule.evaluate(pr.stderr));
+        Assert.assertEquals((Integer) 0, pr.returnValue);        
     }
 
     @Test

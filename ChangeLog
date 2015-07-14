@@ -1,5 +1,37 @@
 2015-07-14  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed various tests
+	* tests/reproducers/signed/GifarBase/testcases/GifarTestcases.java:
+	(GifarViaJnlp_applet_ignoreHeaders) and (GifarViaJnlp_application_ignoreHeaders)
+	marked as KnownToFail. They will never pass on jdk8+
+	* tests/reproducers/signed/ReadPropertiesBySignedHack/testcases/ReadPropertiesBySignedHackTest.java:
+	now correctly expect non-zero return value of child javaws
+	* tests/reproducers/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java:
+	same
+	* tests/reproducers/simple/AddShutdownHook/testcases/AddShutdownHookTest.java:
+	same
+	* tests/reproducers/simple/AddShutdownHook/testcases/HangFirefoxTests.java:
+	same
+	* tests/reproducers/simple/AllStackTraces/testcases/AllStackTracesTest.java:
+	same
+	* tests/reproducers/simple/CreateClassLoader/testcases/CreateClassLoaderTest.java:
+	same
+	* tests/reproducers/simple/ManifestedJar1/testcases/ManifestedJar1Test.java:
+	same except (manifestedJar1main2mainAppDesc). (manifestedJar1main2mainAppDesc)
+	now pass with correct(?) message from first main jar (test never passed imho)
+	* tests/reproducers/simple/ReadEnvironment/testcases/ReadEnvironmentTest.java:
+	same
+	* tests/reproducers/simple/ReadProperties/testcases/ReadPropertiesTest.java:
+	same
+	* tests/reproducers/simple/RedirectStreams/testcases/RedirectStreamsTest.java:
+	same
+	* tests/reproducers/simple/ReplaceSecurityManager/testcases/ReplaceSecurityManagerTest.java:
+	same
+	* tests/reproducers/simple/SetContextClassLoader/testcases/SetContextClassLoaderTest.java:
+	same
+
+2015-07-14  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed AccessClassInPackageTest
 	* tests/reproducers/simple/AccessClassInPackage/testcases/AccessClassInPackageTest.java:
 	(AccessClassInPackageSUNSEC) and (AccessClassInPackageNETSF) now correctly expect

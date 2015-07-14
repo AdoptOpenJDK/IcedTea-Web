@@ -35,13 +35,11 @@
  exception statement from your version.
  */
 
-import net.sourceforge.jnlp.ClosingListener;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
-import net.sourceforge.jnlp.closinglisteners.StringMatchClosingListener;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -63,7 +61,7 @@ public class AddShutdownHookTest extends BrowserTest {
         Assert.assertFalse("stderr " + cnf.toFailingString(), cnf.evaluate(pr.stderr));
         Assert.assertFalse("AddShutdownHookTestLunch1 should not be terminated, but was", pr.wasTerminated);
         Assert.assertFalse("stderr " + cf.toFailingString(), cf.evaluate(pr.stderr));
-        Assert.assertEquals((Integer) 0, pr.returnValue);
+        Assert.assertEquals((Integer) 1, pr.returnValue);
     }
 
     @Test

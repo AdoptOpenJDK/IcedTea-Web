@@ -76,10 +76,14 @@ public class ManifestedJar1Test {
     }
 
     private void assertNotDead(String id, ProcessResult pr) {
+        assertNearlyNotDead(id, pr, 0);
+    }
+    
+    private void assertNearlyNotDead(String id, ProcessResult pr, int i) {
         String cc = "ClassNotFoundException";
         Assert.assertFalse(id + " stderr should NOT contains `" + cc + "`, but did", pr.stderr.contains(cc));
         Assert.assertFalse(id + " should not be terminated, but was", pr.wasTerminated);
-        Assert.assertEquals((Integer) 0, pr.returnValue);
+        Assert.assertEquals((Integer) i, pr.returnValue);
     }
 
     @Test
@@ -188,13 +192,13 @@ public class ManifestedJar1Test {
      *
      * Two jars, both with manifest, sboth with main tag, have app desc
      *
-     * corectly failing with twoMainException
+     * launching first
      */
     @Test
     public void manifestedJar1main2mainAppDesc() throws Exception {
         String id = "ManifestedJar-1main2mainAppDesc";
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + id + ".jnlp");
-        assertNotManifestedJar1(id, pr);
+        assertManifestedJar1(id, pr);
         assertNotManifestedJar2(id, pr);
         assertNotDead(id, pr);
     }
@@ -212,7 +216,7 @@ public class ManifestedJar1Test {
         assertNotManifestedJar1(id, pr);
         assertNotManifestedJar2(id, pr);
         assertAppError(id, pr);
-        assertNotDead(id, pr);
+        assertNearlyNotDead(id, pr, 1);
     }
 
 

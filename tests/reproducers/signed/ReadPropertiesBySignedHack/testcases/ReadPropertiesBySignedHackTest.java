@@ -59,7 +59,7 @@ public class ReadPropertiesBySignedHackTest {
         String ss="ClassNotFoundException";
         Assert.assertFalse("Stderr should not contains "+ss+" but did",pr.stderr.contains(ss));
         Assert.assertFalse("should not be terminated but was",pr.wasTerminated);
-        Assert.assertEquals((Integer)0, pr.returnValue);
+        Assert.assertEquals((Integer)1, pr.returnValue);
    }
 
   }

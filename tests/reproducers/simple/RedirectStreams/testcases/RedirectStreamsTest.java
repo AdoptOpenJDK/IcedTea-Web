@@ -52,6 +52,6 @@ public class RedirectStreamsTest {
         String cc="ClassNotFoundException";
         Assert.assertFalse("stderr should NOT contains `"+cc+"`, but did",pr.stderr.contains(cc));
         Assert.assertFalse("RedirectStreams should not be terminated, but was",pr.wasTerminated);
-        Assert.assertEquals((Integer) 0, pr.returnValue);
+        Assert.assertEquals((Integer) 1, pr.returnValue);
     }
 }

@@ -60,8 +60,7 @@ in PluginMessageConsumer.java
 */
 public class HangFirefoxTests extends BrowserTest {
 
-    String leString = "LaunchException";
-    ;
+    String leString = "Could not initialize";
     String startedString = "applet was started";
     RulesFolowingClosingListener.ContainsRule leRule = new RulesFolowingClosingListener.ContainsRule(leString);
     RulesFolowingClosingListener.ContainsRule appleStartedRule = new RulesFolowingClosingListener.ContainsRule(startedString);
@@ -87,7 +86,6 @@ public class HangFirefoxTests extends BrowserTest {
         });
         Assert.assertTrue("stderr " + AddShutdownHookTest.mr.toPassingString(), AddShutdownHookTest.mr.evaluate(pr.stderr));
         Assert.assertTrue("stdout " + appleStartedRule.toPassingString(), appleStartedRule.evaluate(pr.stdout));
-        Assert.assertFalse("stderr " + AddShutdownHookTest.cnf.toFailingString(), AddShutdownHookTest.cnf.evaluate(pr.stderr));
     }
 
     @Test
@@ -111,7 +109,6 @@ public class HangFirefoxTests extends BrowserTest {
         });
         Assert.assertTrue("stderr " + leRule.toPassingString(), leRule.evaluate(pr.stderr));
         Assert.assertTrue("stdout " + appleStartedRule.toPassingString(), appleStartedRule.evaluate(pr.stdout));
-        Assert.assertFalse("stderr " + AddShutdownHookTest.cnf.toFailingString(), AddShutdownHookTest.cnf.evaluate(pr.stderr));
     }
 
     @Test
@@ -119,6 +116,5 @@ public class HangFirefoxTests extends BrowserTest {
     public void TestAddShutdownHookWrong() throws Exception {
         ProcessResult pr = server.executeBrowser("/AddShutdownHook_wrong.html", null, new RulesFolowingClosingListener(leRule));
         Assert.assertTrue("stderr " + leRule.toPassingString(), leRule.evaluate(pr.stderr));
-        Assert.assertFalse("stderr " + AddShutdownHookTest.cnf.toFailingString(), AddShutdownHookTest.cnf.evaluate(pr.stderr));
     }
 }
