@@ -50,6 +50,7 @@ public class AppletTagWithMissingCodeAttribute extends BrowserTest {
 
     @Test
     @TestInBrowsers(testIn = { Browsers.firefox })
+    //fails everywhere but in firefox. other browsers dont know how to handle it
     public void EmbeddedAppletWithMissingCodeAttribute() throws Exception {
         ProcessResult pr = server.executeBrowser("/AppletTagWithMissingCodeAttribute.html", AutoClose.CLOSE_ON_CORRECT_END);
         Assert.assertTrue("Stdout should contain " + closingString + " but did not", pr.stdout.contains(closingString));

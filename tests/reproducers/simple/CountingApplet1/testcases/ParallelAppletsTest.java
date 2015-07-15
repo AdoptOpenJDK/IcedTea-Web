@@ -36,6 +36,7 @@ exception statement from your version.
  */
 
 import net.sourceforge.jnlp.ProcessResult;
+import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
@@ -60,7 +61,7 @@ public class ParallelAppletsTest extends BrowserTest {
     @NeedsDisplay
     public void testParallelAppletsTest1x2E() throws Exception {
         ProcessResult pr = server.executeBrowser("ParallelAppletsTest_1_x_2EE.html");
-        checkExactCounts(1, 10, pr);
+        checkExactCounts(1, 7, pr);
         checkNotInitialised(pr);
 
     }
@@ -70,7 +71,7 @@ public class ParallelAppletsTest extends BrowserTest {
     @NeedsDisplay
     public void testParallelAppletsTest1x2e() throws Exception {
         ProcessResult pr = server.executeBrowser("ParallelAppletsTest_1_x_2e.html");
-        checkExactCounts(1, 10, pr);
+        checkExactCounts(1, 7, pr);
         checkException(pr);
     }
 
@@ -118,7 +119,7 @@ public class ParallelAppletsTest extends BrowserTest {
     public void testParallelAppletsTest1x2sk() throws Exception {
         ProcessResult pr = server.executeBrowser("ParallelAppletsTest_1_x_2sk.html");
         checkExitNotAllowed(pr);
-        checkAtLeastCounts(1, 10, pr);
+        checkAtLeastCounts(1, 7, pr);
         checkExactCounts(2, 5, pr);
 
     }
@@ -129,7 +130,7 @@ public class ParallelAppletsTest extends BrowserTest {
     public void testParallelAppletsTest1kx2() throws Exception {
         ProcessResult pr = server.executeBrowser("ParallelAppletsTest_1k_x_2.html");
         checkExitNotAllowed(pr);
-        checkAtLeastCounts(1, 10, pr);
+        checkAtLeastCounts(1, 7, pr);
         checkExactCounts(2, 5, pr);
 
     }
@@ -138,8 +139,14 @@ public class ParallelAppletsTest extends BrowserTest {
     @TestInBrowsers(testIn = {Browsers.one})
     @NeedsDisplay
     public void testParallelAppletsTest1x2() throws Exception {
+        long back = ServerAccess.PROCESS_TIMEOUT;
+        ServerAccess.PROCESS_TIMEOUT = 40 * 1000;//ms
+        try{
         ProcessResult pr = server.executeBrowser("ParallelAppletsTest_1_x_2.html");
-        checkExactCounts(2, 10, pr);
+        checkExactCounts(2, 7, pr);
+        }finally {
+            ServerAccess.PROCESS_TIMEOUT = back;
+        }
     }
 
     @Test
@@ -147,7 +154,7 @@ public class ParallelAppletsTest extends BrowserTest {
     @NeedsDisplay
     public void testParallelAppletsTest1x1() throws Exception {
         ProcessResult pr = server.executeBrowser("ParallelAppletsTest_1_x_1.html");
-        checkExactCounts(2, 10, pr);
+        checkExactCounts(2, 7, pr);
     }
     private static final String ACE = "java.security.AccessControlException";
     private static final String Sexit = "System.exit()";
@@ -164,7 +171,8 @@ public class ParallelAppletsTest extends BrowserTest {
 
 
     private void checkExitNotAllowed(ProcessResult pr) {
-        Assert.assertTrue("Applets cant call " + Sexit, pr.stderr.matches("(?s).*" + ACE + ".*" + Sexit + ".*"));
+        Assert.assertTrue("Applets cant call " + Sexit, pr.stderr.contains(ACE));
+        Assert.assertTrue("Applets cant call " + Sexit, pr.stderr.contains(Sexit));
     }
 
     private void checkNotInitialised(ProcessResult pr) {
@@ -184,6 +192,8 @@ public class ParallelAppletsTest extends BrowserTest {
          Assert.assertTrue("Applet's exception should be confirmed by " + AppletThrowedException, pr.stderr.contains(AppletThrowedException));
     }
 
+      //appelt is counting to ten, but last shouts are very often consumated during termination,
+      //so the chek is now called with "7" instead of "10"
     private void checkExactCounts(int howManyTimes, int countIdTill, ProcessResult pr) {
         for (int i = 0; i <= countIdTill; i++) {
             String countId = CountStub + i+"\n";

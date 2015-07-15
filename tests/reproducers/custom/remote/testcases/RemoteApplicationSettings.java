@@ -248,10 +248,19 @@ public class RemoteApplicationSettings {
         }
     }
 
-    public static class SunSwingDemo extends NearlyNoOutputs {
+    public static class SunSwingDemo extends StringBasedURL {
 
         public SunSwingDemo() throws MalformedURLException {
-            super("http://java.sun.com/docs/books/tutorialJWS/uiswing/events/ex6/ComponentEventDemo.jnlp");
+            super("https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/ComponentEventDemoProject/ComponentEventDemo.jnlp");
+        }
+
+        @Override
+        public void evaluate(ProcessResult pr) {
+            Assert.assertFalse(pr.stdout.contains("Exception"));
+            Assert.assertFalse(pr.stdout.contains("Error"));
+            Assert.assertFalse(pr.stderr.contains("Exception"));
+            Assert.assertFalse(pr.stderr.contains("Error"));
+            
         }
     }
 

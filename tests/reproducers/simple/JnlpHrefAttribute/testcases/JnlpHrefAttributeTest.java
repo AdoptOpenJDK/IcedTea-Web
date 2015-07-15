@@ -39,6 +39,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import net.sourceforge.jnlp.ProcessResult;
+import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
@@ -51,6 +52,13 @@ public class JnlpHrefAttributeTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.firefox, Browsers.opera})
     @NeedsDisplay
     public void testJnlpHrefAttributeWorks() throws Exception {
+        //midori and epiphany really do not understand jnlpHref
+        if (server.getBrowserLocation().endsWith("midori") || server.getBrowserLocation().endsWith("epiphany")){
+            return;
+        }
+        if (server.getBrowserLocation().endsWith(ServerAccess.UNSET_BROWSER)){
+            return;
+        }
         String url = "./JnlpHrefAttribute.html";
         ProcessResult pr = server.executeBrowser(url, new AutoOkClosingListener(), new AutoOkClosingListener());
         Assert.assertTrue("The stdout should contain " + AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING + ", but it didnt.", pr.stdout.contains(AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING));
@@ -60,6 +68,13 @@ public class JnlpHrefAttributeTest extends BrowserTest {
     @TestInBrowsers(testIn = { Browsers.midori, Browsers.epiphany})
     @NeedsDisplay
     public void testJnlpHrefAttributeDoesNotWork() throws Exception {
+        //others really do
+        if (!(server.getBrowserLocation().endsWith("midori") || server.getBrowserLocation().endsWith("epiphany"))){
+            return;
+        }
+        if (server.getBrowserLocation().endsWith(ServerAccess.UNSET_BROWSER)){
+            return;
+        }
         String url = "./JnlpHrefAttribute.html";
         ProcessResult pr = server.executeBrowser(url, new AutoErrorClosingListener(), new AutoErrorClosingListener());
         Assert.assertFalse("The stdout should not contain " + AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING + ", but it did.", pr.stdout.contains(AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING));

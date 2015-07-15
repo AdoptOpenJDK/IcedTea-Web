@@ -51,6 +51,7 @@ public class CountingAppletSigned extends Applet {
         int i = 0;
         while (true) {
             System.out.println("counting... " + i);
+            System.out.flush();
             if (counter != null && i == counter.intValue()) {
                 System.exit(-i);
             }
@@ -69,7 +70,7 @@ public class CountingAppletSigned extends Applet {
             public void run() {
                 self.setLayout(new BorderLayout());
                 self.add(new JLabel("S"));
-                self.validateTree();
+                self.validate();
                 self.repaint();
             }
         });

@@ -43,7 +43,6 @@ import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import net.sourceforge.jnlp.closinglisteners.Rule;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import static net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener.*;
 import org.junit.Assert;
@@ -90,7 +89,7 @@ public class AppletTestSignedTests extends BrowserTest {
     }
 
     @Test
-    @TestInBrowsers(testIn = {Browsers.all})
+    @TestInBrowsers(testIn = {Browsers.one})
     public void AppletTestSignedFirefoxTestXslowX() throws Exception {
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
@@ -104,7 +103,7 @@ public class AppletTestSignedTests extends BrowserTest {
     }
 
     @Test
-    @TestInBrowsers(testIn = {Browsers.all})
+    @TestInBrowsers(testIn = {Browsers.one})
     public void AppletTestSignedFirefoxTest() throws Exception {
         ProcessResult pr = server.executeBrowser("/AppletTestSigned.html", ServerAccess.AutoClose.CLOSE_ON_CORRECT_END);
         evaluateSignedApplet(pr, false);

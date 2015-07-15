@@ -37,9 +37,7 @@ exception statement from your version.
 
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ProcessResult;
@@ -60,12 +58,11 @@ public class DeploymentPropertiesAreExposedTest {
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
         config.load();
         String userLogDir = config.getProperty(DeploymentConfiguration.KEY_USER_LOG_DIR);
-        String expectedRegex = userLogDir + "/?";
         String actual = result.stdout.trim();
 
-        boolean stdOutMatches = actual.matches(expectedRegex);
+        boolean stdOutMatches = actual.contains(userLogDir);
 
-        assertTrue("'" + actual + "' should match '" + expectedRegex + "' but did not", stdOutMatches);
+        assertTrue("'" + actual + "' should contains '" + userLogDir + "' but did not", stdOutMatches);
     }
 
 }

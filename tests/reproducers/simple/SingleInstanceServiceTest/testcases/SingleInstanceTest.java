@@ -167,6 +167,7 @@ public class SingleInstanceTest extends BrowserTest {
     @Test
     @NeedsDisplay
     @TestInBrowsers(testIn = Browsers.one)
+    //known to not work in midori and epihany
     public void htmlpAppletXhtmlpApplet() throws Exception {
         ProcessResult[] results = executeSingleInstanceCheck(htmlpApplet, htmlpApplet);
         String id = "htmlpAppletXhtmlpApplet";
@@ -179,6 +180,7 @@ public class SingleInstanceTest extends BrowserTest {
     @Test
     @NeedsDisplay
     @TestInBrowsers(testIn = Browsers.one)
+    //known to not work in midori and epihany
     public void htmlJnlpHrefAppletXhtmlJnlpHrefApplet() throws Exception {
         ProcessResult[] results = executeSingleInstanceCheck(htmlJnlpHrefApplet, htmlJnlpHrefApplet);
         String id = "htmlJnlpHrefAppletXhtmlJnlpHrefApplet";

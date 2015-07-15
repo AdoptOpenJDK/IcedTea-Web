@@ -1,3 +1,31 @@
+2015-07-15  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixing various reproducers
+	* netx/net/sourceforge/jnlp/runtime/JnlpBoot.java: LaunchException now also
+	cause exit with nonzero return
+	* tests/reproducers/custom/remote/testcases/RemoteApplicationSettings.java:
+	fixed url for SunSwingDemo and checking reduced to no exception only
+	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java:
+	moved to one browser only
+	* tests/reproducers/signed/CountingAppletSigned/srcs/CountingAppletSigned.java:
+	added flush, validateTree replaced by validate
+	* tests/reproducers/simple/CountingApplet1/srcs/CountingApplet1.java:
+	same
+	* tests/reproducers/signed/DeploymentPropertiesAreExposed/testcases/DeploymentPropertiesAreExposedTest.java:
+	fixed check on sucess
+	* tests/reproducers/simple/AppletTagWithMissingCodeAttribute/testcases/AppletTagWithMissingCodeAttribute.java:
+	added comment explaining failure in most browsers
+	* tests/reproducers/simple/CountingApplet1/testcases/ParallelAppletsTest.java:
+	verification on counts loosed to 7 from 10 (last are often consumed via exit)
+	* tests/reproducers/simple/JnlpHrefAttribute/testcases/JnlpHrefAttributeTest.java:
+	added exclusive handlers for midori and epiphany
+	* tests/reproducers/simple/SingleInstanceServiceTest/testcases/SingleInstanceTest.java:
+		added comment explaining failure in most browsers
+	* tests/reproducers/simple/simpletest1/resources/simpletest1.jnlp:
+	added second description to make ti fail in strict mode
+	* tests/reproducers/simple/simpletest1/testcases/SimpleTest1Test.java:
+	fixed verification asserts
+
 2015-07-14  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed various tests

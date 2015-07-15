@@ -42,6 +42,8 @@ exception statement from your version.
     <vendor>IcedTea</vendor>
     <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
     <description>simpletest1</description>
+    <!-- Below is invalid, but shouldkill app only in strict mode-->
+    <description>simpletest2</description>
     <offline/>
   </information>
   <resources>

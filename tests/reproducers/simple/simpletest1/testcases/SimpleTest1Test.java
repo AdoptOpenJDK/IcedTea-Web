@@ -42,8 +42,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -51,7 +53,7 @@ import org.junit.Test;
 public class SimpleTest1Test {
 
     private static ServerAccess server = new ServerAccess();
-    private static final List<String> strict = Arrays.asList(new String[]{"-strict", ServerAccess.VERBOSE_OPTION});
+    private static final List<String> strict = Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.STRICT.option, ServerAccess.VERBOSE_OPTION});
 
     private void checkLaunched(ProcessResult pr) {
         checkLaunched(pr, false);
@@ -72,7 +74,11 @@ public class SimpleTest1Test {
             //Assert.assertFalse("testSimpletest1lunchOk stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
         }
         Assert.assertFalse(pr.wasTerminated);
-        Assert.assertEquals((Integer) 0, pr.returnValue);
+        if (negate){
+            Assert.assertEquals((Integer) 1, pr.returnValue);
+        } else {
+            Assert.assertEquals((Integer) 0, pr.returnValue);
+        }
     }
 
     @Test
@@ -106,9 +112,10 @@ public class SimpleTest1Test {
     }
 
     private void createStrictFile(String originalResourceName, String newResourceName, URL codebase) throws MalformedURLException, IOException {
-        String originalContent = ServerAccess.getContentOfStream(new FileInputStream(new File(server.getDir(), originalResourceName)));
+        String originalContent = FileUtils.loadFileAsString(new File(server.getDir(), originalResourceName));
         String nwContent1 = originalContent.replaceAll("href=\""+originalResourceName+"\"", "href=\""+newResourceName+"\"");
         String nwContent = nwContent1.replaceAll("codebase=\".\"", "codebase=\"" + codebase + "\"");
+        nwContent = nwContent.replace("<description>simpletest2</description>", "");
         ServerAccess.saveFile(nwContent, new File(server.getDir(), newResourceName));
     }
 }
