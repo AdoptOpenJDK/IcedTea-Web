@@ -184,7 +184,7 @@ public class ManifestedJar1Test {
         ProcessResult pr = server.executeJavawsHeadless(Arrays.asList(new String[]{"-strict"}), "/" + id + ".jnlp");
         assertNotManifestedJar1(id, pr);
         assertNotManifestedJar2(id, pr);
-        assertNotDead(id, pr);
+        assertNearlyNotDead(id, pr, 1);
         Assert.assertTrue(pr.stderr.contains(Translator.R("PTwoMains")) || pr.stdout.contains(Translator.R("PTwoMains")));
     }
 

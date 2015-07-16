@@ -1,3 +1,11 @@
+2015-07-16  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixing various reproducers
+	* tests/reproducers/simple/ManifestedJar1/testcases/ManifestedJar1Test.java:
+	fixed check on return value
+	* tests/reproducers/simple/InformationTitleVendorParser/testcases/InformationTitleVendorParserTest.java:
+	same
+
 2015-07-15  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixing various reproducers

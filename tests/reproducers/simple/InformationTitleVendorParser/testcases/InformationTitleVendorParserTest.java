@@ -54,7 +54,7 @@ public class InformationTitleVendorParserTest {
         Assert.assertFalse("test" + jnlpName + " stdout should not contain " + s1 + " but did.", pr.stdout.contains(s1));
         Assert.assertTrue("testForTitle stderr should contain " + exception + " but did not.", pr.stderr.contains(exception));
         Assert.assertFalse(pr.wasTerminated);
-        Assert.assertEquals((Integer)0, pr.returnValue);
+        Assert.assertEquals((Integer)1, pr.returnValue);
     }
 
     @Test
