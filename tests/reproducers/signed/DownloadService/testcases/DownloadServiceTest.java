@@ -48,11 +48,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DownloadServiceTest {
-    private static ServerAccess server = new ServerAccess();
+    private static final ServerAccess server = new ServerAccess();
     private final String exitString = "Exiting DownloadService..";
-    private static List<String> checkCache = new ArrayList<String>();
-    private static List<String> manageJnlpResources = new ArrayList<String>();
-    private static List<String> manageExternalResources = new ArrayList<String>();
+    private static final List<String> checkCache = new ArrayList<>();
+    private static final List<String> manageJnlpResources = new ArrayList<>();
+    private static final List<String> manageExternalResources = new ArrayList<>();
 
     @BeforeClass
     public static void initalizeClass() throws MalformedURLException {

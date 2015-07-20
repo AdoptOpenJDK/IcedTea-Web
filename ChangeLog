@@ -1,3 +1,11 @@
+2015-07-20  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed download service
+	* /netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (fillInPartJars)
+	for-each loop replaced by indexed loop to prevent ConcurrentModificationException
+	* tests/reproducers/signed/DownloadService/testcases/DownloadServiceTest.java:
+	small refactoring in favour of diamond operator
+
 2015-07-16  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixing various reproducers
