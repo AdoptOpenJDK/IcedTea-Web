@@ -295,10 +295,12 @@ public class ManifestAttributesChecker {
         } else { // JNLP
             if (isNoneOrDefault(requestedPermissions)) {
                 if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
-                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' and the applet is signed. This is fatal.");
+                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' and the applet is signed. Forcing sandbox.");
+                    securityDelegate.setRunInSandbox();
                 }
                 if (sandboxForced == ManifestBoolean.FALSE && signing == SigningState.NONE) {
-                    throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' and the applet is unsigned. This is fatal.");
+                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' and the applet is unsigned. Forcing sandbox.");
+                    securityDelegate.setRunInSandbox();
                 }
             }
         }

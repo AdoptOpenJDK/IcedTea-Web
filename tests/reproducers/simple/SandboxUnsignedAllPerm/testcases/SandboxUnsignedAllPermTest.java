@@ -71,7 +71,6 @@ public class SandboxUnsignedAllPermTest extends BrowserTest {
     }
 
     @Test
-    //bug, should run in sandbox, see appletAllPermAllSecurity
     public void javawsAllPermNoSecurity() throws Exception {
         ProcessResult p = server.executeJavawsHeadless("SandboxUnsignedAllPerm.jnlp");
         Assert.assertTrue(p.stdout.contains(confirmation));
@@ -88,7 +87,6 @@ public class SandboxUnsignedAllPermTest extends BrowserTest {
     }
 
     @Test
-    //bug, should run in sandbox, see appletAllPermAllSecurity
     public void javawsAppletAllPermNoSecurity() throws Exception {
         ProcessResult p = server.executeJavaws(Arrays.asList(new String[]{"-headless", "-verbose"}), "SandboxUnsignedAllPerm_applet.jnlp", new AutoOkClosingListener(), new AutoErrorClosingListener());
         Assert.assertTrue(p.stdout.contains(confirmation));

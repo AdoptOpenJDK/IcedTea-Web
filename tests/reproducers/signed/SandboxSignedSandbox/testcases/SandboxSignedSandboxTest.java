@@ -75,7 +75,6 @@ public class SandboxSignedSandboxTest extends BrowserTest {
     @Test
     //no security dialog
     //should run in snadbox  (jnlp dont have all-permnissions)
-    //dont run at all. BUG!
     public void javawsAllPermNoSecurity() throws Exception{
             ProcessResult p = server.executeJavawsHeadless("SandboxSignedSandbox.jnlp");
             Assert.assertTrue(p.stdout.contains(confirmation));
@@ -95,7 +94,6 @@ public class SandboxSignedSandboxTest extends BrowserTest {
         @Test
     //no security dialog
     //should run in snadbox  (jnlp dont have all-permnissions)
-    //dont run at all. BUG!
     public void javawsAppletAllPermNoSecurity() throws Exception{
             ProcessResult p = server.executeJavaws(Arrays.asList(new String[]{"-headless", "-verbose"}),"SandboxSignedSandbox_applet.jnlp", new AutoOkClosingListener(), new AutoErrorClosingListener());
             Assert.assertTrue(p.stdout.contains(confirmation));
