@@ -1,5 +1,9 @@
 2015-07-20  Jiri Vanek  <jvanek@redhat.com>
 
+	* NEWS: change of permissions attribute mentioned in news 
+
+2015-07-20  Jiri Vanek  <jvanek@redhat.com>
+
 	Tuned permissions attribute behavior for unsigned jnlps
 	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java:
 	permissions sandbox and signed app and unsigned app with permissions all-permissions
