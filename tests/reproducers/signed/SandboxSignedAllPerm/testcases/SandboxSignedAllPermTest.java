@@ -1,6 +1,7 @@
 
 import java.io.IOException;
 import java.util.Arrays;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
@@ -78,6 +79,15 @@ public class SandboxSignedAllPermTest extends BrowserTest {
             Assert.assertFalse(p.stdout.contains(aok.getCondition()));
             Assert.assertTrue(p.stderr.contains(aer.getCondition()));
     }
+    
+    @Test
+    public void javawsHtml() throws Exception{
+            ProcessResult p = server.executeJavaws(Arrays.asList(new String[] {OptionsDefinitions.OPTIONS.HTML.option}), "SandboxSignedAllPerm.html", new AutoOkClosingListener(), new AutoErrorClosingListener());
+            Assert.assertTrue(p.stdout.contains(confirmation));
+            Assert.assertTrue(p.stdout.contains(aok.getCondition()));
+            Assert.assertFalse(p.stderr.contains(aer.getCondition()));
+    }
+    
     @Test
     //no security dialog
     //pass

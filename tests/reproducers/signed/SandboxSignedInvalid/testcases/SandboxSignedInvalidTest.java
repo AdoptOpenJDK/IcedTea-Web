@@ -1,5 +1,7 @@
 
 import java.io.IOException;
+import java.util.Arrays;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
@@ -116,6 +118,14 @@ public class SandboxSignedInvalidTest extends BrowserTest {
     public void appletAllPermAllSecurity() throws Exception{
         server.getBrowserLocation();
             ProcessResult p = server.executeBrowser("SandboxSignedInvalid.html", ServerAccess.AutoClose.CLOSE_ON_BOTH);
+            Assert.assertFalse(p.stdout.contains(confirmation));
+            Assert.assertFalse(p.stdout.contains(aok.getCondition()));
+            Assert.assertTrue(p.stderr.contains(aer.getCondition()));
+    }
+    
+    @Test
+    public void javawsHtml() throws Exception{
+            ProcessResult p = server.executeJavaws(Arrays.asList(new String[] {OptionsDefinitions.OPTIONS.HTML.option}), "SandboxSignedInvalid.html", new AutoOkClosingListener(), new AutoErrorClosingListener());
             Assert.assertFalse(p.stdout.contains(confirmation));
             Assert.assertFalse(p.stdout.contains(aok.getCondition()));
             Assert.assertTrue(p.stderr.contains(aer.getCondition()));

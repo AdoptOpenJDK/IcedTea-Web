@@ -1,6 +1,7 @@
 
 import java.io.IOException;
 import java.util.Arrays;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ProcessWrapper;
 import net.sourceforge.jnlp.ServerAccess;
@@ -190,6 +191,29 @@ public class SandboxSignedMissingTestHighSecurity extends BrowserTest {
             Assert.assertTrue(p.stdout.contains(aok.getCondition()));
             Assert.assertFalse(p.stderr.contains(aer.getCondition()));
     }
+    
+    @Test
+    public void javawsHtmlYes() throws Exception{
+            ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), Arrays.asList("-headless", "-html"),  server.getUrl("SandboxSignedMissing.html"));
+            pw.addStdOutListener(new AutoOkClosingListener());
+            pw.setWriter("YES\n");
+            ProcessResult p = pw.execute();
+            Assert.assertTrue(p.stdout.contains(confirmation));
+            Assert.assertTrue(p.stdout.contains(aok.getCondition()));
+            Assert.assertFalse(p.stderr.contains(aer.getCondition()));
+    }
+    
+    @Test
+    public void javawsHtmlNo() throws Exception{
+            ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), Arrays.asList("-headless", "-html"),  server.getUrl("SandboxSignedMissing.html"));
+            pw.addStdOutListener(new AutoOkClosingListener());
+            pw.setWriter("NO\n");
+            ProcessResult p = pw.execute();
+            Assert.assertFalse(p.stdout.contains(confirmation));
+            Assert.assertFalse(p.stdout.contains(aok.getCondition()));
+            Assert.assertTrue(p.stderr.contains(aer.getCondition()));
+    }
+
 
 
 }

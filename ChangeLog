@@ -1,3 +1,17 @@
+2015-07-22  Jiri Vanek  <jvanek@redhat.com>
+
+	Added tests for html switch for Sandbox attribute
+	* tests/reproducers/signed/SandboxSignedAllPerm/testcases/SandboxSignedAllPermTest.java
+	* tests/reproducers/signed/SandboxSignedInvalid/testcases/SandboxSignedInvalidTest.java
+	* tests/reproducers/signed/SandboxSignedMissing/testcases/SandboxSignedMissingTest.java
+	* tests/reproducers/signed/SandboxSignedMissing/testcases/SandboxSignedMissingTestHighSecurity.java
+	* tests/reproducers/signed/SandboxSignedSandbox/testcases/SandboxSignedSandboxTest.java
+	* tests/reproducers/simple/SandboxUnsignedAllPerm/testcases/SandboxUnsignedAllPermTest.java
+	* tests/reproducers/simple/SandboxUnsignedInvalid/testcases/SandboxUnsignedInvalidTest.java
+	* tests/reproducers/simple/SandboxUnsignedMissing/testcases/SandboxUnsignedMissingTest.java
+	* tests/reproducers/simple/SandboxUnsignedMissing/testcases/SandboxUnsignedMissingTestHighSecurity.java
+	* tests/reproducers/simple/SandboxUnsignedSandbox/testcases/SandboxUnsignedSandboxTest.java
+
 2015-07-22  Fridrich Strba  <fridrich.strba@suse.com>
 
 	* Makefile.am:  (generate-docs.stamp) added '-' to tail of tail command as

@@ -1,10 +1,12 @@
 
 import java.io.IOException;
 import java.util.Arrays;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import static net.sourceforge.jnlp.browsertesting.BrowserTest.server;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
 import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
@@ -104,7 +106,6 @@ public class SandboxUnsignedAllPermTest extends BrowserTest {
 
     @Test
     @TestInBrowsers(testIn = Browsers.one)
-    //or this one should fail
     public void appletAllPermAllSecurity() throws Exception {
         server.getBrowserLocation();
         ProcessResult p = server.executeBrowser("SandboxUnsignedAllPerm.html", ServerAccess.AutoClose.CLOSE_ON_BOTH);
@@ -113,4 +114,11 @@ public class SandboxUnsignedAllPermTest extends BrowserTest {
         Assert.assertTrue(p.stderr.contains(aer.getCondition()));
     }
 
+    @Test
+    public void javawsHtml() throws Exception {
+        ProcessResult p = server.executeJavaws(Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.HTML.option}), "SandboxUnsignedAllPerm.html", new AutoOkClosingListener(), new AutoErrorClosingListener());
+        Assert.assertTrue(p.stdout.contains(confirmation));
+        Assert.assertFalse(p.stdout.contains(aok.getCondition()));
+        Assert.assertTrue(p.stderr.contains(aer.getCondition()));
+    }
 }

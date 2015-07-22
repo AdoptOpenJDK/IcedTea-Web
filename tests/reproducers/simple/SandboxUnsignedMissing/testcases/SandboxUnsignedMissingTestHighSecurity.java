@@ -172,6 +172,38 @@ public class SandboxUnsignedMissingTestHighSecurity extends BrowserTest {
             Assert.assertTrue(p.stdout.contains(aok.getCondition()));
             Assert.assertFalse(p.stderr.contains(aer.getCondition()));
     }
+    
+     @Test
+    public void javawsHtmlYesYes() throws Exception{
+            ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), Arrays.asList("-headless", "-html"),  server.getUrl("SandboxUnsignedMissing.html"));
+            pw.addStdOutListener(new AutoOkClosingListener());
+            pw.setWriter("YES\nYES\n");
+            ProcessResult p = pw.execute();
+            Assert.assertTrue(p.stdout.contains(confirmation));
+            Assert.assertFalse(p.stdout.contains(aok.getCondition()));
+            Assert.assertTrue(p.stderr.contains(aer.getCondition()));
+    }
+    @Test
+    public void javawsHtmlYesNo() throws Exception{
+            ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), Arrays.asList("-headless", "-html"),  server.getUrl("SandboxUnsignedMissing.html"));
+            pw.addStdOutListener(new AutoOkClosingListener());
+            pw.setWriter("YES\nNO\n");
+            ProcessResult p = pw.execute();
+            Assert.assertFalse(p.stdout.contains(confirmation));
+            Assert.assertFalse(p.stdout.contains(aok.getCondition()));
+            Assert.assertTrue(p.stderr.contains(aer.getCondition()));
+    }
+    
+    @Test
+    public void javawsHtmlNo() throws Exception{
+            ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), Arrays.asList("-headless", "-html"),  server.getUrl("SandboxUnsignedMissing.html"));
+            pw.addStdOutListener(new AutoOkClosingListener());
+            pw.setWriter("NO\n");
+            ProcessResult p = pw.execute();
+            Assert.assertFalse(p.stdout.contains(confirmation));
+            Assert.assertFalse(p.stdout.contains(aok.getCondition()));
+            Assert.assertTrue(p.stderr.contains(aer.getCondition()));
+    }
 
 
 }
