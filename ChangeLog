@@ -1,3 +1,8 @@
+2015-07-22  Fridrich Strba  <fridrich.strba@suse.com>
+
+	* Makefile.am:  (generate-docs.stamp) added '-' to tail of tail command as
+	 some implementations of tail parse the file information as the last argument
+
 2015-07-20  Jiri Vanek  <jvanek@redhat.com>
 
 	* NEWS: change of permissions attribute mentioned in news 
