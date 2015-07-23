@@ -122,6 +122,13 @@ public class ManifestAttributesChecker {
             } else {
                 OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("MACCheckSkipped", "Application Library Allowable Codebase", "ALAC"));
             }
+            
+            if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ENTRYPOINT)
+                    || attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
+                checkEntryPoint();
+            } else {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("MACCheckSkipped", "Entry-Point", "ENTRYPOINT"));
+            }
 
         }
     }

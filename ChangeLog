@@ -1,3 +1,80 @@
+2015-07-23  Jiri Vanek  <jvanek@redhat.com>
+
+	Enabled and properly tested Entry-Point attribute check
+	* NEWS: mentioned enabling
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: enabled
+	call to checkEntryPoint if enabled
+	* tests/reproducers/signed/EntryPointSignedSingleBothInvalid/resources/EntryPointSignedSingleBothInvalid.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothInvalid/resources/EntryPointSignedSingleBothInvalid.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothInvalid/resources/EntryPointSignedSingleBothInvalid_applet.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothInvalid/resources/EntryPointSignedSingleBothInvalid_applet_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothInvalid/resources/EntryPointSignedSingleBothInvalid_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothInvalid/srcs/EntryPointSignedSingleBothInvalid.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothInvalid/srcs/META-INF/MANIFEST.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothInvalid/testcases/EntryPointSignedSingleBothInvalidTest.java:
+	tests for Entry-Point with two values, both invalid
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk1.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk1.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk2.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk2.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk_applet1.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk_applet2.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk_applet_security1.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk_applet_security2.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk_security1.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/resources/EntryPointSignedSingleBothOk_security2.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/srcs/EntryPointSignedSingleBothOk1.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/srcs/EntryPointSignedSingleBothOk2.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/srcs/META-INF/MANIFEST.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/testcases/EntryPointSignedSingleBothOkTest1.java:
+	* tests/reproducers/signed/EntryPointSignedSingleBothOk/testcases/EntryPointSignedSingleBothOkTest2.java:
+	tests for Entry-Point with two values, both valid
+	* tests/reproducers/signed/EntryPointSignedSingleFirstInvalidSecondOk/resources/EntryPointSignedSingleFirstInvalidSecondOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleFirstInvalidSecondOk/resources/EntryPointSignedSingleFirstInvalidSecondOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleFirstInvalidSecondOk/resources/EntryPointSignedSingleFirstInvalidSecondOk_applet.java:
+	* tests/reproducers/signed/EntryPointSignedSingleFirstInvalidSecondOk/resources/EntryPointSignedSingleFirstInvalidSecondOk_applet_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleFirstInvalidSecondOk/resources/EntryPointSignedSingleFirstInvalidSecondOk_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleFirstInvalidSecondOk/srcs/EntryPointSignedSingleFirstInvalidSecondOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleFirstInvalidSecondOk/srcs/META-INF/MANIFEST.java:
+	* tests/reproducers/signed/EntryPointSignedSingleFirstInvalidSecondOk/testcases/EntryPointSignedSingleFirstInvalidSecondOkTest.java:
+	tests for Entry-Point with two values, first invalid, second ok
+	* tests/reproducers/signed/EntryPointSignedSingleInvalid/resources/EntryPointSignedSingleInvalid.java:
+	* tests/reproducers/signed/EntryPointSignedSingleInvalid/resources/EntryPointSignedSingleInvalid.java:
+	* tests/reproducers/signed/EntryPointSignedSingleInvalid/resources/EntryPointSignedSingleInvalid_applet.java:
+	* tests/reproducers/signed/EntryPointSignedSingleInvalid/resources/EntryPointSignedSingleInvalid_applet_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleInvalid/resources/EntryPointSignedSingleInvalid_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleInvalid/srcs/EntryPointSignedSingleInvalid.java:
+	* tests/reproducers/signed/EntryPointSignedSingleInvalid/srcs/META-INF/MANIFEST.java:
+	* tests/reproducers/signed/EntryPointSignedSingleInvalid/testcases/EntryPointSignedSingleInvalidTest.java:
+	tests for Entry-Point with one invalid value
+	* tests/reproducers/signed/EntryPointSignedSingleOk/resources/EntryPointSignedSingleOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleOk/resources/EntryPointSignedSingleOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleOk/resources/EntryPointSignedSingleOk_applet.java:
+	* tests/reproducers/signed/EntryPointSignedSingleOk/resources/EntryPointSignedSingleOk_applet_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleOk/resources/EntryPointSignedSingleOk_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleOk/srcs/EntryPointSignedSingleOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleOk/srcs/META-INF/MANIFEST.java:
+	* tests/reproducers/signed/EntryPointSignedSingleOk/testcases/EntryPointSignedSingleOkTest.java:
+	tests for Entry-Point with one ok vlaue
+	* tests/reproducers/signed/EntryPointSignedSingleSecondInvalidFirstOk/resources/EntryPointSignedSingleSecondInvalidFirstOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleSecondInvalidFirstOk/resources/EntryPointSignedSingleSecondInvalidFirstOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleSecondInvalidFirstOk/resources/EntryPointSignedSingleSecondInvalidFirstOk_applet.java:
+	* tests/reproducers/signed/EntryPointSignedSingleSecondInvalidFirstOk/resources/EntryPointSignedSingleSecondInvalidFirstOk_applet_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleSecondInvalidFirstOk/resources/EntryPointSignedSingleSecondInvalidFirstOk_security.java:
+	* tests/reproducers/signed/EntryPointSignedSingleSecondInvalidFirstOk/srcs/EntryPointSignedSingleSecondInvalidFirstOk.java:
+	* tests/reproducers/signed/EntryPointSignedSingleSecondInvalidFirstOk/srcs/META-INF/MANIFEST.java:
+	* tests/reproducers/signed/EntryPointSignedSingleSecondInvalidFirstOk/testcases/EntryPointSignedSingleSecondInvalidFirstOkTest.java:
+	tests for Entry-Point with two values, first ok, second invalid
+	* tests/reproducers/simple/EntryPointUnsignedSingleInvalid/resources/EntryPointUnsignedSingleInvalid.java:
+	* tests/reproducers/simple/EntryPointUnsignedSingleInvalid/resources/EntryPointUnsignedSingleInvalid.java:
+	* tests/reproducers/simple/EntryPointUnsignedSingleInvalid/resources/EntryPointUnsignedSingleInvalid_applet.java:
+	* tests/reproducers/simple/EntryPointUnsignedSingleInvalid/resources/EntryPointUnsignedSingleInvalid_applet_security.java:
+	* tests/reproducers/simple/EntryPointUnsignedSingleInvalid/resources/EntryPointUnsignedSingleInvalid_security.java:
+	* tests/reproducers/simple/EntryPointUnsignedSingleInvalid/srcs/EntryPointUnsignedSingleInvalid.java:
+	* tests/reproducers/simple/EntryPointUnsignedSingleInvalid/srcs/META-INF/MANIFEST.java:
+	* tests/reproducers/simple/EntryPointUnsignedSingleInvalid/testcases/EntryPointUnsignedSingleInvalidTest.java:
+	tests for Entry-Point with one invalid value in unsigned jar (ignoring this value)
+
 2015-07-22  Jiri Vanek  <jvanek@redhat.com>
 
 	Added tests for html switch for Sandbox attribute
