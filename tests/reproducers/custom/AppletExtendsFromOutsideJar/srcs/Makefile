@@ -5,8 +5,8 @@ JAR_FILES=AppletReferenceInSameJar.class Referenced.class
 OUTER_FILE=AppletReferenceOutOfJar.class
 
 JAVAC_CLASSPATH=$(TEST_EXTENSIONS_DIR):$(NETX_DIR)/lib/classes.jar
-JAVAC=$(BOOT_DIR)/bin/javac
-JAR=$(BOOT_DIR)/bin/jar
+JAVAC=$(EXPORTED_JAVAC)
+JAR=$(EXPORTED_JAR)
 
 TMPDIR:=$(shell mktemp -d)
 

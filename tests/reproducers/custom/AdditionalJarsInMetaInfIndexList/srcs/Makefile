@@ -2,10 +2,10 @@ TESTNAME=AdditionalJarsInMetaInfIndexList
 ARCHIVE_TEST_FOLDER=archive_tag_folder_test
 
 JAVAC_CLASSPATH=$(TEST_EXTENSIONS_DIR):$(NETX_DIR)/lib/classes.jar
-KEYTOOL=$(BOOT_DIR)/bin/keytool
-JARSIGNER=$(BOOT_DIR)/bin/jarsigner
-JAVAC=$(BOOT_DIR)/bin/javac
-JAR=$(BOOT_DIR)/bin/jar
+KEYTOOL=$(EXPORTED_KEYTOOL)
+JARSIGNER=$(EXPORTED_JARSIGNER)
+JAVAC=$(EXPORTED_JAVAC)
+JAR=$(EXPORTED_JAR)
 
 # File used because the 'jar' command does not accept an empty file
 DUMMY_FILE=jar_dummy_content
@@ -43,7 +43,7 @@ prepare-reproducer:
 	# Sign some of the jars for the signed jar test
 	cd $(TMPDIR) ; \
 	for jar_to_sign in $(MAINCLASS_JAR_SIGNED) $(INDEX_JAR_SIGNED); do \
-	   $(BOOT_DIR)/bin/jarsigner -keystore $(TOP_BUILD_DIR)/$(PRIVATE_KEYSTORE_NAME) -storepass  $(PRIVATE_KEYSTORE_PASS)  \
+	   $(EXPORTED_JARSIGNER) -keystore $(TOP_BUILD_DIR)/$(PRIVATE_KEYSTORE_NAME) -storepass  $(PRIVATE_KEYSTORE_PASS)  \
 	   -keypass $(PRIVATE_KEYSTORE_PASS) "$$jar_to_sign" $(TEST_CERT_ALIAS)_signed   ; \
 	done
 	

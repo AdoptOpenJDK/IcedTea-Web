@@ -3,9 +3,9 @@ TESTNAME=SignedAppletCodebaseLoading
 SRC_FILES=SignedAppletCodebaseLoading.java SignedAppletCodebaseLoadingHelper.java
 
 JAVAC_CLASSPATH=$(TEST_EXTENSIONS_DIR):$(NETX_DIR)/lib/classes.jar
-JAVAC=$(BOOT_DIR)/bin/javac
-JAR=$(BOOT_DIR)/bin/jar
-JARSIGNER=$(BOOT_DIR)/bin/jarsigner
+JAVAC=$(EXPORTED_JAVAC)
+JAR=$(EXPORTED_JAR)
+JARSIGNER=$(EXPORTED_JARSIGNER)
 JARSIGNER_CMD=$(JARSIGNER) -keystore $(TOP_BUILD_DIR)/$(PRIVATE_KEYSTORE_NAME) -storepass $(PRIVATE_KEYSTORE_PASS) -keypass $(PRIVATE_KEYSTORE_PASS)
 
 TMPDIR:=$(shell mktemp -d)

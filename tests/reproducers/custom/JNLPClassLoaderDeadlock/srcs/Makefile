@@ -5,8 +5,8 @@ RESOURCE_FILES=JNLPClassLoaderDeadlock.html
 ENTRYPOINT_CLASSES=JNLPClassLoaderDeadlock_1 JNLPClassLoaderDeadlock_2
 
 JAVAC_CLASSPATH=$(TEST_EXTENSIONS_DIR):$(NETX_DIR)/lib/classes.jar
-JAVAC=$(BOOT_DIR)/bin/javac
-JAR=$(BOOT_DIR)/bin/jar
+JAVAC=$(EXPORTED_JAVAC)
+JAR=$(EXPORTED_JAR)
 
 TMPDIR:=$(shell mktemp -d)
 

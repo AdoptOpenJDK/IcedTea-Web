@@ -1,3 +1,26 @@
+2015-07-27  Jiri Vanek  <jvanek@redhat.com>
+
+	Removed last remains of BOOT_DIR
+	* Makefile.am: declared and exported EXPORTED_JAR EXPORTED_KEYTOOL
+	EXPORTED_JARSIGNER EXPORTED_PACK200
+	* tests/reproducers/custom/AdditionalJarsInMetaInfIndexList/srcs/Makefile:
+	all of (BOOT_DIR)/bin/keytool (BOOT_DIR)/bin/jarsigner (BOOT_DIR)/bin/javac
+	(BOOT_DIR)/bin/jar (BOOT_DIR)/bin/pack200 replaced by (EXPORTED_KEYTOOL)
+	(EXPORTED_JARSIGNER) (EXPORTED_JAVAC) (EXPORTED_JAR) (EXPORTED_PACK200)
+	* tests/reproducers/custom/AppletExtendsFromOutsideJar/srcs/Makefile: same
+	* tests/reproducers/custom/ExtensionJnlpsInApplet/srcs/Makefile: same
+	* tests/reproducers/custom/JNLPClassLoaderDeadlock/srcs/Makefile: same
+	* tests/reproducers/custom/MixedSigningApplet/srcs/Makefile: same
+	* tests/reproducers/custom/MultipleSignaturesPerJar/srcs/Makefile: same
+	* tests/reproducers/custom/PackGZip/srcs/Makefile: same
+	* tests/reproducers/custom/PartiallySignedAppletManifestSpecifiesSandbox/srcs/Makefile:
+	same
+	* tests/reproducers/custom/SignedAppletCodebaseLoading/srcs/Makefile: same
+	* tests/reproducers/custom/SignedAppletExternalMainClass/srcs/Makefile: same
+	* tests/reproducers/custom/TrustedOnlyAttribute/srcs/Makefile: same
+	* tests/reproducers/custom/UnsignedContentInMETAINF/srcs/Makefile: same
+
+
 2015-07-23  Jiri Vanek  <jvanek@redhat.com>
 
 	Enabled and properly tested Entry-Point attribute check

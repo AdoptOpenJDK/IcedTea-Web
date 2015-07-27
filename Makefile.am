@@ -231,6 +231,10 @@ export REPRODUCERS_DPARAMETERS= $(DTEST_SERVER) $(DJAVAWS_BUILD) $(DBROWSERS) $(
 
 #exported autoconf copies
 export EXPORTED_JAVAC=$(SYSTEM_JDK_DIR)/bin/javac
+export EXPORTED_JAR=$(SYSTEM_JDK_DIR)/bin/jar
+export EXPORTED_KEYTOOL=$(SYSTEM_JDK_DIR)/bin/keytool
+export EXPORTED_JARSIGNER=$(SYSTEM_JDK_DIR)/bin/jarsigner
+export EXPORTED_PACK200=$(SYSTEM_JDK_DIR)/bin/pack200
 #end of exported autoconf copies
 
 # binary names
