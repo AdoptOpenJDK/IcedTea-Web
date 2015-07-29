@@ -1,5 +1,14 @@
 2015-07-29  Jiri Vanek  <jvanek@redhat.com>
 
+	replaced Trusted-only by Trusted-Only, cosmetic change in TrustedOnlyAttribute reproducer
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-signed-nosecurity.jnlp:
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-signed-security.jnlp:
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-unsigned-nosecurity.jnlp:
+	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-unsigned-security.jnlp:
+	* tests/reproducers/custom/TrustedOnlyAttribute/srcs/MANIFEST.MF:
+
+2015-07-29  Jiri Vanek  <jvanek@redhat.com>
+
 	Initial push for big trusted-only/mixed-permissions reproducer
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/resources/MixedSigningAndTrustedOnly.html.in:
 	template for javaws html and browser test (substitute archives and mainclass and commnad)

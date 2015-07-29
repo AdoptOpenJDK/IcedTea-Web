@@ -42,7 +42,7 @@ exception statement from your version.
     	<title>TrustedOnlyAttribute</title>
     	<vendor>IcedTea</vendor>
     	<homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
-    	<description>Trusted-only Manifest Attribute Test</description>
+    	<description>Trusted-Only Manifest Attribute Test</description>
     	<offline/>
 	</information>
 	<resources>
