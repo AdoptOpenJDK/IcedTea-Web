@@ -1,3 +1,26 @@
+2015-07-29  Jiri Vanek  <jvanek@redhat.com>
+
+	Initial push for big trusted-only/mixed-permissions reproducer
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/resources/MixedSigningAndTrustedOnly.html.in:
+	template for javaws html and browser test (substitute archives and mainclass and commnad)
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/resources/MixedSigningAndTrustedOnlyApp.jnlp.in:
+	template for javaws (substitute security, archives and mainclass  and commnads)
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/resources/MixedSigningAndTrustedOnlyApplet.jnlp.in:
+	template for javaws applet (substitute security, archives and mainclass and commnads)
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MANIFEST.MF:
+	manifest with Trusted-only: true to be potentially used in jars
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/Makefile:
+	custom makefile which generates 12 jars. six signed, six unsigned, six with manifest, six without.
+	two times two with one class, two with both classes
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MixedSigningAndTrustedOnlyClass1.java:
+	source class1, may confirm itself, try privileged action, try those two on second class, 
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MixedSigningAndTrustedOnlyClass2.java:
+	same but vice versa
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnly.java:
+	utility class for this reproducer (with tests)
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyBS1.java:
+	simple twelve tests verifying single signed jar with both classes without manifest works
+
 2015-07-27  Jiri Vanek  <jvanek@redhat.com>
 
 	Removed last remains of BOOT_DIR

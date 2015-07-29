@@ -86,7 +86,7 @@ public class DeploymentPropertiesModifier {
 
     }
 
-    private final InfrastructureFileDescriptor src;
+    public final InfrastructureFileDescriptor src;
     private String savedValue;
     private String requestedProperty;
     private String requestedValue;
