@@ -330,6 +330,21 @@ public class MixedSigningAndTrustedOnly extends BrowserTest {
         Assert.assertFalse(pr.stdout.contains(RESTRICTED21));
         Assert.assertFalse(pr.stdout.contains(RESTRICTED22));
     }
+    
+    static void assertLaunchException(ProcessResult pr) {
+        Assert.assertTrue(pr.stderr.contains("net.sourceforge.jnlp.LaunchException"));
+    }
+    
+     static void assertNone(ProcessResult pr) {
+        Assert.assertFalse(pr.stdout.contains(NORMAL11));
+        Assert.assertFalse(pr.stdout.contains(NORMAL12));
+        Assert.assertFalse(pr.stdout.contains(NORMAL21));
+        Assert.assertFalse(pr.stdout.contains(NORMAL22));
+        Assert.assertFalse(pr.stdout.contains(RESTRICTED11));
+        Assert.assertFalse(pr.stdout.contains(RESTRICTED12));
+        Assert.assertFalse(pr.stdout.contains(RESTRICTED21));
+        Assert.assertFalse(pr.stdout.contains(RESTRICTED22));
+    }
 
     static DeploymentPropertiesModifier setDeploymentPropertiesImpl() throws IOException {
         DeploymentPropertiesModifier q = new DeploymentPropertiesModifier();

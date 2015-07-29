@@ -1,5 +1,15 @@
 2015-07-29  Jiri Vanek  <jvanek@redhat.com>
 
+	Added tests for single signed jar with manifest containing trusted-only
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnly.java:
+	added checks for complete filure and launchException
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyBSmanifest.java:
+	 single signed jar with manifest containing trusted-only. File is same as
+	MixedSigningAndTrustedOnlyBS1, but four reproducers of  jnlpApp and jnlpApplet
+	without security correctly don't run.
+
+2015-07-29  Jiri Vanek  <jvanek@redhat.com>
+
 	replaced Trusted-only by Trusted-Only, cosmetic change in TrustedOnlyAttribute reproducer
 	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-signed-nosecurity.jnlp:
 	* tests/reproducers/custom/TrustedOnlyAttribute/resources/TrustedOnlyAttribute-signed-security.jnlp:
