@@ -1778,7 +1778,7 @@ public class PolicyEditor extends JPanel {
         });
     }
 
-    private static String getFilePathArgument(OptionParser optionParser) {
+    static String getFilePathArgument(OptionParser optionParser) {
         final boolean openDefaultFile = optionParser.hasOption(OptionsDefinitions.OPTIONS.DEFAULTFILE);
         final boolean hasFileArgument = optionParser.hasOption(OptionsDefinitions.OPTIONS.FILE);
         final boolean hasMainArgument = optionParser.mainArgExists();

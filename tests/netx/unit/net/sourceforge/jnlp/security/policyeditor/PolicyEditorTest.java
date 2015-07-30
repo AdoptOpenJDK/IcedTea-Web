@@ -42,11 +42,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import org.junit.Before;
 import org.junit.Test;
 import sun.security.provider.PolicyParser;
@@ -68,7 +73,7 @@ public class PolicyEditorTest {
         final Collection<String> initialCodebases = editor.getCodebases();
         assertTrue("Editor should have one codebase to begin with", initialCodebases.size() == 1);
         assertTrue("Editor's initial codebase should be \"\" (empty string)",
-                          initialCodebases.toArray(new String[initialCodebases.size()])[0].equals(""));
+                initialCodebases.toArray(new String[initialCodebases.size()])[0].equals(""));
     }
 
     @Test
@@ -278,6 +283,96 @@ public class PolicyEditorTest {
         for (final String codebase : toAdd) {
             assertTrue("Editor should have " + codebase, codebases.contains(codebase));
         }
+    }
+
+    @Test
+    public void testFilePathArgumentMainArg() {
+        String[] args = new String[] { "foo" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getFilePathArgument(optionParser);
+        assertTrue(result.equals("foo"));
+    }
+
+    @Test
+    public void testFilePathArgumentMainArg2() {
+        String[] args = new String[] { "-codebase", "http://example.com", "foo" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getFilePathArgument(optionParser);
+        assertTrue(result.equals("foo"));
+    }
+
+    @Test
+    public void testFilePathArgumentFileSwitch() {
+        String[] args = new String[] { "-file", "foo" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getFilePathArgument(optionParser);
+        assertTrue(result.equals("foo"));
+    }
+
+    @Test
+    public void testFilePathArgumentFileSwitch2() {
+        String[] args = new String[] { "-codebase", "http://example.com", "-file", "foo" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getFilePathArgument(optionParser);
+        assertTrue(result.equals("foo"));
+    }
+
+    @Test
+    public void testFilePathArgumentDefaultFileSwitch() throws URISyntaxException {
+        String[] args = new String[] { "-defaultfile" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getFilePathArgument(optionParser);
+        assertTrue(result.equals(new File(new URI(PathsAndFiles.JAVA_POLICY.getFullPath())).getAbsolutePath()));
+    }
+
+    @Test
+    public void testFilePathArgumentDefaultFileSwitch2() throws URISyntaxException {
+        String[] args = new String[] { "-codebase", "http://example.com", "-defaultfile" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getFilePathArgument(optionParser);
+        assertTrue(result.equals(new File(new URI(PathsAndFiles.JAVA_POLICY.getFullPath())).getAbsolutePath()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMainArgAndFileSwitch() {
+        String[] args = new String[] { "-file", "foo", "bar" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getFilePathArgument(optionParser);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMainArgAndFileSwitch2() {
+        String[] args = new String[] { "bar", "-file", "foo" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getFilePathArgument(optionParser);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDefaultFileSwitchAndMainArg() {
+        String[] args = new String[] { "-defaultfile", "foo" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getFilePathArgument(optionParser);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDefaultFileSwitchAndMainArg2() {
+        String[] args = new String[] { "foo", "-defaultfile" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getFilePathArgument(optionParser);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDefaultFileSwitchAndMainArgAndFileSwitch() {
+        String[] args = new String[] { "-defaultfile", "-file", "foo" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getFilePathArgument(optionParser);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDefaultFileSwitchAndMainArgAndFileSwitch2() {
+        String[] args = new String[] { "-file", "foo", "-defaultfile" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getFilePathArgument(optionParser);
     }
 
 }

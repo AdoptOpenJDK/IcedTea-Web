@@ -1,3 +1,11 @@
+2015-07-30  Andrew Azores  <aazores@redhat.com>
+
+	Add tests for PolicyEditor.getFilePathArgument
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(getFilePathArgument): made package-private for testing
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java:
+	new tests for PolicyEditor.getFilePathArgument
+
 2015-07-30  Jiri Vanek  <jvanek@redhat.com>
 
 	Added more asserts to MixedSigningAndTrustedOnly tests
