@@ -56,7 +56,8 @@ import org.junit.BeforeClass;
 
 /**
  * 
- * Very simple tests. Basic behavior. jnlp and html with single signed jar, no trusted-only  manifest 
+ * Very simple tests. Basic behavior. jnlp and html with single signed jar, trusted-only   in manifest 
+ * note - this file is declared to be in package, but directory is wrong. Itw reproducers engine needs it like it, but your ide may complain. Try to live with. Sorry
  */
 public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
 
@@ -118,6 +119,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.JNLP_APP, C1, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, true);
         ProcessResult pr = server.executeJavaws(HEADLESS, file, new AutoOkClosingListener(), new AutoErrorClosingListener());
+        assertAllOk(pr);
     }
 
     @Test
@@ -126,6 +128,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.JNLP_APPLET, C1, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, true);
         ProcessResult pr = server.executeJavaws(file, new AutoOkClosingListener(), new AutoErrorClosingListener());
+        assertAllOk(pr);
     }
 
     @NeedsDisplay
@@ -135,6 +138,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.HTML, C2, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, false);
         ProcessResult pr = server.executeBrowser(file, AutoClose.CLOSE_ON_BOTH);
+        assertAllOk(pr);
     }
     
     @NeedsDisplay
@@ -143,6 +147,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.HTML, C2, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, false);
         ProcessResult pr = server.executeJavaws(HTML, file, new AutoOkClosingListener(), new AutoErrorClosingListener());
+        assertAllOk(pr);
     }
 
     @Test
@@ -171,6 +176,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.JNLP_APP, C2, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, true);
         ProcessResult pr = server.executeJavaws(HEADLESS, file, new AutoOkClosingListener(), new AutoErrorClosingListener());
+        assertAllOk(pr);
     }
 
     @Test
@@ -179,6 +185,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.JNLP_APPLET, C2, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, true);
         ProcessResult pr = server.executeJavaws(file, new AutoOkClosingListener(), new AutoErrorClosingListener());
+        assertAllOk(pr);
     }
 
 

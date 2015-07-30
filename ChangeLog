@@ -1,3 +1,9 @@
+2015-07-30  Jiri Vanek  <jvanek@redhat.com>
+
+	Added more asserts to MixedSigningAndTrustedOnly tests
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyBS1.java
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyBSmanifest.java
+
 2015-07-30  Andrew Azores  <aazores@redhat.com>
 
 	Add -defaultfile switch to PolicyEditor
