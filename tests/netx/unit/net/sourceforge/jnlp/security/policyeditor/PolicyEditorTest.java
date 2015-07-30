@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import static net.sourceforge.jnlp.security.policyeditor.PolicyEditor.identifierFromCodebase;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -48,6 +49,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import sun.security.provider.PolicyParser;
 
 public class PolicyEditorTest {
 
@@ -58,6 +60,7 @@ public class PolicyEditorTest {
     public void setNewTempfile() throws Exception {
         tempFilePath = File.createTempFile("policyeditor", null).getCanonicalPath();
         editor = new PolicyEditor(tempFilePath);
+        editor.openPolicyFileSynchronously();
     }
 
     @Test
@@ -65,13 +68,14 @@ public class PolicyEditorTest {
         final Collection<String> initialCodebases = editor.getCodebases();
         assertTrue("Editor should have one codebase to begin with", initialCodebases.size() == 1);
         assertTrue("Editor's initial codebase should be \"\" (empty string)",
-                initialCodebases.toArray(new String[0])[0].equals(""));
+                          initialCodebases.toArray(new String[initialCodebases.size()])[0].equals(""));
     }
 
     @Test
     public void testAddCodebase() throws Exception {
         final String urlString = "http://example.com";
-        editor.addNewCodebase(urlString);
+        final PolicyIdentifier identifier = identifierFromCodebase(urlString);
+        editor.addNewEntry(identifier);
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));
         assertTrue("Editor should have http://example.com", codebases.contains(urlString));
@@ -80,11 +84,11 @@ public class PolicyEditorTest {
 
     @Test
     public void addMultipleCodebases() throws Exception {
-        final Set<String> toAdd = new HashSet<String>();
+        final Set<String> toAdd = new HashSet<>();
         toAdd.add("http://example.com");
         toAdd.add("http://icedtea.classpath.org");
         for (final String cb : toAdd) {
-            editor.addNewCodebase(cb);
+            editor.addNewEntry(identifierFromCodebase(cb));
         }
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));
@@ -96,7 +100,7 @@ public class PolicyEditorTest {
     @Test
     public void testAddInvalidUrlCodebase() throws Exception {
         final String invalidUrl = "url.com"; // missing protocol -> invalid
-        editor.addNewCodebase(invalidUrl);
+        editor.addNewEntry(identifierFromCodebase(invalidUrl));
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));
         assertTrue("Editor should only have default codebase", codebases.size() == 1);
@@ -105,12 +109,13 @@ public class PolicyEditorTest {
     @Test
     public void testRemoveCodebase() throws Exception {
         final String urlString = "http://example.com";
-        editor.addNewCodebase(urlString);
+        final PolicyIdentifier identifier = identifierFromCodebase(urlString);
+        editor.addNewEntry(identifier);
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));
         assertTrue("Editor should have http://example.com", codebases.contains(urlString));
         assertEquals("Editor should only have two codebases", codebases.size(), 2);
-        editor.removeCodebase(urlString);
+        editor.removeIdentifier(identifier);
         final Collection<String> afterRemove = editor.getCodebases();
         assertTrue("Editor should have default codebase", afterRemove.contains(""));
         assertFalse("Editor should not have http://example.com. Contained: " + afterRemove, afterRemove.contains(urlString));
@@ -122,16 +127,18 @@ public class PolicyEditorTest {
         final String originalUrl = "http://example.com";
         final String renamedUrl = "http://example.com/example";
         final PolicyEditorPermissions clipBoard = PolicyEditorPermissions.CLIPBOARD;
-        editor.addNewCodebase(originalUrl);
-        editor.setPermission(originalUrl, clipBoard, Boolean.TRUE);
+        final PolicyIdentifier identifier = identifierFromCodebase(originalUrl);
+        editor.addNewEntry(identifier);
+        editor.setPermission(identifier, clipBoard, Boolean.TRUE);
         final Collection<String> beforeRenameCodebases = editor.getCodebases();
         assertTrue("Editor should contain " + originalUrl, beforeRenameCodebases.contains(originalUrl));
-        assertTrue(originalUrl + " should have " + clipBoard, editor.getPermissions(originalUrl).get(clipBoard));
-        editor.renameCodebase(originalUrl, renamedUrl);
+        assertTrue(originalUrl + " should have " + clipBoard, editor.getPermissions(identifier).get(clipBoard));
+        editor.modifyCodebase(identifier, renamedUrl);
         final Collection<String> afterRenamedCodebases = editor.getCodebases();
         assertFalse("Editor should not contain old codebase: " + originalUrl, afterRenamedCodebases.contains(originalUrl));
         assertTrue("Editor should contain new codebase name: " + renamedUrl, afterRenamedCodebases.contains(renamedUrl));
-        assertTrue("Renamed " + renamedUrl + " should have " + clipBoard, editor.getPermissions(renamedUrl).get(clipBoard));
+        final PolicyIdentifier renamedIdentifier = identifierFromCodebase(renamedUrl);
+        assertTrue("Renamed " + renamedUrl + " should have " + clipBoard, editor.getPermissions(renamedIdentifier).get(clipBoard));
     }
 
     @Test
@@ -139,54 +146,60 @@ public class PolicyEditorTest {
         final String copyUrl = "http://example.com";
         final String pasteUrl = "http://example.com/example";
         final PolicyEditorPermissions clipBoard = PolicyEditorPermissions.CLIPBOARD;
-        editor.addNewCodebase(copyUrl);
-        editor.setPermission(copyUrl, clipBoard, Boolean.TRUE);
+        final PolicyIdentifier identifier = identifierFromCodebase(copyUrl);
+        editor.addNewEntry(identifier);
+        editor.setPermission(identifier, clipBoard, Boolean.TRUE);
         final Collection<String> beforePasteCodebases = editor.getCodebases();
         assertTrue("Editor should contain original codebase: " + copyUrl, beforePasteCodebases.contains(copyUrl));
-        assertTrue(copyUrl + " should have " + clipBoard, editor.getPermissions(copyUrl).get(clipBoard));
-        editor.copyCodebase(copyUrl);
-        editor.pasteCodebase(pasteUrl);
+        assertTrue(copyUrl + " should have " + clipBoard, editor.getPermissions(identifier).get(clipBoard));
+        editor.copyEntry(identifier);
+        final PolicyIdentifier pastedIdentifier = identifierFromCodebase(pasteUrl);
+        editor.pasteEntry(pastedIdentifier);
         final Collection<String> afterPasteCodebases = editor.getCodebases();
         assertTrue("Editor should still contain original codebase: " + copyUrl, afterPasteCodebases.contains(copyUrl));
         assertTrue("Editor should also contain pasted codebase:" + pasteUrl, afterPasteCodebases.contains(pasteUrl));
-        assertTrue(copyUrl + " should have " + clipBoard, editor.getPermissions(copyUrl).get(clipBoard));
-        assertTrue(pasteUrl + " should have " + clipBoard, editor.getPermissions(pasteUrl).get(clipBoard));
+        assertTrue(copyUrl + " should have " + clipBoard, editor.getPermissions(identifier).get(clipBoard));
+        assertTrue(pasteUrl + " should have " + clipBoard, editor.getPermissions(pastedIdentifier).get(clipBoard));
     }
 
     @Test
     public void testAddCustomPermissionNoActions() throws Exception {
         final String codebase = "http://example.com";
-        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
-        editor.addCustomPermission(codebase, customPermission);
-        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(codebase).contains(customPermission));
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission("java.lang.RuntimePermission", "createClassLoader");
+        final PolicyIdentifier identifier = identifierFromCodebase(codebase);
+        editor.addCustomPermission(identifier, customPermission);
+        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(identifier).contains(customPermission));
     }
 
     @Test
     public void testAddCustomPermissionEmptyActions() throws Exception {
         final String codebase = "http://example.com";
-        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
-        editor.addCustomPermission(codebase, customPermission);
-        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(codebase).contains(customPermission));
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission("java.lang.RuntimePermission", "createClassLoader", "");
+        final PolicyIdentifier identifier = identifierFromCodebase(codebase);
+        editor.addCustomPermission(identifier, customPermission);
+        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(identifier).contains(customPermission));
     }
 
     @Test
     public void testClearCustomPermissionsNoActions() throws Exception {
         final String codebase = "http://example.com";
-        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
-        editor.addCustomPermission(codebase, customPermission);
-        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(codebase).contains(customPermission));
-        editor.clearCustomPermissions(codebase);
-        assertEquals(0, editor.getCustomPermissions(codebase).size());
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission("java.lang.RuntimePermission", "createClassLoader");
+        final PolicyIdentifier identifier = identifierFromCodebase(codebase);
+        editor.addCustomPermission(identifier, customPermission);
+        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(identifier).contains(customPermission));
+        editor.clearCustomPermissions(identifier);
+        assertEquals(0, editor.getCustomPermissions(identifier).size());
     }
 
     @Test
     public void testClearCustomPermissionsEmptyActions() throws Exception {
         final String codebase = "http://example.com";
-        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
-        editor.addCustomPermission(codebase, customPermission);
-        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(codebase).contains(customPermission));
-        editor.clearCustomPermissions(codebase);
-        assertEquals(0, editor.getCustomPermissions(codebase).size());
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission("java.lang.RuntimePermission", "createClassLoader", "");
+        final PolicyIdentifier identifier = identifierFromCodebase(codebase);
+        editor.addCustomPermission(identifier, customPermission);
+        assertTrue("Editor custom permissions should include " + customPermission + " but did not", editor.getCustomPermissions(identifier).contains(customPermission));
+        editor.clearCustomPermissions(identifier);
+        assertEquals(0, editor.getCustomPermissions(identifier).size());
     }
 
     @Test
@@ -201,11 +214,11 @@ public class PolicyEditorTest {
 
     @Test
     public void testReturnedPermissionsMapIsCopy() throws Exception {
-        final Map<PolicyEditorPermissions, Boolean> original = editor.getPermissions("");
+        final Map<PolicyEditorPermissions, Boolean> original = editor.getPermissions(PolicyIdentifier.ALL_APPLETS_IDENTIFIER);
         for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
             original.put(perm, true);
         }
-        final Map<PolicyEditorPermissions, Boolean> second = editor.getPermissions("");
+        final Map<PolicyEditorPermissions, Boolean> second = editor.getPermissions(PolicyIdentifier.ALL_APPLETS_IDENTIFIER);
         for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : second.entrySet()) {
             assertFalse("Permission " + entry.getKey() + " should be false", entry.getValue());
         }
@@ -213,18 +226,19 @@ public class PolicyEditorTest {
 
     @Test
     public void testReturnedCustomPermissionsSetIsCopy() throws Exception {
-        final Collection<CustomPermission> original = editor.getCustomPermissions("");
+        final Collection<PolicyParser.PermissionEntry> original = editor.getCustomPermissions(PolicyIdentifier.ALL_APPLETS_IDENTIFIER);
         assertTrue("There should not be any custom permissions to start", original.isEmpty());
-        original.add(new CustomPermission("java.io.FilePermission", "*", "write"));
-        final Collection<CustomPermission> second = editor.getCustomPermissions("");
+        original.add(new CustomPolicyViewer.DisplayablePermission("java.io.FilePermission", "*", "write"));
+        final Collection<PolicyParser.PermissionEntry> second = editor.getCustomPermissions(PolicyIdentifier.ALL_APPLETS_IDENTIFIER);
         assertTrue("The custom permission should not have been present", second.isEmpty());
     }
 
     @Test
     public void testDefaultPermissionsAllFalse() throws Exception {
-        final Map<PolicyEditorPermissions, Boolean> defaultMap = editor.getPermissions("");
-        editor.addNewCodebase("http://example.com");
-        final Map<PolicyEditorPermissions, Boolean> addedMap = editor.getPermissions("http://example.com");
+        final Map<PolicyEditorPermissions, Boolean> defaultMap = editor.getPermissions(PolicyIdentifier.ALL_APPLETS_IDENTIFIER);
+        final PolicyIdentifier exampleIdentifier = identifierFromCodebase("http://example.com");
+        editor.addNewEntry(exampleIdentifier);
+        final Map<PolicyEditorPermissions, Boolean> addedMap = editor.getPermissions(exampleIdentifier);
         for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : defaultMap.entrySet()) {
             assertFalse("Permission " + entry.getKey() + " should be false", entry.getValue());
         }
@@ -235,9 +249,10 @@ public class PolicyEditorTest {
 
     @Test
     public void testAllPermissionsRepresented() throws Exception {
-        final Map<PolicyEditorPermissions, Boolean> defaultMap = editor.getPermissions("");
-        editor.addNewCodebase("http://example.com");
-        final Map<PolicyEditorPermissions, Boolean> addedMap = editor.getPermissions("http://example.com");
+        final Map<PolicyEditorPermissions, Boolean> defaultMap = editor.getPermissions(PolicyIdentifier.ALL_APPLETS_IDENTIFIER);
+        final PolicyIdentifier exampleIdentifier = identifierFromCodebase("http://example.com");
+        editor.addNewEntry(exampleIdentifier);
+        final Map<PolicyEditorPermissions, Boolean> addedMap = editor.getPermissions(exampleIdentifier);
         assertTrue("Default codebase permissions keyset should be the same size as enum values set",
                 defaultMap.keySet().size() == PolicyEditorPermissions.values().length);
         assertTrue("Added codebase permissions keyset should be the same size as enum values set",
@@ -252,11 +267,11 @@ public class PolicyEditorTest {
 
     @Test
     public void testCodebaseTrailingSlashesDoNotMatch() throws Exception {
-        final Set<String> toAdd = new HashSet<String>();
-        toAdd.add("http://redhat.com");
-        toAdd.add("http://redhat.com/");
+        final Set<String> toAdd = new HashSet<>();
+        toAdd.add("http://example.com");
+        toAdd.add("http://example.com/");
         for (final String cb : toAdd) {
-            editor.addNewCodebase(cb);
+            editor.addNewEntry(identifierFromCodebase(cb));
         }
         final Collection<String> codebases = editor.getCodebases();
         assertTrue("Editor should have default codebase", codebases.contains(""));

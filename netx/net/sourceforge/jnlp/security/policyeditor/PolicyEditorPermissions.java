@@ -36,6 +36,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import sun.security.provider.PolicyParser;
+
+import java.io.Serializable;
 import java.util.Map;
 import javax.swing.JCheckBox;
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -45,7 +48,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * Defines the set of default permissions for PolicyEditor, ie the ones which are assigned
  * dedicated checkboxes
  */
-public enum PolicyEditorPermissions {
+public enum PolicyEditorPermissions implements Serializable {
 
     READ_LOCAL_FILES(R("PEReadFiles"), R("PEReadFilesDetail"),
             PermissionType.FILE_PERMISSION, PermissionTarget.USER_HOME, PermissionActions.READ),
@@ -123,7 +126,7 @@ public enum PolicyEditorPermissions {
 
         ReadFileSystem(R("PEGReadFileSystem"),  READ_LOCAL_FILES, READ_PROPERTIES, READ_SYSTEM_FILES, READ_TMP_FILES, GET_ENV),
         WriteFileSystem(R("PEGWriteFileSystem"), WRITE_LOCAL_FILES, DELETE_LOCAL_FILES, WRITE_PROPERTIES, WRITE_SYSTEM_FILES, WRITE_TMP_FILES, DELETE_TMP_FILES, EXEC_COMMANDS),
-        AccessUnownedCode(R("PEGAccesUnowenedCode"), JAVA_REFLECTION, GET_CLASSLOADER, ACCESS_CLASS_IN_PACKAGE, ACCESS_DECLARED_MEMBERS, ACCESS_THREADS, ACCESS_THREAD_GROUPS),
+        AccessUnownedCode(R("PEGAccessUnownedCode"), JAVA_REFLECTION, GET_CLASSLOADER, ACCESS_CLASS_IN_PACKAGE, ACCESS_DECLARED_MEMBERS, ACCESS_THREADS, ACCESS_THREAD_GROUPS),
         MediaAccess(R("PEGMediaAccess"), PLAY_AUDIO, RECORD_AUDIO, PRINT, CLIPBOARD);
 
         private final PolicyEditorPermissions[] permissions;
@@ -161,15 +164,15 @@ public enum PolicyEditorPermissions {
          * 0 invalid
          * - none is selected
          */
-        public int getState (final Map<PolicyEditorPermissions, Boolean> map) {
+        public int getState(final Map<PolicyEditorPermissions, Boolean> map) {
             boolean allTrue = true;
             boolean allFalse = true;
             for (final PolicyEditorPermissions pp : getPermissions()) {
                 final Boolean b = map.get(pp);
-                if (b == null){
+                if (b == null) {
                     return 0;
                 }
-                if (b.booleanValue()){
+                if (b) {
                     allFalse = false;
                 } else {
                     allTrue = false;
@@ -283,28 +286,18 @@ public enum PolicyEditorPermissions {
         return string.replaceAll("[\\[\\]\\s]", "");
     }
 
-    /**
-     * Get a PolicyEditorPermissions instance matching the input string
-     * @param string a full policy file permissions line, eg `permission java.io.FilePermission "${io.tmpdir}" "read;"`
-     * @return the PolicyEditorPermissions value matching the input String, or null if no such match is found
-     */
-    public static PolicyEditorPermissions fromString(final String string) {
-        final CustomPermission tmpPerm = CustomPermission.fromString(string);
-        if (tmpPerm == null) {
-            return null;
-        }
-
-        final PermissionType type = PermissionType.fromString(tmpPerm.type);
-        final PermissionTarget target = PermissionTarget.fromString(tmpPerm.target);
-        final PermissionActions actions = PermissionActions.fromString(tmpPerm.actions);
-
-        for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
-            final boolean sameType = perm.type.equals(type);
-            final boolean sameTarget = perm.target.equals(target);
-            final boolean sameActions = perm.actions.getActions().equals(actions.getActions());
-
-            if (sameType && sameTarget && sameActions) {
-                return perm;
+    public static PolicyEditorPermissions fromPermissionEntry(final PolicyParser.PermissionEntry permissionEntry) {
+        for (final PolicyEditorPermissions permission : values()) {
+            final String actionsString;
+            if (permission.getActions().equals(PermissionActions.NONE)) {
+                actionsString = null;
+            } else {
+                actionsString = permission.getActions().rawString();
+            }
+            final PolicyParser.PermissionEntry editorEntry =
+                    new PolicyParser.PermissionEntry(permission.getType().type, permission.getTarget().target, actionsString);
+            if (editorEntry.equals(permissionEntry)) {
+                return permission;
             }
         }
         return null;

@@ -36,6 +36,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import sun.security.provider.PolicyParser;
+
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.GridBagConstraints;
@@ -67,31 +69,32 @@ import javax.swing.border.EmptyBorder;
  */
 public class CustomPolicyViewer extends JFrame {
 
-    private final Collection<CustomPermission> customPermissions = new TreeSet<>();
+    private final Collection<DisplayablePermission> customPermissions = new TreeSet<>();
     private final JScrollPane scrollPane = new JScrollPane();
-    private final DefaultListModel<CustomPermission> listModel = new DefaultListModel<>();
-    private final JList<CustomPermission> list = new JList<>(listModel);
+    private final DefaultListModel<DisplayablePermission> listModel = new DefaultListModel<>();
+    private final JList<DisplayablePermission> list = new JList<>(listModel);
     private final JButton addButton = new JButton(), removeButton = new JButton(), closeButton = new JButton();
     private final JLabel listLabel = new JLabel();
     private final ActionListener addButtonAction, removeButtonAction, closeButtonAction;
     private final PolicyEditor parent;
-    private final String codebase;
+    private final PolicyIdentifier policyIdentifier;
 
     /**
      * @param parent the parent PolicyEditor which created this CustomPolicyViewer
-     * @param codebase the codebase for which these custom permissions are enabled
-     * @param policyFile the PolicyFileModel
+     * @param policyIdentifier the policy identifier for which these custom permissions are enabled
      */
-    public CustomPolicyViewer(final PolicyEditor parent, final String codebase) {
+    public CustomPolicyViewer(final PolicyEditor parent, final PolicyIdentifier policyIdentifier) {
         super();
         Objects.requireNonNull(parent);
-        Objects.requireNonNull(codebase);
+        Objects.requireNonNull(policyIdentifier);
         this.parent = parent;
-        this.codebase = codebase;
+        this.policyIdentifier = policyIdentifier;
         setLayout(new GridBagLayout());
         setTitle(R("PECPTitle"));
-        customPermissions.addAll(parent.getCustomPermissions(codebase));
-        for (final CustomPermission perm : customPermissions) {
+        for (final PolicyParser.PermissionEntry permissionEntry : parent.getCustomPermissions(policyIdentifier)) {
+            customPermissions.add(DisplayablePermission.from(permissionEntry));
+        }
+        for (final DisplayablePermission perm : customPermissions) {
             listModel.addElement(perm);
         }
 
@@ -115,7 +118,7 @@ public class CustomPolicyViewer extends JFrame {
                 } else {
                     actions = "";
                 }
-                final CustomPermission perm = new CustomPermission(type, target, actions);
+                final PolicyParser.PermissionEntry perm = new PolicyParser.PermissionEntry(type, target, actions);
                 addCustomPermission(perm);
             }
         };
@@ -125,7 +128,7 @@ public class CustomPolicyViewer extends JFrame {
         removeButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                final CustomPermission selected = list.getSelectedValue();
+                final PolicyParser.PermissionEntry selected = list.getSelectedValue();
                 if (selected == null) {
                     return;
                 }
@@ -144,13 +147,7 @@ public class CustomPolicyViewer extends JFrame {
         closeButton.setText(R("PECPCloseButton"));
         closeButton.addActionListener(closeButtonAction);
 
-        final String codebaseText;
-        if (codebase.trim().isEmpty()) {
-            codebaseText = R("PEGlobalSettings");
-        } else {
-            codebaseText = codebase;
-        }
-        listLabel.setText(R("PECPListLabel", codebaseText));
+        listLabel.setText(R("PECPListLabel", policyIdentifier.toStringNoHtml()));
 
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -215,35 +212,83 @@ public class CustomPolicyViewer extends JFrame {
     /**
      * Update the custom permissions map. Used by the Custom Policy Viewer to update its parent
      * PolicyEditor to changes it has made
-     * @param codebase the codebase for which changes were made
-     * @param permissions the permissions granted to this codebase
      */
     private void updateCustomPermissions() {
         parent.setChangesMade(true);
-        parent.clearCustomPermissions(codebase);
-        for (final CustomPermission permission : customPermissions) {
-            parent.addCustomPermission(codebase, permission);
+        parent.clearCustomPermissions(policyIdentifier);
+        for (final PolicyParser.PermissionEntry permission : customPermissions) {
+            parent.addCustomPermission(policyIdentifier, permission);
         }
     }
 
-    void addCustomPermission(final CustomPermission permission) {
+    void addCustomPermission(final PolicyParser.PermissionEntry permission) {
         Objects.requireNonNull(permission);
-        if (customPermissions.add(permission)) {
-            listModel.addElement(permission);
+        final DisplayablePermission displayablePermission = DisplayablePermission.from(permission);
+        if (customPermissions.add(displayablePermission)) {
+            listModel.addElement(displayablePermission);
             updateCustomPermissions();
         }
         list.setSelectedValue(permission, true);
     }
 
-    void removeCustomPermission(final CustomPermission permission) {
+    void removeCustomPermission(final PolicyParser.PermissionEntry permission) {
         Objects.requireNonNull(permission);
-        customPermissions.remove(permission);
+        customPermissions.remove(DisplayablePermission.from(permission));
         listModel.removeElement(permission);
         updateCustomPermissions();
     }
 
-    Collection<CustomPermission> getCopyOfCustomPermissions() {
+    Collection<DisplayablePermission> getCopyOfCustomPermissions() {
         return new TreeSet<>(customPermissions);
+    }
+
+    public static class DisplayablePermission extends PolicyParser.PermissionEntry implements Comparable<PolicyParser.PermissionEntry> {
+
+        public DisplayablePermission(final PermissionType type, final PermissionTarget target) {
+            this(type, target, PermissionActions.NONE);
+        }
+
+        public DisplayablePermission(final PermissionType type, final PermissionTarget target, final PermissionActions actions) {
+            this(type.type, target.target, actions.rawString());
+        }
+
+        public DisplayablePermission(final String type, final String target) {
+            this(type, target, null);
+        }
+
+        public DisplayablePermission(final String permission, final String name, final String action) {
+            super(permission, name, action);
+        }
+
+        public static DisplayablePermission from(final PolicyParser.PermissionEntry permissionEntry) {
+            return new DisplayablePermission(permissionEntry.permission, permissionEntry.name, permissionEntry.action);
+        }
+
+        @Override
+        public int compareTo(final PolicyParser.PermissionEntry o) {
+            return super.name.compareTo(o.name);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("permission ");
+            sb.append(permission);
+            sb.append(" \"");
+            sb.append(name);
+            sb.append("\"");
+
+            if (this.action == null || !this.action.trim().equals(PermissionActions.NONE.rawString())) {
+                sb.append(", \"");
+                sb.append(action);
+                sb.append("\"");
+            }
+
+            sb.append(";");
+
+            return sb.toString();
+        }
+
     }
 
 }

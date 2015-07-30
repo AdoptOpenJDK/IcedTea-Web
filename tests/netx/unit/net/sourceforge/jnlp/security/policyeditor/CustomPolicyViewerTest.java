@@ -36,35 +36,33 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import static net.sourceforge.jnlp.security.policyeditor.PolicyEditor.identifierFromCodebase;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collection;
-
-import net.sourceforge.jnlp.security.policyeditor.CustomPermission;
-import net.sourceforge.jnlp.security.policyeditor.CustomPolicyViewer;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
-
 import org.junit.Before;
 import org.junit.Test;
+import sun.security.provider.PolicyParser;
+
+import java.util.Collection;
 
 public class CustomPolicyViewerTest {
 
     private CustomPolicyViewer viewer;
-    private static final String CODEBASE = "http://example.com";
-    private static final CustomPermission PERMISSION = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
+    private static final PolicyIdentifier IDENTIFIER = identifierFromCodebase("http://example.com");
+    private static final CustomPolicyViewer.DisplayablePermission PERMISSION = CustomPolicyViewer.DisplayablePermission.from(new PolicyParser.PermissionEntry("java.lang.RuntimePermission", "createClassLoader", null));
 
     @Before
     public void setupViewer() {
-        viewer = new CustomPolicyViewer(new PolicyEditor(null), CODEBASE);
+        viewer = new CustomPolicyViewer(new PolicyEditor(null), IDENTIFIER);
     }
 
     @Test(expected = NullPointerException.class)
     public void testConstructorWithNullPolicyEditor() throws Exception {
-        new CustomPolicyViewer(null, CODEBASE);
+        new CustomPolicyViewer(null, IDENTIFIER);
     }
 
     @Test(expected = NullPointerException.class)
@@ -121,7 +119,7 @@ public class CustomPolicyViewerTest {
 
     @Test
     public void testGetCopyOfCustomPermissionsReturnsCopy() throws Exception {
-        final Collection<CustomPermission> permissions = viewer.getCopyOfCustomPermissions();
+        final Collection<CustomPolicyViewer.DisplayablePermission> permissions = viewer.getCopyOfCustomPermissions();
         permissions.add(PERMISSION);
         assertNotEquals("Sets should be distinct", viewer.getCopyOfCustomPermissions(), permissions);
         assertNotEquals("Sizes should not match", viewer.getCopyOfCustomPermissions().size(), permissions.size());

@@ -48,6 +48,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Permission;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 import javax.swing.AbstractButton;
@@ -62,7 +63,9 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
+import net.sourceforge.jnlp.security.policyeditor.PolicyIdentifier;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import sun.security.provider.PolicyParser;
 
 public class TemporaryPermissionsButton extends JButton {
 
@@ -169,12 +172,13 @@ public class TemporaryPermissionsButton extends JButton {
 
             if (policyEditorWindow == null || policyEditorWindow.getPolicyEditor().isClosed()) {
                 policyEditorWindow = PolicyEditor.getPolicyEditorDialog(filepath);
+                policyEditorWindow.getPolicyEditor().openPolicyFileSynchronously();
             } else {
                 policyEditorWindow.asWindow().toFront();
                 policyEditorWindow.asWindow().repaint();
             }
             policyEditorWindow.setModalityType(ModalityType.DOCUMENT_MODAL);
-            policyEditorWindow.getPolicyEditor().addNewCodebase(file.getCodeBase().toString());
+            policyEditorWindow.getPolicyEditor().addNewEntry(new PolicyIdentifier(null, Collections.<PolicyParser.PrincipalEntry>emptySet(), file.getCodeBase().toString()));
             policyEditorWindow.asWindow().setVisible(true);
             menu.setVisible(false);
         }

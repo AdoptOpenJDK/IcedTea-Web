@@ -36,165 +36,109 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
+import sun.security.provider.PolicyParser;
 
 /**
- * This class represents a codebase entry in a policy file. This is defined as a policy entry block
- * which begins with they keyword "grant" and ends with the delimiter "};". If the entry
- * contains a "codeBase $CODEBASE" substring after the "grant" keyword, then this information
- * is also included in this entry. Other entry "metadata" such as Principal is not defined.
- * Within a codebase entry block, lines are recognized and modelled as either PolicyEditorPermissions
- * or CustomPermissions.
+ * This class represents a "grant" entry in a policy file. This is defined as a policy entry block
+ * which begins with the keyword "grant" and ends with the delimiter "};".
  */
-public class PolicyEntry {
+public class PolicyEntry implements Serializable, Transferable {
 
-    private final String codebase;
-    private final Set<PolicyEditorPermissions> permissions = new HashSet<>();
-    private final Set<CustomPermission> customPermissions = new HashSet<>();
+    public static class Builder {
+        private String signedBy, codebase;
+        private final Set<PolicyEditorPermissions> permissions = EnumSet.noneOf(PolicyEditorPermissions.class);
+        private final Set<PolicyParser.PermissionEntry> customPermissions = new HashSet<>();
+        private final Set<PolicyParser.PrincipalEntry> principals = new HashSet<>();
 
-    public PolicyEntry(final String codebase, final Collection<PolicyEditorPermissions> permissions,
-            final Collection<CustomPermission> customPermissions) {
-        if (codebase == null) {
-            this.codebase = "";
-        } else {
-            this.codebase = codebase;
+        public Builder signedBy(final String signedBy) {
+            this.signedBy = signedBy;
+            return this;
         }
-        this.permissions.addAll(permissions);
+
+        public Builder principals(final Collection<PolicyParser.PrincipalEntry> principals) {
+            this.principals.addAll(principals);
+            return this;
+        }
+
+        public Builder codebase(final String codebase) {
+            this.codebase = codebase;
+            return this;
+        }
+
+        public Builder identifier(final PolicyIdentifier identifier) {
+            return signedBy(identifier.getSignedBy())
+                    .codebase(identifier.getCodebase())
+                    .principals(identifier.getPrincipals());
+        }
+
+        public Builder permissions(final Collection<PolicyEditorPermissions> permissions) {
+            this.permissions.addAll(permissions);
+            return this;
+        }
+
+        public Builder customPermissions(final Collection<? extends PolicyParser.PermissionEntry> customPermissions) {
+            this.customPermissions.addAll(customPermissions);
+            return this;
+        }
+
+        public PolicyEntry build() {
+            return new PolicyEntry(this);
+        }
+    }
+
+    public static final DataFlavor POLICY_ENTRY_DATA_FLAVOR = new DataFlavor(PolicyEntry.class, "PolicyEntry");
+
+    private final PolicyIdentifier policyIdentifier;
+    private final Set<PolicyEditorPermissions> permissions = new HashSet<>();
+    private final Set<PolicyParser.PermissionEntry> customPermissions = new HashSet<>();
+
+    private PolicyEntry(final Builder builder) {
+        this.policyIdentifier = new PolicyIdentifier(builder.signedBy, builder.principals, builder.codebase);
+        this.permissions.addAll(builder.permissions);
         this.permissions.remove(null);
-        this.customPermissions.addAll(customPermissions);
+        this.customPermissions.addAll(builder.customPermissions);
         this.customPermissions.remove(null);
     }
 
-    public String getCodebase() {
-        return codebase;
+    public PolicyIdentifier getPolicyIdentifier() {
+        return policyIdentifier;
     }
 
     public Set<PolicyEditorPermissions> getPermissions() {
         return permissions;
     }
 
-    public Set<CustomPermission> getCustomPermissions() {
+    public Set<PolicyParser.PermissionEntry> getCustomPermissions() {
         return customPermissions;
     }
 
-    public static PolicyEntry fromString(final String contents) throws InvalidPolicyException {
-        final List<String> lines = Arrays.asList(contents.split("\\r?\\n+"));
-        if (!validatePolicy(lines)) {
-            throw new InvalidPolicyException();
-        }
-
-        String codebase = "";
-        final Set<PolicyEditorPermissions> permissions = new HashSet<>();
-        final Set<CustomPermission> customPermissions = new HashSet<>();
-
-        boolean openBlock = false, commentBlock = false;
-        for (final String line : lines) {
-            // Matches eg `grant {` as well as `grant codeBase "http://redhat.com" {`
-            final Pattern openBlockPattern = Pattern.compile("grant\\s*\"?\\s*(?:codeBase)?\\s*\"?([^\"\\s]*)\"?\\s*\\{");
-            final Matcher openBlockMatcher = openBlockPattern.matcher(line);
-            if (openBlockMatcher.matches()) {
-                // Codebase URL
-                codebase = openBlockMatcher.group(1);
-                openBlock = true;
-                continue;
-            }
-
-            // Matches '};', the closing block delimiter, with any amount of whitespace on either side
-            boolean commentLine = false;
-            if (line.matches("\\s*\\};\\s*")) {
-                openBlock = false;
-            }
-            // Matches '/*', the start of a block comment
-            if (line.matches(".*/\\*.*")) {
-                commentBlock = true;
-            }
-            // Matches '*/', the end of a block comment, and '//', a single-line comment
-            if (line.matches(".*\\*/.*")) {
-                commentBlock = false;
-            }
-            if (line.matches(".*/\\*.*") && line.matches(".*\\*/.*")) {
-                commentLine = true;
-            }
-            if (line.matches("\\s*//.*")) {
-                commentLine = true;
-            }
-
-            if (!openBlock || commentBlock || commentLine) {
-                continue;
-            }
-
-            final PolicyEditorPermissions perm = PolicyEditorPermissions.fromString(line);
-            if (perm != null) {
-                permissions.add(perm);
-            } else {
-                final CustomPermission cPerm = CustomPermission.fromString(line.trim());
-                if (cPerm != null) {
-                    customPermissions.add(cPerm);
-                }
-            }
-        }
-        return new PolicyEntry(codebase, permissions, customPermissions);
-    }
-
-    public static boolean validatePolicy(final String content) {
-        return validatePolicy(Arrays.asList(content.split("\\r?\\n")));
-    }
-
-    public static boolean validatePolicy(final List<String> lines) {
-        int openerCount = 0, closerCount = 0;
-        for (final String line : lines) {
-            final Pattern openBlockPattern = Pattern.compile("grant\\s*\"?\\s*(?:codeBase)?\\s*\"?([^\"\\s]*)\"?\\s*\\{");
-            final Matcher openBlockMatcher = openBlockPattern.matcher(line);
-            if (openBlockMatcher.matches()) {
-                ++openerCount;
-            }
-
-            if (line.matches("\\s*\\};\\s*")) {
-                ++closerCount;
-            }
-        }
-        return (openerCount == 1) && (closerCount == 1);
+    @Override
+    public DataFlavor[] getTransferDataFlavors() {
+        return new DataFlavor[] { POLICY_ENTRY_DATA_FLAVOR };
     }
 
     @Override
-    public String toString() {
-        // Empty codebase is the default "All Applets" codebase. If there are no permissions
-        // applied to it, then don't bother recording it in the policy file.
-        if (codebase.isEmpty() && permissions.isEmpty() && customPermissions.isEmpty()) {
-            return "";
-        }
-        final String newline = PlainTextFormatter.getLineSeparator();
-        final StringBuilder result = new StringBuilder();
+    public boolean isDataFlavorSupported(final DataFlavor dataFlavor) {
+        return Objects.equals(POLICY_ENTRY_DATA_FLAVOR, dataFlavor);
+    }
 
-        result.append(newline);
-        result.append("grant");
-        if (!codebase.isEmpty()) {
-            result.append(" codeBase \"");
-            result.append(codebase);
-            result.append("\"");
+    @Override
+    public Object getTransferData(final DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
+        if (!Arrays.asList(getTransferDataFlavors()).contains(dataFlavor)) {
+            throw new UnsupportedFlavorException(dataFlavor);
         }
-        result.append(" {");
-        result.append(newline);
-        for (final PolicyEditorPermissions perm : permissions) {
-            result.append("\t");
-            result.append(perm.toPermissionString());
-            result.append(newline);
-        }
-        for (final CustomPermission customPerm : customPermissions) {
-            result.append("\t");
-            result.append(customPerm.toString().trim());
-            result.append(newline);
-        }
-        result.append("};");
-        result.append(newline);
-        return result.toString();
+        return this;
     }
 
 }

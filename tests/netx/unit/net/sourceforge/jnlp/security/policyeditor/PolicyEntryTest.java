@@ -37,52 +37,56 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.policyeditor;
 
 import org.junit.Test;
+import sun.security.provider.PolicyParser;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * PolicyEntryTest does not test the various parsing scenarios as those are tested in PolicyEditorParsingTest
  */
 public class PolicyEntryTest {
 
-    public static final String POLICY_ENTRY_STRING = "\ngrant codeBase \"http://example.com\" {\n" +
-                                                        "\tpermission java.awt.AWTPermission \"accessClipboard\";\n" +
-                                                    "};\n";
-    public static final String INVALID_POLICY_STRING = "\ngrant codeBase http://example.com {\n" +
-                                                        "\tpermission java.awt.AWTPermission \"accessClipboard\";" +
-                                                    "}";
-
     @Test
     public void testGetCodebase() throws Exception {
         final String codebase = "http://example.com";
         final Set<PolicyEditorPermissions> permissions = Collections.singleton(PolicyEditorPermissions.CLIPBOARD);
-        final Set<CustomPermission> customPermissions = Collections.singleton(new CustomPermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
-        assertEquals("Codebase should equal input", codebase, policyEntry.getCodebase());
+        final Set<CustomPolicyViewer.DisplayablePermission> customPermissions = Collections.singleton(new CustomPolicyViewer.DisplayablePermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
+        final PolicyEntry policyEntry = new PolicyEntry.Builder()
+                .codebase(codebase)
+                .permissions(permissions)
+                .customPermissions(customPermissions)
+                .build();
+        assertEquals("Codebase should equal input", codebase, policyEntry.getPolicyIdentifier().getCodebase());
     }
 
     @Test
     public void testNullCodebaseConvertsToEmpty() throws Exception {
         final String codebase = null;
         final Set<PolicyEditorPermissions> permissions = Collections.singleton(PolicyEditorPermissions.CLIPBOARD);
-        final Set<CustomPermission> customPermissions = Collections.singleton(new CustomPermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
-        assertEquals("Null codebase should produce empty string", "", policyEntry.getCodebase());
+        final Set<CustomPolicyViewer.DisplayablePermission> customPermissions = Collections.singleton(new CustomPolicyViewer.DisplayablePermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
+        final PolicyEntry policyEntry = new PolicyEntry.Builder()
+                                                .codebase(codebase)
+                                                .permissions(permissions)
+                                                .customPermissions(customPermissions)
+                                                .build();
+        assertEquals("Null codebase should produce empty string", "", policyEntry.getPolicyIdentifier().getCodebase());
     }
 
     @Test
     public void testGetPermissions() throws Exception {
         final String codebase = "http://example.com";
         final Set<PolicyEditorPermissions> permissions = Collections.singleton(PolicyEditorPermissions.CLIPBOARD);
-        final Set<CustomPermission> customPermissions = Collections.singleton(new CustomPermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
+        final Set<CustomPolicyViewer.DisplayablePermission> customPermissions = Collections.singleton(new CustomPolicyViewer.DisplayablePermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
+        final PolicyEntry policyEntry = new PolicyEntry.Builder()
+                                                .codebase(codebase)
+                                                .permissions(permissions)
+                                                .customPermissions(customPermissions)
+                                                .build();
         assertEquals("Permissions set should equal input", permissions, policyEntry.getPermissions());
     }
 
@@ -94,8 +98,12 @@ public class PolicyEntryTest {
             add(PolicyEditorPermissions.CLIPBOARD);
             add(PolicyEditorPermissions.NETWORK);
         }};
-        final Set<CustomPermission> customPermissions = Collections.singleton(new CustomPermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
+        final Set<CustomPolicyViewer.DisplayablePermission> customPermissions = Collections.singleton(new CustomPolicyViewer.DisplayablePermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
+        final PolicyEntry policyEntry = new PolicyEntry.Builder()
+                                                .codebase(codebase)
+                                                .permissions(permissions)
+                                                .customPermissions(customPermissions)
+                                                .build();
         assertEquals("Permissions set should equal input", permissions, policyEntry.getPermissions());
     }
 
@@ -103,8 +111,12 @@ public class PolicyEntryTest {
     public void testGetCustomPermissions() throws Exception {
         final String codebase = "http://example.com";
         final Set<PolicyEditorPermissions> permissions = Collections.singleton(PolicyEditorPermissions.CLIPBOARD);
-        final Set<CustomPermission> customPermissions = Collections.singleton(new CustomPermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
+        final Set<? extends PolicyParser.PermissionEntry> customPermissions = Collections.singleton(new CustomPolicyViewer.DisplayablePermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
+        final PolicyEntry policyEntry = new PolicyEntry.Builder()
+                                                .codebase(codebase)
+                                                .permissions(permissions)
+                                                .customPermissions(customPermissions)
+                                                .build();
         assertEquals("Custom permissions set should equal input", customPermissions, policyEntry.getCustomPermissions());
     }
 
@@ -112,80 +124,63 @@ public class PolicyEntryTest {
     public void testGetCustomPermissions2() throws Exception {
         final String codebase = "http://example.com";
         final Set<PolicyEditorPermissions> permissions = Collections.singleton(PolicyEditorPermissions.CLIPBOARD);
-        final Set<CustomPermission> customPermissions = new HashSet<CustomPermission>(){{
-            add(new CustomPermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
-            add(new CustomPermission(PermissionType.RUNTIME_PERMISSION, PermissionTarget.CLASSLOADER));
+        final Set<? extends PolicyParser.PermissionEntry> customPermissions = new HashSet<CustomPolicyViewer.DisplayablePermission>(){{
+            add(new CustomPolicyViewer.DisplayablePermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
+            add(new CustomPolicyViewer.DisplayablePermission(PermissionType.RUNTIME_PERMISSION, PermissionTarget.CLASSLOADER));
         }};
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
+        final PolicyEntry policyEntry = new PolicyEntry.Builder()
+                                                .codebase(codebase)
+                                                .permissions(permissions)
+                                                .customPermissions(customPermissions)
+                                                .build();
         assertEquals("Custom permissions set should equal input", customPermissions, policyEntry.getCustomPermissions());
     }
 
     @Test(expected = NullPointerException.class)
     public void testEntryWithNullPermissions() throws Exception {
         final String codebase = "http://example.com";
-        final Set<CustomPermission> customPermissions = Collections.singleton(new CustomPermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
-        new PolicyEntry(codebase, null, customPermissions);
+        final Set<CustomPolicyViewer.DisplayablePermission> customPermissions = Collections.singleton(new CustomPolicyViewer.DisplayablePermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
+        new PolicyEntry.Builder()
+                .codebase(codebase)
+                .permissions(null)
+                .customPermissions(customPermissions)
+                .build();
     }
 
     @Test(expected = NullPointerException.class)
     public void testEntryWithNullCustomPermissions() throws Exception {
         final String codebase = "http://example.com";
         final Set<PolicyEditorPermissions> permissions = Collections.singleton(PolicyEditorPermissions.CLIPBOARD);
-        new PolicyEntry(codebase, permissions, null);
+        new PolicyEntry.Builder()
+                .codebase(codebase)
+                .permissions(permissions)
+                .customPermissions(null)
+                .build();
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testNullPermissionsNotAllowed() throws Exception {
         final String codebase = "http://example.com";
         final Set<PolicyEditorPermissions> permissions = Collections.singleton(null);
-        final Set<CustomPermission> customPermissions = Collections.singleton(new CustomPermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
-        assertFalse("Permissions set should not contain null element", policyEntry.getPermissions().contains(null));
+        final Set<CustomPolicyViewer.DisplayablePermission> customPermissions = Collections.singleton(new CustomPolicyViewer.DisplayablePermission(PermissionType.AUDIO_PERMISSION, PermissionTarget.PLAY));
+        new PolicyEntry.Builder()
+            .codebase(codebase)
+            .permissions(permissions)
+            .customPermissions(customPermissions)
+            .build();
     }
 
     @Test
     public void testNullCustomPermissionsNotAllowed() throws Exception {
         final String codebase = "http://example.com";
         final Set<PolicyEditorPermissions> permissions = Collections.singleton(PolicyEditorPermissions.CLIPBOARD);
-        final Set<CustomPermission> customPermissions = Collections.singleton(null);
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
+        final Set<CustomPolicyViewer.DisplayablePermission> customPermissions = Collections.singleton(null);
+        final PolicyEntry policyEntry = new PolicyEntry.Builder()
+                                                .codebase(codebase)
+                                                .permissions(permissions)
+                                                .customPermissions(customPermissions)
+                                                .build();
         assertFalse("Custom permissions set should not contain null element", policyEntry.getCustomPermissions().contains(null));
-    }
-
-    @Test
-    public void testFromString() throws Exception {
-        final PolicyEntry entry = PolicyEntry.fromString(POLICY_ENTRY_STRING);
-        assertEquals("Codebase should equal http://example.com", "http://example.com", entry.getCodebase());
-        assertEquals("Permissions should be CLIPBOARD singleton", Collections.singleton(PolicyEditorPermissions.CLIPBOARD), entry.getPermissions());
-        assertEquals("Custom permissions should be empty set", Collections.emptySet(), entry.getCustomPermissions());
-    }
-
-    @Test(expected = InvalidPolicyException.class)
-    public void testFromStringInvalid() throws Exception {
-        PolicyEntry.fromString(INVALID_POLICY_STRING);
-    }
-
-    @Test
-    public void testValidatePolicy1() throws Exception {
-        assertTrue("Valid policy should pass validation", PolicyEntry.validatePolicy(Arrays.asList(POLICY_ENTRY_STRING.split("\\r?\\n"))));
-    }
-
-    @Test
-    public void testValidatePolicy2() throws Exception {
-        assertTrue("Valid policy should pass validation", PolicyEntry.validatePolicy(POLICY_ENTRY_STRING));
-    }
-
-    @Test
-    public void testValidatePolicyInvalid1() throws Exception {
-        assertFalse("Invalid policy should not pass validation", PolicyEntry.validatePolicy(INVALID_POLICY_STRING));
-    }
-
-    @Test
-    public void testToString() {
-        final String codebase = "http://example.com";
-        final Set<PolicyEditorPermissions> permissions = Collections.singleton(PolicyEditorPermissions.CLIPBOARD);
-        final PolicyEntry entry = new PolicyEntry(codebase, permissions, Collections.<CustomPermission>emptySet());
-        assertEquals("Entry toString did not match expected output", POLICY_ENTRY_STRING, entry.toString());
     }
 
 }

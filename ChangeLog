@@ -63,6 +63,63 @@
 	* tests/reproducers/custom/UnsignedContentInMETAINF/srcs/Makefile: same
 
 
+2015-07-27  Andrew Azores  <aazores@redhat.com>
+
+	PolicyEditor updated to use sun.security.provider.PolicyParser
+	* NEWS: mention new PolicyEditor support for SignedBy and Principals
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: UI
+	updates to support SignedBy and Principals
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewer.java:
+	likewise
+	* netx/net/sourceforge/jnlp/security/policyeditor/PermissionActions.java:
+	use diamond operator where applicable
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorController.java:
+	refactor to support use of PolicyIdentifiers rather than plain codebases
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java:
+	replace fromString with fromPermissionEntry, fix formatting
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEntry.java:
+	implement Serializable and Transferable to enable clipboard support. Use
+	Builder pattern. Support PolicyIdentifiers rather than only plain codebases
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyFileModel.java:
+	refactor to support PolicyIdentifiers and use PolicyParser
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissionsButton.java:
+	use PolicyIdentifier to identify current applet by its codebase alone
+	* netx/net/sourceforge/jnlp/util/docprovider/PolicyEditorTextsProvider.java:
+	remove -codebase from PolicyEditor help text
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java: add SIGNEDBY and
+	PRINCIPALS for PolicyEditor, define CODEBASE to take exactly one argument
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/CustomPolicyViewerTest.java:
+	use PolicyIdentifier rather than codebase string
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorControllerTest.java:
+	redo to use PolicyIdentifiers, DisplayablePermissions
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorParsingTest.java:
+	use PolicyIdentifier rather than codebase string
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissionsTest.java
+	(testActionsRegex, testTargetRegex,
+	testRegexesAgainstBadPermissionNames): removed, PolicyParser has replaced
+	this
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java:
+	use PolicyIdentifier rather than codebase string
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEntryTest.java:
+	use DisplayablePermission and PolicyEntry rather than CustomPermission
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyFileModelTest.java:
+	use PolicyIdentifier rather than codebase string
+	* netx/net/sourceforge/jnlp/security/policyeditor/KeystoreInfo.java: new
+	file
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyIdentifier.java:
+	new file
+	* netx/net/sourceforge/jnlp/security/policyeditor/CustomPermission.java:
+	removed
+	* netx/net/sourceforge/jnlp/security/policyeditor/InvalidPolicyException.java:
+	removed
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/CustomPermissionTest.java:
+	removed
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: many changes to
+	PolicyEditor messages for key bindings, UI messages, error messages, etc.
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: likewise
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: likewise
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: likewise
+
 2015-07-23  Jiri Vanek  <jvanek@redhat.com>
 
 	Enabled and properly tested Entry-Point attribute check

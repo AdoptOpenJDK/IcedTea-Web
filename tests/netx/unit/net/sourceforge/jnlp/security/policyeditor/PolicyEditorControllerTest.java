@@ -39,12 +39,14 @@ package net.sourceforge.jnlp.security.policyeditor;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
+import sun.security.provider.PolicyParser;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,6 +54,23 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class PolicyEditorControllerTest {
+
+    private static final String SIGNED_BY = "someCA";
+    private static final String CODEBASE = "http://example.com";
+    private static final List<PolicyParser.PrincipalEntry> EMPTY_PRINCIPALS = Collections.emptyList();
+    private static final PolicyIdentifier DEFAULT_IDENTIFIER = new PolicyIdentifier(SIGNED_BY, EMPTY_PRINCIPALS, CODEBASE);
+    private static final String LINEBREAK = System.getProperty("line.separator");
+
+    private static final String EXAMPLE_POLICY_1 = "grant {" + LINEBREAK
+            + "permission some.java.permission \"somePermission\";" + LINEBREAK
+            + "};" + LINEBREAK;
+    private static final String EXAMPLE_POLICY_2 = "grant {" + LINEBREAK
+            + "permission some.other.java.permission \"somePermission\";" + LINEBREAK
+            + "};" + LINEBREAK;
+
+    private static final String CLIPBOARD_POLICY = "grant codeBase \"http://example.com\" {" + LINEBREAK
+            + "permission java.awt.AWTPermission \"accessClipboard\";" + LINEBREAK
+           + "};" + LINEBREAK;
 
     private String tempFilePath;
     private PolicyEditorController controller;
@@ -65,8 +84,7 @@ public class PolicyEditorControllerTest {
 
     @Test
     public void testChangesMadeInitiallyFalse() throws Exception {
-        // #setFile() counts as a change made
-        assertTrue("Controller should report changes made initially", controller.changesMade());
+        assertFalse("Controller should report changes made initially", controller.changesMade());
     }
 
     @Test
@@ -83,150 +101,145 @@ public class PolicyEditorControllerTest {
     @Test
     public void testFileHasChangedWithChange() throws Exception {
         assertFalse("Controller should report file has changed initially", controller.fileHasChanged());
-        final String codebase = "http://example.com";
-        final PolicyEditorPermissions editorPermissions = PolicyEditorPermissions.CLIPBOARD;
-        final Collection<PolicyEditorPermissions> permissions = Collections.singleton(editorPermissions);
-        final CustomPermission customPermission = new CustomPermission(PermissionType.FILE_PERMISSION, PermissionTarget.USER_HOME, PermissionActions.FILE_ALL);
-        final Collection<CustomPermission> customPermissions = Collections.singleton(customPermission);
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
-        FileUtils.saveFile(policyEntry.toString(), new File(tempFilePath));
+        FileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
         controller.openAndParsePolicyFile();
-        final Collection<PolicyEditorPermissions> editorPermissions2 = Collections.singleton(PolicyEditorPermissions.ALL_AWT);
-        final PolicyEntry policyEntry2 = new PolicyEntry(codebase, editorPermissions2, customPermissions);
-        FileUtils.saveFile(policyEntry2.toString(), new File(tempFilePath));
+        FileUtils.saveFile(EXAMPLE_POLICY_2, new File(tempFilePath));
         assertTrue("File should be marked changed after being externally modified", controller.fileHasChanged());
     }
 
     @Test
-    public void testInitialCodebase() throws Exception {
-        final Collection<String> initialCodebases = controller.getCodebases();
-        assertEquals("Controller should have no codebases to begin with", 0, initialCodebases.size());
+    public void testInitialIdentifier() throws Exception {
+        final Collection<PolicyIdentifier> initialIdentifiers = controller.getIdentifiers();
+        assertEquals("Controller should have no identifiers to begin with", 0, initialIdentifiers.size());
     }
 
     @Test
-    public void testAddCodebase() throws Exception {
-        final String urlString = "http://example.com";
-        controller.addCodebase(urlString);
-        final Collection<String> codebases = controller.getCodebases();
-        assertTrue("Controller should have http://example.com", codebases.contains(urlString));
-        assertEquals("Controller should only have two codebases", 1, codebases.size());
+    public void testAddIdentifier() throws Exception {
+        controller.addIdentifier(DEFAULT_IDENTIFIER);
+        final Collection<PolicyIdentifier> identifiers = controller.getIdentifiers();
+        assertTrue("Controller should have " + DEFAULT_IDENTIFIER, identifiers.contains(DEFAULT_IDENTIFIER));
+        assertEquals("Controller should only have two identifiers", 1, identifiers.size());
     }
 
     @Test
-    public void testAddMultipleCodebases() throws Exception {
-        final Set<String> toAdd = new HashSet<String>();
-        toAdd.add("http://example.com");
-        toAdd.add("http://icedtea.classpath.org");
-        for (final String cb : toAdd) {
-            controller.addCodebase(cb);
+    public void testAddMultipleIdentifiers() throws Exception {
+        final Set<PolicyIdentifier> toAdd = new HashSet<>();
+        toAdd.add(DEFAULT_IDENTIFIER);
+        final PolicyIdentifier newIdentifier = new PolicyIdentifier(null, EMPTY_PRINCIPALS, "http://icedtea.classpath.org");
+        toAdd.add(newIdentifier);
+        for (final PolicyIdentifier id : toAdd) {
+            controller.addIdentifier(id);
         }
-        final Collection<String> codebases = controller.getCodebases();
-        for (final String codebase : toAdd) {
-            assertTrue("Controller should have " + codebase, codebases.contains(codebase));
+        final Collection<PolicyIdentifier> identifiers = controller.getIdentifiers();
+        for (final PolicyIdentifier id : toAdd) {
+            assertTrue("Controller should have " + id, identifiers.contains(id));
         }
     }
 
     @Test
-    public void testRemoveCodebase() throws Exception {
-        final String urlString = "http://example.com";
-        controller.addCodebase(urlString);
-        final Collection<String> codebases = controller.getCodebases();
-        assertTrue("Controller should have http://example.com", codebases.contains(urlString));
-        assertEquals("Controller should only have one codebase", 1, codebases.size());
-        controller.removeCodebase(urlString);
-        final Collection<String> afterRemove = controller.getCodebases();
-        assertFalse("Controller should not have http://example.com. Contained: " + afterRemove, afterRemove.contains(urlString));
-        assertEquals("Controller should have no codebases", 0, afterRemove.size());
+    public void testRemoveIdentifier() throws Exception {
+        controller.addIdentifier(DEFAULT_IDENTIFIER);
+        final Collection<PolicyIdentifier> identifiers = controller.getIdentifiers();
+        assertTrue("Controller should have " + DEFAULT_IDENTIFIER, identifiers.contains(DEFAULT_IDENTIFIER));
+        assertEquals("Controller should only have one identifier", 1, identifiers.size());
+        controller.removeIdentifier(DEFAULT_IDENTIFIER);
+        final Collection<PolicyIdentifier> afterRemove = controller.getIdentifiers();
+        assertFalse("Controller should not have " + DEFAULT_IDENTIFIER + ". Contained: " + afterRemove, afterRemove.contains(DEFAULT_IDENTIFIER));
+        assertEquals("Controller should have no identifiers", Collections.<PolicyIdentifier>emptySet(), afterRemove);
     }
 
     @Test
-    public void testCopyPasteCodebase() throws Exception {
-        final String copyUrl = "http://example.com";
+    public void testCopyPasteIdentifiers() throws Exception {
         final String pasteUrl = "http://example.com/example";
+        final PolicyIdentifier pasteIdentifier = new PolicyIdentifier(null, EMPTY_PRINCIPALS, pasteUrl);
         final PolicyEditorPermissions clipBoard = PolicyEditorPermissions.CLIPBOARD;
-        controller.addCodebase(copyUrl);
-        controller.setPermission(copyUrl, clipBoard, Boolean.TRUE);
-        final Collection<String> beforePasteCodebases = controller.getCodebases();
-        assertTrue("Controller should contain original codebase: " + copyUrl, beforePasteCodebases.contains(copyUrl));
-        assertTrue(copyUrl + " should have " + clipBoard, controller.getPermissions(copyUrl).get(clipBoard));
-        controller.copyCodebaseToClipboard(copyUrl);
+        controller.addIdentifier(DEFAULT_IDENTIFIER);
+        controller.setPermission(DEFAULT_IDENTIFIER, clipBoard, Boolean.TRUE);
+        final Collection<PolicyIdentifier> beforePasteIdentifiers = controller.getIdentifiers();
+        assertTrue("Controller should contain original identifier: " + DEFAULT_IDENTIFIER, beforePasteIdentifiers.contains(DEFAULT_IDENTIFIER));
+        assertTrue(DEFAULT_IDENTIFIER + " should have " + clipBoard, controller.getPermissions(DEFAULT_IDENTIFIER).get(clipBoard));
+        controller.copyPolicyEntryToClipboard(DEFAULT_IDENTIFIER);
         final PolicyEntry clipboardEntry = PolicyEditorController.getPolicyEntryFromClipboard();
-        controller.addPolicyEntry(new PolicyEntry(pasteUrl, clipboardEntry.getPermissions(), clipboardEntry.getCustomPermissions()));
-        final Collection<String> afterPasteCodebases = controller.getCodebases();
-        assertTrue("Controller should still contain original codebase: " + copyUrl, afterPasteCodebases.contains(copyUrl));
-        assertTrue("Controller should also contain pasted codebase:" + pasteUrl, afterPasteCodebases.contains(pasteUrl));
-        assertTrue(copyUrl + " should have " + clipBoard, controller.getPermissions(copyUrl).get(clipBoard));
-        assertTrue(pasteUrl + " should have " + clipBoard, controller.getPermissions(pasteUrl).get(clipBoard));
+        final PolicyEntry newEntry = new PolicyEntry.Builder()
+                .codebase(pasteUrl)
+                .permissions(clipboardEntry.getPermissions())
+                .customPermissions(clipboardEntry.getCustomPermissions())
+                .build();
+        controller.addPolicyEntry(newEntry);
+        final Collection<PolicyIdentifier> afterPasteIdentifiers = controller.getIdentifiers();
+        assertTrue("Controller should still contain original identifier: " + DEFAULT_IDENTIFIER, afterPasteIdentifiers.contains(DEFAULT_IDENTIFIER));
+        assertTrue("Controller should also contain pasted identifier:" + pasteIdentifier, afterPasteIdentifiers.contains(pasteIdentifier));
+        assertTrue(DEFAULT_IDENTIFIER + " should have " + clipBoard, controller.getPermissions(DEFAULT_IDENTIFIER).get(clipBoard));
+        assertTrue(pasteIdentifier + " should have " + clipBoard, controller.getPermissions(pasteIdentifier).get(clipBoard));
     }
 
     @Test
     public void testAddPolicyEntry() throws Exception {
-        final String codebase = "http://example.com";
         final PolicyEditorPermissions editorPermissions = PolicyEditorPermissions.CLIPBOARD;
         final Collection<PolicyEditorPermissions> permissions = Collections.singleton(editorPermissions);
-        final CustomPermission customPermission = new CustomPermission(PermissionType.FILE_PERMISSION, PermissionTarget.USER_HOME, PermissionActions.FILE_ALL);
-        final Collection<CustomPermission> customPermissions = Collections.singleton(customPermission);
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission(PermissionType.FILE_PERMISSION, PermissionTarget.USER_HOME, PermissionActions.FILE_ALL);
+        final Collection<CustomPolicyViewer.DisplayablePermission> customPermissions = Collections.singleton(customPermission);
+        final PolicyEntry policyEntry = new PolicyEntry.Builder()
+                .identifier(DEFAULT_IDENTIFIER)
+                .permissions(permissions)
+                .customPermissions(customPermissions)
+                .build();
         controller.addPolicyEntry(policyEntry);
-        final Collection<String> codebases = controller.getCodebases();
-        assertTrue("Controller should have " + codebase, codebases.contains(codebase));
-        assertEquals("Controller should only have one codebase", 1, codebases.size());
-        assertTrue("Controller should have granted " + editorPermissions, controller.getPermission(codebase, editorPermissions));
-        assertTrue("Controller should have granted " + customPermission, controller.getCustomPermissions(codebase).contains(customPermission));
+        final Collection<PolicyIdentifier> identifiers = controller.getIdentifiers();
+        assertTrue("Controller should have " + DEFAULT_IDENTIFIER, identifiers.contains(DEFAULT_IDENTIFIER));
+        assertEquals("Controller should only have one identifier", 1, identifiers.size());
+        assertTrue("Controller should have granted " + editorPermissions, controller.getPermission(DEFAULT_IDENTIFIER, editorPermissions));
+        assertTrue("Controller should have granted " + customPermission, controller.getCustomPermissions(DEFAULT_IDENTIFIER).contains(customPermission));
     }
 
     @Test
     public void testAddCustomPermissionNoActions() throws Exception {
-        final String codebase = "http://example.com";
-        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
-        controller.addCustomPermission(codebase, customPermission);
-        assertTrue("Controller custom permissions should include " + customPermission + " but did not", controller.getCustomPermissions(codebase).contains(customPermission));
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission("java.lang.RuntimePermission", "createClassLoader");
+        controller.addCustomPermission(DEFAULT_IDENTIFIER, customPermission);
+        assertTrue("Controller custom permissions should include " + customPermission + " but did not", controller.getCustomPermissions(DEFAULT_IDENTIFIER).contains(customPermission));
     }
 
     @Test
     public void testAddCustomPermissionEmptyActions() throws Exception {
-        final String codebase = "http://example.com";
-        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
-        controller.addCustomPermission(codebase, customPermission);
-        assertTrue("Controller custom permissions should include " + customPermission + " but did not", controller.getCustomPermissions(codebase).contains(customPermission));
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission("java.lang.RuntimePermission", "createClassLoader", "");
+        controller.addCustomPermission(DEFAULT_IDENTIFIER, customPermission);
+        assertTrue("Controller custom permissions should include " + customPermission + " but did not", controller.getCustomPermissions(DEFAULT_IDENTIFIER).contains(customPermission));
     }
 
     @Test
     public void testClearCustomPermissionsNoActions() throws Exception {
-        final String codebase = "http://example.com";
-        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader");
-        controller.addCustomPermission(codebase, customPermission);
-        assertTrue("Controller custom permissions should include " + customPermission + " but did not", controller.getCustomPermissions(codebase).contains(customPermission));
-        controller.clearCustomCodebase(codebase);
-        assertEquals(0, controller.getCustomPermissions(codebase).size());
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission("java.lang.RuntimePermission", "createClassLoader");
+        controller.addCustomPermission(DEFAULT_IDENTIFIER, customPermission);
+        assertTrue("Controller custom permissions should include " + customPermission + " but did not", controller.getCustomPermissions(DEFAULT_IDENTIFIER).contains(customPermission));
+        controller.clearCustomIdentifier(DEFAULT_IDENTIFIER);
+        assertEquals(0, controller.getCustomPermissions(DEFAULT_IDENTIFIER).size());
     }
 
     @Test
     public void testClearCustomPermissionsEmptyActions() throws Exception {
-        final String codebase = "http://example.com";
-        final CustomPermission customPermission = new CustomPermission("java.lang.RuntimePermission", "createClassLoader", "");
-        controller.addCustomPermission(codebase, customPermission);
-        assertTrue("Controller custom permissions should include " + customPermission + " but did not", controller.getCustomPermissions(codebase).contains(customPermission));
-        controller.clearCustomCodebase(codebase);
-        assertEquals(0, controller.getCustomPermissions(codebase).size());
+        final CustomPolicyViewer.DisplayablePermission customPermission = new CustomPolicyViewer.DisplayablePermission("java.lang.RuntimePermission", "createClassLoader", "");
+        controller.addCustomPermission(DEFAULT_IDENTIFIER, customPermission);
+        assertTrue("Controller custom permissions should include " + customPermission + " but did not", controller.getCustomPermissions(DEFAULT_IDENTIFIER).contains(customPermission));
+        controller.clearCustomIdentifier(DEFAULT_IDENTIFIER);
+        assertEquals(0, controller.getCustomPermissions(DEFAULT_IDENTIFIER).size());
     }
 
     @Test
-    public void testReturnedCodebasesIsCopy() throws Exception {
-        final Collection<String> original = controller.getCodebases();
-        original.add("some invalid value");
-        original.remove("");
-        final Collection<String> second = controller.getCodebases();
-        assertEquals("Controller should have no codebases", 0, second.size());
+    public void testReturnedIdentifiersIsCopy() throws Exception {
+        final Collection<PolicyIdentifier> original = controller.getIdentifiers();
+        original.add(new PolicyIdentifier("invalidSigner", EMPTY_PRINCIPALS, "invalidURL"));
+        original.remove(DEFAULT_IDENTIFIER);
+        final Collection<PolicyIdentifier> second = controller.getIdentifiers();
+        assertEquals("Controller should have no identifiers", 0, second.size());
     }
 
     @Test
     public void testReturnedPermissionsMapIsCopy() throws Exception {
-        final Map<PolicyEditorPermissions, Boolean> original = controller.getPermissions("");
+        final Map<PolicyEditorPermissions, Boolean> original = controller.getPermissions(DEFAULT_IDENTIFIER);
         for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
             original.put(perm, true);
         }
-        final Map<PolicyEditorPermissions, Boolean> second = controller.getPermissions("");
+        final Map<PolicyEditorPermissions, Boolean> second = controller.getPermissions(DEFAULT_IDENTIFIER);
         for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : second.entrySet()) {
             assertFalse("Permission " + entry.getKey() + " should be false", entry.getValue());
         }
@@ -234,18 +247,18 @@ public class PolicyEditorControllerTest {
 
     @Test
     public void testReturnedCustomPermissionsSetIsCopy() throws Exception {
-        final Collection<CustomPermission> original = controller.getCustomPermissions("");
+        final Collection<PolicyParser.PermissionEntry> original = controller.getCustomPermissions(DEFAULT_IDENTIFIER);
         assertTrue("There should not be any custom permissions to start", original.isEmpty());
-        original.add(new CustomPermission("java.io.FilePermission", "*", "write"));
-        final Collection<CustomPermission> second = controller.getCustomPermissions("");
+        original.add(new CustomPolicyViewer.DisplayablePermission("java.io.FilePermission", "*", "write"));
+        final Collection<PolicyParser.PermissionEntry> second = controller.getCustomPermissions(DEFAULT_IDENTIFIER);
         assertTrue("The custom permission should not have been present", second.isEmpty());
     }
 
     @Test
     public void testDefaultPermissionsAllFalse() throws Exception {
-        final Map<PolicyEditorPermissions, Boolean> defaultMap = controller.getPermissions("");
-        controller.addCodebase("http://example.com");
-        final Map<PolicyEditorPermissions, Boolean> addedMap = controller.getPermissions("http://example.com");
+        final Map<PolicyEditorPermissions, Boolean> defaultMap = controller.getPermissions(DEFAULT_IDENTIFIER);
+        controller.addIdentifier(DEFAULT_IDENTIFIER);
+        final Map<PolicyEditorPermissions, Boolean> addedMap = controller.getPermissions(DEFAULT_IDENTIFIER);
         for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : defaultMap.entrySet()) {
             assertFalse("Permission " + entry.getKey() + " should be false", entry.getValue());
         }
@@ -256,87 +269,69 @@ public class PolicyEditorControllerTest {
 
     @Test
     public void testAllPermissionsRepresented() throws Exception {
-        final Map<PolicyEditorPermissions, Boolean> defaultMap = controller.getPermissions("");
-        controller.addCodebase("http://example.com");
-        final Map<PolicyEditorPermissions, Boolean> addedMap = controller.getPermissions("http://example.com");
-        assertTrue("Default codebase permissions keyset should be the same size as enum values set",
+        final Map<PolicyEditorPermissions, Boolean> defaultMap = controller.getPermissions(DEFAULT_IDENTIFIER);
+        controller.addIdentifier(DEFAULT_IDENTIFIER);
+        final Map<PolicyEditorPermissions, Boolean> addedMap = controller.getPermissions(DEFAULT_IDENTIFIER);
+        assertTrue("Default identifier permissions keyset should be the same size as enum values set",
                 defaultMap.keySet().size() == PolicyEditorPermissions.values().length);
-        assertTrue("Added codebase permissions keyset should be the same size as enum values set",
+        assertTrue("Added identifier permissions keyset should be the same size as enum values set",
                 addedMap.keySet().size() == PolicyEditorPermissions.values().length);
         for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
-            assertTrue("Permission " + perm + " should be in the editor's codebase keyset", defaultMap.keySet().contains(perm));
+            assertTrue("Permission " + perm + " should be in the editor's identifier keyset", defaultMap.keySet().contains(perm));
         }
         for (final PolicyEditorPermissions perm : PolicyEditorPermissions.values()) {
-            assertTrue("Permission " + perm + " should be in the editor's codebase keyset", addedMap.keySet().contains(perm));
+            assertTrue("Permission " + perm + " should be in the editor's identifier keyset", addedMap.keySet().contains(perm));
         }
     }
 
     @Test
     public void testSetGetPermission() throws Exception {
-        final String codebase = "http://example.com";
-        controller.addCodebase(codebase);
+        controller.addIdentifier(DEFAULT_IDENTIFIER);
         final PolicyEditorPermissions permission = PolicyEditorPermissions.CLIPBOARD;
-        assertFalse("Clipboard permission should not be initially granted", controller.getPermission(codebase, permission));
-        controller.setPermission(codebase, permission, true);
-        assertTrue("Clipboard permission should be granted after being set", controller.getPermission(codebase, permission));
+        assertFalse("Clipboard permission should not be initially granted", controller.getPermission(DEFAULT_IDENTIFIER, permission));
+        controller.setPermission(DEFAULT_IDENTIFIER, permission, true);
+        assertTrue("Clipboard permission should be granted after being set", controller.getPermission(DEFAULT_IDENTIFIER, permission));
     }
 
     @Test
     public void testClearPermission() throws Exception {
-        final String codebase = "http://example.com";
-        controller.addCodebase(codebase);
+        controller.addIdentifier(DEFAULT_IDENTIFIER);
         final PolicyEditorPermissions permission = PolicyEditorPermissions.CLIPBOARD;
-        assertFalse("Clipboard permission should not be initially granted", controller.getPermission(codebase, permission));
-        controller.setPermission(codebase, permission, true);
-        assertTrue("Clipboard permission should be granted after being set", controller.getPermission(codebase, permission));
+        assertFalse("Clipboard permission should not be initially granted", controller.getPermission(DEFAULT_IDENTIFIER, permission));
+        controller.setPermission(DEFAULT_IDENTIFIER, permission, true);
+        assertTrue("Clipboard permission should be granted after being set", controller.getPermission(DEFAULT_IDENTIFIER, permission));
         controller.clearPermissions();
-        for (final String cb : controller.getCodebases()) {
-            for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : controller.getPermissions(cb).entrySet()) {
-                assertFalse("Permission " + entry.getKey() + " should be false for codebase " + cb, entry.getValue());
+        for (final PolicyIdentifier id : controller.getIdentifiers()) {
+            for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : controller.getPermissions(id).entrySet()) {
+                assertFalse("Permission " + entry.getKey() + " should be false for identifier " + id, entry.getValue());
             }
         }
-        assertEquals(0, controller.getCodebases().size());
+        assertEquals(0, controller.getIdentifiers().size());
     }
 
     @Test
-    public void testCodebaseTrailingSlashesDoNotMatch() throws Exception {
-        final Collection<String> toAdd = Arrays.asList("http://redhat.com", "http://redhat.com/");
-        for (final String cb : toAdd) {
-            controller.addCodebase(cb);
+    public void testIdentifierCodebaseTrailingSlashesDoNotMatch() throws Exception {
+        final PolicyIdentifier firstId = new PolicyIdentifier(SIGNED_BY, EMPTY_PRINCIPALS, "http://example.com");
+        final PolicyIdentifier secondId = new PolicyIdentifier(SIGNED_BY, EMPTY_PRINCIPALS, "http://example.com");
+        final Collection<PolicyIdentifier> toAdd = Arrays.asList(firstId, secondId);
+        for (final PolicyIdentifier id : toAdd) {
+            controller.addIdentifier(id);
         }
-        final Collection<String> codebases = controller.getCodebases();
-        for (final String codebase : toAdd) {
-            assertTrue("Controller should have " + codebase, codebases.contains(codebase));
+        final Collection<PolicyIdentifier> identifiers = controller.getIdentifiers();
+        for (final PolicyIdentifier id : toAdd) {
+            assertTrue("Controller should have " + id, identifiers.contains(id));
         }
     }
 
     @Test
     public void testOpenAndParsePolicyFile() throws Exception {
-        final String codebase = "http://example.com";
-        final PolicyEditorPermissions editorPermissions = PolicyEditorPermissions.CLIPBOARD;
-        final Collection<PolicyEditorPermissions> permissions = Collections.singleton(editorPermissions);
-        final CustomPermission customPermission = new CustomPermission("com.example.CustomPermission", PermissionTarget.USER_HOME.target, PermissionActions.FILE_ALL.rawString());
-        final Collection<CustomPermission> customPermissions = new HashSet<>(Collections.singleton(customPermission));
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
-        FileUtils.saveFile(policyEntry.toString(), new File(tempFilePath));
+        final PolicyIdentifier exampleIdentifier = new PolicyIdentifier(null, Collections.<PolicyParser.PrincipalEntry>emptyList(), "http://example.com");
+        FileUtils.saveFile(CLIPBOARD_POLICY, new File(tempFilePath));
         controller.openAndParsePolicyFile();
-        assertEquals("Controller should have one codebase", 1, controller.getCodebases().size());
-        assertTrue("Controller should have codebase " + codebase, controller.getCodebases().contains(codebase));
-        assertTrue("Controller should grant " + editorPermissions, controller.getPermission(codebase, editorPermissions));
-        assertEquals("Custom permission sets were not equal", customPermissions, controller.getCustomPermissions(codebase));
+        assertEquals("Controller should have one identifier", 1, controller.getIdentifiers().size());
+        assertTrue("Controller should have identifier " + exampleIdentifier, controller.getIdentifiers().contains(exampleIdentifier));
+        assertTrue("Controller should grant " + PolicyEditorPermissions.CLIPBOARD + " got: " + controller.getPermissions(exampleIdentifier) + " and: " + controller.getCustomPermissions(exampleIdentifier), controller.getPermission(exampleIdentifier, PolicyEditorPermissions.CLIPBOARD));
+        assertEquals("Custom permission set should have been empty", Collections.<PolicyParser.PermissionEntry>emptySet(), controller.getCustomPermissions(exampleIdentifier));
     }
 
-    @Test
-    public void testSavePolicyFile() throws Exception {
-        final String codebase = "http://example.com";
-        final PolicyEditorPermissions editorPermissions = PolicyEditorPermissions.CLIPBOARD;
-        final Collection<PolicyEditorPermissions> permissions = Collections.singleton(editorPermissions);
-        final CustomPermission customPermission = new CustomPermission(PermissionType.FILE_PERMISSION, PermissionTarget.USER_HOME, PermissionActions.FILE_ALL);
-        final Collection<CustomPermission> customPermissions = Collections.singleton(customPermission);
-        final PolicyEntry policyEntry = new PolicyEntry(codebase, permissions, customPermissions);
-        controller.addPolicyEntry(policyEntry);
-        controller.savePolicyFile();
-        final String fileContent = FileUtils.loadFileAsString(new File(tempFilePath));
-        assertTrue("Saved file should contain policy entry as string", fileContent.contains(policyEntry.toString()));
-    }
 }

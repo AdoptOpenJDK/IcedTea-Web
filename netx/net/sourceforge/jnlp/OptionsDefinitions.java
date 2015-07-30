@@ -86,7 +86,9 @@ public class OptionsDefinitions {
         //policyeditor
         //-help
         FILE("-file", "policy_file", "PBOFile", NumberOfArguments.ONE),
-        CODEBASE("-codebase", "url", "PBOCodebase", NumberOfArguments.ONE_OR_MORE);
+        CODEBASE("-codebase", "url", "PBOCodebase", NumberOfArguments.ONE),
+        SIGNEDBY("-signedby", "certificate_alias", "PBOSignedBy", NumberOfArguments.ONE),
+        PRINCIPALS("-principals", "class_name principal_name", "PBOPrincipals", NumberOfArguments.EVEN_NUMBER_SUPPORTS_EQUALS_CHAR);
 
         public final String option;
 
@@ -175,6 +177,8 @@ public class OptionsDefinitions {
             OPTIONS.HELP1,
             OPTIONS.FILE,
             OPTIONS.CODEBASE,
+            OPTIONS.SIGNEDBY,
+            OPTIONS.PRINCIPALS,
             OPTIONS.VERBOSE
             }
         );

@@ -37,21 +37,22 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.policyeditor;
 
 import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import sun.security.provider.PolicyParser;
+
+import static net.sourceforge.jnlp.security.policyeditor.PolicyEntry.POLICY_ENTRY_DATA_FLAVOR;
 
 public class PolicyEditorController {
 
@@ -67,7 +68,7 @@ public class PolicyEditorController {
         changesMade = b;
     }
 
-    boolean performingIO() {
+    boolean isPerformingIO() {
         return performingIO;
     }
 
@@ -76,53 +77,58 @@ public class PolicyEditorController {
     }
 
     public void setFile(final File file) {
-        setChangesMade(true);
-        policyFile.setFile(file);
+        boolean changedFile = policyFile.setFile(file);
+        setChangesMade(changedFile);
     }
 
     public File getFile() {
         return policyFile.getFile();
     }
 
-    public boolean fileHasChanged() throws FileNotFoundException, IOException {
+    public boolean fileHasChanged() throws IOException {
         return policyFile.hasChanged();
     }
 
-    public boolean addCodebase(final String codebase) {
-        final boolean existed = policyFile.addCodebase(codebase);
+    public boolean addIdentifier(final PolicyIdentifier identifier) {
+        final boolean existed = policyFile.addIdentifier(identifier);
         if (!existed) {
             setChangesMade(true);
         }
         return existed;
     }
 
-    public void removeCodebase(final String codebase) {
+    public void removeIdentifier(final PolicyIdentifier identifier) {
         setChangesMade(true);
-        policyFile.removeCodebase(codebase);
+        policyFile.removeIdentifier(identifier);
     }
 
-    public Set<String> getCodebases() {
-        return new HashSet<>(policyFile.getCodebases());
+    public Set<PolicyIdentifier> getIdentifiers() {
+        return new HashSet<>(policyFile.getIdentifiers());
     }
 
-    public Map<String, Map<PolicyEditorPermissions, Boolean>> getCopyOfPermissions() {
+    public Map<PolicyIdentifier, Map<PolicyEditorPermissions, Boolean>> getCopyOfPermissions() {
         return policyFile.getCopyOfPermissions();
     }
 
-    public void setPermission(final String codebase, final PolicyEditorPermissions permission, final boolean state) {
-        if (getPermission(codebase, permission) != state) {
+    public void setPermission(final PolicyIdentifier identifier, final PolicyEditorPermissions permission, final boolean state) {
+        if (getPermission(identifier, permission) != state) {
             setChangesMade(true);
         }
-        policyFile.setPermission(codebase, permission, state);
+        policyFile.setPermission(identifier, permission, state);
     }
 
-    public boolean getPermission(final String codebase, final PolicyEditorPermissions permission) {
-        return policyFile.getPermission(codebase, permission);
+    public boolean getPermission(final PolicyIdentifier identifier, final PolicyEditorPermissions permission) {
+        return policyFile.getPermission(identifier, permission);
     }
 
-    public Map<PolicyEditorPermissions, Boolean> getPermissions(final String codebase) {
-        policyFile.addCodebase(codebase);
-        return new HashMap<>(policyFile.getCopyOfPermissions().get(codebase));
+    public Map<PolicyEditorPermissions, Boolean> getPermissions(final PolicyIdentifier identifier) {
+        policyFile.addIdentifier(identifier);
+        return new HashMap<>(policyFile.getCopyOfPermissions().get(identifier));
+    }
+
+    public void clear() {
+        setChangesMade(true);
+        policyFile.clearPermissions();
     }
 
     public void clearPermissions() {
@@ -130,32 +136,32 @@ public class PolicyEditorController {
         policyFile.clearPermissions();
     }
 
-    public void addCustomPermissions(final String codebase, final Collection<CustomPermission> permissions) {
-        if (!policyFile.getCopyOfCustomPermissions().equals(permissions)) {
+    public void addCustomPermissions(final PolicyIdentifier identifier, final Collection<PolicyParser.PermissionEntry> permissions) {
+        if (!policyFile.getCopyOfCustomPermissions().containsKey(identifier) || !policyFile.getCopyOfCustomPermissions().get(identifier).equals(permissions)) {
             setChangesMade(true);
         }
-        policyFile.addCustomPermissions(codebase, permissions);
+        policyFile.addCustomPermissions(identifier, permissions);
     }
 
-    public void addCustomPermission(final String codebase, final CustomPermission permission) {
-        final Map<String, Set<CustomPermission>> customs = policyFile.getCopyOfCustomPermissions();
-        if (customs == null || !customs.containsKey(codebase) || (customs.containsKey(codebase) && !customs.get(codebase).contains(permission))) {
+    public void addCustomPermission(final PolicyIdentifier identifier, final PolicyParser.PermissionEntry permission) {
+        final Map<PolicyIdentifier, Set<PolicyParser.PermissionEntry>> customs = policyFile.getCopyOfCustomPermissions();
+        if (customs == null || !customs.containsKey(identifier) || (customs.containsKey(identifier) && !customs.get(identifier).contains(permission))) {
             setChangesMade(true);
         }
-        addCustomPermissions(codebase, Arrays.asList(permission));
+        addCustomPermissions(identifier, Collections.singletonList(permission));
     }
 
-    public Set<CustomPermission> getCustomPermissions(final String codebase) {
-        policyFile.addCodebase(codebase);
-        return new HashSet<>(policyFile.getCopyOfCustomPermissions().get(codebase));
+    public Set<PolicyParser.PermissionEntry> getCustomPermissions(final PolicyIdentifier identifier) {
+        policyFile.addIdentifier(identifier);
+        return new HashSet<>(policyFile.getCopyOfCustomPermissions().get(identifier));
     }
 
     public void addPolicyEntry(final PolicyEntry policyEntry) {
-        addCodebase(policyEntry.getCodebase());
+        addIdentifier(policyEntry.getPolicyIdentifier());
         for (final PolicyEditorPermissions permission : policyEntry.getPermissions()) {
-            setPermission(policyEntry.getCodebase(), permission, true);
+            setPermission(policyEntry.getPolicyIdentifier(), permission, true);
         }
-        addCustomPermissions(policyEntry.getCodebase(), policyEntry.getCustomPermissions());
+        addCustomPermissions(policyEntry.getPolicyIdentifier(), policyEntry.getCustomPermissions());
     }
 
     public void clearCustomPermissions() {
@@ -163,18 +169,12 @@ public class PolicyEditorController {
         policyFile.clearCustomPermissions();
     }
 
-    public void clearCustomCodebase(final String codebase) {
+    public void clearCustomIdentifier(final PolicyIdentifier identifier) {
         setChangesMade(true);
-        policyFile.clearCustomCodebase(codebase);
+        policyFile.clearCustomIdentifier(identifier);
     }
 
-    public void openAndParsePolicyFile() throws IOException, InvalidPolicyException {
-        try {
-            policyFile.getFile().createNewFile();
-        } catch (final IOException e) {
-            OutputController.getLogger().log(e);
-        }
-
+    public void openAndParsePolicyFile() throws IOException, PolicyParser.ParsingException {
         setPerformingIO(true);
         policyFile.openAndParsePolicyFile();
 
@@ -182,7 +182,7 @@ public class PolicyEditorController {
         setPerformingIO(false);
     }
 
-    public void savePolicyFile() throws FileNotFoundException, IOException {
+    public void savePolicyFile() throws IOException {
         setPerformingIO(true);
         policyFile.savePolicyFile();
 
@@ -190,45 +190,29 @@ public class PolicyEditorController {
         setPerformingIO(false);
     }
 
-    public void copyCodebaseToClipboard(final String codebase) {
-        final Map<PolicyEditorPermissions, Boolean> standardPermissions = policyFile.getCopyOfPermissions().get(codebase);
-        final Set<CustomPermission> customPermissions = policyFile.getCopyOfCustomPermissions().get(codebase);
+    public void copyPolicyEntryToClipboard(final PolicyIdentifier identifier) {
+        final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        final PolicyEntry policyEntry = getPolicyEntry(identifier);
+        clipboard.setContents(policyEntry, null);
+    }
 
-        final Set<PolicyEditorPermissions> enabledPermissions = new HashSet<>();
-        for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : standardPermissions.entrySet()) {
+    public PolicyEntry getPolicyEntry(final PolicyIdentifier identifier) {
+        final Collection<PolicyEditorPermissions> enabledPermissions = new HashSet<>();
+        for (final Map.Entry<PolicyEditorPermissions, Boolean> entry : getPermissions(identifier).entrySet()) {
             if (entry.getValue()) {
                 enabledPermissions.add(entry.getKey());
             }
         }
-        final PolicyEntry entry = new PolicyEntry(codebase, enabledPermissions, customPermissions);
-        final StringSelection clipboardSelection = new StringSelection(entry.toString());
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardSelection, clipboardSelection);
+        return new PolicyEntry.Builder()
+                .identifier(identifier)
+                .permissions(enabledPermissions)
+                .customPermissions(getCustomPermissions(identifier))
+                .build();
     }
 
-    private static String getClipboardContentsAsString() throws IOException, UnsupportedFlavorException {
-        final Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-        return (String) transferable.getTransferData(DataFlavor.stringFlavor);
-    }
-
-    public static PolicyEntry getPolicyEntryFromClipboard() throws IOException, UnsupportedFlavorException, InvalidPolicyException {
-        return PolicyEntry.fromString(getClipboardContentsAsString());
-    }
-
-    public String getCodebaseFromClipboard() throws IOException, UnsupportedFlavorException, InvalidPolicyException {
-        return getPolicyEntryFromClipboard().getCodebase();
-    }
-
-    public Map<PolicyEditorPermissions, Boolean> getPermissionsFromClipboard() throws IOException, UnsupportedFlavorException, InvalidPolicyException {
-        final Map<PolicyEditorPermissions, Boolean> ret = new HashMap<>();
-        final Set<PolicyEditorPermissions> enabledPermissions = getPolicyEntryFromClipboard().getPermissions();
-        for (final PolicyEditorPermissions permission : PolicyEditorPermissions.values()) {
-            ret.put(permission, enabledPermissions.contains(permission));
-        }
-        return ret;
-    }
-
-    public Set<CustomPermission> getCustomPermissionsFromClipboard() throws IOException, UnsupportedFlavorException, InvalidPolicyException {
-        return getPolicyEntryFromClipboard().getCustomPermissions();
+    public static PolicyEntry getPolicyEntryFromClipboard() throws IOException, UnsupportedFlavorException, PolicyParser.ParsingException {
+        final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        return (PolicyEntry) clipboard.getContents(null).getTransferData(POLICY_ENTRY_DATA_FLAVOR);
     }
 
 }

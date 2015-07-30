@@ -84,7 +84,7 @@ public enum PermissionActions {
     }
 
     public Collection<String> getActions() {
-        return new HashSet<String>(this.actions);
+        return new HashSet<>(this.actions);
     }
 
     private static Set<String> setFromString(final String string) {

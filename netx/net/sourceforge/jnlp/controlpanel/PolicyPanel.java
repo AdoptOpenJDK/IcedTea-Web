@@ -166,6 +166,7 @@ public class PolicyPanel extends NamedBorderPanel {
     private void launchSimplePolicyEditor(final String filePath) {
         if (policyEditor == null || policyEditor.getPolicyEditor().isClosed()) {
             policyEditor = PolicyEditor.getPolicyEditorFrame(filePath);
+            policyEditor.getPolicyEditor().openAndParsePolicyFile();
             policyEditor.asWindow().setVisible(true);
         } else {
             policyEditor.asWindow().toFront();

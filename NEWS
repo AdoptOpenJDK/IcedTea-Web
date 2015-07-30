@@ -30,15 +30,16 @@ New in release 1.7 (2015-XX-XX):
   - fixed issue with -html receiving garbage in width and height
 * PolicyEditor
   - file flag made to work when used standalone
+  - support for SignedBy and Principals along with existing Codebase
 
 New in release 1.6 (2015-XX-XX):
 * Massively improved offline abilities. Added Xoffline switch to force work without inet connection.
 * Improved to be able to run with any JDK
 * JDK 6 and older no longer supported
 * JDK 8 support added (URLPermission granted if applicable)
-* JDK 9 supported 
+* JDK 9 supported
 * Added support for Entry-Point manifest attribute
-* Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK deployment property to control scan of Manifest file 
+* Added KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK deployment property to control scan of Manifest file
 * starting arguments now accept also -- abbreviations
 * Added new documentation
 * Added support for menu shortcuts - both javaws applications/applets and html applets are supported
@@ -202,7 +203,7 @@ Common
 
 New in release 1.1 (2011-XX-XX):
 * Security updates
-  - S6983554, CVE-2010-4450: Launcher incorrect processing of empty library path entries 
+  - S6983554, CVE-2010-4450: Launcher incorrect processing of empty library path entries
   - RH677332, CVE-2011-0706: IcedTea multiple signers privilege escalation
 * New Features
   - IcedTea-Web now installs to a FHS-compliant location
