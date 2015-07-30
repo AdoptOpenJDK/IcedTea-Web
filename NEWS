@@ -30,6 +30,7 @@ New in release 1.7 (2015-XX-XX):
   - fixed issue with -html receiving garbage in width and height
 * PolicyEditor
   - file flag made to work when used standalone
+  - defaultfile flag added
   - support for SignedBy and Principals along with existing Codebase
 
 New in release 1.6 (2015-XX-XX):

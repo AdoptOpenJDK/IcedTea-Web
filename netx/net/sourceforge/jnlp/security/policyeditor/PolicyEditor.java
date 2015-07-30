@@ -356,7 +356,7 @@ public class PolicyEditor extends JPanel {
                     return;
                 }
                 try {
-                    PolicyEditor.this.setFile(new File(new URI(PathsAndFiles.JAVA_POLICY.getFullPath())).getAbsolutePath());
+                    PolicyEditor.this.setFile(getDefaultPolicyFilePath());
                     PolicyEditor.this.getFile().createNewFile();
                 } catch (final IOException | URISyntaxException e) {
                     OutputController.getLogger().log(e);
@@ -514,6 +514,10 @@ public class PolicyEditor extends JPanel {
         closeButton.addActionListener(closeButtonAction);
 
         setupLayout();
+    }
+
+    private static String getDefaultPolicyFilePath() throws URISyntaxException {
+        return new File(new URI(PathsAndFiles.JAVA_POLICY.getFullPath())).getAbsolutePath();
     }
 
     private void addDefaultAllAppletsIdentifier() {
@@ -1758,14 +1762,7 @@ public class PolicyEditor extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                String filepath = optionParser.getParam(OptionsDefinitions.OPTIONS.FILE);
-                if (filepath == null || filepath.isEmpty() || filepath.trim().isEmpty()) {
-                    // maybe the user just forgot the -file flag, so try to open anyway
-                    filepath = optionParser.getMainArg();
-                }
-                if (filepath == null || filepath.isEmpty() || filepath.trim().isEmpty()) {
-                    filepath = null;
-                }
+                final String filepath = getFilePathArgument(optionParser);
                 final PolicyEditorWindow frame = getPolicyEditorFrame(filepath);
                 final String codebase = optionParser.getParam(OptionsDefinitions.OPTIONS.CODEBASE);
                 final String signedBy = optionParser.getParam(OptionsDefinitions.OPTIONS.SIGNEDBY);
@@ -1779,6 +1776,42 @@ public class PolicyEditor extends JPanel {
                 frame.asWindow().setVisible(true);
             }
         });
+    }
+
+    private static String getFilePathArgument(OptionParser optionParser) {
+        final boolean openDefaultFile = optionParser.hasOption(OptionsDefinitions.OPTIONS.DEFAULTFILE);
+        final boolean hasFileArgument = optionParser.hasOption(OptionsDefinitions.OPTIONS.FILE);
+        final boolean hasMainArgument = optionParser.mainArgExists();
+        if ((hasFileArgument && openDefaultFile) || (hasMainArgument && openDefaultFile)) {
+            throw new IllegalArgumentException(R("PEDefaultFileFilePathSpecifiedError"));
+        } else if (hasFileArgument && hasMainArgument) {
+            throw new IllegalArgumentException(R("PEMainArgAndFileSwitchSpecifiedError"));
+        }
+
+        String filepath = null;
+        if (hasFileArgument) {
+            filepath = cleanFilePathArgument(optionParser.getParam(OptionsDefinitions.OPTIONS.FILE));
+        } else if (hasMainArgument) {
+            filepath = cleanFilePathArgument(optionParser.getMainArg());
+        } else if (openDefaultFile) {
+            try {
+                filepath = getDefaultPolicyFilePath();
+            } catch (URISyntaxException e) {
+                OutputController.getLogger().log(e);
+                throw new RuntimeException(e);
+            }
+        }
+        return filepath;
+    }
+
+    private static String cleanFilePathArgument(String filepath) {
+        if (filepath == null) {
+            return null;
+        } else if (filepath.isEmpty() || filepath.trim().isEmpty()) {
+            return null;
+        } else {
+            return filepath;
+        }
     }
 
     /**
