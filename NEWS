@@ -29,6 +29,7 @@ New in release 1.7 (2015-XX-XX):
   - fixed issues with -html shortcuts
   - fixed issue with -html receiving garbage in width and height
 * PolicyEditor
+  - Entry list is sorted, entries will appear with consistent ordering
   - file flag made to work when used standalone
   - file flag cannot be used in combination with main argument
   - defaultfile flag added

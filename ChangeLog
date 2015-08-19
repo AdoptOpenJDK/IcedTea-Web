@@ -1,3 +1,21 @@
+2015-08-19  Andrew Azores  <aazores@redhat.com>
+
+	Sort identifiers list in PolicyEditor
+	* NEWS: add note about sorting
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(addNewEntry): clear listModel before adding new identifiers from
+	policyEditorController. Controller handles sorting results for us, so we
+	just clear and repopulate the UI.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorController.java
+	(getIdentifiers): return SortedSet rather than Set
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyFileModel.java
+	(getIdentifiers): likewise
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyIdentifier.java
+	(compareTo, compareComparable): new methods for implementing Comparable
+	(getPrincipals): return Set, not List
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyIdentifierTest.java:
+	new tests for PolicyIdentifier
+
 2015-07-30  Andrew Azores  <aazores@redhat.com>
 
 	Add tests for PolicyEditor.getFilePathArgument

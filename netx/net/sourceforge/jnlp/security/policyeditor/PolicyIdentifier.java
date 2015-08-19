@@ -43,10 +43,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 // http://docs.oracle.com/javase/7/docs/technotes/guides/security/PolicyFiles.html
-public class PolicyIdentifier implements Serializable {
+public class PolicyIdentifier implements Comparable<PolicyIdentifier>, Serializable {
 
     public static final PolicyIdentifier ALL_APPLETS_IDENTIFIER = new PolicyIdentifier(null, Collections.<PolicyParser.PrincipalEntry>emptySet(), null) {
         @Override
@@ -56,7 +58,7 @@ public class PolicyIdentifier implements Serializable {
     };
 
     private final String signedBy;
-    private final List<PolicyParser.PrincipalEntry> principals = new ArrayList<>();
+    private final LinkedHashSet<PolicyParser.PrincipalEntry> principals = new LinkedHashSet<>();
     private final String codebase;
 
     public PolicyIdentifier(final String signedBy, final Collection<PolicyParser.PrincipalEntry> principals, final String codebase) {
@@ -77,7 +79,7 @@ public class PolicyIdentifier implements Serializable {
         return signedBy;
     }
 
-    public List<PolicyParser.PrincipalEntry> getPrincipals() {
+    public Set<PolicyParser.PrincipalEntry> getPrincipals() {
         return principals;
     }
 
@@ -143,5 +145,40 @@ public class PolicyIdentifier implements Serializable {
         result = 31 * result + (principals != null ? principals.hashCode() : 0);
         result = 31 * result + (codebase.hashCode());
         return result;
+    }
+
+    @Override
+    public int compareTo(PolicyIdentifier policyIdentifier) {
+        if (this.equals(ALL_APPLETS_IDENTIFIER) && policyIdentifier.equals(ALL_APPLETS_IDENTIFIER)) {
+            return 0;
+        } else if (this.equals(ALL_APPLETS_IDENTIFIER) && !policyIdentifier.equals(ALL_APPLETS_IDENTIFIER)) {
+            return -1;
+        } else if (!this.equals(ALL_APPLETS_IDENTIFIER) && policyIdentifier.equals(ALL_APPLETS_IDENTIFIER)) {
+            return 1;
+        }
+
+        final int codebaseComparison = compareComparable(this.getCodebase(), policyIdentifier.getCodebase());
+        if (codebaseComparison != 0) {
+            return codebaseComparison;
+        }
+
+        final int signedByComparison = compareComparable(this.getSignedBy(), policyIdentifier.getSignedBy());
+        if (signedByComparison != 0) {
+            return signedByComparison;
+        }
+
+        return Integer.compare(this.getPrincipals().hashCode(), policyIdentifier.getPrincipals().hashCode());
+    }
+
+    private static <T extends Comparable<T>> int compareComparable(T a, T b) {
+        if (a == null && b != null) {
+            return 1;
+        } else if (a != null && b == null) {
+            return -1;
+        } else if (a == b) {
+            return 0;
+        } else {
+            return a.compareTo(b);
+        }
     }
 }

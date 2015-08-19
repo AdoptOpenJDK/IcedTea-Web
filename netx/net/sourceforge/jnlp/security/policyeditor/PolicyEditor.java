@@ -840,10 +840,9 @@ public class PolicyEditor extends JPanel {
         invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
+                listModel.clear();
                 for (final PolicyIdentifier identifier : policyEditorController.getIdentifiers()) {
-                    if (!listModel.contains(identifier)) {
-                        listModel.addElement(identifier);
-                    }
+                    listModel.addElement(identifier);
                 }
                 list.setSelectedValue(identifier, true);
                 updateCheckboxes(identifier);

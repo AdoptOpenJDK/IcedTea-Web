@@ -48,6 +48,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.MD5SumWatcher;
@@ -201,8 +203,8 @@ public class PolicyFileModel {
         return fileWatcher != null && fileWatcher.update();
     }
 
-    synchronized Set<PolicyIdentifier> getIdentifiers() {
-        return new HashSet<>(permissionsMap.keySet());
+    synchronized SortedSet<PolicyIdentifier> getIdentifiers() {
+        return new TreeSet<>(permissionsMap.keySet());
     }
 
     synchronized KeystoreInfo getKeystoreInfo() {

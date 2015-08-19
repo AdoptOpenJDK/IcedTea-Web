@@ -48,6 +48,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.security.provider.PolicyParser;
@@ -102,8 +104,8 @@ public class PolicyEditorController {
         policyFile.removeIdentifier(identifier);
     }
 
-    public Set<PolicyIdentifier> getIdentifiers() {
-        return new HashSet<>(policyFile.getIdentifiers());
+    public SortedSet<PolicyIdentifier> getIdentifiers() {
+        return new TreeSet<>(policyFile.getIdentifiers());
     }
 
     public Map<PolicyIdentifier, Map<PolicyEditorPermissions, Boolean>> getCopyOfPermissions() {
