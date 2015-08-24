@@ -1,5 +1,21 @@
 2015-08-19  Andrew Azores  <aazores@redhat.com>
 
+	PolicyEditor dies given invalid -codebase -signedby or -principals arguments
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java
+	(main): extracted helper methods for getting codebase, signedBy, principals
+	arguments.
+	(getCodebaseArgument, getSignedByArgument, getPrincipalsArgument): new
+	methods
+	(cleanFilePathArgument): make parameter final for consistent style
+	* tests/netx/unit/net/sourceforge/jnlp/security/policyeditor/PolicyEditorTest.java
+	(testGetCodebaseArgument, testGetCodebaseArgument2,
+	testGetCodebaseArgument3, testGetCodebaseArgumentWhenNotProvided,
+	testGetPrincipalsArgument, testGetPrincipalsArgument2,
+	testGetPrincipalsArgument3, testGetPrincipalsArgumentWhenNotProvided,
+	testGetSignedByArgument, testGetSignedByArgumentWhenNotProvided): new tests
+
+2015-08-19  Andrew Azores  <aazores@redhat.com>
+
 	Sort identifiers list in PolicyEditor
 	* NEWS: add note about sorting
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java

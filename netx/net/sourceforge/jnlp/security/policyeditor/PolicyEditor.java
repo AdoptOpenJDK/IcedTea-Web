@@ -1758,18 +1758,15 @@ public class PolicyEditor extends JPanel {
             // not really important, so just ignore
         }
 
+        final String filepath = getFilePathArgument(optionParser);
+        final String codebase = getCodebaseArgument(optionParser);
+        final String signedBy = getSignedByArgument(optionParser);
+        final Set<PolicyParser.PrincipalEntry> principals = getPrincipalsArgument(optionParser);
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final String filepath = getFilePathArgument(optionParser);
                 final PolicyEditorWindow frame = getPolicyEditorFrame(filepath);
-                final String codebase = optionParser.getParam(OptionsDefinitions.OPTIONS.CODEBASE);
-                final String signedBy = optionParser.getParam(OptionsDefinitions.OPTIONS.SIGNEDBY);
-                final List<String> rawPrincipals = optionParser.getParams(OptionsDefinitions.OPTIONS.PRINCIPALS);
-                final Set<PolicyParser.PrincipalEntry> principals = new HashSet<>();
-                for (int i = 0; i < rawPrincipals.size(); i+= 2) {
-                    principals.add(new PolicyParser.PrincipalEntry(rawPrincipals.get(i), rawPrincipals.get(i + 1)));
-                }
                 frame.getPolicyEditor().openPolicyFileSynchronously();
                 frame.getPolicyEditor().addNewEntry(new PolicyIdentifier(signedBy, principals, codebase));
                 frame.asWindow().setVisible(true);
@@ -1777,7 +1774,47 @@ public class PolicyEditor extends JPanel {
         });
     }
 
-    static String getFilePathArgument(OptionParser optionParser) {
+    static String getCodebaseArgument(final OptionParser optionParser) {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CODEBASE)) {
+            final String codebase = optionParser.getParam(OptionsDefinitions.OPTIONS.CODEBASE);
+            try {
+                new URL(codebase);
+            } catch (final MalformedURLException e) {
+                throw new IllegalArgumentException(R("PEInvalidUrl", codebase), e);
+            }
+            return codebase;
+        } else {
+            return null;
+        }
+    }
+
+    static String getSignedByArgument(final OptionParser optionParser) {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.SIGNEDBY)) {
+            final String signedBy = optionParser.getParam(OptionsDefinitions.OPTIONS.SIGNEDBY);
+            if (signedBy.isEmpty()) {
+                throw new IllegalArgumentException(R("PESignedByEmpty"));
+            } else {
+                return signedBy;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    static Set<PolicyParser.PrincipalEntry> getPrincipalsArgument(final OptionParser optionParser) {
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.PRINCIPALS)) {
+            final List<String> rawPrincipals = optionParser.getParams(OptionsDefinitions.OPTIONS.PRINCIPALS);
+            final Set<PolicyParser.PrincipalEntry> principals = new HashSet<>();
+            for (int i = 0; i < rawPrincipals.size(); i+= 2) {
+                principals.add(new PolicyParser.PrincipalEntry(rawPrincipals.get(i), rawPrincipals.get(i + 1)));
+            }
+            return principals;
+        } else {
+            return Collections.emptySet();
+        }
+    }
+
+    static String getFilePathArgument(final OptionParser optionParser) {
         final boolean openDefaultFile = optionParser.hasOption(OptionsDefinitions.OPTIONS.DEFAULTFILE);
         final boolean hasFileArgument = optionParser.hasOption(OptionsDefinitions.OPTIONS.FILE);
         final boolean hasMainArgument = optionParser.mainArgExists();
@@ -1803,7 +1840,7 @@ public class PolicyEditor extends JPanel {
         return filepath;
     }
 
-    private static String cleanFilePathArgument(String filepath) {
+    private static String cleanFilePathArgument(final String filepath) {
         if (filepath == null) {
             return null;
         } else if (filepath.isEmpty() || filepath.trim().isEmpty()) {

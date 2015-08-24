@@ -46,12 +46,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.sourceforge.jnlp.util.optionparser.UnevenParameterException;
 import org.junit.Before;
 import org.junit.Test;
 import sun.security.provider.PolicyParser;
@@ -375,4 +377,80 @@ public class PolicyEditorTest {
         PolicyEditor.getFilePathArgument(optionParser);
     }
 
+    @Test
+    public void testGetCodebaseArgument() {
+        String[] args = new String[] { "-codebase", "http://example.com" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getCodebaseArgument(optionParser);
+        assertTrue(result.equals("http://example.com"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetCodebaseArgument2() {
+        String[] args = new String[] { "-codebase", "" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getCodebaseArgument(optionParser);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetCodebaseArgument3() {
+        String[] args = new String[] { "-codebase", "example.com" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getCodebaseArgument(optionParser);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetCodebaseArgumentWhenNotProvided() {
+        String[] args = new String[] { "-codebase" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getCodebaseArgument(optionParser);
+    }
+
+    @Test
+    public void testGetPrincipalsArgument() {
+        String[] args = new String[] { "-principals", "aa=bb" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        Set<PolicyParser.PrincipalEntry> result = PolicyEditor.getPrincipalsArgument(optionParser);
+        assertTrue(result.size() == 1);
+        assertTrue(result.contains(new PolicyParser.PrincipalEntry("aa", "bb")));
+    }
+
+    @Test
+    public void testGetPrincipalsArgument2() {
+        String[] args = new String[] { "-principals", "aa", "bb" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        Set<PolicyParser.PrincipalEntry> result = PolicyEditor.getPrincipalsArgument(optionParser);
+        assertTrue(result.size() == 1);
+        assertTrue(result.contains(new PolicyParser.PrincipalEntry("aa", "bb")));
+    }
+
+    @Test(expected = UnevenParameterException.class)
+    public void testGetPrincipalsArgumentWhenUnevenArgumentsProvided() {
+        String[] args = new String[] { "-principals", "aa=bb", "cc" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getPrincipalsArgument(optionParser);
+    }
+
+    @Test
+    public void testGetPrincipalsArgumentWhenNotProvided() {
+        String[] args = new String[] { "-principals" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        Set<PolicyParser.PrincipalEntry> result = PolicyEditor.getPrincipalsArgument(optionParser);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetSignedByArgument() {
+        String[] args = new String[] { "-signedby", "foo" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        String result = PolicyEditor.getSignedByArgument(optionParser);
+        assertTrue(result.equals("foo"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetSignedByArgumentWhenNotProvided() {
+        String[] args = new String[] { "-signedby" };
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        PolicyEditor.getSignedByArgument(optionParser);
+    }
 }
