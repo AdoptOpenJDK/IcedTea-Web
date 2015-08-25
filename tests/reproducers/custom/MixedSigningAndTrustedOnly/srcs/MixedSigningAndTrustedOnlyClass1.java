@@ -40,8 +40,8 @@ import java.util.Arrays;
 
 public class MixedSigningAndTrustedOnlyClass1 extends Applet {
 
-    private static final String ID1 = "MixedSigningAndTrustedOnlyClass1";
-    private static final String ID2 = "MixedSigningAndTrustedOnlyClass2";
+    private static final String ID_THIS = "MixedSigningAndTrustedOnlyClass1";
+    private static final String ID_REMOTE = "MixedSigningAndTrustedOnlyClass2";
 
     public static void main(String[] args) {
         runBody(args);
@@ -56,7 +56,7 @@ public class MixedSigningAndTrustedOnlyClass1 extends Applet {
 
     private static void runBody(String... commands) {
         try {
-            System.out.println(ID1 + " running");
+            System.out.println(ID_THIS + " running");
             System.out.println("params: " + Arrays.toString(commands));
             boolean canDie = true;
             for (String command : commands) {
@@ -68,17 +68,17 @@ public class MixedSigningAndTrustedOnlyClass1 extends Applet {
                         case "cantDie":
                             canDie = false;
                             break;
-                        case ID1 + "_Normal":
-                            doNormal();
+                        case ID_THIS + "_Normal":
+                            doNormalLocal();
                             break;
-                        case ID1 + "_Restricted":
-                            doRestrictedAction();
+                        case ID_THIS + "_Restricted":
+                            doRestrictedActionLocal();
                             break;
-                        case ID2 + "_Normal":
-                            MixedSigningAndTrustedOnlyClass2.doNormal();
+                        case ID_REMOTE + "_Normal":
+                            MixedSigningAndTrustedOnlyClass2.doNormalRemote();
                             break;
-                        case ID2 + "_Restricted":
-                            MixedSigningAndTrustedOnlyClass2.doRestrictedAction();
+                        case ID_REMOTE + "_Restricted":
+                            MixedSigningAndTrustedOnlyClass2.doRestrictedActionlRemote();
                             break;
 
                     }
@@ -91,20 +91,55 @@ public class MixedSigningAndTrustedOnlyClass1 extends Applet {
                 }
             }
         } finally {
+            System.err.flush();
+            System.out.flush();
             System.out.println("*** APPLET FINISHED ***");
             System.out.flush();
             System.out.println("some garbage forcing to flush");
             System.out.flush();
+            System.err.println("some garbage forcing to flush");
+            System.err.flush();
         }
     }
 
-    public static void doRestrictedAction() {
-        System.out.println(System.getProperty("user.home"));
-        System.out.println(ID1 + " Property read");
+    private static void doRestrictedAction() {
+        String a = System.getProperty("user.home");
+        System.out.println(ID_THIS + " Property read");
+        System.out.println(a);
+        System.out.flush();
     }
 
-    public static void doNormal() {
-        System.out.println(ID1 + " confirmed");
+    private static void doNormal() {
+        System.out.println(ID_THIS + " confirmed");
+        System.out.flush();
+    }
+
+    private static final String REMOTE_CALL = "RemoteCall - ";
+    private static final String LOCAL_CALL = "LocalCall - ";
+    
+    public static void doNormalRemote() {
+        System.out.print(REMOTE_CALL);
+        doNormal();
+        System.out.flush();
+    }
+    
+    private static void doNormalLocal() {
+        System.out.print(LOCAL_CALL);
+        doNormal();
+        System.out.flush();
+    }
+    
+    
+     public static void doRestrictedActionlRemote() {
+        System.out.print(REMOTE_CALL);
+        doRestrictedAction();
+        System.out.flush();
+    }
+    
+    private static void doRestrictedActionLocal() {
+        System.out.print(LOCAL_CALL);
+        doRestrictedAction();
+        System.out.flush();
     }
 
 }

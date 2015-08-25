@@ -34,7 +34,9 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
+//package MixedSigningAndTrustedOnlyPackage;
 package MixedSigningAndTrustedOnlyPackage;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,6 +59,7 @@ public class MixedSigningAndTrustedOnly extends BrowserTest {
 
     static List<String> HEADLESS = Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.HEADLESS.option});
     static List<String> HTML = Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.HTML.option});
+    static List<String> verbose = Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.VERBOSE.option});
 
     public static final String PREFIX = "MixedSigningAndTrustedOnly";
     public static final String C1 = "Class1";
@@ -64,10 +67,17 @@ public class MixedSigningAndTrustedOnly extends BrowserTest {
 
     static final String ID11 = PREFIX + C1;
     static final String ID12 = PREFIX + C2;
-    static final String ID21 = PREFIX + C2;
-    static final String ID22 = PREFIX + C1;
+    static final String ID21 = PREFIX + C1;
+    static final String ID22 = PREFIX + C2;
+
+    static final String RUNNING = " running"; //note the space
+    static final String RUNNING1 = ID11 + RUNNING;
+    static final String RUNNING2 = ID22 + RUNNING;
+
     static final String RESTRICTED_CONFIRM_SUFFIX = " Property read"; //note the space
     static final String NORMAL_CONFIRM_SUFFIX = " confirmed"; //same
+    static final String REMOTE_PREFIX = "RemoteCall - "; //note the space
+    static final String LOCAL_PREFIX = "LocalCall - "; //note the space
 
     static final String RESTRICTED11 = ID11 + RESTRICTED_CONFIRM_SUFFIX;
     static final String NORMAL11 = ID11 + NORMAL_CONFIRM_SUFFIX;
@@ -299,16 +309,57 @@ public class MixedSigningAndTrustedOnly extends BrowserTest {
         Assert.assertEquals("<jar href=\"archive1\" />\n<jar href=\"archive2\" main=\"true\" />\n<jar href=\"archive3\" />", c4.toString());
     }
 
-    static void assertAllOk(ProcessResult pr) {
-        Assert.assertTrue(pr.stdout.contains(NORMAL11));
-        Assert.assertTrue(pr.stdout.contains(NORMAL12));
-        Assert.assertTrue(pr.stdout.contains(NORMAL21));
-        Assert.assertTrue(pr.stdout.contains(NORMAL22));
-        Assert.assertTrue(pr.stdout.contains(RESTRICTED11));
-        Assert.assertTrue(pr.stdout.contains(RESTRICTED12));
-        Assert.assertTrue(pr.stdout.contains(RESTRICTED21));
-        Assert.assertTrue(pr.stdout.contains(RESTRICTED22));
+    static void assertAllOkC1(ProcessResult pr) {
+        Assert.assertTrue(pr.stdout.contains(RUNNING1));
+        Assert.assertFalse(pr.stdout.contains(RUNNING2));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + NORMAL11));
+        Assert.assertTrue(pr.stdout.contains(REMOTE_PREFIX + NORMAL12));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + RESTRICTED11));
+        Assert.assertTrue(pr.stdout.contains(REMOTE_PREFIX + RESTRICTED12));
     }
+
+    static void assertAllOkC2(ProcessResult pr) {
+        Assert.assertTrue(pr.stdout.contains(RUNNING2));
+        Assert.assertFalse(pr.stdout.contains(RUNNING1));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + NORMAL22));
+        Assert.assertTrue(pr.stdout.contains(REMOTE_PREFIX + NORMAL21));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + RESTRICTED22));
+        Assert.assertTrue(pr.stdout.contains(REMOTE_PREFIX + RESTRICTED21));
+    }
+
+    static void assertC1C1okTransNotOk(ProcessResult pr) {
+        Assert.assertFalse(pr.stdout.contains(RUNNING2));
+        Assert.assertTrue(pr.stdout.contains(RUNNING1));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + NORMAL11));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + RESTRICTED11));
+        Assert.assertFalse(pr.stdout.contains(REMOTE_PREFIX));
+    }
+    
+     static void assertC2C2okTransNotOk(ProcessResult pr) {
+        Assert.assertTrue(pr.stdout.contains(RUNNING2));
+        Assert.assertFalse(pr.stdout.contains(RUNNING1));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + NORMAL22));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + RESTRICTED22));
+        Assert.assertFalse(pr.stdout.contains(REMOTE_PREFIX));
+    }
+    
+    
+    static void assertC1C1OnlyUnrestrictedokTransNotOk(ProcessResult pr) {
+        Assert.assertFalse(pr.stdout.contains(RUNNING2));
+        Assert.assertTrue(pr.stdout.contains(RUNNING1));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + NORMAL11));
+        Assert.assertFalse(pr.stdout.contains(LOCAL_PREFIX + RESTRICTED11));
+        Assert.assertFalse(pr.stdout.contains(REMOTE_PREFIX));
+    }
+    
+    static void assertC2C2OnlyUnrestrictedokTransNotOk(ProcessResult pr) {
+        Assert.assertTrue(pr.stdout.contains(RUNNING2));
+        Assert.assertFalse(pr.stdout.contains(RUNNING1));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + NORMAL22));
+        Assert.assertFalse(pr.stdout.contains(LOCAL_PREFIX + RESTRICTED22));
+        Assert.assertFalse(pr.stdout.contains(REMOTE_PREFIX));
+    }
+
 
     //mostly useless, all tests are killed
     static void assertProcessOk(ProcessResult pr) {
@@ -320,22 +371,49 @@ public class MixedSigningAndTrustedOnly extends BrowserTest {
         Assert.assertNotEquals(0, pr.returnValue.intValue());
     }
 
-    static void assertAllButRestricted(ProcessResult pr) {
-        Assert.assertTrue(pr.stdout.contains(NORMAL11));
-        Assert.assertTrue(pr.stdout.contains(NORMAL12));
-        Assert.assertTrue(pr.stdout.contains(NORMAL21));
-        Assert.assertTrue(pr.stdout.contains(NORMAL22));
+    static void assertAllButRestrictedC1(ProcessResult pr) {
+        Assert.assertTrue(pr.stdout.contains(RUNNING1));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + NORMAL11));
+        Assert.assertTrue(pr.stdout.contains(REMOTE_PREFIX + NORMAL12));
+        assertNotRestricted(pr);
+    }
+
+    static void assertAllButRestrictedC2(ProcessResult pr) {
+        Assert.assertTrue(pr.stdout.contains(RUNNING2));
+        Assert.assertTrue(pr.stdout.contains(REMOTE_PREFIX + NORMAL21));
+        Assert.assertTrue(pr.stdout.contains(LOCAL_PREFIX + NORMAL22));
+        assertNotRestricted(pr);
+    }
+
+    static void assertNotRestricted(ProcessResult pr) {
         Assert.assertFalse(pr.stdout.contains(RESTRICTED11));
         Assert.assertFalse(pr.stdout.contains(RESTRICTED12));
         Assert.assertFalse(pr.stdout.contains(RESTRICTED21));
         Assert.assertFalse(pr.stdout.contains(RESTRICTED22));
     }
-    
+
     static void assertLaunchException(ProcessResult pr) {
         Assert.assertTrue(pr.stderr.contains("net.sourceforge.jnlp.LaunchException"));
     }
-    
-     static void assertNone(ProcessResult pr) {
+    static void assertInitError(ProcessResult pr) {
+        Assert.assertTrue(pr.stderr.contains("Fatal: Initialization Error"));
+    }
+
+    static void assertSecurityException(ProcessResult pr) {
+        Assert.assertTrue(pr.stderr.contains("java.lang.SecurityException"));
+    }
+
+    static void assertAccessControlException(ProcessResult pr) {
+        Assert.assertTrue(pr.stderr.contains("java.security.AccessControlException"));
+    }
+
+    static void assertAccessDenied(ProcessResult pr) {
+        Assert.assertTrue(pr.stderr.contains("access denied"));
+    }
+
+    static void assertNone(ProcessResult pr) {
+        Assert.assertFalse(pr.stdout.contains(RUNNING1));
+        Assert.assertFalse(pr.stdout.contains(RUNNING2));
         Assert.assertFalse(pr.stdout.contains(NORMAL11));
         Assert.assertFalse(pr.stdout.contains(NORMAL12));
         Assert.assertFalse(pr.stdout.contains(NORMAL21));

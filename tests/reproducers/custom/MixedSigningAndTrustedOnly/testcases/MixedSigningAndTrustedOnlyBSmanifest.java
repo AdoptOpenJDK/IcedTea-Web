@@ -34,6 +34,7 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
+//package MixedSigningAndTrustedOnlyPackage;
 package MixedSigningAndTrustedOnlyPackage;
 
 import net.sourceforge.jnlp.ProcessResult;
@@ -81,7 +82,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.HTML, C1, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, false);
         ProcessResult pr = server.executeBrowser(file, AutoClose.CLOSE_ON_BOTH);
-        assertAllOk(pr);
+        assertAllOkC1(pr);
     }
     
     @NeedsDisplay
@@ -90,7 +91,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.HTML, C1, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, false);
         ProcessResult pr = server.executeJavaws(HTML, file, new AutoOkClosingListener(), new AutoErrorClosingListener());
-        assertAllOk(pr);
+        assertAllOkC1(pr);
     }
 
     @Test
@@ -119,7 +120,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.JNLP_APP, C1, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, true);
         ProcessResult pr = server.executeJavaws(HEADLESS, file, new AutoOkClosingListener(), new AutoErrorClosingListener());
-        assertAllOk(pr);
+        assertAllOkC1(pr);
     }
 
     @Test
@@ -128,7 +129,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.JNLP_APPLET, C1, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, true);
         ProcessResult pr = server.executeJavaws(file, new AutoOkClosingListener(), new AutoErrorClosingListener());
-        assertAllOk(pr);
+        assertAllOkC1(pr);
     }
 
     @NeedsDisplay
@@ -138,7 +139,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.HTML, C2, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, false);
         ProcessResult pr = server.executeBrowser(file, AutoClose.CLOSE_ON_BOTH);
-        assertAllOk(pr);
+        assertAllOkC2(pr);
     }
     
     @NeedsDisplay
@@ -147,7 +148,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.HTML, C2, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, false);
         ProcessResult pr = server.executeJavaws(HTML, file, new AutoOkClosingListener(), new AutoErrorClosingListener());
-        assertAllOk(pr);
+        assertAllOkC2(pr);
     }
 
     @Test
@@ -176,7 +177,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.JNLP_APP, C2, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, true);
         ProcessResult pr = server.executeJavaws(HEADLESS, file, new AutoOkClosingListener(), new AutoErrorClosingListener());
-        assertAllOk(pr);
+        assertAllOkC2(pr);
     }
 
     @Test
@@ -185,7 +186,7 @@ public class MixedSigningAndTrustedOnlyBSmanifest extends BrowserTest {
         String file = prepareFile(FileType.JNLP_APPLET, C2, new Archives[]{BSM},
                 new String[]{COMMAND_C1_NORMAL, COMMAND_C2_NORMAL, COMMAND_C1_RESTRICT, COMMAND_C2_RESTRICT}, true);
         ProcessResult pr = server.executeJavaws(file, new AutoOkClosingListener(), new AutoErrorClosingListener());
-        assertAllOk(pr);
+        assertAllOkC2(pr);
     }
 
 

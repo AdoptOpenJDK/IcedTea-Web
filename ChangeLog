@@ -1,3 +1,19 @@
+2015-08-25  Jiri Vanek  <jvanek@redhat.com>
+
+	Added more tests MixedSigningAndTrustedOnly
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MixedSigningAndTrustedOnlyClass1.java
+	modified to suite more compelx tests
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MixedSigningAndTrustedOnlyClass2.java
+	same
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnly.java
+	same
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyBS1.java
+	adapted to MixedSigningAndTrustedOnly
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyBSmanifest.java
+	same
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyFSSU.java:
+	new file to test signed_>unsigned and unsigned->signed calls behaviors. First on classpath is signed
+
 2015-08-19  Andrew Azores  <aazores@redhat.com>
 
 	PolicyEditor dies given invalid -codebase -signedby or -principals arguments
