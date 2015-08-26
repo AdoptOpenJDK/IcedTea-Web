@@ -18,6 +18,7 @@ export DOCS_DIR=$(TOP_BUILD_DIR)/icedtea-web-docs/$(FULL_VERSION)
 export NETX_SRCDIR = $(abs_top_srcdir)/netx
 export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 export ICONS_DEST_DIR=$(DESTDIR)$(datadir)/pixmaps
+export BASH_CMPL_DEST_DIR=$(DESTDIR)$(sysconfdir)/bash_completion.d
 
 export REPORT_STYLES_DIRNAME=report-styles
 
@@ -219,7 +220,7 @@ endif
 
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
-export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in policyeditor.desktop.in icedteaweb-completion \
+export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in policyeditor.desktop.in icedteaweb-completion.in \
  itweb-settings.desktop.in launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS
 
 # reproducers `D`shortcuts
@@ -263,18 +264,18 @@ all-local: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
 clean-local: clean-netx clean-plugin clean-liveconnect \
- clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-generated-docs clean-tests clean-bootstrap-directory
+ clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-generated-docs clean-icedteaweb-completion clean-tests clean-bootstrap-directory
 	if [ -e stamps ] ; then \
 	  rmdir stamps ; \
 	fi
 
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
- clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs clean-generated-docs \
+ clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs clean-generated-docs clean-icedteaweb-completion\
  clean-tests check-local clean-launchers stamps/check-pac-functions.stamp stamps/run-netx-unit-tests.stamp clean-netx-tests \
  clean-junit-runner clean-netx-unit-tests
 
 install-exec-local:
-	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir) $(ICONS_DEST_DIR)
+	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir) $(ICONS_DEST_DIR) $(BASH_CMPL_DEST_DIR)
 if ENABLE_PLUGIN
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) $(DESTDIR)$(libdir)
 	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
@@ -282,6 +283,7 @@ endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
 	${INSTALL_DATA} $(abs_top_srcdir)/javaws.png $(ICONS_DEST_DIR)/
+	${INSTALL_DATA} $(abs_top_builddir)/icedteaweb-completion $(BASH_CMPL_DEST_DIR)/icedteaweb-completion
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor) $(DESTDIR)$(bindir)
@@ -324,6 +326,7 @@ uninstall-local:
 	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
 	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
 	rm -rf $(DESTDIR)$(htmldir)
+	rm -f $(BASH_CMPL_DEST_DIR)/icedteaweb-completion
 
 # Plugin
 
@@ -508,6 +511,18 @@ if !WITH_RHINO
 	sed -i '/RhinoBasedPacEvaluator/ d' $@
 endif
 
+$(abs_top_builddir)/icedteaweb-completion: $(abs_top_srcdir)/icedteaweb-completion.in
+	OPTIONS_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.OptionsDefinitions" ;  \
+	JAVAWS=`$$OPTIONS_COMMAND javaws` ; \
+	POLICYEDITOR=`$$OPTIONS_COMMAND policyeditor` ; \
+	ITWEBSETTINGS=`$$OPTIONS_COMMAND itweb-settings`; \
+	echo $$JAVAWS ; \
+	echo $$POLICYEDITOR ; \
+	echo $$ITWEBSETTINGS ; \
+	cat $(abs_top_srcdir)/icedteaweb-completion.in | sed "s/@JAVAWS@/$${JAVAWS}/" \
+	| sed "s/@POLICYEDITOR@/$${POLICYEDITOR}/" | \
+	sed "s/@ITWEBSETTINGS@/$${ITWEBSETTINGS}/" > $(abs_top_builddir)/icedteaweb-completion ;
+
 stamps/generate-docs.stamp: stamps/netx.stamp
 	mkdir -p "$(DOCS_DIR)" ; \
 	HTML_DOCS_TARGET_DIR="$(DOCS_DIR)/html"  ; \
@@ -575,7 +590,7 @@ stamps/netx.stamp: netx-source-files.txt stamps/netx-html-gen.stamp
 	mkdir -p stamps
 	touch $@
 
-stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest stamps/generate-docs.stamp
+stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest stamps/generate-docs.stamp $(abs_top_builddir)/icedteaweb-completion 
 	(cd $(NETX_DIR) ; \
 	 mkdir -p lib ; \
 	 $(SYSTEM_JDK_DIR)/bin/jar cfm lib/classes.jar \
@@ -690,6 +705,8 @@ clean-generated-docs:
 	rm -rf "$(DOCS_DIR)"
 	rm -f stamps/generate-docs.stamp
 
+clean-icedteaweb-completion:
+	rm -f $(abs_top_builddir)/icedteaweb-completion
 
 # check
 # ==========================

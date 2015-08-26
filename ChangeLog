@@ -1,4 +1,24 @@
 2015-08-25  Jiri Vanek  <jvanek@redhat.com>
+            Lukasz Dracz  <ldracz@redhat.com>
+
+	* Makefile.am: declared BASH_CMPL_DEST_DIR as directory where to install
+	generated icedteaweb-completion. (clean-local) (.PHONY) added clean-icedteaweb-completion
+	(install-exec-local) now creates BASH_CMPL_DEST_DIR and copy icedteaweb-completion to it
+	(uninstall-local) now removes also  BASH_CMPL_DEST_DIR/icedteaweb-completion
+	(icedteaweb-completion), new target, substiture real values from javacode
+	via icedteaweb-completion.in to icedteaweb-completion
+	(stamps/netx-dist.stamp) now depends also on icedteaweb-completion
+	(clean-icedteaweb-completion) new target to remove generated file
+	* icedteaweb-completion.in: hardcoded opts value replaced by fields for substitutions
+	*netx/net/sourceforge/jnlp/OptionsDefinitions.java: added main method, which
+	can print currently accurate switches
+
+2015-08-25  Jiri Vanek  <jvanek@redhat.com>
+
+	* icedteaweb-completion: removed, renamed to icedteaweb-completion.in
+	* icedteaweb-completion.in: new file from icedteaweb-completion
+
+2015-08-25  Jiri Vanek  <jvanek@redhat.com>
 
 	Added more tests MixedSigningAndTrustedOnly
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MixedSigningAndTrustedOnlyClass1.java

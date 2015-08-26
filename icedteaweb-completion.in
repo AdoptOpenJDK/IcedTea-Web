@@ -8,7 +8,7 @@ _itweb-settings()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # Icedtea-web settings Options
-    opts="-check -get -headless -help -info -list -reset -set -verbose"
+    opts="@ITWEBSETTINGS@"
 
     COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
     return 0
@@ -22,7 +22,7 @@ _policyeditor()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # PolicyEditor Options
-    opts="-codebase -file -help"
+    opts="@POLICYEDITOR@"
 
     COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
     return 0
@@ -36,8 +36,7 @@ _javaws()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # JavaWs Options
-    opts="-about -help -license -viewer -Xclearcache -allowredirect -arg -headless -html -jnlp -nosecurity -noupdate -param -property -strict -update -verbose -version -Xignoreheaders -xml -Xnofork -Xoffline -Xtrustnone"
-
+    opts="@JAVAWS@"
     COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
     return 0
 }
