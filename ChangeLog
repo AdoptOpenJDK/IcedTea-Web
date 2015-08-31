@@ -1,3 +1,16 @@
+2015-08-31  Andrew Azores  <aazores@redhat.com>
+
+	Added new tests to check where applets are allow to make network
+	connections, depending on different combinations of applet codebase,
+	documentbase, and applet archive location.
+	* tests/reproducers/simple/SOPBypass/resources/SOPBypass.html
+	* tests/reproducers/simple/SOPBypass/resources/SOPBypass.jnlp
+	* tests/reproducers/simple/SOPBypass/srcs/SOPBypass.java
+	* tests/reproducers/simple/SOPBypass/testcases/SOPBypassHtmlAppletTest.java
+	* tests/reproducers/simple/SOPBypass/testcases/SOPBypassJnlpAppletTest.java
+	* tests/reproducers/simple/SOPBypass/testcases/SOPBypassJnlpAppletTestWithHtmlSwitch.java
+	* tests/reproducers/simple/SOPBypass/testcases/SOPBypassUtil.java
+
 2015-08-25  Jiri Vanek  <jvanek@redhat.com>
             Lukasz Dracz  <ldracz@redhat.com>
 
