@@ -36,6 +36,7 @@
 
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
+import java.net.MalformedURLException;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.net.URL;
@@ -150,11 +151,12 @@ public class UnsignedAppletTrustConfirmation {
             if (rememberForCodeBase != null) {
                 
                 codebaseRegex = new UrlRegEx("\\Q" + codebase + "\\E");
-                documentbaseRegex = new UrlRegEx(".*"); // Match any from codebase
 
                 if (!rememberForCodeBase) {
                     documentbaseRegex = new UrlRegEx("\\Q" + documentbase + "\\E"); // Match only this applet
                     archiveMatches = toRelativePaths(getJars(file), file.getCodeBase().toString()); // Match only this applet
+                } else {
+                    documentbaseRegex = new UrlRegEx("\\Q" + stripFile(documentbase)+ "\\E.*"); // Match any from codebase and sourceFile "base"
                 }
             }
             
@@ -243,6 +245,50 @@ public class UnsignedAppletTrustConfirmation {
             securityDelegate.setRunInSandbox();
         }
 
+    }
+
+    static String stripFile(URL documentbase) {
+        //whenused in generation of regec, the trailing slash is very important
+        //see the result between http:/some.url/path.* and http:/some.url/path/.*
+        return ensureSlashTail(stripFileImp(documentbase));
+    }
+    
+    private static String stripFileImp(URL documentbase) {
+        try {
+            String normlaized = UrlUtils.normalizeUrlAndStripParams(documentbase).toExternalForm().trim();
+            if (normlaized.endsWith("/") || normlaized.endsWith("\\")) {
+                return normlaized;
+            }
+            URL middleway = new URL(normlaized);
+            String file = middleway.getFile();
+            int i = Math.max(file.lastIndexOf('/'), file.lastIndexOf('\\'));
+            if (i<0){
+                return normlaized;
+            }
+            String parent = file.substring(0, i+1);
+            String stripped = normlaized.replace(file, parent);
+            return stripped;
+        } catch (Exception ex) {
+            OutputController.getLogger().log(ex);
+            return documentbase.toExternalForm();
+        }
+
+    }
+
+    private static String ensureSlashTail(String s) {
+        if (s.endsWith("/")) {
+            return s;
+        }
+        if (s.endsWith("\\")) {
+            return s;
+        }
+        if (s.contains("/")) {
+            return s + "/";
+        }
+        if (s.contains("\\")) {
+            return s + "\\";
+        }
+        return s + "/";
     }
 
 }

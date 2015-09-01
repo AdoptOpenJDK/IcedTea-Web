@@ -1,5 +1,21 @@
 2015-09-01  Jiri Vanek  <jvanek@redhat.com>
 
+	Saving of status of dialogs for "whole codebase" now includes also document base
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	(updateAppletAction) now saves  base of docbase instead of .* "for remember for codebase"
+	stripFile - new method, ensuring docbase do not contains file
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java:
+	added testSripFile unit test for new method
+	* tests/reproducers/simple/FakeCodebase/resources/FakeCodebase.html.in:
+	* tests/reproducers/simple/FakeCodebase/resources/FakeCodebase.jnlp.in:
+	* tests/reproducers/simple/FakeCodebase/resources/OriginalCodebase.html:
+	* tests/reproducers/simple/FakeCodebase/resources/OriginalCodebase.jnlp:
+	* tests/reproducers/simple/FakeCodebase/srcs/FakeCodebase.java:
+	* tests/reproducers/simple/FakeCodebase/testcases/FakeCodebaseTests.java:
+	Reproducer of this behavior
+
+2015-09-01  Jiri Vanek  <jvanek@redhat.com>
+
 	application-library-allowable-codebase dialog made available for unsigned apps
 	*netx/net/sourceforge/jnlp/resources/Messages.properties: (ALACAMissingMainTitle)
 	added warning about possible consequences of  resources out of docbase.

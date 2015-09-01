@@ -177,4 +177,34 @@ public class UnsignedAppletTrustConfirmationTest {
         assertEquals(Arrays.asList("test .jar"),
                 UnsignedAppletTrustConfirmation.toRelativePaths(Arrays.asList("http://example.com/test .jar"), "http://example.com/"));
     }
+    
+    
+    @Test
+    public void testSripFile() throws Exception {
+        String sample = "http://aa.bb/";
+        String result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample));
+        assertEquals(sample, result);
+        sample = "http://aa.bb";
+        result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample));
+        assertEquals(sample + "/", result);
+        sample = "http://aa.bb/";
+        result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample + "cc"));
+        assertEquals(sample, result);
+        sample = "http://aa.bb/cc/";
+        result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample));
+        assertEquals(sample, result);
+        sample = "http://aa.bb/some/complicated/";
+        result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample + "some"));
+        assertEquals(sample, result);
+        sample = "http://aa.bb/some/complicated/some/";
+        result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample));
+        assertEquals(sample, result);
+        sample = "http://aa.bb/some/";
+        result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample + "strange?a=b"));
+        assertEquals(sample, result);
+        sample = "http://aa.bb/some/strange/";
+        result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample + "?a=b"));
+        assertEquals(sample, result);
+        
+    }
 }
