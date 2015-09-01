@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.runtime;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -332,9 +333,6 @@ public class ManifestAttributesChecker {
     }
 
     private void checkApplicationLibraryAllowableCodebaseAttribute() throws LaunchException {
-        if (signing == SigningState.NONE) {
-            return; /*when app is not signed at all, then skip this check*/
-        }
         //conditions
         URL codebase = file.getCodeBase();
         URL documentBase = null;
@@ -386,18 +384,30 @@ public class ManifestAttributesChecker {
             return;
         }
 
-        if (usedUrls.size() == 1) {
-            if (UrlUtils.equalsIgnoreLastSlash(usedUrls.toArray(new URL[0])[0], codebase)
-                    && UrlUtils.equalsIgnoreLastSlash(usedUrls.toArray(new URL[0])[0], documentBase)) {
-                //all resoources are from codebase or document base. it is ok to proceeed.
-                OutputController.getLogger().log("All applications resources (" + usedUrls.toArray(new URL[0])[0] + ") are from codebas/documentbase " + codebase + "/" + documentBase + ", skipping Application-Library-Allowable-Codebase Attribute check.");
-                return;
+        boolean allOk = true;
+        for (URL u : usedUrls) {
+            if (UrlUtils.equalsIgnoreLastSlash(u, codebase)
+                    && UrlUtils.equalsIgnoreLastSlash(u, stripDocbase(documentBase))) {
+                OutputController.getLogger().log("OK - "+u.toExternalForm()+" is from codebase/docbase.");
+            } else {
+                allOk = false;
+                OutputController.getLogger().log("Warning! "+u.toExternalForm()+" is NOT from codebase/docbase.");
             }
         }
-
-        ClasspathMatchers att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
+        if (allOk) {
+            //all resoources are from codebase or document base. it is ok to proceeed.
+            OutputController.getLogger().log("All applications resources (" + usedUrls.toArray(new URL[0])[0] + ") are from codebas/documentbase " + codebase + "/" + documentBase + ", skipping Application-Library-Allowable-Codebase Attribute check.");
+            return;
+        }
+        
+        ClasspathMatchers att = null;
+        if (signing == SigningState.NONE) {
+            //for unsigned app we are ignoring value in manifesdt (may be faked)
+        } else {
+            att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
+        }
         if (att == null) {
-            final boolean userApproved = isLowSecurity() || SecurityDialogs.showMissingALACAttributePanel(file, documentBase, usedUrls);
+            final boolean userApproved = SecurityDialogs.showMissingALACAttributePanel(file, documentBase, usedUrls);
             if (!userApproved) {
                 throw new LaunchException("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was blocked from running by the user");
             } else {
@@ -419,5 +429,27 @@ public class ManifestAttributesChecker {
         } else {
             OutputController.getLogger().log("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user or user's security settings.");
         }
+    }
+    
+    //package private for testing
+    //not perfect but ok for usecase
+    static URL stripDocbase(URL documentBase) {
+        String s = documentBase.toExternalForm();
+        if (s.endsWith("/") || s.endsWith("\\")) {
+            return documentBase;
+        }
+        int i1 = s.lastIndexOf("/");
+        int i2 = s.lastIndexOf("\\");
+        int i = Math.max(i1, i2);
+        if (i <= 8 || i >= s.length()) {
+            return documentBase;
+        }
+        s = s.substring(0, i+1);
+        try {
+            documentBase = new URL(s);
+        } catch (MalformedURLException ex) {
+            OutputController.getLogger().log(ex);
+        }
+        return documentBase;
     }
 }

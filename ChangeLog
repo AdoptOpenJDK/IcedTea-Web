@@ -1,3 +1,22 @@
+2015-09-01  Jiri Vanek  <jvanek@redhat.com>
+
+	application-library-allowable-codebase dialog made available for unsigned apps
+	*netx/net/sourceforge/jnlp/resources/Messages.properties: (ALACAMissingMainTitle)
+	added warning about possible consequences of  resources out of docbase.
+	(ALACAMatchingMainTitle) the red higlights changed to green and added calming
+	words about it.
+	*netx/net/sourceforge/jnlp/resources/Messages_cs.properties: same
+	*netx/net/sourceforge/jnlp/resources/Messages_de.properties: same
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: adapted to red
+	to green recoloring
+	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java:
+	(checkApplicationLibraryAllowableCodebaseAttribute) removed  return for in case
+	of unsigned app. Fixed check for all matching resources against codebase and docbase
+	If app is unsigned, then value in manifest is ignored. Missing alaca required
+	also in low security mode
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/ManifestAttributesCheckerTest.java:
+	new file to test stripDocbase.
+
 2015-08-31  Andrew Azores  <aazores@redhat.com>
 
 	Added new tests to check where applets are allow to make network
