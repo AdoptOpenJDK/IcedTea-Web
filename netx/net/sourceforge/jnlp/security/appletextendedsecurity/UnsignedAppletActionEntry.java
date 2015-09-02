@@ -62,11 +62,11 @@ public class UnsignedAppletActionEntry {
         UnsignedAppletActionEntry nw = new UnsignedAppletActionEntry(
                 AppletSecurityActions.fromString(split[0]),
                 new Date(new Long(split[1])),
-                new UrlRegEx(split[2]),
+                UrlRegEx.exact(split[2]),
                 null,
                 null);
         if (split.length > 3) {
-            nw.setCodeBase(new UrlRegEx(split[3]));
+            nw.setCodeBase(UrlRegEx.exact(split[3]));
         }
         if (split.length > 4) {
             nw.setArchives(createArchivesList(s.substring(s.lastIndexOf(split[3]) + split[3].length()).trim()));

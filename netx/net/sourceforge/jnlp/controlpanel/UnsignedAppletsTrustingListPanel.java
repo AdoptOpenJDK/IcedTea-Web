@@ -629,7 +629,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelTableValid"));
         } catch (Exception ex) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
-            JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelTableInvalid ", ex.toString()));
+            JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelTableInvalid", ex.toString()));
         } finally {
             f.delete();
         }
@@ -820,7 +820,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
         private MyTextField(UrlRegEx urlRegEx) {
             if (urlRegEx == null) {
-                keeper = new UrlRegEx("");
+                keeper = UrlRegEx.exact("");
             } else {
                 this.keeper = urlRegEx;
             }
@@ -839,7 +839,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
         private UrlRegexCellRenderer(UrlRegEx urlRegEx) {
             if (urlRegEx == null) {
-                keeper = new UrlRegEx("");
+                keeper =  UrlRegEx.exact("");
             } else {
                 this.keeper = urlRegEx;
             }

@@ -150,13 +150,13 @@ public class UnsignedAppletTrustConfirmation {
             
             if (rememberForCodeBase != null) {
                 
-                codebaseRegex = new UrlRegEx("\\Q" + codebase + "\\E");
+                codebaseRegex = UrlRegEx.quote(codebase.toExternalForm());
 
                 if (!rememberForCodeBase) {
-                    documentbaseRegex = new UrlRegEx("\\Q" + documentbase + "\\E"); // Match only this applet
+                    documentbaseRegex = UrlRegEx.quote(documentbase.toExternalForm()); // Match only this applet
                     archiveMatches = toRelativePaths(getJars(file), file.getCodeBase().toString()); // Match only this applet
                 } else {
-                    documentbaseRegex = new UrlRegEx("\\Q" + stripFile(documentbase)+ "\\E.*"); // Match any from codebase and sourceFile "base"
+                    documentbaseRegex = UrlRegEx.quoteAndStar(stripFile(documentbase)); // Match any from codebase and sourceFile "base"
                 }
             }
             

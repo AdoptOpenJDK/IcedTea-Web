@@ -35,11 +35,29 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
+import java.util.regex.Pattern;
+
 public class UrlRegEx {
 
-    String regEx;
+    private static String quoteString(String s) {
+        return Pattern.quote(s);
+    }
 
-    public UrlRegEx(String s) {
+    private final String regEx;
+
+    public static UrlRegEx quote(String s) {
+        return new UrlRegEx(quoteString(s));
+    }
+    
+    public static UrlRegEx quoteAndStar(String s) {
+        return new UrlRegEx(quoteString(s)+".*");
+    }
+    
+    public static UrlRegEx exact(String s) {
+        return new UrlRegEx(s);
+    }
+    
+    private UrlRegEx(String s) {
         regEx = s;
     }
 
@@ -52,11 +70,60 @@ public class UrlRegEx {
         return regEx;
     }
 
+    /**
+     * Just cosmetic method to show nicer tables, as \Qsomething\Emaybe is most
+     * common record when cell is edited, the regex is shown fully
+     *
+     * @return unquted pattern or original string
+     */
     public String getFilteredRegEx() {
-        return regEx.replaceAll("\\\\Q", "").replaceAll("\\\\E", "");
+        try {
+            return simpleUnquote(regEx);
+        } catch (Exception ex) {
+            return regEx;
+        }
     }
 
-    public void setRegEx(String regEx) {
-        this.regEx = regEx;
+    //needs testing
+    static String replaceLast(String where, String what, String by) {
+        if (!where.contains(what)) {
+            return where;
+        }
+        StringBuilder b = new StringBuilder(where);
+        b.replace(where.lastIndexOf(what), where.lastIndexOf(what)+what.length(), by);
+        return b.toString();
+    }
+    
+     //needs testing
+    static String simpleUnquote(String s) {
+        //escaped run needs at least \E\Q, but only single char actually hurts
+        if (s.length()<=1){
+            return s;
+        }
+        boolean in = false;
+        for(int i = 1 ; i < s.length() ; i++){
+            if ( i == 0) {
+                continue;
+            }
+            if (!in && s.charAt(i) == 'Q' && s.charAt(i-1) ==  '\\'){
+                in = true;
+                String s1=s.substring(0, i - 1);
+                String s2=s.substring(i + 1);
+                s= s1+s2;
+                i = i - 2;
+                continue;
+            }
+            if (in && s.charAt(i) == 'E' && s.charAt(i-1) ==  '\\'){
+                String s1=s.substring(0, i - 1);
+                String s2=s.substring(i + 1);
+                s= s1+s2;
+                i = i - 2;
+                in = false;
+                continue;
+            }
+        }
+        //all text\Etext were replaced  \Qtext\E\\E\Qtext\E
+        //after above text\\Etext  should remain
+        return s.replace("\\\\E", "\\E");
     }
 }

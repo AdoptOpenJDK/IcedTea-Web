@@ -142,12 +142,12 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
 
     public void addRow() {
         int i = getRowCount()-1;
-        String s = "\\Qhttp://localhost:80/\\E.*";
+        String s = "http://localhost:80/";
         back.add(new UnsignedAppletActionEntry(
                 new AppletSecurityActions(),
                 new Date(),
-                new UrlRegEx(s),
-                new UrlRegEx(s),
+                UrlRegEx.quoteAndStar(s),
+                UrlRegEx.quoteAndStar(s),
                 null));
         fireTableRowsInserted(i+1, i+1);
     }

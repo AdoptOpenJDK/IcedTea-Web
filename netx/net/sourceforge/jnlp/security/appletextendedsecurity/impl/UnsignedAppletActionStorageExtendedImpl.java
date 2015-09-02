@@ -170,10 +170,10 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
                         source.setTimeStamp((Date) aValue);
                     }
                     if (columnIndex == 2) {
-                        source.setDocumentBase(new UrlRegEx((String) aValue));
+                        source.setDocumentBase(UrlRegEx.exact((String) aValue));
                     }
                     if (columnIndex == 3) {
-                        source.setCodeBase(new UrlRegEx((String) aValue));
+                        source.setCodeBase(UrlRegEx.exact((String) aValue));
                     }
                     if (columnIndex == 4) {
                         source.setArchives(UnsignedAppletActionEntry.createArchivesList((String) aValue));

@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 import net.sourceforge.jnlp.security.appletextendedsecurity.InvalidLineException;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
@@ -183,21 +184,26 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     private boolean isMatching(UnsignedAppletActionEntry unsignedAppletActionEntry, String documentBase, String codeBase, List<String> archives) {
-        boolean result = true;
-        if (documentBase != null && !documentBase.trim().isEmpty()) {
-            result = result && documentBase.matches(unsignedAppletActionEntry.getDocumentBase().getRegEx());
-        }
-        if (codeBase != null && !codeBase.trim().isEmpty()) {
-            result = result && codeBase.matches(unsignedAppletActionEntry.getCodeBase().getRegEx());
-        }
-        if (archives != null) {
-            List<String> saved = unsignedAppletActionEntry.getArchives();
-            if (saved == null || saved.isEmpty()) {
-                return result;
+        try {
+            boolean result = true;
+            if (documentBase != null && !documentBase.trim().isEmpty()) {
+                result = result && documentBase.matches(unsignedAppletActionEntry.getDocumentBase().getRegEx());
             }
-            result = result && compareArchives(archives, saved);
+            if (codeBase != null && !codeBase.trim().isEmpty()) {
+                result = result && codeBase.matches(unsignedAppletActionEntry.getCodeBase().getRegEx());
+            }
+            if (archives != null) {
+                List<String> saved = unsignedAppletActionEntry.getArchives();
+                if (saved == null || saved.isEmpty()) {
+                    return result;
+                }
+                result = result && compareArchives(archives, saved);
+            }
+            return result;
+        } catch (PatternSyntaxException ex) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, ex);
+            return false;
         }
-        return result;
     }
 
     @Override

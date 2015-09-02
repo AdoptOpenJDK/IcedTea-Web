@@ -1,5 +1,26 @@
 2015-09-02  Jiri Vanek  <jvanek@redhat.com>
 
+	All UrlRegEx-es got unified and correct quoting
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java:
+	(addRow) now uses factory methods of quoteAndStar form UrlRegEx
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	same, but of exact. Removed redundant space in APPEXTSECguiPanelTableInvalid key
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionEntry.java:
+	same of exact.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
+	same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UrlRegEx.java:
+	constructor made private,  field final. Creation allowed over factory methods of
+	quote. quoteAndStar, exact. Added and iprved mehtods for visualisation
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UrlRegExTest.java:
+	new test file with tests to new methods in UrlRegex
+
+2015-09-02  Jiri Vanek  <jvanek@redhat.com>
+
 	* Changelog: fixed indentation of alaca  paragraph from 9.1
 
 2015-09-02  Jiri Vanek  <jvanek@redhat.com>
