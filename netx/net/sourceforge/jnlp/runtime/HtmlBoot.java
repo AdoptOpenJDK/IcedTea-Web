@@ -132,7 +132,7 @@ public final class HtmlBoot {
         try {
             OutputController.getLogger().log("Proceeding with html");
             final URL html = Boot.getFileLocation();
-            AppletExtractor axe = new AppletExtractor(html);
+            AppletExtractor axe = new AppletExtractor(html, settings);
             AppletsFilter filtered = new AppletsFilter(axe.findAppletsOnPage(), html, vars.subList(1, vars.size()));
             List<AppletParser> applets = filtered.getApplets();
             // this hack was needed in early phases of the patch.   Now it sees to be not neede. Keeping inside to remove after much more testing

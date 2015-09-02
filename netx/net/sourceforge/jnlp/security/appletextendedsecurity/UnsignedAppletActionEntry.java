@@ -93,12 +93,16 @@ public class UnsignedAppletActionEntry {
         bw.write(this.serializeToReadableAndParseableString());
     }
 
-    private String serializeToReadableAndParseableString() {
-        return appletSecurityActions.toString()
+    private String serializeToReadableAndParseableString() throws InvalidLineException {
+        String s = appletSecurityActions.toString()
                 + " " + ((timeStamp == null) ? "1" : timeStamp.getTime())
                 + " " + ((documentBase == null) ? "" : documentBase.getRegEx())
                 + " " + ((codeBase == null) ? "" : codeBase.getRegEx())
                 + " " + createArchivesString(archives);
+        if (s.contains("\n") || s.contains("\r") || s.contains("\f")){
+            throw new InvalidLineException("Cant write line with \\n, \\r or \\f");
+        }
+        return s;
     }
 
     public Date getTimeStamp() {

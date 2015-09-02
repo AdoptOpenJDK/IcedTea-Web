@@ -1,3 +1,25 @@
+2015-09-02  Jiri Vanek  <jvanek@redhat.com>
+
+	Newline characters are banned from saving to .appletTrustSettings
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/InvalidLineException.java:
+	New file. Exception to be specially handled if error appear in saved line.
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionEntry.java:
+	(serializeToReadableAndParseableString) if new-line appear in line,
+	InvalidLineException is thrown
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	(writeContent) InvalidLineException is expected and logged.
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java:
+	adapted and quite a lot of tests added.
+	* tests/reproducers/simple/UnicodeLineBreak/resources/UnicodeLineBreak.java:
+	* tests/reproducers/simple/UnicodeLineBreak/srcs/UnicodeLineBreak.java:
+	* tests/reproducers/simple/UnicodeLineBreak/testcases/UnicodeLineBreakTests.java:
+	half automated reproducer of this behavior	
+	* netx/net/sourceforge/jnlp/runtime/HtmlBoot.java: based on existence of -xml,
+	now can turn off tagsoup
+	* netx/net/sourceforge/jnlp/runtime/html/AppletExtractor.java: is passing
+	parsersettings to HtmlBoot
+
+
 2015-09-01  Jiri Vanek  <jvanek@redhat.com>
 
 	Saving of status of dialogs for "whole codebase" now includes also document base

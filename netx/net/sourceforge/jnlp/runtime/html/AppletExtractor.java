@@ -45,7 +45,9 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.Parser;
+import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -68,10 +70,15 @@ public class AppletExtractor {
         "applet", "APPLET", "Applet",
         "object", "OBJECT", "Object",
         "embed", "EMBED", "Embed"};
+    private final ParserSettings ps;
 
     public AppletExtractor(URL html) {
+        this(html, null);
+    }
+    public AppletExtractor(URL html, ParserSettings ps) {
         JNLPRuntime.saveHistory(html.toExternalForm());
         this.html = html;
+        this.ps = ps;
     }
 
     public URL getHtml() {
@@ -80,9 +87,13 @@ public class AppletExtractor {
 
     private InputStream cleanStreamIfPossible(InputStream is) {
         try {
-            Class<?> klass = Class.forName(Parser.MALFORMED_PARSER_CLASS);
-            Method m = klass.getMethod("xmlizeInputStream", InputStream.class);
-            return (InputStream) m.invoke(null, is);
+            if (ps != null && ps.isMalformedXmlAllowed()){
+                Class<?> klass = Class.forName(Parser.MALFORMED_PARSER_CLASS);
+                Method m = klass.getMethod("xmlizeInputStream", InputStream.class);
+                return (InputStream) m.invoke(null, is);
+            } else {
+                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Tagsoup's html2xml cleaning is Disabled. Remove "+OptionsDefinitions.OPTIONS.XML.option+". Parsing will probably fail.");    
+            }
         } catch (Exception ex) {
             OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Tagsoup's html2xml cleaning not loaded. Install tagsoup. Parsing will probably fail.");
             OutputController.getLogger().log(ex);

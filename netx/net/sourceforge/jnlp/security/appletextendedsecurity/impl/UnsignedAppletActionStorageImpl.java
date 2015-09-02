@@ -41,12 +41,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.security.appletextendedsecurity.InvalidLineException;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.lockingfile.LockingReaderWriter;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class UnsignedAppletActionStorageImpl extends LockingReaderWriter implements UnsignedAppletActionStorage {
 
@@ -73,7 +75,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     @Override
     protected void readContents() throws IOException {
         if (items == null) {
-            items = new ArrayList<UnsignedAppletActionEntry>();
+            items = new ArrayList<>();
         } else {
             items.clear();
         }
@@ -90,8 +92,12 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     @Override
     public void writeContent(BufferedWriter bw) throws IOException {
         for (UnsignedAppletActionEntry item : items) {
-            item.write(bw);
-            bw.newLine();
+            try{
+                item.write(bw);
+                bw.newLine();
+            }catch (InvalidLineException ex){
+                OutputController.getLogger().log(ex);
+            }
         }
     }
 

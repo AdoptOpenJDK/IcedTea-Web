@@ -36,6 +36,8 @@
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -43,15 +45,19 @@ import java.net.URL;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 import net.sourceforge.jnlp.InformationDesc;
-import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
+import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
 import net.sourceforge.jnlp.util.FileUtils;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
@@ -64,12 +70,11 @@ public class UnsignedAppletTrustConfirmationTest {
     private static final String url42 = "resource.jar";
     private static URL url;
     private static URL url4;
-    private static InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER_BACKUP;
 
     private static class DummyJnlpWithTitleAndUrls extends DummyJNLPFileWithJar {
 
         public DummyJnlpWithTitleAndUrls(URL u) throws MalformedURLException {
-            super(null, u);
+            super(url, u);
         }
 
         @Override
@@ -101,49 +106,30 @@ public class UnsignedAppletTrustConfirmationTest {
         url=new URL(surl1);
         url4=new URL(url41+url42);
     }
-    
-    
+   
+   private static File backup;
+
     @BeforeClass
-    public static void backupAppTrsSets() {
-        APPLET_TRUST_SETTINGS_USER_BACKUP = PathsAndFiles.APPLET_TRUST_SETTINGS_USER;
+    public static void backupAppTrust() throws IOException{
+        backup = File.createTempFile("appletExtendedSecurity", "itwUnittest");
+        backup.deleteOnExit();
+        FirefoxProfilesOperator.copyFile(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile(), backup);
     }
     
-    @After
-    public  void restoreAppTrsSets() throws Exception {
-        fakeAppTrsSets(APPLET_TRUST_SETTINGS_USER_BACKUP);
+    @AfterClass
+    public static void restoreAppTrust() throws IOException{
+        FirefoxProfilesOperator.copyFile(backup, PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
     }
-    
-    private static void fakeAppTrsSets(final File f) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        fakeAppTrsSets(new InfrastructureFileDescriptor() {
-
-            @Override
-            public String getFullPath() {
-                return f.getAbsolutePath();
-            }
-
-        });
-    }
-    private static void fakeAppTrsSets(InfrastructureFileDescriptor fake) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field field = PathsAndFiles.class.getDeclaredField("APPLET_TRUST_SETTINGS_USER");
-        field.setAccessible(true);
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        field.set(null, fake);
-    }
-
 
     @Test
     public void updateAppletActionTest1() throws Exception {
-        File f = File.createTempFile("appletExtendedSecurity", "itwUnittest");
-        f.deleteOnExit();
-        fakeAppTrsSets(f);
+        PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().delete(); //clean file to examine later
         UnsignedAppletTrustConfirmation.updateAppletAction(
                 new DummyJnlpWithTitleAndUrls(url4),
                 new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
                 Boolean.FALSE,
                 UnsignedAppletTrustWarningPanel.class);
-        String s = FileUtils.loadFileAsString(f);
+        String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         Assert.assertTrue(s.contains("UnsignedAppletTrustWarningPanel:A{YES}"));
         Assert.assertTrue(s.contains(url41+url42));
         Assert.assertTrue(s.contains(surl1));
@@ -152,7 +138,7 @@ public class UnsignedAppletTrustConfirmationTest {
                 new SavedRememberAction(ExecuteAppletAction.NEVER, "NO"),
                 Boolean.TRUE,
                 UnsignedAppletTrustWarningPanel.class);
-        s = FileUtils.loadFileAsString(f);
+        s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         Assert.assertTrue(s.contains("UnsignedAppletTrustWarningPanel:N{NO}"));
         Assert.assertFalse(s.contains(url41+url42));
         Assert.assertTrue(s.contains(surl1));        
@@ -206,5 +192,173 @@ public class UnsignedAppletTrustConfirmationTest {
         result = UnsignedAppletTrustConfirmation.stripFile(new URL(sample + "?a=b"));
         assertEquals(sample, result);
         
+    }
+    
+    
+    private static URL urlX1;
+    private static URL urlX2;
+    private static URL urlX3;
+    
+    private static URL urlY1;
+    private static URL urlY2;
+    private static URL urlY3;
+    private static URL urlY4;
+    private static URL urlY5;
+    private static URL urlY6;
+    private static URL urlY7;
+    private static URL urlY8;
+    
+    @BeforeClass
+    public static void initUrlsX123() throws MalformedURLException, IOException {
+        urlX1 = new URL("http://&#10;does&#32;not&#32;metter&#32;is&#32;ok");
+        urlX2 = new URL("http://\ndoes not metter is harmfull");
+        Properties p = new Properties();
+        p.load(new StringReader("key=http:\\u002F\\u002F\\u000Adoes\\u0020not\\u0020metter\\u0020is\\u0020harmfull"));
+        urlX3=new URL(p.getProperty("key"));
+    }
+
+    @BeforeClass
+    public static void initUrlsY12345678() throws MalformedURLException, IOException {
+        urlY1 = new URL("http://som\\EeUrl.cz/aa");
+        urlY2 = new URL("http://some\\QUrl.cz/aa");
+        urlY3 = new URL("http://so\\QmeU\\Erl.cz/aa");
+        urlY4 = new URL("http://so\\EmeU\\Qrl.cz/aa");
+
+        urlY5 = new URL("http://someUrl.cz/aa\\Ebb/cc");
+        urlY6 = new URL("http://someUrl.cz/aa\\Qbb/cc");
+        urlY7 = new URL("http://someUrl.cz/aa\\Qbb/cc/dd\\Eee");
+        urlY8 = new URL("http://someUrl.cz/aa\\Ebb/cc/dd\\Qee");
+    }
+
+    @Test
+    public void updateAppletActionTestYQN1234saveAndLoadFine() throws Exception {
+        PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().delete(); //clean file to examine later
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY1),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY2),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY3),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY4),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        AppletStartupSecuritySettings securitySettings = AppletStartupSecuritySettings.getInstance();
+        UnsignedAppletActionStorageImpl userActionStorage = (UnsignedAppletActionStorageImpl) securitySettings.getUnsignedAppletActionCustomStorage();
+        List<UnsignedAppletActionEntry> ll = userActionStorage.getMatchingItems(null, null, null);
+        Assert.assertEquals(4, ll.size());
+    }
+
+    @Test
+    public void updateAppletActionTestYQN5678saveAndLoadFine() throws Exception {
+        PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().delete(); //clean file to examine later
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY5),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY6),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY7),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY8),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        AppletStartupSecuritySettings securitySettings = AppletStartupSecuritySettings.getInstance();
+        UnsignedAppletActionStorageImpl userActionStorage = (UnsignedAppletActionStorageImpl) securitySettings.getUnsignedAppletActionCustomStorage();
+        List<UnsignedAppletActionEntry> ll = userActionStorage.getMatchingItems(null, null, null);
+        Assert.assertEquals(4, ll.size());
+    }
+    
+    @Test
+    public void updateAppletActionTestX3() throws Exception {
+        PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().delete(); //clean file to examine later
+        try{
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrls(urlX3),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        //may throw  RuntimeExeption which is correct, however, wee need to check result
+        } catch (Exception ex){
+            ServerAccess.logException(ex);
+        }
+        String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+        Assert.assertFalse(s.contains("harmfull"));
+    }
+    
+    @Test
+    public void updateAppletActionTestX2() throws Exception {
+        PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().delete(); //clean file to examine later
+        try{
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrls(urlX2),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        //may throw  RuntimeExeption which is correct, however, wee need to check result
+        } catch (Exception ex){
+            ServerAccess.logException(ex);
+        }
+        String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+        Assert.assertFalse(s.contains("harmfull"));
+    }
+    
+     @Test
+    public void updateAppletActionTestX1() throws Exception {
+        //this case is correct, if html ecnoded url is passed as URL from javaws, it is kept intact
+        PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().delete(); //clean file to examine later
+        Exception eex = null;
+        try{
+        UnsignedAppletTrustConfirmation.updateAppletAction(
+                new DummyJnlpWithTitleAndUrls(urlX1),
+                new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
+                Boolean.FALSE,
+                UnsignedAppletTrustWarningPanel.class);
+        //may throw  RuntimeExeption which is correct, however, wee need to check result
+        } catch (Exception ex){
+            eex = ex;
+            ServerAccess.logException(ex);
+        }
+        String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+        Assert.assertNull(eex);
+        Assert.assertTrue(s.contains("http://&#10;does&#32;not&#32;metter&#32;is&#32;ok"));
+    }
+
+    private static class DummyJnlpWithTitleAndUrlsWithOverwrite extends DummyJnlpWithTitleAndUrls {
+        private final URL u;
+
+        public DummyJnlpWithTitleAndUrlsWithOverwrite(URL u) throws MalformedURLException {
+            super(u);
+            this.u  = u;
+        }
+
+        @Override
+        public URL getCodeBase() {
+            return u;
+        }
+
+            @Override
+            public URL getSourceLocation() {
+                return u;
+            }
     }
 }
