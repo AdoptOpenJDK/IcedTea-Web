@@ -1,5 +1,9 @@
 2015-09-02  Jiri Vanek  <jvanek@redhat.com>
 
+	* Changelog: fixed indentation of alaca  paragraph from 9.1
+
+2015-09-02  Jiri Vanek  <jvanek@redhat.com>
+
 	Newline characters are banned from saving to .appletTrustSettings
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/InvalidLineException.java:
 	New file. Exception to be specially handled if error appear in saved line.
@@ -39,12 +43,12 @@
 2015-09-01  Jiri Vanek  <jvanek@redhat.com>
 
 	application-library-allowable-codebase dialog made available for unsigned apps
-	*netx/net/sourceforge/jnlp/resources/Messages.properties: (ALACAMissingMainTitle)
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: (ALACAMissingMainTitle)
 	added warning about possible consequences of  resources out of docbase.
 	(ALACAMatchingMainTitle) the red higlights changed to green and added calming
 	words about it.
-	*netx/net/sourceforge/jnlp/resources/Messages_cs.properties: same
-	*netx/net/sourceforge/jnlp/resources/Messages_de.properties: same
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: same
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: same
 	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: adapted to red
 	to green recoloring
 	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java:
