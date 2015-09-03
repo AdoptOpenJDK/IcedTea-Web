@@ -1,5 +1,13 @@
 2015-09-03  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed ArrayIndexOutOfBound in version cornercase issue
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	length of array is checked,
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/VersionRestrictionTest.java:
+	added tests for this case
+
+2015-09-03  Jiri Vanek  <jvanek@redhat.com>
+
 	Added identificator to .appletTrustSettings to specify version of file
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
 	added handling of version - readVersion, versionPreffix, backup, currentVersion.

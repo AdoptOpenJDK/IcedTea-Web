@@ -90,8 +90,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     protected void readLine(String line) {
         if (line.trim().length() != 0) {
             lineCounter++;
-            //note, there is an sapce at the beggining of  versionPreffix
-            if (line.startsWith(versionPreffix)) {
+            if (line.startsWith(versionPreffix) && line.trim().split("\\s+").length > 1) {
                 if (readVersion == null) {
                     readVersion = line.trim();
                     actOnVersionLoad();
@@ -281,8 +280,6 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     private void actOnVersionLoad() {
-        //note, there is an sapce at the beggining of  versionPreffix
-        //so inut have always length at least 2
         String versionS = readVersion.split("\\s+")[1];
         int version = 0;
         try{

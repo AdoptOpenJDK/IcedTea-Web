@@ -55,7 +55,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class VersionRestrictionTest extends  NoStdOutErrTest{
+public class VersionRestrictionTest extends NoStdOutErrTest {
 
     private static File testFile;
     private static final SavedRememberAction sra = new SavedRememberAction(ExecuteAppletAction.ALWAYS, "NO");
@@ -90,7 +90,7 @@ public class VersionRestrictionTest extends  NoStdOutErrTest{
 
             @Override
             public boolean accept(File dir, String name) {
-                return name.matches(testFile.getName() + "\\.[0123456789]+"+UnsignedAppletActionStorageImpl.BACKUP_SUFFIX);
+                return name.matches(testFile.getName() + "\\.[0123456789]+" + UnsignedAppletActionStorageImpl.BACKUP_SUFFIX);
             }
         });
         return f;
@@ -128,6 +128,45 @@ public class VersionRestrictionTest extends  NoStdOutErrTest{
     @Test
     public void numberFormatExceptionInOnInLoad1() throws IOException {
         ServerAccess.saveFile("#VERSION X\n"
+                + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
+        UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
+        i1.readContents();
+        Assert.assertEquals(0, i1.items.size());
+        i1.add(aq);
+        i1.readContents();
+        Assert.assertEquals(1, i1.items.size());
+        checkBackupFile(true, 0);
+    }
+
+    @Test
+    public void numberFormatExceptionInOnInLoad2() throws IOException {
+        ServerAccess.saveFile("#VERSION\n"
+                + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
+        UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
+        i1.readContents();
+        Assert.assertEquals(0, i1.items.size());
+        i1.add(aq);
+        i1.readContents();
+        Assert.assertEquals(1, i1.items.size());
+        checkBackupFile(true, 0);
+    }
+
+    @Test
+    public void numberFormatExceptionInOnInLoad3() throws IOException {
+        ServerAccess.saveFile("#VERSION \n"
+                + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
+        UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
+        i1.readContents();
+        Assert.assertEquals(0, i1.items.size());
+        i1.add(aq);
+        i1.readContents();
+        Assert.assertEquals(1, i1.items.size());
+        checkBackupFile(true, 0);
+    }
+
+    @Test
+    public void numberFormatExceptionInOnInLoad4() throws IOException {
+        ServerAccess.saveFile("#VERSION                \n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
         i1.readContents();
