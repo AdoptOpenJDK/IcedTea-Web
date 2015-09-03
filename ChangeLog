@@ -1,4 +1,12 @@
 2015-09-03  Jiri Vanek  <jvanek@redhat.com>
+            Jacob Wisor  <gitne@gmx.de>
+            Stefan Ring  <stefan@complang.tuwien.ac.at>
+
+	Gathered and applied shards of DE transaltion
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: added throng of keys
+	* AUTHORS: added Stefan Ring, stefan@complang.tuwien.ac.at
+
+2015-09-03  Jiri Vanek  <jvanek@redhat.com>
 
 	* NEWS: mentioned fixes for RH1233697, RH1233667 and reuse of MissingALACAdialog
 	for unsigned applications
