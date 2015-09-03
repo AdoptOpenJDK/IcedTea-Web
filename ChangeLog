@@ -1,5 +1,10 @@
 2015-09-03  Jiri Vanek  <jvanek@redhat.com>
 
+	* NEWS: mentioned fixes for RH1233697, RH1233667 and reuse of MissingALACAdialog
+	for unsigned applications
+
+2015-09-03  Jiri Vanek  <jvanek@redhat.com>
+
 	Fixed ArrayIndexOutOfBound in version cornercase issue
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
 	length of array is checked,
