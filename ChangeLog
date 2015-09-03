@@ -1,4 +1,8 @@
 2015-09-03  Jiri Vanek  <jvanek@redhat.com>
+
+		* netx/net/sourceforge/jnlp/resources/Messages_de.properties: removed all commented original sentences
+
+2015-09-03  Jiri Vanek  <jvanek@redhat.com>
             Jacob Wisor  <gitne@gmx.de>
             Stefan Ring  <stefan@complang.tuwien.ac.at>
 
