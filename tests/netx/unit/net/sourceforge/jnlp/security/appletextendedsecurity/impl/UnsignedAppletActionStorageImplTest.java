@@ -49,6 +49,8 @@ import org.junit.Test;
 
 public class UnsignedAppletActionStorageImplTest {
 
+    private static final String versionLine=UnsignedAppletActionStorageImpl.versionPreffix+UnsignedAppletActionStorageImpl.currentVersion+"\n";
+    
     private static File f1;
     private static File f2;
     private static File f3;
@@ -83,9 +85,9 @@ public class UnsignedAppletActionStorageImplTest {
         f1 = File.createTempFile("itwMatching", "testFile1");
         f2 = File.createTempFile("itwMatching", "testFile2");
         f3 = File.createTempFile("itwMatching", "testFile3");
-        ServerAccess.saveFile("c1:A{YES}; 123456 .* .* jar1,jar2", f1);
-        ServerAccess.saveFile("c1:N{NO}; 123456 .* \\Qbla\\E jar1,jar2", f2);
-        ServerAccess.saveFile(""
+        ServerAccess.saveFile(versionLine+"c1:A{YES}; 123456 .* .* jar1,jar2", f1);
+        ServerAccess.saveFile(versionLine+"c1:N{NO}; 123456 .* \\Qbla\\E jar1,jar2", f2);
+        ServerAccess.saveFile(versionLine
                 + "c1:A{YES}; 1 \\Qhttp://jmol.sourceforge.net/demo/atoms/\\E \\Qhttp://jmol.sourceforge.net/jmol/\\E JmolApplet0.jar\n"
                 + "c1:N{NO}; 1363278653454 \\Qhttp://www.walter-fendt.de/ph14e\\E.* \\Qhttp://www.walter-fendt.de\\E.*\n"
                 + "c1:n{NO}; 1363281783104 \\Qhttp://www.walter-fendt.de/ph14e/inclplane.htm\\E \\Qhttp://www.walter-fendt.de/ph14_jar/\\E Ph14English.jar,SchiefeEbene.jar"
@@ -98,10 +100,10 @@ public class UnsignedAppletActionStorageImplTest {
         ff2 = File.createTempFile("itwMatching", "testFile2");
         ff3 = File.createTempFile("itwMatching", "testFile3");
         ff4 = File.createTempFile("itwMatching", "testFile3");
-        ServerAccess.saveFile("c1:A{YES};c3:n{NO}; 123456 .* .* jar1,jar2", ff1);
-        ServerAccess.saveFile("c6:y{YES}; 123456 .* \\Qbla\\E jar1,jar2", ff2);
-        ServerAccess.saveFile("c6:A{YES}; 123456 .* \\Qbla\\E jar1,jar2", ff4);
-        ServerAccess.saveFile(""
+        ServerAccess.saveFile(versionLine+"c1:A{YES};c3:n{NO}; 123456 .* .* jar1,jar2", ff1);
+        ServerAccess.saveFile(versionLine+"c6:y{YES}; 123456 .* \\Qbla\\E jar1,jar2", ff2);
+        ServerAccess.saveFile(versionLine+"c6:A{YES}; 123456 .* \\Qbla\\E jar1,jar2", ff4);
+        ServerAccess.saveFile(versionLine
                 + "c2:A{YES}; 1 \\Qa\\E \\Qb\\E jar1\n"
                 + "c1:N{NO};c2:N{NO};c3:A{YES}; 2 \\Qc\\E \\Qd\\E\n"
                 + "c1:n{NO};c2:y{YES};c4:y{YES};c5:n{NO}; 3 \\Qe\\E \\Qf\\E j1,j2"

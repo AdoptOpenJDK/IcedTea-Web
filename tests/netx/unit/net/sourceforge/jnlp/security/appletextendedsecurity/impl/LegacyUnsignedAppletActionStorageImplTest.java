@@ -58,15 +58,17 @@ public class LegacyUnsignedAppletActionStorageImplTest {
     private static File ff2;
     private static File ff3;
     private static File ff4;
+    
+    private static final String versionLine=UnsignedAppletActionStorageImpl.versionPreffix+UnsignedAppletActionStorageImpl.currentVersion+"\n";
 
     @BeforeClass
     public static void preapreTestFiles() throws IOException {
         f1 = File.createTempFile("itwMatching", "testFile1");
         f2 = File.createTempFile("itwMatching", "testFile2");
         f3 = File.createTempFile("itwMatching", "testFile3");
-        ServerAccess.saveFile("A 123456 .* .* jar1,jar2", f1);
-        ServerAccess.saveFile("N 123456 .* \\Qbla\\E jar1,jar2", f2);
-        ServerAccess.saveFile(""
+        ServerAccess.saveFile(versionLine+"A 123456 .* .* jar1,jar2", f1);
+        ServerAccess.saveFile(versionLine+"N 123456 .* \\Qbla\\E jar1,jar2", f2);
+        ServerAccess.saveFile(versionLine
                 + "A 1 \\Qhttp://jmol.sourceforge.net/demo/atoms/\\E \\Qhttp://jmol.sourceforge.net/jmol/\\E JmolApplet0.jar\n"
                 + "N 1363278653454 \\Qhttp://www.walter-fendt.de/ph14e\\E.* \\Qhttp://www.walter-fendt.de\\E.*\n"
                 + "n 1363281783104 \\Qhttp://www.walter-fendt.de/ph14e/inclplane.htm\\E \\Qhttp://www.walter-fendt.de/ph14_jar/\\E Ph14English.jar,SchiefeEbene.jar"
@@ -79,10 +81,10 @@ public class LegacyUnsignedAppletActionStorageImplTest {
         ff2 = File.createTempFile("itwMatching", "testFile2");
         ff3 = File.createTempFile("itwMatching", "testFile3");
         ff4 = File.createTempFile("itwMatching", "testFile3");
-        ServerAccess.saveFile("AXn 123456 .* .* jar1,jar2", ff1);
-        ServerAccess.saveFile("XXXXXy 123456 .* \\Qbla\\E jar1,jar2", ff2);
-        ServerAccess.saveFile("XXXXXA 123456 .* \\Qbla\\E jar1,jar2", ff4);
-        ServerAccess.saveFile(""
+        ServerAccess.saveFile(versionLine+"AXn 123456 .* .* jar1,jar2", ff1);
+        ServerAccess.saveFile(versionLine+"XXXXXy 123456 .* \\Qbla\\E jar1,jar2", ff2);
+        ServerAccess.saveFile(versionLine+"XXXXXA 123456 .* \\Qbla\\E jar1,jar2", ff4);
+        ServerAccess.saveFile(versionLine
                 + "XA 1 \\Qa\\E \\Qb\\E jar1\n"
                 + "NNA 2 \\Qc\\E \\Qd\\E\n"
                 + "nyXyn 3 \\Qe\\E \\Qf\\E j1,j2"

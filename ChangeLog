@@ -1,3 +1,24 @@
+2015-09-03  Jiri Vanek  <jvanek@redhat.com>
+
+	Added identificator to .appletTrustSettings to specify version of file
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
+	added handling of version - readVersion, versionPreffix, backup, currentVersion.
+	(readLine) when first line is read, it is checked for version and acted. If
+	loaded version is missing or older then current 2, then file is  not loaded.
+	otherwise normal loading. (writeContent) now inserts  header with version.
+	(actOnVersionLoad) new method, handling consequences of recognized x current version
+	(backupOldFile) new method, backuping old file as .appletTrustSettings.version-backup
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: consumed exception during
+	normalization is logged only to console/verbose
+	* tests/netx/unit/net/sourceforge/jnlp/security/SecurityDialogsTest.java:
+	added considering of version
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/LegacyUnsignedAppletActionStorageImplTest.java:
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImplTest.java:
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/impl/VersionRestrictionTest.java:
+	new test file testing version recognition and processing
+
 2015-09-02  Jiri Vanek  <jvanek@redhat.com>
 
 	All UrlRegEx-es got unified and correct quoting

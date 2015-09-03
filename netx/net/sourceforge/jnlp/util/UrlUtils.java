@@ -57,7 +57,7 @@ public class UrlUtils {
             URL strippedUrl = new URL(urlParts[0]); 
             return normalizeUrl(strippedUrl, encodeFileUrls);
         } catch (IOException | URISyntaxException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            OutputController.getLogger().log(e);
         }
         return url;
     }

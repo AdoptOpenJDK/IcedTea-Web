@@ -54,6 +54,7 @@ import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.NamePassword;
@@ -613,8 +614,10 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     //ending/mising spaces are important separators!
     //if new rememberable interface implementation is added, then tests using this sentence should start to fail, 
     //and so this sentence should be updated for it
-    private static final String appletSecurityContent
-            = "MissingALACAttributePanel:A{YES};"
+    private static final String versionLine=UnsignedAppletActionStorageImpl.versionPreffix+UnsignedAppletActionStorageImpl.currentVersion+"\n";
+     
+    private static final String appletSecurityContent=versionLine+
+            "MissingALACAttributePanel:A{YES};"
             + "MatchingALACAttributePanel:A{YES};"
             + "UnsignedAppletTrustWarningPanel:A{YES};"
             + "AccessWarningPane:A{YES};"
