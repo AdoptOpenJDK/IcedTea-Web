@@ -37,6 +37,7 @@
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import static org.junit.Assert.assertTrue;
@@ -56,9 +57,9 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
 import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.util.FileUtils;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -128,9 +129,7 @@ public class FakeCodebaseTests extends BrowserTest {
             ProcessResult pr1 = server.executeBrowser("/" + ORIG_BASE, AutoClose.CLOSE_ON_CORRECT_END);
             assertTrue(pr1.stdout.contains(AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING));
             //the record was added to .appletSecuritySettings
-            String s2 = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile()).trim();
-            String[] ss2 = s2.split("\n");
-            Assert.assertEquals(1, ss2.length);
+            assertRecordsCountInAppletTrustSettings(1);
             //create atacker
             String htmlin = FileUtils.loadFileAsString(new File(server.getDir(), HTMLIN + ".in"));
             //now change codebase to be same as ^ but launch applet from  evilServer1
@@ -149,9 +148,7 @@ public class FakeCodebaseTests extends BrowserTest {
             );
             //this  MUST ask for permissions to run, otherwise fail
             assertTrue(pr2.stdout.contains(AutoOkClosingListener.MAGICAL_OK_CLOSING_STRING));
-            String s1 = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile()).trim();
-            String[] ss1 = s1.split("\n");
-            Assert.assertEquals(2, ss1.length);
+            assertRecordsCountInAppletTrustSettings(2);
         } finally {
             dp.restoreProperties();
         }
@@ -206,8 +203,7 @@ public class FakeCodebaseTests extends BrowserTest {
             //the record was added to .appletSecuritySettings
             String s2 = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile()).trim();
             Assert.assertNotEquals("on codebase only, the file must not be stroed, stright save, it must be", codebase, s2.contains(JORIG_BASE));
-            String[] ss2 = s2.split("\n");
-            Assert.assertEquals(1, ss2.length);
+            assertRecordsCountInAppletTrustSettings(1);
             //create atacker
             String htmlin = FileUtils.loadFileAsString(new File(server.getDir(), JHTMLIN + ".in"));
             //now change codebase to be same as ^ but launch applet from  evilServer1
@@ -237,11 +233,18 @@ public class FakeCodebaseTests extends BrowserTest {
             String s1 = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile()).trim();
             Assert.assertNotEquals("on codebase only, the file must not be stroed, stright save, it must be", codebase, s1.contains(JHTMLIN));
             Assert.assertNotEquals("on codebase only, the file must not be stroed, stright save, it must be", codebase, s1.contains(JORIG_BASE));
-            String[] ss1 = s1.split("\n");
-            Assert.assertEquals(2, ss1.length);
+            assertRecordsCountInAppletTrustSettings(2);
         } finally {
             dp.restoreProperties();
         }
     }
-
+private void assertRecordsCountInAppletTrustSettings(int expected) throws Exception{
+     UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+      //i1.readContents();
+     Method readContents = UnsignedAppletActionStorageImpl.class.getDeclaredMethod("readContents");
+     readContents.setAccessible(true);
+     readContents.invoke(i1);
+     Assert.assertEquals(expected, i1.getMatchingItems(null, null, null).size());
+    
+}
 }
