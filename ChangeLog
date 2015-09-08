@@ -1,3 +1,7 @@
+2015-09-07  Jiri Vanek  <jvanek@redhat.com>
+
+	* NEWS: added descriptions for RH1233697, RH1233667
+
 2015-09-04  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed reproducer affected by identificator in .appletTrustSettings 
