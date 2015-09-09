@@ -1,3 +1,7 @@
+2015-09-09  Jacob Wisor  <gitne@icedtea.classpath.org>
+
+	* .hgignore: Fix regex patterns of files ignored by Mercurial
+
 2015-09-07  Jiri Vanek  <jvanek@redhat.com>
 
 	* NEWS: added descriptions for RH1233697, RH1233667
