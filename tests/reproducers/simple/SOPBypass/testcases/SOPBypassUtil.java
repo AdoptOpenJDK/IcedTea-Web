@@ -50,6 +50,7 @@ import net.sourceforge.jnlp.ServerLauncher;
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -86,8 +87,8 @@ public class SOPBypassUtil extends BrowserTest {
     public static final String SOCKET_UNRELATED_SUCCESS = SOCKET_UNRELATED + SUCCESS;
     public static final String SOCKET_UNRELATED_FAILURE = SOCKET_UNRELATED + FAILURE;
 
-    public static TemplatedHtmlDoc filterHtml(String code, String archive, String codebase) throws IOException {
-        TemplatedHtmlDoc templatedDoc = new TemplatedHtmlDoc(server, "SOPBypass.html");
+    public static TemplatedHtmlDoc filterHtml(String doc, String code, String archive, String codebase) throws IOException {
+        TemplatedHtmlDoc templatedDoc = new TemplatedHtmlDoc(server, doc);
         templatedDoc.setCode(code);
         templatedDoc.setArchive(archive);
         templatedDoc.setCodeBase(codebase);
@@ -98,20 +99,20 @@ public class SOPBypassUtil extends BrowserTest {
         return templatedDoc;
     }
 
-    public static TemplatedHtmlDoc filterHtml(String code, URL archive, URL codebase) throws IOException {
-        return filterHtml(code, archive == null ? "" : archive.toString(), codebase == null ? "" : codebase.toString());
+    public static TemplatedHtmlDoc filterHtml(String doc, String code, URL archive, URL codebase) throws IOException {
+        return filterHtml(doc, code, archive == null ? "" : archive.toString(), codebase == null ? "" : codebase.toString());
     }
 
-    public static TemplatedHtmlDoc filterHtml(String code, URL archive, String codebase) throws IOException {
-        return filterHtml(code, archive == null ? "" : archive.toString(), codebase);
+    public static TemplatedHtmlDoc filterHtml(String doc, String code, URL archive, String codebase) throws IOException {
+        return filterHtml(doc, code, archive == null ? "" : archive.toString(), codebase);
     }
 
-    public static TemplatedHtmlDoc filterHtml(String code, String archive, URL codebase) throws IOException {
-        return filterHtml(code, archive, codebase == null ? "" : codebase.toString());
+    public static TemplatedHtmlDoc filterHtml(String doc, String code, String archive, URL codebase) throws IOException {
+        return filterHtml(doc, code, archive, codebase == null ? "" : codebase.toString());
     }
 
-    public static TemplatedJnlpDoc filterJnlp(String jarHref, String codebase) throws IOException {
-        TemplatedJnlpDoc templatedDoc = new TemplatedJnlpDoc(server, "SOPBypass.jnlp");
+    public static TemplatedJnlpDoc filterJnlp(String doc, String jarHref, String codebase) throws IOException {
+        TemplatedJnlpDoc templatedDoc = new TemplatedJnlpDoc(server, doc);
         templatedDoc.setJarHref(jarHref);
         templatedDoc.setCodeBase(codebase);
         templatedDoc.setDocumentBase(server.getUrl("SOPBypass.jnlp").toString());
@@ -122,16 +123,16 @@ public class SOPBypassUtil extends BrowserTest {
         return templatedDoc;
     }
 
-    public static TemplatedJnlpDoc filterJnlp(URL archive, URL codebase) throws IOException {
-        return filterJnlp(archive == null ? "" : archive.toString(), codebase == null ? "" : codebase.toString());
+    public static TemplatedJnlpDoc filterJnlp(String doc, URL archive, URL codebase) throws IOException {
+        return filterJnlp(doc, archive == null ? "" : archive.toString(), codebase == null ? "" : codebase.toString());
     }
 
-    public static TemplatedJnlpDoc filterJnlp(URL archive, String codebase) throws IOException {
-        return filterJnlp(archive == null ? "" : archive.toString(), codebase);
+    public static TemplatedJnlpDoc filterJnlp(String doc, URL archive, String codebase) throws IOException {
+        return filterJnlp(doc, archive == null ? "" : archive.toString(), codebase);
     }
 
-    public static TemplatedJnlpDoc filterJnlp(String archive, URL codebase) throws IOException {
-        return filterJnlp(archive, codebase == null ? "" : codebase.toString());
+    public static TemplatedJnlpDoc filterJnlp(String doc, String archive, URL codebase) throws IOException {
+        return filterJnlp(doc, archive, codebase == null ? "" : codebase.toString());
     }
 
     public static ClosingListener getClosingListener() {
@@ -147,6 +148,14 @@ public class SOPBypassUtil extends BrowserTest {
 
     public static void assertEnd(ProcessResult pr) {
         assertTrue("Applet did not close correctly", pr.stdout.contains(APPLET_CLOSE_STRING));
+    }
+
+    public static void assertPrivileged(ProcessResult pr) {
+        assertTrue("Applet should have had privileges to read system properties", pr.stdout.contains("Elevated privileges: true"));
+    }
+
+    public static void assertUnprivileged(ProcessResult pr) {
+        assertTrue("Applet should have had privileges to read system properties", pr.stdout.contains("Elevated privileges: false"));
     }
 
     public static void assertCodebaseConnection(ProcessResult pr) {
@@ -298,13 +307,14 @@ public class SOPBypassUtil extends BrowserTest {
         private static final String CODE_TOKEN = "CODE_REPLACEMENT_TOKEN";
         private static final String ARCHIVE_TOKEN = "ARCHIVE_REPLACEMENT_TOKEN";
         private static final String CODEBASE_TOKEN = "CODEBASE_REPLACEMENT_TOKEN";
-        private static final String FILENAME = "SOPBypass-filtered.html";
         private static final String NEWLINE = System.lineSeparator();
 
+        private String docName = null;
         private ServerAccess access = null;
         private String content = null;
 
         public TemplatedHtmlDoc(ServerAccess access, String resourceLocation) throws IOException {
+            this.docName = resourceLocation;
             this.access = access;
             content = access.getResourceAsString(resourceLocation);
         }
@@ -339,7 +349,10 @@ public class SOPBypassUtil extends BrowserTest {
         }
 
         public String getFileName() {
-            return FILENAME;
+            String[] parts = docName.split(Pattern.quote("."));
+            String name = parts[0];
+            String extension = parts[1];
+            return name + "-filtered." + extension;
         }
 
         public File getLocation() {
@@ -357,12 +370,13 @@ public class SOPBypassUtil extends BrowserTest {
         private static final String DOCUMENTBASE_TOKEN = "DOCUMENTBASE_REPLACEMENT_TOKEN";
         private static final String CODEBASE_TOKEN = "CODEBASE_REPLACEMENT_TOKEN";
         private static final String JAR_TOKEN = "JAR_HREF_REPLACEMENT_TOKEN";
-        private static final String FILENAME = "SOPBypass-filtered.jnlp";
 
+        private String docName;
         private ServerAccess access;
         private String content;
 
         public TemplatedJnlpDoc(ServerAccess access, String resourceLocation) throws IOException {
+            this.docName = resourceLocation;
             this.access = access;
             content = access.getResourceAsString(resourceLocation);
         }
@@ -397,7 +411,10 @@ public class SOPBypassUtil extends BrowserTest {
         }
 
         public String getFileName() {
-            return FILENAME;
+            String[] parts = docName.split(Pattern.quote("."));
+            String name = parts[0];
+            String extension = parts[1];
+            return name + "-filtered." + extension;
         }
 
         public File getLocation() {

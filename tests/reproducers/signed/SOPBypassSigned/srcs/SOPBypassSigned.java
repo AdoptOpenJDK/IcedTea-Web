@@ -46,7 +46,7 @@ import java.security.AccessController;
 import java.security.AccessControlException;
 import java.security.PrivilegedAction;
 
-public class SOPBypass extends Applet {
+public class SOPBypassSigned extends Applet {
 
     @Override
     public void start() {
@@ -154,7 +154,7 @@ public class SOPBypass extends Applet {
     }
 
     public static void main(String[] args) {
-        new SOPBypass().start();
+        new SOPBypassSigned().start();
     }
 
 }

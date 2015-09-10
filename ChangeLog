@@ -1,3 +1,30 @@
+2015-09-10  Andrew Azores  <aazores@redhat.com>
+
+	Add new signed version of SOPBypass reproducers, add privilege level check
+	to existing unsigned SOPBypass
+	* tests/reproducers/signed/SOPBypassSigned/resources/SOPBypassSigned.html:
+	new signed SOPBypass tests
+	* tests/reproducers/signed/SOPBypassSigned/resources/SOPBypassSigned.jnlp:
+	same
+	* tests/reproducers/signed/SOPBypassSigned/srcs/SOPBypassSigned.java: same
+	* tests/reproducers/signed/SOPBypassSigned/testcases/SOPBypassSignedHtmlAppletTest.java:
+	same
+	* tests/reproducers/signed/SOPBypassSigned/testcases/SOPBypassSignedJnlpAppletTest.java:
+	same
+	* tests/reproducers/signed/SOPBypassSigned/testcases/SOPBypassSignedJnlpAppletTestWithHtmlSwitch.java:
+	same
+	* tests/reproducers/signed/SOPBypassSigned/testcases/SOPBypassSignedUtil.java:
+	same
+	* tests/reproducers/simple/SOPBypass/srcs/SOPBypass.java: add check for
+	privilege level
+	* tests/reproducers/simple/SOPBypass/testcases/SOPBypassHtmlAppletTest.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/SOPBypassJnlpAppletTest.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/SOPBypassJnlpAppletTestWithHtmlSwitch.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/SOPBypassUtil.java: same
+
 2015-09-10  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanelTest.java:
