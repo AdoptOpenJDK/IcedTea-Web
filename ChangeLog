@@ -1,5 +1,10 @@
 2015-09-10  Jiri Vanek  <jvanek@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanelTest.java:
+	Backuped, reset and restored .appletTrustSettings so its content can not affect test
+
+2015-09-10  Jiri Vanek  <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
  	(stripFileImp) fixed typo on variable of normlaized to normalized
 
