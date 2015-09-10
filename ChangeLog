@@ -1,3 +1,9 @@
+2015-09-10  Jiri Vanek  <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+ 	(stripFileImp) fixed typo on variable of normlaized to normalized
+
+
 2015-09-09  Jacob Wisor  <gitne@icedtea.classpath.org>
 
 	* .hgignore: Fix regex patterns of files ignored by Mercurial

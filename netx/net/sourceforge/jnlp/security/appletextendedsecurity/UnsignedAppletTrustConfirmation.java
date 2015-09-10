@@ -255,18 +255,18 @@ public class UnsignedAppletTrustConfirmation {
     
     private static String stripFileImp(URL documentbase) {
         try {
-            String normlaized = UrlUtils.normalizeUrlAndStripParams(documentbase).toExternalForm().trim();
-            if (normlaized.endsWith("/") || normlaized.endsWith("\\")) {
-                return normlaized;
+            String normalized = UrlUtils.normalizeUrlAndStripParams(documentbase).toExternalForm().trim();
+            if (normalized.endsWith("/") || normalized.endsWith("\\")) {
+                return normalized;
             }
-            URL middleway = new URL(normlaized);
+            URL middleway = new URL(normalized);
             String file = middleway.getFile();
             int i = Math.max(file.lastIndexOf('/'), file.lastIndexOf('\\'));
             if (i<0){
-                return normlaized;
+                return normalized;
             }
             String parent = file.substring(0, i+1);
-            String stripped = normlaized.replace(file, parent);
+            String stripped = normalized.replace(file, parent);
             return stripped;
         } catch (Exception ex) {
             OutputController.getLogger().log(ex);
