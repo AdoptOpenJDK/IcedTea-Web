@@ -35,6 +35,7 @@ statement from your version.*/
  *<h3>Following diagram shows how dialog is handled when some application/appelt needs to show it</h3>
  *
  *<pre>
+{@code
         ITW-thread(s)               | dialogs-thread                                                                                                                                  X
                                     |                                                                                                                                                 X
    presteps in SecurtyDialogs       |                                                                                                                                                 X
@@ -83,7 +84,7 @@ statement from your version.*/
             |                       |                                                                                                                                                 X
    continue accordingly             |                                                                                                                                                 X
                                                                                                                                                                                       X
-
+}
  *</pre>
  *
  *<h3>How to make your dialog to be remembered</h3>

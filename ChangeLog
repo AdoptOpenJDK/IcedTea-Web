@@ -1,3 +1,11 @@
+2015-09-22  Jiri Vanek  <jvanek@redhat.com>
+
+	fixed two doclint errors
+	* netx/net/sourceforge/jnlp/security/package-info.java: diagram put inside code annotation 
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java:
+	(getTitle) added javadoc to prevent auto-generated return with (doclint) invalid character
+	
+
 2015-09-09  Jacob Wisor  <gitne@icedtea.classpath.org>
 
 	* ChangeLog: Fix spelling and formatting

@@ -196,6 +196,11 @@ public enum PolicyEditorPermissions implements Serializable {
             return false;
         }
 
+        /**
+         * Return title for policy extended by drop-down mark.
+         *
+         * @return title with down-pointing arrow
+         */
         public String getTitle() {
             return title + " ˇ";
         }
