@@ -36,6 +36,9 @@ exception statement from your version.
  */
 
 import java.applet.Applet;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
@@ -47,13 +50,23 @@ import java.security.AccessControlException;
 import java.security.PrivilegedAction;
 
 public class SOPBypassSigned extends Applet {
+    private String unrelatedUrl;
+    private String reachableResource;
 
+    
+    @Override
+    public void init(){
+        setUnrelatedUrl(this.getParameter("unrelatedUrl"));
+        setReachableResource(this.getParameter("reachableResource"));
+    }
+    
     @Override
     public void start() {
         System.out.println("Applet Started");
 
         System.out.println("Codebase URL: " + getCodeBase());
         System.out.println("DocumentBase URL: " + getDocumentBase());
+        System.out.println("unrelatedUrl: " + unrelatedUrl);
 
         AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             @Override
@@ -87,22 +100,26 @@ public class SOPBypassSigned extends Applet {
     void attemptSocketConnectionToCodebase() {
         String host = getCodeBase().getHost();
         int port = getCodeBase().getPort();;
-        attemptSocketConnection(host, port, "codeBase", true);
+        attemptSocketConnection(host, port, reachableResource, "codeBase", true);
     }
 
     void attemptSocketConnectionToDocumentBase() {
         String host = getDocumentBase().getHost();
         int port = getDocumentBase().getPort();
-        attemptSocketConnection(host, port, "documentBase", true);
+        attemptSocketConnection(host, port, reachableResource,  "documentBase", true);
     }
 
     void attemptSocketConnectionToUnrelated() {
         String host = "example.com";
         int port = 80;
-        attemptSocketConnection(host, port, "unrelated", false);
+        if (unrelatedUrl != null){
+            host=extractHost(unrelatedUrl);
+            port=extractPort(unrelatedUrl);
+        }
+        attemptSocketConnection(host, port, reachableResource, "unrelated", true);
     }
 
-    void attemptSocketConnection(String host, int port, String s, boolean sendData) {
+    void attemptSocketConnection(String host, int port, String resource, String id, boolean sendData) {
         boolean connected = true;
         try {
             Socket local = new Socket();
@@ -113,24 +130,29 @@ public class SOPBypassSigned extends Applet {
                     writer.println("test");
                 }
             }
+            local.close();
         } catch (Exception e) {
             connected = false;
             e.printStackTrace();
         }
-        System.out.println("SocketConnection:" + s + " " + connected);
+        System.out.println("SocketConnection:" + id + " " + connected);
     }
 
     void attemptUrlConnectionToCodebase() {
-        attemptUrlConnection(getCodeBase(), "codeBase");
+        attemptUrlConnection(getCodeBase(), reachableResource, "codeBase");
     }
 
     void attemptUrlConnectionToDocumentBase() {
-        attemptUrlConnection(getDocumentBase(), "documentBase");
+        attemptUrlConnection(getDocumentBase(), reachableResource,  "documentBase");
     }
 
     void attemptUrlConnectionToUnrelated() {
         try {
-            attemptUrlConnection(new URL("http://example.com:80"), "unrelated");
+            if (unrelatedUrl  == null) {
+                attemptUrlConnection(new URL("http://example.com:80"), reachableResource,  "unrelated");
+            } else {
+                attemptUrlConnection(new URL(unrelatedUrl), reachableResource,  "unrelated");
+            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
             System.out.println("Unrelated URL test failed due to MalformedURLException");
@@ -138,7 +160,7 @@ public class SOPBypassSigned extends Applet {
         }
     }
 
-    void attemptUrlConnection(URL url, String s) {
+    void attemptUrlConnection(URL url, String resource,  String id) {
         boolean connected = true;
         try {
             URLConnection conn = url.openConnection();
@@ -146,15 +168,101 @@ public class SOPBypassSigned extends Applet {
             conn.getContentEncoding();
             conn.getContentLength();
             conn.getContentType();
+            if (resource != null) {
+                URLConnection connn = concateUrlAndResource(url, resource).openConnection();
+                connn.connect();
+                connn.getContentEncoding();
+                connn.getContentLength();
+                connn.getContentType();
+                String s = getText(connn.getInputStream());
+                System.out.println("" + s);
+                if (s == null || s.trim().isEmpty()) {
+                    connected = false;
+                }
+            }
         } catch (Exception e) {
             connected = false;
             e.printStackTrace();
         }
-        System.out.println("URLConnection:" + s + " " + connected);
+        System.out.println("URLConnection:" + id + " " + connected);
     }
 
     public static void main(String[] args) {
-        new SOPBypassSigned().start();
+        //args = new String[]{"SOPBypass-filtered.html", "http://localhost:44321"};
+        SOPBypassSigned sop = new SOPBypassSigned();
+        if (args.length > 0) {
+            sop.setReachableResource(args[0]);
+        }
+        if (args.length > 1) {
+            sop.setUnrelatedUrl(args[1]);
+        }
+        sop.start();
+    }
+
+    private void setUnrelatedUrl(String s) {
+        unrelatedUrl = s;
+    }
+
+    private void setReachableResource(String s) {
+        reachableResource = s;
+    }
+
+    static private String extractHost(String unrelatedUrl) {
+        String s[] = unrelatedUrl.split(":");
+        while (s[1].startsWith("/")) {
+            s[1] = s[1].substring(1);
+        }
+        return s[1];
+    }
+
+    static private int extractPort(String unrelatedUrl) {
+        String s[] = unrelatedUrl.split(":");
+        if (s.length < 3) {
+            return 80;
+        }
+        //protocol:host:port or
+        //protocol:i:p:...:v:6:port
+        int i = s.length - 1;
+        try {
+            return new Integer(s[i]);
+        } catch (NumberFormatException ex) {
+            //nope
+        }
+        return 80;
+    }
+
+    private URL concateUrlAndResource(URL url, String resource) {
+        String s = url.toExternalForm();
+        //see testcases for usages
+        s = s.replace("/codebase/", "/");
+        try {
+            //docbase may have it
+            if (s.endsWith(resource)) {
+                return new URL(s);
+            }
+            if (s.endsWith("/")) {
+                s = s + resource;
+            } else {
+                s = s + "/" + resource;
+            }
+            return new URL(s);
+        } catch (MalformedURLException ex) {
+            //jsut adding resource to vlaisd url. 
+            //should not happen, if so, die later
+            return null;
+        }
+    }
+
+    public static String getText(InputStream is ) throws Exception {
+        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        return response.toString();
     }
 
 }

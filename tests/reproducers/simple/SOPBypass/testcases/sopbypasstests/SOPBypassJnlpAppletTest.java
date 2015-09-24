@@ -49,6 +49,7 @@ import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import java.io.File;
+import java.net.MalformedURLException;
 
 import static sopbypasstests.SOPBypassUtil.*;
 
@@ -81,7 +82,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testLocalAbsoluteArchiveLocalPathCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", server.getUrl("SOPBypass.jar"), server.getUrl("."));
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", server.getUrl("SOPBypass.jar"), server.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -91,7 +92,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testLocalAbsoluteArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", server.getUrl("SOPBypass.jar"), serverC.getUrl("."));
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", server.getUrl("SOPBypass.jar"), serverC.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -101,7 +102,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveSameRemoteCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverC.getUrl("SOPBypass.jar"), serverC.getUrl("."));
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverC.getUrl("SOPBypass.jar"), serverC.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -111,7 +112,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverB.getUrl("SOPBypass.jar"), serverC.getUrl("."));
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverB.getUrl("SOPBypass.jar"), serverC.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -121,7 +122,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveLocalPathCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverB.getUrl("SOPBypass.jar"), server.getUrl("."));
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverB.getUrl("SOPBypass.jar"), server.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -131,7 +132,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveLocalDotCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverB.getUrl("SOPBypass.jar"), ".");
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverB.getUrl("SOPBypass.jar"), ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -141,7 +142,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveNoCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverB.getUrl("SOPBypass.jar"), (String) null);
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", serverB.getUrl("SOPBypass.jar"), (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -151,7 +152,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testLocalAbsoluteArchiveNoCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", server.getUrl("SOPBypass.jar"), (String) null);
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", server.getUrl("SOPBypass.jar"), (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -161,7 +162,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testLocalRelativeArchiveNoCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", (String) null);
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -171,7 +172,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testLocalRelativeArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", serverC.getUrl());
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", serverC.getUrl(), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -181,7 +182,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testLocalAbsoluteArchiveLocalDotCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", server.getUrl("SOPBypass.jar"), ".");
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", server.getUrl("SOPBypass.jar"), ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -191,7 +192,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testLocalRelativeArchiveLocalPathCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", server.getUrl("/"));
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", server.getUrl("/"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -201,7 +202,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testLocalRelativeArchiveLocalDotCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", ".");
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -211,7 +212,7 @@ public class SOPBypassJnlpAppletTest {
     @Test
     @NeedsDisplay
     public void testRemoteRelativeArchiveSameRemoteCodebase() throws Exception {
-        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", serverC.getUrl("/"));
+        TemplatedJnlpDoc templatedDoc = filterJnlp("SOPBypass.jnlp", "SOPBypass.jar", serverC.getUrl("/"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -234,6 +235,11 @@ public class SOPBypassJnlpAppletTest {
 
         mod1.restoreProperties();
         mod2.restoreProperties();
+    }
+    
+    public static String getUnrelatedServer() throws MalformedURLException {
+        return serverA.getUrl().toExternalForm();
+
     }
 
 }

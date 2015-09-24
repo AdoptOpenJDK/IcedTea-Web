@@ -87,11 +87,12 @@ public class SOPBypassUtil extends BrowserTest {
     public static final String SOCKET_UNRELATED_SUCCESS = SOCKET_UNRELATED + SUCCESS;
     public static final String SOCKET_UNRELATED_FAILURE = SOCKET_UNRELATED + FAILURE;
 
-    public static TemplatedHtmlDoc filterHtml(String doc, String code, String archive, String codebase) throws IOException {
+    public static TemplatedHtmlDoc filterHtml(String doc, String code, String archive, String codebase, String unrelatedServer) throws IOException {
         TemplatedHtmlDoc templatedDoc = new TemplatedHtmlDoc(server, doc);
         templatedDoc.setCode(code);
         templatedDoc.setArchive(archive);
         templatedDoc.setCodeBase(codebase);
+        templatedDoc.setAppletParams(unrelatedServer, templatedDoc.getFileName());
         assertFalse(templatedDoc.toString(), templatedDoc.toString().contains("TOKEN"));
         templatedDoc.save();
         String content = server.getResourceAsString(templatedDoc.getFileName());
@@ -99,22 +100,23 @@ public class SOPBypassUtil extends BrowserTest {
         return templatedDoc;
     }
 
-    public static TemplatedHtmlDoc filterHtml(String doc, String code, URL archive, URL codebase) throws IOException {
-        return filterHtml(doc, code, archive == null ? "" : archive.toString(), codebase == null ? "" : codebase.toString());
+    public static TemplatedHtmlDoc filterHtml(String doc, String code, URL archive, URL codebase, String unrelatedServer) throws IOException {
+        return filterHtml(doc, code, archive == null ? "" : archive.toString(), codebase == null ? "" : codebase.toString(), unrelatedServer);
     }
 
-    public static TemplatedHtmlDoc filterHtml(String doc, String code, URL archive, String codebase) throws IOException {
-        return filterHtml(doc, code, archive == null ? "" : archive.toString(), codebase);
+    public static TemplatedHtmlDoc filterHtml(String doc, String code, URL archive, String codebase, String unrelatedServer) throws IOException {
+        return filterHtml(doc, code, archive == null ? "" : archive.toString(), codebase, unrelatedServer);
     }
 
-    public static TemplatedHtmlDoc filterHtml(String doc, String code, String archive, URL codebase) throws IOException {
-        return filterHtml(doc, code, archive, codebase == null ? "" : codebase.toString());
+    public static TemplatedHtmlDoc filterHtml(String doc, String code, String archive, URL codebase, String unrelatedServer) throws IOException {
+        return filterHtml(doc, code, archive, codebase == null ? "" : codebase.toString(), unrelatedServer);
     }
 
-    public static TemplatedJnlpDoc filterJnlp(String doc, String jarHref, String codebase) throws IOException {
+    public static TemplatedJnlpDoc filterJnlp(String doc, String jarHref, String codebase, String unrelatedServer) throws IOException {
         TemplatedJnlpDoc templatedDoc = new TemplatedJnlpDoc(server, doc);
         templatedDoc.setJarHref(jarHref);
         templatedDoc.setCodeBase(codebase);
+        templatedDoc.setAppletParams(unrelatedServer, templatedDoc.getFileName());
         templatedDoc.setDocumentBase(server.getUrl("SOPBypass.jnlp").toString());
         assertFalse(templatedDoc.toString(), templatedDoc.toString().contains("TOKEN"));
         templatedDoc.save();
@@ -123,16 +125,16 @@ public class SOPBypassUtil extends BrowserTest {
         return templatedDoc;
     }
 
-    public static TemplatedJnlpDoc filterJnlp(String doc, URL archive, URL codebase) throws IOException {
-        return filterJnlp(doc, archive == null ? "" : archive.toString(), codebase == null ? "" : codebase.toString());
+    public static TemplatedJnlpDoc filterJnlp(String doc, URL archive, URL codebase, String unrelatedServer) throws IOException {
+        return filterJnlp(doc, archive == null ? "" : archive.toString(), codebase == null ? "" : codebase.toString(), unrelatedServer);
     }
 
-    public static TemplatedJnlpDoc filterJnlp(String doc, URL archive, String codebase) throws IOException {
-        return filterJnlp(doc, archive == null ? "" : archive.toString(), codebase);
+    public static TemplatedJnlpDoc filterJnlp(String doc, URL archive, String codebase, String unrelatedServer) throws IOException {
+        return filterJnlp(doc, archive == null ? "" : archive.toString(), codebase, unrelatedServer);
     }
 
-    public static TemplatedJnlpDoc filterJnlp(String doc, String archive, URL codebase) throws IOException {
-        return filterJnlp(doc, archive, codebase == null ? "" : codebase.toString());
+    public static TemplatedJnlpDoc filterJnlp(String doc, String archive, URL codebase, String unrelatedServer) throws IOException {
+        return filterJnlp(doc, archive, codebase == null ? "" : codebase.toString(), unrelatedServer);
     }
 
     public static ClosingListener getClosingListener() {
@@ -301,22 +303,114 @@ public class SOPBypassUtil extends BrowserTest {
         doc.setCodeBase("");
         assertFalse("Doc should not contain \"codebase=\"", doc.toString().contains("codebase="));
     }
+    
+    @Test
+    public void testAppletParamRepalcement2() throws Exception {
+        AppletTemplate doc = new AppletTemplate(server, "SOPBypass.html") {};
+        assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
+        assertFalse("Doc should not contain param2", doc.toString().contains("param2"));
+        doc.setAppletParams("param1", null);
+        assertTrue("Doc should contain param1", doc.toString().contains("param1"));
+        assertFalse("Doc should not contain param2", doc.toString().contains("param2"));
+    }
+    
+    @Test
+    public void testAppletParamRepalcement1() throws Exception {
+        AppletTemplate doc = new AppletTemplate(server, "SOPBypass.jnlp") {};
+        assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
+        assertFalse("Doc should not contain param2", doc.toString().contains("param2"));
+        doc.setAppletParams(null, "param2");
+        assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
+        assertTrue("Doc should contain param2", doc.toString().contains("param2"));
+    }
+     @Test
+    public void testAppletParamRepalcement3() throws Exception {
+        AppletTemplate doc = new AppletTemplate(server, "SOPBypass.html") {};
+        assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
+        assertFalse("Doc should not contain param2", doc.toString().contains("param2"));
+        doc.setAppletParams(null, null);
+        assertFalse("Doc should not contain \"codebase=\"", doc.toString().contains("codebase="));
+        assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
+        assertFalse("Doc should not contain param2", doc.toString().contains("param2"));
+    }
+    
+    @Test
+    public void testAppletParamRepalcement4() throws Exception {
+        AppletTemplate doc = new AppletTemplate(server, "SOPBypass.jnlp") {};
+        assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
+        assertFalse("Doc should not contain param2", doc.toString().contains("param2"));
+        doc.setAppletParams("param1", "param2");
+        assertTrue("Doc should contain param1", doc.toString().contains("param1"));
+        assertTrue("Doc should contain param2", doc.toString().contains("param2"));
+    }
+    
 
-    public static class TemplatedHtmlDoc {
+    public static abstract class BasicTempalte {
+
+        protected final String docName;
+        protected final ServerAccess access;
+        protected String content = null;
+
+        public BasicTempalte(ServerAccess access, String docName) throws IOException {
+            this.docName = docName;
+            this.access = access;
+            content = access.getResourceAsString(docName);
+        }
+
+        @Override
+        public String toString() {
+            return content;
+        }
+
+        public String getFileName() {
+            String[] parts = docName.split(Pattern.quote("."));
+            String name = parts[0];
+            String extension = parts[1];
+            return name + "-filtered." + extension;
+        }
+
+        public File getLocation() {
+            return new File(access.getDir(), getFileName());
+        }
+
+        public void save() throws IOException {
+            ServerAccess.saveFile(content, getLocation());
+        }
+
+    }
+    
+    public static abstract class AppletTemplate  extends BasicTempalte{
+
+        static final String CODEBASE_TOKEN = "CODEBASE_REPLACEMENT_TOKEN";
+        static final String APPLET_PARAMS_TOKEN = "APPLET_PARAMS_TOKEN";
+
+        public AppletTemplate(ServerAccess access, String docName) throws IOException {
+            super(access, docName);
+        }
+        
+        public void setAppletParams(String unrelatedUrl, String reachableResource) {
+            String urlParam = "";
+            if (unrelatedUrl != null) {
+                urlParam = "<PARAM NAME=\"unrelatedUrl\" VALUE=\"" + unrelatedUrl + "\">";
+            }
+            String resourceParam = "";
+            if (reachableResource != null) {
+                resourceParam = "<PARAM NAME=\"reachableResource\" VALUE=\"" + reachableResource + "\">";
+            }
+            String params = urlParam + "\n"+ resourceParam + "\n";
+            content = content.replaceAll(APPLET_PARAMS_TOKEN, params);
+        }
+
+    }
+
+    public static class TemplatedHtmlDoc extends AppletTemplate{
 
         private static final String CODE_TOKEN = "CODE_REPLACEMENT_TOKEN";
         private static final String ARCHIVE_TOKEN = "ARCHIVE_REPLACEMENT_TOKEN";
-        private static final String CODEBASE_TOKEN = "CODEBASE_REPLACEMENT_TOKEN";
         private static final String NEWLINE = System.lineSeparator();
 
-        private String docName = null;
-        private ServerAccess access = null;
-        private String content = null;
-
         public TemplatedHtmlDoc(ServerAccess access, String resourceLocation) throws IOException {
-            this.docName = resourceLocation;
-            this.access = access;
-            content = access.getResourceAsString(resourceLocation);
+            super(access, resourceLocation);
         }
 
         public void setCode(String code) {
@@ -342,43 +436,16 @@ public class SOPBypassUtil extends BrowserTest {
                 content = content.replaceAll(CODEBASE_TOKEN, "codebase=\"" + codeBase + "\"" + NEWLINE);
             }
         }
-
-        @Override
-        public String toString() {
-            return content;
-        }
-
-        public String getFileName() {
-            String[] parts = docName.split(Pattern.quote("."));
-            String name = parts[0];
-            String extension = parts[1];
-            return name + "-filtered." + extension;
-        }
-
-        public File getLocation() {
-            return new File(access.getDir(), getFileName());
-        }
-
-        public void save() throws IOException {
-            access.saveFile(content, getLocation());
-        }
-
+  
     }
 
-    public static class TemplatedJnlpDoc {
+    public static class TemplatedJnlpDoc extends AppletTemplate {
 
         private static final String DOCUMENTBASE_TOKEN = "DOCUMENTBASE_REPLACEMENT_TOKEN";
-        private static final String CODEBASE_TOKEN = "CODEBASE_REPLACEMENT_TOKEN";
         private static final String JAR_TOKEN = "JAR_HREF_REPLACEMENT_TOKEN";
 
-        private String docName;
-        private ServerAccess access;
-        private String content;
-
         public TemplatedJnlpDoc(ServerAccess access, String resourceLocation) throws IOException {
-            this.docName = resourceLocation;
-            this.access = access;
-            content = access.getResourceAsString(resourceLocation);
+            super(access, resourceLocation);
         }
 
         public void setDocumentBase(String documentBase) {
@@ -403,26 +470,6 @@ public class SOPBypassUtil extends BrowserTest {
 
         public void setJarHref(String jarHref) {
             content = content.replaceAll(JAR_TOKEN, jarHref);
-        }
-
-        @Override
-        public String toString() {
-            return content;
-        }
-
-        public String getFileName() {
-            String[] parts = docName.split(Pattern.quote("."));
-            String name = parts[0];
-            String extension = parts[1];
-            return name + "-filtered." + extension;
-        }
-
-        public File getLocation() {
-            return new File(access.getDir(), getFileName());
-        }
-
-        public void save() throws IOException {
-            access.saveFile(content, getLocation());
         }
 
     }

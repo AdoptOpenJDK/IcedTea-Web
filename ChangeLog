@@ -1,5 +1,23 @@
 2015-09-24  Jiri Vanek  <jvanek@redhat.com>
 
+	SOPBypass reprodcuer addapted to use instance of internal server as unrleated url
+	Improved for real reading from all tested urls.
+	* tests/reproducers/signed/SOPBypassSigned/srcs/SOPBypassSigned.java:
+	* tests/reproducers/simple/SOPBypass/resources/SOPBypass.jnlp:
+	* tests/reproducers/simple/SOPBypass/resources/SOPBypass.html:
+	* tests/reproducers/simple/SOPBypass/resources/SOPBypassSigned.jnlp:
+	* tests/reproducers/simple/SOPBypass/resources/SOPBypassSigned.html:
+	* tests/reproducers/simple/SOPBypass/srcs/SOPBypass.java:
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassHtmlAppletTest.java:
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassJnlpAppletTest.java:
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassJnlpAppletTestWithHtmlSwitch.java:
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedHtmlAppletTest.java:
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedJnlpAppletTest.java:
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedJnlpAppletTestWithHtmlSwitch.java:
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassUtil.java:
+
+2015-09-24  Jiri Vanek  <jvanek@redhat.com>
+
 	* .Makefile: (stamps/compile-reproducers-testcases.stamp) added support for
 	tests in packages
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyPackage/MixedSigningAndTrustedOnly.java:

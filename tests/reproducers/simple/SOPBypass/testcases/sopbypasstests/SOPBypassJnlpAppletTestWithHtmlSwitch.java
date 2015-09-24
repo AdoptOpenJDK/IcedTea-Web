@@ -50,6 +50,7 @@ import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import java.io.File;
+import java.net.MalformedURLException;
 
 import static sopbypasstests.SOPBypassUtil.*;
 
@@ -82,7 +83,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testLocalAbsoluteArchiveLocalPathCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), server.getUrl("."));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), server.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -92,7 +93,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testLocalAbsoluteArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), serverC.getUrl("."));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), serverC.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -102,7 +103,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveSameRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverC.getUrl("SOPBypass.jar"), serverC.getUrl("."));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverC.getUrl("SOPBypass.jar"), serverC.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -112,7 +113,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), serverC.getUrl("."));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), serverC.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -122,7 +123,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveLocalPathCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), server.getUrl("."));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), server.getUrl("."), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -132,7 +133,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveLocalDotCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), ".");
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -142,7 +143,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testRemoteAbsoluteArchiveNoCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), (String) null);
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -152,7 +153,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testLocalAbsoluteArchiveNoCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), (String) null);
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -162,7 +163,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testLocalRelativeArchiveNoCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", (String) null);
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -172,7 +173,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testLocalRelativeArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", serverC.getUrl());
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", serverC.getUrl(), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -182,7 +183,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testLocalAbsoluteArchiveLocalDotCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), ".");
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -192,7 +193,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testLocalRelativeArchiveLocalPathCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", server.getUrl("/"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", server.getUrl("/"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -202,7 +203,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testLocalRelativeArchiveLocalDotCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", ".");
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -212,7 +213,7 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
     @Test
     @NeedsDisplay
     public void testRemoteRelativeArchiveSameRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", serverC.getUrl("/"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", serverC.getUrl("/"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -232,6 +233,11 @@ public class SOPBypassJnlpAppletTestWithHtmlSwitch {
         serverA.stop();
         serverB.stop();
         serverC.stop();
+    }
+    
+    public static String getUnrelatedServer() throws MalformedURLException {
+        return serverA.getUrl().toExternalForm();
+
     }
 
 }

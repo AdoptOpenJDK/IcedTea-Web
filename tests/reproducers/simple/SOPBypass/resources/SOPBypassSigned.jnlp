@@ -55,6 +55,7 @@ exception statement from your version.
       width="320"
       height="200"
       >
+      APPLET_PARAMS_TOKEN
   </applet-desc>
   <security>
     <all-permissions/>

@@ -52,6 +52,7 @@ import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import java.io.File;
+import java.net.MalformedURLException;
 
 import static sopbypasstests.SOPBypassUtil.*;
 
@@ -85,7 +86,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testLocalAbsoluteArchiveLocalPathCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), server.getUrl("codebase"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), server.getUrl("codebase"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -96,7 +97,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testLocalAbsoluteArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), serverC.getUrl("codebase"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), serverC.getUrl("codebase"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -107,7 +108,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testRemoteAbsoluteArchiveSameRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverC.getUrl("SOPBypass.jar"), serverC.getUrl("codebase"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverC.getUrl("SOPBypass.jar"), serverC.getUrl("codebase"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -118,7 +119,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testRemoteAbsoluteArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), serverC.getUrl("codebase"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), serverC.getUrl("codebase"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -129,7 +130,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testRemoteAbsoluteArchiveLocalPathCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), server.getUrl("codebase"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), server.getUrl("codebase"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -140,7 +141,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testRemoteAbsoluteArchiveLocalDotCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), ".");
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -151,7 +152,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testRemoteAbsoluteArchiveNoCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), (String) null);
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", serverB.getUrl("SOPBypass.jar"), (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -162,7 +163,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testLocalAbsoluteArchiveNoCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), (String) null);
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -173,7 +174,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testLocalRelativeArchiveNoCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", (String) null);
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", (String) null, getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -184,7 +185,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testLocalRelativeArchiveUnrelatedRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", serverC.getUrl());
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", serverC.getUrl(), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -195,7 +196,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testLocalAbsoluteArchiveLocalDotCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), ".");
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", server.getUrl("SOPBypass.jar"), ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -206,7 +207,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testLocalRelativeArchiveLocalPathCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", server.getUrl("/"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", server.getUrl("/"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -217,7 +218,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testLocalRelativeArchiveLocalDotCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", ".");
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", ".", getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -228,7 +229,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     @NeedsDisplay
     @TestInBrowsers(testIn = {Browsers.one})
     public void testRemoteRelativeArchiveSameRemoteCodebase() throws Exception {
-        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", serverC.getUrl("/"));
+        TemplatedHtmlDoc templatedDoc = filterHtml("SOPBypass.html", "SOPBypass", "SOPBypass.jar", serverC.getUrl("/"), getUnrelatedServer());
         ProcessResult pr = performTest(templatedDoc);
         assertCodebaseConnection(pr);
         assertDocumentBaseConnection(pr);
@@ -236,7 +237,7 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
     }
 
     public ProcessResult performTest(TemplatedHtmlDoc templatedDoc) throws Exception {
-        ProcessResult pr = server.executeBrowser(templatedDoc.getFileName(), getClosingListener(), null);
+        ProcessResult pr = server.executeBrowser(templatedDoc.getFileName());
         assertStart(pr);
         assertEnd(pr);
         assertUnprivileged(pr);
@@ -253,4 +254,8 @@ public class SOPBypassHtmlAppletTest extends BrowserTest {
         mod2.restoreProperties();
     }
 
+    public static String getUnrelatedServer() throws MalformedURLException {
+        return serverA.getUrl().toExternalForm();
+
+    }
 }
