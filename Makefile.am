@@ -947,16 +947,20 @@ stamps/compile-reproducers-testcases.stamp: stamps/netx-dist.stamp stamps/plugin
 	  simpleReproducers=(`cat $(abs_top_builddir)/junit-jnlp-dist-$$which.txt `); \
 	  IFS="$$IFS_BACKUP" ; \
 	  for dir in "$${simpleReproducers[@]}" ; do \
-	    echo "compiling" $$dir ; \
-	    $(SYSTEM_JDK_DIR)/bin/javac $(IT_JAVACFLAGS) \
-	      -d $(TEST_EXTENSIONS_TESTS_DIR) \
-	      $(call composeclasspath, $(JUNIT_RUNTIME) $(NETX_DIR)/lib/classes.jar $(TEST_EXTENSIONS_DIR)) \
-	    "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases/"*.java ; \
-	    if [ -d "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases" ]; then \
-	        pushd "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases" ; \
-	        NONJAVA_RESOURCES=`ls | grep -v ".*\\.java$$"` ; \
+	    TESTCASEPATH="$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/testcases" ; \
+	    if [ -d "$$TESTCASEPATH" ]; then \
+	        echo "compiling" $$dir ; \
+	        pushd "$$TESTCASEPATH" ; \
+	        REGEX=".*\\.java$$" ; \
+	        JAVAFILES=`find . | grep "$$REGEX"` ; \
+	        NONJAVA_RESOURCES=`find . | grep -v "$$REGEX"` ; \
+		    echo $$JAVAFILES ; \
+		    echo $$NONJAVA_RESOURCES ; \
+	        $(SYSTEM_JDK_DIR)/bin/javac $(IT_JAVACFLAGS) \
+	          -d $(TEST_EXTENSIONS_TESTS_DIR) \
+	          $(call composeclasspath, $(JUNIT_RUNTIME) $(NETX_DIR)/lib/classes.jar $(TEST_EXTENSIONS_DIR)) $$JAVAFILES ; \
 	        if [ -n "$$NONJAVA_RESOURCES" ]; then \
-	            cp $$NONJAVA_RESOURCES $(TEST_EXTENSIONS_TESTS_DIR)/ ; \
+	            cp --parents $$NONJAVA_RESOURCES $(TEST_EXTENSIONS_TESTS_DIR)/ ; \
 	        fi ; \
 	        popd ; \
 	    fi ; \

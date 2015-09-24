@@ -1,3 +1,30 @@
+2015-09-24  Jiri Vanek  <jvanek@redhat.com>
+
+	* .Makefile: (stamps/compile-reproducers-testcases.stamp) added support for
+	tests in packages
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyPackage/MixedSigningAndTrustedOnly.java:
+	moved to correct dir to follow package name delcared in file
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyPackage/MixedSigningAndTrustedOnlyBS1.java:
+	same
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyPackage/MixedSigningAndTrustedOnlyBSmanifest.java:
+	same
+	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyPackage/MixedSigningAndTrustedOnlyFSSU.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassHtmlAppletTest.java:
+	moved to correct dir to follow package name delcared in file
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassJnlpAppletTest.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassJnlpAppletTestWithHtmlSwitch.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedHtmlAppletTest.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedJnlpAppletTest.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedJnlpAppletTestWithHtmlSwitch.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassUtil.java:
+	same
+
 2015-09-22  Jiri Vanek  <jvanek@redhat.com>
 
 	fixed two doclint errors
