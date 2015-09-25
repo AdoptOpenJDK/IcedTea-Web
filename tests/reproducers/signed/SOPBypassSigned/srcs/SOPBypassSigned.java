@@ -122,15 +122,25 @@ public class SOPBypassSigned extends Applet {
     void attemptSocketConnection(String host, int port, String resource, String id, boolean sendData) {
         boolean connected = true;
         try {
-            Socket local = new Socket();
+            final Socket local = new Socket();
             local.bind(null);
             local.connect(new InetSocketAddress(host, port));
+            final BufferedReader br = new BufferedReader(new InputStreamReader(local.getInputStream()));
+            final PrintWriter writer = new PrintWriter(local.getOutputStream(), true);
             if (sendData) {
-                try (PrintWriter writer = new PrintWriter(local.getOutputStream(), true)) {
-                    writer.println("test");
+                writer.println("GET /" + reachableResource + " HTTP/1.1");
+                writer.println("Host: " + "itwTest");
+                writer.println("Accept: */*");
+                writer.println("User-Agent: Java"); //used to it to much
+                writer.println(""); // Important, else the server will expect that there's more into the request.
+                writer.flush();
+                String s = getText(br);
+                System.out.println("" + s);
+                if (s == null || s.trim().isEmpty()) {
+                    connected = false;
                 }
+                local.close();
             }
-            local.close();
         } catch (Exception e) {
             connected = false;
             e.printStackTrace();
@@ -233,8 +243,12 @@ public class SOPBypassSigned extends Applet {
 
     private URL concateUrlAndResource(URL url, String resource) {
         String s = url.toExternalForm();
+        String badResource1 = resource.replace("-filtered", "");
+        String badResource2 = badResource1.replace("Signed", "");
         //see testcases for usages
         s = s.replace("/codebase/", "/");
+        s = s.replace("/"+badResource1, "/");
+        s = s.replace("/"+badResource2, "/");
         try {
             //docbase may have it
             if (s.endsWith(resource)) {
@@ -253,15 +267,22 @@ public class SOPBypassSigned extends Applet {
         }
     }
 
-    public static String getText(InputStream is ) throws Exception {
+    public static String getText(InputStream is) throws Exception {
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        try {
+            return getText(in);
+        } finally {
+            in.close();
+        }
+    }
+
+    public static String getText(BufferedReader in) throws Exception {
+
         StringBuilder response = new StringBuilder();
         String inputLine;
         while ((inputLine = in.readLine()) != null) {
             response.append(inputLine);
         }
-        in.close();
-
         return response.toString();
     }
 

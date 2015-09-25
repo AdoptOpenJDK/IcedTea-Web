@@ -1,3 +1,10 @@
+2015-09-25  Jiri Vanek  <jvanek@redhat.com>
+
+	* tests/reproducers/signed/SOPBypassSigned/srcs/SOPBypassSigned.java
+	fixed handling of connect url and added socket reading from internal server
+	* tests/reproducers/simple/SOPBypass/srcs/SOPBypass.java
+	same
+
 2015-09-24  Jiri Vanek  <jvanek@redhat.com>
 
 	SOPBypass reprodcuer addapted to use instance of internal server as unrleated url
