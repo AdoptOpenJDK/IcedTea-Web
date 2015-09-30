@@ -88,12 +88,16 @@ statement from your version.*/
  *</pre>
  *
  *<h3>How to make your dialog to be remembered</h3>
- *<li>make your extension of SecurityPanel implementing RememberableDialog:
+ *<ul>
+ *<li>make your extension of SecurityPanel implementing RememberableDialog: </li>
+ *</ul>
  *<blockquote>
- * <li>  RememberPanelResult getRemeberAction - if your dialogue uses RememberPanel, then you get RememberPanelResult for free
- * <li>  DialogResult getValue() - what your dialogue actually returns. If it is some simple Yes, No.. Then you can use existing types in dialogresults package. If it handles something more complex, you can inspire yourself in AccessWarningPaneComplexReturn
- * <li>  JNLPFile getFile() - ok, file keeps all needed to identify applet/app, so it is a must.
- * <li>  DialogResult readValue(String s) - the dialog must be able to read answer from String, which is supplied to it via engine. If you use some PrimitivesSubset extension, then it is mostly only static call its factory creator from String.
+ *<ul>
+ * <li>  RememberPanelResult getRemeberAction - if your dialogue uses RememberPanel, then you get RememberPanelResult for free</li>
+ * <li>  DialogResult getValue() - what your dialogue actually returns. If it is some simple Yes, No.. Then you can use existing types in dialogresults package. If it handles something more complex, you can inspire yourself in AccessWarningPaneComplexReturn </li>
+ * <li>  JNLPFile getFile() - ok, file keeps all needed to identify applet/app, so it is a must.</li>
+ * <li>  DialogResult readValue(String s) - the dialog must be able to read answer from String, which is supplied to it via engine. If you use some PrimitivesSubset extension, then it is mostly only static call its factory creator from String. </li>
+ *</ul>
  *</blockquote>
  *This should be all. The value your type writeValue to file, is then stored under Key, which is your extension of SecurityPanel implementing RememberableDialog name
  *

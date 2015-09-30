@@ -1,3 +1,9 @@
+2015-09-30  Jiri Vanek  <jvanek@redhat.com>
+
+	fixed doclint errors
+	* netx/net/sourceforge/jnlp/security/package-info.java: li elements wrapped
+	by ul elements
+
 2015-09-25  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/reproducers/signed/SOPBypassSigned/srcs/SOPBypassSigned.java
