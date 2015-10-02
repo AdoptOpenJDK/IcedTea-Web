@@ -117,6 +117,7 @@ extern pthread_mutex_t debug_pipe_lock;
 
 // debug switches
 extern bool debug_initiated;
+extern bool file_logs_initiated;
 extern int plugin_debug;
 extern bool plugin_debug_headers;
 extern bool plugin_debug_to_file;

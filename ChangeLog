@@ -1,3 +1,13 @@
+2015-10-02  Jiri Vanek  <jvanek@redhat.com>
+
+	Fixed possible segfault during files on and debug on
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: added file_logs_initiated initiated as
+	false. plugin_file_log initiated to NULL.
+	* plugin/icedteanp/IcedTeaNPPlugin.h: made aware about extern file_logs_initiated
+	* plugin/icedteanp/IcedTeaPluginUtils.h: (initialize_debug) set file_logs_initiated
+	to true after initFileLog finishes. (PLUGIN_DEBUG) and (PLUGIN_ERROR) logs to
+	file only when enabled and initiated.
+
 2015-09-30  Jiri Vanek  <jvanek@redhat.com>
 
 	fixed doclint errors

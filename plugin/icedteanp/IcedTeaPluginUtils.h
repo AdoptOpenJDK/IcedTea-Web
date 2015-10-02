@@ -86,6 +86,7 @@ void reset_pre_init_messages();
       plugin_debug_to_console = is_java_console_enabled();                    \
       if (plugin_debug_to_file) {                                             \
            IcedTeaPluginUtilities::initFileLog();                             \
+           file_logs_initiated = true;                                        \
       }                                                                       \
       if (plugin_debug_to_console) {                                          \
           /*initialisation done during jvm startup*/                          \
@@ -134,7 +135,7 @@ void reset_pre_init_messages();
         snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body); \
         fprintf  (stdout, "%s", ldebug_message);\
       }                                \
-      if (plugin_debug_to_file) {      \
+      if (plugin_debug_to_file && file_logs_initiated) {      \
         snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body);   \
         fprintf (plugin_file_log, "%s", ldebug_message);   \
         fflush(plugin_file_log);       \
@@ -180,7 +181,7 @@ void reset_pre_init_messages();
       snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body); \
       fprintf  (stderr, "%s", ldebug_message);                                    \
     }                                  \
-    if (plugin_debug_to_file) {        \
+    if (plugin_debug_to_file && file_logs_initiated) {        \
       snprintf(ldebug_message, MESSAGE_SIZE, "%s%s", ldebug_header, ldebug_body); \
       fprintf (plugin_file_log, "%s", ldebug_message);   \
       fflush(plugin_file_log);         \
