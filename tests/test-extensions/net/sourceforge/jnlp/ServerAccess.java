@@ -91,6 +91,9 @@ public class ServerAccess {
      */
     public static final String USED_BROWSERS = "used.browsers";
     public static final String DEFAULT_LOCALHOST_NAME = "localhost";
+    public static final String DEFAULT_LOCALHOST_IP = "127.0.0.1";
+    public static final String DEFAULT_LOCALHOST_PROTOCOL = "http";
+    
     /**
      * server instance singleton
      */

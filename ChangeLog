@@ -1,3 +1,15 @@
+2015-10-07  Jiri Vanek  <jvanek@redhat.com>
+
+	Testserver enhanced to work also in hostname mode or ip mode
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: added enum
+	declared constants for localhost, default protocol (http) and default
+	ip address (127.0.0.1)
+	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java: added enum
+	ServerNaming determining state, whether it respond as localhost, 127.0.0.1 or host-name
+	Added getter for each state, added getter to return all types. Added toString method
+	(stop) now reports what was stopped
+	* tests/test-extensions/net/sourceforge/jnlp/tools/DeploymentPropertiesModifier.java:
+
 2015-10-02  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed possible segfault during files on and debug on
