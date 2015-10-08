@@ -1,3 +1,38 @@
+2015-10-08  Jiri Vanek  <jvanek@redhat.com>
+
+	Tuned SOP reproducer to check also resource's connection and to work on localhost
+	* .Makefile: added target (run-test-server-on-itwtestsport) which lunches
+	testserver on $ITWTESTSPORT port
+	* tests/reproducers/signed/SOPBypassSigned/srcs/SOPBypassSigned.java:
+	addapted to support resource's location
+	* tests/reproducers/simple/SOPBypass/srcs/SOPBypass.java: same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassBeforeAndAfterChunks.java:
+	extracted @before and @after hunks from other testcases to avoid duplicated code.
+	All test servers for this case are run in HOSTNAME mode to enforce visibility
+	of calls from localhost to localhost. Added utility methods above its instances,
+	deployment modifiers forces verbose (same reason)
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassHtmlAppletTest.java:
+	adapted to new api and added assertNoResourcesConnection/assertResourcesConnection
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassJnlpAppletTest.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassJnlpAppletTestWithHtmlSwitch.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedHtmlAppletTest.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedJnlpAppletTest.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassSignedJnlpAppletTestWithHtmlSwitch.java:
+	same
+	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassUtil.java:
+	added logic to serve assertNoResourcesConnection/assertResourcesConnection.
+	Changed evaluation logic. To workaround ignorance of AccessDenied exception
+	from calls from localhost to localhost the check on pass fail is done in different way.
+	If connection is not expected, then no security exception is allowed to appear 
+	nor "Denying permissions ..." string is allowed to appear.
+	If connection is expected, then appearance of security exception or 
+	"Denying permissions ..." string  is considered as failure.
+	
+
 2015-10-07  Jiri Vanek  <jvanek@redhat.com>
 
 	All connection restrictions now consider also port

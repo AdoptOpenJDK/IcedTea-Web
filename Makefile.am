@@ -1399,7 +1399,14 @@ run-test-server-on-random-port: stamps/netx.stamp stamps/junit-jnlp-dist-dirs st
 	cd $(TEST_EXTENSIONS_DIR) ; \
 	CLASSPATH=$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) . $(TEST_EXTENSIONS_TESTS_DIR)) ; \
 	  $(SYSTEM_JRE_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
-	 -Xbootclasspath/a:$$CLASSPATH net.sourceforge.jnlp.ServerAccess randomport 
+	 -Xbootclasspath/a:$$CLASSPATH net.sourceforge.jnlp.ServerAccess randomport
+
+run-test-server-on-itwtestsport: stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
+ stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp
+	cd $(TEST_EXTENSIONS_DIR) ; \
+	CLASSPATH=$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) . $(TEST_EXTENSIONS_TESTS_DIR)) ; \
+	  $(SYSTEM_JRE_DIR)/bin/java $(REPRODUCERS_DPARAMETERS) \
+	 -Xbootclasspath/a:$$CLASSPATH net.sourceforge.jnlp.ServerAccess $$ITWTESTSPORT  
 
 clean-netx-tests: clean-netx-unit-tests clean-junit-runner clean-netx-dist-tests clean-test-code-coverage-jacoco
 	if [ -e $(TESTS_DIR)/netx ]; then \

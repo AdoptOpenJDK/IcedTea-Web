@@ -52,12 +52,14 @@ import java.security.PrivilegedAction;
 public class SOPBypass extends Applet {
     private String unrelatedUrl;
     private String reachableResource;
+    private String resourcesUrl;
 
     
     @Override
     public void init(){
         setUnrelatedUrl(this.getParameter("unrelatedUrl"));
         setReachableResource(this.getParameter("reachableResource"));
+        setResourcesUrl(this.getParameter("resourceUrl"));
     }
     
     @Override
@@ -67,6 +69,8 @@ public class SOPBypass extends Applet {
         System.out.println("Codebase URL: " + getCodeBase());
         System.out.println("DocumentBase URL: " + getDocumentBase());
         System.out.println("unrelatedUrl: " + unrelatedUrl);
+        System.out.println("reachableResource: " + reachableResource);
+        System.out.println("resourcesUrl: " + resourcesUrl);
 
         AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             @Override
@@ -75,9 +79,11 @@ public class SOPBypass extends Applet {
                 attemptSocketConnectionToCodebase();
                 attemptSocketConnectionToDocumentBase();
                 attemptSocketConnectionToUnrelated();
+                attemptSocketConnectionToResourcesLoc();
                 attemptUrlConnectionToCodebase();
                 attemptUrlConnectionToDocumentBase();
                 attemptUrlConnectionToUnrelated();
+                attemptUrlConnectionToResourcesLoc();
                 return true;
             }
         });
@@ -99,7 +105,7 @@ public class SOPBypass extends Applet {
 
     void attemptSocketConnectionToCodebase() {
         String host = getCodeBase().getHost();
-        int port = getCodeBase().getPort();;
+        int port = getCodeBase().getPort();
         attemptSocketConnection(host, port, reachableResource, "codeBase", true);
     }
 
@@ -117,6 +123,17 @@ public class SOPBypass extends Applet {
             port=extractPort(unrelatedUrl);
         }
         attemptSocketConnection(host, port, reachableResource, "unrelated", true);
+    }
+    
+    void attemptSocketConnectionToResourcesLoc() {
+        String host = getCodeBase().getHost();
+        int port = getCodeBase().getPort();
+        //if resources url was null, then it was probably from codebase
+        if (resourcesUrl != null){
+            host=extractHost(resourcesUrl);
+            port=extractPort(resourcesUrl);
+        }
+        attemptSocketConnection(host, port, reachableResource, "resource's", true);
     }
 
     void attemptSocketConnection(String host, int port, String resource, String id, boolean sendData) {
@@ -169,6 +186,20 @@ public class SOPBypass extends Applet {
             System.out.println("URLConnection:unrelated false");
         }
     }
+    void attemptUrlConnectionToResourcesLoc() {
+        try {
+            if (resourcesUrl  == null) {
+                //if resources url was null, then it was probably from codebase
+                attemptUrlConnection(getCodeBase(), reachableResource,  "resource's");
+            } else {
+                attemptUrlConnection(new URL(resourcesUrl), reachableResource,  "resource's");
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            System.out.println("resource's URL test failed due to MalformedURLException");
+            System.out.println("URLConnection:resource's false");
+        }
+    }
 
     void attemptUrlConnection(URL url, String resource,  String id) {
         boolean connected = true;
@@ -206,6 +237,9 @@ public class SOPBypass extends Applet {
         if (args.length > 1) {
             sop.setUnrelatedUrl(args[1]);
         }
+        if (args.length > 2) {
+            sop.setResourcesUrl(args[2]);
+        }
         sop.start();
     }
 
@@ -216,6 +250,12 @@ public class SOPBypass extends Applet {
     private void setReachableResource(String s) {
         reachableResource = s;
     }
+
+    public void setResourcesUrl(String resourcesUrl) {
+        this.resourcesUrl = resourcesUrl;
+    }
+    
+    
 
     static private String extractHost(String unrelatedUrl) {
         String s[] = unrelatedUrl.split(":");
