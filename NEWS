@@ -9,6 +9,7 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.7 (2015-XX-XX):
+* all connection restrictions now consider also port
 * Enabled Entry-Point attribute check
 * permissions sandbox and signed app and unsigned app with permissions all-permissions now run in sandbox instead of not at all.
 * fixed DownloadService

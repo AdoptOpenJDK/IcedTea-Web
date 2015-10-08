@@ -1,5 +1,9 @@
 2015-10-08  Jiri Vanek  <jvanek@redhat.com>
 
+	* NEWS: mentioned restriction about ports
+
+2015-10-08  Jiri Vanek  <jvanek@redhat.com>
+
 	Tuned SOP reproducer to check also resource's connection and to work on localhost
 	* .Makefile: added target (run-test-server-on-itwtestsport) which lunches
 	testserver on $ITWTESTSPORT port
