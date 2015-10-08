@@ -1,5 +1,21 @@
 2015-10-07  Jiri Vanek  <jvanek@redhat.com>
 
+	All connection restrictions now consider also port
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: downloadHost redeclared to URL
+	and made final. All set/gets adapted
+	* netx/net/sourceforge/jnlp/Parser.java: (base) passes url to SecurityDesc
+	* netx/net/sourceforge/jnlp/PluginBridge.java: (PluginBridge) same
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: same
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: (getApplet)
+	(getApplets) same
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java:	added methods sanitizePort and
+	getPort, which always returns port. If no port goes in, default port is going
+	out. Added getHostAndPort which returns host also with port.
+	* tests/netx/unit/net/sourceforge/jnlp/SecurityDescTest.java: adapted to new api
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java: tested new methods
+	
+2015-10-07  Jiri Vanek  <jvanek@redhat.com>
+
 	Testserver enhanced to work also in hostname mode or ip mode
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: added enum
 	declared constants for localhost, default protocol (http) and default

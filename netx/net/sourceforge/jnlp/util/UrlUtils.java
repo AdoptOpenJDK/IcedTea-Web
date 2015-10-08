@@ -332,7 +332,19 @@ public class UrlUtils {
         }
     }
     
+    public static int getSanitizedPort(final URL u) {
+        if (u.getPort() < 0) {
+            return u.getDefaultPort();
+        }
+        return u.getPort();
+    }
 
+    public static int getPort(final URL url) {
+        return getSanitizedPort(url);
+    }
 
+    public static String getHostAndPort(final URL url) {
+        return url.getHost() + ":" + getSanitizedPort(url);
+    }
 
 }

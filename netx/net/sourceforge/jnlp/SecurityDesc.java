@@ -22,6 +22,7 @@ import java.lang.reflect.Constructor;
 import java.net.SocketPermission;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.AllPermission;
 import java.security.CodeSource;
 import java.security.Permission;
@@ -33,6 +34,7 @@ import java.util.*;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -132,7 +134,7 @@ public class SecurityDesc {
     private Object type;
 
     /** the download host */
-    private String downloadHost;
+    final private URL downloadHost;
 
     /** whether sandbox applications should get the show window without banner permission */
     private final boolean grantAwtPermissions;
@@ -256,7 +258,7 @@ public class SecurityDesc {
      * @param type the type of security
      * @param downloadHost the download host (can always connect to)
      */
-    public SecurityDesc(JNLPFile file, RequestedPermissionLevel requestedPermissionLevel, Object type, String downloadHost) {
+    public SecurityDesc(JNLPFile file, RequestedPermissionLevel requestedPermissionLevel, Object type, URL downloadHost) {
         if (file == null) {
             throw new NullJnlpFileException();
         }
@@ -278,7 +280,7 @@ public class SecurityDesc {
      * @param type the type of security
      * @param downloadHost the download host (can always connect to)
      */
-    public SecurityDesc(JNLPFile file, Object type, String downloadHost) {
+    public SecurityDesc(JNLPFile file, Object type, URL downloadHost) {
         this(file, RequestedPermissionLevel.NONE, type, downloadHost);
     }
 
@@ -375,9 +377,10 @@ public class SecurityDesc {
             }
         }
 
-        if (downloadHost != null && downloadHost.length() > 0)
-            permissions.add(new SocketPermission(downloadHost,
-                                                 "connect, accept"));
+        if (downloadHost != null && downloadHost.getHost().length() > 0) {
+            permissions.add(new SocketPermission(UrlUtils.getHostAndPort(downloadHost),
+                    "connect, accept"));
+        }
 
         final Collection<Permission> urlPermissions = getUrlPermissions();
         for (final Permission permission : urlPermissions) {

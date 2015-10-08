@@ -622,7 +622,7 @@ public final class Parser {
         }
 
         if (base != null) {
-            return new SecurityDesc(file, requestedPermissionLevel, type, base.getHost());
+            return new SecurityDesc(file, requestedPermissionLevel, type, base);
         } else {
             return new SecurityDesc(file, requestedPermissionLevel, type, null);
         }

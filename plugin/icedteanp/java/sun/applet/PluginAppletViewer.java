@@ -113,6 +113,7 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecurit
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
@@ -887,7 +888,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     public Applet getApplet(String name) {
         name = name.toLowerCase();
         SocketPermission panelSp =
-                new SocketPermission(panel.getCodeBase().getHost(), "connect");
+                new SocketPermission(UrlUtils.getHostAndPort(panel.getCodeBase()), "connect");
         synchronized(appletPanels) {
             for (Enumeration<NetxPanel> e = appletPanels.elements(); e.hasMoreElements();) {
                 AppletPanel p = e.nextElement();
@@ -899,7 +900,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                         p.getDocumentBase().equals(panel.getDocumentBase())) {
 
                     SocketPermission sp =
-                        new SocketPermission(p.getCodeBase().getHost(), "connect");
+                        new SocketPermission(UrlUtils.getHostAndPort(p.getCodeBase()), "connect");
 
                     if (panelSp.implies(sp)) {
                         return p.applet;
@@ -918,7 +919,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
     public Enumeration<Applet> getApplets() {
         Vector<Applet> v = new Vector<Applet>();
         SocketPermission panelSp =
-                new SocketPermission(panel.getCodeBase().getHost(), "connect");
+                new SocketPermission(UrlUtils.getHostAndPort(panel.getCodeBase()), "connect");
 
         synchronized(appletPanels) {
             for (Enumeration<NetxPanel> e = appletPanels.elements(); e.hasMoreElements();) {
@@ -926,7 +927,7 @@ public class PluginAppletViewer extends XEmbeddedFrame
                 if (p.getDocumentBase().equals(panel.getDocumentBase())) {
 
                     SocketPermission sp =
-                        new SocketPermission(p.getCodeBase().getHost(), "connect");
+                        new SocketPermission(UrlUtils.getHostAndPort(p.getCodeBase()), "connect");
                     if (panelSp.implies(sp)) {
                         v.addElement(p.applet);
                     }

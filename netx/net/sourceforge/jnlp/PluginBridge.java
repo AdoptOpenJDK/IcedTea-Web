@@ -224,7 +224,7 @@ public final class PluginBridge extends JNLPFile {
 
         if (main.endsWith(".class")) //single class file only
             security = new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS,
-                                        codebase.getHost());
+                                        codebase);
         else
             security = null;
 

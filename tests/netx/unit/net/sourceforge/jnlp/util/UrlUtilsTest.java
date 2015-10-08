@@ -42,6 +42,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import net.sourceforge.jnlp.annotations.KnownToFail;
 import org.junit.Assert;
@@ -324,6 +325,37 @@ public class UrlUtilsTest {
         Assert.assertFalse(UrlUtils.compareNullableStrings("aaa", "BBB", false));
         Assert.assertFalse(UrlUtils.compareNullableStrings("BBB", "aaa", false));
 
+    }
+    
+    @Test
+    public void sanitizePortTest() throws MalformedURLException {
+        Assert.assertEquals(0, UrlUtils.getSanitizedPort(new URL("http://aaa.cz:0")));
+        Assert.assertEquals(1, UrlUtils.getSanitizedPort(new URL("https://aaa.cz:1")));
+        Assert.assertEquals(100, UrlUtils.getSanitizedPort(new URL("ftp://aaa.cz:100")));
+        //Assert.assertEquals(1001, UrlUtils.getSanitizedPort(new URL("ssh://aaa.cz:1001"))); unknown protocol :(
+        //Assert.assertEquals(22, UrlUtils.getSanitizedPort(new URL("ssh://aaa.cz")));
+        Assert.assertEquals(80, UrlUtils.getSanitizedPort(new URL("http://aaa.cz")));
+        Assert.assertEquals(443, UrlUtils.getSanitizedPort(new URL("https://aaa.cz")));
+        Assert.assertEquals(21, UrlUtils.getSanitizedPort(new URL("ftp://aaa.cz")));
+        
+   }
+
+    public void getPortTest() throws MalformedURLException {
+        Assert.assertEquals(1, UrlUtils.getPort(new URL("http://aa.bb:1")));
+        Assert.assertEquals(10, UrlUtils.getPort(new URL("http://aa.bb:10/aa")));
+        Assert.assertEquals(1000, UrlUtils.getPort(new URL("http://aa.bb:1000/aa.fs")));
+        Assert.assertEquals(443, UrlUtils.getPort(new URL("https://aa.bb/aa.fs")));
+        Assert.assertEquals(80, UrlUtils.getPort(new URL("http://aa.bb")));
+        Assert.assertEquals(80, UrlUtils.getPort(new URL("http://aa.bb:80/a/b/c")));
+    }
+
+    public void getHostAndPortTest() throws MalformedURLException {
+        Assert.assertEquals("aa.bb:2", UrlUtils.getHostAndPort(new URL("http://aa.bb:2")));
+        Assert.assertEquals("aa.bb:12", UrlUtils.getHostAndPort(new URL("http://aa.bb:12/aa")));
+        Assert.assertEquals("aa.bb:1002", UrlUtils.getHostAndPort(new URL("http://aa.bb:1002/aa.fs")));
+        Assert.assertEquals("aa.bb:443", UrlUtils.getHostAndPort(new URL("https://aa.bb/aa.fs")));
+        Assert.assertEquals("aa.bb:80", UrlUtils.getHostAndPort(new URL("http://aa.bb")));
+        Assert.assertEquals("aa.bb:80", UrlUtils.getHostAndPort(new URL("http://aa.bb:80/a/b/c")));
     }
 
 }
