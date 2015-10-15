@@ -49,9 +49,10 @@ public class WinSystemLog implements SingleStreamLogger{
     public void log(String s) {
      //not yet implemented   
     }
- 
-    
       
-
+    @Override
+    public void close() {
+        //nope
+    }
 
 }

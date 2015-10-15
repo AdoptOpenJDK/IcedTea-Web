@@ -58,11 +58,10 @@ public class PrintStreamLogger implements SingleStreamLogger{
     public void setStream(PrintStream stream) {
         this.stream = stream;
     }
-    
-    
- 
-    
-      
 
+    @Override
+    public void close() {
+        stream.flush();
+    }
 
 }

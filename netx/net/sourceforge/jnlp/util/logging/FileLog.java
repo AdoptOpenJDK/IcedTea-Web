@@ -52,6 +52,23 @@ import net.sourceforge.jnlp.util.logging.headers.Header;
  * This class writes log information to file.
  */
 public final class FileLog implements SingleStreamLogger {
+    
+    private static final class SingleStreamLoggerImpl implements SingleStreamLogger {
+
+        public SingleStreamLoggerImpl() {
+        }
+
+        @Override
+        public void log(String s) {
+            //dummy
+        }
+
+        @Override
+        public void close() {
+            //dummy
+        }
+    }
+
     private static SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.S");
     /**"Tue Nov 19 09:43:50 CET 2013"*/
     private static SimpleDateFormat pluginSharedFormatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZ yyyy");
@@ -60,22 +77,33 @@ public final class FileLog implements SingleStreamLogger {
     private final FileHandler fh;
     private static final String defaultloggerName = "IcedTea-Web file-logger";
 
-    public FileLog() {
+      public static SingleStreamLogger createFileLog() {
+        SingleStreamLogger s;
+        try {
+            s = new FileLog();
+        } catch (Exception ex) {
+            //we do not wont to block whole logging just because initialization error in "new FileLog()"
+            OutputController.getLogger().log(ex);
+            s = new SingleStreamLoggerImpl();
+        }
+        return s;
+    }
+    
+    private FileLog() {
         this(false);
     }
     
-     public FileLog(boolean append) {
+    private FileLog(boolean append) {
         this(defaultloggerName, LogConfig.getLogConfig().getIcedteaLogDir() + "itw-javantx-" + getStamp() + ".log", append);
     }
 
-
-     
-    public FileLog(String fileName, boolean append) {
+    // testing constructor 
+    FileLog(String fileName, boolean append) {
         this(fileName, fileName, append);
     }
-     
-    public FileLog(String loggerName, String fileName, boolean append) {
-       try {
+
+    private FileLog(String loggerName, String fileName, boolean append) {
+        try {
            File futureFile = new File(fileName);
            if (!futureFile.exists()) {
                FileUtils.createRestrictedFile(futureFile, true);
@@ -106,6 +134,7 @@ public final class FileLog implements SingleStreamLogger {
         impl.log(Level.FINE, s);
     }
     
+    @Override
     public void close() {
         fh.close();
     }
@@ -121,4 +150,5 @@ public final class FileLog implements SingleStreamLogger {
     public static SimpleDateFormat getPluginSharedFormatter() {
         return pluginSharedFormatter;
     }
+
 }

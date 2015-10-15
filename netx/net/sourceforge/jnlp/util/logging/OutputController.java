@@ -338,9 +338,10 @@ public class OutputController {
         
         //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
-        private static volatile FileLog INSTANCE = new FileLog();
+        private static volatile SingleStreamLogger INSTANCE = FileLog.createFileLog();
     }
-    private FileLog getFileLog() {
+
+    private SingleStreamLogger getFileLog() {
         return FileLogHolder.INSTANCE;
     }
 

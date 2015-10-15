@@ -21,6 +21,7 @@ New in release 1.7 (2015-XX-XX):
 * RH1231441 Unable to read the text of the buttons of the security dialogue
 * Fixed RH1233697 icedtea-web: applet origin spoofing
 * Fixed RH1233667 icedtea-web: unexpected permanent authorization of unsigned applets
+* fixed fatal impact of initialization error of FileLog
 * MissingALACAdialog made available also for unsigned applications (but ignoring actual manifest value) and fixed
 * more dialogs got remember me possibility
   - MissingALACAttributePanel

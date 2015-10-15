@@ -1,3 +1,20 @@
+2015-10-15  Jiri Vanek  <jvanek@redhat.com>
+
+	Broken file logging now dont crash itw
+	* NEWS: mentioned
+	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: Instance now acquired
+	from factory method  (createFileLog) which defaults new SingleStreamLoggerImpl
+	if normal initialization fails.
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: (getFileLog)
+	uses new factory method rather then constructor.
+	* netx/net/sourceforge/jnlp/util/logging/SingleStreamLogger.java: enforces
+	now also close method
+	* netx/net/sourceforge/jnlp/util/logging/PrintStreamLogger.java: impl close
+	* netx/net/sourceforge/jnlp/util/logging/UnixSystemLog.java: impl close
+	* netx/net/sourceforge/jnlp/util/logging/WinSystemLog.java: impl close
+	* netx/net/sourceforge/jnlp/util/logging/headers/PluginMessage.java: removed
+	unused import
+
 2015-10-08  Jiri Vanek  <jvanek@redhat.com>
 
 	* NEWS: mentioned restriction about ports

@@ -37,10 +37,10 @@
 package net.sourceforge.jnlp.util.logging;
 
 public interface SingleStreamLogger {
- 
-    
+     
      
       public  void log(String s);
+      public void close();
 
 
 }
