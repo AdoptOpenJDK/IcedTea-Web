@@ -105,8 +105,8 @@ public class OutputController {
     private static final String NULL_OBJECT = "Trying to log null object";
     private PrintStreamLogger outLog;
     private PrintStreamLogger errLog;
-    private List<MessageWithHeader> messageQue = new LinkedList<MessageWithHeader>();
-    private MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
+    private final List<MessageWithHeader> messageQue = new LinkedList<>();
+    private final MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
     Thread consumerThread;
      /*stdin reader for headless dialogues*/
     private BufferedReader br;
@@ -155,6 +155,9 @@ public class OutputController {
         }
         //clients app's messages are reprinted only to console
         if (s.getHeader().isClientApp){
+            if (LogConfig.getLogConfig().isLogToFile() && LogConfig.getLogConfig().isLogToFileForClientApp()) {
+                getAppFileLog().log(proceedHeader(s));
+            }
             return;
         }
         if (!JNLPRuntime.isDebug() && (s.getHeader().level == Level.MESSAGE_DEBUG
@@ -164,14 +167,7 @@ public class OutputController {
             //must be here to prevent deadlock, casued by exception form jnlpruntime, loggers or configs themselves
             return;
         }
-        String message = s.getMessage();
-        if (LogConfig.getLogConfig().isEnableHeaders()) {
-            if (message.contains("\n")) {
-                message = s.getHeader().toString() + "\n" + message;
-            } else {
-                message = s.getHeader().toString() + " " + message;
-            }
-        }
+        String message = proceedHeader(s);
         if (LogConfig.getLogConfig().isLogToStreams()) {
             if (s.getHeader().level.isOutput()) {
                 outLog.log(message);
@@ -192,6 +188,18 @@ public class OutputController {
             getSystemLog().log(s.getMessage());
         }
 
+    }
+
+    private String proceedHeader(MessageWithHeader s) {
+        String message = s.getMessage();
+        if (LogConfig.getLogConfig().isEnableHeaders()) {
+            if (message.contains("\n")) {
+                message = s.getHeader().toString() + "\n" + message;
+            } else {
+                message = s.getHeader().toString() + " " + message;
+            }
+        }
+        return message;
     }
 
     private OutputController() {
@@ -344,6 +352,18 @@ public class OutputController {
     private SingleStreamLogger getFileLog() {
         return FileLogHolder.INSTANCE;
     }
+    
+    
+    private static class AppFileLogHolder {
+        
+        //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+        //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+        private static volatile SingleStreamLogger INSTANCE = FileLog.createAppFileLog();
+    }
+
+    private SingleStreamLogger getAppFileLog() {
+        return AppFileLogHolder.INSTANCE;
+    }
 
     private static class SystemLogHolder {
 
@@ -402,6 +422,10 @@ public class OutputController {
 
     void setFileLog(SingleStreamLogger fileLog) {
         FileLogHolder.INSTANCE = fileLog;
+    }
+    
+    void setAppFileLog(SingleStreamLogger fileLog) {
+        AppFileLogHolder.INSTANCE = fileLog;
     }
 
     void setOutLog(PrintStreamLogger outLog) {

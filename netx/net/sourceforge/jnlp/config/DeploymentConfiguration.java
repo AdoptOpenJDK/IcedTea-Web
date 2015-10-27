@@ -178,7 +178,8 @@ public final class DeploymentConfiguration {
     public static final String KEY_ENABLE_LOGGING = "deployment.log"; //same as verbose or ICEDTEAPLUGIN_DEBUG=true
     public static final String KEY_ENABLE_LOGGING_HEADERS = "deployment.log.headers"; //will add header OutputContorll.getHeader To all messages
     public static final String KEY_ENABLE_LOGGING_TOFILE = "deployment.log.file";
-    public static final String KEY_ENABLE_LEGACY_LOGBASEDFILELOG = "deployment.log.file.legacylog";    
+    public static final String KEY_ENABLE_APPLICATION_LOGGING_TOFILE ="deployment.log.file.clientapp"; //also client app will log to its separate file
+    public static final String KEY_ENABLE_LEGACY_LOGBASEDFILELOG = "deployment.log.file.legacylog";
     public static final String KEY_ENABLE_LOGGING_TOSTREAMS = "deployment.log.stdstreams";
     public static final String KEY_ENABLE_LOGGING_TOSYSTEMLOG = "deployment.log.system";
     

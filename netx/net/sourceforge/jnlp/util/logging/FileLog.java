@@ -73,14 +73,22 @@ public final class FileLog  {
     public static final SimpleDateFormat pluginSharedFormatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZ yyyy");
     public static final String defaultloggerName = TextsProvider.ITW + " file-logger";
 
+
+    public static SingleStreamLogger createFileLog() {
+        return createFileLog("javantx");
+    }
     
-      public static SingleStreamLogger createFileLog() {
+    public static SingleStreamLogger createAppFileLog() {
+        return createFileLog("clienta");
+    }
+    
+    private static SingleStreamLogger createFileLog(String id) {
         SingleStreamLogger s;
         try {
-            if (LogConfig.getLogConfig().isLegacyLogBasedFileLog()){
-                s = new LogBasedFileLog(defaultloggerName, getFileName(), false);
+            if (LogConfig.getLogConfig().isLegacyLogBasedFileLog()) {
+                s = new LogBasedFileLog(defaultloggerName, getFileName(id), false);
             } else {
-                s = new WriterBasedFileLog(defaultloggerName, getFileName(), false);
+                s = new WriterBasedFileLog(defaultloggerName, getFileName(id), false);
             }
         } catch (Exception ex) {
             //we do not wont to block whole logging just because initialization error in "new FileLog()"
@@ -90,8 +98,8 @@ public final class FileLog  {
         return s;
     }
 
-    private static String getFileName() {
-        return LogConfig.getLogConfig().getIcedteaLogDir() + "itw-javantx-" + getStamp() + ".log";
+    private static String getFileName(String id) {
+        return LogConfig.getLogConfig().getIcedteaLogDir() + "itw-"+id+"-" + getStamp() + ".log";
     }
     
   

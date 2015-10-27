@@ -1,3 +1,20 @@
+2015-10-27  Jiri Vanek  <jvanek@redhat.com>
+
+	Added and by default enabled logging to files for client applications.
+	* netx/net/sourceforge/jnlp/config/Defaults.java: KEY_ENABLE_APPLICATION_LOGGING_TOFILE
+	added and set by default to true
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: declared
+	KEY_ENABLE_APPLICATION_LOGGING_TOFILE
+	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: next to createFileLog
+	can now does also createAppFileLog
+	* netx/net/sourceforge/jnlp/util/logging/LogConfig.java: made aware of
+	KEY_ENABLE_APPLICATION_LOGGING_TOFILE
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: if logging 
+	to file is enabled and logging to file for client applications is enabled
+	then output of client app is sent also to special file. Added new singleton of
+	AppFileLogHolder to keep instance of file log for client app. proceedHeader
+	extracted as separate method to be reused.
+
 2015-10-15  Jiri Vanek  <jvanek@redhat.com>
 
 	Added and by default enabled possibility to write logs directly to
