@@ -1,5 +1,14 @@
 2015-10-27  Jiri Vanek  <jvanek@redhat.com>
 
+	itweb-settings, debugging panel made aware about legacy log and client apps log
+	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java: added checboxes for
+	KEY_ENABLE_APPLICATION_LOGGING_TOFILE and KEY_ENABLE_LEGACY_LOGBASEDFILELOG
+	Cusotm config directory place was a bit repacked to be more compact and more useful.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added labels
+	and tooltips for new checkboxes
+
+2015-10-27  Jiri Vanek  <jvanek@redhat.com>
+
 	Added and by default enabled logging to files for client applications.
 	* netx/net/sourceforge/jnlp/config/Defaults.java: KEY_ENABLE_APPLICATION_LOGGING_TOFILE
 	added and set by default to true
