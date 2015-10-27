@@ -40,13 +40,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
+import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class FileLogTest {
+public class WriterBasedFileLogTest {
 
     private static final File[] loggingTargets = new File[12];
     private static final String line1 = "I'm logged line one";
@@ -59,7 +59,7 @@ public class FileLogTest {
     @BeforeClass
     public static void prepareTmpFiles() throws IOException {
         for (int i = 0; i < loggingTargets.length; i++) {
-            loggingTargets[i] = File.createTempFile("fileLogger", "iteTest");
+            loggingTargets[i] = File.createTempFile("WriterBasedFileLogger", "iteTest");
             loggingTargets[i].deleteOnExit();
         }
         //delete first half of the files, logger should handle both casses
@@ -79,7 +79,7 @@ public class FileLogTest {
     @Test
     public void isAppendingLoggerLoggingOnNotExisitngFile() throws Exception {
         int i = 0;
-        LogBasedFileLog l = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
+        WriterBasedFileLog l = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l.log(line1);
         String s = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r1.evaluate(s));
@@ -88,7 +88,7 @@ public class FileLogTest {
     @Test
     public void isRewritingLoggerLoggingOnNotExisitngFile() throws Exception {
         int i = 1;
-        LogBasedFileLog l = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
+        WriterBasedFileLog l = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l.log(line1);
         String s = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r1.evaluate(s));
@@ -97,12 +97,12 @@ public class FileLogTest {
     @Test
     public void isRewritingLoggerRewritingOnNotExisitngFile() throws Exception {
         int i = 2;
-        LogBasedFileLog l1 = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
+        WriterBasedFileLog l1 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l1.log(line2);
         String s1 = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r2.evaluate(s1));
         l1.close();
-        LogBasedFileLog l2 = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
+        WriterBasedFileLog l2 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l2.log(line3);
         String s2 = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertFalse(r2.evaluate(s2));
@@ -113,12 +113,12 @@ public class FileLogTest {
     @Test
     public void isAppendingLoggerAppendingOnNotExisitngFile() throws Exception {
         int i = 4;
-        LogBasedFileLog l1 = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
+        WriterBasedFileLog l1 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l1.log(line2);
         String s1 = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r2.evaluate(s1));
         l1.close();
-        LogBasedFileLog l2 = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
+        WriterBasedFileLog l2 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l2.log(line3);
         String s2 = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r2.evaluate(s2));
@@ -130,7 +130,7 @@ public class FileLogTest {
     @Test
     public void isAppendingLoggerLoggingOnExisitngFile() throws Exception {
         int i = 6;
-        LogBasedFileLog l = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
+        WriterBasedFileLog l = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l.log(line1);
         String s = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r1.evaluate(s));
@@ -139,7 +139,7 @@ public class FileLogTest {
     @Test
     public void isRewritingLoggerLoggingOnExisitngFile() throws Exception {
         int i = 7;
-        LogBasedFileLog l = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
+        WriterBasedFileLog l = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l.log(line1);
         String s = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r1.evaluate(s));
@@ -148,12 +148,12 @@ public class FileLogTest {
     @Test
     public void isRewritingLoggerRewritingOnExisitngFile() throws Exception {
         int i = 8;
-        LogBasedFileLog l1 = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
+        WriterBasedFileLog l1 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l1.log(line2);
         String s1 = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r2.evaluate(s1));
         l1.close();
-        LogBasedFileLog l2 = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
+        WriterBasedFileLog l2 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l2.log(line3);
         String s2 = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertFalse(r2.evaluate(s2));
@@ -164,12 +164,12 @@ public class FileLogTest {
     @Test
     public void isAppendingLoggerAppendingOnExisitngFile() throws Exception {
         int i = 10;
-        LogBasedFileLog l1 = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
+        WriterBasedFileLog l1 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l1.log(line2);
         String s1 = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r2.evaluate(s1));
         l1.close();
-        LogBasedFileLog l2 = new LogBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
+        WriterBasedFileLog l2 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l2.log(line3);
         String s2 = StreamUtils.readStreamAsString(new FileInputStream(loggingTargets[i]), true);
         Assert.assertTrue(r2.evaluate(s2));

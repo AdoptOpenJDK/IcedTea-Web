@@ -1,5 +1,33 @@
 2015-10-15  Jiri Vanek  <jvanek@redhat.com>
 
+	Added and by default enabled possibility to write logs directly to
+	file without java.util.logging
+	* netx/net/sourceforge/jnlp/config/Defaults.java: (defaults) added new key
+	KEY_ENABLE_LEGACY_LOGBASEDFILELOG, by default false
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: defined
+	KEY_ENABLE_LEGACY_LOGBASEDFILELOG for deployment.log.file.legacylog
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: (exit) catch new exception
+	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: removed all logic.
+	Now serve onl as factory provider of FileLog implementation
+	* netx/net/sourceforge/jnlp/util/logging/LogConfig.java: fixed indentation, made 
+	aware about LOGBASEDFILELOG
+	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: adapted to
+	autocloseable SingleStreamLogger
+	* netx/net/sourceforge/jnlp/util/logging/SingleStreamLogger.java: this interface
+	now extends	AutoCloseable
+	* netx/net/sourceforge/jnlp/util/logging/filelogs/LogBasedFileLog.java: copy 
+	of original FileLog. Writing to file is done via java.util.loggiing engine
+	* netx/net/sourceforge/jnlp/util/logging/filelogs/WriterBasedFileLog.java:
+	writing to file is done by simple buffered writer
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/FileLogTest.java: now tests
+	LogBasedFileLog
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/OutputControllerTest.java:
+	now tests WriterBasedFileLog instead of FileLog
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/WriterBasedFileLogTest.java:
+	Similar set of tests as are in FileLogTest but for WriterBasedFileLog
+
+2015-10-15  Jiri Vanek  <jvanek@redhat.com>
+
 	Broken file logging now dont crash itw
 	* NEWS: mentioned
 	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: Instance now acquired

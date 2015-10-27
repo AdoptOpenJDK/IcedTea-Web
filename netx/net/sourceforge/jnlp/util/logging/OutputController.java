@@ -139,7 +139,7 @@ public class OutputController {
         }
     }
     
-    public void close() {
+    public void close() throws Exception {
         flush();
         if (LogConfig.getLogConfig().isLogToFile()){
             getFileLog().close();
@@ -400,7 +400,7 @@ public class OutputController {
         this.errLog = errLog;
     }
 
-    void setFileLog(FileLog fileLog) {
+    void setFileLog(SingleStreamLogger fileLog) {
         FileLogHolder.INSTANCE = fileLog;
     }
 

@@ -339,6 +339,11 @@ public class Defaults {
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(false)
                 },
+                 {
+                        DeploymentConfiguration.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(false)
+                },
                 {
                         DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSTREAMS,
                         BasicValueValidators.getBooleanValidator(),

@@ -880,7 +880,11 @@ public class JNLPRuntime {
     }
 
     public static void exit(int i) {
-        OutputController.getLogger().close();
+        try {
+            OutputController.getLogger().close();
+        } catch (Exception ex) {
+            //to late
+        }
         System.exit(i);
     }
 

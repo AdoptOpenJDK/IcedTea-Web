@@ -42,6 +42,7 @@ import java.io.PrintStream;
 import java.util.Random;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import org.junit.Assert;
 import org.junit.After;
 import org.junit.Before;
@@ -49,18 +50,18 @@ import org.junit.Test;
 
 public class OutputControllerTest {
 
-    private static String line1 = "I'm logged line one";
-    private static String line2 = "I'm logged line two";
-    private static String line3 = "I'm logged line three";
-    private static String line4 = "I'm logged line four";
-    private static String line5 = "I'm logged line five";
-    private static String line6 = "I'm logged line six";
-    private static RulesFolowingClosingListener.ContainsRule r1 = new RulesFolowingClosingListener.ContainsRule(line1);
-    private static RulesFolowingClosingListener.ContainsRule r2 = new RulesFolowingClosingListener.ContainsRule(line2);
-    private static RulesFolowingClosingListener.ContainsRule r3 = new RulesFolowingClosingListener.ContainsRule(line3);
-    private static RulesFolowingClosingListener.ContainsRule r4 = new RulesFolowingClosingListener.ContainsRule(line4);
-    private static RulesFolowingClosingListener.ContainsRule r5 = new RulesFolowingClosingListener.ContainsRule(line5);
-    private static RulesFolowingClosingListener.ContainsRule r6 = new RulesFolowingClosingListener.ContainsRule(line6);
+    private static final String line1 = "I'm logged line one";
+    private static final String line2 = "I'm logged line two";
+    private static final String line3 = "I'm logged line three";
+    private static final String line4 = "I'm logged line four";
+    private static final String line5 = "I'm logged line five";
+    private static final String line6 = "I'm logged line six";
+    private static final RulesFolowingClosingListener.ContainsRule r1 = new RulesFolowingClosingListener.ContainsRule(line1);
+    private static final RulesFolowingClosingListener.ContainsRule r2 = new RulesFolowingClosingListener.ContainsRule(line2);
+    private static final RulesFolowingClosingListener.ContainsRule r3 = new RulesFolowingClosingListener.ContainsRule(line3);
+    private static final RulesFolowingClosingListener.ContainsRule r4 = new RulesFolowingClosingListener.ContainsRule(line4);
+    private static final RulesFolowingClosingListener.ContainsRule r5 = new RulesFolowingClosingListener.ContainsRule(line5);
+    private static final RulesFolowingClosingListener.ContainsRule r6 = new RulesFolowingClosingListener.ContainsRule(line6);
 
     private static class AccessiblePrintStream extends PrintStream {
 
@@ -201,7 +202,7 @@ public class OutputControllerTest {
 
                     File f = File.createTempFile("replacedFilelogger", "itwTest");
                     f.deleteOnExit();
-                    oc.setFileLog(new FileLog(f.getAbsolutePath(), false));
+                    oc.setFileLog(new WriterBasedFileLog(f.getAbsolutePath(), false));
                     LogConfig.getLogConfig().setLogToFile(true);
 
                     ThreadGroup tg = new ThreadGroup("TerribleGroup");
@@ -322,7 +323,7 @@ public class OutputControllerTest {
         File f2 = File.createTempFile("replacedFilelogger", "itwTest");
         f1.deleteOnExit();
         f2.deleteOnExit();
-        oc.setFileLog(new FileLog(f1.getAbsolutePath(), false));
+        oc.setFileLog(new WriterBasedFileLog(f1.getAbsolutePath(), false));
         LogConfig.getLogConfig().setLogToFile(true);
         oc.log(OutputController.Level.MESSAGE_ALL, line1);
         oc.log(OutputController.Level.ERROR_ALL, line2);
@@ -338,7 +339,7 @@ public class OutputControllerTest {
         Assert.assertTrue(r3.evaluate(s1));
         Assert.assertFalse(r3.evaluate(s2));
 
-        oc.setFileLog(new FileLog(f2.getAbsolutePath(), false));
+        oc.setFileLog(new WriterBasedFileLog(f2.getAbsolutePath(), false));
         oc.log(OutputController.Level.ERROR_ALL, line5);
         oc.log(OutputController.Level.MESSAGE_ALL, line5);
         oc.flush();

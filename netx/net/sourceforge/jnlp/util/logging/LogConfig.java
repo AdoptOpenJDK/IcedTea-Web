@@ -54,30 +54,32 @@ public class LogConfig {
     private boolean logToFile;
     private boolean logToStreams;
     private boolean logToSysLog;
-    
-    private LogConfig() {
-            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-            // Check whether logging and tracing is enabled.
-            enableLogging = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
-            //enagle disable headers
-            enableHeaders = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_HEADERS));
-            //enable/disable individual channels
-            logToFile = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOFILE));
-            logToStreams = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSTREAMS));
-            logToSysLog = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSYSTEMLOG));
+    private boolean legacyLogaAsedFileLog;
 
-            // Get log directory, create it if it doesn't exist. If unable to create and doesn't exist, don't log.
-            icedteaLogDir = PathsAndFiles.LOG_DIR.getFullPath();
-            if (icedteaLogDir != null) {
-                File f = new File(icedteaLogDir);
-                if (f.isDirectory() || f.mkdirs()) {
-                    icedteaLogDir += File.separator;
-                } else {
-                    enableLogging = false;
-                }
+    private LogConfig() {
+        DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+        // Check whether logging and tracing is enabled.
+        enableLogging = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
+        //enagle disable headers
+        enableHeaders = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_HEADERS));
+        //enable/disable individual channels
+        logToFile = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOFILE));
+        logToStreams = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSTREAMS));
+        logToSysLog = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSYSTEMLOG));
+        legacyLogaAsedFileLog = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LEGACY_LOGBASEDFILELOG));
+
+        // Get log directory, create it if it doesn't exist. If unable to create and doesn't exist, don't log.
+        icedteaLogDir = PathsAndFiles.LOG_DIR.getFullPath();
+        if (icedteaLogDir != null) {
+            File f = new File(icedteaLogDir);
+            if (f.isDirectory() || f.mkdirs()) {
+                icedteaLogDir += File.separator;
             } else {
                 enableLogging = false;
             }
+        } else {
+            enableLogging = false;
+        }
     }
 
     private static class LogConfigHolder {
@@ -91,9 +93,11 @@ public class LogConfig {
         return LogConfigHolder.INSTANCE;
     }
 
-    /** For testing only: throw away the previous config */
+    /**
+     * For testing only: throw away the previous config
+     */
     static synchronized void resetLogConfig() {
-            LogConfigHolder.INSTANCE = new LogConfig();
+        LogConfigHolder.INSTANCE = new LogConfig();
     }
 
     public String getIcedteaLogDir() {
@@ -119,11 +123,8 @@ public class LogConfig {
     public boolean isEnableHeaders() {
         return enableHeaders;
     }
-    
-    
-    
-    //package private setters for testing
 
+    //package private setters for testing
     void setEnableHeaders(boolean enableHeaders) {
         this.enableHeaders = enableHeaders;
     }
@@ -151,5 +152,13 @@ public class LogConfig {
     boolean isLogToConsole() {
         return JavaConsole.isEnabled();
     }
-    
+
+    boolean isLegacyLogBasedFileLog() {
+        return legacyLogaAsedFileLog;
+    }
+
+    boolean setLegacyLogBasedFileLog(boolean b) {
+        return legacyLogaAsedFileLog = b;
+    }
+
 }
