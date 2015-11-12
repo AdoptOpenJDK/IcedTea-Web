@@ -1,5 +1,24 @@
 2015-11-12  Jiri Vanek  <jvanek@redhat.com>
 
+	Added and registered and used image spi provider for icons
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: IcoSpi
+	registered during initialization
+	* netx/net/sourceforge/jnlp/tools/ico/IcoReader.java: new class, implementation
+	of ImageReader for icons.
+	* netx/net/sourceforge/jnlp/tools/ico/IcoSpi.java:  new class, implementation
+	of ImageReaderSpi for icons.
+	* netx/net/sourceforge/jnlp/tools/ico/impl/IcoException.java: new class,
+	exception for special cases in ico parsing
+	* netx/net/sourceforge/jnlp/tools/ico/impl/IcoHeader.java: new class, parser
+	and holder of parsed information of header of ico file
+	* netx/net/sourceforge/jnlp/tools/ico/impl/IcoHeaderEntry.java: new class,
+	parser and holder of parsed information of headers of individual images stored
+	in header of ico file
+	* netx/net/sourceforge/jnlp/tools/ico/impl/ImageInputStreamIco.java: parser
+	of icon files from ImageInputStream
+
+2015-11-12  Jiri Vanek  <jvanek@redhat.com>
+
 	Added desktop integration dialog
 	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java: added linux-only
 	button to sow FreeDesktopIntegrationEditorFrame 

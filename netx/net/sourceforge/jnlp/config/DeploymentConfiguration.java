@@ -36,11 +36,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import javax.imageio.spi.IIORegistry;
 
 import javax.naming.ConfigurationException;
 import javax.swing.JOptionPane;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.tools.ico.IcoSpi;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -267,6 +269,14 @@ public final class DeploymentConfiguration {
         userDeploymentFileDescriptor = configFile;
         currentConfiguration = new HashMap<>();
         unchangeableConfiguration = new HashMap<>();
+         try {
+            IcoSpi spi = new IcoSpi();
+            IIORegistry.getDefaultInstance().registerServiceProvider(spi);
+            OutputController.getLogger().log("Ico provider registered correctly.");
+        } catch (Exception ex) {
+            OutputController.getLogger().log("Exception registering ico provider.");
+            OutputController.getLogger().log(ex);
+        }
     }
 
     /**
