@@ -84,7 +84,7 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
     @Override
     protected String getTopPanelText() {
-        return RememberPanel.htmlWrap(R(getTopPanelTextKey()));
+        return htmlWrap(R(getTopPanelTextKey()));
     }
 
     @Override
@@ -99,12 +99,12 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
                 text += "<br>" + R("SUnsignedRejectedBefore", rememberedEntry.getLocalisedTimeStamp());
             }
         }
-        return RememberPanel.htmlWrap(text);
+        return htmlWrap(text);
     }
 
     @Override
     protected String getQuestionPanelText() {
-        return RememberPanel.htmlWrap(R(getQuestionPanelTextKey()));
+        return htmlWrap(R(getQuestionPanelTextKey()));
     }
     
     public static void main(String[] args) throws Exception {

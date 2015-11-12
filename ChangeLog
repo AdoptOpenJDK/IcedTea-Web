@@ -1,5 +1,41 @@
 2015-11-12  Jiri Vanek  <jvanek@redhat.com>
 
+	Added desktop integration dialog
+	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java: added linux-only
+	button to sow FreeDesktopIntegrationEditorFrame 
+	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/Blinker.java:
+	new class, blink colors on selected component
+	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/FreeDesktopIntegrationEditorFrame.java:
+	new class, window to allow managing generated icons, jnlpfiles and shortcuts
+	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/JListUtils.java:
+	new class, provides models, extensions, renderers and listeners for FreeDesktopIntegrationEditorFrame
+	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/Panels.java:
+	new class, provides various encapsulated parts of FreeDesktopIntegrationEditorFrame
+	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/PreviewSelectionJTextPane.java:
+	new class, impelmetation of preview for FreeDesktopIntegrationEditorFrame
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added  Control 
+	Panel - desktop integration manager DIM family
+	* netx/net/sourceforge/jnlp/security/dialogs/SecurityDialogPanel.java: htmlWrap
+	made public
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanel.java:
+	htmlWrapp called from SecurityDialogPanel
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/MatchingALACAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
+	same
+	* tests/netx/unit/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/AppTrustWarningPanelTest.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberPanel.java:
+	remoed reimplemented htmlWrap, same
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: findFreedesktopOrgDesktopPathCatch
+	made public
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPaneModel.java: replacing of chars by html
+	entities extracted to new method escapeHtmlForJTextPane
+
+2015-11-12  Jiri Vanek  <jvanek@redhat.com>
+
 	fixed build and runtime with jdk9
 	* netx/net/sourceforge/jnlp/NetxPanel.java: (init) setting doInit to true
 	replaced by call to setDoInitIfExists

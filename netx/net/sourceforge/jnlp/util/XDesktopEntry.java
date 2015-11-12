@@ -528,7 +528,7 @@ public class XDesktopEntry {
         return fPath;
     }
 
-    private static String findFreedesktopOrgDesktopPathCatch() {
+    public static String findFreedesktopOrgDesktopPathCatch() {
         try {
             return findFreedesktopOrgDesktopPath();
         } catch (Exception ex) {

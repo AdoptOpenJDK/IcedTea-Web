@@ -85,7 +85,7 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
 
     @Override
     protected String getTopPanelText() {
-        return RememberPanel.htmlWrap(Translator.R("ALACAMatchingMainTitle", title, codebase, remoteUrls));
+        return htmlWrap(Translator.R("ALACAMatchingMainTitle", title, codebase, remoteUrls));
     }
 
     @Override

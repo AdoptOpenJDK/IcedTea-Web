@@ -207,7 +207,7 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
         titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.BOLD, 18));
 
         String infoLabelText = getInfoPanelText();
-        JEditorPane infoLabel = new JEditorPane("text/html", RememberPanel.htmlWrap(infoLabelText));
+        JEditorPane infoLabel = new JEditorPane("text/html", htmlWrap(infoLabelText));
         infoLabel.setBackground(infoPanel.getBackground());
         infoLabel.setEditable(false);
         infoLabel.addHyperlinkListener(new HyperlinkListener() {

@@ -49,6 +49,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class RememberPanel extends JPanel implements RemeberActionProvider {
@@ -79,7 +80,7 @@ public class RememberPanel extends JPanel implements RemeberActionProvider {
     private JPanel createCheckBoxPanel() {
         JPanel checkBoxPanel = new JPanel(new BorderLayout());
 
-        permanencyCheckBox = new JCheckBox(htmlWrap(R("SRememberOption")));
+        permanencyCheckBox = new JCheckBox(SecurityDialogPanel.htmlWrap(R("SRememberOption")));
         permanencyCheckBox.addActionListener(permanencyListener());
         checkBoxPanel.add(permanencyCheckBox, BorderLayout.SOUTH);
 
@@ -94,7 +95,7 @@ public class RememberPanel extends JPanel implements RemeberActionProvider {
         applyToAppletButton.setSelected(true);
         applyToAppletButton.setEnabled(false); // Start disabled until 'Remember this option' is selected
 
-        applyToCodeBaseButton = new JRadioButton(htmlWrap(R("SRememberCodebase", codebase)));
+        applyToCodeBaseButton = new JRadioButton(SecurityDialogPanel.htmlWrap(R("SRememberCodebase", codebase)));
         applyToCodeBaseButton.setEnabled(false);
 
         group.add(applyToAppletButton);
@@ -106,10 +107,7 @@ public class RememberPanel extends JPanel implements RemeberActionProvider {
         return matchOptionsPanel;
     }
 
-    public static String htmlWrap(String text) {
-        return "<html>" + text + "</html>";
-    }
-
+  
     // Toggles whether 'match applet' or 'match codebase' options are greyed out
     protected ActionListener permanencyListener() {
         return new ActionListener() {

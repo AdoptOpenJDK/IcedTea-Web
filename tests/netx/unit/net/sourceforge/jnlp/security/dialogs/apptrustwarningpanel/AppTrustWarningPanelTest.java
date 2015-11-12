@@ -13,6 +13,7 @@ import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -137,7 +138,7 @@ public class AppTrustWarningPanelTest {
     public void testHtmlWrap() throws Exception {
         final String testText = "This is some text";
         final String expectedResult = "<html>This is some text</html>";
-        final String actualResult = RememberPanel.htmlWrap(testText);
+        final String actualResult = SecurityDialogPanel.htmlWrap(testText);
         assertEquals("htmlWrap should properly wrap text with HTML tags", expectedResult, actualResult);
     }
 

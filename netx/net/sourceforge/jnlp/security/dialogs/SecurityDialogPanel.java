@@ -81,7 +81,7 @@ public abstract class SecurityDialogPanel extends JPanel {
      * @param s string to be wrapped to html tag
      * @return 
      */
-    protected String htmlWrap(String s) {
+    public  static String htmlWrap(String s) {
         return "<html>" + s + "</html>";
     }
 
