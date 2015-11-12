@@ -204,7 +204,7 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
     }
 
     public void init(PluginBridge bridge) throws LaunchException {
-        doInit = true;
+        setDoInitIfExists(true);
         dispatchAppletEvent(APPLET_LOADING, null);
         status = APPLET_LOAD;
 

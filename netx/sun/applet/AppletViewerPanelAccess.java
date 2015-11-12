@@ -41,6 +41,7 @@ import java.net.URL;
 import java.util.Hashtable;
 import java.util.Map;
 import net.sourceforge.jnlp.NetxPanel;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
 
@@ -131,5 +132,37 @@ public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
     }
 
     abstract protected void ourRunLoader();
+
+    /**
+     * jdk9 removed doInit.
+     * http://hg.openjdk.java.net/jdk9/jdk9/jdk/rev/2b680924a73f This is way how
+     * to set it in older jdks and still compile on jdk9+
+     *
+     * @param a value to set to doInit if it exists
+     */
+    protected void setDoInitIfExists(boolean a) {
+        //doInit = a;
+        try {
+            Class c = this.getClass();
+            Field fs = null;
+            while (c != null) {
+                if (AppletPanel.class.equals(c)) {
+                    fs = c.getDeclaredField("doInit");
+                    break;
+                }
+                //known location is NetxPanel->AppeltViwerPannelAccess->AppletViwerPanel->AppletPanel
+                c = c.getSuperclass();
+            }
+            if (fs == null) {
+                throw new NoSuchFieldException("AppletPanel not found.");
+            }
+            fs.setAccessible(true);
+            fs.set(this, a);
+        } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
+            OutputController.getLogger().log("Can't get/set doInit. Runing on JDK9 or higher?");
+            OutputController.getLogger().log(ex);
+        }
+
+    }
 
 }

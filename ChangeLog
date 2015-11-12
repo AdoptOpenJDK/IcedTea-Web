@@ -1,3 +1,11 @@
+2015-11-12  Jiri Vanek  <jvanek@redhat.com>
+
+	fixed build and runtime with jdk9
+	* netx/net/sourceforge/jnlp/NetxPanel.java: (init) setting doInit to true
+	replaced by call to setDoInitIfExists
+	* netx/sun/applet/AppletViewerPanelAccess.java: added new function of
+	(setDoInitIfExists) which sets doInit if exists
+
 2015-10-27  Jiri Vanek  <jvanek@redhat.com>
 
 	itweb-settings, debugging panel made aware about legacy log and client apps log
