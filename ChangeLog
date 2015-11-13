@@ -1,5 +1,16 @@
 2015-11-13  Jiri Vanek  <jvanek@redhat.com>
 
+	Added reproducer to test ico provider accessibility
+	* tests/reproducers/simple/IcoAccess/resources/IcoAccess.html: html for applet
+	* tests/reproducers/simple/IcoAccess/resources/IcoAccess.jnlp: jnlp for javaws app
+	* tests/reproducers/simple/IcoAccess/srcs/IcoAccess.java: main class
+	* tests/reproducers/simple/IcoAccess/testcases/IcoAccessTest.java: tests
+	applet, appelt via -html and javaws can access ico normaly. javaws -headless
+	can not. Strange.
+
+
+2015-11-13  Jiri Vanek  <jvanek@redhat.com>
+
 	Tested ico implementation
 	* netx/net/sourceforge/jnlp/tools/ico/impl/ImageInputStreamIco.java: added 
 	getImages public method get images to return all parts of ico.
