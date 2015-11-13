@@ -41,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
@@ -66,6 +67,12 @@ public class ImageInputStreamIco {
             images.add(image);
         }
     }
+
+    public List<BufferedImage> getImages() {
+        return Collections.unmodifiableList(images);
+    }
+    
+    
 
     private static void readMask(IcoHeaderEntry e, ImageInputStream src1) throws IOException {
         //acording to spec, behind img bytes, should be another bytes, with AND bitmap.Hoewer, I had not found them.

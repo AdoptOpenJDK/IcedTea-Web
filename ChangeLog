@@ -1,3 +1,13 @@
+2015-11-13  Jiri Vanek  <jvanek@redhat.com>
+
+	Tested ico implementation
+	* netx/net/sourceforge/jnlp/tools/ico/impl/ImageInputStreamIco.java: added 
+	getImages public method get images to return all parts of ico.
+	* tests/netx/unit/net/sourceforge/jnlp/tools/ico/impl/ImageInputStreamIcoTest.java:
+	new class. Added a lot of tests to test ico parsing
+	* tests/netx/unit/net/sourceforge/jnlp/tools/ico/impl/resources/: added 26
+	ico files with various sizes, pallets and recoverable corruptions
+
 2015-11-12  Jiri Vanek  <jvanek@redhat.com>
 
 	Added and registered and used image spi provider for icons
