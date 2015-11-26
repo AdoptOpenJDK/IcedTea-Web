@@ -1,3 +1,15 @@
+2015-11-26  Jiri Vanek  <jvanek@redhat.com>
+
+	Main-class attribute get trimmed by default
+	* netx/net/sourceforge/jnlp/Parser.java: declared MAINCLASS to keep main-class
+	constant, declared anyWhiteSpace regex to determine whitespaces. All possible fields
+	made final, hardcoded main-class replaced bu constant. New method getOptionalMainClass
+	wrapper around getMainClass but consuming exception. getMainClass, new method
+	reading MAINCLASS from node and handling it. cleanMainClassAttribute, new method
+	trim value and do checks to die or warn if necessary.
+	* tests/netx/unit/net/sourceforge/jnlp/ParserTest.java: added tests for top level
+	behavior on various spaced main-classes
+
 2015-11-13  Jiri Vanek  <jvanek@redhat.com>
 
 	Added reproducer to test ico provider accessibility

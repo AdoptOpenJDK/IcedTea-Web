@@ -24,6 +24,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
@@ -40,6 +42,8 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 public final class Parser {
     
     private static String CODEBASE = "codebase";
+    private static String MAINCLASS = "main-class";
+    private static final Pattern anyWhiteSpace = Pattern.compile("\\s");
 
     // defines netx.jnlp.Node class if using Tiny XML or Nano XML
 
@@ -72,29 +76,29 @@ public final class Parser {
     // constructors
     //
     /** the file reference */
-    private JNLPFile file; // do not use (uninitialized)
+    private final JNLPFile file; // do not use (uninitialized)
 
     /** the root node */
-    private Node root;
+    private final Node root;
 
     /** the specification version */
-    private Version spec;
+    private final Version spec;
 
     /** the base URL that all hrefs are relative to */
-    private URL base;
+    private final URL base;
 
     /** the codebase URL */
     private URL codebase;
 
     /** the file URL */
-    private URL fileLocation;
+    private final URL fileLocation;
 
     /** whether to throw errors on non-fatal errors. */
-    private boolean strict; // if strict==true parses a file with no error then strict==false should also
+    private final boolean strict; // if strict==true parses a file with no error then strict==false should also
 
     /** whether to allow extensions to the JNLP specification */
-    private boolean allowExtensions; // true if extensions to JNLP spec are ok
-
+    private final boolean allowExtensions; // true if extensions to JNLP spec are ok
+    
     /**
      * Create a parser for the JNLP file. If the location
      * parameters is not null it is used as the default codebase
@@ -687,7 +691,7 @@ public final class Parser {
      */
     private AppletDesc getApplet(Node node) throws ParseException {
         String name = getRequiredAttribute(node, "name", R("PUnknownApplet"));
-        String main = getRequiredAttribute(node, "main-class", null);
+        String main = getMainClass(node, true);
         URL docbase = getURL(node, "documentbase", base);
         Map<String, String> paramMap = new HashMap<>();
         int width = 0;
@@ -718,7 +722,7 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private ApplicationDesc getApplication(Node node) throws ParseException {
-        String main = getAttribute(node, "main-class", null);
+        String main = getMainClass(node, false);
         List<String> argsList = new ArrayList<>();
 
         // if (main == null)
@@ -766,7 +770,7 @@ public final class Parser {
      * @return the installer descriptor.
      */
     private InstallerDesc getInstaller(Node node) {
-        String main = getAttribute(node, "main-class", null);
+        String main = getOptionalMainClass(node);
 
         return new InstallerDesc(main);
     }
@@ -1339,4 +1343,59 @@ public final class Parser {
         }
     }
 
+  private String getOptionalMainClass(Node node) {
+        try {
+            return getMainClass(node, false);
+        } catch (ParseException ex) {
+            //only getRequiredAttribute can throw this
+            //and as there is call to getMainClass  with required false
+            //it is not going to be thrown
+            OutputController.getLogger().log(ex);
+            return null;
+        }
+    }
+
+    private String getMainClass(Node node, boolean required) throws ParseException {
+        String main;
+        if (required) {
+            main = getRequiredAttribute(node, MAINCLASS, null);
+        } else {
+            main = getAttribute(node, MAINCLASS, null);
+        }
+        return cleanMainClassAttribute(main);
+    }
+
+    private String cleanMainClassAttribute(String main) throws ParseException {
+        if (main != null) {
+            Matcher matcher = anyWhiteSpace.matcher(main);
+            boolean found = matcher.find();
+            if (found && !strict) {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Warning! main-class contains whitespace - '" + main + "'");
+                main = main.trim();
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Trimmed - '" + main + "'");
+            }
+            boolean valid = true;
+            if (!Character.isJavaIdentifierStart(main.charAt(0))) {
+                valid = false;
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Invlaid char in main-class: '" + main.charAt(0) + "'");
+            }
+            for (int i = 1; i < main.length(); i++) {
+                if (main.charAt(i)=='.'){
+                    //dot connects identifiers
+                    continue;
+                }
+                if (!Character.isJavaIdentifierPart(main.charAt(i))) {
+                    valid = false;
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Invlaid char in main-class: '" + main.charAt(i) + "'");
+                }
+            }
+            if (!valid) {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "main-class contains invalid characters - '" + main + "'. Check with vendor.");
+                if (strict) {
+                    throw new ParseException("main-class contains invalid characters - '" + main + "'. Check with vendor. You are in strict mode. This is fatal.");
+                }
+            }
+        }
+        return main;
+    }
 }

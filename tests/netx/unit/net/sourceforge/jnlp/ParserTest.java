@@ -59,6 +59,8 @@ public class ParserTest {
     private static final Locale ALL_LOCALE = new Locale(LANG, COUNTRY, VARIANT);
 
     ParserSettings defaultParser=new ParserSettings();
+    ParserSettings strictParser=new ParserSettings(true, true, true);
+    
     @Test(expected = MissingInformationException.class)
     public void testMissingInfoFullLocale() throws ParseException {
         String data = "<jnlp></jnlp>\n";
@@ -1439,4 +1441,193 @@ public class ParserTest {
         Assert.assertEquals(true, eex != null);
         Assert.assertEquals(true, eex instanceof ParseException);
     }
+    
+    
+    @Test
+    public void testNullMainClassApplication() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<application-desc>\n"
+                + "</application-desc>\n"
+                + "</jnlp>";
+
+        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String main1 = parser1.getLauncher(root1).getMainClass();
+        Assert.assertEquals(null, main1);
+        
+        //strict also ok
+        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, defaultParser, null);
+        String main2 = parser2.getLauncher(root2).getMainClass();
+        Assert.assertEquals(null, main2);
+
+    }
+    
+    @Test
+    public void testNullMainClassInstaller() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<installer-desc>\n"
+                + "</installer-desc>\n"
+                + "</jnlp>";
+
+        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String main1 = parser1.getLauncher(root1).getMainClass();
+        Assert.assertEquals(null, main1);
+        
+        //strict also ok
+        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        String main2 = parser2.getLauncher(root2).getMainClass();
+        Assert.assertEquals(null, main2);
+
+    }
+    
+      @Test(expected = ParseException.class)
+    public void testNullMainClassApplet() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<applet-desc>\n"
+                + "</applet-desc>\n"
+                + "</jnlp>";
+
+        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        parser1.getLauncher(root1).getMainClass();
+        //both throw
+    }
+    
+    
+    @Test
+    public void testOkMainClassApplication() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<application-desc main-class=\"some.main.class\">\n"
+                + "</application-desc>\n"
+                + "</jnlp>";
+
+        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String main1 = parser1.getLauncher(root1).getMainClass();
+        Assert.assertEquals("some.main.class", main1);
+        
+        //strict also ok
+        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        String main2 = parser2.getLauncher(root2).getMainClass();
+        Assert.assertEquals("some.main.class", main2);
+
+    }
+    
+    
+     @Test(expected = ParseException.class)
+    public void testNeedToBeTrimmed1MainClassApplication() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<application-desc main-class=\"  some.main.class  \">\n"
+                + "</application-desc>\n"
+                + "</jnlp>";
+
+        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String main1 = parser1.getLauncher(root1).getMainClass();
+        Assert.assertEquals("some.main.class", main1);
+        
+        //strict throws
+        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        parser2.getLauncher(root2).getMainClass();
+
+    }
+    
+    @Test(expected = ParseException.class)
+    public void testNeedToBeTrimmed2MainClassApplication() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<application-desc main-class=\"\nsome.main.class\t\">\n"
+                + "</application-desc>\n"
+                + "</jnlp>";
+
+        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String main1 = parser1.getLauncher(root1).getMainClass();
+        Assert.assertEquals("some.main.class", main1);
+        
+        //strict throws
+        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        parser2.getLauncher(root2).getMainClass();
+
+    }
+    
+    @Test(expected = ParseException.class)
+    public void testSpacesInsidePersistedMainClassApplication() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<application-desc main-class=\"\nsom e.main .class\t\">\n"
+                + "</application-desc>\n"
+                + "</jnlp>";
+
+        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String main1 = parser1.getLauncher(root1).getMainClass();
+        Assert.assertEquals("som e.main .class", main1);
+        
+        //strict throws
+        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        parser2.getLauncher(root2).getMainClass();
+    }
+    
+    @Test(expected = ParseException.class)
+    public void testSpacesAroundDots() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<application-desc main-class=\"\nsome\t.\nanother . main\t.class. here\t\">\n"
+                + "</application-desc>\n"
+                + "</jnlp>";
+
+        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String main1 = parser1.getLauncher(root1).getMainClass();
+        Assert.assertEquals("some . another . main .class. here", main1);
+        
+        //strict throws
+        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        parser2.getLauncher(root2).getMainClass();
+    }
+
 }
