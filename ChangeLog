@@ -1,3 +1,8 @@
+2015-11-27  Jiri Vanek  <jvanek@redhat.com>
+
+	ParserTest sielnced
+	* tests/netx/unit/net/sourceforge/jnlp/ParserTest.java: now extends NoStdOutErrTest
+
 2015-11-26  Jiri Vanek  <jvanek@redhat.com>
 
 	Main-class attribute get trimmed by default

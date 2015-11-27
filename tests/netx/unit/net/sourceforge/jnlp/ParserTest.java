@@ -44,12 +44,13 @@ import java.util.List;
 import java.util.Locale;
 
 import net.sourceforge.jnlp.mock.MockJNLPFile;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 /** Test various corner cases of the parser */
-public class ParserTest {
+public class ParserTest extends NoStdOutErrTest {
 
     private static final String LANG = "en";
     private static final String COUNTRY = "CA";
