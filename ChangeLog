@@ -1,3 +1,7 @@
+2015-12-02  Jiri Vanek  <jvanek@redhat.com>
+
+	* NEWS: mentioned main-class handling change
+
 2015-11-27  Jiri Vanek  <jvanek@redhat.com>
 
 	ParserTest sielnced

@@ -33,6 +33,8 @@ New in release 1.7 (2015-XX-XX):
 * NetX
   - fixed issues with -html shortcuts
   - fixed issue with -html receiving garbage in width and height
+  - main-class attribute trimmed by default
+  - in strict mode, main-class attribute checked for invalid characters
 * PolicyEditor
   - Entry list is sorted, entries will appear with consistent ordering
   - file flag made to work when used standalone
