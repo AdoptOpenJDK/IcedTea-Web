@@ -1,5 +1,25 @@
 2015-12-23  Jiri Vanek  <jvanek@redhat.com>
 
+	Added base logic and design for rememberable dialogues editor.
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java:
+	(windowGainedFocus) added Override annotation
+	* netx/net/sourceforge/jnlp/controlpanel/ClassFinder.java: new class. Responsible
+	for searching of all RememberableDialog implementations on classpath
+	* netx/net/sourceforge/jnlp/controlpanel/RemmeberableDialogueEditor.java:
+	Desaigned, for now nearly no-op dialog to modify state of (not)remembered dialogues
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java:
+	first column of extended security table made read only again.
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	Click on read only columns of extended security table make  RemmeberableDialogueEditor
+	pop up.
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/AppletSecurityActions.java:
+	added api to remove keys from main map.
+	* tests/netx/unit/net/sourceforge/jnlp/controlpanel/ClassFinderTest.java:
+	new class, added tests for ClassFinder
+
+
+2015-12-23  Jiri Vanek  <jvanek@redhat.com>
+
 	Small properties parser in C (plugin) now unescapes \= \\ \: \t \n and \r correctly
 	* plugin/icedteanp/IcedTeaParseProperties.cc: (get_property_value) now unescape
 	known escape sequences by calling IcedTeaPluginUtilities::unescape

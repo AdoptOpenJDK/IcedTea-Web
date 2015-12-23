@@ -103,7 +103,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
         }
         //FIXME add editor
         if (columnIndex == 0) {
-            return true; 
+            return false; 
         }
         if (getValueAt(rowIndex, columnIndex - 1) == null || getValueAt(rowIndex, columnIndex - 1).toString().trim().isEmpty()) {
             return false;

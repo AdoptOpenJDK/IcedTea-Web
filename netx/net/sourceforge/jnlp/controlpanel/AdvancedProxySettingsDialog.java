@@ -23,7 +23,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -81,6 +80,7 @@ public class AdvancedProxySettingsDialog extends JDialog {
         WindowAdapter adapter = new WindowAdapter() {
             private boolean gotFocus = false;
 
+            @Override
             public void windowGainedFocus(WindowEvent we) {
                 // Once window gets focus, set initial focus
                 if (!gotFocus) {

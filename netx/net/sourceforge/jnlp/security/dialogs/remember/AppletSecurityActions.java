@@ -195,6 +195,14 @@ public class AppletSecurityActions implements Iterable<SavedRememberAction> {
     public void setAction(String i, SavedRememberAction a) {
         actions.put(i, a);
     }
+    
+    public void removeAction(Class clazz) {
+        removeAction(classToKey(clazz));
+    }
+
+    public void removeAction(String i) {
+        actions.remove(i);
+    }
 
     @Override
     public String toString() {

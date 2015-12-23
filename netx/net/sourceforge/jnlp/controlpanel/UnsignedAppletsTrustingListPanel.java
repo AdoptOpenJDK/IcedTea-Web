@@ -41,6 +41,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,6 +71,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import javax.swing.ListCellRenderer;
@@ -726,7 +729,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
     }
 
     private JTable createTable(final TableModel model) {
-        JTable jt = new JTable() {
+        final JTable jt = new JTable() {
             @Override
             public TableCellEditor getCellEditor(int row, int column) {
                 int columnx = convertColumnIndexToModel(column);
@@ -774,6 +777,19 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         };
         jt.setRowHeight(jt.getRowHeight() + jt.getRowHeight() / 2);
         jt.setModel(model);
+        
+        jt.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount()>1 & jt.getSelectedRowCount() == 1){
+                    JDialog d = new RemmeberableDialogueEditor((JFrame)null, true, jt.getModel().getValueAt(jt.getSelectedRow(), 0));
+               
+                    d.setVisible(true);
+                }
+            }
+            
+});
         return jt;
 
     }
