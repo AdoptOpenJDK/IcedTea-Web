@@ -115,6 +115,29 @@ TEST(trim) {
 	CHECK_EQUAL("te \n stX", toBeTrimmed3);
 }
 
+TEST(unescape1) {
+	std::string toBeEscaped = std::string("he\\\\=llo\\=my=boy\\\\ who :liv\\es in\\: space \\ and \\\\likes\\");
+    /*he\\=llo\=my=boy\\ who :liv\es in\: space \ and \\likes\  */ 
+	IcedTeaPluginUtilities::unescape(toBeEscaped);
+    /* \\= -> \= , \= -> = ,  \\ -> \ , \e -> \e ,  \: -> : ,  \ -> \ ,  \\ -> \*/
+    /*he\=llo=my=boy\ who :liv\es in: space \ and \likes\  */ 
+	CHECK_EQUAL("he\\=llo=my=boy\\ who :liv\\es in: space \\ and \\likes\\", toBeEscaped);
+}
+
+TEST(unescape2) {
+	std::string toBeEscaped = std::string("w1\\tw2\\\\tw3\\nw4\\\\nw5\\=");
+    /*w1\tw2\\tw3\nw4\\nw5\=*/ 
+	IcedTeaPluginUtilities::unescape(toBeEscaped);
+    /*w1TABw2\tw3NWLINEw4\nw5=*/
+	CHECK_EQUAL("w1\tw2\\tw3\nw4\\nw5=", toBeEscaped);
+}
+
+TEST(unescape3) {
+	std::string toBeEscaped = std::string("w1\\rw2\\\\rw3=");
+    IcedTeaPluginUtilities::unescape(toBeEscaped);
+	CHECK_EQUAL("w1\rw2\\rw3=", toBeEscaped);
+}
+
 
 /* Creates a temporary file with the specified contents */
 static std::string temporary_file(const std::string& contents) {

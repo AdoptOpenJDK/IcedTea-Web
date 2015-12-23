@@ -1,3 +1,18 @@
+2015-12-23  Jiri Vanek  <jvanek@redhat.com>
+
+	Small properties parser in C (plugin) now unescapes \= \\ \: \t \n and \r correctly
+	* plugin/icedteanp/IcedTeaParseProperties.cc: (get_property_value) now unescape
+	known escape sequences by calling IcedTeaPluginUtilities::unescape
+	* plugin/icedteanp/IcedTeaPluginUtils.cc: implemented (unescape) which unescape
+	known properties escape sequences
+	* plugin/icedteanp/IcedTeaPluginUtils.h: declared (unescape)
+	* tests/cpp-unit-tests/IcedTeaParsePropertiesTest.cc: ((get_property_value))
+	added testcase which verifies unnescape of escaped sequences from  get_property_value 
+	* tests/cpp-unit-tests/IcedTeaPluginUtilsTest.cc: added family of (unescape) tests
+	* /tests/reproducers/signed/CheckPluginParams: reproducer to verify if params
+	from -D in deployment.plugin.jvm.arguments get correctly unescaped during its
+	way up to users program.
+
 2015-12-02  Jiri Vanek  <jvanek@redhat.com>
 
 	* NEWS: mentioned main-class handling change

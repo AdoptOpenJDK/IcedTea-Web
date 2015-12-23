@@ -95,6 +95,7 @@ bool  get_property_value(string c, string& dest){
 	int l = c.length();
 	dest = c.substr(i+1, l-i);
 	IcedTeaPluginUtilities::trim(dest);
+	IcedTeaPluginUtilities::unescape(dest);
 	return true;
 }
 

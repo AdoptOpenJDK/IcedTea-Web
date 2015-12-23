@@ -431,6 +431,8 @@ class IcedTeaPluginUtilities
 
         /*cutting whitespaces from end and start of string*/
         static void trim(std::string& str);
+        /*Unescape various escaped chars like \\ -> \ or \= -> =  or \: -> \*/
+        static void unescape(std::string& str);
         static bool file_exists(std::string filename);
         static bool is_directory(std::string filename);
         //file-loggers helpers

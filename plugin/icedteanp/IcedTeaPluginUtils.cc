@@ -1148,6 +1148,55 @@ void IcedTeaPluginUtilities::trim(std::string& str) {
 	str = str.substr(start, end - start + 1);
 }
 
+/*Unescape various escaped chars like \\ -> \ or \= -> =  or \: -> , \t -> TAB ,  \n -> NwLine\*/
+
+/* examples
+ *  \\= -> \=
+ *  \=  -> =
+ *  \\  -> \
+ *  \e  -> \e
+ *  \:  -> :
+ *  \   -> \
+ *  \\  ->  \
+ */
+void IcedTeaPluginUtilities::unescape(std::string& str) {
+    std::string result = "";
+    int len = str.length();
+    for (unsigned int i = 0; i < len; i++) {
+        bool processed = false;
+        char c1 = str[i];
+        if (c1 == '\\') {
+            if (i < len - 1) {
+                char c2 = str[i + 1];
+                if (c2 == '=' || c2 == '\\' || c2 == ':') {
+                    result += c2;
+                    i++;
+                    processed = true;
+                }
+                if (c2 == 't') {
+                    result += '\t';
+                    i++;
+                    processed = true;
+                }
+                if (c2 == 'n') {
+                    result += '\n';
+                    i++;
+                    processed = true;
+                }
+                if (c2 == 'r') {
+                    result += '\r';
+                    i++;
+                    processed = true;
+                }
+            }
+        }
+        if (!processed) {
+            result += c1;
+        }
+    }
+    str = result;
+}
+
 std::string IcedTeaPluginUtilities::NPIdentifierAsString(NPIdentifier id) {
     NPUTF8* cstr = browser_functions.utf8fromidentifier(id);
     if (cstr == NULL) {

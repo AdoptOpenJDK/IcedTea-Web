@@ -119,6 +119,11 @@ TEST(get_property_value) {
 	a = get_property_value("better.key but errornous value  ",dest);
 	CHECK_EQUAL("", dest);
 	CHECK_EQUAL(a, false);
+
+	dest = string("");
+	a = get_property_value("key=nice\\=value=\\\\=with\\tescapes",dest);
+	CHECK_EQUAL("nice=value=\\=with\tescapes", dest);
+	CHECK_EQUAL(a, true);
 }
 
 TEST(starts_with) {
