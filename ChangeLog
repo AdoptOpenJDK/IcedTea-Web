@@ -1,3 +1,8 @@
+2016-01-05  Jiri Vanek  <jvanek@redhat.com>
+
+	* NEWS: mentioned PR2779
+	* html-gen.sh: now don't generate mercurial changesets' links if .hg is missing
+
 2015-12-23  Jiri Vanek  <jvanek@redhat.com>
 
 	Added base logic and design for rememberable dialogues editor.

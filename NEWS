@@ -13,6 +13,7 @@ New in release 1.7 (2015-XX-XX):
 * Enabled Entry-Point attribute check
 * permissions sandbox and signed app and unsigned app with permissions all-permissions now run in sandbox instead of not at all.
 * fixed DownloadService
+* PR2779: html-gen.sh: Don't try to call hg if .hg directory isn't present
 * comments in deployment.properties now should persists load/save
 * fixed bug in caching of files with query
 * fixed issues with recreating of existing shortcut
