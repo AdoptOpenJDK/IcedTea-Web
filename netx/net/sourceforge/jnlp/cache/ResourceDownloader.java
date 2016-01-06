@@ -57,8 +57,8 @@ public class ResourceDownloader implements Runnable {
      * HttpURLConnection.HTTP_OK and null if not.
      * @throws IOException
      */
-    static CodeWithRedirect getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, ResourceTracker.RequestMethods requestMethod) throws IOException {
-        CodeWithRedirect result = new CodeWithRedirect();
+    static UrlRequestResult getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, ResourceTracker.RequestMethods requestMethod) throws IOException {
+        UrlRequestResult result = new UrlRequestResult();
         URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(url);
 
         for (Map.Entry<String, String> property : requestProperties.entrySet()) {
@@ -92,6 +92,9 @@ public class ResourceDownloader implements Runnable {
         }
         ConnectionFactory.getConnectionFactory().disconnect(connection);
 
+        result.lastModified = connection.getLastModified();
+        result.length = connection.getContentLengthLong();
+
         return result;
 
     }
@@ -120,7 +123,7 @@ public class ResourceDownloader implements Runnable {
 
     private void initializeOnlineResource() {
         try {
-            URL finalLocation = findBestUrl(resource);
+            UrlRequestResult finalLocation = findBestUrl(resource);
             if (finalLocation != null) {
                 initializeFromURL(finalLocation);
             } else {
@@ -136,18 +139,25 @@ public class ResourceDownloader implements Runnable {
         }
     }
 
-    private void initializeFromURL(URL location) throws IOException {
+    private void initializeFromURL(UrlRequestResult location) throws IOException {
         CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
         try {
-            resource.setDownloadLocation(location);
-            URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location); // this won't change so should be okay not-synchronized
+            resource.setDownloadLocation(location.URL);
+            URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location.URL); // this won't change so should be okay not-synchronized
             connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
-            long size = connection.getContentLengthLong();
+            Long size = location.length;
+            if (size == null) {
+                size = connection.getContentLengthLong();
+            }
+            Long lm = location.lastModified;
+            if (lm == null) {
+                lm = connection.getLastModified();
+            }
 
-            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), connection.getLastModified()) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
+            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
             if (!current) {
                 if (entry.isCached()) {
                     entry.markForDelete();
@@ -168,14 +178,15 @@ public class ResourceDownloader implements Runnable {
                 resource.changeStatus(EnumSet.of(PRECONNECT, CONNECTING), EnumSet.of(CONNECTED, PREDOWNLOAD));
 
                 // check if up-to-date; if so set as downloaded
-                if (current)
+                if (current) {
                     resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
+                }
             }
 
             // update cache entry
             if (!current) {
-                entry.setRemoteContentLength(connection.getContentLengthLong());
-                entry.setLastModified(connection.getLastModified());
+                entry.setRemoteContentLength(size);
+                entry.setLastModified(lm);
             }
 
             entry.setLastUpdated(System.currentTimeMillis());
@@ -225,14 +236,14 @@ public class ResourceDownloader implements Runnable {
     }
 
     /**
-     * Returns the 'best' valid URL for the given resource.
-     * This first adjusts the file name to take into account file versioning
-     * and packing, if possible.
+     * Returns the 'best' valid URL for the given resource. This first adjusts
+     * the file name to take into account file versioning and packing, if
+     * possible.
      *
      * @param resource the resource
      * @return the best URL, or null if all failed to resolve
      */
-    protected URL findBestUrl(Resource resource) {
+    protected UrlRequestResult findBestUrl(Resource resource) {
         DownloadOptions options = resource.getDownloadOptions();
         if (options == null) {
             options = new DownloadOptions(false, false);
@@ -242,7 +253,6 @@ public class ResourceDownloader implements Runnable {
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Finding best URL for: " + resource.getLocation() + " : " + options.toString());
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "All possible urls for "
                 + resource.toString() + " : " + urls);
-
         for (ResourceTracker.RequestMethods requestMethod : ResourceTracker.RequestMethods.getValidRequestMethods()) {
             for (int i = 0; i < urls.size(); i++) {
                 URL url = urls.get(i);
@@ -250,13 +260,13 @@ public class ResourceDownloader implements Runnable {
                     Map<String, String> requestProperties = new HashMap<>();
                     requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
 
-                    CodeWithRedirect response = getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod);
-                    if (response.shouldRedirect()){
+                    UrlRequestResult response = getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod);
+                    if (response.shouldRedirect()) {
                         if (response.URL == null) {
                             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Although " + resource.toString() + " got redirect " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm() + " the target was null. Not following");
                         } else {
-                            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Resource " + resource.toString() + " got redirect " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm() + " adding " + response.URL.toExternalForm()+" to list of possible urls");
-                            if (!JNLPRuntime.isAllowRedirect()){
+                            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Resource " + resource.toString() + " got redirect " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm() + " adding " + response.URL.toExternalForm() + " to list of possible urls");
+                            if (!JNLPRuntime.isAllowRedirect()) {
                                 throw new RedirectionException("The resource " + url.toExternalForm() + " is being redirected (" + response.result + ") to " + response.URL.toExternalForm() + ". This is disabled by default. If you wont to allow it, run javaws with -allowredirect parameter.");
                             }
                             urls.add(response.URL);
@@ -265,7 +275,11 @@ public class ResourceDownloader implements Runnable {
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "For " + resource.toString() + " the server returned " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm());
                     } else {
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
-                        return url; /* This is the best URL */
+                        if (response.URL == null) {
+                            response.URL = url;
+                        }
+                        return response; /* This is the best URL */
+
                     }
                 } catch (IOException e) {
                     // continue to next candidate
@@ -289,18 +303,17 @@ public class ResourceDownloader implements Runnable {
 
             String contentEncoding = connection.getContentEncoding();
 
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading " + downloadTo + " using " +
-                    downloadFrom + " (encoding : " + contentEncoding + ") ");
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading " + downloadTo + " using "
+                    + downloadFrom + " (encoding : " + contentEncoding + ") ");
 
-            boolean packgz = "pack200-gzip".equals(contentEncoding) ||
-                    downloadFrom.getPath().endsWith(".pack.gz");
+            boolean packgz = "pack200-gzip".equals(contentEncoding)
+                    || downloadFrom.getPath().endsWith(".pack.gz");
             boolean gzip = "gzip".equals(contentEncoding);
 
             // It's important to check packgz first. If a stream is both
             // pack200 and gz encoded, then con.getContentEncoding() could
             // return ".gz", so if we check gzip first, we would end up
             // treating a pack200 file as a jar file.
-
             if (packgz) {
                 downloadPackGzFile(resource, connection, new URL(downloadFrom + ".pack.gz"), downloadTo);
             } else if (gzip) {
@@ -380,7 +393,7 @@ public class ResourceDownloader implements Runnable {
                 resource.incrementTransferred(rlen);
                 out.write(buf, 0, rlen);
             }
-            
+
             in.close();
         }
     }
@@ -393,14 +406,14 @@ public class ResourceDownloader implements Runnable {
         try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                 .getCacheFile(compressedLocation, version)))) {
             InputStream inputStream = new BufferedInputStream(gzInputStream);
-            
+
             BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(CacheUtil
                     .getCacheFile(uncompressedLocation, version)));
-            
+
             while (-1 != (rlen = inputStream.read(buf))) {
                 outputStream.write(buf, 0, rlen);
             }
-            
+
             outputStream.close();
             inputStream.close();
         }
@@ -412,29 +425,51 @@ public class ResourceDownloader implements Runnable {
         try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                 .getCacheFile(compressedLocation, version)))) {
             InputStream inputStream = new BufferedInputStream(gzInputStream);
-            
+
             JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(CacheUtil
                     .getCacheFile(uncompressedLocation, version)));
-            
+
             Pack200.Unpacker unpacker = Pack200.newUnpacker();
             unpacker.unpack(inputStream, outputStream);
-            
+
             outputStream.close();
             inputStream.close();
         }
     }
 
     /**
-     * Complex wrapper around return code with utility methods
-     * Default is HTTP_OK
+     * Complex wrapper around url request Contains return code (default is
+     * HTTP_OK), length and last modified
+     *
+     * The storing of redirect target is quite obvious The storing length and
+     * last modified may be not, but appearently
+     * (http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=2591) the url
+     * conenction is not always chaced as expected, and so another request may
+     * be sent when length and lastmodified are checked
+     *
      */
-    private static class CodeWithRedirect {
+    static class UrlRequestResult {
 
         int result = HttpURLConnection.HTTP_OK;
         URL URL;
 
+        Long lastModified;
+        Long length;
+
+        public UrlRequestResult() {
+        }
+
+        public UrlRequestResult(URL URL) {
+            this.URL = URL;
+        }
+
+        URL getURL() {
+            return URL;
+        }
+
         /**
-         *  @return  whether the result code is redirect one. Rigth now 301-303 and 307-308
+         * @return whether the result code is redirect one. Rigth now 301-303
+         * and 307-308
          */
         public boolean shouldRedirect() {
             return (result == 301
@@ -445,10 +480,19 @@ public class ResourceDownloader implements Runnable {
         }
 
         /**
-         * @return  whether the return code is OK one - anything except <200,300)
+         * @return whether the return code is OK one - anything except <200,300)
          */
         public boolean isInvalid() {
             return (result < 200 || result >= 300);
+        }
+
+        @Override
+        public String toString() {
+            return ""
+                    + "url: " + (URL == null ? "null" : URL.toExternalForm()) + "; "
+                    + "result:" + result + "; "
+                    + "lastModified: " + (lastModified == null ? "null" : lastModified.toString()) + "; "
+                    + "length: " + length == null ? "null" : length.toString() + "; ";
         }
     }
 
@@ -463,6 +507,5 @@ public class ResourceDownloader implements Runnable {
         }
 
     }
-
 
 }

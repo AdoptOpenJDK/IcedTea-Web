@@ -1,5 +1,18 @@
 2016-01-06  Jiri Vanek  <jvanek@redhat.com>
 
+	Fixed PR2591 - IcedTea-Web request resources twice for meta informations and
+	causes ClientAbortException on tomcat in conjunction with JnlpDownloadServlet 
+	* NEWS: mentioned PR2591
+	* netx/net/sourceforge/jnlp/cache/ResourceDownloader.java: CodeWithRedirect renamed
+	to UrlRequestResult and now cached also lastModified and length if available.
+	(initializeFromURL) now expects UrlRequestResult instead of URL, (findBestUrl)
+	now returns in same manner
+	(SimpleTest1CountRequests) now passes
+	* tests/netx/unit/net/sourceforge/jnlp/cache/ResourceDownloaderTest.java: adapted
+	to ResourceDownloader.
+
+2016-01-06  Jiri Vanek  <jvanek@redhat.com>
+
 	Added redirection tests
 	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java:  Enhanced so
 	it can redirect requests to another instance. Enhanced to be able to count requests
@@ -7,9 +20,9 @@
 	* tests/reproducers/simple/simpletest1/testcases/SimpleTest1Test.java: small
 	refactoring to reuse checking methods
 	* tests/reproducers/simple/simpletest1/testcases/SimpleTest1CountRequests.java:
-	added set of tests to test behavior under various redirect codes
-	* tests/reproducers/simple/simpletest1/testcases/SimpleTestDefaultRedirects.java:
 	Added FAILING tests for 2591 - counting ITW requests to test server
+	* tests/reproducers/simple/simpletest1/testcases/SimpleTestDefaultRedirects.java:
+	added set of tests to test behavior under various redirect codes
 
 2016-01-05  Jiri Vanek  <jvanek@redhat.com>
 

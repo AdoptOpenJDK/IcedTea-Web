@@ -19,7 +19,6 @@ import java.util.jar.Manifest;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -35,7 +34,7 @@ import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
-public class ResourceDownloaderTest extends NoStdOutErrTest{
+public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     public static ServerLauncher testServer;
     public static ServerLauncher testServerWithBrokenHead;
@@ -77,7 +76,6 @@ public class ResourceDownloaderTest extends NoStdOutErrTest{
         System.setErr(new PrintStream(currentErrorStream));
         OutputController.getLogger().setOut(new PrintStream(currentErrorStream));
         OutputController.getLogger().setErr(new PrintStream(currentErrorStream));
-
 
     }
 
@@ -130,7 +128,8 @@ public class ResourceDownloaderTest extends NoStdOutErrTest{
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
+            int i = ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);
+            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
             f.delete();
             i = ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.HEAD);
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
@@ -227,29 +226,28 @@ public class ResourceDownloaderTest extends NoStdOutErrTest{
             Resource r2 = Resource.getResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
             Resource r3 = Resource.getResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), new Version("1.0"), UpdatePolicy.NEVER);
             Resource r4 = Resource.getResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), new Version("1.0"), UpdatePolicy.NEVER);
-            assertOnServerWithHeader(resourceDownloader.findBestUrl(r1));
-            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2));
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4));
+            assertOnServerWithHeader(resourceDownloader.findBestUrl(r1).getURL());
+            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).URL);
+            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).URL);
+            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).URL);
 
             fileForServerWithHeader.delete();
             Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2));
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4));
+            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).URL);
+            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).URL);
+            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).URL);
 
             versionedFileForServerWithHeader.delete();
             Assert.assertNull(resourceDownloader.findBestUrl(r1));
             Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2));
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4));
+            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).URL);
+            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).URL);
 
             versionedFileForServerWithoutHeader.delete();
             Assert.assertNull(resourceDownloader.findBestUrl(r1));
             Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2));
+            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).URL);
             Assert.assertNull(resourceDownloader.findBestUrl(r4));
-
 
             fileForServerWithoutHeader.delete();
             Assert.assertNull(resourceDownloader.findBestUrl(r1));
@@ -283,6 +281,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest{
         assertPort(u, testServer.getPort());
         assertVersion(u);
     }
+
     private void assertCommonComponentsOfUrl(URL u) {
         Assert.assertTrue(u.getProtocol().equals("http"));
         Assert.assertTrue(u.getHost().equals("localhost"));
@@ -311,7 +310,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest{
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-       PathsAndFiles.CACHE_DIR.setValue(System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
     }
 
     @AfterClass
