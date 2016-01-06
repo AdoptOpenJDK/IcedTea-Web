@@ -667,7 +667,7 @@ clean-docs: clean-netx-docs clean-plugin-docs
 
 stamps/netx-docs.stamp:
 if ENABLE_DOCS
-	$(SYSTEM_JDK_DIR)/bin/javadoc $(JAVADOC_MEM_OPTS) $(	_OPTS) \
+	$(SYSTEM_JDK_DIR)/bin/javadoc $(JAVADOC_MEM_OPTS) $(JAVADOC_OPTS) \
 	 -d ${abs_top_builddir}/docs/netx -sourcepath $(NETX_SRCDIR) \
 	 -doctitle 'IcedTea-Web: NetX API Specification' \
 	 -windowtitle 'IcedTea-Web: NetX ' \

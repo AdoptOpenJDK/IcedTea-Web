@@ -1,3 +1,8 @@
+2016-01-06  James Le Cuirot <chewi@gentoo.org>
+
+	Fixed typo in javadoc generation
+	* Makefile.am: (stamps/netx-docs.stamp) (	_OPTS)->(JAVADOC_OPTS)
+
 2016-01-06  Jiri Vanek  <jvanek@redhat.com>
 
 	Fixed PR2591 - IcedTea-Web request resources twice for meta informations and
