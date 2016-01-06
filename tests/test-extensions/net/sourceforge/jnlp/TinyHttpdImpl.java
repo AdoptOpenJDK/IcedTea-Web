@@ -1,40 +1,39 @@
 /* TinyHttpdImpl.java
-Copyright (C) 2011,2012 Red Hat, Inc.
+ Copyright (C) 2011,2012 Red Hat, Inc.
 
-This file is part of IcedTea.
+ This file is part of IcedTea.
 
-IcedTea is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
+ IcedTea is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, version 2.
 
-IcedTea is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+ IcedTea is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with IcedTea; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
+ You should have received a copy of the GNU General Public License
+ along with IcedTea; see the file COPYING.  If not, write to
+ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301 USA.
 
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
+ Linking this library statically or dynamically with other modules is
+ making a combined work based on this library.  Thus, the terms and
+ conditions of the GNU General Public License cover the whole
+ combination.
 
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.
+ As a special exception, the copyright holders of this library give you
+ permission to link this library with independent modules to produce an
+ executable, regardless of the license terms of these independent
+ modules, and to copy and distribute the resulting executable under
+ terms of your choice, provided that you also meet, for each linked
+ independent module, the terms and conditions of the license of that
+ module.  An independent module is a module which is not derived from
+ or based on this library.  If you modify this library, you may extend
+ this exception to your version of the library, but you are not
+ obligated to do so.  If you do not wish to do so, delete this
+ exception statement from your version.
  */
-
 package net.sourceforge.jnlp;
 
 import java.io.BufferedReader;
@@ -47,19 +46,20 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URLDecoder;
-import java.security.cert.CRL;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sourceforge.jnlp.cache.ResourceTracker;
 
 /**
- * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html
- * Very small implementation of http return headers for our served resources
- * Originally Licenced under GPLv2.0 
+ * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html Very
+ * small implementation of http return headers for our served resources
+ * Originally Licenced under GPLv2.0
  *
- * When resource starts with XslowX prefix, then resouce (without XslowX)
- * is returned, but its delivery is delayed
+ * When resource starts with XslowX prefix, then resouce (without XslowX) is
+ * returned, but its delivery is delayed
  */
 public class TinyHttpdImpl extends Thread {
 
@@ -143,52 +143,77 @@ public class TinyHttpdImpl extends Thread {
                     String filePath = t.nextToken();
                     boolean slowSend = filePath.startsWith(XSX);
 
-                    if (slowSend) {
-                        filePath = filePath.replace(XSX, "/");
+                    if (requestsCounter != null) {
+                        String resource = filePath.replace(XSX, "/");
+                        resource = urlToFilePath(resource);
+                        Map<String, Integer> reosurceRecord = requestsCounter.get(resource);
+                        if (reosurceRecord == null) {
+                            reosurceRecord = new HashMap<>();
+                            requestsCounter.put(resource, reosurceRecord);
+                        }
+                        Integer i = reosurceRecord.get(request);
+                        if (i == null) {
+                            i = 0;
+                        }
+                        i++;
+                        reosurceRecord.put(request, i);
                     }
 
-                    ServerAccess.logOutputReprint("Getting- " + request + ": " + filePath);
-                    filePath = urlToFilePath(filePath);
-
-                    File resource = new File(this.testDir, filePath);
-
-                    if (!(resource.isFile() && resource.canRead())) {
-                        ServerAccess.logOutputReprint("Could not open file " + filePath);
-                        writer.writeBytes(HTTP_NOT_FOUND);
-                        continue;
-                    }
-                    ServerAccess.logOutputReprint("Serving- " + request + ": " + filePath);
-
-                    int resourceLength = (int) resource.length();
-                    byte[] buff = new byte[resourceLength];
-                    FileInputStream fis = new FileInputStream(resource);
-                    fis.read(buff);
-                    fis.close();
-
-                    String contentType = "Content-Type: ";
-                    if (filePath.toLowerCase().endsWith(".jnlp")) {
-                        contentType += "application/x-java-jnlp-file";
-                    } else if (filePath.toLowerCase().endsWith(".jar")) {
-                        contentType += "application/x-jar";
+                    if (redirect != null) {
+                        String where = redirect.getUrl(filePath).toExternalForm();
+                        ServerAccess.logOutputReprint("Redirecting " + request + "as " + redirectCode + " to " + where);
+                        writer.writeBytes("HTTP/1.0 " + redirectCode + " Moved" + CRLF);
+                        writer.writeBytes("Location: " + where + CRLF);
+                        writer.writeBytes(CRLF);
                     } else {
-                        contentType += "text/html";
-                    }
-                    String lastModified = "";
-                    if (supportLastModified) {
-                        lastModified = "Last-Modified: " + new Date(resource.lastModified()) + CRLF;
-                    }
-                    writer.writeBytes(HTTP_OK + "Content-Length:" + resourceLength + CRLF + lastModified + contentType + CRLF + CRLF);
 
-                    if (isGetRequest) {
                         if (slowSend) {
-                            byte[][] bb = splitArray(buff, 10);
-                            for (int j = 0; j < bb.length; j++) {
-                                Thread.sleep(2000);
-                                byte[] bs = bb[j];
-                                writer.write(bs, 0, bs.length);
-                            }
+                            filePath = filePath.replace(XSX, "/");
+                        }
+
+                        ServerAccess.logOutputReprint("Getting- " + request + ": " + filePath);
+                        filePath = urlToFilePath(filePath);
+
+                        File resource = new File(this.testDir, filePath);
+
+                        if (!(resource.isFile() && resource.canRead())) {
+                            ServerAccess.logOutputReprint("Could not open file " + filePath);
+                            writer.writeBytes(HTTP_NOT_FOUND);
+                            continue;
+                        }
+                        ServerAccess.logOutputReprint("Serving- " + request + ": " + filePath);
+
+                        int resourceLength = (int) resource.length();
+                        byte[] buff = new byte[resourceLength];
+                        FileInputStream fis = new FileInputStream(resource);
+                        fis.read(buff);
+                        fis.close();
+
+                        String contentType = "Content-Type: ";
+                        if (filePath.toLowerCase().endsWith(".jnlp")) {
+                            contentType += "application/x-java-jnlp-file";
+                        } else if (filePath.toLowerCase().endsWith(".jar")) {
+                            contentType += "application/x-jar";
                         } else {
-                            writer.write(buff, 0, resourceLength);
+                            contentType += "text/html";
+                        }
+                        String lastModified = "";
+                        if (supportLastModified) {
+                            lastModified = "Last-Modified: " + new Date(resource.lastModified()) + CRLF;
+                        }
+                        writer.writeBytes(HTTP_OK + "Content-Length:" + resourceLength + CRLF + lastModified + contentType + CRLF + CRLF);
+
+                        if (isGetRequest) {
+                            if (slowSend) {
+                                byte[][] bb = splitArray(buff, 10);
+                                for (int j = 0; j < bb.length; j++) {
+                                    Thread.sleep(2000);
+                                    byte[] bs = bb[j];
+                                    writer.write(bs, 0, bs.length);
+                                }
+                            } else {
+                                writer.write(buff, 0, resourceLength);
+                            }
                         }
                     }
                 }
@@ -207,13 +232,14 @@ public class TinyHttpdImpl extends Thread {
     }
 
     /**
-     * This function splits input array to severasl pieces
-     * from byte[length] splitt to n pieces s is retrunrd byte[n][length/n], except
-     * last piece which contains length%n
+     * This function splits input array to severasl pieces from byte[length]
+     * splitt to n pieces s is retrunrd byte[n][length/n], except last piece
+     * which contains length%n
      *
      * @param input - array to be splitted
      * @param pieces - to how many pieces it should be broken
-     * @return inidividual pices of original array, which concatet again givs original array
+     * @return inidividual pices of original array, which concatet again givs
+     * original array
      */
     public static byte[][] splitArray(byte[] input, int pieces) {
         int rest = input.length;
@@ -239,12 +265,13 @@ public class TinyHttpdImpl extends Thread {
     }
 
     /**
-    * This function transforms a request URL into a path to a file which the server
-    * will return to the requester.
-    * @param url - the request URL
-    * @return a String representation of the local path to the file
-    * @throws UnsupportedEncodingException
-    */
+     * This function transforms a request URL into a path to a file which the
+     * server will return to the requester.
+     *
+     * @param url - the request URL
+     * @return a String representation of the local path to the file
+     * @throws UnsupportedEncodingException
+     */
     public static String urlToFilePath(String url) throws UnsupportedEncodingException {
         url = URLDecoder.decode(url, "UTF-8"); // Decode URL encoded charaters, eg "%3B" becomes ';'
         if (url.startsWith(XSX)) {
@@ -261,8 +288,9 @@ public class TinyHttpdImpl extends Thread {
     }
 
     /**
-     * This function removes the HTTP Path Parameter from a given JAR URL, assuming that the
-     * path param delimiter is a semicolon
+     * This function removes the HTTP Path Parameter from a given JAR URL,
+     * assuming that the path param delimiter is a semicolon
+     *
      * @param url - the URL from which to remove the path parameter
      * @return the URL with the path parameter removed
      */
@@ -281,5 +309,32 @@ public class TinyHttpdImpl extends Thread {
             }
         }
         return url;
+    }
+
+    /**
+     * When redirect is set, the requests to this server will just redirect to
+     * the underlying ServerLauncher
+     */
+    private ServerLauncher redirect = null;
+
+    void setRedirect(ServerLauncher redirect) {
+        this.redirect = redirect;
+    }
+
+    /**
+     * one of: 301, 302,303, 307, 308,
+     */
+    private int redirectCode = 302;
+
+    void setRedirectCode(int redirectPort) {
+        this.redirectCode = redirectPort;
+    }
+
+    //resoource -> request -> number of requests on of this rsource on this server
+    // eg   simpletest1.jnlp -> GET -> 3
+    private Map<String, Map<String, Integer>> requestsCounter;
+
+    public void setRequestsCounter(Map<String, Map<String, Integer>> requestsCounter) {
+        this.requestsCounter = requestsCounter;
     }
 }

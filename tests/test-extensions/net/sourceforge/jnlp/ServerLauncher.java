@@ -1,40 +1,39 @@
 /* ServerLauncher.java
-Copyright (C) 2011,2012 Red Hat, Inc.
+ Copyright (C) 2011,2012 Red Hat, Inc.
 
-This file is part of IcedTea.
+ This file is part of IcedTea.
 
-IcedTea is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
+ IcedTea is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, version 2.
 
-IcedTea is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+ IcedTea is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with IcedTea; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
+ You should have received a copy of the GNU General Public License
+ along with IcedTea; see the file COPYING.  If not, write to
+ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301 USA.
 
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
+ Linking this library statically or dynamically with other modules is
+ making a combined work based on this library.  Thus, the terms and
+ conditions of the GNU General Public License cover the whole
+ combination.
 
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.
+ As a special exception, the copyright holders of this library give you
+ permission to link this library with independent modules to produce an
+ executable, regardless of the license terms of these independent
+ modules, and to copy and distribute the resulting executable under
+ terms of your choice, provided that you also meet, for each linked
+ independent module, the terms and conditions of the license of that
+ module.  An independent module is a module which is not derived from
+ or based on this library.  If you modify this library, you may extend
+ this exception to your version of the library, but you are not
+ obligated to do so.  If you do not wish to do so, delete this
+ exception statement from your version.
  */
-
 package net.sourceforge.jnlp;
 
 import java.io.File;
@@ -45,6 +44,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * wrapper around tiny http server to separate lunch configurations and servers.
@@ -52,13 +52,14 @@ import java.util.List;
  */
 public class ServerLauncher implements Runnable {
 
-    public static enum ServerNaming{
+    public static enum ServerNaming {
+
         LOCALHOST, LOCALHOST_IP, HOSTNAME
     }
-    
+
     /**
-     * default url name part.
-     * This can be changed in runtime, but will affect all following tasks upon those server
+     * default url name part. This can be changed in runtime, but will affect
+     * all following tasks upon those server
      */
     private String serverName = ServerAccess.DEFAULT_LOCALHOST_NAME;
     private final String protocol = ServerAccess.DEFAULT_LOCALHOST_PROTOCOL;
@@ -81,7 +82,6 @@ public class ServerLauncher implements Runnable {
         this.serverNaming = naming;
     }
 
-    
     public String getServerName() {
         if (serverNaming == ServerNaming.HOSTNAME) {
             try {
@@ -132,12 +132,42 @@ public class ServerLauncher implements Runnable {
         this(8181, new File(System.getProperty("user.dir")));
     }
 
+    /**
+     * When redirect is set, the requests to this server will just redirect to
+     * the underlying ServerLauncher
+     */
+    private ServerLauncher redirect = null;
+    /**
+     * one of: 301, 302,303, 307, 308,
+     */
+    private int redirectCode = 302;
+
+    public void setRedirect(ServerLauncher redirect) {
+        this.redirect = redirect;
+
+    }
+
+    public void setRedirectCode(int redirectPort) {
+        this.redirectCode = redirectPort;
+    }
+
+    //resoource -> request -> number of requests on of this rsource on this server
+    // eg   simpletest1.jnlp -> GET -> 3
+    private Map<String, Map<String, Integer>> requestsCounter;
+
+    public void setRequestsCounter(Map<String, Map<String, Integer>> requestsCounter) {
+        this.requestsCounter = requestsCounter;
+    }
+
     public void run() {
         running = true;
         try {
             serverSocket = new ServerSocket(port);
             while (running) {
                 TinyHttpdImpl server = new TinyHttpdImpl(serverSocket.accept(), dir, false);
+                server.setRedirect(redirect);
+                server.setRedirectCode(redirectCode);
+                server.setRequestsCounter(requestsCounter);
                 server.setSupportingHeadRequest(isSupportingHeadRequest());
                 server.start();
             }
@@ -157,23 +187,23 @@ public class ServerLauncher implements Runnable {
         }
         return resource;
     }
-    
+
     public URL getUrl(String resource) throws MalformedURLException {
         return new URL(protocol, getServerName(), getPort(), sanitizeResource(resource));
     }
-    
+
     public URL getUrlLocalhost(String resource) throws MalformedURLException {
         return new URL(protocol, serverName, getPort(), sanitizeResource(resource));
     }
-    
+
     public URL getUrlLocalhostIp(String resource) throws MalformedURLException {
-        return new URL(protocol,  ServerAccess.DEFAULT_LOCALHOST_IP, getPort(), sanitizeResource(resource));
+        return new URL(protocol, ServerAccess.DEFAULT_LOCALHOST_IP, getPort(), sanitizeResource(resource));
     }
-    
+
     public URL getUrlHostName(String resource) throws MalformedURLException, UnknownHostException {
         return new URL(protocol, InetAddress.getLocalHost().getHostName(), getPort(), sanitizeResource(resource));
     }
-    
+
     public List<URL> getUrlAliases(String resource) throws MalformedURLException, UnknownHostException {
         List<URL> l = new ArrayList<>(3);
         l.add(getUrlLocalhost(resource));
@@ -204,7 +234,11 @@ public class ServerLauncher implements Runnable {
     @Override
     public String toString() {
         try {
-            return getUrl() + " - " + super.toString();
+            if (redirect != null) {
+                return getUrl() + " - " + super.toString() + "; redirecting via: " + redirectCode + " to " + redirect.toString();
+            } else {
+                return getUrl() + " - " + super.toString();
+            }
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         }

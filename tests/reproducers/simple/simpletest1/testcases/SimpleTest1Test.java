@@ -1,42 +1,41 @@
 /* SimpleTest1Test.java
-Copyright (C) 2011 Red Hat, Inc.
+ Copyright (C) 2011 Red Hat, Inc.
 
-This file is part of IcedTea.
+ This file is part of IcedTea.
 
-IcedTea is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
+ IcedTea is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, version 2.
 
-IcedTea is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+ IcedTea is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with IcedTea; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
+ You should have received a copy of the GNU General Public License
+ along with IcedTea; see the file COPYING.  If not, write to
+ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301 USA.
 
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
+ Linking this library statically or dynamically with other modules is
+ making a combined work based on this library.  Thus, the terms and
+ conditions of the GNU General Public License cover the whole
+ combination.
 
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.
+ As a special exception, the copyright holders of this library give you
+ permission to link this library with independent modules to produce an
+ executable, regardless of the license terms of these independent
+ modules, and to copy and distribute the resulting executable under
+ terms of your choice, provided that you also meet, for each linked
+ independent module, the terms and conditions of the license of that
+ module.  An independent module is a module which is not derived from
+ or based on this library.  If you modify this library, you may extend
+ this exception to your version of the library, but you are not
+ obligated to do so.  If you do not wish to do so, delete this
+ exception statement from your version.
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,14 +51,18 @@ import org.junit.Test;
 
 public class SimpleTest1Test {
 
-    private static ServerAccess server = new ServerAccess();
+    private static final ServerAccess server = new ServerAccess();
     private static final List<String> strict = Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.STRICT.option, ServerAccess.VERBOSE_OPTION});
 
-    private void checkLaunched(ProcessResult pr) {
+    static void checkLaunched(ProcessResult pr) {
         checkLaunched(pr, false);
     }
 
-    private void checkLaunched(ProcessResult pr, boolean negate) {
+    static void checkLaunched(ProcessResult pr, boolean negate) {
+        checkLaunched(pr, negate, true);
+    }
+
+    static void checkLaunched(ProcessResult pr, boolean negate, boolean checkTermination) {
         String s = "Good simple javaws exapmle";
         if (negate) {
             Assert.assertFalse("testSimpletest1lunchOk stdout should NOT contains " + s + " bud did", pr.stdout.contains(s));
@@ -73,11 +76,13 @@ public class SimpleTest1Test {
             //disabled, unnecessary exceptions may occure
             //Assert.assertFalse("testSimpletest1lunchOk stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
         }
-        Assert.assertFalse(pr.wasTerminated);
-        if (negate){
-            Assert.assertEquals((Integer) 1, pr.returnValue);
-        } else {
-            Assert.assertEquals((Integer) 0, pr.returnValue);
+        if (checkTermination) {
+            Assert.assertFalse(pr.wasTerminated);
+            if (negate) {
+                Assert.assertEquals((Integer) 1, pr.returnValue);
+            } else {
+                Assert.assertEquals((Integer) 0, pr.returnValue);
+            }
         }
     }
 
@@ -113,7 +118,7 @@ public class SimpleTest1Test {
 
     private void createStrictFile(String originalResourceName, String newResourceName, URL codebase) throws MalformedURLException, IOException {
         String originalContent = FileUtils.loadFileAsString(new File(server.getDir(), originalResourceName));
-        String nwContent1 = originalContent.replaceAll("href=\""+originalResourceName+"\"", "href=\""+newResourceName+"\"");
+        String nwContent1 = originalContent.replaceAll("href=\"" + originalResourceName + "\"", "href=\"" + newResourceName + "\"");
         String nwContent = nwContent1.replaceAll("codebase=\".\"", "codebase=\"" + codebase + "\"");
         nwContent = nwContent.replace("<description>simpletest2</description>", "");
         ServerAccess.saveFile(nwContent, new File(server.getDir(), newResourceName));
