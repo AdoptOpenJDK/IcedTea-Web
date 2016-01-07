@@ -1,3 +1,17 @@
+2016-01-07  Jiri Vanek  <jvanek@redhat.com>
+
+	BOM character now dont cause error
+	* netx/net/sourceforge/nanoxml/XMLElement.java: duplicated whitespace recognition
+	code moved to isRegularWhiteSpace.  First call to scanWhitespace repalced by
+	call to scanLeadingWhitespace. New field BOM introduced. (scanWhitespace)
+	made private, and uses isRegularWhiteSpace. (scanLeadingWhitespace) new method,
+	same as scanWhitespacebut also skipps BOM and marks it.
+	* tests/netx/unit/net/sourceforge/jnlp/ParserMalformedXml.java: Added tests to
+	issue
+	* tests/netx/unit/net/sourceforge/jnlp/templates/EFBBBF.jnlp: new file. jnlp
+	file starting with bom.
+	* NEWS: mentioned PR2690
+
 2016-01-06  James Le Cuirot <chewi@gentoo.org>
 
 	Fixed typo in javadoc generation

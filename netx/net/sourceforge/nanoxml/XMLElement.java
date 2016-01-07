@@ -195,6 +195,11 @@ public class XMLElement {
      * Character read too much for the comment remover.
      */
     private char sanitizeCharReadTooMuch;
+    
+   /**
+     * Whether the BOM header appeared
+     */
+    private boolean BOM = false;
 
     /**
      * The reader provided by the caller of the parse method.
@@ -494,7 +499,7 @@ public class XMLElement {
         this.parserLineNr = startingLineNr;
 
         for (;;) {
-            char ch = this.scanWhitespace();
+            char ch = this.scanLeadingWhitespace();
 
             if (ch != '<') {
                 throw this.expectedInput("<", ch);
@@ -584,24 +589,50 @@ public class XMLElement {
         }
     }
 
+    private boolean isRegularWhiteSpace(char ch) {
+        switch (ch) {
+            case ' ':
+            case '\t':
+            case '\n':
+            case '\r':
+                return true;
+            default:
+                return false;
+        }
+    }
+    
     /**
      * This method scans an identifier from the current reader.
      *
      * @return the next character following the whitespace.
      * @throws java.io.IOException if something goes wrong
      */
-    protected char scanWhitespace()
+    private char scanWhitespace()
             throws IOException {
-        for (;;) {
+        while(true) {
             char ch = this.readChar();
-            switch (ch) {
-                case ' ':
-                case '\t':
-                case '\n':
-                case '\r':
-                    break;
-                default:
-                    return ch;
+            if (!isRegularWhiteSpace(ch)) {
+                return ch;
+            }
+        }
+    }
+     /**
+     * This method scans an leading identifier from the current reader.
+     * 
+     * UNlike scanWhitespace, it skipps also BOM
+     *
+     * @return the next character following the whitespace.
+     * @throws java.io.IOException if something goes wrong
+     */
+    private char scanLeadingWhitespace()
+            throws IOException {
+        while(true) {
+            char ch = this.readChar();
+            //this is BOM , not space
+            if (ch == '﻿') {
+                BOM = true;
+            } else if (!isRegularWhiteSpace(ch)) {
+                return ch;
             }
         }
     }
@@ -621,18 +652,17 @@ public class XMLElement {
      */
     protected char scanWhitespace(StringBuffer result)
             throws IOException {
-        for (;;) {
+        while (true) {
             char ch = this.readChar();
-            switch (ch) {
-                case ' ':
-                case '\t':
-                case '\n':
-                    result.append(ch);
-                    break;
-                case '\r':
-                    break;
-                default:
-                    return ch;
+            if (!isRegularWhiteSpace(ch)) {
+                return ch;
+            } else {
+                switch (ch) {
+                    case ' ':
+                    case '\t':
+                    case '\n':
+                        result.append(ch);
+                }
             }
         }
     }
@@ -1297,4 +1327,11 @@ public class XMLElement {
 
         }
     }
+
+    public boolean isBOM() {
+        return BOM;
+    }
+    
+    
+    
 }

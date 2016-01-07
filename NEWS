@@ -15,6 +15,7 @@ New in release 1.7 (2015-XX-XX):
 * fixed DownloadService
 * PR2779: html-gen.sh: Don't try to call hg if .hg directory isn't present
 * PR2591 - IcedTea-Web request resources twice for meta informations and causes ClientAbortException on tomcat in conjunction with JnlpDownloadServlet
+* PR2690 - Can't run BOM into JNLP file
 * comments in deployment.properties now should persists load/save
 * fixed bug in caching of files with query
 * fixed issues with recreating of existing shortcut

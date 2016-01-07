@@ -42,7 +42,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.sourceforge.jnlp.util.FileUtils;
+import org.junit.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -104,6 +107,22 @@ public class ParserMalformedXml {
     public void testUnquotedAttributesNoTagSoup() throws ParseException {
         String malformedJnlp = originalJnlp.replace("'jnlp.jnlp'", "jnlp.jnlp");
         Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true, false));
+    }
+    
+    
+    @Bug(id = "PR2690")
+    @Test
+    public void testXmlBomTagSoupOff() throws ParseException {
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/EFBBBF.jnlp");
+        Assert.assertNotNull(is);
+        Parser.getRootNode(is, new ParserSettings(false, true, false));
+    }
+
+    @Test
+    public void testXmlBomTagSoupOn() throws ParseException {
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/EFBBBF.jnlp");
+        Assert.assertNotNull(is);
+        Parser.getRootNode(is, new ParserSettings(false, true, true));
     }
 
 }
