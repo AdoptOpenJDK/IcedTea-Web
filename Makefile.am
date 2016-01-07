@@ -546,7 +546,7 @@ stamps/generate-docs.stamp: stamps/netx.stamp
 	  $$TP_COMMAND html "$$HTML_DOCS_TARGET_DIR/$$ID" $$TP_TAIL ; \
 	  mkdir "$$PLAIN_DOCS_TARGET_DIR/$$ID" ; \
 	  $$TP_COMMAND plain "$$PLAIN_DOCS_TARGET_DIR/$$ID" 160 $$TP_TAIL; \
-	  if [ $$ID == "en" ] ; then \
+	  if [ $$ID = "en" ] ; then \
 	    MAN_DESC="$$MAN_DOCS_TARGET_DIR/man1" ; \
 	  else \
 	    MAN_DESC="$$MAN_DOCS_TARGET_DIR/$$ID/man1" ; \
@@ -564,7 +564,7 @@ stamps/netx-html-gen.stamp:
 	mkdir -p html-gen; \
 	cp AUTHORS NEWS COPYING ChangeLog html-gen/; \
 	export HTML_GEN_DEBUG=true; \
-	bash html-gen.sh; \
+	${SHELL} html-gen.sh; \
 	unset HTML_GEN_DEBUG)
 	${INSTALL_DATA} $(NETX_SRCDIR)/../html-gen/*.html $(NETX_RESOURCE_DIR)
 	rm -r $(NETX_SRCDIR)/../html-gen/

@@ -1,3 +1,12 @@
+2016-01-07  David Cantrell <david.l.cantrell@gmail.com>
+            Jiri Vanek  <jvanek@redhat.com>
+            Andrew John Hughes  <ahughes@redhat.com>
+
+	Remove bash-specifics from top level Makefile.a
+	* Makefile.am: (generate-docs.stamp) double == in test function replaced by single =
+	(stamps/netx-html-gen.stamp) call to plain bash replaced by ${SHELL}
+	* NEWS: mentioned PR2669
+
 2016-01-07  Tiago Stürmer Daitx <tdaitx@gmail.com>
             Jiri Vanek  <jvanek@redhat.com>
 
