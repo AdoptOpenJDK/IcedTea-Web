@@ -36,7 +36,6 @@
 
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
-import java.net.MalformedURLException;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.net.URL;
@@ -156,7 +155,7 @@ public class UnsignedAppletTrustConfirmation {
                     documentbaseRegex = UrlRegEx.quote(documentbase.toExternalForm()); // Match only this applet
                     archiveMatches = toRelativePaths(getJars(file), file.getCodeBase().toString()); // Match only this applet
                 } else {
-                    documentbaseRegex = UrlRegEx.quoteAndStar(stripFile(documentbase)); // Match any from codebase and sourceFile "base"
+                    documentbaseRegex = UrlRegEx.quoteAndStar(UrlUtils.stripFile(documentbase)); // Match any from codebase and sourceFile "base"
                 }
             }
             
@@ -245,50 +244,6 @@ public class UnsignedAppletTrustConfirmation {
             securityDelegate.setRunInSandbox();
         }
 
-    }
-
-    static String stripFile(URL documentbase) {
-        //whenused in generation of regec, the trailing slash is very important
-        //see the result between http:/some.url/path.* and http:/some.url/path/.*
-        return ensureSlashTail(stripFileImp(documentbase));
-    }
-    
-    private static String stripFileImp(URL documentbase) {
-        try {
-            String normalized = UrlUtils.normalizeUrlAndStripParams(documentbase).toExternalForm().trim();
-            if (normalized.endsWith("/") || normalized.endsWith("\\")) {
-                return normalized;
-            }
-            URL middleway = new URL(normalized);
-            String file = middleway.getFile();
-            int i = Math.max(file.lastIndexOf('/'), file.lastIndexOf('\\'));
-            if (i<0){
-                return normalized;
-            }
-            String parent = file.substring(0, i+1);
-            String stripped = normalized.replace(file, parent);
-            return stripped;
-        } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
-            return documentbase.toExternalForm();
-        }
-
-    }
-
-    private static String ensureSlashTail(String s) {
-        if (s.endsWith("/")) {
-            return s;
-        }
-        if (s.endsWith("\\")) {
-            return s;
-        }
-        if (s.contains("/")) {
-            return s + "/";
-        }
-        if (s.contains("\\")) {
-            return s + "\\";
-        }
-        return s + "/";
     }
 
 }

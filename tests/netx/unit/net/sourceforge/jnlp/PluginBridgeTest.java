@@ -520,7 +520,5 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         String fixed = fixCommonIssues(source, true);
         checkIssuesFixed(fixed, true, false);
     }
-    
-    
 
 }

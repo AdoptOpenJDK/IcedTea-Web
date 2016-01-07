@@ -1,5 +1,27 @@
 2016-01-07  Jiri Vanek  <jvanek@redhat.com>
 
+	Codebase resolution of jnlp-href is now aligned with oracle plugin
+	* netx/net/sourceforge/jnlp/PluginBridge.java: When jnlp href is used, codebase
+	is forced to become codebase of jnlp
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: When file.getCodeBase() is null
+	then instead of NPE, codebase of file.fileLocation is used
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	stripFile and ensureSlashTail moved to UrlUtils
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: 	stripFile and ensureSlashTail
+	moved from UnsignedAppletTrustConfirmation
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: removed empty lines
+	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java:
+	adapted to moved methods
+	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java: added more tests
+	to removeFileName and enabled accidentlay disabled  getHostAndPortTest and
+	getPortTest
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
+	ensured manifest attributes are off for this test
+	* tests/netx/unit/net/sourceforge/jnlp/ParserMalformedXml.java: fixed bom tests
+	to use proper classloader
+
+2016-01-07  Jiri Vanek  <jvanek@redhat.com>
+
 	BOM character now dont cause error
 	* netx/net/sourceforge/nanoxml/XMLElement.java: duplicated whitespace recognition
 	code moved to isRegularWhiteSpace.  First call to scanWhitespace repalced by

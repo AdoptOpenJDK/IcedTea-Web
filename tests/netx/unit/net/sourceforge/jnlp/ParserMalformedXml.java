@@ -113,14 +113,14 @@ public class ParserMalformedXml {
     @Bug(id = "PR2690")
     @Test
     public void testXmlBomTagSoupOff() throws ParseException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/EFBBBF.jnlp");
+        InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/EFBBBF.jnlp");
         Assert.assertNotNull(is);
         Parser.getRootNode(is, new ParserSettings(false, true, false));
     }
 
     @Test
     public void testXmlBomTagSoupOn() throws ParseException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/EFBBBF.jnlp");
+        InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/EFBBBF.jnlp");
         Assert.assertNotNull(is);
         Parser.getRootNode(is, new ParserSettings(false, true, true));
     }

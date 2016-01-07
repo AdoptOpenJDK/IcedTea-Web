@@ -42,13 +42,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Locale;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.SecurityDesc;
-import net.sourceforge.jnlp.SecurityDescTest;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.CodeBaseClassLoader;
 import net.sourceforge.jnlp.annotations.Bug;
@@ -66,16 +63,21 @@ import org.junit.Test;
 public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
 
     private static AppletSecurityLevel level;
+    private static String macStatus;
 
     @BeforeClass
     public static void setPermissions() {
         level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
+        macStatus = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.NONE.toString());
+        
     }
 
     @AfterClass
     public static void resetPermissions() {
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, level.toChars());
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, macStatus);
     }
 
     private static final String isWSA = "isWebstartApplication";

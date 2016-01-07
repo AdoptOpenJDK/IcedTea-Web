@@ -246,6 +246,34 @@ public class UrlUtilsTest {
         
     }
     
+     @Test
+    public void removeFileName3() throws Exception {
+        URL l1 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/hchkr/jar.jar?someParam=some&param=very\\evil\\"));
+        assertEquals(l1, new URL("http://aaa.bb/xyz/hchkr"));
+
+        URL l2 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/hchkr/?another=Param&param=very/evil/"));
+        assertEquals(l2, new URL("http://aaa.bb/xyz/hchkr"));
+
+        URL l3 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/hchkr?stillSomePArams=aa"));
+        assertEquals(l3, new URL("http://aaa.bb/xyz"));
+
+        URL l4 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/jar.jar?again=param/bad\\bad/params"));
+        assertEquals(l4, new URL("http://aaa.bb/xyz"));
+
+        URL l5 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/?goingOnWith=params/bad/params"));
+        assertEquals(l5, new URL("http://aaa.bb/xyz"));
+
+        URL l6 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz?someParam=some"));
+        assertEquals(l6, new URL("http://aaa.bb"));
+
+        URL l7 = UrlUtils.removeFileName(new URL("http://aaa.bb/jar.jar?someParam=some"));
+        assertEquals(l7, new URL("http://aaa.bb"));
+
+        URL l8 = UrlUtils.removeFileName(new URL("http://aaa.bb/?someParam=some"));
+        assertEquals(l8, new URL("http://aaa.bb"));
+
+    }
+    
     @Test
     public void testUrlEquals() throws Exception {
         final URL n1 = null, n2 = null, u1 = new URL("http://example.com"), u2 = u1, u3 = new URL("http://example.com");
@@ -340,6 +368,7 @@ public class UrlUtilsTest {
         
    }
 
+    @Test
     public void getPortTest() throws MalformedURLException {
         Assert.assertEquals(1, UrlUtils.getPort(new URL("http://aa.bb:1")));
         Assert.assertEquals(10, UrlUtils.getPort(new URL("http://aa.bb:10/aa")));
@@ -349,6 +378,7 @@ public class UrlUtilsTest {
         Assert.assertEquals(80, UrlUtils.getPort(new URL("http://aa.bb:80/a/b/c")));
     }
 
+    @Test
     public void getHostAndPortTest() throws MalformedURLException {
         Assert.assertEquals("aa.bb:2", UrlUtils.getHostAndPort(new URL("http://aa.bb:2")));
         Assert.assertEquals("aa.bb:12", UrlUtils.getHostAndPort(new URL("http://aa.bb:12/aa")));
@@ -357,5 +387,29 @@ public class UrlUtilsTest {
         Assert.assertEquals("aa.bb:80", UrlUtils.getHostAndPort(new URL("http://aa.bb")));
         Assert.assertEquals("aa.bb:80", UrlUtils.getHostAndPort(new URL("http://aa.bb:80/a/b/c")));
     }
-
+    
+    @Test
+    public void ensureSlashTailTest() {
+        Assert.assertEquals("a/", UrlUtils.ensureSlashTail("a"));
+        Assert.assertEquals("aa/a/", UrlUtils.ensureSlashTail("aa/a"));
+        Assert.assertEquals("aa/a/", UrlUtils.ensureSlashTail("aa/a/"));
+        Assert.assertEquals("/aa/a/", UrlUtils.ensureSlashTail("/aa/a/"));
+        Assert.assertEquals("/aa/a/", UrlUtils.ensureSlashTail("/aa/a"));
+        
+        Assert.assertEquals("aa\\a\\", UrlUtils.ensureSlashTail("aa\\a"));
+        Assert.assertEquals("aa\\a\\", UrlUtils.ensureSlashTail("aa\\a\\"));
+        Assert.assertEquals("\\aa\\a\\", UrlUtils.ensureSlashTail("\\aa\\a\\"));
+        Assert.assertEquals("\\aa\\a\\", UrlUtils.ensureSlashTail("\\aa\\a"));
+        
+        Assert.assertEquals("\\aa/a/", UrlUtils.ensureSlashTail("\\aa/a"));
+        Assert.assertEquals("//aa\\a/", UrlUtils.ensureSlashTail("//aa\\a"));
+        Assert.assertEquals("\\aa/a/", UrlUtils.ensureSlashTail("\\aa/a/"));
+        Assert.assertEquals("\\aa/a\\", UrlUtils.ensureSlashTail("\\aa/a\\"));
+    }
+    
+     @Test
+    public void ensureSlashTailTest3() throws MalformedURLException {
+        Assert.assertEquals("http://aa.bb:2/aa/", UrlUtils.ensureSlashTail(new URL("http://aa.bb:2/aa")).toExternalForm());
+        Assert.assertEquals("http://aa.bb/aa/", UrlUtils.ensureSlashTail(new URL("http://aa.bb/aa/")).toExternalForm());
+    }
 }
