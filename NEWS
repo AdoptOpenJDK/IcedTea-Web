@@ -47,6 +47,7 @@ New in release 1.7 (2015-XX-XX):
 * Plugin
   - RH1273691 - Escaped equals signs in deployment.properties not un-escaped when used
   - PR2746 - IcedTea-Web Plugin 1.6.1: net.sourceforge.jnlp.LaunchException 
+  - PR2714 - IcedTea-Web plugin sends uninitialized memory garbage across a pipe when NPN_GetValueForURL call fails
 
 New in release 1.6 (2015-XX-XX):
 * Massively improved offline abilities. Added Xoffline switch to force work without inet connection.

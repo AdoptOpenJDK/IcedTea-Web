@@ -1,3 +1,16 @@
+2016-01-07  Tiago Stürmer Daitx <tdaitx@gmail.com>
+            Jiri Vanek  <jvanek@redhat.com>
+
+	Resolves an issue where, if IcedTea's call to NPN_GetValueForURL fails,
+	IcedTea-Web attempts to send uninitialized memory garbage across a pipe, which
+	(usually) results in an error. At this point, IcedTea gives up, but does not
+	inform Firefox that it has done so, and unless dom.ipc.plugins.asyncInit is
+	true, this causes Firefox's UI to lock up in addition to the Java component failing to load.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: (onsume_plugin_message) initialize len
+	and proxy_info. (get_proxy_info) returns correct message if 
+	browser_functions.getvalueforurl returns error
+	* NEWS: mentioned PR2714
+
 2016-01-07  Jiri Vanek  <jvanek@redhat.com>
 
 	Codebase resolution of jnlp-href is now aligned with oracle plugin
