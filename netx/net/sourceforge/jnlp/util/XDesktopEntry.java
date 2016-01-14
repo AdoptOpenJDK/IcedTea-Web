@@ -147,7 +147,7 @@ public class XDesktopEntry {
 
         }
         if (file.getInformation().getVendor() != null) {
-            fileContents += "Vendor=" + sanitize(file.getInformation().getVendor()) + "\n";
+            fileContents += "X-Vendor=" + sanitize(file.getInformation().getVendor()) + "\n";
         }
         String exec;
         String title = "xdesktop writing";

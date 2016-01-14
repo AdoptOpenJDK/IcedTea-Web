@@ -1,4 +1,11 @@
-2016-01-07  Jiri Vanek  <jvanek@redhat.com>
+2016-01-14  Jiri Vanek  <jvanek@redhat.com>
+
+	Vendor desktop entry replaced by X-Vendor
+	* ChangeLog: fixed date
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: if vendor is present in jnlp
+	instead of Vendor X-Vendor entry is generated to desktop file
+
+2016-01-14  Jiri Vanek  <jvanek@redhat.com>
 
 	Added reprodcuer for NoClassDeffFoundError behavior
 	* tests/reproducers/custom/NoClassDeff/srcs/NoClassDeff.java: small app including
