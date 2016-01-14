@@ -1,3 +1,18 @@
+2016-01-07  Jiri Vanek  <jvanek@redhat.com>
+
+	Added reprodcuer for NoClassDeffFoundError behavior
+	* tests/reproducers/custom/NoClassDeff/srcs/NoClassDeff.java: small app including
+	inner class, which is missing in deployed jar. Then calling this class on demand
+	* tests/reproducers/custom/NoClassDeff/srcs/.Makefile: responsible for removing
+	the compiled inner class before jarring
+	* tests/reproducers/custom/NoClassDeff/testcases/NoClassDeffTest.java:
+	testing behavior when ClassNotFound/NoClassDefFound  is thrown in various stages
+	* tests/reproducers/custom/NoClassDeff/resources/NoClassDeff.html.in:
+	* tests/reproducers/custom/NoClassDeff/resources/NoClassDeffApp.jnlp.in:
+	* tests/reproducers/custom/NoClassDeff/resources/NoClassDeffApplet.jnlp.in:
+	* tests/reproducers/custom/NoClassDeff/resources/NoClassDeffJnlpHref.html.in:
+	templates to launch app with instruction when to call LostClass and how to deal with it
+
 2016-01-07  David Cantrell <david.l.cantrell@gmail.com>
             Jiri Vanek  <jvanek@redhat.com>
             Andrew John Hughes  <ahughes@redhat.com>
