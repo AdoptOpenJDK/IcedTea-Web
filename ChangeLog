@@ -1,5 +1,12 @@
 2016-01-14  Jiri Vanek <jvanek@redhat.com>
 
+	Added GenericName to desktop files
+	* itweb-settings.desktop.in:
+	* javaws.desktop.in:
+	* policyeditor.desktop.in:
+
+2016-01-14  Jiri Vanek <jvanek@redhat.com>
+
 	Included maven artifacts and appstream metadata
 	* .Makefile: (clean-local) and (.PHONY) now depends on clean-metadata.
 	($(abs_top_builddir)/metadata) new target, copy metadata-in to metadata and

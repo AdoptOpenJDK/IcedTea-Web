@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=IcedTea-Web Policy Editor
+GenericName=Policy Tool 
 Comment=Edit Java Applet policy and permission settings
 Exec=PATH_TO_POLICYEDITOR
 Icon=javaws
