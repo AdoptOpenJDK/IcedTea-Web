@@ -1,4 +1,16 @@
 2016-01-14  Jiri Vanek <jvanek@redhat.com>
+            Fridrich Strba  <fridrich.strba@suse.com>
+
+	Adapted to change in package of HexDumpEncoder (1.8 sun.misc.HexDumpEncoder, 
+	1.9 sun.security.util.HexDumpEncoder)
+	* acinclude.m4: added new macro IT_CHECK_FOR_HEXDUMPENCODER, which tries both
+	locations of HexDumpEncoder
+	* configure.ac: now uses IT_CHECK_FOR_HEXDUMPENCODER instead of 
+	IT_CHECK_FOR_CLASS(SUN_MISC_HEXDUMPENCODER, [sun.misc.HexDumpEncoder])
+	* netx/net/sourceforge/jnlp/security/dialogs/CertsInfoPane.java: added imports
+	to both import sun.misc.*; and import sun.security.util.*;
+
+2016-01-14  Jiri Vanek <jvanek@redhat.com>
 
 	Added GenericName to desktop files
 	* itweb-settings.desktop.in:

@@ -43,8 +43,15 @@ import java.util.ArrayList;
 import java.security.cert.CertPath;
 import java.security.cert.X509Certificate;
 import java.security.MessageDigest;
+/**
+ * Do not remove this two unused imports, nor expands its "*" call.
+ * It is workaround to allow itw to run on jdk8 and older and also on jdk9 and newer
+ */
 
-import sun.misc.HexDumpEncoder;
+// jdk8 is using sun.misc.HexDumpEncoder, 
+import sun.misc.*;
+// jdk9 is using sun.security.util.HexDumpEncoder
+import sun.security.util.*;
 import sun.security.x509.*;
 import javax.swing.*;
 import javax.swing.event.*;
