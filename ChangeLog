@@ -1,3 +1,17 @@
+2016-01-14  Jiri Vanek <jvanek@redhat.com>
+
+	Included maven artifacts and appstream metadata
+	* .Makefile: (clean-local) and (.PHONY) now depends on clean-metadata.
+	($(abs_top_builddir)/metadata) new target, copy metadata-in to metadata and
+	replace name, vendor and version check-meatdata, new stand alone target, checks
+	correctness of poms and xmls in	metadata folder. (stamps/netx-dist.stamp) now
+	depends on $(abs_top_builddir)/metadata. clean-metadata, new target, removes
+	built metadata folder
+	* metadata.in/icedtea-web-javaws.appdata.xml: appstream metadata for javaws
+	* metadata.in/icedtea-web.metainfo.xml: appstream metadata for plugin
+	* metadata.in/icedtea-web-plugin.pom: pom for plugin.jar
+	* metadata.in/icedtea-web.pom: pom for netx jar
+
 2016-01-14  Jiri Vanek  <jvanek@redhat.com>
 
 	Vendor desktop entry replaced by X-Vendor

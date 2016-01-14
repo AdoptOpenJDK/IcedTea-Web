@@ -221,7 +221,7 @@ endif
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
 export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in policyeditor.desktop.in icedteaweb-completion.in \
- itweb-settings.desktop.in launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS
+ itweb-settings.desktop.in launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS $(top_srcdir)/metadata.in
 
 # reproducers `D`shortcuts
 export DTEST_SERVER=-Dtest.server.dir=$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)
@@ -264,7 +264,7 @@ all-local: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
 clean-local: clean-netx clean-plugin clean-liveconnect \
- clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-generated-docs clean-icedteaweb-completion clean-tests clean-bootstrap-directory
+ clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-generated-docs clean-metadata  clean-icedteaweb-completion clean-tests clean-bootstrap-directory
 	if [ -e stamps ] ; then \
 	  rmdir stamps ; \
 	fi
@@ -272,7 +272,7 @@ clean-local: clean-netx clean-plugin clean-liveconnect \
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs clean-generated-docs clean-icedteaweb-completion\
  clean-tests check-local clean-launchers stamps/check-pac-functions.stamp stamps/run-netx-unit-tests.stamp clean-netx-tests \
- clean-junit-runner clean-netx-unit-tests
+ clean-junit-runner clean-netx-unit-tests clean-metadata 
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir) $(ICONS_DEST_DIR) $(BASH_CMPL_DEST_DIR)
@@ -511,6 +511,37 @@ if !WITH_RHINO
 	sed -i '/RhinoBasedPacEvaluator/ d' $@
 endif
 
+$(abs_top_builddir)/metadata: $(top_srcdir)/metadata.in
+	mkdir -p $(abs_top_builddir)/metadata-work ; \
+	METAFILES=`ls $(top_srcdir)/metadata.in` ; \
+	for F in $$METAFILES ; do \
+	  cat $(top_srcdir)/metadata.in/$$F | sed "s;%{name};$(PACKAGE_NAME);g" |  sed "s;%{version};$(FULL_VERSION);g" > $(abs_top_builddir)/metadata-work/$$F ; \
+	done ; \
+	mv $(abs_top_builddir)/metadata-work $(abs_top_builddir)/metadata ;
+
+check-metadata: $(abs_top_builddir)/metadata
+	xmllint --noout $(abs_top_builddir)/metadata/* ; \
+	if [ $$? -eq 0 ] ; then \
+	  echo "Passed: well formed" ; \
+	else \
+	  echo "FAILED: well formed" ; \
+	fi ; \
+	xmllint --noout --schema http://maven.apache.org/xsd/maven-4.0.0.xsd $(abs_top_builddir)/metadata/*.pom ; \
+	if [ $$? -eq 0 ] ; then \
+	  echo "Passed: valid poms" ; \
+	else \
+	  echo "FAILED: valid poms" ; \
+	fi ; \
+	appstream-util validate $(abs_top_builddir)/metadata/*.appdata.xml  $(abs_top_builddir)/metadata/*.metainfo.xml ; \
+	if [ $$? -eq 0 ] ; then \
+	  echo "Passed: valid software descriptors" ; \
+	else \
+	  echo "FAILED: valid software descriptors" ; \
+	fi ;
+# very strange results:
+# appstreamcli  validate $(abs_top_builddir)/metadata/*.appdata.xml  $(abs_top_builddir)/metadata/*.metainfo.xml
+	
+
 $(abs_top_builddir)/icedteaweb-completion: $(abs_top_srcdir)/icedteaweb-completion.in
 	OPTIONS_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.OptionsDefinitions" ;  \
 	JAVAWS=`$$OPTIONS_COMMAND javaws` ; \
@@ -590,7 +621,7 @@ stamps/netx.stamp: netx-source-files.txt stamps/netx-html-gen.stamp
 	mkdir -p stamps
 	touch $@
 
-stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest stamps/generate-docs.stamp $(abs_top_builddir)/icedteaweb-completion 
+stamps/netx-dist.stamp: stamps/netx.stamp $(abs_top_builddir)/netx.manifest stamps/generate-docs.stamp $(abs_top_builddir)/icedteaweb-completion $(abs_top_builddir)/metadata
 	(cd $(NETX_DIR) ; \
 	 mkdir -p lib ; \
 	 $(SYSTEM_JDK_DIR)/bin/jar cfm lib/classes.jar \
@@ -707,6 +738,9 @@ clean-generated-docs:
 
 clean-icedteaweb-completion:
 	rm -f $(abs_top_builddir)/icedteaweb-completion
+
+clean-metadata:
+	rm -rf $(abs_top_builddir)/metadata
 
 # check
 # ==========================

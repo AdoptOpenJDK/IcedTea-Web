@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+<!-- <component> -->
+  <id>javaws.desktop</id>
+  <name>%{name}</name>
+  <name>Java</name>
+  <summary>Javaws implementation from OpenJDK</summary>
+<!--   <provides>
+​    <library>netx.jar</library>
+​    <library>plugin.jar</library>
+​    <binary>javaws</binary>
+​    <binary>itweb-settings</binary>
+​    <binary>policyeditor</binary>
+​  </provides>
+-->
+  <description>
+<p>
+Free java implementation of jnlp launching protocol.
+</p><p>
+Originally based on NetX,but now bringing many improvements compared to proprietary implementations.
+</p><p>
+Powerful debug console, internal appletviewer, safe run-in-sandbox option, extendable "remember me" options and custom policy editor.
+</p><p>
+It have also  possibility to turn all security off and just enjoy legacy web (on your own risk). All via simple itweb-settings gui.
+</p>
+   </description>
+  <url type="homepage">http://icedtea.classpath.org/wiki/IcedTea-Web</url>
+  <metadata_license>CC0-1.0</metadata_license>
+  <updatecontact>distro-pkg-dev@openjdk.java.net</updatecontact>
+  <mimetypes>
+​    <mimetype>text/jnlp</mimetype>
+  </mimetypes>
+ <screenshots>
+  <screenshot type="default"> 
+   <image>http://icedtea.classpath.org/wiki/images/Javaws_splash.png</image>
+   <caption>Itw self describing splash screen</caption>
+  </screenshot>
+  <screenshot>
+   <image>http://icedtea.classpath.org/wiki/images/Fullysigned.png</image>
+   <caption>Run in sandbox dialog</caption>
+  </screenshot>
+  <screenshot>
+   <image>http://icedtea.classpath.org/wiki/images/Policyeditor-in-use.png</image>
+   <caption>Simplified view of policy editor</caption>
+  </screenshot>
+ </screenshots>
+</component>
