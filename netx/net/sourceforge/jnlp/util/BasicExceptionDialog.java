@@ -45,6 +45,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -65,6 +66,7 @@ import net.sourceforge.jnlp.util.logging.JavaConsole;
  */
 public class BasicExceptionDialog {
 
+    private static final AtomicInteger dialogInstancess = new AtomicInteger();
 
     /**
      * Must be invoked from the Swing EDT.
@@ -144,6 +146,7 @@ public class BasicExceptionDialog {
         ScreenFinder.centerWindowsToCurrentScreen(errorDialog);
         errorDialog.setVisible(true);
         errorDialog.dispose();
+        BasicExceptionDialog.willBeHidden();
     }
 
      public static JButton getShowButton(final Component parent) {
@@ -190,5 +193,18 @@ public class BasicExceptionDialog {
             }
         });
         return clearAllButton;
+    }
+
+    private synchronized static int willBeHidden() {
+        return dialogInstancess.decrementAndGet();
+    }
+
+    //must be called out of EDT, otherise -- will happen before ++
+    public synchronized static int  willBeShown() {
+        return dialogInstancess.incrementAndGet();
+    }
+    
+    public synchronized static boolean areShown() {
+        return dialogInstancess.intValue() > 0;
     }
 }

@@ -1315,24 +1315,10 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
-        String className;
-        if (settings.isMalformedXmlAllowed()) {
-            className = MALFORMED_PARSER_CLASS;
-        } else {
-            className = NORMAL_PARSER_CLASS;
-        }
-
         try {
-            Class<?> klass;
-            try {
-                klass = Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                klass = Class.forName(NORMAL_PARSER_CLASS);
-            }
-            Object instance = klass.newInstance();
-            Method m = klass.getMethod("getRootNode", InputStream.class);
-
-            return (Node) m.invoke(instance, input);
+            Object parser = getParserInstance(settings);
+            Method m = parser.getClass().getMethod("getRootNode", InputStream.class);
+            return (Node) m.invoke(parser, input);
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof ParseException) {
                 throw (ParseException)(e.getCause());
@@ -1341,6 +1327,41 @@ public final class Parser {
         } catch (Exception e) {
             throw new ParseException(R("PBadXML"), e);
         }
+    }
+    
+
+     public static Object getParserInstance(ParserSettings settings) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        String className;
+        if (settings.isMalformedXmlAllowed()) {
+            className = MALFORMED_PARSER_CLASS;
+            ParseException.setExpected(ParseException.UsedParsers.MALFORMED);
+        } else {
+            className = NORMAL_PARSER_CLASS;
+            ParseException.setExpected(ParseException.UsedParsers.NORMAL);
+        }
+
+        Class<?> klass;
+        Object instance;
+
+        try {
+            klass = Class.forName(className);
+            instance = klass.newInstance();
+            //catch both, for case that tagsoup was removed after build
+        } catch (ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
+            OutputController.getLogger().log(e);
+            klass = Class.forName(NORMAL_PARSER_CLASS);
+            instance = klass.newInstance();
+        }
+
+        switch (instance.getClass().getName()) {
+            case MALFORMED_PARSER_CLASS:
+                ParseException.setUsed(ParseException.UsedParsers.MALFORMED);
+                break;
+            case NORMAL_PARSER_CLASS:
+                ParseException.setUsed(ParseException.UsedParsers.NORMAL);
+                break;
+        }
+        return instance;
     }
 
   private String getOptionalMainClass(Node node) {

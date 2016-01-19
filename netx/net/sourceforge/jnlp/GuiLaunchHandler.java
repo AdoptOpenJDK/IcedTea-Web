@@ -69,6 +69,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
 
     @Override
     public void launchError(final LaunchException exception) {
+        BasicExceptionDialog.willBeShown();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -102,6 +103,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
     }
 
     @Override
+    @SuppressWarnings("empty-statement")
     public void launchInitialized(final JNLPFile file) {
 
         int preferredWidth = 500;

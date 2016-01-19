@@ -446,6 +446,12 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_TAGSOUP],
     done
   fi
   AC_MSG_RESULT(${TAGSOUP_JAR})
+  if test -z "${TAGSOUP_JAR}"; then
+    AC_MSG_RESULT(***********************************************)
+    AC_MSG_RESULT(*  Warning you are building without tagsoup   *)
+    AC_MSG_RESULT(* Some jnlps and most htmls will be malformed *)
+    AC_MSG_RESULT(***********************************************)
+  fi
   AC_SUBST(TAGSOUP_JAR)
   AM_CONDITIONAL([HAVE_TAGSOUP], [test x$TAGSOUP_JAR != xno -a x$TAGSOUP_JAR != x ])
 ])

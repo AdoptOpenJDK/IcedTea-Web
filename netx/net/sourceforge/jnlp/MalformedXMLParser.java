@@ -111,10 +111,12 @@ public class MalformedXMLParser extends XMLParser {
 
             reader.parse(s);
             return new ByteArrayInputStream(out.toByteArray());
-        } catch (SAXException e) {
-            throw new ParseException(R("PBadXML"), e);
-        } catch (IOException e) {
-            throw new ParseException(R("PBadXML"), e);
+        } catch (SAXException | IOException e1) {
+            throw new ParseException(R("PBadXML"), e1);
+        } catch (NoClassDefFoundError  e2) {
+            OutputController.getLogger().log(e2);
+            ParseException.setUsed(null);
+            return original;
         }
 
     }

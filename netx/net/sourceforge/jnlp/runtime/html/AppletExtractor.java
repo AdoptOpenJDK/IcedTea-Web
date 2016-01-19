@@ -46,10 +46,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.Parser;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -88,14 +90,14 @@ public class AppletExtractor {
     private InputStream cleanStreamIfPossible(InputStream is) {
         try {
             if (ps != null && ps.isMalformedXmlAllowed()){
-                Class<?> klass = Class.forName(Parser.MALFORMED_PARSER_CLASS);
-                Method m = klass.getMethod("xmlizeInputStream", InputStream.class);
+                Object parser = Parser.getParserInstance(ps);
+                Method m = parser.getClass().getMethod("xmlizeInputStream", InputStream.class);
                 return (InputStream) m.invoke(null, is);
             } else {
-                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Tagsoup's html2xml cleaning is Disabled. Remove "+OptionsDefinitions.OPTIONS.XML.option+". Parsing will probably fail.");    
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlNotUsed", OptionsDefinitions.OPTIONS.XML.option));    
             }
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Tagsoup's html2xml cleaning not loaded. Install tagsoup. Parsing will probably fail.");
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlBroken"));
             OutputController.getLogger().log(ex);
         }
         return is;
@@ -104,7 +106,9 @@ public class AppletExtractor {
     public List<Element> findAppletsOnPage() {
         try{
         return findAppletsOnPageImpl(openDocument(cleanStreamIfPossible(JNLPFile.openURL(html, null, UpdatePolicy.ALWAYS))));
-        }catch (IOException | SAXException | ParserConfigurationException ex){
+        } catch (SAXException sex) {
+            throw new RuntimeException(new ParseException(sex));
+        } catch (IOException | ParserConfigurationException ex) {
             throw new RuntimeException(ex);
         }
     }

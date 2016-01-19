@@ -16,6 +16,9 @@
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
+
 /**
  * Thrown to indicate that an error has occurred while parsing a
  * JNLP file.
@@ -34,7 +37,7 @@ public class ParseException extends Exception {
      * @param message to be shown in exception
      */
     public ParseException(String message) {
-        super(message);
+        super(getParserSettingsMessage() + message);
     }
 
     /**
@@ -44,7 +47,48 @@ public class ParseException extends Exception {
      * @param cause cause of exception
      */
     public ParseException(String message, Throwable cause) {
-        super(message, cause);
+        super(getParserSettingsMessage() + message, cause);
     }  
+
+    public ParseException(Throwable cause) {
+        super(getParserSettingsMessage(), cause);
+    }
+    
+    
+    static enum UsedParsers {
+
+        MALFORMED, NORMAL
+    }
+
+    private static UsedParsers expected;
+    private static UsedParsers used;
+
+    static void setExpected(UsedParsers ex) {
+        expected = ex;
+    }
+
+    static void setUsed(UsedParsers us) {
+        used = us;
+    }
+    
+    private static String getParserSettingsMessage() {
+        final String tail = ""
+                + " "
+                + Translator.R("TAGSOUPtail")
+                + " ";
+        if (expected == UsedParsers.NORMAL && used == UsedParsers.NORMAL) {
+            //warn about xml mode
+            return Translator.R("TAGSOUPnotUsed", OptionsDefinitions.OPTIONS.XML.option)+tail;
+        }
+        if (expected == UsedParsers.MALFORMED && used != UsedParsers.MALFORMED) {
+            //warn about TagSoup
+            return Translator.R("TAGSOUPbroken") + tail;
+        }
+        if (JNLPRuntime.isDebug()) {
+            return expected + " " + used + "; ";
+        } else {
+            return "";
+        }
+    }
 
 }

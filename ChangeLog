@@ -1,3 +1,24 @@
+2016-01-19  Jiri Vanek <jvanek@redhat.com>
+
+	When tagsoup is missing, parsing errors are more informative
+ 	* acinclude.m4: when building without tagsoup, more verbose warning is printed
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: (launchError) is now noting
+	that BasicExceptionDialog will be shown.
+	* netx/net/sourceforge/jnlp/MalformedXMLParser.java: Now react on NoClassDefFoundError
+	by returning original stream.
+	* netx/net/sourceforge/jnlp/ParseException.java: Stores information about
+	parsers loading, and add this info to ParseException message.
+	* netx/net/sourceforge/jnlp/Parser.java: (getRootNode) logic retrieving parser
+	class extracted to separate method getParserInstance
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added family of TAGSOUP
+	for messages about its state
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: (exit) now waits for 
+	BasicExceptionDialog.
+	* netx/net/sourceforge/jnlp/runtime/html/AppletExtractor.java: (cleanStreamIfPossible)
+	now uses Parser.getParserInstance ratehr then its own.
+	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java: Is now capable of
+	publishing number of shown instances.
+
 2016-01-14  Jiri Vanek <jvanek@redhat.com>
             Fridrich Strba  <fridrich.strba@suse.com>
 

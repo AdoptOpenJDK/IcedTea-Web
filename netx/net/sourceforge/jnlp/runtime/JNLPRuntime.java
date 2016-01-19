@@ -67,6 +67,7 @@ import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
+import net.sourceforge.jnlp.util.BasicExceptionDialog;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.LogConfig;
@@ -882,6 +883,9 @@ public class JNLPRuntime {
     public static void exit(int i) {
         try {
             OutputController.getLogger().close();
+            while (BasicExceptionDialog.areShown()){
+                Thread.sleep(100);
+            }
         } catch (Exception ex) {
             //to late
         }
