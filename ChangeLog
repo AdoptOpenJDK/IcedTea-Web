@@ -1,7 +1,7 @@
 2016-01-19  Jiri Vanek <jvanek@redhat.com>
 
 	When tagsoup is missing, parsing errors are more informative
- 	* acinclude.m4: when building without tagsoup, more verbose warning is printed
+	* acinclude.m4: when building without tagsoup, more verbose warning is printed
 	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: (launchError) is now noting
 	that BasicExceptionDialog will be shown.
 	* netx/net/sourceforge/jnlp/MalformedXMLParser.java: Now react on NoClassDefFoundError
