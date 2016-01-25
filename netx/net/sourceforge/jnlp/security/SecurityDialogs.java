@@ -232,7 +232,7 @@ public class SecurityDialogs {
 
         SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.MISSING_ALACA;
-         String urlToShow = "unknown url";
+         String urlToShow = file.getNotNullProbalbeCodeBase().toExternalForm();
          if (codeBase != null) {
              urlToShow = codeBase.toString();
          } else {

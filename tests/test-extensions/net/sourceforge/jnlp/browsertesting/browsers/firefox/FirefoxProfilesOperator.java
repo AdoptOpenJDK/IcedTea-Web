@@ -129,11 +129,9 @@ public class FirefoxProfilesOperator {
         FileInputStream is = new FileInputStream(from);
         FileOutputStream fos = new FileOutputStream(to);
         FileChannel f = is.getChannel();
-        FileChannel f2 = fos.getChannel();
-        try {
+        try (FileChannel f2 = fos.getChannel()) {
             f.transferTo(0, f.size(), f2);
         } finally {
-            f2.close();
             f.close();
         }
     }

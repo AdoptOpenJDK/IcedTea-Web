@@ -116,8 +116,8 @@ public class UnsignedAppletTrustConfirmation {
     private static UnsignedAppletActionEntry getMatchingItem(UnsignedAppletActionStorage actionStorage, JNLPFile file, Class<? extends RememberableDialog> id) {
         return actionStorage.getMatchingItem(
                 UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */).toString(), 
-                UrlUtils.normalizeUrlAndStripParams(file.getCodeBase(), true /* encode local files */).toString(), 
-                toRelativePaths(getJars(file), file.getCodeBase().toString()), id);
+                UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbalbeCodeBase(), true /* encode local files */).toString(), 
+                toRelativePaths(getJars(file), file.getNotNullProbalbeCodeBase().toExternalForm()), id);
     }
 
     /* Extract the archives as relative paths */
@@ -140,7 +140,7 @@ public class UnsignedAppletTrustConfirmation {
         try {
             UnsignedAppletActionEntry oldEntry = getMatchingItem(userActionStorage, file, id);
 
-            URL codebase = UrlUtils.normalizeUrlAndStripParams(file.getCodeBase(), true /* encode local files */);
+            URL codebase = UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbalbeCodeBase(), true /* encode local files */);
             URL documentbase = UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */);
 
             UrlRegEx codebaseRegex = null;
@@ -153,7 +153,7 @@ public class UnsignedAppletTrustConfirmation {
 
                 if (!rememberForCodeBase) {
                     documentbaseRegex = UrlRegEx.quote(documentbase.toExternalForm()); // Match only this applet
-                    archiveMatches = toRelativePaths(getJars(file), file.getCodeBase().toString()); // Match only this applet
+                    archiveMatches = toRelativePaths(getJars(file), file.getNotNullProbalbeCodeBase().toString()); // Match only this applet
                 } else {
                     documentbaseRegex = UrlRegEx.quoteAndStar(UrlUtils.stripFile(documentbase)); // Match any from codebase and sourceFile "base"
                 }

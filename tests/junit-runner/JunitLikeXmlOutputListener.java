@@ -424,12 +424,22 @@ public class JunitLikeXmlOutputListener extends RunListener {
 
         String distro = "http://mail.openjdk.java.net/pipermail/distro-pkg-dev/";
         String openjdk = "http://mail.openjdk.java.net/pipermail/";
+        String pushHead = "http://icedtea.classpath.org/hg/";
+        String pushBranch = "http://icedtea.classpath.org/hg/release/";
         if (string.startsWith(distro)) {
             r[0] = "distro-pkg";
             return r;
         }
         if (string.startsWith(openjdk)) {
             r[0] = "openjdk";
+            return r;
+        }
+        if (string.startsWith(pushBranch)) {
+            r[0] = "push (branch)";
+            return r;
+        }
+        if (string.startsWith(pushHead)) {
+            r[0] = "push (head)";
             return r;
         }
         return r;
@@ -458,6 +468,12 @@ public class JunitLikeXmlOutputListener extends RunListener {
         System.out.println(q[0] + " : " + q[1]);
 
         q = createBug("http://lists.fedoraproject.org/pipermail/chinese/2012-January/008868.html");
+        System.out.println(q[0] + " : " + q[1]);
+        
+        q = createBug("http://icedtea.classpath.org/hg/icedtea-web/rev/22b7becd48a7");
+        System.out.println(q[0] + " : " + q[1]);
+        
+        q = createBug("http://icedtea.classpath.org/hg/release/icedtea-web-1.6/rev/0d9faf51357d");
         System.out.println(q[0] + " : " + q[1]);
     }
 }

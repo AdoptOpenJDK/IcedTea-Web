@@ -1,5 +1,5 @@
-/* AutoErrorClosingListener.java
- Copyright (C) 2012 Red Hat, Inc.
+/* ExtensionJnlpTestApplet.java
+ Copyright (C) 2013 Red Hat, Inc.
 
  This file is part of IcedTea.
 
@@ -34,23 +34,53 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.closinglisteners;
 
-public class AutoErrorClosingListener extends StringBasedClosingListener {
+import java.applet.*;
+import java.awt.Graphics;
 
-    public static final String MAGICAL_ERROR_CLOSING_STRING = "xception";
+/**
+ *
+ * Note that for html's appelt and jnlphreff's jnlp file may have different
+ * codebase.
+ *
+ */
+public class CodebasesAttsSigned extends Applet {
 
-    public AutoErrorClosingListener() {
-        super(MAGICAL_ERROR_CLOSING_STRING);
+    private static final String appletCloseString = "*** APPLET FINISHED ***";
+    private static final String bid = "BID0";
+
+    public static void main(String... args) {
+        System.out.println("id: "+args[0]);
+        System.out.println("BID: "+bid);
+        System.out.println(CodebasesAttsSigned.class.getName());
+        System.out.println(appletCloseString);
+        System.out.flush();
+        System.out.println("some garbage");
     }
 
     @Override
-    public void lineReaded(String s) {
-        if (s.contains("FAILED ASSERTION")) {
-            //dont terminate if it is rhino's org.mozilla.javascript.Kit 
-        } else {
-            super.lineReaded(s);
-        }
+    public void init() {
+
+    }
+
+    @Override
+    public void start() {
+        main(getParameter("id"));
+    }
+
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public void paint(Graphics g) {
+
     }
 
 }

@@ -100,7 +100,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
 
         try {
             if (file instanceof PluginBridge) {
-                from = file.getCodeBase().toExternalForm();
+                from = file.getNotNullProbalbeCodeBase().toExternalForm();
             } else {
                 from = file.getInformation().getHomepage().toExternalForm();
             }

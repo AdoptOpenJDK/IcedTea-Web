@@ -1,3 +1,65 @@
+2016-01-25  Jiri Vanek <jvanek@redhat.com>
+
+	Fixed various cosmetic NPEs when codebase is null (+tests)
+	* NEWS: mentioned PR2489
+	* netx/net/sourceforge/jnlp/JNLPFile.java: added method getNotNullProbalbeCodeBase
+	workaround cases when codebase is null (for various output reasons)
+	* netx/net/sourceforge/jnlp/PluginBridge.java: using getNotNullProbalbeCodeBase
+	when fixing codebase during generation of jnlp stub.
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: same for generating uri for policies
+	record
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (manageExternalJars)
+	same for ref string comparsion
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: same for visible form of
+	codebase
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: same
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/TemporaryPermissionsButton.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: (normalizeUrlAndStripParams) and
+	(removeFileName) when input is null, return null.
+	* tests/junit-runner/JunitLikeXmlOutputListener.java: now supports hg commits
+	* tests/reproducers/signed/CodebasesAttsSigned/srcs/CodebasesAttsSigned.java:
+	test printing "hardocded" id and paramet to know jar and calling jnlp/html source
+	* tests/reproducers/signed/CodebasesAttsSigned/resources/CodebasesAttsSigned.html.in:
+	resouirce capable of substitue id param, codebase, jar and htmlHref
+	* tests/reproducers/signed/CodebasesAttsSigned/resources/CodebasesAttsSignedApp.jnlp.in:
+	same
+	* tests/reproducers/signed/CodebasesAttsSigned/resources/CodebasesAttsSignedApplet.jnlp.in:
+	same
+	* tests/reproducers/signed/CodebasesAttsSigned/resources/CodebasesAttsSignedJnlpHref.html.in:
+	same
+	* tests/reproducers/signed/CodebasesAttsSigned/testcases/CodebasesAttsSignedDialogsTest1.java:
+	Test testing various dialogues of signed app. Including tests for corrupted signature
+	* tests/reproducers/simple/CodebasesAtts/srcs/CodebasesAtts.java: same as CodebasesAttsSigned
+	but not signed
+	* tests/reproducers/simple/CodebasesAtts/resources/CodebasesAtts.html.in:
+	same as signed ones
+	* tests/reproducers/simple/CodebasesAtts/resources/CodebasesAttsApp.jnlp.in:
+	same
+	* tests/reproducers/simple/CodebasesAtts/resources/CodebasesAttsApplet.jnlp.in:
+	same
+	* tests/reproducers/simple/CodebasesAtts/resources/CodebasesAttsJnlpHref.html.in:
+	same
+	* tests/reproducers/simple/CodebasesAtts/testcases/CodebasesAttsDialogsTest1.java:
+	same
+	* tests/reproducers/simple/CodebasesAtts/testcases/CodebasesAttsNoDialogsTest1.java:
+	* tests/reproducers/simple/CodebasesAtts/testcases/CodebasesAttsNoDialogsTest2.java:
+	* tests/reproducers/simple/CodebasesAtts/testcases/CodebasesAttsNoDialogsTest3.java:
+	Again tests for various substituted values
+	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
+	added stubs to create independent instance upon tmp folder and execute browser
+	upon url.
+	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/firefox/FirefoxProfilesOperator.java:
+	(copyFile) moved to autocloseable
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/AutoErrorClosingListener.java:
+	fixed to not to close on rhino exception
+	* tests/test-extensions/net/sourceforge/jnlp/closinglisteners/StringBasedClosingListener.java:
+	condition made protected
+
 2016-01-19  Jiri Vanek <jvanek@redhat.com>
 
 	When tagsoup is missing, parsing errors are more informative

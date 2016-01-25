@@ -52,6 +52,9 @@ public class UrlUtils {
     private static final String UTF8 = "utf-8";
 
     public static URL normalizeUrlAndStripParams(URL url, boolean encodeFileUrls) {
+        if (url == null) {
+            return null;
+        }
         try {
             String[] urlParts = url.toString().split("\\?");
             URL strippedUrl = new URL(urlParts[0]); 
@@ -165,6 +168,9 @@ public class UrlUtils {
      * @return  src without file
      */
     public static URL removeFileName(final URL src) {
+        if (src == null) {
+            return src;
+        }
         URL nsrc = normalizeUrlAndStripParams(src);
         String s = nsrc.getPath();
         int i1 = s.lastIndexOf("/");

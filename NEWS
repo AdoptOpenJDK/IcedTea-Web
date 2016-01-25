@@ -17,6 +17,7 @@ New in release 1.7 (2015-XX-XX):
 * PR2591 - IcedTea-Web request resources twice for meta informations and causes ClientAbortException on tomcat in conjunction with JnlpDownloadServlet
 * PR2690 - Can't run BOM into JNLP file
 * PR2669 - remove bash-specific syntax from top level Makefile.am
+* PR2489 - various NPEs when codebase is null
 * comments in deployment.properties now should persists load/save
 * fixed bug in caching of files with query
 * fixed issues with recreating of existing shortcut

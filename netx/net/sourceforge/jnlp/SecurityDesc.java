@@ -415,11 +415,7 @@ public class SecurityDesc {
             }
         }
         try {
-            URL codebaseOriginal = file.getCodeBase();
-            if (codebaseOriginal == null){
-                codebaseOriginal =file.fileLocation;
-            }
-            final URI codebase = codebaseOriginal.toURI().normalize();
+            final URI codebase = file.getNotNullProbalbeCodeBase().toURI().normalize();
             final URI host = getHost(codebase);
             final String codebaseHostUriString = host.toString();
             final String urlPermissionUrlString = appendRecursiveSubdirToCodebaseHostString(codebaseHostUriString);

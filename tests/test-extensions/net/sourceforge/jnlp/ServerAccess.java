@@ -231,7 +231,20 @@ public class ServerAccess {
     public static ServerLauncher getIndependentInstance(String dir, int port) {
         return getIndependentInstance(dir, port, true);
     }
-    public static ServerLauncher getIndependentInstance(String dir, int port,boolean daemon) {
+
+    public static ServerLauncher getIndependentInstance(String dir) throws IOException {
+        return getIndependentInstance(dir, findFreePort(), true);
+    }
+
+    public static ServerLauncher getIndependentInstanceOnTmpDir() throws IOException {
+        File f = File.createTempFile("itwReproducers_", "_anotherDeployDir");
+        f.delete();
+        f.mkdir();
+        f.deleteOnExit();
+        return getIndependentInstance(f.getAbsolutePath(), findFreePort(), true);
+    }
+
+    public static ServerLauncher getIndependentInstance(String dir, int port, boolean daemon) {
 
 
         if (dir == null || dir.trim().length() == 0 || !new File(dir).exists() || !new File(dir).isDirectory()) {
@@ -647,6 +660,12 @@ public class ServerAccess {
 
     public ProcessResult executeBrowser(List<String> otherargs, String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
         ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
+        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
+        return rpw.execute();
+    }
+    
+    public ProcessResult executeBrowser(List<String> otherargs, URL url, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, url, stdoutl, stderrl, null);
         rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
         return rpw.execute();
     }

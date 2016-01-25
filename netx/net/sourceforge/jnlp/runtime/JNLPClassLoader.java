@@ -2157,7 +2157,7 @@ public class JNLPClassLoader extends URLClassLoader {
         if (foundLoader != null)
             approved = true;
 
-        else if (ref.toString().startsWith(file.getCodeBase().toString()))
+        else if (ref.toString().startsWith(file.getNotNullProbalbeCodeBase().toString()))
             approved = true;
         else if (SecurityDesc.ALL_PERMISSIONS.equals(security.getSecurityType()))
             approved = true;

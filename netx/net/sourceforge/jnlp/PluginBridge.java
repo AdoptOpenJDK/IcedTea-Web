@@ -475,7 +475,7 @@ public final class PluginBridge extends JNLPFile {
         } else {
             StringBuilder s = new StringBuilder();
             s.append("<?xml version='1.0' encoding='UTF-8'?>\n"
-                   + "<jnlp codebase='").append(getCodeBase().toString()).append("'>\n")
+                   + "<jnlp codebase='").append(getNotNullProbalbeCodeBase().toString()).append("'>\n")
                     .append("  <information>\n"
                           + "    <title>").append(createJnlpTitle()).append("</title>\n"
                           + "    <vendor>").append(createJnlpVendor()).append("</vendor>\n"
@@ -540,7 +540,7 @@ public final class PluginBridge extends JNLPFile {
     }
 
      private String fixCommonIsuses(boolean needSecurity, String orig) {
-        String codebase = getCodeBase().toString();
+        String codebase = getNotNullProbalbeCodeBase().toString();
         return fixCommonIsuses(needSecurity, orig, codebase, createJnlpTitle(), createJnlpVendor());
     }
      

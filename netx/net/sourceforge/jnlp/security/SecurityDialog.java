@@ -336,7 +336,7 @@ public class SecurityDialog extends JDialog {
         } else if (type == DialogType.AUTHENTICATION) {
             lpanel = new PasswordAuthenticationPane(sd, sd.extras);
         } else if (type == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING) {
-            lpanel = new MissingPermissionsAttributePanel(sd, sd.file.getTitle(), sd.file.getCodeBase().toExternalForm());
+            lpanel = new MissingPermissionsAttributePanel(sd, sd.file.getTitle(), sd.file.getNotNullProbalbeCodeBase().toExternalForm());
         } else if (type == DialogType.MISSING_ALACA) {
             lpanel = new MissingALACAttributePanel(sd, sd.file.getTitle(), (String) sd.extras[0], (String) sd.extras[1]);
         } else if (type == DialogType.MATCHING_ALACA) {

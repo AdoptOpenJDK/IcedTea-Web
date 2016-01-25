@@ -37,6 +37,7 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ClasspathMatcher;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -418,6 +419,25 @@ public class JNLPFile {
      */
     public URL getCodeBase() {
         return codeBase;
+    }
+    
+    /**
+     * It is not recommended to use this method for internals of itw - use normal getCodeBase rather, as null is expected always except toString calls.
+     *
+     * If you are not sure, use getCodeBase and chek null as you need. See that this method is used mostly for xtendedAppletSecuriyty dialogs.
+     * 
+     * @return the codebase URL for the JNLP file  or url of location of calling file (jnlp, hreffed jnlp, or directly html)
+     */
+    public URL getNotNullProbalbeCodeBase() {
+        if (getCodeBase()!=null){
+            return getCodeBase();
+        }
+        try {
+            return UrlUtils.removeFileName(getSourceLocation());
+        } catch (Exception ex) {
+            OutputController.getLogger().log(ex);
+        }
+        return getSourceLocation();
     }
 
     /**
