@@ -91,7 +91,7 @@ public class CodeBaseManifestEntryUnsignedNotMatching extends BrowserTest {
 
     @Test
     public void ApplicationJNLPLocalTest() throws Exception {
-        List<String> commands = new ArrayList<String>(3);
+        List<String> commands = new ArrayList<>(3);
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add(GENERAL_NAME + SIGNATURE + ".jnlp");
@@ -106,7 +106,7 @@ public class CodeBaseManifestEntryUnsignedNotMatching extends BrowserTest {
     @Test
     public void ApplicationJNLPLocalTestWithRemoteCodebase() throws Exception {
         prepareCopyFile();
-        List<String> commands = new ArrayList<String>(3);
+        List<String> commands = new ArrayList<>(3);
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add(GENERAL_NAME + SIGNATURE + "_copy.jnlp");
@@ -126,7 +126,7 @@ public class CodeBaseManifestEntryUnsignedNotMatching extends BrowserTest {
     @NeedsDisplay
     @Test
     public void AppletJNLPRLocalTest() throws Exception {
-        List<String> commands = new ArrayList<String>(3);
+        List<String> commands = new ArrayList<>(3);
         commands.add(server.getJavawsLocation());
         commands.add(ServerAccess.HEADLES_OPTION);
         commands.add(GENERAL_NAME + SIGNATURE + "Applet.jnlp");
@@ -148,7 +148,7 @@ public class CodeBaseManifestEntryUnsignedNotMatching extends BrowserTest {
     @TestInBrowsers(testIn = {Browsers.one})
     @Test
     public void BrowserJNLPHrefLocalTest() throws Exception {
-        List<String> commands = new ArrayList<String>(2);
+        List<String> commands = new ArrayList<>(2);
         commands.add(server.getBrowserLocation());
         commands.add(GENERAL_NAME + SIGNATURE + "Jnlp.html");
         ProcessResult pr = ServerAccess.executeProcess(commands, server.getDir(), new AutoOkClosingListener(), null);
@@ -160,7 +160,7 @@ public class CodeBaseManifestEntryUnsignedNotMatching extends BrowserTest {
     @TestInBrowsers(testIn = {Browsers.one})
     @Test
     public void BrowserAppletLocalTest() throws Exception {
-        List<String> commands = new ArrayList<String>(2);
+        List<String> commands = new ArrayList<>(2);
         commands.add(server.getBrowserLocation());
         commands.add(GENERAL_NAME + SIGNATURE + ".html");
         ProcessResult pr = ServerAccess.executeProcess(commands, server.getDir(), new AutoOkClosingListener(), null);

@@ -1,3 +1,20 @@
+2016-01-26  Jiri Vanek <jvanek@redhat.com>
+
+	Revisited some jnlp_href tests. 
+	* tests/reproducers/signed/ClasspathManifestTest/testcases/ClasspathManifestTest.java:
+	explained why localtests on "." are passing (removed KnownToFail) and added
+	(correctly failing) tests in various dirs
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedMatching.java:
+	used diamond
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntrySignedNotMatching.java:
+	same
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntryUnsignedMatching.java:
+	same
+	* tests/reproducers/signed/CodeBaseManifestEntrySignedMatching/testcases/CodeBaseManifestEntryUnsignedNotMatching.java:
+	same
+	* tests/reproducers/simple/SingleInstanceServiceTest/testcases/SingleInstanceTest.java:
+	fixed midori incompatible tests
+
 2016-01-25  Jiri Vanek <jvanek@redhat.com>
 
 	Fixed various cosmetic NPEs when codebase is null (+tests)
