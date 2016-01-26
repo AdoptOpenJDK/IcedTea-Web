@@ -1,5 +1,13 @@
 2016-01-26  Jiri Vanek <jvanek@redhat.com>
 
+	Messages for Invalid JDK dialog improved a bit.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties:
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties:
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties:
+
+2016-01-26  Jiri Vanek <jvanek@redhat.com>
+
 	Revisited some jnlp_href tests. 
 	* tests/reproducers/signed/ClasspathManifestTest/testcases/ClasspathManifestTest.java:
 	explained why localtests on "." are passing (removed KnownToFail) and added
