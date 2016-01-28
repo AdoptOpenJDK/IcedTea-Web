@@ -1,3 +1,8 @@
+2016-01-28  Matthias Klose  <doko@ubuntu.com>
+            Jiri Vanek <jvanek@redhat.com>
+
+	* Makefile: (stamps/generate-docs.stamp) added quotes around HTML_DOCS_INDEX
+
 2016-01-26  Jiri Vanek <jvanek@redhat.com>
 
 	Messages for Invalid JDK dialog improved a bit.
