@@ -511,11 +511,22 @@ if !WITH_RHINO
 	sed -i '/RhinoBasedPacEvaluator/ d' $@
 endif
 
+# if 'sed' will be missing on machine, use old IFS hack as on other places
+# the 'sed' cycles is changing some custom version like 1.6.2 fedora23.4 to simple 1.6
+# if changed, keep in mind that also 1.7 should bubble to 1.7
+# also 1.7pre or 1.7preHASH should end up like 1.7
 $(abs_top_builddir)/metadata: $(top_srcdir)/metadata.in
 	mkdir -p $(abs_top_builddir)/metadata-work ; \
 	METAFILES=`ls $(top_srcdir)/metadata.in` ; \
+	SEDDED_VERSION=`echo "$(FULL_VERSION)" | sed 's/[^0-9]\+/ /g'` ; \
+	x=0; for i in $$SEDDED_VERSION ; do  \
+	  let x++; \
+	  if [ $$x -eq 1 ] ; then V1=$$i; fi; \
+	  if [ $$x -eq 2 ] ; then V2=$$i; fi; \
+	done; \
+	XVERSION=$$V1.$$V2; \
 	for F in $$METAFILES ; do \
-	  cat $(top_srcdir)/metadata.in/$$F | sed "s;%{name};$(PACKAGE_NAME);g" |  sed "s;%{version};$(FULL_VERSION);g" > $(abs_top_builddir)/metadata-work/$$F ; \
+	  cat $(top_srcdir)/metadata.in/$$F | sed "s;%{name};$(PACKAGE_NAME);g" |  sed "s;%{version};$$XVERSION;g" > $(abs_top_builddir)/metadata-work/$$F ; \
 	done ; \
 	mv $(abs_top_builddir)/metadata-work $(abs_top_builddir)/metadata ;
 

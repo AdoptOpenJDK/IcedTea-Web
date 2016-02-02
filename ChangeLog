@@ -1,3 +1,9 @@
+2016-02-02  Jiri Vanek <jvanek@redhat.com>
+
+	maven artifacts version substituted to contains only major version 
+	* .Makefile: ($(abs_top_builddir)/metadata) version stripped by everything
+	behind second number
+
 2016-01-28  Matthias Klose  <doko@ubuntu.com>
             Jiri Vanek <jvanek@redhat.com>
 
