@@ -41,6 +41,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -56,6 +57,7 @@ import net.sourceforge.jnlp.security.dialogs.AccessWarningPane;
 import net.sourceforge.jnlp.security.dialogs.AppletWarningPane;
 import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
 import net.sourceforge.jnlp.security.dialogs.CertsInfoPane;
+import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
 import net.sourceforge.jnlp.security.dialogs.MissingALACAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MissingPermissionsAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.MoreInfoPane;
@@ -341,6 +343,8 @@ public class SecurityDialog extends JDialog {
             lpanel = new MissingALACAttributePanel(sd, sd.file.getTitle(), (String) sd.extras[0], (String) sd.extras[1]);
         } else if (type == DialogType.MATCHING_ALACA) {
             lpanel = AppTrustWarningDialog.matchingAlaca(sd, sd.file, (String) sd.extras[0], (String) sd.extras[1]);
+        } else if (type == DialogType.SECURITY_511) {
+            lpanel = new InetSecurity511Panel(sd, (URL) sd.extras[0]);
         } else {
             throw new RuntimeException("Unknown value of " + sd.dialogType + ". Panel will be null. Tahts not allowed.");
         }

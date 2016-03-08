@@ -1,3 +1,60 @@
+2016-03-08  Jiri Vanek <jvanek@redhat.com>
+
+	Added support for http 511 authentication
+	As side effect added -browser switch, which enables internal browser as standalone window 
+	* NEWS: mentioned PR878, mentioned -browser switch
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java: added BROWSER to represent
+	-browser switch
+	* netx/net/sourceforge/jnlp/cache/ResourceDownloader.java: when 511 is encountered,
+	show511Dialogue is called and dialog shown
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added resource regarding
+	to integrated browser and http 511 dialog messages
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: added reaction to -browser; refactored
+	* netx/net/sourceforge/jnlp/runtime/html/browser/DocumentChangededListener.java:
+	new file, used to notify LinksPannel that Browser changed
+	* netx/net/sourceforge/jnlp/runtime/html/browser/HtmlBrowserPanel.java: dummy
+	implementation of browser based on jeditorpane, to resolve http 511 messages and forms
+	* netx/net/sourceforge/jnlp/runtime/html/browser/LinkingBrowser.java: connected
+	dualpane for Browser and LinksPanel.
+	* netx/net/sourceforge/jnlp/runtime/html/browser/LinksPanel.java: primarily
+	for headless dialogues, extracts links from http communication and prints them out.
+	In Xfull mode allows user to quickly browse out to real browser to resolve http 511
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: add http 511 invocation
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: same and reformatted.
+	* netx/net/sourceforge/jnlp/security/dialogresults/BasicDialogValue.java: added
+	SKIP result.
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesCancel.java: constructor
+	made protected to allow inheritance
+	* netx/net/sourceforge/jnlp/security/dialogresults/YesCancelSkip.java: extension
+	of YES CANCEL by SKIP
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: button made final
+	* netx/net/sourceforge/jnlp/security/dialogs/InetSecurity511Panel.java:
+	security dialog based on LinkingBrowser
+	* netx/net/sourceforge/jnlp/security/dialogs/SecurityDialogPanel.java:
+	removed unused import
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: added loadUrl and loadUrlWithInvalidHeader
+	to load content of url negotination. First for URLconection, second for Socket connection
+	* tests/reproducers/simple/Http511/testcases/Http511Test.java: huge reproducer
+	for various http 511 cases
+	* tests/reproducers/simple/Http511/resources/Http511.html:
+	* tests/reproducers/simple/Http511/resources/Http511.jnlp:
+	* tests/reproducers/simple/Http511/resources/Http511_applet.jnlp:
+	* tests/reproducers/simple/Http511/resources/Http511_href.html:
+	* tests/reproducers/simple/Http511/srcs/Http511.java:
+	* tests/test-extensions/net/sourceforge/jnlp/Authentication511Requester.java:
+	interface to summary necessary methods for http 511 authentification
+	* tests/test-extensions/net/sourceforge/jnlp/ClosingListener.java: assasin made
+	accessible
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java: kill -9
+	again enabled on demand
+	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java: now implements
+	Authentication511Requester
+	* tests/test-extensions/net/sourceforge/jnlp/TinyHttpdImpl.java: can set and use 
+	Authentication511Requester
+	* tests/test-extensions/net/sourceforge/jnlp/tools/WaitingForStringProcess.java:
+	output made final
+
+
 2016-02-02  Jiri Vanek <jvanek@redhat.com>
 
 	maven artifacts version substituted to contains only major version 

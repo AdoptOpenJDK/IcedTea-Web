@@ -1,5 +1,8 @@
-/* 
- Copyright (C) 2009 Red Hat, Inc.
+
+import java.applet.Applet;
+
+/* AppletTest.java
+ Copyright (C) 2011 Red Hat, Inc.
 
  This file is part of IcedTea.
 
@@ -34,37 +37,22 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.security.dialogresults;
-
-import java.util.EnumSet;
-
-public class YesCancel extends Yes {
-
-    public static YesCancel yes() {
-        return new YesCancel(BasicDialogValue.Primitive.YES);
-    }
- 
-    public static YesCancel cancel() {
-        return new YesCancel(BasicDialogValue.Primitive.CANCEL);
-    }
-
-    public static YesCancel readValue(String s) {
-        return new YesCancel(BasicDialogValue.Primitive.valueOf(s));
-    }
-
-    protected YesCancel(BasicDialogValue.Primitive valueOf) {
-        super(valueOf);
-    }
+public class Http511 extends Applet {
 
     @Override
-    public int getButtonIndex() {
-        //use rather NO, however nonsense it seems?
-        return BasicDialogValue.Primitive.CANCEL.getLegacyButton();
+    public void start() {
+        confirm();
     }
 
-    @Override
-    public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
-        return BasicDialogValue.YesCancel;
+    public static void main(String... s) {
+        confirm();
     }
 
+    private static void confirm() {
+        System.out.println("*** applet running ***");
+        System.out.println("http 511 reprodcuer executed");
+        System.out.println("*** APPLET FINISHED ***");
+        System.err.println("flushing garbage");
+        System.out.println("flushing garbage");
+    }
 }

@@ -1,54 +1,65 @@
 /* UrlUtils.java
-   Copyright (C) 2011 Red Hat, Inc.
+ Copyright (C) 2011 Red Hat, Inc.
 
-This file is part of IcedTea.
+ This file is part of IcedTea.
 
-IcedTea is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
+ IcedTea is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, version 2.
 
-IcedTea is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+ IcedTea is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with IcedTea; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
+ You should have received a copy of the GNU General Public License
+ along with IcedTea; see the file COPYING.  If not, write to
+ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301 USA.
 
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
+ Linking this library statically or dynamically with other modules is
+ making a combined work based on this library.  Thus, the terms and
+ conditions of the GNU General Public License cover the whole
+ combination.
 
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.
-*/
-
+ As a special exception, the copyright holders of this library give you
+ permission to link this library with independent modules to produce an
+ executable, regardless of the license terms of these independent
+ modules, and to copy and distribute the resulting executable under
+ terms of your choice, provided that you also meet, for each linked
+ independent module, the terms and conditions of the license of that
+ module.  An independent module is a module which is not derived from
+ or based on this library.  If you modify this library, you may extend
+ this exception to your version of the library, but you are not
+ obligated to do so.  If you do not wish to do so, delete this
+ exception statement from your version.
+ */
 package net.sourceforge.jnlp.util;
 
+import java.io.BufferedReader;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import net.sourceforge.jnlp.JNLPFile;
 
 public class UrlUtils {
+
     private static final String UTF8 = "utf-8";
 
     public static URL normalizeUrlAndStripParams(URL url, boolean encodeFileUrls) {
@@ -57,7 +68,7 @@ public class UrlUtils {
         }
         try {
             String[] urlParts = url.toString().split("\\?");
-            URL strippedUrl = new URL(urlParts[0]); 
+            URL strippedUrl = new URL(urlParts[0]);
             return normalizeUrl(strippedUrl, encodeFileUrls);
         } catch (IOException | URISyntaxException e) {
             OutputController.getLogger().log(e);
@@ -71,9 +82,9 @@ public class UrlUtils {
 
     public static boolean isLocalFile(URL url) {
 
-        if (url.getProtocol().equals("file") &&
-                (url.getAuthority() == null || url.getAuthority().equals("")) &&
-                (url.getHost() == null || url.getHost().equals(("")))) {
+        if (url.getProtocol().equals("file")
+                && (url.getAuthority() == null || url.getAuthority().equals(""))
+                && (url.getHost() == null || url.getHost().equals(("")))) {
             return true;
         }
         return false;
@@ -151,21 +162,21 @@ public class UrlUtils {
     public static File decodeUrlAsFile(URL url) {
         return new File(decodeUrlQuietly(url).getFile());
     }
-  
+
     /**
      * This function i striping part behind last path delimiter.
-     * 
-     * Expected is input like protcol://som.url/some/path/file.suff
-     * Then output will bee protcol://som.url/some/path
-     * 
-     * Be aware of input like  protcol://som.url/some/path/
-     * then input will be just  protcol://som.url/some/path
-     * 
-     * You can use sanitizeLastSlash and see also unittests
-     * Both unix and windows salshes are supported
-     * 
+     *
+     * Expected is input like protcol://som.url/some/path/file.suff Then output
+     * will bee protcol://som.url/some/path
+     *
+     * Be aware of input like protcol://som.url/some/path/ then input will be
+     * just protcol://som.url/some/path
+     *
+     * You can use sanitizeLastSlash and see also unittests Both unix and
+     * windows salshes are supported
+     *
      * @param src src to be stripped
-     * @return  src without file
+     * @return src without file
      */
     public static URL removeFileName(final URL src) {
         if (src == null) {
@@ -190,6 +201,7 @@ public class UrlUtils {
 
     /**
      * Small utility function creating li list from collection of urls
+     *
      * @param remoteUrls list of urls
      * @return String containing html item list of those urls
      */
@@ -204,18 +216,19 @@ public class UrlUtils {
     }
 
     /**
-     * This function is removing all tailing slashes of url and 
-     * both unix and windows salshes are supported.
-     * See tests for valid and invalid inputs/outputs
-     * Shortly   protcol://som.url/some/path/ or  protcol://som.url/some/path////
-     * (and same for windows  protcol://som.url/some\path\\) will become  protcol://som.url/some/path
-     * Even  protcol://som.url/ is reduced to  protcol://som.url
-     * 
-     * 
-     * When input is like 
+     * This function is removing all tailing slashes of url and both unix and
+     * windows salshes are supported. See tests for valid and invalid
+     * inputs/outputs Shortly protcol://som.url/some/path/ or
+     * protcol://som.url/some/path//// (and same for windows
+     * protcol://som.url/some\path\\) will become protcol://som.url/some/path
+     * Even protcol://som.url/ is reduced to protcol://som.url
+     *
+     *
+     * When input is like
+     *
      * @param in url t be sanitized
      * @return url without trailing slash (if any)
-     * @throws MalformedURLException if original url was wrong 
+     * @throws MalformedURLException if original url was wrong
      */
     public static URL sanitizeLastSlash(URL in) throws MalformedURLException {
         if (in == null) {
@@ -237,13 +250,13 @@ public class UrlUtils {
     }
 
     /**
-     * both urls are processed by sanitizeLastSlash before actual equals.
-     * So protcol://som.url/some/path/ is same as protcol://som.url/some/path.
-     * Even protcol://som.url/some/path\ is same as protcol://som.url/some/path/
-     * 
+     * both urls are processed by sanitizeLastSlash before actual equals. So
+     * protcol://som.url/some/path/ is same as protcol://som.url/some/path. Even
+     * protcol://som.url/some/path\ is same as protcol://som.url/some/path/
+     *
      * @param u1 first url to comapre
      * @param u2 second
-     * @return  true if urls are equals no matter of trailing slash
+     * @return true if urls are equals no matter of trailing slash
      */
     public static boolean equalsIgnoreLastSlash(URL u1, URL u2) {
         try {
@@ -262,7 +275,7 @@ public class UrlUtils {
         }
     }
 
-     public static URL guessCodeBase(JNLPFile file) {
+    public static URL guessCodeBase(JNLPFile file) {
         if (file.getCodeBase() != null) {
             return file.getCodeBase();
         } else {
@@ -271,14 +284,13 @@ public class UrlUtils {
             return file.getResources().getMainJAR().getLocation();
         }
     }
-     
-     
-     /**
-     * Compares a URL using string compareNullableStrings of its protocol, host, port, path,
- query, and anchor. This method avoids the host name lookup that
-     * URL.equals does for http: protocol URLs. It may not return the same value
-     * as the URL.equals method (different hostnames that resolve to the same IP
-     * address, ie sourceforge.net and www.sourceforge.net).
+
+    /**
+     * Compares a URL using string compareNullableStrings of its protocol, host,
+     * port, path, query, and anchor. This method avoids the host name lookup
+     * that URL.equals does for http: protocol URLs. It may not return the same
+     * value as the URL.equals method (different hostnames that resolve to the
+     * same IP address, ie sourceforge.net and www.sourceforge.net).
      *
      * @param u1 first url to compareNullableStrings
      * @param u2 second url to compareNullableStrings
@@ -308,17 +320,17 @@ public class UrlUtils {
     }
 
     static boolean notNullUrlEquals(URL u1, URL u2) {
-        return compareNullableStrings(u1.getProtocol(), u2.getProtocol(), true) 
-                && compareNullableStrings(u1.getHost(), u2.getHost(), true) 
-                && compareNullableStrings(u1.getPath(), u2.getPath(), false) 
-                && compareNullableStrings(u1.getQuery(), u2.getQuery(), false) 
+        return compareNullableStrings(u1.getProtocol(), u2.getProtocol(), true)
+                && compareNullableStrings(u1.getHost(), u2.getHost(), true)
+                && compareNullableStrings(u1.getPath(), u2.getPath(), false)
+                && compareNullableStrings(u1.getQuery(), u2.getQuery(), false)
                 && compareNullableStrings(u1.getRef(), u2.getRef(), false);
-                // && u1.getPort() ==  u2.getPort(); errornous?
+        // && u1.getPort() ==  u2.getPort(); errornous?
     }
-    
-    
+
     /**
      * Compare strings that can be {@code null}.
+     *
      * @param s1 first string to compareNullableStrings with s2
      * @param s2 second string to compareNullableStrings with s1
      * @param ignore switch to ignore case
@@ -337,7 +349,7 @@ public class UrlUtils {
             return s1.equals(s2);
         }
     }
-    
+
     public static int getSanitizedPort(final URL u) {
         if (u.getPort() < 0) {
             return u.getDefaultPort();
@@ -352,7 +364,7 @@ public class UrlUtils {
     public static String getHostAndPort(final URL url) {
         return url.getHost() + ":" + getSanitizedPort(url);
     }
-    
+
     public static URL ensureSlashTail(URL u) {
         if (u == null) {
             return null;
@@ -409,6 +421,106 @@ public class UrlUtils {
             return documentbase.toExternalForm();
         }
 
+    }
+
+    public static String loadUrl(URL url) throws IOException {
+        StringBuilder all = new StringBuilder();
+        int tries = 0;
+        InputStream is = null;
+        while (true) {
+            URLConnection connection = url.openConnection();
+            //from time to time we get
+            //java.io.IOException: Invalid Http response, which kleads to null is
+            //maybe this is happening onloy with test server, but trying few more times should not harm
+            tries++;
+            try {
+                is = connection.getInputStream();
+            } catch (IOException ioe) {
+                OutputController.getLogger().log(ioe);
+                if (connection instanceof HttpURLConnection) {
+                    HttpURLConnection httpConn = (HttpURLConnection) connection;
+                    int statusCode = httpConn.getResponseCode();
+                    if (statusCode != 200) {
+                        is = httpConn.getErrorStream();
+                    }
+                }
+            }
+            if (tries > 6) {
+                throw new IOException("Failed " + url + " on " + tries + " attempts");
+            }
+            if (is != null) {
+                break;
+            } else {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, UTF8))) {
+            while (true) {
+                String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                all.append(line).append("\n");
+            }
+        }
+
+        return all.toString();
+    }
+
+    public static String[] loadUrlWithInvalidHeader(URL url) throws IOException {
+        try (Socket s = UrlUtils.createSocketFromUrl(url)) {
+            Writer w = new OutputStreamWriter(s.getOutputStream(), StandardCharsets.US_ASCII);
+            String file = url.getFile();
+            if (file.isEmpty()) {
+                file = "/";
+            }
+            w.write("GET " + file + " HTTP/1.0\r\n");
+            w.write("Host: " + url.getHost() + "\r\n");
+            w.write("User-Agent: javaws (icedtea-web)\r\n");
+            w.write("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n");
+            w.write("Referer: " + url.toExternalForm() + "\r\n");
+            w.write("\r\n");
+
+            w.flush();
+
+            StringBuilder all = new StringBuilder();
+            StringBuilder head = new StringBuilder();
+            StringBuilder body = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.US_ASCII))) {
+                StringBuilder second = head;
+                while (true) {
+                    String line = br.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    all.append(line).append("\n");
+                    if (line.isEmpty()) {
+                        second = body;
+                    } else {
+                        second.append(line).append("\n");
+                    }
+                }
+            }
+            return new String[]{all.toString(), head.toString(), body.toString()};
+        }
+    }
+
+    private static Socket createSocketFromUrl(URL url) throws IOException {
+        int p = url.getPort();
+        if (p < 0) {
+            p = url.getDefaultPort();
+        }
+        Socket s;
+        if (url.getProtocol().equals("https")) {
+            s = SSLSocketFactory.getDefault().createSocket(url.getHost(), p);
+        } else {
+            s = new Socket(url.getHost(), p);
+        }
+
+        return s;
     }
 
 }

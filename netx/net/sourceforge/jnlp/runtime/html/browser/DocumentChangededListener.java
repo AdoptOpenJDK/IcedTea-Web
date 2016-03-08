@@ -1,5 +1,5 @@
-/* ClosingListener.java
-Copyright (C) 2012 Red Hat, Inc.
+/* 
+   Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -33,27 +33,16 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
- */
-package net.sourceforge.jnlp;
+*/
 
-public abstract class ClosingListener implements ContentReaderListener {
+package net.sourceforge.jnlp.runtime.html.browser;
 
-    private ThreadedProcess process;
-    private ProcessAssasin assasin;
+import java.net.URL;
 
-    void setProcess(ThreadedProcess p) {
-        this.process = p;
-    }
+public interface DocumentChangededListener {
 
-    void setAssasin(ProcessAssasin assasin) {
-        this.assasin = assasin;
-    }
+    public void documentChangeded(String current);
+    public void addressChangeded(String url);
+    public void addressChangeded(URL url);
 
-    public ProcessAssasin getAssasin() {
-        return assasin;
-    }
-    
-    public void terminate() {
-        assasin.setTimeout(Long.MIN_VALUE);
-    }
 }

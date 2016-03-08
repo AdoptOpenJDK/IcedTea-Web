@@ -31,6 +31,8 @@ import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.ConnectionFactory;
+import net.sourceforge.jnlp.security.SecurityDialogs;
+import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
 import net.sourceforge.jnlp.util.HttpUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -261,6 +263,18 @@ public class ResourceDownloader implements Runnable {
                     requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
 
                     UrlRequestResult response = getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod);
+                    if (response.result == 511) {
+                        if (!InetSecurity511Panel.isSkip()) {
+
+                            boolean result511 = SecurityDialogs.show511Dialogue(resource);
+                            if (!result511) {
+                                throw new RuntimeException("Terminated on users request after encauntering 'http 511 authentication'.");
+                            }
+                            //try again, what to do with original resource was nowhere specified
+                            i--;
+                            continue;
+                        }
+                    }
                     if (response.shouldRedirect()) {
                         if (response.URL == null) {
                             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Although " + resource.toString() + " got redirect " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm() + " the target was null. Not following");
@@ -450,6 +464,7 @@ public class ResourceDownloader implements Runnable {
      */
     static class UrlRequestResult {
 
+        //http response code
         int result = HttpURLConnection.HTTP_OK;
         URL URL;
 

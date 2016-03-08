@@ -76,6 +76,7 @@ public class OptionsDefinitions {
         TRUSTNONE("-Xtrustnone","BOTrustnone"),
         JNLP("-jnlp","BOJnlp", NumberOfArguments.ONE),
         HTML("-html","BOHtml", NumberOfArguments.ONE_OR_MORE),
+        BROWSER("-browser", "BrowserArg", NumberOfArguments.ONE_OR_MORE),
         //itweb settings
         LIST("-list", "IBOList"),
         GET("-get", "name", "IBOGet", NumberOfArguments.ONE_OR_MORE),
@@ -217,7 +218,8 @@ public class OptionsDefinitions {
             OPTIONS.OFFLINE,
             OPTIONS.TRUSTNONE,
             OPTIONS.JNLP,
-            OPTIONS.HTML
+            OPTIONS.HTML,
+            OPTIONS.BROWSER
         });
     }
 

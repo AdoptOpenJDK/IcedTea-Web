@@ -18,6 +18,7 @@ New in release 1.7 (2015-XX-XX):
 * PR2690 - Can't run BOM into JNLP file
 * PR2669 - remove bash-specific syntax from top level Makefile.am
 * PR2489 - various NPEs when codebase is null
+* PR878 - (http-511) Handle HTTP error 511 Network Authentication Required (standard secure proxy authentification/captive portal detection) 
 * comments in deployment.properties now should persists load/save
 * fixed bug in caching of files with query
 * fixed issues with recreating of existing shortcut
@@ -40,6 +41,7 @@ New in release 1.7 (2015-XX-XX):
   - fixed issue with -html receiving garbage in width and height
   - main-class attribute trimmed by default
   - in strict mode, main-class attribute checked for invalid characters
+  - added -browser switch as workaround around most uttermost http authentications cornercases
 * PolicyEditor
   - Entry list is sorted, entries will appear with consistent ordering
   - file flag made to work when used standalone

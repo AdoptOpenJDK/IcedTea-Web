@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
 package net.sourceforge.jnlp.runtime;
 
 import java.io.File;
@@ -47,24 +46,23 @@ import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
 
 /**
- * This is the main entry point for the JNLP client. The main
- * method parses the command line parameters and loads a JNLP
- * file into the secure runtime environment. This class is meant
- * to be called from the command line or file association; to
- * initialize the netx engine from other code invoke the
- * {@link JNLPRuntime#initialize} method after configuring
- * the runtime.
+ * This is the main entry point for the JNLP client. The main method parses the
+ * command line parameters and loads a JNLP file into the secure runtime
+ * environment. This class is meant to be called from the command line or file
+ * association; to initialize the netx engine from other code invoke the
+ * {@link JNLPRuntime#initialize} method after configuring the runtime.
  *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
+ * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell
+ * (JAM)</a> - initial author
  * @version $Revision: 1.21 $
  */
 public final class Boot implements PrivilegedAction<Void> {
 
     // todo: decide whether a spawned netx (external launch)
     // should inherit the same options as this instance (store argv?)
-
     public static final String name = Boot.class.getPackage().getImplementationTitle();
     public static final String version = Boot.class.getPackage().getImplementationVersion();
 
@@ -93,6 +91,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
     /**
      * Launch the JNLP file specified by the command-line arguments.
+     *
      * @param argsIn launching arguments
      */
     public static void main(String[] argsIn) throws UnevenParameterException {
@@ -108,7 +107,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
             JNLPRuntime.setHeadless(true);
         }
-        
+
         DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VIEWER)) {
@@ -119,7 +118,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
-        
+
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERSION)) {
             OutputController.getLogger().printOutLn(nameAndVersion);
             JNLPRuntime.exit(0);
@@ -147,7 +146,7 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.ABOUT)) {
-                handleAbout();
+            handleAbout();
             if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
                 JNLPRuntime.exit(0);
             } else {
@@ -162,15 +161,13 @@ public final class Boot implements PrivilegedAction<Void> {
             }
         }
 
-
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.UPDATE)) {
             int value = Integer.parseInt(optionParser.getParam(OptionsDefinitions.OPTIONS.UPDATE));
             JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000l));
         }
-
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.NOUPDATE))
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.NOUPDATE)) {
             JNLPRuntime.setDefaultUpdatePolicy(UpdatePolicy.NEVER);
-
+        }
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.NOFORK)) {
             JNLPRuntime.setForksAllowed(false);
         }
@@ -189,10 +186,17 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.REDIRECT)) {
             JNLPRuntime.setAllowRedirect(true);
         }
+        
+        //if it is browser go by ots own, otherwise procedd with normal ITW logic
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.BROWSER)) {
+            String url = optionParser.getParam(OptionsDefinitions.OPTIONS.BROWSER);
+            LinkingBrowser.showStandAloneWindow(url, false);
+        } else {
 
-        JNLPRuntime.setInitialArgments(Arrays.asList(argsIn));
+            JNLPRuntime.setInitialArgments(Arrays.asList(argsIn));
 
-        AccessController.doPrivileged(new Boot());
+            AccessController.doPrivileged(new Boot());
+        }
 
     }
 
@@ -200,16 +204,16 @@ public final class Boot implements PrivilegedAction<Void> {
         final TextsProvider helpMessagesProvider = new JavaWsTextsProvider("utf-8", new PlainTextFormatter(), true, true);
 
         String helpMessage = "\n";
-        if (JNLPRuntime.isDebug()){
+        if (JNLPRuntime.isDebug()) {
             helpMessage += helpMessagesProvider.writeToString();
         } else {
             helpMessage = helpMessage
-                + helpMessagesProvider.prepare().getSynopsis()
-                + helpMessagesProvider.getFormatter().getNewLine()
-                + helpMessagesProvider.prepare().getOptions()
-                + helpMessagesProvider.getFormatter().getNewLine();
+                    + helpMessagesProvider.prepare().getSynopsis()
+                    + helpMessagesProvider.getFormatter().getNewLine()
+                    + helpMessagesProvider.prepare().getOptions()
+                    + helpMessagesProvider.getFormatter().getNewLine();
         }
-        
+
         OutputController.getLogger().printOut(helpMessage);
     }
 
@@ -266,7 +270,7 @@ public final class Boot implements PrivilegedAction<Void> {
             location = getMainFile();
         } catch (InvalidArgumentException e) {
             OutputController.getLogger().log(e);
-            fatalError("Invalid argument: "+e);
+            fatalError("Invalid argument: " + e);
         }
 
         if (location == null) {
@@ -279,16 +283,15 @@ public final class Boot implements PrivilegedAction<Void> {
         URL url = null;
 
         try {
-            if (new File(location).exists())
-                // TODO: Should be toURI().toURL()
+            if (new File(location).exists()) // TODO: Should be toURI().toURL()
+            {
                 url = new File(location).toURL(); // Why use file.getCanonicalFile?
-            else
-                if (ServiceUtil.getBasicService() != null){
-                    OutputController.getLogger().log("Warning, null basicService");
-                    url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
-                } else {
-                    url = new URL(location);
-                }
+            } else if (ServiceUtil.getBasicService() != null) {
+                OutputController.getLogger().log("Warning, null basicService");
+                url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
+            } else {
+                url = new URL(location);
+            }
         } catch (Exception e) {
             OutputController.getLogger().log(e);
             fatalError("Invalid jnlp file " + location);
@@ -301,12 +304,11 @@ public final class Boot implements PrivilegedAction<Void> {
      * Gets the JNLP file from the command line arguments, or exits upon error.
      */
     private static String getMainFile() throws InvalidArgumentException {
-        if (optionParser.getMainArgs().size() > 1 
+        if (optionParser.getMainArgs().size() > 1
                 || (optionParser.mainArgExists() && optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP))
                 || (optionParser.mainArgExists() && optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML))
-                || (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP) && optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML))
-                ) {
-              throw new InvalidArgumentException(optionParser.getMainArgs().toString());
+                || (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP) && optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML))) {
+            throw new InvalidArgumentException(optionParser.getMainArgs().toString());
         } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP)) {
             return optionParser.getParam(OptionsDefinitions.OPTIONS.JNLP);
         } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
@@ -342,5 +344,5 @@ public final class Boot implements PrivilegedAction<Void> {
 
         return ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
     }
-    
+
 }

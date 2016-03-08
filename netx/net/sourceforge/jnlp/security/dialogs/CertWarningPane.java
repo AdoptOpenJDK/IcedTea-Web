@@ -317,7 +317,7 @@ public class CertWarningPane extends SecurityDialogPanel {
      * Disable the Sandbox button when the AlwaysTrust checkbox is checked
      */
     private class ButtonDisableListener implements ActionListener {
-        private JButton button;
+        private final JButton button;
 
         public ButtonDisableListener(JButton button) {
             this.button = button;

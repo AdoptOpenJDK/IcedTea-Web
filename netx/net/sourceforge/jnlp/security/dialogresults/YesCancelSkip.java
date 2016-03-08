@@ -38,33 +38,31 @@ package net.sourceforge.jnlp.security.dialogresults;
 
 import java.util.EnumSet;
 
-public class YesCancel extends Yes {
+public class YesCancelSkip extends YesCancel {
 
-    public static YesCancel yes() {
-        return new YesCancel(BasicDialogValue.Primitive.YES);
-    }
- 
-    public static YesCancel cancel() {
-        return new YesCancel(BasicDialogValue.Primitive.CANCEL);
+    public static YesCancelSkip yes() {
+        return new YesCancelSkip(BasicDialogValue.Primitive.YES);
     }
 
-    public static YesCancel readValue(String s) {
-        return new YesCancel(BasicDialogValue.Primitive.valueOf(s));
+    public static YesCancelSkip cancel() {
+        return new YesCancelSkip(BasicDialogValue.Primitive.CANCEL);
     }
 
-    protected YesCancel(BasicDialogValue.Primitive valueOf) {
+    public static YesCancelSkip skip() {
+        return new YesCancelSkip(BasicDialogValue.Primitive.SKIP);
+    }
+
+    public static YesCancelSkip readValue(String s) {
+        return new YesCancelSkip(BasicDialogValue.Primitive.valueOf(s));
+    }
+
+    private  YesCancelSkip(BasicDialogValue.Primitive valueOf) {
         super(valueOf);
     }
 
     @Override
-    public int getButtonIndex() {
-        //use rather NO, however nonsense it seems?
-        return BasicDialogValue.Primitive.CANCEL.getLegacyButton();
-    }
-
-    @Override
     public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
-        return BasicDialogValue.YesCancel;
+        return BasicDialogValue.YesCancelSkip;
     }
 
 }

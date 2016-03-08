@@ -42,7 +42,7 @@ public abstract class BasicDialogValue {
 
     public static enum Primitive {
 
-        YES(0), NO(1), CANCEL(2), SANDBOX(2);
+        YES(0), NO(1), CANCEL(2), SANDBOX(2), SKIP(0);
 
         private final int legacyButton;
 
@@ -132,6 +132,7 @@ public abstract class BasicDialogValue {
     public static final EnumSet<Primitive> Yes = EnumSet.of(Primitive.YES);
     public static final EnumSet<Primitive> YesNo = EnumSet.of(Primitive.YES, Primitive.NO);
     public static final EnumSet<Primitive> YesCancel = EnumSet.of(Primitive.YES, Primitive.CANCEL);
+    public static final EnumSet<Primitive> YesCancelSkip = EnumSet.of(Primitive.YES, Primitive.CANCEL, Primitive.SKIP);
     public static final EnumSet<Primitive> YesNoCancel = EnumSet.of(Primitive.YES, Primitive.NO, Primitive.CANCEL);
     public static final EnumSet<Primitive> YesNoSandbox = EnumSet.of(Primitive.YES, Primitive.NO, Primitive.SANDBOX);
 

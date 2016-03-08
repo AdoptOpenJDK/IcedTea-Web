@@ -56,6 +56,8 @@ public class ProcessAssasin extends Thread {
     private volatile boolean killing = false;
     //signifies that assasin have done its job
     private volatile boolean killed = false;
+
+    private boolean useKill = false;
     /**
      * if this is true, then process is not destroyed after timeout, but just
      * left to its own destiny. Its stdout/err is no longer recorded, and it is
@@ -109,7 +111,6 @@ public class ProcessAssasin extends Thread {
     void setTimeout(long timeout) {
         this.timeout = timeout;
     }
-
 
     @Override
     public void run() {
@@ -176,7 +177,7 @@ public class ProcessAssasin extends Thread {
     public void destroyProcess() {
         try {
             killing = true;
-            destroyProcess(p, reactingProcess);
+            destroyProcess(p, reactingProcess, isUseKill());
         } finally {
             killed = true;
         }
@@ -190,9 +191,19 @@ public class ProcessAssasin extends Thread {
         return killing;
     }
 
+    public void setUseKill(boolean useKill) {
+        this.useKill = useKill;
+    }
 
+    public boolean isUseKill() {
+        return useKill;
+    }
 
     public static void destroyProcess(ThreadedProcess pp, ReactingProcess reactingProcess) {
+        destroyProcess(pp, reactingProcess, false);
+    }
+
+    public static void destroyProcess(ThreadedProcess pp, ReactingProcess reactingProcess, boolean mercielessKill) {
         Process p = pp.getP();
         try {
             Field f = p.getClass().getDeclaredField("pid");
@@ -202,8 +213,12 @@ public class ProcessAssasin extends Thread {
                 reactingProcess.beforeKill(pid);
             }
 //            sigInt(pid);
-            sigTerm(pid);
-//            sigKill(pid);
+            if (!mercielessKill) {
+                sigTerm(pid);
+            } else {
+                sigKill(pid);
+                ServerAccess.log("Mercieless -9 kil was used!", true, true);
+            }
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         } finally {

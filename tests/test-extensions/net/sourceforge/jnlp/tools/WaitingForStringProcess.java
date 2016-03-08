@@ -14,7 +14,7 @@ import org.junit.Assert;
 public class WaitingForStringProcess implements ContentReaderListener, Runnable {
     private final boolean headless;
     private final String url;
-    private StringBuilder output = new StringBuilder();
+    private final StringBuilder output = new StringBuilder();
     private StringBuilder err = new StringBuilder();
     private AsyncJavaws aj;
     ContentReaderListener errListener = new ContentReaderListener() {

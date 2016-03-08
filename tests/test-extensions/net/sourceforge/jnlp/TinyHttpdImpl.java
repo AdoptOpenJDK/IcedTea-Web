@@ -74,6 +74,7 @@ public class TinyHttpdImpl extends Thread {
     private boolean canRun = true;
     private boolean supportingHeadRequest = true;
     private boolean supportLastModified = false;
+    private Authentication511Requester authenticationRequester;
 
     public TinyHttpdImpl(Socket socket, File dir) {
         this(socket, dir, true);
@@ -111,6 +112,14 @@ public class TinyHttpdImpl extends Thread {
         return this.socket.getPort();
     }
 
+    private String extractMemory(String filePath) throws UnsupportedEncodingException {
+        //the memory is last item in form, browsers generraly agree on this
+        int i = filePath.lastIndexOf("=");
+        filePath = filePath.substring(i);
+        filePath = URLDecoder.decode(filePath, "utf-8");
+        return filePath;
+    }
+
     @Override
     public void run() {
         try {
@@ -125,6 +134,7 @@ public class TinyHttpdImpl extends Thread {
 
                     StringTokenizer t = new StringTokenizer(line, " ");
                     String request = t.nextToken();
+                    String filePath = t.nextToken();
 
                     boolean isHeadRequest = request.equals(ResourceTracker.RequestMethods.HEAD.toString());
                     boolean isGetRequest = request.equals(ResourceTracker.RequestMethods.GET.toString());
@@ -140,7 +150,42 @@ public class TinyHttpdImpl extends Thread {
                         continue;
                     }
 
-                    String filePath = t.nextToken();
+                    if (authenticationRequester != null) {
+                        if (authenticationRequester.isNeedsAuthentication511()) {
+                            if (filePath.startsWith("/" + ServerLauncher.login501_1)) {
+                                //requeested login dialog
+                                writer.writeBytes(HTTP_OK + CRLF);
+                                if (authenticationRequester.isRememberOrigianlUrl()) {
+                                    writer.writeBytes(authenticationRequester.createReply2(extractMemory(filePath)));
+                                } else {
+                                    writer.writeBytes(authenticationRequester.createReply2(null));
+                                }
+
+                                continue;
+                            } else if (filePath.startsWith("/" + ServerLauncher.login501_2) && filePath.contains("name=itw") && filePath.contains("passwd=itw")) {
+                                //verifying password
+                                authenticationRequester.setWasuthenticated511(true);
+                                if (authenticationRequester.isRememberOrigianlUrl()) {
+                                    filePath = extractMemory(filePath);
+                                    filePath = filePath.replaceAll("=", "");
+                                } else {
+                                     writer.writeBytes("HTTP/1.1 200 OK" + CRLF + "Content-Type: text/html" + CRLF + CRLF);
+                                     writer.writeBytes("Authentication ok, get back to your resource");
+                                     continue;
+                                }
+                            } else if (!authenticationRequester.isWasuthenticated011()) {
+                                //request authentication - redirect to 501_1
+                                writer.writeBytes("HTTP/1.1 511 Network Authentication Required" + CRLF + "Content-Type: text/html" + CRLF + CRLF);
+                                if (authenticationRequester.isRememberOrigianlUrl()) {
+                                    writer.writeBytes(authenticationRequester.createReply1(filePath));
+                                } else {
+                                    writer.writeBytes(authenticationRequester.createReply1(null));
+                                }
+                                continue;
+                            }
+                        }
+                    }
+
                     boolean slowSend = filePath.startsWith(XSX);
 
                     if (requestsCounter != null) {
@@ -337,4 +382,9 @@ public class TinyHttpdImpl extends Thread {
     public void setRequestsCounter(Map<String, Map<String, Integer>> requestsCounter) {
         this.requestsCounter = requestsCounter;
     }
+
+    void setAuthenticator(Authentication511Requester ar) {
+        this.authenticationRequester = ar;
+    }
+
 }

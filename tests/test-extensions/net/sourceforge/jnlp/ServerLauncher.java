@@ -50,7 +50,7 @@ import java.util.Map;
  * wrapper around tiny http server to separate lunch configurations and servers.
  * to allow terminations and stuff around.
  */
-public class ServerLauncher implements Runnable {
+public class ServerLauncher implements Runnable, Authentication511Requester {
 
     public static enum ServerNaming {
 
@@ -159,6 +159,7 @@ public class ServerLauncher implements Runnable {
         this.requestsCounter = requestsCounter;
     }
 
+    @Override
     public void run() {
         running = true;
         try {
@@ -169,6 +170,9 @@ public class ServerLauncher implements Runnable {
                 server.setRedirectCode(redirectCode);
                 server.setRequestsCounter(requestsCounter);
                 server.setSupportingHeadRequest(isSupportingHeadRequest());
+                if (isNeedsAuthentication511()) {
+                    server.setAuthenticator(this);
+                }
                 server.start();
             }
         } catch (Exception e) {
@@ -243,6 +247,90 @@ public class ServerLauncher implements Runnable {
             ServerAccess.logException(ex);
         }
         return super.toString();
+    }
+
+    private boolean needsAuthentication511 = false;
+    private boolean wasuthenticated511 = false;
+    private boolean remberLastUrl = false;
+
+    @Override
+    public boolean isRememberOrigianlUrl() {
+        return remberLastUrl;
+    }
+
+    @Override
+    public void setRememberOrigianlUrl(boolean remberUrl) {
+        remberLastUrl = remberUrl;
+    }
+
+    @Override
+    public void setNeedsAuthentication511(boolean needsAuthentication511) {
+        this.needsAuthentication511 = needsAuthentication511;
+    }
+
+    @Override
+    public void setWasuthenticated511(boolean wasuthenticated011) {
+        this.wasuthenticated511 = wasuthenticated011;
+    }
+
+    @Override
+    public boolean isNeedsAuthentication511() {
+        return needsAuthentication511;
+    }
+
+    @Override
+    public boolean isWasuthenticated011() {
+        return wasuthenticated511;
+    }
+
+    public static final String login501_1 = "login501_1";
+    public static final String login501_2 = "login501_2";
+
+    @Override
+    public String createReply1(String memory) throws MalformedURLException {
+        String hidden = "";
+        if (memory != null) {
+            hidden = "?memory=" + memory;
+        }
+        return "<html>\n"
+                + "<head>\n"
+                + " <title>Network Authentication Required</title>\n"
+                + "   <meta http-equiv='refresh'\n"
+                + "        content='2; url=" + getUrl(login501_1).toExternalForm() + hidden + "'>\n"
+                + "</head>\n"
+                + "<body>\n"
+                + "   <p>You need to <a href='" + getUrl(login501_1).toExternalForm() + hidden + "'>\n"
+                + "   authenticate with the local network</a> in order to gain\n"
+                + "   access.</p>\n"
+                + "</body>\n"
+                + "</html>\n";
+
+    }
+
+    @Override
+    public String createReply2(String memory) throws MalformedURLException {
+        String s1 = "<html>\n"
+                + "<head>\n"
+                + " <title>Network Authentication Required</title>\n"
+                + "</head>\n"
+                + "<body>\n"
+                + "   <p>Itw 511 simulator use itw/itw  for successful login</p><p>\n"
+                //+ "   <form action='" + login501_2 + "'  method=\"get\">\n"
+                //+TODO test on post "   <form action='" + login501_2 + "'  method=\"post \">\n"
+                + "   <form action='" + login501_2 + "' >\n"
+                + "   First name: <input type='text' name='name'><br>\n"
+                + "   password: <input type='text' name='passwd'><br>\n"
+                + "   <input type='submit' value='Submit'>\n";
+        String hidden = "";
+        if (memory != null) {
+            hidden = "<input type='hidden' name='memory' value='" + memory + "'>\n";
+        }
+        return s1 + hidden
+                + "   </form> \n"
+                + "   </p>\n"
+                + "</body>\n"
+                + "</html>\n";
+
     }
 
 }
