@@ -1,3 +1,7 @@
+2016-03-15  Jiri Vanek <jvanek@redhat.com>
+
+	* NEWS: mentioned PR2855
+
 2016-03-15  James Le Cuirot <chewi@gentoo.org>
 
 	* README: removed libX11 and zlib-devel from requirement
