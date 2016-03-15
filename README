@@ -64,8 +64,6 @@ incantation.  The build requirements are as follows:
 
 * A bootstrap JDK.  You can use any java JDK7 or higher compatible.
 * A C compiler (for the launchers).
-* libX11
-* zlib-devel
 
 Additionally, the plugin requires:
 

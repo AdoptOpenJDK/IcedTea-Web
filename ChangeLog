@@ -1,3 +1,8 @@
+2016-03-15  James Le Cuirot <chewi@gentoo.org>
+
+	* README: removed libX11 and zlib-devel from requirement
+	* configure.ac: removed check on zlib and on Xlibs
+
 2016-03-08  Jiri Vanek <jvanek@redhat.com>
 
 	Added support for http 511 authentication
