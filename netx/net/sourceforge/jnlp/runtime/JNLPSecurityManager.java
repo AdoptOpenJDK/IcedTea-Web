@@ -267,10 +267,9 @@ class JNLPSecurityManager extends AWTSecurityManager {
     public void checkPermission(Permission perm) {
         String name = perm.getName();
 
-        // Enable this manually -- it'll produce too much output for -verbose
-        // otherwise.
-        //      if (true)
-        //        OutputController.getLogger().log("Checking permission: " + perm.toString());
+        // Enable this manually -- it can kill ITW if left uncommented
+        //      if (false)
+        //        System.out.println("Checking permission: " + perm.toString());
 
         if (!JNLPRuntime.isWebstartApplication() &&
                 ("setPolicy".equals(name) || "setSecurityManager".equals(name))) {

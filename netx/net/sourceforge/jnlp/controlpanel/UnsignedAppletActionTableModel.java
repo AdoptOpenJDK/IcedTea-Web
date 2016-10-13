@@ -113,7 +113,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-
+        //tis returns copy, so we can save/cancel
         UnsignedAppletActionEntry source = back.toArray()[rowIndex];
         if (columnIndex == 0) {
             return source.getAppletSecurityActions();
@@ -136,7 +136,7 @@ public class UnsignedAppletActionTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
         final UnsignedAppletActionEntry source = back.toArray()[rowIndex];
-        back.modify(source, columnIndex, aValue);
+        back.modify(source, columnIndex, aValue.toString());
 
     }
 

@@ -130,6 +130,7 @@ class PluginMessageConsumer {
 
         public ConsumerThread() {
             super("PluginMessageConsumer.ConsumerThread");
+            this.setDaemon(true);
         }
 
         // Notify that either work is ready to do, or a worker is available

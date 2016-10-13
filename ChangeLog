@@ -1,3 +1,26 @@
+2016-10-13  Jiri Vanek <jvanek@redhat.com>
+
+	Finished implementation of editor of state of remembered dialogues 
+	* netx/net/sourceforge/jnlp/SecurityDesc.java: small fix - not enforcing
+	array on input of method  expecting ... type
+	* netx/net/sourceforge/jnlp/controlpanel/ClassFinder.java:
+	do not count interfaces as valid members
+	* netx/net/sourceforge/jnlp/controlpanel/RemmeberableDialogueEditor.java:
+	implemented missing code for Expert edit button and for combobox selection.
+	Implemented	save and close and close and cancel buttons.
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletActionTableModel.java:
+	highlighted some copying whew one would expect instance
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
+	gui creation moved to separate method, implemented reactions on RemmeberableDialogueEditor
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	added EPE group for RemmeberableDialogueEditor
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
+	highlighted some copying whew one would expect instance
+	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java: made deamon
+	* tests/netx/unit/net/sourceforge/jnlp/controlpanel/ClassFinderTest.java:
+	adapted to ignorance of interface
+
+
 2016-03-15  Jiri Vanek <jvanek@redhat.com>
 
 	* NEWS: mentioned PR2855

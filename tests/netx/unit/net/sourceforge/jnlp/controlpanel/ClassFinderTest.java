@@ -52,15 +52,14 @@ public class ClassFinderTest {
         "AppTrustWarningPanel",
         "AccessWarningPane",
         "MissingALACAttributePanel",
-        "MissingPermissionsAttributePanel",
-        "RememberableDialog"
+        "MissingPermissionsAttributePanel"
     };
 
     @Test
     public void testFoundClasses() {
         List<String> kknown = new ArrayList<>(Arrays.asList(known));
         List<Class<? extends RememberableDialog>> l = ClassFinder.findAllMatchingTypes(RememberableDialog.class);
-        Assert.assertTrue(l.size() == 8);
+        Assert.assertTrue(l.size() == 7);
         for (Class<? extends RememberableDialog> l1 : l) {
             Assert.assertTrue(l1.getName().startsWith("net.sourceforge.jnlp.security.dialogs."));
         }

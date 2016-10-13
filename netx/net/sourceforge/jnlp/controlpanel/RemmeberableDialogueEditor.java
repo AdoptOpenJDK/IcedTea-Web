@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
+import java.awt.Button;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,7 +49,9 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListDataListener;
+import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
@@ -64,11 +67,19 @@ public class RemmeberableDialogueEditor extends JDialog {
     private final List<Class<? extends RememberableDialog>> allClasses;
     private final AppletSecurityActions actions;
 
+    private AppletSecurityActions result;
+    private final RemmeberableDialogueEditor self;
+    private final JFrame frame;
+
     RemmeberableDialogueEditor(JFrame jFrame, boolean modal, Object dialogs) {
         super(jFrame, modal);
+        frame=jFrame;
+        this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        self = this;
         actions = (AppletSecurityActions) dialogs;
         allClasses = ClassFinder.findAllMatchingTypes(RememberableDialog.class);
         recreateGui();
+        this.setLocationRelativeTo(jFrame);
     }
 
     private void recreateGui() {
@@ -76,13 +87,12 @@ public class RemmeberableDialogueEditor extends JDialog {
         final JDialog d = this;
         getContentPane().removeAll();
         d.setLayout(new GridLayout(0, 4));
-        
 
-        final List<Class<? extends RememberableDialog>> addedBleClasses = new ArrayList<>(allClasses);
-        for (Map.Entry<String, SavedRememberAction> entry : entries) {
-            String dialog = entry.getKey();
-            for (int i = 0; i < addedBleClasses.size(); i++) {
-                final Class<? extends RememberableDialog> get = addedBleClasses.get(i);
+        final List<Class<? extends RememberableDialog>> addedableClasses = new ArrayList<>(allClasses);
+        for (final Map.Entry<String, SavedRememberAction> entry : entries) {
+            final String dialog = entry.getKey();
+            for (int i = 0; i < addedableClasses.size(); i++) {
+                final Class<? extends RememberableDialog> get = addedableClasses.get(i);
                 String s = get.getSimpleName();
                 if (s.equals(dialog)) {
                     JButton bb = new JButton("-");
@@ -96,11 +106,38 @@ public class RemmeberableDialogueEditor extends JDialog {
                     });
                     d.add(bb);
                     d.add(new JLabel(entry.getKey()));
-                    JComboBox cbb = new JComboBox(ExecuteAppletAction.values());
+                    final JComboBox<ExecuteAppletAction> cbb = new JComboBox(ExecuteAppletAction.values());
                     cbb.setSelectedItem(entry.getValue().getAction());
+                    cbb.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            actions.setAction(entry.getKey(), createRember((ExecuteAppletAction) cbb.getSelectedItem(), entry));
+                        }
+
+                        private SavedRememberAction createRember(ExecuteAppletAction nwValue, Map.Entry<String, SavedRememberAction> entry) {
+                            return new SavedRememberAction(nwValue, entry.getValue().getSavedValue());
+                        }
+                    });
                     d.add(cbb);
-                    d.add(new JButton("Expert edit"));
-                    addedBleClasses.remove(i);
+                    JButton expertButton = new JButton(Translator.R("EPEexpert"));
+                    expertButton.setToolTipText(Translator.R("EPEexpertHelp"));
+                    expertButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            Object result = JOptionPane.showInputDialog(self.frame, entry.getValue().getSavedValue(), Translator.R("EPEexpertHint"), JOptionPane.YES_NO_OPTION, null, null, entry.getValue().getSavedValue());
+                            if (result != null) {
+                                String s = result.toString();
+                                if (!s.trim().isEmpty()){
+                                    actions.setAction(entry.getKey(), createRember(entry.getValue().getAction(), s));
+                                }
+                            }
+                        }
+                        private SavedRememberAction createRember(ExecuteAppletAction action, String newValue) {
+                            return new SavedRememberAction(action, newValue);
+                        }
+                    });
+                    d.add(expertButton);
+                    addedableClasses.remove(i);
                     i--;
                 }
             }
@@ -113,8 +150,8 @@ public class RemmeberableDialogueEditor extends JDialog {
 
             @Override
             public void setSelectedItem(Object anItem) {
-                for (int i = 0; i < addedBleClasses.size(); i++) {
-                    Class<? extends RememberableDialog> get = addedBleClasses.get(i);
+                for (int i = 0; i < addedableClasses.size(); i++) {
+                    Class<? extends RememberableDialog> get = addedableClasses.get(i);
                     if (get.getSimpleName().equals(anItem)) {
                         selected = get.getSimpleName();
                     }
@@ -129,12 +166,12 @@ public class RemmeberableDialogueEditor extends JDialog {
 
             @Override
             public int getSize() {
-                return addedBleClasses.size();
+                return addedableClasses.size();
             }
 
             @Override
             public String getElementAt(int index) {
-                return addedBleClasses.get(index).getSimpleName();
+                return addedableClasses.get(index).getSimpleName();
             }
 
             @Override
@@ -147,20 +184,50 @@ public class RemmeberableDialogueEditor extends JDialog {
 
             }
         };
+        for (int x = 0; x < 4; x++) {
+            Button b = new Button(Translator.R("EPEhelp" + (x + 1)));
+            b.setEnabled(false);
+            d.add(b);
+        }
         final JComboBox<String> cb = new JComboBox<>(model);
         JButton b = new JButton("+");
         b.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                actions.setAction(addedBleClasses.get(cb.getSelectedIndex()), new SavedRememberAction(ExecuteAppletAction.NEVER, ExecuteAppletAction.NEVER.toChar()));
+                if (cb.getSelectedIndex() < 0) {
+                    return;
+                }
+                actions.setAction(addedableClasses.get(cb.getSelectedIndex()), new SavedRememberAction(ExecuteAppletAction.NEVER, ExecuteAppletAction.NEVER.toChar()));
                 recreateGui();
             }
         });
         d.add(b);
         d.add(cb);
+        JButton save = new JButton(Translator.R("EPEsave"));
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                result = actions;
+                self.setVisible(false);
+            }
+        });
+        d.add(save);
+        JButton cancel = new JButton(Translator.R("EPEcancel"));
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                result = null;
+                self.setVisible(false);
+            }
+        });
+        d.add(cancel);
         d.pack();
 
+    }
+
+    public AppletSecurityActions getResult() {
+        return result;
     }
 
 }

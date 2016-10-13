@@ -54,6 +54,10 @@ public class UnsignedAppletActionStorageExtendedImpl extends UnsignedAppletActio
         super(location);
     }
 
+    /**
+     * 
+     * @return  always fresh copy loaded from disc
+     */
     public UnsignedAppletActionEntry[] toArray() {
         lock();
         try {

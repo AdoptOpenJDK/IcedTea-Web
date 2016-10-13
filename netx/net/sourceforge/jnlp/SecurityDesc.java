@@ -155,11 +155,11 @@ public class SecurityDesc {
      */
     private static Class<Permission> urlPermissionClass = null;
     private static Constructor<Permission> urlPermissionConstructor = null;
-
+    
     static {
         try {
             urlPermissionClass = (Class<Permission>) Class.forName("java.net.URLPermission");
-            urlPermissionConstructor = urlPermissionClass.getDeclaredConstructor(new Class[] { String.class });
+            urlPermissionConstructor = urlPermissionClass.getDeclaredConstructor(String.class);
         } catch (final ReflectiveOperationException | SecurityException e) {
             OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while reflectively finding URLPermission - host is probably not running Java 8+");
             OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
@@ -249,7 +249,7 @@ public class SecurityDesc {
             new PropertyPermission("swing.noxp", "read,write"),
             new PropertyPermission("swing.useSystemFontSettings", "read,write"),
     };
-
+    
     /**
      * Create a security descriptor.
      *
@@ -386,7 +386,7 @@ public class SecurityDesc {
         for (final Permission permission : urlPermissions) {
             permissions.add(permission);
         }
-
+        
         return permissions;
     }
 

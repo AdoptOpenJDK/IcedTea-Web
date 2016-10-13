@@ -57,12 +57,13 @@ public class ClassFinder extends JDialog {
     public static final String CUSTOM_CLASS_PATH_PROPERTY = "custom.class.path";
     public static final String BOOT_CLASS_PATH_PROPERTY = "sun.boot.class.path";
 
-    
     static public <T> List<Class<? extends T>> findAllMatchingTypes(Class<T> toFind) {
         List<Class<? extends T>> returnedClasses = new ArrayList<>();
         Set<Class> foundClasses = walkClassPath(toFind);
         for (Class<?> clazz : foundClasses) {
-            returnedClasses.add((Class<? extends T>) clazz);
+            if (!clazz.isInterface()) {
+                returnedClasses.add((Class<? extends T>) clazz);
+            }
         }
         return returnedClasses;
     }
@@ -121,9 +122,9 @@ public class ClassFinder extends JDialog {
     }
 
     static private Class determine(String name, Class toFind) {
-         if (name.contains("$")) {
-             return null;
-         }
+        if (name.contains("$")) {
+            return null;
+        }
         try {
             if (name.endsWith(".class")) {
                 name = name.replace(".class", "");
