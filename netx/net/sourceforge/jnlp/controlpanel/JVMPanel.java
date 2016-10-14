@@ -33,7 +33,7 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
-*/
+ */
 package net.sourceforge.jnlp.controlpanel;
 
 import java.awt.Component;
@@ -69,10 +69,12 @@ public class JVMPanel extends NamedBorderPanel {
         }
         public final String formattedText;
         public final STATE id;
+        private final String stds;
 
-        public JvmValidationResult(String formattedText, STATE id) {
+        public JvmValidationResult(String formattedText, STATE id, String stdouts) {
             this.id = id;
             this.formattedText = formattedText;
+            this.stds = stdouts;
         }
     }
     private final DeploymentConfiguration config;
@@ -85,10 +87,10 @@ public class JVMPanel extends NamedBorderPanel {
         addComponents();
     }
 
-    
-    void resetTestFieldArgumentsExec(){
+    void resetTestFieldArgumentsExec() {
         testFieldArgumentsExec.setText("");
     }
+
     private void addComponents() {
         final JLabel description = new JLabel("<html>" + Translator.R("CPJVMPluginArguments") + "<hr /></html>");
         final JTextField testFieldArguments = new JTextField(25);
@@ -96,15 +98,16 @@ public class JVMPanel extends NamedBorderPanel {
         testFieldArguments.getDocument().addDocumentListener(new DocumentAdapter(config, DeploymentConfiguration.KEY_PLUGIN_JVM_ARGUMENTS));
         testFieldArguments.setText(config.getProperty(DeploymentConfiguration.KEY_PLUGIN_JVM_ARGUMENTS));
 
-
         final JLabel descriptionExec = new JLabel("<html>" + Translator.R("CPJVMitwExec") + "<hr /></html>");
         testFieldArgumentsExec = new JTextField(100);
         final JLabel validationResult = new JLabel(resetValidationResult(testFieldArgumentsExec.getText(), "", "CPJVMnone"));
+        validationResult.setToolTipText("");
         final JCheckBox allowTypoTimeValidation = new JCheckBox(Translator.R("CPJVMPluginAllowTTValidation"), true);
         allowTypoTimeValidation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 validationResult.setText(resetValidationResult(testFieldArgumentsExec.getText(), "", "CPJVMnone"));
+                validationResult.setToolTipText("");
             }
         });
         testFieldArgumentsExec.getDocument().addDocumentListener(new DocumentListener() {
@@ -114,6 +117,7 @@ public class JVMPanel extends NamedBorderPanel {
                 if (allowTypoTimeValidation.isSelected()) {
                     JvmValidationResult s = validateJvm(testFieldArgumentsExec.getText());
                     validationResult.setText(resetValidationResult(testFieldArgumentsExec.getText(), s.formattedText, "CPJVMvalidated"));
+                    validationResult.setToolTipText(s.stds);
                 }
             }
 
@@ -122,6 +126,7 @@ public class JVMPanel extends NamedBorderPanel {
                 if (allowTypoTimeValidation.isSelected()) {
                     JvmValidationResult s = validateJvm(testFieldArgumentsExec.getText());
                     validationResult.setText(resetValidationResult(testFieldArgumentsExec.getText(), s.formattedText, "CPJVMvalidated"));
+                    validationResult.setToolTipText(s.stds);
                 }
             }
 
@@ -130,6 +135,7 @@ public class JVMPanel extends NamedBorderPanel {
                 if (allowTypoTimeValidation.isSelected()) {
                     JvmValidationResult s = validateJvm(testFieldArgumentsExec.getText());
                     validationResult.setText(resetValidationResult(testFieldArgumentsExec.getText(), s.formattedText, "CPJVMvalidated"));
+                    validationResult.setToolTipText(s.stds);
                 }
             }
         });
@@ -155,6 +161,7 @@ public class JVMPanel extends NamedBorderPanel {
                     String olds = testFieldArgumentsExec.getText();
                     if (!nws.equals(olds)) {
                         validationResult.setText(resetValidationResult(testFieldArgumentsExec.getText(), "", "CPJVMnone"));
+                        validationResult.setToolTipText("");
                     }
                     testFieldArgumentsExec.setText(nws);
                 }
@@ -167,6 +174,7 @@ public class JVMPanel extends NamedBorderPanel {
             public void actionPerformed(ActionEvent e) {
                 JvmValidationResult s = validateJvm(testFieldArgumentsExec.getText());
                 validationResult.setText(resetValidationResult(testFieldArgumentsExec.getText(), s.formattedText, "CPJVMvalidated"));
+                validationResult.setToolTipText(s.stds);
 
             }
         });
@@ -215,7 +223,7 @@ public class JVMPanel extends NamedBorderPanel {
     public static JvmValidationResult validateJvm(String cmd) {
         if (cmd == null || cmd.trim().equals("")) {
             return new JvmValidationResult("<span color=\"orange\">" + Translator.R("CPJVMvalueNotSet") + "</span>",
-                    JvmValidationResult.STATE.EMPTY);
+                    JvmValidationResult.STATE.EMPTY, "");
         }
         String validationResult = "";
         File jreDirFile = new File(cmd);
@@ -231,15 +239,6 @@ public class JVMPanel extends NamedBorderPanel {
             validationResult += "<span color=\"green\">" + Translator.R("CPJVMjava") + "</span><br />";
         } else {
             validationResult += "<span color=\"red\">" + Translator.R("CPJVMnoJava") + "</span><br />";
-            if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
-                latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
-            }
-        }
-        File rtFile = new File(cmd + File.separator + "lib" + File.separator + "rt.jar");
-        if (rtFile.isFile()) {
-            validationResult += "<span color=\"green\">" + Translator.R("CPJVMrtJar") + "</span><br />";
-        } else {
-            validationResult += "<span color=\"red\">" + Translator.R("CPJVMnoRtJar") + "</span><br />";
             if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
                 latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
             }
@@ -268,32 +267,77 @@ public class JVMPanel extends NamedBorderPanel {
             if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
                 latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
             }
-            return new JvmValidationResult(validationResult, latestOne);
+            return new JvmValidationResult(validationResult, latestOne, "");
         }
-        if (r.intValue() != 0) {
+
+        String reportableOutputs = processErrorStream + "\n" + processStdOutStream;
+
+        if (r != 0) {
             validationResult += "<span color=\"red\">" + Translator.R("CPJVMnoSuccess") + "</span>";
             if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
                 latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
             }
-            return new JvmValidationResult(validationResult, latestOne);
+            return new JvmValidationResult(validationResult, latestOne, reportableOutputs);
         }
+
+        boolean findRT = false;
+
+        if (processErrorStream.contains("\"9") || processStdOutStream.contains("\"9") || processErrorStream.contains("build 9") || processStdOutStream.contains("build 9")) {
+            validationResult += "<span color=\"green\">" + Translator.R("CPJVMjdk9") + "</span><br />";
+            findRT = false;
+        } else if (processErrorStream.contains("1.8.0") || processStdOutStream.contains("1.8.0")) {
+            validationResult += "<span color=\"#00EE00\">" + Translator.R("CPJVMjdk8") + "</span><br />";
+            findRT = true;
+        } else if (processErrorStream.contains("1.7.0") || processStdOutStream.contains("1.7.0")) {
+            validationResult += "<span color=\"#EE0000\">" + Translator.R("CPJVMjdk7") + "</span><br />";
+            if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
+                latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
+                findRT = true;
+
+            }
+        } else if (processErrorStream.contains("1.6.0") || processStdOutStream.contains("1.6.0")) {
+            validationResult += "<span color=\"#EE0000\">" + Translator.R("CPJVMjdk6") + "</span><br />";
+            if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
+                latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
+                findRT = true;
+            }
+        } else {
+            validationResult += "<span color=\"yellow\">" + Translator.R("CPJVMjdk") + "</span><br />";
+            if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
+                latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
+                findRT = false;
+            }
+        }
+
+        if (findRT) {
+            File rtFile = new File(cmd + File.separator + "lib" + File.separator + "rt.jar");
+            if (rtFile.isFile()) {
+                validationResult += "<span color=\"green\">" + Translator.R("CPJVMrtJar") + "</span><br />";
+            } else {
+                validationResult += "<span color=\"red\">" + Translator.R("CPJVMnoRtJar") + "</span><br />";
+                if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
+                    latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
+                }
+            }
+        }
+
         if (processErrorStream.contains("openjdk") || processStdOutStream.contains("openjdk")) {
             validationResult += "<span color=\"#00EE00\">" + Translator.R("CPJVMopenJdkFound") + "</span>";
-            return new JvmValidationResult(validationResult, JvmValidationResult.STATE.VALID_JDK);
+            return new JvmValidationResult(validationResult, JvmValidationResult.STATE.VALID_JDK, reportableOutputs);
         }
         if (processErrorStream.contains("ibm") || processStdOutStream.contains("ibm")) {
             validationResult += "<span color=\"green\">" + Translator.R("CPJVMibmFound") + "</span>";
             if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
                 latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
             }
-            return new JvmValidationResult(validationResult, latestOne);
+            return new JvmValidationResult(validationResult, latestOne, reportableOutputs);
         }
         if (processErrorStream.contains("gij") || processStdOutStream.contains("gij")) {
             validationResult += "<span color=\"orange\">" + Translator.R("CPJVMgijFound") + "</span>";
             if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
                 latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
             }
-            return new JvmValidationResult(validationResult, latestOne);
+            return new JvmValidationResult(validationResult, latestOne, reportableOutputs);
         }
         if (processErrorStream.contains("oracle") || processStdOutStream.contains("oracle")
                 || processErrorStream.contains("java(tm)") || processStdOutStream.contains("java(tm)")) {
@@ -301,10 +345,10 @@ public class JVMPanel extends NamedBorderPanel {
             if (latestOne != JvmValidationResult.STATE.NOT_DIR) {
                 latestOne = JvmValidationResult.STATE.NOT_VALID_JDK;
             }
-            return new JvmValidationResult(validationResult, latestOne);
+            return new JvmValidationResult(validationResult, latestOne, reportableOutputs);
         }
         validationResult += "<span color=\"orange\">" + Translator.R("CPJVMstrangeProcess") + "</span>";
-        return new JvmValidationResult(validationResult, JvmValidationResult.STATE.NOT_VALID_JDK);
+        return new JvmValidationResult(validationResult, JvmValidationResult.STATE.NOT_VALID_JDK, reportableOutputs);
 
     }
 
