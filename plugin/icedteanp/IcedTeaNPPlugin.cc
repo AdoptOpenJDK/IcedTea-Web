@@ -102,6 +102,7 @@ exception statement from your version. */
   "application/x-java-applet;version=1.5:class,jar:IcedTea;"           \
   "application/x-java-applet;version=1.6:class,jar:IcedTea;"           \
   "application/x-java-applet;version=1.7:class,jar:IcedTea;"           \
+  "application/x-java-applet;version=1.8:class,jar:IcedTea;"           \
   PLUGIN_APPLET_MIME_DESC \
   "application/x-java-applet;jpi-version=" JPI_VERSION ":class,jar:IcedTea;"  \
   "application/x-java-bean:class,jar:IcedTea;"                         \
@@ -120,6 +121,7 @@ exception statement from your version. */
   "application/x-java-bean;version=1.5:class,jar:IcedTea;"             \
   "application/x-java-bean;version=1.6:class,jar:IcedTea;"             \
   "application/x-java-bean;version=1.7:class,jar:IcedTea;"             \
+  "application/x-java-bean;version=1.8:class,jar:IcedTea;"             \
   PLUGIN_BEAN_MIME_DESC \
   "application/x-java-bean;jpi-version=" JPI_VERSION ":class,jar:IcedTea;"    \
   "application/x-java-vm-npruntime::IcedTea;"

@@ -1,3 +1,14 @@
+2016-10-14  Jiri Vanek <jvanek@redhat.com>
+
+	Enforced JDK8 or better for runtime and compile
+	* Makefile.am: IT_LANGUAGE_SOURCE_VERSION, IT_CLASS_TARGET_VERSION) bumped to 8
+	* acinclude.m4: (IT_CHECK_JAVA_VERSION) modified to accept jdk9. Simplified.
+	(IT_CHECK_FOR_JDK) changed directories to search for JDK, notably adding
+	alternatives-defined JDK9 locations.
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: added records for version=1.8
+	* netx/net/sourceforge/jnlp/controlpanel/JVMPanel.java: jvm recognition made java9 aware
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added corresponding messages
+
 2016-10-13  Jiri Vanek <jvanek@redhat.com>
 
 	Finished implementation of editor of state of remembered dialogues 

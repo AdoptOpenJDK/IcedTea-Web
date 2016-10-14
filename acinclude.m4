@@ -48,9 +48,9 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
               ])
   if test -z "${SYSTEM_JDK_DIR}"; then
     for dir in /etc/alternatives/java_sdk \
-               /usr/lib/jvm/java-1.7.0-openjdk \
-               /usr/lib/jvm/icedtea7 \
-               /usr/lib/jvm/java-7-openjdk \
+               /usr/lib/jvm/java-1.9.0-openjdk \
+               /usr/lib/jvm/icedtea9 \
+               /usr/lib/jvm/java-9-openjdk \
                /usr/lib/jvm/java-1.8.0-openjdk \
                /usr/lib/jvm/icedtea8 \
                /usr/lib/jvm/java-8-openjdk \
@@ -98,7 +98,7 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JRE],
     # still not found?
     if test -z "${SYSTEM_JRE_DIR}" ; then
       # try modular, jdk9 or higher compliant
-      if test -d "${SYSTEM_JRE_DIR_MODULAR}" -a -f "${SYSTEM_JRE_DIR_MODULAR}/bin/java" -a -d "${SYSTEM_JRE_DIR_MODULAR}/lib/modules" ; then
+      if test -d "${SYSTEM_JRE_DIR_MODULAR}" -a -f "${SYSTEM_JRE_DIR_MODULAR}/bin/java" -a -e "${SYSTEM_JRE_DIR_MODULAR}/lib/modules" ; then
         SYSTEM_JRE_DIR="${SYSTEM_JRE_DIR_MODULAR}"
       fi
     fi
@@ -775,7 +775,7 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
   AC_REQUIRE([IT_CHECK_FOR_JRE])
   AC_MSG_CHECKING([for a Java virtual machine])
   AC_ARG_WITH([java],
-              [AS_HELP_STRING(--with-java, specify location of the Java 1.7 VM)],
+              [AS_HELP_STRING(--with-java, specify location of the Java 1.8 or better VM)],
   [
     JAVA="${withval}"
   ],
@@ -789,7 +789,7 @@ AC_DEFUN_ONCE([IT_FIND_JAVA],
     AC_PATH_PROG(JAVA, "java")
   fi
   if test -z "${JAVA}"; then
-    AC_MSG_ERROR("A 1.7+-compatible Java VM is required.")
+    AC_MSG_ERROR("A 1.8+-compatible Java VM is required.")
   fi
   AC_MSG_RESULT(${JAVA})
   AC_SUBST(JAVA)
@@ -799,13 +799,12 @@ AC_DEFUN_ONCE([IT_CHECK_JAVA_VERSION],
 [
   AC_REQUIRE([IT_FIND_JAVA])
   AC_MSG_CHECKING([JDK version])
-  JAVA_VERSION=`$JAVA -version 2>&1 | sed -n '1s/@<:@^"@:>@*"\(.*\)"$/\1/p'`
+  JAVA_VERSION=`$JAVA -version 2>&1`
   AC_MSG_RESULT($JAVA_VERSION)
-  HAVE_JAVA7=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.7) print "yes"}'`
-  HAVE_JAVA8=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.8) print "yes"}'`
-  HAVE_JAVA9=`echo $JAVA_VERSION | awk '{if ($(0) >= 1.9) print "yes"}'`
-  if test -z "$HAVE_JAVA7"; then
-    AC_MSG_ERROR([JDK7 or newer is required, detected was: $JAVA_VERSION])
+  HAVE_JAVA8=`if echo $JAVA_VERSION | grep -q -e 1.8.0 ; then echo yes ; fi`
+  HAVE_JAVA9=`if echo $JAVA_VERSION | grep -q -e 1.9.0 -e \"9 -e "build 9" ; then echo yes ; fi `
+  if test -z "$HAVE_JAVA8" -a -z "$HAVE_JAVA9"; then
+    AC_MSG_ERROR([JDK8 or newer is required, detected was: $JAVA_VERSION])
   fi
   if ! test -z "$HAVE_JAVA8"; then
     VERSION_DEFS="-DHAVE_JAVA8"
@@ -814,7 +813,6 @@ AC_DEFUN_ONCE([IT_CHECK_JAVA_VERSION],
     VERSION_DEFS="-DHAVE_JAVA9"
   fi
   AC_SUBST(VERSION_DEFS)
-  AM_CONDITIONAL([HAVE_JAVA7], test x"${HAVE_JAVA7}" = "xyes")
   AM_CONDITIONAL([HAVE_JAVA8], test x"${HAVE_JAVA8}" = "xyes")
   AM_CONDITIONAL([HAVE_JAVA9], test x"${HAVE_JAVA9}" = "xyes")
 ])
