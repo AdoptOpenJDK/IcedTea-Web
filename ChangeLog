@@ -1,5 +1,9 @@
 2016-10-14  Jiri Vanek <jvanek@redhat.com>
 
+	* NEWS: mentioned rememberable dialogues editor and jdk8
+
+2016-10-14  Jiri Vanek <jvanek@redhat.com>
+
 	Enforced JDK8 or better for runtime and compile
 	* Makefile.am: IT_LANGUAGE_SOURCE_VERSION, IT_CLASS_TARGET_VERSION) bumped to 8
 	* acinclude.m4: (IT_CHECK_JAVA_VERSION) modified to accept jdk9. Simplified.
