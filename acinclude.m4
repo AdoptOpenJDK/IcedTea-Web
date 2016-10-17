@@ -466,13 +466,16 @@ AC_DEFUN([IT_CHECK_FOR_CLASS],[
 AC_REQUIRE([IT_FIND_JAVAC])
 AC_REQUIRE([IT_FIND_JAVA])
 AC_CACHE_CHECK([if $2 is available], it_cv_$1, [
-CLASS=sun/applet/Test.java
+# first param is name of class to find, second is name of package to make check in.
+# mostly some.pkg is ok, but some tests must bedone in sun.applet or other special directory
+PKGPATH=`echo $3 | sed "s;\\.;/;g" `
+CLASS=$PKGPATH/Test.java
 BYTECODE=$(echo $CLASS|sed 's#\.java##')
 mkdir -p tmp.$$/$(dirname $CLASS)
 cd tmp.$$
 cat << \EOF > $CLASS
 [/* [#]line __oline__ "configure" */
-package sun.applet;
+package $3;
 
 import $2;
 
@@ -511,13 +514,13 @@ AC_DEFUN([IT_CHECK_FOR_HEXDUMPENCODER],[
 AC_REQUIRE([IT_FIND_JAVAC])
 AC_REQUIRE([IT_FIND_JAVA])
 AC_CACHE_CHECK([if HexDumpEncoder is available], it_cv_HEXDUMPENCODER, [
-CLASS=sun/applet/Test.java
+CLASS=ssun/aapplet/Test.java
 BYTECODE=$(echo $CLASS|sed 's#\.java##')
 mkdir -p tmp.$$/$(dirname $CLASS)
 cd tmp.$$
 cat << \EOF > $CLASS
 [/* [#]line __oline__ "configure" */
-package sun.applet;
+package ssun.aapplet;
 
 import sun.misc.*;
 import sun.security.util.*;

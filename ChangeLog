@@ -1,3 +1,14 @@
+2016-10-17  Jiri Vanek <jvanek@redhat.com>
+
+	Workarounded to pass configure checks on jdk9 to debug build failures themselves
+	* acinclude.m4: (IT_CHECK_FOR_CLASS) changed to accept third parameter -
+	package where to make check in, as not all checks needs to be doen in sun.applet.
+	(IT_CHECK_FOR_HEXDUMPENCODER) test moved out of sun.applet too.
+	* configure.ac: IT_CHECK_FOR_CLASS adapted to third parameter, 
+	various classes which are private in jdk9 moved out from configure check.
+	This s not permanent solution, those classes will be deal with.
+
+
 2016-10-14  Jiri Vanek <jvanek@redhat.com>
 
 	* NEWS: mentioned rememberable dialogues editor and jdk8
