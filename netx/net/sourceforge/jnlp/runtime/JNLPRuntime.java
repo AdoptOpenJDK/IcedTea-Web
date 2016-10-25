@@ -48,6 +48,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.swing.JOptionPane;
+import javax.swing.JWindow;
 import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 
@@ -126,6 +127,7 @@ public class JNLPRuntime {
 
     /** whether netx is in command-line mode (headless) */
     private static boolean headless = false;
+    private static boolean headlessChecked = false;
 
     /** whether we'll be checking for jar signing */
     private static boolean verify = true;
@@ -241,14 +243,11 @@ public class JNLPRuntime {
         System.setProperty("javawebstart.version", "javaws-" +
                 System.getProperty("java.version"));
 
-        if (headless == false)
-            checkHeadless();
-
-        if (!headless && indicator == null)
+        if (!isHeadless() && indicator == null)
             indicator = new DefaultDownloadIndicator();
 
         if (handler == null) {
-            if (headless) {
+            if (isHeadless()) {
                 handler = new DefaultLaunchHandler(OutputController.getLogger());
             } else {
                 handler = new GuiLaunchHandler(OutputController.getLogger());
@@ -500,6 +499,10 @@ public class JNLPRuntime {
      * components.
      */
     public static boolean isHeadless() {
+        if (!headless && !headlessChecked) {
+            checkHeadless();
+
+        }
         return headless;
     }
 
@@ -733,9 +736,21 @@ public class JNLPRuntime {
         //if (GraphicsEnvironment.isHeadless()) // jdk1.4+ only
         //    headless = true;
         try {
-            if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless")))
+            if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless"))){
                 headless = true;
+            }
+            if (!headless) {
+                try {
+                    new JWindow().getOwner();
+                } catch (Exception ex) {
+                    headless = true;
+                    OutputController.getLogger().log(ex);
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
+                }
+            }
         } catch (SecurityException ex) {
+        } finally {
+            headlessChecked = true;
         }
     }
 

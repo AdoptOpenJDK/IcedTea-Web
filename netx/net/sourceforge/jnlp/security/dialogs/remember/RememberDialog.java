@@ -47,7 +47,7 @@ import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 public class RememberDialog {
 
     public void setOrUpdateRememberedState(SecurityDialog dialog) {
-        RememberableDialog found = findRememberablePanel(dialog);
+        RememberableDialog found = findRememberablePanel(dialog.getSecurityDialogPanel());
         if (found == null) {
             return;
         }
@@ -63,7 +63,7 @@ public class RememberDialog {
      * for headless dialogues
      */
      public void setOrUpdateRememberedState(SecurityDialog dialog, boolean wholeCodebase, SavedRememberAction action) {
-        RememberableDialog found = findRememberablePanel(dialog);
+        RememberableDialog found = findRememberablePanel(dialog.getSecurityDialogPanel());
         if (found == null) {
             return;
         }
@@ -71,7 +71,7 @@ public class RememberDialog {
     }
 
     public SavedRememberAction getRememberedState(SecurityDialog dialog) {
-        RememberableDialog found = findRememberablePanel(dialog);
+        RememberableDialog found = findRememberablePanel(dialog.getSecurityDialogPanel());
         if (found != null) {
             return getRememberedState(found);
         }
@@ -91,6 +91,9 @@ public class RememberDialog {
     public RememberableDialog findRememberablePanel(Container search) {
         if (search==null){
             return null;
+        }
+        if (search instanceof  RememberableDialog){
+            return (RememberableDialog) search;
         }
         //Breadth-first important
         for (Component comp : search.getComponents()) {

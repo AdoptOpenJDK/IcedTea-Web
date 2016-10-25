@@ -50,7 +50,6 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.Resource;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -60,7 +59,6 @@ import net.sourceforge.jnlp.security.dialogresults.NamePassword;
 import net.sourceforge.jnlp.security.dialogresults.YesCancel;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
-import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 

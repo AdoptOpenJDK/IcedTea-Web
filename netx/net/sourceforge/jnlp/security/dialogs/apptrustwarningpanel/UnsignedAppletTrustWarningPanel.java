@@ -50,7 +50,6 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 
 
 public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
@@ -60,7 +59,7 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
         this.INFO_PANEL_HEIGHT = 250;
         addComponents();
         if (securityDialog != null) {
-            securityDialog.setMinimumSize(new Dimension(600, 400));
+            securityDialog.getViwableDialog().setMinimumSize(new Dimension(600, 400));
         }
     }
 

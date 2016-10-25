@@ -83,7 +83,7 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
             throw new RuntimeException(ex);
         }
         if (x != null) {
-            x.setMinimumSize(new Dimension(400, 400));
+            x.getViwableDialog().setMinimumSize(new Dimension(400, 400));
         }
     }
 

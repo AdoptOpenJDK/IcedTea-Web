@@ -117,7 +117,7 @@ public class SecurityDialogMessageHandler implements Runnable {
             return;
         }
 
-        final RememberableDialog found = RememberDialog.getInstance().findRememberablePanel(dialog);
+        final RememberableDialog found = RememberDialog.getInstance().findRememberablePanel(dialog.getSecurityDialogPanel());
         SavedRememberAction action = null;
         if (found!=null){
             action = RememberDialog.getInstance().getRememberedState(found);
@@ -155,7 +155,7 @@ public class SecurityDialogMessageHandler implements Runnable {
     }
 
     private void processMessageInGui(final SecurityDialog dialog, final RememberableDialog found, final SecurityDialogMessage message) {
-        dialog.addActionListener(new ActionListener() {
+        dialog.getViwableDialog().addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -169,7 +169,7 @@ public class SecurityDialogMessageHandler implements Runnable {
             }
             
         });
-        dialog.setVisible(true);
+        dialog.getViwableDialog().show();
     }
 
     private void processMessageInHeadless(final SecurityDialog dialog, final SecurityDialogMessage message) {

@@ -1,3 +1,47 @@
+2016-10-25  Jiri Vanek <jvanek@redhat.com>
+
+	JDialog removed as main keeper of information in SecurityDialog class
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java:
+	If headless, is printing downloading message to console
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
+	Added key HEADLESS_MISSCONFIGURED warning user that he do not have X
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
+	checkHeadless made lazy in first call to isHeadless
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java:
+	no longer Extends JDialog, instead have member ViwableDialog.
+	All calls to former extensions of JDialog changed to this viwableDialog
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessageHandler.java:
+	All calls to former JDialog changed to viwableDialog
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogresults/SetValueHandler.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/InetSecurity511Panel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingALACAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/MissingPermissionsAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/MoreInfoPane.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/PasswordAuthenticationPane.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/MatchingALACAttributePanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/PartiallySignedAppTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/apptrustwarningpanel/UnsignedAppletTrustWarningPanel.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/remember/RememberDialog.java:
+	Search now contains check for itself, as input is not dialog, but security panel
+	* netx/net/sourceforge/jnlp/util/logging/JavaConsole.java:
+	made better accepting headless state
+    * netx/net/sourceforge/jnlp/security/dialogs/ViwableDialog.java:
+	New class. Instead of applying all sets to jdialog itself, those are saved,
+	and applied just before cration of the dialog itself.
+
 2016-10-17  Jiri Vanek <jvanek@redhat.com>
 
 	Workarounded to pass configure checks on jdk9 to debug build failures themselves

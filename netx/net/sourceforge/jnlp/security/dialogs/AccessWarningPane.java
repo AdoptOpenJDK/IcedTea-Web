@@ -289,7 +289,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                 negateVisibility(rememberPanel);
                 negateVisibility(htmlPanelDesktop);
                 negateVisibility(htmlPanelMenu);
-                AccessWarningPane.this.parent.pack();
+                AccessWarningPane.this.parent.getViwableDialog().pack();
                 
             }
 
@@ -305,7 +305,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             @Override
             public void actionPerformed(ActionEvent e) {
                 parent.setValue(getModifier(BasicDialogValue.Primitive.YES));
-                parent.dispose();
+                parent.getViwableDialog().dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
@@ -313,7 +313,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             @Override
             public void actionPerformed(ActionEvent e) {
                 parent.setValue(getModifier(BasicDialogValue.Primitive.NO));
-                parent.dispose();
+                parent.getViwableDialog().dispose();
             }
         });
         initialFocusComponent = cancel;
@@ -329,7 +329,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         add(buttonPanel);
         
         rememberPanel.setVisible(false);
-        this.parent.pack();
+        this.parent.getViwableDialog().pack();
 
     }
 

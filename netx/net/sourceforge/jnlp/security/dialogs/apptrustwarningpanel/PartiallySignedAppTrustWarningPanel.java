@@ -57,7 +57,6 @@ import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.security.dialogs.TemporaryPermissionsButton;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
@@ -82,7 +81,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         buttons.add(2, advancedOptionsButton);
 
         addComponents();
-        securityDialog.setMinimumSize(new Dimension(600, 400));
+        securityDialog.getViwableDialog().setMinimumSize(new Dimension(600, 400));
     }
 
     private String getAppletInfo() {

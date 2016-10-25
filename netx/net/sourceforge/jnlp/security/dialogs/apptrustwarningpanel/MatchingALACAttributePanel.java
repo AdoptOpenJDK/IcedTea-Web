@@ -53,7 +53,6 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 /**
@@ -73,7 +72,7 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
         TOP_PANEL_HEIGHT = 250;
         addComponents();
         if (securityDialog != null) {
-            securityDialog.setMinimumSize(new Dimension(600, 400));
+            securityDialog.getViwableDialog().setMinimumSize(new Dimension(600, 400));
         }
     }
 

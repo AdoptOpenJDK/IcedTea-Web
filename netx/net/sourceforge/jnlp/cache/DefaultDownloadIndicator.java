@@ -30,6 +30,7 @@ import javax.jnlp.*;
 import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Show the progress of downloads.
@@ -338,7 +339,11 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
             // don't get whole string from resource and sub in
             // values because it'll be doing a MessageFormat for
             // each update.
-            header.setText(downloading + " " + downloadName + ": " + percent + "% " + complete + ".");
+            String s = downloading + " " + downloadName + ": " + percent + "% " + complete + ".";
+            if (JNLPRuntime.isHeadless()){
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, s);
+            }
+            header.setText(s);
             Container c = header.getParent();
             //we need to adapt both panels and also dialog to new length of header text
             while (c != null) {

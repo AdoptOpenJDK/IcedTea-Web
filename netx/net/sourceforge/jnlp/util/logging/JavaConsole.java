@@ -82,7 +82,7 @@ import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 
 /**
  * A simple Java console for IcedTeaPlugin and JavaWS
- * 
+ *
  */
 public class JavaConsole implements ObservableMessagesProvider {
 
@@ -98,39 +98,38 @@ public class JavaConsole implements ObservableMessagesProvider {
         //when console is off, those tees are not installed
     }
 
-    
     private void refreshOutputs() {
-        refreshOutputs(outputsPanel, (Integer)numberOfOutputs.getValue());
+        refreshOutputs(outputsPanel, (Integer) numberOfOutputs.getValue());
     }
 
     private void refreshOutputs(JPanel pane, int count) {
         pane.removeAll();
-        while(outputs.size()>count){
-            getObservable().deleteObserver(outputs.get(outputs.size()-1));
-            outputs.remove(outputs.size()-1);
+        while (outputs.size() > count) {
+            getObservable().deleteObserver(outputs.get(outputs.size() - 1));
+            outputs.remove(outputs.size() - 1);
         }
-        while(outputs.size()<count){
+        while (outputs.size() < count) {
             ConsoleOutputPane c1 = new ConsoleOutputPane(this);
             observable.addObserver(c1);
             outputs.add(c1);
         }
-        if (count == 0){
+        if (count == 0) {
             pane.add(new JPanel());
-        } else if (outputs.size() == 1){
+        } else if (outputs.size() == 1) {
             pane.add(outputs.get(0));
         } else {
-                JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,outputs.get(outputs.size()-2), outputs.get(outputs.size()-1));
-                splitPane.setDividerLocation(0.5);
-                splitPane.setResizeWeight(0.5);
+            JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, outputs.get(outputs.size() - 2), outputs.get(outputs.size() - 1));
+            splitPane.setDividerLocation(0.5);
+            splitPane.setResizeWeight(0.5);
 
-            for (int i = outputs.size()-3; i>=0; i--){
+            for (int i = outputs.size() - 3; i >= 0; i--) {
                 JSplitPane outerPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, outputs.get(i), splitPane);
                 outerPane.setDividerLocation(0.5);
                 outerPane.setResizeWeight(0.5);
                 splitPane = outerPane;
             }
-                pane.add(splitPane);
-                
+            pane.add(splitPane);
+
         }
         pane.validate();
     }
@@ -159,12 +158,13 @@ public class JavaConsole implements ObservableMessagesProvider {
     private PublicObservable observable = new PublicObservable();
     private boolean initialized = false;
 
-     private static class JavaConsoleHolder {
+    private static class JavaConsoleHolder {
 
         //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
         private static final JavaConsole INSTANCE = new JavaConsole();
     }
+
     public static JavaConsole getConsole() {
         return JavaConsoleHolder.INSTANCE;
     }
@@ -192,31 +192,33 @@ public class JavaConsole implements ObservableMessagesProvider {
                 || (DeploymentConfiguration.CONSOLE_SHOW_JAVAWS.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
                 && isApplication);
     }
-   
+
     private void initializeWindow() {
-        if (!initialized){
+        if (!initialized) {
             initialize();
         }
-        initializeWindow(lastSize, contentPanel);
+        if (!JNLPRuntime.isHeadless()) {
+            initializeWindow(lastSize, contentPanel);
+        }
     }
-    
+
     private void initializeWindow(Dimension size, JPanel content) {
         consoleWindow = new JDialog((JFrame) null, R("DPJavaConsole"));
         consoleWindow.addWindowListener(new WindowAdapter() {
 
             @Override
             public void windowClosed(WindowEvent e) {
-                lastSize=consoleWindow.getSize();
+                lastSize = consoleWindow.getSize();
             }
-            
-        });        
+
+        });
         consoleWindow.setIconImages(ImageResources.INSTANCE.getApplicationImages());
         //view is added after console is made visible so no performance impact when hidden/
         refreshOutputs();
         consoleWindow.add(content);
         consoleWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //HIDE_ON_CLOSE can cause shut down deadlock
         consoleWindow.pack();
-        if (size!=null){
+        if (size != null) {
             consoleWindow.setSize(size);
         } else {
             consoleWindow.setSize(new Dimension(900, 600));
@@ -224,7 +226,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         consoleWindow.setMinimumSize(new Dimension(300, 300));
 
     }
-    
+
     /**
      * Initialize the console
      */
@@ -245,7 +247,6 @@ public class JavaConsole implements ObservableMessagesProvider {
         contentPanel.add(outputsPanel, c);
 
         /* buttons */
-
         c = new GridBagConstraints();
         c.gridy = 10;
         c.gridheight = 1;
@@ -368,7 +369,7 @@ public class JavaConsole implements ObservableMessagesProvider {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                synchronized (rawData){
+                synchronized (rawData) {
                     rawData.clear();
                     updateModel(true);
                 }
@@ -383,10 +384,12 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     public void showConsole(boolean modal) {
-        if (consoleWindow == null || !consoleWindow.isVisible()){
-            initializeWindow();
-            consoleWindow.setModal(modal);
-            consoleWindow.setVisible(true);
+        if (!JNLPRuntime.isHeadless()) {
+            if (consoleWindow == null || !consoleWindow.isVisible()) {
+                initializeWindow();
+                consoleWindow.setModal(modal);
+                consoleWindow.setVisible(true);
+            }
         }
     }
 
@@ -500,7 +503,6 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     }
 
-    
     synchronized void addMessage(MessageWithHeader m) {
         rawData.add(m);
         updateModel();
@@ -509,15 +511,16 @@ public class JavaConsole implements ObservableMessagesProvider {
     private synchronized void updateModel() {
         updateModel(null);
     }
+
     private synchronized void updateModel(Boolean force) {
         observable.setChanged();
         observable.notifyObservers(force);
     }
 
-
     /**
      * parse plugin message and add it as header+message to data
-     * @param s string to be parsed 
+     *
+     * @param s string to be parsed
      */
     private void processPluginMessage(String s) {
         PluginMessage pm = new PluginMessage(s);
@@ -546,13 +549,13 @@ public class JavaConsole implements ObservableMessagesProvider {
                             Charset.forName("UTF-8")));
                     //never ending loop
                     while (true) {
-                        try{
-                        String s = br.readLine();
-                        if (s == null) {
-                            break;
-                        }
-                        processPluginMessage(s);
-                        }catch(Exception ex){
+                        try {
+                            String s = br.readLine();
+                            if (s == null) {
+                                break;
+                            }
+                            processPluginMessage(s);
+                        } catch (Exception ex) {
                             OutputController.getLogger().log(ex);
                         }
                     }

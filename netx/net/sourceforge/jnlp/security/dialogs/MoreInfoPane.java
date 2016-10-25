@@ -125,7 +125,7 @@ public class MoreInfoPane extends SecurityDialogPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             SecurityDialog.showCertInfoDialog(parent.getCertVerifier(),
-                                parent);
+                                parent.getSecurityDialogPanel());
         }
     }
 

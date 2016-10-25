@@ -38,13 +38,12 @@ exception statement from your version.
 package net.sourceforge.jnlp.security;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
+import java.awt.Component;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JDialog;
 
@@ -64,8 +63,8 @@ import net.sourceforge.jnlp.security.dialogs.MoreInfoPane;
 import net.sourceforge.jnlp.security.dialogs.PasswordAuthenticationPane;
 import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.security.dialogs.SingleCertInfoPane;
+import net.sourceforge.jnlp.security.dialogs.ViwableDialog;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningDialog;
-import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -77,7 +76,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
  */
-public class SecurityDialog extends JDialog {
+public class SecurityDialog {
 
     /** The type of dialog we want to show */
     private final DialogType dialogType;
@@ -104,14 +103,15 @@ public class SecurityDialog extends JDialog {
     private boolean initialized = false;
 
     private DialogResult value;
+    
+    private ViwableDialog viwableDialog;
 
     /** Should show signed JNLP file warning */
     private boolean requiresSignedJNLPWarning;
 
     SecurityDialog(DialogType dialogType, AccessType accessType,
                 JNLPFile file, CertVerifier JarCertVerifier, X509Certificate cert, Object[] extras) {
-        super();
-        setIconImages(ImageResources.INSTANCE.getApplicationImages());
+        this.viwableDialog = new ViwableDialog();
         this.dialogType = dialogType;
         this.accessType = accessType;
         this.file = file;
@@ -188,9 +188,9 @@ public class SecurityDialog extends JDialog {
         SecurityDialog dialog =
                         new SecurityDialog(DialogType.MORE_INFO, null, file,
                                 certVerifier);
-        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-        dialog.setVisible(true);
-        dialog.dispose();
+        dialog.getViwableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.getViwableDialog().show();
+        dialog.getViwableDialog().dispose();
     }
 
     /**
@@ -200,13 +200,13 @@ public class SecurityDialog extends JDialog {
      * @param parent the parent option pane
      */
     public static void showCertInfoDialog(CertVerifier certVerifier,
-                SecurityDialog parent) {
+                Component parent) {
         SecurityDialog dialog = new SecurityDialog(DialogType.CERT_INFO,
                         null, null, certVerifier);
-        dialog.setLocationRelativeTo(parent);
-        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-        dialog.setVisible(true);
-        dialog.dispose();
+        dialog.getViwableDialog().setLocationRelativeTo(parent);
+        dialog.getViwableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.getViwableDialog().show();
+        dialog.getViwableDialog().dispose();
     }
 
     /**
@@ -218,24 +218,24 @@ public class SecurityDialog extends JDialog {
     public static void showSingleCertInfoDialog(X509Certificate c,
                         JDialog parent) {
         SecurityDialog dialog = new SecurityDialog(DialogType.SINGLE_CERT_INFO, c);
-        dialog.setLocationRelativeTo(parent);
-        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-        dialog.setVisible(true);
-        dialog.dispose();
+        dialog.getViwableDialog().setLocationRelativeTo(parent);
+        dialog.getViwableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.getViwableDialog().show();
+        dialog.getViwableDialog().dispose();
     }
 
     private void initDialog() {
         String dialogTitle = createTitle();
 
-        setTitle(dialogTitle);
-        setModalityType(ModalityType.MODELESS);
+        getViwableDialog().setTitle(dialogTitle);
+        getViwableDialog().setModalityType(ModalityType.MODELESS);
 
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        getViwableDialog().setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         installPanel();
 
-        pack();
-        centerDialog(this);
+        getViwableDialog().pack();
+        getViwableDialog().centerDialog();
 
         WindowAdapter adapter = new WindowAdapter() {
             private boolean gotFocus = false;
@@ -253,13 +253,13 @@ public class SecurityDialog extends JDialog {
             public void windowOpened(WindowEvent e) {
                 if (e.getSource() instanceof SecurityDialog) {
                     SecurityDialog dialog = (SecurityDialog) e.getSource();
-                    dialog.setResizable(true);
+                    dialog.getViwableDialog().setResizable(true);
                     dialog.setValue(null);
                 }
             }
         };
-        addWindowListener(adapter);
-        addWindowFocusListener(adapter);
+        getViwableDialog().addWindowListener(adapter);
+        getViwableDialog().addWindowFocusListener(adapter);
     }
 
     private String createTitle() {
@@ -356,11 +356,7 @@ public class SecurityDialog extends JDialog {
      */
     private void installPanel() {
         panel = getPanel();
-        add(panel, BorderLayout.CENTER);
-    }
-
-    private static void centerDialog(JDialog dialog) {
-        ScreenFinder.centerWindowsToCurrentScreen(dialog);
+        getViwableDialog().add(panel, BorderLayout.CENTER);
     }
 
     private void selectDefaultButton() {
@@ -381,37 +377,6 @@ public class SecurityDialog extends JDialog {
         return value;
     }
 
-    /**
-     * Called when the SecurityDialog is hidden - either because the user
-     * made a choice (Ok, Cancel, etc) or closed the window
-     */
-    @Override
-    public void dispose() {
-        notifySelectionMade();
-        super.dispose();
-    }
-
-    private final List<ActionListener> listeners = new CopyOnWriteArrayList<>();
-
-    /**
-     * Notify all the listeners that the user has made a decision using this
-     * security dialog.
-     */
-    private void notifySelectionMade() {
-        for (ActionListener listener : listeners) {
-            listener.actionPerformed(null);
-        }
-    }
-
-    /**
-     * Adds an {@link ActionListener} which will be notified if the user makes a
-     * choice using this SecurityDialog. The listener should use {@link #getValue()}
-     * to actually get the user's response.
-     * @param listener another action listener to be listen to
-     */
-    public void addActionListener(ActionListener listener) {
-        listeners.add(listener);
-    }
     
     public boolean requiresSignedJNLPWarning()
     {
@@ -438,4 +403,11 @@ public class SecurityDialog extends JDialog {
         return panel.helpToStdIn();
     }
 
+    public ViwableDialog getViwableDialog() {
+        return viwableDialog;
+    }
+    
+    public SecurityDialogPanel getSecurityDialogPanel(){
+        return panel;
+    }
 }
