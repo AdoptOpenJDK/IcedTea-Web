@@ -466,8 +466,15 @@ AC_DEFUN([IT_CHECK_FOR_CLASS],[
 AC_REQUIRE([IT_FIND_JAVAC])
 AC_REQUIRE([IT_FIND_JAVA])
 AC_CACHE_CHECK([if $2 is available], it_cv_$1, [
-# first param is name of class to find, second is name of package to make check in.
+# first is the variableto save in, second  param is name of class to find,
+# third  is name of package to make check in.
 # mostly some.pkg is ok, but some tests must bedone in sun.applet or other special directory
+# fourth, optional is module
+MODULE_NAME="$4"
+if test -n "$MODULE_NAME" ; then
+  XMODULE="-Xmodule:$MODULE_NAME"
+  PATCH_MODULE="--patch-module $MODULE_NAME=."
+fi
 PKGPATH=`echo $3 | sed "s;\\.;/;g" `
 CLASS=$PKGPATH/Test.java
 BYTECODE=$(echo $CLASS|sed 's#\.java##')
@@ -489,8 +496,8 @@ public class Test
 }
 ]
 EOF
-if $JAVAC -cp . $JAVACFLAGS -nowarn $CLASS >&AS_MESSAGE_LOG_FD 2>&1; then
-  if $JAVA -classpath . $BYTECODE >&AS_MESSAGE_LOG_FD 2>&1; then
+if $JAVAC -cp . $XMODULE $JAVACFLAGS -nowarn $CLASS >&AS_MESSAGE_LOG_FD 2>&1; then
+  if $JAVA $PATCH_MODULE -classpath . $BYTECODE >&AS_MESSAGE_LOG_FD 2>&1; then
       it_cv_$1=yes;
   else
       it_cv_$1=no;
@@ -509,54 +516,6 @@ fi
 AC_PROVIDE([$0])dnl
 ])
 
-dnl Macro to check for a Java class HexDumpEncoder
-AC_DEFUN([IT_CHECK_FOR_HEXDUMPENCODER],[
-AC_REQUIRE([IT_FIND_JAVAC])
-AC_REQUIRE([IT_FIND_JAVA])
-AC_CACHE_CHECK([if HexDumpEncoder is available], it_cv_HEXDUMPENCODER, [
-CLASS=ssun/aapplet/Test.java
-BYTECODE=$(echo $CLASS|sed 's#\.java##')
-mkdir -p tmp.$$/$(dirname $CLASS)
-cd tmp.$$
-cat << \EOF > $CLASS
-[/* [#]line __oline__ "configure" */
-package ssun.aapplet;
-
-import sun.misc.*;
-import sun.security.util.*;
-
-public class Test
-{
-  public static void main(String[] args)
-    throws Exception
-  {
-    try {
-      System.out.println(Class.forName("sun.misc.HexDumpEncoder"));
-    } catch (ClassNotFoundException e) {
-      System.out.println(Class.forName("sun.security.util.HexDumpEncoder"));
-    }
-  }
-}
-]
-EOF
-if $JAVAC -cp . $JAVACFLAGS -nowarn $CLASS >&AS_MESSAGE_LOG_FD 2>&1; then
-  if $JAVA -classpath . $BYTECODE >&AS_MESSAGE_LOG_FD 2>&1; then
-      it_cv_HEXDUMPENCODER=yes;
-  else
-      it_cv_HEXDUMPENCODER=no;
-  fi
-else
-  it_cv_HEXDUMPENCODER=no;
-fi
-])
-rm -f $CLASS *.class
-cd ..
-# should be rmdir but has to be rm -rf due to sun.applet usage
-rm -rf tmp.$$
-if test x"${it_cv_HEXDUMPENCODER}" = "xno"; then
-   AC_MSG_ERROR([HexDumpEncoder not found.])
-fi
-])
 
 AC_DEFUN_ONCE([IT_CHECK_FOR_MERCURIAL],
 [

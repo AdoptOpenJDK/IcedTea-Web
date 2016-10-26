@@ -1,3 +1,16 @@
+2016-10-26  Jiri Vanek <jvanek@redhat.com>
+
+	Configure made more JDK9 friendly
+	* acinclude.m4: (IT_CHECK_FOR_CLASS) added support for modules,
+	including support for access to private parts of module system
+	removed IT_CHECK_FOR_HEXDUMPENCODER as jdk8/9 separation is done
+	elsewhere anyway
+	* configure.ac: IT_CHECK_FOR_HEXDUMPENCODER replaced by corresponding
+	IT_CHECK_FOR_CLASS. All IT_CHECK_FOR_CLASS got corresponding module param.
+	Module variables filled for jdk9, empty otherwise. Added checks for
+	sun.misc.JarIndex (jdk8,9) and sun.misc.Launcher (jdk8 only, 9 have comment.. and troubles)
+
+
 2016-10-25  Jiri Vanek <jvanek@redhat.com>
 
 	JDialog removed as main keeper of information in SecurityDialog class

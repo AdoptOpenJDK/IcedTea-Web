@@ -64,28 +64,38 @@ dnl IT573 - Plugin depends on sun.awt,X11.XEmbeddedFrame.java
 dnl IT575 - Plugin depends on com.sun/jndi.toolkit.url.UrlUtil
 dnl IT576 - Plugin depends on sun.applet.AppletImageRef
 dnl IT578 - Remove need for patching AppletPanel for Plugin/Webstart
-IT_CHECK_FOR_CLASS(JAVA_UTIL_JAR_PACK200, [java.util.jar.Pack200], [some.pkg])
-IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEMANAGER, [java.net.CookieManager], [some.pkg])
-IT_CHECK_FOR_CLASS(JAVA_NET_HTTPCOOKIE, [java.net.HttpCookie], [some.pkg])
-IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEHANDLER, [java.net.CookieHandler], [some.pkg])
 if test x"$HAVE_JAVA9" = xyes ; then
-   echo "skipping x509,SecurityConstants, sun.net ...  checks"
-   echo "The skip is wrong. Thy must be handled for jdk9 anyway!"
-#   TODO!
-else
-  IT_CHECK_FOR_CLASS(SUN_SECURITY_PROVIDER_X509FACTORY, [sun.security.provider.X509Factory], [some.pkg])
-  IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_SECURITYCONSTANTS, [sun.security.util.SecurityConstants], [some.pkg])
-  IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_HOSTNAMECHECKER, [sun.security.util.HostnameChecker], [some.pkg])
-  IT_CHECK_FOR_CLASS(SUN_SECURITY_X509_X500NAME, [sun.security.x509.X500Name], [some.pkg])
-  IT_CHECK_FOR_HEXDUMPENCODER
-  IT_CHECK_FOR_CLASS(SUN_SECURITY_VALIDATOR_VALIDATOREXCEPTION, [sun.security.validator.ValidatorException], [some.pkg])
-  IT_CHECK_FOR_CLASS(COM_SUN_NET_SSL_INTERNAL_SSL_X509EXTENDEDTRUSTMANAGER, [com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager], [some.pkg])
-  IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILE, [sun.net.www.protocol.jar.URLJarFile], [some.pkg])
-  IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILECALLBACK, [sun.net.www.protocol.jar.URLJarFileCallBack], [some.pkg])
-  IT_CHECK_FOR_CLASS(SUN_AWT_X11_XEMBEDDEDFRAME, [sun.awt.X11.XEmbeddedFrame], [some.pkg])
-  IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.UrlUtil], [some.pkg])
-  IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef], [sun.applet], [sun.applet])
+  JAVA_BASE=java.base
+  JAVA_DESKTOP=java.desktop
+  JAVA_NAMING=java.naming
 fi
+IT_CHECK_FOR_CLASS(JAVA_UTIL_JAR_PACK200, [java.util.jar.Pack200], [some.pkg], [])
+IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEMANAGER, [java.net.CookieManager], [some.pkg], [])
+IT_CHECK_FOR_CLASS(JAVA_NET_HTTPCOOKIE, [java.net.HttpCookie], [some.pkg], [])
+IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEHANDLER, [java.net.CookieHandler], [some.pkg], [])
+# in jdk9, those classes are using internal apis, must be enabled via module cheats
+IT_CHECK_FOR_CLASS(SUN_SECURITY_PROVIDER_X509FACTORY, [sun.security.provider.X509Factory], [some.pkg], [$JAVA_BASE])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_SECURITYCONSTANTS, [sun.security.util.SecurityConstants], [some.pkg], [$JAVA_BASE])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_HOSTNAMECHECKER, [sun.security.util.HostnameChecker], [some.pkg], [$JAVA_BASE])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_X509_X500NAME, [sun.security.x509.X500Name], [some.pkg], [$JAVA_BASE])
+# the classname cant be substitued by variable, as it is substituted to inner class
+if test x"$HAVE_JAVA9" = xyes ; then
+  IT_CHECK_FOR_CLASS(HEXDUMPENCODER, [sun.security.util.HexDumpEncoder], [some.pkg], [$JAVA_BASE])
+  IT_CHECK_FOR_CLASS(SUN_MISC_JARINDEX, [jdk.internal.util.jar.JarIndex], [some.pkg], [$JAVA_BASE])
+  # jdk9 do not have sun.misc.Launcher. It must be patched in code.
+else
+  IT_CHECK_FOR_CLASS(HEXDUMPENCODER, [sun.misc.HexDumpEncoder], [some.pkg], [$JAVA_BASE])
+  IT_CHECK_FOR_CLASS(SUN_MISC_JARINDEX, [sun.misc.JarIndex], [some.pkg], [$JAVA_BASE])
+  IT_CHECK_FOR_CLASS(SUN_MISC_LAUNCHER, [sun.misc.Launcher], [some.pkg], [$JAVA_BASE])
+fi
+IT_CHECK_FOR_CLASS(SUN_SECURITY_VALIDATOR_VALIDATOREXCEPTION, [sun.security.validator.ValidatorException], [some.pkg], [$JAVA_BASE])
+IT_CHECK_FOR_CLASS(COM_SUN_NET_SSL_INTERNAL_SSL_X509EXTENDEDTRUSTMANAGER, [com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager], [some.pkg], [$JAVA_BASE])
+IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILE, [sun.net.www.protocol.jar.URLJarFile], [some.pkg], [$JAVA_BASE])
+IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILECALLBACK, [sun.net.www.protocol.jar.URLJarFileCallBack], [some.pkg], [$JAVA_BASE])
+IT_CHECK_FOR_CLASS(SUN_AWT_X11_XEMBEDDEDFRAME, [sun.awt.X11.XEmbeddedFrame], [some.pkg], [$JAVA_DESKTOP])
+IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.UrlUtil], [some.pkg], [$JAVA_NAMING])
+IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef], [sun.applet], [$JAVA_DESKTOP])
+
 IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY
 IT_CHECK_GLIB_VERSION
 IT_CHECK_XULRUNNER_MIMEDESCRIPTION_CONSTCHAR
