@@ -57,6 +57,7 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
 import net.sourceforge.jnlp.security.dialogresults.Yes;
+import net.sourceforge.jnlp.jdk89acesses.SunMiscLauncher;
 
 /**
  * Provides the panel for the More Info dialog. This dialog shows details about an
@@ -92,12 +93,11 @@ public class MoreInfoPane extends SecurityDialogPanel {
 
         for (int i = 0; i < numLabels; i++) {
             ImageIcon icon = null;
-            if (details.get(i).equals(R("STrustedCertificate")))
-                icon = new ImageIcon((new sun.misc.Launcher())
-                                                .getClassLoader().getResource("net/sourceforge/jnlp/resources/info-small.png"));
-            else
-                icon = new ImageIcon((new sun.misc.Launcher())
-                                                .getClassLoader().getResource("net/sourceforge/jnlp/resources/warning-small.png"));
+            if (details.get(i).equals(R("STrustedCertificate"))) {
+                icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/info-small.png");
+            } else {
+                icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning-small.png");
+            }
 
             errorPanel.add(new JLabel(htmlWrap(details.get(i)), icon, SwingConstants.LEFT));
         }

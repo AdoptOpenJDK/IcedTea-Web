@@ -1,3 +1,26 @@
+2016-11-01  Jiri Vanek <jvanek@redhat.com>
+
+	javaws made run under jdk9 (if compiled by jdk8)
+	* configure.ac: added check for sun.security.action.GetPropertyAction
+	* launcher/launchers.in: added check for jdk9 and if jdk9 detected,
+	added many modules-related access-allowing switches.
+	* netx/net/sourceforge/jnlp/jdk89acesses/JarIndexAccess.java: helping
+	class allowing access to JarIndex for both jdk9 and jdk8 packages locations
+	* netx/net/sourceforge/jnlp/jdk89acesses/SunMiscLauncher.java:
+	similar for sun.misc.Launcher. Used as used in jdk8, but in jdk9, where
+	is missing is used BootClassLoader instead.
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
+	Using JarIndexAccess instead of JarInde
+	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java:
+	Using SunMiscLauncher isntead of sun.misc.Launcher
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java:
+	same
+	* netx/net/sourceforge/jnlp/security/dialogs/MoreInfoPane.java:
+	same
+	* netx/net/sourceforge/jnlp/util/ScreenFinder.java:
+	Added catch for IllegalArgumentException - jdk9 is newly smuggling
+	[0,0] size window under some conditions causing this to be thrown
+
 2016-10-26  Jiri Vanek <jvanek@redhat.com>
 
 	Configure made more JDK9 friendly

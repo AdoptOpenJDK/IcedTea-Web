@@ -78,6 +78,7 @@ import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.jdk89acesses.SunMiscLauncher;
 
 /**
  * Provides the panel for using inside a SecurityDialog. These dialogs are
@@ -208,8 +209,7 @@ public class CertWarningPane extends SecurityDialogPanel {
     }
 
     private ImageIcon getImageIcon(final String imageLocation) {
-        return new ImageIcon((new sun.misc.Launcher())
-                .getClassLoader().getResource(imageLocation));
+        return SunMiscLauncher.getSecureImageIcon(imageLocation);
     }
 
     private void addButtons() {

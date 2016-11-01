@@ -81,6 +81,7 @@ import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
+import net.sourceforge.jnlp.jdk89acesses.SunMiscLauncher;
 
 /**
  * Provides a panel to show inside a SecurityDialog. These dialogs are
@@ -177,7 +178,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                     topLabelText = R("SNetworkAccess", "(address here)");
         }
 
-        ImageIcon icon = new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource("net/sourceforge/jnlp/resources/question.png"));
+        ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
         JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.LEFT);
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                         Font.BOLD, 12));

@@ -78,11 +78,11 @@ IT_CHECK_FOR_CLASS(SUN_SECURITY_PROVIDER_X509FACTORY, [sun.security.provider.X50
 IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_SECURITYCONSTANTS, [sun.security.util.SecurityConstants], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_HOSTNAMECHECKER, [sun.security.util.HostnameChecker], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_X509_X500NAME, [sun.security.x509.X500Name], [some.pkg], [$JAVA_BASE])
+IT_CHECK_FOR_CLASS(SUN_SECURITY_ACTION_GETPROPERTYACTION, [sun.security.action.GetPropertyAction], [some.pkg], [$JAVA_BASE])
 # the classname cant be substitued by variable, as it is substituted to inner class
 if test x"$HAVE_JAVA9" = xyes ; then
   IT_CHECK_FOR_CLASS(HEXDUMPENCODER, [sun.security.util.HexDumpEncoder], [some.pkg], [$JAVA_BASE])
   IT_CHECK_FOR_CLASS(SUN_MISC_JARINDEX, [jdk.internal.util.jar.JarIndex], [some.pkg], [$JAVA_BASE])
-  # jdk9 do not have sun.misc.Launcher. It must be patched in code.
 else
   IT_CHECK_FOR_CLASS(HEXDUMPENCODER, [sun.misc.HexDumpEncoder], [some.pkg], [$JAVA_BASE])
   IT_CHECK_FOR_CLASS(SUN_MISC_JARINDEX, [sun.misc.JarIndex], [some.pkg], [$JAVA_BASE])
