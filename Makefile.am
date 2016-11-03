@@ -111,8 +111,10 @@ export MOZILLA_FAMILY_TEST= "$(FIREFOX)" != "" -o "$(CHROMIUM)" != "" -o "$(CHRO
 JUNIT_RUNTIME:=$(JUNIT_JAR) $(HAMCREST_JAR)
 
 # support for javaws -html needs plugin.jar on classpath. rest of javaws works of course without it.
+# plugin jar is split into plugin.jar and jsobject.jar so it can run with modular (9+) jdk
 if ENABLE_PLUGIN
   PLUGIN_JAR=$(datadir)/$(PACKAGE_NAME)/plugin.jar
+  JSOBJECT_JAR=$(datadir)/$(PACKAGE_NAME)/jsobject.jar
 endif
 
 # Conditional defintions
@@ -136,7 +138,7 @@ export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) 
 #    IllegalAccessException
 #  - we want full privileges
 #
-export UNIFIED_CLASSPATH_SEGMENTS=$(datadir)/$(PACKAGE_NAME)/netx.jar $(PLUGIN_JAR) $(RHINO_JAR) $(TAGSOUP_JAR)
+export UNIFIED_CLASSPATH_SEGMENTS=$(datadir)/$(PACKAGE_NAME)/netx.jar $(PLUGIN_JAR) $(JSOBJECT_JAR) $(RHINO_JAR) $(TAGSOUP_JAR)
 export UNIFIED_JACOCO_CLASSPATH_SEGMENTS=$(UNIFIED_CLASSPATH_SEGMENTS) $(JACOCO_CLASSPATH)
 export UNIFIED_CLASSPATH=$(call joinsegments, $(UNIFIED_CLASSPATH_SEGMENTS))
 export UNIFIED_JACOCO_CLASSPATH=$(call joinsegments, $(UNIFIED_JACOCO_CLASSPATH_SEGMENTS))
@@ -165,7 +167,9 @@ export NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
 
 if ENABLE_PLUGIN
 export ICEDTEAPLUGIN_CLEAN = clean-IcedTeaPlugin
-export LIVECONNECT_DIR = netscape sun/applet
+export JSOBJECT_DIRS = netscape
+export SUN_APPLET_DIRS = sun/applet
+export LIVECONNECT_DIR = $(JSOBJECT_DIRS) $(SUN_APPLET_DIRS)
 export PLUGIN_DIR=$(abs_top_builddir)/plugin/icedteanp
 export PLUGIN_SRCDIR=$(abs_top_srcdir)/plugin/icedteanp
 export LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
@@ -252,6 +256,9 @@ edit_launcher_script = sed \
   -e "s|[@]JRE[@]|$(SYSTEM_JRE_DIR)|g" \
   -e "s|[@]MAIN_CLASS[@]|$${MAIN_CLASS}|g" \
   -e "s|[@]BIN_LOCATION[@]|$${BIN_LOCATION}|g" \
+  -e "s|[@]NETX_JAR[@]|$(datadir)/$(PACKAGE_NAME)/netx.jar|g" \
+  -e "s|[@]PLUGIN_JAR[@]|$(PLUGIN_JAR)|g" \
+  -e "s|[@]JSOBJECT_JAR[@]|$(JSOBJECT_JAR)|g" \
   -e "s|[@]PROGRAM_NAME[@]|$${PROGRAM_NAME}|g"
 
 # Top-Level Targets
@@ -278,7 +285,8 @@ install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir) $(ICONS_DEST_DIR) $(BASH_CMPL_DEST_DIR)
 if ENABLE_PLUGIN
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) $(DESTDIR)$(libdir)
-	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
+	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes-applet.jar   $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
+	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes-jsobject.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
 endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
@@ -312,6 +320,7 @@ endif
 uninstall-local:
 	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
+	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
 	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	rm -r $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
 	rm -r $(ICONS_DEST_DIR)/javaws.png
@@ -478,11 +487,16 @@ stamps/liveconnect.stamp: liveconnect-source-files.txt stamps/netx.stamp
 	mkdir -p stamps
 	touch $@
 
+# although sun and netscape packages were compiled together, we pack and install them as two jars, to follow java.desktop and jdk.jsobject jdk9 modules
+# the all together jar is kept for usage in tests. Feel free to remove and refactor
+
 stamps/liveconnect-dist.stamp: stamps/liveconnect.stamp
 	if test "x${LIVECONNECT_DIR}" != x; then \
 	  (cd $(abs_top_builddir)/liveconnect ; \
 	   mkdir -p lib ; \
-	   $(SYSTEM_JDK_DIR)/bin/jar cf lib/classes.jar $(LIVECONNECT_DIR) ; \
+	   $(SYSTEM_JDK_DIR)/bin/jar cf lib/classes.jar          $(LIVECONNECT_DIR) ; \
+	   $(SYSTEM_JDK_DIR)/bin/jar cf lib/classes-applet.jar   $(SUN_APPLET_DIRS) ; \
+	   $(SYSTEM_JDK_DIR)/bin/jar cf lib/classes-jsobject.jar $(JSOBJECT_DIRS)   ; \
 	   cp -pPR $(SRC_DIR_LINK) $(LIVECONNECT_SRCS) src; \
 	   find src -type f -exec chmod 640 '{}' ';' -o -type d -exec chmod 750 '{}' ';'; \
 	   cd src ; \
@@ -498,8 +512,6 @@ clean-liveconnect:
 	rm -f stamps/liveconnect.stamp
 
 # NetX
-# requires availability of OpenJDK source code including
-# a patch applied to sun.plugin.AppletViewerPanel and generated sources
 
 netx-source-files.txt:
 	find $(NETX_SRCDIR) -name '*.java' | sort > $@ ; \

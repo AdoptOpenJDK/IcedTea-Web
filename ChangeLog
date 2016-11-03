@@ -1,3 +1,14 @@
+2016-11-03  Jiri Vanek <jvanek@redhat.com>
+
+	javaws -html made run under jdk9 (if compiled by jdk8)
+	* .Makefile: (stamps/liveconnect-dist.stamp)(install-exec-local)
+	plugin jar split to plugin.jar (sun package) and jsobject.jar
+	(nescape package) so each can be patched into different module
+	* launcher/launchers.in: all add-exports and add-reads now adds to
+	java.desktop too (next to ALL-UNNAMED). plugin.jar and netx.jar 
+	patched into java.desktop. jsobject.jar patched into jdk.jsobject
+
+
 2016-11-01  Jiri Vanek <jvanek@redhat.com>
 
 	javaws made run under jdk9 (if compiled by jdk8)
