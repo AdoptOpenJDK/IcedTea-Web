@@ -79,12 +79,10 @@ COMMAND[k]="${LAUNCHER_FLAGS}"
 k=$((k+1))
 
 if [ "x$JDK9" == "xYES" ] ; then
-
 COMMAND[k]="--patch-module"
 k=$((k+1))
 COMMAND[k]="java.desktop=@PLUGIN_JAR@:@NETX_JAR@"
 k=$((k+1))
-
 # jsobject must be pathched separately from plugin
 # otherwise netscape pkg would be shared by two modules, which is forbiden
 COMMAND[k]="--patch-module"
@@ -92,14 +90,13 @@ k=$((k+1))
 COMMAND[k]="jdk.jsobject=@JSOBJECT_JAR@"
 k=$((k+1))
 
-
 COMMAND[k]="--add-reads"
 k=$((k+1))
 COMMAND[k]="java.base=ALL-UNNAMED,java.desktop"
 k=$((k+1))
 COMMAND[k]="--add-reads"
 k=$((k+1))
-COMMAND[k]="java.desktop=ALL-UNNAMED,java.desktop"
+COMMAND[k]="java.desktop=ALL-UNNAMED,java.naming"
 k=$((k+1))
 COMMAND[k]="--add-reads"
 k=$((k+1))
@@ -150,10 +147,13 @@ COMMAND[k]="--add-exports"
 k=$((k+1))
 COMMAND[k]="java.desktop/sun.applet=ALL-UNNAMED,java.desktop"
 k=$((k+1))
-
 COMMAND[k]="--add-exports"
 k=$((k+1))
 COMMAND[k]="java.base/sun.security.action=ALL-UNNAMED,java.desktop"
+k=$((k+1))
+COMMAND[k]="--add-exports"
+k=$((k+1))
+COMMAND[k]="java.base/sun.net.www.protocol.http=ALL-UNNAMED,java.desktop"
 k=$((k+1))
 fi
 

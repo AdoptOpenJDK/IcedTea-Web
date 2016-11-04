@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
-import net.sourceforge.jnlp.util.JarFile;
+import java.util.jar.JarFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -24,6 +24,7 @@ public class JarIndexAccess {
         } catch (ClassNotFoundException ex) {
             try {
                 OutputController.getLogger().log(ex);
+                OutputController.getLogger().log("Running jdk9+ ?");
                 jarIndexClass = Class.forName("jdk.internal.util.jar.JarIndex");
             } catch (ClassNotFoundException exx) {
                 OutputController.getLogger().log(exx);

@@ -1,3 +1,21 @@
+2016-11-04  Jiri Vanek <jvanek@redhat.com>
+
+	Plugin made run on jdk9
+	* .Makefile: ($(PLUGIN_DIR)/%.o) and (stamps/cpp-unit-tests-compile.stamp)
+	got setters for -DNETX_JAR, -DPLUGIN_JAR and -DJSOBJECT_JAR
+	* configure.ac: added cehck for sun.net.www.protocol.http.Handler
+	* launcher/launchers.in: wrong reads for java.desktop (java.desktop)
+	fixed to java.naming. Added exports for java.base/sun.net.www.protocol.http
+	to ALL-UNAMED,java.desktop.
+	* netx/net/sourceforge/jnlp/jdk89acesses/JarIndexAccess.java:
+	fixed type of JarFile - from wrong in sourceforge, to correct in java.util.jar
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: added plugin_get_java_version
+	which, by spawning java process determine java version it wonts to be
+	launching. (plugin_start_appletviewer) based on javaVersion adds 
+	patch-module, add-reads, add-exports if jdk9 is detected. rt.jar is 
+	now added only for jdk8. (NP_Initialize) sets javaVersion by calling 
+	plugin_get_java_version
+
 2016-11-03  Jiri Vanek <jvanek@redhat.com>
 
 	javaws -html made run under jdk9 (if compiled by jdk8)

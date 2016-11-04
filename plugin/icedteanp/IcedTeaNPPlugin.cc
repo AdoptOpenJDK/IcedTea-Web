@@ -185,6 +185,7 @@ gboolean jvm_up = FALSE;
 // Keeps track of initialization. NP_Initialize should only be
 // called once.
 gboolean initialized = false;
+int javaVersion = 0;
 
 // browser functions into mozilla
 NPNetscapeFuncs browser_functions;
@@ -1488,6 +1489,80 @@ plugin_test_appletviewer ()
   return error;
 }
 
+static int
+plugin_get_java_version ()
+{
+
+  PLUGIN_DEBUG ("plugin_get_java_version: %s\n", get_plugin_executable().c_str());
+
+  gchar* command_line[3] = { NULL, NULL, NULL };
+  gchar** environment;
+
+  gchar* standard_output;
+  gchar* standard_error;
+  gint exit_status;
+
+  command_line[0] = g_strdup (get_plugin_executable().c_str());
+  command_line[1] = g_strdup("-version");
+  command_line[2] = NULL;
+
+  environment = plugin_filter_environment();
+
+  gboolean result = g_spawn_sync (NULL, command_line, environment,
+          (GSpawnFlags) 0,
+          NULL/*GSpawnChildSetupFunc*/,
+          NULL/*user_data*/,
+          &standard_output,
+          &standard_error,
+          &exit_status,
+          &channel_error);
+  if (channel_error)
+        {
+          g_error_free (channel_error);
+          channel_error = NULL;
+        }
+  PLUGIN_DEBUG ("got_out: %s\n", standard_output);
+  PLUGIN_DEBUG ("got_err: %s\n", standard_error);
+
+  g_strfreev (environment);
+
+  g_free (command_line[0]);
+  command_line[0] = NULL;
+  g_free (command_line[1]);
+  command_line[1] = NULL;
+  g_free (command_line[2]);
+  command_line[2] = NULL;
+
+  if ( standard_error != NULL ){
+    if(strstr(standard_error, "\"9") != NULL) {
+      PLUGIN_DEBUG ("detected 9\n");
+      PLUGIN_DEBUG ("plugin_get_java_version return\n");
+      return 9;
+    }
+  }
+  PLUGIN_DEBUG ("detected 8 (or generally non nine)\n");
+  PLUGIN_DEBUG ("plugin_get_java_version return\n");
+  return 8;
+}
+
+
+
+const char *knownExports[]{
+    "java.desktop/sun.awt=ALL-UNNAMED,java.desktop",
+    "java.base/sun.security.provider=ALL-UNNAMED,java.desktop",
+    "java.base/sun.security.util=ALL-UNNAMED,java.desktop",
+    "java.base/sun.security.x509=ALL-UNNAMED,java.desktop",
+    "java.base/jdk.internal.util.jar=ALL-UNNAMED,java.desktop",
+    "java.base/sun.security.validator=ALL-UNNAMED,java.desktop",
+    "java.base/com.sun.net.ssl.internal.ssl=ALL-UNNAMED,java.desktop",
+    "java.base/sun.net.www.protocol.jar=ALL-UNNAMED,java.desktop",
+    "java.desktop/sun.awt.X11=ALL-UNNAMED,java.desktop",
+    "java.naming/com.sun.jndi.toolkit.url=ALL-UNNAMED,java.desktop",
+    "java.desktop/sun.applet=ALL-UNNAMED,java.desktop",
+    "java.base/sun.security.action=ALL-UNNAMED,java.desktop",
+    "java.base/sun.net.www.protocol.http=ALL-UNNAMED,java.desktop"
+};
+
 NPError
 plugin_start_appletviewer (ITNPPluginData* data)
 {
@@ -1511,10 +1586,29 @@ plugin_start_appletviewer (ITNPPluginData* data)
   }
 
   command_line.push_back(PLUGIN_BOOTCLASSPATH);
-  // set the classpath to avoid using the default (cwd).
-  command_line.push_back("-classpath");
-  command_line.push_back(get_plugin_rt_jar());
+  if (javaVersion < 9 ) {
+    // for jdk8 set the classpath to avoid using the default (cwd).
+    command_line.push_back("-classpath");
+    command_line.push_back(get_plugin_rt_jar());
+  } else {
+    command_line.push_back("--patch-module");
+    command_line.push_back("java.desktop="PLUGIN_JAR":"NETX_JAR);
+    command_line.push_back("--patch-module");
+    command_line.push_back("jdk.jsobject="JSOBJECT_JAR);
+    command_line.push_back("--add-reads");
+    command_line.push_back("java.base=ALL-UNNAMED,java.desktop");
+    command_line.push_back("--add-reads");
+    command_line.push_back("java.desktop=ALL-UNNAMED,java.naming");
+    command_line.push_back("--add-reads");
+    command_line.push_back("java.naming=ALL-UNNAMED,java.desktop");
 
+    for(int i = 0; i < sizeof(knownExports)/sizeof(knownExports[0]); i++) {
+      command_line.push_back("--add-exports");
+      command_line.push_back(knownExports[i]);
+    }
+
+
+  }
   // Enable coverage agent if we are running instrumented plugin
 #ifdef COVERAGE_AGENT
   command_line.push_back(COVERAGE_AGENT);
@@ -2066,7 +2160,7 @@ NP_Initialize (NPNetscapeFuncs* browserTable, NPPluginFuncs* pluginTable)
       PLUGIN_ERROR("Unable to find java executable %s\n", get_plugin_executable().c_str());
       return np_error;
     }
-
+  javaVersion = plugin_get_java_version();
   initialized = true;
 
   // Initialize threads (needed for mutexes).
