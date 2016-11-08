@@ -1,3 +1,14 @@
+2016-11-08  Jiri Vanek <jvanek@redhat.com>
+
+	Fixed behavior of JarIndexAccess to better copy original JarIndex usage
+	* netx/net/sourceforge/jnlp/jdk89acesses/JarIndexAccess.java: 
+	(JarIndexAccess)if parent is attempted to be null,  object is not created
+	(JarIndexAccess) if result of method invoking is null, null is returned
+	rather then JarIndexAccess with null parent.
+	Note - this error successfully fixed PR2219 (see NoClassDeff reproducer) but
+	still it looks as bad idea to wrap/replace ClassNotFound error/exception by
+	different exception.
+
 2016-11-04  Jiri Vanek <jvanek@redhat.com>
 
 	Plugin made run on jdk9

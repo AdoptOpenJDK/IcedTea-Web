@@ -34,6 +34,9 @@ public class JarIndexAccess {
     }
 
     private JarIndexAccess(Object parent) {
+        if (parent == null) {
+            throw new RuntimeException("JarFile can notbe null!");
+        }
         this.parent = parent;
     }
 
@@ -48,6 +51,9 @@ public class JarIndexAccess {
     public static JarIndexAccess getJarIndexImpl(JarFile jarFile) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method method = jarIndexClass.getMethod("getJarIndex", JarFile.class);
         Object o = method.invoke(null, jarFile);
+        if (o == null) {
+            return null;
+        }
         return new JarIndexAccess(o);
     }
 
