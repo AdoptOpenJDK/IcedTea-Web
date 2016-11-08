@@ -10,6 +10,7 @@ import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,6 +35,7 @@ import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
 import net.sourceforge.jnlp.util.HttpUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class ResourceDownloader implements Runnable {
@@ -380,7 +382,24 @@ public class ResourceDownloader implements Runnable {
         CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading file: " + downloadLocation + " into: " + downloadEntry.getCacheFile().getCanonicalPath());
         if (!downloadEntry.isCurrent(connection.getLastModified())) {
-            writeDownloadToFile(resource, downloadLocation, new BufferedInputStream(connection.getInputStream()));
+            try {
+                writeDownloadToFile(resource, downloadLocation, new BufferedInputStream(connection.getInputStream()));
+            } catch (IOException ex) {
+                String IH = "Invalid Http response";
+                if (ex.getMessage().equals(IH)) {
+                    OutputController.getLogger().log(ex);
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "'" + IH + "' message detected. Attempting direct socket");
+                    Object[] result = UrlUtils.loadUrlWithInvalidHeaderBytes(connection.getURL());
+                    OutputController.getLogger().log("Header of: " + connection.getURL() + " (" + downloadLocation + ")");
+                    String head = (String) result[0];
+                    byte[] body = (byte[]) result[1];
+                    OutputController.getLogger().log(head);
+                    OutputController.getLogger().log("Body is: " + body.length + " bytes long");
+                    writeDownloadToFile(resource, downloadLocation, new ByteArrayInputStream(body));
+                } else {
+                    throw ex;
+                }
+            }
         } else {
             resource.setTransferred(CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion()).length());
         }

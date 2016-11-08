@@ -1,5 +1,17 @@
 2016-11-08  Jiri Vanek <jvanek@redhat.com>
 
+	Fixed PR3198. ITW now tries direct socket connection when it met invalid http header by java impl.
+	* netx/net/sourceforge/jnlp/cache/ResourceDownloader.java:
+	(downloadFile) when  Invalid Http response exception is encountered,
+	direct socket connection is tried before giving up
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: new method of loadUrlWithInvalidHeaderBytes
+	introduced. Based on loadUrlWithInvalidHeader, just slower in reading header, and returns
+	header as string and body as byte[]. New method getRemainingBytes introduced
+	to read remaining byte[] from originally char-processed stream.
+	* NEWS: mentioned PR3198
+
+2016-11-08  Jiri Vanek <jvanek@redhat.com>
+
 	Fixed behavior of JarIndexAccess to better copy original JarIndex usage
 	* netx/net/sourceforge/jnlp/jdk89acesses/JarIndexAccess.java: 
 	(JarIndexAccess)if parent is attempted to be null,  object is not created

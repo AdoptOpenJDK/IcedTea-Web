@@ -37,11 +37,13 @@
 package net.sourceforge.jnlp.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -54,7 +56,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import net.sourceforge.jnlp.JNLPFile;
 
@@ -469,23 +470,49 @@ public class UrlUtils {
 
         return all.toString();
     }
+    
+    
+      private static byte[] getRemainingBytes(InputStream is) throws IOException {
+        byte[] buf = new byte[2048];
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        int len;
+        while ((len = is.read(buf)) != -1) {
+            bos.write(buf, 0, len);
+        }
+        bos.close();
+        return bos.toByteArray();
+    }
 
+    public static Object[] loadUrlWithInvalidHeaderBytes(URL url) throws IOException {
+        try (Socket s = UrlUtils.createSocketFromUrl(url)) {
+            writeRequest(s.getOutputStream(), url);
+            //StringBuilder do not have endsWith method. Check on that are more expensive then recreations
+            String head = new String();
+            byte[] body = new byte[0];
+            //we cant use bufferedreader, otherwise buffer consume also part of body
+            try (InputStream is = s.getInputStream()) {
+                while (true) {
+                    int readChar = is.read();
+                    if (readChar < 0) {
+                        break;
+                    }
+                    head = head + ((char) readChar);
+                    if (head.endsWith("\n\n")
+                            || head.endsWith("\r\n\r\n")
+                            || head.endsWith("\n\r\n\r")
+                            || head.endsWith("\r\r")) {
+                        body = getRemainingBytes(is);
+                    }
+                }
+            }
+            return new Object[]{head, body};
+        }
+    }
+    
+    
     public static String[] loadUrlWithInvalidHeader(URL url) throws IOException {
         try (Socket s = UrlUtils.createSocketFromUrl(url)) {
-            Writer w = new OutputStreamWriter(s.getOutputStream(), StandardCharsets.US_ASCII);
-            String file = url.getFile();
-            if (file.isEmpty()) {
-                file = "/";
-            }
-            w.write("GET " + file + " HTTP/1.0\r\n");
-            w.write("Host: " + url.getHost() + "\r\n");
-            w.write("User-Agent: javaws (icedtea-web)\r\n");
-            w.write("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n");
-            w.write("Referer: " + url.toExternalForm() + "\r\n");
-            w.write("\r\n");
-
-            w.flush();
-
+            writeRequest(s.getOutputStream(), url);
             StringBuilder all = new StringBuilder();
             StringBuilder head = new StringBuilder();
             StringBuilder body = new StringBuilder();
@@ -506,6 +533,22 @@ public class UrlUtils {
             }
             return new String[]{all.toString(), head.toString(), body.toString()};
         }
+    }
+
+    private static void writeRequest(final OutputStream s, URL url) throws IOException {
+        Writer w = new OutputStreamWriter(s, StandardCharsets.US_ASCII);
+        String file = url.getFile();
+        if (file.isEmpty()) {
+            file = "/";
+        }
+        w.write("GET " + file + " HTTP/1.0\r\n");
+        w.write("Host: " + url.getHost() + "\r\n");
+        w.write("User-Agent: javaws (icedtea-web)\r\n");
+        w.write("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n");
+        w.write("Referer: " + url.toExternalForm() + "\r\n");
+        w.write("\r\n");
+        
+        w.flush();
     }
 
     private static Socket createSocketFromUrl(URL url) throws IOException {
