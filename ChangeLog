@@ -1,5 +1,14 @@
 2016-11-14  Jiri Vanek <jvanek@redhat.com>
 
+	If port is specified in URL, it is used in cache.
+	* NEWS: mentioned PR1190
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (urlToPath) por, if used,
+	included in path of cached resource.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java: added test
+	(testUrlToPathWithPort) to to check port.
+
+2016-11-14  Jiri Vanek <jvanek@redhat.com>
+
 	Exception from closing silent connection printed out only in debug mode. It was
 	spamming FileNotFound exception even if the file was later found on different(valid) url
 	* netx/net/sourceforge/jnlp/util/HttpUtils.java: (consumeAndCloseConnectionSilently)

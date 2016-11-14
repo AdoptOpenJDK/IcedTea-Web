@@ -21,6 +21,7 @@ New in release 1.7 (2015-XX-XX):
 * PR2489 - various NPEs when codebase is null
 * PR2855 - configure.ac: Remove unnecessary checks for libX11 and zlib
 * PR878 - (http-511) Handle HTTP error 511 Network Authentication Required (standard secure proxy authentification/captive portal detection) 
+* PR1190 - unuseable javaws cache handling 
 * comments in deployment.properties now should persists load/save
 * fixed bug in caching of files with query
 * fixed issues with recreating of existing shortcut

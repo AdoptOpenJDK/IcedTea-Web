@@ -480,6 +480,14 @@ public class CacheUtil {
         path.append(File.separatorChar);
         path.append(location.getHost());
         path.append(File.separatorChar);
+        /**
+         * This is a bit of imprecise. The usage of default port would be
+         * better, but it would cause terrible backward incompatibility.
+         */
+        if (location.getPort() > 0) {
+            path.append(location.getPort());
+            path.append(File.separatorChar);
+        }
         path.append(location.getPath().replace('/', File.separatorChar));
         if (location.getQuery() != null && !location.getQuery().trim().isEmpty()) {
             path.append(".").append(location.getQuery());

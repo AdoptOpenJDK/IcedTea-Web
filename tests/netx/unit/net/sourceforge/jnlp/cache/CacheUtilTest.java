@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.cache;
 
 import java.io.File;
 import java.net.URL;
+import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import org.junit.Assert;
@@ -62,7 +63,15 @@ public class CacheUtilTest {
         final File expected = new File("/tmp/https/example.com/applet/some_weird_applet..jar");
         Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
     }
-    
+
+    @Test
+    @Bug(id = "1190")
+    public void testUrlToPathWithPort() throws Exception {
+        final URL u = new URL("https://example.com:5050/applet/some:weird*applet?.jar");
+        //stuf behind querry is kept
+        final File expected = new File("/tmp/https/example.com/5050/applet/some_weird_applet..jar");
+        Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
+    }
     
     @Test
     public void testUrlToPathWithQuery() throws Exception {
