@@ -72,6 +72,23 @@ public class CacheUtilTest {
         final File expected = new File("/tmp/https/example.com/5050/applet/some_weird_applet..jar");
         Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
     }
+
+    @Test
+    @Bug(id = "3227")
+    public void testUrlToPathLonger256() throws Exception {
+        final URL u = new URL("https://example.com:5050/applet/uspto-auth.authenticate.jnlp.q_SlNFU1NJT05JRD02OUY1ODVCNkJBOTM1NThCQjdBMTA5RkQyNDZEQjEwRi5wcm9kX3RwdG9tY2F0MjE1X2p2bTsgRW50cnVzdFRydWVQYXNzUmVkaXJlY3RVcmw9Imh0dHBzOi8vZWZzLnVzcHRvLmdvdi9FRlNXZWJVSVJlZ2lzdGVyZWQvRUZTV2ViUmVnaXN0ZXJlZCI7IFRDUFJPRFBQQUlSc2Vzc2lvbj02MjIxMjk0MTguMjA0ODAuMDAwMA__.info");
+        final File expected = new File("/tmp/https/example.com/5050/applet/a2ac35576c36d0304c86eb9e645a251ff69dba28646e13f2e81dbb9cc96097f.info");
+        Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
+    }
+    
+    @Test
+    @Bug(id = "3227")
+    public void testUrlToPathLonger256NoSuffix() throws Exception {
+        final URL u = new URL("https://example.com:5050/applet/uspto-auth.authenticate.jnlp.q_SlNFU1NJT05JRD02OUY1ODVCNkJBOTM1NThCQjdBMTA5RkQyNDZEQjEwRi5wcm9kX3RwdG9tY2F0MjE1X2p2bTsgRW50cnVzdFRydWVQYXNzUmVkaXJlY3RVcmw9Imh0dHBzOi8vZWZzLnVzcHRvLmdvdi9FRlNXZWJVSVJlZ2lzdGVyZWQvRUZTV2ViUmVnaXN0ZXJlZCI7IFRDUFJPRFBQQUlSc2Vzc2lvbj02MjIxMjk0MTguMjA0ODAuMDAwMA");
+        final File expected = new File("/tmp/https/example.com/5050/applet/e4f3cf11f86f5aa33f424bc3efe3df7a9d20837a6f1a5bbbc60c1f57f3780a4");
+        Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
+    }
+    
     
     @Test
     public void testUrlToPathWithQuery() throws Exception {

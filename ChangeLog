@@ -1,5 +1,14 @@
 2016-11-14  Jiri Vanek <jvanek@redhat.com>
 
+	Fixed PR3227. When filename in cache is to long, it is saved under its hash.
+	* NEWS: mentioned PR3227
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: when resulting filename is
+	longer then 255, then it is saved under its name hash.
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java: added tests
+	for urls with filenames longer then 255 chars.
+
+2016-11-14  Jiri Vanek <jvanek@redhat.com>
+
 	If port is specified in URL, it is used in cache.
 	* NEWS: mentioned PR1190
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (urlToPath) por, if used,
