@@ -52,7 +52,8 @@ public class HttpUtils {
         try {
             consumeAndCloseConnection(c);
         } catch (IOException ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            OutputController.getLogger().log("Following exception: '" + ex.getMessage() + "' should be harmless, but may help in finding root cause.");
+            OutputController.getLogger().log(ex);
         }
     }
 

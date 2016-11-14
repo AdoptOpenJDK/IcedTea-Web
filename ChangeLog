@@ -1,3 +1,10 @@
+2016-11-14  Jiri Vanek <jvanek@redhat.com>
+
+	Exception from closing silent connection printed out only in debug mode. It was
+	spamming FileNotFound exception even if the file was later found on different(valid) url
+	* netx/net/sourceforge/jnlp/util/HttpUtils.java: (consumeAndCloseConnectionSilently)
+	exception printed only in debug mode
+
 2016-11-08  Jiri Vanek <jvanek@redhat.com>
 
 	Fixed PR3198. ITW now tries direct socket connection when it met invalid http header by java impl.
