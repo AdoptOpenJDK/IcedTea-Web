@@ -1,3 +1,26 @@
+2016-11-18  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/Launcher.java: (createApplet) call to setContextClassLoaderForAllThreads
+	moved to earlier stage to allow Thread.currentThread().getContextClassLoader(). call in
+	early stages of constructions.
+	* tests/reproducers/signed/LoadResources/resources/LoadResources1.jnlp:
+	jnlp for javaws  reproducer in default package
+	* tests/reproducers/signed/LoadResources/resources/LoadResources2.jnlp:
+	jnlp for javaws reproducer in some.pkg package
+	* tests/reproducers/signed/LoadResources/resources/LoadResourcesApplet1.jnlp:
+	jnlp for applet  reproducer in default package
+	* tests/reproducers/signed/LoadResources/resources/LoadResourcesApplet2.jnlp:
+	jnlp for applet reproducer in some.pkg package
+	* tests/reproducers/signed/LoadResources/srcs/LoadResources.java:
+	reproducer in default package calling various getClassLoader
+	* tests/reproducers/signed/LoadResources/srcs/LoadResourcesPackaged.java:
+	reproducer in some.pkg package calling various getClassLoader
+	* tests/reproducers/signed/LoadResources/srcs/some.file:
+	testabel resource
+	* tests/reproducers/signed/LoadResources/testcases/LoadResourcesTest.java:
+	testcase of reproducer
+	* NEWS: mentioned PR2968
+
 2016-11-14  Jiri Vanek <jvanek@redhat.com>
 
 	Fixed PR3227. When filename in cache is to long, it is saved under its hash.

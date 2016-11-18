@@ -742,6 +742,15 @@ public class Launcher {
                  appletInstance = new AppletInstance(file, group, loader, null, cont);
              }
 
+             /**
+              * Due to PR2968, moved to earlier phase, so early stages of appelt
+              * can access Thread.currentThread().getContextClassLoader().
+              *
+              * However it is notable, that init and start still do not have access to right classloader.
+              * See LoadResources test.
+              */
+             setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
+
             loader.setApplication(appletInstance);
 
             // Initialize applet now that ServiceManager has access to its
@@ -754,8 +763,6 @@ public class Launcher {
             appletInstance.setApplet(applet);
             appletInstance.getAppletEnvironment().setApplet(applet);
             
-            setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
-
             return appletInstance;
         } catch (Exception ex) {
             throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplet"), R("LInitAppletInfo")), appletInstance);
