@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -62,6 +63,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * this calss intentioanlly NOT cache any content, but always load data. Its
@@ -231,6 +234,16 @@ public class HtmlBrowserPanel extends JPanel {
     private final JButton fwdButton = new JButton(">>>");
     private final JToggleButton viewSourceButton = new JToggleButton(Translator.R("BrowserSource"));
     private final JCheckBox socketCheckbox = new JCheckBox(Translator.R("BrowserSocket"));
+    private final JComboBox<Charset> encodingBox = new JComboBox<>(new Charset[]{
+        null,
+        Charset.forName("US-ASCII"),
+        Charset.forName("UTF-8"),
+        Charset.forName("ISO-8859-1"),
+        Charset.forName("UTF-16"),
+        Charset.forName("UTF-16BE"),
+        Charset.forName("UTF-16LE")
+    
+});
 
     private static final String TEXTPLAIN = "text/plain";
     private static final String TEXTHTML = "text/html";
@@ -301,10 +314,21 @@ public class HtmlBrowserPanel extends JPanel {
         String[] result;
         if (isUseSocket()) {
             OutputController.getLogger().log("Using socket connection");
-            result = UrlUtils.loadUrlWithInvalidHeader(url);
+            Charset ch = (Charset)(encodingBox.getSelectedItem());
+            if (ch == null) { 
+                result = UrlUtils.loadUrlWithInvalidHeader(url);
+            } else {
+                result = UrlUtils.loadUrlWithInvalidHeader(url, ch);
+            }
         } else {
             OutputController.getLogger().log("Using URLconnection");
-            String s = UrlUtils.loadUrl(url);
+            String s;
+            Charset ch = (Charset)(encodingBox.getSelectedItem());
+            if (ch == null) { 
+                s = UrlUtils.loadUrl(url);
+            } else {
+                s = UrlUtils.loadUrl(url, ch);
+            }
             result = new String[]{s, s, s};
         }
         OutputController.getLogger().log(result[0]);
@@ -314,8 +338,14 @@ public class HtmlBrowserPanel extends JPanel {
         current = new State(url, result[0], result[2]);
         if (source) {
             currentHtml = new JEditorPane(TEXTPLAIN, current.getSource());
+            if (encodingBox.getSelectedItem()!=null){
+                currentHtml.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
+            }
         } else {
             currentHtml = new JEditorPane(TEXTHTML, current.getHtml());
+            if (encodingBox.getSelectedItem()!=null){
+                currentHtml.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
+            }
             ((HTMLDocument) currentHtml.getDocument()).setBase(current.url);
         }
         fireDocumentChanged(getCurrentSource());
@@ -351,6 +381,7 @@ public class HtmlBrowserPanel extends JPanel {
         socketCheckbox.setToolTipText(Translator.R("BrowserSocketHelp"));
         customUrl.add(gotoButton, BorderLayout.WEST);
         customUrl.add(goTo);
+        customUrl.add(encodingBox, BorderLayout.EAST);
         tools.add(customUrl, BorderLayout.SOUTH);
         tools.add(mainButtons, BorderLayout.NORTH);
         gotoButton.addActionListener(new ActionListener() {

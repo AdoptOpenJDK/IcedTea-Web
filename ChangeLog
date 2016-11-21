@@ -1,5 +1,22 @@
 2016-11-21  Jiri Vanek <jvanek@redhat.com>
 
+	internal browser extended for trivial charset selection
+	* netx/net/sourceforge/jnlp/runtime/html/browser/HtmlBrowserPanel.java:
+	Added combobox with all currently known java standard charsets.
+	(load) if this combobox value is selected, then given encoding is used to read
+	the page. If not, then default is used as before.
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java:
+	(loadUrlWithInvalidHeader) overloaded with optional charset argument.
+	Default kept on US_ASCII
+	(loadUrl) overloaded with optional charset argument
+	Default kept on UTF_8
+	* tests/reproducers/simple/Http511/testcases/Http511Test.java:
+	(http511AuthRequired_jnlpOneFirstAuthorisedServerServerResourceAnother511Server)
+	"fixed". by putting more input before final SKIP to cause delay allowing
+	external logging to success.
+
+2016-11-21  Jiri Vanek <jvanek@redhat.com>
+
 	AbsolutePathsAndQueryStrings reproducer adapted to port in cache path
 	* tests/reproducers/simple/AbsolutePathsAndQueryStrings/testcases/AbsolutePathsAndQueryStrings.java:
 	(testCaching) exemplar urls now uses server's port instead of random and hardcoded 1234

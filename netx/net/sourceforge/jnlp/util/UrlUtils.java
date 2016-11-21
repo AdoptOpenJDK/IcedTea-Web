@@ -55,6 +55,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import javax.net.ssl.SSLSocketFactory;
 import net.sourceforge.jnlp.JNLPFile;
@@ -425,6 +426,9 @@ public class UrlUtils {
     }
 
     public static String loadUrl(URL url) throws IOException {
+        return loadUrl(url, StandardCharsets.UTF_8);
+    }
+    public static String loadUrl(URL url, Charset ch) throws IOException {
         StringBuilder all = new StringBuilder();
         int tries = 0;
         InputStream is = null;
@@ -458,7 +462,7 @@ public class UrlUtils {
                 }
             }
         }
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, UTF8))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, ch))) {
             while (true) {
                 String line = br.readLine();
                 if (line == null) {
@@ -511,12 +515,15 @@ public class UrlUtils {
     
     
     public static String[] loadUrlWithInvalidHeader(URL url) throws IOException {
+        return loadUrlWithInvalidHeader(url, StandardCharsets.US_ASCII);
+    }
+    public static String[] loadUrlWithInvalidHeader(URL url, Charset ch) throws IOException {
         try (Socket s = UrlUtils.createSocketFromUrl(url)) {
             writeRequest(s.getOutputStream(), url);
             StringBuilder all = new StringBuilder();
             StringBuilder head = new StringBuilder();
             StringBuilder body = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.US_ASCII))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream(), ch))) {
                 StringBuilder second = head;
                 while (true) {
                     String line = br.readLine();

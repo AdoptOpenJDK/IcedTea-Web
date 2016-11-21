@@ -562,7 +562,10 @@ public class Http511Test extends BrowserTest {
                 nwJnlp,
                 Arrays.asList(new ContentReaderListener[]{new ExternalLogin(server511_returnsLast), new ExternalLogin(server511_notreturns), AOK}),
                 Arrays.asList(new ContentReaderListener[]{sbc}), null);
-        pw.setWriter("SKIP\n");
+        // although ExternlLoging is launched correctly after app is started and before prompt is requested,
+        // sometimes the skip goes before ExternlLoging completesd
+        // those empty lines seems to be causing enough delay
+        pw.setWriter("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSKIP\n");
         ProcessResult p = pw.execute();
         Assert.assertTrue(p.stdout.contains(CONFIRMATION));
         Assert.assertTrue(p.stdout.contains(AOK.getCondition()));
