@@ -1,3 +1,9 @@
+2016-11-21  Jiri Vanek <jvanek@redhat.com>
+
+	AbsolutePathsAndQueryStrings reproducer adapted to port in cache path
+	* tests/reproducers/simple/AbsolutePathsAndQueryStrings/testcases/AbsolutePathsAndQueryStrings.java:
+	(testCaching) exemplar urls now uses server's port instead of random and hardcoded 1234
+
 2016-11-18  Jiri Vanek <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/Launcher.java: (createApplet) call to setContextClassLoaderForAllThreads

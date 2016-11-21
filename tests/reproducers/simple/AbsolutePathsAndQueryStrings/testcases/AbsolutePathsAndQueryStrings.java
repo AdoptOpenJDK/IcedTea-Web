@@ -82,10 +82,10 @@ public class AbsolutePathsAndQueryStrings extends BrowserTest {
         testAbsolutePathAndQueryStringWebstart();
         /* Test that caching ignores path parameters and double-slash issue from absolute codebase paths
          */
-        URL plainLocation = new URL("http://localhost:1234/StripHttpPathParams.jar");
-        URL paramLocation = new URL("http://localhost:1234/StripHttpPathParams.jar?i=abcd");
-        URL absoluteLocation = new URL("http://localhost:1234//StripHttpPathParams.jar");
-        URL absoluteParamLocation = new URL("http://localhost:1234//StripHttpPathParams.jar?i=abcd");
+        URL plainLocation = new URL("http://localhost:" + server.getPort() + "/StripHttpPathParams.jar");
+        URL paramLocation = new URL("http://localhost:" + server.getPort() + "/StripHttpPathParams.jar?i=abcd");
+        URL absoluteLocation = new URL("http://localhost:" + server.getPort() + "//StripHttpPathParams.jar");
+        URL absoluteParamLocation = new URL("http://localhost:" + server.getPort() + "//StripHttpPathParams.jar?i=abcd");
 
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
         config.load();
@@ -118,7 +118,7 @@ public class AbsolutePathsAndQueryStrings extends BrowserTest {
                 }
             }
         }
-        Assert.assertTrue(hasCachedCopy>=4);
+        Assert.assertTrue("At least 4 items should be in cach. Are not. Are: " + hasCachedCopy, hasCachedCopy >= 4);
     }
 
 }
