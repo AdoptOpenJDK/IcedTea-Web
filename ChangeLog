@@ -1,3 +1,11 @@
+2016-12-16  Jiri Vanek <jvanek@redhat.com>
+
+	Nashorn made accessible to javaws applications
+	* NEWS: mentioned PR3263
+	* launcher/launchers.in: added nashorn to BOOT_CLASSPATH
+	* tests/reproducers/signed/jsengineSigned/: reproducer of behavior
+	* tests/reproducers/simple/jsengine/: for completeness, added signed reproducer of behavior
+
 2016-11-21  Jiri Vanek <jvanek@redhat.com>
 
 	internal browser extended for trivial charset selection
