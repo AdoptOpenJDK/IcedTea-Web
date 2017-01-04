@@ -38,6 +38,7 @@
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -51,6 +52,19 @@ public class jsengineTest {
     public void jsengineTestcase1() throws Exception {
         String originalResourceName = "jsengine.jnlp";
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + originalResourceName);
+        //ServerAccess.logOutputReprint(pr.stderr);
+        //ServerAccess.logOutputReprint(pr.stdout);
+        Assert.assertTrue(pr.stdout.matches("(?s).*starting.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*A-.*nashorn.*-Z.*") || pr.stdout.matches("(?s)(?i).*A-.*rhino.*-Z.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*B-.*nashorn.*-Y.*") || pr.stdout.matches("(?s)(?i).*B-.*rhino.*-Y.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*C-.*nashorn.*-X.*") || pr.stdout.matches("(?s)(?i).*C-.*rhino.*-X.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s).*finished.*"));
+    }
+    
+     @Test
+    public void jsengineAppletTestcase1() throws Exception {
+        String originalResourceName = "jsengineApplet.jnlp";
+        ProcessResult pr = server.executeJavawsHeadless(null, "/" + originalResourceName, new StringBasedClosingListener("finished"), null, null);
         //ServerAccess.logOutputReprint(pr.stderr);
         //ServerAccess.logOutputReprint(pr.stdout);
         Assert.assertTrue(pr.stdout.matches("(?s).*starting.*"));

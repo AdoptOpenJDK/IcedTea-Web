@@ -1,5 +1,12 @@
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 
+	Added test for javaws-applet and nashorn
+	* tests/reproducers/simple/jsengine/resources/jsengineApplet.jnlp: new file, aplet definition
+	* tests/reproducers/simple/jsengine/srcs/jsengineApplet.java: new file, applet impelmentation
+	* tests/reproducers/simple/jsengine/testcases/jsengineTest.java: added test calling jsengineApplet.jnlp
+
+2017-01-04  Jiri Vanek <jvanek@redhat.com>
+
 	Fixed reproducers code coverage after plugin+jdk9 changeset
 	* Makefile.am: (COVERABLE_PLUGIN_DIR) added sets for new
 	-DNETX_JAR, -DPLUGIN_JAR and -DJSOBJECT_JAR
