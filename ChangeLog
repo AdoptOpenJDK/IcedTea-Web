@@ -1,5 +1,14 @@
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 
+	Added signed reproducer for nashorn and applets
+	* tests/reproducers/signed/jsengineSigned/resources/jsengineAppletSigned.html:
+	* tests/reproducers/signed/jsengineSigned/resources/jsengineAppletSigned.jnlp:
+	* tests/reproducers/signed/jsengineSigned/srcs/jsengineAppletSigned.java:
+	* tests/reproducers/signed/jsengineSigned/testcases/jsengineSignedTest.java:
+	* tests/reproducers/simple/jsengine/srcs/jsengineApplet.java:
+
+2017-01-04  Jiri Vanek <jvanek@redhat.com>
+
 	applets got javafx and nashorn support too
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: added default locations of
 	appletviewer_default_jfxrtjar and appletviewer_default_nashonrjar. Added methods
@@ -9,7 +18,6 @@
 	nashorn.jar to bootclassapth
 	* tests/reproducers/simple/jsengine/resources/jsengineApplet.html: testcase html
 	* tests/reproducers/simple/jsengine/testcases/jsengineTest.java: added test for apelt in html
-
 
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 

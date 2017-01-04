@@ -36,19 +36,49 @@
  */
 
 import net.sourceforge.jnlp.ProcessResult;
-import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import static net.sourceforge.jnlp.browsertesting.BrowserTest.server;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import org.junit.Assert;
 
 import org.junit.Test;
 
-public class jsengineSignedTest {
+public class jsengineSignedTest extends BrowserTest{
 
-    private static final ServerAccess server = new ServerAccess();
     
     @Test
     public void jsengineSignedTestcase1() throws Exception {
         String originalResourceName = "jsengineSigned.jnlp";
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + originalResourceName);
+        //ServerAccess.logOutputReprint(pr.stderr);
+        //ServerAccess.logOutputReprint(pr.stdout);
+        Assert.assertTrue(pr.stdout.matches("(?s).*starting.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*A-.*nashorn.*-Z.*") || pr.stdout.matches("(?s)(?i).*A-.*rhino.*-Z.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*B-.*nashorn.*-Y.*") || pr.stdout.matches("(?s)(?i).*B-.*rhino.*-Y.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*C-.*nashorn.*-X.*") || pr.stdout.matches("(?s)(?i).*C-.*rhino.*-X.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s).*finished.*"));
+    }
+    
+        @Test
+    public void jsengineAppletSignedTestcase1() throws Exception {
+        String originalResourceName = "jsengineAppletSigned.jnlp";
+        ProcessResult pr = server.executeJavawsHeadless(null, "/" + originalResourceName, new StringBasedClosingListener("finished"), null, null);
+        //ServerAccess.logOutputReprint(pr.stderr);
+        //ServerAccess.logOutputReprint(pr.stdout);
+        Assert.assertTrue(pr.stdout.matches("(?s).*starting.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*A-.*nashorn.*-Z.*") || pr.stdout.matches("(?s)(?i).*A-.*rhino.*-Z.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*B-.*nashorn.*-Y.*") || pr.stdout.matches("(?s)(?i).*B-.*rhino.*-Y.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*C-.*nashorn.*-X.*") || pr.stdout.matches("(?s)(?i).*C-.*rhino.*-X.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s).*finished.*"));
+    }
+
+    @Test
+    @TestInBrowsers(testIn = {Browsers.all})
+    public void jsengineAppletSignedTestcase2() throws Exception {
+        String originalResourceName = "jsengineAppletSigned.html";
+        ProcessResult pr = server.executeBrowser("/" + originalResourceName, new StringBasedClosingListener("finished"), null);
         //ServerAccess.logOutputReprint(pr.stderr);
         //ServerAccess.logOutputReprint(pr.stdout);
         Assert.assertTrue(pr.stdout.matches("(?s).*starting.*"));

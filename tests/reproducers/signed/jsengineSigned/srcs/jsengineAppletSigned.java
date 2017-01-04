@@ -40,10 +40,10 @@ import java.applet.Applet;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-public class jsengineApplet extends Applet{
+public class jsengineAppletSigned extends Applet{
     
     private  static final ScriptEngine engine1 = new ScriptEngineManager().getEngineByName("JavaScript");
-    private  static final ScriptEngine engine2 = new ScriptEngineManager(jsengineApplet.class.getClassLoader()).getEngineByName("JavaScript");
+    private  static final ScriptEngine engine2 = new ScriptEngineManager(jsengineAppletSigned.class.getClassLoader()).getEngineByName("JavaScript");
     private  static final ScriptEngine engine3 = new ScriptEngineManager(null).getEngineByName("JavaScript");
 
     @Override
