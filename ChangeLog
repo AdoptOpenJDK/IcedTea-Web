@@ -1,5 +1,10 @@
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 
+	Fixed bash completion generation
+	* Makefile.am: (icedteaweb-completion) now depends on stamps/netx.stamp
+
+2017-01-04  Jiri Vanek <jvanek@redhat.com>
+
 	Added signed reproducer for nashorn and applets
 	* tests/reproducers/signed/jsengineSigned/resources/jsengineAppletSigned.html:
 	* tests/reproducers/signed/jsengineSigned/resources/jsengineAppletSigned.jnlp:

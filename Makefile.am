@@ -571,7 +571,7 @@ check-metadata: $(abs_top_builddir)/metadata
 # appstreamcli  validate $(abs_top_builddir)/metadata/*.appdata.xml  $(abs_top_builddir)/metadata/*.metainfo.xml
 	
 
-$(abs_top_builddir)/icedteaweb-completion: $(abs_top_srcdir)/icedteaweb-completion.in
+$(abs_top_builddir)/icedteaweb-completion: $(abs_top_srcdir)/icedteaweb-completion.in stamps/netx.stamp
 	OPTIONS_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.OptionsDefinitions" ;  \
 	JAVAWS=`$$OPTIONS_COMMAND javaws` ; \
 	POLICYEDITOR=`$$OPTIONS_COMMAND policyeditor` ; \
