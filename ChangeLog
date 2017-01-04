@@ -1,5 +1,11 @@
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 
+	Fixed reproducers code coverage after plugin+jdk9 changeset
+	* Makefile.am: (COVERABLE_PLUGIN_DIR) added sets for new
+	-DNETX_JAR, -DPLUGIN_JAR and -DJSOBJECT_JAR
+
+2017-01-04  Jiri Vanek <jvanek@redhat.com>
+
 	When system desktop integration directory do not exists, do not die.
 	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/JListUtils.java:
 	workarounded NPE when listFiles was invoked on non-existing dir, and so returned
