@@ -1,5 +1,13 @@
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 
+	When system desktop integration directory do not exists, do not die.
+	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/JListUtils.java:
+	workarounded NPE when listFiles was invoked on non-existing dir, and so returned
+	null instead of empty array.
+	
+
+2017-01-04  Jiri Vanek <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: "can not open" dialog
 	do not show when policy file simply do not exists.
 

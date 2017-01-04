@@ -136,6 +136,9 @@ public class JListUtils {
                     return mask.matcher(name).matches();
                 }
             });
+            if (list == null) {
+                list = new File[0];
+            }
             return list;
         }
 
@@ -151,6 +154,9 @@ public class JListUtils {
         public Object getElementAt(int index) {
             if (list == null) {
                 populateList();
+            }
+            if (list.length == 0) {
+                return "??";
             }
             return list[index];
         }
