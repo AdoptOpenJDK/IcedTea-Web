@@ -141,6 +141,8 @@ static DIR *data_directory_descriptor;
 // Fully-qualified appletviewer default  executable and rt.jar
 static const char* appletviewer_default_executable = ICEDTEA_WEB_JRE "/bin/java";
 static const char* appletviewer_default_rtjar = ICEDTEA_WEB_JRE "/lib/rt.jar";
+static const char* appletviewer_default_jfxrtjar = ICEDTEA_WEB_JRE "/lib/jfxrt.jar";
+static const char* appletviewer_default_nashonrjar = ICEDTEA_WEB_JRE "/lib/ext/nashorn.jar";
 //javaws name and binary
 static const char* javaws_bin_property = "-Dicedtea-web.bin.location=" JAVAWS_BIN;
 static const char* javaws_name_property = "-Dicedtea-web.bin.name=" JAVAWS_NAME;
@@ -303,6 +305,32 @@ static std::string get_plugin_rt_jar(){
             }
       }
       return appletviewer_default_rtjar;      
+}
+
+static std::string get_plugin_jfx_jar(){
+      std::string custom_jre;
+      bool custom_jre_defined = find_custom_jre(custom_jre);
+      if (custom_jre_defined) {
+            if (IcedTeaPluginUtilities::file_exists(custom_jre+"/lib/jfxrt.jar")){
+                  return custom_jre+"/lib/jfxrt.jar";
+            } else {
+                  PLUGIN_ERROR("Your custom jre (/lib/jfxrt.jar check) %s is not valid. Please fix %s in your %s. In attempt to run using default one. \n", custom_jre.c_str(), custom_jre_key.c_str(), default_file_ITW_deploy_props_name.c_str());
+            }
+      }
+      return appletviewer_default_jfxrtjar;      
+}
+
+static std::string get_plugin_nashorn_jar(){
+      std::string custom_jre;
+      bool custom_jre_defined = find_custom_jre(custom_jre);
+      if (custom_jre_defined) {
+            if (IcedTeaPluginUtilities::file_exists(custom_jre+"/lib/ext/nashorn.jar")){
+                  return custom_jre+"/lib/ext/nashorn.jar";
+            } else {
+                  PLUGIN_ERROR("Your custom jre (/lib/ext/nashorn.jar check) %s is not valid. Please fix %s in your %s. In attempt to run using default one. \n", custom_jre.c_str(), custom_jre_key.c_str(), default_file_ITW_deploy_props_name.c_str());
+            }
+      }
+      return appletviewer_default_nashonrjar;      
 }
 
 static void cleanUpDir(){
@@ -1584,13 +1612,15 @@ plugin_start_appletviewer (ITNPPluginData* data)
   {
     command_line.push_back(*jvm_args->at(i));
   }
-
-  command_line.push_back(PLUGIN_BOOTCLASSPATH);
+   
+  command_line.push_back(PLUGIN_BOOTCLASSPATH":"+get_plugin_nashorn_jar());
   if (javaVersion < 9 ) {
     // for jdk8 set the classpath to avoid using the default (cwd).
     command_line.push_back("-classpath");
-    command_line.push_back(get_plugin_rt_jar());
+    command_line.push_back(get_plugin_rt_jar()+":"+get_plugin_jfx_jar());
   } else {
+    command_line.push_back("-classpath");
+    command_line.push_back(get_plugin_jfx_jar());
     command_line.push_back("--patch-module");
     command_line.push_back("java.desktop="PLUGIN_JAR":"NETX_JAR);
     command_line.push_back("--patch-module");

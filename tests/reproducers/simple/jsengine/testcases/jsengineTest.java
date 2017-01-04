@@ -36,19 +36,19 @@
  */
 
 import net.sourceforge.jnlp.ProcessResult;
-import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import org.junit.Assert;
 
 import org.junit.Test;
 
-public class jsengineTest {
+public class jsengineTest extends BrowserTest {
 
-    private static final ServerAccess server = new ServerAccess();
-    
     @Test
-    @Bug(id="PR3263")
+    @Bug(id = "PR3263")
     public void jsengineTestcase1() throws Exception {
         String originalResourceName = "jsengine.jnlp";
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + originalResourceName);
@@ -60,8 +60,8 @@ public class jsengineTest {
         Assert.assertTrue(pr.stdout.matches("(?s)(?i).*C-.*nashorn.*-X.*") || pr.stdout.matches("(?s)(?i).*C-.*rhino.*-X.*"));
         Assert.assertTrue(pr.stdout.matches("(?s).*finished.*"));
     }
-    
-     @Test
+
+    @Test
     public void jsengineAppletTestcase1() throws Exception {
         String originalResourceName = "jsengineApplet.jnlp";
         ProcessResult pr = server.executeJavawsHeadless(null, "/" + originalResourceName, new StringBasedClosingListener("finished"), null, null);
@@ -73,5 +73,18 @@ public class jsengineTest {
         Assert.assertTrue(pr.stdout.matches("(?s)(?i).*C-.*nashorn.*-X.*") || pr.stdout.matches("(?s)(?i).*C-.*rhino.*-X.*"));
         Assert.assertTrue(pr.stdout.matches("(?s).*finished.*"));
     }
-}
 
+    @Test
+    @TestInBrowsers(testIn = {Browsers.all})
+    public void jsengineAppletTestcase2() throws Exception {
+        String originalResourceName = "jsengineApplet.html";
+        ProcessResult pr = server.executeBrowser("/" + originalResourceName, new StringBasedClosingListener("finished"), null);
+        //ServerAccess.logOutputReprint(pr.stderr);
+        //ServerAccess.logOutputReprint(pr.stdout);
+        Assert.assertTrue(pr.stdout.matches("(?s).*starting.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*A-.*nashorn.*-Z.*") || pr.stdout.matches("(?s)(?i).*A-.*rhino.*-Z.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*B-.*nashorn.*-Y.*") || pr.stdout.matches("(?s)(?i).*B-.*rhino.*-Y.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s)(?i).*C-.*nashorn.*-X.*") || pr.stdout.matches("(?s)(?i).*C-.*rhino.*-X.*"));
+        Assert.assertTrue(pr.stdout.matches("(?s).*finished.*"));
+    }
+}

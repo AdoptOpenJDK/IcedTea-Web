@@ -1,5 +1,18 @@
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 
+	applets got javafx and nashorn support too
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: added default locations of
+	appletviewer_default_jfxrtjar and appletviewer_default_nashonrjar. Added methods
+	get_plugin_jfx_jar and get_plugin_nashorn_jar to get dynamically resolved nashorn/javafx
+	(command_line.push_back) for jdk8, on classapth added javafx,
+	for jdk9 added classpath attribute with javafx (unknown behavior), for both jdks appended
+	nashorn.jar to bootclassapth
+	* tests/reproducers/simple/jsengine/resources/jsengineApplet.html: testcase html
+	* tests/reproducers/simple/jsengine/testcases/jsengineTest.java: added test for apelt in html
+
+
+2017-01-04  Jiri Vanek <jvanek@redhat.com>
+
 	Added test for javaws-applet and nashorn
 	* tests/reproducers/simple/jsengine/resources/jsengineApplet.jnlp: new file, aplet definition
 	* tests/reproducers/simple/jsengine/srcs/jsengineApplet.java: new file, applet impelmentation
