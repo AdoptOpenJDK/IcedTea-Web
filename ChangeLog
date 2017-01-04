@@ -1,3 +1,8 @@
+2017-01-04  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: "can not open" dialog
+	do not show when policy file simply do not exists.
+
 2016-12-16  Jiri Vanek <jvanek@redhat.com>
 
 	Nashorn made accessible to javaws applications

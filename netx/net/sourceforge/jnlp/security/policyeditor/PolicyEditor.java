@@ -1518,7 +1518,9 @@ public class PolicyEditor extends JPanel {
         final OpenFileResult ofr = FileUtils.testFilePermissions(getFile());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
-            FileUtils.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyEditorController.getFile().getPath());
+            if (policyEditorController.getFile().exists()) {
+                FileUtils.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyEditorController.getFile().getPath());
+            }
             return;
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
