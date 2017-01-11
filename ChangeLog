@@ -1,3 +1,7 @@
+2017-01-11  Jiri Vanek <jvanek@redhat.com>
+
+	* icedteaweb-completion.in: improved to suggest also files in relevant cases
+
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 
 	Fixed bash completion generation
