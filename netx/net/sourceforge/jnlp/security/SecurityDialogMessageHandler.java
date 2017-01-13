@@ -50,6 +50,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
+import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
@@ -207,6 +208,12 @@ public class SecurityDialogMessageHandler implements Runnable {
                         String value = BasicDialogValue.writeNUll();
                         if (message.userResponse != null) {
                             value = message.userResponse.writeValue();
+                        }
+                        if (dialog.getSecurityDialogPanel() instanceof CertWarningPane) {
+                            CertWarningPane cp = (CertWarningPane) (dialog.getSecurityDialogPanel());
+                            if (remember) {
+                                cp.saveCert();
+                            }
                         }
                         RememberDialog.getInstance().setOrUpdateRememberedState(dialog, codebase, new SavedRememberAction(RememberDialog.createAction(remember, message.userResponse), value));
                     } catch (Exception ex) {    
