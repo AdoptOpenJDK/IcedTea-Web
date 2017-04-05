@@ -112,7 +112,7 @@ JUNIT_RUNTIME:=$(JUNIT_JAR) $(HAMCREST_JAR)
 
 # support for javaws -html needs plugin.jar on classpath. rest of javaws works of course without it.
 # plugin jar is split into plugin.jar and jsobject.jar so it can run with modular (9+) jdk
-if ENABLE_PLUGIN
+if ENABLE_PLUGINJAR
   PLUGIN_JAR=$(datadir)/$(PACKAGE_NAME)/plugin.jar
   JSOBJECT_JAR=$(datadir)/$(PACKAGE_NAME)/jsobject.jar
 endif
@@ -165,19 +165,24 @@ export NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
 	net.sourceforge.jnlp.tools net.sourceforge.jnlp.util \
 	sun.applet
 
-if ENABLE_PLUGIN
-export ICEDTEAPLUGIN_CLEAN = clean-IcedTeaPlugin
-export JSOBJECT_DIRS = netscape
-export SUN_APPLET_DIRS = sun/applet
-export LIVECONNECT_DIR = $(JSOBJECT_DIRS) $(SUN_APPLET_DIRS)
+if ENABLE_PLUGINJAR
+export ICEDTEAPLUGIN_TARGET = stamps/liveconnect-dist.stamp
 export PLUGIN_DIR=$(abs_top_builddir)/plugin/icedteanp
 export PLUGIN_SRCDIR=$(abs_top_srcdir)/plugin/icedteanp
-export LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
-export ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) stamps/liveconnect-dist.stamp
+export JSOBJECT_DIRS = netscape
+export SUN_APPLET_DIRS = sun/applet
 export PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
+export LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
+export LIVECONNECT_DIR = $(JSOBJECT_DIRS) $(SUN_APPLET_DIRS)
+endif
+#overriding ICEDTEAPLUGIN_TARGET
+if ENABLE_NATIVE_PLUGIN
+export ICEDTEAPLUGIN_TARGET = $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) stamps/liveconnect-dist.stamp
+export ICEDTEAPLUGIN_CLEAN = clean-IcedTeaPlugin
 #this is for plugin testcoverage
 export COVERABLE_PLUGIN_DIR=$(TESTS_DIR)/icedteanp-build-with-jacoco
 endif
+
 
 if CP_SUPPORTS_REFLINK
   REFLINK = --reflink=auto
@@ -283,8 +288,10 @@ clean-local: clean-netx clean-plugin clean-liveconnect \
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir) $(ICONS_DEST_DIR) $(BASH_CMPL_DEST_DIR)
-if ENABLE_PLUGIN
+if ENABLE_NATIVE_PLUGIN
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) $(DESTDIR)$(libdir)
+endif
+if ENABLE_PLUGINJAR
 	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes-applet.jar   $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
 	${INSTALL_DATA} $(abs_top_builddir)/liveconnect/lib/classes-jsobject.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
 endif
@@ -307,7 +314,7 @@ if ENABLE_DOCS
 	 do \
 	   ${INSTALL_DATA} -D $${files} $(DESTDIR)$(htmldir)/netx/$${files}; \
 	 done)
-if ENABLE_PLUGIN
+if ENABLE_PLUGINJAR
 	(cd ${abs_top_builddir}/docs/plugin; \
 	 for files in $$(find . -type f); \
 	 do \
@@ -339,7 +346,7 @@ uninstall-local:
 
 # Plugin
 
-if ENABLE_PLUGIN
+if ENABLE_NATIVE_PLUGIN
 # IcedTeaPlugin.so.
 # Separate compile and link invocations to ensure intermediate object
 # is listed before -l options.  See:
@@ -495,7 +502,6 @@ stamps/liveconnect.stamp: liveconnect-source-files.txt stamps/netx.stamp
 
 # although sun and netscape packages were compiled together, we pack and install them as two jars, to follow java.desktop and jdk.jsobject jdk9 modules
 # the all together jar is kept for usage in tests. Feel free to remove and refactor
-
 stamps/liveconnect-dist.stamp: stamps/liveconnect.stamp
 	if test "x${LIVECONNECT_DIR}" != x; then \
 	  (cd $(abs_top_builddir)/liveconnect ; \
@@ -744,7 +750,7 @@ clean-netx-docs:
 
 stamps/plugin-docs.stamp:
 if ENABLE_DOCS
-if ENABLE_PLUGIN
+if ENABLE_PLUGINJAR
 	$(SYSTEM_JDK_DIR)/bin/javadoc $(JAVADOC_MEM_OPTS) $(JAVADOC_OPTS) \
 	 -d ${abs_top_builddir}/docs/plugin -sourcepath $(NETX_SRCDIR):$(LIVECONNECT_SRCS) \
 	 -doctitle 'IcedTea-Web: Plugin API Specification' \
@@ -1114,7 +1120,7 @@ clean-custom-reproducers: junit-jnlp-dist-custom.txt
 #for global-links you must be root, for opera there do not exists user-links
 #although this targets will indeed create symbolic links to enable 
 #icedtea-web plugin inside browser it is intended for testing purposes
-if ENABLE_PLUGIN
+if ENABLE_NATIVE_PLUGIN
 stamps/user-links.stamp: stamps/netx-dist.stamp stamps/plugin.stamp \
  launcher.build/$(javaws) stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) 
 	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
@@ -1567,7 +1573,7 @@ clean-test-code-coverage-tools-jacoco:
 
 # plugin tests
 
-if ENABLE_PLUGIN
+if ENABLE_NATIVE_PLUGIN
 stamps/plugin-tests.stamp: $(PLUGIN_TEST_SRCS) stamps/plugin.stamp
 	mkdir -p plugin/tests/LiveConnect
 	$(SYSTEM_JDK_DIR)/bin/javac $(IT_JAVACFLAGS) \

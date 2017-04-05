@@ -54,6 +54,11 @@ IT_FIND_PACK200
 
 IT_SET_VERSION
 IT_CHECK_XULRUNNER_VERSION
+IT_CHECK_PLUGINJAR
+
+if test "$enable_native_plugin" = yes -a  ! "$enable_pluginjar" = yes ; then
+  AC_MSG_ERROR([$enable_native_plugin/$enable_pluginjar you can not build native_plugin without pluginjar])
+fi
 
 dnl PR46074 (gcc) - Missing java.net cookie code required by IcedTea plugin
 dnl IT563 - NetX uses sun.security code

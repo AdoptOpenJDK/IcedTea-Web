@@ -371,22 +371,33 @@ AC_DEFUN([IT_FIND_OPTIONAL_JAR],
   AC_SUBST($2_AVAILABLE)
 ])
 
-AC_DEFUN_ONCE([IT_CHECK_PLUGIN],
+AC_DEFUN_ONCE([IT_CHECK_NATIVE_PLUGIN],
 [
 AC_MSG_CHECKING([whether to build the browser plugin])
-AC_ARG_ENABLE([plugin],
-              [AS_HELP_STRING([--disable-plugin],
+AC_ARG_ENABLE([native_plugin],
+              [AS_HELP_STRING([--disable-native-plugin],
                               [Disable compilation of browser plugin])],
-              [enable_plugin="${enableval}"], [enable_plugin="yes"])
-AC_MSG_RESULT(${enable_plugin})
+              [enable_native_plugin="${enableval}"], [enable_native_plugin="yes"])
+AC_MSG_RESULT(${enable_native_plugin})
 ])
 
-AC_DEFUN_ONCE([IT_CHECK_PLUGIN_DEPENDENCIES],
+AC_DEFUN_ONCE([IT_CHECK_PLUGINJAR],
+[
+AC_MSG_CHECKING([whether to build plugin jar for javaws -html])
+AC_ARG_ENABLE([pluginjar],
+              [AS_HELP_STRING([--disable-pluginjar],
+                              [Disable compilation of plugin.jar for javaws -html])],
+              [enable_pluginjar="${enableval}"], [enable_pluginjar="yes"])
+AC_MSG_RESULT(${enable_pluginjar})
+AM_CONDITIONAL(ENABLE_PLUGINJAR, test "x${enable_pluginjar}" = "xyes")
+])
+
+AC_DEFUN_ONCE([IT_CHECK_NATIVE_PLUGIN_DEPENDENCIES],
 [
 dnl Check for plugin support headers and libraries.
 dnl FIXME: use unstable
-AC_REQUIRE([IT_CHECK_PLUGIN])
-if test "x${enable_plugin}" = "xyes" ; then
+AC_REQUIRE([IT_CHECK_NATIVE_PLUGIN])
+if test "x${enable_native_plugin}" = "xyes" ; then
   PKG_CHECK_MODULES(GLIB, glib-2.0)
   AC_SUBST(GLIB_CFLAGS)
   AC_SUBST(GLIB_LIBS)
@@ -403,13 +414,13 @@ if test "x${enable_plugin}" = "xyes" ; then
   AC_SUBST(MOZILLA_CFLAGS)
   AC_SUBST(MOZILLA_LIBS)
 fi
-AM_CONDITIONAL(ENABLE_PLUGIN, test "x${enable_plugin}" = "xyes")
+AM_CONDITIONAL(ENABLE_NATIVE_PLUGIN, test "x${enable_native_plugin}" = "xyes")
 ])
 
 AC_DEFUN_ONCE([IT_CHECK_XULRUNNER_VERSION],
 [
-AC_REQUIRE([IT_CHECK_PLUGIN_DEPENDENCIES])
-if test "x${enable_plugin}" = "xyes"
+AC_REQUIRE([IT_CHECK_NATIVE_PLUGIN_DEPENDENCIES])
+if test "x${enable_native_plugin}" = "xyes"
 then
   AC_CACHE_CHECK([for xulrunner version], [xulrunner_cv_collapsed_version],[
     if pkg-config --modversion libxul >/dev/null 2>&1
