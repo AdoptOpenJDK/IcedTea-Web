@@ -97,10 +97,25 @@ IT_CHECK_FOR_CLASS(SUN_SECURITY_VALIDATOR_VALIDATOREXCEPTION, [sun.security.vali
 IT_CHECK_FOR_CLASS(COM_SUN_NET_SSL_INTERNAL_SSL_X509EXTENDEDTRUSTMANAGER, [com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILE, [sun.net.www.protocol.jar.URLJarFile], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILECALLBACK, [sun.net.www.protocol.jar.URLJarFileCallBack], [some.pkg], [$JAVA_BASE])
-IT_CHECK_FOR_CLASS(SUN_AWT_X11_XEMBEDDEDFRAME, [sun.awt.X11.XEmbeddedFrame], [some.pkg], [$JAVA_DESKTOP])
+IT_CHECK_FOR_CLASS(SUN_AWT_X11_XEMBEDDEDFRAME, [sun.awt.X11.XEmbeddedFrame], [some.pkg], [$JAVA_DESKTOP], [NonFatal])
+IT_CHECK_FOR_CLASS(SUN_AWT_WEMBEDDEDFRAME, [sun.awt.windows.WEmbeddedFrame], [some.pkg], [$JAVA_DESKTOP], [NonFatal])
 IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.UrlUtil], [some.pkg], [$JAVA_NAMING])
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_HTTP_HANDLER, [sun.net.www.protocol.http.Handler], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef], [sun.applet], [$JAVA_DESKTOP])
+
+# you can see checks for embedded frame are NonFatal. We wont exactly one of them
+if test x$SUN_AWT_X11_XEMBEDDEDFRAME = xyes -a x$SUN_AWT_WEMBEDDEDFRAME = xyes ; then
+  AC_MSG_ERROR([Your jdk have both X11 and Windows EmbeddedFrame])
+fi
+if test x$SUN_AWT_X11_XEMBEDDEDFRAME = xno -a x$SUN_AWT_WEMBEDDEDFRAME = xno ; then
+  AC_MSG_ERROR([Your jdk have non of X11 or Windows EmbeddedFrame])
+fi
+if test x$SUN_AWT_X11_XEMBEDDEDFRAME = xyes ; then
+  AC_MSG_RESULT([using X11 EmbeddedFrame])
+fi
+if test x$SUN_AWT_WEMBEDDEDFRAME = xyes ; then
+  AC_MSG_RESULT([using Windows EmbeddedFrame])
+fi
 
 IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY
 IT_CHECK_GLIB_VERSION

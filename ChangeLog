@@ -1,5 +1,18 @@
 2017-04-05  Jiri Vanek <jvanek@redhat.com>
 
+	plugin.jar made buildable on windows
+	* Makefile.am: (liveconnect-source-files.txt) added sed to source code to
+	use WEmbeddedFrame on windows (based on SUN_AWT_WEMBEDDEDFRAME value)
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: added warning 
+	that base class name is sedded
+	* acinclude.m4: IT_CHECK_FOR_CLASS got new parameter. If its value is
+	NonFatal, then its absence is only warning
+	* configure.ac: IT_CHECK_FOR_CLASS SUN_AWT_X11_XEMBEDDEDFRAME made NonFatal,
+	added similar check for SUN_AWT_WEMBEDDEDFRAME. Added checks that exactly one of them exists,
+	otherwise error
+
+2017-04-05  Jiri Vanek <jvanek@redhat.com>
+
 	Split ENABLE_PLUGIN to ENABLE_NATIVE_PLUGIN and ENABLE_PLUGINJAR to allow build
 	of plugin.jar and jsobject.jar without native plugin. Doing so,
 	javaws -html may end on plugin-less system.
@@ -7,7 +20,7 @@
 	* configure.ac: added check, that native_plugin can not be built without pluginjar
 	* acinclude.m4: IT_CHECK_PLUGIN and comp. changed to IT_CHECK_NATIVE_PLUGIN and likewise.
 	Added IT_CHECK_PLUGINJAR to allow user enable/disable plugin completely.
-	* .Makefile: following configure changes, ENABLE_PLUGIN renamed/split to
+	* Makefile.am: following configure changes, ENABLE_PLUGIN renamed/split to
 	ENABLE_NATIVE_PLUGIN and ENABLE_PLUGINJAR
 	all testsuites keep running with --disable-native_plugin. Not so with disabled plugin completely
 

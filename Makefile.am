@@ -485,7 +485,11 @@ clean-plugin: $(ICEDTEAPLUGIN_CLEAN)
 liveconnect-source-files.txt:
 	if test "x${LIVECONNECT_DIR}" != x; then \
 	  find $(LIVECONNECT_SRCS) -name '*.java' | sort > $@ ; \
-	fi
+	fi ; \
+	if test x$(SUN_AWT_WEMBEDDEDFRAME) = xyes ; then \
+	  sed "s;sun.awt.X11.XEmbeddedFrame;sun.awt.windows.WEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
+	  sed "s;XEmbeddedFrame;WEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
+	fi ; \
 	touch $@
 
 stamps/liveconnect.stamp: liveconnect-source-files.txt stamps/netx.stamp

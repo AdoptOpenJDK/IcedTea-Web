@@ -120,6 +120,7 @@ import sun.awt.SunToolkit;
 import sun.awt.X11.XEmbeddedFrame;
 
 /*
+ * Waring! Warious EmbeddedFrames are sedded during windows builds!
  */
 // FIXME: declare JSProxy implementation
 @SuppressWarnings("serial")
