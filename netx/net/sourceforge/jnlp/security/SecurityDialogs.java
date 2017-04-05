@@ -122,6 +122,7 @@ public class SecurityDialogs {
      *
      * @param accessType the type of system access requested.
      * @param file the jnlp file associated with the requesting application.
+     * @param extras array of objects used as extra.toString or similarly later
      * @return true if permission was granted by the user, false otherwise.
      */
     public static AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType,

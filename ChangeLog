@@ -1,3 +1,8 @@
+2017-04-05  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
+	(AccessWarningPaneComplexReturn) fixed javadoc warning
+
 2017-01-11  Jiri Vanek <jvanek@redhat.com>
 
 	* icedteaweb-completion.in: improved to suggest also files in relevant cases
