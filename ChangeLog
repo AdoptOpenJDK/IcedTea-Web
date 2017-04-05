@@ -16,6 +16,14 @@
 	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
 	(AccessWarningPaneComplexReturn) fixed javadoc warning
 
+2017-01-13  Jiri Vanek <jvanek@redhat.com>
+
+	Basic certificate got command line saving support
+	* netx/net/sourceforge/jnlp/security/SecurityDialogMessageHandler.java: if
+	dialog is CertWarningPane and should be remembered, is.
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: extracted
+	saving method, so it can be reused
+
 2017-01-11  Jiri Vanek <jvanek@redhat.com>
 
 	* icedteaweb-completion.in: improved to suggest also files in relevant cases

@@ -336,22 +336,26 @@ public class CertWarningPane extends SecurityDialogPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (alwaysTrust != null && alwaysTrust.isSelected()) {
-                try {
-                    KeyStore ks = KeyStores.getKeyStore(Level.USER, Type.CERTS);
-                    X509Certificate c = (X509Certificate) parent.getCertVerifier().getPublisher(null);
-                    CertificateUtils.addToKeyStore(c, ks);
-                    File keyStoreFile = KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFile();
-                    if (!keyStoreFile.isFile()) {
-                        FileUtils.createRestrictedFile(keyStoreFile, true);
-                    }
-                    SecurityUtil.storeKeyStore(ks, keyStoreFile);
-                    OutputController.getLogger().log("certificate is now permanently trusted");
-                } catch (Exception ex) {
-                    // TODO: Let NetX show a dialog here notifying user
-                    // about being unable to add cert to keystore
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
-                }
+                saveCert();
             }
+        }
+    }
+
+    public void saveCert() {
+        try {
+            KeyStore ks = KeyStores.getKeyStore(Level.USER, Type.CERTS);
+            X509Certificate c = (X509Certificate) parent.getCertVerifier().getPublisher(null);
+            CertificateUtils.addToKeyStore(c, ks);
+            File keyStoreFile = KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFile();
+            if (!keyStoreFile.isFile()) {
+                FileUtils.createRestrictedFile(keyStoreFile, true);
+            }
+            SecurityUtil.storeKeyStore(ks, keyStoreFile);
+            OutputController.getLogger().log("certificate is now permanently trusted");
+        } catch (Exception ex) {
+                    // TODO: Let NetX show a dialog here notifying user
+            // about being unable to add cert to keystore
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
         }
     }
 
