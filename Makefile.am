@@ -818,23 +818,26 @@ stamps/junit-jnlp-dist-dirs: junit-jnlp-dist-simple.txt stamps/junit-jnlp-dist-s
 	touch $@
 
 junit-jnlp-dist-custom.txt:
+	rm -f $(abs_top_builddir)/$@ ; \
 	cd $(REPRODUCERS_TESTS_SRCDIR)/$(CUSTOM_REPRODUCERS)/ ; \
 	for x in $(COMPILE_WHITELIST_FILTER) ; do \
-	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/$@ || true ; \
+	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x >> $(abs_top_builddir)/$@ || true ; \
 	done
 
 junit-jnlp-dist-simple.txt:
+	rm -f $(abs_top_builddir)/$@ ; \
 	cd $(REPRODUCERS_TESTS_SRCDIR)/simple/ ; \
 	for x in $(COMPILE_WHITELIST_FILTER) ; do \
-	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/$@ || true ; \
+	  find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x >> $(abs_top_builddir)/$@ || true ; \
 	done
 
 stamps/junit-jnlp-dist-signed.stamp:
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
+	  rm -f $(abs_top_builddir)/junit-jnlp-dist-$$which.txt ; \
 	  pushd $(REPRODUCERS_TESTS_SRCDIR)/$$which/ ; \
 	    for x in $(COMPILE_WHITELIST_FILTER) ; do \
-	      find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x > $(abs_top_builddir)/junit-jnlp-dist-$$which.txt ; \
+	      find .  -maxdepth 1 -mindepth 1 | sed "s/.\/*//" | grep $$x >> $(abs_top_builddir)/junit-jnlp-dist-$$which.txt ; \
 	    done ; \
 	  popd ; \
 	done ; \
