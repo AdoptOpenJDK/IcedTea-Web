@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Created-By: 1.6.0 (Sun Microsystems Inc.)
+Permissions: all-permissions
+Trusted-Only: true
+Application-Name: Kemtrak
+Main-Class: Kemtrak
+Class-path: jcalendar.jar
+Codebase: *
+Application-Library-Allowable-Codebase: *
+

@@ -1,5 +1,18 @@
 2017-04-06  Jiri Vanek <jvanek@redhat.com>
 
+	Reproduce and fixed pr3350.
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: (showMatchingALACAttributePanel)
+	defensive NPE check for document base
+	* netx/net/sourceforge/jnlp/util/UrlUtils.java: (setOfUrlsToHtmlList) defensive NPE check
+	* tests/reproducers/signed/Kemtrakpro/resources/Kemtrak.jnlp: exact jnlp from pr3350 bug report
+	* tests/reproducers/signed/Kemtrakpro/srcs/Kemtrak.java: dummy main jar
+	* tests/reproducers/signed/Kemtrakpro/srcs/META-INF/MANIFEST.MF:  exact manifest from pr3350
+	* tests/reproducers/signed/jcalendar/srcs/jcalendar.java:dummy dependence of Kemtrak
+	* tests/reproducers/signed/Kemtrakpro/testcases/KemtrakTests.java: simple launch of jnlp. This
+	test is hitting the issue. Headless dialogue used.
+
+2017-04-06  Jiri Vanek <jvanek@redhat.com>
+
 	* Makefile.am: for windows build, sed PluginAppletViewer's super call
 
 2017-04-05  Jiri Vanek <jvanek@redhat.com>

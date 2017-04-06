@@ -264,7 +264,11 @@ public class SecurityDialogs {
 
         SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.MATCHING_ALACA;
-        message.extras = new Object[]{documentBase.toString(), UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
+        String docBaseString = "null-documentbase";
+        if (documentBase != null) {
+            docBaseString = documentBase.toString();
+        }
+        message.extras = new Object[]{docBaseString, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         DialogResult selectedValue = getUserResponse(message);
 
         OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue);

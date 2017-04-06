@@ -208,6 +208,9 @@ public class UrlUtils {
      * @return String containing html item list of those urls
      */
     public static String setOfUrlsToHtmlList(Iterable<URL> remoteUrls) {
+        if (remoteUrls == null) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("<ul>");
         for (URL url : remoteUrls) {
