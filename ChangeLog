@@ -1,3 +1,7 @@
+2017-04-06  Jiri Vanek <jvanek@redhat.com>
+
+	* Makefile.am: for windows build, sed PluginAppletViewer's super call
+
 2017-04-05  Jiri Vanek <jvanek@redhat.com>
 
 	plugin.jar made buildable on windows

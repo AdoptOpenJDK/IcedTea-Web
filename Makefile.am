@@ -489,6 +489,7 @@ liveconnect-source-files.txt:
 	if test x$(SUN_AWT_WEMBEDDEDFRAME) = xyes ; then \
 	  sed "s;sun.awt.X11.XEmbeddedFrame;sun.awt.windows.WEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
 	  sed "s;XEmbeddedFrame;WEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
+	  sed "s;super(handle, true);super(handle);" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
 	fi ; \
 	touch $@
 
