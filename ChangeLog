@@ -1,3 +1,11 @@
+2017-04-10  Jiri Vanek <jvanek@redhat.com>
+
+	On windows, shutdown hook added like we do, via lazy initiated OutputController
+	(which may be swing/awt hidden call (not verified)) causes exception
+	"can't add shutdown hook, shutdown already in progress"
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: (main) enforced
+	headless mode, to prevent itw debug console from showing.
+
 2017-04-06  Jiri Vanek <jvanek@redhat.com>
 
 	Reproduce and fixed pr3350.
