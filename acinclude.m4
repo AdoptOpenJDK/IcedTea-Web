@@ -476,7 +476,7 @@ dnl Test class has to be in sun.applet for some internal classes
 AC_DEFUN([IT_CHECK_FOR_CLASS],[
 AC_REQUIRE([IT_FIND_JAVAC])
 AC_REQUIRE([IT_FIND_JAVA])
-AC_CACHE_CHECK([if $2 is available from $3 (module "$4") as $5], it_cv_$1, [
+AC_CACHE_CHECK([if $2 is available from $3 (module "$4")], it_cv_$1, [
 # first is the variableto save in, second  param is name of class to find,
 # third  is name of package to make check in.
 # mostly some.pkg is ok, but some tests must bedone in sun.applet or other special directory
@@ -522,11 +522,7 @@ cd ..
 # should be rmdir but has to be rm -rf due to sun.applet usage
 rm -rf tmp.$$
 if test x"${it_cv_$1}" = "xno"; then
-  if test x$5 = xNonFatal; then
-    AC_MSG_WARN([$2 not found.])
-  else
-    AC_MSG_ERROR([$2 not found.])
-  fi
+  AC_MSG_ERROR([$2 not found.])
 fi
 AC_SUBST([$1], [${it_cv_$1}])
 AC_PROVIDE([$0])dnl

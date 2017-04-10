@@ -1,3 +1,12 @@
+2017-04-10  Jiri Vanek <jvanek@redhat.com>
+
+	better handling of WEmbeddedFrame/XEmbeddedFrame
+	* configure.ac: IT_CHECK_FOR_CLASS removed NonFatal support
+	check for WEmbeddedFrame/XEmbeddedFrame done by windows/linux recognition
+	removed checks on SUN_AWT_X11_XEMBEDDEDFRAME and SUN_AWT_WEMBEDDEDFRAME
+	* Makefile.am: sed in PluginAppletViewer.java conditioned
+	by WINDOWS variable isntead of SUN_AWT_WEMBEDDEDFRAME one
+
 2017-04-10  Michal Vala <mvala@redhat.com>
             Jiri Vanek  <jvanek@redhat.com>
 
