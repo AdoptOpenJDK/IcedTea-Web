@@ -36,14 +36,18 @@ exception statement from your version.
  */
 
 import java.applet.Applet;
-import java.lang.reflect.*;
 
 /**
- * This is used by Kemtrak reproducer.
- * Originally the jar was signed2, but I always forget:
- * netx: Initialization Error: Could not initialize applet. (Fatal: Application Error: The JNLP application is not fully signed by a single cert. The JNLP application has its components individually signed, however there must be a common signer to all entries.)
- * netx: Initialization Error: Could not initialize applet. (Fatal: Application Error: The JNLP application is not fully signed by a single cert. The JNLP application has its components individually signed, however there must be a common signer to all entries.)
- * 
+ * This is used by Kemtrak reproducer. Originally the jar was signed2, but I
+ * always forget: netx: Initialization Error: Could not initialize applet.
+ * (Fatal: Application Error: The JNLP application is not fully signed by a
+ * single cert. The JNLP application has its components individually signed,
+ * however there must be a common signer to all entries.) netx: Initialization
+ * Error: Could not initialize applet. (Fatal: Application Error: The JNLP
+ * application is not fully signed by a single cert. The JNLP application has
+ * its components individually signed, however there must be a common signer to
+ * all entries.)
+ *
  * @author jvanek
  */
 public class jcalendar extends Applet {
@@ -64,17 +68,19 @@ public class jcalendar extends Applet {
     }
     private Killer killer;
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
+        System.out.println("jcalendar1");
+    }
+
+    public static void main2(String[] args) {
         System.out.println("jcalendar2");
     }
 
     @Override
     public void init() {
-        System.out.println("jcalendar1");
+        System.out.println("jcalendar0");
         killer = new Killer();
         killer.start();
     }
-
-
 
 }

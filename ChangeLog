@@ -1,5 +1,19 @@
 2017-04-10  Jiri Vanek <jvanek@redhat.com>
 
+	Reproduced issue PR3351
+	* tests/reproducers/signed/Kemtrakpro/resources/Kemtrak_javaws.jnlp:
+	jnlp file to test also javaws (next to applet) behavior
+	* tests/reproducers/signed/Kemtrakpro/srcs/Kemtrak.java: added code to
+	reproduce issue
+	* tests/reproducers/signed/Kemtrakpro/testcases/KemtrakTests.java:
+	added testcases for applet to close jar and try to load class again.
+	added same testcases for javaws. Added testcase for plain java run to
+	prove underlying jdk is not guilty
+	* tests/reproducers/signed/jcalendar/srcs/jcalendar.java: small modification 
+	to add distinguish call inside.
+
+2017-04-10  Jiri Vanek <jvanek@redhat.com>
+
 	better handling of WEmbeddedFrame/XEmbeddedFrame
 	* configure.ac: IT_CHECK_FOR_CLASS removed NonFatal support
 	check for WEmbeddedFrame/XEmbeddedFrame done by windows/linux recognition

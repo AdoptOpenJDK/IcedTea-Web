@@ -36,7 +36,12 @@ exception statement from your version.
  */
 
 import java.applet.Applet;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.*;
+import java.net.JarURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Kemtrak extends Applet {
 
@@ -56,28 +61,65 @@ public class Kemtrak extends Applet {
     }
     private Killer killer;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws  IOException {
         System.out.println("Kemtrak2");
-        jcalendar();
+        if (args.length == 2 && args[0].equals("closeJar")) {
+            String cbase = args[1];
+            System.out.println("Closing Jar!");
+            URL localURL = new java.net.URL("jar", "", cbase + "jcalendar.jar!/");
+            JarURLConnection localObject3 = (java.net.JarURLConnection) localURL.openConnection();
+            java.util.jar.JarFile localJarFile = ((java.net.JarURLConnection) localObject3).getJarFile();
+            String str9 = localJarFile.getName();
+            int i3 = localJarFile.size();
+            localJarFile.close();
+            System.out.println("jcalendar " + localURL + "   " + str9 + ", entrie: " + i3);
+            //if one call inisde  jcalendar.jar (jcalendar1() and/or jcalendar2) *BEFORE* closing, issue is NOT hit
+            jcalendar2();
+        } else {
+            jcalendar1();
+        }
+        System.out.println("kemtrak finished");
     }
 
     @Override
     public void init() {
-        System.out.println("Kemtrak1");
-        Kemtrak.main(null);
-        killer = new Killer();
-        killer.start();
+        try {
+            System.out.println("Kemtrak1");
+            String cj = this.getParameter("closeJar");
+            if ("closeJar".equals(cj)) {
+                Kemtrak.main(new String[]{"closeJar", getCodeBase().toExternalForm()});
+            } else {
+                Kemtrak.main(new String[0]);
+            }
+        } catch (IOException u) {
+            throw new RuntimeException(u);
+        } finally {
+            killer = new Killer();
+            killer.start();
+        }
     }
+    
+    
+    //we use reflection only to avoid jcalendar.jar on classpath
 
- public static void jcalendar() {
+    public static void jcalendar1() {
         try {
             Class<?> signedAppletClass = Class.forName("jcalendar");
-            Method m = signedAppletClass.getMethod("main", String[].class);
-            m.invoke(null, (Object)null);
+            Method m = signedAppletClass.getMethod("main1", String[].class);
+            m.invoke(null, (Object) null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static void jcalendar2() {
+        try {
+            Class<?> signedAppletClass = Class.forName("jcalendar");
+            Method m = signedAppletClass.getMethod("main2", String[].class);
+            m.invoke(null, (Object) null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
