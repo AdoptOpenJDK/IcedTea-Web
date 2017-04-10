@@ -41,6 +41,22 @@ if test x"$BIN_BASH" = x ; then
     AC_MSG_ERROR([/bin/bash is used in runtime and for about generation. Dying sooner rather then later])
 fi
 
+build_linux=no
+build_windows=no
+case "${host_os}" in
+    linux*)
+        build_linux=yes
+        ;;
+    cygwin*)
+        build_windows=yes
+        ;;
+    *)
+        AC_MSG_ERROR(["OS $host_os is not supported"])
+        ;;
+esac
+AM_CONDITIONAL([LINUX], [test "$build_linux" = "yes"])
+AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
+
 IT_CHECK_WITH_GCJ
 FIND_TOOL([ZIP], [zip])
 FIND_JAVAC

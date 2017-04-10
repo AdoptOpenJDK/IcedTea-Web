@@ -1,3 +1,14 @@
+2017-04-10  Michal Vala <mvala@redhat.com>
+            Jiri Vanek  <jvanek@redhat.com>
+
+	made fully buildable (java) on windows
+	* Makefile.am: on windows used ";" as cp separator
+	on win, TOP_BUILD_DIR and expanded to win paths.
+	macros TOP_BUILD_DIR and TOP_SRC_DIR used constantly over
+	abs_top_builddir and abs_top_srcdir
+	* configure.ac: added win/linux recognition based on
+	autotools standard approaches 
+
 2017-04-10  Jiri Vanek <jvanek@redhat.com>
 
 	On windows, shutdown hook added like we do, via lazy initiated OutputController
