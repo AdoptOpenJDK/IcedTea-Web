@@ -19,6 +19,7 @@ endef
 if WINDOWS
 	export TOP_BUILD_DIR := $(shell cygpath -p -m "$(abs_top_builddir)")
 	export TOP_SRC_DIR := $(shell cygpath -p -m "$(abs_top_srcdir)")
+	export prefix := $(shell cygpath -p -m "$(prefix)")
 else
 	export TOP_BUILD_DIR = $(abs_top_builddir)
 	export TOP_SRC_DIR = $(abs_top_srcdir)
