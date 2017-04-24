@@ -232,6 +232,10 @@ public final class Boot implements PrivilegedAction<Void> {
         OutputController.getLogger().printOut(itwInfoMessage);
     }
 
+    private static String fixJnlpProtocol(String param) {
+        return param.replaceFirst("^jnlp:", "http:").replaceFirst("^jnlps:", "https:");
+    }
+
     /**
      * The privileged part (jdk1.3 compatibility).
      */
@@ -310,11 +314,11 @@ public final class Boot implements PrivilegedAction<Void> {
                 || (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP) && optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML))) {
             throw new InvalidArgumentException(optionParser.getMainArgs().toString());
         } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP)) {
-            return optionParser.getParam(OptionsDefinitions.OPTIONS.JNLP);
+            return fixJnlpProtocol(optionParser.getParam(OptionsDefinitions.OPTIONS.JNLP));
         } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
             return optionParser.getParam(OptionsDefinitions.OPTIONS.HTML);
         } else if (optionParser.mainArgExists()) {
-            return optionParser.getMainArg();
+            return fixJnlpProtocol(optionParser.getMainArg());
         }
 
         handleMessage();

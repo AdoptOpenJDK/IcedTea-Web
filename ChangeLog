@@ -1,5 +1,12 @@
 2017-04-24  Jiri Vanek <jvanek@redhat.com>
 
+	javaws made to understand jnlp "network protokol"
+	* NEWS: mentioned jnlp protocol
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: when main or jnlp argument starts with
+	jnlp(s): then it is substituted by http(s)
+
+2017-04-24  Jiri Vanek <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java: https preffered over http
 
 2017-04-24  Jiri Vanek <jvanek@redhat.com>
