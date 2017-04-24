@@ -1,5 +1,9 @@
 2017-04-24  Jiri Vanek <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java: https preffered over http
+
+2017-04-24  Jiri Vanek <jvanek@redhat.com>
+
 	fixed PR3365
 	* icedteaweb-completion.in: _itweb-settings renamed to _itwebsettings
 

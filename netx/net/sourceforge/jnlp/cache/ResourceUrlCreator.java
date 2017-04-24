@@ -34,7 +34,6 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
-
 package net.sourceforge.jnlp.cache;
 
 import java.net.MalformedURLException;
@@ -43,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class ResourceUrlCreator {
 
@@ -55,9 +55,10 @@ public class ResourceUrlCreator {
     }
 
     /**
-     * Returns a list of URLs that the resources might be downloadable from.
-     * The Resources may not be downloadable from any of them. The returned order is the order
-     * the urls should be attempted in.
+     * Returns a list of URLs that the resources might be downloadable from. The
+     * Resources may not be downloadable from any of them. The returned order is
+     * the order the urls should be attempted in.
+     *
      * @return a list of URLs that the resources might be downloadable from
      */
     public List<URL> getUrls() {
@@ -94,15 +95,29 @@ public class ResourceUrlCreator {
 
         urls.add(resource.getLocation());
 
+        //preffering https and  owerriding case, when applciation was moved to https, but the jnlp stayed intacted
+        List<URL> urlsCopy = new LinkedList<>(urls);
+        for (URL u : urlsCopy) {
+            if (u.getProtocol().equals("http")) {
+                try {
+                    urls.add(0, copyUrltoHttps(u));
+                } catch (Exception ex) {
+                    OutputController.getLogger().log(ex);
+                }
+            }
+        }
         return urls;
     }
 
     /**
      * Returns a url for the resource.
+     *
      * @param resource the resource
      * @param usePack whether the URL should point to the pack200 file
-     * @param useVersion whether the URL should be modified to include the version
-     * @return a URL for the resource or null if an appropriate URL can not be found
+     * @param useVersion whether the URL should be modified to include the
+     * version
+     * @return a URL for the resource or null if an appropriate URL can not be
+     * found
      */
     static URL getUrl(Resource resource, boolean usePack, boolean useVersion) {
         if (!(usePack || useVersion)) {
@@ -123,7 +138,7 @@ public class ResourceUrlCreator {
             for (int i = 0; i < parts.length; i++) {
                 sb.append(parts[i]);
                 // Append __V<number> before last '.'
-                if (i == parts.length -2) {
+                if (i == parts.length - 2) {
                     sb.append("__V").append(resource.getRequestVersion());
                 }
                 sb.append('.');
@@ -146,8 +161,10 @@ public class ResourceUrlCreator {
     }
 
     /**
-     * Returns the URL for this resource, including the resource's version number in the query string
-     * @return  url with version cared about
+     * Returns the URL for this resource, including the resource's version
+     * number in the query string
+     *
+     * @return url with version cared about
      */
     protected URL getVersionedUrl() {
         URL resourceUrl = resource.getLocation();
@@ -185,9 +202,18 @@ public class ResourceUrlCreator {
     }
 
     private static String uriPartToString(String part) {
-        if (part == null)
+        if (part == null) {
             return "";
+        }
         return part;
+    }
+
+    private URL copyUrltoHttps(URL u) throws MalformedURLException {
+        if (u.getPort() < 0) {
+            return new URL("https", u.getHost(), u.getFile());
+        } else {
+            return new URL("https", u.getHost(), u.getPort(), u.getFile(), null);
+        }
     }
 
 }
