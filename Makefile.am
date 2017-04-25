@@ -20,9 +20,11 @@ if WINDOWS
 	export TOP_BUILD_DIR := $(shell cygpath -p -m "$(abs_top_builddir)")
 	export TOP_SRC_DIR := $(shell cygpath -p -m "$(abs_top_srcdir)")
 	export prefix := $(shell cygpath -p -m "$(prefix)")
+	export CPA=""
 else
 	export TOP_BUILD_DIR = $(abs_top_builddir)
 	export TOP_SRC_DIR = $(abs_top_srcdir)
+	export CPA="-a"
 endif
 
 export NETX_DIR = $(TOP_BUILD_DIR)/netx.build
@@ -670,9 +672,9 @@ stamps/netx.stamp: netx-source-files.txt stamps/netx-html-gen.stamp
 	   ${INSTALL_DATA} -D $${files} \
 	   $(NETX_DIR)/net/sourceforge/jnlp/resources/$${files}; \
 	 done)
-	cp -a $(NETX_SRCDIR)/net/sourceforge/jnlp/runtime/pac-funcs.js \
+	cp $(CPA) $(NETX_SRCDIR)/net/sourceforge/jnlp/runtime/pac-funcs.js \
 	  $(NETX_DIR)/net/sourceforge/jnlp/runtime
-	cp -a build.properties $(NETX_DIR)/net/sourceforge/jnlp/
+	cp $(CPA) build.properties $(NETX_DIR)/net/sourceforge/jnlp/
 	mkdir -p stamps
 	touch $@
 
