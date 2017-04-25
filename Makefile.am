@@ -20,11 +20,11 @@ if WINDOWS
 	export TOP_BUILD_DIR := $(shell cygpath -p -m "$(abs_top_builddir)")
 	export TOP_SRC_DIR := $(shell cygpath -p -m "$(abs_top_srcdir)")
 	export prefix := $(shell cygpath -p -m "$(prefix)")
-	export CPA=""
+	export CPA="-v"
 else
 	export TOP_BUILD_DIR = $(abs_top_builddir)
 	export TOP_SRC_DIR = $(abs_top_srcdir)
-	export CPA="-a"
+	export CPA="-av"
 endif
 
 export NETX_DIR = $(TOP_BUILD_DIR)/netx.build
