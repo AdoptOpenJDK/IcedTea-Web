@@ -1,3 +1,8 @@
+2017-04-25  Jiri Vanek <jvanek@redhat.com>
+
+	* html-gen.sh: fixed case for some cygwin versions, when changelog
+	html generation could end in endless loop.
+
 2017-04-24  Jiri Vanek <jvanek@redhat.com>
 
 	javaws made to understand jnlp "network protokol"

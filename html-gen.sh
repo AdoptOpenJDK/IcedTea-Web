@@ -141,7 +141,8 @@ do
                 BOLD=0
             fi
             date_regex=[0-9]{4}-[0-9]{2}-[0-9]{2}
-            if [[ "$LINE" =~ $date_regex* ]] # Matches line starting with eg 2013-07-01
+            cutLine=`echo $LINE | sed "s/&.*//"` # on some versions of windows, the & caused the [[ ]] command to fail
+            if [[ "$cutLine" =~ $date_regex ]] # Matches line starting with eg 2013-07-01
             then
                 html_space="\&ensp;\&ensp;"
                 if [ -n "${REPO_URL}" ]; then
