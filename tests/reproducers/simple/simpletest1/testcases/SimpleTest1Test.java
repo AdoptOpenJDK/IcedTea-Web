@@ -44,7 +44,9 @@ import java.util.List;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.optionparser.ParsedOption;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -90,6 +92,17 @@ public class SimpleTest1Test {
     public void testSimpletest1lunchOk() throws Exception {
         ProcessResult pr = server.executeJavawsHeadless(null, "/simpletest1.jnlp");
         checkLaunched(pr);
+    }
+    
+     @Test
+    public void testSimpletestJnlpProtocolMainArgument() throws Exception {
+        ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{server.getJavawsLocation(),  "jnlp://localhost:"+server.getPort()+"/simpletest1.jnlp"}), new StringBasedClosingListener("Good simple javaws exapmle"), null);
+        checkLaunched(pr, false, false);
+    }
+    @Test
+    public void testSimpletestJnlpProtocolJnlpArgument() throws Exception {
+        ProcessResult pr = ServerAccess.executeProcess(Arrays.asList(new String[]{server.getJavawsLocation(), OptionsDefinitions.OPTIONS.JNLP.option , "jnlp://localhost:"+server.getPort()+"/simpletest1.jnlp"}), new StringBasedClosingListener("Good simple javaws exapmle"), null);
+        checkLaunched(pr, false, false);
     }
 
     @Test

@@ -1,5 +1,10 @@
 2017-04-25  Jiri Vanek <jvanek@redhat.com>
 
+	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java: added tests for jnlp protocol
+	* tests/reproducers/simple/simpletest1/testcases/SimpleTest1Test.java:  added tests for jnlp protocol
+
+2017-04-25  Jiri Vanek <jvanek@redhat.com>
+
 	* Makefile.am: cp -a got extracted -a switch to variable, disabled on win,
 	which may fail on certain combinations ow wndows x cygwin.
 

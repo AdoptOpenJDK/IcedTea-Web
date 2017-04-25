@@ -38,20 +38,22 @@ exception statement from your version.
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
+import net.sourceforge.jnlp.ProcessWrapper;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import static net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener.*;
+import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import org.junit.Assert;
 
 import org.junit.Test;
 
 public class AppletTestSignedTests extends BrowserTest {
 
-    private final List<String> l = Collections.unmodifiableList(Arrays.asList(new String[]{"-Xtrustall"}));
     private static final String s0 = "AppletTestSigned was started";
     private static final String s1 = "value1";
     private static final String s2 = "value2";
@@ -64,12 +66,50 @@ public class AppletTestSignedTests extends BrowserTest {
     private static final ContainsRule killedRule = new ContainsRule(s7);
     private static final RulesFolowingClosingListener okListener=new RulesFolowingClosingListener(startedRule, variable1Rule, variable2Rule, initialisedRule, killedRule);
 
-   // @Test
+    @Test
     public void AppletTestSignedTest() throws Exception {
-        ProcessResult pr = server.executeJavawsHeadless(l, "/AppletTestSigned.jnlp");
+        ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.HEADLESS.option}), server.getUrl("AppletTestSigned.jnlp"));
+        pw.setWriter("YES\nYES\n");
+        pw.addStdOutListener(new StringBasedClosingListener("killer was started"));
+        ProcessResult pr = pw.execute();
         evaluateSignedApplet(pr, true);
-        Assert.assertFalse(pr.wasTerminated);
-        Assert.assertEquals((Integer) 0, pr.returnValue);
+        //closing listener affected those two
+        //Assert.assertFalse(pr.wasTerminated);
+        //Assert.assertEquals((Integer) 0, pr.returnValue);
+    }
+    
+    @Test
+    @TestInBrowsers(testIn = {Browsers.one})
+    public void AppletTestSignedTestBrowser() throws Exception {
+        ProcessWrapper pw = new ProcessWrapper(server.getBrowserLocation(), Arrays.asList(new String[]{}), server.getUrl("AppletTestSigned.html"));
+        pw.setWriter("YES\nYES\n");
+        pw.addStdOutListener(new StringBasedClosingListener("killer was started"));
+        ProcessResult pr = pw.execute();
+        evaluateSignedApplet(pr, true);
+    }
+
+    @Test
+    public void AppletTestSignedTestHtmlSwitch() throws Exception {
+        ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.HEADLESS.option, OptionsDefinitions.OPTIONS.HTML.option}), server.getUrl("AppletTestSigned.html"));
+        pw.setWriter("YES\nYES\n");
+        pw.addStdOutListener(new StringBasedClosingListener("killer was started"));
+        ProcessResult pr = pw.execute();
+        evaluateSignedApplet(pr, true);
+    }
+
+    @Test
+    public void AppletTestSignedTestHtmlSwitchNotAffectedByJnlpProtocol() throws Exception {
+        String jnlpUrl = "jnlp://localhost:" + server.getPort() + "/AppletTestSigned.html";
+        ProcessWrapper pw = new ProcessWrapper(server.getJavawsLocation(), Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.HEADLESS.option, OptionsDefinitions.OPTIONS.HTML.option}), jnlpUrl);
+        pw.setWriter("YES\nYES\n");
+        pw.addStdOutListener(new StringBasedClosingListener("killer was started"));
+        ProcessResult pr = pw.execute();
+        Assert.assertTrue("jnlp protocol should not be recognized", pr.stderr.contains("Invalid jnlp file "+jnlpUrl));
+        //applet should not start
+        Assert.assertFalse("AppletTestSigned stdout " + initialisedRule.toFailingString()+ " but didn't", initialisedRule.evaluate(pr.stdout));
+        Assert.assertFalse("AppletTestSigned stdout " + startedRule.toFailingString() + " but didn't", startedRule.evaluate(pr.stdout));
+        Assert.assertFalse("AppletTestSigned stdout " + variable1Rule.toFailingString() + " but didn't", variable1Rule.evaluate(pr.stdout));
+        Assert.assertFalse("AppletTestSigned stdout " + variable2Rule.toFailingString() + " but didn't", variable2Rule.evaluate(pr.stdout));
     }
 
     private void evaluateSignedApplet(ProcessResult pr, boolean javawsApplet) {
@@ -77,7 +117,7 @@ public class AppletTestSignedTests extends BrowserTest {
         Assert.assertTrue("AppletTestSigned stdout " + startedRule.toPassingString() + " but didn't", startedRule.evaluate(pr.stdout));
         Assert.assertTrue("AppletTestSigned stdout " + variable1Rule.toPassingString() + " but didn't", variable1Rule.evaluate(pr.stdout));
         Assert.assertTrue("AppletTestSigned stdout " + variable2Rule.toPassingString() + " but didn't", variable2Rule.evaluate(pr.stdout));
-        Assert.assertTrue("AppletTestSigned stdout " + killedRule.toPassingString() + " but didn't", killedRule.evaluate(pr.stdout));
+        //Assert.assertTrue("AppletTestSigned stdout " + killedRule.toPassingString() + " but didn't", killedRule.evaluate(pr.stdout));
         if (!javawsApplet) {
             /*this is working correctly in most browser, but not in all. temporarily disabling
             String s4 = "AppletTestSigned was stopped";
