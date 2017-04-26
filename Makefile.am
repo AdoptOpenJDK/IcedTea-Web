@@ -12,7 +12,7 @@ define joinsegments
 $(subst $(SPACE),$(CLASSPATH_SEPARATOR),$(strip $1))
 endef
 define composeclasspath
-$(if $(call joinsegments,$1),-classpath $(call joinsegments,$1),)
+$(if $(call joinsegments,$1),-classpath "$(call joinsegments,$1)",)
 endef
 
 # Source directories
