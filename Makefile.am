@@ -34,6 +34,9 @@ export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 export ICONS_DEST_DIR=$(DESTDIR)$(datadir)/pixmaps
 export BASH_CMPL_DEST_DIR=$(DESTDIR)$(sysconfdir)/bash_completion.d
 
+export WIN_ALL_DEPS=$(DESTDIR)$(prefix)/win-deps-all
+export WIN_RUN_DEPS=$(DESTDIR)$(prefix)/win-deps-runtime
+
 export REPORT_STYLES_DIRNAME=report-styles
 
 export TESTS_SRCDIR=$(TOP_SRC_DIR)/tests
@@ -318,7 +321,9 @@ endif
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor) $(DESTDIR)$(bindir)
 
 # all generated manpages are installed in swarm
-install-data-local:
+# all windows depndences are copied for windows build, and known one are copied/removed as necessary
+# the makefile variables are used in favor of global variables, but maybe they will need to get mixed together
+install-data-local: printvarsfile
 	${mkinstalldirs} -d $(DESTDIR)$(mandir)
 	cp -r "$(DOCS_DIR)/man/"* $(DESTDIR)$(mandir)/
 if ENABLE_DOCS
@@ -334,6 +339,27 @@ if ENABLE_PLUGINJAR
 	 do \
 	   ${INSTALL_DATA} -D $${files} $(DESTDIR)$(htmldir)/plugin/$${files}; \
 	 done)
+endif
+endif
+if WINDOWS
+	mkdir $(WIN_ALL_DEPS)
+	mkdir $(WIN_RUN_DEPS)
+	JARSVARS=` ( set -o posix ; set ) | sed "s/.*=//"  | grep \\.jar$$ ` ; \
+	JARSMAKE=` cat $(TOP_BUILD_DIR)/printvarsfile | sed  "s/.*=//"  |  grep \\.jar$$ ` ; \
+	for JAR in $$JARSMAKE ; do \
+	  if [ -f $ $$JAR ] ; then \
+	    cp -v  $$JAR $(WIN_ALL_DEPS)/ ; \
+	  fi ; \
+	done ;
+	rm -f $(WIN_ALL_DEPS)/jar ;
+	for JAR in `ls $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/*.jar` ; do \
+	  rm -v $(WIN_ALL_DEPS)/`basename $$JAR` ; \
+	done;
+if WITH_RHINO
+	cp -v  $(RHINO_JAR) $(WIN_RUN_DEPS)/
+endif
+if HAVE_TAGSOUP
+	cp -v  $(TAGSOUP_JAR)   $(WIN_RUN_DEPS)/
 endif
 endif
 
@@ -357,6 +383,10 @@ uninstall-local:
 	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
 	rm -rf $(DESTDIR)$(htmldir)
 	rm -f $(BASH_CMPL_DEST_DIR)/icedteaweb-completion
+if WINDOWS
+	rm -rf $(WIN_ALL_DEPS)
+	rm -rf $(WIN_RUN_DEPS)
+endif
 
 # Plugin
 
@@ -1613,6 +1643,15 @@ stamps/plugin-tests.stamp: $(PLUGIN_TEST_SRCS) stamps/plugin.stamp
 	mkdir -p stamps
 	touch stamps/plugin-tests.stamp
 endif
+
+
+printvarsfile:
+	$(MAKE) printvars > $@
+
+printvars:
+	$(foreach v, $(.VARIABLES), $(info $(v)=$($(v))))
+
+
 
 # Target Aliases
 # ===============

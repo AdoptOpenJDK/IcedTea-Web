@@ -1,5 +1,15 @@
 2017-04-26  Jiri Vanek <jvanek@redhat.com>
 
+	jars used during windows build are now saved to distribution image
+	* Makefile.am: (printvars) new target to print out all used variables
+	(printvarsfile) new target to save all variables to file. Those is only way
+	I found to extract jars from configure in without manual enumeration.
+	(uninstall-local) on windows, removes copied dependence. (install-data-local)
+	on windows, copy all used jars. Some selected jars are duplicated in runtime
+	dependeces
+
+2017-04-26  Jiri Vanek <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: added support for jnlp:other_protocol:// handlig
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/BootTest.java: added unitt tests for various jnlp protocol cases
 
