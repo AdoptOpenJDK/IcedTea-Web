@@ -1,3 +1,8 @@
+2017-04-26  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: added support for jnlp:other_protocol:// handlig
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/BootTest.java: added unitt tests for various jnlp protocol cases
+
 2017-04-25  Jiri Vanek <jvanek@redhat.com>
 
 	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java: added tests for jnlp protocol

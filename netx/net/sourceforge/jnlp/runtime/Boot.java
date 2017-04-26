@@ -232,7 +232,12 @@ public final class Boot implements PrivilegedAction<Void> {
         OutputController.getLogger().printOut(itwInfoMessage);
     }
 
-    private static String fixJnlpProtocol(String param) {
+    static String fixJnlpProtocol(String param) {
+        //remove jnlp: for case like jnlp:https://some.app/file.jnlp
+        if (param.matches("^jnlp[s]?:.*://.*")){
+            param = param.replaceFirst("^jnlp[s]?:", "");
+        }
+        //transalte jnlp://some.app/file.jnlp to http/https
         return param.replaceFirst("^jnlp:", "http:").replaceFirst("^jnlps:", "https:");
     }
 
