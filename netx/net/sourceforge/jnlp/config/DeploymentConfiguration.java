@@ -642,6 +642,12 @@ public final class DeploymentConfiguration {
 
         File backupPropertiesFile = new File(userPropertiesFile.toString() + ".old");
         if (userPropertiesFile.isFile()) {
+            if (backupPropertiesFile.exists()){
+                boolean result = backupPropertiesFile.delete();
+                if(!result){
+                    OutputController.getLogger().log("Failed to delete backup properties file " + backupPropertiesFile+ " silently continuing.");
+                }
+            }
             if (!userPropertiesFile.renameTo(backupPropertiesFile)) {
                 throw new IOException("Error saving backup copy of " + userPropertiesFile);
             }
