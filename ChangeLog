@@ -1,5 +1,10 @@
 2017-04-27  Jiri Vanek <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java: all win-slashes replaced by
+	linux-slashes before uri is created
+
+2017-04-27  Jiri Vanek <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: .old properties
 	file removed before original is renamed. On windows, rewriting was not working
 
