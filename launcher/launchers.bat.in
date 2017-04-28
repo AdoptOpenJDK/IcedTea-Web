@@ -1,0 +1,52 @@
+rem use JAVAWS_J_OPTIONS to pass java arguments, instead of -J opts for this script. This will be fixed in next releases
+rem use ITW_HOME to set location where ITW can be found. Form there all binaries and jars and other resources are found
+rem use JAVA_HOME to set path to JRE
+rem any redistribution/installer can replace INST_ITW_HOME and INST_JAVA_HOME to create better defaults
+rem if not set, following defaults are used
+set NASHORN=lib/ext/nashorn.jar
+set LAUNCHER_FLAGS=-Xms8m
+
+set CLASSNAME=@MAIN_CLASS@
+set PROGRAM_NAME=@PROGRAM_NAME@
+
+rem warning for linux users: when you put VAR="value" also quotes are stored in VAR!
+set INST_ITW_HOME=
+set INST_JAVA_HOME=
+
+if "%JAVA_HOME%" == ""  (
+  if not "%INST_JAVA_HOME%" == ""  (
+  set CP=%INST_JAVA_HOME%/lib/rt.jar;%INST_JAVA_HOME%/lib/jfxrt.jar
+  set NASHORN=%INST_JAVA_HOME%/%NASHORN%
+  set JAVA=%INST_JAVA_HOME%/bin/java
+  ) else (
+    set CP=@JRE@/lib/rt.jar;@JRE@/lib/jfxrt.jar
+    set NASHORN=@JRE@/%NASHORN%
+    set JAVA=@JAVA@
+  )
+) else (
+  set CP=%JAVA_HOME%/lib/rt.jar;%JAVA_HOME%/lib/jfxrt.jar
+  set NASHORN=%JAVA_HOME%/%NASHORN%
+  set JAVA=%JAVA_HOME%/bin/java
+)
+
+if "%ITW_HOME%" == ""  (
+  if not "%INST_ITW_HOME%" == ""  (
+  set SPLASH_LOCATION=%INST_ITW_HOME%/share/icedtea-web/javaws_splash.png
+  set BINARY_LOCATION=%INST_ITW_HOME%/bin/@PROGRAM_NAME@.bat
+  set LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%INST_ITW_HOME%/share/icedtea-web/netx.jar;%INST_ITW_HOME%/share/icedtea-web/plugin.jar;%INST_ITW_HOME%/share/icedtea-web/jsobject.jar;%INST_ITW_HOME%/win-deps-runtime/js.jar;%INST_ITW_HOME%/win-deps-runtime/tagsoup.jar;%NASHORN%
+  ) else (
+    set SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
+    set BINARY_LOCATION=@BIN_LOCATION@.bat
+    set LAUNCHER_BOOTCLASSPATH=@LAUNCHER_BOOTCLASSPATH@;%NASHORN%
+  )
+) else (
+  set SPLASH_LOCATION=%ITW_HOME%/share/icedtea-web/javaws_splash.png
+  set BINARY_LOCATION=%ITW_HOME%/bin/@PROGRAM_NAME@.bat
+  set LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%ITW_HOME%/share/icedtea-web/netx.jar;%ITW_HOME%/share/icedtea-web/plugin.jar;%ITW_HOME%/share/icedtea-web/jsobject.jar;%ITW_HOME%/win-deps-runtime/js.jar;%ITW_HOME%/win-deps-runtime/tagsoup.jar;%NASHORN%
+)
+
+
+
+rem TODO use "exec -a %PROGRAM_NAME% ..." idiom
+"%JAVA%" "-splash:%SPLASH_LOCATION%" "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %JAVAWS_J_OPTIONS% "-classpath" "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" "%CLASSNAME%" %*
+

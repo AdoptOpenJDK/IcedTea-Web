@@ -1,5 +1,11 @@
 2017-04-28  Jiri Vanek <jvanek@redhat.com>
 
+	Added and installed windows.bat launchers
+	* Makefile.am: added set of target, if windows, creating and installing .bat launchers from bat.in
+	* launcher/launchers.bat.in: new file, bat launcher skeleton
+
+2017-04-28  Jiri Vanek <jvanek@redhat.com>
+
 	* Makefile.am: removed quoting about UNIFIED_BOOTCLASSPATH in LAUNCHER_BOOTCLASSPATH
 	to get more freedom. Intentionallynot added quoting about LAUNCHER_BOOTCLASSPATH 
 	in run-reproducers-test-code-coverage-jacoco.stamp, as imho their sed was error

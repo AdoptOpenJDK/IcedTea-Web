@@ -21,10 +21,12 @@ if WINDOWS
 	export TOP_SRC_DIR := $(shell cygpath -p -m "$(abs_top_srcdir)")
 	export prefix := $(shell cygpath -p -m "$(prefix)")
 	export CPA="-v"
+	WIN_LAUNCHERS=launcher.build/$(javaws).bat launcher.build/$(itweb_settings).bat  launcher.build/$(policyeditor).bat
 else
 	export TOP_BUILD_DIR = $(abs_top_builddir)
 	export TOP_SRC_DIR = $(abs_top_srcdir)
 	export CPA="-av"
+	WIN_LAUNCHERS=
 endif
 
 export NETX_DIR = $(TOP_BUILD_DIR)/netx.build
@@ -286,9 +288,10 @@ edit_launcher_script = sed \
 # Top-Level Targets
 # =================
 
-all-local: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
- javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop \
- launcher.build/$(policyeditor) policyeditor.desktop
+all-local: stamps/netx-dist.stamp stamps/plugin.stamp stamps/docs.stamp \
+ $(WIN_LAUNCHERS) \
+ launcher.build/$(javaws) javaws.desktop launcher.build/$(itweb_settings) itweb-settings.desktop launcher.build/$(policyeditor) policyeditor.desktop
+
 
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
@@ -319,6 +322,11 @@ endif
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor) $(DESTDIR)$(bindir)
+if WINDOWS
+	${INSTALL_PROGRAM} launcher.build/$(javaws).bat $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/$(itweb_settings).bat $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/$(policyeditor).bat $(DESTDIR)$(bindir)
+endif
 
 # all generated manpages are installed in swarm
 # all windows depndences are copied for windows build, and known one are copied/removed as necessary
@@ -386,6 +394,9 @@ uninstall-local:
 if WINDOWS
 	rm -rf $(WIN_ALL_DEPS)
 	rm -rf $(WIN_RUN_DEPS)
+	rm -f $(DESTDIR)$(bindir)/$(javaws).bat
+	rm -f $(DESTDIR)$(bindir)/$(itweb_settings).bat
+	rm -f $(DESTDIR)$(bindir)/$(policyeditor).bat
 endif
 
 # Plugin
@@ -747,6 +758,31 @@ launcher.build/$(itweb_settings): launcher/launchers.in
 	$(edit_launcher_script) < $< > $@
 
 launcher.build/$(policyeditor): launcher/launchers.in
+	mkdir -p launcher.build
+	MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ;\
+	BIN_LOCATION=$(bindir)/$(policyeditor) ;\
+	PROGRAM_NAME=$(policyeditor) ;\
+	$(edit_launcher_script) < $< > $@
+
+# TODO get rid of this copypaste
+launcher.build/$(javaws).bat: launcher/launchers.bat.in
+	mkdir -p launcher.build
+	MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ;\
+	BIN_LOCATION=$(bindir)/$(javaws) ;\
+	PROGRAM_NAME=$(javaws) ;\
+	$(edit_launcher_script) < $< > $@
+
+
+# TODO get rid of this copypaste
+launcher.build/$(itweb_settings).bat: launcher/launchers.bat.in
+	mkdir -p launcher.build
+	MAIN_CLASS=net.sourceforge.jnlp.controlpanel.CommandLine ;\
+	BIN_LOCATION=$(bindir)/$(itweb_settings) ;\
+	PROGRAM_NAME=$(itweb_settings) ;\
+	$(edit_launcher_script) < $< > $@
+
+# TODO get rid of this copypaste
+launcher.build/$(policyeditor).bat: launcher/launchers.bat.in
 	mkdir -p launcher.build
 	MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ;\
 	BIN_LOCATION=$(bindir)/$(policyeditor) ;\
