@@ -1,5 +1,13 @@
 2017-04-28  Jiri Vanek <jvanek@redhat.com>
 
+	* Makefile.am: removed quoting about UNIFIED_BOOTCLASSPATH in LAUNCHER_BOOTCLASSPATH
+	to get more freedom. Intentionallynot added quoting about LAUNCHER_BOOTCLASSPATH 
+	in run-reproducers-test-code-coverage-jacoco.stamp, as imho their sed was error
+	passing just by luck
+	* launcher/launchers.in: in consequence, added quotes about @LAUNCHER_BOOTCLASSPATH@
+
+2017-04-28  Jiri Vanek <jvanek@redhat.com>
+
 	Hopefully fixed codecoverage, which failed with 8u131 update
 	* Makefile.am: JACOCO_ADVANCED_EXCLUDE added javax.swing.*
 
