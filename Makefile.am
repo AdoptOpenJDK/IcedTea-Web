@@ -98,7 +98,7 @@ export JACOCO_PLUGIN_RESULTS=$(TEST_EXTENSIONS_DIR)/jacoco_plugin.exec
 export JACOCO_CLASSPATH=$(JACOCO_PATH)/$(JACOCO_CORE) $(JACOCO_PATH)/$(JACOCO_AGENT) $(JACOCO_PATH)/$(JACOCO_REPORT) $(JACOCO_PATH)/$(JACOCO_AGENTRT) $(JACOCO_PATH)/$(JACOCO_ANT) $(ASM_JAR)
 export JACOCO_AGENT_SWITCH_BODY=-javaagent:$(JACOCO_PATH)/$(JACOCO_AGENTRT)
 export JACOCO_BASE_EXCLUDE=org.junit.*:junit.*
-export JACOCO_ADVANCED_EXCLUDE=:*jacoco*:java.lang.*:java.reflect.*:java.util.*:sun.reflect.*
+export JACOCO_ADVANCED_EXCLUDE=:*jacoco*:java.lang.*:java.reflect.*:java.util.*:sun.reflect.*:javax.swing.*
 export JACOCO_AGENT_SWITCH="$(JACOCO_AGENT_SWITCH_BODY)=excludes=$(JACOCO_BASE_EXCLUDE)$(JACOCO_ADVANCED_EXCLUDE),inclbootstrapclasses=true"
 export JACOCO_AGENT_JAVAWS_SWITCH=\"$(JACOCO_AGENT_SWITCH),destfile=$(JACOCO_JAVAWS_RESULTS)\"
 export JACOCO_AGENT_PLUGIN_SWITCH=\"$(JACOCO_AGENT_SWITCH),destfile=$(JACOCO_PLUGIN_RESULTS)\"

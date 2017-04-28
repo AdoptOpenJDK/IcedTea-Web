@@ -1,3 +1,8 @@
+2017-04-28  Jiri Vanek <jvanek@redhat.com>
+
+	Hopefully fixed codecoverage, which failed with 8u131 update
+	* Makefile.am: JACOCO_ADVANCED_EXCLUDE added javax.swing.*
+
 2017-04-27  Jiri Vanek <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPPolicy.java: all win-slashes replaced by
