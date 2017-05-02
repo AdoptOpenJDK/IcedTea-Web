@@ -10,7 +10,8 @@ set CLASSNAME=@MAIN_CLASS@
 set PROGRAM_NAME=@PROGRAM_NAME@
 
 rem warning for linux users: when you put VAR="value" also quotes are stored in VAR!
-set INST_ITW_HOME=
+rem maybe set "VAR=value" is working better?
+set INST_ITW_HOME=%~dp0/../
 set INST_JAVA_HOME=
 
 if "%JAVA_HOME%" == ""  (

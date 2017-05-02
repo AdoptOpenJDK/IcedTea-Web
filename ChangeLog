@@ -1,3 +1,7 @@
+2017-05-02  Jiri Vanek <jvanek@redhat.com>
+
+	* launcher/launchers.bat.in: added 	INST_ITW_HOME=%~dp0/../ as default location for windows CP search
+
 2017-04-28  Jiri Vanek <jvanek@redhat.com>
 
 	Added and installed windows.bat launchers
