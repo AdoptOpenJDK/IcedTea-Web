@@ -44,6 +44,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -65,6 +66,17 @@ public class FirefoxPreferencesFinder {
 
         String configPath = System.getProperty("user.home") + File.separator + ".mozilla"
                 + File.separator + "firefox" + File.separator;
+
+        if (JNLPRuntime.isWindows()) {
+            Map<String, String> env = System.getenv();
+            if (env != null) {
+                String appdata = env.get("APPDATA");
+                if (appdata != null) {
+                    configPath = appdata + File.separator + "Mozilla"
+                            + File.separator + "Firefox" + File.separator;
+                }
+            }
+        }
 
         String profilesPath = configPath + "profiles.ini";
 

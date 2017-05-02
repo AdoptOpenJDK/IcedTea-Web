@@ -1,3 +1,10 @@
+2017-05-02  Adam Buchta  <adbuch7@gmail.com>
+            Jiri Vanek <jvanek@redhat.com>
+
+	* AUTHORS: added Adam Buchta to authors
+	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesFinder.java
+	(find) for windows, using different path firefox profile
+
 2017-05-02  Jiri Vanek <jvanek@redhat.com>
 
 	* launcher/launchers.bat.in: added 	INST_ITW_HOME=%~dp0/../ as default location for windows CP search
