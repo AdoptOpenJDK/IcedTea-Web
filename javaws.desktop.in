@@ -8,4 +8,4 @@ Terminal=false
 Type=Application
 NoDisplay=true
 Categories=Network;WebBrowser;
-MimeType=application/x-java-jnlp-file;
+MimeType=application/x-java-jnlp-file;x-scheme-handler/jnlp;x-scheme-handler/jnlps

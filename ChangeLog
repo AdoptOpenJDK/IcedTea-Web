@@ -1,3 +1,7 @@
+2017-05-03  Jiri Vanek <jvanek@redhat.com>
+
+	* javaws.desktop.in: added x-scheme-handler/jnlp;x-scheme-handler/jnlps
+
 2017-05-02  Adam Buchta  <adbuch7@gmail.com>
             Jiri Vanek <jvanek@redhat.com>
 
