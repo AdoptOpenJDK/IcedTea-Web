@@ -1354,8 +1354,8 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	done ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) $(TEST_EXTENSIONS_DIR) . $(TEST_EXTENSIONS_SRCDIR) $(TAGSOUP_JAR)) ; \
-	  $(SYSTEM_JRE_DIR)/bin/java -Xbootclasspath/a:$$CLASSPATH CommandLine $$class_names 
+	CLASSPATH="$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) $(TEST_EXTENSIONS_DIR) . $(TEST_EXTENSIONS_SRCDIR) $(TAGSOUP_JAR))" ; \
+	  $(SYSTEM_JRE_DIR)/bin/java "-Xbootclasspath/a:$$CLASSPATH" CommandLine $$class_names 
 if WITH_XSLTPROC
 	-$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
 	-$(XSLTPROC) $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/logs.xsl $(NETX_UNIT_TEST_DIR)/ServerAccess-logs.xml > $(TESTS_DIR)/logs_unit.html

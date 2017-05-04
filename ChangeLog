@@ -1,5 +1,12 @@
 2017-05-04  Jiri Vanek <jvanek@redhat.com>
 
+	* Makefile: (stamps/run-netx-unit-tests.stamp) variable CLASSPATH's content
+	and its usage on with Xbootclasspath put to quotes, to run junits in cygwin.
+	Note, that this issue is spread on all usages of raw call to joinsegments and its
+	results. Will be fixed on demand.
+
+2017-05-04  Jiri Vanek <jvanek@redhat.com>
+
 	* Makefile: (install-data-local) when copying to WIN_RUN_DEPS, the name of
 	resource is stripped to be versionless
 
