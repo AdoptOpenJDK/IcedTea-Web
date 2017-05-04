@@ -364,10 +364,12 @@ if WINDOWS
 	  rm -v $(WIN_ALL_DEPS)/`basename $$JAR` ; \
 	done;
 if WITH_RHINO
-	cp -v  $(RHINO_JAR) $(WIN_RUN_DEPS)/
+	filteredName=`basename $(RHINO_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(RHINO_JAR) $(WIN_RUN_DEPS)/$$filteredName
 endif
 if HAVE_TAGSOUP
-	cp -v  $(TAGSOUP_JAR)   $(WIN_RUN_DEPS)/
+	filteredName=`basename $(TAGSOUP_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(TAGSOUP_JAR) $(WIN_RUN_DEPS)/$$filteredName
 endif
 endif
 

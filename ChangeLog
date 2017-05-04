@@ -1,4 +1,9 @@
 2017-05-04  Jiri Vanek <jvanek@redhat.com>
+
+	* Makefile: (install-data-local) when copying to WIN_RUN_DEPS, the name of
+	resource is stripped to be versionless
+
+2017-05-04  Jiri Vanek <jvanek@redhat.com>
             Adam Buchta  <adbuch7@gmail.com>
 
 	sanitizing of paths made windows friendly
