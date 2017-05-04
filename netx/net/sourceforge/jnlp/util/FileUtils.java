@@ -17,7 +17,6 @@
 package net.sourceforge.jnlp.util;
 
 import java.awt.Component;
-import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -38,6 +37,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -48,6 +48,7 @@ import net.sourceforge.jnlp.config.DirectoryValidator;
 import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * This class contains a few file-related utility functions.
@@ -56,6 +57,8 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 
 public final class FileUtils {
+
+    private static final String WIN_DRIVE_LETTER_COLON_WILDCHAR = "WINDOWS_VERY_SPECIFIC_DOUBLEDOT";
 
     /**
      * Indicates whether a file was successfully opened. If not, provides specific reasons
@@ -77,7 +80,13 @@ public final class FileUtils {
     /**
      * list of characters not allowed in filenames
      */
-    public static final char INVALID_CHARS[] = {'\\', '/', ':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ','};
+    public static final List<Character> INVALID_PATH = Arrays.asList(new Character[]{':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ','});
+    public static final List<Character> INVALID_NAME = new ArrayList<>(INVALID_PATH);
+
+    static {
+        INVALID_NAME.add(0, '\\');
+        INVALID_NAME.add(0, '/');
+    }
 
     private static final char SANITIZED_CHAR = '_';
 
@@ -85,25 +94,28 @@ public final class FileUtils {
      * Clean up a string by removing characters that can't appear in a local
      * file name.
      *
-     * @param path
-     *        the path to sanitize
+     * @param path the path to sanitize
      * @return a sanitized version of the input which is suitable for using as a
-     *         file path
+     * file path
      */
     public static String sanitizePath(String path) {
         return sanitizePath(path, SANITIZED_CHAR);
     }
 
     public static String sanitizePath(String path, char substitute) {
-
-        for (int i = 0; i < INVALID_CHARS.length; i++) {
-            if (INVALID_CHARS[i] != File.separatorChar) {
-                if (-1 != path.indexOf(INVALID_CHARS[i])) {
-                    path = path.replace(INVALID_CHARS[i], substitute);
-                }
+        //on windows, we can recieve both c:/path/ and c:\path\
+        path = path.replace("\\", "/");
+        if (JNLPRuntime.isWindows() && path.matches("^[a-zA-Z]\\:.*")) {
+            path = path.replaceFirst(":", WIN_DRIVE_LETTER_COLON_WILDCHAR);
+        }
+        for (int i = 0; i < INVALID_PATH.size(); i++) {
+            if (-1 != path.indexOf(INVALID_PATH.get(i))) {
+                path = path.replace(INVALID_PATH.get(i), substitute);
             }
         }
-
+        if (JNLPRuntime.isWindows()) {
+            path = path.replaceFirst(WIN_DRIVE_LETTER_COLON_WILDCHAR, ":");
+        }
         return path;
     }
 
@@ -120,9 +132,9 @@ public final class FileUtils {
 
     public static String sanitizeFileName(String filename, char substitute) {
 
-        for (int i = 0; i < INVALID_CHARS.length; i++) {
-            if (-1 != filename.indexOf(INVALID_CHARS[i])) {
-                filename = filename.replace(INVALID_CHARS[i], substitute);
+        for (int i = 0; i < INVALID_NAME.size(); i++) {
+            if (-1 != filename.indexOf(INVALID_NAME.get(i))) {
+                filename = filename.replace(INVALID_NAME.get(i), substitute);
             }
         }
 

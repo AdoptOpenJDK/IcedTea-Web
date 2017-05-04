@@ -34,10 +34,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-
 package net.sourceforge.jnlp.util;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import org.junit.Test;
 
@@ -45,35 +48,74 @@ import static org.junit.Assert.*;
 
 public class FileUtilsTest {
 
-    private static final char[] INVALID = {
-            '\\',
-            '/',
-            ':',
-            '*',
-            '?',
-            '"',
-            '<',
-            '>',
-            '|', };
-    private static final char SANITIZED = '_';
+    public static final List<Character> INVALID_PATH = Arrays.asList(new Character[]{':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ','});
+    public static final List<Character> INVALID_NAME = new ArrayList<>(INVALID_PATH);
+
+    static {
+        INVALID_NAME.add(0, '\\');
+        INVALID_NAME.add(0, '/');
+    }
 
     @Test
     public void testSanitizePath() throws Exception {
-        for (char ch : INVALID) {
-            String str = File.separator + "tmp" + File.separator + "test" + ch + "path";
+        for (char ch : INVALID_PATH) {
+            String str = "/tmp/test" + ch + "path";
             String sanitized = FileUtils.sanitizePath(str);
             assertFalse(ch + " should be sanitized from " + sanitized, ch != File.separatorChar && sanitized.contains(Character.toString(ch)));
-            assertEquals(str.replace(ch, ch == File.separatorChar ? ch : SANITIZED), sanitized);
+            assertEquals("/tmp/test_path", sanitized);
+        }
+    }
+
+    @Test
+    public void testSanitizeMoreDoubleDots() throws Exception {
+        String str = "C:/some:dir/some:file";
+        String sanitized = FileUtils.sanitizePath(str);
+        if (JNLPRuntime.isWindows()) {
+            assertEquals("C:/some_dir/some_file", sanitized);
+        } else {
+            assertEquals("C_/some_dir/some_file", sanitized);
+        }
+    }
+
+    @Test
+    public void testSanitizePathWindowsLinuxSlashes() throws Exception {
+        String str = "C:/some.dir/some.file";
+        String sanitized = FileUtils.sanitizePath(str);
+        if (JNLPRuntime.isWindows()) {
+            assertEquals("C:/some.dir/some.file", sanitized);
+        } else {
+            assertEquals("C_/some.dir/some.file", sanitized);
+        }
+    }
+
+    @Test
+    public void testSanitizePathWindowsWinSlashes() throws Exception {
+        String str = "C:\\some.dir\\some.file";
+        String sanitized = FileUtils.sanitizePath(str);
+        if (JNLPRuntime.isWindows()) {
+            assertEquals("C:/some.dir/some.file", sanitized);
+        } else {
+            assertEquals("C_/some.dir/some.file", sanitized);
         }
     }
 
     @Test
     public void testSanitizeFilename() throws Exception {
-        for (char ch : INVALID) {
+        for (char ch : INVALID_PATH) {
             String str = "file" + ch + "name";
             String sanitized = FileUtils.sanitizeFileName(str);
             assertFalse(ch + " should be sanitized from " + sanitized, sanitized.contains(Character.toString(ch)));
-            assertEquals(str.replace(ch, SANITIZED), sanitized);
+            assertEquals("file_name", sanitized);
+        }
+    }
+
+    @Test
+    public void testSanitizeFilenameSlashes() throws Exception {
+        for (char ch : new char[]{'/', '\\'}) {
+            String str = "file" + ch + "name";
+            String sanitized = FileUtils.sanitizeFileName(str);
+            assertFalse(ch + " should be sanitized from " + sanitized, sanitized.contains(Character.toString(ch)));
+            assertEquals("file_name", sanitized);
         }
     }
 

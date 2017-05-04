@@ -1,3 +1,16 @@
+2017-05-04  Jiri Vanek <jvanek@redhat.com>
+            Adam Buchta  <adbuch7@gmail.com>
+
+	sanitizing of paths made windows friendly
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: (INVALID_CHARS) replaced by INVALID_PATH
+	for filtering paths, and INVALID_NAME, based on INVALID_PATH with slashes, for filtering
+	chars form name. (sanitizePath) and (sanitizeFileName) rewrote to use adequate list, and get
+	rid of unreliable separator - windows can have both.  In addition. (sanitizePath) enhanced
+	to deal with absolute X:\ windows path and keep filtering any other colons.
+	* tests/netx/unit/net/sourceforge/jnlp/util/FileUtilsTest.java: test
+	adapted to new logic. Added tests for new cases,added tests for some
+	cornercases
+
 2017-05-03  Jiri Vanek <jvanek@redhat.com>
 
 	* javaws.desktop.in: added x-scheme-handler/jnlp;x-scheme-handler/jnlps
