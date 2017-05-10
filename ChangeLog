@@ -1,5 +1,19 @@
 2017-05-10  Jiri Vanek <jvanek@redhat.com>
 
+	Added support for pure windows image and distribute-able windows-bin-dist archive 
+	* NEWS: mentioned windows support, jdk9 support limited for linux
+	* Makefile.am: (install-exec-local) make of win-deps dirs made -p, to allow re-installing
+	without error. (uninstall-linux-only) new target. Cleans linux-specific stuff.
+	(uninstall-local) now depends on, uninstall-linux-only. Removed code which moved to  it.
+	(remove-empty-linux-only-dirs) target to remove various empty directories in dist folder
+	(win-only-image) windows only target. by calling remove-empty-linux-only-dirs and
+	copying bit more stuff, creating clean windows-only image. (win-bin-dist) last new
+	target, compressing pure windows image to redistributable zip.
+	Note that this patch was not tested in windows, but was designed to not harm linux parts.
+	Fixes expected.
+
+2017-05-10  Jiri Vanek <jvanek@redhat.com>
+
 	* AUTHORS: added Ville Skyttä
 
 2017-05-10  Jiri Vanek <jvanek@redhat.com>

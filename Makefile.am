@@ -352,8 +352,8 @@ if ENABLE_PLUGINJAR
 endif
 endif
 if WINDOWS
-	mkdir $(WIN_ALL_DEPS)
-	mkdir $(WIN_RUN_DEPS)
+	mkdir -p $(WIN_ALL_DEPS)
+	mkdir -p $(WIN_RUN_DEPS)
 	JARSVARS=` ( set -o posix ; set ) | sed "s/.*=//"  | grep \\.jar$$ ` ; \
 	JARSMAKE=` cat $(TOP_BUILD_DIR)/printvarsfile | sed  "s/.*=//"  |  grep \\.jar$$ ` ; \
 	for JAR in $$JARSMAKE ; do \
@@ -375,14 +375,45 @@ if HAVE_TAGSOUP
 endif
 endif
 
+
+win-bin-dist: win-only-image
+	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).win.bin.zip `basename $(DESTDIR)$(prefix)` );
+
+if WINDOWS
+# strips cygwin and other linux-like blobs. keeping only windows-usefull stuff
+win-only-image: install uninstall-linux-only remove-empty-linux-only-dirs
+	rm -rf $(WIN_ALL_DEPS)
+if ENABLE_DOCS
+	cp -r $(DOCS_DIR)/html $(DESTDIR)$(prefix)/icedtea-web-docs
+endif
+	cp $(NETX_DIR)/lib/src.zip $(DESTDIR)$(prefix)/netx.src.zip
+if ENABLE_PLUGINJAR
+	cp $(TOP_BUILD_DIR)/liveconnect/lib/src.zip $(DESTDIR)$(prefix)/plugin.src.zip
+endif
+endif
+
+# note that this is called only from windows specific target (hidden otherwise)
+remove-empty-linux-only-dirs:
+	echo "*************************************************************************" ; \
+	echo "* If run without prefix or on non-windows machine, may harm your system *" ; \
+	echo "*************************************************************************" ; \
+	MAN_DIRS_TO_CHECK_AND_CLEAN="de/man1 pl/man1 cs/man1 de pl cs man1 " ; \
+	for manDirName in $$MAN_DIRS_TO_CHECK_AND_CLEAN ; do \
+	  dirCandidate=$(DESTDIR)$(mandir)/$$manDirName ; \
+	  if ls -1qA $$dirCandidate | grep -q . ; then echo "$$dirCandidate not empty"; else rmdir -v $$dirCandidate ; fi ; \
+	done
+	dirCandidate=$(DESTDIR)$(mandir)/$$manDirName ; \
+	if ls -1qA $$dirCandidate | grep -q . ; then echo "$$dirCandidate not empty"; else rmdir -v $$dirCandidate ; fi ;
+	DEFAULT_CMPL_DIRS_TO_CHECK_AND_CLEAN="$(BASH_CMPL_DEST_DIR) `dirname $(BASH_CMPL_DEST_DIR)` $$(dirname $$(dirname $(BASH_CMPL_DEST_DIR)))" ; \
+	for cmplDirName in $$DEFAULT_CMPL_DIRS_TO_CHECK_AND_CLEAN ; do \
+	  dirCandidate=$$cmplDirName ; \
+	  if ls -1qA $$dirCandidate | grep -q . ; then echo "$$dirCandidate not empty"; else rmdir -v $$dirCandidate ; fi ; \
+	done
+	dirCandidate=$(DESTDIR)$(libdir)/ ; \
+	if ls -1qA $$dirCandidate | grep -q . ; then echo "$$dirCandidate not empty"; else rmdir -v $$dirCandidate ; fi ;
+
 # all generated manpages must be removed one by one
-uninstall-local:
-	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	rm -r $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
-	rm -r $(ICONS_DEST_DIR)/javaws.png
+uninstall-linux-only:
 	KNOWN_MANS="icedtea-web.1  icedtea-web-plugin.1  itweb-settings.1  javaws.1  policyeditor.1" ; \
 	KNOWN_DIRS="man1 de/man1 pl/man1 cs/man1" ; \
 	for file in $$KNOWN_MANS ; do \
@@ -390,13 +421,21 @@ uninstall-local:
 	    rm -f $(DESTDIR)$(mandir)/$$dir/$$file ; \
 	  done ; \
 	done
+	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
 	rm -f $(DESTDIR)$(bindir)/$(javaws)
 	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
 	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
-	rm -rf $(DESTDIR)$(htmldir)
 	rm -f $(BASH_CMPL_DEST_DIR)/itweb-settings.bash
 	rm -f $(BASH_CMPL_DEST_DIR)/javaws.bash
-	rm -f $(BASH_CMPL_DEST_DIR)/policyeditor.bas
+	rm -f $(BASH_CMPL_DEST_DIR)/policyeditor.bash
+
+uninstall-local: uninstall-linux-only
+	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
+	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
+	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
+	rm -r $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+	rm -r $(ICONS_DEST_DIR)/javaws.png
+	rm -rf $(DESTDIR)$(htmldir)
 if WINDOWS
 	rm -rf $(WIN_ALL_DEPS)
 	rm -rf $(WIN_RUN_DEPS)

@@ -10,7 +10,8 @@ CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.7 (2015-XX-XX):
 * PR3366 - bash completion file was split to three, and is setup-able by bashcompdir environment variable
-* added experimental support for java 9
+* added experimental support for windows
+* added experimental support for java 9 (linux only)
 * added experimental support for jnlp protocol (see https://bugs.openjdk.java.net/browse/JDK-8055464)
 * restricted to JDK8 and higher
 * all connection restrictions now consider also port
