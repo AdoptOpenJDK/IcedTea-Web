@@ -248,7 +248,7 @@ endif
 
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
-export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in policyeditor.desktop.in icedteaweb-completion.in \
+export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in policyeditor.desktop.in $(top_srcdir)/completion \
  itweb-settings.desktop.in launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS $(top_srcdir)/metadata.in
 
 # reproducers `D`shortcuts
@@ -318,7 +318,9 @@ endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
 	${INSTALL_DATA} $(TOP_SRC_DIR)/javaws.png $(ICONS_DEST_DIR)/
-	${INSTALL_DATA} $(TOP_BUILD_DIR)/icedteaweb-completion $(BASH_CMPL_DEST_DIR)/icedteaweb-completion
+	${INSTALL_DATA} $(TOP_BUILD_DIR)/completion/itweb-settings.bash $(BASH_CMPL_DEST_DIR)/
+	${INSTALL_DATA} $(TOP_BUILD_DIR)/completion/javaws.bash $(BASH_CMPL_DEST_DIR)/
+	${INSTALL_DATA} $(TOP_BUILD_DIR)/completion/policyeditor.bash $(BASH_CMPL_DEST_DIR)/
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor) $(DESTDIR)$(bindir)
@@ -392,7 +394,9 @@ uninstall-local:
 	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
 	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
 	rm -rf $(DESTDIR)$(htmldir)
-	rm -f $(BASH_CMPL_DEST_DIR)/icedteaweb-completion
+	rm -f $(BASH_CMPL_DEST_DIR)/itweb-settings.bash
+	rm -f $(BASH_CMPL_DEST_DIR)/javaws.bash
+	rm -f $(BASH_CMPL_DEST_DIR)/policyeditor.bas
 if WINDOWS
 	rm -rf $(WIN_ALL_DEPS)
 	rm -rf $(WIN_RUN_DEPS)
@@ -642,17 +646,26 @@ check-metadata: $(TOP_BUILD_DIR)/metadata
 # appstreamcli  validate $(TOP_BUILD_DIR)/metadata/*.appdata.xml  $(TOP_BUILD_DIR)/metadata/*.metainfo.xml
 	
 
-$(TOP_BUILD_DIR)/icedteaweb-completion: $(TOP_SRC_DIR)/icedteaweb-completion.in stamps/netx.stamp
+$(TOP_BUILD_DIR)/completion/itweb-settings.bash: $(TOP_SRC_DIR)/completion/itweb-settings.bash.in stamps/netx.stamp
 	OPTIONS_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.OptionsDefinitions" ;  \
-	JAVAWS=`$$OPTIONS_COMMAND javaws` ; \
-	POLICYEDITOR=`$$OPTIONS_COMMAND policyeditor` ; \
-	ITWEBSETTINGS=`$$OPTIONS_COMMAND itweb-settings`; \
-	echo $$JAVAWS ; \
-	echo $$POLICYEDITOR ; \
-	echo $$ITWEBSETTINGS ; \
-	cat $(TOP_SRC_DIR)/icedteaweb-completion.in | sed "s/@JAVAWS@/$${JAVAWS}/" \
-	| sed "s/@POLICYEDITOR@/$${POLICYEDITOR}/" | \
-	sed "s/@ITWEBSETTINGS@/$${ITWEBSETTINGS}/" > $(TOP_BUILD_DIR)/icedteaweb-completion ;
+	OPTIONS=`$$OPTIONS_COMMAND itweb-settings`; \
+	echo $$OPTIONS ; \
+	cat $(TOP_SRC_DIR)/completion/itweb-settings.bash.in | \
+	sed "s/@OPTIONS@/$${OPTIONS}/" > $@ ;
+
+$(TOP_BUILD_DIR)/completion/javaws.bash: $(TOP_SRC_DIR)/completion/javaws.bash.in stamps/netx.stamp
+	OPTIONS_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.OptionsDefinitions" ;  \
+	OPTIONS=`$$OPTIONS_COMMAND javaws` ; \
+	echo $$OPTIONS ; \
+	cat $(TOP_SRC_DIR)/completion/javaws.bash.in | \
+	sed "s/@OPTIONS@/$${OPTIONS}/" > $@ ;
+
+$(TOP_BUILD_DIR)/completion/policyeditor.bash: $(TOP_SRC_DIR)/completion/policyeditor.bash.in stamps/netx.stamp
+	OPTIONS_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.OptionsDefinitions" ;  \
+	OPTIONS=`$$OPTIONS_COMMAND policyeditor` ; \
+	echo $$OPTIONS ; \
+	cat $(TOP_SRC_DIR)/completion/policyeditor.bash.in | \
+	sed "s/@OPTIONS@/$${OPTIONS}/" > $@ ;
 
 stamps/generate-docs.stamp: stamps/netx.stamp
 	mkdir -p "$(DOCS_DIR)" ; \
@@ -721,7 +734,7 @@ stamps/netx.stamp: netx-source-files.txt stamps/netx-html-gen.stamp
 	mkdir -p stamps
 	touch $@
 
-stamps/netx-dist.stamp: stamps/netx.stamp $(TOP_BUILD_DIR)/netx.manifest stamps/generate-docs.stamp $(TOP_BUILD_DIR)/icedteaweb-completion $(TOP_BUILD_DIR)/metadata
+stamps/netx-dist.stamp: stamps/netx.stamp $(TOP_BUILD_DIR)/netx.manifest stamps/generate-docs.stamp $(TOP_BUILD_DIR)/completion/itweb-settings.bash $(TOP_BUILD_DIR)/completion/javaws.bash $(TOP_BUILD_DIR)/completion/policyeditor.bash $(TOP_BUILD_DIR)/metadata
 	(cd $(NETX_DIR) ; \
 	 mkdir -p lib ; \
 	 $(SYSTEM_JDK_DIR)/bin/jar cfm lib/classes.jar \
@@ -862,7 +875,9 @@ clean-generated-docs:
 	rm -f stamps/generate-docs.stamp
 
 clean-icedteaweb-completion:
-	rm -f $(TOP_BUILD_DIR)/icedteaweb-completion
+	rm -f $(TOP_BUILD_DIR)/completion/itweb-settings.bash
+	rm -f $(TOP_BUILD_DIR)/completion/javaws.bash
+	rm -f $(TOP_BUILD_DIR)/completion/policyeditor.bash
 
 clean-metadata:
 	rm -rf $(TOP_BUILD_DIR)/metadata

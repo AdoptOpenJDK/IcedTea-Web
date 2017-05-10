@@ -1,6 +1,21 @@
 2017-05-10  Jiri Vanek <jvanek@redhat.com>
             Ville Skyttä <ville.skytta@iki.fi>
 
+	PR3366 - Split bash completion to (three) files per binary (4./4)
+	* NEWS: mentioned configure-ability and split to three
+	* icedteaweb-completion.in: removed (split to three following files)
+	* completion/itweb-settings.bash.in: new file, extracted from icedteaweb-completion.in
+	individual @@ replace identifiers replaced by OPTIONS
+	* completion/javaws.bash.in: same
+	* completion/policyeditor.bash.in: same
+	* Makefile: EXTRA_DIST now lists completion dir instead of icedteaweb-completion.in file
+	(install-exec-local) installs three new files instead of old one.
+	(uninstall-local) same with removal.  (TOP_BUILD_DIR/completion/itweb-settings.bash)
+	split to three targets accordingly. (clean-icedteaweb-completion) as uninstall.
+
+2017-05-10  Jiri Vanek <jvanek@redhat.com>
+            Ville Skyttä <ville.skytta@iki.fi>
+
 	PR3366 - Install bash completion to configured dynamic load location (3/4)
 	* Makefile.am: BASH_CMPL_DEST_DIR subsituted from bashcompdir
 	* configure.ac: added PKG_CHECK_VAR on bashcompdir and bash-completion

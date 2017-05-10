@@ -1,34 +1,3 @@
-#/bin/bash
-#place this file over to /etc/bash_completion.d/ to make this file useful
-#Note: If you do not have bash-completion you will need to install it
-_itwebsettings()
-{
-    local cur prev opts base
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
-
-    # Icedtea-web settings Options
-    opts="@ITWEBSETTINGS@"
-
-    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
-    return 0
-}
-complete -F _itwebsettings itweb-settings
-
-_policyeditor()
-{
-    local cur prev opts base
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
-
-    # PolicyEditor Options
-    opts="@POLICYEDITOR@"
-
-    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
-    return 0
-}
-complete -F _policyeditor policyeditor
-
 _javaws()
 {
     local cur prev opts base
@@ -36,7 +5,7 @@ _javaws()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # JavaWs Options
-    opts="@JAVAWS@"
+    opts="@OPTIONS@"
     if [[ $prev == *"-jnlp" || $prev == *"-html" ]] ; then
       COMPREPLY=($(compgen -f -X "!*" -- ${cur}))
       if [ -d "$COMPREPLY" ] ; then
