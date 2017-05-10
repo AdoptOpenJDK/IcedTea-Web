@@ -1,4 +1,8 @@
 2017-05-10  Jiri Vanek <jvanek@redhat.com>
+
+	* AUTHORS: added Ville Skyttä
+
+2017-05-10  Jiri Vanek <jvanek@redhat.com>
             Ville Skyttä <ville.skytta@iki.fi>
 
 	PR3366 - Split bash completion to (three) files per binary (4./4)
