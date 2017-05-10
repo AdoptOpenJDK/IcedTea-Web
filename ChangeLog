@@ -1,3 +1,10 @@
+2017-05-10  Jiri Vanek <jvanek@redhat.com>
+            Ville Skyttä <ville.skytta@iki.fi>
+
+	PR3366 - Install bash completion to configured dynamic load location (3/4)
+	* Makefile.am: BASH_CMPL_DEST_DIR subsituted from bashcompdir
+	* configure.ac: added PKG_CHECK_VAR on bashcompdir and bash-completion
+
 2017-05-04  Jiri Vanek <jvanek@redhat.com>
 
 	* Makefile: (stamps/run-netx-unit-tests.stamp) variable CLASSPATH's content

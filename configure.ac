@@ -157,6 +157,10 @@ IT_FIND_OPTIONAL_JAR([asm], ASM,
 
 IT_CHECK_FOR_TAGSOUP
 
+PKG_CHECK_VAR(bashcompdir, [bash-completion], [completionsdir], ,
+     bashcompdir="${sysconfdir}/bash_completion.d")
+AC_SUBST(bashcompdir)
+
 AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
 AC_CONFIG_FILES([build.properties])
 

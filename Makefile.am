@@ -34,7 +34,7 @@ export DOCS_DIR=$(TOP_BUILD_DIR)/icedtea-web-docs/$(FULL_VERSION)
 export NETX_SRCDIR = $(TOP_SRC_DIR)/netx
 export NETX_RESOURCE_DIR=$(NETX_SRCDIR)/net/sourceforge/jnlp/resources
 export ICONS_DEST_DIR=$(DESTDIR)$(datadir)/pixmaps
-export BASH_CMPL_DEST_DIR=$(DESTDIR)$(sysconfdir)/bash_completion.d
+export BASH_CMPL_DEST_DIR=$(DESTDIR)@bashcompdir@
 
 export WIN_ALL_DEPS=$(DESTDIR)$(prefix)/win-deps-all
 export WIN_RUN_DEPS=$(DESTDIR)$(prefix)/win-deps-runtime
