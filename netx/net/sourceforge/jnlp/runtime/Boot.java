@@ -147,7 +147,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.ABOUT)) {
             handleAbout();
-            if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
+            if (JNLPRuntime.isHeadless()) {
                 JNLPRuntime.exit(0);
             } else {
                 try {

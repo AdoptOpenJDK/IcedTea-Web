@@ -1,5 +1,9 @@
 2017-05-11  Jiri Vanek <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: processing of -about adapted to correct headless check
+
+2017-05-11  Jiri Vanek <jvanek@redhat.com>
+
 	* Makefile: (clean-launchers) added removal of win launchers (if windows)
 
 2017-05-11  Jiri Vanek <jvanek@redhat.com>
