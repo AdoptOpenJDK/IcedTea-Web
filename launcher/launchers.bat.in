@@ -5,6 +5,7 @@ rem any redistribution/installer can replace INST_ITW_HOME and INST_JAVA_HOME to
 rem if not set, following defaults are used
 set NASHORN=lib/ext/nashorn.jar
 set LAUNCHER_FLAGS=-Xms8m
+set ITW_WIN_SPECIALS=-Xnofork
 
 set CLASSNAME=@MAIN_CLASS@
 set PROGRAM_NAME=@PROGRAM_NAME@
@@ -49,5 +50,5 @@ if "%ITW_HOME%" == ""  (
 
 
 rem TODO use "exec -a %PROGRAM_NAME% ..." idiom
-"%JAVA%" "-splash:%SPLASH_LOCATION%" "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %JAVAWS_J_OPTIONS% "-classpath" "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" "%CLASSNAME%" %*
+"%JAVA%" "-splash:%SPLASH_LOCATION%" "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %JAVAWS_J_OPTIONS% "-classpath" "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" "%CLASSNAME%" %ITW_WIN_SPECIALS% %*
 

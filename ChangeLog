@@ -1,5 +1,9 @@
 2017-05-11  Jiri Vanek <jvanek@redhat.com>
 
+	* launcher/launchers.bat.in: hardcoded Xnofork, as it is necessary anyway
+
+2017-05-11  Jiri Vanek <jvanek@redhat.com>
+
 	fixed windows headless detection problems
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: as (mostly) first initialized class
 	on windows, enforced headless check and initialized logging. This is WORKAROUND and shoudl get FIXED.
