@@ -1,5 +1,15 @@
 2017-05-11  Jiri Vanek <jvanek@redhat.com>
 
+	fixed windows headless detection problems
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: as (mostly) first initialized class
+	on windows, enforced headless check and initialized logging. This is WORKAROUND and shoudl get FIXED.
+	There is strange behavior in AWT windows impelmentation, which is causing awt queue to get corrupted
+	when called from "bad" thread.  This hack is enforcing to be called from "correct" thread. This is 
+	likely bug in JDK and have to be investigated. Btw see patch from 2017.04.10 about awt hooks. That is 
+	same issue.
+
+2017-05-11  Jiri Vanek <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: processing of -about adapted to correct headless check
 
 2017-05-11  Jiri Vanek <jvanek@redhat.com>
