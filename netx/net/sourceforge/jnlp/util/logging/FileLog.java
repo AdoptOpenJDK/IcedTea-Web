@@ -77,7 +77,7 @@ public final class FileLog  {
         }
     }
 
-    public static final SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH"+getColon()+"mm:ss.S");
+    public static final SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH" + getColon() + "mm" + getColon() + "ss.S");
     /**"Tue Nov 19 09:43:50 CET 2013"*/
     public static final SimpleDateFormat pluginSharedFormatter = new SimpleDateFormat("EEE MMM dd HH" + getColon() + "mm" + getColon() + "ss ZZZ yyyy");
     public static final String defaultloggerName = TextsProvider.ITW + " file-logger";
@@ -108,7 +108,9 @@ public final class FileLog  {
     }
 
     private static String getFileName(String id) {
-        return LogConfig.getLogConfig().getIcedteaLogDir() + "itw-"+id+"-" + getStamp() + ".log";
+        String s = LogConfig.getLogConfig().getIcedteaLogDir() + "itw-" + id + "-" + getStamp() + ".log";
+        OutputController.getLogger().log("Attempting to log into: " + s);
+        return s;
     }
     
   

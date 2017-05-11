@@ -1,6 +1,6 @@
 2017-05-11  Jiri Vanek <jvanek@redhat.com>
 
-	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: on windows, name of logs do not contain colons
+	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: on windows, name of logs do not contain colons, path is printed to console
 
 2017-05-10  Jiri Vanek <jvanek@redhat.com>
 
