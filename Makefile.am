@@ -847,6 +847,11 @@ clean-launchers:
 	rm -f launcher.build/$(javaws)
 	rm -f launcher.build/$(itweb_settings)
 	rm -f launcher.build/$(policyeditor)
+if WINDOWS
+	rm -f launcher.build/$(javaws).bat
+	rm -f launcher.build/$(itweb_settings).bat
+	rm -f launcher.build/$(policyeditor).bat
+endif
 	if [ -e launcher.build ] ; then \
 	  rmdir launcher.build ; \
 	fi
