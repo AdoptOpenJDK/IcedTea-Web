@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.util.logging;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
@@ -50,6 +51,14 @@ public final class FileLog  {
 
     public static Header getHeadlineHeader() {
         return new Header(OutputController.Level.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false);
+    }
+
+    private static String getColon() {
+        if (JNLPRuntime.isWindows()) {
+            return "_";
+        } else {
+            return ":";
+        }
     }
     
     private static final class SingleStreamLoggerImpl implements SingleStreamLogger {
@@ -68,9 +77,9 @@ public final class FileLog  {
         }
     }
 
-    public static final SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.S");
+    public static final SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH"+getColon()+"mm:ss.S");
     /**"Tue Nov 19 09:43:50 CET 2013"*/
-    public static final SimpleDateFormat pluginSharedFormatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZ yyyy");
+    public static final SimpleDateFormat pluginSharedFormatter = new SimpleDateFormat("EEE MMM dd HH" + getColon() + "mm" + getColon() + "ss ZZZ yyyy");
     public static final String defaultloggerName = TextsProvider.ITW + " file-logger";
 
 

@@ -1,3 +1,7 @@
+2017-05-11  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: on windows, name of logs do not contain colons
+
 2017-05-10  Jiri Vanek <jvanek@redhat.com>
 
 	Added support for pure windows image and distribute-able windows-bin-dist archive 
