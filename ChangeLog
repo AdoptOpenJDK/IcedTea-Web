@@ -1,3 +1,7 @@
+2017-12-10  Jiri Vanek <jvanek@redhat.com>
+
+	* Makefile.am: (install-exec-local) completion files installed last
+
 2017-05-11  Jiri Vanek <jvanek@redhat.com>
 
 	* launcher/launchers.bat.in: hardcoded Xnofork, as it is necessary anyway
