@@ -154,6 +154,25 @@ IT_FIND_OPTIONAL_JAR([jacoco], JACOCO,
     [/usr/share/java/jacoco/org.jacoco.core.jar])
 IT_FIND_OPTIONAL_JAR([asm], ASM,
     [/usr/share/java/objectweb-asm4/asm-all.jar /usr/share/java/objectweb-asm4/asm-all-4.0.jar /usr/share/java/objectweb-asm/asm-all.jar])
+IT_FIND_OPTIONAL_JAR([wixgen], WIXGEN, [/usr/share/java/wixgen.jar])
+if test "x$build_windows" = xyes ; then
+  IT_CHECK_FOR_WIX
+fi
+echo -n "checking for MSI deps... "
+if test "x$WIX_TOOLSET_DIR" = "x" ; then
+  if test "x$WIXGEN_JAR" = "x" ; then
+    echo  "No WiX tools, nor wixgen jar, correct - build on linux or on windows witout MSI" 
+  else
+    echo  "No WiX tools, but wixgen jar - wixgen jar will do its job, but is useless. No MSI can be generated" 
+  fi
+else
+  if test "x$WIXGEN_JAR" = "x" ; then
+    echo  "WiX tools, but no wixgen jar, fatal. You need wixgen.jar from https://github.com/akashche/wixgen" 
+    exit 1
+  else
+    echo  "WiX tools and wixgen jar - build on windows with MSI generation support" 
+  fi
+fi
 
 IT_CHECK_FOR_TAGSOUP
 

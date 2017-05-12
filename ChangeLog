@@ -1,3 +1,21 @@
+2017-12-10  Alex Kashchenko <akashche@redhat.com>
+            Jiri Vanek <jvanek@redhat.com>
+            Michal Vala <mvala@redhat.com>
+
+	Added support for MSI generation
+	* AUTHORS: added MIchal and Alex
+	* Makefile.am: added win-installer target. For now missing clean
+	* acinclude.m4: all search macros enhanced for cygpath on windows, java read from path
+	(if available, windows only), added IT_CHECK_FOR_WIX macro
+	* configure.ac:  added checks for wixgen.jar and WiX tools
+	* win-installer/LICENSE.rtf: new file, license for  MSI to display. generated from COPYING
+	* win-installer/greetings_banner.bmp: new file, main banner for MSI
+	* win-installer/icon.ico: new file, icon for MSI
+	* win-installer/top_banner.bmp: new file, banner for MSI
+	* win-installer/installer.json.in: MSI descriptor, hart beat of whole MSI archive generator.
+	Needs a lot of sedding
+
+
 2017-12-10  Jiri Vanek <jvanek@redhat.com>
 
 	* Makefile.am: (install-exec-local) completion files installed last

@@ -304,7 +304,7 @@ clean-local: clean-netx clean-plugin clean-liveconnect \
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs clean-generated-docs clean-icedteaweb-completion\
  clean-tests check-local clean-launchers stamps/check-pac-functions.stamp stamps/run-netx-unit-tests.stamp clean-netx-tests \
- clean-junit-runner clean-netx-unit-tests clean-metadata 
+ clean-junit-runner clean-netx-unit-tests clean-metadata win-installer
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir) $(ICONS_DEST_DIR) $(BASH_CMPL_DEST_DIR)
@@ -354,7 +354,7 @@ endif
 if WINDOWS
 	mkdir -p $(WIN_ALL_DEPS)
 	mkdir -p $(WIN_RUN_DEPS)
-	JARSVARS=` ( set -o posix ; set ) | sed "s/.*=//"  | grep \\.jar$$ ` ; \
+	JARSVARS=` ( set -o posix ; set ) | sed "s/.*=//"  | grep \\.jar$$ | grep \\.jar.exe$$ ` ; \
 	JARSMAKE=` cat $(TOP_BUILD_DIR)/printvarsfile | sed  "s/.*=//"  |  grep \\.jar$$ ` ; \
 	for JAR in $$JARSMAKE ; do \
 	  if [ -f $ $$JAR ] ; then \
@@ -363,7 +363,7 @@ if WINDOWS
 	done ;
 	rm -f $(WIN_ALL_DEPS)/jar ;
 	for JAR in `ls $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/*.jar` ; do \
-	  rm -v $(WIN_ALL_DEPS)/`basename $$JAR` ; \
+	  rm -fv $(WIN_ALL_DEPS)/`basename $$JAR` ; \
 	done;
 if WITH_RHINO
 	filteredName=`basename $(RHINO_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
@@ -390,6 +390,16 @@ endif
 if ENABLE_PLUGINJAR
 	cp $(TOP_BUILD_DIR)/liveconnect/lib/src.zip $(DESTDIR)$(prefix)/plugin.src.zip
 endif
+
+
+installer.json:
+	sed -e s/[@]PACKAGE_VERSION[@]/$(PACKAGE_VERSION)/g win-installer/installer.json.in > $@
+
+win-installer: win-only-image installer.json
+	rm -vf installer.wxs
+	"$(JAVA)" -jar "$(WIXGEN_JAR)" "$(DESTDIR)$(prefix)" -c installer.json -o installer.wxs
+	"$(WIX_TOOLSET_DIR)"/candle.exe /nologo installer.wxs
+	"$(WIX_TOOLSET_DIR)"/light.exe /nologo -ext WixUIExtension installer.wixobj
 endif
 
 # note that this is called only from windows specific target (hidden otherwise)

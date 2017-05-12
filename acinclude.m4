@@ -65,11 +65,24 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
        fi
     done
   fi
+  AM_COND_IF([WINDOWS], [
+    # does not work, use which instead
+    # AC_CHECK_PROGS([SYSTEM_JAVA_IN_PATH], [java.exe]) 
+    SYSTEM_JAVA_IN_PATH=$(which java 2>&AS_MESSAGE_LOG_FD)
+    if test x"${SYSTEM_JAVA_IN_PATH}" != x ; then
+      SYSTEM_JDK_DIR=$(dirname $(dirname ${SYSTEM_JAVA_IN_PATH}))
+    fi
+  ])
   if ! test -d "${SYSTEM_JDK_DIR}"; then
     AC_MSG_ERROR("A JDK home directory could not be found. ${SYSTEM_JDK_DIR}")
   else
-    READ=`readlink -f ${SYSTEM_JDK_DIR}`
-    AC_MSG_RESULT(${SYSTEM_JDK_DIR} (link to ${READ}))
+    AM_COND_IF([WINDOWS], [
+      SYSTEM_JDK_DIR=$(cygpath -m ${SYSTEM_JDK_DIR})
+      AC_MSG_RESULT(${SYSTEM_JDK_DIR})
+    ], [
+      READ=`readlink -f ${SYSTEM_JDK_DIR}`
+      AC_MSG_RESULT(${SYSTEM_JDK_DIR} (link to ${READ}))
+    ])
   fi
   AC_SUBST(SYSTEM_JDK_DIR)
 ])
@@ -356,6 +369,11 @@ AC_DEFUN([IT_FIND_OPTIONAL_JAR],
   if test x"${$2_JAR}" = "xyes"; then
     $2_JAR=no
   fi
+  AM_COND_IF([WINDOWS], [
+    if test x"${$2_JAR}" != "xno"; then
+      $2_JAR=$(cygpath -m ${$2_JAR})
+    fi
+  ])
   AC_MSG_RESULT(${$2_JAR})
   AM_CONDITIONAL(WITH_$2, test x"${$2_JAR}" != "xno")
   # Clear $2_JAR if it doesn't contain a valid filename
@@ -377,7 +395,9 @@ AC_MSG_CHECKING([whether to build the browser plugin])
 AC_ARG_ENABLE([native_plugin],
               [AS_HELP_STRING([--disable-native-plugin],
                               [Disable compilation of browser plugin])],
-              [enable_native_plugin="${enableval}"], [enable_native_plugin="yes"])
+              [enable_native_plugin="${enableval}"], [
+                  AM_COND_IF([WINDOWS], [enable_native_plugin="no"], [enable_native_plugin="yes"])
+              ])
 AC_MSG_RESULT(${enable_native_plugin})
 ])
 
@@ -456,6 +476,9 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_TAGSOUP],
       fi
     done
   fi
+  AM_COND_IF([WINDOWS], [
+    TAGSOUP_JAR=$(cygpath -m ${TAGSOUP_JAR})
+  ])
   AC_MSG_RESULT(${TAGSOUP_JAR})
   if test -z "${TAGSOUP_JAR}"; then
     AC_MSG_RESULT(***********************************************)
@@ -1070,4 +1093,29 @@ AC_DEFUN_ONCE([IT_SET_GLOBAL_BROWSERTESTS_BEHAVIOUR],
   esac
   AC_MSG_RESULT(${BROWSER_SWITCH})
   AC_SUBST(BROWSER_TESTS_MODIFICATION)
+])
+
+AC_DEFUN_ONCE([IT_CHECK_FOR_WIX],
+[
+  AC_MSG_CHECKING([for a WiX Toolset directory])
+  AC_ARG_WITH([wix],
+             [AS_HELP_STRING([--with-wix],
+                             [WiX Toolset directory (candle.exe, light.exe)])],
+             [
+                 WIX_TOOLSET_DIR=${withval}
+             ])
+  if test x"${WIX_TOOLSET_DIR}" = x; then
+    SYSTEM_CANDLE_IN_PATH="$(which candle.exe 2>&AS_MESSAGE_LOG_FD)"
+    if test -f "${SYSTEM_CANDLE_IN_PATH}" ; then
+        WIX_TOOLSET_DIR="$(dirname "$(dirname "$(cygpath -m "${SYSTEM_CANDLE_IN_PATH}")")")"
+    fi
+  fi
+  if ! test -d "${WIX_TOOLSET_DIR}"; then
+    AC_MSG_WARN("A WiX Toolset directory could not be found. ${WIX_TOOLSET_DIR}")
+    AC_MSG_WARN(["You can build itw, but can not generate MSI"])
+    AC_MSG_WARN(["you can get WiX tools at http://wixtoolset.org/"])
+  else
+    AC_MSG_RESULT(${WIX_TOOLSET_DIR})
+    AC_SUBST(WIX_TOOLSET_DIR)
+  fi
 ])
