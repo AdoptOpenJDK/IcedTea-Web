@@ -1107,7 +1107,7 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_WIX],
   if test x"${WIX_TOOLSET_DIR}" = x; then
     SYSTEM_CANDLE_IN_PATH="$(which candle.exe 2>&AS_MESSAGE_LOG_FD)"
     if test -f "${SYSTEM_CANDLE_IN_PATH}" ; then
-        WIX_TOOLSET_DIR="$(dirname "$(dirname "$(cygpath -m "${SYSTEM_CANDLE_IN_PATH}")")")"
+        WIX_TOOLSET_DIR="$(dirname "$(cygpath -m "${SYSTEM_CANDLE_IN_PATH}")")"
     fi
   fi
   if ! test -d "${WIX_TOOLSET_DIR}"; then

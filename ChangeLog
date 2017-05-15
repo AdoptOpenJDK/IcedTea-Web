@@ -1,5 +1,19 @@
 2017-12-10  Alex Kashchenko <akashche@redhat.com>
             Jiri Vanek <jvanek@redhat.com>
+
+	Used absolute dirs, win installer work done in special folder, better WiX detection, win installer clean
+	* Makefile.am: introduced WIN_INSTALLER_DIR putting win-installer.build to abs build dir
+	introduced WIN_INSTALLER_SRC_DIR to put win-installer to abs src dir. clean-win-installer, new target,
+	cleaning  installer. installer.json and win-installer targets now using correct path macros. All work done
+	done in special dir
+	* acinclude.m4: WIX_TOOLSET_DIR is now striped only once, so it wrks well for both bin(msi) and no  bin(zip)
+	WiX isntallations
+	* configure.ac: wixgen.jar added more defaults to try
+	* win-installer/installer.json.in: adapted to work in different subdirectory (hot candidate for sed)
+
+
+2017-12-10  Alex Kashchenko <akashche@redhat.com>
+            Jiri Vanek <jvanek@redhat.com>
             Michal Vala <mvala@redhat.com>
 
 	Added support for MSI generation

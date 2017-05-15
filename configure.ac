@@ -154,10 +154,11 @@ IT_FIND_OPTIONAL_JAR([jacoco], JACOCO,
     [/usr/share/java/jacoco/org.jacoco.core.jar])
 IT_FIND_OPTIONAL_JAR([asm], ASM,
     [/usr/share/java/objectweb-asm4/asm-all.jar /usr/share/java/objectweb-asm4/asm-all-4.0.jar /usr/share/java/objectweb-asm/asm-all.jar])
-IT_FIND_OPTIONAL_JAR([wixgen], WIXGEN, [/usr/share/java/wixgen.jar])
 if test "x$build_windows" = xyes ; then
   IT_CHECK_FOR_WIX
 fi
+IT_FIND_OPTIONAL_JAR([wixgen], WIXGEN, [/usr/share/java/wixgen.jar $WIX_TOOLSET_DIR/wixgen.jar $WIX_TOOLSET_DIR/../wixgen.jar])
+
 echo -n "checking for MSI deps... "
 if test "x$WIX_TOOLSET_DIR" = "x" ; then
   if test "x$WIXGEN_JAR" = "x" ; then

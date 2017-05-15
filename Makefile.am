@@ -29,6 +29,8 @@ else
 	WIN_LAUNCHERS=
 endif
 
+export WIN_INSTALLER_DIR = $(TOP_BUILD_DIR)/win-installer.build
+export WIN_INSTALLER_SRC_DIR = $(TOP_SRC_DIR)/win-installer
 export NETX_DIR = $(TOP_BUILD_DIR)/netx.build
 export DOCS_DIR=$(TOP_BUILD_DIR)/icedtea-web-docs/$(FULL_VERSION)
 export NETX_SRCDIR = $(TOP_SRC_DIR)/netx
@@ -296,7 +298,7 @@ all-local: stamps/netx-dist.stamp stamps/plugin.stamp stamps/docs.stamp \
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
 
 clean-local: clean-netx clean-plugin clean-liveconnect \
- clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-generated-docs clean-metadata  clean-icedteaweb-completion clean-tests clean-bootstrap-directory
+ clean-native-ecj clean-launchers clean-desktop-files clean-docs clean-generated-docs clean-metadata  clean-icedteaweb-completion clean-tests clean-bootstrap-directory clean-win-installer
 	if [ -e stamps ] ; then \
 	  rmdir stamps ; \
 	fi
@@ -304,7 +306,7 @@ clean-local: clean-netx clean-plugin clean-liveconnect \
 .PHONY: clean-IcedTeaPlugin clean-add-netx clean-add-netx-debug clean-add-plugin clean-add-plugin-debug \
  clean-bootstrap-directory clean-native-ecj clean-desktop-files clean-netx-docs clean-docs clean-plugin-docs clean-generated-docs clean-icedteaweb-completion\
  clean-tests check-local clean-launchers stamps/check-pac-functions.stamp stamps/run-netx-unit-tests.stamp clean-netx-tests \
- clean-junit-runner clean-netx-unit-tests clean-metadata win-installer
+ clean-junit-runner clean-netx-unit-tests clean-metadata win-installer clean-win-installer
 
 install-exec-local:
 	${mkinstalldirs} $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/ $(DESTDIR)$(libdir) $(ICONS_DEST_DIR) $(BASH_CMPL_DEST_DIR)
@@ -391,15 +393,17 @@ if ENABLE_PLUGINJAR
 	cp $(TOP_BUILD_DIR)/liveconnect/lib/src.zip $(DESTDIR)$(prefix)/plugin.src.zip
 endif
 
+clean-win-installer:
+	rm -rf $(WIN_INSTALLER_DIR)
 
-installer.json:
-	sed -e s/[@]PACKAGE_VERSION[@]/$(PACKAGE_VERSION)/g win-installer/installer.json.in > $@
+$(WIN_INSTALLER_DIR)/installer.json: clean-win-installer
+	mkdir $(WIN_INSTALLER_DIR)
+	sed -e s/[@]PACKAGE_VERSION[@]/$(PACKAGE_VERSION)/g $(WIN_INSTALLER_SRC_DIR)/installer.json.in > $@
 
-win-installer: win-only-image installer.json
-	rm -vf installer.wxs
-	"$(JAVA)" -jar "$(WIXGEN_JAR)" "$(DESTDIR)$(prefix)" -c installer.json -o installer.wxs
-	"$(WIX_TOOLSET_DIR)"/candle.exe /nologo installer.wxs
-	"$(WIX_TOOLSET_DIR)"/light.exe /nologo -ext WixUIExtension installer.wixobj
+win-installer: win-only-image $(WIN_INSTALLER_DIR)/installer.json
+	"$(JAVA)" -jar "$(WIXGEN_JAR)" "$(DESTDIR)$(prefix)" -c $(WIN_INSTALLER_DIR)/installer.json -o $(WIN_INSTALLER_DIR)/installer.wxs
+	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/candle.exe /nologo installer.wxs
+	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/light.exe /nologo -ext WixUIExtension installer.wixobj
 endif
 
 # note that this is called only from windows specific target (hidden otherwise)
