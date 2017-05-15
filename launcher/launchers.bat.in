@@ -52,3 +52,5 @@ if "%ITW_HOME%" == ""  (
 rem TODO use "exec -a %PROGRAM_NAME% ..." idiom
 "%JAVA%" "-splash:%SPLASH_LOCATION%" "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %JAVAWS_J_OPTIONS% "-classpath" "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" "%CLASSNAME%" %ITW_WIN_SPECIALS% %*
 
+echo Please press any key to close this window/get back prompt
+pause > nul

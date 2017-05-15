@@ -1,4 +1,11 @@
 2017-12-10  Alex Kashchenko <akashche@redhat.com>
+            Jiri Vanek <jvanek@redhat.com>
+
+	* launcher/launchers.bat.in: added pause to the end of the script to allow
+	reading of messages if launched out of prompt.
+
+
+2017-12-10  Alex Kashchenko <akashche@redhat.com>
 
 	Made jnlp protocol work in msi
 	* win-installer/installer.json.in: "name": "TODO_DEFAULT", replaced by "name": "".
