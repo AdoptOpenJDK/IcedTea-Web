@@ -1,4 +1,10 @@
 2017-12-10  Alex Kashchenko <akashche@redhat.com>
+
+	Made jnlp protocol work in msi
+	* win-installer/installer.json.in: "name": "TODO_DEFAULT", replaced by "name": "".
+	Needs wixgen 1.3 https://github.com/akashche/wixgen/releases/tag/1.3
+
+2017-12-10  Alex Kashchenko <akashche@redhat.com>
             Jiri Vanek <jvanek@redhat.com>
 
 	Used absolute dirs, win installer work done in special folder, better WiX detection, win installer clean
