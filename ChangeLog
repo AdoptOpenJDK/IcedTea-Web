@@ -1,3 +1,8 @@
+2017-12-10  Jiri Vanek <jvanek@redhat.com>
+
+	* Makefile.am: installer renamed to itw-installer.msi, relative paths
+	in json.in sedded to absolute ones to allow build in different build dir.
+
 2017-12-10  Alex Kashchenko <akashche@redhat.com>
             Jiri Vanek <jvanek@redhat.com>
 

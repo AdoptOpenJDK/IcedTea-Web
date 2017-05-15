@@ -396,14 +396,16 @@ endif
 clean-win-installer:
 	rm -rf $(WIN_INSTALLER_DIR)
 
-$(WIN_INSTALLER_DIR)/installer.json: clean-win-installer
+$(WIN_INSTALLER_DIR)/itw-installer.json: clean-win-installer
 	mkdir $(WIN_INSTALLER_DIR)
-	sed -e s/[@]PACKAGE_VERSION[@]/$(PACKAGE_VERSION)/g $(WIN_INSTALLER_SRC_DIR)/installer.json.in > $@
+	sed \
+	-e "s|../win-installer|$(WIN_INSTALLER_SRC_DIR)|g" \
+	-e s/[@]PACKAGE_VERSION[@]/$(PACKAGE_VERSION)/g $(WIN_INSTALLER_SRC_DIR)/installer.json.in > $@
 
-win-installer: win-only-image $(WIN_INSTALLER_DIR)/installer.json
-	"$(JAVA)" -jar "$(WIXGEN_JAR)" "$(DESTDIR)$(prefix)" -c $(WIN_INSTALLER_DIR)/installer.json -o $(WIN_INSTALLER_DIR)/installer.wxs
-	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/candle.exe /nologo installer.wxs
-	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/light.exe /nologo -ext WixUIExtension installer.wixobj
+win-installer: win-only-image $(WIN_INSTALLER_DIR)/itw-installer.json
+	"$(JAVA)" -jar "$(WIXGEN_JAR)" "$(DESTDIR)$(prefix)" -c $(WIN_INSTALLER_DIR)/itw-installer.json -o $(WIN_INSTALLER_DIR)/itw-installer.wxs
+	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/candle.exe /nologo itw-installer.wxs
+	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/light.exe /nologo -ext WixUIExtension itw-installer.wixobj
 endif
 
 # note that this is called only from windows specific target (hidden otherwise)
