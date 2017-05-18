@@ -1,3 +1,9 @@
+2017-05-18  Jiri Vanek <jvanek@redhat.com>
+            Tomáš Votava <tomcacolca@gmail.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/formatters/formatters/FormatterTest.java:
+	regular expression of testXNewLinesPlain adapted to match both win and linux line endings
+
 2017-05-15  Jiri Vanek <jvanek@redhat.com>
 
 	Installer graphic made a bit more ITWized

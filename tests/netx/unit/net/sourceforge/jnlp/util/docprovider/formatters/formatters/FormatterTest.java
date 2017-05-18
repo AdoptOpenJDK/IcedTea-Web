@@ -60,7 +60,7 @@ public class FormatterTest {
         PlainTextFormatter f = new PlainTextFormatter();
         final int x = 10;
         String s = f.getNewLine(x);
-        String[] a = s.replace(f.getNewLine(), "X" + f.getNewLine()).split("[" + f.getNewLine() + "]{1}");
+        String[] a = s.replace(f.getNewLine(), "X" + f.getNewLine()).split("" + f.getNewLine() + "");
         Assert.assertEquals(x, a.length);
     }
 
