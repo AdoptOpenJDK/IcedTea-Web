@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
-import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.TextWithWaterLevel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -106,17 +105,18 @@ public class TextWithWaterLevelTest {
 
     @Test
     public void cutToTest() {
+        double firstColumnSharedWidth  = 0.1947565543;
         TextWithWaterLevel ifc = getInstance();
         ifc.setPercentageOfWater(50);
         BufferedImage bic = ifc.getBackground();
         int w = bic.getWidth();
         int h = bic.getHeight();
-        bic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        bic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB); 
         ifc.cutTo(bic.createGraphics(), 0, h);
-        Assert.assertEquals(Color.blue, new Color(bic.getRGB(52, 142)));
-        Assert.assertEquals(Color.blue, new Color(bic.getRGB(170, 110)));
-        Assert.assertEquals(Color.white, new Color(bic.getRGB(52, 62)));
-        Assert.assertEquals(Color.white, new Color(bic.getRGB(245, 85)));
+        Assert.assertEquals(Color.blue, new Color(bic.getRGB((int) (w * firstColumnSharedWidth), (int) (h * 0.93421052631))));
+        Assert.assertEquals(Color.blue, new Color(bic.getRGB((int) (w * 0.63670411985), (int) (h * 0.72368421052))));
+        Assert.assertEquals(Color.white, new Color(bic.getRGB((int) (w * firstColumnSharedWidth), (int) (h * 0.45))));
+        Assert.assertEquals(Color.white, new Color(bic.getRGB((int) (w * 0.91760299625), (int) (h * 0.55921052631))));
 
         //well this should be acctually rgba 0,0,0,0 but somehow this was no passig
         //you can confirm with:
