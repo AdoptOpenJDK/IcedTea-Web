@@ -1,6 +1,14 @@
 2017-05-18  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/util/logging/TeeOutputStreamTest.java: testPrint and testWriteByteArrayString
+	made dual for linux and windows. Those tests are charset specific. testWriteByteArrayString2 is new test, showing
+	strange issue when strange characters are going into and from byte array. On windows, this test fails, showing, that somewhere
+	in the stack, there is bad encoding or bad offset/lenght used.
+
+2017-05-18  Jiri Vanek <jvanek@redhat.com>
+            Tomáš Votava <tomcacolca@gmail.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/formatters/formatters/FormatterTest.java:
 	regular expression of testXNewLinesPlain adapted to match both win and linux line endings
 
