@@ -1,3 +1,9 @@
+2017-12-19  Alex Kashchenko <akashche@redhat.com>
+
+	Aligned msi and netx icons
+	* netx/net/sourceforge/jnlp/resources/netx-icon.png: redrawn
+	* win-installer/icon.ico: redrawn
+
 2017-05-18  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
 
