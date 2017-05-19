@@ -3,32 +3,53 @@ rem use ITW_HOME to set location where ITW can be found. Form there all binaries
 rem use JAVA_HOME to set path to JRE
 rem any redistribution/installer can replace INST_ITW_HOME and INST_JAVA_HOME to create better defaults
 rem if not set, following defaults are used
-set NASHORN=lib/ext/nashorn.jar
-set LAUNCHER_FLAGS=-Xms8m
-set ITW_WIN_SPECIALS=-Xnofork
-
 set CLASSNAME=@MAIN_CLASS@
 set PROGRAM_NAME=@PROGRAM_NAME@
 
+set NASHORN=lib/ext/nashorn.jar
+set LAUNCHER_FLAGS=-Xms8m
+if "%PROGRAM_NAME%" == "javaws"  (
+  set ITW_WIN_SPECIALS=-Xnofork
+) else (
+ set ITW_WIN_SPECIALS=
+)
+
+
 rem warning for linux users: when you put VAR="value" also quotes are stored in VAR!
 rem maybe set "VAR=value" is working better?
-set INST_ITW_HOME=%~dp0/../
-set INST_JAVA_HOME=
 
-if "%JAVA_HOME%" == ""  (
-  if not "%INST_JAVA_HOME%" == ""  (
-  set CP=%INST_JAVA_HOME%/lib/rt.jar;%INST_JAVA_HOME%/lib/jfxrt.jar
-  set NASHORN=%INST_JAVA_HOME%/%NASHORN%
-  set JAVA=%INST_JAVA_HOME%/bin/java
+set INST_JAVA_HOME=
+set BAD_SLASH_SCRIPT_DIR=%~dp0
+set SCRIPT_DIR=%BAD_SLASH_SCRIPT_DIR:\=/%
+set ITW_HOME=%SCRIPT_DIR%../
+
+rem the following is for testing-only and not intended to be robust
+rem will not work from 32-bit firefox
+for /f "tokens=*" %%a in ('%windir%\System32\reg query "HKLM\SOFTWARE\JavaSoft\Java Development Kit"') do set "version_key=%%a"
+set "version=%version_key:~58%"
+for /f "tokens=*" %%a in ('%windir%\System32\reg query "HKLM\SOFTWARE\JavaSoft\Java Development Kit\%version%" /v JavaHome') do set "jh_key=%%a"
+set BAD_SLASH_JAVA_HOME=%jh_key:~22%
+set REG_JAVA_HOME=%BAD_SLASH_JAVA_HOME:\=/%
+"%REG_JAVA_HOME%/bin/java.exe" -version
+if errorlevel 0 if not errorlevel 1 (
+    set JAVA_HOME=%REG_JAVA_HOME%
+)
+
+
+if "%INST_JAVA_HOME%" == ""  (
+  if not "%JAVA_HOME%" == ""  (
+  set CP=%JAVA_HOME%/lib/rt.jar;%JAVA_HOME%/lib/jfxrt.jar
+  set NASHORN=%JAVA_HOME%/%NASHORN%
+  set JAVA=%JAVA_HOME%/bin/java
   ) else (
     set CP=@JRE@/lib/rt.jar;@JRE@/lib/jfxrt.jar
     set NASHORN=@JRE@/%NASHORN%
     set JAVA=@JAVA@
   )
 ) else (
-  set CP=%JAVA_HOME%/lib/rt.jar;%JAVA_HOME%/lib/jfxrt.jar
-  set NASHORN=%JAVA_HOME%/%NASHORN%
-  set JAVA=%JAVA_HOME%/bin/java
+  set CP=%INST_JAVA_HOME%/lib/rt.jar;%INST_JAVA_HOME%/lib/jfxrt.jar
+  set NASHORN=%INST_JAVA_HOME%/%NASHORN%
+  set JAVA=%INST_JAVA_HOME%/bin/java
 )
 
 if "%ITW_HOME%" == ""  (
@@ -52,5 +73,9 @@ if "%ITW_HOME%" == ""  (
 rem TODO use "exec -a %PROGRAM_NAME% ..." idiom
 "%JAVA%" "-splash:%SPLASH_LOCATION%" "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %JAVAWS_J_OPTIONS% "-classpath" "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" "%CLASSNAME%" %ITW_WIN_SPECIALS% %*
 
+SET errno=%ERRORLEVEL%
+
+
 echo Please press any key to close this window/get back prompt
 pause > nul
+EXIT /B %errno%

@@ -1,3 +1,11 @@
+2017-05-19  Jiri Vanek <jvanek@redhat.com>
+            Alex Kashchenko <akashche@redhat.com>
+
+	added support for reading java home from regsitry
+	* launcher/launchers.bat.in: registry support(Alex),
+	fixed issue with ITW_WIN_SPECIALS, fixed issue with returnvlaue,
+	user-in-file java path proffered over all.
+
 2017-12-19  Alex Kashchenko <akashche@redhat.com>
 
 	Aligned msi and netx icons
