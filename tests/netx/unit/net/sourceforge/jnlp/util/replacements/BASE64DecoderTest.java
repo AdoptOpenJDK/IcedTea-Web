@@ -38,28 +38,24 @@ package net.sourceforge.jnlp.util.replacements;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import org.junit.Assert;
 import org.junit.Test;
 
-/** Test various corner cases of the parser */
+/**
+ * Test various corner cases of the parser
+ */
 public class BASE64DecoderTest {
 
     private static final String sunClassE = "sun.misc.BASE64Encoder";
-      
+
     @Test
     public void testEmbededBase64Decoder() throws Exception {
-        final byte[] data = BASE64EncoderTest.encoded;
+        final byte[] data = getData();
         ByteArrayOutputStream out2 = new ByteArrayOutputStream();
         BASE64Decoder e2 = new BASE64Decoder();
         e2.decodeBuffer(new ByteArrayInputStream(data), out2);
         byte[] decoded = out2.toByteArray();
         Assert.assertEquals(BASE64EncoderTest.sSrc, new String(decoded, "utf-8"));
-
-
-
     }
 
     @Test
@@ -67,7 +63,7 @@ public class BASE64DecoderTest {
      * This test will fail, in case taht sun.misc.BASE64Encoder will be removed from builders java
      */
     public void testEmbededBase64DecoderAgainstSunOne() throws Exception {
-        final byte[] data = BASE64EncoderTest.encoded;
+        final byte[] data = getData();
         ByteArrayOutputStream out2 = new ByteArrayOutputStream();
         BASE64Decoder e2 = new BASE64Decoder();
         e2.decodeBuffer(new ByteArrayInputStream(data), out2);
@@ -76,13 +72,12 @@ public class BASE64DecoderTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         BASE64EncoderTest.getAndInvokeMethod(encoder, "encodeBuffer", encoded2, out);
         Assert.assertArrayEquals(data, out.toByteArray());
-        Assert.assertArrayEquals(BASE64EncoderTest.encoded, out.toByteArray());
-
+        Assert.assertArrayEquals(getData(), out.toByteArray());
     }
-    
-     @Test
+
+    @Test
     public void testEmbededBase64DecoderAgainstEmbededEncoder() throws Exception {
-        final byte[] data = BASE64EncoderTest.encoded;
+        final byte[] data = getData();
         ByteArrayOutputStream out2 = new ByteArrayOutputStream();
         BASE64Decoder e2 = new BASE64Decoder();
         e2.decodeBuffer(new ByteArrayInputStream(data), out2);
@@ -91,9 +86,17 @@ public class BASE64DecoderTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         encoder.encodeBuffer(encoded2, out);
         Assert.assertArrayEquals(data, out.toByteArray());
-        Assert.assertArrayEquals(BASE64EncoderTest.encoded, out.toByteArray());
+        Assert.assertArrayEquals(getData(), out.toByteArray());
 
     }
 
-  
+
+    private byte[] getData() {
+        byte[] r = new byte[BASE64EncoderTest.encoded.size()];
+        for (int i = 0; i < BASE64EncoderTest.encoded.size(); i++) {
+            r[i]=BASE64EncoderTest.encoded.get(i);
+        }
+        return r;
+    }
+
 }

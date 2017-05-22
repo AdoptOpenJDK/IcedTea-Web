@@ -40,30 +40,54 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
-import net.sourceforge.jnlp.ServerAccess;
+import java.util.List;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.Assert;
 import org.junit.Test;
 
-/** Test various corner cases of the parser */
+/**
+ * Test various corner cases of the parser
+ */
 public class BASE64EncoderTest {
 
     static final String sSrc = "abcdefgHIJKLMNOPQrstuvwxyz1234567890\r\n"
             + "-=+_))(**&&&^^%%$$##@@!!~{}][\":'/\\.,><\n"
             + "+ěšěčřžýáíé=ů/úěřťšďňéíáč";
-    static final byte[] encoded = {89, 87, 74, 106, 90, 71, 86, 109, 90,
+    static final Byte[] part1 = {89, 87, 74, 106, 90, 71, 86, 109, 90,
         48, 104, 74, 83, 107, 116, 77, 84, 85, 53, 80, 85, 70, 70, 121, 99, 51,
         82, 49, 100, 110, 100, 52, 101, 88, 111, 120, 77, 106, 77, 48, 78, 84,
         89, 51, 79, 68, 107, 119, 68, 81, 111, 116, 80, 83, 116, 102, 75, 83,
         107, 111, 75, 105, 111, 109, 74, 105, 90, 101, 88, 105, 85, 108, 74, 67,
-        81, 106, 10, 73, 48, 66, 65, 73, 83, 70, 43, 101, 51, 49, 100, 87, 121,
+        81, 106};
+    static final Byte[] part2 = {73, 48, 66, 65, 73, 83, 70, 43, 101, 51, 49, 100, 87, 121,
         73, 54, 74, 121, 57, 99, 76, 105, 119, 43, 80, 65, 111, 114, 120, 74,
         118, 70, 111, 99, 83, 98, 120, 73, 51, 70, 109, 99, 87, 43, 119, 55, 51,
         68, 111, 99, 79, 116, 119, 54, 107, 57, 120, 97, 56, 118, 119, 55, 114,
-        69, 109, 56, 87, 90, 120, 97, 88, 70, 111, 99, 83, 80, 10, 120, 89, 106,
-        68, 113, 99, 79, 116, 119, 54, 72, 69, 106, 81, 61, 61, 10};
-    
+        69, 109, 56, 87, 90, 120, 97, 88, 70, 111, 99, 83, 80};
+    static final Byte[] part3 = {120, 89, 106, 68, 113, 99, 79, 116, 119, 54, 72, 69, 106, 81, 61, 61};
+
+    private static List<Byte> getBASE64LineEnding() {
+            if (JNLPRuntime.isWindows()) {
+                return Arrays.asList(new Byte[]{13, 10});
+            } else {
+                return Arrays.asList(new Byte[]{10});
+            }
+        }
+
+    static final List<Byte> encoded = new ArrayList<Byte>();
+
     private static final String sunClassD = "sun.misc.BASE64Decoder";
+
+    static {
+        encoded.addAll(Arrays.asList(part1));
+        encoded.addAll(getBASE64LineEnding());
+        encoded.addAll(Arrays.asList(part2));
+        encoded.addAll(getBASE64LineEnding());
+        encoded.addAll(Arrays.asList(part3));
+        encoded.addAll(getBASE64LineEnding());
+    }
 
     @Test
     public void testEmbededBase64Encoder() throws Exception {
@@ -77,11 +101,8 @@ public class BASE64EncoderTest {
         BASE64Encoder e2 = new BASE64Encoder();
         e2.encodeBuffer(data, out2);
         byte[] encoded2 = out2.toByteArray();
-        Assert.assertArrayEquals(encoded, encoded2);
+        Assert.assertEquals(encoded, byteArrayToByteList(encoded2));
 //      ServerAccess.logErrorReprint(Arrays.toString(encoded2));
-
-
-
     }
 
     @Test
@@ -100,8 +121,8 @@ public class BASE64EncoderTest {
         Assert.assertArrayEquals(data, decoded);
         Assert.assertEquals(sSrc, new String(decoded, "utf-8"));
     }
-    
-      @Test
+
+    @Test
     public void testEmbededBase64EncoderAgainstEbededDecoder() throws Exception {
         final byte[] data = sSrc.getBytes("utf-8");
         ByteArrayOutputStream out2 = new ByteArrayOutputStream();
@@ -133,5 +154,13 @@ public class BASE64EncoderTest {
         Method m = instance.getClass().getMethod(methodName, cs);
         return m.invoke(instance, params);
 
+    }
+
+    private static List<Byte> byteArrayToByteList(byte[] encoded2) {
+         List<Byte> r = new ArrayList<>(encoded2.length);
+        for (byte b : encoded2) {
+            r.add(b);
+        }
+        return r;
     }
 }

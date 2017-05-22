@@ -1,3 +1,10 @@
+2017-05-22  Jiri Vanek <jvanek@redhat.com>
+            Tomáš Votava <tomcacolca@gmail.com>
+
+	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64DecoderTest.java: enhanced for windows new lines
+	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64EncoderTest.java: same
+
+
 2017-05-19  Jiri Vanek <jvanek@redhat.com>
             Alex Kashchenko <akashche@redhat.com>
 
