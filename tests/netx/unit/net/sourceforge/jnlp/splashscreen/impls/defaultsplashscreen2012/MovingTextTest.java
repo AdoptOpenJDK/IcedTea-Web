@@ -36,13 +36,13 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
-import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.MovingText;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import org.junit.Assert;
 import org.junit.Test;
+import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.TextWithWaterLevel;
 
 public class MovingTextTest {
 
@@ -133,10 +133,10 @@ public class MovingTextTest {
         bic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         ifc.cutTo(bic.createGraphics(), 0, h);
         Color cc = new Color(0, 0, 0);
-        assertNotEquals(cc, new Color(bic.getRGB(52, 142)));
-        assertNotEquals(cc, new Color(bic.getRGB(170, 110)));
-        assertNotEquals(cc, new Color(bic.getRGB(52, 62)));
-        assertNotEquals(cc, new Color(bic.getRGB(245, 85)));
+        assertNotEquals(cc, new Color(bic.getRGB((int) (w * TextWithWaterLevelTest.firstLetterMiddleWidth), (int) (h * TextWithWaterLevelTest.firstLetterLowerHeight))));
+        assertNotEquals(cc, new Color(bic.getRGB((int) (w * TextWithWaterLevelTest.secondLetterLeftWidth), (int) (h * TextWithWaterLevelTest.secondLetterMiddleHeight))));
+        assertNotEquals(cc, new Color(bic.getRGB((int) (w * TextWithWaterLevelTest.firstLetterMiddleWidth), (int) (h * TextWithWaterLevelTest.firstLetterUpperHeight))));
+        assertNotEquals(cc, new Color(bic.getRGB((int) (w * TextWithWaterLevelTest.secondLetterRightWidth), (int) (h * TextWithWaterLevelTest.secondLetterUpperHeight))));
 
         //well this should be acctually rgba 0,0,0,0 but somehow this was no passig
         //you can confirm with:

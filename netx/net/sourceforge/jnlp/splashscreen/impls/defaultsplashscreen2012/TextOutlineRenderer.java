@@ -80,7 +80,7 @@ public class TextOutlineRenderer {
         return img.getHeight(null);
     }
 
-    public void cutTo(Graphics2D g2, int x, int y) {
+    public Rectangle cutTo(Graphics2D g2, int x, int y) {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -98,6 +98,7 @@ public class TextOutlineRenderer {
         g2.draw(shape);
         g2.setClip(shape);
         g2.drawImage(getImg(), r.x, r.y, r.width, r.height, null);
+        return r;
 
     }
 

@@ -1,6 +1,19 @@
 2017-05-22  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
 
+	Splash-screen text renderers adapted to different fonts on windows. It is miracle splash screen is working on windows...
+	* AUTHORS: added Tom
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextOutlineRenderer.java: cutTo now returns rectangle in vain attempt to find center
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextWithWaterLevel.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/MovingTextTest.java:
+	where possible, used relative measurements. hardcoded if values otherwise
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextOutlineRendererTest.java: same
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextWithWaterLevelTest.java: same
+
+
+2017-05-22  Jiri Vanek <jvanek@redhat.com>
+            Tomáš Votava <tomcacolca@gmail.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64DecoderTest.java: enhanced for windows new lines
 	* tests/netx/unit/net/sourceforge/jnlp/util/replacements/BASE64EncoderTest.java: same
 
@@ -83,7 +96,7 @@
             Michal Vala <mvala@redhat.com>
 
 	Added support for MSI generation
-	* AUTHORS: added MIchal and Alex
+	* AUTHORS: added Michal and Alex
 	* Makefile.am: added win-installer target. For now missing clean
 	* acinclude.m4: all search macros enhanced for cygpath on windows, java read from path
 	(if available, windows only), added IT_CHECK_FOR_WIX macro

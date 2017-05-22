@@ -42,14 +42,19 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
+import net.sourceforge.jnlp.annotations.WindowsIssue;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TextOutlineRendererTest {
 
+    final int imageSize = 100;
+    final int zero = 0;
+
     @Test
     public void getSetTest() {
-        BufferedImage bi = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = bi.createGraphics();
         Font f1 = g2d.getFont().deriveFont(Font.ITALIC);
         Font f2 = g2d.getFont().deriveFont(Font.BOLD);
@@ -62,8 +67,8 @@ public class TextOutlineRendererTest {
         Assert.assertEquals(s, ifc.getText());
         Assert.assertEquals(Color.BLACK, ifc.getTextOutline());
         ifc.setImg(bi);
-        Assert.assertEquals(100, ifc.getHeight());
-        Assert.assertEquals(100, ifc.getWidth());
+        Assert.assertEquals(imageSize, ifc.getHeight());
+        Assert.assertEquals(imageSize, ifc.getWidth());
         Assert.assertEquals(f1, ifc.getFont());
         Assert.assertEquals(bi, ifc.getImg());
         Assert.assertEquals(s, ifc.getText());
@@ -73,8 +78,8 @@ public class TextOutlineRendererTest {
         xfc.setImg(bi);
         xfc.setFont(f2);
         String ss = "HelloHello";
-        Assert.assertEquals(100, xfc.getHeight());
-        Assert.assertEquals(100, xfc.getWidth());
+        Assert.assertEquals(imageSize, xfc.getHeight());
+        Assert.assertEquals(imageSize, xfc.getWidth());
         Assert.assertEquals(f2, xfc.getFont());
         Assert.assertEquals(bi, xfc.getImg());
         Assert.assertEquals(s, xfc.getText());
@@ -85,30 +90,42 @@ public class TextOutlineRendererTest {
     }
 
     @Test
+    @WindowsIssue
+    //hardcoded values cannot be metrified, the solution to find the centre is unknown.
     public void cutToTest() {
-        BufferedImage bi1 = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi1 = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d1 = bi1.createGraphics();
         g2d1.setColor(Color.red);
-        g2d1.fillRect(0, 0, 100, 100);
+        g2d1.fillRect(zero, zero, imageSize, imageSize);
 
 
-        BufferedImage bi2 = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi2 = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d2 = bi2.createGraphics();
         g2d2.setColor(Color.blue);
-        g2d2.fillRect(0, 0, 100, 100);
+        g2d2.fillRect(zero, zero, imageSize, imageSize);
         TextOutlineRenderer ifc = new TextOutlineRenderer(g2d1.getFont().deriveFont(Font.BOLD, 130), "O");
         ifc.setImg(bi1);
-        ifc.cutTo(g2d2, -5, 100);
+        ifc.cutTo(g2d2, -5, imageSize);
+        Color c2 = null;
+        Color c3 = null;
+        Color c5 = null;
         Color c1 = new Color(bi2.getRGB(1, 1));
-        Assert.assertEquals(Color.blue, c1);
-        Color c2 = new Color(bi2.getRGB(50, 50));
-        Assert.assertEquals(Color.blue, c2);
-        Color c3 = new Color(bi2.getRGB(30, 30));
-        Assert.assertEquals(Color.red, c3);
         Color c4 = new Color(bi2.getRGB(70, 70));
+        if (JNLPRuntime.isWindows()) {
+            c2 = new Color(bi2.getRGB(45, 54));
+            c3 = new Color(bi2.getRGB(27, 27));
+            c5 = new Color(bi2.getRGB(20, 52));
+        } else {
+            c2 = new Color(bi2.getRGB(50, 50));
+            c3 = new Color(bi2.getRGB(30, 30));
+            c5 = new Color(bi2.getRGB(26, 52));
+        }
+        Assert.assertEquals(Color.blue, c1);
+        Assert.assertEquals(Color.blue, c2);
+        Assert.assertEquals(Color.red, c3);
         Assert.assertEquals(Color.red, c4);
-        Color c5 = new Color(bi2.getRGB(26, 52));
         Assert.assertEquals(Color.black, c5);
+
 
 
     }

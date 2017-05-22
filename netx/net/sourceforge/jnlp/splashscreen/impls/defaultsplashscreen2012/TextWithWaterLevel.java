@@ -42,6 +42,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -117,12 +118,12 @@ public class TextWithWaterLevel extends TextOutlineRenderer {
     }
 
     @Override
-    public void cutTo(Graphics2D g2, int x, int y) {
+    public Rectangle cutTo(Graphics2D g2, int x, int y) {
         if (this.getImg() == null) {
             this.setImg(getBackground());
         }
         if (this.getImg() == null) {
-            return;
+            return null;
         }
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setFont(getFont());
@@ -132,7 +133,7 @@ public class TextWithWaterLevel extends TextOutlineRenderer {
         g2.drawString(getText(), x - 2, y);
         g2.drawString(getText(), x + 2, y);
         //sorry, cuted text have disturbed borders
-        super.cutTo(g2, x, y);
+        return super.cutTo(g2, x, y);
     }
 
     /**

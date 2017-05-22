@@ -45,6 +45,14 @@ import org.junit.Test;
 
 public class TextWithWaterLevelTest {
 
+    static final double firstLetterMiddleWidth  = 0.1947565543;
+    static final double firstLetterLowerHeight  = 0.934210526;
+    static final double secondLetterLeftWidth  = 0.63670412;
+    static final double secondLetterMiddleHeight  = 0.723684211;
+    static final double firstLetterUpperHeight  = 0.43902439;
+    static final double secondLetterRightWidth  = 0.917602996;
+    static final double secondLetterUpperHeight  = 0.559210526;
+
     @Test
     public void setGetTest() {
         BufferedImage bi = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
@@ -105,7 +113,6 @@ public class TextWithWaterLevelTest {
 
     @Test
     public void cutToTest() {
-        double firstColumnSharedWidth  = 0.1947565543;
         TextWithWaterLevel ifc = getInstance();
         ifc.setPercentageOfWater(50);
         BufferedImage bic = ifc.getBackground();
@@ -113,10 +120,10 @@ public class TextWithWaterLevelTest {
         int h = bic.getHeight();
         bic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB); 
         ifc.cutTo(bic.createGraphics(), 0, h);
-        Assert.assertEquals(Color.blue, new Color(bic.getRGB((int) (w * firstColumnSharedWidth), (int) (h * 0.93421052631))));
-        Assert.assertEquals(Color.blue, new Color(bic.getRGB((int) (w * 0.63670411985), (int) (h * 0.72368421052))));
-        Assert.assertEquals(Color.white, new Color(bic.getRGB((int) (w * firstColumnSharedWidth), (int) (h * 0.45))));
-        Assert.assertEquals(Color.white, new Color(bic.getRGB((int) (w * 0.91760299625), (int) (h * 0.55921052631))));
+        Assert.assertEquals(Color.blue, new Color(bic.getRGB((int) (w * firstLetterMiddleWidth), (int) (h * firstLetterLowerHeight))));
+        Assert.assertEquals(Color.blue, new Color(bic.getRGB((int) (w * secondLetterLeftWidth), (int) (h * secondLetterMiddleHeight))));
+        Assert.assertEquals(Color.white, new Color(bic.getRGB((int) (w * firstLetterMiddleWidth), (int) (h * firstLetterUpperHeight))));
+        Assert.assertEquals(Color.white, new Color(bic.getRGB((int) (w * secondLetterRightWidth), (int) (h * secondLetterUpperHeight))));
 
         //well this should be acctually rgba 0,0,0,0 but somehow this was no passig
         //you can confirm with:
