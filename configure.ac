@@ -154,6 +154,9 @@ IT_FIND_OPTIONAL_JAR([jacoco], JACOCO,
     [/usr/share/java/jacoco/org.jacoco.core.jar])
 IT_FIND_OPTIONAL_JAR([asm], ASM,
     [/usr/share/java/objectweb-asm4/asm-all.jar /usr/share/java/objectweb-asm4/asm-all-4.0.jar /usr/share/java/objectweb-asm/asm-all.jar])
+
+IT_CHECK_FOR_TAGSOUP
+
 if test "x$build_windows" = xyes ; then
   IT_CHECK_FOR_WIX
 fi
@@ -174,8 +177,6 @@ else
     echo  "WiX tools and wixgen jar - build on windows with MSI generation support" 
   fi
 fi
-
-IT_CHECK_FOR_TAGSOUP
 
 PKG_CHECK_VAR(bashcompdir, [bash-completion], [completionsdir], ,
      bashcompdir="${sysconfdir}/bash_completion.d")
