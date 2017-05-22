@@ -37,6 +37,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.swing.filechooser.FileSystemView;
 
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -498,8 +499,16 @@ public class XDesktopEntry {
         return sanitize(file.createJnlpTitle());
     }
 
-    public File getLinuxDesktopIconFile() {
-        return new File(findFreedesktopOrgDesktopPathCatch() + "/" + getDesktopIconFileName());
+    public File getDesktopIconFile() {
+            return new File(getDesktop(), getDesktopIconFileName());
+    }
+    public static File getDesktop(){
+        if (JNLPRuntime.isWindows()) {
+            FileSystemView filesys = FileSystemView.getFileSystemView();
+            return filesys.getHomeDirectory();
+        } else {
+            return new File(findFreedesktopOrgDesktopPathCatch());
+        }
     }
 
     public File getLinuxMenuIconFile() {

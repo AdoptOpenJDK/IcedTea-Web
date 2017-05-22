@@ -52,6 +52,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridgeTest;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.sourceforge.jnlp.annotations.WindowsIssue;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
@@ -174,38 +175,58 @@ public class XDesktopEntryTest {
     }
 
     @Test
+    @WindowsIssue
     public void getFreedesktopOrgDesktopPathFromtestSimpleWithHome() throws IOException {
-        String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src4)));
-        Assert.assertEquals(s, des2Res);
+        if (JNLPRuntime.isUnix()) {
+            String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src4)));
+            Assert.assertEquals(s, des2Res);
+        }
     }
 
     @Test
+    @WindowsIssue
     public void getFreedesktopOrgDesktopPathFromtestSpacedWithHome() throws IOException {
-        String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src5)));
-        Assert.assertEquals(s, des2Res);
+        if (JNLPRuntime.isUnix()) {
+            String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src5)));
+            Assert.assertEquals(s, des2Res);
+        }
     }
 
     @Test
+    @WindowsIssue
     public void getFreedesktopOrgDesktopPathFromtestSpacedWithHomeAndQuotes() throws IOException {
-        String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src7)));
-        Assert.assertEquals(s, des7res);
+        if (JNLPRuntime.isUnix()) {
+            String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src7)));
+            Assert.assertEquals(s, des7res);
+        }
     }
 
     @Test
+    @WindowsIssue
     public void getFreedesktopOrgDesktopPathFromtestSpacedWithHomeAndEscapedQuotes() throws IOException {
-        String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src8)));
-        Assert.assertEquals(s, des8res);
+        if (JNLPRuntime.isUnix()) {
+            String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src8)));
+            Assert.assertEquals(s, des8res);
+        }
     }
 
     @Test
+    @WindowsIssue
     public void getFreedesktopOrgDesktopPathFromtestSpacedWithHomeAndMixedQuotes() throws IOException {
-        String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src9)));
-        Assert.assertEquals(s, des9res);
+        if (JNLPRuntime.isUnix()) {
+            String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src9)));
+            Assert.assertEquals(s, des9res);
+        }
     }
 
     @Test(expected = IOException.class)
     public void getFreedesktopOrgDesktopPathFromtestCommentedWithHome() throws IOException {
         String s = XDesktopEntry.getFreedesktopOrgDesktopPathFrom(new BufferedReader(new StringReader(src6)));
+    }
+
+    @Test
+    public void desktopPath() {
+            Assert.assertTrue(XDesktopEntry.getDesktop().getAbsolutePath().startsWith(System.getProperty("user.home")));;
     }
 
     private static void envToString() {
@@ -224,7 +245,7 @@ public class XDesktopEntryTest {
         JNLPFile jnlpf = new DummyJnlpWithTitle();
         XDesktopEntry xde = new XDesktopEntry(jnlpf);
         File f1 = xde.getShortcutTmpFile();
-        File f2 = xde.getLinuxDesktopIconFile();
+        File f2 = xde.getDesktopIconFile();
         File f3 = xde.getLinuxMenuIconFile();
         Assert.assertEquals(f1.getName(), f2.getName());
         Assert.assertEquals(f2.getName(), f3.getName());

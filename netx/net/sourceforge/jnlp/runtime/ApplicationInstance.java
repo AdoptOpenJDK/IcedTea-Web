@@ -152,7 +152,7 @@ public class ApplicationInstance {
     private void addMenuAndDesktopEntries() {
         XDesktopEntry entry = new XDesktopEntry(file);
         ShortcutDesc sd = file.getInformation().getShortcut();
-        File possibleDesktopFile = entry.getLinuxDesktopIconFile();
+        File possibleDesktopFile = entry.getDesktopIconFile();
         File possibleMenuFile = entry.getLinuxMenuIconFile();
         File generatedJnlp = entry.getGeneratedJnlpFileName();
         //if one of menu or desktop exists, do not bother user

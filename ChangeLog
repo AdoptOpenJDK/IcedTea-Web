@@ -1,4 +1,13 @@
 2017-05-22  Jiri Vanek <jvanek@redhat.com>
+
+	Windows desktop path attempted to be handled correctly
+	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: adapted to new name
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: added windows desktop locating
+	* tests/netx/unit/net/sourceforge/jnlp/util/XDesktopEntryTest.java: on windows excluded xdg tests. Added test
+	for windows desktop
+
+
+2017-05-22  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
 
 	Splash-screen text renderers adapted to different fonts on windows. It is miracle splash screen is working on windows...
