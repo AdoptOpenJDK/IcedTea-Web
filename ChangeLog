@@ -1,3 +1,9 @@
+2017-05-22  Juergen Hoffmann <juhoffma@redhat.com>
+            Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: fixed grammar in
+	JREContinueDialogSentence2 and ALACAMatchingMainTitle keys
+
 2017-05-22  Jiri Vanek <jvanek@redhat.com>
 
 	Windows desktop path attempted to be handled correctly
