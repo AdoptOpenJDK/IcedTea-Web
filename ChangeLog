@@ -1,3 +1,7 @@
+2017-05-22  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: TAGSOUPnotUsed got fixed key/value delimiter
+
 2017-05-22  Juergen Hoffmann <juhoffma@redhat.com>
             Jiri Vanek <jvanek@redhat.com>
 
