@@ -1,3 +1,13 @@
+2017-06-07  Jiri Vanek <jvanek@redhat.com>
+            Tereza Hlavackova <hlavackova.tereza@gmail.com>
+
+	Updated installer graphic, aligned first set of icons
+	* AUTHORS: added Tereza
+	* win-installer/icon.ico: designed new frontend ico
+	* netx/net/sourceforge/jnlp/resources/netx-icon.png: aligned with ico.ico
+	* win-installer/greetings_banner.bmp: redrawn (in style with ico.ico)
+	* win-installer/top_banner.bmp: redrawn (in style with ico.ico)
+
 2017-05-22  Jiri Vanek <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: TAGSOUPnotUsed got fixed key/value delimiter
