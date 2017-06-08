@@ -1,3 +1,10 @@
+2017-06-08  Jiri Vanek <jvanek@redhat.com>
+
+	Small alignment of icon usage
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: removed custom loading
+	of netx.icon and replaced by standard call.
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: added usage of netx.icon
+
 2017-06-07  Jiri Vanek <jvanek@redhat.com>
             Tereza Hlavackova <hlavackova.tereza@gmail.com>
 

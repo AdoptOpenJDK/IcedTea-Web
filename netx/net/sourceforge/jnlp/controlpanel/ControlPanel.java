@@ -139,18 +139,8 @@ public class ControlPanel extends JFrame {
         descriptionPanel.add(description);
 
         JLabel image = new JLabel();
+        image.setIcon(new ImageIcon(ImageResources.INSTANCE.getApplicationImages().get(0)));
 
-        ClassLoader cl = getClass().getClassLoader();
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        try {
-            URL imgUrl = cl.getResource("net/sourceforge/jnlp/resources/netx-icon.png");
-            image.setIcon(new ImageIcon(ImageIO.read(imgUrl)));
-        } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-        }
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(UIManager.getColor("TextPane.background"));

@@ -114,6 +114,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
@@ -673,6 +674,7 @@ public class PolicyEditor extends JPanel {
 
         private PolicyEditorFrame(final PolicyEditor editor) {
             super();
+            setIconImages(ImageResources.INSTANCE.getApplicationImages());
             preparePolicyEditorWindow(this, editor);
         }
 
