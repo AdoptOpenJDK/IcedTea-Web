@@ -1,3 +1,17 @@
+2017-06-15  Jiri Vanek <jvanek@redhat.com>
+            Tereza Hlavackova <hlavackova.tereza@gmail.com>
+
+	More tuning of itw graphics. Now new splashscreen have to be done
+	* netx/javaws_splash.png: adapted to new leaves
+	* netx/net/sourceforge/jnlp/resources/itw_logo.png: same
+	* netx/net/sourceforge/jnlp/resources/netx-icon.png: added frozen lines around to 
+	be less environment-settings vulnereable
+	* win-installer/greetings_banner.bmp: aligned to more blue color schema
+	* win-installer/icon.ico: adapted to frozen leaves
+	* win-installer/top_banner.bmp: added a bit of ice
+
+
+
 2017-06-08  Jiri Vanek <jvanek@redhat.com>
 
 	Small alignment of icon usage
