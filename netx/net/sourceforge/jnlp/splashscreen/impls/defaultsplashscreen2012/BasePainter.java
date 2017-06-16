@@ -122,13 +122,13 @@ public class BasePainter implements Observer {
     protected TextWithWaterLevel oldTwl;
     protected boolean canWave = true;
     private Point aboutOfset = new Point();
-    
+
     private final static float dash1[] = {10.0f};
-    private final static BasicStroke dashed =
-        new BasicStroke(1.0f,
-                        BasicStroke.CAP_BUTT,
-                        BasicStroke.JOIN_MITER,
-                        10.0f, dash1, 0.0f);
+    private final static BasicStroke dashed
+            = new BasicStroke(1.0f,
+                    BasicStroke.CAP_BUTT,
+                    BasicStroke.JOIN_MITER,
+                    10.0f, dash1, 0.0f);
 
     protected void paintNiceTexts(Graphics2D g2d) {
         //the only animated stuff
@@ -269,8 +269,6 @@ public class BasePainter implements Observer {
         } else {
             paintPlainTexts(g2d);
         }
-
-
 
     }
 
@@ -485,17 +483,11 @@ public class BasePainter implements Observer {
             g2d.drawString(tea, scaleX(42) + g2d.getFontMetrics(icedFont).stringWidth(ICED), scaleY(278));
             g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
             if (showLeaf) {
-                g2d.fillPolygon(SplinesDefs.getMainLeafCurve(getRatioX(), getRatioY()));
-            }
-            if (showLeaf) {
-                g2d.fillPolygon(SplinesDefs.getSecondLeafCurve(getRatioX(), getRatioY()));
+                g2d.fillPolygon(SplinesDefs.getMainLeaf(getRatioX(), getRatioY()));
             }
             g2d.setColor(teaLeafsStalksColor);
             if (showLeaf) {
-                g2d.fillPolygon(SplinesDefs.getMainLeafStalkCurve(getRatioX(), getRatioY()));
-            }
-            if (showLeaf) {
-                g2d.fillPolygon(SplinesDefs.getSecondLeafStalkCurve(getRatioX(), getRatioY()));
+                g2d.fillPolygon(SplinesDefs.getSecondLeaf(getRatioX(), getRatioY()));
             }
             g2d.setFont(pluginFont);
             g2d.setColor(pluginColor);
@@ -542,7 +534,7 @@ public class BasePainter implements Observer {
             aboutOfset = new Point(y, fm.getHeight());
             Stroke backup = g2d.getStroke();
             g2d.setStroke(dashed);
-            g2d.drawRect(aboutOfset.x-1,1, master.getSplashWidth()-aboutOfset.x-1, aboutOfset.y+1);
+            g2d.drawRect(aboutOfset.x - 1, 1, master.getSplashWidth() - aboutOfset.x - 1, aboutOfset.y + 1);
             g2d.setStroke(backup);
             g2d.drawString(niceVersion, y, fm.getHeight());
         }

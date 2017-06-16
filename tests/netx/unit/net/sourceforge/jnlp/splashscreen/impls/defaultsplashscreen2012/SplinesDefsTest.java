@@ -74,13 +74,9 @@ public class SplinesDefsTest {
     public void testApi() {
         double x = 1d;
         Polygon[] p = {SplinesDefs.getMainLeaf(x, x),
-            SplinesDefs.getMainLeafCurve(x, x),
-            SplinesDefs.getMainLeafStalk(x, x),
-            SplinesDefs.getMainLeafStalkCurve(x, x),
+            SplinesDefs.getMainLeaf(x, x),
             SplinesDefs.getSecondLeaf(x, x),
-            SplinesDefs.getSecondLeafCurve(x, x),
-            SplinesDefs.getSecondLeafStalk(x, x),
-            SplinesDefs.getSecondLeafStalkCurve(x, x)};
+            };
         for (Polygon polygon : p) {
             Assert.assertNotNull(polygon);
             Assert.assertTrue(polygon.npoints > 5);

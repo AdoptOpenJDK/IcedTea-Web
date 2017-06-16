@@ -1,3 +1,13 @@
+2017-16-15  Jiri Vanek <jvanek@redhat.com>
+
+	Splash screen aligned with current graphic
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/SplinesDefs.java: leading points of main leaves regenerated
+	from current graphics. Pushed generating algorithm. Cubic splines are no longer used, instead the exact polygon is filled.
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainter.java: adapted splinesDefs
+	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: iffed out NPE in midori
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainterTest.java: aligned
+	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/SplinesDefsTest.java: aligned
+
 2017-06-15  Jiri Vanek <jvanek@redhat.com>
             Tereza Hlavackova <hlavackova.tereza@gmail.com>
 
