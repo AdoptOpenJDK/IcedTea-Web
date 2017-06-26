@@ -1313,7 +1313,7 @@ public class SplinesDefs {
         for (int i = 0; i < pp.length; i++) {
             Point p = pp[i];
             //small movement to right
-            r.addPoint((int) ((double) (p.x - 25) * scalex), (int) ((double) p.y * scaley));
+            r.addPoint((int) ((double) (p.x - 17) * scalex), (int) ((double) p.y * scaley));
         }
         return r;
     }

@@ -46,7 +46,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
-import java.awt.Toolkit;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -493,7 +492,7 @@ public class BasePainter implements Observer {
             g2d.setColor(pluginColor);
             if (SplashReason.APPLET.equals(master.getSplashReason())) {
                 if (showLeaf) {
-                    g2d.drawString(plugin, scaleX(404), scaleY(145));
+                    g2d.drawString(plugin, scaleX(420), scaleY(145));
                 } else {
                     FontMetrics wfm = g2d.getFontMetrics(webFont);
                     g2d.drawString(plugin, wfm.stringWidth(web) + scaleX(WEB_LEFT_ALIGMENT) + 10, scaleY(WEB_TOP_ALIGMENT));
