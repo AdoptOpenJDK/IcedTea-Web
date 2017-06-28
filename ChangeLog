@@ -1,3 +1,10 @@
+2017-06-28  Jiri Vanek <jvanek@redhat.com>
+            Tereza Hlavackova <hlavackova.tereza@gmail.com>
+
+	* javaws.png: adapted to new color schema (still work planned)
+	* win-installer/greetings_banner.bmp: fixed small glitches
+	* win-installer/icon.ico: made multisize
+
 2017-16-15  Jiri Vanek <jvanek@redhat.com>
 
 	Splash screen aligned with current graphic
