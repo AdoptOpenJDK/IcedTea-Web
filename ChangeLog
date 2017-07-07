@@ -1,3 +1,10 @@
+2017-07-07  Jiri Vanek <jvanek@redhat.com>
+
+	Fixed pr3417
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: nested jars go into subdirectory instead alongside parent
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java: test for the issue
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/pf.jar-orig: jar with nested name clash
+
 2017-06-28  Jiri Vanek <jvanek@redhat.com>
             Tereza Hlavackova <hlavackova.tereza@gmail.com>
 

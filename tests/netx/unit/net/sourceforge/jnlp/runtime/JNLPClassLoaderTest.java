@@ -33,7 +33,6 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-
 package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.util.FileTestUtils.assertNoFileLeak;
@@ -42,11 +41,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import net.sourceforge.jnlp.JARDesc;
 
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
@@ -60,12 +66,11 @@ import org.junit.BeforeClass;
 
 import org.junit.Test;
 
-public class JNLPClassLoaderTest extends NoStdOutErrTest{
+public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     private static AppletSecurityLevel level;
     public static String askUser;
-    
-    
+
     @BeforeClass
     public static void setPermissions() {
         level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
@@ -76,16 +81,18 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
     public static void resetPermissions() {
         JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, level.toChars());
     }
+
     @BeforeClass
-    public static void noDialogs(){
-        askUser = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER); 
-       JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER, Boolean.toString(false)); 
+    public static void noDialogs() {
+        askUser = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER);
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER, Boolean.toString(false));
     }
-    
+
     @AfterClass
-    public static void restoreDialogs(){
-       JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER, askUser); 
+    public static void restoreDialogs() {
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER, askUser);
     }
+
     /* Note: Only does file leak testing for now. */
     @Test
     public void constructorFileLeakTest() throws Exception {
@@ -95,7 +102,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
 
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
 
-        assertNoFileLeak( new Runnable () {
+        assertNoFileLeak(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -118,14 +125,14 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-        assertNoFileLeak( new Runnable () {
+        assertNoFileLeak(new Runnable() {
             @Override
             public void run() {
-                    assertFalse(classLoader.isInvalidJar(jnlpFile.getJarDesc()));
+                assertFalse(classLoader.isInvalidJar(jnlpFile.getJarDesc()));
             }
         });
     }
-    
+
     @Test
     public void getMainClassNameTest() throws Exception {
         File tempDirectory = FileTestUtils.createTempDirectory();
@@ -147,7 +154,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
             });
         }
     }
-    
+
     @Test
     public void getMainClassNameTestEmpty() throws Exception {
         /* Test with-out any main-class specified */ {
@@ -185,10 +192,10 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
                     fail(e.toString());
                 }
             }
-         });
+        });
         assertFalse(classLoader.hasMainJar());
     }
- 
+
     @Test
     public void getCustomAtributes() throws Exception {
         File tempDirectory = FileTestUtils.createTempDirectory();
@@ -263,7 +270,6 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
         Manifest manifest5 = new Manifest();
         manifest5.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_URL, "some url1"); //see DummyJNLPFileWithJar constructor with int
 
-
         FileTestUtils.createJarWithContents(jarLocation1, manifest1);
         FileTestUtils.createJarWithContents(jarLocation2, manifest2);
         FileTestUtils.createJarWithContents(jarLocation3, manifest3);
@@ -289,8 +295,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
             }
         });
     }
-    
-    
+
     @Test
     public void tryNullManifest() throws Exception {
         File tempDirectory = FileTestUtils.createTempDirectory();
@@ -322,5 +327,40 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest{
         Assert.assertNotNull(exs);
         Assert.assertNull(exs[0]);
         Assert.assertNull(exs[1]);
+    }
+
+    @Test
+    @Bug(id = "PR3417")
+    /**
+     * The nested jar must be more 1024 bytes long. Better, longer
+     * then  byte[] bytes = new byte[1024] on line 1273 in
+     * net.sourceforge.jnlp.runtime.JNLPClassLoader otherwise the file
+     * will not get rewritten while read  Also there must be more then
+     * one item of this size, for same reason
+     */
+    public void testNameClashInNestedJars() throws Exception {
+        //for this test is enought to not crash jvm
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        File dirHolder = File.createTempFile("pf-", ".jar");
+        dirHolder.deleteOnExit();
+        File jarLocation = new File(dirHolder.getParentFile(), "pf.jar");
+        jarLocation.deleteOnExit();
+        try {
+            //it is invalid jar, so we have to disable checks first
+            JNLPRuntime.setVerify(false);
+            InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/pf.jar-orig");
+            Files.copy(is, jarLocation.toPath());
+            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
+            final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS) {
+                @Override
+                protected void activateJars(List<JARDesc> jars) {
+                    super.activateJars(jars);
+                }
+
+            };
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+        }
+
     }
 }
