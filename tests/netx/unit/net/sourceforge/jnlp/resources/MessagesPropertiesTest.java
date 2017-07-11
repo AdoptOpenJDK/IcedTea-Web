@@ -186,6 +186,7 @@ public class MessagesPropertiesTest {
                             || (val1.trim().equals("javaws html"))
                             || (val1.trim().matches("Minimum: .* Maximum: .*"))
                             || (val1.trim().equals("jnlp href"))
+                            || (val1.trim().equals("shift F2"))
                             || (val1.trim().equals("GNU Lesser General Public License."))
                                          )
                     {
