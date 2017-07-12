@@ -81,7 +81,10 @@ public class TemporaryPermissions {
             Matcher m = expandablePattern.matcher(target);
             while (m.find()) {
                 // Expand any matches by reading from System properties, eg ${java.io.tmpdir} is /tmp on most systems
-                target = m.replaceFirst(System.getProperty(m.group(1)));
+                String s = m.group(1);
+                String p = System.getProperty(s);
+                p = p.replace("\\", "\\\\");
+                target = m.replaceFirst(p);
                 m = expandablePattern.matcher(target);
             }
 
