@@ -39,6 +39,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ClasspathMatcher;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * <p>
@@ -562,8 +563,12 @@ public class JNLPFile {
                     }
                     if (hasUsableLocale
                             && stringMatches(os, rescDesc.getOS())
-                            && stringMatches(arch, rescDesc.getArch()))
-                        result.addAll(rescDesc.getResources(launchType));
+                            && stringMatches(arch, rescDesc.getArch())) {
+                        List<T> ll = rescDesc.getResources(launchType);
+                        result.addAll(ll);
+                    } else {
+                        //those are skipped
+                    }
                 }
 
                 result.addAll(sharedResources.getResources(launchType));
@@ -774,12 +779,21 @@ public class JNLPFile {
      * @return true if prefixStr is a prefix of any strings in
      * available, or if available is empty or null.
      */
-    private boolean stringMatches(String prefixStr, String available[]) {
-        if (available == null || available.length == 0)
+    static boolean stringMatches(String prefixStr, String available[]) {
+        if (available == null || available.length == 0){
             return true;
+        }
 
-        for (String available1 : available) {
-            if (available1 != null && available1.startsWith(prefixStr)) {
+        for (String candidate : available) {
+            String trimmedPrefix = null;
+            if (prefixStr != null) {
+                trimmedPrefix = prefixStr.split("\\s+")[0];
+            }
+            String trimmedCandidate = null;
+            if (candidate != null) {
+                trimmedCandidate = candidate.split("\\s+")[0];
+            }
+            if (trimmedCandidate != null && trimmedCandidate.startsWith(trimmedPrefix)) {
                 return true;
             }
         }
