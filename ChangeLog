@@ -1,5 +1,10 @@
 2017-07-18  Jiri Vanek <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/security/dialogs/CertsInfoPane.java: HexEncoder loaded by reflection
+	to allow smooth jdk8 x 9 transition.
+
+2017-07-18  Jiri Vanek <jvanek@redhat.com>
+
 	* launcher/launchers.in: added exports for javax.jnlp to hook jdk9 one more times
 
 2017-07-13  Jiri Vanek <jvanek@redhat.com>

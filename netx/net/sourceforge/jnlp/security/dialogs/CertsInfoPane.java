@@ -48,10 +48,6 @@ import java.security.MessageDigest;
  * It is workaround to allow itw to run on jdk8 and older and also on jdk9 and newer
  */
 
-// jdk8 is using sun.misc.HexDumpEncoder, 
-import sun.misc.*;
-// jdk9 is using sun.security.util.HexDumpEncoder
-import sun.security.util.*;
 import sun.security.x509.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -60,6 +56,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.lang.reflect.Method;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import net.sourceforge.jnlp.security.CertVerifier;
@@ -68,6 +65,7 @@ import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
 import net.sourceforge.jnlp.security.dialogresults.Yes;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Provides the panel for the Certificate Info dialog. This dialog displays data from
@@ -153,9 +151,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
                             c.getNotAfter()).toString();
         String subject = c.getSubjectX500Principal().toString();
 
-        //convert our signature into a nice human-readable form.
-        HexDumpEncoder encoder = new HexDumpEncoder();
-        String signature = encoder.encodeBuffer(c.getSignature());
+        String signature = jdkIndependentHexEncoder(c.getSignature());
 
         String md5Hash = "";
         String sha1Hash = "";
@@ -182,6 +178,32 @@ public class CertsInfoPane extends SecurityDialogPanel {
                                                         { R("SSHA1Fingerprint"), sha1Hash }
                                                         };
         return cert;
+    }
+    
+     private String jdkIndependentHexEncoder(byte[] signature) {
+        try {
+            return jdkIndependentHexEncoderImpl(signature);
+        } catch (Exception ex) {
+            String s = "Failed to encode signature: " + ex.toString();
+            OutputController.getLogger().log(s);
+            return s;
+        }
+    }
+
+    private String jdkIndependentHexEncoderImpl(byte[] signature) throws Exception {
+        // jdk8 is using sun.misc.HexDumpEncoder, 
+        // jdk9 is using sun.security.util.HexDumpEncoder
+        Class clazz;
+        try {
+            clazz = Class.forName("sun.security.util.HexDumpEncoder");
+        } catch (ClassNotFoundException ex) {
+            OutputController.getLogger().log("Using jdk8's HexDumpEncoder");
+            clazz = Class.forName("sun.misc.HexDumpEncoder");
+        }
+        Object encoder  = clazz.newInstance();
+        Method m = clazz.getDeclaredMethod("encodeBuffer", byte[].class);
+        //convert our signature into a nice human-readable form.
+        return (String) m.invoke(encoder, signature);
     }
 
     /**
