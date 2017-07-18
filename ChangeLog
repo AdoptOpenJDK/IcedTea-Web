@@ -1,3 +1,7 @@
+2017-07-18  Jiri Vanek <jvanek@redhat.com>
+
+	* launcher/launchers.in: added exports for javax.jnlp to hook jdk9 one more times
+
 2017-07-13  Jiri Vanek <jvanek@redhat.com>
 
 	Fixed issue, when some resources were not used, because of OS was reporting full name. Eg. "Windows 7" where just "windows" was expected

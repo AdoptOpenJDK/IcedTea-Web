@@ -113,6 +113,10 @@ COMMAND[k]="java.desktop/sun.awt=ALL-UNNAMED,java.desktop"
 k=$((k+1))
 COMMAND[k]="--add-exports"
 k=$((k+1))
+COMMAND[k]="java.desktop/javax.jnlp=ALL-UNNAMED,java.desktop"
+k=$((k+1))
+COMMAND[k]="--add-exports"
+k=$((k+1))
 COMMAND[k]="java.base/sun.security.provider=ALL-UNNAMED,java.desktop"
 k=$((k+1))
 COMMAND[k]="--add-exports"
