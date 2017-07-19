@@ -89,10 +89,14 @@ COMMAND[k]="java.desktop=@PLUGIN_JAR@:@NETX_JAR@"
 k=$((k+1))
 # jsobject must be pathched separately from plugin
 # otherwise netscape pkg would be shared by two modules, which is forbiden
-COMMAND[k]="--patch-module"
-k=$((k+1))
-COMMAND[k]="jdk.jsobject=@JSOBJECT_JAR@"
-k=$((k+1))
+JSOBJECT_JAR=@JSOBJECT_JAR@
+# plugin jar may not be built
+if [ ! "x$JSOBJECT_JAR" == "x" ] ; then
+  COMMAND[k]="--patch-module"
+  k=$((k+1))
+  COMMAND[k]="jdk.jsobject=$JSOBJECT_JAR"
+  k=$((k+1))
+fi
 
 COMMAND[k]="--add-reads"
 k=$((k+1))

@@ -1,3 +1,11 @@
+2017-07-19  Jiri Vanek <jvanek@redhat.com>
+
+	made usable with jdk9  again
+	* acinclude.m4: IT_CHECK_FOR_CLASS removed no longer valid -Xmodule usage
+	* launcher/launchers.in: made immune to missing plugin jar
+	* netx/net/sourceforge/jnlp/jdk89acesses/SunMiscLauncher.java: moved to reflection, made javaws buildable under jdk9
+
+
 2017-07-18  Jiri Vanek <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/dialogs/CertsInfoPane.java: HexEncoder loaded by reflection

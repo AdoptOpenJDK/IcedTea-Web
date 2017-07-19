@@ -32,6 +32,7 @@
  statement from your version.*/
 package net.sourceforge.jnlp.jdk89acesses;
 
+import java.lang.reflect.Method;
 import javax.swing.ImageIcon;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -44,8 +45,12 @@ public class SunMiscLauncher {
 
     public static ImageIcon getSecureImageIcon(String resource) {
         try {
-            return new ImageIcon((new sun.misc.Launcher()).getClassLoader().getResource(resource));
-        } catch (java.lang.NoClassDefFoundError ex) {
+            Class clazz = Class.forName("sun.misc.Launcher");
+            Object obj  = clazz.newInstance();
+            Method m = clazz.getMethod("getClassLoader");
+            ClassLoader cl = (ClassLoader) m.invoke(obj);
+            return new ImageIcon(cl.getResource(resource));
+        } catch (Exception ex) {
             OutputController.getLogger().log(ex);
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "sun.misc.Launcher not found. Running jdk9 or higher? Using unsecure BootClassLoader");
             return new ImageIcon(ClassLoader.getSystemClassLoader().getParent().getResource(resource));

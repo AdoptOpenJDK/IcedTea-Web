@@ -506,7 +506,6 @@ AC_CACHE_CHECK([if $2 is available from $3 (module "$4")], it_cv_$1, [
 # fourth, optional is module
 MODULE_NAME="$4"
 if test -n "$MODULE_NAME" ; then
-  XMODULE="-Xmodule:$MODULE_NAME"
   PATCH_MODULE="--patch-module $MODULE_NAME=."
 fi
 PKGPATH=`echo $3 | sed "s;\\.;/;g" `
@@ -530,7 +529,7 @@ public class Test
 }
 ]
 EOF
-if $JAVAC -cp . $XMODULE $JAVACFLAGS -nowarn $CLASS >&AS_MESSAGE_LOG_FD 2>&1; then
+if $JAVAC $PATCH_MODULE -cp . $JAVACFLAGS -nowarn $CLASS >&AS_MESSAGE_LOG_FD 2>&1; then
   if $JAVA $PATCH_MODULE -classpath . $BYTECODE >&AS_MESSAGE_LOG_FD 2>&1; then
       it_cv_$1=yes;
   else
