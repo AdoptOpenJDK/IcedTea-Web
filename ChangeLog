@@ -1,5 +1,12 @@
 2017-07-19  Jiri Vanek <jvanek@redhat.com>
 
+	Pre-release tuning
+	* Makefile.am: (netx-html-gen.stamp) set number of changests to 236 (since 1.6)
+	* NEWS: date of 1.7 set
+	* configure.ac: (AC_INIT) set to use 1.7
+
+2017-07-19  Jiri Vanek <jvanek@redhat.com>
+
 	made usable with jdk9  again
 	* acinclude.m4: IT_CHECK_FOR_CLASS removed no longer valid -Xmodule usage
 	* launcher/launchers.in: made immune to missing plugin jar
