@@ -1,5 +1,11 @@
 2017-07-20  Jiri Vanek <jvanek@redhat.com>
 
+	Post-release changes
+	* NEWS: added 1.8 section
+	* configure.ac: (AC_INIT) bumped to 1.8pre
+
+2017-07-20  Jiri Vanek <jvanek@redhat.com>
+
 	* javaws.desktop.in: value type changed from %f (file) to %u (url)
 	this helps jnlp protocol a lot, and should not harm older normal_file_path behavior
 
