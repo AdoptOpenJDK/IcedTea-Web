@@ -8,6 +8,8 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.7.1 (YYYY-MM-DD):
+
 New in release 1.7 (2017-07-19):
 * PR3366 - bash completion file was split to three, and is setup-able by bashcompdir environment variable
 * added experimental support for windows
