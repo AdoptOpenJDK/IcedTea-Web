@@ -2,7 +2,7 @@
 Name=IcedTea Web Start
 GenericName=Java Web Start
 Comment=IcedTea Application Launcher
-Exec=PATH_TO_JAVAWS %f
+Exec=PATH_TO_JAVAWS %u
 Icon=javaws
 Terminal=false
 Type=Application

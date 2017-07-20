@@ -1,3 +1,8 @@
+2017-07-20  Jiri Vanek <jvanek@redhat.com>
+
+	* javaws.desktop.in: value type changed from %f (file) to %u (url)
+	this helps jnlp protocol a lot, and should not harm older normal_file_path behavior
+
 2017-07-19  Jiri Vanek <jvanek@redhat.com>
 
 	Pre-release tuning
