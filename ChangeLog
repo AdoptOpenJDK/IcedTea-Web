@@ -1,5 +1,12 @@
 2017-09-12  Fridrich Strba  <fridrich.strba@suse.com>
 
+	Get rid of X509Factory class usage
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java: removed import and usage of
+	X509Factory (replaced by hardcoded string). Still better then reflection.
+	* configure.ac: removed check for sun.security.provider.X509Factory
+
+2017-09-12  Fridrich Strba  <fridrich.strba@suse.com>
+
 	Plugin made work again with jdk9
 	* launcher/launchers.in: added exports for sun.applet
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: same

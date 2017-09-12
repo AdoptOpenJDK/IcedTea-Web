@@ -95,7 +95,6 @@ IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEMANAGER, [java.net.CookieManager], [some.pkg],
 IT_CHECK_FOR_CLASS(JAVA_NET_HTTPCOOKIE, [java.net.HttpCookie], [some.pkg], [])
 IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEHANDLER, [java.net.CookieHandler], [some.pkg], [])
 # in jdk9, those classes are using internal apis, must be enabled via module cheats
-IT_CHECK_FOR_CLASS(SUN_SECURITY_PROVIDER_X509FACTORY, [sun.security.provider.X509Factory], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_SECURITYCONSTANTS, [sun.security.util.SecurityConstants], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_HOSTNAMECHECKER, [sun.security.util.HostnameChecker], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_X509_X500NAME, [sun.security.x509.X500Name], [some.pkg], [$JAVA_BASE])

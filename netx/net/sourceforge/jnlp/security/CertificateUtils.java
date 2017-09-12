@@ -58,7 +58,6 @@ import java.util.Random;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
-import sun.security.provider.X509Factory;
 
 /**
  * Common utilities to manipulate certificates. Provides methods to add
@@ -193,9 +192,9 @@ public class CertificateUtils {
             CertificateException {
 
         BASE64Encoder encoder = new BASE64Encoder();
-        out.println(X509Factory.BEGIN_CERT);
+        out.println("-----BEGIN CERTIFICATE-----");
         encoder.encodeBuffer(cert.getEncoded(), out);
-        out.println(X509Factory.END_CERT);
+        out.println("-----END CERTIFICATE-----");
     }
 
     public static void dumpPKCS12(String alias, File file, KeyStore ks, char[] password)
