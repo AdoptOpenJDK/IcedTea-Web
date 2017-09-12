@@ -1,5 +1,11 @@
 2017-09-12  Fridrich Strba  <fridrich.strba@suse.com>
 
+	Set source language version for javadoc generation for jdk9
+	* Makefile.am: (JAVADOC_OPTS) if HAVE_JAVA9 then -source is appended with 
+	correct IT_LANGUAGE_SOURCE_VERSION number
+
+2017-09-12  Fridrich Strba  <fridrich.strba@suse.com>
+
 	Get rid of X509Factory class usage
 	* netx/net/sourceforge/jnlp/security/CertificateUtils.java: removed import and usage of
 	X509Factory (replaced by hardcoded string). Still better then reflection.
