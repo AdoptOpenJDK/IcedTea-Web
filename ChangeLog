@@ -1,8 +1,15 @@
+2017-09-12  Fridrich Strba  <fridrich.strba@suse.com>
+
+	Plugin made work again with jdk9
+	* launcher/launchers.in: added exports for sun.applet
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: same
+
 2017-07-20  Jiri Vanek <jvanek@redhat.com>
 
 	Post-release changes
 	* NEWS: added 1.8 section
 	* configure.ac: (AC_INIT) bumped to 1.8pre
+
 
 2017-07-20  Jiri Vanek <jvanek@redhat.com>
 
