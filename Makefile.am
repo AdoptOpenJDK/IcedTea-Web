@@ -730,6 +730,7 @@ stamps/generate-docs.stamp: stamps/netx.stamp
 	HTML_DOCS_TARGET_DIR="$(DOCS_DIR)/html"  ; \
 	PLAIN_DOCS_TARGET_DIR="$(DOCS_DIR)/plain" ; \
 	MAN_DOCS_TARGET_DIR="$(DOCS_DIR)/man"  ; \
+	AUTHORS_FILE_TARGET="$(TOP_SRC_DIR)/AUTHORS" ; \
 	mkdir "$$HTML_DOCS_TARGET_DIR" ; \
 	mkdir "$$PLAIN_DOCS_TARGET_DIR" ; \
 	mkdir "$$MAN_DOCS_TARGET_DIR" ; \
@@ -745,16 +746,16 @@ stamps/generate-docs.stamp: stamps/netx.stamp
 	  export LANG=$$LANG_ID; \
 	  mkdir "$$HTML_DOCS_TARGET_DIR/$$ID" ; \
 	  echo "<li><a href='$$ID/icedtea-web.html'>$$LANG_ID</a></li>"  >> "$$HTML_DOCS_INDEX" ; \
-	  $$TP_COMMAND html "$$HTML_DOCS_TARGET_DIR/$$ID" $$TP_TAIL ; \
+	  $$TP_COMMAND html "$$HTML_DOCS_TARGET_DIR/$$ID" $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
 	  mkdir "$$PLAIN_DOCS_TARGET_DIR/$$ID" ; \
-	  $$TP_COMMAND plain "$$PLAIN_DOCS_TARGET_DIR/$$ID" 160 $$TP_TAIL; \
+	  $$TP_COMMAND plain "$$PLAIN_DOCS_TARGET_DIR/$$ID" 160 $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
 	  if [ $$ID = "en" ] ; then \
 	    MAN_DESC="$$MAN_DOCS_TARGET_DIR/man1" ; \
 	  else \
 	    MAN_DESC="$$MAN_DOCS_TARGET_DIR/$$ID/man1" ; \
 	  fi ; \
 	  mkdir -p "$$MAN_DESC" ; \
-	  $$TP_COMMAND man $$ENCOD "$$MAN_DESC" $$TP_TAIL ; \
+	  $$TP_COMMAND man $$ENCOD "$$MAN_DESC" $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
 	  $$TP_COMMAND htmlIntro "$(NETX_DIR)/net/sourceforge/jnlp/resources/about_$$ID.html" $$TP_TAIL; \
 	done ; \
 	export LANG=$$LANG_BACKUP ; \

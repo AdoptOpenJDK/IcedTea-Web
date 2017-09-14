@@ -1,3 +1,17 @@
+2017-09-14  Jiri Vanek <jvanek@redhat.com>
+            Tomáš Votava <tomcacolca@gmail.com>
+
+	PR3426 - ITW Docs do not have correct 'AUTHOR' field 
+	* AUTHORS: removed invalid space after one lt mark
+	* Makefile: (generate-docs.stamp) added and used (where appropriate)
+	path to src AUTHORS file.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added message for
+	case, when no authors file specified on input.
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: implemented
+	possibility to include authors file to documentation.
+	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/ReadAutorsTest.java:
+	tests for generator 
+
 2017-09-12  Fridrich Strba  <fridrich.strba@suse.com>
 
 	Set source language version for javadoc generation for jdk9
