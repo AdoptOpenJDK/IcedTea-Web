@@ -1,3 +1,13 @@
+2017-09-25  Jiri Vanek <jvanek@redhat.com>
+            Tomáš Votava <tomcacolca@gmail.com>
+
+	Authors made as links in html docs
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: isntanceof replaced by correct interface method
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java: added getAdressLink and replaceLtGtCharacters methods
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/HtmlFormatter.java: implemented newmethods. Added dummy antispam protection
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java: dummy impl of new methods
+	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/ReadAutorsTest.java: adapted
+
 2017-09-14  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
 

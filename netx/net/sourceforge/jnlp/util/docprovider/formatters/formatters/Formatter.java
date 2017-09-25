@@ -74,5 +74,9 @@ public interface Formatter {
     public String getTail();
 
     public String getFileSuffix();
+    
+    public String getAdressLink(String s);
+    
+    public String replaceLtGtCharacters(String s);
 
 }

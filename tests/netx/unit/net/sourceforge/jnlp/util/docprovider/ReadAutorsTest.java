@@ -50,46 +50,48 @@ public class ReadAutorsTest {
     public static final String NEWLINE = System.getProperty("line.separator");
     public static final String HTMLNEWLINE = "<BR/>";
     public static final String MANNEWLINE = ".br";
+    private static final String ANTISPAM_EMAIL="t e s t @ t e s t . t e s t";
     
-    public static final String TESTTEXT = "<test@test.test><<>><><>" + NEWLINE + "<><><>";
-    public static final String BRACKETSTESTREPLACEDHTML = "&#60test@test.test&#62&#60&#60&#62&#62&#60&#62&#60&#62" + HTMLNEWLINE + NEWLINE + "&#60&#62&#60&#62&#60&#62" + HTMLNEWLINE + NEWLINE;
-    public static final String BRACKETSTESTREPLACEDMAN = "<test@test.test><<>><><>" + NEWLINE + MANNEWLINE + NEWLINE + "<><><>" + NEWLINE + MANNEWLINE + NEWLINE;
+    public static final String TESTTEXT = "NAME SURNAME <test@test.test>" + NEWLINE + "<><><>";
+    public static final String BRACKETSTESTREPLACED = "NAME SURNAME &#60test@test.test&#62" + NEWLINE + "&#60&#62&#60&#62&#60&#62";
+    public static final String BRACKETSTESTREPLACEDHTML = "<a href=\"mailto:"+ANTISPAM_EMAIL+"\"" + " target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE + "<a href=\"\"></a>" + HTMLNEWLINE + NEWLINE;
+    public static final String BRACKETSTESTREPLACEDMAN = "NAME SURNAME <test@test.test>" + NEWLINE + MANNEWLINE + NEWLINE + "<><><>" + NEWLINE + MANNEWLINE + NEWLINE;
     public static final String BRACKETSTESTREPLACEDPLAIN = TESTTEXT + NEWLINE;
     
-    public static final String FILESTREAM = "RANDOM TEXT" + NEWLINE + "RANDOM TEXT" + NEWLINE
+    public static final String FILESTREAM = "This is autor list." + NEWLINE + "This is random text." + NEWLINE
             + NEWLINE
-            + "ANOTHER RANDOM TEXT" + NEWLINE
-            + "ANOTHER RANDOM TEXT" + NEWLINE
-            + "ANOTHER RANDOM TEXT" + NEWLINE
-            + "ANOTHER RANDOM TEXT" + NEWLINE
-            + "ANOTHER RANDOM TEXT" + NEWLINE
-            + "ANOTHER RANDOM TEXT" + NEWLINE
+            + "NAME SURNAME <test@test.test>" + NEWLINE
+            + "NAME SURNAME <test@test.test>" + NEWLINE
+            + "NAME SURNAME <test@test.test>" + NEWLINE
+            + "NAME SURNAME <test@test.test>" + NEWLINE
+            + "NAME SURNAME <test@test.test>" + NEWLINE
+            + "NAME SURNAME <test@test.test>" + NEWLINE
             + NEWLINE 
-            + "MORE RANDOM TEXT" + NEWLINE
-            + "MORE RANDOM TEXT" + NEWLINE
-            + "MORE RANDOM TEXT" + NEWLINE;
-    public static final String FILESTREAMHTML = "RANDOM TEXT" + HTMLNEWLINE + NEWLINE + "RANDOM TEXT" + HTMLNEWLINE + NEWLINE
+            + "This is list with links" + NEWLINE
+            + "OpenJDK <http://openjdk.java.net/>" + NEWLINE
+            + "OpenJDK <http://openjdk.java.net/>" + NEWLINE;
+    public static final String FILESTREAMHTML = "This is autor list." + HTMLNEWLINE + NEWLINE + "This is random text." + HTMLNEWLINE + NEWLINE
             + HTMLNEWLINE + NEWLINE
-            + "ANOTHER RANDOM TEXT" + HTMLNEWLINE + NEWLINE
-            + "ANOTHER RANDOM TEXT" + HTMLNEWLINE + NEWLINE
-            + "ANOTHER RANDOM TEXT" + HTMLNEWLINE + NEWLINE
-            + "ANOTHER RANDOM TEXT" + HTMLNEWLINE + NEWLINE
-            + "ANOTHER RANDOM TEXT" + HTMLNEWLINE + NEWLINE
-            + "ANOTHER RANDOM TEXT" + HTMLNEWLINE + NEWLINE
+            + "<a href=\"mailto:"+ANTISPAM_EMAIL+"\" target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE
+            + "<a href=\"mailto:"+ANTISPAM_EMAIL+"\" target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE
+            + "<a href=\"mailto:"+ANTISPAM_EMAIL+"\" target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE
+            + "<a href=\"mailto:"+ANTISPAM_EMAIL+"\" target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE
+            + "<a href=\"mailto:"+ANTISPAM_EMAIL+"\" target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE
+            + "<a href=\"mailto:"+ANTISPAM_EMAIL+"\" target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE
             + HTMLNEWLINE + NEWLINE
-            + "MORE RANDOM TEXT" + HTMLNEWLINE + NEWLINE
-            + "MORE RANDOM TEXT" + HTMLNEWLINE + NEWLINE
-            + "MORE RANDOM TEXT" + HTMLNEWLINE + NEWLINE;
-    public static final String FILESTREAMPLAIN = "RANDOM TEXT" + NEWLINE + "RANDOM TEXT" + NEWLINE
-            + "ANOTHER RANDOM TEXT"
-            + "ANOTHER RANDOM TEXT"
-            + "ANOTHER RANDOM TEXT"
-            + "ANOTHER RANDOM TEXT"
-            + "ANOTHER RANDOM TEXT"
-            + "ANOTHER RANDOM TEXT" + NEWLINE
-            + "MORE RANDOM TEXT" + NEWLINE
-            + "MORE RANDOM TEXT" + NEWLINE
-            + "MORE RANDOM TEXT" + NEWLINE;
+            + "This is list with links" + HTMLNEWLINE + NEWLINE
+            + "OpenJDK <a href=\"http://openjdk.java.net/\">http://openjdk.java.net/</a>" + HTMLNEWLINE + NEWLINE
+            + "OpenJDK <a href=\"http://openjdk.java.net/\">http://openjdk.java.net/</a>" + HTMLNEWLINE + NEWLINE;
+    public static final String FILESTREAMPLAIN = "This is autor list." + NEWLINE + "This is random text." + NEWLINE
+            + "NAME SURNAME <test@test.test>"
+            + "NAME SURNAME <test@test.test>"
+            + "NAME SURNAME <test@test.test>"
+            + "NAME SURNAME <test@test.test>"
+            + "NAME SURNAME <test@test.test>"
+            + "NAME SURNAME <test@test.test>" + NEWLINE
+            + "This is list with links" + NEWLINE
+            + "OpenJDK <http://openjdk.java.net/>" + NEWLINE
+            + "OpenJDK <http://openjdk.java.net/>" + NEWLINE;
 
     @Test
     public void replaceBracketsWithEntitiesHtml() throws IOException {
@@ -150,6 +152,17 @@ public class ReadAutorsTest {
         };
         String output = tp.readAuthorsImpl(new StringReader(FILESTREAM));
         assertEquals(FILESTREAMPLAIN, output);
-
+    }
+    
+    @Test
+    public void replaceLtGtTest() throws IOException {
+        TextsProvider tp = new TextsProvider("utf-8", new HtmlFormatter(), true, true) {
+            @Override
+            public String getId() {
+                return "test6";
+            }
+        };
+        String output = tp.getFormatter().replaceLtGtCharacters(TESTTEXT);
+        assertEquals(BRACKETSTESTREPLACED, output);
     }
 }

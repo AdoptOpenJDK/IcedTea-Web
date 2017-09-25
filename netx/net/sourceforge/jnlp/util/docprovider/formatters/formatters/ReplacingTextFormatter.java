@@ -99,8 +99,16 @@ public abstract class ReplacingTextFormatter implements Formatter {
         return sb.toString();
     }
     
+    @Override
+    public String getAdressLink(String s) {
+        return s;
+    }
     
-    
+    @Override
+    public String replaceLtGtCharacters(String s) {
+        return s;
+    }
+ 
     
 
 }

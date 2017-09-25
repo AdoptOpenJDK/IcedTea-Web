@@ -743,13 +743,7 @@ public abstract class TextsProvider {
             if (line.trim().isEmpty()) {
                 areAuthors = !areAuthors;
             }
-            if (getFormatter() instanceof HtmlFormatter) {
-                String replace = line.replaceAll("<", "&#60");
-                String replaceAll = replace.replaceAll(">", "&#62");
-                sb.append(getFormatter().process(replaceAll));
-            } else {
-                sb.append(getFormatter().process(line));
-            }
+            sb.append(getFormatter().process(getFormatter().getAdressLink(line)));
             if (getFormatter() instanceof HtmlFormatter || areAuthors == false) {
                 sb.append(getFormatter().getNewLine());
             }
