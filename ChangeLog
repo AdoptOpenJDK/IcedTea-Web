@@ -1,3 +1,16 @@
+2017-11-02  Jiri Vanek <jvanek@redhat.com>
+
+	Deprecated shell launchers, added skeleton for future rust launcher
+	* Makefile.am: launchers and desktop files gathered to variable, filled according to configure
+	iffed out deprecated shell launchers, added build stubs for rustc calls
+	* configure.ac: added switch --enable-shell-launchers to enable build of legacy shell launchers.
+	note, that when installed, those launchers will have .sh suffix
+	added check for rustc - Mandatory without shell launchers, only optional with.
+	* rust-launcher/launchers.rs: new, stub for native launchers
+	* shell-launcher/launchers.bat.in: renamed from launcher/launchers.bat.in
+	* shell-launcher/launchers.sh.in: renamed from launcher/launchers.in
+
+
 2017-09-25  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
 

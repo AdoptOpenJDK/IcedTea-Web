@@ -41,6 +41,24 @@ if test x"$BIN_BASH" = x ; then
     AC_MSG_ERROR([/bin/bash is used in runtime and for about generation. Dying sooner rather then later])
 fi
 
+AC_MSG_CHECKING([whether build legacy shell launchers])
+AC_ARG_ENABLE([shell-launchers],
+	      [AS_HELP_STRING([--enable-shell-launchers],
+	      		      [Enable build of legacy shell launchers])],
+	      [ENABLE_SHELL_LAUNCHERS="${enableval}"], [ENABLE_SHELL_LAUNCHERS='no'])
+AM_CONDITIONAL([ENABLE_SHELL_LAUNCHERS], [test x$ENABLE_SHELL_LAUNCHERS = xyes])
+AC_MSG_RESULT(${ENABLE_SHELL_LAUNCHERS})
+
+AC_PATH_PROG([RUSTC], [rustc],,)
+if test x"$RUSTC" = x ; then
+  if test x${ENABLE_SHELL_LAUNCHERS} = xno ; then
+    AC_MSG_ERROR([rust is used to compile lunchers. No go])
+  else
+    echo "rust is used to compile lunchers, is missing but you have enable-shell-launchers as yes, continuing with UNAMAINTAINED shell launchers only"
+  fi
+fi
+AM_CONDITIONAL([ENABLE_NATIVE_LAUNCHERS], [test ! x"$RUSTC" = x])
+
 build_linux=no
 build_windows=no
 case "${host_os}" in
