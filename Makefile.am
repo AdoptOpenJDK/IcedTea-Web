@@ -280,7 +280,7 @@ endif
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
 export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png $(DESKTOP_IN_FILES) $(top_srcdir)/completion \
- launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS $(top_srcdir)/metadata.in
+  $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS $(top_srcdir)/metadata.in
 
 # reproducers `D`shortcuts
 export DTEST_SERVER=-Dtest.server.dir=$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)
