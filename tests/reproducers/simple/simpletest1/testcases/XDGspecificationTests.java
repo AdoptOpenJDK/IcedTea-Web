@@ -327,7 +327,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw1 = new ProcessWrapper();
             pw1.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath()
+                       server.getItwebSettingsFile().getAbsolutePath()
                     }));
             pw1.setVars(setXdgVAlues(tmp, tmp));
             ProcessResult pr1 = pw1.execute();
@@ -335,7 +335,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw2 = new ProcessWrapper();
             pw2.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath(),
+                       server.getItwebSettingsFile().getAbsolutePath(),
                         //one impl of new parser was unable to handle duplicates
                         "set", "oldBaf", "differentOldBaf"
                     }));
@@ -796,7 +796,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw = new ProcessWrapper();
             pw.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath()
+                       server.getItwebSettingsFile().getAbsolutePath()
                     }));
             pw.setVars(removeXdgVAlues());
             ProcessResult pr = pw.execute();
@@ -819,7 +819,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw = new ProcessWrapper();
             pw.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath()
+                       server.getItwebSettingsFile().getAbsolutePath()
                     }));
             pw.setVars(setXdgVAlues(f));
             ProcessResult pr = pw.execute();
@@ -846,7 +846,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw1 = new ProcessWrapper();
             pw1.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath()
+                       server.getItwebSettingsFile().getAbsolutePath()
                     }));
             pw1.setVars(removeXdgVAlues());
             ProcessResult pr1 = pw1.execute();
@@ -857,7 +857,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw2 = new ProcessWrapper();
             pw2.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath()
+                       server.getItwebSettingsFile().getAbsolutePath()
                     }));
             pw2.setVars(removeXdgVAlues());
             ProcessResult pr2 = pw2.execute();
@@ -882,7 +882,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw1 = new ProcessWrapper();
             pw1.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath()
+                       server.getItwebSettingsFile().getAbsolutePath()
                     }));
             pw1.setVars(setXdgVAlues(f));
             ProcessResult pr = pw1.execute();
@@ -892,7 +892,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw2 = new ProcessWrapper();
             pw2.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath()
+                       server.getItwebSettingsFile().getAbsolutePath()
                     }));
             pw2.setVars(removeXdgVAlues());
             ProcessResult pr2 = pw2.execute();
@@ -918,7 +918,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw = new ProcessWrapper();
             pw.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath(),
+                       server.getItwebSettingsFile().getAbsolutePath(),
                         //one impl of new parser was unable to handle duplicates
                         "set", "blah", "differentBlah"
                     }));
@@ -944,7 +944,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw = new ProcessWrapper();
             pw.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath(),
+                       server.getItwebSettingsFile().getAbsolutePath(),
                         //one impl of new parser was unable to handle duplicates
                         "set", "blah", "differentBlah"
                     }));
@@ -974,7 +974,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw1 = new ProcessWrapper();
             pw1.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath(),
+                       server.getItwebSettingsFile().getAbsolutePath(),
                         //one impl of new parser was unable to handle duplicates
                         "set", "blah", "differentBlah"
                     }));
@@ -988,7 +988,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw2 = new ProcessWrapper();
             pw2.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath(),
+                       server.getItwebSettingsFile().getAbsolutePath(),
                         //one impl of new parser was unable to handle duplicates
                         "set", "baf", "differentBaf"
                     }));
@@ -1016,7 +1016,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw1 = new ProcessWrapper();
             pw1.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath(),
+                       server.getItwebSettingsFile().getAbsolutePath(),
                         //one impl of new parser was unable to handle duplicates
                         "set", "blah", "differentBlah"
                     }));
@@ -1029,7 +1029,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw2 = new ProcessWrapper();
             pw2.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath(),
+                       server.getItwebSettingsFile().getAbsolutePath(),
                         //one impl of new parser was unable to handle duplicates
                         "set", "baf", "differentBaf"
                     }));
@@ -1197,7 +1197,7 @@ public class XDGspecificationTests extends BrowserTest {
             ProcessWrapper pw = new ProcessWrapper();
             pw.setArgs(Arrays.asList(
                     new String[]{
-                        new File(server.getJavawsFile().getParentFile(), "itweb-settings").getAbsolutePath(),
+                       server.getItwebSettingsFile().getAbsolutePath(),
                         //one impl of new parser was unable to handle duplicates
                         "set", "blah", "blah"
                     }));
