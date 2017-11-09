@@ -5,6 +5,12 @@
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: added getItwebSettingsFile  and getIPolicyEditorFile methods
 	to guess those binaries from javaws, as those can be now .sh or none suffix
 
+2017-11-08 Alex Kashchenko <akashche@redhat.com>
+
+	Support creating cache files with restricted access on windows
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: set proper ACLs for cache files and directories
+	* tests/netx/unit/net/sourceforge/jnlp/util/FileUtilsTest.java: added testCreateRestrictedFile test that checks ACLs for cache file
+
 2017-11-02  Jiri Vanek <jvanek@redhat.com>
 
 	Deprecated shell launchers, added skeleton for future rust launcher
