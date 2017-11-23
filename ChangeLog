@@ -1,3 +1,9 @@
+2017-11-02  Jiri Vanek <jvanek@redhat.com>
+
+	Added linux binary dist target
+	* Makefile.am: (uninstall-linux-only) fixed suffixes of removed lunchers
+	added new target (linux-bin-dist) creating binary javaws static distribute-able image
+
 2017-11-09  Jiri Vanek <jvanek@redhat.com>
 
 	Fixed XDGspecificationTests to survive with shell scripts of .sh suffix

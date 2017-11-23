@@ -66,6 +66,7 @@ export BASH_CMPL_DEST_DIR=$(DESTDIR)@bashcompdir@
 
 export WIN_ALL_DEPS=$(DESTDIR)$(prefix)/win-deps-all
 export WIN_RUN_DEPS=$(DESTDIR)$(prefix)/win-deps-runtime
+export LINUX_BIN_DIST_DEPS=$(DESTDIR)$(prefix)/linux-deps-runtime
 
 export REPORT_STYLES_DIRNAME=report-styles
 
@@ -412,6 +413,26 @@ if HAVE_TAGSOUP
 endif
 endif
 
+#no npapi plugin at all!
+linux-bin-dist: install
+	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
+	mkdir -p $(LINUX_BIN_DIST_DEPS)
+if WITH_RHINO
+	filteredName=`basename $(RHINO_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(RHINO_JAR) $(LINUX_BIN_DIST_DEPS)/$$filteredName
+endif
+if HAVE_TAGSOUP
+	filteredName=`basename $(TAGSOUP_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(TAGSOUP_JAR) $(LINUX_BIN_DIST_DEPS)/$$filteredName
+endif
+	cp $(NETX_DIR)/lib/src.zip $(DESTDIR)$(prefix)/netx.src.zip
+if ENABLE_PLUGINJAR
+	cp $(TOP_BUILD_DIR)/liveconnect/lib/src.zip $(DESTDIR)$(prefix)/plugin.src.zip
+endif
+if ENABLE_DOCS
+	cp -r $(DOCS_DIR)/html $(DESTDIR)$(prefix)/icedtea-web-docs
+endif
+	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).linux.bin.zip `basename $(DESTDIR)$(prefix)` );
 
 win-bin-dist: win-only-image
 	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).win.bin.zip `basename $(DESTDIR)$(prefix)` );
@@ -464,6 +485,7 @@ remove-empty-linux-only-dirs:
 	if ls -1qA $$dirCandidate | grep -q . ; then echo "$$dirCandidate not empty"; else rmdir -v $$dirCandidate ; fi ;
 
 # all generated manpages must be removed one by one
+# shell (only shell!) lunchers must go away
 uninstall-linux-only:
 	KNOWN_MANS="icedtea-web.1  icedtea-web-plugin.1  itweb-settings.1  javaws.1  policyeditor.1" ; \
 	KNOWN_DIRS="man1 de/man1 pl/man1 cs/man1" ; \
@@ -473,9 +495,9 @@ uninstall-linux-only:
 	  done ; \
 	done
 	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
-	rm -f $(DESTDIR)$(bindir)/$(javaws)
-	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
-	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
+	rm -f $(DESTDIR)$(bindir)/$(javaws).sh
+	rm -f $(DESTDIR)$(bindir)/$(itweb_settings).sh
+	rm -f $(DESTDIR)$(bindir)/$(policyeditor).sh
 	rm -f $(BASH_CMPL_DEST_DIR)/itweb-settings.bash
 	rm -f $(BASH_CMPL_DEST_DIR)/javaws.bash
 	rm -f $(BASH_CMPL_DEST_DIR)/policyeditor.bash
