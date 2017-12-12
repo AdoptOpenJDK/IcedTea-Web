@@ -151,6 +151,9 @@ public final class DeploymentConfiguration {
     public static final String KEY_SECURITY_INSTALL_AUTHENTICATOR = "deployment.security.authenticator";
 
     public static final String KEY_STRICT_JNLP_CLASSLOADER = "deployment.jnlpclassloader.strict";
+    
+    /** Boolean. Do not prefere https over http */
+    public static final String KEY_HTTPS_DONT_ENFORCE = "deployment.https.noenforce";
     /*
      * Networking
      */

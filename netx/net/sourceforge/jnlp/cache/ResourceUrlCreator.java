@@ -42,6 +42,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class ResourceUrlCreator {
@@ -95,14 +97,17 @@ public class ResourceUrlCreator {
 
         urls.add(resource.getLocation());
 
-        //preffering https and  owerriding case, when applciation was moved to https, but the jnlp stayed intacted
-        List<URL> urlsCopy = new LinkedList<>(urls);
-        for (URL u : urlsCopy) {
-            if (u.getProtocol().equals("http")) {
-                try {
-                    urls.add(0, copyUrltoHttps(u));
-                } catch (Exception ex) {
-                    OutputController.getLogger().log(ex);
+        boolean noHttpsPreffered = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_HTTPS_DONT_ENFORCE));
+        if (!noHttpsPreffered) {
+            //preffering https and  owerriding case, when applciation was moved to https, but the jnlp stayed intacted
+            List<URL> urlsCopy = new LinkedList<>(urls);
+            for (URL u : urlsCopy) {
+                if (u.getProtocol().equals("http")) {
+                    try {
+                        urls.add(0, copyUrltoHttps(u));
+                    } catch (Exception ex) {
+                        OutputController.getLogger().log(ex);
+                    }
                 }
             }
         }

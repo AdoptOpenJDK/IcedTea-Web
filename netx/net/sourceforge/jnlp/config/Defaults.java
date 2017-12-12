@@ -220,7 +220,12 @@ public class Defaults {
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(true)
                 },
-                                {
+                {
+                        DeploymentConfiguration.KEY_HTTPS_DONT_ENFORCE,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(false)
+                },
+                {
                         DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(true)
