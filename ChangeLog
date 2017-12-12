@@ -1,3 +1,13 @@
+2017-12-08  Jiri Vanek <jvanek at redhat.com>
+
+	Added possibility to turn off https preference via deployment properties
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java:
+	if deployment.https.noenforce is true, then https variants are not smuggled into urlslist
+	* netx/net/sourceforge/jnlp/config/Defaults.java:
+	deployment.https.noenforce declared as false by default
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java:
+	added field of KEY_HTTPS_DONT_ENFORCE = "deployment.https.noenforce"
+
 2017-07-20  Jiri Vanek <jvanek@redhat.com>
 
 	Post-release changes
