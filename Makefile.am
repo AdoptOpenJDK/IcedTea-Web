@@ -874,17 +874,33 @@ clean-desktop-files:
 
 
 if ENABLE_NATIVE_LAUNCHERS
-launcher.build/$(javaws): rust-launcher/launchers.rs
-	mkdir -p launcher.build
-	$(RUSTC) -o $@ $<
+launcher.in/libhardoced_paths_$(javaws).rs: rust-launcher/hardoced_paths.rs.in
+	mkdir -p launcher.in
+	MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ;\
+	BIN_LOCATION=$(bindir)/$(javaws).sh ;\
+	PROGRAM_NAME=$(javaws) ;\
+	$(edit_launcher_script) < $< > $@
 
-launcher.build/$(itweb_settings): rust-launcher/launchers.rs
-	mkdir -p launcher.build
-	$(RUSTC) -o $@ $<
+launcher.in/libhardoced_paths_$(itweb_settings).rs: rust-launcher/hardoced_paths.rs.in
+	mkdir -p launcher.in
+	MAIN_CLASS=net.sourceforge.jnlp.controlpanel.CommandLine ;\
+	BIN_LOCATION=$(bindir)/$(itweb_settings).sh ;\
+	PROGRAM_NAME=$(itweb_settings) ;\
+	$(edit_launcher_script) < $< > $@
 
-launcher.build/$(policyeditor): rust-launcher/launchers.rs
+launcher.in/libhardoced_paths_$(policyeditor).rs: rust-launcher/hardoced_paths.rs.in
+	mkdir -p launcher.in
+	MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ;\
+	BIN_LOCATION=$(bindir)/$(policyeditor).sh ;\
+	PROGRAM_NAME=$(policyeditor) ;\
+	$(edit_launcher_script) < $< > $@
+
+launcher.in/libhardoced_paths_$(javaws).rlib launcher.in/libhardoced_paths_$(itweb_settings).rlib launcher.in/libhardoced_paths_$(policyeditor).rlib: %.rlib: %.rs
+	$(RUSTC) --crate-type=lib -o $@ $<
+
+launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor): launcher.build/%: launcher.in/libhardoced_paths_%.rlib rust-launcher/launchers.rs
 	mkdir -p launcher.build
-	$(RUSTC) -o $@ $<
+	$(RUSTC) --extern hardcoded_paths=$< -o $@ rust-launcher/launchers.rs
 endif
 
 if ENABLE_SHELL_LAUNCHERS
@@ -942,6 +958,7 @@ if ENABLE_NATIVE_LAUNCHERS
 	rm -f launcher.build/$(javaws)
 	rm -f launcher.build/$(itweb_settings)
 	rm -f launcher.build/$(policyeditor)
+	rm -f launcher.in
 endif
 if ENABLE_SHELL_LAUNCHERS
 	rm -f launcher.build/$(javaws).sh
