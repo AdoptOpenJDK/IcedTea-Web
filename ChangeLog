@@ -1,3 +1,22 @@
+2017-15-12  Jiri Vanek <jvanek@redhat.com>
+            Tomáš Votava <tomcacolca@gmail.com>
+
+	Authors made as links in html docs, PR3426 - ITW Docs do not have correct 'AUTHOR' field 
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: isntanceof replaced by correct interface method
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java: added getAdressLink and replaceLtGtCharacters methods
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/HtmlFormatter.java: implemented newmethods. Added dummy antispam protection
+	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java: dummy impl of new methods
+	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/ReadAutorsTest.java: adapted
+	* AUTHORS: removed invalid space after one lt mark
+	* Makefile: (generate-docs.stamp) added and used (where appropriate)
+	path to src AUTHORS file.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added message for
+	case, when no authors file specified on input.
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: implemented
+	possibility to include authors file to documentation.
+	* tests/netx/unit/net/sourceforge/jnlp/util/docprovider/ReadAutorsTest.java:
+	tests for generator
+
 2017-15-12  Fridrich Strba  <fridrich.strba@suse.com>
 
 	Set source language version for javadoc generation for jdk9, Get rid of X509Factory class usage, Plugin made work again with jdk9
