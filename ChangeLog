@@ -1,3 +1,10 @@
+2017-12-15  Jiri Vanek <jvanek@redhat.com>
+
+	Pre-release tuning
+	* Makefile.am: (netx-html-gen.stamp) set number of changests to 7 (since 1.7)
+	* NEWS: set date and added content for 1.7.1
+	* configure.ac: (AC_INIT) set to use 1.7.1
+
 2017-15-12  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
 
