@@ -167,6 +167,10 @@ COMMAND[k]="--add-exports"
 k=$((k+1))
 COMMAND[k]="java.base/sun.net.www.protocol.http=ALL-UNNAMED,java.desktop"
 k=$((k+1))
+COMMAND[k]="--add-exports"
+k=$((k+1))
+COMMAND[k]="java.desktop/sun.applet=ALL-UNNAMED,jdk.jsobject"
+k=$((k+1))
 fi
 
 

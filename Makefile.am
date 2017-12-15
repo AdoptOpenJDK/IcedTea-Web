@@ -218,6 +218,9 @@ endif
 if ENABLE_DOCS
 JAVADOC_OPTS=-use -keywords -encoding UTF-8 -splitIndex \
  -bottom '<font size="-1"> <a href="http://icedtea.classpath.org/bugzilla">Submit a bug or feature</a></font>'
+if HAVE_JAVA9
+JAVADOC_OPTS+=-source $(IT_LANGUAGE_SOURCE_VERSION)
+endif
 if JAVADOC_SUPPORTS_J_OPTIONS
 JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m
 endif

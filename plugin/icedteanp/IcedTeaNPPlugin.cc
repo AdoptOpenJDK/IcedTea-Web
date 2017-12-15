@@ -1588,7 +1588,8 @@ const char *knownExports[]{
     "java.naming/com.sun.jndi.toolkit.url=ALL-UNNAMED,java.desktop",
     "java.desktop/sun.applet=ALL-UNNAMED,java.desktop",
     "java.base/sun.security.action=ALL-UNNAMED,java.desktop",
-    "java.base/sun.net.www.protocol.http=ALL-UNNAMED,java.desktop"
+    "java.base/sun.net.www.protocol.http=ALL-UNNAMED,java.desktop",
+    "java.desktop/sun.applet=ALL-UNNAMED,jdk.jsobject"
 };
 
 NPError

@@ -1,3 +1,14 @@
+2017-15-12  Fridrich Strba  <fridrich.strba@suse.com>
+
+	Set source language version for javadoc generation for jdk9, Get rid of X509Factory class usage, Plugin made work again with jdk9
+	* Makefile.am: (JAVADOC_OPTS) if HAVE_JAVA9 then -source is appended with 
+	correct IT_LANGUAGE_SOURCE_VERSION number
+	* netx/net/sourceforge/jnlp/security/CertificateUtils.java: removed import and usage of
+	X509Factory (replaced by hardcoded string). Still better then reflection.
+	* configure.ac: removed check for sun.security.provider.X509Factory
+	* launcher/launchers.in: added exports for sun.applet
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: same
+
 2017-12-08  Jiri Vanek <jvanek at redhat.com>
 
 	Added possibility to turn off https preference via deployment properties
