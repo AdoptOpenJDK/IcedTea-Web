@@ -958,7 +958,7 @@ if ENABLE_NATIVE_LAUNCHERS
 	rm -f launcher.build/$(javaws)
 	rm -f launcher.build/$(itweb_settings)
 	rm -f launcher.build/$(policyeditor)
-	rm -f launcher.in
+	rm -rf launcher.in
 endif
 if ENABLE_SHELL_LAUNCHERS
 	rm -f launcher.build/$(javaws).sh
