@@ -1,5 +1,9 @@
 2018-02-03  Jiri Vanek <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: autoformatted
+
+2018-02-03  Jiri Vanek <jvanek@redhat.com>
+
 	Made ITW to load resources from j2se/java tag too
 	* netx/net/sourceforge/jnlp/Parser.java: constructors/methods made public to help unittests
 	* netx/net/sourceforge/jnlp/ShortcutDesc.java: same
