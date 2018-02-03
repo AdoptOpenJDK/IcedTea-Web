@@ -1,3 +1,6 @@
+2018-02-03  Jiri Vanek <jvanek@redhat.com>
+	* netx/net/sourceforge/jnlp/Parser.java: auto-formatted
+
 2017-12-11  Jiri Vanek <jvanek at redhat.com>
 
 	* Makefile.am: preprocessing hardoced_paths.rs.in for each binary and creating libs
