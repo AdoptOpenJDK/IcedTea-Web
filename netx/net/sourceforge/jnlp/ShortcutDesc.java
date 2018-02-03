@@ -74,7 +74,7 @@ public final class ShortcutDesc {
       * For testing purposes. Verify if it have been parsed out correctly.
      * @return whether the shortcut requires being online.
      */
-    boolean isOnlineValue() {
+    public boolean isOnlineValue() {
         return requiresOnline;
     }
 

@@ -213,13 +213,32 @@ public class ResourcesDesc {
      */
     public <T> List<T> getResources(Class<T> type) {
         List<T> result = new ArrayList<>();
-
         for (Object resource : resources) {
-            if (type.isAssignableFrom(resource.getClass()))
-                result.add(type.cast(resource));
+            if (resource instanceof JREDesc) {
+                JREDesc jre = (JREDesc) resource;
+                List<ResourcesDesc> descs = jre.getResourcesDesc();
+                for (ResourcesDesc desc : descs) {
+                    result.addAll(desc.getResources(type));
+                }
+            }
+            if (isWontedResource(resource, type)) {
+                result.add(getWontedResource(resource, type));
+            }
         }
 
         return result;
+    }
+
+    private static <T> boolean isWontedResource(Object resource, Class<T> type) {
+        T l = getWontedResource(resource, type);
+        return l != null;
+    }
+
+    private static <T> T getWontedResource(Object resource, Class<T> type) {
+        if (type.isAssignableFrom(resource.getClass())) {
+            return type.cast(resource);
+        }
+        return null;
     }
 
     /**

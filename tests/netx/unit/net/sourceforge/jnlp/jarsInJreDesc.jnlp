@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+exmaple of "bad" jnlp file with resources inside j2sa
+-->
+<jnlp spec="1.0+" codebase="http://localhost/" href="jnlp.jnlp">
+	<information>
+		<title>OmegaT</title>
+		<vendor>OmegaT development team</vendor>
+		<homepage href="http://www.omegat.org" />
+		<shortcut online="false">
+			<desktop />
+			<menu submenu="OmegaT from WebStart" />
+		</shortcut>
+		<offline-allowed />
+        <association mime-type="application/x-omegat-project" extensions="project" />
+
+<!--
+		<related-content href="readme.html">
+			<title>README</title>
+			<description>
+				The README file contains additional information about
+				the product
+			</description>
+		</related-content>
+-->
+	</information>
+
+	<security>
+		<all-permissions />
+	</security>
+
+	<resources>
+		<j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se">
+			<resources>
+				<jar href="OmegaT.jar" />
+				<jar href="docs.jar" />
+				<jar href="htmlparser.jar" />
+				<jar href="jmyspell-core-1.0.0-beta-2.jar" />
+				<jar href="jna.jar" />
+				<jar href="lib-mnemonics.jar" />
+				<jar href="swing-layout-1.0.4.jar" />
+				<jar href="vldocking-3.0.5-SNAPSHOT.jar" />
+				<jar href="svnkit-1.8.5.jar" />
+				<jar href="antlr-runtime-3.4.jar" />
+				<jar href="sqljet-1.1.10.jar" />
+				<jar href="sequence-library-1.0.2.jar" />
+				<jar href="org.eclipse.jgit-3.7.1.201504261725-r.jar" />
+				<jar href="jsch-0.1.49.jar" />
+				<jar href="lucene-analyzers-3.6.2.jar" />
+				<jar href="lucene-core-3.6.2.jar" />
+				<jar href="lucene-kuromoji-3.6.2.jar" />
+				<jar href="lucene-smartcn-3.6.2.jar" />
+				<jar href="tinysegmenter.jar" />
+				<jar href="commons-lang-2.4.jar"  />
+				<jar href="commons-io-2.4.jar"  />
+				<jar href="commons-logging-1.1.1.jar"  />
+				<jar href="jwordsplitter-3.4.jar"  />
+				<jar href="KoreanAnalyzer-3x-120223.jar" />
+				<jar href="LanguageTool-data.jar"  />
+				<jar href="languagetool-core-2.2.jar"  />
+				<jar href="morfologik-fsa-1.5.4.jar"  />
+				<jar href="morfologik-speller-1.5.4.jar"  />
+				<jar href="morfologik-stemming-1.5.4.jar"  />
+				<jar href="cjftransform-1.0.1.jar"  />
+				<jar href="ictclas4j-1.0.1.jar"  />
+				<jar href="segment-1.4.1.jar"  />		
+				<jar href="lucene-gosen-2.0.2-ipadic.jar"  />
+				<jar href="pdfbox-app-1.8.1.jar"  />
+				<jar href="groovy-all-2.2.2.jar"  />
+				<jar href="diff.jar" />
+				<jar href="SuperTMXMerge-for_OmegaT.jar" />
+				<jar href="slf4j-api-1.7.7.jar" />
+				<jar href="slf4j-jdk14-1.7.7.jar" />
+				<jar href="trilead-ssh2-1.0.0-build217.jar" />
+				<jar href="juniversalchardet-1.0.3.jar" />
+			</resources>
+			<resources os="Linux" arch="amd64">
+				<nativelib href="hunspell-linux64.jar" />
+			</resources>
+			<resources os="Linux" arch="i386">
+				<nativelib href="hunspell-linux32.jar" />
+			</resources>
+			<resources os="MacOS" arch="x86_64">
+				<nativelib href="hunspell-macos64.jar" />
+			</resources>
+			<resources os="MacOS" arch="i386">
+				<nativelib href="hunspell-macos32.jar" />
+			</resources>
+			<resources os="Windows" arch="amd64">
+				<nativelib href="hunspell-win64.jar" />
+			</resources>
+			<resources os="Windows" arch="x86">
+				<nativelib href="hunspell-win32.jar" />
+			</resources>
+		</j2se>
+		<property name="javaws.cfg.jauthenticator" value="true" />
+	</resources>
+	<application-desc main-class="org.omegat.Main" />
+</jnlp>
