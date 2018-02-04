@@ -150,6 +150,9 @@ public final class DeploymentConfiguration {
     /** Boolean. Only install the custom authenticator if true */
     public static final String KEY_SECURITY_INSTALL_AUTHENTICATOR = "deployment.security.authenticator";
 
+    /** Boolean. Only install the custom authenticator if true */
+    public static final String KEY_SECURITY_ITW_IGNORECERTISSUES = "deployment.security.itw.ignorecertissues";
+    
     public static final String KEY_STRICT_JNLP_CLASSLOADER = "deployment.jnlpclassloader.strict";
     
     /** Boolean. Do not prefere https over http */

@@ -68,6 +68,7 @@ import net.sourceforge.jnlp.jdk89acesses.JarIndexAccess;
 import net.sourceforge.jnlp.LaunchDesc;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NullJnlpFileException;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PluginBridge;
@@ -89,6 +90,7 @@ import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * Classloader that takes it's resources from a JNLP file. If the JNLP file
@@ -340,6 +342,20 @@ public class JNLPClassLoader extends URLClassLoader {
 
         installShutdownHooks();
 
+    }
+
+    public static boolean isCertUnderestimated() {
+        return Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES))
+                && !JNLPRuntime.isSecurityEnabled();
+    }
+
+    private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
+        if (isCertUnderestimated()) {
+            OutputController.getLogger().log(OptionsDefinitions.OPTIONS.NOSEC.option + " and " + DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES + " are declared. Ignoring certificate issue");
+            OutputController.getLogger().log(ex);
+        } else {
+            throw ex;
+        }
     }
 
     public boolean isStrict() {
@@ -719,8 +735,9 @@ public class JNLPClassLoader extends URLClassLoader {
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-                throw new LaunchException(null, null, R("LSFatal"),
+                LaunchException ex = new LaunchException(null, null, R("LSFatal"),
                         R("LCInit"), R("LFatalVerification"), R("LFatalVerificationInfo") + ": " + e.getMessage());
+                consultCertificateSecurityException(ex);
             }
 
             //Case when at least one jar has some signing
@@ -1090,13 +1107,14 @@ public class JNLPClassLoader extends URLClassLoader {
              * Throws LaunchException if signed JNLP file fails to be verified
              * or fails to match the launching JNLP file
              */
-            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"),
+            LaunchException ex = new LaunchException(file, null, R("LSFatal"), R("LCClient"),
                     R("LSignedJNLPFileDidNotMatch"), R(e.getMessage()));
-
+            consultCertificateSecurityException(ex);
             /*
              * Throwing this exception will fail to initialize the application
              * resulting in the termination of the application
              */
+
         } catch (Exception e) {
 
             OutputController.getLogger().log(e);
@@ -2456,11 +2474,19 @@ public class JNLPClassLoader extends URLClassLoader {
              */ if (!runInSandbox && !classLoader.getSigning()
                     && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
                 if (classLoader.jcv.allJarsSigned()) {
-                    throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCClient"), R("LSignedJNLPAppDifferentCerts"), R("LSignedJNLPAppDifferentCertsInfo"));
+                    LaunchException ex = new LaunchException(classLoader.file, null, R("LSFatal"), R("LCClient"), R("LSignedJNLPAppDifferentCerts"), R("LSignedJNLPAppDifferentCertsInfo"));
+                    consultCertificateSecurityException(ex);
+                    return consultResult(codebaseHost);
                 } else {
-                    throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCClient"), R("LUnsignedJarWithSecurity"), R("LUnsignedJarWithSecurityInfo"));
+                    LaunchException ex = new LaunchException(classLoader.file, null, R("LSFatal"), R("LCClient"), R("LUnsignedJarWithSecurity"), R("LUnsignedJarWithSecurityInfo"));;
+                    consultCertificateSecurityException(ex);
+                    return consultResult(codebaseHost);
                 }
-            } else if (!runInSandbox && classLoader.getSigning()) {
+            } else return consultResult(codebaseHost);
+        }
+        
+        private SecurityDesc consultResult(URL codebaseHost){
+            if (!runInSandbox && classLoader.getSigning()) {
                 return classLoader.file.getSecurity();
             } else {
                 return new SecurityDesc(classLoader.file,

@@ -226,6 +226,11 @@ public class Defaults {
                         String.valueOf(false)
                 },
                 {
+                        DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(false)
+                },
+                {
                         DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(true)
