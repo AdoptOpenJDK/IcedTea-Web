@@ -30,7 +30,8 @@ public class ApplicationDesc implements LaunchDesc {
     private final String mainClass;
 
     /** the arguments */
-    private String arguments[];
+    private  String arguments[];
+    private final boolean fx;
 
     /**
      * Create an Application descriptor.
@@ -38,9 +39,10 @@ public class ApplicationDesc implements LaunchDesc {
      * @param mainClass the main class name and package
      * @param arguments the arguments
      */
-    public ApplicationDesc(String mainClass, String arguments[]) {
+    public ApplicationDesc(String mainClass, String[] arguments, boolean isFX) {
         this.mainClass = mainClass;
         this.arguments = arguments;
+        this.fx = isFX;
     }
 
     /**

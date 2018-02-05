@@ -40,6 +40,7 @@ package net.sourceforge.jnlp;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 
 import net.sourceforge.nanoxml.XMLElement;
 
@@ -52,7 +53,7 @@ import net.sourceforge.nanoxml.XMLElement;
  * regular XML Node interface (for the methods used by Parser).
  */
 /* NANO */
-class Node {
+public class Node {
     private XMLElement xml;
     private Node next;
     private Node children[];
@@ -124,18 +125,62 @@ class Node {
         return (String) xml.getAttribute(name);
     }
 
-    String getNodeName() {
+    public ElementName getNodeName() {
         if (xml.getName() == null) {
-            return "";
+            return new ElementName("");
         }
         else {
-            return xml.getName();
+            return new ElementName(xml.getName());
         }
     }
 
+
     @Override
     public String toString() {
-        return getNodeName();
+        return getNodeName().getOriginal();
+    }
+
+    public static class ElementName {
+
+        private final String base;
+
+        public ElementName(String base) {
+            this.base = base;
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof ElementName) {
+                return ((ElementName) obj).base.equals(base);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return base.hashCode();
+        }
+
+        public String getName() {
+            if (base.contains(":")) {
+                return base.split(":")[1];
+            } else {
+                return base;
+            }
+        }
+        public String getPrefix() {
+            if (base.contains(":")) {
+                return base.split(":")[0];
+            } else {
+                return "";
+            }
+        }
+
+        private String getOriginal() {
+            return base + "(" + getPrefix() + ":" + getName() + ")";
+        }
+
     }
 }
 
