@@ -1,3 +1,16 @@
+2018-02-06  Jiri Vanek <jvanek@redhat.com>
+
+	Added test for javafx-desc
+	* tests/reproducers/custom/JavaFx/resources/JavaFx.jar
+	* tests/reproducers/custom/JavaFx/resources/JavaFx.jnlp
+	* tests/reproducers/custom/JavaFx/srcs/Controller.class
+	* tests/reproducers/custom/JavaFx/srcs/Controller.java
+	* tests/reproducers/custom/JavaFx/srcs/Main.class
+	* tests/reproducers/custom/JavaFx/srcs/Main.java
+	* tests/reproducers/custom/JavaFx/srcs/Makefile
+	* tests/reproducers/custom/JavaFx/srcs/helloworld.fxml
+	* tests/reproducers/custom/JavaFx/testcases/JavaFxTest.java
+
 2018-02-05  Jiri Vanek <jvanek@redhat.com>
 
 	Fixed news for latest changes
