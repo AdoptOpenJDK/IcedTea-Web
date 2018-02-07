@@ -70,7 +70,7 @@ The error was 'RenderBadPicture (invalid Picture parameter)'.
     @NeedsDisplay
     public void testJavawsJNLP() throws Exception {
         ProcessResult pr = server.executeJavaws(
-                Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.NOSEC.option}),
+                Arrays.asList(new String[]{OptionsDefinitions.OPTIONS.NOSEC.option, OptionsDefinitions.OPTIONS.HEADLESS.option}),
                 "/JavaFx.jnlp",
                 new StringBasedClosingListener(done),
                 new StringBasedClosingListener("xceptionxception"));
