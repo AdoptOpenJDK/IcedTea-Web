@@ -51,6 +51,21 @@ public class JavaFxTest {
     private static final String done = "jnlp-javafx can be terminated";
     public static final ServerAccess server = new ServerAccess();
 
+    /*
+     * Randomly seeing:
+     * 
+(javaws:13906): Gdk-ERROR **: The program 'javaws' received an X Window System error.
+This probably reflects a bug in the program.
+The error was 'RenderBadPicture (invalid Picture parameter)'.
+  (Details: serial 7754 error_code 141 request_code 138 minor_code 7)
+  (Note to programmers: normally, X errors are reported asynchronously;
+   that is, you will receive the error a while after causing it.
+   To debug your program, run it with the --sync command line
+   option to change this behavior. You can then get a meaningful
+   backtrace from your debugger if you break on the gdk_x_error() function.)
+    
+     *  Suprsing is, that awt splasshcreen is visible, and after it also itw error dialogue is visible
+     */
     @Test
     @NeedsDisplay
     public void testJavawsJNLP() throws Exception {
