@@ -59,8 +59,8 @@ public class JavaFxTest {
                 "/JavaFx.jnlp",
                 new StringBasedClosingListener(done),
                 new StringBasedClosingListener("xceptionxception"));
-        /System.out.println(pr.stdout);
-        /System.out.println(pr.stderr);
+        System.out.println(pr.stdout);
+        System.out.println(pr.stderr);
         Assert.assertTrue("stdout should contain " + correct + ", but it didnt.", pr.stdout.contains(correct));
     }
 }
