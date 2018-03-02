@@ -1,5 +1,14 @@
 2018-02-03  Jiri Vanek <jvanek@redhat.com>
 
+	nosecurity switch made extendable also for certificate issues
+	* netx/net/sourceforge/jnlp/config/Defaults.java: set deployment.security.itw.ignorecertissues
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: added deployment.security.itw.ignorecertissues
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: BONosecurity is now tailed by rumor about deployment.security.itw.ignorecertissues
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: when ITW was about to throw certificate-caused launch exception,
+	it i snow consulted with nosecurity and deployment.security.itw.ignorecertissues. If both are here, exception is only printed
+
+2018-02-03  Jiri Vanek <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: autoformatted
 
 2018-02-03  Jiri Vanek <jvanek@redhat.com>
