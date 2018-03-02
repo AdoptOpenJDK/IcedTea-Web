@@ -147,14 +147,14 @@ public final class Parser {
      * @param codebase codebase to use if we did not parse one from JNLP file.
      * @throws ParseException if the JNLP file is invalid
      */
-    Parser(JNLPFile file, URL base, Node root, ParserSettings settings, URL codebase) throws ParseException {
+    public Parser(JNLPFile file, URL base, Node root, ParserSettings settings, URL codebase) throws ParseException {
         this.file = file;
         this.root = root;
         this.strict = settings.isStrict();
         this.allowExtensions = settings.isExtensionAllowed();
 
         // ensure it's a JNLP node
-        if (root == null || !root.getNodeName().equals("jnlp")) {
+        if (root == null || !root.getNodeName().getName().equals("jnlp")) {
             throw new ParseException(R("PInvalidRoot"));
         }
 
@@ -216,7 +216,7 @@ public final class Parser {
         UpdateDesc updateDesc = null;
         Node child = parent.getFirstChild();
         while (child != null) {
-            if (child.getNodeName().equals("update")) {
+            if (child.getNodeName().getName().equals("update")) {
                 if (strict && updateDesc != null) {
                     throw new ParseException(R("PTwoUpdates"));
                 }
@@ -315,7 +315,7 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
             // check for nativelib but no trusted environment
             if ("nativelib".equals(name)) {
@@ -403,7 +403,7 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private JARDesc getJAR(Node node) throws ParseException {
-        boolean nativeJar = "nativelib".equals(node.getNodeName());
+        boolean nativeJar = "nativelib".equals(node.getNodeName().getName());
         URL location = getRequiredURL(node, "href", base);
         Version version = getVersion(node, "version", null);
         String part = getAttribute(node, "part", null);
@@ -545,7 +545,7 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
             if ("title".equals(name)) {
                 addInfo(info, child, null, getSpanText(child, false));
@@ -610,7 +610,7 @@ public final class Parser {
             return;
         }
 
-        info.addItem(node.getNodeName() + modStr, value);
+        info.addItem(node.getNodeName().getName() + modStr, value);
     }
 
     /**
@@ -704,22 +704,26 @@ public final class Parser {
         // check for other than one application type
         if (1 < getChildNodes(parent, "applet-desc").length
                 + getChildNodes(parent, "application-desc").length
+                + getChildNodes(parent, "javafx-desc").length
                 + getChildNodes(parent, "installer-desc").length) {
             throw new ParseException(R("PTwoDescriptors"));
         }
 
         Node child = parent.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
             if ("applet-desc".equals(name)) {
                 return getApplet(child);
             }
             if ("application-desc".equals(name)) {
-                return getApplication(child);
+                return getApplication(child, false);
             }
             if ("installer-desc".equals(name)) {
                 return getInstaller(child);
+            }
+            if ("javafx-desc".equals(name)) {
+                return getApplication(child, true);
             }
 
             child = child.getNextSibling();
@@ -728,6 +732,8 @@ public final class Parser {
         // not reached
         return null;
     }
+    
+    
 
     /**
      * @param node
@@ -768,7 +774,7 @@ public final class Parser {
      * @param node
      * @throws ParseException if the JNLP file is invalid
      */
-    private ApplicationDesc getApplication(Node node) throws ParseException {
+    private ApplicationDesc getApplication(Node node, boolean isFx) throws ParseException {
         String main = getMainClass(node, false);
         List<String> argsList = new ArrayList<>();
 
@@ -784,7 +790,7 @@ public final class Parser {
 
         String argStrings[] = argsList.toArray(new String[argsList.size()]);
 
-        return new ApplicationDesc(main, argStrings);
+        return new ApplicationDesc(main, argStrings, isFx);
     }
 
     /**
@@ -800,7 +806,7 @@ public final class Parser {
 
         Node child = parent.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
             if ("component-desc".equals(name)) {
                 return new ComponentDesc();
@@ -848,7 +854,7 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
             if (null != name) {
                 switch (name) {
@@ -901,7 +907,7 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
             if (null != name) {
                 switch (name) {
@@ -1064,7 +1070,7 @@ public final class Parser {
         if (child == null) {
             if (strict)
                 // not sure if this is an error or whether "" is proper
-                throw new ParseException("No text specified (node="+node.getNodeName()+")");
+                throw new ParseException("No text specified (node="+node.getNodeName().getName()+")");
             else
                 return "";
         }
@@ -1093,7 +1099,7 @@ public final class Parser {
 
         Node child = node.getFirstChild();
         while (child != null) {
-            if (child.getNodeName().equals(name)) {
+            if (child.getNodeName().getName().equals(name)) {
                 result.add(child);
             }
             child = child.getNextSibling();
@@ -1148,7 +1154,7 @@ public final class Parser {
      * @param base the base URL
      * @throws ParseException if the JNLP file is invalid
      */
-    URL getURL(Node node, String name, URL base) throws ParseException {
+    public URL getURL(Node node, String name, URL base) throws ParseException {
         String href;
         if (CODEBASE.equals(name)) {
             href = getCleanAttribute(node, name);
@@ -1160,7 +1166,7 @@ public final class Parser {
         } else {
             href = getAttribute(node, name, null);
         }
-        return getURL(href, node.getNodeName(), base, strict);
+        return getURL(href, node.getNodeName().getName(), base, strict);
     }
 
     public static URL getURL(String href, String nodeName, URL base, boolean strict) throws ParseException {
@@ -1334,7 +1340,7 @@ public final class Parser {
 
         if (result == null || result.length() == 0) {
             if (strict || defaultValue == null) {
-                throw new ParseException(R("PNeedsAttribute", node.getNodeName(), name));
+                throw new ParseException(R("PNeedsAttribute", node.getNodeName().getName(), name));
             }
         }
 

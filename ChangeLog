@@ -1,5 +1,15 @@
 2018-02-05  Jiri Vanek <jvanek@redhat.com>
 
+	Added basic support for javafx desc
+	* netx/net/sourceforge/jnlp/ApplicationDesc.java: added flag fx to rember what was initiator
+	* netx/net/sourceforge/jnlp/Node.java: Added abstraction ElementName over string of element name to hold namespace
+	and separate it for name if present
+	* netx/net/sourceforge/jnlp/Parser.java: for javafx-desc ApplicationDesc is instantiated. Adapted to ElementName
+	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCases.java: ElementName
+	* tests/netx/unit/net/sourceforge/jnlp/ParserTest.java: ElementName
+
+2018-02-05  Jiri Vanek <jvanek@redhat.com>
+
 	Fixed news for latest changes
 	* NEWS: mentioned javafx-desc, -nosecurity enhancement and j2se/java resources
 
