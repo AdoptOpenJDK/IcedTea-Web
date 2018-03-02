@@ -37,6 +37,9 @@ exception statement from your version.
 package net.sourceforge.jnlp.util;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclFileAttributeView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -325,6 +325,34 @@ public class ServerAccess {
     public File getJavawsFile() {
         return new File(System.getProperty(JAVAWS_BUILD_BIN));
     }
+    
+    /**
+     *
+     * @return - file pointing to itweb-settings deducted from passed inside
+     * javaws binary location (JAVAWS_BUILD_BIN)
+     */
+    public File getItwebSettingsFile() {
+        String itwebSettings = "itweb-settings";
+        return getFileInJavawsDir(itwebSettings);
+    }
+    
+        /**
+     *
+     * @return - file pointing to itweb-settings deducted from passed inside
+     * javaws binary location (JAVAWS_BUILD_BIN)
+     */
+    public File getIPolicyEditorFile() {
+        String policyeditor = "policyeditor";
+        return getFileInJavawsDir(policyeditor);
+    }
+
+    private File getFileInJavawsDir(String file) {
+        String javawsNameRoot = "javaws";
+        File dir = getJavawsFile().getParentFile();
+        String name = getJavawsFile().getName();
+        String nwName = name.replace(javawsNameRoot, file);
+        return new File(dir, nwName);
+    }
 
     /**
      *
