@@ -9,6 +9,9 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
 New in release 1.7.2 (YYYY-MM-DD):
+* added support for javafx-desc and so allwong run of pure-javafx only applications
+* --nosecurity enhanced for possibility to skip invalid signatures
+* enhanced to allow resources to be read also from j2se/java element (OmegaT)
 
 New in release 1.7.1 (2017-12-15):
 * better work with authors file
