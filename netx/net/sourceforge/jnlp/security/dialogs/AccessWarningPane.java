@@ -197,7 +197,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         fromLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 
-        final JButton run = new JButton(R("ButAllow"));
+        final JButton run = new JButton(R("ButOk"));
         final JButton cancel = new JButton(R("ButCancel"));
         
         JPanel infoPanel = new JPanel(new GridBagLayout());
@@ -241,23 +241,6 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                 htmlPanelDesktop.setVisible(false);
                 c.gridy++;
             }
-            ActionListener al = new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (desktopCheck.isSelected() || menuCheck.isSelected()){
-                        run.setEnabled(true);
-                        cancel.setEnabled(false);
-                    } else {
-                        run.setEnabled(false);
-                        cancel.setEnabled(true);
-                    }
-                    
-                }
-            };
-            desktopCheck.addActionListener(al);
-            menuCheck.addActionListener(al);
-            al.actionPerformed(null);
             infoPanel.add(menuCheck,c);
             c.gridy++;
             if (!JNLPRuntime.isWebstartApplication()) {
