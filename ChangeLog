@@ -1,5 +1,14 @@
 2018-02-03  Jiri Vanek <jvanek@redhat.com>
 
+	Made ITW to load resources from j2se/java tag too
+	* netx/net/sourceforge/jnlp/Parser.java: constructors/methods made public to help unittests
+	* netx/net/sourceforge/jnlp/ShortcutDesc.java: same
+	* netx/net/sourceforge/jnlp/ResourcesDesc.java: getJars made to iterate recursively over content of j2se
+	* tests/netx/unit/net/sourceforge/jnlp/ParserBasic.java: added testcase
+	* tests/netx/unit/net/sourceforge/jnlp/jarsInJreDesc.jnlp: testfile copied form omegat which have this strange resources
+
+2018-02-03  Jiri Vanek <jvanek@redhat.com>
+
 	nosecurity switch made extendable also for certificate issues
 	* netx/net/sourceforge/jnlp/config/Defaults.java: set deployment.security.itw.ignorecertissues
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: added deployment.security.itw.ignorecertissues

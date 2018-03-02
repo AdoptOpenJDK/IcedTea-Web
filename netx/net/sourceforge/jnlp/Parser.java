@@ -127,7 +127,7 @@ public final class Parser {
      * @param settings the parser settings to use when parsing the JNLP file
      * @throws ParseException if the JNLP file is invalid
      */
-    Parser(JNLPFile file, URL base, Node root, ParserSettings settings) throws ParseException {
+    public Parser(JNLPFile file, URL base, Node root, ParserSettings settings) throws ParseException {
         this(file, base, root, settings, null);
     }
 
@@ -280,7 +280,7 @@ public final class Parser {
      * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
-    List<ResourcesDesc> getResources(Node parent, boolean j2se)
+    public List<ResourcesDesc> getResources(Node parent, boolean j2se)
             throws ParseException {
         List<ResourcesDesc> result = new ArrayList<>();
         Node resources[] = getChildNodes(parent, "resources");
@@ -509,7 +509,7 @@ public final class Parser {
      * @param parent the parent node (jnlp)
      * @throws ParseException if the JNLP file is invalid
      */
-    List<InformationDesc> getInfo(Node parent)
+    public List<InformationDesc> getInfo(Node parent)
             throws ParseException {
         List<InformationDesc> result = new ArrayList<>();
         Node info[] = getChildNodes(parent, "information");
@@ -641,7 +641,7 @@ public final class Parser {
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
-    SecurityDesc getSecurity(Node parent) throws ParseException {
+    public SecurityDesc getSecurity(Node parent) throws ParseException {
         Node nodes[] = getChildNodes(parent, "security");
 
         // test for too many security elements
@@ -700,7 +700,7 @@ public final class Parser {
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
-    LaunchDesc getLauncher(Node parent) throws ParseException {
+    public LaunchDesc getLauncher(Node parent) throws ParseException {
         // check for other than one application type
         if (1 < getChildNodes(parent, "applet-desc").length
                 + getChildNodes(parent, "application-desc").length
@@ -1379,7 +1379,7 @@ public final class Parser {
      *
      * @throws ParseException if the JNLP file is invalid
      */
-    static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
+    public static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
         try {
             Object parser = getParserInstance(settings);
             Method m = parser.getClass().getMethod("getRootNode", InputStream.class);

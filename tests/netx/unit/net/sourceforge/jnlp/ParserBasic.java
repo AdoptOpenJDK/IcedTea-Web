@@ -33,8 +33,7 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
-*/
-
+ */
 package net.sourceforge.jnlp;
 
 import java.io.InputStream;
@@ -46,8 +45,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/** Test that the parser works with basic jnlp files */
-public class ParserBasic extends NoStdOutErrTest{
+/**
+ * Test that the parser works with basic jnlp files
+ */
+public class ParserBasic extends NoStdOutErrTest {
 
     private static Node root;
     private static Parser parser;
@@ -214,6 +215,22 @@ public class ParserBasic extends NoStdOutErrTest{
     }
 
     @Test
+    public void testResourcesInsideJava() throws ParseException {
+        ClassLoader cl = ParserBasic.class.getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+        ParserSettings defaultParser = new ParserSettings();
+        InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/jarsInJreDesc.jnlp");
+        Node omega = Parser.getRootNode(jnlpStream, defaultParser);
+        Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParser);
+        ResourcesDesc resources = omegaParser.getResources(omega, false).get(0);
+        JARDesc[] r = resources.getJARs();
+        // we ensures that also in j2se hars ar eloaded.it is 7 withutt them.
+        Assert.assertTrue(r.length>30);
+    }
+
+    @Test
     public void testResourcesJar() throws ParseException {
         ResourcesDesc resources = parser.getResources(root, false).get(0);
 
@@ -276,7 +293,7 @@ public class ParserBasic extends NoStdOutErrTest{
         ApplicationDesc app = (ApplicationDesc) parser.getLauncher(root);
         Assert.assertNotNull(app);
         Assert.assertEquals("MainClass", app.getMainClass());
-        Assert.assertArrayEquals(new String[] { "arg1", "arg2" }, app.getArguments());
+        Assert.assertArrayEquals(new String[]{"arg1", "arg2"}, app.getArguments());
     }
 
 }
