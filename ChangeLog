@@ -1,3 +1,17 @@
+2018-02-15  Jiri Vanek <jvanek at redhat.com>
+
+	Build of rust lunchers moved to cargo 
+	* configure.ac: added check for cargo
+	* .hgignore: added target and Cargo.lock
+	* .Makefile.am: dropped all launcher.in/libhardoced_paths_*.rs targets and rustc targets.
+	(launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor))
+	adapted to use cargo. Variables handled in switch. (clean) now cleans all launcher.in*
+	* rust-launcher/Cargo.toml: primitive declaration of package
+	* rust-launcher/src/hardcoded_paths.rs: copied from rust-launcher/hardoced_paths.rs.in
+	adapted to get substitution via cargo rather then by sed.  Added test and wrapping getters
+	* rust-launcher/src/main.rs: copied from rust-launcher/launchers.rs. Adapted imports to new 
+	infrastructure,s till just reprinting hardcoded stuff
+
 2018-02-06  Jiri Vanek <jvanek@redhat.com>
 
 	Added test for javafx-desc

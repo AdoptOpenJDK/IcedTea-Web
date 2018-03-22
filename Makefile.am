@@ -874,33 +874,46 @@ clean-desktop-files:
 
 
 if ENABLE_NATIVE_LAUNCHERS
-launcher.in/libhardoced_paths_$(javaws).rs: rust-launcher/hardoced_paths.rs.in
-	mkdir -p launcher.in
-	MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ;\
-	BIN_LOCATION=$(bindir)/$(javaws).sh ;\
-	PROGRAM_NAME=$(javaws) ;\
-	$(edit_launcher_script) < $< > $@
-
-launcher.in/libhardoced_paths_$(itweb_settings).rs: rust-launcher/hardoced_paths.rs.in
-	mkdir -p launcher.in
-	MAIN_CLASS=net.sourceforge.jnlp.controlpanel.CommandLine ;\
-	BIN_LOCATION=$(bindir)/$(itweb_settings).sh ;\
-	PROGRAM_NAME=$(itweb_settings) ;\
-	$(edit_launcher_script) < $< > $@
-
-launcher.in/libhardoced_paths_$(policyeditor).rs: rust-launcher/hardoced_paths.rs.in
-	mkdir -p launcher.in
-	MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ;\
-	BIN_LOCATION=$(bindir)/$(policyeditor).sh ;\
-	PROGRAM_NAME=$(policyeditor) ;\
-	$(edit_launcher_script) < $< > $@
-
-launcher.in/libhardoced_paths_$(javaws).rlib launcher.in/libhardoced_paths_$(itweb_settings).rlib launcher.in/libhardoced_paths_$(policyeditor).rlib: %.rlib: %.rs
-	$(RUSTC) --crate-type=lib -o $@ $<
-
-launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor): launcher.build/%: launcher.in/libhardoced_paths_%.rlib rust-launcher/launchers.rs
-	mkdir -p launcher.build
-	$(RUSTC) --extern hardcoded_paths=$< -o $@ rust-launcher/launchers.rs
+# todo, handling of suffixes
+# there is curently harecoded sh, so it can somehow basically work
+# see the DESKTOP_SUFFIX for final tuning
+launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor): rust-launcher/src/main.rs rust-launcher/Cargo.toml
+	filename=`basename $@` ; \
+	type=$${filename%.*} ; \
+	srcs=$(TOP_SRC_DIR)/rust-launcher ; \
+	outs=$(TOP_BUILD_DIR)/launcher.in.$$type  ; \
+	mkdir -p launcher.build  ; \
+	cp -r $$srcs $$outs  ; \
+	pushd $$outs ; \
+	  export JAVA=$(JAVA) ; \
+	  export JRE=$(SYSTEM_JRE_DIR) ; \
+	  unset MAIN_CLASS ; \
+	  unset BIN_LOCATION ; \
+	  unset PROGRAM_NAME ; \
+	  if [ $$filename = $(javaws) ] ; then \
+	    export MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ; \
+	    export BIN_LOCATION=$(bindir)/$(javaws).sh ; \
+	    export PROGRAM_NAME=$(javaws) ; \
+	  fi ; \
+	  if [ $$filename = $(itweb_settings) ] ; then \
+	    export MAIN_CLASS=net.sourceforge.jnlp.controlpanel.CommandLine ; \
+	    export BIN_LOCATION=$(bindir)/$(itweb_settings).sh ; \
+	    export PROGRAM_NAME=$(itweb_settings) ; \
+	  fi ; \
+	  if [ $$filename = $(policyeditor) ] ; then \
+	    export MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ; \
+	    export BIN_LOCATION=$(bindir)/$(policyeditor).sh ; \
+	    export PROGRAM_NAME=$(policyeditor) ; \
+	  fi ; \
+	  $(CARGO) test ; \
+	  r=$$? ; \
+	  $(CARGO) build --release ; \
+	popd ;\
+	cp -v $$outs/target/release/launcher $@ ; \
+	if [ $$r -ne 0 ] ; then \
+	  mv $@ $@.broken ; \
+	fi; \
+	exit $$r
 endif
 
 if ENABLE_SHELL_LAUNCHERS
@@ -958,7 +971,7 @@ if ENABLE_NATIVE_LAUNCHERS
 	rm -f launcher.build/$(javaws)
 	rm -f launcher.build/$(itweb_settings)
 	rm -f launcher.build/$(policyeditor)
-	rm -rf launcher.in
+	rm -rf launcher.in*
 endif
 if ENABLE_SHELL_LAUNCHERS
 	rm -f launcher.build/$(javaws).sh
