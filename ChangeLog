@@ -1,3 +1,9 @@
+2018-05-14  Jiri Vanek <jvanek@redhat.com>
+
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: getDocumentBase no returns codeBase as fallback when 
+	documentBase is null. Oracle Applications R12, Oracle Forms Java Webstart application is requesting getDocumentBase
+	where it shouldn't, however they refuse to modify their code and add ITW to supported platforms
+
 2018-02-15  Jiri Vanek <jvanek at redhat.com>
 
 	Build of rust lunchers moved to cargo 
