@@ -375,8 +375,12 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     @Override
     public URL getDocumentBase() {
         checkDestroyed();
-
-        return file.getApplet().getDocumentBase();
+        URL db = file.getApplet().getDocumentBase();
+        if (db == null) {
+            return getCodeBase();
+        } else {
+            return db;
+        }
     }
 
     // FIXME: Sun's applet code forces all parameters to lower case.
