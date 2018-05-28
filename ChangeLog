@@ -1,6 +1,12 @@
+2018-05-24  Jiri Vanek <jvanek@redhat.com>
+
+	Made headless detection softer
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: JWindow().getOwner() repalced by GraphicsEnvironment.isHeadless()
+	JWindow().getOwner() was failing on headfull systems after headless check itself, on NPE.
+
 2018-05-14  Jiri Vanek <jvanek@redhat.com>
 
-	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: getDocumentBase no returns codeBase as fallback when 
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: getDocumentBase now returns codeBase as fallback when 
 	documentBase is null. Oracle Applications R12, Oracle Forms Java Webstart application is requesting getDocumentBase
 	where it shouldn't, however they refuse to modify their code and add ITW to supported platforms
 
