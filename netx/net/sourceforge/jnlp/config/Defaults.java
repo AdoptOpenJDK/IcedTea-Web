@@ -412,6 +412,11 @@ public class Defaults {
                         BasicValueValidators.getRangedIntegerValidator(0, 10000),
                         String.valueOf(500)
                 },
+                {
+                        DeploymentConfiguration.IGNORE_HEADLESS_CHECK,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(false)
+                },
                 //JVM arguments for plugin
                 {
                         DeploymentConfiguration.KEY_PLUGIN_JVM_ARGUMENTS,

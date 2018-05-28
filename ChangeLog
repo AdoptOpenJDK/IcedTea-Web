@@ -1,3 +1,11 @@
+2018-05-28  Jiri Vanek <jvanek@redhat.com>
+
+	added deployment property to enforce headfull execution
+	* netx/net/sourceforge/jnlp/config/Defaults.java: IGNORE_HEADLESS_CHECK set to false
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: deployment.headless.ignore
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: if deployment.headless.ignore is true, then headless state is not checked
+	and environment is always considered as headfull
+
 2018-05-24  Jiri Vanek <jvanek@redhat.com>
 
 	Made headless detection softer

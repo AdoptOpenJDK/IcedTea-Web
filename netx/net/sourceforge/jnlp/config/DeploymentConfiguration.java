@@ -222,6 +222,8 @@ public final class DeploymentConfiguration {
 
     public static final String KEY_BROWSER_PATH = "deployment.browser.path";
     public static final String KEY_UPDATE_TIMEOUT = "deployment.javaws.update.timeout";
+    
+    public static final String IGNORE_HEADLESS_CHECK = "deployment.headless.ignore";
 
     /*
      * JVM arguments for plugin
