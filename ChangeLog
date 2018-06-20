@@ -1,3 +1,9 @@
+2018-06-20  Jiri Vanek <jvanek@redhat.com>
+
+	Added semi support for recognition jdk10 and up
+	* netx/net/sourceforge/jnlp/controlpanel/JVMPanel.java: replaced hardcoded 9 by cycle from 9 to 99
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: replaced jdk9 by jdk9 and up.
+
 2018-05-28  Jiri Vanek <jvanek@redhat.com>
 
 	added deployment property to enforce headfull execution

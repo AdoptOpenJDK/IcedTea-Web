@@ -281,8 +281,13 @@ public class JVMPanel extends NamedBorderPanel {
         }
 
         boolean findRT = false;
-
-        if (processErrorStream.contains("\"9") || processStdOutStream.contains("\"9") || processErrorStream.contains("build 9") || processStdOutStream.contains("build 9")) {
+        boolean jdk9up = false;
+        for (int i = 9; i <= 99; i++) {
+            if (processErrorStream.contains("\"" + i) || processStdOutStream.contains("\"" + i)) {
+                jdk9up = true;
+            }
+        }
+        if (jdk9up) {
             validationResult += "<span color=\"green\">" + Translator.R("CPJVMjdk9") + "</span><br />";
             findRT = false;
         } else if (processErrorStream.contains("1.8.0") || processStdOutStream.contains("1.8.0")) {
