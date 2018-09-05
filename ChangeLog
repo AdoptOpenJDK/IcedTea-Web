@@ -1,3 +1,18 @@
+2018-09-05  Jiri Vanek <jvanek@redhat.com>
+
+	Implemented JVM recognition in rust launchers
+	* .hgignore: added rust-launcher/.idea
+	* .Makefile: (launcher.build) adapted to tmp handling - exporting rust_tests_tmp and creating it
+	* rust-launcher/src/hardcoded_paths.rs: not-using returns consistently
+	* rust-launcher/src/jvm_from_properties.rs: logic to parse properties file, and to read JDK value from here
+	* rust-launcher/src/jvm_from_properties_resolver.rs: logic to waterfall all usable properties files and try
+	locate JDK here.
+	* rust-launcher/src/main.rs: now trying various JDKS: proeprties->JAVA_HOME->registry->default (from build)
+	* rust-launcher/src/os_access.rs: set of classes serving to bridge few details where win and Linux may differ
+	* rust-launcher/src/property.rs: class to read generic properties file
+	* rust-launcher/src/utils.rs: class for various utility methods. Including testing subclass
+
+
 2018-08-13  Jiri Vanek <jvanek@redhat.com>
 
 	* LICENSE: new file. Added explicit license with details

@@ -14,4 +14,4 @@ netx/net/sourceforge/jnlp/resources/NEWS\.html
 netx-dist-tests-whitelist
 rust-launcher/target
 rust-launcher/Cargo.lock
-
+rust-launcher/.idea

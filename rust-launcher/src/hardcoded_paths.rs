@@ -12,25 +12,24 @@ const JSOBJECT_JAR: Option<&'static str> = option_env!("JSOBJECT_JAR");
 
 
 pub fn get_jre() -> &'static str {
-    return JRE.unwrap_or("JRE-dev-unspecified")
+    JRE.unwrap_or("JRE-dev-unspecified")
 }
 
 pub fn get_java() -> &'static str {
-    return JAVA.unwrap_or("JAVA-dev-unspecified")
+    JAVA.unwrap_or("JAVA-dev-unspecified")
 }
 
 pub fn get_main() -> &'static str {
-    return MAIN_CLASS.unwrap_or("MAIN_CLASS-dev-unspecified")
+    MAIN_CLASS.unwrap_or("MAIN_CLASS-dev-unspecified")
 }
 
 pub fn get_name() -> &'static str {
-    return PROGRAM_NAME.unwrap_or("PROGRAM_NAME-dev-unspecified")
+    PROGRAM_NAME.unwrap_or("PROGRAM_NAME-dev-unspecified")
 }
 
 pub fn get_bin() -> &'static str {
-    return BIN_LOCATION.unwrap_or("BIN_LOCATION-dev-unspecified")
+    BIN_LOCATION.unwrap_or("BIN_LOCATION-dev-unspecified")
 }
-
 
 
 /*new variables*/
@@ -38,7 +37,6 @@ pub fn get_bin() -> &'static str {
 /*tests*/
 #[cfg(test)]
 mod tests {
-
     #[test]
     fn variables_non_default() {
         assert_ne!(String::from(super::get_jre()).trim(), String::from("JRE-dev-unspecified"));
