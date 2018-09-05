@@ -18,6 +18,11 @@
 	* rust-launcher/src/utils.rs: class for various utility methods. Including testing subclass
 
 
+2018-09-04 Alex Kashchenko <akashche@redhat.com>
+
+	Fix cargo detection in autoconf
+	* autoconf.ac: add missed check whether cargo was found in PATH
+
 2018-08-13  Jiri Vanek <jvanek@redhat.com>
 
 	* LICENSE: new file. Added explicit license with details
