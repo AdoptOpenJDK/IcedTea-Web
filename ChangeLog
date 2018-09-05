@@ -1,5 +1,10 @@
 2018-09-05  Jiri Vanek <jvanek@redhat.com>
 
+	* shell-launcher/launchers.sh.in: inverted logic to detect modular jdk.
+	If it is jdk8, then it is not modular JDK, otherwise it is.
+
+2018-09-05  Jiri Vanek <jvanek@redhat.com>
+
 	Implemented JVM recognition in rust launchers
 	* .hgignore: added rust-launcher/.idea
 	* .Makefile: (launcher.build) adapted to tmp handling - exporting rust_tests_tmp and creating it
