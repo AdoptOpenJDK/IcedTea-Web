@@ -739,18 +739,24 @@ public class JNLPRuntime {
         //if (GraphicsEnvironment.isHeadless()) // jdk1.4+ only
         //    headless = true;
         try {
-            if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless"))){
+            if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless"))) {
                 headless = true;
             }
             if (!headless) {
-                try {
-                    if (GraphicsEnvironment.isHeadless()) {
-                        throw new HeadlessException();
+                boolean noCheck = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.IGNORE_HEADLESS_CHECK));
+                if (noCheck) {
+                    headless = false;
+                    OutputController.getLogger().log(DeploymentConfiguration.IGNORE_HEADLESS_CHECK + " set to " + noCheck + ". Avoding headless check.");
+                } else {
+                    try {
+                        if (GraphicsEnvironment.isHeadless()) {
+                            throw new HeadlessException();
+                        }
+                    } catch (HeadlessException ex) {
+                        headless = true;
+                        OutputController.getLogger().log(ex);
+                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
                     }
-                } catch (HeadlessException ex) {
-                    headless = true;
-                    OutputController.getLogger().log(ex);
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
                 }
             }
         } catch (SecurityException ex) {
