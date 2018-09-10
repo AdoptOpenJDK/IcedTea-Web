@@ -37,9 +37,9 @@ else
   LAUNCHER_BOOTCLASSPATH="$LAUNCHER_BOOTCLASSPATH:@JRE@/$NASHORN"
 fi;
 
-JDK9="NO"
-if ${JAVA} -version 2>&1 | grep -q "version \"9-" ; then
-  JDK9="YES"
+MODULAR_JDK="YES"
+if ${JAVA} -version 2>&1 | grep -q "version \"1.8.0" ; then
+  MODULAR_JDK="NO"
 fi
 
 JAVA_ARGS=( )
@@ -82,7 +82,7 @@ k=$((k+1))
 COMMAND[k]="${LAUNCHER_FLAGS}"
 k=$((k+1))
 
-if [ "x$JDK9" == "xYES" ] ; then
+if [ "x$MODULAR_JDK" == "xYES" ] ; then
 COMMAND[k]="--patch-module"
 k=$((k+1))
 COMMAND[k]="java.desktop=@PLUGIN_JAR@:@NETX_JAR@"

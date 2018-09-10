@@ -1,3 +1,8 @@
+2018-09-05  Jiri Vanek <jvanek@redhat.com>
+
+	* launcher/launchers.in: inverted logic to detect modular jdk.
+	If it is jdk8, then it is not modular JDK, otherwise it is.
+
 2018-08-13  Jiri Vanek <jvanek@redhat.com>
 
 	* LICENSE: new file. Added explicit license with details
