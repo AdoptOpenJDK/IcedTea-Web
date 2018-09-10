@@ -1,3 +1,7 @@
+2018-08-13  Jiri Vanek <jvanek@redhat.com>
+
+	* LICENSE: new file. Added explicit license with details
+
 2018-06-20  Jiri Vanek <jvanek@redhat.com>
 
 	Enhanced itw-settngs' certificate viewer to show what file is backing showed certificate store.
