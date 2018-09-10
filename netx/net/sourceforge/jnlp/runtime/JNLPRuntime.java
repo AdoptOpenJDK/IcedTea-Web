@@ -19,6 +19,9 @@ package net.sourceforge.jnlp.runtime;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
+import static java.awt.GraphicsEnvironment.isHeadless;
+import java.awt.HeadlessException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -741,8 +744,10 @@ public class JNLPRuntime {
             }
             if (!headless) {
                 try {
-                    new JWindow().getOwner();
-                } catch (Exception ex) {
+                    if (GraphicsEnvironment.isHeadless()) {
+                        throw new HeadlessException();
+                    }
+                } catch (HeadlessException ex) {
                     headless = true;
                     OutputController.getLogger().log(ex);
                     OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
