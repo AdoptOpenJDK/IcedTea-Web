@@ -1,5 +1,13 @@
 2018-06-20  Jiri Vanek <jvanek@redhat.com>
 
+	Enhanced itw-settngs' certificate viewer to show what file is backing showed certificate store.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: adapted to refactoring of KeyStores
+	* netx/net/sourceforge/jnlp/security/KeyStores.java: getKeyStore now returns wrapper with path alongside with ks itself
+	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: adapted to refactoring of KeyStores
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: now shows read-only path to shown ks
+
+2018-06-20  Jiri Vanek <jvanek@redhat.com>
+
 	* netx/net/sourceforge/jnlp/security/dialogs/CertsInfoPane.java: fixed hex output of certificate signature 
 	for jdk8
 
