@@ -1,3 +1,10 @@
+2018-10-01  Fridrich Strba  <fridrich.strba@suse.com>
+
+	Added eternal java version detection
+	* acinclude.m4: used sophisticated head-cut to determine single number major java version
+	* plugin/icedteanp/IcedTeaNPPlugin.cc: similar
+	* shell-launcher/launchers.sh.in: same
+
 2018-09-05  Jiri Vanek <jvanek@redhat.com>
 
 	* shell-launcher/launchers.sh.in: inverted logic to detect modular jdk.

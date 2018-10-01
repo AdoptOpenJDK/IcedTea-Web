@@ -37,9 +37,13 @@ else
   LAUNCHER_BOOTCLASSPATH="$LAUNCHER_BOOTCLASSPATH:@JRE@/$NASHORN"
 fi;
 
-MODULAR_JDK="YES"
-if ${JAVA} -version 2>&1 | grep -q "version \"1.8.0" ; then
-  MODULAR_JDK="NO"
+MODULAR_JDK="NO"
+version=`${JAVA} -version 2>&1 | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f1`
+if [ $version -eq "1" ]; then
+  version=`${JAVA} -version 2>&1 | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f2`
+fi
+if [ $version -ge "9" ]; then
+  MODULAR_JDK="YES"
 fi
 
 JAVA_ARGS=( )
