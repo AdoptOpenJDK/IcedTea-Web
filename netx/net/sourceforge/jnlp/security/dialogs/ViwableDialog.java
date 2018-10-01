@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JDialog;
+import net.sourceforge.swing.SwingUtils;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 
@@ -57,18 +58,23 @@ import net.sourceforge.jnlp.util.ScreenFinder;
  */
 public class ViwableDialog {
 
-    private JDialog jd;
+    private JDialog jd = null;
     List<Runnable> operations = new ArrayList<Runnable>();
 
     public ViwableDialog() {
     }
 
-    private JDialog crateJDialog() {
+    private JDialog createJDialog() {
         jd = new JDialog();
+        jd.setName("ViwableDialog");
+        SwingUtils.info(jd);
         jd.setIconImages(ImageResources.INSTANCE.getApplicationImages());
+        
         for (Runnable operation : operations) {
             operation.run();
         }
+        // prune operations. May throw NPE if operations used after createJDialog()
+        operations = null;
         return jd;
     }
 
@@ -100,10 +106,15 @@ public class ViwableDialog {
     }
 
     public void show() {
-        if (jd == null) {
-            jd = crateJDialog();
-        }
-        jd.setVisible(true);
+        SwingUtils.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                if (jd == null) {
+                    jd = createJDialog();
+                }
+                jd.setVisible(true);
+            }
+        });
     }
 
     /**
@@ -111,9 +122,13 @@ public class ViwableDialog {
      * choice (Ok, Cancel, etc) or closed the window
      */
     public void dispose() {
-        notifySelectionMade();
+        // avoid reentrance:
         if (jd != null) {
+            notifySelectionMade();
+
             jd.dispose();
+            // recycle:
+            jd = null;
         }
     }
 
@@ -190,12 +205,10 @@ public class ViwableDialog {
     }
 
     public void setResizable(final boolean b) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.setResizable(b);
-            }
-        });
+        // not defered: called when alive
+        if (jd != null) {
+            jd.setResizable(b);
+        }
     }
 
     public void addWindowListener(final WindowAdapter adapter) {

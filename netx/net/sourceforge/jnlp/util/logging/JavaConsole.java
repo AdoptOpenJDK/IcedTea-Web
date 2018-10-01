@@ -69,10 +69,10 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatter;
+import net.sourceforge.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -204,6 +204,9 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     private void initializeWindow(Dimension size, JPanel content) {
         consoleWindow = new JDialog((JFrame) null, R("DPJavaConsole"));
+        consoleWindow.setName("JavaConsole");
+        SwingUtils.info(consoleWindow);
+        
         consoleWindow.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -353,7 +356,7 @@ public class JavaConsole implements ObservableMessagesProvider {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtils.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
@@ -407,7 +410,7 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     public void showConsoleLater(final boolean modal) {
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
 
             @Override
             public void run() {
@@ -417,7 +420,7 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     public void hideConsoleLater() {
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
 
             @Override
             public void run() {
@@ -512,9 +515,21 @@ public class JavaConsole implements ObservableMessagesProvider {
         updateModel(null);
     }
 
-    private synchronized void updateModel(Boolean force) {
+    private synchronized void updateModel(final Boolean force) {
         observable.setChanged();
-        observable.notifyObservers(force);
+        
+        SwingUtils.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                // avoid too much processing if already processed:
+                synchronized(observable) {
+                    if (observable.hasChanged() || (Boolean.TRUE.equals(force))) {
+                        observable.notifyObservers(force);
+                    }
+                }
+            }
+        });
     }
 
     /**

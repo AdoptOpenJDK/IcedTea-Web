@@ -30,6 +30,7 @@ import javax.swing.*;
 import net.sourceforge.jnlp.*;
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.util.*;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * The applet environment including stub, context, and frame.  The
@@ -188,7 +189,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
             }
 
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
+                SwingUtils.callOnAppContext(new Runnable() {
                     @Override
                     public void run() {
                         // do first because some applets need to be displayed before

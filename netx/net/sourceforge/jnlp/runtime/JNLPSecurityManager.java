@@ -23,12 +23,12 @@ import java.net.SocketPermission;
 import java.security.AccessControlException;
 import java.security.Permission;
 
-import javax.swing.JWindow;
 
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.WeakList;
+import net.sourceforge.swing.SwingUtils;
 import sun.awt.AWTSecurityManager;
 import sun.awt.AppContext;
 
@@ -114,7 +114,8 @@ class JNLPSecurityManager extends AWTSecurityManager {
         // called for it (and not disposed).
 
         if (!JNLPRuntime.isHeadless()) {
-            new JWindow().getOwner();
+            /* is it really useful ? */
+            SwingUtils.getOrCreateWindowOwner();
         }
 
         mainAppContext = AppContext.getAppContext();

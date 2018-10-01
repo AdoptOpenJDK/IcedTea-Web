@@ -47,7 +47,7 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
+import net.sourceforge.swing.SwingUtils;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.Resource;
@@ -320,7 +320,7 @@ public class SecurityDialogs {
         /*
          * If this is the event dispatch thread the use the hack
          */
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (SwingUtils.isEventDispatchThread()) {
             /*
              * Create a tiny modal dialog (which creates a new EventQueue for
              * this AppContext, but blocks the original client EventQueue) and
@@ -329,6 +329,8 @@ public class SecurityDialogs {
              * continue processing
              */
             final JDialog fakeDialog = new JDialog();
+            fakeDialog.setName("FakeDialog");
+            SwingUtils.info(fakeDialog);
             fakeDialog.setSize(0, 0);
             fakeDialog.setResizable(false);
             fakeDialog.setModalityType(ModalityType.APPLICATION_MODAL);

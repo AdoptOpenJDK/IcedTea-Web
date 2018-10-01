@@ -47,6 +47,7 @@ import sun.awt.SunToolkit;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * This is the main entry point for the JNLP client. The main method parses the
@@ -112,11 +113,16 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VIEWER)) {
             try {
-                CertificateViewer.main(null);
-                JNLPRuntime.exit(0);
+                SwingUtils.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        CertificateViewer.showCertificateViewer();
+                    }
+                });
             } catch (Exception e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
+            JNLPRuntime.exit(0);
         }
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERSION)) {

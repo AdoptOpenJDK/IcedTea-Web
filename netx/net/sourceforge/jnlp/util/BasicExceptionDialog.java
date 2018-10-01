@@ -57,7 +57,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import net.sourceforge.swing.SwingUtils;
 import net.sourceforge.jnlp.controlpanel.CachePane;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
 
@@ -81,6 +81,8 @@ public class BasicExceptionDialog {
 
         JOptionPane optionPane = new JOptionPane(mainPanel, JOptionPane.ERROR_MESSAGE);
         final JDialog errorDialog = optionPane.createDialog(R("Error"));
+        errorDialog.setName("BasicExceptionDialog");
+        SwingUtils.info(errorDialog);
         errorDialog.setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
         final JPanel quickInfoPanelAll = new JPanel();
@@ -179,7 +181,7 @@ public class BasicExceptionDialog {
 
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtils.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {

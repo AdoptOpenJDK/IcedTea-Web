@@ -20,7 +20,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
-import static java.awt.GraphicsEnvironment.isHeadless;
 import java.awt.HeadlessException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,7 +50,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.swing.JOptionPane;
-import javax.swing.JWindow;
 import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 

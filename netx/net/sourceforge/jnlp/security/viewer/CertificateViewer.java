@@ -41,18 +41,16 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
-import javax.swing.UIManager;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.swing.SwingUtils;
 
 public class CertificateViewer extends JDialog {
 
@@ -63,6 +61,8 @@ public class CertificateViewer extends JDialog {
 
     public CertificateViewer() {
         super((Frame) null, dialogTitle, true);
+        this.setName("CertificateViewer");
+        SwingUtils.info(this);
         setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
         Container contentPane = getContentPane();
@@ -98,7 +98,7 @@ public class CertificateViewer extends JDialog {
         ScreenFinder.centerWindowsToCurrentScreen(this);
     }
 
-    public static void showCertificateViewer() throws Exception {
+    public static void showCertificateViewer() {
         JNLPRuntime.initialize(true);
 
         CertificateViewer cv = new CertificateViewer();
@@ -109,6 +109,11 @@ public class CertificateViewer extends JDialog {
     }
 
     public static void main(String[] args) throws Exception {
-        CertificateViewer.showCertificateViewer();
+        SwingUtils.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                CertificateViewer.showCertificateViewer();
+            }
+        });
     }
 }

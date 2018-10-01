@@ -55,7 +55,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.SwingUtilities;
+import net.sourceforge.swing.SwingUtils;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.parts.BasicComponentSplashScreen;
@@ -558,18 +558,16 @@ public class BasePainter implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
+        SwingUtils.invokeAndWait(new Runnable() {
 
-                @Override
-                public void run() {
+            @Override
+            public void run() {
+                if (master.isAnimationRunning()) {
                     ExtensionManager.getExtension().animate();
                     master.repaint();
                 }
-            });
-        } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
-        }
+            }
+        });
     }
 
     public BasicComponentSplashScreen getMaster() {
