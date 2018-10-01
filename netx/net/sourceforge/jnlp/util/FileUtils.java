@@ -64,6 +64,8 @@ public final class FileUtils {
 
     private static final String WIN_DRIVE_LETTER_COLON_WILDCHAR = "WINDOWS_VERY_SPECIFIC_DOUBLEDOT";
 
+    private static final List<String> WIN_ROOT_PRINCIPALS = Arrays.asList("NT AUTHORITY\\SYSTEM", "BUILTIN\\Administrators");
+
     /**
      * Indicates whether a file was successfully opened. If not, provides specific reasons
      * along with a general failure case
@@ -246,37 +248,52 @@ public final class FileUtils {
         }
 
         if (JNLPRuntime.isWindows()) {
-            // remove all permissions
-            if (!tempFile.setExecutable(false, false)) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RRemoveXPermFailed", tempFile));
-            }
-            if (!tempFile.setReadable(false, false)) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RRemoveRPermFailed", tempFile));
-            }
-            if (!tempFile.setWritable(false, false)) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RRemoveWPermFailed", tempFile));
+            // prepare ACL flags
+            Set<AclEntryFlag> flags = new LinkedHashSet<>();
+            if (tempFile.isDirectory()) {
+                flags.add(AclEntryFlag.DIRECTORY_INHERIT);
+                flags.add(AclEntryFlag.FILE_INHERIT);
             }
 
-            // allow owner to read
-            if (!tempFile.setReadable(true, true)) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RGetRPermFailed", tempFile));
+            // prepare ACL permissions
+            Set<AclEntryPermission> permissions = new LinkedHashSet<>();
+            permissions.addAll(Arrays.asList(
+                    AclEntryPermission.READ_DATA,
+                    AclEntryPermission.READ_NAMED_ATTRS,
+                    AclEntryPermission.EXECUTE,
+                    AclEntryPermission.READ_ATTRIBUTES,
+                    AclEntryPermission.READ_ACL,
+                    AclEntryPermission.SYNCHRONIZE));
+            if (writableByOwner) {
+                permissions.addAll(Arrays.asList(
+                        AclEntryPermission.WRITE_DATA,
+                        AclEntryPermission.APPEND_DATA,
+                        AclEntryPermission.WRITE_NAMED_ATTRS,
+                        AclEntryPermission.DELETE_CHILD,
+                        AclEntryPermission.WRITE_ATTRIBUTES,
+                        AclEntryPermission.DELETE,
+                        AclEntryPermission.WRITE_ACL,
+                        AclEntryPermission.WRITE_OWNER));
             }
 
-            // allow owner to write
-            if (writableByOwner && !tempFile.setWritable(true, true)) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RGetWPermFailed", tempFile));
+            // filter ACL's leaving only root and owner
+            AclFileAttributeView view = Files.getFileAttributeView(tempFile.toPath(), AclFileAttributeView.class);
+            List<AclEntry> list = new ArrayList<>();
+            String owner = view.getOwner().getName();
+            for (AclEntry ae : view.getAcl()) {
+                String principalName = ae.principal().getName();
+                if (WIN_ROOT_PRINCIPALS.contains(principalName) || owner.equals(principalName)) {
+                    list.add(AclEntry.newBuilder()
+                            .setType(AclEntryType.ALLOW)
+                            .setPrincipal(ae.principal())
+                            .setPermissions(permissions)
+                            .setFlags(flags)
+                            .build());
+                }
             }
 
-            // allow owner to enter directories
-            if (isDir && !tempFile.setExecutable(true, true)) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RGetXPermFailed", tempFile));
-            }
-            // rename this file. Unless the file is moved/renamed, any program that
-            // opened the file right after it was created might still be able to
-            // read the data.
-            if (!tempFile.renameTo(file)) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantRename", tempFile, file));
-            }
+            // apply ACL
+            view.setAcl(list);
         } else {
         // remove all permissions
         if (!tempFile.setExecutable(false, false)) {
@@ -303,13 +320,13 @@ public final class FileUtils {
         if (isDir && !tempFile.setExecutable(true, true)) {
             throw new IOException(R("RGetXPermFailed", tempFile));
         }
-        
+        }
+
         // rename this file. Unless the file is moved/renamed, any program that
         // opened the file right after it was created might still be able to
         // read the data.
         if (!tempFile.renameTo(file)) {
             throw new IOException(R("RCantRename", tempFile, file));
-        }
         }
     }
 

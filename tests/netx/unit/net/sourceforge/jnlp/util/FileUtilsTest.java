@@ -133,4 +133,27 @@ public class FileUtilsTest {
         assertFalse(testChild.exists());
     }
 
+    @Test
+    public void testCreateRestrictedFile() throws Exception {
+        if (!JNLPRuntime.isWindows()) {
+            return;
+        }
+        final File tmpdir = new File(System.getProperty("java.io.tmpdir")), testfile = new File(tmpdir, "itw_test_create_restricted_file");
+        if (testfile.exists()) {
+            assertTrue(testfile.delete());
+        }
+        testfile.deleteOnExit();
+        FileUtils.createRestrictedFile(testfile, true);
+        boolean hasOwner = false;
+        AclFileAttributeView view = Files.getFileAttributeView(testfile.toPath(), AclFileAttributeView.class);
+        for (AclEntry ae : view.getAcl()) {
+            if (view.getOwner().getName().equals(ae.principal().getName())) {
+                assertFalse("Duplicate owner entry", hasOwner);
+                hasOwner = true;
+                assertEquals("Owner must have all perimissions",14, ae.permissions().size());
+            }
+        }
+        assertTrue("No owner entry", hasOwner);
+    }
+
 }

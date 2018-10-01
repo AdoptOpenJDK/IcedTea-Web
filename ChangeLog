@@ -157,6 +157,12 @@
 	* NEWS: set date and added content for 1.7.1
 	* configure.ac: (AC_INIT) set to use 1.7.1
 
+2017-11-08 Alex Kashchenko <akashche@redhat.com>
+
+	Support creating cache files with restricted access on windows
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: set proper ACLs for cache files and directories
+	* tests/netx/unit/net/sourceforge/jnlp/util/FileUtilsTest.java: added testCreateRestrictedFile test that checks ACLs for cache file
+
 2017-15-12  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
 
