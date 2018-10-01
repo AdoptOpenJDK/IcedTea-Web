@@ -34,7 +34,11 @@ import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
-import java.nio.file.attribute.*;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclEntryFlag;
+import java.nio.file.attribute.AclEntryPermission;
+import java.nio.file.attribute.AclEntryType;
+import java.nio.file.attribute.AclFileAttributeView;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,7 +46,7 @@ import java.util.*;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import net.sourceforge.swing.SwingUtils;
 
 import net.sourceforge.jnlp.config.DirectoryValidator;
 import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
@@ -374,7 +378,7 @@ public final class FileUtils {
      * @param frame a {@link JFrame} to act as parent to this dialog
      */
     public static void showReadOnlyDialog(final Component frame) {
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(frame, R("RFileReadOnly"), R("Warning"), JOptionPane.WARNING_MESSAGE);
@@ -422,7 +426,7 @@ public final class FileUtils {
      * @param message a {@link String} giving the specific reason the file could not be opened
      */
     public static void showCouldNotOpenDialog(final Component frame, final String message) {
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(frame, message, R("Error"), JOptionPane.ERROR_MESSAGE);

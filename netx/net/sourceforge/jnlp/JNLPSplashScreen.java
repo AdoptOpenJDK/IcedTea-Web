@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
+import net.sourceforge.swing.SwingUtils;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
@@ -70,7 +71,9 @@ public class JNLPSplashScreen extends JDialog {
     private SplashPanel splash;
 
     public JNLPSplashScreen(ResourceTracker resourceTracker, final JNLPFile file) {
-
+        super();
+        this.setName("JNLPSplashScreen");
+        SwingUtils.info(this);
         setIconImages(ImageResources.INSTANCE.getApplicationImages());
 
         // If the JNLP file does not contain any icon images, the splash image

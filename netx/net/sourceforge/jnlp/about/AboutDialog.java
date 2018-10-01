@@ -53,13 +53,13 @@ import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
 
 public final class AboutDialog extends JPanel implements Runnable, ActionListener {
 
@@ -95,9 +95,10 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
         super(new GridBagLayout());
         this.app = app;
         frame = new JDialog((Frame) null, R("AboutDialogueTabAbout") + " IcedTea-Web", modal);
+        frame.setName("AboutDialog");
+        SwingUtils.info(frame);
         frame.setContentPane(this);
         frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
 
         aboutButton = new JButton( R("AboutDialogueTabAbout"));
         aboutButton.addActionListener(this);
@@ -267,7 +268,7 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
     }
     
     public static void display(boolean modal, String app, ShowPage showPage) {
-        SwingUtilities.invokeLater(new AboutDialog(modal, app, showPage));
+        SwingUtils.invokeLater(new AboutDialog(modal, app, showPage));
     }
 }
 

@@ -1,3 +1,41 @@
+2018-10-01  Laurent Bourgès <bourges.laurent@gmail.com>
+
+	Fixed EDT hanging
+	* AUTHORS: added Laurent
+	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: invokeLater and invokeAndWait moved from SwingUtilities to the local wrapper SwingUtils.
+	Simplified splashscreen loading
+	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java: called super and added name to the dialog
+	* netx/net/sourceforge/jnlp/Launcher.java: added log entry for main class loading. Highlighted usage of SwingUtilities on top SwingUtils
+	for this particular space
+	* netx/net/sourceforge/jnlp/about/AboutDialog.java: added name. InvokeLater and invokeAndWait moved from SwingUtilities to the 
+	local wrapper SwingUtils.
+	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java: reworked to work in SwingUtils.invokeAndWait. Added name.
+	* netx/net/sourceforge/jnlp/controlpanel/AdvancedProxySettingsDialog.java: added name
+	* netx/net/sourceforge/jnlp/controlpanel/CacheViewer.java: added name
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: added top level setup for enabling SwingUtils debugging abilities
+	added log entry for main class loading. Highlighted usage of SwingUtilities on top SwingUtils for this particular space
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: instead of invokeAndWait, used SwingUtils.callOnAppContext
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: added top level setup for enabling SwingUtils debugging abilities
+	CertificateViwer moved to invokeAndWait. added log entry for main class loading. Highlighted usage of SwingUtilities instead
+	of SwingUtils for this particular case
+	* netx/net/sourceforge/jnlp/runtime/HtmlBoot.java: invokeLater and invokeAndWait moved from SwingUtilities to the local wrapper SwingUtils.
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: removed import of import javax.swing.JWindow
+	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java: direct call to JWindow().getOwner(), moved to  SwingUtils.getOrCreateWindowOwner.
+	Its existence doubtful
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: installPanel moved to invokeAndWait
+	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: used SwingUtils instead of SwingUtilities, added name
+	* netx/net/sourceforge/jnlp/security/dialogs/ViwableDialog.java: swing ops moved to invokeAndWait
+	* netx/net/sourceforge/jnlp/security/viewer/CertificateViewer.java: calling Swingutils.setup, still all the same
+	* netx/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/BasePainter.java: still the same
+	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java: same - name, SwingUtils x SwingUtilities, and proper usage of invokes
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: SwingUtils x SwingUtilities
+	* netx/net/sourceforge/jnlp/util/logging/JavaConsole.java: observable.notifyObservers moved to invokeLater and
+	and invoked only if observable.hasChanged
+	* netx/net/sourceforge/swing/SwingUtils.java: new class. Wrapper around most commonly used SwingUtilities calls. Add debugging bridge
+	property of icedtea-web.edt.debug set to true, can enable it on runtime.
+	* netx/net/sourceforge/swing/ThreadCheckingRepaintManager.java: Based on http://weblogs.java.net/blog/alexfromsun/archive/2006/02/debugging_swing.html
+	debugging repaint manager
+
 2018-10-01  Fridrich Strba  <fridrich.strba@suse.com>
 
 	Added eternal java version detection

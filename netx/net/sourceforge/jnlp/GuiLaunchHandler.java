@@ -37,10 +37,8 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-
-import javax.swing.SwingUtilities;
+import net.sourceforge.swing.SwingUtils;
 
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -70,7 +68,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
     @Override
     public void launchError(final LaunchException exception) {
         BasicExceptionDialog.willBeShown();
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 closeSplashScreen();
@@ -94,7 +92,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
 
     @Override
     public void launchStarting(ApplicationInstance application) {
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 closeSplashScreen();
@@ -117,39 +115,17 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
             resourceTracker.addResource(splashImageURL, file.getFileVersion(), null, policy);
         }
         synchronized (mutex) {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
+            SwingUtils.invokeAndWait(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        splashScreen = new JNLPSplashScreen(resourceTracker, file);
-                    }
-                });
-            } catch (InterruptedException ie) {
-                // Wait till splash screen is created
-                while (splashScreen == null);
-            } catch (InvocationTargetException ite) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ite);
-            }
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        splashScreen.setSplashImageURL(splashImageURL);
-                    }
-                });
-            } catch (InterruptedException ie) {
-                // Wait till splash screen is created
-                while (!splashScreen.isSplashImageLoaded());
-            } catch (InvocationTargetException ite) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ite);
-            }
-
-
+                @Override
+                public void run() {
+                    splashScreen = new JNLPSplashScreen(resourceTracker, file);
+                    splashScreen.setSplashImageURL(splashImageURL);
+                }
+            });
         }
 
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
 
             @Override
             public void run() {

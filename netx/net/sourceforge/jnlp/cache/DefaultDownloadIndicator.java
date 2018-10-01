@@ -26,6 +26,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.jnlp.*;
+import net.sourceforge.swing.SwingUtils;
 
 import net.sourceforge.jnlp.runtime.*;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -106,39 +107,48 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
      * @return donload service listener attached to this app. instance
      */
     @Override
-    public DownloadServiceListener getListener(ApplicationInstance app, String downloadName, URL resources[]) {
-        DownloadPanel result = new DownloadPanel(downloadName);
+    public DownloadServiceListener getListener(ApplicationInstance app, final String downloadName, final URL resources[]) {
+        final FutureResult<DownloadPanel> result = new FutureResult<DownloadPanel>() {
+            @Override
+            public void run() {
+                DownloadPanel result = new DownloadPanel(downloadName);
 
-        synchronized (dialogMutex) {
-            if (dialog == null) {
-                dialog = createDownloadIndicatorWindow(true);
-            }
+                synchronized (dialogMutex) {
+                    if (dialog == null) {
+                        dialog = createDownloadIndicatorWindow(true);
+                    }
 
-            if (resources != null) {
-                for (URL url : resources) {
-                    result.addProgressPanel(url, null);
-        
-                }
-            }
+                    if (resources != null) {
+                        for (URL url : resources) {
+                            result.addProgressPanel(url, null);
+                        }
+                    }
 
-            dialog.getContentPane().add(result, vertical);
-            dialog.pack();
-            placeFrameToLowerRight();
-            result.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
+                    dialog.getContentPane().add(result, vertical);
+                    dialog.pack();
                     placeFrameToLowerRight();
+                    
+                    result.addComponentListener(new ComponentAdapter() {
+                        @Override
+                        public void componentResized(ComponentEvent e) {
+                            placeFrameToLowerRight();
+                        }
+                    });
+
+                    dialog.setVisible(true);
+
+                    setRef(result);
                 }
-            });
-
-            dialog.setVisible(true);
-
-            return result;
-        }
+            }
+        };
+        SwingUtils.invokeAndWait(result);
+        return result.getRef();
     }
 
      public static JDialog createDownloadIndicatorWindow(boolean undecorated) throws HeadlessException {
         JDialog f = new JDialog((JFrame)null, downloading + "...");
+        f.setName("DownloadIndicatorDialog");
+        SwingUtils.info(f);
         f.setUndecorated(undecorated);
         f.setIconImages(ImageResources.INSTANCE.getApplicationImages());
         f.getContentPane().setLayout(new GridBagLayout());
@@ -328,7 +338,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
 
                 }
             };
-            SwingUtilities.invokeLater(r);
+            SwingUtils.invokeLater(r);
         }
 
         /**
@@ -474,4 +484,15 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
         }
     };
 
+    static abstract class FutureResult<V> implements Runnable {
+        private V ref = null;
+
+        public V getRef() {
+            return ref;
+        }
+
+        public void setRef(V ref) {
+            this.ref = ref;
+        }
+    }
 }

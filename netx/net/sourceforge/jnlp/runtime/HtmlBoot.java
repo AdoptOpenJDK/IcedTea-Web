@@ -45,7 +45,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.JNLPSplashScreen;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ParserSettings;
@@ -58,6 +57,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.sourceforge.swing.SwingUtils;
 
 public final class HtmlBoot {
 
@@ -111,7 +111,7 @@ public final class HtmlBoot {
 
     boolean run(Map<String, List<String>> extra) {
         if (!optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            SwingUtils.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
@@ -157,7 +157,7 @@ public final class HtmlBoot {
                 //close all applets in time
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 //f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         Point movement = changeMovementSigns(move);
@@ -180,7 +180,7 @@ public final class HtmlBoot {
         } catch (final Exception ex) {
             OutputController.getLogger().log(ex);
             if (splashScreen != null) {
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtils.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
