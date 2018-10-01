@@ -795,10 +795,16 @@ AC_DEFUN_ONCE([IT_CHECK_JAVA_VERSION],
 [
   AC_REQUIRE([IT_FIND_JAVA])
   AC_MSG_CHECKING([JDK version])
-  JAVA_VERSION=`$JAVA -version 2>&1`
+  JAVA_VERSION=`$JAVA -version 2>&1 | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f1`
+  if test "${JAVA_VERSION}" -eq "1"; then
+    JAVA_VERSION=`$JAVA -version 2>&1 | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f2`
+  fi
   AC_MSG_RESULT($JAVA_VERSION)
-  HAVE_JAVA8=`if echo $JAVA_VERSION | grep -q -e 1.8.0 ; then echo yes ; fi`
-  HAVE_JAVA9=`if echo $JAVA_VERSION | grep -q -e 1.9.0 -e \"9 -e "build 9" ; then echo yes ; fi `
+  if test "${JAVA_VERSION}" -eq "8"; then
+    HAVE_JAVA8="yes"
+  elif test "$JAVA_VERSION" -ge "9"; then
+    HAVE_JAVA9="yes"
+  fi
   if test -z "$HAVE_JAVA8" -a -z "$HAVE_JAVA9"; then
     AC_MSG_ERROR([JDK8 or newer is required, detected was: $JAVA_VERSION])
   fi
