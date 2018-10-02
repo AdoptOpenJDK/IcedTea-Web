@@ -1,3 +1,7 @@
+2018-10-01  Jiri Vanek <jvanek@redhat.com>
+
+    * rust-launcher/src/main.rs: new method of (is_debug_on) based on cmd line determining verbosity. (main) return of is_debug_on used for  os_access::Linux::new call. 
+
 2018-09-26  Jiri Vanek <jvanek@redhat.com>
 
 	Allowed itw-settings to be opened from viewer

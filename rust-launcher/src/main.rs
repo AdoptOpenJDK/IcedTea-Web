@@ -10,10 +10,20 @@ use std::fmt::Write;
 use os_access::Os;
 use std::env;
 
+fn is_debug_on() -> bool{
+    for s in env::args() {
+        //this can go wrong with case like -jnlp file-verbose or -html file-verbose
+        //but it is really unlikely case as those are ususally .jnlp or .html suffixed
+        if s.ends_with("-verbose") {
+            return true;
+        }
+    }
+    return false;
+}
 
 fn main() {
-    //TODO verbose will be populated by -verbose in arguments and augmented by deployment properties
-    let os = os_access::Linux::new(true);
+    //TODO verbose will be populated by also from deployment properties
+    let os = os_access::Linux::new(is_debug_on());
     let java_dir: std::path::PathBuf;
     let mut info1 = String::new();
     write!(&mut info1, "{}", "itw-rust-debug: trying jdk over properties (").expect("unwrap failed");
@@ -52,7 +62,7 @@ fn main() {
         }
     }
     let mut info2 = String::new();
-    write!(&mut info2, "{}", "itw-rust-debug: selected jre: ").expect("unwrap failed");
+    write!(&mut info2, "{}", "selected jre: ").expect("unwrap failed");
     write!(&mut info2, "{}", java_dir.display()).expect("unwrap failed");
-    os.log(&info2);
+    os.info(&info2);
 }
