@@ -122,6 +122,48 @@ public final class Boot implements PrivilegedAction<Void> {
             }
         }
 
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERSION)) {
+            OutputController.getLogger().printOutLn(nameAndVersion);
+            JNLPRuntime.exit(0);
+        }
+
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.LICENSE)) {
+            OutputController.getLogger().printOutLn(miniLicense);
+            JNLPRuntime.exit(0);
+        }
+
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP1)) {
+            handleMessage();
+            JNLPRuntime.exit(0);
+        }
+        List<String> properties = optionParser.getParams(OptionsDefinitions.OPTIONS.PROPERTY);
+        if (properties != null) {
+            for (String prop : properties) {
+                try {
+                    PropertyDesc propDesc = PropertyDesc.fromString(prop);
+                    JNLPRuntime.getConfiguration().setProperty(propDesc.getKey(), propDesc.getValue());
+                } catch (LaunchException ex) {
+                    OutputController.getLogger().log(ex);
+                }
+            }
+        }
+
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.ABOUT)) {
+            handleAbout();
+            if (JNLPRuntime.isHeadless()) {
+                JNLPRuntime.exit(0);
+            } else {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception e) {
+                    OutputController.getLogger().log("Unable to set system look and feel");
+                }
+                OutputController.getLogger().printOutLn(R("BLaunchAbout"));
+                AboutDialog.display(TextsProvider.JAVAWS);
+                return;
+            }
+        }
+
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.UPDATE)) {
             int value = Integer.parseInt(optionParser.getParam(OptionsDefinitions.OPTIONS.UPDATE));
             JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000l));
