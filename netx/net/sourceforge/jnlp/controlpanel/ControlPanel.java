@@ -54,6 +54,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.controlpanel.JVMPanel.JvmValidationResult;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -118,7 +119,7 @@ public class ControlPanel extends JFrame {
         add(topPanel, BorderLayout.PAGE_START);
         add(mainPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.PAGE_END);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
     }
 
@@ -184,7 +185,7 @@ public class ControlPanel extends JFrame {
                 if (validationResult!= JOptionPane.OK_OPTION){
                     return;
                 }
-                ControlPanel.this.dispose();
+                JNLPRuntime.exit(0);
             }
         });
         buttons.add(okButton);
@@ -211,7 +212,7 @@ public class ControlPanel extends JFrame {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ControlPanel.this.dispose();
+                JNLPRuntime.exit(0);
             }
         });
         buttons.add(cancelButton);

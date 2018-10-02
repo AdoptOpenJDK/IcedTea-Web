@@ -47,7 +47,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.swing.JDialog;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -80,7 +79,7 @@ public final class SwingUtils {
         new Throwable().printStackTrace();
     }
 
-    public static void info(final JDialog dialog) {
+    public static void info(final Window dialog) {
         if (INFO_DIALOG) {
             trace("Dialog[" + dialog.getName() + "]"
                     + " in TG [" + Thread.currentThread().getThreadGroup() + "]");

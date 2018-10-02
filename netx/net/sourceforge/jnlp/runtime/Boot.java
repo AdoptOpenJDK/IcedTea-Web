@@ -113,16 +113,13 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VIEWER)) {
             try {
-                SwingUtils.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        CertificateViewer.showCertificateViewer();
-                    }
-                });
+                CertificateViewer.main(null);
             } catch (Exception e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            } finally {
+                //no metter what happens, terminate
+                return;
             }
-            JNLPRuntime.exit(0);
         }
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERSION)) {
@@ -192,7 +189,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.REDIRECT)) {
             JNLPRuntime.setAllowRedirect(true);
         }
-        
+
         //if it is browser go by ots own, otherwise procedd with normal ITW logic
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.BROWSER)) {
             String url = optionParser.getParam(OptionsDefinitions.OPTIONS.BROWSER);
@@ -240,7 +237,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
     static String fixJnlpProtocol(String param) {
         //remove jnlp: for case like jnlp:https://some.app/file.jnlp
-        if (param.matches("^jnlp[s]?:.*://.*")){
+        if (param.matches("^jnlp[s]?:.*://.*")) {
             param = param.replaceFirst("^jnlp[s]?:", "");
         }
         //transalte jnlp://some.app/file.jnlp to http/https

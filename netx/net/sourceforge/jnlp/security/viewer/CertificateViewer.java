@@ -41,18 +41,17 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.swing.SwingUtils;
 
-public class CertificateViewer extends JDialog {
+public class CertificateViewer extends JFrame {
 
     private boolean initialized = false;
     private static final String dialogTitle = R("CVCertificateViewer");
@@ -60,7 +59,8 @@ public class CertificateViewer extends JDialog {
     CertificatePane panel;
 
     public CertificateViewer() {
-        super((Frame) null, dialogTitle, true);
+        super(dialogTitle);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setName("CertificateViewer");
         SwingUtils.info(this);
         setIconImages(ImageResources.INSTANCE.getApplicationImages());
@@ -98,14 +98,13 @@ public class CertificateViewer extends JDialog {
         ScreenFinder.centerWindowsToCurrentScreen(this);
     }
 
-    public static void showCertificateViewer() {
+    private static void showCertificateViewer() {
         JNLPRuntime.initialize(true);
 
         CertificateViewer cv = new CertificateViewer();
         cv.setResizable(true);
         cv.centerDialog();
         cv.setVisible(true);
-        cv.dispose();
     }
 
     public static void main(String[] args) throws Exception {

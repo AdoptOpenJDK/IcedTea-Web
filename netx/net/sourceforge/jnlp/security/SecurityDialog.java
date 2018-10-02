@@ -46,6 +46,7 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 
 import javax.swing.JDialog;
+import java.awt.Window;
 import net.sourceforge.swing.SwingUtils;
 
 import net.sourceforge.jnlp.JNLPFile;
@@ -216,7 +217,7 @@ public class SecurityDialog {
      * @param parent the parent pane.
      */
     public static void showSingleCertInfoDialog(X509Certificate c,
-                        JDialog parent) {
+                        Window parent) {
         SecurityDialog dialog = new SecurityDialog(DialogType.SINGLE_CERT_INFO, c);
         dialog.getViwableDialog().setLocationRelativeTo(parent);
         dialog.getViwableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
