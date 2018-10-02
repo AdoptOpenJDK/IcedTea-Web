@@ -59,7 +59,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -69,9 +68,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import java.awt.Window;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
@@ -115,7 +116,7 @@ public class CertificatePane extends JPanel {
     /** JComponents that should be disbled for system store */
     private final List<JComponent> disableForSystem;
 
-    private JDialog parent;
+    private Window parent;
     private JComponent defaultFocusComponent = null;
 
     /**
@@ -124,7 +125,7 @@ public class CertificatePane extends JPanel {
      */
     private KeyStores.KeyStoreWithPath keyStore = null;
 
-    public CertificatePane(JDialog parent) {
+    public CertificatePane(Window parent) {
         super();
         this.parent = parent;
 
@@ -246,6 +247,11 @@ public class CertificatePane extends JPanel {
             closeButton.addActionListener(new CloseButtonListener());
             defaultFocusComponent = closeButton;
             closePanel.add(closeButton, BorderLayout.EAST);
+            
+            JButton openAll = new JButton(R("ButLunchFullItwSettings"));
+            openAll.addActionListener(new FullSettingsButtonListener());
+            closePanel.add(openAll, BorderLayout.WEST);
+            
             main.add(closePanel, BorderLayout.SOUTH);
         }
 
@@ -537,7 +543,22 @@ public class CertificatePane extends JPanel {
     private class CloseButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            parent.dispose();
+            JNLPRuntime.exit(0);
+        }
+    }
+    
+    private class FullSettingsButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                net.sourceforge.jnlp.controlpanel.ControlPanel.main(new String[0]);
+                parent.dispose();    
+            } catch (Exception ex) {
+                OutputController.getLogger().log(ex);
+                JOptionPane.showMessageDialog(parent, ex);
+
+            }
         }
     }
 

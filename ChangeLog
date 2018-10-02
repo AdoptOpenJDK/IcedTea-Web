@@ -1,3 +1,14 @@
+2018-09-26  Jiri Vanek <jvanek@redhat.com>
+
+	Allowed itw-settings to be opened from viewer
+	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java: used exit instead of dispose
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: new string with key of ButLunchFullItwSettings
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: get rid of exit, and only return from main method 
+	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: call too showSingleCertInfoDialog changed to Window
+	* netx/net/sourceforge/jnlp/security/viewer/CertificatePane.java: added new button to launch ControlPanel main class 
+	* netx/net/sourceforge/jnlp/security/viewer/CertificateViewer.java: used exit instead of dispose
+	* netx/net/sourceforge/swing/SwingUtils.java: (info) now accepts Window instead of JDialog
+
 2018-10-01  Laurent Bourgès <bourges.laurent@gmail.com>
 
 	Fixed EDT hanging
