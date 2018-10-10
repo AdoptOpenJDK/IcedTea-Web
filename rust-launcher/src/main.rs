@@ -65,4 +65,10 @@ fn main() {
     write!(&mut info2, "{}", "selected jre: ").expect("unwrap failed");
     write!(&mut info2, "{}", java_dir.display()).expect("unwrap failed");
     os.info(&info2);
+    let mut child = os.spawn_java_process(&java_dir, &(env::args().skip(1).collect()));
+    let ecode = child.wait().expect("failed to wait on child");
+    let code = ecode.code().expect("code should be always here");
+    std::process::exit(code)
 }
+
+

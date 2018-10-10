@@ -1,3 +1,10 @@
+2018-10-10  Jiri Vanek <jvanek@redhat.com>
+
+	Rust launchers now spawn jvm
+	* rust-launcher/src/jvm_from_properties_resolver.rs: implemented new trait method (spawn_java_process). Stub only. Will panic 
+	* rust-launcher/src/main.rs: java from found java_dir is launched. Process is awaited, its return returned.
+	* rust-launcher/src/os_access.rs: trait method of (spawn_java_process) add and implemented for linux.
+
 2018-10-01  Jiri Vanek <jvanek@redhat.com>
 
     * rust-launcher/src/main.rs: new method of (is_debug_on) based on cmd line determining verbosity. (main) return of is_debug_on used for  os_access::Linux::new call. 

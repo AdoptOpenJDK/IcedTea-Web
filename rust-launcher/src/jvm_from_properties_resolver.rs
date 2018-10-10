@@ -94,6 +94,10 @@ mod tests {
         fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
             None
         }
+
+        fn spawn_java_process(&self, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child {
+            panic!("not implemented");
+        }
     }
 
     #[test]
