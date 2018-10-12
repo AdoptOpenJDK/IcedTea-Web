@@ -13,54 +13,68 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
 package net.sourceforge.jnlp.services;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.StringTokenizer;
 
 import javax.jnlp.BasicService;
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.Launcher;
+import net.sourceforge.jnlp.config.BasicValueValidators;
+import static net.sourceforge.jnlp.config.BasicValueValidators.verifyFileOrCommand;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * The BasicService JNLP service.
  *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
+ * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell
+ * (JAM)</a> - initial author
  * @version $Revision: 1.10 $
  */
 class XBasicService implements BasicService {
-
-    /** command used to exec the native browser */
-    private String command = null;
-
-    /** whether the command was loaded / prompted for */
-    private boolean initialized = false;
 
     protected XBasicService() {
     }
 
     /**
-     * Returns the codebase of the application, applet, or
-     * installer.  If the codebase was not specified in the JNLP
-     * element then the main JAR's location is returned.  If no main
-     * JAR was specified then the location of the JAR containing the
-     * main class is returned.
+     * Returns the codebase of the application, applet, or installer. If the
+     * codebase was not specified in the JNLP element then the main JAR's
+     * location is returned. If no main JAR was specified then the location of
+     * the JAR containing the main class is returned.
      */
     @Override
     public URL getCodeBase() {
@@ -70,13 +84,15 @@ class XBasicService implements BasicService {
             JNLPFile file = app.getJNLPFile();
 
             // return the codebase.
-            if (file.getCodeBase() != null)
+            if (file.getCodeBase() != null) {
                 return file.getCodeBase();
+            }
 
             // else return the main JAR's URL.
             JARDesc mainJar = file.getResources().getMainJAR();
-            if (mainJar != null)
+            if (mainJar != null) {
                 return mainJar.getLocation();
+            }
 
             // else find JAR where main class was defined.
             //
@@ -101,8 +117,8 @@ class XBasicService implements BasicService {
     }
 
     /**
-     * Return the first URL from the jnlp file
-     * Or a default URL if no url found in JNLP file
+     * Return the first URL from the jnlp file Or a default URL if no url found
+     * in JNLP file
      */
     private URL findFirstURLFromJNLPFile() {
 
@@ -150,9 +166,8 @@ class XBasicService implements BasicService {
      */
     @Override
     public boolean isWebBrowserSupported() {
-        initialize();
-
-        return command != null;
+        //there is hardly anything our impl can not handle
+        return true;
     }
 
     /**
@@ -162,133 +177,238 @@ class XBasicService implements BasicService {
      */
     @Override
     public boolean showDocument(URL url) {
-        initialize();
+        try {
+//        if (url.toString().endsWith(".jnlp")) {
+//            try {
+//                new Launcher(false).launchExternal(url);
+//                return true;
+//            } catch (Exception ex) {
+//                return false;
+//            }
+//        }
+// Ignorance of this code is the only regression against original code (if you asume msot of the jnlps havejnlp suffix...) we had
+// anyway, also jnlp protocol should be handled via this, so while this can be set via 
+// ALWAYS-ASK, or directly via BROWSER of deployment.browser.path , it still should be better then it was
+// in all cases, the mime recognition is much harder then .jnlp suffix
 
-        if (url.toString().endsWith(".jnlp")) {
-            try {
-                new Launcher(false).launchExternal(url);
-                return true;
-            } catch (Exception ex) {
+            String urls = url.toExternalForm();
+            OutputController.getLogger().log("showDocument for: " + urls);
+
+            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+            String command = config.getProperty(DeploymentConfiguration.KEY_BROWSER_PATH);
+            //for various debugging
+            //command=DeploymentConfiguration.ALWAYS_ASK;
+            if (command != null) {
+                OutputController.getLogger().log(DeploymentConfiguration.KEY_BROWSER_PATH + " located. Using: " + command);
+                return exec(command, urls);
+            }
+            if (System.getenv(DeploymentConfiguration.BROWSER_ENV_VAR) != null) {
+                command = System.getenv(DeploymentConfiguration.BROWSER_ENV_VAR);
+                OutputController.getLogger().log("variable " + DeploymentConfiguration.BROWSER_ENV_VAR + " located. Using: " + command);
+                return exec(command, urls);
+            }
+            if (JNLPRuntime.isHeadless() || !Desktop.isDesktopSupported()) {
+                command = promptForCommand(urls, false);
+                return exec(command, urls);
+            } else {
+                if (Desktop.isDesktopSupported()) {
+                    OutputController.getLogger().log("using default browser");
+                    Desktop.getDesktop().browse(url.toURI());
+                    return true;
+                } else {
+                    OutputController.getLogger().log("dont know what to do");
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, e.toString());
+            OutputController.getLogger().log(e);
+            return false;
+        }
+    }
+
+    //cmd form user can contains spaces, wuotes and so... now we are relying on default dummy impl
+    private boolean exec(String cmd, String url) {
+        try {
+            if (cmd == null || cmd.length() == 0) {
                 return false;
             }
-        }
-
-        if (command != null) {
-            try {
-                // this is bogus because the command may require options;
-                // should use a StreamTokenizer or similar to get tokens
-                // outside of quotes.
-                Runtime.getRuntime().exec(command + " " + url.toString());
-                //Runtime.getRuntime().exec(new String[]{command,url.toString()});
-
+            if (url == null || url.length() == 0) {
+                return false;
+            }
+            if (cmd.equals(DeploymentConfiguration.ALWAYS_ASK)) {
+                cmd = promptForCommand(url, true);
+            }
+            if (cmd.equals(DeploymentConfiguration.INTERNAL_HTML)) {
+                LinkingBrowser.createFrame(url, false, JFrame.DISPOSE_ON_CLOSE);
                 return true;
-            } catch (IOException ex) {
-                OutputController.getLogger().log(ex);
             }
-        }
-
-        return false;
-    }
-
-    private void initialize() {
-        if (initialized)
-            return;
-        initialized = true;
-        initializeBrowserCommand();
-        OutputController.getLogger().log("browser is " + command);
-    }
-
-    /**
-     * Initializes {@link #command} to launch a browser
-     */
-    private void initializeBrowserCommand() {
-        if (JNLPRuntime.isWindows()) {
-            command = "rundll32 url.dll,FileProtocolHandler ";
-        } else if (JNLPRuntime.isUnix()) {
-            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-            command = config.getProperty(DeploymentConfiguration.KEY_BROWSER_PATH);
-            if (command != null) {
-                return;
+            //copypasted from exec
+            StringTokenizer st = new StringTokenizer(cmd + " " + url);
+            String[] cmdarray = new String[st.countTokens()];
+            for (int i = 0; st.hasMoreTokens(); i++) {
+                cmdarray[i] = st.nextToken();
             }
-
-            if (posixCommandExists("xdg-open")) {
-                command = "xdg-open";
-                return;
-            }
-
-            if (posixCommandExists(System.getenv("BROWSER"))) {
-                command = System.getenv("BROWSER");
-                return;
-            }
-
-            while (true) {
-                command = promptForCommand(command);
-                if (command != null && posixCommandExists(command)) {
-                    config.setProperty(DeploymentConfiguration.KEY_BROWSER_PATH, command);
-                    try {
-                        config.save();
-                    } catch (IOException e) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-                    }
-                    break;
-                }
-            }
-        } else {
-            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-            command = config.getProperty(DeploymentConfiguration.KEY_BROWSER_PATH);
-
-            if (command == null) { // prompt & store
-                command = promptForCommand(null);
-
-                if (command != null) {
-                    config.setProperty(DeploymentConfiguration.KEY_BROWSER_PATH, command);
-                    try {
-                        config.save();
-                    } catch (IOException e) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Check that a command exists on a posix-like system
-     * @param command the command to check
-     * @return true if the command exists
-     */
-    private boolean posixCommandExists(String command) {
-        if (command == null || command.trim().length() == 0) {
-            return false;
-        }
-
-        command = command.trim();
-        if (command.contains("\n") || command.contains("\r")) {
-            return false;
-        }
-
-        try {
-            Process p = Runtime.getRuntime().exec(new String[] { "bash", "-c", "type " + command });
+            final ProcessBuilder pb = new ProcessBuilder(cmdarray);
+            pb.inheritIO();
+            final Process p = pb.start();
             StreamUtils.waitForSafely(p);
             return (p.exitValue() == 0);
-        } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+        } catch (Exception e) {
+            OutputController.getLogger().log(e);
+            try {
+                //time for stderr to deal with it in verbose mode
+                Thread.sleep(50);
+            } catch (Exception ex) {
+                //ss
+            }
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, e.toString());
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.VVPossibleBrowserValues());
             return false;
         }
     }
 
-    private String promptForCommand(String previousCommand) {
-        String message = null;
-        if (previousCommand == null) {
-            message = R("RBrowserLocationPromptMessage");
+    private String promptForCommand(final String targetUrl, boolean aa) throws IOException {
+        String message = Translator.VVPossibleBrowserValues();
+        String title = R("RBrowserLocationPromptTitle");
+        if (JNLPRuntime.isHeadless()) {
+            OutputController.getLogger().printOutLn(message);
+            OutputController.getLogger().printOutLn("*** " + targetUrl + " ***");
+            OutputController.getLogger().printOutLn(title);
+            String entered = OutputController.getLogger().readLine();
+            String verification = verifyFileOrCommand(entered);
+            if (verification == null) {
+                OutputController.getLogger().printOutLn(R("VVBrowserVerificationFail"));
+            } else {
+                OutputController.getLogger().printOutLn(R("VVBrowserVerificationPass", verification));
+            }
+            return entered;
         } else {
-            message = R("RBrowserLocationPromptMessageWithReason", previousCommand);
+            final PromptUrl pu = new PromptUrl();
+            pu.arrange(targetUrl, aa);
+            pu.setVisible(true);
+            return pu.getValue();
         }
-        return JOptionPane.showInputDialog(new JPanel(),
-                                           R("RBrowserLocationPromptTitle"),
-                                           message,
-                                           JOptionPane.PLAIN_MESSAGE
-                                          );
+    }
+
+    private static class PromptUrl extends JDialog {
+
+        JTextField value = new JTextField("firefox");
+        JLabel verification = new JLabel("?");
+        private WindowListener cl = new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                value.setText("");
+            }
+        };
+        JCheckBox save = new JCheckBox(R("PESaveChanges"));
+        private boolean ask;
+
+        public PromptUrl() {
+            super((JDialog) null, R("RBrowserLocationPromptTitle"), true);
+        }
+
+        public void arrange(String url, boolean ask) {
+            this.ask = ask;
+            JPanel top = new JPanel(new GridLayout(2, 1));
+            JPanel bottom = new JPanel(new GridLayout(5, 1));
+            this.setLayout(new BorderLayout());
+            this.add(top, BorderLayout.NORTH);
+            this.add(bottom, BorderLayout.SOUTH);
+            top.add(new JLabel("<html><b>" + R("RBrowserLocationPromptTitle")));
+            JTextField urlField = new JTextField(url);
+            urlField.setEditable(false);
+            top.add(urlField);
+            JTextArea ta = new JTextArea(Translator.VVPossibleBrowserValues());
+            ta.setEditable(false);
+            ta.setLineWrap(true);
+            ta.setWrapStyleWord(false);
+            JScrollPane scrollableTa=new JScrollPane(ta);
+            scrollableTa.setHorizontalScrollBar(null);
+            this.add(scrollableTa);
+            bottom.add(value);
+            bottom.add(verification);
+            JButton ok = new JButton(R("ButOk"));
+            ok.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (save.isSelected()) {
+                        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_BROWSER_PATH, value.getText());
+                        try {
+                            JNLPRuntime.getConfiguration().save();
+                        } catch (IOException ex) {
+                            OutputController.getLogger().log(ex);
+                        }
+                    }
+                    PromptUrl.this.dispose();
+                }
+            });
+            JButton cancel = new JButton(R("ButCancel"));
+            cancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cl.windowClosing(null);
+                    PromptUrl.this.dispose();
+                }
+            });
+            bottom.add(save);
+            bottom.add(ok);
+            bottom.add(cancel);
+            if (this.ask) {
+                save.setSelected(false);
+                save.setEnabled(false);
+                save.setToolTipText(R("VVBrowserSaveNotAllowed", DeploymentConfiguration.ALWAYS_ASK, DeploymentConfiguration.KEY_BROWSER_PATH));
+            } else {
+                save.setEnabled(true);
+                save.setToolTipText(R("VVBrowserSaveAllowed", DeploymentConfiguration.KEY_BROWSER_PATH));
+            }
+            this.addWindowListener(cl);
+
+            value.getDocument().addDocumentListener(new DocumentListener() {
+
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    check();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    check();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    check();
+                }
+
+                private void check() {
+                    String result = BasicValueValidators.verifyFileOrCommand(value.getText());
+                    if (result == null) {
+                        verification.setForeground(Color.red);
+                        verification.setText(R("VVBrowserVerificationFail"));
+                        if (!PromptUrl.this.ask) {
+                            save.setSelected(false);
+                        }
+                    } else {
+                        verification.setForeground(Color.green);
+                        verification.setText(R("VVBrowserVerificationPass", result));
+                        if (!PromptUrl.this.ask) {
+                            save.setSelected(true);
+                        }
+                    }
+                }
+            });
+            this.pack();
+            this.setSize(500, 400);
+        }
+
+        private String getValue() {
+            if (value.getText().trim().isEmpty()) {
+                return null;
+            }
+            return value.getText();
+        }
+
     }
 
 }

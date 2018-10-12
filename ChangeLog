@@ -1,3 +1,23 @@
+2018-10-12  Jiri Vanek <jvanek@redhat.com>
+
+	reworked showDocument logic
+	* netx/net/sourceforge/jnlp/config/BasicValueValidators.java: added special validator for browser
+	* netx/net/sourceforge/jnlp/config/Defaults.java: used this validator
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: declared browser's constants and environment variable
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: removed invalid lines, added new lines
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: removed invalid lines,
+	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: removed invalid lines,
+	* netx/net/sourceforge/jnlp/resources/Messages_pl.properties: removed invalid lines,
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: showDocument now works
+	* netx/net/sourceforge/jnlp/runtime/Translator.java: added shortcut method to call call VVPossibleBrowserValues
+	* netx/net/sourceforge/jnlp/runtime/html/browser/LinkingBrowser.java: split creation from stand alone launch
+	* netx/net/sourceforge/jnlp/services/XBasicService.java: fully reworked  showDocument. Focus on standard desktop api and customization
+	* tests/reproducers/signed/ShowDocument/resources/ShowDocumentApplet.jnlp: test jnlp for applet's context.showDocument
+	* tests/reproducers/signed/ShowDocument/resources/ShowDocumentMain.jnlp: test jnlp for application's  basicService.showDocument
+	* tests/reproducers/signed/ShowDocument/resources/document.txt: document to be shown in test
+	* tests/reproducers/signed/ShowDocument/srcs/ShowDocument.java: body of applet/jnlp-app
+	* tests/reproducers/signed/ShowDocument/testcases/ShowDocumentTest.java: two testcases - one for applet, second for app. Both running on headless.
+
 2018-10-10  Jiri Vanek <jvanek@redhat.com>
 
 	Rust launchers now spawn jvm

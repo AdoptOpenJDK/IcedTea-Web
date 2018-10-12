@@ -403,7 +403,7 @@ public class Defaults {
                 /* browser selection */
                 {
                         DeploymentConfiguration.KEY_BROWSER_PATH,
-                        BasicValueValidators.getFilePathValidator(),
+                        BasicValueValidators.getBrowserPathValidator(),
                         null
                 },
                 /* check for update timeout */

@@ -45,6 +45,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Locale;
+import net.sourceforge.jnlp.runtime.Translator;
 
 /**
  * Provides {@link ValueValidator} implementations for some common value types
@@ -327,6 +328,52 @@ public class BasicValueValidators {
     public static ValueValidator getFilePathValidator() {
         return new FilePathValidator();
     }
+    
+     public static ValueValidator getBrowserPathValidator() {
+        return new ValueValidator() {
+            @Override
+            public void validate(Object value) throws IllegalArgumentException {
+                if (value == null) {
+                    return;
+                }
+                if (!(value instanceof String)) {
+                    throw new IllegalArgumentException("Value should be string!");
+                }
+               if (verifyFileOrCommand((String)value) == null){
+                    //jsut warn?
+                    throw new IllegalArgumentException("Value should be file, or on PATH, or known keyword. See possible values.");
+               }
+            }
+
+            @Override
+            public String getPossibleValues() {
+                return Translator.VVPossibleBrowserValues();
+            }
+        };
+    }
+     
+      public static String verifyFileOrCommand(String cmd) {
+        cmd = cmd.split("\\s+")[0];
+          if (cmd.equals(DeploymentConfiguration.ALWAYS_ASK) || cmd.equals(DeploymentConfiguration.INTERNAL_HTML)) {
+              return "keyword";
+          }
+        File fileCandidate = new File(cmd);
+        if (fileCandidate.exists() && !fileCandidate.isDirectory()) {
+            return cmd;
+        }
+        String path = System.getenv("PATH");
+        if (path != null) {
+            String[] pathMembers = path.split(File.pathSeparator);
+            for (String s : pathMembers) {
+                File pathCandidate = new File(s, cmd);
+                if (pathCandidate.exists() && !pathCandidate.isDirectory()) {
+                    return pathCandidate.toString();
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Returns a {@link ValueValidator} that checks if an object represents a
