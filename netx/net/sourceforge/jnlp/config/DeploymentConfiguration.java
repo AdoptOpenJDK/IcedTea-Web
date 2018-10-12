@@ -221,6 +221,13 @@ public final class DeploymentConfiguration {
     public static final String KEY_AUTO_DOWNLOAD_JRE = "deployment.javaws.autodownload";
 
     public static final String KEY_BROWSER_PATH = "deployment.browser.path";
+    //for legacy reasons, also $BROWSER variable is supported
+    public static final String BROWSER_ENV_VAR = "BROWSER";
+    // both browser.path and BROWSER can ave those for-fun keys:
+    public static final String ALWAYS_ASK="ALWAYS-ASK";
+    public static final String INTERNAL_HTML="INTERNAL-HTML";
+    public static final String LEGACY_WIN32_URL__HANDLER="rundll32 url.dll,FileProtocolHandler ";
+    
     public static final String KEY_UPDATE_TIMEOUT = "deployment.javaws.update.timeout";
     
     public static final String IGNORE_HEADLESS_CHECK = "deployment.headless.ignore";
