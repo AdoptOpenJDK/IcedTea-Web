@@ -48,7 +48,7 @@ The Browser Plugin
 
 IcedTea-Web contains a Free Software browser plugin based on NPRuntime
 called NPPlugin.  By default, this will be built, and it can be turned
-off using the -disable-plugin option.
+off using the --disable-native-plugin option.
 
 Building IcedTea-Web
 ====================
@@ -73,7 +73,7 @@ Additionally, the plugin requires:
 Some distributions do not provide correct NPAPI headers so you can use those: 
 https://bitbucket.org/mgorny/npapi-sdk/downloads.
 
-The plugin can be disabled by passing --disable-plugin.
+The plugin can be disabled by passing --disable-native-plugin.
 
 The following optional dependencies enable additional features
 
@@ -120,7 +120,7 @@ to point to same location.
 Other options may be supplied which enable or disable new features.
 These are documented fully in the relevant section below.
 
-* --disable-plugin: Don't build the browser plugin.
+* --disable-native-plugin: Don't build the browser plugin.
 * --with-rhino: Specify the location of rhino jar
 * --with-tagsoup: Specify the location of the tagsoup jar
 * --with-jacoco: Specify the location of the jacoco jar
