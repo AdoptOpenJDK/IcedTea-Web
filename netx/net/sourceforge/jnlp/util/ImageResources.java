@@ -77,14 +77,16 @@ public enum ImageResources {
         }
 
         InputStream in = cl.getResourceAsStream(APPLICATION_ICON_PATH);
-        try {
-            Image image = ImageIO.read(in);
-            cache.put(APPLICATION_ICON_PATH, image);
-            return image;
-        } catch (IOException ioe) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
-            return null;
+        if (in != null) {
+            try {
+                Image image = ImageIO.read(in);
+                cache.put(APPLICATION_ICON_PATH, image);
+                return image;
+            } catch (IOException ioe) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
+            }
         }
+        return null;
     }
 
     /**

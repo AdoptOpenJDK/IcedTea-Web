@@ -21,7 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -67,6 +66,7 @@ import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.ui.NonEditableTableModel;
+import net.sourceforge.swing.SwingUtils;
 
 public class CachePane extends JPanel {
     final JDialog parent;
@@ -267,7 +267,7 @@ public class CachePane extends JPanel {
      * @see CachePane#cacheTable
      */
     private  void invokeLaterDelete() {
-        EventQueue.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -339,8 +339,7 @@ public class CachePane extends JPanel {
     }
 
     private void invokeLaterDeleteAll() {
-        EventQueue.invokeLater(new Runnable() {
-
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -362,7 +361,7 @@ public class CachePane extends JPanel {
      * @see CachePane#populateTable
      */
     final void invokeLaterPopulateTable() {
-        EventQueue.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {

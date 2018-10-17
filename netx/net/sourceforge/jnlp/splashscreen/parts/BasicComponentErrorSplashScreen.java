@@ -37,6 +37,7 @@ exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.parts;
 
 import net.sourceforge.jnlp.splashscreen.SplashErrorPanel;
+import net.sourceforge.swing.SwingUtils;
 
 public abstract class BasicComponentErrorSplashScreen extends BasicComponentSplashScreen implements SplashErrorPanel {
 
@@ -70,8 +71,7 @@ public abstract class BasicComponentErrorSplashScreen extends BasicComponentSpla
     }
 
     protected void raiseExceptionDialogQUEUED() {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 raiseExceptionDialogNOW();

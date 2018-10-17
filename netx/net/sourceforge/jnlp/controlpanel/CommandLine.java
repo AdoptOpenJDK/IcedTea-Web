@@ -37,6 +37,7 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * Encapsulates a command line interface to the deployment configuration.
@@ -495,6 +496,9 @@ public class CommandLine {
      * @throws java.lang.Exception when it goes wrong
      */
     public static void main(String[] args) throws Exception {
+        // setup Swing EDT tracing:
+        SwingUtils.setup();
+
         try {
             OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
             if (optionParser.hasOption(OptionsDefinitions.OPTIONS.DETAILS) || optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)){

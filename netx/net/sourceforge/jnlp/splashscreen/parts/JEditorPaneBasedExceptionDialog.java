@@ -66,6 +66,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.BasicExceptionDialog;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
 
 public class JEditorPaneBasedExceptionDialog extends JDialog implements HyperlinkListener {
 
@@ -276,8 +277,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
+        SwingUtils.invokeLater(new Runnable() {
             public void run() {
                 Exception ex = new RuntimeException("dsgsfdg");
                 JEditorPaneBasedExceptionDialog dialog = new JEditorPaneBasedExceptionDialog(new JFrame(), true, ex, null, "uaaa: aaa\nwqdeweq:sdsds");

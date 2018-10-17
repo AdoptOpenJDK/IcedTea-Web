@@ -57,7 +57,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -96,7 +95,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -120,6 +118,7 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.sourceforge.swing.SwingUtils;
 import sun.security.provider.PolicyParser;
 
 /**
@@ -460,7 +459,7 @@ public class PolicyEditor extends JPanel {
         viewCustomButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                invokeRunnableOrEnqueueLater(new Runnable() {
+                SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
                     @Override
                     public void run() {
                         final PolicyIdentifier policyIdentifier = getSelectedPolicyIdentifier();
@@ -505,7 +504,7 @@ public class PolicyEditor extends JPanel {
         closeButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                final Window parentWindow = SwingUtilities.getWindowAncestor(PolicyEditor.this);
+                final Window parentWindow = SwingUtils.getWindowAncestor(PolicyEditor.this);
                 if (parentWindow instanceof PolicyEditorWindow) {
                     ((PolicyEditorWindow) parentWindow).quit();
                 }
@@ -587,10 +586,10 @@ public class PolicyEditor extends JPanel {
     }
 
     private void setParentWindowTitle(final String title) {
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
-                final Window parent = SwingUtilities.getWindowAncestor(PolicyEditor.this);
+                final Window parent = SwingUtils.getWindowAncestor(PolicyEditor.this);
                 if (!(parent instanceof PolicyEditorWindow)) {
                     return;
                 }
@@ -839,7 +838,7 @@ public class PolicyEditor extends JPanel {
             return;
         }
         policyEditorController.addIdentifier(identifier);
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 listModel.clear();
@@ -880,7 +879,7 @@ public class PolicyEditor extends JPanel {
      * or when the user presses cancel.
      */
     public void addNewIdentifierInteractive() {
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 final PolicyIdentifier identifier = promptForPolicyIdentifier(PolicyIdentifier.ALL_APPLETS_IDENTIFIER);
@@ -936,7 +935,7 @@ public class PolicyEditor extends JPanel {
         }
         policyEditorController.removeIdentifier(identifier);
         final int fIndex = previousIndex;
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 listModel.removeElement(identifier);
@@ -1047,37 +1046,17 @@ public class PolicyEditor extends JPanel {
         policyEditorController.clearCustomIdentifier(identifier);
     }
 
-    private void invokeRunnableOrEnqueueLater(final Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
-    }
-
-    private void invokeRunnableOrEnqueueAndWait(final Runnable runnable) throws InvocationTargetException, InterruptedException {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeAndWait(runnable);
-        }
-    }
-
     /**
      * Update the checkboxes to show the permissions granted to the specified identifier
      * @param identifier whose permissions to display
      */
     private void updateCheckboxes(final PolicyIdentifier identifier) {
-        try {
-            invokeRunnableOrEnqueueAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    updateCheckboxesImpl(identifier);
-                }
-            });
-        } catch (final InterruptedException | InvocationTargetException ex) {
-            OutputController.getLogger().log(ex);
-        }
+        SwingUtils.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                updateCheckboxesImpl(identifier);
+            }
+        });
     }
 
     private void updateCheckboxesImpl(final PolicyIdentifier identifier) {
@@ -1461,7 +1440,7 @@ public class PolicyEditor extends JPanel {
 
     void setChangesMade(final boolean b) {
         policyEditorController.setChangesMade(b);
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 setParentWindowTitle(getWindowTitleForStatus());
@@ -1529,14 +1508,14 @@ public class PolicyEditor extends JPanel {
             FileUtils.showReadOnlyDialog(PolicyEditor.this);
         }
 
-        final Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        final Window parentWindow = SwingUtils.getWindowAncestor(this);
         final JDialog progressIndicator = new IndeterminateProgressDialog(parentWindow, "Loading...");
         final SwingWorker<Void, Void> openPolicyFileWorker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
                 try {
                     if (parentWindow != null) {
-                        invokeRunnableOrEnqueueLater(new Runnable() {
+                        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
                             @Override
                             public void run() {
                                 progressIndicator.setLocationRelativeTo(parentWindow);
@@ -1590,14 +1569,14 @@ public class PolicyEditor extends JPanel {
                 break;
         }
 
-        final Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        final Window parentWindow = SwingUtils.getWindowAncestor(this);
         final JDialog progressIndicator = new IndeterminateProgressDialog(parentWindow, "Saving...");
         final SwingWorker<Void, Void> savePolicyFileWorker = new SwingWorker<Void, Void>() {
             @Override
             public Void doInBackground() throws Exception {
                 try {
                     if (parentWindow != null) {
-                        invokeRunnableOrEnqueueLater(new Runnable() {
+                        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
                             @Override
                             public void run() {
                                 progressIndicator.setLocationRelativeTo(parentWindow);
@@ -1631,7 +1610,7 @@ public class PolicyEditor extends JPanel {
         // This dialog is often displayed when closing the editor, and so PolicyEditor
         // may already be disposed when this dialog appears. Give a weak reference so
         // that this dialog doesn't prevent the JVM from exiting
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEChangesSaved"));
@@ -1646,7 +1625,7 @@ public class PolicyEditor extends JPanel {
         // This dialog is often displayed when closing the editor, and so PolicyEditor
         // may already be disposed when this dialog appears. Give a weak reference so
         // that this dialog doesn't prevent the JVM from exiting
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PECouldNotSave"), R("Error"), JOptionPane.ERROR_MESSAGE);
@@ -1655,7 +1634,7 @@ public class PolicyEditor extends JPanel {
     }
 
     private void showClipboardErrorDialog() {
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEClipboardError"), R("Error"), JOptionPane.ERROR_MESSAGE);
@@ -1664,7 +1643,7 @@ public class PolicyEditor extends JPanel {
     }
 
     private void showInvalidPolicyExceptionDialog(final PolicyIdentifier identifier) {
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEInvalidPolicy", identifier.toString()), R("Error"), JOptionPane.ERROR_MESSAGE);
@@ -1673,7 +1652,7 @@ public class PolicyEditor extends JPanel {
     }
 
     private void showCouldNotAccessClipboardDialog() {
-        invokeRunnableOrEnqueueLater(new Runnable() {
+        SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(parentPolicyEditor.get(), R("PEClipboardAccessError"), R("Error"), JOptionPane.ERROR_MESSAGE);
@@ -1720,7 +1699,7 @@ public class PolicyEditor extends JPanel {
     private void toggleExpandedCheckboxGroupPanel(final JPanel groupPanel) {
         groupPanel.setVisible(!groupPanel.isVisible());
         PolicyEditor.this.validate();
-        final Window w = SwingUtilities.getWindowAncestor(PolicyEditor.this);
+        final Window w = SwingUtils.getWindowAncestor(PolicyEditor.this);
         if (w != null) {
             w.pack();
         }
@@ -1734,6 +1713,9 @@ public class PolicyEditor extends JPanel {
      * -help will print a help message and immediately return (no editor instance opens)
      */
     public static void main(final String[] args) {
+        // setup Swing EDT tracing:
+        SwingUtils.setup();
+
         final OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
         
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
@@ -1767,7 +1749,7 @@ public class PolicyEditor extends JPanel {
         final String signedBy = getSignedByArgument(optionParser);
         final Set<PolicyParser.PrincipalEntry> principals = getPrincipalsArgument(optionParser);
 
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final PolicyEditorWindow frame = getPolicyEditorFrame(filepath);
