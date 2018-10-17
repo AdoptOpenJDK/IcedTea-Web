@@ -96,6 +96,9 @@ public final class Boot implements PrivilegedAction<Void> {
      * @param argsIn launching arguments
      */
     public static void main(String[] argsIn) throws UnevenParameterException {
+        // setup Swing EDT tracing:
+        SwingUtils.setup();
+
         optionParser = new OptionParser(argsIn, OptionsDefinitions.getJavaWsOptions());
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
@@ -117,7 +120,7 @@ public final class Boot implements PrivilegedAction<Void> {
             } catch (Exception e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             } finally {
-                //no metter what happens, terminate
+                //no matter what happens, terminate
                 return;
             }
         }

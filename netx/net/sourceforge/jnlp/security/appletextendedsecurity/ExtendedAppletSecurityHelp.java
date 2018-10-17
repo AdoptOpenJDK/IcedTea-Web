@@ -47,6 +47,7 @@ import javax.swing.event.HyperlinkListener;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
 
 public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements HyperlinkListener {
 
@@ -162,7 +163,7 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
     }
 
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             public void run() {
                 ExtendedAppletSecurityHelp dialog = new ExtendedAppletSecurityHelp(null, false);
                 dialog.setVisible(true);

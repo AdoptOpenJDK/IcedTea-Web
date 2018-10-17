@@ -1,3 +1,22 @@
+2018-10-17  Laurent Bourgès <bourges.laurent@gmail.com>
+
+	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java: using SwingUtils.invokeLater instead of 
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java: same + calling SwingUtils.setup
+	* netx/net/sourceforge/jnlp/controlpanel/DesktopShortcutPanel.java: same
+	* netx/net/sourceforge/jnlp/controlpanel/PolicyPanel.java: same
+	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java: same
+	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/Blinker.java: same
+	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/FreeDesktopIntegrationEditorFrame.java: same
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: same + calling SwingUtils.setup
+	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/ExtendedAppletSecurityHelp.java: same
+	* netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditor.java: same + calling SwingUtils.setup
+	* netx/net/sourceforge/jnlp/splashscreen/parts/BasicComponentErrorSplashScreen.java: same
+	* netx/net/sourceforge/jnlp/splashscreen/parts/JEditorPaneBasedExceptionDialog.java: same
+	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: same
+	* netx/net/sourceforge/jnlp/util/ImageResources.java: added check for null in stream
+	* netx/net/sourceforge/swing/SwingUtils.java: added setup-able. removed EDT_DAEMON_THREAD_POOL (thus currently not
+	working properly in jdk11+, but fix for JDK itself is on the way)
+
 2018-10-12  Jiri Vanek <jvanek@redhat.com>
 
 	reworked showDocument logic

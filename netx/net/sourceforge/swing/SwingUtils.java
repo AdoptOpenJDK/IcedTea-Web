@@ -36,18 +36,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.swing;
 
+import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JWindow;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -57,16 +51,35 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 public final class SwingUtils {
 
+    private static final boolean DEBUG_EDT = System.getProperty("icedtea-web.edt.debug", "false").equalsIgnoreCase("true");
+
     // debugging flags:
     private static final boolean INFO_DIALOG = false;
     private static final boolean TRACE_INVOKE_EDT = false;
     private static final boolean TRACE_TG = false;
 
+    // internals:
+    private static boolean DO_SETUP = true;
+
     /** main thread group (initialized at startup) */
-    static final ThreadGroup MAIN_GROUP = Thread.currentThread().getThreadGroup();
+    private static final ThreadGroup MAIN_GROUP = Thread.currentThread().getThreadGroup();
+
+    /* shared Window owner */
+    private static Window window = null;
 
     private SwingUtils() {
         // forbidden
+    }
+
+    public static void setup() {
+        if (DO_SETUP) {
+            DO_SETUP = false; // avoid reentrance
+
+            if (DEBUG_EDT) {
+                trace("Using ThreadCheckingRepaintManager");
+                RepaintManager.setCurrentManager(new ThreadCheckingRepaintManager());
+            }
+        }
     }
 
     static void trace(final String msg) {
@@ -93,72 +106,6 @@ public final class SwingUtils {
         }
     }
 
-    // --- SwingUtilities wrapper ---
-    public static boolean isEventDispatchThread() {
-        return SwingUtilities.isEventDispatchThread();
-    }
-
-    public static void invokeLater(final Runnable doRun) {
-        if (isMainThreadGroup()) {
-            if (isEventDispatchThread()) {
-                if (TRACE_INVOKE_EDT) {
-                    traceWithStack("invokeLater() from EDT: MAY be fixed ?");
-                }
-            }
-            SwingUtilities.invokeLater(doRun);
-        } else {
-            EDT_DAEMON_THREAD_POOL.submit(new Runnable() {
-                @Override
-                public void run() {
-                    SwingUtilities.invokeLater(doRun);
-                }
-            });
-        }
-    }
-
-    public static void callOnAppContext(final Runnable doRun) throws InterruptedException, InvocationTargetException {
-        SwingUtilities.invokeAndWait(doRun);
-    }
-
-    public static void invokeAndWait(final Runnable doRun) {
-        if (isMainThreadGroup()) {
-            if (isEventDispatchThread()) {
-                if (TRACE_INVOKE_EDT) {
-                    traceWithStack("invokeAndWait() from EDT: MAY be fixed ?");
-                }
-                doRun.run();
-            } else {
-                try {
-                    callOnAppContext(doRun);
-                } catch (InterruptedException ie) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ie);
-                } catch (InvocationTargetException ite) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ite);
-                }
-            }
-        } else {
-            final Future<?> future = EDT_DAEMON_THREAD_POOL.submit(new Callable<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    callOnAppContext(doRun);
-                    return null;
-                }
-            });
-            try {
-                // Wait on Future:
-                future.get();
-            } catch (InterruptedException ie) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ie);
-            } catch (ExecutionException ee) {
-                if (ee.getCause() != null) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ee.getCause());
-                } else {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ee);
-                }
-            }
-        }
-    }
-
     private static boolean isMainThreadGroup() {
         final Thread t = Thread.currentThread();
         final ThreadGroup g = t.getThreadGroup();
@@ -172,35 +119,53 @@ public final class SwingUtils {
         return true;
     }
 
-    private static final class MainAppContextDaemonThreadFactory implements ThreadFactory {
+    // --- SwingUtilities wrapper ---
+    public static Window getWindowAncestor(Component c) {
+        return SwingUtilities.getWindowAncestor(c);
+    }
 
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix = "itw-edt-thread-";
+    public static boolean isEventDispatchThread() {
+        return EventQueue.isDispatchThread();
+    }
 
-        @Override
-        public Thread newThread(Runnable r) {
-            final Thread t = new Thread(MAIN_GROUP, r,
-                    namePrefix + threadNumber.getAndIncrement()
-            );
-            if (!t.isDaemon()) {
-                t.setDaemon(true);
+    public static void invokeLater(final Runnable doRun) {
+        if (isMainThreadGroup()) {
+            if (TRACE_INVOKE_EDT && isEventDispatchThread()) {
+                traceWithStack("invokeLater() from EDT: MAY be fixed (useless) ?");
             }
-            if (t.getPriority() != Thread.NORM_PRIORITY) {
-                t.setPriority(Thread.NORM_PRIORITY);
-            }
-            return t;
+        }
+        EventQueue.invokeLater(doRun);
+    }
+
+    public static void invokeRunnableOrEnqueueLater(final Runnable runnable) {
+        if (isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            invokeLater(runnable);
         }
     }
 
-    /** single thread pool with max 1 live daemon thread */
-    private static final ExecutorService EDT_DAEMON_THREAD_POOL = new ThreadPoolExecutor(0, 1,
-            60L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(),
-            new MainAppContextDaemonThreadFactory()
-    );
+    public static void callOnAppContext(final Runnable doRun) throws InterruptedException, InvocationTargetException {
+        EventQueue.invokeAndWait(doRun);
+    }
 
-    /* shared Window owner */
-    private static Window window = null;
+    public static void invokeAndWait(final Runnable doRun) {
+        if (isEventDispatchThread()) {
+            if (TRACE_INVOKE_EDT) {
+                traceWithStack("invokeAndWait() from EDT: to be fixed (illegal) ?");
+            }
+            // Direct invocation:
+            doRun.run();
+        } else {
+            try {
+                callOnAppContext(doRun);
+            } catch (InterruptedException ie) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ie);
+            } catch (InvocationTargetException ite) {
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ite);
+            }
+        }
+    }
 
     public static synchronized Window getOrCreateWindowOwner() {
         if (window == null) {

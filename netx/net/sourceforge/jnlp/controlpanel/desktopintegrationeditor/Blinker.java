@@ -39,8 +39,8 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import net.sourceforge.swing.SwingUtils;
 
 public class Blinker {
 
@@ -76,7 +76,7 @@ public class Blinker {
             }
             if (counter == 5) {
                 ((Timer) e.getSource()).stop();
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtils.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
@@ -86,7 +86,7 @@ public class Blinker {
                 });
                 return;
             }
-            SwingUtilities.invokeLater(new Runnable() {
+            SwingUtils.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
