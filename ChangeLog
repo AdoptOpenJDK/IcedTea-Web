@@ -1,3 +1,8 @@
+2018-10-17  Jiri Vanek <jvanek@redhat.com>
+            Alex Kashchenko <akashche@redhat.com>
+
+	* netx/net/sourceforge/jnlp/util/lockingfile/LockedFile.java: caching enabled, or at least semi-enabled on windows
+
 2018-10-17  Laurent Bourgès <bourges.laurent@gmail.com>
 
 	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java: using SwingUtils.invokeLater instead of 
