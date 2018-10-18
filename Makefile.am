@@ -231,6 +231,13 @@ export ICEDTEAPLUGIN_CLEAN = clean-IcedTeaPlugin
 export COVERABLE_PLUGIN_DIR=$(TESTS_DIR)/icedteanp-build-with-jacoco
 endif
 
+if ENABLE_NATIVE_PLUGIN
+  CPPUNIT_IMPL = run-cpp-unit-tests-impl
+  CPPUNIT_CLEAN_IMPL = clean-cpp-unit-tests-impl
+else
+  CPPUNIT_IMPL = run-cpp-unit-tests-impl-placeholder
+  CPPUNIT_CLEAN_IMPL = clean-cpp-unit-tests-placeholder
+endif
 
 if CP_SUPPORTS_REFLINK
   REFLINK = --reflink=auto
@@ -627,12 +634,12 @@ $(CPP_UNITTEST_EXECUTABLE): $(CPP_UNITTEST_FRAMEWORK_LIB) stamps/cpp-unit-tests-
 	  $(CPP_UNITTEST_FRAMEWORK_LIB)\
 	  $(BUILT_CPP_UNIT_TEST_FRAMEWORK) -o $@
 
-clean-cpp-unit-tests: 
+clean-cpp-unit-tests-impl: 
 	rm -f stamps/cpp-unit-tests-compile.stamp
 	rm -f $(CPP_UNITTEST_EXECUTABLE)
 	rm -f $(CPP_UNITTEST_DIR)/*.o
 
-run-cpp-unit-tests: $(CPP_UNITTEST_EXECUTABLE)
+run-cpp-unit-tests-impl: $(CPP_UNITTEST_EXECUTABLE)
 	$(CPP_UNITTEST_EXECUTABLE)
 
 # End of CPP Unit test targets
@@ -647,6 +654,17 @@ clean-IcedTeaPlugin:
 	  fi ; \
 	fi
 endif
+
+clean-cpp-unit-tests-placeholder:
+	echo "plugin disabled"
+
+run-cpp-unit-tests-impl-placeholder:
+	echo "plugin disabled"
+
+clean-cpp-unit-tests: $(CPPUNIT_IMPL)
+
+run-cpp-unit-tests: $(CPPUNIT_CLEAN_IMPL)
+
 
 stamps/plugin.stamp: $(ICEDTEAPLUGIN_TARGET)
 	mkdir -p stamps

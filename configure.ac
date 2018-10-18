@@ -13,8 +13,6 @@ cd $abs_top_builddir
 AC_SUBST(abs_top_srcdir)
 
 AC_CANONICAL_HOST
-AC_PROG_CC
-AC_PROG_CXX
 IT_SET_ARCH_SETTINGS
 
 IT_CP_SUPPORTS_REFLINK
@@ -210,5 +208,19 @@ AC_SUBST(bashcompdir)
 
 AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
 AC_CONFIG_FILES([build.properties])
+
+# this is nasty hack to make GCC trully optional
+echo -n "destroying gcc config? ... "
+if test "x${enable_native_plugin}" = "xno" ; then
+am__fastdepCC_TRUE="#"
+am__fastdepCC_FALSE="#"
+am__fastdepCC="#"
+am__fastdepCXX_TRUE="#"
+am__fastdepCXX_FALSE="#"
+am__fastdepCXX="#"
+echo "destroyed!"
+else
+echo "no"
+fi 
 
 AC_OUTPUT

@@ -1,3 +1,11 @@
+2018-10-18  Jiri Vanek <jvanek@redhat.com>
+
+	Removed gcc if native plugin is not build
+	* acinclude.m4: AC_PROG_CC and AC_PROG_CXX moved behind enable_native_plugin condition
+	* configure.ac: AC_PROG_CC and AC_PROG_CXX moved behind enable_native_plugin condition, Faked fastDepC variables
+	otherwise configure always fell
+	* Makefile.am: plugin native tests made passing without plugin
+
 2018-10-17  Jiri Vanek <jvanek@redhat.com>
             Alex Kashchenko <akashche@redhat.com>
 
