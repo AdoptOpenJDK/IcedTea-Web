@@ -418,6 +418,8 @@ dnl Check for plugin support headers and libraries.
 dnl FIXME: use unstable
 AC_REQUIRE([IT_CHECK_NATIVE_PLUGIN])
 if test "x${enable_native_plugin}" = "xyes" ; then
+  AC_PROG_CC
+  AC_PROG_CXX
   PKG_CHECK_MODULES(GLIB, glib-2.0)
   AC_SUBST(GLIB_CFLAGS)
   AC_SUBST(GLIB_LIBS)
