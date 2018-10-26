@@ -661,9 +661,9 @@ clean-cpp-unit-tests-placeholder:
 run-cpp-unit-tests-impl-placeholder:
 	echo "plugin disabled"
 
-clean-cpp-unit-tests: $(CPPUNIT_IMPL)
+clean-cpp-unit-tests: $(CPPUNIT_CLEAN_IMPL)
 
-run-cpp-unit-tests: $(CPPUNIT_CLEAN_IMPL)
+run-cpp-unit-tests: $(CPPUNIT_IMPL)
 
 
 stamps/plugin.stamp: $(ICEDTEAPLUGIN_TARGET)
