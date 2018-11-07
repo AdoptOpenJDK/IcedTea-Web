@@ -58,6 +58,7 @@ public class MessagesPropertiesTest {
         public static final LocalesIdentifier DE = new LocalesIdentifier("de");
         public static final LocalesIdentifier PL = new LocalesIdentifier("pl");
         //public static final LocalesIdentifier DE_DE = new LocalesIdentifier("DE","de");
+        public static final LocalesIdentifier RU = new LocalesIdentifier("ru");
         
         public static final String mainFileName = "Messages";
         public static final String pckg = "net.sourceforge.jnlp.resources";
@@ -146,7 +147,7 @@ public class MessagesPropertiesTest {
         //get default by non existing language and country
         main = LocalesIdentifier.DEFAULT;
         assertNotNull(main);
-        secondary= new LocalesIdentifier[] {LocalesIdentifier.CZ, LocalesIdentifier.DE, LocalesIdentifier.PL};
+        secondary= new LocalesIdentifier[] {LocalesIdentifier.CZ, LocalesIdentifier.DE, LocalesIdentifier.PL, LocalesIdentifier.RU};
         assertNotNull(secondary);
         for (LocalesIdentifier secondary1 : secondary) {
             assertNotNull(secondary1);
