@@ -1,3 +1,10 @@
+2018-11-07  Olesya Gerasimenko <gammaray@basealt.ru>
+
+	Added Russian translation
+	* netx/net/sourceforge/jnlp/resources/Messages_ru.propertie: new file with Russian strings
+	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java: added RU to iterated sets.
+	* AUTHORS: added Olesya
+
 2018-10-18  Jiri Vanek <jvanek@redhat.com>
 
 	Removed gcc if native plugin is not build
