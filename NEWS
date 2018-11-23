@@ -12,6 +12,7 @@ New in release 1.8 (YYYY-MM-DD):
 * added support for javafx-desc and so allwong run of pure-javafx only applications
 * --nosecurity enhanced for possibility to skip invalid signatures
 * enhanced to allow resources to be read also from j2se/java element (OmegaT)
+* PR3644 - java.lang.NoClassDefFoundError: Could not initialize class net.sourceforge.jnlp.runtime.JNLPRuntime$DeploymentConfigurationHolder
 
 New in release 1.7 (2017-07-19):
 * PR3366 - bash completion file was split to three, and is setup-able by bashcompdir environment variable
