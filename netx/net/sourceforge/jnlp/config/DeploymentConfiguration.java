@@ -284,10 +284,6 @@ public final class DeploymentConfiguration {
         userDeploymentFileDescriptor = configFile;
         currentConfiguration = new HashMap<>();
         unchangeableConfiguration = new HashMap<>();
-        if (JNLPRuntime.isWindows()) {
-            boolean wh = JNLPRuntime.isHeadless();
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "On windows, answering headless at startup, to prevent race condition later - " + wh);
-         }
          try {
             IcoSpi spi = new IcoSpi();
             IIORegistry.getDefaultInstance().registerServiceProvider(spi);
