@@ -197,7 +197,9 @@ public class LockedFile {
         /*Comment why itis different*/
         @Override
         public void lock() throws IOException {
-            super.file.createNewFile();
+            if (!isReadOnly()) {
+                super.file.createNewFile();
+            }
             super.threadLock.lock();
         }
 

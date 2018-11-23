@@ -775,6 +775,7 @@ public class JNLPRuntime {
      * @return {@code true} if running on a Unix or Unix-like system (including
      * Linux and *BSD)
      */
+    @Deprecated
     public static boolean isUnix() {
         String sep = System.getProperty("file.separator");
         return (sep != null && sep.equals("/"));

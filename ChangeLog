@@ -1,4 +1,14 @@
 2018-11-23  Lars Herschke <lhersch@dssgmbh.de>
+            Jiri Vanek <jvanek@redhat.com>
+
+	Fixed LockedFile for readonly on windows
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: made isUnix deprecated
+	* netx/net/sourceforge/jnlp/util/lockingfile/LockedFile.java: creating file (for windows) only if not readonly
+	* tests/netx/unit/net/sourceforge/jnlp/util/lockingfile/NonWindowsLockedFile.java: tests for os set to no windows
+	* tests/netx/unit/net/sourceforge/jnlp/util/lockingfile/WindowsLockedFileTest.java: tests for os set to windows
+
+
+2018-11-23  Lars Herschke <lhersch@dssgmbh.de>
 
 	Fix for java.lang.NoClassDefFoundError: Could not initialize class net.sourceforge.jnlp.runtime.JNLPRuntime$DeploymentConfigurationHolder
 	* NEWS: mentioned PR3644
