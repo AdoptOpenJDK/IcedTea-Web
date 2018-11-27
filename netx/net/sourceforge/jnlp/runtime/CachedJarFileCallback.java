@@ -86,6 +86,12 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
     @Override
     public java.util.jar.JarFile retrieve(URL url) throws IOException {
         URL localUrl = mapping.get(url);
+        if (localUrl == null) {
+            if (url.getRef() != null) {
+                url = new URL(url.toString().substring(0, url.toString().lastIndexOf(url.getRef()) - 1));
+                localUrl = mapping.get(url);
+            }
+        }
 
         if (localUrl == null) {
             /*

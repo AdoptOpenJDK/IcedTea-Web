@@ -1401,7 +1401,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         // there is currently no mechanism to cache files per
                         // instance.. so only index cached files
                         if (localFile != null) {
-                            CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURL());
+                            CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURI().toURL());
 
                             try (JarFile jarFile = new JarFile(localFile.getAbsolutePath())) {
                                 Manifest mf = jarFile.getManifest();
