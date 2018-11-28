@@ -1,5 +1,9 @@
 2018-11-27  Jiri Vanek <jvanek@redhat.com>
 
+	* netx/net/sourceforge/jnlp/OptionsDefinitions.java: (main) moved from ifelse to switch
+
+2018-11-27  Jiri Vanek <jvanek@redhat.com>
+
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPProxySelectorTest.java: fixed tests in (testConvertingProxyAutoConfigResultToProxyObject)
 
 2018-11-27  Jiri Vanek <jvanek@redhat.com>
