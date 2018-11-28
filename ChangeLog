@@ -1,5 +1,9 @@
 2018-11-27  Jiri Vanek <jvanek@redhat.com>
 
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPProxySelectorTest.java: fixed tests in (testConvertingProxyAutoConfigResultToProxyObject)
+
+2018-11-27  Jiri Vanek <jvanek@redhat.com>
+
 	https is preffered only on default port
 	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java: (getUrls) when http protocol-ed  url have set port
 	its https clone is not put to the list of possible urls
