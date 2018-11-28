@@ -21,6 +21,7 @@ package net.sourceforge.jnlp.controlpanel;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,7 @@ public class CommandLine {
         config = new DeploymentConfiguration();
         try {
             config.load(false);
-        } catch (ConfigurationException e) {
+        } catch (ConfigurationException | MalformedURLException e) {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("RConfigurationFatal"));
             OutputController.getLogger().log(e);
         }

@@ -440,6 +440,16 @@ public class Defaults {
                         DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
                         BasicValueValidators.getManifestAttributeCheckValidator(),
                         String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL)
+                },
+                {
+                        DeploymentConfiguration.KEY_SYSTEM_CONFIG,
+                        BasicValueValidators.getUrlValidator(),
+                        null
+                },
+                {
+                        DeploymentConfiguration.KEY_SYSTEM_CONFIG_MANDATORY,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(false)
                 }
         };
 
