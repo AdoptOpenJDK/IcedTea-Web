@@ -31,6 +31,29 @@ impl Validator for JreValidator {
     }
 }
 
+pub struct BoolValidator {}
+
+
+impl Validator for BoolValidator {
+    fn validate(&self, s: &str) -> bool {
+        verify_bool_string(&s.to_string())
+    }
+
+    fn get_fail_message(&self, key: &str, value: &str, file: &Option<std::path::PathBuf>) -> String {
+        let mut res = String::new();
+        write!(&mut res, "the boolean value of {} read from {} under key {} is not valid. Expected true or false (key insensitive)", value, file.clone().expect("jre path should be loaded").display(), key).expect("unwrap failed");
+        return res;
+    }
+}
+
+fn verify_bool_string(val: &String) -> bool {
+    val.trim().to_lowercase() == "true" || val.trim().to_lowercase() == "false"
+}
+
+pub fn str_to_bool(val: &String) -> bool {
+    val.trim().to_lowercase() == "true"
+}
+
 fn is_file(path: &std::path::PathBuf) -> bool {
     path.metadata().map(|md| md.is_file()).unwrap_or(false)
 }
@@ -164,6 +187,38 @@ mod tests {
         let prop = get_jre_from_file(Some(path.clone()));
         tu::debuggable_remove_file(&path);
         assert_eq!(None, prop);
+    }
+
+    #[test]
+    fn verify_bool_string_true() {
+        assert_eq!(true, super::verify_bool_string(&String::from("true")));
+        assert_eq!(true, super::verify_bool_string(&String::from("True")));
+        assert_eq!(true, super::verify_bool_string(&String::from("TRUE")));
+        assert_eq!(true, super::verify_bool_string(&String::from("false")));
+        assert_eq!(true, super::verify_bool_string(&String::from("FALSE")));
+        assert_eq!(true, super::verify_bool_string(&String::from("False")));
+    }
+
+    #[test]
+    fn verify_bool_string_false() {
+        assert_eq!(false, super::verify_bool_string(&String::from("truee")));
+        assert_eq!(false, super::verify_bool_string(&String::from("WHATEVER")));
+    }
+
+    #[test]
+    fn str_to_bool_true() {
+        assert_eq!(true, super::str_to_bool(&String::from("true")));
+        assert_eq!(true, super::str_to_bool(&String::from("True")));
+        assert_eq!(true, super::str_to_bool(&String::from("TRUE")));
+    }
+
+    #[test]
+    fn str_to_bool_false() {
+        assert_eq!(false, super::str_to_bool(&String::from("truee")));
+        assert_eq!(false, super::str_to_bool(&String::from("WHATEVER")));
+        assert_eq!(false, super::str_to_bool(&String::from("false")));
+        assert_eq!(false, super::str_to_bool(&String::from("FALSE")));
+        assert_eq!(false, super::str_to_bool(&String::from("False")));
     }
 
 

@@ -1,5 +1,12 @@
 2018-11-30  Jiri Vanek <jvanek@redhat.com>
 
+	verbose also from deployment.properties
+	* rust-launcher/src/main.rs: now reading verbose also from deployment.properties
+	* rust-launcher/src/property_from_file.rs: added wrapping functions to load deployment.log boolean
+	* rust-launcher/src/property_from_files_resolver.rs: refactored to use new validators
+
+2018-11-30  Jiri Vanek <jvanek@redhat.com>
+
 	Rust properties parser generalized to be reusable
 	* rust-launcher/src/dirs_paths_helper.rs: new file, including get_xdg_config_dir, deployment.properties and similar
 	originally from jvm_from_properties.rs

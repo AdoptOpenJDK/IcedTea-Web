@@ -6,7 +6,8 @@ use std;
 use std::string::String;
 use std::fmt::Write;
 
-pub fn try_jdk_from_properties(logger: &os_access::Os) -> Option<String> {
+
+fn get_basic_array(logger: &os_access::Os) -> [Option<std::path::PathBuf>; 4] {
     //obviously search in jre dir is missing, when we search for jre
     let array: [Option<std::path::PathBuf>; 4] = [
         dirs_paths_helper::get_itw_config_file(logger),
@@ -14,7 +15,23 @@ pub fn try_jdk_from_properties(logger: &os_access::Os) -> Option<String> {
         dirs_paths_helper::get_itw_legacy_global_config_file(logger),
         dirs_paths_helper::get_itw_global_config_file(logger)
     ];
-    try_key_from_properties_files(logger, &array, property_from_file::JRE_PROPERTY_NAME, &property_from_file::JreValidator {})
+    array
+}
+
+pub fn try_jdk_from_properties(logger: &os_access::Os) -> Option<String> {
+    try_key_from_properties_files(logger, &get_basic_array(logger), property_from_file::JRE_PROPERTY_NAME, &property_from_file::JreValidator {})
+}
+
+pub fn try_main_verbose_from_properties(logger: &os_access::Os) -> bool {
+    let str_bool = try_key_from_properties_files(logger, &get_basic_array(logger), property_from_file::VERBOSE_PROPERTY_NAME, &property_from_file::BoolValidator {});
+    match str_bool {
+        Some(val) => {
+            property_from_file::str_to_bool(&val)
+        }
+        None => {
+            false
+        }
+    }
 }
 
 fn try_key_from_properties_files(logger: &os_access::Os, array: &[Option<std::path::PathBuf>], key: &str, validator: &property_from_file::Validator) -> Option<String> {

@@ -19,7 +19,8 @@ fn is_debug_on() -> bool{
             return true;
         }
     }
-    return false;
+    let os = os_access::Linux::new(false);
+    return property_from_files_resolver::try_main_verbose_from_properties(&os);
 }
 
 fn main() {
