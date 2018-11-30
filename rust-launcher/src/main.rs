@@ -1,7 +1,8 @@
 mod hardcoded_paths;
-mod jvm_from_properties;
+mod property_from_file;
 mod os_access;
-mod jvm_from_properties_resolver;
+mod dirs_paths_helper;
+mod property_from_files_resolver;
 mod utils;
 mod property;
 
@@ -26,11 +27,9 @@ fn main() {
     let os = os_access::Linux::new(is_debug_on());
     let java_dir: std::path::PathBuf;
     let mut info1 = String::new();
-    write!(&mut info1, "{}", "itw-rust-debug: trying jdk over properties (").expect("unwrap failed");
-    write!(&mut info1, "{}", jvm_from_properties::PROPERTY_NAME).expect("unwrap failed");
-    write!(&mut info1, "{}", ")").expect("unwrap failed");
+    write!(&mut info1, "itw-rust-debug: trying jdk over properties ({})", property_from_file::JRE_PROPERTY_NAME).expect("unwrap failed");
     os.log(&info1);
-    match jvm_from_properties_resolver::try_jdk_from_properties(&os) {
+    match property_from_files_resolver::try_jdk_from_properties(&os) {
         Some(path) => {
             java_dir = std::path::PathBuf::from(path);
             os.log("itw-rust-debug: found and using");
@@ -62,8 +61,7 @@ fn main() {
         }
     }
     let mut info2 = String::new();
-    write!(&mut info2, "{}", "selected jre: ").expect("unwrap failed");
-    write!(&mut info2, "{}", java_dir.display()).expect("unwrap failed");
+    write!(&mut info2, "selected jre: {}", java_dir.display()).expect("unwrap failed");
     os.info(&info2);
     let mut child = os.spawn_java_process(&java_dir, &(env::args().skip(1).collect()));
     let ecode = child.wait().expect("failed to wait on child");

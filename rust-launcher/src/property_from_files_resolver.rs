@@ -1,50 +1,37 @@
-use hardcoded_paths;
-use jvm_from_properties;
+use property_from_file;
 use os_access;
+use dirs_paths_helper;
 
 use std;
 use std::string::String;
 use std::fmt::Write;
 
 pub fn try_jdk_from_properties(logger: &os_access::Os) -> Option<String> {
+    //obviously search in jre dir is missing, when we search for jre
     let array: [Option<std::path::PathBuf>; 4] = [
-        jvm_from_properties::get_itw_config_file(),
-        jvm_from_properties::get_itw_legacy_config_file(),
-        jvm_from_properties::get_itw_legacy_global_config_file(),
-        jvm_from_properties::get_itw_global_config_file()
+        dirs_paths_helper::get_itw_config_file(logger),
+        dirs_paths_helper::get_itw_legacy_config_file(logger),
+        dirs_paths_helper::get_itw_legacy_global_config_file(logger),
+        dirs_paths_helper::get_itw_global_config_file(logger)
     ];
-    try_jdk_from_properties_files(logger, &array)
+    try_key_from_properties_files(logger, &array, property_from_file::JRE_PROPERTY_NAME, &property_from_file::JreValidator {})
 }
 
-fn try_jdk_from_properties_files(logger: &os_access::Os, array: &[Option<std::path::PathBuf>]) -> Option<String> {
-    for jdk in array {
+fn try_key_from_properties_files(logger: &os_access::Os, array: &[Option<std::path::PathBuf>], key: &str, validator: &property_from_file::Validator) -> Option<String> {
+    for file in array {
         let mut info1 = String::new();
-        write!(&mut info1, "{} ", "itw-rust-debug: checking jre in:").expect("unwrap failed");
-        write!(&mut info1, "{}", jdk.clone().unwrap_or(std::path::PathBuf::from("None")).display()).expect("unwrap failed");
+        write!(&mut info1, "itw-rust-debug: checking {} in: {}", key, file.clone().unwrap_or(std::path::PathBuf::from("None")).display()).expect("unwrap failed");
         logger.log(&info1);
-        match jvm_from_properties::get_jre_from_file(jdk.clone()) {
-            Some(path) => {
+        match property_from_file::get_property_from_file(file.clone(), &key) {
+            Some(value) => {
                 let mut info2 = String::new();
-                write!(&mut info2, "{} ", "itw-rust-debug: located").expect("unwrap failed");
-                write!(&mut info2, "{}", path).expect("unwrap failed");
-                write!(&mut info2, " in file {}", jdk.clone().expect("file should be already verified").display()).expect("unwrap failed");
+                write!(&mut info2, "itw-rust-debug: located {} in file {}", value, file.clone().expect("file should be already verified").display()).expect("unwrap failed");
                 logger.log(&info2);
-                if jvm_from_properties::verify_jdk_string(&path) {
-                    return Some(path);
+                if validator.validate(&value) {
+                    return Some(value);
                 } else {
                     //the only output out of verbose mode
-                    let mut res = String::new();
-                    write!(&mut res, "{}", "Your custom JRE ").expect("unwrap failed");
-                    write!(&mut res, "{}", path).expect("unwrap failed");
-                    write!(&mut res, "{}", " read from ").expect("unwrap failed");
-                    write!(&mut res, "{}", jdk.clone().expect("jre path should be loaded").display()).expect("unwrap failed");
-                    write!(&mut res, "{}", " under key ").expect("unwrap failed");
-                    write!(&mut res, "{}", jvm_from_properties::PROPERTY_NAME).expect("unwrap failed");
-                    write!(&mut res, "{}", " is not valid. Trying other config files, then using default (").expect("unwrap failed");
-                    write!(&mut res, "{}", hardcoded_paths::get_java()).expect("unwrap failed");
-                    write!(&mut res, "{}", ", ").expect("unwrap failed");
-                    write!(&mut res, "{}", hardcoded_paths::get_jre()).expect("unwrap failed");
-                    write!(&mut res, "{}", ", registry or JAVA_HOME) in attempt to start. Please fix this.").expect("unwrap failed");
+                    let res = validator.get_fail_message(&key, &value, file);
                     logger.info(&res);
                 }
             }
@@ -65,6 +52,7 @@ mod tests {
     use os_access;
     use std::cell::RefCell;
     use utils::tests_utils as tu;
+    use property_from_file;
     //if you wont to investigate files used for testing
     // use cargo test -- --nocapture to see  files which needs delete
     static DELETE_TEST_FILES: bool = true;
@@ -98,6 +86,26 @@ mod tests {
         fn spawn_java_process(&self, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child {
             panic!("not implemented");
         }
+
+        fn get_system_config_javadir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+
+        fn get_user_config_dir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+
+        fn get_legacy_system_config_javadir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+
+        fn get_legacy_user_config_dir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+    }
+
+    fn try_jdk_from_properties_files(logger: &os_access::Os, array: &[Option<std::path::PathBuf>]) -> Option<String> {
+        super::try_key_from_properties_files(logger, &array, property_from_file::JRE_PROPERTY_NAME, &property_from_file::JreValidator {})
     }
 
     #[test]
@@ -109,7 +117,7 @@ mod tests {
             None
         ];
         let os = TestLogger { vec: RefCell::new(Vec::new()) };
-        let r = super::try_jdk_from_properties_files(&os, &array);
+        let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         assert_eq!(None, r);
     }
@@ -123,7 +131,7 @@ mod tests {
             Some(std::path::PathBuf::from("Nonexisting file 4")),
         ];
         let os = TestLogger { vec: RefCell::new(Vec::new()) };
-        let r = super::try_jdk_from_properties_files(&os, &array);
+        let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         assert_eq!(None, r);
     }
@@ -152,7 +160,7 @@ mod tests {
             Some(std::path::PathBuf::from(tu::create_tmp_file())),
         ];
         let os = TestLogger { vec: RefCell::new(Vec::new()) };
-        let r = super::try_jdk_from_properties_files(&os, &array);
+        let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         clean_fake_files(&array);
         assert_eq!(None, r);
@@ -167,7 +175,7 @@ mod tests {
             Some(std::path::PathBuf::from(tu::create_tmp_propfile_with_custom_jre_content("non/existing/jre4"))),
         ];
         let os = TestLogger { vec: RefCell::new(Vec::new()) };
-        let r = super::try_jdk_from_properties_files(&os, &array);
+        let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         clean_fake_files(&array);
         assert_eq!(None, r);
@@ -188,7 +196,7 @@ mod tests {
             Some(std::path::PathBuf::from(tu::create_tmp_propfile_with_custom_jre_content("non/existing/jre4"))),
         ];
         let os = TestLogger { vec: RefCell::new(Vec::new()) };
-        let r = super::try_jdk_from_properties_files(&os, &array);
+        let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         clean_fake_files(&array);
         assert_ne!(None, r);
@@ -209,7 +217,7 @@ mod tests {
             Some(std::path::PathBuf::from(tu::create_tmp_propfile_with_custom_jre_content(&master_dir2.display().to_string()))),
         ];
         let os = TestLogger { vec: RefCell::new(Vec::new()) };
-        let r = super::try_jdk_from_properties_files(&os, &array);
+        let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         clean_fake_files(&array);
         assert_ne!(None, r);

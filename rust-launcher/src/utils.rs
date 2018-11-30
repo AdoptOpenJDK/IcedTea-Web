@@ -7,7 +7,7 @@ pub mod tests_utils {
     use std::fmt::Write as fmt_write;
     use std::io::Write;
     use std::sync::atomic::{AtomicUsize, Ordering, ATOMIC_USIZE_INIT};
-    use jvm_from_properties;
+    use property_from_file;
 
     // rand is in separate crate, so using atomic increment instead
     static TMP_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
@@ -98,7 +98,7 @@ pub mod tests_utils {
         let mut res = String::new();
         write!(&mut res, "{}", "key1=val1\n").expect("unwrap failed");
         write!(&mut res, "{}", "key2=val2\n").expect("unwrap failed");
-        write!(&mut res, "{}", jvm_from_properties::PROPERTY_NAME).expect("unwrap failed");
+        write!(&mut res, "{}", property_from_file::JRE_PROPERTY_NAME).expect("unwrap failed");
         write!(&mut res, "{}", "=").expect("unwrap failed");
         write!(&mut res, "{}", jre_path).expect("unwrap failed");
         write!(&mut res, "{}", "\n").expect("unwrap failed");

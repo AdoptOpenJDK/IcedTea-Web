@@ -1,3 +1,14 @@
+2018-11-30  Jiri Vanek <jvanek@redhat.com>
+
+	Rust properties parser generalized to be reusable
+	* rust-launcher/src/dirs_paths_helper.rs: new file, including get_xdg_config_dir, deployment.properties and similar
+	originally from jvm_from_properties.rs
+	* rust-launcher/src/main.rs: adapted to re-factored state
+	* rust-launcher/src/os_access.rs: added and for Linux implemented get_system_config_javadir, get_user_config_dir
+	* rust-launcher/src/property_from_file.rs: renamed from jvm_from_properties_file and generalized
+	* rust-launcher/src/property_from_files_resolver.rs: renamed from jvm_from_files_resolver and generalized
+	* rust-launcher/src/utils.rs: adapted to renamed JRE_PROPERTY_NAME from PROPERTY_NAME
+
 2018-11-28  Jiri Vanek <jvanek@redhat.com>
 
 	deployment.config now support generic url instead just file
