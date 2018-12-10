@@ -6,20 +6,14 @@ use std::env;
 pub static ICEDTEA_WEB: &'static str = "icedtea-web";
 pub static DEPLOYMENT_PROPERTIES: &'static str = "deployment.properties";
 
-pub fn get_home() -> Option<std::path::PathBuf> {
-    match env::home_dir() {
-        Some(p) => Some(p),
-        None => None
-    }
-}
 
-pub fn get_xdg_config_dir() -> Option<std::path::PathBuf> {
+pub fn get_xdg_config_dir(os: &os_access::Os) -> Option<std::path::PathBuf> {
     match env::var("XDG_CONFIG_HOME") {
         Ok(war) => {
             Some(std::path::PathBuf::from(war))
         }
         Err(_) => {
-            match get_home() {
+            match os.get_home() {
                 Some(mut p) => {
                     p.push(".config");
                     Some(p)
@@ -58,11 +52,21 @@ pub fn get_itw_global_config_file(os: &os_access::Os) -> Option<std::path::PathB
     append_deployment_file(os.get_system_config_javadir())
 }
 
+pub fn is_file(path: &std::path::PathBuf) -> bool {
+    path.metadata().map(|md| md.is_file()).unwrap_or(false)
+}
+
+pub fn is_dir(path: &std::path::PathBuf) -> bool {
+    path.metadata().map(|md| md.is_dir()).unwrap_or(false)
+}
 
 /*tests*/
 #[cfg(test)]
 mod tests {
+    use std;
+    use std::fs;
     use os_access;
+    use utils::tests_utils as tu;
 
     #[test]
     fn check_config_files_paths() {
@@ -91,5 +95,53 @@ mod tests {
         assert_eq!(true, p5.clone().expect("unwrap failed").display().to_string().contains(".java"));
         assert_eq!(true, p5.clone().expect("unwrap failed").display().to_string().contains("deployment"));
         assert_eq!(true, p6.clone().expect("unwrap failed").display().to_string().ends_with("deployment.properties"));
+    }
+
+    #[test]
+    fn is_not_file() {
+        let r = super::is_file(&std::path::PathBuf::from("/definitely/not/existing/file"));
+        assert_eq!(false, r);
+    }
+
+    #[test]
+    fn is_not_file_is_dir() {
+        let dir = tu::create_tmp_file();
+        tu::debuggable_remove_file(&dir);
+        let _cd = fs::create_dir(&dir); //silenting compiler worning
+        let r = super::is_file(&dir);
+        tu::debuggable_remove_dir(&dir);
+        assert_eq!(false, r);
+    }
+
+    #[test]
+    fn is_file() {
+        let file = tu::create_tmp_file();
+        let r = super::is_file(&file);
+        tu::debuggable_remove_file(&file);
+        assert_eq!(true, r);
+    }
+
+    #[test]
+    fn is_not_dir() {
+        let r = super::is_dir(&std::path::PathBuf::from("/definitely/not/existing/file"));
+        assert_eq!(false, r);
+    }
+
+    #[test]
+    fn is_dir() {
+        let dir = tu::create_tmp_file();
+        tu::debuggable_remove_file(&dir);
+        let _cd = fs::create_dir(&dir); //silenting compiler worning
+        let r = super::is_dir(&dir);
+        tu::debuggable_remove_dir(&dir);
+        assert_eq!(true, r);
+    }
+
+    #[test]
+    fn is_not_dir_is_file() {
+        let file = tu::create_tmp_file();
+        let r = super::is_dir(&file);
+        tu::debuggable_remove_file(&file);
+        assert_eq!(false, r);
     }
 }

@@ -1,5 +1,6 @@
 use property;
 use hardcoded_paths;
+use dirs_paths_helper as dh;
 
 use std;
 use std::string::String;
@@ -54,9 +55,6 @@ pub fn str_to_bool(val: &String) -> bool {
     val.trim().to_lowercase() == "true"
 }
 
-fn is_file(path: &std::path::PathBuf) -> bool {
-    path.metadata().map(|md| md.is_file()).unwrap_or(false)
-}
 
 
 pub fn get_property_from_file(file: Option<std::path::PathBuf>, key: &str) -> Option<String> {
@@ -71,7 +69,7 @@ pub fn get_property_from_file(file: Option<std::path::PathBuf>, key: &str) -> Op
 fn get_property_from_file_direct(path: std::path::PathBuf, key: &str) -> Option<String> {
     if !path.exists() {
         None
-    } else if !is_file(&path) {
+    } else if !dh::is_file(&path) {
         return None;
     } else {
         let fileresult = File::open(path);
@@ -102,7 +100,7 @@ fn verify_jdk_string(spath: &str) -> bool {
     file.push("java");
     if !file.exists() {
         false
-    } else if !is_file(&file) {
+    } else if !dh::is_file(&file) {
         false
     } else {
         true
@@ -120,21 +118,7 @@ mod tests {
         super::get_property_from_file(file, super::JRE_PROPERTY_NAME)
     }
 
-    #[test]
-    fn is_not_file_() {
-        let r = super::is_file(&std::path::PathBuf::from("/definitely/not/existing/file"));
-        assert_eq!(false, r);
-    }
-
-    #[test]
-    fn is_file_() {
-        let dir = tu::create_tmp_file();
-        let r = super::is_file(&dir);
-        tu::debuggable_remove_file(&dir);
-        assert_eq!(true, r);
-    }
-
-    #[test]
+     #[test]
     fn check_file_for_property_jredir_not_found() {
         let path = tu::create_tmp_file();
         let f = File::open(&path);

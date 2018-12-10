@@ -1,20 +1,25 @@
 use std;
 use dirs_paths_helper;
+use std::env;
 
 pub trait Os {
-    //logging "api" can change
+    // logging "api" can change
     fn log(&self, s: &str);
     fn info(&self, s: &str);
     fn get_registry_jdk(&self) -> Option<std::path::PathBuf>;
     // next to system and home cfg dir, there is also by-jre config dir, but that do not need to be handled os-specific way
-    //https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/jcp/properties.html
+    // https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/jcp/properties.html
     fn get_system_config_javadir(&self) -> Option<std::path::PathBuf>;
     fn get_user_config_dir(&self) -> Option<std::path::PathBuf>;
-    //is valid  only on linux, otherwise returns get_system_config_javadir
+    // is valid  only on linux, otherwise returns get_system_config_javadir
     fn get_legacy_system_config_javadir(&self) -> Option<std::path::PathBuf>;
-    //is valid  only on linux, otherwise returns get_user_config_dir
+    // is valid  only on linux, otherwise returns get_user_config_dir
     fn get_legacy_user_config_dir(&self) -> Option<std::path::PathBuf>;
     fn spawn_java_process(&self, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child;
+    // should probe HOME on linux and USERPROFILE on windows.
+    // it should have fallback in env::home_dir as it is doing a bit more
+    // see https://doc.rust-lang.org/std/env/fn.home_dir.html
+    fn get_home(&self) -> Option<std::path::PathBuf>;
 }
 
 pub struct Linux {
@@ -48,7 +53,7 @@ impl Os for Linux {
     }
 
     fn get_user_config_dir(&self) -> Option<std::path::PathBuf> {
-        match dirs_paths_helper::get_xdg_config_dir() {
+        match dirs_paths_helper::get_xdg_config_dir(self) {
             Some(mut p) => {
                 p.push(dirs_paths_helper::ICEDTEA_WEB);
                 Some(p)
@@ -63,7 +68,7 @@ impl Os for Linux {
     }
 
     fn get_legacy_user_config_dir(&self) -> Option<std::path::PathBuf> {
-        match dirs_paths_helper::get_home() {
+        match self.get_home() {
             Some(mut p) => {
                 p.push(".icedtea");
                 Some(p)
@@ -71,7 +76,7 @@ impl Os for Linux {
             None => None
         }
     }
-    
+
     fn spawn_java_process(&self, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child {
         let mut bin_java = jre_dir.clone();
         bin_java.push("bin");
@@ -89,5 +94,21 @@ impl Os for Linux {
             Err(_) => panic!("Error spawning JVM process, \
                  java executable: [{}], arguments: [{:?}]", bin_java.into_os_string().to_str().expect("path should unwrap"), args)
         }
+    }
+
+    fn get_home(&self) -> Option<std::path::PathBuf> {
+        match env::var("HOME") {
+            Ok(war) => {
+                let home_var_path = std::path::PathBuf::from(war);
+                if dirs_paths_helper::is_dir(&home_var_path) {
+                    return Some(home_var_path);
+                }
+            }
+            Err(_) => {}
+        }
+        // Not failing to env::get_home
+        // if this will ever be bugged, the fix should be to set HOME
+        // locally, or fix the distribution itslef
+        None
     }
 }

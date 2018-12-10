@@ -100,7 +100,7 @@ mod tests {
             None
         }
 
-        fn spawn_java_process(&self, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child {
+        fn spawn_java_process(&self, _jre_dir: &std::path::PathBuf, _args: &Vec<String>) -> std::process::Child {
             panic!("not implemented");
         }
 
@@ -117,6 +117,10 @@ mod tests {
         }
 
         fn get_legacy_user_config_dir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+
+        fn get_home(&self) -> Option<std::path::PathBuf> {
             panic!("not implemented");
         }
     }

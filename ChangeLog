@@ -1,3 +1,12 @@
+2018-12-10  Jiri Vanek <jvanek@redhat.com>
+
+	Made get_home os dependent.
+	* rust-launcher/src/dirs_paths_helper.rs: removed get_home; used os.get_home where appropriate.
+	Introduced is_dir, and moved is_file here and theirs tests.
+	* rust-launcher/src/os_access.rs: prescribed get_home and implemeted for Linux, solemnly on HOME variable
+	* rust-launcher/src/property_from_file.rs: adapted to new location of is_file
+	* rust-launcher/src/property_from_files_resolver.rs: implemented get_home doing nothing for testing stub
+
 2018-11-30  Jiri Vanek <jvanek@redhat.com>
 
 	verbose also from deployment.properties
