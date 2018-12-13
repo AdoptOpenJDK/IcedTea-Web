@@ -39,7 +39,7 @@ import java.nio.ByteBuffer;
  * A character encoder is an algorithim for transforming 8 bit binary
  * data into text (generally 7 bit ASCII or 8 bit ISO-Latin-1 text)
  * for transmition over text channels such as e-mail and network news.
- * <p>
+ 
  * The character encoders have been structured around a central theme
  * that, in general, the encoded text has the form:
  * <pre><code>
@@ -47,25 +47,22 @@ import java.nio.ByteBuffer;
  *      [Line Prefix][encoded data atoms][Line Suffix]
  *      [Buffer Suffix]
  * </code></pre>
- * </p>
- * <p>
+  * <p>
  * In the {@code CharacterEncoder} and {@link CharacterDecoder}
  * classes, one complete chunk of data is referred to as a
  * <i>buffer</i>. Encoded buffers are all text, and decoded buffers
  * (sometimes just referred to as buffers) are binary octets.
  * </p>
- * <p>
- * To create a custom encoder, you must, at a minimum, overide three
+  * To create a custom encoder, you must, at a minimum, overide three
  * abstract methods in this class.
  * <dl>
- * <dd/>bytesPerAtom which tells the encoder how many bytes to
- * send to encodeAtom
- * <dd/>encodeAtom which encodes the bytes sent to it as text.
- * <dd/>bytesPerLine which tells the encoder the maximum number of
- * bytes per line.
+ * <dd>bytesPerAtom which tells the encoder how many bytes to
+ * send to encodeAtom</dd>
+ * <dd>encodeAtom which encodes the bytes sent to it as text.</dd>
+ * <dd>bytesPerLine which tells the encoder the maximum number of
+ * bytes per line.</dd>
  * </dl>
- * </p>
- * <p>
+  * <p>
  * Several useful encoders have already been written and are
  * referenced in the See Also list below.
  * </p>
@@ -107,7 +104,7 @@ public abstract class CharacterEncoder {
 
     /**
      * Encode the suffix that ends every output line. By default
-     * this method just prints a <newline> into the output stream.
+     * this method just prints a newline into the output stream.
      */
     protected void encodeLineSuffix(OutputStream aStream) throws IOException {
         pStream.println();

@@ -46,7 +46,7 @@ public final class ThreadCheckingRepaintManager extends RepaintManager {
     /**
      * Initially there was a rule that it is safe to create and use Swing components until they are realized but this
      * rule is not valid any more, and now it is recommended to interact with Swing from EDT only.
-     * <p/>
+     * 
      * That's why completeCheck flag is used - if you test the old program switch it to false, but new applications
      * should be tested with completeCheck set to true*
      *

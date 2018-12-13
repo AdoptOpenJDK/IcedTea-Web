@@ -147,7 +147,7 @@ public class ViwableDialog {
     /**
      * Adds an {@link ActionListener} which will be notified if the user makes a
      * choice using this SecurityDialog. The listener should use
-     * {@link #getValue()} to actually get the user's response.
+     * getValue() to actually get the user's response.
      *
      * @param listener another action listener to be listen to
      */

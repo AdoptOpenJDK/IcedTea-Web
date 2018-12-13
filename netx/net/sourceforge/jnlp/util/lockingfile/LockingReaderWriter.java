@@ -64,7 +64,7 @@ public abstract class LockingReaderWriter {
 
     /**
      * Get the underlying file. 
-     * Any access to this file should use lock() & unlock().
+     * Any access to this file should use lock() and unlock().
      * 
      * @return the file
      */

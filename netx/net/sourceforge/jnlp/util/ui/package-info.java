@@ -34,7 +34,7 @@ statement from your version.*/
  * Contains classes that deal with common and recurring UI tasks.
  * <p>
  * <b>NOTE:</b> Before adding new self-sufficient {@code public static} methods
- * to this package please evaluate thier suitability for {@link UI} first.</p>
+ * to this package please evaluate thier suitability for @link UI first.</p>
  * @since IcedTea-Web 1.5
  */
 package net.sourceforge.jnlp.util.ui;

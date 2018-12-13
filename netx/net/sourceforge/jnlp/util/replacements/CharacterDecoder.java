@@ -38,7 +38,6 @@ import java.nio.ByteBuffer;
  * A character decoder is an algorithim for transforming 8 bit
  * binary data that has been encoded into text by a character
  * encoder, back into original binary form.
- * <p>
  * The character encoders, in general, have been structured
  * around a central theme that binary data can be encoded into
  * text that has the form:
@@ -47,7 +46,6 @@ import java.nio.ByteBuffer;
  *      [Line Prefix][encoded data atoms][Line Suffix]
  *      [Buffer Suffix]
  * </code></pre>
- * </p>
  * <p>
  * Of course in the simplest encoding schemes, the buffer has no
  * distinct prefix of suffix, however all have some fixed relationship
@@ -64,11 +62,11 @@ import java.nio.ByteBuffer;
  * abstract methods in this class.
  * </p>
  * <dl>
- * <dd/>bytesPerAtom which tells the decoder how many bytes to
- * expect from decodeAtom
- * <dd/>decodeAtom which decodes the bytes sent to it as text.
- * <dd/>bytesPerLine which tells the encoder the maximum number of
- * bytes per line.
+ * <dd>bytesPerAtom which tells the decoder how many bytes to
+ * expect from decodeAtom</dd>
+ * <dd>decodeAtom which decodes the bytes sent to it as text.</dd>
+ * <dd>bytesPerLine which tells the encoder the maximum number of
+ * bytes per line.</dd>
  * </dl>
  * <p>
  * In general, the character decoders return error in the form of a
@@ -123,7 +121,7 @@ public abstract class CharacterDecoder {
     /**
      * This method does an actual decode. It takes the decoded bytes and
      * writes them to the OutputStream. The integer <i>l</i> tells the
-     * method how many bytes are required. This is always <= bytesPerAtom().
+     * method how many bytes are required. This is always less or equal to bytesPerAtom().
      */
     protected void decodeAtom(PushbackInputStream aStream, OutputStream bStream, int l) throws IOException {
         throw new CEStreamExhausted();
@@ -149,8 +147,7 @@ public abstract class CharacterDecoder {
      * Decode the text from the InputStream and write the decoded
      * octets to the OutputStream. This method runs until the stream
      * is exhausted.
-     * @exception CEFormatException An error has occured while decoding
-     * @exception CEStreamExhausted The input stream is unexpectedly out of data
+     * @exception IOException The input stream is unexpectedly out of data, An error has occured while decoding
      */
     public void decodeBuffer(InputStream aStream, OutputStream bStream) throws IOException {
         int     i;
@@ -185,7 +182,7 @@ public abstract class CharacterDecoder {
     /**
      * Alternate decode interface that takes a String containing the encoded
      * buffer and returns a byte array containing the data.
-     * @exception CEFormatException An error has occured while decoding
+     * @exception IOException An error has occured while decoding
      */
     public byte decodeBuffer(String inputString)[] throws IOException {
         byte    inputBuffer[] = new byte[inputString.length()];

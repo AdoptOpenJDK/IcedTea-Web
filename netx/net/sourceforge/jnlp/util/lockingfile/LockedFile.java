@@ -116,7 +116,8 @@ public class LockedFile {
     }
 
     /**
-     * Lock access to the file. Lock is reentrant.
+     * Lock access to the file.Lock is reentrant.
+     * @throws java.io.IOException
      */
     public void lock() throws IOException {
         // Create if does not already exist, cannot lock non-existing file
@@ -153,7 +154,8 @@ public class LockedFile {
     }
 
     /**
-     * Unlock access to the file. Lock is reentrant. Does not do anything if not holding the lock.
+     * Unlock access to the file.Lock is reentrant. Does not do anything if not holding the lock.
+     * @throws java.io.IOException
      */
     public void unlock() throws IOException {
         if (!this.threadLock.isHeldByCurrentThread()) {
