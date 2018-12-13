@@ -628,8 +628,8 @@ public class XMLElement {
             throws IOException {
         while(true) {
             char ch = this.readChar();
-            //this is BOM , not space
-            if (ch == '﻿') {
+            //this is BOM , when used without \\u, appear like space, but causes issues on windows development
+            if (ch == '\uFEFF') {
                 BOM = true;
             } else if (!isRegularWhiteSpace(ch)) {
                 return ch;
