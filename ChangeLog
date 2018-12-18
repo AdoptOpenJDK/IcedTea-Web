@@ -1,3 +1,9 @@
+2018-12-10  Jiri Vanek <jvanek@redhat.com>
+            jtesdall <jtesdall@mapcon.com>
+
+	Replaced hardcoded BOM character with utf representation (PR3671)
+	* netx/net/sourceforge/nanoxml/XMLElement.java: (scanLeadingWhitespace) resolved PR3671, relaced ' ' by \\ufeff
+
 2018-11-28  Jiri Vanek <jvanek@redhat.com>
 
 	deployment.config now support generic url instead just file
