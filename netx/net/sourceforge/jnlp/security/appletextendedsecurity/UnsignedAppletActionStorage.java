@@ -54,8 +54,8 @@ public interface UnsignedAppletActionStorage {
 
     /**
      * This methods iterates through records in
-     * {@link net.sourceforge.jnlp.config.DeploymentConfiguration#getAppletTrustUserSettingsPath} or
-     * {@link net.sourceforge.jnlp.config.DeploymentConfiguration#getAppletTrustGlobalSettingsPath}, and is matching
+     * net.sourceforge.jnlp.config.DeploymentConfiguration#getAppletTrustUserSettingsPath or
+     * net.sourceforge.jnlp.config.DeploymentConfiguration#getAppletTrustGlobalSettingsPath, and is matching
      * regexes saved here against params. So parameters here are NOT regexes,
      * but are matched against saved regexes.
      * <p>
@@ -103,12 +103,12 @@ public interface UnsignedAppletActionStorage {
     /**
      * Will add new record. Note that regexes are stored for bases matching.
      * <p>
-     * eg {@link UnsignedAppletActionEntry} which will deny some applet no matter of
-     * page will be {@code new }{@link UnsignedAppletActionEntry#UnsignedAppletActionEntry UnsignedAppletActionEntry}{@code (}{@link ExecuteUnsignedApplet#NEVER}{@code , new }{@link java.util.Date#Date() Date()}{@code , null, null, someMain, someArchives)}
+     * eg UnsignedAppletActionEntry which will deny some applet no matter of
+     * page will be {@code new }{@link UnsignedAppletActionEntry#UnsignedAppletActionEntry UnsignedAppletActionEntry}{@code (} ExecuteUnsignedApplet#NEVER{@code , new }{@link java.util.Date#Date() Date()}{@code , null, null, someMain, someArchives)}
      * </p>
      * <p>
      * eg {@link UnsignedAppletActionEntry} which will
-     * allow all applets on page with same codebase will be {@code new }{@link UnsignedAppletActionEntry#UnsignedAppletActionEntry UnsignedAppletActionEntry}{@code (}{@link ExecuteUnsignedApplet#NEVER}{@code , new }{@link java.util.Date#Date() Date()}{@code , ".*", ".*", null, null);}
+     * allow all applets on page with same codebase will be {@code new }{@link UnsignedAppletActionEntry#UnsignedAppletActionEntry UnsignedAppletActionEntry}{@code (} ExecuteUnsignedApplet#NEVER {@code , new }{@link java.util.Date#Date() Date()}{@code , ".*", ".*", null, null);}
      * </p>
      * @param item
      */

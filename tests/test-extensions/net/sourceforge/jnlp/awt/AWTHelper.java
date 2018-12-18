@@ -337,8 +337,8 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * 4. sets screenCapture indicator to true (after tryKTimes unsuccessfull
      *    tries an exception "ComponentNotFound" will be raised)
      * 
-     * @throws AWTException 
-     * @throws ComponentNotFoundException 
+     * @throws ComponentNotFoundException  
+     * @throws AWTFrameworkException 
      * @throws AWTFrameworkException 
      */
     public void captureScreenAndFindAppletByIcon() throws ComponentNotFoundException, AWTFrameworkException {

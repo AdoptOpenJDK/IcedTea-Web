@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Helper for getting an input & output stream for use with PluginStreamHandler.
+ * Helper for getting an input and output stream for use with PluginStreamHandler.
  * Provides a convenient way of reading the Java requests and sending mocked
  * plugin responses.
  * 
