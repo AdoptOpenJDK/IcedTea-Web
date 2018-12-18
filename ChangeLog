@@ -1,3 +1,10 @@
+2018-11-27  Jiri Vanek <jvanek@redhat.com>
+            Lars Herschke <lhersch@dssgmbh.de>
+
+	Fixed PR3637 - making cache work with jdk9+ #runtime jar url anchor
+	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java: (retrieve) if jar is not found in cache, ale url without anchor is attempted
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: usinf localFile.toURI().toURL() instead of direct localFile.toURL()
+
 2018-11-23  Lars Herschke <lhersch@dssgmbh.de>
             Jiri Vanek <jvanek@redhat.com>
 
