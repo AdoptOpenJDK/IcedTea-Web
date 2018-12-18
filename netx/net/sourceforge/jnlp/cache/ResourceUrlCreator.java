@@ -102,7 +102,7 @@ public class ResourceUrlCreator {
             //preffering https and  owerriding case, when applciation was moved to https, but the jnlp stayed intacted
             List<URL> urlsCopy = new LinkedList<>(urls);
             for (URL u : urlsCopy) {
-                if (u.getProtocol().equals("http")) {
+                if (u.getProtocol().equals("http") && u.getPort() < 0) {
                     try {
                         urls.add(0, copyUrltoHttps(u));
                     } catch (Exception ex) {

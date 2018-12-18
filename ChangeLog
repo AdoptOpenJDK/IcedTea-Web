@@ -1,5 +1,11 @@
 2018-11-27  Jiri Vanek <jvanek@redhat.com>
 
+	https is preffered only on default port
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java: (getUrls) when http protocol-ed  url have set port
+	its https clone is not put to the list of possible urls
+
+2018-11-27  Jiri Vanek <jvanek@redhat.com>
+
 	PR3645, second part - following windows system paths correctly
 	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: following 
 	https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/jcp/properties.html
