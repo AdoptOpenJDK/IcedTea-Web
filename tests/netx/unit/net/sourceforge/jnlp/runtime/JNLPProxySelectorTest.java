@@ -312,7 +312,7 @@ public class JNLPProxySelectorTest {
 
         result = JNLPProxySelector.getProxiesFromPacResult("PROXY foo:42");
         assertEquals(1, result.size());
-        assertEquals(new Proxy(Type.HTTP, InetSocketAddress.createUnresolved("foo", 42)), result.get(0));
+        assertEquals(new Proxy(Type.HTTP, new InetSocketAddress("foo", 42)), result.get(0));
 
         result = JNLPProxySelector.getProxiesFromPacResult("PROXY foo:bar");
         assertEquals(0, result.size());
@@ -322,7 +322,7 @@ public class JNLPProxySelectorTest {
 
         result = JNLPProxySelector.getProxiesFromPacResult("SOCKS foo:42");
         assertEquals(1, result.size());
-        assertEquals(new Proxy(Type.SOCKS, InetSocketAddress.createUnresolved("foo", 42)), result.get(0));
+        assertEquals(new Proxy(Type.SOCKS,  new InetSocketAddress("foo", 42)), result.get(0));
 
         result = JNLPProxySelector.getProxiesFromPacResult("SOCKS foo:bar");
         assertEquals(0, result.size());
