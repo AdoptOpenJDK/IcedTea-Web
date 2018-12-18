@@ -1,3 +1,15 @@
+2018-11-28  Jiri Vanek <jvanek@redhat.com>
+
+	deployment.config now support generic url instead just file
+	* netx/net/sourceforge/jnlp/config/Defaults.java: added option KEY_SYSTEM_CONFIG as url and KEY_SYSTEM_CONFIG_MANDATORY as boolean,
+	thus documented
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: refactored to work with general url rather then with file only
+	* netx/net/sourceforge/jnlp/config/InfrastructureFileDescriptor.java: added (getUrl) as shortcut to  getFile().toURI().toURL()
+	* netx/net/sourceforge/jnlp/controlpanel/CommandLine.java: (CommandLine) made aware of MalformedURLException
+	* tests/netx/unit/net/sourceforge/jnlp/config/DeploymentConfigurationTest.java: added tests for new DeploymentConfiguration.checkUrl
+	covering ok/not ok file, ok/not ok http
+	* NEWS: mentioned 
+
 2018-11-27  Jiri Vanek <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/OptionsDefinitions.java: (main) moved from ifelse to switch

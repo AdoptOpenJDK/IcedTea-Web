@@ -22,8 +22,9 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
@@ -237,6 +238,11 @@ public final class DeploymentConfiguration {
      */
     public static final String KEY_PLUGIN_JVM_ARGUMENTS= "deployment.plugin.jvm.arguments";
     public static final String KEY_JRE_DIR= "deployment.jre.dir";
+    /**
+     * remote configuration properties
+     */
+    public static final String KEY_SYSTEM_CONFIG = "deployment.system.config";
+    public static final String KEY_SYSTEM_CONFIG_MANDATORY = "deployment.system.config.mandatory";
     
     
     public static final String TRANSFER_TITLE = "Legacy configuration and cache found. Those will be now transported to new locations";
@@ -255,6 +261,14 @@ public final class DeploymentConfiguration {
         currentConfiguration = Defaults.getDefaults();
     }
 
+    static boolean checkUrl(URL file) {
+        try (InputStream s = file.openStream()) {
+            return true;
+        } catch (Throwable ex) {
+            // this should be logged, however, logging botle neck may not be initialised here
+            return false;
+        }
+    }
 
     public enum ConfigType {
         System, User
@@ -264,7 +278,7 @@ public final class DeploymentConfiguration {
     private boolean systemPropertiesMandatory = false;
 
     /** The system's subdirResult deployment.config file */
-    private File systemPropertiesFile = null;
+    private URL systemPropertiesFile = null;
     /** Source of always right and only path to file (even if underlying path changes) */
     private final InfrastructureFileDescriptor userDeploymentFileDescriptor;
     /** The user's subdirResult deployment.config file */
@@ -301,7 +315,11 @@ public final class DeploymentConfiguration {
      * @throws ConfigurationException if it encounters a fatal error.
      */
     public void load() throws ConfigurationException {
-        load(true);
+        try {
+            load(true);
+        } catch (MalformedURLException ex) {
+            throw new ConfigurationException(ex.toString());
+        }
     }
 
     /**
@@ -312,18 +330,18 @@ public final class DeploymentConfiguration {
      * resorting to the default values
      * @throws ConfigurationException if it encounters a fatal error.
      */
-    public void load(boolean fixIssues) throws ConfigurationException {
+    public void load(boolean fixIssues) throws ConfigurationException, MalformedURLException {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkRead(userDeploymentFileDescriptor.getFullPath());
         }
 
-        File systemConfigFile = findSystemConfigFile();
+        URL systemConfigFile = findSystemConfigFile();
 
         load(systemConfigFile, userDeploymentFileDescriptor.getFile(), fixIssues);
     }
 
-    void load(File systemConfigFile, File userFile, boolean fixIssues) throws ConfigurationException {
+    void load(URL systemConfigFile, File userFile, boolean fixIssues) throws ConfigurationException, MalformedURLException {
         Map<String, Setting<String>> initialProperties = Defaults.getDefaults();
 
         Map<String, Setting<String>> systemProperties = null;
@@ -357,8 +375,8 @@ public final class DeploymentConfiguration {
          * Third, read the user's subdirResult deployment.properties file
          */
         userPropertiesFile = userFile;
-        Map<String, Setting<String>> userProperties = loadProperties(ConfigType.User, userPropertiesFile, false);
-        userComments=loadComments(userPropertiesFile);
+        Map<String, Setting<String>> userProperties = loadProperties(ConfigType.User, userPropertiesFile.toURI().toURL(), false);
+        userComments = loadComments(userPropertiesFile.toURI().toURL());
         if (userProperties != null) {
             mergeMaps(initialProperties, userProperties);
         }
@@ -499,14 +517,14 @@ public final class DeploymentConfiguration {
     /**
      * @return the location of system-level deployment.config file, or null if none can be found
      */
-    private File findSystemConfigFile() {
+    private URL findSystemConfigFile() throws MalformedURLException {
         if (PathsAndFiles.ETC_DEPLOYMENT_CFG.getFile().isFile()) {
-            return PathsAndFiles.ETC_DEPLOYMENT_CFG.getFile();
+            return PathsAndFiles.ETC_DEPLOYMENT_CFG.getUrl();
         }
 
         String jrePath = null;
         try {
-            Map<String, Setting<String>> tmpProperties = parsePropertiesFile(userDeploymentFileDescriptor.getFile());
+            Map<String, Setting<String>> tmpProperties = parsePropertiesFile(userDeploymentFileDescriptor.getUrl());
             Setting<String> jreSetting = tmpProperties.get(KEY_JRE_DIR);
             if (jreSetting != null) {
                 jrePath = jreSetting.getValue();
@@ -524,7 +542,7 @@ public final class DeploymentConfiguration {
             jreFile = PathsAndFiles.JAVA_DEPLOYMENT_PROP_FILE.getFile();
         }
         if (jreFile.isFile()) {
-            return jreFile;
+            return jreFile.toURI().toURL();
         }
 
         return null;
@@ -534,7 +552,7 @@ public final class DeploymentConfiguration {
      * Reads the system configuration file and sets the relevant
      * system-properties related variables
      */
-    private boolean loadSystemConfiguration(File configFile) throws ConfigurationException {
+    private boolean loadSystemConfiguration(URL configFile) throws ConfigurationException {
 
         OutputController.getLogger().log("Loading system configuation from: " + configFile);
 
@@ -553,26 +571,21 @@ public final class DeploymentConfiguration {
          */
         String urlString = null;
         try {
-            Setting<String> urlSettings = systemConfiguration.get("deployment.system.config");
+            Setting<String> urlSettings = systemConfiguration.get(KEY_SYSTEM_CONFIG);
             if (urlSettings == null || urlSettings.getValue() == null) {
-                OutputController.getLogger().log("No System level " + DEPLOYMENT_PROPERTIES + " found in "+configFile.getAbsolutePath());
+                OutputController.getLogger().log("No System level " + DEPLOYMENT_PROPERTIES + " found in "+configFile.toExternalForm());
                 return false;
             }
             urlString = urlSettings.getValue();
-            Setting<String> mandatory = systemConfiguration.get("deployment.system.config.mandatory");
+            Setting<String> mandatory = systemConfiguration.get(KEY_SYSTEM_CONFIG_MANDATORY);
             systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue()); //never null
             OutputController.getLogger().log("System level settings " + DEPLOYMENT_PROPERTIES + " are mandatory:" + systemPropertiesMandatory);
             URL url = new URL(urlString);
-            if (url.getProtocol().equals("file")) {
-                systemPropertiesFile = new File(url.getFile());
-                OutputController.getLogger().log("Using System level" + DEPLOYMENT_PROPERTIES + ": " + systemPropertiesFile);
-                return true;
-            } else {
-                OutputController.getLogger().log("Remote + " + DEPLOYMENT_PROPERTIES + " not supported: " + urlString + "in " + configFile.getAbsolutePath());
-                return false;
-            }
+            systemPropertiesFile = url;
+            OutputController.getLogger().log("Using System level" + DEPLOYMENT_PROPERTIES + ": " + systemPropertiesFile);
+            return true;
         } catch (MalformedURLException e) {
-            OutputController.getLogger().log("Invalid url for " + DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.getAbsolutePath());
+            OutputController.getLogger().log("Invalid url for " + DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.toExternalForm());
             OutputController.getLogger().log(e);
             if (systemPropertiesMandatory){
                 ConfigurationException ce = new ConfigurationException("Invalid url to system properties, which are mandatory");
@@ -593,9 +606,9 @@ public final class DeploymentConfiguration {
      *
      * @throws ConfigurationException if the file is mandatory but cannot be read
      */
-    private Map<String, Setting<String>> loadProperties(ConfigType type, File file, boolean mandatory)
+    private Map<String, Setting<String>> loadProperties(ConfigType type, URL file, boolean mandatory)
             throws ConfigurationException {
-        if (file == null || !file.isFile()) {
+        if (file == null || !checkUrl(file)) {
             OutputController.getLogger().log("No " + type.toString() + " level " + DEPLOYMENT_PROPERTIES + " found.");
             if (!mandatory) {
                 return null;
@@ -684,12 +697,12 @@ public final class DeploymentConfiguration {
      * @param propertiesFile the file to read Properties from
      * @throws IOException if an IO problem occurs
      */
-    private Map<String, Setting<String>> parsePropertiesFile(File propertiesFile) throws IOException {
+    private Map<String, Setting<String>> parsePropertiesFile(URL propertiesFile) throws IOException {
         Map<String, Setting<String>> result = new HashMap<>();
 
         Properties properties = new Properties();
 
-        try (Reader reader = new BufferedReader(new FileReader(propertiesFile))) {
+        try (Reader reader = new BufferedReader(new InputStreamReader(propertiesFile.openStream(), "UTF-8"))) {
             properties.load(reader);
         }
 
@@ -904,9 +917,9 @@ public final class DeploymentConfiguration {
     //standard date.toString format
     public static final SimpleDateFormat pattern = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
     
-    private static String loadComments(File path) {
+    private static String loadComments(URL path) {
         StringBuilder r = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(path.openStream(), "UTF-8"))) {
             while (true) {
                 String s = br.readLine();
                 if (s == null) {
