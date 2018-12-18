@@ -234,12 +234,18 @@ public class OptionsDefinitions {
     }
 
     public static void main(String[] args) throws IOException {
-        if (args[0].equals(TextsProvider.JAVAWS)) {
-            printOptions(getJavaWsOptions());
-        } else if (args[0].equals(TextsProvider.ITWEB_SETTINGS)) {
-            printOptions(getItwsettingsCommands());
-        } else if (args[0].equals(TextsProvider.POLICY_EDITOR)) {
-            printOptions(getPolicyEditorOptions());
+        switch (args[0]) {
+            case TextsProvider.JAVAWS:
+                printOptions(getJavaWsOptions());
+                break;
+            case TextsProvider.ITWEB_SETTINGS:
+                printOptions(getItwsettingsCommands());
+                break;
+            case TextsProvider.POLICY_EDITOR:
+                printOptions(getPolicyEditorOptions());
+                break;
+            default:
+                break;
         }
     }
 
