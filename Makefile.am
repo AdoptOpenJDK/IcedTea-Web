@@ -29,6 +29,31 @@ else
 	WIN_LAUNCHERS=
 endif
 
+if ENABLE_SHELL_LAUNCHERS
+	SHELL_LUNCHERS=$(WIN_LAUNCHERS) launcher.build/$(javaws).sh launcher.build/$(itweb_settings).sh launcher.build/$(policyeditor).sh
+else
+	SHELL_LUNCHERS=
+endif
+
+
+if ENABLE_NATIVE_LAUNCHERS
+	NATIVE_LUNCHERS=launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor)
+	DESKTOP_SUFFIX=
+else
+	NATIVE_LUNCHERS=
+	DESKTOP_SUFFIX=.sh
+endif
+
+# javaws is program name, JAVAWS is used executable name.
+# ITW 1.7 always do javaws and javaws.sh
+JAVAWS=$(javaws)$(DESKTOP_SUFFIX)
+ITWEB_SETTINGS=$(itweb_settings)$(DESKTOP_SUFFIX)
+POLICYEDITOR=$(policyeditor)$(DESKTOP_SUFFIX)
+
+LAUNCHERS=$(NATIVE_LUNCHERS) $(SHELL_LUNCHERS)
+DESKTOP_FILES=javaws.desktop itweb-settings.desktop policyeditor.desktop
+DESKTOP_IN_FILES=javaws.desktop.in itweb-settings.desktop.in policyeditor.desktop.in
+
 export WIN_INSTALLER_DIR = $(TOP_BUILD_DIR)/win-installer.build
 export WIN_INSTALLER_SRC_DIR = $(TOP_SRC_DIR)/win-installer
 export NETX_DIR = $(TOP_BUILD_DIR)/netx.build
@@ -40,6 +65,7 @@ export BASH_CMPL_DEST_DIR=$(DESTDIR)@bashcompdir@
 
 export WIN_ALL_DEPS=$(DESTDIR)$(prefix)/win-deps-all
 export WIN_RUN_DEPS=$(DESTDIR)$(prefix)/win-deps-runtime
+export LINUX_BIN_DIST_DEPS=$(DESTDIR)$(prefix)/linux-deps-runtime
 
 export REPORT_STYLES_DIRNAME=report-styles
 
@@ -137,6 +163,8 @@ if ENABLE_PLUGINJAR
   PLUGIN_JAR=$(datadir)/$(PACKAGE_NAME)/plugin.jar
   JSOBJECT_JAR=$(datadir)/$(PACKAGE_NAME)/jsobject.jar
 endif
+  NETX_JAR=$(datadir)/$(PACKAGE_NAME)/netx.jar
+  SPLASH_PNG=$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
 
 # Conditional defintions
 if HAVE_TAGSOUP
@@ -159,7 +187,7 @@ export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) 
 #    IllegalAccessException
 #  - we want full privileges
 #
-export UNIFIED_CLASSPATH_SEGMENTS=$(datadir)/$(PACKAGE_NAME)/netx.jar $(PLUGIN_JAR) $(JSOBJECT_JAR) $(RHINO_JAR) $(TAGSOUP_JAR)
+export UNIFIED_CLASSPATH_SEGMENTS=$(NETX_JAR) $(PLUGIN_JAR) $(JSOBJECT_JAR) $(RHINO_JAR) $(TAGSOUP_JAR)
 export UNIFIED_JACOCO_CLASSPATH_SEGMENTS=$(UNIFIED_CLASSPATH_SEGMENTS) $(JACOCO_CLASSPATH)
 export UNIFIED_CLASSPATH=$(call joinsegments, $(UNIFIED_CLASSPATH_SEGMENTS))
 export UNIFIED_JACOCO_CLASSPATH=$(call joinsegments, $(UNIFIED_JACOCO_CLASSPATH_SEGMENTS))
@@ -260,12 +288,12 @@ endif
 
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
-export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png javaws.desktop.in policyeditor.desktop.in $(top_srcdir)/completion \
- itweb-settings.desktop.in launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS $(top_srcdir)/metadata.in $(top_srcdir)/win-installer
+export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png $(DESKTOP_IN_FILES) $(top_srcdir)/completion \
+ launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS $(top_srcdir)/metadata.in $(top_srcdir)/win-installer
 
 # reproducers `D`shortcuts
 export DTEST_SERVER=-Dtest.server.dir=$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)
-export DJAVAWS_BUILD=-Djavaws.build.bin=$(DESTDIR)$(bindir)/$(javaws)
+export DJAVAWS_BUILD=-Djavaws.build.bin=$(DESTDIR)$(bindir)/$(JAVAWS)
 export DBROWSERS=-Dused.browsers=$(FIREFOX):$(CHROMIUM):$(CHROME):$(OPERA):$(MIDORI):$(EPIPHANY)
 export REPRODUCERS_DPARAMETERS= $(DTEST_SERVER) $(DJAVAWS_BUILD) $(DBROWSERS) $(BROWSER_TESTS_MODIFICATION)
 # end of `D`shortcuts
@@ -287,22 +315,23 @@ policyeditor:= $(shell echo policyeditor | sed '@program_transform_name@')
 # make-time from configure-time
 edit_launcher_script = sed \
   -e "s|[@]LAUNCHER_BOOTCLASSPATH[@]|$(LAUNCHER_BOOTCLASSPATH)|g" \
-  -e "s|[@]JAVAWS_SPLASH_LOCATION[@]|$(datadir)/$(PACKAGE_NAME)/javaws_splash.png|g" \
+  -e "s|[@]JAVAWS_SPLASH_LOCATION[@]|$(SPLASH_PNG)|g" \
   -e "s|[@]JAVA[@]|$(JAVA)|g" \
   -e "s|[@]JRE[@]|$(SYSTEM_JRE_DIR)|g" \
   -e "s|[@]MAIN_CLASS[@]|$${MAIN_CLASS}|g" \
   -e "s|[@]BIN_LOCATION[@]|$${BIN_LOCATION}|g" \
-  -e "s|[@]NETX_JAR[@]|$(datadir)/$(PACKAGE_NAME)/netx.jar|g" \
+  -e "s|[@]NETX_JAR[@]|$(NETX_JAR)|g" \
   -e "s|[@]PLUGIN_JAR[@]|$(PLUGIN_JAR)|g" \
   -e "s|[@]JSOBJECT_JAR[@]|$(JSOBJECT_JAR)|g" \
+  -e "s|[@]TAGSOUP_JAR[@]|$(TAGSOUP_JAR)|g" \
+  -e "s|[@]RHINO_JAR[@]|$(RHINO_JAR)|g" \
   -e "s|[@]PROGRAM_NAME[@]|$${PROGRAM_NAME}|g"
 
 # Top-Level Targets
 # =================
 
 all-local: stamps/netx-dist.stamp stamps/plugin.stamp stamps/docs.stamp \
- $(WIN_LAUNCHERS) \
- launcher.build/$(javaws) javaws.desktop launcher.build/$(itweb_settings) itweb-settings.desktop launcher.build/$(policyeditor) policyeditor.desktop
+ $(LAUNCHERS) $(DESKTOP_FILES)
 
 
 check-local: $(RHINO_TESTS) $(JUNIT_TESTS)
@@ -324,19 +353,26 @@ if ENABLE_NATIVE_PLUGIN
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) $(DESTDIR)$(libdir)
 endif
 if ENABLE_PLUGINJAR
-	${INSTALL_DATA} $(TOP_BUILD_DIR)/liveconnect/lib/classes-applet.jar   $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
-	${INSTALL_DATA} $(TOP_BUILD_DIR)/liveconnect/lib/classes-jsobject.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
+	${INSTALL_DATA} $(TOP_BUILD_DIR)/liveconnect/lib/classes-applet.jar   $(DESTDIR)$(PLUGIN_JAR)
+	${INSTALL_DATA} $(TOP_BUILD_DIR)/liveconnect/lib/classes-jsobject.jar $(DESTDIR)$(JSOBJECT_JAR)
 endif
-	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(NETX_JAR)
+	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(SPLASH_PNG)
 	${INSTALL_DATA} $(TOP_SRC_DIR)/javaws.png $(ICONS_DEST_DIR)/
+if ENABLE_NATIVE_LAUNCHERS
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor) $(DESTDIR)$(bindir)
+endif
+if ENABLE_SHELL_LAUNCHERS
+	${INSTALL_PROGRAM} launcher.build/$(javaws).sh $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/$(itweb_settings).sh $(DESTDIR)$(bindir)
+	${INSTALL_PROGRAM} launcher.build/$(policyeditor).sh $(DESTDIR)$(bindir)
 if WINDOWS
 	${INSTALL_PROGRAM} launcher.build/$(javaws).bat $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings).bat $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor).bat $(DESTDIR)$(bindir)
+endif
 endif
 	${INSTALL_DATA} $(TOP_BUILD_DIR)/completion/itweb-settings.bash $(BASH_CMPL_DEST_DIR)/
 	${INSTALL_DATA} $(TOP_BUILD_DIR)/completion/javaws.bash $(BASH_CMPL_DEST_DIR)/
@@ -387,6 +423,26 @@ if HAVE_TAGSOUP
 endif
 endif
 
+#no npapi plugin at all!
+linux-bin-dist: install
+	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
+	mkdir -p $(LINUX_BIN_DIST_DEPS)
+if WITH_RHINO
+	filteredName=`basename $(RHINO_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(RHINO_JAR) $(LINUX_BIN_DIST_DEPS)/$$filteredName
+endif
+if HAVE_TAGSOUP
+	filteredName=`basename $(TAGSOUP_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(TAGSOUP_JAR) $(LINUX_BIN_DIST_DEPS)/$$filteredName
+endif
+	cp $(NETX_DIR)/lib/src.zip $(DESTDIR)$(prefix)/netx.src.zip
+if ENABLE_PLUGINJAR
+	cp $(TOP_BUILD_DIR)/liveconnect/lib/src.zip $(DESTDIR)$(prefix)/plugin.src.zip
+endif
+if ENABLE_DOCS
+	cp -r $(DOCS_DIR)/html $(DESTDIR)$(prefix)/icedtea-web-docs
+endif
+	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).linux.bin.zip `basename $(DESTDIR)$(prefix)` );
 
 win-bin-dist: win-only-image
 	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).win.bin.zip `basename $(DESTDIR)$(prefix)` );
@@ -439,6 +495,7 @@ remove-empty-linux-only-dirs:
 	if ls -1qA $$dirCandidate | grep -q . ; then echo "$$dirCandidate not empty"; else rmdir -v $$dirCandidate ; fi ;
 
 # all generated manpages must be removed one by one
+# shell (only shell!) lunchers must go away
 uninstall-linux-only:
 	KNOWN_MANS="icedtea-web.1  icedtea-web-plugin.1  itweb-settings.1  javaws.1  policyeditor.1" ; \
 	KNOWN_DIRS="man1 de/man1 pl/man1 cs/man1" ; \
@@ -448,18 +505,18 @@ uninstall-linux-only:
 	  done ; \
 	done
 	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
-	rm -f $(DESTDIR)$(bindir)/$(javaws)
-	rm -f $(DESTDIR)$(bindir)/$(itweb_settings)
-	rm -f $(DESTDIR)$(bindir)/$(policyeditor)
+	rm -f $(DESTDIR)$(bindir)/$(javaws).sh
+	rm -f $(DESTDIR)$(bindir)/$(itweb_settings).sh
+	rm -f $(DESTDIR)$(bindir)/$(policyeditor).sh
 	rm -f $(BASH_CMPL_DEST_DIR)/itweb-settings.bash
 	rm -f $(BASH_CMPL_DEST_DIR)/javaws.bash
 	rm -f $(BASH_CMPL_DEST_DIR)/policyeditor.bash
 
 uninstall-local: uninstall-linux-only
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	rm -r $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+	rm -f $(DESTDIR)$(PLUGIN_JAR)
+	rm -f $(DESTDIR)$(JSOBJECT_JAR)
+	rm -f $(DESTDIR)$(NETX_JAR)
+	rm -r $(DESTDIR)$(SPLASH_PNG)
 	rm -r $(ICONS_DEST_DIR)/javaws.png
 	rm -rf $(DESTDIR)$(htmldir)
 if WINDOWS
@@ -493,14 +550,14 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	   $(DEFS) $(VERSION_DEFS) \
 	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
 	  -DPLUGIN_NAME="\"IcedTea-Web Plugin\"" \
-	  -DJAVAWS_BIN="\"$(bindir)/$(javaws)\"" \
+	  -DJAVAWS_BIN="\"$(bindir)/$(JAVAWS)\"" \
 	  -DJAVAWS_NAME="\"$(javaws)\"" \
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
 	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
-	  -DNETX_JAR="\"$(datadir)/$(PACKAGE_NAME)/netx.jar\"" \
+	  -DNETX_JAR="\"$(NETX_JAR)\"" \
 	  -DPLUGIN_JAR="\"$(PLUGIN_JAR)\"" \
 	  -DJSOBJECT_JAR="\"$(JSOBJECT_JAR)\""\
 	  $(GLIB_CFLAGS) \
@@ -548,14 +605,14 @@ stamps/cpp-unit-tests-compile.stamp: $(CPP_UNITTEST_FRAMEWORK_LIB) $(CPP_UNITTES
 	   $(DEFS) $(VERSION_DEFS) \
 	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
 	  -DPLUGIN_NAME="\"IcedTea-Web Plugin\"" \
-	  -DJAVAWS_BIN="\"$(bindir)/$(javaws)\"" \
+	  -DJAVAWS_BIN="\"$(bindir)/$(JAVAWS)\"" \
 	  -DJAVAWS_NAME="\"$(javaws)\"" \
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
 	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
-	  -DNETX_JAR="\"$(datadir)/$(PACKAGE_NAME)/netx.jar\"" \
+	  -DNETX_JAR="\"$(NETX_JAR)\"" \
 	  -DPLUGIN_JAR="\"$(PLUGIN_JAR)\"" \
 	  -DJSOBJECT_JAR="\"$(JSOBJECT_JAR)\""\
 	  $(GLIB_CFLAGS) \
@@ -834,28 +891,31 @@ clean-netx:
 clean-desktop-files:
 	rm -f javaws.desktop
 	rm -f itweb-settings.desktop
+	rm -f policyeditor.desktop
 
-launcher.build/$(javaws): launcher/launchers.in
+if ENABLE_SHELL_LAUNCHERS
+launcher.build/$(javaws).sh: launcher/launchers.sh.in
 	mkdir -p launcher.build
 	MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ;\
-	BIN_LOCATION=$(bindir)/$(javaws) ;\
+	BIN_LOCATION=$(bindir)/$(javaws).sh ;\
 	PROGRAM_NAME=$(javaws) ;\
 	$(edit_launcher_script) < $< > $@
 
-launcher.build/$(itweb_settings): launcher/launchers.in
+launcher.build/$(itweb_settings).sh: launcher/launchers.sh.in
 	mkdir -p launcher.build
 	MAIN_CLASS=net.sourceforge.jnlp.controlpanel.CommandLine ;\
-	BIN_LOCATION=$(bindir)/$(itweb_settings) ;\
+	BIN_LOCATION=$(bindir)/$(itweb_settings).sh ;\
 	PROGRAM_NAME=$(itweb_settings) ;\
 	$(edit_launcher_script) < $< > $@
 
-launcher.build/$(policyeditor): launcher/launchers.in
+launcher.build/$(policyeditor).sh: launcher/launchers.sh.in
 	mkdir -p launcher.build
 	MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ;\
-	BIN_LOCATION=$(bindir)/$(policyeditor) ;\
+	BIN_LOCATION=$(bindir)/$(policyeditor).sh ;\
 	PROGRAM_NAME=$(policyeditor) ;\
 	$(edit_launcher_script) < $< > $@
 
+if WINDOWS
 # TODO get rid of this copypaste
 launcher.build/$(javaws).bat: launcher/launchers.bat.in
 	mkdir -p launcher.build
@@ -880,29 +940,39 @@ launcher.build/$(policyeditor).bat: launcher/launchers.bat.in
 	BIN_LOCATION=$(bindir)/$(policyeditor) ;\
 	PROGRAM_NAME=$(policyeditor) ;\
 	$(edit_launcher_script) < $< > $@
+endif
+endif
 
 clean-launchers:
+if ENABLE_NATIVE_LAUNCHERS
 	rm -f launcher.build/$(javaws)
 	rm -f launcher.build/$(itweb_settings)
 	rm -f launcher.build/$(policyeditor)
+	rm -rf launcher.in*
+endif
+if ENABLE_SHELL_LAUNCHERS
+	rm -f launcher.build/$(javaws).sh
+	rm -f launcher.build/$(itweb_settings).sh
+	rm -f launcher.build/$(policyeditor).sh
 if WINDOWS
 	rm -f launcher.build/$(javaws).bat
 	rm -f launcher.build/$(itweb_settings).bat
 	rm -f launcher.build/$(policyeditor).bat
+endif
 endif
 	if [ -e launcher.build ] ; then \
 	  rmdir launcher.build ; \
 	fi
 
 javaws.desktop: javaws.desktop.in
-	sed "s#PATH_TO_JAVAWS#$(bindir)/$(javaws)#" < $(srcdir)/javaws.desktop.in > javaws.desktop
+	sed "s#PATH_TO_JAVAWS#$(bindir)/$(JAVAWS)#" < $(srcdir)/javaws.desktop.in > javaws.desktop
 
 itweb-settings.desktop: $(srcdir)/itweb-settings.desktop.in
-	sed "s#PATH_TO_ITWEB_SETTINGS#$(bindir)/$(itweb_settings)#" \
+	sed "s#PATH_TO_ITWEB_SETTINGS#$(bindir)/$(ITWEB_SETTINGS)#" \
 	  < $(srcdir)/itweb-settings.desktop.in > itweb-settings.desktop
 
 policyeditor.desktop: $(srcdir)/policyeditor.desktop.in
-	sed 's#PATH_TO_POLICYEDITOR#$(bindir)/$(policyeditor)#' \
+	sed "s#PATH_TO_POLICYEDITOR#$(bindir)/$(POLICYEDITOR)#" \
 	< $(srcdir)/policyeditor.desktop.in > policyeditor.desktop
 
 # documentation
@@ -1265,8 +1335,8 @@ $(REPRODUCERS_CLASS_NAMES):
 	done ; \
 	echo $$class_names > $(REPRODUCERS_CLASS_NAMES)
 
-stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
- javaws.desktop stamps/docs.stamp launcher.build/$(itweb_settings) itweb-settings.desktop launcher.build/$(policyeditor) policyeditor.desktop \
+stamps/run-netx-dist-tests.stamp: stamps/netx-dist.stamp stamps/plugin.stamp stamps/docs.stamp \
+ $(LAUNCHERS) $(DESKTOP_FILES) \
  stamps/netx.stamp stamps/junit-jnlp-dist-dirs stamps/netx-dist-tests-import-cert-to-public \
  stamps/test-extensions-compile.stamp stamps/compile-reproducers-testcases.stamp $(JUNIT_RUNNER_JAR) stamps/copy-reproducers-resources.stamp\
  $(TESTS_DIR)/$(REPORT_STYLES_DIRNAME) $(REPRODUCERS_CLASS_NAMES) stamps/process-custom-reproducers.stamp
@@ -1312,7 +1382,7 @@ clean-custom-reproducers: junit-jnlp-dist-custom.txt
 #icedtea-web plugin inside browser it is intended for testing purposes
 if ENABLE_NATIVE_PLUGIN
 stamps/user-links.stamp: stamps/netx-dist.stamp stamps/plugin.stamp \
- launcher.build/$(javaws) stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) 
+ $(LAUNCHERS) stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
 	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	  if [ -e $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME) ] ; then \
 	    mv -f $(MOZILLA_LOCAL_PLUGINDIR)/$(PLUGIN_LINK_NAME)  $(MOZILLA_LOCAL_BACKUP_FILE) ; \
@@ -1341,7 +1411,7 @@ restore-user-links:
 	  rm -f stamps/user-links.stamp ; \
 	fi
 
-stamps/global-links.stamp: stamps/netx-dist.stamp stamps/plugin.stamp launcher.build/$(javaws) \
+stamps/global-links.stamp: stamps/netx-dist.stamp stamps/plugin.stamp $(LAUNCHERS) \
  stamps/netx.stamp $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
 	if [ $(MOZILLA_FAMILY_TEST) ]  ; then  \
 	    dir="$(MOZILLA_GLOBAL32_PLUGINDIR)"  ; \
@@ -1517,7 +1587,7 @@ $(COVERABLE_PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	   $(DEFS) $(VERSION_DEFS) \
 	  -DJDK_UPDATE_VERSION="\"$(JDK_UPDATE_VERSION)\"" \
 	  -DPLUGIN_NAME="\"IcedTea-Web Plugin with jacoco coverage agent\"" \
-	  -DJAVAWS_BIN="\"$(bindir)/$(javaws)\"" \
+	  -DJAVAWS_BIN="\"$(bindir)/$(JAVAWS)\"" \
 	  -DJAVAWS_NAME="\"$(javaws)\"" \
 	  -DPLUGIN_VERSION="\"$(PLUGIN_VERSION)\"" \
 	  -DPACKAGE_URL="\"$(PACKAGE_URL)\"" \
@@ -1525,7 +1595,7 @@ $(COVERABLE_PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_COVERAGE_BOOTCLASSPATH) \
 	  -DCOVERAGE_AGENT=$(JACOCO_AGENT_PLUGIN_SWITCH) \
-	  -DNETX_JAR="\"$(datadir)/$(PACKAGE_NAME)/netx.jar\"" \
+	  -DNETX_JAR="\"$(NETX_JAR)\"" \
 	  -DPLUGIN_JAR="\"$(PLUGIN_JAR)\"" \
 	  -DJSOBJECT_JAR="\"$(JSOBJECT_JAR)\""\
 	  $(GLIB_CFLAGS) \
@@ -1553,13 +1623,13 @@ if WITH_JACOCO
 	for file in $(COVERAGE_MODIFIED_FILES) ; do \
 	  mv $(TEST_EXTENSIONS_DIR)/$$file $(TEST_EXTENSIONS_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
 	done ;\
-	echo "backuping javaws in $(DESTDIR)$(bindir)" ; \
+	echo "backuping $(JAVAWS) in $(DESTDIR)$(bindir)" ; \
 	javaws_backup=$(DESTDIR)$(bindir)/javaws_backup ; \
-	mv $(DESTDIR)$(bindir)/javaws $$javaws_backup ;  \
-	echo "patching $(javaws)" ; \
+	mv $(DESTDIR)$(bindir)/$(JAVAWS) $$javaws_backup ;  \
+	echo "patching $(JAVAWS)" ; \
 	nw_bootclasspath="-Xbootclasspath/a:$(UNIFIED_JACOCO_CLASSPATH)" ; \
-	cat $$javaws_backup | sed "s|COMMAND.k.=\"..JAVA.\"|COMMAND[k]=\"\\$$\\{JAVA\\}\" ;  k=1 ; COMMAND[k]=$(JACOCO_AGENT_JAVAWS_SWITCH)|" | sed "s,$(LAUNCHER_BOOTCLASSPATH),$$nw_bootclasspath," > $(DESTDIR)$(bindir)/$(javaws) ; \
-	chmod 777 $(DESTDIR)$(bindir)/$(javaws) ; \
+	cat $$javaws_backup | sed "s|COMMAND.k.=\"..JAVA.\"|COMMAND[k]=\"\\$$\\{JAVA\\}\" ;  k=1 ; COMMAND[k]=$(JACOCO_AGENT_JAVAWS_SWITCH)|" | sed "s,$(LAUNCHER_BOOTCLASSPATH),$$nw_bootclasspath," > $(DESTDIR)$(bindir)/$(JAVAWS) ; \
+	chmod 777 $(DESTDIR)$(bindir)/$(JAVAWS) ; \
 	echo "backuping plugin in $(DESTDIR)/$(libdir)$(BUILT_PLUGIN_LIBRARY)" ; \
 	plugin_backup=$(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)_backup ; \
 	mv $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) $$plugin_backup ;  \
@@ -1605,9 +1675,9 @@ if WITH_JACOCO
 	  --input-srcs  $(NETX_SRCDIR) $(PLUGIN_SRCDIR)/java  $(JUNIT_RUNNER_SRCDIR) $(TEST_EXTENSIONS_SRCDIR) $(TEST_EXTENSIONS_TESTS_SRCDIR) "$${testcases_srcs[@]}" \
 	  --input-builds $(NETX_DIR)/lib/classes.jar $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar  $(JUNIT_RUNNER_JAR)  $(TEST_EXTENSIONS_DIR) $(TEST_EXTENSIONS_TESTS_DIR) \
 	  --title "IcedTea-Web reproducers-tests codecoverage" ; \
-	echo "restoring javaws in $(DESTDIR)$(bindir)" ; \
+	echo "restoring $(JAVAWS) in $(DESTDIR)$(bindir)" ; \
 	rm -f $(DESTDIR)$(bindir)/$(javaws);  \
-	mv $$javaws_backup $(DESTDIR)$(bindir)/$(javaws);  \
+	mv $$javaws_backup $(DESTDIR)$(bindir)/$(JAVAWS);  \
 	echo "restoring  plugin in $(DESTDIR)/$(libdir)$(BUILT_PLUGIN_LIBRARY)" ; \
 	mv $$plugin_backup $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY) ; \
 	for file in $(COVERAGE_MODIFIED_FILES) ; do \
