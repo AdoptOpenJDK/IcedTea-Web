@@ -52,7 +52,7 @@ public class Translator {
             resources = ResourceBundle.getBundle(s);
         } catch (Exception ex) {
             throw new IllegalStateException("No bundles found for Locale: " + Locale.getDefault().toString()
-                    + "and missing base resource bundle in netx.jar:net/sourceforge/jnlp/resource/Messages.properties");
+                    + "and missing base resource bundle in javaws.jar:net/sourceforge/jnlp/resource/Messages.properties");
         }
     }
 

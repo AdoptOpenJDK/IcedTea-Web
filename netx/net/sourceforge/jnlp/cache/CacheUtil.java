@@ -183,10 +183,10 @@ public class CacheUtil {
                 FileChannel channel = fis.getChannel();
                 locking  = channel.tryLock();
                 if (locking == null) {
-                    OutputController.getLogger().log("Other instances of netx are running");
+                    OutputController.getLogger().log("Other instances of javaws are running");
                     return false;
                 }
-                OutputController.getLogger().log("No other instances of netx are running");
+                OutputController.getLogger().log("No other instances of javaws are running");
                 return true;
 
             } else {

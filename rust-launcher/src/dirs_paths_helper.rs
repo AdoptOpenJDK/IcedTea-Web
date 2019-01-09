@@ -60,6 +60,22 @@ pub fn is_dir(path: &std::path::PathBuf) -> bool {
     path.metadata().map(|md| md.is_dir()).unwrap_or(false)
 }
 
+pub fn path_to_string(path: &std::path::PathBuf) -> String {
+    path.to_str().expect("unwrap of os string failed").to_string()
+}
+
+pub fn current_program() -> std::path::PathBuf {
+    env::current_exe().expect("unwrap of pgm path failed")
+}
+
+pub fn current_program_parent() -> std::path::PathBuf {
+    std::path::PathBuf::from(current_program().parent().expect("getting of pgm dir failed"))
+}
+
+pub fn current_program_name() -> String {
+    String::from(current_program().file_name().expect("unwrap of pgm name failed").to_str().expect("unwrap of pgm name failed"))
+}
+
 /*tests*/
 #[cfg(test)]
 mod tests {
@@ -69,22 +85,30 @@ mod tests {
     use utils::tests_utils as tu;
 
     #[test]
+    #[cfg(not(windows))]
     fn check_config_files_paths() {
         let os = os_access::Linux::new(false);
         let p3 = super::get_itw_config_file(&os);
-        let p4 = super::get_itw_legacy_config_file(&os);
-        let p5 = super::get_itw_legacy_global_config_file(&os);
         let p6 = super::get_itw_global_config_file(&os);
         assert_ne!(None, p3);
-        assert_ne!(None, p4);
-        assert_ne!(None, p5);
         assert_ne!(None, p6);
         println!("{}", p3.clone().expect("unwrap failed").display());
-        println!("{}", p4.clone().expect("unwrap failed").display());
-        println!("{}", p5.clone().expect("unwrap failed").display());
         println!("{}", p6.clone().expect("unwrap failed").display());
         assert_eq!(true, p3.clone().expect("unwrap failed").display().to_string().contains("icedtea-web"));
         assert_eq!(true, p3.clone().expect("unwrap failed").display().to_string().ends_with("deployment.properties"));
+        assert_eq!(true, p6.clone().expect("unwrap failed").display().to_string().ends_with("deployment.properties"));
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn check_legacy_config_files_paths() {
+        let os = os_access::Linux::new(false);
+        let p4 = super::get_itw_legacy_config_file(&os);
+        let p5 = super::get_itw_legacy_global_config_file(&os);
+        assert_ne!(None, p4);
+        assert_ne!(None, p5);
+        println!("{}", p4.clone().expect("unwrap failed").display());
+        println!("{}", p5.clone().expect("unwrap failed").display());
         assert_eq!(true, p4.clone().expect("unwrap failed").display().to_string().contains(".icedtea"));
         assert_eq!(true, p4.clone().expect("unwrap failed").display().to_string().ends_with("deployment.properties"));
         assert_eq!(true, p5.clone().expect("unwrap failed").display().to_string().contains("etc"));
@@ -94,7 +118,6 @@ mod tests {
         assert_eq!(true, p5.clone().expect("unwrap failed").display().to_string().contains("etc"));
         assert_eq!(true, p5.clone().expect("unwrap failed").display().to_string().contains(".java"));
         assert_eq!(true, p5.clone().expect("unwrap failed").display().to_string().contains("deployment"));
-        assert_eq!(true, p6.clone().expect("unwrap failed").display().to_string().ends_with("deployment.properties"));
     }
 
     #[test]

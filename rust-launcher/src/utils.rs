@@ -8,6 +8,66 @@ pub mod tests_utils {
     use std::io::Write;
     use std::sync::atomic::{AtomicUsize, Ordering, ATOMIC_USIZE_INIT};
     use property_from_file;
+    use os_access;
+    use std::cell::RefCell;
+    use dirs_paths_helper;
+
+    pub struct TestLogger {
+        vec: RefCell<Vec<String>>,
+    }
+
+    impl TestLogger {
+        pub fn create_new() -> TestLogger {
+            TestLogger { vec: RefCell::new(Vec::new()) }
+        }
+
+        pub fn get_log(&self) -> String {
+            let joined = self.vec.borrow_mut().join("; ");
+            joined
+        }
+    }
+
+    impl os_access::Os for TestLogger {
+        fn log(&self, s: &str) {
+            let ss = String::from(s);
+            self.vec.borrow_mut().push(ss);
+        }
+
+        fn info(&self, s: &str) {
+            let ss = String::from(s);
+            self.vec.borrow_mut().push(ss);
+        }
+
+        fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
+            None
+        }
+
+        fn spawn_java_process(&self, _jre_dir: &std::path::PathBuf, _args: &Vec<String>) -> std::process::Child {
+            panic!("not implemented");
+        }
+
+        fn get_system_config_javadir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+
+        fn get_user_config_dir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+
+        fn get_legacy_system_config_javadir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+
+        fn get_legacy_user_config_dir(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+
+        fn get_home(&self) -> Option<std::path::PathBuf> {
+            panic!("not implemented");
+        }
+        fn get_classpath_separator(&self) -> char { ':' }
+    }
+
 
     // rand is in separate crate, so using atomic increment instead
     static TMP_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
@@ -49,10 +109,9 @@ pub mod tests_utils {
     }
 
     pub fn create_scratch_dir() -> std::path::PathBuf {
-        let exepath = std::env::current_exe().expect("Current exe path not accessible");
-        let mut project_dir = exepath.parent().expect("Cannot get parent");
+        let mut project_dir = dirs_paths_helper::current_program_parent();
         while !project_dir.to_str().expect("Cannot get path name").ends_with("rust-launcher") {
-            project_dir = project_dir.parent().expect("Cannot get parent");
+            project_dir = project_dir.parent().expect("Cannot get parent").to_path_buf();
         }
         let mut scratch_dir = std::path::PathBuf::new();
         scratch_dir.push(project_dir);

@@ -1,6 +1,7 @@
 use std;
 use dirs_paths_helper;
 use std::env;
+use std::fmt::Write;
 
 pub trait Os {
     // logging "api" can change
@@ -20,6 +21,7 @@ pub trait Os {
     // it should have fallback in env::home_dir as it is doing a bit more
     // see https://doc.rust-lang.org/std/env/fn.home_dir.html
     fn get_home(&self) -> Option<std::path::PathBuf>;
+    fn get_classpath_separator(&self) -> char;
 }
 
 pub struct Linux {
@@ -88,6 +90,9 @@ impl Os for Linux {
         cmd.stdin(std::process::Stdio::inherit());
         cmd.stdout(std::process::Stdio::inherit());
         cmd.stderr(std::process::Stdio::inherit());
+        let mut info = String::new();
+        write!(&mut info, "itw-rust-debug: command {}", format!("{:?}", cmd)).expect("unwrap failed");
+        self.log(&info);
         let res = cmd.spawn();
         match res {
             Ok(child) => child,
@@ -110,5 +115,9 @@ impl Os for Linux {
         // if this will ever be bugged, the fix should be to set HOME
         // locally, or fix the distribution itslef
         None
+    }
+
+    fn get_classpath_separator(&self) -> char {
+        return ':';
     }
 }

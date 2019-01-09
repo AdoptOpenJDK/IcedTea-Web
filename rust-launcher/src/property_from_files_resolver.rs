@@ -67,63 +67,11 @@ fn try_key_from_properties_files(logger: &os_access::Os, array: &[Option<std::pa
 mod tests {
     use std;
     use os_access;
-    use std::cell::RefCell;
     use utils::tests_utils as tu;
     use property_from_file;
     //if you wont to investigate files used for testing
     // use cargo test -- --nocapture to see  files which needs delete
     static DELETE_TEST_FILES: bool = true;
-
-    pub struct TestLogger {
-        vec: RefCell<Vec<String>>,
-    }
-
-    impl TestLogger {
-        fn get_log(&self) -> String {
-            let joined = self.vec.borrow_mut().join("; ");
-            joined
-        }
-    }
-
-    impl os_access::Os for TestLogger {
-        fn log(&self, s: &str) {
-            let ss = String::from(s);
-            self.vec.borrow_mut().push(ss);
-        }
-
-        fn info(&self, s: &str) {
-            let ss = String::from(s);
-            self.vec.borrow_mut().push(ss);
-        }
-
-        fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
-            None
-        }
-
-        fn spawn_java_process(&self, _jre_dir: &std::path::PathBuf, _args: &Vec<String>) -> std::process::Child {
-            panic!("not implemented");
-        }
-
-        fn get_system_config_javadir(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
-        }
-
-        fn get_user_config_dir(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
-        }
-
-        fn get_legacy_system_config_javadir(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
-        }
-
-        fn get_legacy_user_config_dir(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
-        }
-
-        fn get_home(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
-        }
-    }
 
     fn try_jdk_from_properties_files(logger: &os_access::Os, array: &[Option<std::path::PathBuf>]) -> Option<String> {
         super::try_key_from_properties_files(logger, &array, property_from_file::JRE_PROPERTY_NAME, &property_from_file::JreValidator {})
@@ -137,7 +85,7 @@ mod tests {
             None,
             None
         ];
-        let os = TestLogger { vec: RefCell::new(Vec::new()) };
+        let os = tu::TestLogger::create_new();
         let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         assert_eq!(None, r);
@@ -151,7 +99,7 @@ mod tests {
             Some(std::path::PathBuf::from("Nonexisting file 3")),
             Some(std::path::PathBuf::from("Nonexisting file 4")),
         ];
-        let os = TestLogger { vec: RefCell::new(Vec::new()) };
+        let os = tu::TestLogger::create_new();
         let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         assert_eq!(None, r);
@@ -180,7 +128,7 @@ mod tests {
             Some(std::path::PathBuf::from(tu::create_tmp_file())),
             Some(std::path::PathBuf::from(tu::create_tmp_file())),
         ];
-        let os = TestLogger { vec: RefCell::new(Vec::new()) };
+        let os = tu::TestLogger::create_new();
         let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         clean_fake_files(&array);
@@ -195,7 +143,7 @@ mod tests {
             Some(std::path::PathBuf::from(tu::create_tmp_propfile_with_custom_jre_content("non/existing/jre3"))),
             Some(std::path::PathBuf::from(tu::create_tmp_propfile_with_custom_jre_content("non/existing/jre4"))),
         ];
-        let os = TestLogger { vec: RefCell::new(Vec::new()) };
+        let os = tu::TestLogger::create_new();
         let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         clean_fake_files(&array);
@@ -216,7 +164,7 @@ mod tests {
             Some(std::path::PathBuf::from(tu::create_tmp_propfile_with_custom_jre_content("non/existing/jre3"))),
             Some(std::path::PathBuf::from(tu::create_tmp_propfile_with_custom_jre_content("non/existing/jre4"))),
         ];
-        let os = TestLogger { vec: RefCell::new(Vec::new()) };
+        let os = tu::TestLogger::create_new();
         let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         clean_fake_files(&array);
@@ -237,7 +185,7 @@ mod tests {
             Some(std::path::PathBuf::from(tu::create_tmp_file())),
             Some(std::path::PathBuf::from(tu::create_tmp_propfile_with_custom_jre_content(&master_dir2.display().to_string()))),
         ];
-        let os = TestLogger { vec: RefCell::new(Vec::new()) };
+        let os = tu::TestLogger::create_new();
         let r = try_jdk_from_properties_files(&os, &array);
         println!("{}", &os.get_log());
         clean_fake_files(&array);

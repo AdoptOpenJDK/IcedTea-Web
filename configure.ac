@@ -82,6 +82,26 @@ esac
 AM_CONDITIONAL([LINUX], [test "$build_linux" = "yes"])
 AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
 
+AC_MSG_CHECKING([how to search for libraries in native launchers])
+AC_ARG_WITH([itw-libs],
+	      [AS_HELP_STRING([--with-itw-libs],
+	      		      [set way of searching system for jar depndencies - BUNDLED, for portable build (in application space); DISTRIBUTION, for linux (in installed path); BOTH, for both usages (should be for testing only])], [ITW_LIBS="${withval}"], [ITW_LIBS='none'])
+if test "x$build_windows" = xyes ; then
+  if test x"$ITW_LIBS" = xnone -o x"$ITW_LIBS" = x; then
+      ITW_LIBS="BUNDLED"
+      echo  -n "On Windows, presetting missing --with-itw-libs ITW_LIBS to $ITW_LIBS. " 
+      echo  -n "On Windows, DISTRIBUTION nor BOTH do not have much sense... " 
+  fi
+fi
+AC_MSG_RESULT(${ITW_LIBS})
+AC_SUBST(ITW_LIBS)
+if test x"$ITW_LIBS" = xnone -o x"$ITW_LIBS" = x; then
+    AC_MSG_ERROR([missing --with-itw-libs; mandatory on linux. Use BUNDLED, DISTRIBUTION or BOTH. use BOTH with care. ])
+fi
+if test ! "$ITW_LIBS" = BUNDLED -a ! "$ITW_LIBS" = DISTRIBUTION -a ! "$ITW_LIBS" = BOTH; then
+    AC_MSG_ERROR([incorrect --with-itw-libs; mandatory are BUNDLED, DISTRIBUTION or BOTH ])
+fi
+
 IT_CHECK_WITH_GCJ
 FIND_TOOL([ZIP], [zip])
 FIND_JAVAC

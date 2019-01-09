@@ -164,6 +164,8 @@ if ENABLE_PLUGINJAR
   PLUGIN_JAR=$(datadir)/$(PACKAGE_NAME)/plugin.jar
   JSOBJECT_JAR=$(datadir)/$(PACKAGE_NAME)/jsobject.jar
 endif
+  NETX_JAR=$(datadir)/$(PACKAGE_NAME)/javaws.jar
+  SPLASH_PNG=$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
 
 # Conditional defintions
 if HAVE_TAGSOUP
@@ -186,7 +188,7 @@ export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) 
 #    IllegalAccessException
 #  - we want full privileges
 #
-export UNIFIED_CLASSPATH_SEGMENTS=$(datadir)/$(PACKAGE_NAME)/netx.jar $(PLUGIN_JAR) $(JSOBJECT_JAR) $(RHINO_JAR) $(TAGSOUP_JAR)
+export UNIFIED_CLASSPATH_SEGMENTS=$(NETX_JAR) $(PLUGIN_JAR) $(JSOBJECT_JAR) $(RHINO_JAR) $(TAGSOUP_JAR)
 export UNIFIED_JACOCO_CLASSPATH_SEGMENTS=$(UNIFIED_CLASSPATH_SEGMENTS) $(JACOCO_CLASSPATH)
 export UNIFIED_CLASSPATH=$(call joinsegments, $(UNIFIED_CLASSPATH_SEGMENTS))
 export UNIFIED_JACOCO_CLASSPATH=$(call joinsegments, $(UNIFIED_JACOCO_CLASSPATH_SEGMENTS))
@@ -314,14 +316,16 @@ policyeditor:= $(shell echo policyeditor | sed '@program_transform_name@')
 # make-time from configure-time
 edit_launcher_script = sed \
   -e "s|[@]LAUNCHER_BOOTCLASSPATH[@]|$(LAUNCHER_BOOTCLASSPATH)|g" \
-  -e "s|[@]JAVAWS_SPLASH_LOCATION[@]|$(datadir)/$(PACKAGE_NAME)/javaws_splash.png|g" \
+  -e "s|[@]JAVAWS_SPLASH_LOCATION[@]|$(SPLASH_PNG)|g" \
   -e "s|[@]JAVA[@]|$(JAVA)|g" \
   -e "s|[@]JRE[@]|$(SYSTEM_JRE_DIR)|g" \
   -e "s|[@]MAIN_CLASS[@]|$${MAIN_CLASS}|g" \
   -e "s|[@]BIN_LOCATION[@]|$${BIN_LOCATION}|g" \
-  -e "s|[@]NETX_JAR[@]|$(datadir)/$(PACKAGE_NAME)/netx.jar|g" \
+  -e "s|[@]NETX_JAR[@]|$(NETX_JAR)|g" \
   -e "s|[@]PLUGIN_JAR[@]|$(PLUGIN_JAR)|g" \
   -e "s|[@]JSOBJECT_JAR[@]|$(JSOBJECT_JAR)|g" \
+  -e "s|[@]TAGSOUP_JAR[@]|$(TAGSOUP_JAR)|g" \
+  -e "s|[@]RHINO_JAR[@]|$(RHINO_JAR)|g" \
   -e "s|[@]PROGRAM_NAME[@]|$${PROGRAM_NAME}|g"
 
 # Top-Level Targets
@@ -350,11 +354,11 @@ if ENABLE_NATIVE_PLUGIN
 	${INSTALL_PROGRAM} $(PLUGIN_DIR)/$(BUILT_PLUGIN_LIBRARY) $(DESTDIR)$(libdir)
 endif
 if ENABLE_PLUGINJAR
-	${INSTALL_DATA} $(TOP_BUILD_DIR)/liveconnect/lib/classes-applet.jar   $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
-	${INSTALL_DATA} $(TOP_BUILD_DIR)/liveconnect/lib/classes-jsobject.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
+	${INSTALL_DATA} $(TOP_BUILD_DIR)/liveconnect/lib/classes-applet.jar   $(DESTDIR)$(PLUGIN_JAR)
+	${INSTALL_DATA} $(TOP_BUILD_DIR)/liveconnect/lib/classes-jsobject.jar $(DESTDIR)$(JSOBJECT_JAR)
 endif
-	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(NETX_JAR)
+	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(SPLASH_PNG)
 	${INSTALL_DATA} $(TOP_SRC_DIR)/javaws.png $(ICONS_DEST_DIR)/
 if ENABLE_NATIVE_LAUNCHERS
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
@@ -510,10 +514,10 @@ uninstall-linux-only:
 	rm -f $(BASH_CMPL_DEST_DIR)/policyeditor.bash
 
 uninstall-local: uninstall-linux-only
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/plugin.jar
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/jsobject.jar
-	rm -f $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/netx.jar
-	rm -r $(DESTDIR)$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+	rm -f $(DESTDIR)$(PLUGIN_JAR)
+	rm -f $(DESTDIR)$(JSOBJECT_JAR)
+	rm -f $(DESTDIR)$(NETX_JAR)
+	rm -r $(DESTDIR)$(SPLASH_PNG)
 	rm -r $(ICONS_DEST_DIR)/javaws.png
 	rm -rf $(DESTDIR)$(htmldir)
 if WINDOWS
@@ -554,7 +558,7 @@ $(PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
-	  -DNETX_JAR="\"$(datadir)/$(PACKAGE_NAME)/netx.jar\"" \
+	  -DNETX_JAR="\"$(NETX_JAR)\"" \
 	  -DPLUGIN_JAR="\"$(PLUGIN_JAR)\"" \
 	  -DJSOBJECT_JAR="\"$(JSOBJECT_JAR)\""\
 	  $(GLIB_CFLAGS) \
@@ -609,7 +613,7 @@ stamps/cpp-unit-tests-compile.stamp: $(CPP_UNITTEST_FRAMEWORK_LIB) $(CPP_UNITTES
 	  -DMOZILLA_VERSION_COLLAPSED="$(MOZILLA_VERSION_COLLAPSED)" \
 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
-	  -DNETX_JAR="\"$(datadir)/$(PACKAGE_NAME)/netx.jar\"" \
+	  -DNETX_JAR="\"$(NETX_JAR)\"" \
 	  -DPLUGIN_JAR="\"$(PLUGIN_JAR)\"" \
 	  -DJSOBJECT_JAR="\"$(JSOBJECT_JAR)\""\
 	  $(GLIB_CFLAGS) \
@@ -907,6 +911,13 @@ launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(polic
 	pushd $$outs ; \
 	  export JAVA=$(JAVA) ; \
 	  export JRE=$(SYSTEM_JRE_DIR) ; \
+	  export SPLASH_PNG=$(SPLASH_PNG) ; \
+	  export ITW_LIBS=$(ITW_LIBS) ; \
+	  export PLUGIN_JAR=$(PLUGIN_JAR) ; \
+	  export NETX_JAR=$(NETX_JAR) ; \
+	  export JSOBJECT_JAR=$(JSOBJECT_JAR) ; \
+	  export TAGSOUP_JAR=$(TAGSOUP_JAR) ; \
+	  export RHINO_JAR=$(RHINO_JAR) ; \
 	  unset MAIN_CLASS ; \
 	  unset BIN_LOCATION ; \
 	  unset PROGRAM_NAME ; \
@@ -1638,7 +1649,7 @@ $(COVERABLE_PLUGIN_DIR)/%.o: $(PLUGIN_SRCDIR)/%.cc
 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_COVERAGE_BOOTCLASSPATH) \
 	  -DCOVERAGE_AGENT=$(JACOCO_AGENT_PLUGIN_SWITCH) \
-	  -DNETX_JAR="\"$(datadir)/$(PACKAGE_NAME)/netx.jar\"" \
+	  -DNETX_JAR="\"$(NETX_JAR)\"" \
 	  -DPLUGIN_JAR="\"$(PLUGIN_JAR)\"" \
 	  -DJSOBJECT_JAR="\"$(JSOBJECT_JAR)\""\
 	  $(GLIB_CFLAGS) \
