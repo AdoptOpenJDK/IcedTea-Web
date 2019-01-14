@@ -1,5 +1,14 @@
 2019-01-14  Jiri Vanek <jvanek@redhat.com>
 
+	Refactored arranging of arguments and finding jre on path to be testable
+	* rust-launcher/src/main.rs: introduced compose_arguments, include_not_dashJs,
+	include_dashJs_values; used, tested
+	* rust-launcher/src/utils.rs: introduced get_jdk_from_path_conditionally_testable and
+	get_jdk_from_given_path_testable; used, tested
+
+
+2019-01-14  Jiri Vanek <jvanek@redhat.com>
+
 	Added detection of JDK from PATH
 	* rust-launcher/src/hardcoded_paths.rs: minor fix of Err to err
 	* rust-launcher/src/jars_helper.rs: removed redundant declaration of i
