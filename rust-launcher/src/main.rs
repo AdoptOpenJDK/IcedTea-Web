@@ -101,7 +101,22 @@ fn main() {
     bin_name.push_str(&current_name);
     bin_location.push_str(&dirs_paths_helper::path_to_string(&current_bin));
 
+    let a = env::args();
+    let s = a.skip(1);
+    let c: std::vec::Vec<String> = s.collect();
+
     let mut all_args = std::vec::Vec::new();
+    for f in c.iter() {
+        if f.to_string().starts_with("-J") {
+            let s = String::from(f.to_string().get(2..).expect("-J should be substring-able by 2"));
+            if s.is_empty() {
+                os.info("Warning, empty -J switch")
+            } else {
+                all_args.push(s);
+            }
+        }
+    }
+
     all_args.push(bootcp);
     all_args.push(String::from("-classpath"));
     all_args.push(cp);
@@ -109,12 +124,10 @@ fn main() {
     all_args.push(bin_location);
     all_args.push(hardcoded_paths::get_main().to_string());
 
-
-    let a = env::args();
-    let s = a.skip(1);
-    let c: std::vec::Vec<String> = s.collect();
     for f in c.iter() {
-        all_args.push(f.to_string());
+        if !f.to_string().starts_with("-J") {
+            all_args.push(f.to_string());
+        }
     }
 
     let mut child = os.spawn_java_process(&java_dir, &all_args);

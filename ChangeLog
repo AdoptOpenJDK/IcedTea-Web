@@ -1,5 +1,12 @@
 2019-01-14  Jiri Vanek <jvanek@redhat.com>
 
+	Added support for -J options
+	* rust-launcher/src/main.rs: arguments are now copied to sub-process in two steps
+	First those with -J prefix are having it stripped and are given to JVM. Those withou J are
+	suffixed to the itw itself
+
+2019-01-14  Jiri Vanek <jvanek@redhat.com>
+
 	Added code-coverage for rust launchers
 	* .Makefile.am: declared target counting code coverage on rust launchers based on kcov
 	* acinclude.m4: declared checkfor kcov directory
