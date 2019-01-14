@@ -1,5 +1,17 @@
 2019-01-14  Jiri Vanek <jvanek@redhat.com>
 
+	Added detection of JDK from PATH
+	* rust-launcher/src/hardcoded_paths.rs: minor fix of Err to err
+	* rust-launcher/src/jars_helper.rs: removed redundant declaration of i
+	* rust-launcher/src/main.rs:resolving of jre moved to utils
+	* rust-launcher/src/os_access.rs: declared new method, get_exec_suffixes to obtain java's executable suffix
+	implemented for linux as ""
+	* rust-launcher/src/utils.rs: new method find_jre, extracted form main, enhanced for call to get_jdk_from_path_conditionally
+	new method get_jdk_from_path, for bundled build and both, searching fo jre on path. Based on java executable on path, resolves
+	jre
+
+2019-01-14  Jiri Vanek <jvanek@redhat.com>
+
 	Added support for -J options
 	* rust-launcher/src/main.rs: arguments are now copied to sub-process in two steps
 	First those with -J prefix are having it stripped and are given to JVM. Those withou J are

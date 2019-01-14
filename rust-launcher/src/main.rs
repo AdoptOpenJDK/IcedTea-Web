@@ -28,41 +28,10 @@ fn main() {
     //TODO verbose will be populated by also from deployment properties
     let os = os_access::Linux::new(is_debug_on());
     os.log(&dirs_paths_helper::path_to_string(&dirs_paths_helper::current_program()));
-    let java_dir: std::path::PathBuf;
     let mut info1 = String::new();
     write!(&mut info1, "itw-rust-debug: trying jdk over properties ({})", property_from_file::JRE_PROPERTY_NAME).expect("unwrap failed");
     os.log(&info1);
-    match property_from_files_resolver::try_jdk_from_properties(&os) {
-        Some(path) => {
-            java_dir = std::path::PathBuf::from(path);
-            os.log("itw-rust-debug: found and using");
-        }
-        None => {
-            os.log("itw-rust-debug: nothing");
-            os.log("itw-rust-debug: trying jdk JAVA_HOME");
-            match env::var("JAVA_HOME") {
-                Ok(war) => {
-                    java_dir = std::path::PathBuf::from(war);
-                    os.log("itw-rust-debug: found and using");
-                }
-                Err(_e) => {
-                    os.log("itw-rust-debug: nothing");
-                    os.log("itw-rust-debug: trying jdk from registry");
-                    match os.get_registry_jdk() {
-                        Some(path) => {
-                            java_dir = path;
-                            os.log("itw-rust-debug: found and using");
-                        }
-                        None => {
-                            os.log("itw-rust-debug: nothing");
-                            os.log("itw-rust-debug: failing down to hardcoded");
-                            java_dir = std::path::PathBuf::from(hardcoded_paths::get_jre());
-                        }
-                    }
-                }
-            }
-        }
-    }
+    let java_dir = utils::find_jre(&os);
     let mut info2 = String::new();
     write!(&mut info2, "selected jre: {}", java_dir.display()).expect("unwrap failed");
     os.info(&info2);

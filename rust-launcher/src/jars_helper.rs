@@ -144,7 +144,6 @@ fn get_cp_members(jre_path: &std::path::PathBuf, _os: &os_access::Os) -> Vec<std
 
 fn compose_class_path(members: Vec<std::path::PathBuf>, os: &os_access::Os) -> String {
     let mut result = String::new();
-    let mut i = 0;
     for (i, mb) in members.iter().enumerate()  {
         result.push_str(&dirs_paths_helper::path_to_string(&mb));
         if i < members.len() - 1 {

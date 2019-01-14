@@ -1,3 +1,120 @@
+use std;
+use env;
+use dirs_paths_helper;
+use os_access;
+use std::fmt::Write;
+use hardcoded_paths;
+use property_from_files_resolver;
+
+pub fn find_jre(os: &os_access::Os) -> std::path::PathBuf {
+    match property_from_files_resolver::try_jdk_from_properties(os) {
+        Some(path) => {
+            os.log("itw-rust-debug: found and using");
+            return std::path::PathBuf::from(path);
+        }
+        None => {
+            os.log("itw-rust-debug: nothing");
+            os.log("itw-rust-debug: trying jdk JAVA_HOME");
+            match env::var("JAVA_HOME") {
+                Ok(war) => {
+                    os.log("itw-rust-debug: found and using");
+                    return std::path::PathBuf::from(war);
+                }
+                Err(_e) => {
+                    os.log("itw-rust-debug: nothing");
+                    os.log("itw-rust-debug: trying jdk from registry");
+                    match os.get_registry_jdk() {
+                        Some(path) => {
+                            os.log("itw-rust-debug: found and using");
+                            return path;
+                        }
+                        None => {
+                            os.log("itw-rust-debug: nothing");
+                            os.log("itw-rust-debug: trying jdk from path");
+                            match get_jdk_from_path_conditionally(os) {
+                                Some(path) => {
+                                    os.log("itw-rust-debug: found and using");
+                                    return path;
+                                }
+                                None => {
+                                    os.log("itw-rust-debug: nothing");
+                                    os.log("itw-rust-debug: failing down to hardcoded");
+                                    return std::path::PathBuf::from(hardcoded_paths::get_jre());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn get_jdk_from_path_conditionally(os: &os_access::Os) -> Option<std::path::PathBuf> {
+    let libsearch = hardcoded_paths::get_libsearch(os);
+    if libsearch == hardcoded_paths::ItwLibSearch::DISTRIBUTION {
+        os.log("itw-rust-debug: skipping jdk from path, your build is distribution");
+        None
+    } else {
+        if libsearch == hardcoded_paths::ItwLibSearch::BOTH {
+            os.info("your build is done as BOTH distribution and bundled, jdk from PATH may be not what you want!");
+        }
+        get_jdk_from_path(os)
+    }
+}
+
+fn get_jdk_from_path(os: &os_access::Os) -> Option<std::path::PathBuf> {
+    env::var_os("PATH").and_then(|paths| {
+        env::split_paths(&paths).filter_map(|dir| {
+            for suffix in os.get_exec_suffixes() {
+                let mut bin_name = String::new();
+                write!(&mut bin_name, "java{}", suffix).expect("unwrap failed");
+                let full_path = dir.join(bin_name);
+                let mut info1 = String::new();
+                write!(&mut info1, "itw-rust-debug: trying {}", full_path.to_str().expect("unwrap failed")).expect("unwrap failed");
+                os.log(&info1);
+                if dirs_paths_helper::is_file(&full_path) {
+                    let can = match full_path.canonicalize() {
+                        Ok(resolved) => {
+                            //.../bin/java
+                            resolved
+                        }
+                        _error => {
+                            full_path.clone()
+                        }
+                    };
+                    //.../bin/java -> bin
+                    let jre_bin_dir: std::path::PathBuf = std::path::PathBuf::from(&can.parent().expect("file should always have parent"));
+                    let jre_dir: std::path::PathBuf;
+                    //will panic if the file was /java - not fixing
+                    if jre_bin_dir.file_name().expect("java's parent should have name") == "bin" {
+                        jre_dir = std::path::PathBuf::from(jre_bin_dir.parent().expect("java's  bin dir should have parent"))
+                    } else {
+                        os.info("Error: JRE from path seems to not have bin dir");
+                        jre_dir = match jre_bin_dir.parent() {
+                            Some(p) => {
+                                //.../bin/ -> ...
+                                std::path::PathBuf::from(p)
+                            }
+                            None => {
+                                //??
+                                jre_bin_dir.clone()
+                            }
+                        }
+                    }
+                    let mut info2 = String::new();
+                    write!(&mut info2, "itw-rust-debug: found {} resolving as {}", full_path.to_str().expect("unwrap failed"), can.to_str().expect("unwrap failed")).expect("unwrap failed");
+                    os.log(&info2);
+                    //returning owner of /bin/java as needed by find_jre
+                    return Some(jre_dir);
+                }
+            }
+            None
+        }).next()
+    })
+}
+
+
 #[cfg(test)]
 pub mod tests_utils {
     use std;
@@ -66,6 +183,10 @@ pub mod tests_utils {
             panic!("not implemented");
         }
         fn get_classpath_separator(&self) -> char { ':' }
+
+        fn get_exec_suffixes(&self) -> &'static [&'static str] {
+            panic!("not implemented");
+        }
     }
 
 

@@ -22,6 +22,7 @@ pub trait Os {
     // see https://doc.rust-lang.org/std/env/fn.home_dir.html
     fn get_home(&self) -> Option<std::path::PathBuf>;
     fn get_classpath_separator(&self) -> char;
+    fn get_exec_suffixes(&self) -> &'static [&'static str];
 }
 
 pub struct Linux {
@@ -118,6 +119,11 @@ impl Os for Linux {
     }
 
     fn get_classpath_separator(&self) -> char {
-        return ':';
+         ':'
+    }
+
+    //on linux, java is known to be compiled witout any suffix, on windows, it should be .exe
+    fn get_exec_suffixes(&self) -> &'static [&'static str] {
+        &[""]
     }
 }

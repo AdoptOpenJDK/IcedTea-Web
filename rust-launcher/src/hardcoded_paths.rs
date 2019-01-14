@@ -99,7 +99,7 @@ pub fn get_libsearch(logger: &os_access::Os) -> ItwLibSearch {
             Ok(result_of_override_to_enum) => {
                 return result_of_override_to_enum;
             }
-            _Err => {
+            _err => {
                 let mut info = String::new();
                 write!(&mut info, "ITW-LIBS provided, but have invalid value of {}. Use BUNDLED, DISTRIBUTION or BOTH", result_of_override_var);
                 logger.info(&info);
@@ -113,7 +113,7 @@ pub fn get_libsearch(logger: &os_access::Os) -> ItwLibSearch {
         Ok(v) => {
             return v
         }
-        _Err=> {
+        _err=> {
             panic!("itw-lib search out of range");
         }
     }
