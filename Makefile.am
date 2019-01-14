@@ -923,17 +923,17 @@ launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(polic
 	  unset PROGRAM_NAME ; \
 	  if [ $$filename = $(javaws) ] ; then \
 	    export MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ; \
-	    export BIN_LOCATION=$(bindir)/$(javaws).sh ; \
+	    export BIN_LOCATION=$(bindir)/$(javaws) ; \
 	    export PROGRAM_NAME=$(javaws) ; \
 	  fi ; \
 	  if [ $$filename = $(itweb_settings) ] ; then \
 	    export MAIN_CLASS=net.sourceforge.jnlp.controlpanel.CommandLine ; \
-	    export BIN_LOCATION=$(bindir)/$(itweb_settings).sh ; \
+	    export BIN_LOCATION=$(bindir)/$(itweb_settings) ; \
 	    export PROGRAM_NAME=$(itweb_settings) ; \
 	  fi ; \
 	  if [ $$filename = $(policyeditor) ] ; then \
 	    export MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ; \
-	    export BIN_LOCATION=$(bindir)/$(policyeditor).sh ; \
+	    export BIN_LOCATION=$(bindir)/$(policyeditor) ; \
 	    export PROGRAM_NAME=$(policyeditor) ; \
 	  fi ; \
 	  $(CARGO) test ; \
@@ -945,6 +945,50 @@ launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(polic
 	  mv $@ $@.broken ; \
 	fi; \
 	exit $$r
+
+# https://github.com/SimonKagstrom/kcov/
+# build is not part of upstream, declaring
+rust-code-coverage:
+	kcov="none" ; \
+	if [ -f $(KCOV)/kcov ] ; then \
+	  kcov=$(KCOV)/kcov ; \
+	elif [ -f $(KCOV)/bin/kcov ] ; then \
+	  kcov=$(KCOV)/bin/kcov ; \
+	elif [ -f $(KCOV)/build/kcov ] ; then \
+	  kcov=$(KCOV)/build/kcov ; \
+	elif [ -f $(KCOV)/build/src/kcov ] ; then \
+	  kcov=$(KCOV)/build/src/kcov ; \
+	else \
+	  mkdir $(KCOV)/build ; \
+	  pushd $(KCOV)/build ; \
+	  cmake .. ; \
+	  make ; \
+	  popd ; \
+	  kcov=$(KCOV)/build/src/kcov ; \
+	fi ; \
+	export ITW_TMP_REPLACEMENT=$(TESTS_DIR)/rust_tests_tmp ; \
+	mkdir -p $$ITW_TMP_REPLACEMENT; \
+	srcs=$(TOP_SRC_DIR)/rust-launcher ; \
+	outs=$(TOP_BUILD_DIR)/launcher.in.codecoverage  ; \
+	rm -rvf $$outs  ; \
+	cp -r $$srcs $$outs  ; \
+	pushd $$outs ; \
+	  export JAVA=$(JAVA) ; \
+	  export JRE=$(SYSTEM_JRE_DIR) ; \
+	  export SPLASH_PNG=$(SPLASH_PNG) ; \
+	  export ITW_LIBS=$(ITW_LIBS) ; \
+	  export PLUGIN_JAR=$(PLUGIN_JAR) ; \
+	  export NETX_JAR=$(NETX_JAR) ; \
+	  export JSOBJECT_JAR=$(JSOBJECT_JAR) ; \
+	  export TAGSOUP_JAR=$(TAGSOUP_JAR) ; \
+	  export RHINO_JAR=$(RHINO_JAR) ; \
+	  export MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ; \
+	  export BIN_LOCATION=$(bindir)/none ; \
+	  export PROGRAM_NAME=test ; \
+	  $(CARGO) test  --no-run ; \
+	popd ; \
+	rm -fv $(TOP_BUILD_DIR)/launcher.in.codecoverage/target/debug/launcher-*.d ; \
+	$$kcov $$outs $(TOP_BUILD_DIR)/launcher.in.codecoverage/target/debug/launcher-*
 endif
 
 if ENABLE_SHELL_LAUNCHERS

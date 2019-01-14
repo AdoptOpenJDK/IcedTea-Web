@@ -1126,3 +1126,24 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_WIX],
     AC_SUBST(WIX_TOOLSET_DIR)
   fi
 ])
+
+
+AC_DEFUN([IT_CHECK_WITH_KCOV],
+[
+  AC_MSG_CHECKING([whether enable rust code coverage])
+  AC_ARG_WITH([kcov],
+	      [AS_HELP_STRING(--with-kcov,location of kcov directory)],
+  [
+    KCOV="${withval}"
+  ],
+  [ 
+    KCOV="no"
+  ])
+  AC_MSG_RESULT([${KCOV}])
+  if ! test "x${KCOV}" = "xno" ; then
+    if ! test -d "${KCOV}" ; then
+      AC_MSG_ERROR("kcov schould point to direcotry or - default - no")
+    fi
+  fi
+  AC_SUBST([KCOV])
+])

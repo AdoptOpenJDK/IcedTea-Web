@@ -82,6 +82,8 @@ esac
 AM_CONDITIONAL([LINUX], [test "$build_linux" = "yes"])
 AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
 
+IT_CHECK_WITH_KCOV
+
 AC_MSG_CHECKING([how to search for libraries in native launchers])
 AC_ARG_WITH([itw-libs],
 	      [AS_HELP_STRING([--with-itw-libs],
