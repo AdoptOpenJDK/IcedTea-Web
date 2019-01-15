@@ -90,6 +90,12 @@ public final class Boot implements PrivilegedAction<Void> {
 
     private static OptionParser optionParser;
 
+    public static OptionParser getOptionParser() {
+        return optionParser;
+    }
+    
+    
+
     /**
      * Launch the JNLP file specified by the command-line arguments.
      *
@@ -342,6 +348,18 @@ public final class Boot implements PrivilegedAction<Void> {
         JNLPRuntime.setOfflineForced(optionParser.hasOption(OptionsDefinitions.OPTIONS.OFFLINE));
         JNLPRuntime.initialize(true);
 
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.LISTCACHEIDS)) {
+            List<String> optionArgs = optionParser.getMainArgs();
+            if (optionArgs.size() > 0) {
+                //clear one app 
+                CacheUtil.listCacheIds(optionArgs.get(0));
+            } else {
+                // clear all cache
+                CacheUtil.listCacheIds(".*");
+            }
+            return null;
+        }
+
         /*
          * FIXME
          * This should have been done with the rest of the argument parsing
@@ -349,7 +367,14 @@ public final class Boot implements PrivilegedAction<Void> {
          * and baseDir is initialized here
          */
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CLEARCACHE)) {
-            CacheUtil.clearCache();
+            List<String> optionArgs = optionParser.getMainArgs();
+            if (optionArgs.size() > 0) {
+                //clear one app 
+                CacheUtil.clearCache(optionArgs.get(0));
+            } else {
+                // clear all cache
+                CacheUtil.clearCache();
+            }
             return null;
         }
 

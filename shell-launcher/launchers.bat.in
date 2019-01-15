@@ -56,7 +56,7 @@ if "%ITW_HOME%" == ""  (
   if not "%INST_ITW_HOME%" == ""  (
   set SPLASH_LOCATION=%INST_ITW_HOME%/share/icedtea-web/javaws_splash.png
   set BINARY_LOCATION=%INST_ITW_HOME%/bin/@PROGRAM_NAME@.bat
-  set LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%INST_ITW_HOME%/share/icedtea-web/netx.jar;%INST_ITW_HOME%/share/icedtea-web/plugin.jar;%INST_ITW_HOME%/share/icedtea-web/jsobject.jar;%INST_ITW_HOME%/win-deps-runtime/js.jar;%INST_ITW_HOME%/win-deps-runtime/tagsoup.jar;%NASHORN%
+  set LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%INST_ITW_HOME%/share/icedtea-web/netx.jar;%INST_ITW_HOME%/share/icedtea-web/plugin.jar;%INST_ITW_HOME%/share/icedtea-web/jsobject.jar;%INST_ITW_HOME%/win-deps-runtime/js.jar;%INST_ITW_HOME%/win-deps-runtime/tagsoup.jar;%INST_ITW_HOME%/win-deps-runtime/mslinks.jar;%NASHORN%
   ) else (
     set SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
     set BINARY_LOCATION=@BIN_LOCATION@.bat
@@ -65,7 +65,7 @@ if "%ITW_HOME%" == ""  (
 ) else (
   set SPLASH_LOCATION=%ITW_HOME%/share/icedtea-web/javaws_splash.png
   set BINARY_LOCATION=%ITW_HOME%/bin/@PROGRAM_NAME@.bat
-  set LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%ITW_HOME%/share/icedtea-web/netx.jar;%ITW_HOME%/share/icedtea-web/plugin.jar;%ITW_HOME%/share/icedtea-web/jsobject.jar;%ITW_HOME%/win-deps-runtime/js.jar;%ITW_HOME%/win-deps-runtime/tagsoup.jar;%NASHORN%
+  set LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%ITW_HOME%/share/icedtea-web/netx.jar;%ITW_HOME%/share/icedtea-web/plugin.jar;%ITW_HOME%/share/icedtea-web/jsobject.jar;%ITW_HOME%/win-deps-runtime/js.jar;%ITW_HOME%/win-deps-runtime/tagsoup.jar;%ITW_HOME%/win-deps-runtime/mslinks.jar;%NASHORN%
 )
 
 
