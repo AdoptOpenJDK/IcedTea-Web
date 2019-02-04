@@ -1,3 +1,10 @@
+2019-02-04  Jiri Vanek <jvanek@redhat.com>
+
+	Native launchers got splash support
+	* rust-launcher/src/main.rs: made parsing of variables and arguments testable; added handling of splash
+	Fixed issue with wrongly parsed -switch from commandline; splash is now added to java command if not forbidden or headless
+	added tests for all above
+
 2019-01-15  Jiri Vanek <jvanek@redhat.com>
 
 	Relaxed vendor and title to be no longer mandatory - based on oracle javaws behavior

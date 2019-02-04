@@ -13,19 +13,56 @@ use os_access::Os;
 use std::env;
 
 fn is_debug_on() -> bool {
-    for s in env::args() {
-        //this can go wrong with case like -jnlp file-verbose or -html file-verbose
-        //but it is really unlikely case as those are ususally .jnlp or .html suffixed
-        if s.ends_with("-verbose") {
+    match is_debug_on_testable(env::args().collect::<Vec<_>>()) {
+        Some(val) => {
+            return val;
+        }
+        _none => {
+            let os = os_access::Linux::new(false);
+            return property_from_files_resolver::try_main_verbose_from_properties(&os);
+        }
+    }
+}
+
+fn is_debug_on_testable(aargs: Vec<String>) -> Option<bool> {
+    for s in aargs {
+        if clean_param(s) == ("-verbose") {
+            return Some(true);
+        }
+    }
+    None
+}
+
+fn is_headless_enforced() -> bool {
+    is_headless_enforced_testable(env::args().collect::<Vec<_>>())
+}
+
+fn is_headless_enforced_testable(aargs: Vec<String>) -> bool {
+    for s in aargs {
+        if clean_param(s) == ("-headless") {
             return true;
         }
     }
-    let os = os_access::Linux::new(false);
-    return property_from_files_resolver::try_main_verbose_from_properties(&os);
+    false
+}
+
+fn is_splash_forbidden() -> bool {
+    is_splash_forbidden_testable(env::vars().collect::<Vec<_>>())
+}
+
+fn is_splash_forbidden_testable(vars: Vec<(String, String)>) -> bool {
+    for (key, value) in vars {
+        if key == "ICEDTEA_WEB_SPLASH" {
+            if value.to_lowercase() == "true" {
+                return false;
+            }
+            return true;
+        }
+    }
+    false
 }
 
 fn main() {
-    //TODO verbose will be populated by also from deployment properties
     let os = os_access::Linux::new(is_debug_on());
     os.log(&dirs_paths_helper::path_to_string(&dirs_paths_helper::current_program()));
     let mut info1 = String::new();
@@ -40,7 +77,7 @@ fn main() {
     let s = a.skip(1);
     let c: std::vec::Vec<String> = s.collect();
 
-    let mut child = os.spawn_java_process(&java_dir, &compose_arguments(&java_dir, &c,  &os));
+    let mut child = os.spawn_java_process(&java_dir, &compose_arguments(&java_dir, &c, &os));
     let ecode = child.wait().expect("failed to wait on child");
     let code = ecode.code().expect("code should be always here");
     std::process::exit(code)
@@ -74,7 +111,6 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
     write!(&mut info2, "itw-rust-debug: current bin: {}", &dirs_paths_helper::path_to_string(&current_bin)).expect("unwrap failed");
     os.log(&info2);
 
-    let splash = jars_helper::resolve_splash(os);
     let mut bin_name = String::from("-Dicedtea-web.bin.name=");
     let mut bin_location = String::from("-Dicedtea-web.bin.location=");
     //no metter what ITW_LIBS are saying, imho using current pgm is always correct comapred to hardcoded values
@@ -84,6 +120,15 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
     let mut all_args = std::vec::Vec::new();
 
     include_dashJs_values(&original_args, &mut all_args, os);
+
+    match get_splash(os) {
+        Some(switch) => {
+            all_args.push(switch);
+        }
+        _none => {
+            os.log("itw-rust-debug: splash excluded");
+        }
+    }
 
     all_args.push(bootcp);
     all_args.push(String::from("-classpath"));
@@ -95,6 +140,37 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
     include_not_dashJs(&original_args, &mut all_args);
 
     all_args
+}
+
+fn get_splash(os: &os_access::Os) -> Option<String> {
+    let headless = is_headless_enforced();
+    let splash_forbidden = is_splash_forbidden();
+    get_splash_testable(headless, splash_forbidden, os)
+}
+
+fn get_splash_testable(headless: bool, splash_forbidden: bool, os: &os_access::Os) -> Option<String> {
+    if !headless && !splash_forbidden {
+        let splash_location = dirs_paths_helper::path_to_string(&jars_helper::resolve_splash(os));
+        let mut owned_string: String = splash_location.to_owned();
+        let splash_switch: &str = "-splash:";
+        owned_string.insert_str(0, splash_switch);
+        let r = String::from(owned_string);
+        Some(r)
+    } else {
+        None
+    }
+}
+
+fn clean_param(s: String) -> String {
+    let mut ss = String::from(s);
+    let was = ss.starts_with("-");
+    while ss.starts_with("-") {
+        ss = ss[1..ss.len()].to_string();
+    }
+    if was {
+        ss.insert_str(0, "-");
+    }
+    String::from(ss)
 }
 
 #[allow(non_snake_case)]
@@ -124,6 +200,131 @@ fn include_dashJs_values(srcs: &Vec<std::string::String>, target: &mut Vec<std::
 pub mod tests_main {
     use utils::tests_utils as tu;
 
+    #[test]
+    fn is_splash_forbidden_test() {
+        let mut vec: Vec<(String, String)> = Vec::new();
+        assert_eq!(super::is_splash_forbidden_testable(vec), false);
+        vec = Vec::new();
+        vec.push(("".to_string(), "".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), false);
+        vec = Vec::new();
+        vec.push(("-blah".to_string(), "-blah".to_string()));
+        vec.push(("-verbose".to_string(), "-blah".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), false);
+        vec = Vec::new();
+        vec.push(("-blah".to_string(), "-blah".to_string()));
+        vec.push(("ICEDTEA_WEB_SPLASH".to_string(), "".to_string()));
+        vec.push(("-headless".to_string(),"-blah".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), true);
+        vec = Vec::new();
+        vec.push(("-blah".to_string(), "-blah".to_string()));
+        vec.push(("ICEDTEA_WEB_SPLASH".to_string(), "".to_string()));
+        vec.push(("---headless".to_string(), "-blah".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), true);
+        vec = Vec::new();
+        vec.push(("-blah".to_string(), "-blah".to_string()));
+        vec.push(("aICEDTEA_WEB_SPLASH".to_string(), "".to_string()));
+        vec.push(("---headless".to_string(), "-blah".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), false);
+        vec = Vec::new();
+        vec.push(("-blah".to_string(), "-blah".to_string()));
+        vec.push(("ICEDTEA_WEB_SPLASHb".to_string(), "".to_string()));
+        vec.push(("---headless".to_string(), "-blah".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), false);
+        vec = Vec::new();
+        vec.push(("-blah".to_string(), "-blah".to_string()));
+        vec.push(("aICEDTEA_WEB_SPLASHb".to_string(), "".to_string()));
+        vec.push(("---headless".to_string(), "-blah".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), false);
+        vec = Vec::new();
+        vec.push(("ICEDTEA_WEB_SPLASH".to_string(), "value".to_string()));
+        vec.push(("---headless".to_string(), "-blah".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), true);
+        vec = Vec::new();
+        vec.push(("ICEDTEA_WEB_SPLASH".to_string(), "true".to_string()));
+        vec.push(("---headless".to_string(), "-blah".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), false);
+    }
+
+    #[test]
+    fn is_headless_enforced_test() {
+        let mut vec: Vec<String> = Vec::new();
+        assert_eq!(super::is_headless_enforced_testable(vec), false);
+        vec = Vec::new();
+        vec.push("".to_string());
+        assert_eq!(super::is_headless_enforced_testable(vec), false);
+        vec = Vec::new();
+        vec.push("-blah".to_string());
+        vec.push("-verbose".to_string());
+        assert_eq!(super::is_headless_enforced_testable(vec), false);
+        vec = Vec::new();
+        vec.push("-blah".to_string());
+        vec.push("-verbose".to_string());
+        vec.push("headless".to_string());
+        assert_eq!(super::is_headless_enforced_testable(vec), false);
+        vec = Vec::new();
+        vec.push("-blah".to_string());
+        vec.push("-verbose".to_string());
+        vec.push("-headless".to_string());
+        assert_eq!(super::is_headless_enforced_testable(vec), true);
+        vec = Vec::new();
+        vec.push("-blah".to_string());
+        vec.push("-verbose".to_string());
+        vec.push("---headless".to_string());
+        assert_eq!(super::is_headless_enforced_testable(vec), true);
+    }
+
+    #[test]
+    fn is_debug_on_test() {
+        let mut vec: Vec<String> = Vec::new();
+        assert_eq!(super::is_debug_on_testable(vec), None);
+        vec = Vec::new();
+        vec.push("".to_string());
+        assert_eq!(super::is_debug_on_testable(vec), None);
+        vec = Vec::new();
+        vec.push("-blah".to_string());
+        vec.push("-headless".to_string());
+        assert_eq!(super::is_debug_on_testable(vec), None);
+        vec = Vec::new();
+        vec.push("-blah".to_string());
+        vec.push("verbose".to_string());
+        vec.push("-headless".to_string());
+        assert_eq!(super::is_debug_on_testable(vec), None);
+        vec = Vec::new();
+        vec.push("-blah".to_string());
+        vec.push("-verbose".to_string());
+        vec.push("-headless".to_string());
+        assert_eq!(super::is_debug_on_testable(vec), Some(true));
+        vec = Vec::new();
+        vec.push("-blah".to_string());
+        vec.push("---verbose".to_string());
+        vec.push("-headless".to_string());
+        assert_eq!(super::is_debug_on_testable(vec), Some(true));
+    }
+
+    #[test]
+    fn get_splash_test() {
+        assert_eq!(super::get_splash_testable(true, false, &tu::TestLogger::create_new()), None);
+        assert_eq!(super::get_splash_testable(false, true, &tu::TestLogger::create_new()), None);
+        assert_eq!(super::get_splash_testable(true, true, &tu::TestLogger::create_new()), None);
+        let some = super::get_splash_testable(false, false, &tu::TestLogger::create_new());
+        assert_eq!(some == None, false);
+        let val = some.expect("is known to be not none");
+        assert_eq!(val.starts_with("-splash:"), true);
+    }
+
+    #[test]
+    fn clean_param_test() {
+        assert_eq!(super::clean_param(String::from("-verbose")), String::from("-verbose"));
+        assert_eq!(super::clean_param(String::from("--verbose")), String::from("-verbose"));
+        assert_eq!(super::clean_param(String::from("------verbose")), String::from("-verbose"));
+        assert_eq!(super::clean_param(String::from("a-headless")), String::from("a-headless"));
+        assert_eq!(super::clean_param(String::from("-a-headless")), String::from("-a-headless"));
+        assert_eq!(super::clean_param(String::from("----a-headless")), String::from("-a-headless"));
+        assert_eq!(super::clean_param(String::from("test-")), String::from("test-"));
+        assert_eq!(super::clean_param(String::from("-test-")), String::from("-test-"));
+        assert_eq!(super::clean_param(String::from("verbose")), String::from("verbose"));
+    }
 
     #[test]
     fn compose_arguments_test() {
@@ -131,11 +332,10 @@ pub mod tests_main {
         let switches = vec![
             String::from("-a"),
             String::from("-J-b")];
-        let result = super::compose_arguments(&std::path::PathBuf::from("/some/jre"),&switches, &tu::TestLogger::create_new());
-        assert_eq!(result.len()>3, true);
+        let result = super::compose_arguments(&std::path::PathBuf::from("/some/jre"), &switches, &tu::TestLogger::create_new());
+        assert_eq!(result.len() > 3, true);
         assert_eq!(result.get(0).expect("first item should exists"), &String::from("-b"));
-        assert_eq!(result.get(result.len()-1).expect("last item should exists"), &String::from("-a"));
-
+        assert_eq!(result.get(result.len() - 1).expect("last item should exists"), &String::from("-a"));
     }
 
     #[test]
@@ -173,11 +373,14 @@ pub mod tests_main {
             String::from("-J-a"),
             String::from("-b"),
             String::from("--Jc"),
+            String::from("-J"), //not added, have no arg
+            String::from("-J-"), //added
             String::from("-Jd")];
         let mut result = Vec::new();
         super::include_dashJs_values(&switches, &mut result, &tu::TestLogger::create_new());
         let ex = vec![
             String::from("-a"),
+            String::from("-"),
             String::from("d")];
         assert_eq!(ex, result);
     }
