@@ -31,9 +31,12 @@ import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -80,9 +83,22 @@ public class CacheAppViewer extends JDialog {
         parentPane.setLayout(new BorderLayout());
         mainPane.setLayout(new GridLayout(2, 1));
         parentPane.add(mainPane);
-        final JList<CacheUtil.CacheId> apps = new JList<>();
-        apps.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        final JTextArea info = new JTextArea();
+        info.setEditable(false);
+        final JTabbedPane idTabs = new JTabbedPane();
+        final JPanel jnlpPaths = new JPanel(new BorderLayout());
+        jnlpPaths.setName("jnlp-path");
+        final JPanel domains = new JPanel(new BorderLayout());
+        domains.setName("domain");
+        idTabs.add(jnlpPaths);
+        idTabs.add(domains);
         final JButton delete = new JButton(Translator.R("TIFPDeleteFiles"));
+        DummyCacheIdListModel jnlpPathsIds = new DummyCacheIdListModel(CacheUtil.getCacheIds(".*", true, false));
+        DummyCacheIdListModel domainIds = new DummyCacheIdListModel(CacheUtil.getCacheIds(".*", false, true));
+        final JList<CacheUtil.CacheId> appsByJnlpPath = new JList<>();
+        final JList<CacheUtil.CacheId> appsByDomain = new JList<>();
+        appsByJnlpPath.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        appsByDomain.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         delete.setEnabled(false);
         delete.addActionListener(new ActionListener() {
             @Override
@@ -91,7 +107,12 @@ public class CacheAppViewer extends JDialog {
                 SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        CacheUtil.clearCache(apps.getSelectedValue().getId());
+                        if (idTabs.getSelectedComponent()==jnlpPaths){
+                            CacheUtil.clearCache(appsByJnlpPath.getSelectedValue().getId(), true, false);
+                        }
+                        if (idTabs.getSelectedComponent()==domains){
+                            CacheUtil.clearCache(appsByDomain.getSelectedValue().getId(), false, true);
+                        }
                         CacheAppViewer.this.getContentPane().removeAll();
                         CacheAppViewer.this.pack();
                         create();
@@ -100,33 +121,42 @@ public class CacheAppViewer extends JDialog {
                 });
             }
         });
-        final List<CacheUtil.CacheId> content = CacheUtil.getCacheIds(".*");
-        ListModel<CacheUtil.CacheId> m = new ListModel<CacheUtil.CacheId>() {
+        appsByJnlpPath.setModel(jnlpPathsIds);
+        appsByDomain.setModel(domainIds);
+        appsByJnlpPath.addListSelectionListener(new DummyListSelectionListenerWithModel(info, appsByJnlpPath, delete));
+        appsByDomain.addListSelectionListener(new DummyListSelectionListenerWithModel(info, appsByDomain, delete));
+        jnlpPaths.add(mainPane.add(new JScrollPane(appsByJnlpPath)));
+        domains.add(mainPane.add(new JScrollPane(appsByDomain)));
+        mainPane.add(idTabs);
+        idTabs.addChangeListener(new ChangeListener() {
             @Override
-            public int getSize() {
-                return content.size();
+            public void stateChanged(ChangeEvent e) {
+                appsByDomain.clearSelection();
+                appsByJnlpPath.clearSelection();
             }
+        });
+        mainPane.add(new JScrollPane(info));
+        parentPane.add(delete, BorderLayout.SOUTH);
+        pack();
 
-            @Override
-            public CacheUtil.CacheId getElementAt(int index) {
-                return content.get(index);
-            }
+    }
 
-            @Override
-            public void addListDataListener(ListDataListener l) {
+    public void centerDialog() {
+        ScreenFinder.centerWindowsToCurrentScreen(this);
+    }
+    
+    private static class DummyListSelectionListenerWithModel implements ListSelectionListener {
 
-            }
+        private final JTextArea info;
+        private final JList<CacheUtil.CacheId> apps;
+        private final JButton delete;
 
-            @Override
-            public void removeListDataListener(ListDataListener l) {
-
-            }
-
-        };
-        apps.setModel(m);
-        final JTextArea info = new JTextArea();
-        info.setEditable(false);
-        apps.addListSelectionListener(new ListSelectionListener() {
+        public DummyListSelectionListenerWithModel(JTextArea info, JList<CacheUtil.CacheId> apps, JButton delete) {
+            this.info = info;
+            this.apps = apps;
+            this.delete = delete;
+        }
+        
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 info.setText("");
@@ -149,15 +179,34 @@ public class CacheAppViewer extends JDialog {
                     delete.setText(Translator.R("TIFPDeleteFiles"));
                 }
             }
-        });
-        mainPane.add(new JScrollPane(apps));
-        mainPane.add(new JScrollPane(info));
-        parentPane.add(delete, BorderLayout.SOUTH);
-        pack();
+        }
+    
+    private static class DummyCacheIdListModel implements ListModel<CacheUtil.CacheId> {
+        
+        List<CacheUtil.CacheId> content;
+        public DummyCacheIdListModel(List<CacheUtil.CacheId> content){
+            this.content = content;
+        }
+            @Override
+            public int getSize() {
+                return content.size();
+            }
 
-    }
+            @Override
+            public CacheUtil.CacheId getElementAt(int index) {
+                return content.get(index);
+            }
 
-    public void centerDialog() {
-        ScreenFinder.centerWindowsToCurrentScreen(this);
-    }
+            @Override
+            public void addListDataListener(ListDataListener l) {
+
+            }
+
+            @Override
+            public void removeListDataListener(ListDataListener l) {
+
+            }
+
+        };
 }
+

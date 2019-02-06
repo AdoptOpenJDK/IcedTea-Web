@@ -352,10 +352,10 @@ public final class Boot implements PrivilegedAction<Void> {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
                 //clear one app 
-                CacheUtil.listCacheIds(optionArgs.get(0));
+                CacheUtil.listCacheIds(optionArgs.get(0), true, true);
             } else {
                 // clear all cache
-                CacheUtil.listCacheIds(".*");
+                CacheUtil.listCacheIds(".*", true, true);
             }
             return null;
         }
@@ -370,7 +370,7 @@ public final class Boot implements PrivilegedAction<Void> {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
                 //clear one app 
-                CacheUtil.clearCache(optionArgs.get(0));
+                CacheUtil.clearCache(optionArgs.get(0), true, true);
             } else {
                 // clear all cache
                 CacheUtil.clearCache();
