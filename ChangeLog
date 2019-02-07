@@ -1,5 +1,11 @@
 2019-02-07  Jiri Vanek <jvanek@redhat.com>
 
+	Allowed cross-build of bat launchers on linux systems
+	* .Makefile: some if WINDOWS changed to if WINDOWS_OR_INCLUDE_BATS
+	* configure.ac: introduced --enable-bats-on-linux which (or if host is windows) set WINDOWS_OR_INCLUDE_BATS to true
+
+2019-02-07  Jiri Vanek <jvanek@redhat.com>
+
 	Added protection against to small applets. Enhanced understanding of properties like width/height
 	* netx/net/sourceforge/jnlp/AppletDesc.java: (getWidth) and (getHeight) now query proeprties for new keys
 	and resize acodringly to them and/

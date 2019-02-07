@@ -82,6 +82,15 @@ esac
 AM_CONDITIONAL([LINUX], [test "$build_linux" = "yes"])
 AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
 
+# the images built with this switch on linux, are not exactly windows friendly (see removed jars in make log, which are made in favor of clean linux build)
+AC_MSG_CHECKING([whether to include also bat lunchers during linux build])
+AC_ARG_ENABLE([bats-on-linux],
+	      [AS_HELP_STRING([--enable-bats-on-linux],
+	      		      [enable generation of windows legacy bat launchers during linux build with legacy shell launchers. This is for subjects, who wish to do an custom build for windows and linuxes/mac users togethrer. Preparation of rest of the ITW then require a bit of love. This switch is not exactly supported option.])],
+	      [WINDOWS_OR_INCLUDE_BATS="${enableval}"], [WINDOWS_OR_INCLUDE_BATS='no'])
+AM_CONDITIONAL([WINDOWS_OR_INCLUDE_BATS], [test "x$WINDOWS_OR_INCLUDE_BATS" = "xyes" -o "$build_windows" = "yes" ])
+AC_MSG_RESULT(${WINDOWS_OR_INCLUDE_BATS})
+
 IT_CHECK_WITH_KCOV
 
 AC_MSG_CHECKING([how to search for libraries in native launchers])

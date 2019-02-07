@@ -21,11 +21,16 @@ if WINDOWS
 	export TOP_SRC_DIR := $(shell cygpath -p -m "$(abs_top_srcdir)")
 	export prefix := $(shell cygpath -p -m "$(prefix)")
 	export CPA="-v"
-	WIN_LAUNCHERS=launcher.build/$(javaws).bat launcher.build/$(itweb_settings).bat  launcher.build/$(policyeditor).bat
 else
 	export TOP_BUILD_DIR = $(abs_top_builddir)
 	export TOP_SRC_DIR = $(abs_top_srcdir)
 	export CPA="-av"
+	WIN_LAUNCHERS=
+endif
+
+if WINDOWS_OR_INCLUDE_BATS
+	WIN_LAUNCHERS=launcher.build/$(javaws).bat launcher.build/$(itweb_settings).bat  launcher.build/$(policyeditor).bat
+else
 	WIN_LAUNCHERS=
 endif
 
@@ -378,7 +383,7 @@ if ENABLE_SHELL_LAUNCHERS
 	${INSTALL_PROGRAM} launcher.build/$(javaws).sh $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings).sh $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor).sh $(DESTDIR)$(bindir)
-if WINDOWS
+if WINDOWS_OR_INCLUDE_BATS
 	${INSTALL_PROGRAM} launcher.build/$(javaws).bat $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings).bat $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(policyeditor).bat $(DESTDIR)$(bindir)
@@ -409,7 +414,7 @@ if ENABLE_PLUGINJAR
 	 done)
 endif
 endif
-if WINDOWS
+if WINDOWS_OR_INCLUDE_BATS
 	mkdir -p $(WIN_ALL_DEPS)
 	mkdir -p $(WIN_RUN_DEPS)
 	JARSVARS=` ( set -o posix ; set ) | sed "s/.*=//"  | grep \\.jar$$ | grep \\.jar.exe$$ ` ; \
@@ -533,7 +538,7 @@ uninstall-local: uninstall-linux-only
 	rm -r $(DESTDIR)$(SPLASH_PNG)
 	rm -r $(ICONS_DEST_DIR)/javaws.png
 	rm -rf $(DESTDIR)$(htmldir)
-if WINDOWS
+if WINDOWS_OR_INCLUDE_BATS
 	rm -rf $(WIN_ALL_DEPS)
 	rm -rf $(WIN_RUN_DEPS)
 	rm -f $(DESTDIR)$(bindir)/$(javaws).bat
@@ -1026,7 +1031,7 @@ launcher.build/$(policyeditor).sh: shell-launcher/launchers.sh.in
 	PROGRAM_NAME=$(policyeditor) ;\
 	$(edit_launcher_script) < $< > $@
 
-if WINDOWS
+if WINDOWS_OR_INCLUDE_BATS
 # TODO get rid of this copypaste
 launcher.build/$(javaws).bat: shell-launcher/launchers.bat.in
 	mkdir -p launcher.build
