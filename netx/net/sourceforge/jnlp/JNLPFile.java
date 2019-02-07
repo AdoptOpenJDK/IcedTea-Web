@@ -1190,7 +1190,7 @@ public class JNLPFile {
         return "Generated from applet from " + createJnlpVendorValue();
     }
 
-    public String createJnlpTitleValue() {
+    private String createJnlpTitleValue() {
         final String location;
         if (getSourceLocation() != null) {
             location = new File(getSourceLocation().getFile()).getName();
@@ -1213,6 +1213,15 @@ public class JNLPFile {
             return createJnlpTitleValue();
         }
         return getTitle() + " from " + createJnlpTitleValue();
+    }
+    
+    public String createNameForDesktopFile() {
+        String basicTitle = getTitle();
+        if (basicTitle == null || basicTitle.trim().isEmpty()) {
+            return createJnlpTitleValue().replaceAll(".jnlp$","");
+        } else {
+            return basicTitle;            
+        }
     }
     
     //not private for testing purposes

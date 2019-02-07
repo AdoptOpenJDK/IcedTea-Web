@@ -414,7 +414,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
     @Override
     public File getGeneratedJnlpFileName() {
-        String name = FileUtils.sanitizeFileName(file.createJnlpTitle());
+        String name = FileUtils.sanitizeFileName(file.createNameForDesktopFile());
         while (name.endsWith(".jnlp")) {
             name = name.substring(0, name.length() - 5);
         }
@@ -558,9 +558,10 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
     
     static String getDesktopIconName(JNLPFile file) {
-        return sanitize(file.createJnlpTitle());
+        return sanitize(file.createNameForDesktopFile());
     }
 
+    @Override
     public File getDesktopIconFile() {
             return new File(getDesktop(), getDesktopIconFileName());
     }
