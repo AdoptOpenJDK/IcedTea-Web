@@ -18,6 +18,9 @@ package net.sourceforge.jnlp;
 
 import java.net.*;
 import java.util.*;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * The applet-desc element.
@@ -91,6 +94,12 @@ public class AppletDesc implements LaunchDesc {
      * @return the width
      */
     public int getWidth() {
+        if (width < Integer.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD))) {
+            Integer nww = fixWidth();
+            if (nww != null) {
+                return nww;
+            }
+        }
         return width;
     }
 
@@ -98,6 +107,12 @@ public class AppletDesc implements LaunchDesc {
      * @return the height
      */
     public int getHeight() {
+        if (height < Integer.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD))) {
+            Integer nwh = fixHeight();
+            if (nwh != null) {
+                return nwh;
+            }
+        }
         return height;
     }
 
@@ -118,6 +133,44 @@ public class AppletDesc implements LaunchDesc {
      */
     public void addParameter(String name, String value) {
         parameters.put(name, value);
+    }
+
+    private Integer fixHeight() {
+        return fixSize(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_HEIGHT, "Height", "height", "HEIGHT");
+    }
+    private Integer fixWidth() {
+        return fixSize(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_WIDTH, "Width", "width", "WIDTH");
+    }
+
+    private Integer fixSize(String depKey, String... keys) {
+        OutputController.getLogger().log("Found to small applet!");
+        try {
+            Integer depVal = Integer.valueOf(JNLPRuntime.getConfiguration().getProperty(depKey));
+            if (depVal == 0) {
+                OutputController.getLogger().log("using its size");
+                return null;
+            }
+            if (depVal < 0) {
+                OutputController.getLogger().log("enforcing " + depVal);
+                return Math.abs(depVal);
+            }
+            for (String key : keys) {
+                String sizeFromParam = parameters.get(key);
+                if (sizeFromParam != null) {
+                    try {
+                        OutputController.getLogger().log("using its "+key+"=" + sizeFromParam);
+                        return Integer.valueOf(sizeFromParam);
+                    } catch (NumberFormatException ex) {
+                        OutputController.getLogger().log(ex);
+                    }
+                }
+            }
+            OutputController.getLogger().log("defaulting to " + depVal);
+            return depVal;
+        } catch (NumberFormatException | NullPointerException ex) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            return null;
+        }
     }
 
 }

@@ -1,5 +1,16 @@
 2019-02-07  Jiri Vanek <jvanek@redhat.com>
 
+	Added protection against to small applets. Enhanced understanding of properties like width/height
+	* netx/net/sourceforge/jnlp/AppletDesc.java: (getWidth) and (getHeight) now query proeprties for new keys
+	and resize acodringly to them and/
+	* netx/net/sourceforge/jnlp/config/Defaults.java: new keys made validated by integer. Treshold must be positive
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: added keys of deployment.small.size.treshold to allow
+	value since which applet is to small (default 10), deployment.small.size.override.{width,height} to set new size
+	negative values to enforce it, positive to be used as fallback, if no width/heigh (lower/upper/cammel) parameter found
+	default is set to search for width/height param and enforce 800x600 if not present
+
+2019-02-07  Jiri Vanek <jvanek@redhat.com>
+
 	Desktop sortcuts name is now based on title. And only if missing, then on file
 	* netx/net/sourceforge/jnlp/JNLPFile.java: new method of createNameForDesktopFile, which
 	returns title if it is present, jnlp file name otherwise.
