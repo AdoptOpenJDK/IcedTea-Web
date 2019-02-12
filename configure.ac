@@ -39,6 +39,8 @@ if test x"$BIN_BASH" = x ; then
     AC_MSG_ERROR([/bin/bash is used in runtime and for about generation. Dying sooner rather then later])
 fi
 
+IT_CHECK_MODULARJDK_ARGS
+
 AC_MSG_CHECKING([whether build legacy shell launchers])
 AC_ARG_ENABLE([shell-launchers],
 	      [AS_HELP_STRING([--enable-shell-launchers],
@@ -50,17 +52,17 @@ AC_MSG_RESULT(${ENABLE_SHELL_LAUNCHERS})
 AC_PATH_PROG([RUSTC], [rustc],,)
 if test x"$RUSTC" = x ; then
   if test x${ENABLE_SHELL_LAUNCHERS} = xno ; then
-    AC_MSG_ERROR([rust is used to compile lunchers. No go])
+    AC_MSG_ERROR([rust is used to compile launchers. No go])
   else
-    echo "rust is used to compile lunchers, is missing but you have enable-shell-launchers as yes, continuing with UNAMAINTAINED shell launchers only"
+    echo "rust is used to compile launchers, is missing but you have enable-shell-launchers as yes, continuing with UNMAINTAINED shell launchers only"
   fi
 else
   AC_PATH_PROG([CARGO], [cargo],,)
   if test x"$CARGO" = x ; then
     if test x${ENABLE_SHELL_LAUNCHERS} = xno ; then
-      AC_MSG_ERROR([cargo is used to call rustc for lunchers. No go])
+      AC_MSG_ERROR([cargo is used to call rustc for launchers. No go])
     else
-      echo "cargo is used to manage lunchers sources, is missing but you have enable-shell-launchers as yes, continuing with UNAMAINTAINED shell launchers only"
+      echo "cargo is used to manage launchers sources, is missing but you have enable-shell-launchers as yes, continuing with UNMAINTAINED shell launchers only"
     fi
   fi
 fi
@@ -86,7 +88,7 @@ AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
 AC_MSG_CHECKING([whether to include also bat lunchers during linux build])
 AC_ARG_ENABLE([bats-on-linux],
 	      [AS_HELP_STRING([--enable-bats-on-linux],
-	      		      [enable generation of windows legacy bat launchers during linux build with legacy shell launchers. This is for subjects, who wish to do an custom build for windows and linuxes/mac users togethrer. Preparation of rest of the ITW then require a bit of love. This switch is not exactly supported option.])],
+	      		      [enable generation of windows legacy bat launchers during linux build with legacy shell launchers. This is for subjects, who wish to do an custom build for windows and linuxes/mac users together. Preparation of rest of the ITW then require a bit of love. This switch is not exactly supported option.])],
 	      [WINDOWS_OR_INCLUDE_BATS="${enableval}"], [WINDOWS_OR_INCLUDE_BATS='no'])
 AM_CONDITIONAL([WINDOWS_OR_INCLUDE_BATS], [test "x$WINDOWS_OR_INCLUDE_BATS" = "xyes" -o "$build_windows" = "yes" ])
 AC_MSG_RESULT(${WINDOWS_OR_INCLUDE_BATS})

@@ -1,3 +1,16 @@
+2019-02-11  Laurent Bourgès <bourges.laurent@gmail.com>
+            Jiri Vanek <jvanek@redhat.com>
+
+	Rewritten bat launcher and introduced file to keep modular JDK swithces
+	* .Makefile: introduced MODULARJDK_ARGS_FILE=itw-modularjdk.args; built to launcher-build, handled as separate file.
+	MODULARJDK_ARGS_LOCATION is sedded into shell scripts. bat files are now cleaned to windows line-endings.
+	* acinclude.m4: Introduced new switch to allow to set switch file target location
+	* configure.ac: IT_CHECK_MODULARJDK_ARGS called; fixed few typos (mostly lunch->launch)
+	* itw-modularjdk.args: new file, containing jisgsaw argument to allow ITW to run on jdk9 and up
+	* shell-launcher/launchers.bat.in: rewritten from scratch; to be more like linux shell launcher
+	* shell-launcher/launchers.sh.in: JAVA no longer sed. USed JRE/bin/java instead. Adapted for itw-modularjdk.args file;
+	few additional cosmetic changes
+
 2019-02-07  Jiri Vanek <jvanek@redhat.com>
 
 	Allowed cross-build of bat launchers on linux systems

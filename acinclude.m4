@@ -1184,3 +1184,18 @@ AC_DEFUN([IT_CHECK_WITH_KCOV],
   fi
   AC_SUBST([KCOV])
 ])
+
+AC_DEFUN([IT_CHECK_MODULARJDK_ARGS],
+[
+  AC_MSG_CHECKING([where to place file with modular switches])
+  AC_ARG_WITH([modularjdk-file],
+	      [AS_HELP_STRING(--with-modularjdk-file,directory where file with arguments for modualr jdk willbe installed)],
+  [
+    MODULARJDK_ARGS_DIR="${withval}"
+  ],
+  [ 
+    MODULARJDK_ARGS_DIR="${bindir}"
+  ])
+  AC_MSG_RESULT([${MODULARJDK_ARGS_DIR}])
+  AC_SUBST([MODULARJDK_ARGS_DIR])
+])
