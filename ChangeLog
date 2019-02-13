@@ -1,3 +1,16 @@
+2019-02-13  Jiri Vanek <jvanek@redhat.com>
+
+	Propagating unimplemented DownloadService2. Added tests for it
+	* netx/net/sourceforge/jnlp/services/ServiceUtil.java: added static getter for DownloadService2
+	* netx/net/sourceforge/jnlp/services/XDownloadService2.java: unimplemented stub for future DownloadService2
+	* netx/net/sourceforge/jnlp/services/XServiceManagerStub.java: listed  javax.jnlp.DownloadService2 providing  XDownloadService2
+	* tests/reproducers/simple/DownloadService2/resources/DownloadService.jnlp: jnlp to call DownloadService
+	* tests/reproducers/simple/DownloadService2/resources/DownloadService2.jnlp:jnlp to call DownloadService2
+	* tests/reproducers/simple/DownloadService2/srcs/DownloadService.java: app to call DownloadService
+	* tests/reproducers/simple/DownloadService2/srcs/DownloadService2.java: app to call DownloadService2 
+	* tests/reproducers/simple/DownloadService2/testcases/DownloadService2Test.java: test to laounch DownloadService2
+	and DownloadService
+
 2019-02-12  Jim Douglas <jimdouglas@mac.com>
 
 	Fixed typo in DownloadService2
