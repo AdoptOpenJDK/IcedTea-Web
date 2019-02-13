@@ -1,3 +1,13 @@
+2019-02-13  Alex Kashchenko <akashche@redhat.com>
+
+	Os trait implemented for windows
+	* rust-launcher/src/dirs_paths_helper.rs: added (get_os) os dependent factory method to provide os impl with debug off.
+	(check_config_files_paths_global) split to os independent (check_config_files_paths) and rest linux only
+	* rust-launcher/src/jars_helper.rs:  (get_bootclasspath) fixed issue with hardcoded cp delimiter in xbootclasspath
+	* rust-launcher/src/main.rs:  added (get_os) os dependent factory method to provide os impl with debug parameter
+	* rust-launcher/src/os_access.rs: implemented os trait for windows
+	* rust-launcher/src/utils.rs: better recognition of rop_dir and parent dir in (try_jre_exists_on_path)
+
 2019-02-13  Jiri Vanek <jvanek@redhat.com>
 
 	Propagating unimplemented DownloadService2. Added tests for it

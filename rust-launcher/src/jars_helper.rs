@@ -158,8 +158,7 @@ pub fn get_classpath(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Strin
 }
 
 pub fn get_bootclasspath(jre_path: &std::path::PathBuf, os: &os_access::Os) -> String {
-    let mut result = String::from("-Xbootclasspath/a");
-    result.push(os.get_classpath_separator());
+    let mut result = String::from("-Xbootclasspath/a:");
     result.push_str(&compose_class_path(get_bootcp_members(jre_path, os), os));
     result
 }

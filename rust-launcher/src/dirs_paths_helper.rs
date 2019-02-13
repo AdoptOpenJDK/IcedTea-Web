@@ -84,18 +84,34 @@ mod tests {
     use os_access;
     use utils::tests_utils as tu;
 
-    #[test]
     #[cfg(not(windows))]
+    fn get_os() -> os_access::Linux {
+        os_access::Linux::new(false)
+    }
+
+    #[cfg(windows)]
+    fn get_os() -> os_access::Windows {
+        os_access::Windows::new(false)
+    }
+
+
+    #[test]
     fn check_config_files_paths() {
-        let os = os_access::Linux::new(false);
+        let os = get_os();
         let p3 = super::get_itw_config_file(&os);
-        let p6 = super::get_itw_global_config_file(&os);
         assert_ne!(None, p3);
-        assert_ne!(None, p6);
         println!("{}", p3.clone().expect("unwrap failed").display());
-        println!("{}", p6.clone().expect("unwrap failed").display());
         assert_eq!(true, p3.clone().expect("unwrap failed").display().to_string().contains("icedtea-web"));
         assert_eq!(true, p3.clone().expect("unwrap failed").display().to_string().ends_with("deployment.properties"));
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn check_config_files_paths_global() {
+        let os = os_access::Linux::new(false);
+        let p6 = super::get_itw_global_config_file(&os);
+        assert_ne!(None, p6);
+        println!("{}", p6.clone().expect("unwrap failed").display());
         assert_eq!(true, p6.clone().expect("unwrap failed").display().to_string().ends_with("deployment.properties"));
     }
 
