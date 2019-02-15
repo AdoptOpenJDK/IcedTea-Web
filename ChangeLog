@@ -1,3 +1,13 @@
+2019-02-15  Jiri Vanek <jvanek@redhat.com>
+
+	Native launchers got support for modular jdk  (via @MODULARJDK_ARGS_LOCATION file)
+	* rust-launcher/src/hardcoded_paths.rs: introduced MODULARJDK_ARGS_LOCATION recognition
+	* rust-launcher/src/jars_helper.rs: now are able search in bin, and this reads MODULARJDK_ARGS_LOCATION
+	* rust-launcher/src/main.rs: now reads java -version, and if modular, put MODULARJDK_ARGS_LOCATION to args
+	* rust-launcher/src/os_access.rs: removed duplicated code form windows in java spawn, extracted args creation
+	so it could be reused for java version recognition
+	* rust-launcher/src/property.rs: added note about Unicode failure in case properties (thus jre location) contains \u values
+
 2019-02-13  Alex Kashchenko <akashche@redhat.com>
 
 	Os trait implemented for windows

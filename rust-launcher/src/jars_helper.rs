@@ -16,7 +16,24 @@ const LOCAL_PATHS: &'static [&'static str] = &[
     "../linux-deps-runtime",
     "../win-deps-runtime",
     "../win-deps-all",
-    "."];
+    ".",
+    "bin",
+    "../bin"];
+
+pub fn resolve_argsfile(logger: &os_access::Os) -> std::path::PathBuf {
+    resolve_jar(hardcoded_paths::get_argsfile(), logger)
+}
+
+pub fn resolve_jsobject(logger: &os_access::Os) -> Option<std::path::PathBuf> {
+    match hardcoded_paths::get_jsobject() {
+        Some(js) => {
+            Some(resolve_jar(js, logger))
+        }
+        None => {
+            None
+        }
+    }
+}
 
 
 pub fn resolve_splash(logger: &os_access::Os) -> std::path::PathBuf {

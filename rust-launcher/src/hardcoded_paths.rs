@@ -18,6 +18,7 @@ const JSOBJECT_JAR: Option<&'static str> = option_env!("JSOBJECT_JAR");
 const TAGSOUP_JAR: Option<&'static str> = option_env!("TAGSOUP_JAR");
 const RHINO_JAR: Option<&'static str> = option_env!("RHINO_JAR");
 const ITW_LIBS: Option<&'static str> = option_env!("ITW_LIBS");
+const MODULARJDK_ARGS_LOCATION: Option<&'static str> = option_env!("MODULARJDK_ARGS_LOCATION");
 
 
 pub fn get_jre() -> &'static str {
@@ -62,6 +63,10 @@ pub fn get_jsobject() -> Option<&'static str> { JSOBJECT_JAR }
 pub fn get_tagsoup() -> Option<&'static str> { TAGSOUP_JAR }
 
 pub fn get_rhino() -> Option<&'static str> { RHINO_JAR }
+
+pub fn get_argsfile() -> &'static str {
+    MODULARJDK_ARGS_LOCATION.unwrap_or("MODULARJDK_ARGS_LOCATION-dev-unspecified")
+}
 
 
 #[derive(PartialEq)]
@@ -137,6 +142,7 @@ mod tests {
         assert_ne!(String::from(super::get_splash()).trim(), String::from("SPLASH_PNG-dev-unspecified"));
         assert_ne!(String::from(super::get_netx()).trim(), String::from("NETX_JAR-dev-unspecified"));
         assert_ne!(String::from(super::get_itwlibsearch()).trim(), String::from("ITW_LIBS-dev-unspecified"));
+        assert_ne!(String::from(super::get_argsfile()).trim(), String::from("MODULARJDK_ARGS_LOCATION-dev-unspecified"));
     }
 
     #[test]
@@ -149,6 +155,7 @@ mod tests {
         assert_ne!(String::from(super::get_splash()).trim(), String::from(""));
         assert_ne!(String::from(super::get_netx()).trim(), String::from(""));
         assert_ne!(String::from(super::get_itwlibsearch()).trim(), String::from(""));
+        assert_ne!(String::from(super::get_argsfile()).trim(), String::from(""));
     }
 
     #[test]

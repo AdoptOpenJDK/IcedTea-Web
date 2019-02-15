@@ -3,7 +3,32 @@ use dirs_paths_helper;
 use std::env;
 use std::fmt::Write;
 
+pub fn create_java_cmd(os: &Os,jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Command {
+    let mut bin_java = jre_dir.clone();
+    bin_java.push("bin");
+    bin_java.push("java");
+    let mut cmd = std::process::Command::new(&bin_java);
+    for ar in args.into_iter() {
+        cmd.arg(ar);
+    }
+    let mut info = String::new();
+    write!(&mut info, "itw-rust-debug: command {}", format!("{:?}", cmd)).expect("unwrap failed");
+    os.log(&info);
+    return cmd;
+}
 
+fn spawn_java_process(os: &Os, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child {
+    let mut cmd = create_java_cmd(os, jre_dir, args);
+    cmd.stdin(std::process::Stdio::inherit());
+    cmd.stdout(std::process::Stdio::inherit());
+    cmd.stderr(std::process::Stdio::inherit());
+    let res = cmd.spawn();
+    match res {
+        Ok(child) => child,
+        Err(_) => panic!("Error spawning JVM process, \
+                 java executable: [{}], arguments: [{:?}]", jre_dir.clone().into_os_string().to_str().expect("path should unwrap"), args)
+    }
+}
 
 pub trait Os {
     // logging "api" can change
@@ -86,25 +111,7 @@ impl Os for Linux {
     }
 
     fn spawn_java_process(&self, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child {
-        let mut bin_java = jre_dir.clone();
-        bin_java.push("bin");
-        bin_java.push("java");
-        let mut cmd = std::process::Command::new(&bin_java);
-        for ar in args.into_iter() {
-            cmd.arg(ar);
-        }
-        cmd.stdin(std::process::Stdio::inherit());
-        cmd.stdout(std::process::Stdio::inherit());
-        cmd.stderr(std::process::Stdio::inherit());
-        let mut info = String::new();
-        write!(&mut info, "itw-rust-debug: command {}", format!("{:?}", cmd)).expect("unwrap failed");
-        self.log(&info);
-        let res = cmd.spawn();
-        match res {
-            Ok(child) => child,
-            Err(_) => panic!("Error spawning JVM process, \
-                 java executable: [{}], arguments: [{:?}]", bin_java.into_os_string().to_str().expect("path should unwrap"), args)
-        }
+        spawn_java_process(self, jre_dir, args)
     }
 
     fn get_home(&self) -> Option<std::path::PathBuf> {
@@ -193,25 +200,8 @@ impl Os for Windows {
     }
 
     fn spawn_java_process(&self, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child {
-        let mut bin_java = jre_dir.clone();
-        bin_java.push("bin");
-        bin_java.push("java");
-        let mut cmd = std::process::Command::new(&bin_java);
-        for ar in args.into_iter() {
-            cmd.arg(ar);
-        }
-        cmd.stdin(std::process::Stdio::inherit());
-        cmd.stdout(std::process::Stdio::inherit());
-        cmd.stderr(std::process::Stdio::inherit());
-        let mut info = String::new();
-        write!(&mut info, "itw-rust-debug: command {}", format!("{:?}", cmd)).expect("unwrap failed");
-        self.log(&info);
-        let res = cmd.spawn();
-        match res {
-            Ok(child) => child,
-            Err(_) => panic!("Error spawning JVM process, \
-                 java executable: [{}], arguments: [{:?}]", bin_java.into_os_string().to_str().expect("path should unwrap"), args)
-        }
+        //there was an intention, which caused all the os trait, to implement this better. However developer (alex) faield and gave up
+        spawn_java_process(self, jre_dir, args)
     }
 
     fn get_home(&self) -> Option<std::path::PathBuf> {

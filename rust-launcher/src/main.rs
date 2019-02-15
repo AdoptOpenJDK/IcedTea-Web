@@ -139,7 +139,17 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
             os.log("itw-rust-debug: splash excluded");
         }
     }
-
+    if is_modular_jdk(os, &java_dir) {
+        all_args.push(resolve_argsfile(os));
+        let js_object_candidate = get_jsobject_patchmodule(os);
+        match js_object_candidate {
+            Some(js_object_path) => {
+                all_args.push(js_object_path.0);
+                all_args.push(js_object_path.1);
+            }
+            _none => {}
+        }
+    }
     all_args.push(bootcp);
     all_args.push(String::from("-classpath"));
     all_args.push(cp);
@@ -150,6 +160,78 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
     include_not_dashJs(&original_args, &mut all_args);
 
     all_args
+}
+
+fn is_modular_jdk(os: &os_access::Os, jre_dir: &std::path::PathBuf) -> bool {
+    if jdk_version(os, jre_dir) > 8 {
+        os.log("itw-rust-debug: modular jdk");
+        true
+    } else {
+        os.log("itw-rust-debug: non-modular jdk");
+        false
+    }
+}
+
+fn jdk_version(os: &os_access::Os, jre_dir: &std::path::PathBuf) -> i32 {
+    let vec = vec!["-version".to_string()];
+    //this of  course fails during tests
+    let output_result = os_access::create_java_cmd(os, jre_dir, &vec).output();
+    match output_result {
+        Ok(output) => {
+            for line in String::from_utf8(output.stderr).expect("java version was supopsed to return output").lines() {
+                if line.contains("version")
+                    && (line.contains("\"1")
+                    || line.contains("\"2")
+                    || line.contains("\"3")) {
+                    if line.contains("\"1.7.0") || line.contains("\"1.7.1") {
+                        os.log("itw-rust-debug: detected jdk 7");
+                        return 7
+                    } else if line.contains("\"1.8.0") {
+                        os.log("itw-rust-debug: detected jdk 8");
+                        return 8
+                    } else {
+                        //currently this serves only to determine module/non modular jdk
+                        os.log("itw-rust-debug: detected jdk 9 or up");
+                        return 9
+                    }
+                }
+            }
+            os.log("itw-rust-debug: unrecognized jdk! Fallback to 8!");
+            return 8;
+        }
+        _Error => {
+            os.log("itw-rust-debug: failed to launch jdk recognition. fallback to 8");
+            return 8
+        }
+    }
+}
+
+fn resolve_argsfile(os: &os_access::Os) -> String {
+    let args_location = dirs_paths_helper::path_to_string(&jars_helper::resolve_argsfile(os));
+    let mut owned_string: String = args_location.to_owned();
+    let splash_switch: &str = "@";
+    owned_string.insert_str(0, splash_switch);
+    let r = String::from(owned_string);
+    r
+}
+
+
+fn get_jsobject_patchmodule(os: &os_access::Os) -> Option<(String, String)> {
+    let js_object_candidate = jars_helper::resolve_jsobject(os);
+    match js_object_candidate {
+        Some(js_object_path) => {
+            let args_location = dirs_paths_helper::path_to_string(&js_object_path);
+            let mut owned_string: String = args_location.to_owned();
+            let splash_switch: &str = "jdk.jsobject=";
+            owned_string.insert_str(0, splash_switch);
+            let r = String::from(owned_string);
+            let tuple = ("--patch-module".to_string(), r);
+            return Some(tuple)
+        }
+        None => {
+            return None
+        }
+    }
 }
 
 fn get_splash(os: &os_access::Os) -> Option<String> {

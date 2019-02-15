@@ -63,6 +63,15 @@ fn split_property(string: &String) -> Option<Property> {
     }
 }
 
+//error[E0658]: use of unstable library feature 'str_escape': return type may change to be an iterator (see issue #27791)
+//
+//                             let a = kvv.value.escape_unicode();
+//For more information about this error, try `rustc --explain E0658`.
+//https://icedtea.classpath.org/bugzilla/show_bug.cgi?id=3697
+fn escape_unicode(src: String) -> String {
+    src
+}
+
 fn check_file_for_property(file: File, key: &str) -> Option<String> {
     let bf = BufReader::new(file);
     for lineresult in bf.lines() {
@@ -76,7 +85,7 @@ fn check_file_for_property(file: File, key: &str) -> Option<String> {
                     None => {}
                     Some(kvv) => {
                         if kvv.key.eq(key) {
-                            return Some(kvv.value);
+                            return Some(escape_unicode(kvv.value));
                         }
                     }
                 }
