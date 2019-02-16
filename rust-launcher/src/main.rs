@@ -6,6 +6,7 @@ mod property_from_files_resolver;
 mod utils;
 mod property;
 mod jars_helper;
+mod log_helper;
 
 use std::string::String;
 use std::fmt::Write;

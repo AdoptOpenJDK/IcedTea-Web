@@ -2,6 +2,7 @@ use std;
 use dirs_paths_helper;
 use std::env;
 use std::fmt::Write;
+use log_helper;
 
 pub fn create_java_cmd(os: &Os,jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Command {
     let mut bin_java = jre_dir.clone();
@@ -27,20 +28,6 @@ fn spawn_java_process(os: &Os, jre_dir: &std::path::PathBuf, args: &Vec<String>)
         Ok(child) => child,
         Err(_) => panic!("Error spawning JVM process, \
                  java executable: [{}], arguments: [{:?}]", jre_dir.clone().into_os_string().to_str().expect("path should unwrap"), args)
-    }
-}
-//0 critical
-//1 info
-//2 debug only
-fn log_impl(level: i32, os: &Os, s: &str) {
-    if level == 0 {
-
-    } else if level == 1 {
-        println!("{}", s);
-    } else if level == 2 {
-        if os.is_verbose() {
-            println!("{}", s);
-        }
     }
 }
 
@@ -88,11 +75,11 @@ impl Os for Linux {
 
 
     fn log(&self, s: &str) {
-        log_impl(2,self, s);
+        log_helper::log_impl(2,self, s);
     }
 
     fn info(&self, s: &str) {
-        log_impl(1,self, s);
+        log_helper::log_impl(1,self, s);
     }
 
     fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
@@ -176,11 +163,15 @@ impl Windows {
 #[cfg(windows)]
 impl Os for Windows {
     fn log(&self, s: &str) {
-        log_impl(2,self, s);
+        log_helper::log_impl(2,self, s);
     }
 
     fn info(&self, s: &str) {
-        log_impl(1,self, s);
+        log_helper::log_impl(1,self, s);
+    }
+
+    fn is_verbose(&self) -> bool {
+        return self.verbose;
     }
 
     fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {

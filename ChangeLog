@@ -1,5 +1,15 @@
 2019-02-16  Jiri Vanek <jvanek@redhat.com>
 
+	Implemented basic stub for file logging
+	* rust-launcher/src/log_helper.rs: extracted log_impl from os.
+	Implemented (always on for now) call to log to file
+	* rust-launcher/src/main.rs: made aware of new log_hlper module
+	* rust-launcher/src/os_access.rs: adapted to log_helper. Added forgotten is_verbose
+	to windows os impl.
+
+
+2019-02-16  Jiri Vanek <jvanek@redhat.com>
+
 	* rust-launcher/src/os_access.rs: removed duplicated code from windows launchers
 	* rust-launcher/src/utils.rs: implemented is_verbose for testing os impl
 
