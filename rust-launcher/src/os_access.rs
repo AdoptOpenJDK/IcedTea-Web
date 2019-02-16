@@ -29,6 +29,20 @@ fn spawn_java_process(os: &Os, jre_dir: &std::path::PathBuf, args: &Vec<String>)
                  java executable: [{}], arguments: [{:?}]", jre_dir.clone().into_os_string().to_str().expect("path should unwrap"), args)
     }
 }
+//0 critical
+//1 info
+//2 debug only
+fn log_impl(level: i32, os: &Os, s: &str) {
+    if level == 0 {
+
+    } else if level == 1 {
+        println!("{}", s);
+    } else if level == 2 {
+        if os.is_verbose() {
+            println!("{}", s);
+        }
+    }
+}
 
 pub trait Os {
     // logging "api" can change
@@ -50,6 +64,7 @@ pub trait Os {
     fn get_home(&self) -> Option<std::path::PathBuf>;
     fn get_classpath_separator(&self) -> char;
     fn get_exec_suffixes(&self) -> &'static [&'static str];
+    fn is_verbose(&self) -> bool;
 }
 
 #[cfg(not(windows))]
@@ -66,14 +81,18 @@ impl Linux {
 
 #[cfg(not(windows))]
 impl Os for Linux {
+
+    fn is_verbose(&self) -> bool {
+        return self.verbose;
+    }
+
+
     fn log(&self, s: &str) {
-        if self.verbose {
-            println!("{}", s);
-        }
+        log_impl(2,self, s);
     }
 
     fn info(&self, s: &str) {
-        println!("{}", s);
+        log_impl(1,self, s);
     }
 
     fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
@@ -157,13 +176,11 @@ impl Windows {
 #[cfg(windows)]
 impl Os for Windows {
     fn log(&self, s: &str) {
-        if self.verbose {
-            println!("{}", s);
-        }
+        log_impl(2,self, s);
     }
 
     fn info(&self, s: &str) {
-        println!("{}", s);
+        log_impl(1,self, s);
     }
 
     fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {

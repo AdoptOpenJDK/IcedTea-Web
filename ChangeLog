@@ -1,5 +1,10 @@
 2019-02-16  Jiri Vanek <jvanek@redhat.com>
 
+	* rust-launcher/src/os_access.rs: removed duplicated code from windows launchers
+	* rust-launcher/src/utils.rs: implemented is_verbose for testing os impl
+
+2019-02-16  Jiri Vanek <jvanek@redhat.com>
+
 	Native launchers got loading (unused for now) of advanced logging properties
 	* rust-launcher/src/dirs_paths_helper.rs: added struct AdvancedLogging which holds setup of extended logging
 	* rust-launcher/src/main.rs: now load advanced settings from properties. Debug output of jre from properties moved to utils.rs

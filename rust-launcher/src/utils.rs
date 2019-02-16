@@ -216,6 +216,11 @@ pub mod tests_utils {
     }
 
     impl os_access::Os for TestLogger {
+
+        fn is_verbose(&self) -> bool {
+            return true;
+        }
+
         fn log(&self, s: &str) {
             let ss = String::from(s);
             self.vec.borrow_mut().push(ss);
