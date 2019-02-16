@@ -1,5 +1,14 @@
 2019-02-16  Jiri Vanek <jvanek@redhat.com>
 
+	Native launchers got loading (unused for now) of advanced logging properties
+	* rust-launcher/src/dirs_paths_helper.rs: added struct AdvancedLogging which holds setup of extended logging
+	* rust-launcher/src/main.rs: now load advanced settings from properties. Debug output of jre from properties moved to utils.rs
+	* rust-launcher/src/property_from_file.rs: declared keys for advanced logging properties. Added simple string validator.
+	* rust-launcher/src/property_from_files_resolver.rs:  now provides reading methods  with validation for new logging keys
+	* rust-launcher/src/utils.rs: got that logging message from main.
+
+2019-02-16  Jiri Vanek <jvanek@redhat.com>
+
 	* Makefile.am: fixed issue with MODULARJDK_ARGS_FILE being installded as executable
 
 2019-02-15  Jiri Vanek <jvanek@redhat.com>

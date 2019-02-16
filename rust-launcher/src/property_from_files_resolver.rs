@@ -34,6 +34,64 @@ pub fn try_main_verbose_from_properties(logger: &os_access::Os) -> bool {
     }
 }
 
+pub fn try_log_to_file_from_properties(logger: &os_access::Os) -> bool {
+    let str_bool = try_key_from_properties_files(logger, &get_basic_array(logger), property_from_file::KEY_ENABLE_LOGGING_TOFILE, &property_from_file::BoolValidator {});
+    match str_bool {
+        Some(val) => {
+            property_from_file::str_to_bool(&val)
+        }
+        None => {
+            dirs_paths_helper::AdvancedLogging::default().log_to_file
+        }
+    }
+}
+
+pub fn try_log_to_streams_from_properties(logger: &os_access::Os) -> bool {
+    let str_bool = try_key_from_properties_files(logger, &get_basic_array(logger), property_from_file::KEY_ENABLE_LOGGING_TOSTREAMS, &property_from_file::BoolValidator {});
+    match str_bool {
+        Some(val) => {
+            property_from_file::str_to_bool(&val)
+        }
+        None => {
+            dirs_paths_helper::AdvancedLogging::default().log_to_stdstreams
+        }
+    }
+}
+
+pub fn try_log_to_system_from_properties(logger: &os_access::Os) -> bool {
+    let str_bool = try_key_from_properties_files(logger, &get_basic_array(logger), property_from_file::KEY_ENABLE_LOGGING_TOSYSTEMLOG, &property_from_file::BoolValidator {});
+    match str_bool {
+        Some(val) => {
+            property_from_file::str_to_bool(&val)
+        }
+        None => {
+            dirs_paths_helper::AdvancedLogging::default().log_to_system
+        }
+    }
+}
+
+pub fn try_custom_logdir_from_properties(logger: &os_access::Os) ->  std::path::PathBuf {
+    let str_candidate = try_key_from_properties_files(logger, &get_basic_array(logger), property_from_file::KEY_USER_LOG_DIR, &property_from_file::NotMandatoryPathValidator {});
+    match str_candidate {
+        Some(val) => {
+            std::path::PathBuf::from(val)
+        }
+        None => {
+            let mut cfgdir_candidate = logger.get_user_config_dir();
+            match cfgdir_candidate {
+                Some(mut cfgdir) => {
+                    cfgdir.push("/log");
+                    cfgdir
+                }
+                None => {
+                    std::path::PathBuf::from("unloadable")
+                }
+            }
+        }
+    }
+}
+
+
 fn try_key_from_properties_files(logger: &os_access::Os, array: &[Option<std::path::PathBuf>], key: &str, validator: &property_from_file::Validator) -> Option<String> {
     for file in array {
         let mut info1 = String::new();

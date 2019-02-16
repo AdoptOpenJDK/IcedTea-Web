@@ -1,4 +1,5 @@
 use os_access;
+use property_from_files_resolver;
 
 use std;
 use std::env;
@@ -6,6 +7,37 @@ use std::env;
 pub static ICEDTEA_WEB: &'static str = "icedtea-web";
 pub static DEPLOYMENT_PROPERTIES: &'static str = "deployment.properties";
 
+
+pub struct AdvancedLogging {
+    pub log_to_file: bool,
+    pub user_logdir: std::path::PathBuf,
+    pub log_to_stdstreams: bool ,
+    pub log_to_system: bool,
+}
+
+impl Default for AdvancedLogging {
+    fn default() -> AdvancedLogging {
+        AdvancedLogging {
+            log_to_file:  false,
+            user_logdir: std::path::PathBuf::from("undeffined"),
+            log_to_stdstreams: true,
+            log_to_system: true
+        }
+    }
+}
+
+impl AdvancedLogging {
+    pub fn load(os: &os_access::Os) -> AdvancedLogging {
+        AdvancedLogging {
+            log_to_file: property_from_files_resolver::try_log_to_file_from_properties(os),
+            log_to_stdstreams: property_from_files_resolver::try_log_to_streams_from_properties(os),
+            log_to_system: property_from_files_resolver::try_log_to_system_from_properties(os),
+            user_logdir: property_from_files_resolver::try_custom_logdir_from_properties(os)
+        }
+    }
+
+
+}
 
 pub fn get_xdg_config_dir(os: &os_access::Os) -> Option<std::path::PathBuf> {
     match env::var("XDG_CONFIG_HOME") {

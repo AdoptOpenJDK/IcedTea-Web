@@ -75,9 +75,7 @@ fn is_splash_forbidden_testable(vars: Vec<(String, String)>) -> bool {
 fn main() {
     let os = get_os(is_debug_on());
     os.log(&dirs_paths_helper::path_to_string(&dirs_paths_helper::current_program()));
-    let mut info1 = String::new();
-    write!(&mut info1, "itw-rust-debug: trying jdk over properties ({})", property_from_file::JRE_PROPERTY_NAME).expect("unwrap failed");
-    os.log(&info1);
+    let  al = dirs_paths_helper::AdvancedLogging::load(&os);
     let java_dir = utils::find_jre(&os);
     let mut info2 = String::new();
     write!(&mut info2, "selected jre: {}", java_dir.display()).expect("unwrap failed");
@@ -199,7 +197,7 @@ fn jdk_version(os: &os_access::Os, jre_dir: &std::path::PathBuf) -> i32 {
             os.log("itw-rust-debug: unrecognized jdk! Fallback to 8!");
             return 8;
         }
-        _Error => {
+        _error => {
             os.log("itw-rust-debug: failed to launch jdk recognition. fallback to 8");
             return 8
         }

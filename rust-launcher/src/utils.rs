@@ -6,8 +6,12 @@ use os_access;
 use std::fmt::Write;
 use hardcoded_paths;
 use property_from_files_resolver;
+use property_from_file;
 
 pub fn find_jre(os: &os_access::Os) -> std::path::PathBuf {
+    let mut info1 = String::new();
+    write!(&mut info1, "itw-rust-debug: trying jdk over properties ({})", property_from_file::JRE_PROPERTY_NAME).expect("unwrap failed");
+    os.log(&info1);
     match property_from_files_resolver::try_jdk_from_properties(os) {
         Some(path) => {
             os.log("itw-rust-debug: found and using");

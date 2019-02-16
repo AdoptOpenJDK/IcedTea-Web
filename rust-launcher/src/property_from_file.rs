@@ -10,6 +10,11 @@ use std::fmt::Write;
 pub static JRE_PROPERTY_NAME: &'static str = "deployment.jre.dir";
 pub static VERBOSE_PROPERTY_NAME: &'static str = "deployment.log";
 
+pub static KEY_USER_LOG_DIR: &'static str  = "deployment.user.logdir";  //custom log file; default to xdg_confgi/icedtea-web/log
+pub static KEY_ENABLE_LOGGING_TOFILE: &'static str  = "deployment.log.file"; //is loging to file enabled? default false
+pub static KEY_ENABLE_LOGGING_TOSTREAMS: &'static str  = "deployment.log.stdstreams";//is logging to stdouts enabled?defoult true
+pub static KEY_ENABLE_LOGGING_TOSYSTEMLOG: &'static str  = "deployment.log.system";//is logging to system logs enabled? default true
+
 
 pub trait Validator {
     fn validate(&self, s: &str) -> bool;
@@ -43,6 +48,21 @@ impl Validator for BoolValidator {
     fn get_fail_message(&self, key: &str, value: &str, file: &Option<std::path::PathBuf>) -> String {
         let mut res = String::new();
         write!(&mut res, "the boolean value of {} read from {} under key {} is not valid. Expected true or false (key insensitive)", value, file.clone().expect("jre path should be loaded").display(), key).expect("unwrap failed");
+        return res;
+    }
+}
+
+pub struct NotMandatoryPathValidator {}
+
+
+impl Validator for NotMandatoryPathValidator {
+    fn validate(&self, _s: &str) -> bool {
+        true
+    }
+
+    fn get_fail_message(&self, key: &str, value: &str, file: &Option<std::path::PathBuf>) -> String {
+        let mut res = String::new();
+        write!(&mut res, "the String value of {} read from {} under key {} is not valid. Expected String", value, file.clone().expect("jre path should be loaded").display(), key).expect("unwrap failed");
         return res;
     }
 }
