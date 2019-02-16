@@ -1,3 +1,7 @@
+2019-02-16  Jiri Vanek <jvanek@redhat.com>
+
+	* Makefile.am: fixed issue with MODULARJDK_ARGS_FILE being installded as executable
+
 2019-02-15  Jiri Vanek <jvanek@redhat.com>
 
 	Native launchers got support for modular jdk  (via @MODULARJDK_ARGS_LOCATION file)
