@@ -1,5 +1,4 @@
 use os_access;
-use property_from_files_resolver;
 
 use std;
 use std::env;
@@ -8,36 +7,6 @@ pub static ICEDTEA_WEB: &'static str = "icedtea-web";
 pub static DEPLOYMENT_PROPERTIES: &'static str = "deployment.properties";
 
 
-pub struct AdvancedLogging {
-    pub log_to_file: bool,
-    pub user_logdir: std::path::PathBuf,
-    pub log_to_stdstreams: bool ,
-    pub log_to_system: bool,
-}
-
-impl Default for AdvancedLogging {
-    fn default() -> AdvancedLogging {
-        AdvancedLogging {
-            log_to_file:  false,
-            user_logdir: std::path::PathBuf::from("undeffined"),
-            log_to_stdstreams: true,
-            log_to_system: true
-        }
-    }
-}
-
-impl AdvancedLogging {
-    pub fn load(os: &os_access::Os) -> AdvancedLogging {
-        AdvancedLogging {
-            log_to_file: property_from_files_resolver::try_log_to_file_from_properties(os),
-            log_to_stdstreams: property_from_files_resolver::try_log_to_streams_from_properties(os),
-            log_to_system: property_from_files_resolver::try_log_to_system_from_properties(os),
-            user_logdir: property_from_files_resolver::try_custom_logdir_from_properties(os)
-        }
-    }
-
-
-}
 
 pub fn get_xdg_config_dir(os: &os_access::Os) -> Option<std::path::PathBuf> {
     match env::var("XDG_CONFIG_HOME") {
@@ -118,12 +87,12 @@ mod tests {
 
     #[cfg(not(windows))]
     fn get_os() -> os_access::Linux {
-        os_access::Linux::new(false)
+        os_access::Linux::new(false, false)
     }
 
     #[cfg(windows)]
     fn get_os() -> os_access::Windows {
-        os_access::Windows::new(false)
+        os_access::Windows::new(false, false)
     }
 
 
@@ -140,7 +109,7 @@ mod tests {
     #[test]
     #[cfg(not(windows))]
     fn check_config_files_paths_global() {
-        let os = os_access::Linux::new(false);
+        let os = os_access::Linux::new(false, false);
         let p6 = super::get_itw_global_config_file(&os);
         assert_ne!(None, p6);
         println!("{}", p6.clone().expect("unwrap failed").display());
@@ -150,7 +119,7 @@ mod tests {
     #[test]
     #[cfg(not(windows))]
     fn check_legacy_config_files_paths() {
-        let os = os_access::Linux::new(false);
+        let os = os_access::Linux::new(false, false);
         let p4 = super::get_itw_legacy_config_file(&os);
         let p5 = super::get_itw_legacy_global_config_file(&os);
         assert_ne!(None, p4);

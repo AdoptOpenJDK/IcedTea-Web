@@ -1,3 +1,21 @@
+2019-02-17  Jiri Vanek <jvanek@redhat.com>
+
+	Implemented proper file logging
+	* rust-launcher/src/dirs_paths_helper.rs: AdvancedLogging moved to log_helper;
+	Linux::new(false) redeclared new to Linux::new(false, false);
+	* rust-launcher/src/log_helper.rs: now harbor AdvancedLogging as it should since beggining
+	log_impl now logs to fille only if log_to_file is true, logs to correct file,
+	format time-stamp a bit better, creates a parent directory
+	* rust-launcher/src/main.rs: get_os functions redeclared to (debug: bool, al: bool) and now calls new(debug, al)
+	main no longer creates AdvancedLogging but calls proper get_os
+	* rust-launcher/src/os_access.rs: added trait method of (advanced_logging), implementations
+	now keep AdvancedLogging variable - dummy or loaded from properties as requested during creation
+	* rust-launcher/src/property_from_files_resolver.rs: adapted to log_to_file -> log_to_file refactoring
+	* rust-launcher/src/utils.rs: try_custom_logdir_from_properties renamed to 
+	try_logtarget_from_properties and now returns final log file. New method of
+	(logfile_name) whic compses itw-like name for new log file. TestLogger
+	implements (unimplemented) advanced_logging function
+
 2019-02-16  Jiri Vanek <jvanek@redhat.com>
 
 	Implemented basic stub for file logging

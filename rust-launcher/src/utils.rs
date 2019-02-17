@@ -139,6 +139,7 @@ pub mod tests_utils {
     use dirs_paths_helper;
     use hardcoded_paths;
     use std::ffi::OsString as fo;
+    use log_helper;
 
     #[test]
     fn try_none_jre_from_path() {
@@ -216,6 +217,10 @@ pub mod tests_utils {
     }
 
     impl os_access::Os for TestLogger {
+
+        fn advanced_logging(&self) ->  &log_helper::AdvancedLogging {
+            panic!("not implemented");
+        }
 
         fn is_verbose(&self) -> bool {
             return true;

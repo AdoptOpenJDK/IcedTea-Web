@@ -1,6 +1,9 @@
 use property_from_file;
 use os_access;
 use dirs_paths_helper;
+use::log_helper;
+use std::time::SystemTime;
+use std::time::UNIX_EPOCH;
 
 use std;
 use std::string::String;
@@ -41,7 +44,7 @@ pub fn try_log_to_file_from_properties(logger: &os_access::Os) -> bool {
             property_from_file::str_to_bool(&val)
         }
         None => {
-            dirs_paths_helper::AdvancedLogging::default().log_to_file
+            log_helper::AdvancedLogging::default().log_to_file
         }
     }
 }
@@ -53,7 +56,7 @@ pub fn try_log_to_streams_from_properties(logger: &os_access::Os) -> bool {
             property_from_file::str_to_bool(&val)
         }
         None => {
-            dirs_paths_helper::AdvancedLogging::default().log_to_stdstreams
+            log_helper::AdvancedLogging::default().log_to_stdstreams
         }
     }
 }
@@ -65,22 +68,36 @@ pub fn try_log_to_system_from_properties(logger: &os_access::Os) -> bool {
             property_from_file::str_to_bool(&val)
         }
         None => {
-            dirs_paths_helper::AdvancedLogging::default().log_to_system
+            log_helper::AdvancedLogging::default().log_to_system
         }
     }
 }
 
-pub fn try_custom_logdir_from_properties(logger: &os_access::Os) ->  std::path::PathBuf {
+//this method is not in log_helpers because of io::write and  fmt::write issue
+pub fn logfile_name() -> String {
+    let start = SystemTime::now();
+    let t = start.duration_since(UNIX_EPOCH).expect("time should be measureable");
+    let m = t.as_secs();
+    //itw-javantx-2019-02-16_20:56:08.882.log
+    let mut future_name = String::new();
+    write!(&mut future_name, "itw-nativerustlauncher-{}.log", m).expect("unwrap failed");
+    future_name
+}
+
+pub fn try_logtarget_from_properties(logger: &os_access::Os) ->  std::path::PathBuf {
     let str_candidate = try_key_from_properties_files(logger, &get_basic_array(logger), property_from_file::KEY_USER_LOG_DIR, &property_from_file::NotMandatoryPathValidator {});
     match str_candidate {
         Some(val) => {
-            std::path::PathBuf::from(val)
+            let mut  futureFile=std::path::PathBuf::from(val);
+            futureFile.push(logfile_name());
+            futureFile
         }
         None => {
             let mut cfgdir_candidate = logger.get_user_config_dir();
             match cfgdir_candidate {
                 Some(mut cfgdir) => {
-                    cfgdir.push("/log");
+                    cfgdir.push("log");
+                    cfgdir.push(logfile_name());
                     cfgdir
                 }
                 None => {

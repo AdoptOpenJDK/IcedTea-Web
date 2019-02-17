@@ -14,13 +14,13 @@ use os_access::Os;
 use std::env;
 
 #[cfg(not(windows))]
-fn get_os(debug: bool) -> os_access::Linux {
-    os_access::Linux::new(debug)
+fn get_os(debug: bool, al: bool) -> os_access::Linux {
+    os_access::Linux::new(debug, al)
 }
 
 #[cfg(windows)]
-fn get_os(debug: bool) -> os_access::Windows {
-    os_access::Windows::new(debug)
+fn get_os(debug: bool, al: bool) -> os_access::Windows {
+    os_access::Windows::new(debug, al)
 }
 
 fn is_debug_on() -> bool {
@@ -29,7 +29,7 @@ fn is_debug_on() -> bool {
             return val;
         }
         _none => {
-            let os = get_os(false);
+            let os = get_os(false, false);
             return property_from_files_resolver::try_main_verbose_from_properties(&os);
         }
     }
@@ -74,9 +74,8 @@ fn is_splash_forbidden_testable(vars: Vec<(String, String)>) -> bool {
 }
 
 fn main() {
-    let os = get_os(is_debug_on());
+    let os = get_os(is_debug_on(), true);
     os.log(&dirs_paths_helper::path_to_string(&dirs_paths_helper::current_program()));
-    let  al = dirs_paths_helper::AdvancedLogging::load(&os);
     let java_dir = utils::find_jre(&os);
     let mut info2 = String::new();
     write!(&mut info2, "selected jre: {}", java_dir.display()).expect("unwrap failed");

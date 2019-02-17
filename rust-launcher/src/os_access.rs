@@ -32,7 +32,7 @@ fn spawn_java_process(os: &Os, jre_dir: &std::path::PathBuf, args: &Vec<String>)
 }
 
 pub trait Os {
-    // logging "api" can change
+    fn advanced_logging(&self) ->  &log_helper::AdvancedLogging;
     fn log(&self, s: &str);
     fn info(&self, s: &str);
     fn get_registry_jdk(&self) -> Option<std::path::PathBuf>;
@@ -57,17 +57,26 @@ pub trait Os {
 #[cfg(not(windows))]
 pub struct Linux {
     verbose: bool,
+    al: log_helper::AdvancedLogging,
 }
 
 #[cfg(not(windows))]
 impl Linux {
-    pub fn new(debug: bool) -> Linux {
-        Linux { verbose: debug }
+    pub fn new(debug: bool, load_advanced: bool) -> Linux {
+        if ! load_advanced {
+            Linux { verbose: debug, al: log_helper::AdvancedLogging::default() }
+        } else {
+            Linux { verbose: debug, al: log_helper::AdvancedLogging::load(&Linux::new(debug, false)) }
+        }
     }
 }
 
 #[cfg(not(windows))]
 impl Os for Linux {
+
+    fn advanced_logging(&self) ->  &log_helper::AdvancedLogging {
+        return &self.al;
+    }
 
     fn is_verbose(&self) -> bool {
         return self.verbose;
@@ -150,18 +159,30 @@ impl Os for Linux {
 #[cfg(windows)]
 pub struct Windows {
     verbose: bool,
+    al: log_helper::AdvancedLogging,
 }
 
 #[cfg(windows)]
 impl Windows {
-    pub fn new(debug: bool) -> Windows {
-        Windows { verbose: debug }
+    pub fn new(debug: bool, load_advanced: bool) -> Windows {
+        pub fn new(debug: bool, load_advanced: bool) -> Windows {
+            if ! load_advanced {
+                Windows { verbose: debug, al: log_helper::AdvancedLogging::default() }
+            } else {
+                Windows { verbose: debug, al: log_helper::AdvancedLogging::load(&Windows::new(debug, false)) }
+            }
+        }
     }
 
 }
 
 #[cfg(windows)]
 impl Os for Windows {
+
+    fn advanced_logging(&self) ->  &log_helper::AdvancedLogging {
+        return &self.al;
+    }
+
     fn log(&self, s: &str) {
         log_helper::log_impl(2,self, s);
     }
