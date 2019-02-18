@@ -88,9 +88,9 @@ pub fn try_logtarget_from_properties(logger: &os_access::Os) ->  std::path::Path
     let str_candidate = try_key_from_properties_files(logger, &get_basic_array(logger), property_from_file::KEY_USER_LOG_DIR, &property_from_file::NotMandatoryPathValidator {});
     match str_candidate {
         Some(val) => {
-            let mut  futureFile=std::path::PathBuf::from(val);
-            futureFile.push(logfile_name());
-            futureFile
+            let mut  future_file=std::path::PathBuf::from(val);
+            future_file.push(logfile_name());
+            future_file
         }
         None => {
             let mut cfgdir_candidate = logger.get_user_config_dir();
