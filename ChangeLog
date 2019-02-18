@@ -1,5 +1,9 @@
 2019-02-18  Jiri Vanek <jvanek@redhat.com>
 
+	* rust-launcher/src/log_helper.rs: deployment.log.stdstreams is now honored
+
+2019-02-18  Jiri Vanek <jvanek@redhat.com>
+
 	For linux, implemented and used system logging
 	* rust-launcher/src/hardcoded_paths.rs: call to info moved to important
 	* rust-launcher/src/jars_helper.rs: same
