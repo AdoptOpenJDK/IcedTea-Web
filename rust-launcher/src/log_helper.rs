@@ -14,7 +14,14 @@ static mut FIRST: bool = true;
 //1 info
 //2 debug only
 pub fn log_impl(level: i32, os: &os_access::Os, s: &str) {
-    if level == 0 {} else if level == 1 {
+    if level == 0 {
+        println!("{}", s);
+        if os.advanced_logging().log_to_system {
+            let mut info2 = String::from("IcedTea-Web nativerustlauncher error. Consult - https://icedtea.classpath.org/wiki/IcedTea-Web\n");
+            info2.push_str(s);
+            os.system_log(&info2);
+        }
+    } else if level == 1 {
         println!("{}", s);
     } else if level == 2 {
         if os.is_verbose() {

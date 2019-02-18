@@ -107,7 +107,7 @@ pub fn get_libsearch(logger: &os_access::Os) -> ItwLibSearch {
             _err => {
                 let mut info = String::new();
                 write!(&mut info, "ITW-LIBS provided, but have invalid value of {}. Use BUNDLED, DISTRIBUTION or BOTH", result_of_override_var);
-                logger.info(&info);
+                logger.important(&info);
             }
         }
         _error => {

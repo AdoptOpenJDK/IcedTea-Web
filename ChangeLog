@@ -1,3 +1,13 @@
+2019-02-18  Jiri Vanek <jvanek@redhat.com>
+
+	For linux, implemented and used system logging
+	* rust-launcher/src/hardcoded_paths.rs: call to info moved to important
+	* rust-launcher/src/jars_helper.rs: same
+	* rust-launcher/src/log_helper.rs: if log_to_system is true(defoult) log_impl logs important messages also to system log
+	* rust-launcher/src/os_access.rs: added trait methods of important and system_log. Implemented for Linux
+	* rust-launcher/src/utils.rs:call to info moved to important. TestLogger got implemented and important and system_log
+	declared as panicking
+
 2019-02-17  Jiri Vanek <jvanek@redhat.com>
 
 	Implemented proper file logging

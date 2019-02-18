@@ -65,7 +65,7 @@ fn get_jdk_from_path_conditionally_testable(system_path: Option<OsString>, libse
         None
     } else {
         if libsearch == hardcoded_paths::ItwLibSearch::BOTH {
-            os.info("your build is done as BOTH distribution and bundled, jdk from PATH may be not what you want!");
+            os.important("your build is done as BOTH distribution and bundled, jdk from PATH may be not what you want!");
         }
         get_jdk_from_given_path_testable(system_path, os)
     }
@@ -99,7 +99,7 @@ fn get_jdk_from_given_path_testable(system_path: Option<OsString>, os: &os_acces
                     if jre_bin_dir.file_name().expect("java's parent should have name") == "bin" {
                         jre_dir = std::path::PathBuf::from(jre_bin_dir.parent().expect("java's  bin dir should have parent"))
                     } else {
-                        os.info("Error: JRE from path seems to not have bin dir");
+                        os.important("Error: JRE from path seems to not have bin dir");
                         jre_dir = match jre_bin_dir.parent() {
                             Some(p) => {
                                 //.../bin/ -> ...
@@ -218,6 +218,8 @@ pub mod tests_utils {
 
     impl os_access::Os for TestLogger {
 
+        fn system_log(&self, s: &str){ panic!("not implemented"); }
+
         fn advanced_logging(&self) ->  &log_helper::AdvancedLogging {
             panic!("not implemented");
         }
@@ -232,6 +234,11 @@ pub mod tests_utils {
         }
 
         fn info(&self, s: &str) {
+            let ss = String::from(s);
+            self.vec.borrow_mut().push(ss);
+        }
+
+        fn important(&self, s: &str) {
             let ss = String::from(s);
             self.vec.borrow_mut().push(ss);
         }

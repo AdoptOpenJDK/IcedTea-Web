@@ -35,6 +35,8 @@ pub trait Os {
     fn advanced_logging(&self) ->  &log_helper::AdvancedLogging;
     fn log(&self, s: &str);
     fn info(&self, s: &str);
+    fn important(&self, s: &str);
+    fn system_log(&self, s: &str);
     fn get_registry_jdk(&self) -> Option<std::path::PathBuf>;
     // next to system and home cfg dir, there is also by-jre config dir, but that do not need to be handled os-specific way
     // https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/jcp/properties.html
@@ -74,6 +76,29 @@ impl Linux {
 #[cfg(not(windows))]
 impl Os for Linux {
 
+    fn system_log(&self, s: &str) {
+        let mut cmd = std::process::Command::new("logger");
+        cmd.arg("-p");
+        cmd.arg("user.err");
+        cmd.arg("--");
+        cmd.arg(s);
+        let output_result = cmd.output();
+        match output_result {
+            Ok(output) => {
+                let mut info = String::new();
+                write!(&mut info, "itw-rust-debug: system log call returned {}", output.status.code().expect("Failed to read syslog process return value")).expect("unwrap failed");
+                self.log(&info);
+                if !output.status.success() {
+                    self.log(&String::from_utf8(output.stdout).expect("sout should unwrap"));
+                    self.log(&String::from_utf8(output.stderr).expect("serr should unwrap"));
+                }
+            }
+            _error => {
+                self.log("itw-rust-debug: failed to call system log");
+            }
+        }
+    }
+
     fn advanced_logging(&self) ->  &log_helper::AdvancedLogging {
         return &self.al;
     }
@@ -82,13 +107,16 @@ impl Os for Linux {
         return self.verbose;
     }
 
-
     fn log(&self, s: &str) {
         log_helper::log_impl(2,self, s);
     }
 
     fn info(&self, s: &str) {
         log_helper::log_impl(1,self, s);
+    }
+
+    fn important(&self, s: &str) {
+        log_helper::log_impl(0,self, s);
     }
 
     fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
@@ -176,6 +204,8 @@ impl Windows {
 #[cfg(windows)]
 impl Os for Windows {
 
+    fn system_log(&self, s: &str){/*no go for now*/}
+
     fn advanced_logging(&self) ->  &log_helper::AdvancedLogging {
         return &self.al;
     }
@@ -186,6 +216,10 @@ impl Os for Windows {
 
     fn info(&self, s: &str) {
         log_helper::log_impl(1,self, s);
+    }
+
+    fn important(&self, s: &str) {
+        log_helper::log_impl(0,self, s);
     }
 
     fn is_verbose(&self) -> bool {

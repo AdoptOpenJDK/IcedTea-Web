@@ -77,7 +77,7 @@ fn resolve_jar(full_hardcoded_path: &str, logger: &os_access::Os) -> std::path::
             } else {
                 let mut info1 = String::new();
                 write!(&mut info1, "custom ITW_HOME provided, but do not exists or is not directory: {}", &(dirs_paths_helper::path_to_string(&custom_dir)));
-                logger.info(&info1);
+                logger.important(&info1);
             }
         }
         _error => {
@@ -113,9 +113,9 @@ fn resolve_jar(full_hardcoded_path: &str, logger: &os_access::Os) -> std::path::
         }
     }
     //fallback to hardcoded, but warn
-    logger.info("Warning!, Fall back in resolve_jar to hardcoded paths: ");
+    logger.important("Warning!, Fall back in resolve_jar to hardcoded paths: ");
     let result = std::path::PathBuf::from(full_hardcoded_path);
-    logger.info(&dirs_paths_helper::path_to_string(&result));
+    logger.important(&dirs_paths_helper::path_to_string(&result));
     result
 }
 
