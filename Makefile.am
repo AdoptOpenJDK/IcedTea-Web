@@ -962,6 +962,7 @@ launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(polic
 	  export JSOBJECT_JAR=$(JSOBJECT_JAR) ; \
 	  export TAGSOUP_JAR=$(TAGSOUP_JAR) ; \
 	  export RHINO_JAR=$(RHINO_JAR) ; \
+	  export MSLINKS_JAR=$(MSLINKS_JAR) ; \
 	  export MODULARJDK_ARGS_LOCATION=$(MODULARJDK_ARGS_LOCATION) ; \
 	  unset MAIN_CLASS ; \
 	  unset BIN_LOCATION ; \
