@@ -164,7 +164,6 @@ pub struct Windows {
 
 #[cfg(windows)]
 impl Windows {
-    pub fn new(debug: bool, load_advanced: bool) -> Windows {
         pub fn new(debug: bool, load_advanced: bool) -> Windows {
             if ! load_advanced {
                 Windows { verbose: debug, al: log_helper::AdvancedLogging::default() }
@@ -173,8 +172,6 @@ impl Windows {
             }
         }
     }
-
-}
 
 #[cfg(windows)]
 impl Os for Windows {
