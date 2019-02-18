@@ -54,18 +54,33 @@ fn get_itwlibsearch() -> &'static str {
 pub fn get_bootcp() -> &'static str {LAUNCHER_BOOTCLASSPATH.unwrap_or("LAUNCHER_BOOTCLASSPATH-dev-unspecified") }
 
 // optional deps
-pub fn get_plugin() -> Option<&'static str> {
-    PLUGIN_JAR
-}
+pub fn get_plugin() -> Option<&'static str> { sanitize(PLUGIN_JAR) }
 
-pub fn get_jsobject() -> Option<&'static str> { JSOBJECT_JAR }
+pub fn get_jsobject() -> Option<&'static str> { sanitize(JSOBJECT_JAR) }
 
-pub fn get_tagsoup() -> Option<&'static str> { TAGSOUP_JAR }
+pub fn get_tagsoup() -> Option<&'static str> { sanitize(TAGSOUP_JAR) }
 
-pub fn get_rhino() -> Option<&'static str> { RHINO_JAR }
+pub fn get_rhino() -> Option<&'static str> { sanitize(RHINO_JAR) }
 
 pub fn get_argsfile() -> &'static str {
     MODULARJDK_ARGS_LOCATION.unwrap_or("MODULARJDK_ARGS_LOCATION-dev-unspecified")
+}
+
+//unluckily, option_env can go wild and retunr Some("") isntead of None. Fixing here.
+fn sanitize(candidate: Option<&'static str>)  -> Option<&'static str> {
+    match candidate {
+        Some(s) => {
+                if !String::from(String::from(s).trim()).is_empty() {
+                    return candidate;
+                } else {
+                    return None;
+                }
+            }
+        _none => {
+            return None;
+            }
+        }
+    return None;
 }
 
 
