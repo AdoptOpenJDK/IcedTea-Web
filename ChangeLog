@@ -1,5 +1,12 @@
 2019-02-18  Jiri Vanek <jvanek@redhat.com>
 
+	Implemented forgotten support for mslinks.jar library in rust launchers
+	* Makefile.am: MSLINKS_JAR are now eported in rust launchers build
+	* rust-launcher/src/hardcoded_paths.rs: MSLINKS_JAR is being captured here and exported as optional
+	* rust-launcher/src/jars_helper.rs: (get_bootcp_members) now append_if_exists also get_mslinks
+
+2019-02-18  Jiri Vanek <jvanek@redhat.com>
+
 	* rust-launcher/src/log_helper.rs: deployment.log.stdstreams is now honored
 
 2019-02-18  Jiri Vanek <jvanek@redhat.com>
