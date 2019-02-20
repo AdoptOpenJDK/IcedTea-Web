@@ -465,7 +465,33 @@ public class Defaults {
                         DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD,
                         BasicValueValidators.getRangedIntegerValidator(0, 1000),
                         String.valueOf(10)// treshold when applet is considered as too small
+                },
+                //**************
+                //* Native (rust) only - beggin
+                //**************
+                {
+                        "deployment.launcher.rust.cp.add",
+                       new BasicValueValidators.RustCpValidator(),
+                        ""
+                },
+                {
+                        "deployment.launcher.rust.cp.remove",
+                        new BasicValueValidators.RustCpValidator(),
+                        ""
+                },
+                {
+                        "deployment.launcher.rust.bootcp.add",
+                        new BasicValueValidators.RustCpValidator(),
+                        null
+                },
+                {
+                        "deployment.launcher.rust.bootcp.remove",
+                        new BasicValueValidators.RustCpValidator(),
+                        ""
                 }
+                //**************
+                //* Native (rust) only - end
+                //**************
         };
 
         HashMap<String, Setting<String>> result = new HashMap<>();

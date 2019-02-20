@@ -108,6 +108,18 @@ pub fn try_logtarget_from_properties(logger: &os_access::Os) ->  std::path::Path
     }
 }
 
+pub fn try_direct_key_from_properties(key: &str, logger: &os_access::Os) ->  String {
+    let str_candidate = try_key_from_properties_files(logger, &get_basic_array(logger), key, &property_from_file::NotMandatoryPathValidator {});
+    match str_candidate {
+        Some(val) => {
+            val
+        }
+        None => {
+            return String::from("")
+        }
+    }
+}
+
 
 fn try_key_from_properties_files(logger: &os_access::Os, array: &[Option<std::path::PathBuf>], key: &str, validator: &property_from_file::Validator) -> Option<String> {
     for file in array {

@@ -267,6 +267,24 @@ public class BasicValueValidators {
         }
 
     }
+    
+    
+    public static class RustCpValidator implements ValueValidator {
+
+
+        @Override
+        public void validate(Object value) throws IllegalArgumentException {
+            //cant be wrong...
+            //but we need that getPossibleValues description
+        }
+
+
+        @Override
+        public String getPossibleValues() {
+                return R("VVRustCpModifiers");
+        }
+
+    }
 
     private final static String DELIMITER = ",";
 

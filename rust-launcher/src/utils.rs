@@ -252,19 +252,19 @@ pub mod tests_utils {
         }
 
         fn get_system_config_javadir(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
+            None
         }
 
         fn get_user_config_dir(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
+            None
         }
 
         fn get_legacy_system_config_javadir(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
+            None
         }
 
         fn get_legacy_user_config_dir(&self) -> Option<std::path::PathBuf> {
-            panic!("not implemented");
+           None
         }
 
         fn get_home(&self) -> Option<std::path::PathBuf> {

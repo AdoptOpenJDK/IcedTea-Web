@@ -2,6 +2,7 @@ use std;
 use env;
 use hardcoded_paths;
 use hardcoded_paths::ItwLibSearch;
+use property_from_files_resolver;
 use os_access;
 use dirs_paths_helper;
 use std::fmt::Write;
@@ -128,6 +129,39 @@ fn append_if_exists(value: Option<&'static str>, os: &os_access::Os, vec: &mut V
     }
 }
 
+pub static XCP_MODS_DELMITER: &'static str = " ";
+
+fn filter_out_val(val: String, vec: &mut Vec<std::path::PathBuf>) {
+    let mut i:i32 = 0;
+    while i < (vec.len() as i32) {
+        let cpstring=dirs_paths_helper::path_to_string(vec.get(i as usize).expect("string should be there"));
+        for value in val.split(XCP_MODS_DELMITER) {
+            if !String::from(String::from(value).trim()).is_empty() && cpstring.contains(value) {
+                vec.remove(i as usize);
+                i = i - 1;
+                break;
+            }
+        }
+        i = i + 1;
+    }
+}
+
+fn filter_out_key(key: &str, os: &os_access::Os, vec: &mut Vec<std::path::PathBuf>) {
+    let val = property_from_files_resolver::try_direct_key_from_properties(key, os);
+    filter_out_val(val,  vec);
+}
+
+fn filter_in_val(val: String, vec: &mut Vec<std::path::PathBuf>) {
+    for value in val.split(" ") {
+        vec.push(std::path::PathBuf::from(value));
+    }
+}
+
+fn filter_in_key(key: &str, os: &os_access::Os, vec: &mut Vec<std::path::PathBuf>) {
+    let val = property_from_files_resolver::try_direct_key_from_properties(key, os);
+    filter_in_val(val, vec)
+}
+
 //TODO what to do with rt.jar, nashorn and javafx.jar with jdk11 and up?
 fn get_bootcp_members(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Vec<std::path::PathBuf> {
     let mut cp_parts = Vec::new();
@@ -142,12 +176,14 @@ fn get_bootcp_members(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Vec<
     nashorn_jar.push("ext");
     nashorn_jar.push("nashorn.jar");
     cp_parts.push(nashorn_jar);
+    filter_out_key("deployment.launcher.rust.bootcp.remove", os, &mut cp_parts, );
+    filter_in_key("deployment.launcher.rust.bootcp.add", os, &mut cp_parts);
     cp_parts
 }
 
 //can this be buggy? Shouldnt jfxrt.jar be in boot classapth? Copied from shell launchers...
 //see eg: http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2018-November/040492.html
-fn get_cp_members(jre_path: &std::path::PathBuf, _os: &os_access::Os) -> Vec<std::path::PathBuf> {
+fn get_cp_members(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Vec<std::path::PathBuf> {
     let mut cp_parts = Vec::new();
     let mut rt_jar = jre_path.clone();
     rt_jar.push("lib");
@@ -157,6 +193,8 @@ fn get_cp_members(jre_path: &std::path::PathBuf, _os: &os_access::Os) -> Vec<std
     jfxrt_jar.push("lib");
     jfxrt_jar.push("jfxrt.jar");
     cp_parts.push(jfxrt_jar);
+    filter_out_key("deployment.launcher.rust.cp.remove", os, &mut cp_parts, );
+    filter_in_key("deployment.launcher.rust.cp.add", os, &mut cp_parts);
     cp_parts
 }
 
@@ -185,6 +223,7 @@ pub fn get_bootclasspath(jre_path: &std::path::PathBuf, os: &os_access::Os) -> S
 #[cfg(test)]
 mod tests {
     use utils::tests_utils as tu;
+    use std::path::PathBuf;
 
     #[test]
     fn compose_class_path_test_emty() {
@@ -211,5 +250,47 @@ mod tests {
             std::path::PathBuf::from("c"),
             std::path::PathBuf::from("a/b"),
         ], &tu::TestLogger::create_new()));
+    }
+
+    #[test]
+    fn filter_out_val_test1() {
+        let mut vec = vec![std::path::PathBuf::from("a"), std::path::PathBuf::from("b"), std::path::PathBuf::from("c")];
+        super::filter_out_val(String::from("a c"), &mut vec);
+        assert_eq!(vec![std::path::PathBuf::from("b")], vec);
+        super::filter_out_val(String::from(""), &mut vec);
+        assert_eq!(vec![std::path::PathBuf::from("b")], vec);
+        super::filter_out_val(String::from("   "), &mut vec);
+        assert_eq!(vec![std::path::PathBuf::from("b")], vec);
+        super::filter_out_val(String::from("b"), &mut vec);
+        let mut empty: Vec<std::path::PathBuf> = Vec::new();
+        assert_eq!(empty, vec);
+
+    }
+
+    #[test]
+    fn filter_out_val_test2() {
+        let mut vec = vec![std::path::PathBuf::from("a"), std::path::PathBuf::from("b"), std::path::PathBuf::from("c")];
+        super::filter_out_val(String::from("b"), &mut vec);
+        assert_eq!(vec![std::path::PathBuf::from("a"), std::path::PathBuf::from("c")], vec);
+        super::filter_out_val(String::from("a c"), &mut vec);
+        let mut empty: Vec<std::path::PathBuf> = Vec::new();
+        assert_eq!(empty, vec);
+
+    }
+
+    #[test]
+    fn filter_in_val_test1() {
+        let mut vec = vec![std::path::PathBuf::from("a")];
+        super::filter_in_val(String::from("b"), &mut vec);
+        assert_eq!(vec![std::path::PathBuf::from("a"), std::path::PathBuf::from("b")], vec);
+
+    }
+
+    #[test]
+    fn filter_in_val_test2() {
+        let mut vec = vec![];
+        super::filter_in_val(String::from("b"), &mut vec);
+        assert_eq!(vec![std::path::PathBuf::from("b")], vec);
+
     }
 }

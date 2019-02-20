@@ -1,3 +1,17 @@
+2019-02-20  Jiri Vanek <jvanek@redhat.com>
+
+	Implemented way how to modify cp/bootcp in native launchers
+	* netx/net/sourceforge/jnlp/config/BasicValueValidators.java: added (RustCpValidator) as provider for help for new
+	properties
+	* netx/net/sourceforge/jnlp/config/Defaults.java: declared for properties to control native lanchers cp/bootcp
+	deployment.launcher.rust.{cp,bootcp}.{add,remove}
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added help message for new properties
+	* rust-launcher/src/jars_helper.rs: (get_{bootcp,cp}_members) method nw filter items in and from based on properties
+	added and tested new methods (filter_in_val) to add string to vector, and (filter_out_val) to remove matching items from vector 
+	* rust-launcher/src/property_from_files_resolver.rs: added try_direct_key_from_properties to get raw property without validation
+	and without option.
+	* rust-launcher/src/utils.rs: test logger return none rather then panic for providing of properties files
+
 2019-02-18  Jiri Vanek <jvanek@redhat.com>
 
 	Implemented forgotten support for mslinks.jar library in rust launchers
