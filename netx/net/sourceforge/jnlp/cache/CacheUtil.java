@@ -179,14 +179,14 @@ public class CacheUtil {
         return true;
     }
 
-    public static boolean clearCache(final String application) {
+    public static boolean clearCache(final String application, boolean jnlpPath, boolean domain) {
         // clear one app
         if (!checkToClearCache()) {
             return false;
         }
 
         OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("BXSingleCacheCleared", application));
-        List<CacheId> ids = getCacheIds(".*");
+        List<CacheId> ids = getCacheIds(".*", jnlpPath, domain);
         int found = 0;
         int files = 0;
         for (CacheId id : ids) {
@@ -289,8 +289,8 @@ public class CacheUtil {
 
     }
     
-     public static void listCacheIds(String filter) {
-         List<CacheId> items = getCacheIds(filter);
+     public static void listCacheIds(String filter, boolean jnlpPath, boolean domain) {
+         List<CacheId> items = getCacheIds(filter, jnlpPath, domain);
          if (JNLPRuntime.isDebug()) {
              for (CacheId id : items) {
                  OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, id.getId()+" ("+id.getType()+") ["+id.files.size()+"]");
@@ -315,11 +315,12 @@ public class CacheUtil {
      
      /**
       * This method load all known IDs of applications and  will gather all members, which share the id
+     * @param filter - regex to filter keys
       * @return 
       */
-      public static List<CacheId> getCacheIds(final String filter) {
+      public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
         CacheLRUWrapper.getInstance().lock();
-        final List<CacheId> r = new ArrayList<CacheId>();
+        final List<CacheId> r = new ArrayList<>();
         try {
             Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
                 @Override
@@ -331,23 +332,27 @@ public class CacheUtil {
                 public void accept(Path path) {
                     if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
                         PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                        // if jnlp-path in .info equals path of app to delete mark to delete
-                        String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                        if (jnlpPath != null && jnlpPath.matches(filter)) {
-                            CacheId jnlpPathId = new CacheJnlpId(jnlpPath);
-                            if (!r.contains(jnlpPathId)) {
-                                r.add(jnlpPathId);
-                                jnlpPathId.populate();
+                        if (jnlpPath) {
+                            // if jnlp-path in .info equals path of app to delete mark to delete
+                            String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                            if (jnlpPath != null && jnlpPath.matches(filter)) {
+                                CacheId jnlpPathId = new CacheJnlpId(jnlpPath);
+                                if (!r.contains(jnlpPathId)) {
+                                    r.add(jnlpPathId);
+                                    jnlpPathId.populate();
 
+                                }
                             }
                         }
-                        String domain = getDomain(path);
-                        if (domain != null && domain.matches(filter)) {
-                            CacheId doaminId = new CacheDomainId(domain);
-                            if (!r.contains(doaminId)) {
-                                r.add(doaminId);
-                                doaminId.populate();
+                        if (domain) {
+                            String domain = getDomain(path);
+                            if (domain != null && domain.matches(filter)) {
+                                CacheId doaminId = new CacheDomainId(domain);
+                                if (!r.contains(doaminId)) {
+                                    r.add(doaminId);
+                                    doaminId.populate();
 
+                                }
                             }
                         }
                     }

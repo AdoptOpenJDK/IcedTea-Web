@@ -1,3 +1,12 @@
+2019-02-06  Jiri Vanek <jvanek@redhat.com>
+
+	Delete-by app dialogue split keys to two groups instead of mixing them
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: clearCache(String) changed to (String,bool,bool) to allow by-key access.
+	(listCacheIds) - same. (getCacheIds) - same plus used those two booleasn to select what keys to include in filtering
+	* netx/net/sourceforge/jnlp/controlpanel/CacheAppViewer.java: the deleteByApp dialog enhanced by TabView. Each tab holds
+	one family of keys.
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: adapted to new signature of (CacheUtil.listCacheIds)
+
 2019-01-15  Jiri Vanek <jvanek@redhat.com>
 
 	Relaxed vendor and title to be no longer mandatory - based on oracle javaws behavior
