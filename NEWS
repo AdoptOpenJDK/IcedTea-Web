@@ -16,6 +16,7 @@ New in release 1.7.2 (YYYY-MM-DD):
 * deployment.config now support generic url instead just file
 * Added support for windows desktop shortcuts via https://github.com/DmitriiShamrikov/mslinks
 * cache can now be operated by groups, list by -Xcacheids (details via -verbose, can filter by regex), Xclearcache now can clear only selected id. There is also gui to operate cache via id in itweb-settings now.
+* desktop shortcut name get shortened to title or file if title is missing.
 
 New in release 1.7.1 (2017-12-15):
 * better work with authors file

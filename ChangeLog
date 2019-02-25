@@ -1,3 +1,11 @@
+2019-02-07  Jiri Vanek <jvanek@redhat.com>
+
+	Desktop sortcuts name is now based on title. And only if missing, then on file
+	* netx/net/sourceforge/jnlp/JNLPFile.java: new method of createNameForDesktopFile, which
+	returns title if it is present, jnlp file name otherwise.
+	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: getGeneratedJnlpFileName and getDesktopIconName now uses 
+	* NEWS: mentioned
+
 2019-02-06  Jiri Vanek <jvanek@redhat.com>
 
 	Delete-by app dialogue split keys to two groups instead of mixing them
