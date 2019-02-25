@@ -327,13 +327,40 @@ public class JNLPFile {
      * See PluginBridge
      */
     public String getTitle() {
+        try {
+            return getTitle(false);
+        } catch (MissingTitleException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public String getTitle(boolean kill) throws MissingTitleException {
+        String title = getTitleImpl();
+        if (title == null) {
+            title = "";
+
+        }
+        if (title.trim().isEmpty() && kill) {
+            throw new MissingTitleException();
+        }
+        if (title.trim().isEmpty()) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingElement", R("PMissingTitle")));
+            title = R("PMissingMandatorySubstitution", R("PMissingTitle"));
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingMandatoryWarning", R("PMissingTitle")) + ": " + title);
+        } else {
+            OutputController.getLogger().log("Acceptable title tag found, contains: " + title);
+        }
+        return title;
+    }
+
+    private String getTitleImpl() {
         String jnlpTitle = getTitleFromJnlp();
         String manifestTitle = getTitleFromManifest();
         if (jnlpTitle != null && manifestTitle != null) {
             if (jnlpTitle.equals(manifestTitle)) {
                 return jnlpTitle;
             }
-            return jnlpTitle+" ("+manifestTitle+")";
+            return jnlpTitle + " (" + manifestTitle + ")";
         }
         if (jnlpTitle != null && manifestTitle == null) {
             return jnlpTitle;
@@ -342,32 +369,56 @@ public class JNLPFile {
             return manifestTitle;
         }
         String mainClass = getManifestsAttributes().getMainClass();
-        return mainClass;        
+        return mainClass;
     }
-    
+
     /**
-     * @return the JNLP file's best localized title. This method returns the same
-     * value as InformationDesc.getTitle().
+     * @return the JNLP file's best localized title. This method returns the
+     * same value as InformationDesc.getTitle().
      */
     public String getTitleFromJnlp() {
         return getInformation().getTitle();
     }
-    
+
     public String getTitleFromManifest() {
         String inManifestTitle = getManifestsAttributes().getApplicationName();
-        if (inManifestTitle == null && getManifestsAttributes().isLoader()){
+        if (inManifestTitle == null && getManifestsAttributes().isLoader()) {
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, TITLE_NOT_FOUND);
         }
         return inManifestTitle;
     }
-    
-    
 
     /**
-     * @return the JNLP file's best localized vendor. This method returns the same
-     * value as InformationDesc.getVendor().
+     * @return the JNLP file's best localized vendor. This method returns the
+     * same value as InformationDesc.getVendor().
      */
     public String getVendor() {
+        try {
+            return getVendor(false);
+        } catch (MissingVendorException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public String getVendor(boolean kill) throws MissingVendorException {
+        String vendor = getVendorImpl();
+        if (vendor == null) {
+            vendor = "";
+        }
+        if (vendor.trim().isEmpty() && kill) {
+            throw new MissingVendorException();
+        }
+        if (vendor.trim().isEmpty()) {
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingElement", R("PMissingVendor")));
+            vendor = R("PMissingMandatorySubstitution", R("PMissingVendor"));
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingMandatoryWarning", R("PMissingVendor")) + ": " + vendor);
+        } else {
+            OutputController.getLogger().log("Acceptable vendor tag found, contains: " + vendor);
+        }
+        return vendor;
+    }
+
+    private String getVendorImpl() {
         return getInformation().getVendor();
     }
 

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -486,21 +487,8 @@ public final class Parser {
     void checkForInformation() throws RequiredElementException {
         OutputController.getLogger().log("Homepage: " + file.getInformation().getHomepage());
         OutputController.getLogger().log("Description: " + file.getInformation().getDescription());
-
-        String title = file.getTitle();
-        String vendor = file.getVendor();
-
-        if (title == null || title.trim().isEmpty()) {
-            throw new MissingTitleException();
-        } else {
-            OutputController.getLogger().log("Acceptable title tag found, contains: " + title);
-        }
-
-        if (vendor == null || vendor.trim().isEmpty()) {
-            throw new MissingVendorException();
-        } else {
-            OutputController.getLogger().log("Acceptable vendor tag found, contains: " + vendor);
-        }
+        file.getTitle(strict);
+        file.getVendor(strict);
     }
 
     /**

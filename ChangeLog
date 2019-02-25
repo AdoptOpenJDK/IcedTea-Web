@@ -1,5 +1,15 @@
 2019-01-15  Jiri Vanek <jvanek@redhat.com>
 
+	Relaxed vendor and title to be no longer mandatory - based on oracle javaws behavior
+	* netx/net/sourceforge/jnlp/JNLPFile.java: getVendor/Title refactored to work without values. In strict mode,
+	they keep throwing MisisngElement exception/
+	* netx/net/sourceforge/jnlp/Parser.java: delegating logic to check title/vendor to JNLPfile. Jsut calling it with possibility of fail.
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added PMissingMandatoryWarning and PMissingMandatorySubstitution
+	to inform about missing title/vendor
+	* tests/netx/unit/net/sourceforge/jnlp/ParserTest.java: adapted to new behavior
+
+2019-01-15  Jiri Vanek <jvanek@redhat.com>
+
 	Made Linux launchers portable
 	* launcher/launchers.bat.in: made aware of the variables substituted from
 	* launcher/launchers.sh.in: included snippet for current directory resolving. If NEXT_JAR is not found on
