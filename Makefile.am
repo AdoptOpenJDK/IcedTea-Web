@@ -389,8 +389,8 @@ endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(NETX_JAR)
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(SPLASH_PNG)
 	${INSTALL_DATA} $(TOP_SRC_DIR)/javaws.png $(ICONS_DEST_DIR)/
-	mkdir -p $(MODULARJDK_ARGS_DIR)
-	cp launcher.build/$(MODULARJDK_ARGS_FILE) $(MODULARJDK_ARGS_DIR)/$(MODULARJDK_ARGS)
+	mkdir -p $(DESTDIR)/$(MODULARJDK_ARGS_DIR)
+	cp launcher.build/$(MODULARJDK_ARGS_FILE) $(DESTDIR)/$(MODULARJDK_ARGS_DIR)/$(MODULARJDK_ARGS)
 if ENABLE_NATIVE_LAUNCHERS
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
