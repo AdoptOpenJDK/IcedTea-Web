@@ -1,3 +1,10 @@
+2019-01-15  Jiri Vanek <jvanek@redhat.com>
+
+	Made Linux launchers portable
+	* launcher/launchers.bat.in: made aware of the variables substituted from
+	* launcher/launchers.sh.in: included snippet for current directory resolving. If NEXT_JAR is not found on
+	its location, compose new (boot)classpath, based on current directory.
+
 2018-01-07  Joel Tesdall <jtesdall@mapcon.com>
             Jiri Vanek <jvanek@redhat.com>
 

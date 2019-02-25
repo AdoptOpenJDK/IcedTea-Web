@@ -6,6 +6,14 @@ rem if not set, following defaults are used
 set CLASSNAME=@MAIN_CLASS@
 set PROGRAM_NAME=@PROGRAM_NAME@
 
+# individual parts of bootclasspath for more easy processing
+NETX_JAR=@NETX_JAR
+PLUGIN_JAR=@PLUGIN_JAR@
+JSOBJECT_JAR=@JSOBJECT_JAR@
+TAGSOUP_JAR=@TAGSOUP_JAR@
+RHINO_JAR=@RHINO_JAR@
+MSLINKS_JAR=@MSLINKS_JAR@
+
 set NASHORN=lib/ext/nashorn.jar
 set LAUNCHER_FLAGS=-Xms8m
 if "%PROGRAM_NAME%" == "javaws"  (

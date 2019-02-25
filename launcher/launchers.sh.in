@@ -9,6 +9,25 @@ BINARY_LOCATION=@BIN_LOCATION@
 SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
 PROGRAM_NAME=@PROGRAM_NAME@
 CP=@JRE@/lib/rt.jar:@JRE@/lib/jfxrt.jar
+# individual parts of bootclasspath for more easy processing
+NETX_JAR=@NETX_JAR@
+PLUGIN_JAR=@PLUGIN_JAR@
+JSOBJECT_JAR=@JSOBJECT_JAR@
+TAGSOUP_JAR=@TAGSOUP_JAR@
+RHINO_JAR=@RHINO_JAR@
+MSLINKS_JAR=@MSLINKS_JAR@
+
+## resolve folder of this script, following all symlinks,
+## http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
+  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+  # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
+done
+readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
+readonly PORTABLE_ITW_HOME="`dirname $SCRIPT_DIR`"
 
 CONFIG_HOME=$XDG_CONFIG_HOME
 if [ "x$CONFIG_HOME" = "x" ] ; then
@@ -25,6 +44,28 @@ fi;
 if [ "x$CUSTOM_JRE" = "x" ] ; then
   CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" /etc/.java/.deploy/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
 fi;
+
+# as used in windows lunchers, supporting portable ITW
+# note, that this is temporary, experimental solution, moreover for 1.7 and will likely change since 1.8
+# by this, sh launchers can be again a bit more portable then win ones, thats why we moved to native ones since 1.8
+# still this is very dummy
+if [ ! -f $NETX_JAR ] ; then
+  ITW_LIBS="BUNDLED";
+fi
+if [ "x$ITW_LIBS" == "xBUNDLED" -o ! "x$ITW_HOME" = "x" ] ; then
+  if [ "x$ITW_HOME" = "x" ] ; then
+    LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$PORTABLE_ITW_HOME/share/icedtea-web/`basename \"$NETX_JAR\"`:$PORTABLE_ITW_HOME/share/icedtea-web/`basename \"$PLUGIN_JAR\"`:$PORTABLE_ITW_HOME/share/icedtea-web/`basename \"$JSOBJECT_JAR\"`:$PORTABLE_ITW_HOME/linux-deps-runtime/`basename \"$TAGSOUP_JAR\"`:$PORTABLE_ITW_HOME/linux-deps-runtime/`basename \"$RHINO_JAR\"`"
+BINARY_LOCATION="$PORTABLE_ITW_HOME/bin/`basename  \"$BINARY_LOCATION \"`"
+SPLASH_LOCATION="$PORTABLE_ITW_HOME/share/icedtea-web/`basename  \"$SPLASH_LOCATION \"`"
+echo "warning, using portable itw from $PORTABLE_ITW_HOME: $LAUNCHER_BOOTCLASSPATH $BINARY_LOCATION $SPLASH_LOCATION"
+  else
+    LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$ITW_HOME/share/icedtea-web/`basename \"$NETX_JAR\"`:$ITW_HOME/share/icedtea-web/`basename \"$PLUGIN_JAR\"`:$ITW_HOME/share/icedtea-web/`basename \"$JSOBJECT_JAR\"`:$ITW_HOME/linux-deps-runtime/`basename \"$TAGSOUP_JAR\"`:$ITW_HOME/linux-deps-runtime/`basename \"$RHINO_JAR\"`"
+BINARY_LOCATION="$ITW_HOME/bin/`basename  \"$BINARY_LOCATION \"`"
+SPLASH_LOCATION="$ITW_HOME/share/icedtea-web/`basename  \"$SPLASH_LOCATION\"`"
+echo "warning, using portable itw from $ITW_HOME: $LAUNCHER_BOOTCLASSPATH $BINARY_LOCATION $SPLASH_LOCATION"
+  fi
+fi
+
 if [ "x$CUSTOM_JRE" != "x" ] ; then
   if [ -e  "$CUSTOM_JRE" -a -e "$CUSTOM_JRE/bin/java" ] ; then
     JAVA=$CUSTOM_JRE/bin/java
