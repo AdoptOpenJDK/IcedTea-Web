@@ -1,3 +1,7 @@
+2019-02-16  Jiri Vanek <jvanek@redhat.com>
+
+	* Makefile.am: fixed issue with MODULARJDK_ARGS_FILE being installded as executable
+
 2019-02-11  Laurent Bourgès <bourges.laurent@gmail.com>
             Jiri Vanek <jvanek@redhat.com>
 
