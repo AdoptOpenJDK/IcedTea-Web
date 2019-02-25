@@ -450,6 +450,21 @@ public class Defaults {
                         DeploymentConfiguration.KEY_SYSTEM_CONFIG_MANDATORY,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(false)
+                } ,
+                {
+                        DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_WIDTH,
+                        BasicValueValidators.getRangedIntegerValidator(-9999, +9999),
+                        String.valueOf(800)//0 is disabling it; negative is enforcing it
+                },
+                {
+                        DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_HEIGHT,
+                        BasicValueValidators.getRangedIntegerValidator(-9999, +9999),
+                        String.valueOf(600)//0 is disabling it; negative is enforcing it
+                },
+                {
+                        DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD,
+                        BasicValueValidators.getRangedIntegerValidator(0, 1000),
+                        String.valueOf(10)// treshold when applet is considered as too small
                 }
         };
 

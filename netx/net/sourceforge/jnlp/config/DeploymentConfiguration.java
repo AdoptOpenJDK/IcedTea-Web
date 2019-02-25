@@ -244,6 +244,12 @@ public final class DeploymentConfiguration {
     public static final String KEY_SYSTEM_CONFIG = "deployment.system.config";
     public static final String KEY_SYSTEM_CONFIG_MANDATORY = "deployment.system.config.mandatory";
     
+    /**
+     * Possibility to control hack which resizes very small applets
+     */
+    public static final String KEY_SMALL_SIZE_OVERRIDE_TRESHOLD = "deployment.small.size.treshold";
+    public static final String KEY_SMALL_SIZE_OVERRIDE_WIDTH = "deployment.small.size.override.width";
+    public static final String KEY_SMALL_SIZE_OVERRIDE_HEIGHT = "deployment.small.size.override.height";
     
     public static final String TRANSFER_TITLE = "Legacy configuration and cache found. Those will be now transported to new locations";
     
