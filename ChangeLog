@@ -1,3 +1,8 @@
+2019-02-12  Jim Douglas <jimdouglas@mac.com>
+
+	Fixed typo in DownloadService2
+	* netx/javax/jnlp/DownloadService2.java: getUpdateAvailableResources repalced incorrect getUpdateAvaiableReosurces
+
 2019-02-16  Jiri Vanek <jvanek@redhat.com>
 
 	* Makefile.am: fixed issue with MODULARJDK_ARGS_FILE being installded as executable
