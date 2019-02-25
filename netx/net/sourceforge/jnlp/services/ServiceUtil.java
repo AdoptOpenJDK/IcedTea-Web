@@ -27,6 +27,7 @@ import java.security.PrivilegedExceptionAction;
 import javax.jnlp.BasicService;
 import javax.jnlp.ClipboardService;
 import javax.jnlp.DownloadService;
+import javax.jnlp.DownloadService2;
 import javax.jnlp.ExtensionInstallerService;
 import javax.jnlp.FileOpenService;
 import javax.jnlp.FileSaveService;
@@ -77,6 +78,14 @@ public class ServiceUtil {
      */
     public static DownloadService getDownloadService() {
         return (DownloadService) getService("javax.jnlp.DownloadService");
+    }
+    
+    /**
+     * @return the DownloadService reference, or null if the service is
+     * unavailable.
+     */
+    public static DownloadService2 getDownloadService2() {
+        return (DownloadService2) getService("javax.jnlp.DownloadService2");
     }
 
     /**

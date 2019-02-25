@@ -16,15 +16,8 @@
 
 package net.sourceforge.jnlp.services;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.lang.ref.*;
-import java.lang.reflect.*;
-import java.security.*;
 import javax.jnlp.*;
 
-import net.sourceforge.jnlp.*;
 
 /**
  * Lookup table for services.
@@ -44,6 +37,7 @@ public class XServiceManagerStub implements ServiceManagerStub {
     private static String serviceNames[] = {
             "javax.jnlp.BasicService", // required
             "javax.jnlp.DownloadService", // required
+            "javax.jnlp.DownloadService2",
             "javax.jnlp.ExtendedService",
             "javax.jnlp.ExtensionInstallerService", // required
             "javax.jnlp.PersistenceService",
@@ -57,6 +51,7 @@ public class XServiceManagerStub implements ServiceManagerStub {
     private static Object services[] = {
             ServiceUtil.createPrivilegedProxy(BasicService.class, new XBasicService()),
             ServiceUtil.createPrivilegedProxy(DownloadService.class, new XDownloadService()),
+            ServiceUtil.createPrivilegedProxy(DownloadService2.class, new XDownloadService2()),
             ServiceUtil.createPrivilegedProxy(ExtendedService.class, new XExtendedService()),
             ServiceUtil.createPrivilegedProxy(ExtensionInstallerService.class, new XExtensionInstallerService()),
             ServiceUtil.createPrivilegedProxy(PersistenceService.class, new XPersistenceService()),
