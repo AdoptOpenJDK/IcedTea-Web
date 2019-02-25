@@ -28,6 +28,9 @@ else
 	WIN_LAUNCHERS=
 endif
 
+
+MODULARJDK_ARGS_FILE=itw-modularjdk.args
+
 if WINDOWS_OR_INCLUDE_BATS
 	WIN_LAUNCHERS=launcher.build/$(javaws).bat launcher.build/$(itweb_settings).bat  launcher.build/$(policyeditor).bat
 else
@@ -35,17 +38,17 @@ else
 endif
 
 if ENABLE_SHELL_LAUNCHERS
-	SHELL_LUNCHERS=$(WIN_LAUNCHERS) launcher.build/$(javaws).sh launcher.build/$(itweb_settings).sh launcher.build/$(policyeditor).sh
+	SHELL_LAUNCHERS=$(WIN_LAUNCHERS) launcher.build/$(MODULARJDK_ARGS_FILE) launcher.build/$(javaws).sh launcher.build/$(itweb_settings).sh launcher.build/$(policyeditor).sh
 else
-	SHELL_LUNCHERS=
+	SHELL_LAUNCHERS=
 endif
 
 
 if ENABLE_NATIVE_LAUNCHERS
-	NATIVE_LUNCHERS=launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor)
+	NATIVE_LAUNCHERS=launcher.build/$(MODULARJDK_ARGS_FILE) launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor)
 	DESKTOP_SUFFIX=
 else
-	NATIVE_LUNCHERS=
+	NATIVE_LAUNCHERS=
 	DESKTOP_SUFFIX=.sh
 endif
 
@@ -55,7 +58,7 @@ JAVAWS=$(javaws)$(DESKTOP_SUFFIX)
 ITWEB_SETTINGS=$(itweb_settings)$(DESKTOP_SUFFIX)
 POLICYEDITOR=$(policyeditor)$(DESKTOP_SUFFIX)
 
-LAUNCHERS=$(NATIVE_LUNCHERS) $(SHELL_LUNCHERS)
+LAUNCHERS=$(NATIVE_LAUNCHERS) $(SHELL_LAUNCHERS)
 DESKTOP_FILES=javaws.desktop itweb-settings.desktop policyeditor.desktop
 DESKTOP_IN_FILES=javaws.desktop.in itweb-settings.desktop.in policyeditor.desktop.in
 
@@ -168,8 +171,11 @@ if ENABLE_PLUGINJAR
   PLUGIN_JAR=$(datadir)/$(PACKAGE_NAME)/plugin.jar
   JSOBJECT_JAR=$(datadir)/$(PACKAGE_NAME)/jsobject.jar
 endif
-  NETX_JAR=$(datadir)/$(PACKAGE_NAME)/netx.jar
-  SPLASH_PNG=$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+
+NETX_JAR=$(datadir)/$(PACKAGE_NAME)/netx.jar
+SPLASH_PNG=$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
+MODULARJDK_ARGS_LOCATION=$(MODULARJDK_ARGS_DIR)/$(MODULARJDK_ARGS_FILE)
+
 
 # Conditional defintions
 if HAVE_TAGSOUP
@@ -301,7 +307,7 @@ endif
 
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
-export EXTRA_DIST = $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png $(DESKTOP_IN_FILES) $(top_srcdir)/completion \
+export EXTRA_DIST = $(MODULARJDK_ARGS_FILE) $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png $(DESKTOP_IN_FILES) $(top_srcdir)/completion \
  launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS $(top_srcdir)/metadata.in $(top_srcdir)/win-installer
 
 # reproducers `D`shortcuts
@@ -324,6 +330,14 @@ javaws:= $(shell echo javaws | sed '@program_transform_name@')
 itweb_settings:= $(shell echo itweb-settings | sed '@program_transform_name@')
 policyeditor:= $(shell echo policyeditor | sed '@program_transform_name@')
 
+if WINDOWS_OR_INCLUDE_BATS
+# convert Unix newlines (LF) to DOS format:
+  fix_CRLF=-e "s/\$$/\r/"
+else
+  fix_CRLF=
+endif
+
+
 # the launcher needs to know $(bindir) and $(datadir) which can be different at
 # make-time from configure-time
 edit_launcher_script = sed \
@@ -339,7 +353,9 @@ edit_launcher_script = sed \
   -e "s|[@]MSLINKS_JAR[@]|$(MSLINKS_JAR)|g" \
   -e "s|[@]TAGSOUP_JAR[@]|$(TAGSOUP_JAR)|g" \
   -e "s|[@]RHINO_JAR[@]|$(RHINO_JAR)|g" \
-  -e "s|[@]PROGRAM_NAME[@]|$${PROGRAM_NAME}|g"
+  -e "s|[@]PROGRAM_NAME[@]|$${PROGRAM_NAME}|g" \
+  -e "s|[@]MODULARJDK_ARGS_LOCATION[@]|$(MODULARJDK_ARGS_LOCATION)|g"
+
 
 # Top-Level Targets
 # =================
@@ -373,6 +389,8 @@ endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(NETX_JAR)
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(SPLASH_PNG)
 	${INSTALL_DATA} $(TOP_SRC_DIR)/javaws.png $(ICONS_DEST_DIR)/
+	mkdir -p $(MODULARJDK_ARGS_DIR)
+	${INSTALL_PROGRAM} launcher.build/$(MODULARJDK_ARGS_FILE) $(MODULARJDK_ARGS_DIR)/$(MODULARJDK_ARGS)
 if ENABLE_NATIVE_LAUNCHERS
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
 	${INSTALL_PROGRAM} launcher.build/$(itweb_settings) $(DESTDIR)$(bindir)
@@ -460,6 +478,7 @@ endif
 if ENABLE_DOCS
 	cp -r $(DOCS_DIR)/html $(DESTDIR)$(prefix)/icedtea-web-docs
 endif
+	if [ ! -e $(DESTDIR)$(bindir)/$(MODULARJDK_ARGS_FILE) ] ; then cp $(MODULARJDK_ARGS_LOCATION) $(DESTDIR)$(bindir)/$(MODULARJDK_ARGS_FILE) ; fi
 	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).linux.bin.zip `basename $(DESTDIR)$(prefix)` );
 
 win-bin-dist: win-only-image
@@ -469,6 +488,7 @@ if WINDOWS
 # strips cygwin and other linux-like blobs. keeping only windows-usefull stuff
 win-only-image: install uninstall-linux-only remove-empty-linux-only-dirs
 	rm -rf $(WIN_ALL_DEPS)
+	if [ ! -e $(DESTDIR)$(bindir)/$(MODULARJDK_ARGS_FILE) ] ; then cp $(MODULARJDK_ARGS_LOCATION) $(DESTDIR)$(bindir)/$(MODULARJDK_ARGS_FILE) ; fi
 if ENABLE_DOCS
 	cp -r $(DOCS_DIR)/html $(DESTDIR)$(prefix)/icedtea-web-docs
 endif
@@ -513,7 +533,7 @@ remove-empty-linux-only-dirs:
 	if ls -1qA $$dirCandidate | grep -q . ; then echo "$$dirCandidate not empty"; else rmdir -v $$dirCandidate ; fi ;
 
 # all generated manpages must be removed one by one
-# shell (only shell!) lunchers must go away
+# shell (only shell!) launchers must go away
 uninstall-linux-only:
 	KNOWN_MANS="icedtea-web.1  icedtea-web-plugin.1  itweb-settings.1  javaws.1  policyeditor.1" ; \
 	KNOWN_DIRS="man1 de/man1 pl/man1 cs/man1" ; \
@@ -911,6 +931,12 @@ clean-desktop-files:
 	rm -f itweb-settings.desktop
 	rm -f policyeditor.desktop
 
+# launcher run args:
+launcher.build/$(MODULARJDK_ARGS_FILE): $(srcdir)/$(MODULARJDK_ARGS_FILE)
+	mkdir -p launcher.build
+	cp $(srcdir)/$(MODULARJDK_ARGS_FILE) launcher.build/$(MODULARJDK_ARGS_FILE)
+
+
 if ENABLE_SHELL_LAUNCHERS
 launcher.build/$(javaws).sh: launcher/launchers.sh.in
 	mkdir -p launcher.build
@@ -940,8 +966,7 @@ launcher.build/$(javaws).bat: launcher/launchers.bat.in
 	MAIN_CLASS=net.sourceforge.jnlp.runtime.Boot ;\
 	BIN_LOCATION=$(bindir)/$(javaws) ;\
 	PROGRAM_NAME=$(javaws) ;\
-	$(edit_launcher_script) < $< > $@
-
+	$(edit_launcher_script) $(fix_CRLF) < $< > $@
 
 # TODO get rid of this copypaste
 launcher.build/$(itweb_settings).bat: launcher/launchers.bat.in
@@ -949,7 +974,7 @@ launcher.build/$(itweb_settings).bat: launcher/launchers.bat.in
 	MAIN_CLASS=net.sourceforge.jnlp.controlpanel.CommandLine ;\
 	BIN_LOCATION=$(bindir)/$(itweb_settings) ;\
 	PROGRAM_NAME=$(itweb_settings) ;\
-	$(edit_launcher_script) < $< > $@
+	$(edit_launcher_script) $(fix_CRLF) < $< > $@
 
 # TODO get rid of this copypaste
 launcher.build/$(policyeditor).bat: launcher/launchers.bat.in
@@ -957,11 +982,12 @@ launcher.build/$(policyeditor).bat: launcher/launchers.bat.in
 	MAIN_CLASS=net.sourceforge.jnlp.security.policyeditor.PolicyEditor ;\
 	BIN_LOCATION=$(bindir)/$(policyeditor) ;\
 	PROGRAM_NAME=$(policyeditor) ;\
-	$(edit_launcher_script) < $< > $@
+	$(edit_launcher_script) $(fix_CRLF) < $< > $@
 endif
 endif
 
 clean-launchers:
+	rm -f launcher.build/$(MODULARJDK_ARGS_FILE)
 if ENABLE_NATIVE_LAUNCHERS
 	rm -f launcher.build/$(javaws)
 	rm -f launcher.build/$(itweb_settings)
@@ -972,11 +998,11 @@ if ENABLE_SHELL_LAUNCHERS
 	rm -f launcher.build/$(javaws).sh
 	rm -f launcher.build/$(itweb_settings).sh
 	rm -f launcher.build/$(policyeditor).sh
-if WINDOWS
+endif
+if WINDOWS_OR_INCLUDE_BATS
 	rm -f launcher.build/$(javaws).bat
 	rm -f launcher.build/$(itweb_settings).bat
 	rm -f launcher.build/$(policyeditor).bat
-endif
 endif
 	if [ -e launcher.build ] ; then \
 	  rmdir launcher.build ; \

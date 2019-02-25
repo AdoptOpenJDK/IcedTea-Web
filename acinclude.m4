@@ -1163,3 +1163,18 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_WIX],
     AC_SUBST(WIX_TOOLSET_DIR)
   fi
 ])
+
+AC_DEFUN([IT_CHECK_MODULARJDK_ARGS],
+[
+  AC_MSG_CHECKING([where to place file with modular switches])
+  AC_ARG_WITH([modularjdk-file],
+	      [AS_HELP_STRING(--with-modularjdk-file,directory where file with arguments for modualr jdk willbe installed)],
+  [
+    MODULARJDK_ARGS_DIR="${withval}"
+  ],
+  [ 
+    MODULARJDK_ARGS_DIR="${bindir}"
+  ])
+  AC_MSG_RESULT([${MODULARJDK_ARGS_DIR}])
+  AC_SUBST([MODULARJDK_ARGS_DIR])
+])
