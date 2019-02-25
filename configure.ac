@@ -39,6 +39,8 @@ if test x"$BIN_BASH" = x ; then
     AC_MSG_ERROR([/bin/bash is used in runtime and for about generation. Dying sooner rather then later])
 fi
 
+IT_CHECK_MODULARJDK_ARGS
+
 #shell launchers are only opinion for 1.7
 AM_CONDITIONAL([ENABLE_SHELL_LAUNCHERS], [true])
 #native launchers do not exists in 1.7
