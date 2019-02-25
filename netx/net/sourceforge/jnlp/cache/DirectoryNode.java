@@ -84,7 +84,7 @@ public class DirectoryNode {
             this.childNodes = new ArrayList<DirectoryNode>();
         this.parent = parent;
         if (!isDir())
-            this.infoFile = new File(this.getFile().getAbsolutePath().concat(".info"));
+            this.infoFile = new File(this.getFile().getAbsolutePath().concat(CacheDirectory.INFO_SUFFIX));
     }
 
     /**

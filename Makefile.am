@@ -168,9 +168,17 @@ endif
 
 # Conditional defintions
 if HAVE_TAGSOUP
+if HAVE_MSLINKS
   NETX_EXCLUDE_SRCS=
 else
+  NETX_EXCLUDE_SRCS=net.sourceforge.jnlp.util.WindowsDesktopEntry.java
+endif
+else
+if HAVE_MSLINKS
   NETX_EXCLUDE_SRCS=net.sourceforge.jnlp.MalformedXMLParser.java
+else
+  NETX_EXCLUDE_SRCS=net.sourceforge.jnlp.MalformedXMLParser.java net.sourceforge.jnlp.util.WindowsDesktopEntry.java
+endif
 endif
 
 # Flags
@@ -187,7 +195,7 @@ export IT_JAVACFLAGS=$(IT_JAVAC_SETTINGS) -source $(IT_LANGUAGE_SOURCE_VERSION) 
 #    IllegalAccessException
 #  - we want full privileges
 #
-export UNIFIED_CLASSPATH_SEGMENTS=$(NETX_JAR) $(PLUGIN_JAR) $(JSOBJECT_JAR) $(RHINO_JAR) $(TAGSOUP_JAR)
+export UNIFIED_CLASSPATH_SEGMENTS=$(NETX_JAR) $(PLUGIN_JAR) $(JSOBJECT_JAR) $(RHINO_JAR) $(TAGSOUP_JAR) $(MSLINKS_JAR)
 export UNIFIED_JACOCO_CLASSPATH_SEGMENTS=$(UNIFIED_CLASSPATH_SEGMENTS) $(JACOCO_CLASSPATH)
 export UNIFIED_CLASSPATH=$(call joinsegments, $(UNIFIED_CLASSPATH_SEGMENTS))
 export UNIFIED_JACOCO_CLASSPATH=$(call joinsegments, $(UNIFIED_JACOCO_CLASSPATH_SEGMENTS))
@@ -323,6 +331,7 @@ edit_launcher_script = sed \
   -e "s|[@]NETX_JAR[@]|$(NETX_JAR)|g" \
   -e "s|[@]PLUGIN_JAR[@]|$(PLUGIN_JAR)|g" \
   -e "s|[@]JSOBJECT_JAR[@]|$(JSOBJECT_JAR)|g" \
+  -e "s|[@]MSLINKS_JAR[@]|$(MSLINKS_JAR)|g" \
   -e "s|[@]TAGSOUP_JAR[@]|$(TAGSOUP_JAR)|g" \
   -e "s|[@]RHINO_JAR[@]|$(RHINO_JAR)|g" \
   -e "s|[@]PROGRAM_NAME[@]|$${PROGRAM_NAME}|g"
@@ -420,6 +429,10 @@ endif
 if HAVE_TAGSOUP
 	filteredName=`basename $(TAGSOUP_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
 	cp -v $(TAGSOUP_JAR) $(WIN_RUN_DEPS)/$$filteredName
+endif
+if HAVE_MSLINKS
+	filteredName=`basename $(MSLINKS_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(MSLINKS_JAR) $(WIN_RUN_DEPS)/$$filteredName
 endif
 endif
 
@@ -695,7 +708,7 @@ stamps/liveconnect.stamp: liveconnect-source-files.txt stamps/netx.stamp
 	  mkdir -p $(TOP_BUILD_DIR)/liveconnect && \
 	  $(SYSTEM_JDK_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	      -d $(TOP_BUILD_DIR)/liveconnect \
-	      $(call composeclasspath,$(NETX_DIR) $(TAGSOUP_JAR) $(RHINO_JAR)) \
+	      $(call composeclasspath,$(NETX_DIR) $(MSLINKS_JAR) $(TAGSOUP_JAR) $(RHINO_JAR)) \
 	      -sourcepath $(LIVECONNECT_SRCS) \
 	      @liveconnect-source-files.txt ; \
 	fi
@@ -854,7 +867,7 @@ stamps/netx.stamp: netx-source-files.txt stamps/netx-html-gen.stamp
 	$(SYSTEM_JDK_DIR)/bin/javac $(IT_JAVACFLAGS) \
 		-d $(NETX_DIR) \
 		-sourcepath $(NETX_SRCDIR) \
-		$(call composeclasspath, $(TAGSOUP_JAR) $(RHINO_JAR)) \
+		$(call composeclasspath, $(MSLINKS_JAR) $(TAGSOUP_JAR) $(RHINO_JAR)) \
 	    @netx-source-files.txt
 	(cd $(NETX_RESOURCE_DIR); \
 	 for files in $$(find . -type f); \
@@ -993,7 +1006,7 @@ if ENABLE_DOCS
 	 -doctitle 'IcedTea-Web: NetX API Specification' \
 	 -windowtitle 'IcedTea-Web: NetX ' \
 	 -header '<strong>IcedTea-Web<br/>NetX</strong>' \
-	 $(call composeclasspath, $(TAGSOUP_JAR) $(RHINO_JAR)) \
+	 $(call composeclasspath, $(MSLINKS_JAR) $(TAGSOUP_JAR) $(RHINO_JAR)) \
 	 $(NETX_PKGS)
 endif
 	mkdir -p stamps
@@ -1011,7 +1024,7 @@ if ENABLE_PLUGINJAR
 	 -doctitle 'IcedTea-Web: Plugin API Specification' \
 	 -windowtitle 'IcedTea-Web: Plugin ' \
 	 -header '<strong>IcedTea-Web<br/>Plugin</strong>' \
-	 $(call composeclasspath, $(TAGSOUP_JAR) $(RHINO_JAR)) \
+	 $(call composeclasspath, $(MSLINKS_JAR) $(TAGSOUP_JAR) $(RHINO_JAR)) \
 	 $(PLUGIN_PKGS)
 endif
 endif
@@ -1491,7 +1504,7 @@ stamps/netx-unit-tests-compile.stamp: stamps/netx.stamp \
 	mkdir -p $(NETX_UNIT_TEST_DIR) && \
 	$(SYSTEM_JDK_DIR)/bin/javac $(IT_JAVACFLAGS) \
 	 -d $(NETX_UNIT_TEST_DIR) \
-	 $(call composeclasspath, $(JUNIT_RUNTIME) $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar $(NETX_DIR)/lib/classes.jar $(TEST_EXTENSIONS_DIR) $(TAGSOUP_JAR)) \
+	 $(call composeclasspath, $(JUNIT_RUNTIME) $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar $(NETX_DIR)/lib/classes.jar $(MSLINKS_JAR)  $(TEST_EXTENSIONS_DIR) $(TAGSOUP_JAR)) \
 	 @netx-unit-tests-source-files.txt && \
 	mkdir -p stamps && \
 	touch $@
@@ -1521,7 +1534,7 @@ stamps/run-netx-unit-tests.stamp: stamps/netx-unit-tests-compile.stamp $(JUNIT_R
 	done ; \
 	cd $(NETX_UNIT_TEST_DIR) ; \
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH="$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) $(TEST_EXTENSIONS_DIR) . $(TEST_EXTENSIONS_SRCDIR) $(TAGSOUP_JAR))" ; \
+	CLASSPATH="$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar $(JUNIT_RUNTIME) $(MSLINKS_JAR) $(JUNIT_RUNNER_JAR) $(TEST_EXTENSIONS_DIR) . $(TEST_EXTENSIONS_SRCDIR) $(TAGSOUP_JAR))" ; \
 	  $(SYSTEM_JRE_DIR)/bin/java "-Xbootclasspath/a:$$CLASSPATH" CommandLine $$class_names 
 if WITH_XSLTPROC
 	-$(XSLTPROC) --stringparam logs logs_unit.html $(TESTS_SRCDIR)/$(REPORT_STYLES_DIRNAME)/jreport.xsl $(NETX_UNIT_TEST_DIR)/tests-output.xml > $(TESTS_DIR)/index_unit.html
@@ -1561,7 +1574,7 @@ if WITH_JACOCO
 	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_BACKUP_SUFFIX)" ; \
 	done ;\
 	class_names=`cat $(UNIT_CLASS_NAMES)` ; \
-	CLASSPATH=$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) $(TEST_EXTENSIONS_DIR) $(JACOCO_CLASSPATH) . $(TEST_EXTENSIONS_SRCDIR) $(TAGSOUP_JAR)) ; \
+	CLASSPATH=$(call joinsegments, $(NETX_DIR)/lib/classes.jar $(TOP_BUILD_DIR)/liveconnect/lib/classes.jar $(JUNIT_RUNTIME) $(JUNIT_RUNNER_JAR) $(TEST_EXTENSIONS_DIR) $(JACOCO_CLASSPATH) . $(TEST_EXTENSIONS_SRCDIR) $(MSLINKS_JAR) $(TAGSOUP_JAR)) ; \
 	  $(SYSTEM_JRE_DIR)/bin/java $(JACOCO_AGENT_SWITCH) -Xbootclasspath/a:$$CLASSPATH CommandLine $$class_names ; \
 	for file in $(COVERAGE_MODIFIED_FILES) ; do \
 	  mv $(NETX_UNIT_TEST_DIR)/$$file  $(NETX_UNIT_TEST_DIR)/"$$file""$(EMMA_SUFFIX)" ; \

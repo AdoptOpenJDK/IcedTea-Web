@@ -82,6 +82,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
     private final JLabel lCompression;
     private final JLabel lCacheSize;
     private final JButton bViewFiles;
+    private final JButton bCleanByApp;
     private final JPanel diskSpacePanel;
 
     public TemporaryInternetFilesPanel(final DeploymentConfiguration config) {
@@ -111,6 +112,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         location = new JTextField(PathsAndFiles.CACHE_DIR.getFullPath(config));
         locationDescription = new JLabel(Translator.R("TIFPLocationLabel") + ":");
         bViewFiles = new JButton(Translator.R("TIFPViewFiles"));
+        bCleanByApp = new JButton(Translator.R("TIFPCleanByApp"));
 
         diskSpacePanel = new JPanel();
         diskSpacePanel.setLayout(new GridBagLayout());
@@ -235,6 +237,18 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
                 CacheViewer.showCacheDialog(config);
             }
         });
+        
+         bCleanByApp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                 CacheAppViewer psd = new CacheAppViewer(config);
+                 psd.setResizable(true);
+                 psd.centerDialog();
+                 psd.setVisible(true);
+                 psd.dispose();
+             }
+        });
+
 
         c.gridy = 4;
         c.gridx = 0;
@@ -250,8 +264,11 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         c.gridx = 2;
         c.weightx = 0.5;
         diskSpacePanel.add(bLocation, c);
-        c.gridx = 3;
+        c.gridy = 6;
+        c.gridx = 1;
         diskSpacePanel.add(bViewFiles, c);
+        c.gridx = 2;
+        diskSpacePanel.add(bCleanByApp, c);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());

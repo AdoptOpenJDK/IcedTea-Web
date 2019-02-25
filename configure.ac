@@ -158,6 +158,7 @@ IT_FIND_OPTIONAL_JAR([asm], ASM,
     [/usr/share/java/objectweb-asm4/asm-all.jar /usr/share/java/objectweb-asm4/asm-all-4.0.jar /usr/share/java/objectweb-asm/asm-all.jar])
 
 IT_CHECK_FOR_TAGSOUP
+IT_CHECK_FOR_MSLINKS
 
 if test "x$build_windows" = xyes ; then
   IT_CHECK_FOR_WIX

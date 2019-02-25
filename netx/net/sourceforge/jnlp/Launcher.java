@@ -83,6 +83,8 @@ public class Launcher {
     private ParserSettings parserSettings = new ParserSettings();
 
     private Map<String, List<String>> extra = null;
+    
+    public static final String KEY_JAVAWS_LOCATION = "icedtea-web.bin.location";
 
     /**
      * Create a launcher with the runtime's default update policy
@@ -422,7 +424,7 @@ public class Launcher {
             List<String> commands = new LinkedList<>();
 
             // this property is set by the javaws launcher to point to the javaws binary
-            String pathToWebstartBinary = System.getProperty("icedtea-web.bin.location");
+            String pathToWebstartBinary = System.getProperty(KEY_JAVAWS_LOCATION);
             commands.add(pathToWebstartBinary);
             // use -Jargument format to pass arguments to the JVM through the launcher
             for (String arg : vmArgs) {

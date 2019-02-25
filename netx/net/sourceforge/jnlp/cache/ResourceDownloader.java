@@ -29,7 +29,9 @@ import java.util.jar.Pack200;
 import java.util.zip.GZIPInputStream;
 
 import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.security.SecurityDialogs;
@@ -160,7 +162,6 @@ public class ResourceDownloader implements Runnable {
             if (lm == null) {
                 lm = connection.getLastModified();
             }
-
             boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
             if (!current) {
                 if (entry.isCached()) {
@@ -192,8 +193,33 @@ public class ResourceDownloader implements Runnable {
                 entry.setRemoteContentLength(size);
                 entry.setLastModified(lm);
             }
-
             entry.setLastUpdated(System.currentTimeMillis());
+            try { 
+                //do not die here no metter of cost. Just metadata
+                //is the path from user best to store? He can run some jnlp from temp which then be stored
+                //on contrary, this downloads the jnlp, we actually do not have jnlp parsed during first interaction
+                //in addition, downloaded name can be really nasty (some generated has from dynamic servlet.jnlp)
+                //anjother issue is forking. If this (eg local) jnlp starts its second isntance, the url *can* be different
+                //in contrary, usally si no. as fork is reusing all args, and only adding xmx/xms and xnofork.
+                String jnlpPath = Boot.getOptionParser().getMainArg(); //get jnlp from args passed 
+                if (jnlpPath == null || jnlpPath.equals("")) {
+                    jnlpPath = Boot.getOptionParser().getParam(OptionsDefinitions.OPTIONS.JNLP);
+                    if (jnlpPath == null || jnlpPath.equals("")) {
+                        jnlpPath = Boot.getOptionParser().getParam(OptionsDefinitions.OPTIONS.HTML);
+                        if (jnlpPath == null || jnlpPath.equals("")) {
+                            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Not-setting jnlp-path for missing main/jnlp/html argument");
+                        } else {
+                            entry.setJnlpPath(jnlpPath);
+                        }
+                    } else {
+                        entry.setJnlpPath(jnlpPath);
+                    }
+                } else {
+                    entry.setJnlpPath(jnlpPath);
+                }
+            } catch (Exception ex){
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            }
             entry.store();
 
             synchronized (lock) {

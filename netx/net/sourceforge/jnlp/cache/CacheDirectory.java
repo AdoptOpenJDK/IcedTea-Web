@@ -46,6 +46,8 @@ public final class CacheDirectory {
 
     /* Don't allow instantiation of this class */
     private CacheDirectory(){}
+    
+    public static final String INFO_SUFFIX = ".info";
 
     /**
      * Get the structure of directory for keeping track of the protocol and
@@ -56,7 +58,7 @@ public final class CacheDirectory {
     public static void getDirStructure(DirectoryNode root) {
         for (File f : root.getFile().listFiles()) {
             DirectoryNode node = new DirectoryNode(f.getName(), f, root);
-            if (f.isDirectory() || (!f.isDirectory() && !f.getName().endsWith(".info")))
+            if (f.isDirectory() || (!f.isDirectory() && !f.getName().endsWith(INFO_SUFFIX)))
                 root.addChild(node);
             if (f.isDirectory())
                 getDirStructure(node);
@@ -74,7 +76,7 @@ public final class CacheDirectory {
         for (DirectoryNode f : root.getChildren()) {
             if (f.isDir())
                 temp.addAll(getLeafData(f));
-            else if (!f.getName().endsWith(".info"))
+            else if (!f.getName().endsWith(INFO_SUFFIX))
                 temp.add(f);
         }
         return temp;

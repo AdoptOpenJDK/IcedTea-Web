@@ -29,23 +29,33 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.jnlp.DownloadServiceListener;
 
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.controlpanel.CachePane;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import net.sourceforge.jnlp.security.ConnectionFactory;
@@ -141,15 +151,11 @@ public class CacheUtil {
      * @return true if the cache could be cleared and was cleared
      */
     public static boolean clearCache() {
-
-        if (!okToClearCache()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("CCannotClearCache"));
-            return false;
-        }
-        
+        // clear all cache
         CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         File cacheDir = lruHandler.getCacheDir().getFile();
-        if (!(cacheDir.isDirectory())) {
+
+        if (!checkToClearCache()) {
             return false;
         }
 
@@ -157,6 +163,10 @@ public class CacheUtil {
         lruHandler.lock();
         try {
             cacheDir = cacheDir.getCanonicalFile();
+            // remove windows shortcuts before cache dir is gone
+            if (JNLPRuntime.isWindows()) {
+                removeWindowsShortcuts("ALL");
+            }
             FileUtils.recursiveDelete(cacheDir, cacheDir);
             cacheDir.mkdir();
             lruHandler.clearLRUSortedEntries();
@@ -167,6 +177,188 @@ public class CacheUtil {
             lruHandler.unlock();
         }
         return true;
+    }
+
+    public static boolean clearCache(final String application) {
+        // clear one app
+        if (!checkToClearCache()) {
+            return false;
+        }
+
+        OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("BXSingleCacheCleared", application));
+        List<CacheId> ids = getCacheIds(".*");
+        int found = 0;
+        int files = 0;
+        for (CacheId id : ids) {
+            if (id.getId().equalsIgnoreCase(application)) {
+                found++;
+                files += id.files.size();
+            }
+        }
+        if (found == 0) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("BXSingleCacheClearNotFound", application));
+        }
+        if (found > 1) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("BXSingleCacheMoreThenOneId", application));
+        }
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("BXSingleCacheFileCount", files));
+        CacheLRUWrapper.getInstance().lock();
+        try {
+            Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
+                @Override
+                public boolean test(Path t) {
+                    return Files.isRegularFile(t);
+                }
+            }).forEach(new Consumer<Path>() {
+                @Override
+                public void accept(Path path) {
+                    if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
+                        PropertiesFile pf = new PropertiesFile(new File(path.toString()));
+                        // if jnlp-path in .info equals path of app to delete mark to delete
+                        String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                        if (application.equalsIgnoreCase(jnlpPath) || application.equalsIgnoreCase(getDomain(path))) {
+                            pf.setProperty("delete", "true");
+                            pf.store();
+                            OutputController.getLogger().log("marked for deletion: " + path);
+                        }
+                    }
+                }
+            });
+            if (JNLPRuntime.isWindows()) {
+                removeWindowsShortcuts(application.toLowerCase());
+            }
+            // clean the cache of entries now marked for deletion
+            cleanCache();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            CacheLRUWrapper.getInstance().unlock();
+        }
+        return true;
+    }
+
+    public static boolean checkToClearCache() {
+        if (!okToClearCache()) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("CCannotClearCache"));
+            return false;
+        }
+        return CacheLRUWrapper.getInstance().getCacheDir().getFile().isDirectory();
+    }
+
+    public static void removeWindowsShortcuts(String jnlpApp)
+            throws IOException {
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Clearing Windows shortcuts");
+        if (CacheLRUWrapper.getInstance().getWindowsShortcutList().exists()) {
+            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), Charset.forName("UTF-8"));
+            Iterator it = lines.iterator();
+            Boolean fDelete;
+            while (it.hasNext()) {
+                String sItem = it.next().toString();
+                String[] sArray = sItem.split(",");
+                String application = sArray[0];
+                String sPath = sArray[1];
+                // if application is codebase then delete files
+                if (application.equalsIgnoreCase(jnlpApp)) {
+                    fDelete = true;
+                    it.remove();
+                } else {
+                    fDelete = false;
+                }
+                if (jnlpApp.equals("ALL")) {
+                    fDelete = true;
+                }
+                if (fDelete) {
+                    OutputController.getLogger().log("Deleting item = " + sPath);
+                    File scList = new File(sPath);
+                    try {
+                        FileUtils.recursiveDelete(scList, scList);
+                    } catch (Exception e) {
+                        OutputController.getLogger().log(e);
+                    }
+                }
+            }
+            if (jnlpApp.equals("ALL")) {
+                //delete shortcut list file
+                Files.deleteIfExists(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath());
+            } else {
+                //write file after application scuts have been removed
+                Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), lines, Charset.forName("UTF-8"));
+            }
+        }
+
+    }
+    
+     public static void listCacheIds(String filter) {
+         List<CacheId> items = getCacheIds(filter);
+         if (JNLPRuntime.isDebug()) {
+             for (CacheId id : items) {
+                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, id.getId()+" ("+id.getType()+") ["+id.files.size()+"]");
+                 for(Object[] o: id.getFiles()){
+                     StringBuilder sb = new StringBuilder();
+                     for (int i = 0; i < o.length; i++) {
+                         Object object = o[i];
+                         if (object == null) {
+                             object = "??";
+                         }
+                         sb.append(object.toString()).append(" ;  ");
+                     }
+                     OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  * " + sb);
+                 }
+             }
+         } else {
+             for (CacheId id : items) {
+                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, id.getId());
+             }
+         }
+     }
+     
+     /**
+      * This method load all known IDs of applications and  will gather all members, which share the id
+      * @return 
+      */
+      public static List<CacheId> getCacheIds(final String filter) {
+        CacheLRUWrapper.getInstance().lock();
+        final List<CacheId> r = new ArrayList<CacheId>();
+        try {
+            Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
+                @Override
+                public boolean test(Path t) {
+                    return Files.isRegularFile(t);
+                }
+            }).forEach(new Consumer<Path>() {
+                @Override
+                public void accept(Path path) {
+                    if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
+                        PropertiesFile pf = new PropertiesFile(new File(path.toString()));
+                        // if jnlp-path in .info equals path of app to delete mark to delete
+                        String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                        if (jnlpPath != null && jnlpPath.matches(filter)) {
+                            CacheId jnlpPathId = new CacheJnlpId(jnlpPath);
+                            if (!r.contains(jnlpPathId)) {
+                                r.add(jnlpPathId);
+                                jnlpPathId.populate();
+
+                            }
+                        }
+                        String domain = getDomain(path);
+                        if (domain != null && domain.matches(filter)) {
+                            CacheId doaminId = new CacheDomainId(domain);
+                            if (!r.contains(doaminId)) {
+                                r.add(doaminId);
+                                doaminId.populate();
+
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            CacheLRUWrapper.getInstance().unlock();
+        }
+        return r;
     }
 
     /**
@@ -395,7 +587,7 @@ public class CacheUtil {
                         try {
                             cacheFile = urlToPath(source, path);
                             FileUtils.createParentDir(cacheFile);
-                            File pf = new File(cacheFile.getPath() + ".info");
+                            File pf = new File(cacheFile.getPath() + CacheDirectory.INFO_SUFFIX);
                             FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
                             lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
                         } catch (IOException ioe) {
@@ -630,7 +822,7 @@ public class CacheUtil {
                     final String path = e.getValue();
 
                     File file = new File(path);
-                    PropertiesFile pf = new PropertiesFile(new File(path + ".info"));
+                    PropertiesFile pf = new PropertiesFile(new File(path + CacheDirectory.INFO_SUFFIX));
                     boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
 
                 /*
@@ -694,5 +886,136 @@ public class CacheUtil {
             } catch (IOException e) {
             }
         }
+    }
+
+    static class CacheJnlpId extends CacheId {
+
+        public CacheJnlpId(String id) {
+            super(id);
+        }
+
+        @Override
+        public void populate() {
+            ArrayList<Object[]> all = CachePane.generateData();
+            for (Object[] object : all) {
+                if (id.equals(object[6])) {
+                    this.files.add(object);
+                }
+            }
+        }
+
+        @Override
+        String getType() {
+            return "JNLP-PATH";
+        }
+
+        @Override
+        //hascode in super is ok
+        public boolean equals(Object obj) {
+            if (obj instanceof CacheJnlpId) {
+                return super.equals(obj);
+            } else {
+                return false;
+            }
+        }
+
+    }
+
+    static class CacheDomainId extends CacheId {
+
+        public CacheDomainId(String id) {
+            super(id);
+        }
+
+        @Override
+        public void populate() {
+            ArrayList<Object[]> all = CachePane.generateData();
+            for (Object[] object : all) {
+                if (id.equals(object[3].toString())) {
+                    this.files.add(object);
+                }
+            }
+        }
+
+        @Override
+        String getType() {
+            return "DOMAIN";
+        }
+
+        @Override
+        //hascode in super is ok
+        public boolean equals(Object obj) {
+            if (obj instanceof CacheDomainId) {
+                return super.equals(obj);
+            } else {
+                return false;
+            }
+        }
+
+    }
+
+    public abstract static class CacheId {
+
+        //last century array of objects instead of some nice class inherited from previous century
+        protected final List<Object[]> files = new ArrayList<>();
+
+        abstract void populate();
+
+        abstract String getType();
+
+        protected final String id;
+
+        public CacheId(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public String toString() {
+            return id;
+        }   
+
+        public List<Object[]> getFiles() {
+            return files;
+        }
+
+        public String getId() {
+            return id;
+        }
+        
+        
+        
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof CacheId) {
+                CacheId c = (CacheId) obj;
+                if (c.id == null && this.id == null) {
+                    return true;
+                }
+                if (c.id == null) {
+                    return false;
+                }
+                return c.id.equals(this.id);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(this.id);
+        }
+
+    }
+
+    private static String getDomain(Path path) {
+        String relativeToCache = path.toAbsolutePath().toString().replace(CacheLRUWrapper.getInstance().getCacheDir().getFullPath(), "");
+        for (int x = 0; x < 3; x++) {
+            int i = relativeToCache.indexOf(File.separator);
+            relativeToCache = relativeToCache.substring(i + 1);
+        }
+        int i = relativeToCache.indexOf(File.separator);
+        relativeToCache = relativeToCache.substring(0, i);
+        return relativeToCache;
     }
 }

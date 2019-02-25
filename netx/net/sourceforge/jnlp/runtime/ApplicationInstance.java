@@ -18,6 +18,9 @@ package net.sourceforge.jnlp.runtime;
 
 import java.awt.Window;
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.security.AccessControlContext;
 import java.security.AccessController;
@@ -28,7 +31,6 @@ import java.security.ProtectionDomain;
 import javax.swing.event.EventListenerList;
 
 import sun.awt.AppContext;
-
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.SecurityDesc;
@@ -39,6 +41,7 @@ import net.sourceforge.jnlp.event.ApplicationListener;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.util.GenericDesktopEntry;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.XDesktopEntry;
@@ -150,47 +153,99 @@ public class ApplicationInstance {
      */
 
     private void addMenuAndDesktopEntries() {
-        XDesktopEntry entry = new XDesktopEntry(file);
         ShortcutDesc sd = file.getInformation().getShortcut();
-        File possibleDesktopFile = entry.getDesktopIconFile();
-        File possibleMenuFile = entry.getLinuxMenuIconFile();
-        File generatedJnlp = entry.getGeneratedJnlpFileName();
-        //if one of menu or desktop exists, do not bother user
-        boolean exists = false;
-        if (possibleDesktopFile.exists()) {
-            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
-                    + possibleDesktopFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
-            exists = true;
-            if (JNLPRuntime.isOnline()) {
-                entry.refreshExistingShortcuts(false, true); //update
+        if (JNLPRuntime.isWindows()) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Generating windows desktop shorcut");
+            try {
+                Object instance = null;
+                try {
+                    Class cl = Class.forName("net.sourceforge.jnlp.util.WindowsDesktopEntry");
+                    Constructor cons = cl.getConstructor(JNLPFile.class);
+                    instance = cons.newInstance(file);
+                    //catch both, for case that mslink was removed after build
+                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
+                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, e);
+                }
+                GenericDesktopEntry wde = (GenericDesktopEntry) instance;
+                if (!wde.getDesktopIconFile().exists()) {
+                    // if the desktop shortcut doesn't exist ask
+                    AccessWarningPaneComplexReturn ics = getComplexReturn(sd);
+                    if (ics != null && ics.toBoolean()) {
+                        boolean isDesktop = false;
+                        if (ics.getDekstop() != null && ics.getDekstop().isCreate()) {
+                            isDesktop = true;
+                        }
+                        boolean isMenu = false;
+                        if (ics.getMenu() != null && ics.getMenu().isCreate()) {
+                            isMenu = true;
+                        }
+                        // if setting is always create theen ics will be true but "get" properties will be null, so set to create
+                        if (ics.getDekstop() == null && ics.toBoolean()) {
+                            isDesktop = true;
+                        };
+                        if (ics.getMenu() == null && ics.toBoolean()) {
+                            isMenu = true;
+                        };
+                        // create shortcuts if its ok
+                        if (isDesktop) {
+                            wde.createShortcutOnWindowsDesktop();
+                        }
+                        if (isMenu) {
+                            wde.createWindowsMenu();
+                        }
+                    }
+                } else {
+                    // refresh shortcut if it already exists
+                    wde.createShortcutOnWindowsDesktop();
+                    wde.createWindowsMenu();
+                }
+            } catch (Throwable ex) {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, ex);
+                String message = Translator.R("WinDesktopError");
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, message);
             }
+        } else {
+            // do non-windows desktop stuff
+            GenericDesktopEntry entry = new XDesktopEntry(file);
+            File possibleDesktopFile = entry.getDesktopIconFile();
+            File possibleMenuFile = entry.getLinuxMenuIconFile();
+            File generatedJnlp = entry.getGeneratedJnlpFileName();
+	        //if one of menu or desktop exists, do not bother user
+	        boolean exists = false;
+	        if (possibleDesktopFile.exists()) {
+	            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
+	                    + possibleDesktopFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+	            exists = true;
+	            if (JNLPRuntime.isOnline()) {
+	                entry.refreshExistingShortcuts(false, true); //update
+	            }
+	        }
+	        if (possibleMenuFile.exists()) {
+	            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
+	                    + possibleMenuFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+	            exists = true;
+	            if (JNLPRuntime.isOnline()) {
+	                entry.refreshExistingShortcuts(true, false); //update
+	            }
+	        }
+	        if (generatedJnlp.exists()) {
+	            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): generated file - "
+	                    + generatedJnlp.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+	            exists = true;
+	            if (JNLPRuntime.isOnline()) {
+	                entry.refreshExistingShortcuts(true, true); //update
+	            }
+	        }
+	        if (exists){
+	            return;
+	        }
+	        AccessWarningPaneComplexReturn ics = getComplexReturn(sd);
+	        if (ics !=null && ics.toBoolean()) {
+	            entry.createDesktopShortcuts(ics.getMenu(), ics.getDekstop(), isSigned());
+	        }
         }
-        if (possibleMenuFile.exists()) {
-            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
-                    + possibleMenuFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
-            exists = true;
-            if (JNLPRuntime.isOnline()) {
-                entry.refreshExistingShortcuts(true, false); //update
-            }
-        }
-        if (generatedJnlp.exists()) {
-            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): generated file - "
-                    + generatedJnlp.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
-            exists = true;
-            if (JNLPRuntime.isOnline()) {
-                entry.refreshExistingShortcuts(true, true); //update
-            }
-        }
-        if (exists){
-            return;
-        }
-        AccessWarningPaneComplexReturn ics = getComplexReturn(sd);
-        if (ics !=null && ics.toBoolean()) {
-            entry.createDesktopShortcuts(ics.getMenu(), ics.getDekstop(), isSigned());
-        }
-
     }
-
+ 	   
     /**
      * Indicates whether a desktop launcher/shortcut should be created for this
      * application instance

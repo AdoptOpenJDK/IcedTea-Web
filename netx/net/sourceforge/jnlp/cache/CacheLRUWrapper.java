@@ -70,6 +70,7 @@ public class CacheLRUWrapper {
     
     private final InfrastructureFileDescriptor recentlyUsedPropertiesFile;
     private final InfrastructureFileDescriptor cacheDir;
+    private final File windowsShortcutList;
     
     public CacheLRUWrapper() {
         this(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
@@ -81,9 +82,10 @@ public class CacheLRUWrapper {
      * @param recentlyUsed file to be used as recently_used file
      * @param cacheDir dir with cache
      */
-    public CacheLRUWrapper(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
+    CacheLRUWrapper(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
         recentlyUsedPropertiesFile = recentlyUsed;
         this.cacheDir = cacheDir;
+        windowsShortcutList = new File(cacheDir.getFile(), "shortcutList.txt");
         if (!recentlyUsed.getFile().exists()) {
             try {
                 FileUtils.createParentDir(recentlyUsed.getFile());
@@ -136,6 +138,10 @@ public class CacheLRUWrapper {
         return cacheDir;
     }
 
+    public File getWindowsShortcutList() {
+        return windowsShortcutList;
+    }
+    
     /**
      * @return the recentlyUsedFile
      */
