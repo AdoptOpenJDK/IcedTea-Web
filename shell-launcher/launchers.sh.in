@@ -2,6 +2,7 @@
 
 NASHORN=lib/ext/nashorn.jar
 JRE=@JRE@
+#unused
 JAVA=$JRE/bin/java
 LAUNCHER_BOOTCLASSPATH='@LAUNCHER_BOOTCLASSPATH@'
 LAUNCHER_FLAGS=-Xms8m
@@ -51,6 +52,10 @@ fi;
 if [ "x$CUSTOM_JRE" = "x" ] ; then
   CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" /etc/.java/.deploy/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
 fi;
+if [ ! "x$JAVA_HOME" = "x" ] ; then
+  echo "Warning! JAVA_HOME of $JAVA_HOME in play!"
+  CUSTOM_JRE=$JAVA_HOME
+fi
 
 
 # Support portable ITW:
@@ -82,7 +87,7 @@ if [ "x$CUSTOM_JRE" != "x" ] ; then
     CP=$CUSTOM_JRE/lib/rt.jar:$CUSTOM_JRE/lib/jfxrt.jar
     LAUNCHER_BOOTCLASSPATH=$LAUNCHER_BOOTCLASSPATH:$CUSTOM_JRE/$NASHORN
   else
-    echo "Your custom JRE $CUSTOM_JRE read from deployment.properties under key $PROPERTY_NAME as $CUSTOM_JRE is not valid. Using default ($JAVA, $CP) in attempt to start. Please fix this."
+    echo "Your custom JRE $CUSTOM_JRE read from deployment.properties under key $PROPERTY_NAME as $CUSTOM_JRE is not valid. Using default ($JRE, $CP) in attempt to start. Please fix this."
   fi
 else
   LAUNCHER_BOOTCLASSPATH="$LAUNCHER_BOOTCLASSPATH:$JRE/$NASHORN"
