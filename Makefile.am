@@ -1288,7 +1288,10 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 	touch $@
 
 stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepare-reproducers.stamp
-	keystore=$(TOP_BUILD_DIR)/$(PRIVATE_KEYSTORE_NAME); \
+	export keystore=$(TOP_BUILD_DIR)/$(PRIVATE_KEYSTORE_NAME); \
+	if [ which cygpath ] ; then \
+	  export keystore=$(shell cygpath -p -m "$$keystore") ; \
+	fi ; \
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
 	  tcaw=$(TEST_CERT_ALIAS)_$$which ; \
@@ -1344,7 +1347,10 @@ stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
 	if test "x$$PUBLIC_KEYSTORE" = x; then \
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
-	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	if [ which cygpath ] ; then \
+	  export PUBLIC_KEYSTORE=$(shell cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
+	fi ; \
 	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
 	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
 	for which in "$${types[@]}" ; do \
@@ -1363,7 +1369,10 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	if test "x$$PUBLIC_KEYSTORE" = x; then \
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
-	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	if [ which cygpath ] ; then \
+	  export PUBLIC_KEYSTORE=$(shell cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
+	fi ; \
 	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
 	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
 	for which in "$${types[@]}" ; do \
@@ -1378,7 +1387,10 @@ netx-dist-tests-remove-cert-from-public:
 	if test "x$$PUBLIC_KEYSTORE" = x; then \
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
-	PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
+	if [ which cygpath ] ; then \
+	  export PUBLIC_KEYSTORE=$(shell cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
+	fi ; \
 	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
 	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
 	for which in "$${types[@]}" ; do \
