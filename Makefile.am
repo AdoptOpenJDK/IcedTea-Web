@@ -1274,7 +1274,7 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 	      then \
 	       export TMP_MANIFEST=`mktemp` ; \
 	       echo "$$AN $$dir" > $$TMP_MANIFEST ; \
-	       if  which cygpath  ; then \
+	       if  which cygpath &> /dev/null  ; then \
 	         export TMP_MANIFEST=$$(cygpath -p -m "$$TMP_MANIFEST") ; \
 	       fi ; \
 	       $(SYSTEM_JDK_DIR)/bin/jar ufm "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$TMP_MANIFEST ; \
@@ -1345,7 +1345,7 @@ stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
-	if  which cygpath  ; then \
+	if  which cygpath &> /dev/null  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
 	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
@@ -1367,7 +1367,7 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
-	if  which cygpath  ; then \
+	if  which cygpath &> /dev/null  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
 	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
@@ -1385,7 +1385,7 @@ netx-dist-tests-remove-cert-from-public:
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
-	if  which cygpath  ; then \
+	if  which cygpath &> /dev/null  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
 	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
