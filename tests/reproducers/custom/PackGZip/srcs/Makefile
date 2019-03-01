@@ -6,7 +6,11 @@ JAR=$(EXPORTED_JAR)
 JARSIGNER=$(EXPORTED_JARSIGNER)
 PACKER=$(EXPORTED_PACK200)
 
-TMPDIR:=$(shell mktemp -d)
+ifeq ($(OS), Windows_NT)
+	TMPDIR:=$(shell cygpath -p -m $(shell mktemp -d))
+else
+	TMPDIR:=$(shell mktemp -d)
+endif
 
 prepare-reproducer:
 	echo PREPARING REPRODUCER $(TESTNAME)

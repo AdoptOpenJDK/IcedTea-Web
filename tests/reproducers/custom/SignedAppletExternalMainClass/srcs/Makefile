@@ -4,7 +4,11 @@ JARSIGNER=$(EXPORTED_JARSIGNER)
 JAVAC=$(EXPORTED_JAVAC)
 JAR=$(EXPORTED_JAR)
 
-TMPDIR:=$(shell mktemp -d)
+ifeq ($(OS), Windows_NT)
+	TMPDIR:=$(shell cygpath -p -m $(shell mktemp -d))
+else
+	TMPDIR:=$(shell mktemp -d)
+endif
 
 prepare-reproducer: 
 	echo PREPARING REPRODUCER $(TESTNAME) in $(TMPDIR)
