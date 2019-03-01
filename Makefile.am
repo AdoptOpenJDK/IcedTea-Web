@@ -1348,8 +1348,8 @@ stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
 	if  which cygpath  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
-	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
-	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
+	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
+	[ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
 	  $(SYSTEM_JDK_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
@@ -1370,8 +1370,8 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	if  which cygpath  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
-	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
-	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
+	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
+  [ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
 	  yes | $(SYSTEM_JDK_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) ;\
 	done ;
@@ -1388,8 +1388,8 @@ netx-dist-tests-remove-cert-from-public:
 	if  which cygpath  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
-	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
-	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
+	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
+  [ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
 	  $(SYSTEM_JDK_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
