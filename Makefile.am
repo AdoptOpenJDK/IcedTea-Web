@@ -880,7 +880,7 @@ stamps/netx-html-gen.stamp:
 	mkdir -p html-gen; \
 	cp AUTHORS NEWS COPYING ChangeLog html-gen/; \
 	export HTML_GEN_DEBUG=true; \
-	${SHELL} html-gen.sh 7; \
+	${SHELL} html-gen.sh 236; \
 	unset HTML_GEN_DEBUG)
 	${INSTALL_DATA} $(NETX_SRCDIR)/../html-gen/*.html $(NETX_RESOURCE_DIR)
 	rm -r $(NETX_SRCDIR)/../html-gen/
@@ -930,6 +930,7 @@ clean-desktop-files:
 	rm -f javaws.desktop
 	rm -f itweb-settings.desktop
 	rm -f policyeditor.desktop
+
 
 # launcher run args:
 launcher.build/$(MODULARJDK_ARGS_FILE): $(srcdir)/$(MODULARJDK_ARGS_FILE)
@@ -1173,7 +1174,7 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 	      then \
 	       export TMP_MANIFEST=`mktemp` ; \
 	       echo "$$AN $$dir" > $$TMP_MANIFEST ; \
-	       if  which cygpath  ; then \
+	       if  which cygpath &> /dev/null  ; then \
 	         export TMP_MANIFEST=$$(cygpath -p -m "$$TMP_MANIFEST") ; \
 	       fi ; \
 	       $(SYSTEM_JDK_DIR)/bin/jar ufm "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$TMP_MANIFEST ; \
@@ -1238,17 +1239,17 @@ stamps/change-dots-to-paths.stamp: stamps/netx-dist-tests-sign-some-reproducers.
 #the code is copypasted from netx-dist-tests-remove-cert-from-public, because 
 #with depending to not stamped target we always have to rerun reproducers targets
 stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
-	-types=($(SIGNED_REPRODUCERS)) ; \
+	types=($(SIGNED_REPRODUCERS)) ; \
 	PUBLIC_KEYSTORE=$$XDG_CONFIG_HOME ; \
 	if test "x$$PUBLIC_KEYSTORE" = x; then \
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
-	if  which cygpath  ; then \
+	if  which cygpath &> /dev/null  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
-	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
-	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
+	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
+	[ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
 	  $(SYSTEM_JDK_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
@@ -1266,11 +1267,11 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
-	if  which cygpath  ; then \
+	if  which cygpath &> /dev/null  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
-	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
-	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
+	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
+	[ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
 	  yes | $(SYSTEM_JDK_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) ;\
 	done ;
@@ -1278,17 +1279,17 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	touch $@
 
 netx-dist-tests-remove-cert-from-public:
-	-types=($(SIGNED_REPRODUCERS)) ; \
+	types=($(SIGNED_REPRODUCERS)) ; \
 	PUBLIC_KEYSTORE=$$XDG_CONFIG_HOME ; \
 	if test "x$$PUBLIC_KEYSTORE" = x; then \
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
-	if  which cygpath  ; then \
+	if  which cygpath &> /dev/null  ; then \
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
-	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
-	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
+	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
+	[ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
 	  $(SYSTEM_JDK_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
