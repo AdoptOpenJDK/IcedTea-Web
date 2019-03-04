@@ -1174,7 +1174,7 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 	       export TMP_MANIFEST=`mktemp` ; \
 	       echo "$$AN $$dir" > $$TMP_MANIFEST ; \
 	       if  which cygpath  ; then \
-	         export TMP_MANIFEST=$(shell cygpath -p -m "$$TMP_MANIFEST") ; \
+	         export TMP_MANIFEST=$$(cygpath -p -m "$$TMP_MANIFEST") ; \
 	       fi ; \
 	       $(SYSTEM_JDK_DIR)/bin/jar ufm "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$TMP_MANIFEST ; \
 	       rm -f $$TMP_MANIFEST ; \
@@ -1189,7 +1189,7 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepare-reproducers.stamp
 	export keystore=$(TOP_BUILD_DIR)/$(PRIVATE_KEYSTORE_NAME); \
 	if  which cygpath  ; then \
-	  export keystore=$(shell cygpath -p -m "$$keystore") ; \
+	  export keystore=$$(cygpath -p -m "$$keystore") ; \
 	fi ; \
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
@@ -1248,7 +1248,7 @@ stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
 	if  which cygpath  ; then \
-	  export PUBLIC_KEYSTORE=$(shell cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
+	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
 	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
 	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
@@ -1270,7 +1270,7 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
 	if  which cygpath  ; then \
-	  export PUBLIC_KEYSTORE=$(shell cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
+	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
 	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
 	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
@@ -1288,7 +1288,7 @@ netx-dist-tests-remove-cert-from-public:
 	fi ;\
 	export PUBLIC_KEYSTORE=$$PUBLIC_KEYSTORE/$(PUBLIC_KEYSTORE_STUB); \
 	if  which cygpath  ; then \
-	  export PUBLIC_KEYSTORE=$(shell cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
+	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
 	keystoredir=`dirname $(PUBLIC_KEYSTORE)`; \
 	[ ! -d $(keystoredir) ] && mkdir -p $(keystoredir); \
