@@ -1188,9 +1188,6 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 
 stamps/netx-dist-tests-sign-some-reproducers.stamp: stamps/netx-dist-tests-prepare-reproducers.stamp
 	export keystore=$(TOP_BUILD_DIR)/$(PRIVATE_KEYSTORE_NAME); \
-	if  which cygpath  ; then \
-	  export keystore=$$(cygpath -p -m "$$keystore") ; \
-	fi ; \
 	types=($(SIGNED_REPRODUCERS)) ; \
 	for which in "$${types[@]}" ; do \
 	  tcaw=$(TEST_CERT_ALIAS)_$$which ; \
