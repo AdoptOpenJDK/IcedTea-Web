@@ -1,4 +1,10 @@
 2019-02-27  Jiri Vanek <jvanek@redhat.com>
+            Alexandr Kolouch  <skolnag@gmail.com>
+
+	Added Czech translation for 1.8
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: adapted
+
+2019-02-27  Jiri Vanek <jvanek@redhat.com>
 
 	keytool command used to create test keystores is called windows friendly
 	* Makefile.am: path to keystore or PUBLIC_KEYSTORE is preprocessed via cygapth on windows
