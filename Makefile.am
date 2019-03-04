@@ -1155,7 +1155,7 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 	      cd "$(REPRODUCERS_TESTS_SRCDIR)/$$which/$$dir/srcs/" ; \
 	      srcFiles=`find . -mindepth 1 -type f -name "*.java" | sed "s/.\/*//"` ; \
 	      notSrcFiles=`find . -mindepth 1 -type f \! -name "*.java" | sed "s/.\/*//"` ; \
-	      $(SYSTEM_JDK_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar:$(TOP_BUILD_DIR)/liveconnect -d "$(REPRODUCERS_BUILD_DIR)/$$dir/" $$srcFiles ; \
+	      $(SYSTEM_JDK_DIR)/bin/javac -cp $(NETX_DIR)/lib/classes.jar\$(CLASSPATH_SEPARATOR)$(TOP_BUILD_DIR)/liveconnect -d "$(REPRODUCERS_BUILD_DIR)/$$dir/" $$srcFiles ; \
 	      if [ -n "$$notSrcFiles" ] ; then \
 	        cp -R --parents $$notSrcFiles "$(REPRODUCERS_BUILD_DIR)/$$dir/" ; \
 	      fi ; \
