@@ -1,3 +1,8 @@
+2019-02-25  Olesya Gerasimenko <gammaray@basealt.ru>
+
+	Updated Russian translation
+	* netx/net/sourceforge/jnlp/resources/Messages_ru.properties: adapted to current state
+
 2019-02-13  Jiri Vanek <jvanek@redhat.com>
 
 	Propagating unimplemented DownloadService2. Added tests for it
