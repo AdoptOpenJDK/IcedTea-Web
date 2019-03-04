@@ -1,5 +1,11 @@
 2019-02-27  Jiri Vanek <jvanek@redhat.com>
 
+	jar command used to pack reproducers is called windows friendly
+	* Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp) TMP_MANIFEST is now exported so it can reach 
+	subshell of cygpath. If cygpath is in on PATH, TMP_MANIFEST path is cygpathed
+
+2019-02-27  Jiri Vanek <jvanek@redhat.com>
+
 	shell launcher got support for JAVA_HOME
 	* shell-launcher/launchers.sh.in: if JAVA_HOME is detected, is used as most preferred
 

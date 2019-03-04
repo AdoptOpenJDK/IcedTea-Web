@@ -1171,8 +1171,11 @@ stamps/netx-dist-tests-prepare-reproducers.stamp: stamps/junit-jnlp-dist-dirs st
 	      GREP_R=$$?; \
 	      if [ ! -f $(META_MANIFEST) -o  $$GREP_R -ne 0  ]; \
 	      then \
-	       TMP_MANIFEST=`mktemp` ; \
+	       export TMP_MANIFEST=`mktemp` ; \
 	       echo "$$AN $$dir" > $$TMP_MANIFEST ; \
+	       if [ which cygpath ] ; then \
+	         export TMP_MANIFEST=$(shell cygpath -p -m "$$TMP_MANIFEST") ; \
+	       fi ; \
 	       $(SYSTEM_JDK_DIR)/bin/jar ufm "$(REPRODUCERS_TESTS_SERVER_DEPLOYDIR)/$$dir.jar"  $$TMP_MANIFEST ; \
 	       rm -f $$TMP_MANIFEST ; \
 	      fi ; \
