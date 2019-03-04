@@ -1339,7 +1339,7 @@ stamps/change-dots-to-paths.stamp: stamps/netx-dist-tests-sign-some-reproducers.
 #the code is copypasted from netx-dist-tests-remove-cert-from-public, because 
 #with depending to not stamped target we always have to rerun reproducers targets
 stamps/exported-test-certs.stamp: stamps/change-dots-to-paths.stamp
-	-types=($(SIGNED_REPRODUCERS)) ; \
+	types=($(SIGNED_REPRODUCERS)) ; \
 	PUBLIC_KEYSTORE=$$XDG_CONFIG_HOME ; \
 	if test "x$$PUBLIC_KEYSTORE" = x; then \
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
@@ -1371,7 +1371,7 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
 	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
-  [ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
+	[ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
 	  yes | $(SYSTEM_JDK_DIR)/bin/keytool -import -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) -file $(EXPORTED_TEST_CERT_PREFIX)_$$which.$(EXPORTED_TEST_CERT_SUFFIX) ;\
 	done ;
@@ -1379,7 +1379,7 @@ stamps/netx-dist-tests-import-cert-to-public: stamps/exported-test-certs.stamp
 	touch $@
 
 netx-dist-tests-remove-cert-from-public:
-	-types=($(SIGNED_REPRODUCERS)) ; \
+	types=($(SIGNED_REPRODUCERS)) ; \
 	PUBLIC_KEYSTORE=$$XDG_CONFIG_HOME ; \
 	if test "x$$PUBLIC_KEYSTORE" = x; then \
 	  PUBLIC_KEYSTORE=${HOME}/.config ; \
@@ -1389,7 +1389,7 @@ netx-dist-tests-remove-cert-from-public:
 	  export PUBLIC_KEYSTORE=$$(cygpath -p -m "$$PUBLIC_KEYSTORE") ; \
 	fi ; \
 	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
-  [ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
+	[ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
 	  $(SYSTEM_JDK_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
 	done ;
