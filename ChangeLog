@@ -1,3 +1,8 @@
+2019-02-27  Jiri Vanek <jvanek@redhat.com>
+
+	shell launcher got support for JAVA_HOME
+	* shell-launcher/launchers.sh.in: if JAVA_HOME is detected, is used as most preferred
+
 2019-02-25  Olesya Gerasimenko <gammaray@basealt.ru>
 
 	Updated Russian translation
