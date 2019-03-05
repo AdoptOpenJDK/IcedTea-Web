@@ -174,7 +174,7 @@ endif
 
 NETX_JAR=$(datadir)/$(PACKAGE_NAME)/netx.jar
 SPLASH_PNG=$(datadir)/$(PACKAGE_NAME)/javaws_splash.png
-MODULARJDK_ARGS_LOCATION=$(DESTDIR)/$(MODULARJDK_ARGS_DIR)/$(MODULARJDK_ARGS_FILE)
+MODULARJDK_ARGS_LOCATION=$(DESTDIR)$(MODULARJDK_ARGS_DIR)/$(MODULARJDK_ARGS_FILE)
 
 
 # Conditional defintions
@@ -254,9 +254,11 @@ endif
 if ENABLE_NATIVE_PLUGIN
   CPPUNIT_IMPL = run-cpp-unit-tests-impl
   CPPUNIT_CLEAN_IMPL = clean-cpp-unit-tests-impl
+  CPPUNIT_FRAMEWORK_CLEAN_IMPL = clean-unittest++-impl
 else
   CPPUNIT_IMPL = run-cpp-unit-tests-impl-placeholder
   CPPUNIT_CLEAN_IMPL = clean-cpp-unit-tests-placeholder
+  CPPUNIT_FRAMEWORK_CLEAN_IMPL = clean-unittest++-placeholder
 endif
 
 if CP_SUPPORTS_REFLINK
@@ -389,7 +391,7 @@ endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(NETX_JAR)
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(SPLASH_PNG)
 	${INSTALL_DATA} $(TOP_SRC_DIR)/javaws.png $(ICONS_DEST_DIR)/
-	mkdir -p $(DESTDIR)/$(MODULARJDK_ARGS_DIR)
+	mkdir -p $(DESTDIR)$(MODULARJDK_ARGS_DIR)
 	cp launcher.build/$(MODULARJDK_ARGS_FILE) $(MODULARJDK_ARGS_LOCATION)
 if ENABLE_NATIVE_LAUNCHERS
 	${INSTALL_PROGRAM} launcher.build/$(javaws) $(DESTDIR)$(bindir)
@@ -625,7 +627,7 @@ $(CPP_UNITTEST_FRAMEWORK_LIB): $(CPP_UNITTEST_FRAMEWORK_SRCDIR)
 	ar cr $(CPP_UNITTEST_FRAMEWORK_LIB) $(CPP_UNITTEST_FRAMEWORK_BUILDDIR)/*.o ; \
 	popd
 
-clean-unittest++:
+clean-unittest++-impl:
 	rm -f $(CPP_UNITTEST_FRAMEWORK_BUILDDIR)/*.o
 	rm -f $(CPP_UNITTEST_FRAMEWORK_LIB)
 	if [ -e $(CPP_UNITTEST_FRAMEWORK_BUILDDIR) ] ; then \
@@ -696,11 +698,15 @@ clean-IcedTeaPlugin:
 	fi
 endif
 
+clean-unittest++-placeholder:
+
 clean-cpp-unit-tests-placeholder:
 	echo "plugin disabled"
 
 run-cpp-unit-tests-impl-placeholder:
 	echo "plugin disabled"
+
+clean-unittest++: $(CPPUNIT_FRAMEWORK_CLEAN_IMPL)
 
 clean-cpp-unit-tests: $(CPPUNIT_CLEAN_IMPL)
 
