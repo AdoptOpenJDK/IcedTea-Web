@@ -47,6 +47,14 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
 	        SYSTEM_JDK_DIR=
               ])
   if test -z "${SYSTEM_JDK_DIR}"; then
+    AM_COND_IF([WINDOWS], [
+      # does not work, use which instead
+      # AC_CHECK_PROGS([SYSTEM_JAVA_IN_PATH], [java.exe]) 
+      SYSTEM_JAVA_IN_PATH=$(which javac 2>&AS_MESSAGE_LOG_FD)      
+      if test x"${SYSTEM_JAVA_IN_PATH}" != x ; then
+        SYSTEM_JDK_DIR=$(dirname $(dirname ${SYSTEM_JAVA_IN_PATH}))
+      fi
+    ] , [
     for dir in /etc/alternatives/java_sdk \
                /usr/lib/jvm/java-1.9.0-openjdk \
                /usr/lib/jvm/icedtea9 \
@@ -64,15 +72,8 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
 	 break
        fi
     done
-  fi
-  AM_COND_IF([WINDOWS], [
-    # does not work, use which instead
-    # AC_CHECK_PROGS([SYSTEM_JAVA_IN_PATH], [java.exe]) 
-    SYSTEM_JAVA_IN_PATH=$(which java 2>&AS_MESSAGE_LOG_FD)
-    if test x"${SYSTEM_JAVA_IN_PATH}" != x ; then
-      SYSTEM_JDK_DIR=$(dirname $(dirname ${SYSTEM_JAVA_IN_PATH}))
-    fi
   ])
+  fi
   if ! test -d "${SYSTEM_JDK_DIR}"; then
     AC_MSG_ERROR("A JDK home directory could not be found. ${SYSTEM_JDK_DIR}")
   else

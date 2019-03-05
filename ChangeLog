@@ -1,4 +1,9 @@
 2019-03-05  Lars Herschke <lhersch@dssgmbh.de>
+
+	* acinclude.m4: Moved windows specific check for JDK on the begging of  SYSTEM_JDK part of IT_CHECK_FOR_JDK macro
+	to fix search on windows
+
+2019-03-05  Lars Herschke <lhersch@dssgmbh.de>
             
 	* Makefile.am: removed dual slash between destdir and modularjdk, included CPPUNIT_FRAMEWORK_CLEAN_IMPL with
 	clean-unittest++-impl/plaeholder to avoid fail of unknown target when native plugin is gone. Cleaning up rust_test_tmp 
