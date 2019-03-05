@@ -1,3 +1,11 @@
+2019-03-05  Jiri Vanek <jvanek@redhat.com>
+            Lars Herschke <lhersch@dssgmbh.de>
+
+	Fixed path to jfxrt.jar from lib/jfxrt.jar to ext/lib
+	* rust-launcher/src/jars_helper.rs: in (get_cp_members)
+	* shell-launcher/launchers.bat.in: in both CP and CUSTOM_JRE
+	* shell-launcher/launchers.sh.in: in both CP and CUSTOM_JRE
+
 2019-03-05  Lars Herschke <lhersch@dssgmbh.de>
 
 	* acinclude.m4: Moved windows specific check for JDK on the begging of  SYSTEM_JDK part of IT_CHECK_FOR_JDK macro

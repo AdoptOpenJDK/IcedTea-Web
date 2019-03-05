@@ -24,7 +24,7 @@ set "BINARY_LOCATION=@BIN_LOCATION@.bat"
 set "SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@"
 set "RUN_ARGS_LOCATION=@MODULARJDK_ARGS_LOCATION@"
 set "PROGRAM_NAME=@PROGRAM_NAME@"
-set "CP=%JRE%/lib/rt.jar;%JRE%/lib/jfxrt.jar"
+set "CP=%JRE%/lib/rt.jar;%JRE%/lib/ext/jfxrt.jar"
 
 rem individual parts of bootclasspath for more easy processing
 set "NETX_JAR=@NETX_JAR@"
@@ -99,7 +99,7 @@ if not "%ITW_HOME%" == "" (
 rem Fix classpaths for custom JRE:
 if not "%CUSTOM_JRE%" == "" (
   set "JAVA=%CUSTOM_JRE%/bin/java"
-  set "CP=%CUSTOM_JRE%/lib/rt.jar;%CUSTOM_JRE%/lib/jfxrt.jar"
+  set "CP=%CUSTOM_JRE%/lib/rt.jar;%CUSTOM_JRE%/lib/ext/jfxrt.jar"
   set "LAUNCHER_BOOTCLASSPATH=%LAUNCHER_BOOTCLASSPATH%;%CUSTOM_JRE%/%NASHORN%"
 ) else (
   set "LAUNCHER_BOOTCLASSPATH=%LAUNCHER_BOOTCLASSPATH%;%JRE%/%NASHORN%"

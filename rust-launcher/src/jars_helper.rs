@@ -191,6 +191,7 @@ fn get_cp_members(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Vec<std:
     cp_parts.push(rt_jar);
     let mut jfxrt_jar = jre_path.clone();
     jfxrt_jar.push("lib");
+    jfxrt_jar.push("ext");
     jfxrt_jar.push("jfxrt.jar");
     cp_parts.push(jfxrt_jar);
     filter_out_key("deployment.launcher.rust.cp.remove", os, &mut cp_parts, );
