@@ -83,7 +83,7 @@ fn get_jdk_from_given_path_testable(system_path: Option<OsString>, os: &os_acces
                 write!(&mut info1, "itw-rust-debug: trying {}", full_path.to_str().expect("unwrap failed")).expect("unwrap failed");
                 os.log(&info1);
                 if dirs_paths_helper::is_file(&full_path) {
-                    let can = match full_path.canonicalize() {
+                    let can = match dirs_paths_helper::canonicalize(&full_path) {
                         Ok(resolved) => {
                             //.../bin/java
                             resolved
@@ -159,7 +159,7 @@ pub mod tests_utils {
 
     #[test]
     fn try_jre_exists_on_path() {
-        let top_dir = fake_jre(true).canonicalize().expect("canonicalize failed");
+        let top_dir = dirs_paths_helper::canonicalize(&fake_jre(true)).expect("canonicalize failed");
         let mut master_dir = top_dir.clone();
         master_dir.push("bin");
         let v1 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::DISTRIBUTION, &TestLogger::create_new());
@@ -196,7 +196,7 @@ pub mod tests_utils {
         let v3 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::BOTH, &TestLogger::create_new());
         debuggable_remove_dir(&master_dir);
         assert_eq!(None, v1);
-        let parent = std::path::PathBuf::from(master_dir.parent().expect("just created")).canonicalize().expect("canonicalize failed");
+        let parent = dirs_paths_helper::canonicalize(&std::path::PathBuf::from(master_dir.parent().expect("just created"))).expect("canonicalize failed");
         assert_eq!(Some(parent.clone()), v2);
         assert_eq!(Some(parent.clone()), v3);
     }

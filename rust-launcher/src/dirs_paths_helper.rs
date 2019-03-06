@@ -1,7 +1,11 @@
 use os_access;
 
 use std;
+use std::io;
 use std::env;
+
+#[cfg(windows)] extern crate dunce;
+
 
 pub static ICEDTEA_WEB: &'static str = "icedtea-web";
 pub static DEPLOYMENT_PROPERTIES: &'static str = "deployment.properties";
@@ -76,6 +80,18 @@ pub fn current_program_parent() -> std::path::PathBuf {
 pub fn current_program_name() -> String {
     String::from(current_program().file_name().expect("unwrap of pgm name failed").to_str().expect("unwrap of pgm name failed"))
 }
+
+#[cfg(not(windows))]
+pub fn canonicalize(full_path: &std::path::PathBuf) -> Result<std::path::PathBuf, io::Error> {
+    full_path.canonicalize()
+}
+
+
+#[cfg(windows)]
+pub fn canonicalize(full_path: &std::path::PathBuf) -> Result<std::path::PathBuf, io::Error> {
+    dunce::canonicalize(&full_path)
+}
+
 
 /*tests*/
 #[cfg(test)]
