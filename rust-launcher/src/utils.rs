@@ -23,12 +23,19 @@ pub fn find_jre(os: &os_access::Os) -> std::path::PathBuf {
             match env::var("JAVA_HOME") {
                 Ok(war) => {
                     os.log("itw-rust-debug: found and using");
-                    return std::path::PathBuf::from(war);
+                    let java_home = std::path::PathBuf::from(war);
+                    let mut jre_dir = java_home.clone();
+                    jre_dir.push("jre");
+                    jre_dir.push("");
+                    if jre_dir.exists() {
+                        return jre_dir; 
+                }
+                    return java_home;
                 }
                 Err(_e) => {
                     os.log("itw-rust-debug: nothing");
                     os.log("itw-rust-debug: trying jdk from registry");
-                    match os.get_registry_jdk() {
+                    match os.get_registry_java() {
                         Some(path) => {
                             os.log("itw-rust-debug: found and using");
                             return path;
@@ -39,6 +46,12 @@ pub fn find_jre(os: &os_access::Os) -> std::path::PathBuf {
                             match get_jdk_from_path_conditionally(os) {
                                 Some(path) => {
                                     os.log("itw-rust-debug: found and using");
+                                    let mut jre_dir = path.clone();
+                                    jre_dir.push("jre");
+                                    jre_dir.push("");
+                                    if jre_dir.exists() {
+                                        return jre_dir; 
+                                    }
                                     return path;
                                 }
                                 None => {
@@ -243,7 +256,7 @@ pub mod tests_utils {
             self.vec.borrow_mut().push(ss);
         }
 
-        fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
+        fn get_registry_java(&self) -> Option<std::path::PathBuf> {
             None
         }
 

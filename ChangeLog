@@ -1,3 +1,10 @@
+2019-03-07  Lars Herschke <lhersch@dssgmbh.de>
+
+	Native launchers now iterate through various keys of jre/jdk in registry
+	* rust-launcher/src/os_access.rs: introduced RegQueryInfoKeyW and RegEnumKeyExW to enable registry query
+	jdk_registry_path renamed to java_registry_path. jdk_registry_path now iterates over several keys
+	* rust-launcher/src/utils.rs: adapted, and if jdk is found, its jre is used.
+
 2019-03-06  Jiri Vanek <jvanek@redhat.com>
             Lars Herschke <lhersch@dssgmbh.de>
 

@@ -37,7 +37,7 @@ pub trait Os {
     fn info(&self, s: &str);
     fn important(&self, s: &str);
     fn system_log(&self, s: &str);
-    fn get_registry_jdk(&self) -> Option<std::path::PathBuf>;
+    fn get_registry_java(&self) -> Option<std::path::PathBuf>;
     // next to system and home cfg dir, there is also by-jre config dir, but that do not need to be handled os-specific way
     // https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/jcp/properties.html
     fn get_system_config_javadir(&self) -> Option<std::path::PathBuf>;
@@ -119,7 +119,7 @@ impl Os for Linux {
         log_helper::log_impl(0,self, s);
     }
 
-    fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
+    fn get_registry_java(&self) -> Option<std::path::PathBuf> {
         None
     }
 
@@ -226,10 +226,12 @@ impl Os for Windows {
         return self.verbose;
     }
 
-    fn get_registry_jdk(&self) -> Option<std::path::PathBuf> {
+    fn get_registry_java(&self) -> Option<std::path::PathBuf> {
         std::panic::catch_unwind(|| {
-            let path = win::jdk_registry_path();
-            Some(std::path::PathBuf::from(path))
+            match win::java_registry_path() {
+                Ok(path) => Some(std::path::PathBuf::from(path)),
+                Err(_) => None,
+            }
         }).unwrap_or_else(|_e| {
             // show_error_message(errloc_msg(&e));
             None
@@ -414,6 +416,32 @@ mod win {
             phkResult: *mut *mut c_void
         ) -> c_long;
 
+        fn RegQueryInfoKeyW(
+            hKey: *mut c_void,
+            lpClass: *mut c_ushort,
+            lpcchClass: *mut c_ulong,
+            lpReserved: *mut c_ulong,
+            lpcSubKeys: *mut c_ulong,
+            lpcbMaxSubKeyLen: *mut c_ulong,
+            lpcbMaxClassLen: *mut c_ulong,
+            lpcValues: *mut c_ulong,
+            lpcbMaxValueNameLen: *mut c_ulong,
+            lpcbMaxValueLen: *mut c_ulong,
+            lpcbSecurityDescriptor: *mut c_ulong,
+            lpftLastWriteTime: *mut c_void
+        ) -> c_long;
+
+        fn RegEnumKeyExW(
+            hKey: *mut c_void,
+            dwIndex: c_ulong,
+            lpName: *mut c_ushort,
+            lpcchName: *mut c_ulong,
+            lpReserved: *mut c_ulong,
+            lpClass: *mut c_ushort,
+            lpcchClass: *mut c_ulong,
+            lpftLastWriteTime: *mut c_void
+        ) -> c_long;
+        
         fn RegCloseKey(
             hKey: *mut c_void
         ) -> c_long;
@@ -536,32 +564,109 @@ mod win {
         }
     }
 
-    pub fn jdk_registry_path() -> String {
-        let jdk_key_name = "SOFTWARE\\JavaSoft\\Java Development Kit\\1.8";
-        let wjdk_key_name = widen(jdk_key_name);
+    /* 
+        try to get with the following preference:
+        -     JRE    1.8
+        -     JDK    1.8
+        - max JDK >= 9
+        - max JRE >= 9   (only 9 or 10 possible)
+        - max JDK <  1.8 
+        - max JRE <  1.8
+    */
+    pub fn java_registry_path() -> Result<String, u32> {
+        let mut java_key_name = String::new();
+        let jskeys = vec!["Java Runtime Environment", 
+                          "Java Development Kit", "JDK", "JRE"];   
+        for jskey in jskeys.iter() {
+            let reg_key_name = r"SOFTWARE\JavaSoft\".to_string() + jskey;
+            let wreg_key_name = widen(&reg_key_name);
+            unsafe {
+                // open regkey
+                let mut reg_key = null_mut::<c_void>();
+                let err_java = RegOpenKeyExW(
+                    HKEY_LOCAL_MACHINE,
+                    wreg_key_name.as_ptr(),
+                    0,
+                    KEY_READ | KEY_ENUMERATE_SUB_KEYS,
+                    &mut reg_key) as u32;
+                if ERROR_SUCCESS != err_java {
+                    continue;
+                }
+                defer!({
+                    RegCloseKey(reg_key);
+                });
+       
+                // get subkey count
+                let mut sub_cnt: c_ulong = 0;
+                let err_cnt = RegQueryInfoKeyW(
+                    reg_key,
+                    null_mut::<c_ushort>(),
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_ulong>(),
+                    &mut sub_cnt,
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_void>()) as u32;
+                if ERROR_SUCCESS != err_cnt || !(sub_cnt > 0) {
+                    continue;
+                }
+                 
+                // get last subkey
+                let mut sub_key = Vec::with_capacity(256);
+                let mut sub_len = sub_key.capacity() as u32;
+                let err_sub = RegEnumKeyExW(
+                    reg_key,
+                    sub_cnt-1,
+                    sub_key.as_mut_ptr(),
+                    &mut sub_len,
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_ushort>(),
+                    null_mut::<c_ulong>(),
+                    null_mut::<c_void>()) as u32;
+                if ERROR_SUCCESS != err_sub {
+                    continue;
+                }
+                sub_key.set_len(sub_len as usize);
+                let slice = std::slice::from_raw_parts(sub_key.as_ptr(), sub_key.len() as usize);
+                let jpath = narrow(slice);
+                java_key_name = reg_key_name + r"\" + &jpath;
+                if jpath.starts_with("1.8") || jskey.len() == 3 {
+                  break;
+                }
+            }
+        }
+        
+        if java_key_name.len() == 0 {
+            return Err(2);
+        }
+        
+        let wjava_key_name = widen(&java_key_name);
         let java_home = "JavaHome";
         let wjava_home = widen("JavaHome");
         unsafe {
             // open root
-            let mut jdk_key = null_mut::<c_void>();
-            let err_jdk = RegOpenKeyExW(
+            let mut java_key = null_mut::<c_void>();
+            let err_java = RegOpenKeyExW(
                 HKEY_LOCAL_MACHINE,
-                wjdk_key_name.as_ptr(),
+                wjava_key_name.as_ptr(),
                 0,
                 KEY_READ | KEY_ENUMERATE_SUB_KEYS,
-                &mut jdk_key) as u32;
-            if ERROR_SUCCESS != err_jdk {
-                panic!(format!("Error opening registry key, \
-                    name: [{}], message: [{}]", jdk_key_name, errcode_to_string(err_jdk)));
+                &mut java_key) as u32;
+            if ERROR_SUCCESS != err_java {
+                return Err(err_java);
             }
             defer!({
-                RegCloseKey(jdk_key);
+                RegCloseKey(java_key);
             });
             // find out value len
             let mut value_len: c_ulong = 0;
             let mut value_type: c_ulong = 0;
             let err_len = RegQueryValueExW(
-                jdk_key,
+                java_key,
                 wjava_home.as_ptr(),
                 null_mut::<c_ulong>(),
                 &mut value_type,
@@ -569,13 +674,13 @@ mod win {
                 &mut value_len) as u32;
             if ERROR_SUCCESS != err_len || !(value_len > 0) || REG_SZ != value_type {
                 panic!(format!("Error opening registry value len, \
-                    key: [{}], value: [{}], message: [{}]", jdk_key_name, java_home, errcode_to_string(err_len)));
+                    key: [{}], value: [{}], message: [{}]", java_key_name, java_home, errcode_to_string(err_len)));
             }
             // get value
             let mut wvalue: Vec<u16> = Vec::new();
             wvalue.resize((value_len as usize) / std::mem::size_of::<u16>(), 0);
             let err_val = RegQueryValueExW(
-                jdk_key,
+                java_key,
                 wjava_home.as_ptr(),
                 null_mut::<c_ulong>(),
                 null_mut::<c_ulong>(),
@@ -583,16 +688,15 @@ mod win {
                 &mut value_len) as u32;
             if ERROR_SUCCESS != err_val {
                 panic!(format!("Error opening registry value, \
-                    key: [{}], value: [{}], message: [{}]", jdk_key_name, java_home, errcode_to_string(err_val)));
+                    key: [{}], value: [{}], message: [{}]", java_key_name, java_home, errcode_to_string(err_val)));
             }
             // format and return path
             let slice = std::slice::from_raw_parts(wvalue.as_ptr(), wvalue.len() - 1 as usize);
-            let jpath_badslash = narrow(slice);
-            let mut jpath = jpath_badslash.replace("\\", "/");
-            if '/' as u8 != jpath.as_bytes()[jpath.len() - 1] {
-                jpath.push('/');
+            let mut jpath = narrow(slice);
+            if '\\' as u8 != jpath.as_bytes()[jpath.len() - 1] {
+                jpath.push('\\');
             }
-            return jpath;
+            return Ok(jpath);
         }
     }
 
