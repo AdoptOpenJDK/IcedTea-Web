@@ -98,10 +98,10 @@ fi;
 MODULAR_JDK="NO"
 fullversion=`${JAVA} -version 2>&1`
 version=`echo $fullversion | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f1`
-if [ $version -eq "1" ]; then
+if [ "$version" -eq "1" ]; then
   version=`echo $fullversion | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f2`
 fi
-if [ $version -ge "9" ]; then
+if [ "$version" -ge "9" ]; then
   MODULAR_JDK="YES"
 fi
 
