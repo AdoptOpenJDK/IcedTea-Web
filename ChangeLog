@@ -1,5 +1,11 @@
 2019-03-11  Jiri Vanek <jvanek@redhat.com>
 
+	Post-release changes
+	* NEWS: added 1.7.3 section
+	* configure.ac: (AC_INIT) bumped to 1.7.3pre
+
+2019-03-11  Jiri Vanek <jvanek@redhat.com>
+
 	Pre-release tuning
 	* Makefile.am: (netx-html-gen.stamp) set number of changests to 70 (since 1.7.1)
 	* NEWS: set date and added content for 1.7.2
