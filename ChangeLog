@@ -1,3 +1,10 @@
+2019-03-11  Jiri Vanek <jvanek@redhat.com>
+
+	Pre-release tuning
+	* Makefile.am: (netx-html-gen.stamp) set number of changests to 70 (since 1.7.1)
+	* NEWS: set date and added content for 1.7.2
+	* configure.ac: (AC_INIT) set to use 1.7.2
+
 2019-03-05  Lars Herschke <lhersch@dssgmbh.de>
 
 	* acinclude.m4: Moved windows specific check for JDK on the begging of  SYSTEM_JDK part of IT_CHECK_FOR_JDK macro
