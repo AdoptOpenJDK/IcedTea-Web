@@ -89,7 +89,7 @@ if not "%ITW_HOME%" == "" (
   set "BINARY_LOCATION=%ITW_HOME%/bin/%PROGRAM_NAME%.bat"
   set "SPLASH_LOCATION=%ITW_HOME%/share/icedtea-web/javaws_splash.png"
   set "RUN_ARGS_LOCATION=%ITW_HOME%/bin/itw-modularjdk.args"
-  set "NETX_JAR=%ITW_HOME%/share/icedtea-web/javaws.jar"
+  set "NETX_JAR=%ITW_HOME%/share/icedtea-web/netx.jar"
   set "PLUGIN_JAR=%ITW_HOME%/share/icedtea-web/plugin.jar"
   set "JSOBJECT_JAR=%ITW_HOME%/share/icedtea-web/jsobject.jar"
   set "LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:!NETX_JAR!;!PLUGIN_JAR!;!JSOBJECT_JAR!;%ITW_HOME%/win-deps-runtime/tagsoup.jar;%ITW_HOME%/win-deps-runtime/js.jar;%ITW_HOME%/win-deps-runtime/mslinks.jar"
