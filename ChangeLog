@@ -1,3 +1,10 @@
+2019-03-12  Jiri Vanek <jvanek@redhat.com>
+
+	Pre-release tuning
+	* Makefile.am: (netx-html-gen.stamp) set number of changests to 140 (since 1.7)
+	* NEWS: date of 1.8 set
+	* configure.ac: (AC_INIT) set to use 1.8
+
 2019-03-07  Lars Herschke <lhersch@dssgmbh.de>
 
 	Native launchers now iterate through various keys of jre/jdk in registry
