@@ -1,3 +1,13 @@
+2019-03-12  Lars Herschke <lhersch@dssgmbh.de>
+
+	Hidden console on Windows
+	* rust-launcher/src/dirs_paths_helper.rs: factory for windows os now supply third parameter
+	* rust-launcher/src/main.rs: (get_os) on windows now have three params. Call to get os if-windows cfged out
+	(main) parent process is now checking ATTACH_PARENT_PROCESS before get_os on windows
+	* rust-launcher/src/os_access.rs: oon windows, without console, no window is enforced. Trait got win-only  inside_console method
+	windows impl of os_access. Win module made public to expose AttachConsole function.
+	* rust-launcher/src/utils.rs: test logger got windows-only inside_console
+
 2019-03-12  Jiri Vanek <jvanek@redhat.com>
 
 	Pre-release tuning

@@ -108,7 +108,7 @@ mod tests {
 
     #[cfg(windows)]
     fn get_os() -> os_access::Windows {
-        os_access::Windows::new(false, false)
+        os_access::Windows::new(false, false, true)
     }
 
 

@@ -241,6 +241,11 @@ pub mod tests_utils {
             return true;
         }
 
+        #[cfg(windows)]
+        fn inside_console(&self) -> bool {
+            return true;
+        }
+
         fn log(&self, s: &str) {
             let ss = String::from(s);
             self.vec.borrow_mut().push(ss);

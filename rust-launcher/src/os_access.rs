@@ -12,6 +12,13 @@ pub fn create_java_cmd(os: &Os,jre_dir: &std::path::PathBuf, args: &Vec<String>)
     for ar in args.into_iter() {
         cmd.arg(ar);
     }
+    #[cfg(windows)]
+    {
+        if !os.inside_console() {
+            use std::os::windows::process::CommandExt;
+            cmd.creation_flags(win::CREATE_NO_WINDOW);
+        }
+    }
     let mut info = String::new();
     write!(&mut info, "itw-rust-debug: command {}", format!("{:?}", cmd)).expect("unwrap failed");
     os.log(&info);
@@ -54,6 +61,8 @@ pub trait Os {
     fn get_classpath_separator(&self) -> char;
     fn get_exec_suffixes(&self) -> &'static [&'static str];
     fn is_verbose(&self) -> bool;
+    #[cfg(windows)]
+    fn inside_console(&self) -> bool;
 }
 
 #[cfg(not(windows))]
@@ -188,15 +197,16 @@ impl Os for Linux {
 pub struct Windows {
     verbose: bool,
     al: log_helper::AdvancedLogging,
+    ic: bool
 }
 
 #[cfg(windows)]
 impl Windows {
-        pub fn new(debug: bool, load_advanced: bool) -> Windows {
+        pub fn new(debug: bool, load_advanced: bool, ic: bool) -> Windows {
             if ! load_advanced {
-                Windows { verbose: debug, al: log_helper::AdvancedLogging::default() }
+                Windows { verbose: debug, al: log_helper::AdvancedLogging::default(), ic: ic }
             } else {
-                Windows { verbose: debug, al: log_helper::AdvancedLogging::load(&Windows::new(debug, false)) }
+                Windows { verbose: debug, al: log_helper::AdvancedLogging::load(&Windows::new(debug, false, ic)), ic: ic }
             }
         }
     }
@@ -224,6 +234,10 @@ impl Os for Windows {
 
     fn is_verbose(&self) -> bool {
         return self.verbose;
+    }
+
+    fn inside_console(&self) -> bool {
+        return self.ic;
     }
 
     fn get_registry_java(&self) -> Option<std::path::PathBuf> {
@@ -293,7 +307,7 @@ impl Os for Windows {
 #[cfg(windows)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
-mod win {
+pub mod win {
     // https://crates.io/crates/scopeguard
     macro_rules! defer {
         ($e:expr) => {
@@ -347,6 +361,8 @@ mod win {
     use std::ptr::{null, null_mut};
 
     // constants
+    pub const ATTACH_PARENT_PROCESS: c_ulong = 0xFFFFFFFF;
+    pub const CREATE_NO_WINDOW: c_ulong = 0x08000000;
     const CP_UTF8: c_ulong = 65001;
     const FORMAT_MESSAGE_ALLOCATE_BUFFER: c_ulong = 0x00000100;
     const FORMAT_MESSAGE_FROM_SYSTEM: c_ulong = 0x00001000;
@@ -372,6 +388,8 @@ mod win {
     // function declarations
 
     extern "system" {
+        pub fn AttachConsole(dwProcessId: c_ulong) -> c_int;
+        
         fn MultiByteToWideChar(
             CodePage: c_uint,
             dwFlags: c_ulong,

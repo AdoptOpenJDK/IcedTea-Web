@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 mod hardcoded_paths;
 mod property_from_file;
 mod os_access;
@@ -19,8 +21,8 @@ fn get_os(debug: bool, al: bool) -> os_access::Linux {
 }
 
 #[cfg(windows)]
-fn get_os(debug: bool, al: bool) -> os_access::Windows {
-    os_access::Windows::new(debug, al)
+fn get_os(debug: bool, al: bool, ic: bool) -> os_access::Windows {
+    os_access::Windows::new(debug, al, ic)
 }
 
 fn is_debug_on() -> bool {
@@ -29,7 +31,10 @@ fn is_debug_on() -> bool {
             return val;
         }
         _none => {
+            #[cfg(not(windows))]
             let os = get_os(false, false);
+            #[cfg(windows)]
+            let os = get_os(false, false, true);
             return property_from_files_resolver::try_main_verbose_from_properties(&os);
         }
     }
@@ -74,7 +79,18 @@ fn is_splash_forbidden_testable(vars: Vec<(String, String)>) -> bool {
 }
 
 fn main() {
-    let os = get_os(is_debug_on(), true);
+    let os;
+    #[cfg(windows)]
+    {
+        use os_access::win;
+        let acr: i32;
+        unsafe { acr = win::AttachConsole(win::ATTACH_PARENT_PROCESS) };
+        os = get_os(is_debug_on(), true, acr != 0);
+    }
+    #[cfg(not(windows))]
+    {
+        os = get_os(is_debug_on(), true);
+    }
     os.log(&dirs_paths_helper::path_to_string(&dirs_paths_helper::current_program()));
     let java_dir = utils::find_jre(&os);
     let mut info2 = String::new();
