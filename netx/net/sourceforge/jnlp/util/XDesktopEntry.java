@@ -17,7 +17,10 @@
 package net.sourceforge.jnlp.util;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,6 +31,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -38,6 +43,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.imageio.ImageIO;
 
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -206,13 +212,14 @@ public class XDesktopEntry implements GenericDesktopEntry {
         //Shortcut executes the jnlp as it was with system preferred java. It should work fine offline
         //absolute - works in case of self built
         String exec = System.getProperty(Launcher.KEY_JAVAWS_LOCATION);
+        if (exec != null) {
+            return exec;
+        }
         String pathResult = findOnPath(new String[]{"javaws", System.getProperty("icedtea-web.bin.name")});
         if (pathResult != null) {
             return pathResult;
         }
-        if (exec != null) {
-            return exec;
-        }
+        
         return "javaws";
     }
     
@@ -237,8 +244,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
                     continue;
                 }
                 for (String p : paths) {
-                    if (new File(p, bin).exists()) {
-                        exec = bin;
+                    File file = new File(p, bin);
+                    if (file.exists()) {
+                        exec = file.getAbsolutePath();
                         break outerloop;
                     }
                 }
@@ -477,11 +485,97 @@ public class XDesktopEntry implements GenericDesktopEntry {
             if (targetName.equals(FAVICON)) {
                 targetName = file.getNotNullProbalbeCodeBase().getHost() + ".ico";
             }
-            File target = new File(PathsAndFiles.ICONS_DIR.getFile(), targetName);
-            Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            File target = null;
+            if (JNLPRuntime.isWindows() &&
+                (targetName.toLowerCase().endsWith("gif")  || 
+                 targetName.toLowerCase().endsWith("jpg")  || 
+                 targetName.toLowerCase().endsWith("jpeg") || 
+                 targetName.toLowerCase().endsWith("png"))) {
+                target = convertToIco(source, targetName);
+            }            
+            if (target == null) {
+                target = new File(PathsAndFiles.ICONS_DIR.getFile(), targetName);
+                Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
             this.iconLocation = target.getAbsolutePath();
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + origLocation);
         }
+    }
+    
+    private File convertToIco(File source, String targetName)
+    {
+        try {
+            BufferedImage img = ImageIO.read(source);
+            short bitCount = (short)img.getColorModel().getPixelSize();
+            // Images with less than 32 bit color depth 
+            // are very hard to produce in ico format.
+            // Therefore, the image is converted if necessary
+            if (bitCount < 32)
+            {
+                BufferedImage dest = new BufferedImage(
+      			  	img.getWidth(), img.getHeight(),
+        			BufferedImage.TYPE_INT_ARGB);
+                ColorConvertOp cco = new ColorConvertOp(
+        			img.getColorModel().getColorSpace(),
+        			dest.getColorModel().getColorSpace(),
+        			null);
+                img = cco.filter(img, dest);
+                bitCount = (short)img.getColorModel().getPixelSize();
+            }
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            boolean written = ImageIO.write(img, "png", bos);
+            if (!written)
+                return null;
+                        
+            byte width  = (byte)(img.getWidth()  < 256 ? img.getWidth()   : 0);
+            byte height = (byte)(img.getHeight() < 256 ? img.getHeight()  : 0);
+            byte colorCount = (byte)(bitCount < 8 ? Math.pow(2, bitCount) : 0);            
+            byte[] imgBytes = bos.toByteArray();
+            int offset = 22;
+            int fileSize = imgBytes.length + offset;
+            ByteBuffer bytes = ByteBuffer.allocate(fileSize);
+            bytes.order(ByteOrder.LITTLE_ENDIAN);
+            
+            // Header
+            bytes.putShort((short) 0);      // Reserved, must be 0
+            bytes.putShort((short) 1);      // Image type: 1 for ico
+            bytes.putShort((short) 1);      // Number of images in the file
+            // Directory Entry
+            bytes.put(width);               // Image width
+            bytes.put(height);              // Image height
+            bytes.put(colorCount);          // Number of colors
+            bytes.put((byte) 0);            // Reserved, must be 0
+            bytes.putShort((short) 1);      // Number of color planes
+            bytes.putShort(bitCount);       // Number of bits per pixel
+            bytes.putInt(imgBytes.length);  // Image size
+            bytes.putInt(offset);           // Image offset
+            // Image
+            bytes.put(imgBytes);            // Image data
+
+            File target = new File(PathsAndFiles.ICONS_DIR.getFile(), 
+                                   targetName.substring(0, 
+                                   targetName.lastIndexOf('.')) + ".ico"); 
+            try (FileOutputStream fos = new FileOutputStream(target)) {
+                fos.write(bytes.array());
+                fos.flush();
+            }
+            return target;
+        }
+        catch (IOException e) {
+            return null;
+        }
+    }
+    
+    String cacheAndGetIconLocation() {        
+        try {
+            cacheIcon();
+        } catch (NonFileProtocolException ex) {
+            OutputController.getLogger().log(ex);
+        }
+        catch (IOException e) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+        }
+        return this.iconLocation;
     }
     
     static String getFavIcon(JNLPFile file) {
