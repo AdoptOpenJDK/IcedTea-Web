@@ -85,7 +85,7 @@ fn check_file_for_property(file: File, key: &str) -> Option<String> {
                     None => {}
                     Some(kvv) => {
                         if kvv.key.eq(key) {
-                            return Some(escape_unicode(kvv.value));
+                            return Some(escape_unicode(kvv.value.replace(r"\:", ":")));
                         }
                     }
                 }
