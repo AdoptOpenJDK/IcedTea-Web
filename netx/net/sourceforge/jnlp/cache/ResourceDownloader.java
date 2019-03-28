@@ -394,14 +394,16 @@ public class ResourceDownloader implements Runnable {
         downloadFile(resource, connection, downloadFrom);
 
         uncompressPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
-        storeEntryFields(new CacheEntry(downloadTo, resource.getDownloadVersion()), connection.getContentLength(), connection.getLastModified());
+        CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
+        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
     }
 
     private void downloadGZipFile(Resource resource, URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
         downloadFile(resource, connection, downloadFrom);
 
         uncompressGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
-        storeEntryFields(new CacheEntry(downloadTo, resource.getDownloadVersion()), connection.getContentLength(), connection.getLastModified());
+        CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
+        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
     }
 
     private void downloadFile(Resource resource, URLConnection connection, URL downloadLocation) throws IOException {
