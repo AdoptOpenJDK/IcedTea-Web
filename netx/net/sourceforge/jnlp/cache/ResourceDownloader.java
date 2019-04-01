@@ -357,11 +357,11 @@ public class ResourceDownloader implements Runnable {
             // return ".gz", so if we check gzip first, we would end up
             // treating a pack200 file as a jar file.
             if (packgz) {
-                downloadPackGzFile(connection, downloadFrom, downloadTo);
+                downloadPackGzFile(resource, connection, new URL(downloadFrom + ".pack.gz"), downloadTo);
             } else if (gzip) {
-                downloadGZipFile(connection, downloadFrom, downloadTo);
+                downloadGZipFile(resource, connection, new URL(downloadFrom + ".gz"), downloadTo);
             } else {
-                downloadFile(connection, downloadTo);
+                downloadFile(resource, connection, downloadTo);
             }
 
             resource.changeStatus(EnumSet.of(DOWNLOADING), EnumSet.of(DOWNLOADED));
@@ -390,30 +390,26 @@ public class ResourceDownloader implements Runnable {
         return con;
     }
 
-    private void downloadPackGzFile(URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
-        downloadFile(connection, downloadFrom);
+    private void downloadPackGzFile(Resource resource, URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
+        downloadFile(resource, connection, downloadFrom);
 
         uncompressPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
-        CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
-        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
-        markForDelete(downloadFrom);
+        storeEntryFields(new CacheEntry(downloadTo, resource.getDownloadVersion()), connection.getContentLength(), connection.getLastModified());
     }
 
-    private void downloadGZipFile(URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
-        downloadFile(connection, downloadFrom);
+    private void downloadGZipFile(Resource resource, URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
+        downloadFile(resource, connection, downloadFrom);
 
         uncompressGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
-        CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
-        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
-        markForDelete(downloadFrom);
+        storeEntryFields(new CacheEntry(downloadTo, resource.getDownloadVersion()), connection.getContentLength(), connection.getLastModified());
     }
 
-    private void downloadFile(URLConnection connection, URL downloadLocation) throws IOException {
+    private void downloadFile(Resource resource, URLConnection connection, URL downloadLocation) throws IOException {
         CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading file: " + downloadLocation + " into: " + downloadEntry.getCacheFile().getCanonicalPath());
         if (!downloadEntry.isCurrent(connection.getLastModified())) {
             try {
-                writeDownloadToFile(downloadLocation, new BufferedInputStream(connection.getInputStream()));
+                writeDownloadToFile(resource, downloadLocation, new BufferedInputStream(connection.getInputStream()));
             } catch (IOException ex) {
                 String IH = "Invalid Http response";
                 if (ex.getMessage().equals(IH)) {
@@ -425,7 +421,7 @@ public class ResourceDownloader implements Runnable {
                     byte[] body = (byte[]) result[1];
                     OutputController.getLogger().log(head);
                     OutputController.getLogger().log("Body is: " + body.length + " bytes long");
-                    writeDownloadToFile(downloadLocation, new ByteArrayInputStream(body));
+                    writeDownloadToFile(resource, downloadLocation, new ByteArrayInputStream(body));
                 } else {
                     throw ex;
                 }
@@ -447,20 +443,8 @@ public class ResourceDownloader implements Runnable {
             entry.unlock();
         }
     }
-    
-    private void markForDelete(URL location) {
-        CacheEntry entry = new CacheEntry(location, 
-                                          resource.getDownloadVersion());
-        entry.lock();
-        try {
-            entry.markForDelete();
-            entry.store();
-        } finally {
-            entry.unlock();
-        }
-    }
-    
-    private void writeDownloadToFile(URL downloadLocation, InputStream in) throws IOException {
+
+    private void writeDownloadToFile(Resource resource, URL downloadLocation, InputStream in) throws IOException {
         byte buf[] = new byte[1024];
         int rlen;
         try (OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {

@@ -33,7 +33,10 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 public class CacheEntry {
 
+    public static final long LENGTH_UNKNOWN = -1;
+
     private static final String KEY_CONTENT_LENGTH = "content-length";
+    private static final String KEY_CONTENT_ORIGINAL_LENGTH = "content-original-length";
     private static final String KEY_LAST_MODIFIED = "last-modified";
     private static final String KEY_LAST_UPDATED = "last-updated";
     public static final String KEY_JNLP_PATH = "jnlp-path";
@@ -57,11 +60,18 @@ public class CacheEntry {
     public CacheEntry(URL location, Version version) {
         this.location = location;
         this.version = version;
-        
+
+        this.properties = readCacheEntryInfo();
+    }
+
+    /**
+     * Seam for testing
+     */
+    PropertiesFile readCacheEntryInfo() {
         File infoFile = CacheUtil.getCacheFile(location, version);
         infoFile = new File(infoFile.getPath() + CacheDirectory.INFO_SUFFIX); // replace with something that can't be clobbered
 
-        properties = new PropertiesFile(infoFile, R("CAutoGen"));
+        return new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
     /**
@@ -101,6 +111,25 @@ public class CacheEntry {
     public void setJnlpPath(String jnlpPath) {
     	properties.setProperty(KEY_JNLP_PATH, jnlpPath);
     }
+    
+    /**
+     * Return the length of the original content that was cached. May be different
+     * from the actual cache entry size due to (de)compression.
+     *
+     * @return the content length or {@link #LENGTH_UNKNOWN} if unknown.
+     */
+    public long getOriginalContentLength() {
+        return getLongKey(KEY_CONTENT_ORIGINAL_LENGTH, LENGTH_UNKNOWN);
+    }
+
+    /**
+     * Set the length of the original content that was cached. May be different
+     * from the actual cache entry size due to (de)compression.
+     * @param contentLength length of content
+     */
+    public void setOriginalContentLength(long contentLength) {
+        setLongKey(KEY_CONTENT_ORIGINAL_LENGTH, contentLength);
+    }
 
     public long getLastModified() {
         return getLongKey(KEY_LAST_MODIFIED);
@@ -111,10 +140,15 @@ public class CacheEntry {
     }
 
     private long getLongKey(String key) {
+        return getLongKey(key, 0);
+    }
+
+    private long getLongKey(String key, long defaultValue) {
         try {
             return Long.parseLong(properties.getProperty(key));
         } catch (Exception ex) {
-            return 0;
+            OutputController.getLogger().log(ex);
+            return defaultValue;
         }
     }
 
@@ -159,6 +193,11 @@ public class CacheEntry {
 
         try {
             long cachedLength = localFile.length();
+            String originalLength = properties.getProperty(KEY_CONTENT_ORIGINAL_LENGTH);
+            if (originalLength != null) {
+                cachedLength = Long.parseLong(originalLength);
+            }
+
             long remoteLength = Long.parseLong(properties.getProperty(KEY_CONTENT_LENGTH, "-1"));
 
             OutputController.getLogger().log("isCached: remote:" + remoteLength + " cached:" + cachedLength);

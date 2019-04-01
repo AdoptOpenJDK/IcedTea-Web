@@ -56,6 +56,7 @@ import org.junit.Test;
 
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.util.CacheTestUtils;
+import net.sourceforge.jnlp.util.PropertiesFile;
 
 public class CacheEntryTest {
 
@@ -69,6 +70,14 @@ public class CacheEntryTest {
         @Override
         protected File getCacheFile() {
             return cacheFile;
+        }
+        @Override
+        protected PropertiesFile readCacheEntryInfo() {
+            try {
+                return new PropertiesFile(createFile(""));
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
         }
     }
 
@@ -123,6 +132,16 @@ public class CacheEntryTest {
     }
 
     @Test
+    public void verifyOriginalContentLengthIsSetCorrectly() {
+        long ORIGINAL_CONTENT_LENGTH = 1000;
+
+        CacheEntry entry = new TestCacheEntry(url, version, null);
+        entry.setOriginalContentLength(ORIGINAL_CONTENT_LENGTH);
+
+        assertEquals(ORIGINAL_CONTENT_LENGTH, entry.getOriginalContentLength());
+    }
+
+    @Test
     public void verifyNotCachedIfFileIsAbsent() {
         File doesNotExist = new File("/foo/bar/baz/spam/eggs");
 
@@ -148,6 +167,19 @@ public class CacheEntryTest {
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
         entry.setRemoteContentLength(contents.length());
+
+        assertTrue(entry.isCached());
+    }
+
+    @Test
+    public void verifyCachedIfOriginalContentLengthsAreSame() throws IOException {
+        String contents = "FooDECOMPRESSED";
+        long compressedLength = 5;
+        File cachedFile = createFile(contents);
+
+        CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
+        entry.setRemoteContentLength(compressedLength);
+        entry.setOriginalContentLength(compressedLength);
 
         assertTrue(entry.isCached());
     }
