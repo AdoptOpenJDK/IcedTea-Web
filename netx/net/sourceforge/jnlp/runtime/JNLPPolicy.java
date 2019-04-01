@@ -47,7 +47,7 @@ public class JNLPPolicy extends Policy {
     /** the previous policy */
     private static Policy systemPolicy;
 
-    private final String jreExtDir;
+    private final URI jreExtDir;
 
     /** the system level policy for jnlps */
     private Policy systemJnlpPolicy = null;
@@ -64,7 +64,7 @@ public class JNLPPolicy extends Policy {
         userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
 
         String jre = System.getProperty("java.home");
-        jreExtDir = jre + File.separator + "lib" + File.separator + "ext";
+        jreExtDir = (new File(jre + File.separator + "lib" + File.separator + "ext")).toURI();
     }
 
     /**
@@ -158,7 +158,7 @@ public class JNLPPolicy extends Policy {
         String sourceProtocol = source.getLocation().getProtocol();
         String sourcePath = source.getLocation().getPath();
         if (sourceProtocol.toUpperCase().equals("FILE") &&
-                sourcePath.startsWith(jreExtDir)) {
+                sourcePath.startsWith(jreExtDir.getRawPath())) {
             return true;
         }
 
