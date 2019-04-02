@@ -394,7 +394,8 @@ public class ResourceDownloader implements Runnable {
         downloadFile(connection, downloadFrom);
 
         uncompressPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
-        storeEntryFields(new CacheEntry(downloadTo, resource.getDownloadVersion()), connection.getContentLength(), connection.getLastModified());
+        CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
+        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
         markForDelete(downloadFrom);
     }
 
@@ -402,7 +403,8 @@ public class ResourceDownloader implements Runnable {
         downloadFile(connection, downloadFrom);
 
         uncompressGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
-        storeEntryFields(new CacheEntry(downloadTo, resource.getDownloadVersion()), connection.getContentLength(), connection.getLastModified());
+        CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
+        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
         markForDelete(downloadFrom);
     }
 
