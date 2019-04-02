@@ -357,9 +357,9 @@ public class ResourceDownloader implements Runnable {
             // return ".gz", so if we check gzip first, we would end up
             // treating a pack200 file as a jar file.
             if (packgz) {
-                downloadPackGzFile(resource, connection, new URL(downloadFrom + ".pack.gz"), downloadTo);
+                downloadPackGzFile(resource, connection, downloadFrom, downloadTo);
             } else if (gzip) {
-                downloadGZipFile(resource, connection, new URL(downloadFrom + ".gz"), downloadTo);
+                downloadGZipFile(resource, connection, downloadFrom, downloadTo);
             } else {
                 downloadFile(resource, connection, downloadTo);
             }
