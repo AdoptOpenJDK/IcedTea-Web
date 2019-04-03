@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Button?>
+<GridPane fx:controller="Controller"
+          xmlns:fx="http://javafx.com/fxml"
+          alignment="CENTER">
+    <Text text="Hello"
+          GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="CENTER"/>
+    <Button fx:id="button" text="press if you're brave enough"
+            GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="CENTER"
+            onAction="#onPressButton"/>
+    <Text fx:id="text" text="BAF!" style="-fx-text-fill: red; -fx-font-size: 50; -fx-fill: red;"
+          GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.halignment="CENTER"
+          visible="false"/>
+</GridPane>

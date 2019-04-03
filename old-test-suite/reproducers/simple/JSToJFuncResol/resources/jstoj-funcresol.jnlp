@@ -1,0 +1,22 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="." href="jstoj-funcresol.jnlp">
+    <information>
+        <title>JavaScript to Java LiveConnect - FuncResol</title>
+        <vendor>IcedTea</vendor>
+        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
+        <description>LiveConnect - tests for overloaded function resolution when calling Java functions from JS.</description>
+    </information>
+    <resources>
+        <!-- Application Resources -->
+        <j2se version="1.6+" />
+        <jar href="JSToJFuncResol.jar" main="true" />
+
+    </resources>
+    <applet-desc
+         name="JS to J FuncResol"
+         main-class="JSToJFuncResol"
+         width="1000"
+         height="100">
+     </applet-desc>
+</jnlp>

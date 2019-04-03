@@ -1,0 +1,32 @@
+Each file in directory simple must follows hierarchy conventions and is compiled/jared 
+ automatically into server's working directory and content of resources likewise. 
+ The name of jnlp is independent, and there can be even more jnlps for each future jar.
+Directories are honored in srcs and in resources, but not in testcases.
+Directories in signed handle their content in similar way as simple's content is handled,
+ but in addition final jars are signed with simple testkey.
+Files in custom directory have to care about compilation/packaging and deploying of srcs
+ directory themselves. This can affect also testcase and resources, but testcases and
+ resources are still automatically prepared like they are in the other test types.
+There are three reproducers – simpletest1, simpletest2 and deadlocktest, which tests 
+ test’s suite itself and serve as examples of behaviour.
+
+Directory "signed" is listed in Makefile.am. You can specify as much to-be-signed
+directories as you want. And jars in each of those signed directories will be 
+signed  by their's own unique key (number of signed directories == number of certificates).
+Do not forget to add each this directory into list n Makefile.am
+
+If the name of a folder in simple/signed is composed of dots, then its contents
+ are deployed from under a directory structure such that each part evaluates to
+ a folder. For example, my.dir.reproducer/ will be deployed as jnlp_test_server/my/dir/reproducer.jar.
+
+Inside custom directory are expected directories which are handling themselves.
+ The only strictly necessary file is custom/reproducerName/srcs/Makefile. Upon 
+ all custom/*/srcs are then launched make prepare-reproducer and during cleaning make 
+ clean-reproducer. Those targets are run after all simple and signed reproducers are
+ prepared, so they can reuse components of the simple and signed reproducers, eg 
+ certificates or dependencies. to keep this custom makefiles as simple as possible. 
+ Some comment in makefile or readme file is recommended for each custom reproducer
+ to tell dependencies and what it does. Some readme (or comment in classes) is good
+  advice for any reproducer anyway;)
+Because of automake only small set of variables from icedtea-web Makefile is 
+ available for custom makefiles, but feel free to export others if needed.

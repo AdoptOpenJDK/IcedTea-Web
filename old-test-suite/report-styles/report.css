@@ -1,0 +1,26 @@
+div.passed {background-color:green;height:auto }
+div.failed {background-color:red ;height:auto}
+div.ignored {background-color:yellow ;height:auto}
+
+div.clazz {display:inline }
+div.method {display:inline }
+
+div.result {display:block; border: thin solid black ;height:auto}
+div.status {display:inline; }
+div.wtrace {display:inline; border: thin solid black; float: right;height:auto}
+div.theader {display:block; border: thin solid black}
+div.trace {display:block; border: thin solid black}
+
+div.space-line {  clear: both; margin: 0; padding: 0; width: auto;}
+
+div.tablee {width:200px; border: thin solid black; }
+div.row { border: thin solid black; }
+div.cell1 {display:inline; float: left;height:auto}
+div.cell2 {display:inline; float: right;height:auto}
+
+a.classSumaryName{font-weight:bold}
+
+a.logLink:link {color: black}
+a.logLink:active {color: black; }
+a.logLink:visited {color: black;}
+a.logLink:hover {color: black;font-weight: bolder;}

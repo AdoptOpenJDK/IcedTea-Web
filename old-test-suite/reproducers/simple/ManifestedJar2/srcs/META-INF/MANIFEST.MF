@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: ManifestedJar2
+Application-Name: ManifestedJar2
+

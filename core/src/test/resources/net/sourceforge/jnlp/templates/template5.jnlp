@@ -1,0 +1,23 @@
+<?xml version="*"?>
+<jnlp spec="*" 
+      codebase="*" 
+      href="*"    
+      >
+ 
+ <information>
+<!-- This is my comment-->
+    <title>*</title>
+    <vendor>*</vendor>
+    <offline-allowed/>
+  </information>
+
+<!-- This is my comment-->
+
+  <resources>
+    <j2se version='*' />
+    <jar href='*' main='*' />
+  </resources>
+
+
+  <application-desc <!-- This is my comment--> main-class='*' />
+</jnlp>

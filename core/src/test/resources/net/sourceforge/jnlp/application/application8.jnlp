@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.2+" codebase="file:///home/smohammad/Desktop/Test/" href="Sample2.jnlp">
+  <information>
+    <title>Sample</title>
+    <vendor>RedHat</vendor>
+    <description>This is a sample to test a bug</description>
+    <offline-allowed />
+    <icon href="red.gif" />
+  </information>
+  <resources>
+    <jar version="1.2+" href="myResource2.jar" />
+  </resources>
+  <application-desc main-class="test.Runner" />
+</jnlp>

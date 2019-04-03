@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase=".">
+    <information>
+        <title>OriginalCodebase FakeCodebase</title>
+        <vendor>IcedTea</vendor>
+    </information>
+    <resources>
+        <jar href="FakeCodebase.jar" main="true"/>
+    </resources>
+    <application-desc main-class="FakeCodebase"/>
+</jnlp>
+
+<!-- FakeCodebase0 -->

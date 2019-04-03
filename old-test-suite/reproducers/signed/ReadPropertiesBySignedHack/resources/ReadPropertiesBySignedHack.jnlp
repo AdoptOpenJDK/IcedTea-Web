@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase="./"
+      href="ReadPropertiesBySignedHack.jnlp">
+    <information>
+        <title>read properties using System.getenv()</title>
+        <vendor>IcedTea</vendor>
+    </information>
+    <resources>
+        <jar href="ReadPropertiesBySignedHack.jar" main="true"/>
+        <jar href="ReadProperties.jar" main="false" download="lazy"/>  
+    </resources>
+    <application-desc main-class="ReadPropertiesBySignedHack">
+      <argument>user.name</argument>
+    </application-desc>
+     <security>
+      <all-permissions/>
+    </security>
+</jnlp>

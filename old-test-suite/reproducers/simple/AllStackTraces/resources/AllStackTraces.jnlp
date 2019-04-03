@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase="./"
+      href="AllStackTraces.jnlp">
+   <information> 
+      <title>Test Thread.getAllStackTraces</title> 
+      <vendor>IcedTea</vendor>
+   </information> 
+   <resources>
+      <jar href="AllStackTraces.jar" main="true" download="eager"/>
+   </resources>
+   <application-desc main-class="AllStackTraces"/>
+</jnlp> 

@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Codebase: http://localhost https://localhost
+Application-Name: CodeBaseManifestEntryUnsignedMatching
+

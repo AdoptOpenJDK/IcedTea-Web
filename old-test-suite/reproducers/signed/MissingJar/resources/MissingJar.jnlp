@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase="./"
+      href="MissingJar.jnlp">
+   <information> 
+      <title>test MissingJar</title> 
+      <vendor>IcedTea</vendor>
+   </information> 
+   <resources>
+      <!-- MissingJar is name of reproducer and of main jar,
+      so MissingJar.jar is presented unlike the ThisOneIsMissing jar  -->
+      <jar href="MissingJar.jar" main="true" />
+   </resources>
+   <resources>
+      <jar href="ThisOneIsMissing.jar"  />
+   </resources>
+   <application-desc main-class="MissingJar"/>
+   <security>
+      <all-permissions/>
+   </security>
+</jnlp>

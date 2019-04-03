@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0"
+      codebase="./"
+      href="CacheReproducer1.jnlp">
+    <information>
+        <title>Just prints out "Good simple javaws exapmle" using reflection call from CacheReproducer.jar SimpletestSigned1.jar</title>
+        <vendor>IcedTea</vendor>
+    </information>
+    <resources>
+        <jar href="CacheReproducer.jar" main="true"/>
+        <jar href="SimpletestSigned1.jar" main="false" download="eager"/>  
+    </resources>
+    <application-desc main-class="CacheReproducer"/>
+     <security>
+      <all-permissions/>
+    </security>
+</jnlp>

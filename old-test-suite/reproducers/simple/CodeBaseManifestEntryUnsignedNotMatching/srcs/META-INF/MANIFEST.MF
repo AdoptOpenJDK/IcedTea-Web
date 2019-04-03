@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Codebase: somthingWhatShould mustNeverMatch
+Application-Name: CodeBaseManifestEntryUnsignedNotMatching
+

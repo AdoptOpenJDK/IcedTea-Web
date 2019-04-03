@@ -1,0 +1,2 @@
+Trusted-only: true
+Application-Name: MixedSigningAndTrustedOnly

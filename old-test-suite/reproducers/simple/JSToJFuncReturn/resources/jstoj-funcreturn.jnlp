@@ -1,0 +1,22 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="." href="jstoj-funcreturn.jnlp">
+    <information>
+        <title>JavaScript to Java LiveConnect - FuncReturn</title>
+        <vendor>RedHat</vendor>
+        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
+        <description>LiveConnect - tests to process various return types from Java side function calls.</description>
+    </information>
+    <resources>
+        <!-- Application Resources -->
+        <j2se version="1.6+" />
+        <jar href="JSToJFuncReturn.jar" main="true" />
+
+    </resources>
+    <applet-desc 
+         name="JS to J FuncReturn"
+         main-class="JSToJFuncReturn"
+         width="1000"
+         height="100">
+     </applet-desc>
+</jnlp>

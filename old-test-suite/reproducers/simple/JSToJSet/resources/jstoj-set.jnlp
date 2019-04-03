@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="." href="jstoj-set.jnlp">
+    <information>
+        <title>JavaScript to Java LiveConnect - Set</title>
+        <vendor>RedHat</vendor>
+        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
+        <description>LiveConnect - tests for setting members on Java side.</description>
+    </information>
+    <resources>
+        <!-- Application Resources -->
+        <j2se version="1.6+" />
+        <jar href="JSToJSet.jar" main="true" />
+    </resources>
+    <applet-desc 
+         name="JS to J Set"
+         main-class="JSToJSet"
+         width="1000"
+         height="100">
+     </applet-desc>
+</jnlp>
