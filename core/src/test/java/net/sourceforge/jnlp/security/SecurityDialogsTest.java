@@ -69,6 +69,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class SecurityDialogsTest extends NoStdOutErrTest {
 
     private static boolean wasHeadless;
@@ -205,7 +206,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     @Test(timeout = 10000)//if gui pops up
-    @Ignore
     public void testDialogsHeadlessTrustAllPrompt() throws Exception {
         JNLPRuntime.setHeadless(true);
         JNLPRuntime.setTrustAll(true);
@@ -228,7 +228,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     @Test(timeout = 10000)//if gui pops up
-    @Ignore
     public void testDialogsHeadlessTrustNonePrompt() throws Exception {
         JNLPRuntime.setHeadless(true);
         JNLPRuntime.setTrustAll(false);
@@ -496,7 +495,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     @Test(timeout = 10000)//if gui pops up
-    @Ignore
     public void testDialogsNotHeadlessTrustNonePrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
         JNLPRuntime.setTrustAll(false);//should notmetter
@@ -539,7 +537,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     @Test(timeout = 10000)//if gui pops up
-    @Ignore
     public void testUnsignedDialogsNotHeadlessTrustNonePrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
         JNLPRuntime.setTrustAll(false);
@@ -651,7 +648,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     @Test(timeout = 10000)//if gui pops up
-    @Ignore
     public void testRemeberBehaviour() throws Exception {
         File f = PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile();
         try {

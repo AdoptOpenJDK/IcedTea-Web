@@ -49,8 +49,10 @@ import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.TextOutli
 import net.sourceforge.jnlp.splashscreen.parts.InfoItem;
 import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class SplashScreenTest extends JDialog {
 
     static int width = JNLPSplashScreen.DEF_WIDTH;

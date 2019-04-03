@@ -58,6 +58,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
@@ -131,6 +132,7 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     @Remote
+    @Ignore
     public void testResourceLoadSuccessCachingApplet() throws Exception {
         setApplet();
         //so new resource again not in cache

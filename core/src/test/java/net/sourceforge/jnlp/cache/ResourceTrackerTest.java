@@ -58,6 +58,7 @@ import java.util.List;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import net.sourceforge.jnlp.ServerAccess;
@@ -263,6 +264,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
     }
 
     @Test
+    @Ignore
     public void testDownloadResource() throws IOException {
         String s = "hello";
         File f = downloadServer.getDir();
